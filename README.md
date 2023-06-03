@@ -129,7 +129,7 @@ Licensed under the GNU General Public License, Version 3
 
 ipuz is a trademark of Puzzazz, used with permission
 
-[changelogs]: https://yourealwaysbe.github.io/forkyz/changes.html
+[changelogs]: https://hague.gitlab.io/forkyz/changes.html
 [forkyz-scanner]: https://gitlab.com/Hague/forkyzscanner
 [gnome-crosswords]: https://gitlab.gnome.org/jrb/crosswords
-[online-sources]: https://yourealwaysbe.github.io/forkyz/
+[online-sources]: https://hague.gitlab.io/forkyz/
