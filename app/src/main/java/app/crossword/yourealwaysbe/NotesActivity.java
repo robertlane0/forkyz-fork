@@ -560,6 +560,9 @@ public class NotesActivity extends PuzzleActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
+        if (!super.onPrepareOptionsMenu(menu))
+            return false;
+
         MenuItem specialEntry = menu.findItem(R.id.puzzle_menu_special_entry);
 
         boolean specialEntryEnabled = getCurrentFocus() == boardView;
