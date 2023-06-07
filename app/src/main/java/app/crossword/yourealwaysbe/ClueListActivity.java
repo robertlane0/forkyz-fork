@@ -9,11 +9,11 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat;
 
 import app.crossword.yourealwaysbe.forkyz.R;
+import app.crossword.yourealwaysbe.forkyz.databinding.ClueListBinding;
 import app.crossword.yourealwaysbe.puz.Box;
 import app.crossword.yourealwaysbe.puz.Clue;
 import app.crossword.yourealwaysbe.puz.ClueID;
@@ -25,10 +25,8 @@ import app.crossword.yourealwaysbe.puz.Zone;
 import app.crossword.yourealwaysbe.util.KeyboardManager;
 import app.crossword.yourealwaysbe.util.VoiceCommands.VoiceCommand;
 import app.crossword.yourealwaysbe.view.BoardEditView.BoardClickListener;
-import app.crossword.yourealwaysbe.view.BoardWordEditView;
 import app.crossword.yourealwaysbe.view.ClueEditDialog;
 import app.crossword.yourealwaysbe.view.ClueTabs;
-import app.crossword.yourealwaysbe.view.ForkyzKeyboard;
 
 public class ClueListActivity extends PuzzleActivity
                               implements ClueTabs.ClueTabsListener {
@@ -38,10 +36,8 @@ public class ClueListActivity extends PuzzleActivity
 
     private static final String PREF_SHOW_WORDS = "showWordsInClueList";
 
+    private ClueListBinding binding;
     private KeyboardManager keyboardManager;
-    private BoardWordEditView boardView;
-    private ClueTabs clueTabs;
-    private View rootView;
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -83,19 +79,17 @@ public class ClueListActivity extends PuzzleActivity
             return;
         }
 
-        setContentView(R.layout.clue_list);
+        binding = ClueListBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         super.onCreate(icicle);
 
         utils.holographic(this);
         utils.finishOnHomeButton(this);
 
-        this.rootView = this.findViewById(android.R.id.content);
+        binding.miniboard.setAllowOverScroll(false);
 
-        this.boardView = this.findViewById(R.id.miniboard);
-        this.boardView.setAllowOverScroll(false);
-
-        this.boardView.addBoardClickListener(new BoardClickListener() {
+        binding.miniboard.addBoardClickListener(new BoardClickListener() {
             @Override
             public void onClick(Position position, Word previousWord) {
                 displayKeyboard();
@@ -107,28 +101,27 @@ public class ClueListActivity extends PuzzleActivity
             }
         });
         ViewCompat.replaceAccessibilityAction(
-            boardView,
+            binding.miniboard,
             AccessibilityActionCompat.ACTION_LONG_CLICK,
             getText(R.string.open_clue_notes),
             null
         );
 
-        this.clueTabs = this.findViewById(R.id.clueListClueTabs);
-
-        this.clueTabs.setOnClueLongClickDescription(
+        binding.clueTabs.setOnClueLongClickDescription(
             getString(R.string.open_clue_notes)
         );
-        this.clueTabs.setOnClueClickDescription(
+        binding.clueTabs.setOnClueClickDescription(
             getString(R.string.select_clue)
         );
 
-        ForkyzKeyboard keyboard = (ForkyzKeyboard) findViewById(R.id.keyboard);
-        keyboardManager = new KeyboardManager(this, keyboard, boardView);
+        keyboardManager = new KeyboardManager(
+            this, binding.keyboard, binding.miniboard
+        );
 
         setupVoiceButtons();
         setupVoiceCommands();
 
-        addAccessibilityActions(this.boardView);
+        addAccessibilityActions(binding.miniboard);
     }
 
     @Override
@@ -147,13 +140,13 @@ public class ClueListActivity extends PuzzleActivity
             return;
         }
 
-        boardView.setBoard(board);
+        binding.miniboard.setBoard(board);
 
         setupShowWordsMode();
 
-        clueTabs.setBoard(board);
-        clueTabs.addListener(this);
-        clueTabs.listenBoard();
+        binding.clueTabs.setBoard(board);
+        binding.clueTabs.addListener(this);
+        binding.clueTabs.listenBoard();
 
         keyboardManager.onResume();
 
@@ -280,10 +273,8 @@ public class ClueListActivity extends PuzzleActivity
 
         keyboardManager.onPause();
 
-        if (clueTabs != null) {
-            clueTabs.removeListener(this);
-            clueTabs.unlistenBoard();
-        }
+        binding.clueTabs.removeListener(this);
+        binding.clueTabs.unlistenBoard();
     }
 
     @Override
@@ -299,7 +290,7 @@ public class ClueListActivity extends PuzzleActivity
     }
 
     private void displayKeyboard() {
-        keyboardManager.showKeyboard(boardView);
+        keyboardManager.showKeyboard(binding.miniboard);
     }
 
     private void displayKeyboard(Word previousWord) {
@@ -310,7 +301,7 @@ public class ClueListActivity extends PuzzleActivity
             Position newPos = board.getHighlightLetter();
             if ((previousWord != null) &&
                 previousWord.checkInWord(newPos.getRow(), newPos.getCol())) {
-                keyboardManager.showKeyboard(boardView);
+                keyboardManager.showKeyboard(binding.miniboard);
             } else {
                 keyboardManager.hideKeyboard();
             }
@@ -327,18 +318,20 @@ public class ClueListActivity extends PuzzleActivity
      */
     private void selectFirstSelectableClue(boolean searchForwards) {
         boolean selectedClue = false;
-        String startPage = clueTabs.getCurrentPageListName();
+        String startPage = binding.clueTabs.getCurrentPageListName();
         do {
            selectedClue = selectFirstClue();
            if (!selectedClue) {
                if (searchForwards)
-                   clueTabs.nextPage();
+                   binding.clueTabs.nextPage();
                else
-                   clueTabs.prevPage();
+                   binding.clueTabs.prevPage();
             }
         } while (
             !selectedClue
-            && !Objects.equals(startPage, clueTabs.getCurrentPageListName())
+            && !Objects.equals(
+                startPage, binding.clueTabs.getCurrentPageListName()
+            )
         );
     }
 
@@ -350,9 +343,9 @@ public class ClueListActivity extends PuzzleActivity
     private boolean selectFirstClue() {
         Playboard board = getBoard();
         Puzzle puz = getPuzzle();
-        switch (clueTabs.getCurrentPageType()) {
+        switch (binding.clueTabs.getCurrentPageType()) {
         case CLUES:
-            String listName = clueTabs.getCurrentPageListName();
+            String listName = binding.clueTabs.getCurrentPageListName();
             int firstClue = puz.getClues(listName).getFirstZonedIndex();
             if (firstClue < 0) {
                 return false;
@@ -391,11 +384,11 @@ public class ClueListActivity extends PuzzleActivity
 
     private void setupShowWordsMode() {
         if (isShowWordsInClueList()) {
-            boardView.setIncognitoMode(true);
-            clueTabs.setShowWords(true);
+            binding.miniboard.setIncognitoMode(true);
+            binding.clueTabs.setShowWords(true);
         } else {
-            boardView.setIncognitoMode(false);
-            clueTabs.setShowWords(false);
+            binding.miniboard.setIncognitoMode(false);
+            binding.clueTabs.setShowWords(false);
         }
     }
 
@@ -430,14 +423,14 @@ public class ClueListActivity extends PuzzleActivity
         registerVoiceCommand(new VoiceCommand(
             getString(R.string.command_next),
             args -> {
-                clueTabs.nextPage();
+                binding.clueTabs.nextPage();
                 selectFirstClue();
             }
         ));
         registerVoiceCommand(new VoiceCommand(
             getString(R.string.command_previous),
             args -> {
-                clueTabs.prevPage();
+                binding.clueTabs.prevPage();
                 selectFirstClue();
             }
         ));
@@ -461,7 +454,7 @@ public class ClueListActivity extends PuzzleActivity
         if (!board.getHighlightLetter().equals(first)) {
             board.moveZoneBack(false);
         } else {
-            clueTabs.prevPage();
+            binding.clueTabs.prevPage();
             selectFirstSelectableClue(false);
         }
     }
@@ -476,7 +469,7 @@ public class ClueListActivity extends PuzzleActivity
         if (!board.getHighlightLetter().equals(last)) {
             board.moveZoneForward(false);
         } else {
-            clueTabs.nextPage();
+            binding.clueTabs.nextPage();
             selectFirstSelectableClue(true);
         }
     }
@@ -494,9 +487,9 @@ public class ClueListActivity extends PuzzleActivity
         if (curList != null && curClueIndex >= 0) {
             int prev = puz.getClues(curList)
                 .getPreviousZonedIndex(curClueIndex, true);
-            clueTabs.setForceSnap(true);
+            binding.clueTabs.setForceSnap(true);
             board.jumpToClue(new ClueID(curList, prev));
-            clueTabs.setForceSnap(false);
+            binding.clueTabs.setForceSnap(false);
         } else {
             selectFirstSelectableClue(false);
         }
@@ -515,9 +508,9 @@ public class ClueListActivity extends PuzzleActivity
         if (curList != null && curClueIndex >= 0) {
             int next = puz.getClues(curList)
                 .getNextZonedIndex(curClueIndex, true);
-            clueTabs.setForceSnap(true);
+            binding.clueTabs.setForceSnap(true);
             board.jumpToClue(new ClueID(curList, next));
-            clueTabs.setForceSnap(false);
+            binding.clueTabs.setForceSnap(false);
         } else {
             selectFirstSelectableClue(true);
         }
