@@ -358,7 +358,7 @@ public class PlayActivity extends PuzzleActivity
             this.handler.postDelayed(fitToScreenTask, 100);
         }
 
-        setupVoiceButtons();
+        setupVoiceButtons(binding.voiceButtonsInclude);
         setupVoiceCommands();
 
         addAccessibilityActions(binding.boardView);

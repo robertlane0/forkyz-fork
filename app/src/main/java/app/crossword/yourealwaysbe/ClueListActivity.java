@@ -118,7 +118,7 @@ public class ClueListActivity extends PuzzleActivity
             this, binding.keyboard, binding.miniboard
         );
 
-        setupVoiceButtons();
+        setupVoiceButtons(binding.voiceButtonsInclude);
         setupVoiceCommands();
 
         addAccessibilityActions(binding.miniboard);

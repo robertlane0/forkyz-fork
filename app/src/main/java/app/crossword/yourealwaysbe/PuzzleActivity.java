@@ -30,6 +30,7 @@ import org.jg.wordstonumbers.WordsToNumbersUtil;
 
 import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
 import app.crossword.yourealwaysbe.forkyz.R;
+import app.crossword.yourealwaysbe.forkyz.databinding.VoiceButtonsBinding;
 import app.crossword.yourealwaysbe.net.ChatGPTHelp;
 import app.crossword.yourealwaysbe.puz.Box;
 import app.crossword.yourealwaysbe.puz.Clue;
@@ -77,13 +78,11 @@ public abstract class PuzzleActivity
 
     private static final String HELP_RESPONSE_TEXT = "helpResponse";
 
+    private VoiceButtonsBinding voiceBinding = null;
     private boolean firstPlay = false;
     private ImaginaryTimer timer;
     private Handler handler = new Handler(Looper.getMainLooper());
     private PlayboardTextRenderer textRenderer;
-    private View voiceButtonContainer;
-    private View voiceButton;
-    private View announceClueButton;
     private TextToSpeech ttsService = null;
     private boolean ttsReady = false;
 
@@ -692,32 +691,33 @@ public abstract class PuzzleActivity
         return prefs.getBoolean(PREF_BUTTON_ANNOUNCE_CLUE, false);
     }
 
-    protected void setupVoiceButtons() {
-        this.voiceButtonContainer
-            = this.findViewById(R.id.voice_buttons_container);
-        this.voiceButton
-            = this.findViewById(R.id.voice_button);
-        this.announceClueButton
-            = this.findViewById(R.id.announce_clue_button);
-        voiceButton.setOnClickListener(view -> {
+    protected void setupVoiceButtons(VoiceButtonsBinding binding) {
+        voiceBinding = binding;
+        if (voiceBinding == null)
+            return;
+
+        voiceBinding.voiceButton.setOnClickListener(view -> {
             launchVoiceInput();
         });
-        announceClueButton.setOnClickListener(view -> {
+        voiceBinding.announceClueButton.setOnClickListener(view -> {
             announceClue(false);
         });
     }
 
     protected void setVoiceButtonVisibility() {
+        if (voiceBinding == null)
+            return;
+
         boolean anyButton
             = isButtonActivatesVoicePref() || isButtonAnnounceCluePref();
 
-        voiceButtonContainer.setVisibility(
+        voiceBinding.voiceButtonsContainer.setVisibility(
             anyButton ? View.VISIBLE : View.GONE
         );
-        voiceButton.setVisibility(
+        voiceBinding.voiceButton.setVisibility(
             isButtonActivatesVoicePref() ? View.VISIBLE : View.GONE
         );
-        announceClueButton.setVisibility(
+        voiceBinding.announceClueButton.setVisibility(
             isButtonAnnounceCluePref() ? View.VISIBLE : View.GONE
         );
     }

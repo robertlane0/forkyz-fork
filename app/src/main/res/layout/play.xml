@@ -49,6 +49,7 @@
         >
             <include
                 layout="@layout/voice_buttons"
+                android:id="@+id/voice_buttons_include"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
             />

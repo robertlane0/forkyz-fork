@@ -288,7 +288,7 @@ public class NotesActivity extends PuzzleActivity {
             isPuzzleNotes() ? binding.scratchMiniboard : binding.miniboard
         );
 
-        setupVoiceButtons();
+        setupVoiceButtons(binding.voiceButtonsInclude);
         setupVoiceCommands();
 
         addAccessibilityActions(binding.miniboard);
