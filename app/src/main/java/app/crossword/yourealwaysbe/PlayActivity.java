@@ -22,7 +22,6 @@ import android.view.View.OnLongClickListener;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.TextView;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat;
@@ -34,6 +33,7 @@ import com.squareup.seismic.ShakeDetector;
 
 import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
 import app.crossword.yourealwaysbe.forkyz.R;
+import app.crossword.yourealwaysbe.forkyz.databinding.PlayBinding;
 import app.crossword.yourealwaysbe.puz.Box;
 import app.crossword.yourealwaysbe.puz.Clue;
 import app.crossword.yourealwaysbe.puz.ClueID;
@@ -46,7 +46,6 @@ import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.util.KeyboardManager;
 import app.crossword.yourealwaysbe.util.VoiceCommands.VoiceCommand;
 import app.crossword.yourealwaysbe.view.BoardEditView.BoardClickListener;
-import app.crossword.yourealwaysbe.view.BoardEditView;
 import app.crossword.yourealwaysbe.view.ClueTabs;
 import app.crossword.yourealwaysbe.view.ForkyzKeyboard;
 import app.crossword.yourealwaysbe.view.PuzzleInfoDialogs;
@@ -76,13 +75,12 @@ public class PlayActivity extends PuzzleActivity
     public static final String SCALE = "scale";
     private static final String PREF_RANDOM_CLUE_ON_SHAKE = "randomClueOnShake";
 
-    private ClueTabs clueTabs;
-    private ConstraintLayout constraintLayout;
+    private PlayBinding binding;
+    // clue may be TextView in layout or action bar
+    private TextView clue;
     private Handler handler = new Handler(Looper.getMainLooper());
     private KeyboardManager keyboardManager;
     private MovementStrategy movement = null;
-    private BoardEditView boardView;
-    private TextView clue;
     private boolean hasInitialValues = false;
     private ShakeDetector shakeDetector = null;
 
@@ -114,18 +112,7 @@ public class PlayActivity extends PuzzleActivity
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        setContentView(R.layout.play);
-
         super.onCreate(savedInstanceState);
-
-        utils.holographic(this);
-        utils.finishOnHomeButton(this);
-
-        setDefaultKeyMode(Activity.DEFAULT_KEYS_DISABLE);
-
-        MovementStrategy movement = getMovementStrategy();
-
-        setFullScreenMode();
 
         // board is loaded by BrowseActivity and put into the
         // Application, onResume sets up PlayActivity for current board
@@ -139,17 +126,24 @@ public class PlayActivity extends PuzzleActivity
             return;
         }
 
-        setContentView(R.layout.play);
+        binding = PlayBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        this.constraintLayout
-            = (ConstraintLayout) this.findViewById(R.id.playConstraintLayout);
+        utils.holographic(this);
+        utils.finishOnHomeButton(this);
 
-        this.clue = this.findViewById(R.id.clueLine);
-        if (clue != null && clue.getVisibility() != View.GONE) {
+        setDefaultKeyMode(Activity.DEFAULT_KEYS_DISABLE);
+
+        MovementStrategy movement = getMovementStrategy();
+
+        setFullScreenMode();
+
+        clue = binding.clueLine;
+        if (clue.getVisibility() != View.GONE) {
             ConstraintSet set = new ConstraintSet();
-            set.clone(constraintLayout);
+            set.clone(binding.constraintLayout);
             set.setVisibility(clue.getId(), ConstraintSet.GONE);
-            set.applyTo(constraintLayout);
+            set.applyTo(binding.constraintLayout);
 
             View custom = utils.onActionBarCustom(this, R.layout.clue_line_only);
             if (custom != null) {
@@ -157,22 +151,17 @@ public class PlayActivity extends PuzzleActivity
             }
         }
 
-        this.boardView = (BoardEditView) this.findViewById(R.id.board);
-        this.clueTabs = this.findViewById(R.id.playClueTab);
-
-        this.clueTabs.setOnClueLongClickDescription(
+        binding.clueTabs.setOnClueLongClickDescription(
             getString(R.string.open_clue_notes)
         );
-        this.clueTabs.setOnClueClickDescription(
+        binding.clueTabs.setOnClueClickDescription(
             getString(R.string.select_clue)
         );
-        this.clueTabs.setOnBarLongClickDescription(
+        binding.clueTabs.setOnBarLongClickDescription(
             getString(R.string.toggle_clue_tabs)
         );
 
-        ForkyzKeyboard keyboardView
-            = (ForkyzKeyboard) this.findViewById(R.id.keyboard);
-        keyboardView.setSpecialKeyListener(
+        binding.keyboardView.setSpecialKeyListener(
             new ForkyzKeyboard.SpecialKeyListener() {
                 @Override
                 public void onKeyDown(@ForkyzKeyboard.SpecialKey int key) {
@@ -199,7 +188,11 @@ public class PlayActivity extends PuzzleActivity
             }
         );
 
-        keyboardManager = new KeyboardManager(this, keyboardView, boardView);
+        keyboardManager = new KeyboardManager(
+            this,
+            binding.keyboardView,
+            binding.boardView
+        );
 
         board.setSkipCompletedLetters(
             this.prefs.getBoolean("skipFilled", false)
@@ -236,8 +229,8 @@ public class PlayActivity extends PuzzleActivity
             );
         }
 
-        this.registerForContextMenu(boardView);
-        boardView.addBoardClickListener(new BoardClickListener() {
+        this.registerForContextMenu(binding.boardView);
+        binding.boardView.addBoardClickListener(new BoardClickListener() {
             @Override
             public void onClick(Position position, Word previousWord) {
                 displayKeyboard(previousWord);
@@ -250,7 +243,7 @@ public class PlayActivity extends PuzzleActivity
             }
         });
         ViewCompat.replaceAccessibilityAction(
-            boardView,
+            binding.boardView,
             AccessibilityActionCompat.ACTION_LONG_CLICK,
             getText(R.string.open_clue_notes),
             null
@@ -258,92 +251,97 @@ public class PlayActivity extends PuzzleActivity
 
         // constrain to 1:1 if clueTabs is showing
         // or half of screen if acrostic
-        boardView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-            public void onLayoutChange(View v,
-              int left, int top, int right, int bottom,
-              int leftWas, int topWas, int rightWas, int bottomWas
-            ) {
-                boolean constrainedDims = false;
+        binding.boardView.addOnLayoutChangeListener(
+            new View.OnLayoutChangeListener() {
+                public void onLayoutChange(View v,
+                  int left, int top, int right, int bottom,
+                  int leftWas, int topWas, int rightWas, int bottomWas
+                ) {
+                    boolean constrainedDims = false;
 
-                ConstraintSet set = new ConstraintSet();
-                set.clone(constraintLayout);
+                    ConstraintSet set = new ConstraintSet();
+                    set.clone(binding.constraintLayout);
 
-                boolean showCluesTab = PlayActivity.this.prefs.getBoolean(
-                    SHOW_CLUES_TAB, true
-                );
+                    boolean showCluesTab = PlayActivity.this.prefs.getBoolean(
+                        SHOW_CLUES_TAB, true
+                    );
 
-                if (showCluesTab) {
-                    int height = bottom - top;
-                    int width = right - left;
+                    if (showCluesTab) {
+                        int height = bottom - top;
+                        int width = right - left;
 
-                    int orientation
-                        = PlayActivity.this
-                            .getResources()
-                            .getConfiguration()
-                            .orientation;
+                        int orientation
+                            = PlayActivity.this
+                                .getResources()
+                                .getConfiguration()
+                                .orientation;
 
-                    boolean portrait
-                        = orientation == Configuration.ORIENTATION_PORTRAIT;
+                        boolean portrait
+                            = orientation == Configuration.ORIENTATION_PORTRAIT;
 
-                    if (portrait) {
-                        int maxHeight = 0;
-                        if (isAcrostic()) {
-                            DisplayMetrics metrics
-                                = getResources().getDisplayMetrics();
-                            maxHeight = (int)(
-                                ACROSTIC_BOARD_HEIGHT_RATIO_MIN
-                                    * metrics.heightPixels
-                            );
-                            Puzzle puz = getPuzzle();
-                            if (puz != null) {
-                                int proportionalHeight = (int)(
-                                    ((float) puz.getHeight()) / puz.getWidth()
-                                        * metrics.widthPixels
+                        if (portrait) {
+                            int maxHeight = 0;
+                            if (isAcrostic()) {
+                                DisplayMetrics metrics
+                                    = getResources().getDisplayMetrics();
+                                maxHeight = (int)(
+                                    ACROSTIC_BOARD_HEIGHT_RATIO_MIN
+                                        * metrics.heightPixels
                                 );
-                                maxHeight = Math.max(
-                                    maxHeight, proportionalHeight
+                                Puzzle puz = getPuzzle();
+                                if (puz != null) {
+                                    int proportionalHeight = (int)(
+                                        ((float) puz.getHeight())
+                                            / puz.getWidth()
+                                            * metrics.widthPixels
+                                    );
+                                    maxHeight = Math.max(
+                                        maxHeight, proportionalHeight
+                                    );
+                                }
+                            } else {
+                                maxHeight = (int)(BOARD_DIM_RATIO * width);
+                            }
+
+                            if (height > maxHeight) {
+                                constrainedDims = true;
+                                set.constrainMaxHeight(
+                                    binding.boardView.getId(), maxHeight
                                 );
                             }
-                        } else {
-                            maxHeight = (int)(BOARD_DIM_RATIO * width);
                         }
-
-                        if (height > maxHeight) {
-                            constrainedDims = true;
-                            set.constrainMaxHeight(
-                                boardView.getId(), maxHeight
-                            );
-                        }
+                    } else {
+                        set.constrainMaxHeight(binding.boardView.getId(), 0);
                     }
-                } else {
-                    set.constrainMaxHeight(boardView.getId(), 0);
-                }
 
-                set.applyTo(constraintLayout);
+                    set.applyTo(binding.constraintLayout);
 
-                // if the view changed size, then rescale the view
-                // cannot change layout during a layout change, so
-                // use a predraw listener that requests a new layout
-                // and returns false to cancel the current draw
-                if (constrainedDims ||
-                    left != leftWas || right != rightWas ||
-                    top != topWas || bottom != bottomWas) {
-                    boardView.getViewTreeObserver()
-                             .addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-                        public boolean onPreDraw() {
-                            boardView.forceRedraw();
-                            PlayActivity.this
-                                        .boardView
-                                        .getViewTreeObserver()
-                                        .removeOnPreDrawListener(this);
-                            return false;
-                        }
-                    });
+                    // if the view changed size, then rescale the view
+                    // cannot change layout during a layout change, so
+                    // use a predraw listener that requests a new layout
+                    // and returns false to cancel the current draw
+                    if (constrainedDims ||
+                        left != leftWas || right != rightWas ||
+                        top != topWas || bottom != bottomWas) {
+                        binding.boardView
+                            .getViewTreeObserver()
+                            .addOnPreDrawListener(
+                                new ViewTreeObserver.OnPreDrawListener() {
+                                    public boolean onPreDraw() {
+                                        binding.boardView.forceRedraw();
+                                        binding.boardView
+                                            .getViewTreeObserver()
+                                            .removeOnPreDrawListener(this);
+                                        return false;
+                                    }
+                                }
+                            );
+                    }
                 }
             }
-        });
+        );
 
-        this.boardView.setScaleListener(new ScaleListener() {
+        binding.boardView.setScaleListener(new ScaleListener() {
             public void onScale(float newScale) {
                 prefs.edit().putFloat(SCALE, newScale).apply();
             }
@@ -363,11 +361,11 @@ public class PlayActivity extends PuzzleActivity
         setupVoiceButtons();
         setupVoiceCommands();
 
-        addAccessibilityActions(this.boardView);
+        addAccessibilityActions(binding.boardView);
     }
 
     private void fitBoardToScreen() {
-        float newScale = boardView.fitToView();
+        float newScale = binding.boardView.fitToView();
         prefs.edit().putFloat(SCALE, newScale).apply();
     }
 
@@ -604,22 +602,22 @@ public class PlayActivity extends PuzzleActivity
                 this.startActivity(i);
                 return true;
             } else if (id == R.id.play_menu_zoom_in) {
-                float newScale = boardView.zoomIn();
+                float newScale = binding.boardView.zoomIn();
                 prefs.edit().putFloat(SCALE, newScale).apply();
                 return true;
             } else if (id == R.id.play_menu_zoom_in_max) {
-                float newScale = boardView.zoomInMax();
+                float newScale = binding.boardView.zoomInMax();
                 this.prefs.edit().putFloat(SCALE, newScale).apply();
                 return true;
             } else if (id == R.id.play_menu_zoom_out) {
-                float newScale = boardView.zoomOut();
+                float newScale = binding.boardView.zoomOut();
                 this.prefs.edit().putFloat(SCALE, newScale).apply();
                 return true;
             } else if (id == R.id.play_menu_zoom_fit) {
                 fitBoardToScreen();
                 return true;
             } else if (id == R.id.play_menu_zoom_reset) {
-                float newScale = boardView.zoomReset();
+                float newScale = binding.boardView.zoomReset();
                 this.prefs.edit().putFloat(SCALE, newScale).apply();
                 return true;
             } else if (id == R.id.play_menu_info) {
@@ -737,10 +735,8 @@ public class PlayActivity extends PuzzleActivity
         if (board != null)
             board.removeListener(this);
 
-        if (clueTabs != null) {
-            clueTabs.removeListener(this);
-            clueTabs.unlistenBoard();
-        }
+        binding.clueTabs.removeListener(this);
+        binding.clueTabs.unlistenBoard();
 
         pauseShakeDetection();
     }
@@ -787,22 +783,18 @@ public class PlayActivity extends PuzzleActivity
 
         syncShowErrors();
 
-        if (boardView != null) {
-            boardView.setBoard(board);
+        binding.boardView.setBoard(board);
 
-            float scale = prefs.getFloat(SCALE, 1.0F);
-            scale = boardView.setCurrentScale(scale);
-            prefs.edit().putFloat(SCALE, scale).apply();
-        }
+        float scale = prefs.getFloat(SCALE, 1.0F);
+        scale = binding.boardView.setCurrentScale(scale);
+        prefs.edit().putFloat(SCALE, scale).apply();
 
-        if (clueTabs != null) {
-            clueTabs.setBoard(board);
-            clueTabs.setMaxWordScale(ACROSTIC_CLUE_TABS_WORD_SCALE);
-            clueTabs.setShowWords(isAcrostic());
-            clueTabs.setPage(prefs.getInt(CLUE_TABS_PAGE, 0));
-            clueTabs.addListener(this);
-            clueTabs.listenBoard();
-        }
+        binding.clueTabs.setBoard(board);
+        binding.clueTabs.setMaxWordScale(ACROSTIC_CLUE_TABS_WORD_SCALE);
+        binding.clueTabs.setShowWords(isAcrostic());
+        binding.clueTabs.setPage(prefs.getInt(CLUE_TABS_PAGE, 0));
+        binding.clueTabs.addListener(this);
+        binding.clueTabs.listenBoard();
 
         board.setSkipCompletedLetters(
             this.prefs.getBoolean("skipFilled", false)
@@ -810,7 +802,7 @@ public class PlayActivity extends PuzzleActivity
         board.setMovementStrategy(this.getMovementStrategy());
         board.addListener(this);
 
-        keyboardManager.attachKeyboardToView(boardView);
+        keyboardManager.attachKeyboardToView(binding.boardView);
 
         setClueText();
 
@@ -859,7 +851,7 @@ public class PlayActivity extends PuzzleActivity
             Position newPos = board.getHighlightLetter();
             if ((previous != null) &&
                 previous.checkInWord(newPos.getRow(), newPos.getCol())) {
-                keyboardManager.showKeyboard(boardView);
+                keyboardManager.showKeyboard(binding.boardView);
             } else {
                 keyboardManager.hideKeyboard();
             }
@@ -910,19 +902,21 @@ public class PlayActivity extends PuzzleActivity
      * Updates shared prefs.
      */
     private void showClueTabs() {
+        int clueTabsId = binding.clueTabs.getId();
+
         ConstraintSet set = new ConstraintSet();
-        set.clone(constraintLayout);
-        set.setVisibility(clueTabs.getId(), ConstraintSet.VISIBLE);
+        set.clone(binding.constraintLayout);
+        set.setVisibility(clueTabsId, ConstraintSet.VISIBLE);
         if (isAcrostic()) {
             DisplayMetrics metrics = getResources().getDisplayMetrics();
             int minHeight = (int)(
                 ACROSTIC_CLUE_TABS_HEIGHT_RATIO_MIN * metrics.heightPixels
             );
-            set.constrainMinHeight(clueTabs.getId(), minHeight);
+            set.constrainMinHeight(clueTabsId, minHeight);
         }
-        set.applyTo(constraintLayout);
+        set.applyTo(binding.constraintLayout);
 
-        clueTabs.setPage(prefs.getInt(CLUE_TABS_PAGE, 0));
+        binding.clueTabs.setPage(prefs.getInt(CLUE_TABS_PAGE, 0));
 
         SharedPreferences.Editor editor = prefs.edit();
         editor.putBoolean(SHOW_CLUES_TAB, true);
@@ -936,9 +930,9 @@ public class PlayActivity extends PuzzleActivity
      */
     private void hideClueTabs() {
         ConstraintSet set = new ConstraintSet();
-        set.clone(constraintLayout);
-        set.setVisibility(clueTabs.getId(), ConstraintSet.GONE);
-        set.applyTo(constraintLayout);
+        set.clone(binding.constraintLayout);
+        set.setVisibility(binding.clueTabs.getId(), ConstraintSet.GONE);
+        set.applyTo(binding.constraintLayout);
 
         SharedPreferences.Editor editor = prefs.edit();
         editor.putBoolean(SHOW_CLUES_TAB, false);
