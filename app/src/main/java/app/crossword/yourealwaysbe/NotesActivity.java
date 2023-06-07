@@ -17,8 +17,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.TextView;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat;
@@ -27,6 +25,7 @@ import androidx.fragment.app.DialogFragment;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import app.crossword.yourealwaysbe.forkyz.R;
+import app.crossword.yourealwaysbe.forkyz.databinding.NotesBinding;
 import app.crossword.yourealwaysbe.puz.Box;
 import app.crossword.yourealwaysbe.puz.Clue;
 import app.crossword.yourealwaysbe.puz.ClueID;
@@ -42,8 +41,6 @@ import app.crossword.yourealwaysbe.versions.AndroidVersionUtils;
 import app.crossword.yourealwaysbe.view.BoardEditText.BoardEditFilter;
 import app.crossword.yourealwaysbe.view.BoardEditText;
 import app.crossword.yourealwaysbe.view.BoardEditView.BoardClickListener;
-import app.crossword.yourealwaysbe.view.BoardWordEditView;
-import app.crossword.yourealwaysbe.view.ForkyzKeyboard;
 import app.crossword.yourealwaysbe.view.ScrollingImageView.Point;
 import app.crossword.yourealwaysbe.view.ScrollingImageView;
 
@@ -69,15 +66,10 @@ public class NotesActivity extends PuzzleActivity {
         BOARD_TO_ANAGRAM_SOL
     }
 
-    protected KeyboardManager keyboardManager;
+    private NotesBinding binding;
+    private KeyboardManager keyboardManager;
+    // may be layout clueLine or action bar clue line
     private TextView clueLine;
-    private TextView boardViewLabel;
-    private BoardWordEditView boardView;
-    private EditText notesBox;
-    private BoardEditText scratchView;
-    private BoardEditText anagramSourceView;
-    private BoardEditText anagramSolView;
-    private CheckBox flagClue;
 
     private Random rand = new Random();
 
@@ -107,15 +99,16 @@ public class NotesActivity extends PuzzleActivity {
             return;
         }
 
-        setContentView(R.layout.notes);
+        binding = NotesBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         super.onCreate(icicle);
 
         utils.holographic(this);
         utils.finishOnHomeButton(this);
 
-        clueLine = (TextView) this.findViewById(R.id.clueLine);
-        if (clueLine != null && clueLine.getVisibility() != View.GONE) {
+        clueLine = binding.clueLine;
+        if (clueLine.getVisibility() != View.GONE) {
             clueLine.setVisibility(View.GONE);
             clueLine
                 = (TextView) utils
@@ -129,25 +122,25 @@ public class NotesActivity extends PuzzleActivity {
             clueLine, 5, clueTextSize, 1, TypedValue.COMPLEX_UNIT_SP
         );
 
-        boardViewLabel = this.findViewById(R.id.boardLab);
-        boardView = this.findViewById(R.id.miniboard);
-        boardView.setAllowOverScroll(false);
-        boardView.addBoardClickListener(new BoardClickListener() {
+        binding.miniboard.setAllowOverScroll(false);
+        binding.miniboard.addBoardClickListener(new BoardClickListener() {
             @Override
             public void onClick(Position position, Word previousWord) {
-                NotesActivity.this.keyboardManager.showKeyboard(boardView);
+                NotesActivity.this
+                    .keyboardManager
+                    .showKeyboard(binding.miniboard);
             }
 
             @Override
             public void onLongClick(Position position) {
                 View focused = getWindow().getCurrentFocus();
                 int id = focused.getId();
-                if (id == R.id.scratchMiniboard) {
+                if (id == R.id.scratch_miniboard) {
                     NotesActivity.this.executeTransferResponseRequest(
                         TransferResponseRequest.BOARD_TO_SCRATCH, true
                     );
                 } else if (
-                    id == R.id.anagramSolution || id == R.id.anagramSource
+                    id == R.id.anagram_solution || id == R.id.anagram_source
                 ) {
                     NotesActivity.this.executeTransferResponseRequest(
                         TransferResponseRequest.BOARD_TO_ANAGRAM_SOL, true
@@ -156,13 +149,13 @@ public class NotesActivity extends PuzzleActivity {
             }
         });
         ViewCompat.replaceAccessibilityAction(
-            boardView,
+            binding.miniboard,
             AccessibilityActionCompat.ACTION_LONG_CLICK,
             getText(R.string.transfer_board_to_scratch_or_anagram),
             null
         );
 
-        boardView.setOnKeyListener(new View.OnKeyListener() {
+        binding.miniboard.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View view, int keyCode, KeyEvent event) {
                 if (event.getAction() == KeyEvent.ACTION_UP)
@@ -171,7 +164,7 @@ public class NotesActivity extends PuzzleActivity {
                     return false;
             }
         });
-        boardView.setOnFocusChangeListener(
+        binding.miniboard.setOnFocusChangeListener(
             new View.OnFocusChangeListener() {
                 @Override
                 public void onFocusChange(View v, boolean gainFocus) {
@@ -180,9 +173,7 @@ public class NotesActivity extends PuzzleActivity {
             }
         );
 
-        notesBox = (EditText) this.findViewById(R.id.notesBox);
-
-        notesBox.setOnLongClickListener(new View.OnLongClickListener() {
+        binding.notesBox.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 NotesActivity.this.moveScratchToNote();
@@ -190,13 +181,13 @@ public class NotesActivity extends PuzzleActivity {
             }
         });
         ViewCompat.replaceAccessibilityAction(
-            notesBox,
+            binding.notesBox,
             AccessibilityActionCompat.ACTION_LONG_CLICK,
             getText(R.string.transfer_scratch_to_notes),
             null
         );
 
-        notesBox.setOnFocusChangeListener(
+        binding.notesBox.setOnFocusChangeListener(
             new View.OnFocusChangeListener() {
                 @Override
                 public void onFocusChange(View v, boolean gainFocus) {
@@ -205,18 +196,17 @@ public class NotesActivity extends PuzzleActivity {
             }
         );
         if (isPuzzleNotes()) {
-            notesBox.setHint(getString(R.string.general_puzzle_notes));
+            binding.notesBox.setHint(getString(R.string.general_puzzle_notes));
         }
 
-        scratchView = (BoardEditText) this.findViewById(R.id.scratchMiniboard);
-        scratchView.setContextMenuListener(
+        binding.scratchMiniboard.setContextMenuListener(
             new ScrollingImageView.ClickListener() {
                 @Override
                 public void onTap(Point point) {
                     NotesActivity
                         .this
                         .keyboardManager
-                        .showKeyboard(scratchView);
+                        .showKeyboard(binding.scratchMiniboard);
                 }
 
                 @Override
@@ -230,51 +220,50 @@ public class NotesActivity extends PuzzleActivity {
             }
         );
         ViewCompat.replaceAccessibilityAction(
-            scratchView,
+            binding.scratchMiniboard,
             AccessibilityActionCompat.ACTION_LONG_CLICK,
             getText(R.string.transfer_scratch_to_board),
             null
         );
 
-        anagramSourceView = (BoardEditText) this.findViewById(R.id.anagramSource);
-        anagramSolView = (BoardEditText) this.findViewById(R.id.anagramSolution);
-
-        anagramSourceView.setContextMenuListener(
+        binding.anagramSource.setContextMenuListener(
             new ScrollingImageView.ClickListener() {
                 @Override
                 public void onTap(Point point) {
                     NotesActivity
                         .this
                         .keyboardManager
-                        .showKeyboard(anagramSourceView);
+                        .showKeyboard(binding.anagramSource);
                 }
 
                 @Override
                 public void onContextMenu(Point point) {
                     // reshuffle squares
-                    int len = anagramSourceView.getLength();
+                    int len = binding.anagramSource.getLength();
                     for (int i = 0; i < len; i++) {
                         int j = rand.nextInt(len);
-                        char ci = anagramSourceView.getResponse(i);
-                        char cj = anagramSourceView.getResponse(j);
-                        anagramSourceView.setResponse(i, cj);
-                        anagramSourceView.setResponse(j, ci);
+                        char ci = binding.anagramSource.getResponse(i);
+                        char cj = binding.anagramSource.getResponse(j);
+                        binding.anagramSource.setResponse(i, cj);
+                        binding.anagramSource.setResponse(j, ci);
                     }
                 }
             }
         );
         ViewCompat.replaceAccessibilityAction(
-            anagramSourceView,
+            binding.anagramSource,
             AccessibilityActionCompat.ACTION_LONG_CLICK,
             getText(R.string.shuffle_anagram_source),
             null
         );
 
-        anagramSolView.setContextMenuListener(
+        binding.anagramSolution.setContextMenuListener(
             new ScrollingImageView.ClickListener() {
                 @Override
                 public void onTap(Point point) {
-                    NotesActivity.this.keyboardManager.showKeyboard(anagramSolView);
+                    NotesActivity.this
+                        .keyboardManager
+                        .showKeyboard(binding.anagramSolution);
                 }
 
                 @Override
@@ -288,23 +277,21 @@ public class NotesActivity extends PuzzleActivity {
             }
         );
         ViewCompat.replaceAccessibilityAction(
-            anagramSolView,
+            binding.anagramSolution,
             AccessibilityActionCompat.ACTION_LONG_CLICK,
             getText(R.string.transfer_anagram_solution_to_board),
             null
         );
 
-        flagClue = (CheckBox) findViewById(R.id.flagClue);
-
-        ForkyzKeyboard keyboardView
-            = (ForkyzKeyboard) findViewById(R.id.keyboard);
-        keyboardManager = new KeyboardManager(this, keyboardView, null);
-        keyboardManager.showKeyboard(isPuzzleNotes() ? scratchView : boardView);
+        keyboardManager = new KeyboardManager(this, binding.keyboard, null);
+        keyboardManager.showKeyboard(
+            isPuzzleNotes() ? binding.scratchMiniboard : binding.miniboard
+        );
 
         setupVoiceButtons();
         setupVoiceCommands();
 
-        addAccessibilityActions(this.boardView);
+        addAccessibilityActions(binding.miniboard);
     }
 
     @Override
@@ -443,28 +430,28 @@ public class NotesActivity extends PuzzleActivity {
         if (isPuzzleNotes()) {
             clueLine.setText(getString(R.string.player_notes));
             note = puz.getPlayerNote();
-            boardViewLabel.setVisibility(View.GONE);
-            boardView.setVisibility(View.GONE);
-            flagClue.setVisibility(View.GONE);
+            binding.miniboardLab.setVisibility(View.GONE);
+            binding.miniboard.setVisibility(View.GONE);
+            binding.flagClue.setVisibility(View.GONE);
         } else {
-            boardView.setBoard(board, getSuppressNotesList());
+            binding.miniboard.setBoard(board, getSuppressNotesList());
 
             clueLine.setText(smartHtml(getLongClueText(clue)));
             note = puz.getNote(clue);
-            flagClue.setChecked(puz.isFlagged(clue));
+            binding.flagClue.setChecked(puz.isFlagged(clue));
             int clueVisibility = isClueOnBoard() ? View.VISIBLE : View.GONE;
-            boardViewLabel.setVisibility(clueVisibility);
-            boardView.setVisibility(clueVisibility);
-            flagClue.setVisibility(View.VISIBLE);
+            binding.miniboardLab.setVisibility(clueVisibility);
+            binding.miniboard.setVisibility(clueVisibility);
+            binding.flagClue.setVisibility(View.VISIBLE);
         }
 
         // set up and erase any previous data
-        notesBox.setText("");
+        binding.notesBox.setText("");
 
         // set lengths after fully set up
-        scratchView.clear();
-        anagramSourceView.clear();
-        anagramSolView.clear();
+        binding.scratchMiniboard.clear();
+        binding.anagramSource.clear();
+        binding.anagramSolution.clear();
 
         numAnagramLetters = 0;
 
@@ -494,14 +481,16 @@ public class NotesActivity extends PuzzleActivity {
             }
         };
 
-        anagramSourceView.setFilters(new BoardEditFilter[]{sourceFilter});
+        binding.anagramSource.setFilters(
+            new BoardEditFilter[]{sourceFilter}
+        );
 
         BoardEditFilter solFilter = new BoardEditFilter() {
             public boolean delete(char oldChar, int pos) {
                 if (!BoardEditText.isBlank(oldChar)) {
                     for (int i = 0; i < curWordLen; i++) {
-                        if (anagramSourceView.isBlank(i)) {
-                            anagramSourceView.setResponse(i, oldChar);
+                        if (binding.anagramSource.isBlank(i)) {
+                            binding.anagramSource.setResponse(i, oldChar);
                             return true;
                         }
                     }
@@ -516,29 +505,29 @@ public class NotesActivity extends PuzzleActivity {
             }
         };
 
-        anagramSolView.setFilters(new BoardEditFilter[]{solFilter});
+        binding.anagramSolution.setFilters(new BoardEditFilter[]{solFilter});
 
         if (note != null) {
-            notesBox.setText(note.getText());
+            binding.notesBox.setText(note.getText());
 
-            scratchView.setFromString(note.getScratch());
+            binding.scratchMiniboard.setFromString(note.getScratch());
 
             String src = note.getAnagramSource();
             if (src != null) {
-                anagramSourceView.setFromString(src);
-                numAnagramLetters += anagramSourceView.getNumNonBlank();
+                binding.anagramSource.setFromString(src);
+                numAnagramLetters += binding.anagramSource.getNumNonBlank();
             }
 
             String sol = note.getAnagramSolution();
             if (sol != null) {
-                anagramSolView.setFromString(sol);
-                numAnagramLetters +=  anagramSolView.getNumNonBlank();
+                binding.anagramSolution.setFromString(sol);
+                numAnagramLetters +=  binding.anagramSolution.getNumNonBlank();
             }
         }
 
-        anagramSolView.setLength(curWordLen);
-        scratchView.setLength(curWordLen);
-        anagramSourceView.setLength(curWordLen);
+        binding.anagramSolution.setLength(curWordLen);
+        binding.scratchMiniboard.setLength(curWordLen);
+        binding.anagramSource.setLength(curWordLen);
 
         keyboardManager.onResume();
 
@@ -552,7 +541,7 @@ public class NotesActivity extends PuzzleActivity {
 
         MenuItem specialEntry = menu.findItem(R.id.puzzle_menu_special_entry);
 
-        boolean specialEntryEnabled = getCurrentFocus() == boardView;
+        boolean specialEntryEnabled = getCurrentFocus() == binding.miniboard;
 
         specialEntry.setVisible(specialEntryEnabled);
         specialEntry.setEnabled(specialEntryEnabled);
@@ -577,17 +566,17 @@ public class NotesActivity extends PuzzleActivity {
     }
 
     private void moveScratchToNote() {
-        String notesText = notesBox.getText().toString();
+        String notesText = binding.notesBox.getText().toString();
 
-        String scratchText = scratchView.toString().trim();
+        String scratchText = binding.scratchMiniboard.toString().trim();
 
         if (scratchText.length() > 0) {
             if (notesText.length() > 0)
                 notesText += "\n";
             notesText += scratchText;
 
-            scratchView.clear();
-            notesBox.setText(notesText);
+            binding.scratchMiniboard.clear();
+            binding.notesBox.setText(notesText);
         }
     }
 
@@ -599,7 +588,7 @@ public class NotesActivity extends PuzzleActivity {
                     char newChar = newResponse.charAt(0);
                     boolean allowed = preAnagramSolResponse(i, newChar);
                     if (allowed)
-                        anagramSolView.setResponse(i, newChar);
+                        binding.anagramSolution.setResponse(i, newChar);
                 }
             }
         }
@@ -644,20 +633,20 @@ public class NotesActivity extends PuzzleActivity {
      * @return true if play of letter can proceed
      */
     private boolean preAnagramSolResponse(int pos, char newChar) {
-        char oldChar = anagramSolView.getResponse(pos);
-        int sourceLen = anagramSourceView.getLength();
+        char oldChar = binding.anagramSolution.getResponse(pos);
+        int sourceLen = binding.anagramSource.getLength();
         for (int i = 0; i < sourceLen; i++) {
-            if (anagramSourceView.getResponse(i) == newChar) {
-                anagramSourceView.setResponse(i, oldChar);
+            if (binding.anagramSource.getResponse(i) == newChar) {
+                binding.anagramSource.setResponse(i, oldChar);
                 return true;
             }
         }
         // if failed to find it in the source view, see if we can
         // find one to swap it with one in the solution
-        int solLen = anagramSolView.getLength();
+        int solLen = binding.anagramSolution.getLength();
         for (int i = 0; i < solLen; i++) {
-            if (anagramSolView.getResponse(i) == newChar) {
-                anagramSolView.setResponse(i, oldChar);
+            if (binding.anagramSolution.getResponse(i) == newChar) {
+                binding.anagramSolution.setResponse(i, oldChar);
                 return true;
             }
         }
@@ -689,17 +678,17 @@ public class NotesActivity extends PuzzleActivity {
             switch (request) {
             case SCRATCH_TO_BOARD:
                 conflict = hasConflict(
-                    scratchView.getBoxes(), curWordBoxes, true
+                    binding.scratchMiniboard.getBoxes(), curWordBoxes, true
                 );
                 break;
             case ANAGRAM_SOL_TO_BOARD:
                 conflict = hasConflict(
-                    anagramSolView.getBoxes(), curWordBoxes, true
+                    binding.anagramSolution.getBoxes(), curWordBoxes, true
                 );
                 break;
             case BOARD_TO_SCRATCH:
                 conflict = hasConflict(
-                    curWordBoxes, scratchView.getBoxes(), false
+                    curWordBoxes, binding.scratchMiniboard.getBoxes(), false
                 );
                 break;
             case BOARD_TO_ANAGRAM_SOL:
@@ -712,13 +701,13 @@ public class NotesActivity extends PuzzleActivity {
         } else {
             switch (request) {
             case SCRATCH_TO_BOARD:
-                board.setCurrentWord(scratchView.getBoxes());
+                board.setCurrentWord(binding.scratchMiniboard.getBoxes());
                 break;
             case ANAGRAM_SOL_TO_BOARD:
-                board.setCurrentWord(anagramSolView.getBoxes());
+                board.setCurrentWord(binding.anagramSolution.getBoxes());
                 break;
             case BOARD_TO_SCRATCH:
-                overlayBoxesOnBoardView(curWordBoxes, scratchView);
+                overlayBoxesOnBoardView(curWordBoxes, binding.scratchMiniboard);
                 break;
             case BOARD_TO_ANAGRAM_SOL:
                 copyBoxesToAnagramSol(curWordBoxes);
@@ -773,13 +762,14 @@ public class NotesActivity extends PuzzleActivity {
                 // means you can't enter "clear" into scratch, but oh well
                 String clear = getString(R.string.command_clear);
                 if (clear.equalsIgnoreCase(text)) {
-                    scratchView.clear();
+                    binding.scratchMiniboard.clear();
                 } else {
                     int len = Math.min(
-                        prepped.length(), scratchView.getLength()
+                        prepped.length(), binding.scratchMiniboard.getLength()
                     );
                     for (int i = 0; i < len; i++) {
-                        scratchView.setResponse(i, prepped.charAt(i));
+                        binding.scratchMiniboard
+                            .setResponse(i, prepped.charAt(i));
                     }
                 }
 
@@ -795,7 +785,7 @@ public class NotesActivity extends PuzzleActivity {
                 if (board == null)
                     return;
 
-                flagClue.setChecked(true);
+                binding.flagClue.setChecked(true);
 
                 // need to save since is called between an onPause and an
                 // onResume
@@ -894,7 +884,7 @@ public class NotesActivity extends PuzzleActivity {
      * focus lost
      */
     private void onNotesBoxFocusChanged(boolean gainFocus) {
-        keyboardManager.onFocusNativeView(notesBox, gainFocus);
+        keyboardManager.onFocusNativeView(binding.notesBox, gainFocus);
     }
 
     /**
@@ -937,10 +927,10 @@ public class NotesActivity extends PuzzleActivity {
     private void saveNoteToBoard() {
         Puzzle puz = getPuzzle();
 
-        String text = notesBox.getText().toString();
-        String scratch = scratchView.toString();
-        String anagramSource = anagramSourceView.toString();
-        String anagramSolution = anagramSolView.toString();
+        String text = binding.notesBox.getText().toString();
+        String scratch = binding.scratchMiniboard.toString();
+        String anagramSource = binding.anagramSource.toString();
+        String anagramSolution = binding.anagramSolution.toString();
 
         Note note = new Note(scratch, text, anagramSource, anagramSolution);
 
@@ -949,7 +939,7 @@ public class NotesActivity extends PuzzleActivity {
         } else {
             Clue clue = getNotesClue();
             puz.setNote(clue, note);
-            puz.flagClue(clue, flagClue.isChecked());
+            puz.flagClue(clue, binding.flagClue.isChecked());
         }
     }
 
