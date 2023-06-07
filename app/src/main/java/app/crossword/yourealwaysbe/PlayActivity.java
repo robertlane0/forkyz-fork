@@ -516,12 +516,6 @@ public class PlayActivity extends PuzzleActivity
                 case KeyEvent.KEYCODE_DEL:
                     onDeleteKey();
                     break;
-
-                case KeyEvent.KEYCODE_VOLUME_DOWN:
-                    if (isVolumeDownActivatesVoicePref()) {
-                        launchVoiceInput();
-                    }
-                    break;
             }
 
             char c = Character.toUpperCase(event.getDisplayLabel());
@@ -1196,8 +1190,6 @@ public class PlayActivity extends PuzzleActivity
         case KeyEvent.KEYCODE_ENTER:
         case KeyEvent.KEYCODE_DEL:
             return true;
-        case KeyEvent.KEYCODE_VOLUME_DOWN:
-            return isVolumeDownActivatesVoicePref();
         }
 
         char c = Character.toUpperCase(event.getDisplayLabel());

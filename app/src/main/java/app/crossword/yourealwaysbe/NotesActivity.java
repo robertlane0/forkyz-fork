@@ -78,7 +78,6 @@ public class NotesActivity extends PuzzleActivity {
     private BoardEditText anagramSourceView;
     private BoardEditText anagramSolView;
     private CheckBox flagClue;
-    private View voiceButtonContainer;
 
     private Random rand = new Random();
 
@@ -302,12 +301,7 @@ public class NotesActivity extends PuzzleActivity {
         keyboardManager = new KeyboardManager(this, keyboardView, null);
         keyboardManager.showKeyboard(isPuzzleNotes() ? scratchView : boardView);
 
-        this.voiceButtonContainer
-            = this.findViewById(R.id.voiceButtonContainer);
-        this.findViewById(R.id.voiceButton).setOnClickListener(view -> {
-            launchVoiceInput();
-        });
-
+        setupVoiceButtons();
         setupVoiceCommands();
 
         addAccessibilityActions(this.boardView);
@@ -342,11 +336,6 @@ public class NotesActivity extends PuzzleActivity {
         case KeyEvent.KEYCODE_ESCAPE:
             onBackKey();
             return true;
-        case KeyEvent.KEYCODE_VOLUME_DOWN:
-            if (isVolumeDownActivatesVoicePref()) {
-                launchVoiceInput();
-                return true;
-            }
         }
 
         return true;
@@ -553,9 +542,7 @@ public class NotesActivity extends PuzzleActivity {
 
         keyboardManager.onResume();
 
-        voiceButtonContainer.setVisibility(
-            isButtonActivatesVoicePref() ? View.VISIBLE : View.GONE
-        );
+        setVoiceButtonVisibility();
     }
 
     @Override
@@ -976,8 +963,6 @@ public class NotesActivity extends PuzzleActivity {
         case KeyEvent.KEYCODE_BACK:
         case KeyEvent.KEYCODE_ESCAPE:
             return true;
-        case KeyEvent.KEYCODE_VOLUME_DOWN:
-            return isVolumeDownActivatesVoicePref();
         }
         return false;
     }

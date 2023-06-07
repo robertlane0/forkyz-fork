@@ -269,6 +269,11 @@ public abstract class PuzzleActivity
         case KeyEvent.KEYCODE_EQUALS:
             if (isAnnounceClueEquals())
                 return true;
+            break;
+        case KeyEvent.KEYCODE_VOLUME_DOWN:
+            if (isVolumeDownActivatesVoicePref())
+                return true;
+            break;
         }
         return super.onKeyDown(keyCode, event);
     }
@@ -281,6 +286,13 @@ public abstract class PuzzleActivity
                 announceClue(false);
                 return true;
             }
+            break;
+        case KeyEvent.KEYCODE_VOLUME_DOWN:
+            if (isVolumeDownActivatesVoicePref()) {
+                launchVoiceInput();
+                return true;
+            }
+            break;
         }
         return super.onKeyUp(keyCode, event);
     }
@@ -682,11 +694,11 @@ public abstract class PuzzleActivity
 
     protected void setupVoiceButtons() {
         this.voiceButtonContainer
-            = this.findViewById(R.id.voiceButtonContainer);
+            = this.findViewById(R.id.voice_buttons_container);
         this.voiceButton
-            = this.findViewById(R.id.voiceButton);
+            = this.findViewById(R.id.voice_button);
         this.announceClueButton
-            = this.findViewById(R.id.announceClueButton);
+            = this.findViewById(R.id.announce_clue_button);
         voiceButton.setOnClickListener(view -> {
             launchVoiceInput();
         });

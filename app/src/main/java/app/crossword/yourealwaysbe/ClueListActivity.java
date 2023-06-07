@@ -249,12 +249,6 @@ public class ClueListActivity extends PuzzleActivity
         case KeyEvent.KEYCODE_SPACE:
             onSpaceKey();
             return true;
-
-        case KeyEvent.KEYCODE_VOLUME_DOWN:
-            if (isVolumeDownActivatesVoicePref()) {
-                launchVoiceInput();
-                return true;
-            }
         }
 
         Playboard board = getBoard();
@@ -637,8 +631,6 @@ public class ClueListActivity extends PuzzleActivity
         case KeyEvent.KEYCODE_DEL:
         case KeyEvent.KEYCODE_SPACE:
             return true;
-        case KeyEvent.KEYCODE_VOLUME_DOWN:
-            return isVolumeDownActivatesVoicePref();
         }
 
         char c = Character.toUpperCase(event.getDisplayLabel());
