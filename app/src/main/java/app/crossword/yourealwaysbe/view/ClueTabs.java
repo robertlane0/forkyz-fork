@@ -801,8 +801,10 @@ public class ClueTabs extends LinearLayout
             if (refresh)
                 setStyle();
 
-            if (changes.getEditedClueIDs().contains(thisClueID))
+            if (changes.getChangedClueIDs().contains(thisClueID)) {
                 setClueText();
+                setStyle();
+            }
         }
 
         private void setClueText() {

@@ -925,7 +925,11 @@ public class NotesActivity extends PuzzleActivity {
     }
 
     private void saveNoteToBoard() {
+        Playboard board = getBoard();
         Puzzle puz = getPuzzle();
+
+        if (puz == null)
+            return;
 
         String text = binding.notesBox.getText().toString();
         String scratch = binding.scratchMiniboard.toString();
@@ -939,7 +943,7 @@ public class NotesActivity extends PuzzleActivity {
         } else {
             Clue clue = getNotesClue();
             puz.setNote(clue, note);
-            puz.flagClue(clue, binding.flagClue.isChecked());
+            board.flagClue(clue, binding.flagClue.isChecked());
         }
     }
 

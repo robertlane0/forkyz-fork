@@ -47,7 +47,7 @@ public class Playboard implements Serializable {
     private int notificationDisabledDepth = 0;
 
     private Set<Position> changedPositions = new HashSet<>();
-    private Set<ClueID> editedClueIDs = new HashSet<>();
+    private Set<ClueID> changedClueIDs = new HashSet<>();
     // reuse same one for all notifications
     private PlayboardChanges notificationChanges = new PlayboardChanges();
 
@@ -1359,7 +1359,16 @@ public class Playboard implements Serializable {
 
     public void editClue(Clue clue, String newHint) {
         clue.setHint(newHint);
-        flagClueEdit(clue);
+        flagClueChange(clue);
+        notifyChange();
+    }
+
+    /**
+     * Call this instead of puzzle.flagClue to update listeners
+     */
+    public void flagClue(Clue clue, boolean flag) {
+        puzzle.flagClue(clue, flag);
+        flagClueChange(clue);
         notifyChange();
     }
 
@@ -1413,7 +1422,7 @@ public class Playboard implements Serializable {
 
             Collection<Position> posChanges
                 = wholeBoard ? null : getPositionChanges();
-            Collection<ClueID> clueEdits = getEditedClueIDs();
+            Collection<ClueID> clueEdits = getChangedClueIDs();
 
             notificationChanges.setValues(
                 currentWord, previousWord, previousPosition, posChanges,
@@ -1539,15 +1548,15 @@ public class Playboard implements Serializable {
 
     private void clearChanges() {
         changedPositions.clear();
-        editedClueIDs.clear();
+        changedClueIDs.clear();
     }
 
     private Collection<Position> getPositionChanges() {
         return changedPositions;
     }
 
-    private Collection<ClueID> getEditedClueIDs() {
-        return editedClueIDs;
+    private Collection<ClueID> getChangedClueIDs() {
+        return changedClueIDs;
     }
 
     private void flagChange(Position... positions) {
@@ -1557,8 +1566,8 @@ public class Playboard implements Serializable {
         }
     }
 
-    private void flagClueEdit(Clue clue) {
-        editedClueIDs.add(clue.getClueID());
+    private void flagClueChange(Clue clue) {
+        changedClueIDs.add(clue.getClueID());
     }
 
     /**
@@ -1766,7 +1775,7 @@ public class Playboard implements Serializable {
         private Collection<Position> cellChanges;
         private boolean historyChange;
         private int lastHistoryIndex;
-        private Collection<ClueID> editedClueIDs;
+        private Collection<ClueID> changedClueIDs;
 
         private void setValues(
             Word currentWord,
@@ -1775,7 +1784,7 @@ public class Playboard implements Serializable {
             Collection<Position> cellChanges,
             boolean historyChange,
             int lastHistoryIndex,
-            Collection<ClueID> editedClueIDs
+            Collection<ClueID> changedClueIDs
         ) {
             this.currentWord = currentWord;
             this.previousWord = previousWord;
@@ -1783,7 +1792,7 @@ public class Playboard implements Serializable {
             this.cellChanges = cellChanges;
             this.historyChange = historyChange;
             this.lastHistoryIndex = lastHistoryIndex;
-            this.editedClueIDs = editedClueIDs;
+            this.changedClueIDs = changedClueIDs;
         }
 
         /**
@@ -1824,8 +1833,8 @@ public class Playboard implements Serializable {
         public int getLastHistoryIndex() { return lastHistoryIndex; }
 
         /**
-         * List of clues that have had num/hint edited
+         * List of clues that have had num/hint edited or flagged
          */
-        public Collection<ClueID> getEditedClueIDs() { return editedClueIDs; }
+        public Collection<ClueID> getChangedClueIDs() { return changedClueIDs; }
     }
 }
