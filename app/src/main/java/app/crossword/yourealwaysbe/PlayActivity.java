@@ -730,7 +730,6 @@ public class PlayActivity extends PuzzleActivity
             board.removeListener(this);
 
         binding.clueTabs.removeListener(this);
-        binding.clueTabs.unlistenBoard();
 
         pauseShakeDetection();
     }
@@ -788,7 +787,6 @@ public class PlayActivity extends PuzzleActivity
         binding.clueTabs.setShowWords(isAcrostic());
         binding.clueTabs.setPage(prefs.getInt(CLUE_TABS_PAGE, 0));
         binding.clueTabs.addListener(this);
-        binding.clueTabs.listenBoard();
 
         board.setSkipCompletedLetters(
             this.prefs.getBoolean("skipFilled", false)

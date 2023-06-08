@@ -146,7 +146,6 @@ public class ClueListActivity extends PuzzleActivity
 
         binding.clueTabs.setBoard(board);
         binding.clueTabs.addListener(this);
-        binding.clueTabs.listenBoard();
 
         keyboardManager.onResume();
 
@@ -270,11 +269,8 @@ public class ClueListActivity extends PuzzleActivity
     @Override
     protected void onPause() {
         super.onPause();
-
         keyboardManager.onPause();
-
         binding.clueTabs.removeListener(this);
-        binding.clueTabs.unlistenBoard();
     }
 
     @Override

@@ -236,6 +236,8 @@ public class ClueTabs extends LinearLayout
                 );
             }
         }
+
+        listenBoard();
     }
 
     public void setPage(int pageNumber) {
@@ -297,20 +299,6 @@ public class ClueTabs extends LinearLayout
 
     public void removeListener(ClueTabsListener listener) {
         listeners.remove(listener);
-    }
-
-    public void listenBoard() {
-        if (board != null && !listening) {
-            board.addListener(this);
-            listening = true;
-        }
-    }
-
-    public void unlistenBoard() {
-        if (board != null && listening) {
-            board.removeListener(this);
-            listening = false;
-        }
     }
 
     public void onResume() {
@@ -395,6 +383,20 @@ public class ClueTabs extends LinearLayout
     private void notifyListenersPageChanged(int pageNumber) {
         for (ClueTabsListener listener : listeners)
             listener.onClueTabsPageChange(this, pageNumber);
+    }
+
+    private void listenBoard() {
+        if (board != null && !listening) {
+            board.addListener(this);
+            listening = true;
+        }
+    }
+
+    private void unlistenBoard() {
+        if (board != null && listening) {
+            board.removeListener(this);
+            listening = false;
+        }
     }
 
     private class ClueTabsPagerAdapter extends RecyclerView.Adapter<ClueListHolder> {
