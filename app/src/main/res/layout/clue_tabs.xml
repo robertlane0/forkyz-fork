@@ -1,29 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:ignore="overdraw"
-    android:background="?clueTabsBackground"
 >
-    <!-- ignore overdraw because on my LineageOS 17 phone, the theme background
-    doesn't always cover board. I couldn't define a custom theme without
-    breaking Material You  -->
-
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/clueTabsTabLayout"
-        android:layout_width="match_parent"
-        android:layout_height="50sp"
-    />
-
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/clueTabsPager"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-    />
-
-</LinearLayout>
-
+        android:orientation="vertical"
+        tools:ignore="overdraw"
+        android:background="?clueTabsBackground"
+    >
+        <!-- ignore overdraw because on my LineageOS 17 phone, the theme background
+        doesn't always cover board. I couldn't define a custom theme without
+        breaking Material You  -->
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/clue_tabs_tab_layout"
+            android:layout_width="match_parent"
+            android:layout_height="50sp"
+        />
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/clue_tabs_pager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+        />
+    </LinearLayout>
+</layout>

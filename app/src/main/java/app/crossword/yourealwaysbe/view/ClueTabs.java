@@ -1,6 +1,9 @@
 package app.crossword.yourealwaysbe.view;
 
 import app.crossword.yourealwaysbe.forkyz.R;
+import app.crossword.yourealwaysbe.forkyz.databinding.ClueListItemBinding;
+import app.crossword.yourealwaysbe.forkyz.databinding.ClueTabsBinding;
+import app.crossword.yourealwaysbe.forkyz.databinding.ClueTabsPageBinding;
 import app.crossword.yourealwaysbe.puz.Clue;
 import app.crossword.yourealwaysbe.puz.ClueID;
 import app.crossword.yourealwaysbe.puz.ClueList;
@@ -23,7 +26,6 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckedTextView;
 import android.widget.LinearLayout;
 import androidx.core.text.HtmlCompat;
 import androidx.core.view.GestureDetectorCompat;
@@ -36,7 +38,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
 import java.util.ArrayList;
@@ -56,7 +57,7 @@ public class ClueTabs extends LinearLayout
         CLUES, HISTORY;
     }
 
-    private ViewPager2 viewPager;
+    private ClueTabsBinding binding;
     private Playboard board;
     private boolean listening = false;
     private Set<ClueTabsListener> listeners = WeakSet.buildSet();
@@ -133,7 +134,9 @@ public class ClueTabs extends LinearLayout
 
     public ClueTabs(Context context, AttributeSet as) {
         super(context, as);
-        LayoutInflater.from(context).inflate(R.layout.clue_tabs, this);
+        binding = ClueTabsBinding.inflate(
+            LayoutInflater.from(context), this, true
+        );
     }
 
     public void setOnClueClickDescription(String description) {
@@ -196,14 +199,12 @@ public class ClueTabs extends LinearLayout
         listNames.addAll(puz.getClueListNames());
         Collections.sort(listNames);
 
-        TabLayout tabLayout = findViewById(R.id.clueTabsTabLayout);
-        viewPager = findViewById(R.id.clueTabsPager);
-
         final ClueTabsPagerAdapter adapter = new ClueTabsPagerAdapter();
 
-        viewPager.setAdapter(adapter);
+        System.out.println("FORKYZ: adapter set");
+        binding.clueTabsPager.setAdapter(adapter);
 
-        viewPager.registerOnPageChangeCallback(
+        binding.clueTabsPager.registerOnPageChangeCallback(
             new ViewPager2.OnPageChangeCallback() {
                 public void onPageSelected(int position) {
                     ClueTabs.this.notifyListenersPageChanged(position);
@@ -211,13 +212,15 @@ public class ClueTabs extends LinearLayout
             }
         );
 
-        new TabLayoutMediator(tabLayout, viewPager,
+        new TabLayoutMediator(
+            binding.clueTabsTabLayout,
+            binding.clueTabsPager,
             (tab, position) -> { tab.setText(adapter.getPageTitle(position)); }
         ).attach();
 
         setTabLayoutOnTouchListener();
 
-        LinearLayout tabStrip = (LinearLayout) tabLayout.getChildAt(0);
+        LinearLayout tabStrip = (LinearLayout) binding.clueTabsTabLayout.getChildAt(0);
         for (int i = 0; i < tabStrip.getChildCount(); i++) {
             View view = tabStrip.getChildAt(i);
             view.setOnLongClickListener(new View.OnLongClickListener() {
@@ -241,49 +244,37 @@ public class ClueTabs extends LinearLayout
     }
 
     public void setPage(int pageNumber) {
-        if (viewPager != null) {
-            viewPager.setCurrentItem(pageNumber, false);
-        }
+        binding.clueTabsPager.setCurrentItem(pageNumber, false);
     }
 
     public PageType getCurrentPageType() {
-        if (viewPager != null) {
-            int curPage = viewPager.getCurrentItem();
-            ClueTabsPagerAdapter adapter
-                = (ClueTabsPagerAdapter) viewPager.getAdapter();
-            return adapter.getPageType(curPage);
-        }
-        return null;
+        int curPage = binding.clueTabsPager.getCurrentItem();
+        ClueTabsPagerAdapter adapter
+            = (ClueTabsPagerAdapter) binding.clueTabsPager.getAdapter();
+        return adapter.getPageType(curPage);
     }
 
     /**
      * Name of current list or null if oob or history
      */
     public String getCurrentPageListName() {
-        if (viewPager != null) {
-            int curPage = viewPager.getCurrentItem();
-            ClueTabsPagerAdapter adapter
-                = (ClueTabsPagerAdapter) viewPager.getAdapter();
-            return adapter.getPageListName(curPage);
-        }
-        return null;
+        int curPage = binding.clueTabsPager.getCurrentItem();
+        ClueTabsPagerAdapter adapter
+            = (ClueTabsPagerAdapter) binding.clueTabsPager.getAdapter();
+        return adapter.getPageListName(curPage);
     }
 
     public void nextPage() {
-        if (viewPager != null) {
-            int curPage = viewPager.getCurrentItem();
-            int numPages = viewPager.getAdapter().getItemCount();
-            viewPager.setCurrentItem((curPage + 1) % numPages, false);
-        }
+        int curPage = binding.clueTabsPager.getCurrentItem();
+        int numPages = binding.clueTabsPager.getAdapter().getItemCount();
+        binding.clueTabsPager.setCurrentItem((curPage + 1) % numPages, false);
     }
 
     public void prevPage() {
-        if (viewPager != null) {
-            int curPage = viewPager.getCurrentItem();
-            int numPages = viewPager.getAdapter().getItemCount();
-            int nextPage = curPage == 0 ? numPages - 1 : curPage - 1;
-            viewPager.setCurrentItem(nextPage, false);
-        }
+        int curPage = binding.clueTabsPager.getCurrentItem();
+        int numPages = binding.clueTabsPager.getAdapter().getItemCount();
+        int nextPage = curPage == 0 ? numPages - 1 : curPage - 1;
+        binding.clueTabsPager.setCurrentItem(nextPage, false);
     }
 
     /**
@@ -310,7 +301,7 @@ public class ClueTabs extends LinearLayout
     }
 
     public void onPlayboardChange(PlayboardChanges changes) {
-        if (viewPager == null || !isSnapToClue())
+        if (!isSnapToClue())
             return;
 
         ClueID cid = board.getClueID();
@@ -323,7 +314,7 @@ public class ClueTabs extends LinearLayout
         if (listIndex < 0)
             return;
 
-        viewPager.setCurrentItem(listIndex);
+        binding.clueTabsPager.setCurrentItem(listIndex);
     }
 
     /**
@@ -331,8 +322,8 @@ public class ClueTabs extends LinearLayout
      */
     @SuppressLint("NotifyDataSetChanged")
     private void refresh() {
-        if (viewPager != null)
-            viewPager.getAdapter().notifyDataSetChanged();
+        if (binding.clueTabsPager.getAdapter() != null)
+            binding.clueTabsPager.getAdapter().notifyDataSetChanged();
     }
 
     private boolean isSnapToClue() {
@@ -402,11 +393,10 @@ public class ClueTabs extends LinearLayout
     private class ClueTabsPagerAdapter extends RecyclerView.Adapter<ClueListHolder> {
         @Override
         public ClueListHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View page = LayoutInflater.from(parent.getContext())
-                                      .inflate(R.layout.clue_tabs_page,
-                                               parent,
-                                               false);
-            return new ClueListHolder(page);
+            ClueTabsPageBinding pageBinding = ClueTabsPageBinding.inflate(
+                LayoutInflater.from(parent.getContext()), parent, false
+            );
+            return new ClueListHolder(pageBinding);
         }
 
         @Override
@@ -450,7 +440,7 @@ public class ClueTabs extends LinearLayout
     private class ClueListHolder
             extends RecyclerView.ViewHolder {
 
-        private RecyclerView clueList;
+        private ClueTabsPageBinding pageBinding;
         private ClueListAdapter clueListAdapter;
         private LinearLayoutManager layoutManager;
         private PageType pageType;
@@ -462,30 +452,30 @@ public class ClueTabs extends LinearLayout
                 public void onItemRangeInserted(int start, int count) {
                     boolean atStart
                         = layoutManager.findFirstVisibleItemPosition() == 0;
-                    if (start == 0 && atStart && clueList != null)
+                    if (start == 0 && atStart)
                         layoutManager.scrollToPositionWithOffset(0, 0);
                 }
 
                 public void onItemRangeMoved(int from, int to, int count) {
                     boolean atStart
                         = layoutManager.findFirstVisibleItemPosition() == 0;
-                    if (to == 0 && atStart && clueList != null)
+                    if (to == 0 && atStart)
                         layoutManager.scrollToPositionWithOffset(0, 0);
                 }
             };
 
-        public ClueListHolder(View view) {
-            super(view);
-            Context context = itemView.getContext();
-            clueList = view.findViewById(R.id.tabClueList);
+        public ClueListHolder(ClueTabsPageBinding pageBinding) {
+            super(pageBinding.getRoot());
 
+            this.pageBinding = pageBinding;
+
+            Context context = itemView.getContext();
             layoutManager = new LinearLayoutManager(context);
-            clueList.setLayoutManager(layoutManager);
-            clueList.setItemAnimator(new DefaultItemAnimator());
-            clueList.addItemDecoration(
-                new DividerItemDecoration(context,
-                                          DividerItemDecoration.VERTICAL)
-            );
+            pageBinding.tabClueList.setLayoutManager(layoutManager);
+            pageBinding.tabClueList.setItemAnimator(new DefaultItemAnimator());
+            pageBinding.tabClueList.addItemDecoration(new DividerItemDecoration(
+                context, DividerItemDecoration.VERTICAL
+            ));
         }
 
         /**
@@ -493,7 +483,6 @@ public class ClueTabs extends LinearLayout
          */
         @SuppressLint("NotifyDataSetChanged")
         public void setContents(PageType pageType, String listName) {
-
             Playboard board = ClueTabs.this.board;
             Puzzle puz = board.getPuzzle();
 
@@ -541,7 +530,7 @@ public class ClueTabs extends LinearLayout
                     break;
                 }
 
-                clueList.setAdapter(clueListAdapter);
+                pageBinding.tabClueList.setAdapter(clueListAdapter);
                 this.pageType = pageType;
                 this.listName = listName;
             }
@@ -579,11 +568,10 @@ public class ClueTabs extends LinearLayout
 
         @Override
         public ClueViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View clueView = LayoutInflater.from(parent.getContext())
-                                          .inflate(R.layout.clue_list_item,
-                                                   parent,
-                                                   false);
-            return new ClueViewHolder(clueView, showDirection);
+            ClueListItemBinding clueBinding = ClueListItemBinding.inflate(
+                LayoutInflater.from(parent.getContext()), parent, false
+            );
+            return new ClueViewHolder(clueBinding, showDirection);
         }
 
         @Override
@@ -665,20 +653,21 @@ public class ClueTabs extends LinearLayout
             extends RecyclerView.ViewHolder
             implements Playboard.PlayboardListener {
 
-        private CheckedTextView clueView;
-        private View flagView;
-        private BoardWordEditView boardView;
+        //private CheckedTextView clueView;
+        //private View flagView;
+        //private BoardWordEditView boardView;
+        private ClueListItemBinding clueBinding;
         private Clue clue;
         private boolean showDirection;
 
-        public ClueViewHolder(View view, boolean showDirection) {
-            super(view);
-            this.clueView = view.findViewById(R.id.clue_text_view);
-            this.flagView = view.findViewById(R.id.clue_flag_view);
-            this.boardView = view.findViewById(R.id.miniboard);
+        public ClueViewHolder(
+            ClueListItemBinding clueBinding, boolean showDirection
+        ) {
+            super(clueBinding.getRoot());
+            this.clueBinding = clueBinding;
             this.showDirection = showDirection;
 
-            view.setOnClickListener(new View.OnClickListener() {
+            clueBinding.getRoot().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     ClueTabs.this.notifyListenersClueClick(clue);
@@ -686,23 +675,25 @@ public class ClueTabs extends LinearLayout
             });
             if (onClueClickDescription != null) {
                 ViewCompat.replaceAccessibilityAction(
-                    view,
+                    clueBinding.getRoot(),
                     AccessibilityActionCompat.ACTION_CLICK,
                     onClueClickDescription,
                     null
                 );
             }
 
-            view.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View view) {
-                    ClueTabs.this.notifyListenersClueLongClick(clue);
-                    return true;
+            clueBinding.getRoot().setOnLongClickListener(
+                new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View view) {
+                        ClueTabs.this.notifyListenersClueLongClick(clue);
+                        return true;
+                    }
                 }
-            });
+            );
             if (onClueLongClickDescription != null) {
                 ViewCompat.replaceAccessibilityAction(
-                    view,
+                    clueBinding.getRoot(),
                     AccessibilityActionCompat.ACTION_LONG_CLICK,
                     onClueLongClickDescription,
                     null
@@ -710,26 +701,28 @@ public class ClueTabs extends LinearLayout
             }
 
             // assume gone unless proven otherwise
-            this.boardView.setVisibility(View.GONE);
+            clueBinding.miniboard.setVisibility(View.GONE);
             // potential memory leak as click listener has a strong
             // reference in the board view, but the board view lives as
             // long as this holder afaik
-            this.boardView.addBoardClickListener(new BoardClickListener() {
-                @Override
-                public void onClick(Position position, Word previousWord) {
-                    ClueTabs.this.notifyListenersClueBoardClick(
-                        clue, previousWord
-                    );
-                }
+            clueBinding.miniboard.addBoardClickListener(
+                new BoardClickListener() {
+                    @Override
+                    public void onClick(Position position, Word previousWord) {
+                        ClueTabs.this.notifyListenersClueBoardClick(
+                            clue, previousWord
+                        );
+                    }
 
-                @Override
-                public void onLongClick(Position position) {
-                    ClueTabs.this.notifyListenersClueLongClick(clue);
+                    @Override
+                    public void onLongClick(Position position) {
+                        ClueTabs.this.notifyListenersClueLongClick(clue);
+                    }
                 }
-            });
+            );
             if (onClueBoardClickDescription != null) {
                 ViewCompat.replaceAccessibilityAction(
-                    boardView,
+                    clueBinding.miniboard,
                     AccessibilityActionCompat.ACTION_CLICK,
                     onClueBoardClickDescription,
                     null
@@ -737,7 +730,7 @@ public class ClueTabs extends LinearLayout
             }
             if (onClueLongClickDescription != null) {
                 ViewCompat.replaceAccessibilityAction(
-                    boardView,
+                    clueBinding.miniboard,
                     AccessibilityActionCompat.ACTION_LONG_CLICK,
                     onClueLongClickDescription,
                     null
@@ -752,7 +745,7 @@ public class ClueTabs extends LinearLayout
             this.clue = clue;
 
             if (clue == null) {
-                boardView.detach();
+                clueBinding.miniboard.detach();
             } else {
                 Playboard board = ClueTabs.this.board;
 
@@ -766,14 +759,14 @@ public class ClueTabs extends LinearLayout
                 if (showWords && board != null) {
                     Word word = board.getClueWord(clue.getClueID());
                     // suppress board render until we set the word later
-                    boardView.setBoard(board, true);
-                    boardView.setMaxScale(maxWordScale);
-                    boardView.setWord(word, Collections.<String>emptySet());
-                    boardView.setVisibility(
+                    clueBinding.miniboard.setBoard(board, true);
+                    clueBinding.miniboard.setMaxScale(maxWordScale);
+                    clueBinding.miniboard.setWord(word, Collections.<String>emptySet());
+                    clueBinding.miniboard.setVisibility(
                         word == null ? View.GONE : View.VISIBLE
                     );
                 } else {
-                    boardView.setVisibility(View.GONE);
+                    clueBinding.miniboard.setVisibility(View.GONE);
                 }
             }
         }
@@ -810,7 +803,9 @@ public class ClueTabs extends LinearLayout
         }
 
         private void setClueText() {
-            clueView.setText(HtmlCompat.fromHtml(getClueText(clue), 0));
+            clueBinding.clueTextView.setText(
+                HtmlCompat.fromHtml(getClueText(clue), 0)
+            );
         }
 
         private void setStyle() {
@@ -818,24 +813,24 @@ public class ClueTabs extends LinearLayout
             if (board == null)
                 return;
 
-            ColorStateList colors = clueView.getTextColors();
+            ColorStateList colors = clueBinding.clueTextView.getTextColors();
             int alpha
                 = ClueTabs.this.getContext().getResources().getInteger(
                     board.isFilledClueID(clue.getClueID())
                     ? R.integer.filled_clue_alpha
                     : R.integer.unfilled_clue_alpha
                 );
-            clueView.setTextColor(colors.withAlpha(alpha));
+            clueBinding.clueTextView.setTextColor(colors.withAlpha(alpha));
 
             ClueID cid = board.getClueID();
             boolean selected = Objects.equals(clue.getClueID(), cid);
-            clueView.setChecked(selected);
+            clueBinding.clueTextView.setChecked(selected);
 
             Puzzle puz = board.getPuzzle();
             if (puz != null && puz.isFlagged(clue)) {
-                flagView.setVisibility(View.VISIBLE);
+                clueBinding.clueFlagView.setVisibility(View.VISIBLE);
             } else {
-                flagView.setVisibility(View.INVISIBLE);
+                clueBinding.clueFlagView.setVisibility(View.INVISIBLE);
             }
         }
 
@@ -914,8 +909,6 @@ public class ClueTabs extends LinearLayout
     // suppress because the swipe detector does not consume clicks
     @SuppressWarnings("ClickableViewAccessibility")
     private void setTabLayoutOnTouchListener() {
-        TabLayout tabLayout = findViewById(R.id.clueTabsTabLayout);
-
         OnGestureListener tabSwipeListener
             = new SimpleOnGestureListener() {
                 // as recommended by the docs
@@ -941,10 +934,10 @@ public class ClueTabs extends LinearLayout
             };
 
         GestureDetectorCompat tabSwipeDetector = new GestureDetectorCompat(
-            tabLayout.getContext(), tabSwipeListener
+            binding.clueTabsTabLayout.getContext(), tabSwipeListener
         );
 
-        tabLayout.setOnTouchListener(new OnTouchListener() {
+        binding.clueTabsTabLayout.setOnTouchListener(new OnTouchListener() {
             public boolean onTouch(View v, MotionEvent e) {
                 return tabSwipeDetector.onTouchEvent(e);
             }
