@@ -36,16 +36,9 @@ import java.util.logging.Logger;
  * Custom dialog for choosing puzzles to download.
  */
 public class DownloadPickerDialogBuilder {
-    private static final Logger LOGGER = Logger.getLogger(DownloadPickerDialogBuilder.class.getCanonicalName());
-    private OnDateChangedListener dateChangedListener
-        = new DatePicker.OnDateChangedListener() {
-            public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                LOGGER.info("OnDateChanged " + year + " " + monthOfYear + " " + dayOfMonth);
-                downloadDate = LocalDate.of(year, monthOfYear + 1, dayOfMonth);
-                updateDayOfWeek();
-                updatePuzzleSelect();
-            }
-        };
+    private static final Logger LOGGER = Logger.getLogger(
+        DownloadPickerDialogBuilder.class.getCanonicalName()
+    );
 
     private Activity activity;
     private DownloadDialogBinding binding;
@@ -54,6 +47,17 @@ public class DownloadPickerDialogBuilder {
     private Downloaders downloaders;
     private LocalDate downloadDate;
     private int selectedItemPosition = 0;
+
+    private OnDateChangedListener dateChangedListener
+        = new DatePicker.OnDateChangedListener() {
+            public void onDateChanged(
+                DatePicker view, int year, int monthOfYear, int dayOfMonth
+            ) {
+                downloadDate = LocalDate.of(year, monthOfYear + 1, dayOfMonth);
+                updateDayOfWeek();
+                updatePuzzleSelect();
+            }
+        };
 
     public DownloadPickerDialogBuilder(
         Activity a,
@@ -84,6 +88,7 @@ public class DownloadPickerDialogBuilder {
                     selectedItemPosition = 0;
                 }
             });
+
         updatePuzzleSelect();
 
         OnClickListener clickHandler = new OnClickListener() {
@@ -104,8 +109,7 @@ public class DownloadPickerDialogBuilder {
         MaterialAlertDialogBuilder builder
             = new MaterialAlertDialogBuilder(activity);
 
-        builder
-            .setView(binding.getRoot())
+        builder.setView(binding.getRoot())
             .setPositiveButton(R.string.download, clickHandler)
             .setNegativeButton(R.string.cancel, null);
 
