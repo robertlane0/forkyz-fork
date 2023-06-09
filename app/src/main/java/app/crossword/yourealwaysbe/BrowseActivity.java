@@ -23,7 +23,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission;
@@ -48,6 +47,8 @@ import com.leinardi.android.speeddial.SpeedDialView;
 
 import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
 import app.crossword.yourealwaysbe.forkyz.R;
+import app.crossword.yourealwaysbe.forkyz.databinding.BrowseBinding;
+import app.crossword.yourealwaysbe.forkyz.databinding.PuzzleListItemBinding;
 import app.crossword.yourealwaysbe.net.Downloader;
 import app.crossword.yourealwaysbe.net.Downloaders;
 import app.crossword.yourealwaysbe.util.BackgroundDownloadManager;
@@ -57,7 +58,6 @@ import app.crossword.yourealwaysbe.util.files.DirHandle;
 import app.crossword.yourealwaysbe.util.files.PuzHandle;
 import app.crossword.yourealwaysbe.util.files.PuzMetaFile;
 import app.crossword.yourealwaysbe.versions.AndroidVersionUtils;
-import app.crossword.yourealwaysbe.view.CircleProgressBar;
 import app.crossword.yourealwaysbe.view.recycler.RemovableRecyclerViewAdapter;
 import app.crossword.yourealwaysbe.view.recycler.SeparatedRecyclerViewAdapter;
 
@@ -115,6 +115,9 @@ public class BrowseActivity extends ForkyzActivity {
     private static final Logger LOGGER
         = Logger.getLogger(BrowseActivity.class.getCanonicalName());
 
+    private static final DateTimeFormatter DATE_FORMAT
+        = DateTimeFormatter.ofPattern("EEEE\n MMM dd, yyyy");
+
     /**
      * See note for BROWSER_CLOSE_ACTION
      */
@@ -162,17 +165,15 @@ public class BrowseActivity extends ForkyzActivity {
     private DirHandle crosswordsFolder
         = getFileHandler().getCrosswordsDirectory();
 
+    private BrowseBinding binding;
     private Accessor accessor = Accessor.DATE_DESC;
     private SeparatedRecyclerViewAdapter<FileViewHolder, FileAdapter>
         currentAdapter = null;
     private Handler handler = new Handler(Looper.getMainLooper());
-    private RecyclerView puzzleList;
     private NotificationManagerCompat nm;
     private boolean hasWritePermissions;
-    private SpeedDialView buttonAdd;
     private Set<PuzMetaFile> selected = new HashSet<>();
     private MenuItem viewCrosswordsArchiveMenuItem;
-    private View pleaseWaitView;
     private Collection<Uri> pendingImports = null;
 
     ActivityResultLauncher<String> getImportURI =
@@ -377,10 +378,11 @@ public class BrowseActivity extends ForkyzActivity {
 
         // Now create!
 
+        binding = BrowseBinding.inflate(getLayoutInflater());
+        this.setContentView(binding.getRoot());
+
         setDefaultKeyMode(DEFAULT_KEYS_SHORTCUT);
-        this.setContentView(R.layout.browse);
-        this.puzzleList = (RecyclerView) this.findViewById(R.id.puzzleList);
-        this.puzzleList.setLayoutManager(new LinearLayoutManager(this));
+        binding.puzzleList.setLayoutManager(new LinearLayoutManager(this));
         ItemTouchHelper helper = new ItemTouchHelper(
             new ItemTouchHelper.SimpleCallback(
                 0,
@@ -434,7 +436,7 @@ public class BrowseActivity extends ForkyzActivity {
                     }
                 }
             });
-        helper.attachToRecyclerView(this.puzzleList);
+        helper.attachToRecyclerView(binding.puzzleList);
         upgradePreferences();
         this.nm = NotificationManagerCompat.from(this);
 
@@ -448,20 +450,15 @@ public class BrowseActivity extends ForkyzActivity {
         default:
             this.accessor = Accessor.DATE_DESC;
         }
-        buttonAdd = findViewById(R.id.speed_dial_add);
         setupSpeedDial();
-
-        SwipeRefreshLayout swipePuzzleReloadView
-            = findViewById(R.id.swipeContainer);
 
         model = new ViewModelProvider(this).get(BrowseActivityViewModel.class);
         model.getPuzzleFiles().observe(this, (v) -> {
             BrowseActivity.this.setViewCrosswordsOrArchiveUI();
             BrowseActivity.this.loadPuzzleAdapter();
-            swipePuzzleReloadView.setRefreshing(false);
+            binding.swipeContainer.setRefreshing(false);
         });
 
-        pleaseWaitView = findViewById(R.id.please_wait_notice);
         model.getIsUIBusy().observe(this, (isBusy) -> {
             if (isBusy)
                 showPleaseWait();
@@ -474,7 +471,7 @@ public class BrowseActivity extends ForkyzActivity {
             BrowseActivity.this.startActivity(i);
         });
 
-        swipePuzzleReloadView.setOnRefreshListener(
+        binding.swipeContainer.setOnRefreshListener(
              new SwipeRefreshLayout.OnRefreshListener() {
                  @Override
                  public void onRefresh() {
@@ -768,45 +765,42 @@ public class BrowseActivity extends ForkyzActivity {
         boolean showEmptyMsgs
     ) {
         currentAdapter = adapter;
-        puzzleList.setAdapter(adapter);
-
-        TextView emptyMsg = findViewById(R.id.empty_listing_msg);
-        TextView storageMsg = findViewById(R.id.internal_storage_msg);
+        binding.puzzleList.setAdapter(adapter);
 
         if (adapter.isEmpty() && showEmptyMsgs) {
             if (model.getIsViewArchive()) {
-                emptyMsg.setText(R.string.no_puzzles);
+                binding.emptyListingMsg.setText(R.string.no_puzzles);
             } else {
-                emptyMsg.setText(
+                binding.emptyListingMsg.setText(
                     R.string.no_puzzles_download_or_configure_storage
                 );
             }
-            emptyMsg.setVisibility(View.VISIBLE);
+            binding.emptyListingMsg.setVisibility(View.VISIBLE);
 
             if (ForkyzApplication.getInstance().isInternalStorage())
-                storageMsg.setVisibility(View.VISIBLE);
+                binding.internalStorageMsg.setVisibility(View.VISIBLE);
             else
-                storageMsg.setVisibility(View.GONE);
+                binding.internalStorageMsg.setVisibility(View.GONE);
         } else {
-            emptyMsg.setVisibility(View.GONE);
-            storageMsg.setVisibility(View.GONE);
+            binding.emptyListingMsg.setVisibility(View.GONE);
+            binding.internalStorageMsg.setVisibility(View.GONE);
         }
 
         showSpeedDial();
     }
 
     private void showPleaseWait() {
-        pleaseWaitView.setVisibility(View.VISIBLE);
+        binding.pleaseWaitNotice.setVisibility(View.VISIBLE);
         setSpeedDialVisibility(View.GONE);
     }
 
     private void hidePleaseWait() {
-        pleaseWaitView.setVisibility(View.GONE);
+        binding.pleaseWaitNotice.setVisibility(View.GONE);
         setSpeedDialVisibility(View.VISIBLE);
     }
 
     private void setSpeedDialVisibility(int visibility) {
-        buttonAdd.setVisibility(visibility);
+        binding.speedDialAdd.setVisibility(visibility);
     }
 
     /**
@@ -816,13 +810,13 @@ public class BrowseActivity extends ForkyzActivity {
      * scroll show/hide feature, rather than setting visibility directly
      */
     private void showSpeedDial() {
-        buttonAdd.show();
+        binding.speedDialAdd.show();
     }
 
     private void setupSpeedDial() {
-        buttonAdd.inflate(R.menu.speed_dial_browse_menu);
+        binding.speedDialAdd.inflate(R.menu.speed_dial_browse_menu);
 
-        buttonAdd.setOnActionSelectedListener(
+        binding.speedDialAdd.setOnActionSelectedListener(
             new SpeedDialView.OnActionSelectedListener() {
                 @Override
                 public boolean onActionSelected(
@@ -830,7 +824,7 @@ public class BrowseActivity extends ForkyzActivity {
                 ) {
                     int id = actionItem.getId();
                     if (id == R.id.speed_dial_download) {
-                        buttonAdd.close();
+                        binding.speedDialAdd.close();
                         showDownloadDialog();
                         return true;
                     } else if (id == R.id.speed_dial_import) {
@@ -977,8 +971,6 @@ public class BrowseActivity extends ForkyzActivity {
 
     private class FileAdapter
             extends RemovableRecyclerViewAdapter<FileViewHolder> {
-        final DateTimeFormatter df
-            = DateTimeFormatter.ofPattern("EEEE\n MMM dd, yyyy");
         final ArrayList<MutableLiveData<PuzMetaFile>> objects;
         final Map<MutableLiveData<PuzMetaFile>, Observer<PuzMetaFile>>
             objectObservers = new HashMap<>();
@@ -992,80 +984,17 @@ public class BrowseActivity extends ForkyzActivity {
 
         @Override
         public FileViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.puzzle_list_item, parent, false);
-            return new FileViewHolder(view);
+            PuzzleListItemBinding itemBinding = PuzzleListItemBinding.inflate(
+                LayoutInflater.from(parent.getContext()), parent, false
+            );
+            return new FileViewHolder(itemBinding);
         }
 
         @Override
         public void onBindViewHolder(FileViewHolder holder, int position) {
-            View view = holder.itemView;
             MutableLiveData<PuzMetaFile> pmData = objects.get(position);
             PuzMetaFile pm = pmData.getValue();
-
             holder.setPuzMetaFile(pm);
-
-            view.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View view) {
-                    BrowseActivity.this.onItemClick(view, pm);
-                }
-            });
-
-            view.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View view) {
-                    BrowseActivity.this.onItemLongClick(view, pm);
-                    return true;
-                }
-            });
-
-            TextView date = (TextView) view.findViewById(R.id.puzzle_date);
-
-            date.setText(df.format(pm.getDate()));
-
-            if (accessor == Accessor.SOURCE) {
-                date.setVisibility(View.VISIBLE);
-            } else {
-                date.setVisibility(View.GONE);
-            }
-
-            String title = pm.getTitle();
-            String caption = pm.getCaption();
-            String author = pm.getAuthor();
-
-            TextView titleView = (TextView) view.findViewById(R.id.puzzle_name);
-
-            titleView.setText(smartHtml(title));
-
-            CircleProgressBar bar
-                = (CircleProgressBar) view.findViewById(R.id.puzzle_progress);
-
-            bar.setPercentFilled(pm.getFilled());
-            bar.setComplete(pm.getComplete() == 100);
-
-            TextView captionView
-                = (TextView) view.findViewById(R.id.puzzle_caption);
-
-            // add author if not already in title or caption
-            // case insensitive trick:
-            // https://www.baeldung.com/java-case-insensitive-string-matching
-            String quotedAuthor = Pattern.quote(author);
-            boolean addAuthor
-                = author.length() > 0
-                    && !title.matches("(?i).*" + quotedAuthor + ".*")
-                    && !caption.matches("(?i).*" + quotedAuthor + ".*");
-
-            if (addAuthor) {
-                captionView.setText(smartHtml(
-                    view.getContext().getString(
-                        R.string.puzzle_caption_with_author, caption, author
-                    )
-                ));
-            } else {
-                captionView.setText(smartHtml(caption));
-            }
-
-            setListItemColor(view, selected.contains(pm));
         }
 
         @Override
@@ -1122,14 +1051,82 @@ public class BrowseActivity extends ForkyzActivity {
     }
 
     private class FileViewHolder extends RecyclerView.ViewHolder {
+        private PuzzleListItemBinding itemBinding;
         private PuzMetaFile puzMetaFile;
 
-        public FileViewHolder(View itemView) {
-            super(itemView);
+        public FileViewHolder(PuzzleListItemBinding itemBinding) {
+            super(itemBinding.getRoot());
+            this.itemBinding = itemBinding;
         }
 
         public void setPuzMetaFile(PuzMetaFile puzMetaFile) {
             this.puzMetaFile = puzMetaFile;
+
+            itemBinding.getRoot().setOnClickListener(
+                new View.OnClickListener() {
+                    public void onClick(View view) {
+                        BrowseActivity.this.onItemClick(view, puzMetaFile);
+                    }
+                }
+            );
+
+            itemBinding.getRoot().setOnLongClickListener(
+                new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View view) {
+                        BrowseActivity.this.onItemLongClick(
+                            view, puzMetaFile
+                        );
+                        return true;
+                    }
+                }
+            );
+
+            itemBinding.puzzleDate.setText(
+                DATE_FORMAT.format(puzMetaFile.getDate())
+            );
+
+            if (accessor == Accessor.SOURCE) {
+                itemBinding.puzzleDate.setVisibility(View.VISIBLE);
+            } else {
+                itemBinding.puzzleDate.setVisibility(View.GONE);
+            }
+
+            String title = puzMetaFile.getTitle();
+            String caption = puzMetaFile.getCaption();
+            String author = puzMetaFile.getAuthor();
+
+            itemBinding.puzzleName.setText(smartHtml(title));
+
+            itemBinding.puzzleProgress.setPercentFilled(
+                puzMetaFile.getFilled()
+            );
+            itemBinding.puzzleProgress.setComplete(
+                puzMetaFile.getComplete() == 100
+            );
+
+            // add author if not already in title or caption
+            // case insensitive trick:
+            // https://www.baeldung.com/java-case-insensitive-string-matching
+            String quotedAuthor = Pattern.quote(author);
+            boolean addAuthor
+                = author.length() > 0
+                    && !title.matches("(?i).*" + quotedAuthor + ".*")
+                    && !caption.matches("(?i).*" + quotedAuthor + ".*");
+
+            if (addAuthor) {
+                itemBinding.puzzleCaption.setText(smartHtml(
+                    itemBinding.getRoot().getContext().getString(
+                        R.string.puzzle_caption_with_author, caption, author
+                    )
+                ));
+            } else {
+                itemBinding.puzzleCaption.setText(smartHtml(caption));
+            }
+
+            setListItemColor(
+                itemBinding.getRoot(), selected.contains(puzMetaFile)
+            );
         }
 
         public PuzMetaFile getPuzMetaFile() {
