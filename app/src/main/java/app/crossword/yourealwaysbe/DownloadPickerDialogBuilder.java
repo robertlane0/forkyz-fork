@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.logging.Logger;
 
-
 /**
  * Custom dialog for choosing puzzles to download.
  */
