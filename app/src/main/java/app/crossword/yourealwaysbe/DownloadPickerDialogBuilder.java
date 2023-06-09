@@ -14,14 +14,14 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker.OnDateChangedListener;
 import android.widget.DatePicker;
-import android.widget.Spinner;
 import android.widget.TextView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import app.crossword.yourealwaysbe.forkyz.R;
+import app.crossword.yourealwaysbe.forkyz.databinding.DownloadDialogBinding;
 import app.crossword.yourealwaysbe.net.Downloader;
 import app.crossword.yourealwaysbe.net.Downloaders;
 import app.crossword.yourealwaysbe.net.DummyDownloader;
-import app.crossword.yourealwaysbe.forkyz.R;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -37,10 +37,8 @@ import java.util.logging.Logger;
  */
 public class DownloadPickerDialogBuilder {
     private static final Logger LOGGER = Logger.getLogger(DownloadPickerDialogBuilder.class.getCanonicalName());
-    private Activity mActivity;
-    private Dialog mDialog;
-    private List<Downloader> mAvailableDownloaders;
-    private OnDateChangedListener dateChangedListener = new DatePicker.OnDateChangedListener() {
+    private OnDateChangedListener dateChangedListener
+        = new DatePicker.OnDateChangedListener() {
             public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                 LOGGER.info("OnDateChanged " + year + " " + monthOfYear + " " + dayOfMonth);
                 downloadDate = LocalDate.of(year, monthOfYear + 1, dayOfMonth);
@@ -49,47 +47,53 @@ public class DownloadPickerDialogBuilder {
             }
         };
 
+    private Activity activity;
+    private DownloadDialogBinding binding;
+    private List<Downloader> availableDownloaders;
+    private Dialog dialog;
     private Downloaders downloaders;
-    private Spinner mPuzzleSelect;
     private LocalDate downloadDate;
     private int selectedItemPosition = 0;
-    private final TextView dayOfWeek;
 
-    public DownloadPickerDialogBuilder(Activity a, final OnDownloadSelectedListener downloadButtonListener, int year,
-        int monthOfYear, int dayOfMonth, Downloaders downloaders) {
-        mActivity = a;
-
-        downloadDate = LocalDate.of(year, monthOfYear,  dayOfMonth);
-
+    public DownloadPickerDialogBuilder(
+        Activity a,
+        final OnDownloadSelectedListener downloadButtonListener,
+        int year, int monthOfYear, int dayOfMonth,
+        Downloaders downloaders
+    ) {
+        this.activity = a;
+        this.downloadDate = LocalDate.of(year, monthOfYear,  dayOfMonth);
         this.downloaders = downloaders;
+        this.binding = DownloadDialogBinding.inflate(LayoutInflater.from(activity));
 
-        LayoutInflater inflater = (LayoutInflater) mActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View layout = inflater.inflate(R.layout.download_dialog, (ViewGroup) mActivity.findViewById(R.id.download_root));
-
-
-        final DatePicker datePicker = layout.findViewById(R.id.datePicker);
-        dayOfWeek = layout.findViewById(R.id.dayOfWeek);
         updateDayOfWeek();
 
-        datePicker.init(year, monthOfYear - 1, dayOfMonth, dateChangedListener);
+        binding.datePicker.init(
+            year, monthOfYear - 1, dayOfMonth, dateChangedListener
+        );
 
-        mPuzzleSelect = layout.findViewById(R.id.puzzleSelect);
-        mPuzzleSelect.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-               selectedItemPosition = position;
-            }
+        binding.puzzleSelect.setOnItemSelectedListener(
+            new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                   selectedItemPosition = position;
+                }
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                selectedItemPosition = 0;
-            }
-        });
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+                    selectedItemPosition = 0;
+                }
+            });
         updatePuzzleSelect();
 
         OnClickListener clickHandler = new OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
-                    dateChangedListener.onDateChanged(datePicker, datePicker.getYear(), datePicker.getMonth(), datePicker.getDayOfMonth());
+                    dateChangedListener.onDateChanged(
+                        binding.datePicker,
+                        binding.datePicker.getYear(),
+                        binding.datePicker.getMonth(),
+                        binding.datePicker.getDayOfMonth()
+                    );
                     downloadButtonListener.onDownloadSelected(
                         getCurrentDate(),
                         getSelectedDownloaders()
@@ -98,14 +102,15 @@ public class DownloadPickerDialogBuilder {
             };
 
         MaterialAlertDialogBuilder builder
-            = new MaterialAlertDialogBuilder(mActivity);
+            = new MaterialAlertDialogBuilder(activity);
 
-        builder.setPositiveButton(R.string.download, clickHandler)
-            .setNegativeButton(R.string.cancel, null)
-            .setView(layout);
+        builder
+            .setView(binding.getRoot())
+            .setPositiveButton(R.string.download, clickHandler)
+            .setNegativeButton(R.string.cancel, null);
 
-        mDialog = builder.create();
-        mDialog.setOnShowListener(new OnShowListener() {
+        dialog = builder.create();
+        dialog.setOnShowListener(new OnShowListener() {
                 public void onShow(DialogInterface arg0) {
                     updatePuzzleSelect();
                 }
@@ -113,16 +118,14 @@ public class DownloadPickerDialogBuilder {
     }
 
     private void updateDayOfWeek() {
-        if (dayOfWeek == null) return;
-
         String dayName
             = downloadDate.getDayOfWeek()
                         .getDisplayName(TextStyle.FULL, Locale.getDefault());
-        dayOfWeek.setText(dayName);
+        binding.dayOfWeek.setText(dayName);
     }
 
     public Dialog getInstance() {
-        return mDialog;
+        return dialog;
     }
 
 	private LocalDate getCurrentDate() {
@@ -134,24 +137,24 @@ public class DownloadPickerDialogBuilder {
             return downloaders.getDownloaders(getCurrentDate());
         } else {
             return Collections.singletonList(
-                mAvailableDownloaders.get(selectedItemPosition)
+                availableDownloaders.get(selectedItemPosition)
             );
         }
     }
 
     private void updatePuzzleSelect() {
-        mAvailableDownloaders = downloaders.getDownloaders();
-        mAvailableDownloaders.add(0, new DummyDownloader());
+        availableDownloaders = downloaders.getDownloaders();
+        availableDownloaders.add(0, new DummyDownloader());
 
         ArrayAdapter<Downloader> adapter = new DownloadersAdapter(
-            mActivity,
+            activity,
             android.R.layout.simple_spinner_item,
-            mAvailableDownloaders
+            availableDownloaders
         );
         adapter.setDropDownViewResource(
             android.R.layout.simple_spinner_dropdown_item
         );
-        mPuzzleSelect.setAdapter(adapter);
+        binding.puzzleSelect.setAdapter(adapter);
     }
 
     public interface OnDownloadSelectedListener {
@@ -189,7 +192,7 @@ public class DownloadPickerDialogBuilder {
             TextView view = (TextView) rawView;
 
             ColorStateList colors = view.getTextColors();
-            int alpha = mActivity.getResources().getInteger(
+            int alpha = activity.getResources().getInteger(
                 isEnabled(position)
                 ? R.integer.enabled_downloader_alpha
                 : R.integer.disabled_downloader_alpha
