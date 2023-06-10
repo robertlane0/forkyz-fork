@@ -984,8 +984,10 @@ public class BrowseActivity extends ForkyzActivity {
 
         @Override
         public FileViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            LayoutInflater inflater = (LayoutInflater) parent.getContext()
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             PuzzleListItemBinding itemBinding = PuzzleListItemBinding.inflate(
-                LayoutInflater.from(parent.getContext()), parent, false
+                inflater, parent, false
             );
             return new FileViewHolder(itemBinding);
         }

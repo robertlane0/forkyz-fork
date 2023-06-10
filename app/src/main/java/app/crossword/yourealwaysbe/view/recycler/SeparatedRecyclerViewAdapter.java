@@ -1,6 +1,7 @@
 package app.crossword.yourealwaysbe.view.recycler;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -36,8 +37,10 @@ public class SeparatedRecyclerViewAdapter<
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         if(viewType == HEADER){
-            TextView view = (TextView) LayoutInflater.from(viewGroup.getContext())
-                    .inflate(textViewId, viewGroup, false);
+            LayoutInflater inflater = (LayoutInflater) viewGroup.getContext()
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            TextView view
+                = (TextView) inflater.inflate(textViewId, viewGroup, false);
             return new SimpleTextViewHolder(view);
         } else {
             RecyclerView.ViewHolder result = null;

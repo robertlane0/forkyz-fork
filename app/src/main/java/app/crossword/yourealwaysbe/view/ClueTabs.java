@@ -134,9 +134,9 @@ public class ClueTabs extends LinearLayout
 
     public ClueTabs(Context context, AttributeSet as) {
         super(context, as);
-        binding = ClueTabsBinding.inflate(
-            LayoutInflater.from(context), this, true
-        );
+        LayoutInflater inflater = (LayoutInflater)
+            context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        binding = ClueTabsBinding.inflate(inflater, this, true);
     }
 
     public void setOnClueClickDescription(String description) {
@@ -393,8 +393,10 @@ public class ClueTabs extends LinearLayout
     private class ClueTabsPagerAdapter extends RecyclerView.Adapter<ClueListHolder> {
         @Override
         public ClueListHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            LayoutInflater inflater = (LayoutInflater) parent.getContext()
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             ClueTabsPageBinding pageBinding = ClueTabsPageBinding.inflate(
-                LayoutInflater.from(parent.getContext()), parent, false
+                inflater, parent, false
             );
             return new ClueListHolder(pageBinding);
         }
@@ -568,8 +570,10 @@ public class ClueTabs extends LinearLayout
 
         @Override
         public ClueViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            LayoutInflater inflater = (LayoutInflater) parent.getContext()
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             ClueListItemBinding clueBinding = ClueListItemBinding.inflate(
-                LayoutInflater.from(parent.getContext()), parent, false
+                inflater, parent, false
             );
             return new ClueViewHolder(clueBinding, showDirection);
         }

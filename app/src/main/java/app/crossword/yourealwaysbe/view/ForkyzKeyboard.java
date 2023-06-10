@@ -242,8 +242,9 @@ public class ForkyzKeyboard
         specialKeyViewIds = new ArrayList<>();;
 
         // inflate new state
-        LayoutInflater inflater
-            = LayoutInflater.from(context).cloneInContext(context);
+        LayoutInflater inflater = (LayoutInflater)
+            context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        inflater = inflater.cloneInContext(context);
         LayoutInflaterCompat.setFactory2(inflater, new FKFactory());
         inflater.inflate(getKeyboardLayout(context), this, true);
 
