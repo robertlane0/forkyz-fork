@@ -1,4 +1,7 @@
-<merge xmlns:android="http://schemas.android.com/apk/res/android">
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+>
+<merge>
     <TableLayout
         android:id="@+id/stats_table"
         android:layout_width="match_parent"
@@ -17,9 +20,8 @@
                 android:textSize="16sp"
                 android:padding="7dp"
             />
-
             <TextView
-                android:id="@+id/elapsed"
+                android:id="@+id/elapsed_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/elapsed_time_dummy"
@@ -27,7 +29,6 @@
                 android:padding="7dp"
             />
         </TableRow>
-
         <TableRow
             android:gravity="center"
             android:layout_width="wrap_content"
@@ -40,9 +41,8 @@
                 android:textSize="16sp"
                 android:padding="7dp"
             />
-
             <TextView
-                android:id="@+id/totalClues"
+                android:id="@+id/total_clues"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/dummy_xx"
@@ -50,7 +50,6 @@
                 android:padding="7dp"
             />
         </TableRow>
-
         <TableRow
             android:gravity="center"
             android:layout_width="wrap_content"
@@ -64,7 +63,7 @@
                 android:padding="7dp"
             />
             <TextView
-                android:id="@+id/totalBoxes"
+                android:id="@+id/total_boxes"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/dummy_xx"
@@ -72,7 +71,6 @@
                 android:padding="7dp"
             />
         </TableRow>
-
         <TableRow
             android:gravity="center"
             android:layout_width="wrap_content"
@@ -86,7 +84,7 @@
                 android:padding="7dp"
             />
             <TextView
-                android:id="@+id/cheatedBoxes"
+                android:id="@+id/cheated_boxes"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/dummy_xx_w_pcnt"
@@ -95,7 +93,6 @@
             />
         </TableRow>
     </TableLayout>
-
     <TextView
         android:id="@+id/puzzle_completed_msg"
         android:layout_width="fill_parent"
@@ -105,3 +102,4 @@
         android:paddingBottom="?dialogPreferredPadding"
     />
 </merge>
+</layout>

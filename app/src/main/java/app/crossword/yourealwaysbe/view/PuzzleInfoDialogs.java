@@ -2,24 +2,23 @@ package app.crossword.yourealwaysbe.view;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Spanned;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.core.text.HtmlCompat;
 import androidx.fragment.app.DialogFragment;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.progressindicator.LinearProgressIndicator;
 
 import app.crossword.yourealwaysbe.ImaginaryTimer;
 import app.crossword.yourealwaysbe.PuzzleActivity;
 import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
 import app.crossword.yourealwaysbe.forkyz.R;
+import app.crossword.yourealwaysbe.forkyz.databinding.CompletedBinding;
+import app.crossword.yourealwaysbe.forkyz.databinding.CompletionInfoBinding;
+import app.crossword.yourealwaysbe.forkyz.databinding.PuzzleInfoDialogBinding;
 import app.crossword.yourealwaysbe.puz.Box;
 import app.crossword.yourealwaysbe.puz.Playboard;
 import app.crossword.yourealwaysbe.puz.Puzzle;
@@ -43,22 +42,17 @@ public class PuzzleInfoDialogs {
             MaterialAlertDialogBuilder builder
                 = new MaterialAlertDialogBuilder(activity);
 
-            LayoutInflater inflater = (LayoutInflater) activity.getSystemService(
-                Context.LAYOUT_INFLATER_SERVICE
-            );
-            View layout = inflater.inflate(
-                R.layout.completed,
-                (ViewGroup) activity.findViewById(R.id.finished)
-            );
+            CompletedBinding binding
+                = CompletedBinding.inflate(activity.getLayoutInflater());
 
-            builder.setTitle(activity.getString(R.string.puzzle_finished_title));
-            builder.setView(layout);
+            builder.setView(binding.getRoot())
+                .setTitle(activity.getString(R.string.puzzle_finished_title));
 
             Puzzle puz = getPuzzle();
             if (puz == null)
                 return builder.create();
 
-            populateFinishedInfo(puz, layout);
+            populateFinishedInfo(puz, binding.completionInfo);
 
             String shareMessage = getShareMessage(puz);
 
@@ -83,10 +77,12 @@ public class PuzzleInfoDialogs {
 
         }
 
-        protected void populateFinishedInfo(Puzzle puz, View layout) {
+        protected void populateFinishedInfo(
+            Puzzle puz, CompletionInfoBinding binding
+        ) {
             Activity activity = getActivity();
 
-            addCompletedMsg(puz, layout.findViewById(R.id.puzzle_completed_msg));
+            addCompletedMsg(puz, binding.puzzleCompletedMsg);
 
             long elapsed = puz.getTime();
             long finishedTime = elapsed;
@@ -124,21 +120,14 @@ public class PuzzleInfoDialogs {
                 R.string.num_hinted_boxes, cheatedBoxes, cheatLevel
             );
 
-            TextView elapsedTime = layout.findViewById(R.id.elapsed);
-            elapsedTime.setText(elapsedString);
-
-            TextView totalCluesView = layout.findViewById(R.id.totalClues);
-            totalCluesView.setText(String.format(
+            binding.elapsedTime.setText(elapsedString);
+            binding.totalClues.setText(String.format(
                 Locale.getDefault(), "%d", totalClues)
             );
-
-            TextView totalBoxesView = layout.findViewById(R.id.totalBoxes);
-            totalBoxesView.setText(String.format(
+            binding.totalBoxes.setText(String.format(
                 Locale.getDefault(), "%d", totalBoxes
             ));
-
-            TextView cheatedBoxesView = layout.findViewById(R.id.cheatedBoxes);
-            cheatedBoxesView.setText(cheatedString);
+            binding.cheatedBoxes.setText(cheatedString);
         }
 
         private String getShareMessage(Puzzle puz) {
@@ -203,61 +192,53 @@ public class PuzzleInfoDialogs {
     public static class Info extends Finished {
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
+            Activity activity = getActivity();
+
             MaterialAlertDialogBuilder builder
                 = new MaterialAlertDialogBuilder(getActivity());
-            LayoutInflater inflater = requireActivity().getLayoutInflater();
 
-            View view = inflater.inflate(R.layout.puzzle_info_dialog, null);
-
-            Activity activity = getActivity();
+            PuzzleInfoDialogBinding binding = PuzzleInfoDialogBinding.inflate(
+                activity.getLayoutInflater()
+            );
 
             Puzzle puz = getPuzzle();
             if (puz != null) {
-                TextView title = view.findViewById(R.id.puzzle_info_title);
-                title.setText(smartHtml(puz.getTitle()));
-
-                TextView author = view.findViewById(R.id.puzzle_info_author);
-                author.setText(puz.getAuthor());
-
-                TextView copyright
-                    = view.findViewById(R.id.puzzle_info_copyright);
-                copyright.setText(smartHtml(puz.getCopyright()));
-
-                TextView time = view.findViewById(R.id.puzzle_info_time);
+                binding.puzzleInfoTitle.setText(smartHtml(puz.getTitle()));
+                binding.puzzleInfoAuthor.setText(puz.getAuthor());
+                binding.puzzleInfoCopyright.setText(
+                    smartHtml(puz.getCopyright())
+                );
 
                 ImaginaryTimer timer = getTimer();
                 if (timer != null) {
-                    time.setText(getString(
+                    binding.puzzleInfoTime.setText(getString(
                         R.string.elapsed_time, timer.time()
                     ));
                 } else {
-                    time.setText(getString(
+                    binding.puzzleInfoTime.setText(getString(
                         R.string.elapsed_time,
                         new ImaginaryTimer(puz.getTime()).time()
                     ));
                 }
 
-                LinearProgressIndicator progress
-                    = view.findViewById(R.id.puzzle_info_progress);
-                progress.setProgress(puz.getPercentComplete());
+                binding.puzzleInfoProgress
+                    .setProgress(puz.getPercentComplete());
 
-                TextView filename
-                    = view.findViewById(R.id.puzzle_info_filename);
                 FileHandler fileHandler
                     = ForkyzApplication.getInstance().getFileHandler();
                 PuzHandle handle = getPuzHandle();
                 if (handle != null) {
-                    filename.setText(
+                    binding.puzzleInfoFilename.setText(
                         fileHandler.getUri(handle).toString()
                     );
                 }
 
-                addIntro(view);
-                addNotes(view);
-                addCompletedInfo(view);
+                addIntro(binding);
+                addNotes(binding);
+                addCompletedInfo(binding);
             }
 
-            builder.setView(view);
+            builder.setView(binding.getRoot());
 
             return builder.create();
         }
@@ -274,40 +255,32 @@ public class PuzzleInfoDialogs {
             return ForkyzApplication.getInstance().getPuzHandle();
         }
 
-        private void addIntro(View dialogView) {
-            TextView titleView
-                = dialogView.findViewById(R.id.puzzle_info_intro_title);
-            TextView view = dialogView.findViewById(R.id.puzzle_info_intro);
-
+        private void addIntro(PuzzleInfoDialogBinding binding) {
             Puzzle puz = getPuzzle();
             if (puz == null)
                 return;
 
             String intro = puz.getIntroMessage();
             if (intro == null || intro.isEmpty()) {
-                titleView.setVisibility(View.GONE);
-                view.setVisibility(View.GONE);
+                binding.puzzleInfoIntroTitle.setVisibility(View.GONE);
+                binding.puzzleInfoIntro.setVisibility(View.GONE);
             } else {
-                view.setText(smartHtml(intro));
-                titleView.setVisibility(View.VISIBLE);
-                view.setVisibility(View.VISIBLE);
+                binding.puzzleInfoIntroTitle.setVisibility(View.VISIBLE);
+                binding.puzzleInfoIntro.setText(smartHtml(intro));
+                binding.puzzleInfoIntro.setVisibility(View.VISIBLE);
             }
         }
 
-        private void addNotes(View dialogView) {
-            TextView titleView
-                = dialogView.findViewById(R.id.puzzle_info_notes_title);
-            TextView view = dialogView.findViewById(R.id.puzzle_info_notes);
-
+        private void addNotes(PuzzleInfoDialogBinding binding) {
             Puzzle puz = getPuzzle();
             if (puz == null || !puz.hasNotes()) {
-                titleView.setVisibility(View.GONE);
-                view.setVisibility(View.GONE);
+                binding.puzzleInfoNotesTitle.setVisibility(View.GONE);
+                binding.puzzleInfoNotes.setVisibility(View.GONE);
                 return;
             }
 
-            titleView.setVisibility(View.VISIBLE);
-            view.setVisibility(View.VISIBLE);
+            binding.puzzleInfoNotesTitle.setVisibility(View.VISIBLE);
+            binding.puzzleInfoNotes.setVisibility(View.VISIBLE);
 
             String puzNotes = puz.getNotes();
 
@@ -324,87 +297,82 @@ public class PuzzleInfoDialogs {
             final boolean hasMore = split.length > 1;
 
             if (!hasMore) {
-                view.setText(smartHtml(text));
+                binding.puzzleInfoNotes.setText(smartHtml(text));
             } else {
                 if (text.length() > 0) {
-                    view.setText(smartHtml(
-                        getString(R.string.tap_to_show_full_notes_with_text, text)
-                    ));
+                    binding.puzzleInfoNotes.setText(smartHtml(getString(
+                        R.string.tap_to_show_full_notes_with_text, text
+                    )));
                 } else {
-                    view.setText(getString(
+                    binding.puzzleInfoNotes.setText(getString(
                         R.string.tap_to_show_full_notes_no_text
                     ));
                 }
 
-                view.setOnClickListener(new View.OnClickListener() {
-                    private boolean showAll = true;
+                binding.puzzleInfoNotes.setOnClickListener(
+                    new View.OnClickListener() {
+                        private boolean showAll = true;
 
-                    public void onClick(View view) {
-                        TextView tv = (TextView) view;
+                        public void onClick(View view) {
+                            TextView tv = (TextView) view;
 
-                        if (showAll) {
-                            if (notes == null || notes.length() == 0) {
-                                tv.setText(getString(
-                                    R.string.tap_to_hide_full_notes_no_text
-                                ));
-                            } else {
-                                tv.setText(smartHtml(
-                                    getString(
+                            if (showAll) {
+                                if (notes == null || notes.length() == 0) {
+                                    tv.setText(getString(
+                                        R.string.tap_to_hide_full_notes_no_text
+                                    ));
+                                } else {
+                                    tv.setText(smartHtml(getString(
                                         R.string.tap_to_hide_full_notes_with_text,
                                         notes
-                                    )
-                                ));
-                            }
-                        } else {
-                            if (text == null || text.length() == 0) {
-                                tv.setText(getString(
-                                    R.string.tap_to_show_full_notes_no_text
-                                ));
+                                    )));
+                                }
                             } else {
-                                tv.setText(smartHtml(
-                                    getString(
+                                if (text == null || text.length() == 0) {
+                                    tv.setText(getString(
+                                        R.string.tap_to_show_full_notes_no_text
+                                    ));
+                                } else {
+                                    tv.setText(smartHtml(getString(
                                         R.string.tap_to_show_full_notes_with_text,
                                         text
-                                    )
-                                ));
+                                    )));
+                                }
                             }
-                        }
 
-                        showAll = !showAll;
+                            showAll = !showAll;
+                        }
                     }
-                });
+                );
             }
         }
 
-        private void addCompletedInfo(View dialogView) {
-            View completedTitle
-                = dialogView.findViewById(R.id.puzzle_info_completed_title);
-            View completedPadding
-                = dialogView.findViewById(R.id.puzzle_info_completed_padding);
-            View completedMsg
-                = dialogView.findViewById(R.id.puzzle_completed_msg);
-            View statsTable
-                = dialogView.findViewById(R.id.stats_table);
-
+        private void addCompletedInfo(PuzzleInfoDialogBinding binding) {
             Puzzle puz = getPuzzle();
             if (puz == null || puz.getPercentComplete() < 100) {
-                completedTitle.setVisibility(View.GONE);
-                completedPadding.setVisibility(View.GONE);
-                completedMsg.setVisibility(View.GONE);
-                statsTable.setVisibility(View.GONE);
+                binding.puzzleInfoCompletedTitle.setVisibility(View.GONE);
+                binding.puzzleInfoCompletedPadding.setVisibility(View.GONE);
+                binding.completionInfo
+                    .puzzleCompletedMsg.setVisibility(View.GONE);
+                binding.completionInfo.statsTable.setVisibility(View.GONE);
             } else {
                 String msg = puz.getCompletionMessage();
                 if (msg == null || msg.isEmpty()) {
-                    completedTitle.setVisibility(View.GONE);
-                    completedPadding.setVisibility(View.VISIBLE);
-                    completedMsg.setVisibility(View.GONE);
+                    binding.puzzleInfoCompletedTitle.setVisibility(View.GONE);
+                    binding.puzzleInfoCompletedPadding
+                        .setVisibility(View.VISIBLE);
+                    binding.completionInfo
+                        .puzzleCompletedMsg.setVisibility(View.GONE);
                 } else {
-                    completedTitle.setVisibility(View.VISIBLE);
-                    completedPadding.setVisibility(View.GONE);
-                    completedMsg.setVisibility(View.VISIBLE);
+                    binding.puzzleInfoCompletedTitle
+                        .setVisibility(View.VISIBLE);
+                    binding.puzzleInfoCompletedPadding
+                        .setVisibility(View.GONE);
+                    binding.completionInfo
+                        .puzzleCompletedMsg.setVisibility(View.VISIBLE);
                 }
-                statsTable.setVisibility(View.VISIBLE);
-                populateFinishedInfo(puz, dialogView);
+                binding.completionInfo.statsTable.setVisibility(View.VISIBLE);
+                populateFinishedInfo(puz, binding.completionInfo);
             }
         }
     }
