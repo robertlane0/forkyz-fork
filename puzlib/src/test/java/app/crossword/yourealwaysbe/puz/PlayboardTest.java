@@ -7,6 +7,8 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.Collection;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -15,6 +17,7 @@ import app.crossword.yourealwaysbe.io.IO;
 import app.crossword.yourealwaysbe.io.IOTest;
 import app.crossword.yourealwaysbe.io.IPuzIO;
 
+import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -408,6 +411,30 @@ public class PlayboardTest {
         assertEquals(box1.getResponse(), "*");
         assertEquals(box2.getResponse(), "*");
         assertTrue(box3.isBlank());
+    }
+
+    @Test
+    public void testEditHint() throws IOException {
+        Puzzle puz = loadTestPuz(false);
+        Playboard board = new Playboard(puz);
+
+        final ClueID cid = new ClueID("Across", 10);
+        Clue clue = puz.getClue(cid);
+        assertEquals(clue.getHint(), "Surprised reaction");
+
+        final AtomicBoolean notified = new AtomicBoolean(false);
+        Playboard.PlayboardListener listener = (changes) -> {
+            Collection<ClueID> changedClues = changes.getChangedClueIDs();
+            assertEquals(changedClues.size(), 1);
+            assertTrue(changedClues.contains(cid));
+            notified.set(true);
+        };
+
+        board.addListener(listener);
+        board.editClue(clue, "Test update");
+
+        assertEquals(clue.getHint(), "Test update");
+        assertTrue(notified.get());
     }
 
     private void checkNoMoveFullGrid(
