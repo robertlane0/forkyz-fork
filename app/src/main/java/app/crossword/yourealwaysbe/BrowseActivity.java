@@ -166,7 +166,6 @@ public class BrowseActivity extends ForkyzActivity {
         = getFileHandler().getCrosswordsDirectory();
 
     private BrowseBinding binding;
-    private Accessor accessor = Accessor.DATE_DESC;
     private SeparatedRecyclerViewAdapter<FileViewHolder, FileAdapter>
         currentAdapter = null;
     private Handler handler = new Handler(Looper.getMainLooper());
@@ -332,25 +331,13 @@ public class BrowseActivity extends ForkyzActivity {
             this.startActivity(helpIntent);
             return true;
         } else if (id == R.id.browse_menu_sort_source) {
-            this.accessor = Accessor.SOURCE;
-            prefs.edit()
-                 .putInt("sort", 2)
-                 .apply();
-            this.loadPuzzleAdapter();
+            settings.setBrowseSort(Accessor.SOURCE);
             return true;
         } else if (id == R.id.browse_menu_sort_date_asc) {
-            this.accessor = Accessor.DATE_ASC;
-            prefs.edit()
-                 .putInt("sort", 1)
-                 .apply();
-            this.loadPuzzleAdapter();
+            settings.setBrowseSort(Accessor.DATE_ASC);
             return true;
         } else if (id == R.id.browse_menu_sort_date_desc) {
-            this.accessor = Accessor.DATE_DESC;
-            prefs.edit()
-                 .putInt("sort", 0)
-                 .apply();
-            this.loadPuzzleAdapter();
+            settings.setBrowseSort(Accessor.DATE_DESC);
             return true;
         }
 
@@ -440,16 +427,11 @@ public class BrowseActivity extends ForkyzActivity {
         upgradePreferences();
         this.nm = NotificationManagerCompat.from(this);
 
-        switch (prefs.getInt("sort", 0)) {
-        case 2:
-            this.accessor = Accessor.SOURCE;
-            break;
-        case 1:
-            this.accessor = Accessor.DATE_ASC;
-            break;
-        default:
-            this.accessor = Accessor.DATE_DESC;
-        }
+        settings.liveBrowseSort().observe(this, accessor -> {
+            System.out.println("FORKYZ: live outer " + accessor);
+            loadPuzzleAdapter();
+        });
+
         setupSpeedDial();
 
         model = new ViewModelProvider(this).get(BrowseActivityViewModel.class);
@@ -689,7 +671,10 @@ public class BrowseActivity extends ForkyzActivity {
         List<MutableLiveData<PuzMetaFile>> puzList
             = model.getPuzzleFiles().getValue();
         if (puzList != null) {
-            setPuzzleListAdapter(buildList(puzList, accessor), true);
+            settings.getBrowseSort(accessor -> {
+                System.out.println("FORKYZ: bet brwose " + accessor);
+                setPuzzleListAdapter(buildList(puzList, accessor), true);
+            });
         } else {
             setPuzzleListAdapter(buildEmptyList(), true);
         }
@@ -1059,6 +1044,17 @@ public class BrowseActivity extends ForkyzActivity {
         public FileViewHolder(PuzzleListItemBinding itemBinding) {
             super(itemBinding.getRoot());
             this.itemBinding = itemBinding;
+
+            settings.liveBrowseSort().observe(
+                BrowseActivity.this,
+                accessor -> {
+                    if (accessor == Accessor.SOURCE) {
+                        itemBinding.puzzleDate.setVisibility(View.VISIBLE);
+                    } else {
+                        itemBinding.puzzleDate.setVisibility(View.GONE);
+                    }
+                }
+            );
         }
 
         public void setPuzMetaFile(PuzMetaFile puzMetaFile) {
@@ -1087,12 +1083,6 @@ public class BrowseActivity extends ForkyzActivity {
             itemBinding.puzzleDate.setText(
                 DATE_FORMAT.format(puzMetaFile.getDate())
             );
-
-            if (accessor == Accessor.SOURCE) {
-                itemBinding.puzzleDate.setVisibility(View.VISIBLE);
-            } else {
-                itemBinding.puzzleDate.setVisibility(View.GONE);
-            }
 
             String title = puzMetaFile.getTitle();
             String caption = puzMetaFile.getCaption();
