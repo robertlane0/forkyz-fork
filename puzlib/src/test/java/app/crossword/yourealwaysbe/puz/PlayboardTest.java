@@ -19,6 +19,7 @@ import app.crossword.yourealwaysbe.io.IPuzIO;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PlayboardTest {
@@ -434,6 +435,31 @@ public class PlayboardTest {
         board.editClue(clue, "Test update");
 
         assertEquals(clue.getHint(), "Test update");
+        assertTrue(notified.get());
+    }
+
+    @Test
+    public void testFlagClue() throws IOException {
+        Puzzle puz = loadTestPuz(false);
+        Playboard board = new Playboard(puz);
+
+        final ClueID cid = new ClueID("Across", 10);
+        Clue clue = puz.getClue(cid);
+
+        assertFalse(puz.isFlagged(cid));
+
+        final AtomicBoolean notified = new AtomicBoolean(false);
+        Playboard.PlayboardListener listener = (changes) -> {
+            Collection<ClueID> changedClues = changes.getChangedClueIDs();
+            assertEquals(changedClues.size(), 1);
+            assertTrue(changedClues.contains(cid));
+            notified.set(true);
+        };
+
+        board.addListener(listener);
+        board.flagClue(clue, true);
+
+        assertTrue(puz.isFlagged(cid));
         assertTrue(notified.get());
     }
 
