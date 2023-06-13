@@ -4,6 +4,7 @@ import java.util.logging.Logger;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.GestureDetector.OnGestureListener;
@@ -33,9 +34,13 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
     private int boardStickyBorder;
     private int gestureStartX;
     private int gestureStartY;
+    private Handler handler;
 
     public ScrollingImageView(Context context, AttributeSet as) {
         super(context, as);
+
+        handler = new Handler(context.getMainLooper());
+
         gestureDetector = new GestureDetectorCompat(context, this);
         gestureDetector.setIsLongpressEnabled(true);
         imageView = new ImageView(context);
@@ -65,6 +70,14 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
         }
     }
 
+    public void postBitmap(Bitmap bitmap) {
+        handler.post(() -> { setBitmap(bitmap); });
+    }
+
+    public void postBitmap(Bitmap bitmap, boolean rescale) {
+        handler.post(() -> { setBitmap(bitmap, rescale); });
+    }
+
     public void setBitmap(Bitmap bitmap) {
         this.setBitmap(bitmap, true);
     }
@@ -79,6 +92,13 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
         } else {
             imageView.setImageBitmap(bitmap);
         }
+    }
+
+    // This method is a hack needed in PlayActivity when clue tabs are
+    // shown. The constrain of the board to 1:1 seems to have no effect
+    // until render(true) is called.
+    public void relayout() {
+        setImageViewParams(imageView.getWidth(), imageView.getHeight());
     }
 
     public void setContextMenuListener(ClickListener l) {

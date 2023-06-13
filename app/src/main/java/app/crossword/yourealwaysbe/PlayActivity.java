@@ -328,7 +328,7 @@ public class PlayActivity extends PuzzleActivity
                             .addOnPreDrawListener(
                                 new ViewTreeObserver.OnPreDrawListener() {
                                     public boolean onPreDraw() {
-                                        binding.boardView.forceRedraw();
+                                        binding.boardView.relayout();
                                         binding.boardView
                                             .getViewTreeObserver()
                                             .removeOnPreDrawListener(this);

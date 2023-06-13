@@ -3,6 +3,8 @@ package app.crossword.yourealwaysbe.view;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
 import android.content.Context;
@@ -36,6 +38,10 @@ public class BoardEditText
 
     private static final Logger LOG
         = Logger.getLogger(BoardEditText.class.getCanonicalName());
+
+    // for rendering
+    protected final ExecutorService executorService
+        = Executors.newSingleThreadExecutor();
 
     private BoxInputConnection currentInputConnection = null;
     private boolean nativeInput = false;
@@ -475,15 +481,19 @@ public class BoardEditText
             ? Collections.emptySet()
             : null;
 
-        boolean[] renderChanges = renderAll ? null : changes;
+        boolean[] renderChanges = renderAll
+            ? null
+            : Arrays.copyOf(changes, changes.length);
 
-        setBitmap(renderer.drawBoxes(
-            boxes,
-            renderChanges,
-            selection,
-            suppressNotesList,
-            getContentWidth()
-        ));
+        executorService.execute(() -> {
+            postBitmap(renderer.drawBoxes(
+                boxes,
+                renderChanges,
+                selection,
+                suppressNotesList,
+                getContentWidth()
+            ));
+        });
 
         clearChanges();
     }

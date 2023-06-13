@@ -120,7 +120,7 @@ public class PlayboardRenderer {
         return retValue;
     }
 
-    public void setScale(float scale) {
+    synchronized public void setScale(float scale) {
         float maxScale = getMaxScale();
         float minScale = getMinScale();
 
@@ -151,7 +151,7 @@ public class PlayboardRenderer {
      * lookup.
      * @param suppressNotesLists as in drawBox
      */
-    public Bitmap draw(
+    synchronized public Bitmap draw(
         Collection<Position> changes, Set<String> suppressNotesLists
     ) {
         try {
@@ -188,7 +188,7 @@ public class PlayboardRenderer {
      * contain positions outside of current word.
      * @param suppressNotesLists as in drawBox
      */
-    public Bitmap drawWord(
+    synchronized public Bitmap drawWord(
         Collection<Position> changes,
         Set<String> suppressNotesLists,
         int wrapWidth
@@ -201,7 +201,7 @@ public class PlayboardRenderer {
     /**
      * Draw word suppressing no notes
      */
-    public Bitmap drawWord(
+    synchronized public Bitmap drawWord(
         Word word,
         Collection<Position> changes,
         int wrapWidth
@@ -223,7 +223,7 @@ public class PlayboardRenderer {
      * @param wrapWidth if non-zero, wrap word after width (in pixels)
      * exceeded
      */
-    public Bitmap drawWord(
+    synchronized public Bitmap drawWord(
         Word word,
         Collection<Position> changes,
         Set<String> suppressNotesLists,
@@ -293,7 +293,7 @@ public class PlayboardRenderer {
      * @param suppressNotesLists as in drawBox
      * @param wrapWidth if non-zero, wrap after this number of pixels
      */
-    public Bitmap drawBoxes(
+    synchronized public Bitmap drawBoxes(
         Box[] boxes,
         boolean[] changes,
         Position highlight,
@@ -439,11 +439,11 @@ public class PlayboardRenderer {
         return findPointTopLeft(zone.getPosition(0));
     }
 
-    public float fitTo(int width, int height) {
+    synchronized public float fitTo(int width, int height) {
         return fitTo(width, height, getFullWidth(), getFullHeight());
     }
 
-    public float fitTo(
+    synchronized public float fitTo(
         int width, int height, int numBoxesWidth, int numBoxesHeight
     ) {
         this.bitmap = null;
@@ -453,13 +453,13 @@ public class PlayboardRenderer {
         return getScale();
     }
 
-    public float fitWidthTo(int width, int numBoxes) {
+    synchronized public float fitWidthTo(int width, int numBoxes) {
         this.bitmap = null;
         setScale(calculateScale(width, numBoxes));
         return getScale();
     }
 
-    public float zoomIn() {
+    synchronized public float zoomIn() {
         this.bitmap = null;
         this.scale = scale * 1.25F;
         if(scale > this.getMaxScale()){
@@ -468,7 +468,7 @@ public class PlayboardRenderer {
         return scale;
     }
 
-    public float zoomOut() {
+    synchronized public float zoomOut() {
         this.bitmap = null;
         this.scale = scale / 1.25F;
         if(scale < this.getMinScale()){
@@ -477,13 +477,13 @@ public class PlayboardRenderer {
         return scale;
     }
 
-    public float zoomReset() {
+    synchronized public float zoomReset() {
         this.bitmap = null;
         this.scale = 1.0F;
         return scale;
     }
 
-    public float zoomInMax() {
+    synchronized public float zoomInMax() {
         this.bitmap = null;
         this.scale = getMaxScale();
 

@@ -3,6 +3,7 @@ package app.crossword.yourealwaysbe.view;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -167,15 +168,23 @@ public class BoardWordEditView extends BoardEditView {
             return;
 
         Word renderWord = getRenderWord();
-        setBitmap(
-            renderer.drawWord(
-                renderWord,
-                changes,
-                getSuppressNotesList(),
-                getContentWidth()
-            ),
-            rescale
-        );
+
+        Collection<Position> localChanges
+            = (changes == null)
+                ? null
+                : new HashSet<>(changes);
+
+        executorService.execute(() -> {
+            postBitmap(
+                renderer.drawWord(
+                    renderWord,
+                    localChanges,
+                    getSuppressNotesList(),
+                    getContentWidth()
+                ),
+                rescale
+            );
+        });
     }
 
     @Override

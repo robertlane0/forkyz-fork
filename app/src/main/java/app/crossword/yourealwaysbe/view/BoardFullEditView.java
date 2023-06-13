@@ -3,6 +3,7 @@ package app.crossword.yourealwaysbe.view;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import android.content.Context;
@@ -90,10 +91,17 @@ public class BoardFullEditView extends BoardEditView {
         if (renderer == null || board == null)
             return;
 
-        setBitmap(
-            renderer.draw(changes, getSuppressNotesList()),
-            rescale
-        );
+        Collection<Position> localChanges
+            = (changes == null)
+                ? null
+                : new HashSet<>(changes);
+
+        executorService.execute(() -> {
+            postBitmap(
+                renderer.draw(localChanges, getSuppressNotesList()),
+                rescale
+            );
+        });
     }
 
     @Override

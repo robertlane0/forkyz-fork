@@ -4,6 +4,8 @@ package app.crossword.yourealwaysbe.view;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -47,6 +49,12 @@ public abstract class BoardEditView
     private long lastTap = 0;
     private BoxInputConnection currentInputConnection = null;
     private boolean nativeInput = false;
+
+    // For use by implementers of render to avoid on-main-thread
+    // rendering. Bitmap can be set with postBitmap in
+    // ScrollingImageView
+    protected final ExecutorService executorService
+        = Executors.newSingleThreadExecutor();
 
     public interface BoardClickListener {
         default void onClick(Position position, Word previousWord) { }
@@ -261,13 +269,6 @@ public abstract class BoardEditView
         BaseInputConnection fic = new BaseInputConnection(this, false);
         outAttrs.inputType = InputType.TYPE_NULL;
         return fic;
-    }
-
-    // This method is a hack needed in PlayActivity when clue tabs are
-    // shown. The constrain of the board to 1:1 seems to have no effect
-    // until render(true) is called.
-    public void forceRedraw() {
-        render(true);
     }
 
     @Override
