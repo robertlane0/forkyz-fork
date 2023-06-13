@@ -3,6 +3,7 @@ package app.crossword.yourealwaysbe.util;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import app.crossword.yourealwaysbe.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.net.Downloaders;
 import app.crossword.yourealwaysbe.versions.AndroidVersionUtils;
 
@@ -15,6 +16,12 @@ public class MigrationHelper {
 
         (new ThemeHelper(context, prefs)).migrateThemePreferences();
 
-        (new Downloaders(context, prefs)).migrateAutoDownloaders();
+        ForkyzSettings settings = ForkyzSettings.getSettings();
+
+        settings.getDownloadersSettings(downloadersSettings -> {
+            settings.migrateAutoDownloaders(
+                new Downloaders(context, downloadersSettings)
+            );
+        });
     }
 }

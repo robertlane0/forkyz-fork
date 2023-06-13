@@ -30,6 +30,7 @@ import app.crossword.yourealwaysbe.net.Downloader;
 import app.crossword.yourealwaysbe.net.Downloaders;
 import app.crossword.yourealwaysbe.puz.Playboard;
 import app.crossword.yourealwaysbe.puz.Puzzle;
+import app.crossword.yourealwaysbe.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.util.SingleLiveEvent;
 import app.crossword.yourealwaysbe.util.files.DirHandle;
 import app.crossword.yourealwaysbe.util.files.FileHandler;
@@ -50,6 +51,7 @@ public class BrowseActivityViewModel extends ViewModel {
     private Handler handler = new Handler(Looper.getMainLooper());
 
     private SharedPreferences prefs;
+    private ForkyzSettings settings = ForkyzSettings.getSettings();
 
     private boolean isViewArchive = false;
 
@@ -224,21 +226,23 @@ public class BrowseActivityViewModel extends ViewModel {
     }
 
     public void download(LocalDate date, List<Downloader> downloaders) {
-        downloadExecutorService.execute(() -> {
-            NotificationManagerCompat nm
-                = NotificationManagerCompat.from(ForkyzApplication.getInstance());
+        settings.getDownloadersSettings(downloadersSettings -> {
+            downloadExecutorService.execute(() -> {
+                NotificationManagerCompat nm
+                    = NotificationManagerCompat.from(ForkyzApplication.getInstance());
 
-            Downloaders dls = new Downloaders(
-                 ForkyzApplication.getInstance(), prefs, nm
-            );
+                Downloaders dls = new Downloaders(
+                     ForkyzApplication.getInstance(), downloadersSettings, nm
+                );
 
-            dls.download(date, downloaders);
+                dls.download(date, downloaders);
 
-            if (!getIsViewArchive()) {
-                handler.post(() -> {
-                    startLoadFiles();
-                });
-            }
+                if (!getIsViewArchive()) {
+                    handler.post(() -> {
+                        startLoadFiles();
+                    });
+                }
+            });
         });
     }
 

@@ -5,7 +5,6 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
@@ -17,14 +16,13 @@ import app.crossword.yourealwaysbe.io.IO;
 import app.crossword.yourealwaysbe.io.JPZIO;
 import app.crossword.yourealwaysbe.io.PrzekrojIO;
 import app.crossword.yourealwaysbe.io.RCIJeuxMFJIO;
+import app.crossword.yourealwaysbe.settings.ForkyzSettings.DownloadersSettings;
 import app.crossword.yourealwaysbe.util.files.FileHandler;
 import app.crossword.yourealwaysbe.versions.AndroidVersionUtils;
 
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -41,20 +39,9 @@ public class Downloaders {
         = Logger.getLogger("app.crossword.yourealwaysbe");
     private static final int NUM_DOWNLOAD_THREADS = 3;
 
-    public static final String PREF_AUTO_DOWNLOADERS = "autoDownloaders";
-    public static final String PREF_DOWNLOAD_TIMEOUT = "downloadTimeout";
-    private static final String DEFAULT_TIMEOUT_MILLIS = "30000";
-
-    private static final String PREF_SUPPRESS_SUMMARY_NOTIFICATIONS
-        = "supressSummaryMessages";
-    private static final String PREF_SUPPRESS_INDIVIDUAL_NOTIFICATIONS
-        = "supressMessages";
-
     private Context context;
     private NotificationManagerCompat notificationManager;
-    private boolean suppressSummaryMessages;
-    private boolean suppressIndividualMessages;
-    private SharedPreferences prefs;
+    private DownloadersSettings settings;
 
     private AndroidVersionUtils utils
         = AndroidVersionUtils.Factory.getInstance();
@@ -62,28 +49,24 @@ public class Downloaders {
     /**
      * Create a downloader instance that does not notify
      */
-    public Downloaders(Context context, SharedPreferences prefs) {
-        this(context, prefs, null);
+    public Downloaders(Context context, DownloadersSettings settings) {
+        this(context, settings, null);
     }
 
     /**
      * Create a downloader instance
      *
      * Pass a null notification manager if notifications not needed.
-     * Notifications only used if not disabled in prefs.
+     * Notifications only used if not disabled in settings.
      */
     public Downloaders(
         Context context,
-        SharedPreferences prefs,
+        DownloadersSettings settings,
         NotificationManagerCompat notificationManager
     ) {
-        this.prefs = prefs;
+        this.settings = settings;
         this.notificationManager = notificationManager;
         this.context = context;
-        this.suppressSummaryMessages
-            = prefs.getBoolean(PREF_SUPPRESS_SUMMARY_NOTIFICATIONS, false);
-        this.suppressIndividualMessages
-            = prefs.getBoolean(PREF_SUPPRESS_INDIVIDUAL_NOTIFICATIONS, false);
     }
 
     public List<Downloader> getDownloaders(LocalDate date) {
@@ -140,58 +123,19 @@ public class Downloaders {
         download(puzzlesToDownload);
     }
 
-    public boolean isDLOnStartup() {
-        return prefs.getBoolean("dlOnStartup", false);
-    }
-
     public List<Downloader> getAutoDownloaders() {
         List<Downloader> available = getDownloaders();
 
-        Set<String> autoDownloaders = prefs.getStringSet(
-            PREF_AUTO_DOWNLOADERS, Collections.emptySet()
-        );
-
         List<Downloader> downloaders = new LinkedList<>();
         for (Downloader downloader : available) {
-            if (autoDownloaders.contains(downloader.getInternalName()))
+            boolean isAuto = settings
+                .getAutoDownloaders()
+                .contains(downloader.getInternalName());
+            if (isAuto)
                 downloaders.add(downloader);
         }
 
         return downloaders;
-    }
-
-    /**
-     * Handle introduction of second selection of auto downloaders
-     */
-    public void migrateAutoDownloaders() {
-        Set<String> autoDownloaders
-            = prefs.getStringSet(PREF_AUTO_DOWNLOADERS, null);
-
-        if (autoDownloaders == null) {
-            autoDownloaders = new HashSet<>();
-
-            List<Downloader> downloaders = getDownloaders();
-
-            for (Downloader downloader : downloaders) {
-                autoDownloaders.add(downloader.getInternalName());
-            }
-
-            prefs.edit()
-                .putStringSet(PREF_AUTO_DOWNLOADERS, autoDownloaders)
-                .apply();
-        }
-    }
-
-    public boolean isNotificationPermissionNeeded() {
-        return notificationManager != null
-            && !(suppressSummaryMessages && suppressIndividualMessages);
-    }
-
-    public void disableNotificationsInPrefs() {
-        prefs.edit()
-            .putBoolean(PREF_SUPPRESS_SUMMARY_NOTIFICATIONS, true)
-            .putBoolean(PREF_SUPPRESS_INDIVIDUAL_NOTIFICATIONS, true)
-            .apply();
     }
 
     private void download(Map<Downloader, LocalDate> puzzlesToDownload) {
@@ -376,7 +320,7 @@ public class Downloaders {
     public List<Downloader> getDownloaders() {
         List<Downloader> downloaders = new LinkedList<>();
 
-        if (prefs.getBoolean("downloadDeStandaard", true)) {
+        if (settings.getDownloadDeStandaard()) {
             downloaders.add(new KeesingDownloader(
                 "destandaard",
                 context.getString(R.string.de_standaard),
@@ -389,7 +333,7 @@ public class Downloaders {
             ));
         }
 
-        if (prefs.getBoolean("downloadDeTelegraaf", true)) {
+        if (settings.getDownloadDeTelegraaf()) {
             downloaders.add(new AbstractDateDownloader(
                 "detelegraaf",
                 context.getString(R.string.de_telegraaf),
@@ -403,13 +347,13 @@ public class Downloaders {
             ));
         }
 
-        if (prefs.getBoolean("downloadGuardianDailyCryptic", true)) {
+        if (settings.getDownloadGuardianDailyCryptic()) {
             downloaders.add(new GuardianDailyCrypticDownloader(
                 "guardian", context.getString(R.string.guardian_daily)
             ));
         }
 
-        if (prefs.getBoolean("downloadHamAbend", true)) {
+        if (settings.getDownloadHamAbend()) {
             downloaders.add(new RaetselZentraleSchwedenDownloader(
                 "hamabend",
                 context.getString(R.string.hamburger_abendblatt_daily),
@@ -423,7 +367,7 @@ public class Downloaders {
             ));
         }
 
-        if (prefs.getBoolean("downloadIndependentDailyCryptic", true)) {
+        if (settings.getDownloadIndependentDailyCryptic()) {
             downloaders.add(new AbstractDateDownloader(
                 "independent",
                 context.getString(R.string.independent_daily),
@@ -438,7 +382,7 @@ public class Downloaders {
             ));
         }
 
-        if (prefs.getBoolean("downloadJonesin", true)) {
+        if (settings.getDownloadJonesin()) {
             downloaders.add(new AbstractDateDownloader(
                 "jonesin",
                 context.getString(R.string.jonesin_crosswords),
@@ -452,7 +396,7 @@ public class Downloaders {
             ));
         }
 
-        if (prefs.getBoolean("downloadJoseph", true)) {
+        if (settings.getDownloadJoseph()) {
             downloaders.add(new KingDigitalDownloader(
                 "Joseph",
                 "Joseph",
@@ -465,7 +409,7 @@ public class Downloaders {
             ));
         }
 
-        if (prefs.getBoolean("download20Minutes", true)) {
+        if (settings.getDownload20Minutes()) {
             downloaders.add(new AbstractDateDownloader(
                 "20minutes",
                 context.getString(R.string.vingminutes),
@@ -478,7 +422,7 @@ public class Downloaders {
             ));
         }
 
-        if (prefs.getBoolean("downloadLeParisienF1", true)) {
+        if (settings.getDownloadLeParisienF1()) {
             downloaders.add(new AbstractRCIJeuxMFJDateDownloader(
                 "leparisienf1",
                 context.getString((R.string.le_parisien_daily_f1)),
@@ -494,7 +438,7 @@ public class Downloaders {
             ));
         }
 
-        if (prefs.getBoolean("downloadLeParisienF2", true)) {
+        if (settings.getDownloadLeParisienF2()) {
             downloaders.add(new AbstractRCIJeuxMFJDateDownloader(
                 "leparisienf2",
                 context.getString((R.string.le_parisien_daily_f2)),
@@ -510,7 +454,7 @@ public class Downloaders {
             ));
         }
 
-        if (prefs.getBoolean("downloadLeParisienF3", true)) {
+        if (settings.getDownloadLeParisienF3()) {
             downloaders.add(new AbstractRCIJeuxMFJDateDownloader(
                 "leparisienf3",
                 context.getString((R.string.le_parisien_daily_f3)),
@@ -526,7 +470,7 @@ public class Downloaders {
             ));
         }
 
-        if (prefs.getBoolean("downloadLeParisienF4", true)) {
+        if (settings.getDownloadLeParisienF4()) {
             downloaders.add(new AbstractRCIJeuxMFJDateDownloader(
                 "leparisienf4",
                 context.getString((R.string.le_parisien_daily_f4)),
@@ -542,7 +486,7 @@ public class Downloaders {
             ));
         }
 
-        if (prefs.getBoolean("downloadNewsday", true)) {
+        if (settings.getDownloadNewsday()) {
             downloaders.add(new AbstractDateDownloader(
                 "newsday",
                 context.getString(R.string.newsday),
@@ -558,7 +502,7 @@ public class Downloaders {
             ));
         }
 
-        if (prefs.getBoolean("downloadPremier", true)) {
+        if (settings.getDownloadPremier()) {
             downloaders.add(new KingDigitalDownloader(
                 "Premier",
                 "Premier",
@@ -571,7 +515,7 @@ public class Downloaders {
             ));
         }
 
-        if (prefs.getBoolean("downloadSheffer", true)) {
+        if (settings.getDownloadSheffer()) {
             downloaders.add(new KingDigitalDownloader(
                 "Sheffer",
                 "Sheffer",
@@ -584,7 +528,7 @@ public class Downloaders {
             ));
         }
 
-        if (prefs.getBoolean("downloadUniversal", true)) {
+        if (settings.getDownloadUniversal()) {
             downloaders.add(new UclickDownloader(
                 "universal",
                 "fcx",
@@ -597,7 +541,7 @@ public class Downloaders {
             ));
         }
 
-        if (prefs.getBoolean("downloadUSAToday", true)) {
+        if (settings.getDownloadUSAToday()) {
             downloaders.add(new UclickDownloader(
                 "usatoday",
                 "usaon",
@@ -610,7 +554,7 @@ public class Downloaders {
             ));
         }
 
-        if (prefs.getBoolean("downloadWaPoSunday", true)) {
+        if (settings.getDownloadWaPoSunday()) {
             downloaders.add(new AbstractDateDownloader(
                 "waposunday",
                 context.getString(R.string.washington_post_sunday),
@@ -623,7 +567,7 @@ public class Downloaders {
             ));
         }
 
-        if (prefs.getBoolean("downloadWsj", true)) {
+        if (settings.getDownloadWsj()) {
             downloaders.add(new AbstractDateDownloader(
                 "wsj",
                 context.getString(R.string.wall_street_journal),
@@ -638,7 +582,7 @@ public class Downloaders {
 
         addCustomDownloaders(downloaders);
 
-        if (prefs.getBoolean("scrapeCru", false)) {
+        if (settings.getScrapeCru()) {
             downloaders.add(new PageScraper.Puz(
                 // certificate doesn't seem to work for me
                 // "https://theworld.com/~wij/puzzles/cru/index.html",
@@ -649,7 +593,7 @@ public class Downloaders {
             ));
         }
 
-        if (prefs.getBoolean("scrapeKegler", false)) {
+        if (settings.getScrapeKegler()) {
             downloaders.add(new PageScraper.Puz(
                 "https://kegler.gitlab.io/Block_style/index.html",
                 "keglar",
@@ -658,7 +602,7 @@ public class Downloaders {
             ));
         }
 
-        if (prefs.getBoolean("scrapePrivateEye", false)) {
+        if (settings.getScrapePrivateEye()) {
             downloaders.add(new PageScraper.Puz(
                 "https://www.private-eye.co.uk/pictures/crossword/download/",
                 "privateeye",
@@ -668,7 +612,7 @@ public class Downloaders {
             ));
         }
 
-        if (prefs.getBoolean("scrapePrzekroj", false)) {
+        if (settings.getScrapePrzekroj()) {
             downloaders.add(new PageScraper(
                 ".*krzyzowki/\\d+",
                 new PrzekrojIO(),
@@ -681,24 +625,19 @@ public class Downloaders {
             ));
         }
 
-        // Set timeout before returning
-        int timeout = Integer.valueOf(
-            prefs.getString(PREF_DOWNLOAD_TIMEOUT, DEFAULT_TIMEOUT_MILLIS)
-        );
         for (Downloader downloader : downloaders)
-            downloader.setTimeout(timeout);
+            downloader.setTimeout(settings.getDownloadTimeout());
 
         return downloaders;
     }
 
     private void addCustomDownloaders(List<Downloader> downloaders) {
-        if (prefs.getBoolean("downloadCustomDaily", true)) {
-            String title = prefs.getString("customDailyTitle", "");
+        if (settings.getDownloadCustomDaily()) {
+            String title = settings.getCustomDailyTitle();
             if (title == null || title.trim().isEmpty())
                 title = context.getString(R.string.custom_daily_title);
 
-            String urlDateFormatPattern
-                = prefs.getString("customDailyUrl", "");
+            String urlDateFormatPattern = settings.getCustomDailyUrl();
 
             downloaders.add(
                 new CustomDailyDownloader("custom", title, urlDateFormatPattern)
@@ -714,13 +653,13 @@ public class Downloaders {
     private boolean isNotifyingSummary() {
         return canNotify()
             && notificationManager.areNotificationsEnabled()
-            && !suppressSummaryMessages;
+            && !settings.getSuppressSummaryNotifications();
     }
 
     private boolean isNotifyingIndividual() {
         return canNotify()
             && notificationManager.areNotificationsEnabled()
-            && !suppressIndividualMessages;
+            && !settings.getSuppressIndividualNotifications();
     }
 
     @SuppressLint("MissingPermission") // canNotify does check

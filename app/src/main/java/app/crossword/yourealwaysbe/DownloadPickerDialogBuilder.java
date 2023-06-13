@@ -29,6 +29,7 @@ import java.time.format.TextStyle;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 /**
@@ -62,11 +63,10 @@ public class DownloadPickerDialogBuilder {
         Activity a,
         final OnDownloadSelectedListener downloadButtonListener,
         int year, int monthOfYear, int dayOfMonth,
-        Downloaders downloaders
+        Consumer<Consumer<Downloaders>> downloadersProvider
     ) {
         this.activity = a;
         this.downloadDate = LocalDate.of(year, monthOfYear,  dayOfMonth);
-        this.downloaders = downloaders;
         this.binding = DownloadDialogBinding.inflate(LayoutInflater.from(activity));
 
         updateDayOfWeek();
@@ -87,8 +87,6 @@ public class DownloadPickerDialogBuilder {
                     selectedItemPosition = 0;
                 }
             });
-
-        updatePuzzleSelect();
 
         OnClickListener clickHandler = new OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
@@ -118,6 +116,15 @@ public class DownloadPickerDialogBuilder {
                     updatePuzzleSelect();
                 }
             });
+
+        downloadersProvider.accept(downloaders -> {
+            this.downloaders = downloaders;
+            updatePuzzleSelect();
+        });
+    }
+
+    private boolean hasDownloaders() {
+        return downloaders != null;
     }
 
     private void updateDayOfWeek() {
@@ -136,7 +143,9 @@ public class DownloadPickerDialogBuilder {
     }
 
     private List<Downloader> getSelectedDownloaders() {
-        if (selectedItemPosition == 0) {
+        if (!hasDownloaders()) {
+            return Collections.emptyList();
+        } else if (selectedItemPosition == 0) {
             return downloaders.getDownloaders(getCurrentDate());
         } else {
             return Collections.singletonList(
@@ -146,6 +155,9 @@ public class DownloadPickerDialogBuilder {
     }
 
     private void updatePuzzleSelect() {
+        if (!hasDownloaders())
+            return;
+
         availableDownloaders = downloaders.getDownloaders();
         availableDownloaders.add(0, new DummyDownloader());
 

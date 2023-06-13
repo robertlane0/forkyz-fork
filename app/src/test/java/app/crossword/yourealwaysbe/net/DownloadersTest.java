@@ -12,7 +12,8 @@ import org.junit.runners.Parameterized.Parameters;
 import org.junit.runners.Parameterized;
 
 import android.content.Context;
-import android.content.SharedPreferences;
+
+import app.crossword.yourealwaysbe.settings.ForkyzSettings.DownloadersSettings;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
@@ -31,10 +32,10 @@ public class DownloadersTest {
     @Parameters(name = "Downloader {0}")
     public static Iterable<Object[]> downloaders() {
         Context context = mock(Context.class);
-        SharedPreferences prefs = mock(SharedPreferences.class);
-        initialiseMocks(context, prefs);
+        initialiseMocks(context);
+        DownloadersSettings settings = getDownloadersSettings();
         final List<Downloader> downloaders
-            = (new Downloaders(context, prefs)).getDownloaders();
+            = (new Downloaders(context, settings)).getDownloaders();
         return new AbstractList<Object[]>() {
             @Override
             public int size() { return downloaders.size(); }
@@ -61,22 +62,45 @@ public class DownloadersTest {
         assertTrue(res.isSuccess());
     }
 
-    private static void initialiseMocks(
-        Context context, SharedPreferences prefs
-    ) {
-        // say yes to all downloaders
-        when(prefs.getBoolean(anyString(), anyBoolean())).thenReturn(true);
-        // except dummy custom downloader
-        when(prefs.getBoolean(eq("downloadCustomDaily"), anyBoolean()))
-            .thenReturn(false);
-
-        // timeout
-        when(
-            prefs.getString(eq(Downloaders.PREF_DOWNLOAD_TIMEOUT), anyString())
-        ).thenReturn("30000");
-
+    private static void initialiseMocks(Context context) {
         // when names come from context, give any
         when(context.getString(anyInt())).thenReturn(DEFAULT_NAME);
+    }
+
+    private static DownloadersSettings getDownloadersSettings() {
+        return new DownloadersSettings(
+            true, // downloadDeStandaard
+            true, // downloadDeTelegraaf
+            true, // downloadGuardianDailyCryptic
+            true, // downloadHamAbend
+            true, // downloadIndependentDailyCryptic
+            true, // downloadJonesin
+            true, // downloadJoseph
+            true, // download20Minutes
+            true, // downloadLeParisienF1
+            true, // downloadLeParisienF2
+            true, // downloadLeParisienF3
+            true, // downloadLeParisienF4
+            true, // downloadNewsday
+            true, // downloadPremier
+            true, // downloadSheffer
+            true, // downloadUniversal
+            true, // downloadUSAToday
+            true, // downloadWaPoSunday
+            true, // downloadWsj
+            true, // scrapeCru
+            true, // scrapeKegler
+            true, // scrapePrivateEye
+            true, // scrapePrzekroj
+            false , // downloadCustomDaily
+            "", // customDailyTitle,
+            "", // customDailyUrl,
+            true, // suppressSummaryNotifications,
+            true, // suppressIndividualNotifications,
+            null, // autoDownloaders,
+            30000, // downloadTimeout,
+            false // downloadOnStartup
+        );
     }
 }
 

@@ -28,6 +28,7 @@ import androidx.work.WorkerParameters;
 
 import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
 import app.crossword.yourealwaysbe.net.Downloaders;
+import app.crossword.yourealwaysbe.settings.ForkyzSettings;
 
 /**
  * Schedule background downloads using Android WorkManager
@@ -66,6 +67,8 @@ public class BackgroundDownloadManager {
             PREF_DOWNLOAD_DAYS_TIME
         )
     );
+
+    private static ForkyzSettings settings = ForkyzSettings.getSettings();
 
     /**
      * For preference activity to detect if config changes
@@ -254,8 +257,6 @@ public class BackgroundDownloadManager {
         protected void doDownload() {
             ForkyzApplication app = ForkyzApplication.getInstance();
 
-            NotificationManagerCompat nm = NotificationManagerCompat.from(app);
-
             if (app.isMissingWritePermission()) {
                 LOGGER.info("Skipping download, no write permission");
                 return;
@@ -265,17 +266,20 @@ public class BackgroundDownloadManager {
 
             SharedPreferences prefs = BackgroundDownloadManager.getPrefs();
 
-            final Downloaders dls = new Downloaders(app, prefs, nm);
-            LocalDate now = LocalDate.now();
-            dls.downloadLatestInRange(now, now, dls.getAutoDownloaders());
+            settings.getDownloadersSettings(downloadersSettings -> {
+                NotificationManagerCompat nm
+                    = NotificationManagerCompat.from(app);
+                final Downloaders dls
+                    = new Downloaders(app, downloadersSettings, nm);
+                LocalDate now = LocalDate.now();
+                dls.downloadLatestInRange(now, now, dls.getAutoDownloaders());
 
-            // This is used to tell BrowseActivity that puzzles may have
-            // been updated while paused.
-            prefs.edit()
-                .putBoolean(PREF_DOWNLOAD_PENDING, true)
-                .apply();
-
-            return;
+                // This is used to tell BrowseActivity that puzzles may have
+                // been updated while paused.
+                prefs.edit()
+                    .putBoolean(PREF_DOWNLOAD_PENDING, true)
+                    .apply();
+            });
         }
     }
 

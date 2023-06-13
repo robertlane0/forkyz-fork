@@ -17,10 +17,13 @@ import com.google.android.material.color.DynamicColors;
 import app.crossword.yourealwaysbe.forkyz.R;
 import app.crossword.yourealwaysbe.net.Downloader;
 import app.crossword.yourealwaysbe.net.Downloaders;
+import app.crossword.yourealwaysbe.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.util.BackgroundDownloadManager;
 import app.crossword.yourealwaysbe.util.ThemeHelper;
 
 public class PreferencesSubPages {
+    private static ForkyzSettings settings = ForkyzSettings.getSettings();
+
     public static class SourcesFragment extends PreferencesBaseFragment {
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -73,30 +76,30 @@ public class PreferencesSubPages {
         }
 
         private void setAvailableDownloaders() {
-            SharedPreferences prefs
-                = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            settings.getDownloadersSettings(downloadersSettings -> {
+                Downloaders dls
+                    = new Downloaders(getActivity(), downloadersSettings);
+                List<Downloader> downloaders = dls.getDownloaders();
 
-            List<Downloader> downloaders
-                = (new Downloaders(getActivity(), prefs)).getDownloaders();
+                int len = downloaders.size();
+                CharSequence[] values = new CharSequence[len];
+                CharSequence[] labels = new CharSequence[len];
 
-            int len = downloaders.size();
-            CharSequence[] values = new CharSequence[len];
-            CharSequence[] labels = new CharSequence[len];
+                // done this way because i know the downloaders list is a linked
+                // list
+                int index = 0;
+                for (Downloader downloader : downloaders) {
+                    values[index] = downloader.getInternalName();
+                    labels[index] = downloader.getName();
+                    index += 1;
+                }
 
-            // done this way because i know the downloaders list is a linked
-            // list
-            int index = 0;
-            for (Downloader downloader : downloaders) {
-                values[index] = downloader.getInternalName();
-                labels[index] = downloader.getName();
-                index += 1;
-            }
-
-            MultiSelectListPreference available = findPreference(
-                Downloaders.PREF_AUTO_DOWNLOADERS
-            );
-            available.setEntries(labels);
-            available.setEntryValues(values);
+                MultiSelectListPreference available = findPreference(
+                    ForkyzSettings.PREF_AUTO_DOWNLOADERS
+                );
+                available.setEntries(labels);
+                available.setEntryValues(values);
+            });
         }
     }
 

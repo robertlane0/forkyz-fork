@@ -9,7 +9,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
@@ -32,10 +31,10 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.IntentCompat;
 import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -51,6 +50,7 @@ import app.crossword.yourealwaysbe.forkyz.databinding.BrowseBinding;
 import app.crossword.yourealwaysbe.forkyz.databinding.PuzzleListItemBinding;
 import app.crossword.yourealwaysbe.net.Downloader;
 import app.crossword.yourealwaysbe.net.Downloaders;
+import app.crossword.yourealwaysbe.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.util.BackgroundDownloadManager;
 import app.crossword.yourealwaysbe.util.MigrationHelper;
 import app.crossword.yourealwaysbe.util.files.Accessor;
@@ -72,6 +72,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
@@ -97,11 +98,6 @@ public class BrowseActivity extends ForkyzActivity {
      */
     private static final String BROWSER_CLOSE_TASK_ID
         = "app.crossword.yourealwaysbe.BROWSER_CLOSE_TASK_ID";
-
-    /**
-     * Store the last know version so we can say hello on new versions
-     */
-    private static final String PREF_LAST_SEEN_VERSION = "lastSeenVersion";
 
     /**
      * So the imports complete dialog knows if there was success or not
@@ -180,6 +176,12 @@ public class BrowseActivity extends ForkyzActivity {
             this,
             uris -> { onImportURIs(uris); }
         );
+
+    private Consumer<Consumer<Downloaders>> downloadersProvider = cb -> {
+        settings.getDownloadersSettings(downloadersSettings -> {
+            cb.accept(new Downloaders(this, downloadersSettings, nm));
+        });
+    };
 
     private ActionMode actionMode;
     private final ActionMode.Callback actionModeCallback = new ActionMode.Callback() {
@@ -375,13 +377,20 @@ public class BrowseActivity extends ForkyzActivity {
                 0,
                 ItemTouchHelper.START | ItemTouchHelper.END
             ) {
+                private LiveData<Boolean> liveDisableSwipe
+                    = settings.liveBrowseDisableSwipe();
+
                 @Override
                 public int getSwipeDirs(
                     RecyclerView recyclerView,
                     RecyclerView.ViewHolder viewHolder
                 ) {
+                    Boolean disableSwipe = liveDisableSwipe.getValue();
+                    if (disableSwipe == null)
+                        disableSwipe = true;
+
                     if (!(viewHolder instanceof FileViewHolder)
-                            || prefs.getBoolean("disableSwipe", false)
+                            || disableSwipe
                             || !selected.isEmpty()) {
                         return 0; // Don't swipe the headers.
                     }
@@ -409,22 +418,21 @@ public class BrowseActivity extends ForkyzActivity {
                     PuzMetaFile puzMeta
                         = ((FileViewHolder) viewHolder).getPuzMetaFile();
 
-                    boolean delete = "DELETE".equals(
-                        prefs.getString("swipeAction", "DELETE")
-                    );
-                    if (delete) {
-                        model.deletePuzzle(puzMeta);
-                    } else {
-                        if (model.getIsViewArchive()) {
-                            model.movePuzzle(puzMeta, crosswordsFolder);
+                    settings.getBrowseSwipeAction(action -> {
+                        if (action == ForkyzSettings.BROWSE_SWIPE_DELETE) {
+                            model.deletePuzzle(puzMeta);
                         } else {
-                            model.movePuzzle(puzMeta, archiveFolder);
+                            if (model.getIsViewArchive()) {
+                                model.movePuzzle(puzMeta, crosswordsFolder);
+                            } else {
+                                model.movePuzzle(puzMeta, archiveFolder);
+                            }
                         }
-                    }
+                    });
                 }
             });
         helper.attachToRecyclerView(binding.puzzleList);
-        upgradePreferences();
+
         this.nm = NotificationManagerCompat.from(this);
 
         settings.liveBrowseSort().observe(this, accessor -> {
@@ -631,27 +639,34 @@ public class BrowseActivity extends ForkyzActivity {
     }
 
     private void checkAutoDownloadNotificationPermissions() {
-        Downloaders dls = new Downloaders(this, prefs, nm);
-        boolean downloading = dls.isDLOnStartup()
-            || BackgroundDownloadManager.isBackgroundDownloadEnabled();
+        settings.getDownloadersSettings(settings -> {
+            boolean downloading = settings.getDownloadOnStartup()
+                || BackgroundDownloadManager.isBackgroundDownloadEnabled();
 
-        if (dls.isNotificationPermissionNeeded() && downloading)
-            checkRequestNotificationPermissions();
+            if (settings.isNotificationPermissionNeeded() && downloading)
+                checkRequestNotificationPermissions();
+        });
     }
 
     private void autoDownloadIfEnabled() {
         if (!hasWritePermissions) return;
 
-        long lastDL = prefs.getLong("dlLast", 0);
-        Downloaders dls = new Downloaders(this, prefs, nm);
+        settings.getBrowseLastDownload(lastDL -> {
+            settings.getDownloadersSettings(downloaderSettings -> {
+                Downloaders dls = new Downloaders(this, downloaderSettings, nm);
 
-        if (dls.isDLOnStartup() &&
-                ((System.currentTimeMillis() - (long) (12 * 60 * 60 * 1000)) > lastDL)) {
-            model.download(LocalDate.now(), dls.getAutoDownloaders());
-            prefs.edit()
-                    .putLong("dlLast", System.currentTimeMillis())
-                    .apply();
-        }
+                long downloadCutoff
+                    = System.currentTimeMillis() - (long) (12 * 60 * 60 * 1000);
+
+                boolean isDownload = downloaderSettings.getDownloadOnStartup()
+                    && downloadCutoff > lastDL;
+
+                if (isDownload) {
+                    model.download(LocalDate.now(), dls.getAutoDownloaders());
+                    settings.setBrowseLastDownload(System.currentTimeMillis());
+                }
+            });
+        });
     }
 
     private void startLoadPuzzleList() {
@@ -694,10 +709,6 @@ public class BrowseActivity extends ForkyzActivity {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-    }
-
-    private void upgradePreferences() {
-        // do nothing now no keyboard
     }
 
     public void onItemClick(final View v, final PuzMetaFile puzMeta) {
@@ -910,26 +921,27 @@ public class BrowseActivity extends ForkyzActivity {
      * activities life
      */
     private void checkRequestNotificationPermissions() {
-        Downloaders dls = new Downloaders(this, prefs, nm);
-        if (!dls.isNotificationPermissionNeeded())
-            return;
+        settings.getDownloadersSettings(settings -> {
+            if (!settings.isNotificationPermissionNeeded())
+                return;
 
-        if (nm.areNotificationsEnabled())
-            return;
+            if (nm.areNotificationsEnabled())
+                return;
 
-        boolean showRationale
-            = utils.shouldShowRequestNotificationPermissionRationale(this);
+            boolean showRationale
+                = utils.shouldShowRequestNotificationPermissionRationale(this);
 
-        if (showRationale) {
-            Toast t = Toast.makeText(
-                this,
-                R.string.notifications_request_rationale,
-                Toast.LENGTH_LONG
-            );
-            t.show();
-        }
+            if (showRationale) {
+                Toast t = Toast.makeText(
+                    this,
+                    R.string.notifications_request_rationale,
+                    Toast.LENGTH_LONG
+                );
+                t.show();
+            }
 
-        utils.requestPostNotifications(notificationPermissionLauncher);
+            utils.requestPostNotifications(notificationPermissionLauncher);
+        });
     }
 
     private void requestWritePermission() {
@@ -939,19 +951,18 @@ public class BrowseActivity extends ForkyzActivity {
     }
 
     private void checkNewVersion() {
-        String currentVersion = utils.getApplicationVersionName(this);
-        String lastSeenVersion = prefs.getString(PREF_LAST_SEEN_VERSION, null);
+        settings.getBrowseLastSeenVersion(lastSeenVersion -> {
+            String currentVersion = utils.getApplicationVersionName(this);
 
-        if (!Objects.equals(currentVersion, lastSeenVersion)) {
-            DialogFragment dialog = new NewVersionDialog();
-            dialog.show(
-                getSupportFragmentManager(), "NewVersionDialog"
-            );
-        }
+            if (!Objects.equals(currentVersion, lastSeenVersion)) {
+                DialogFragment dialog = new NewVersionDialog();
+                dialog.show(
+                    getSupportFragmentManager(), "NewVersionDialog"
+                );
+            }
 
-        prefs.edit()
-            .putString(PREF_LAST_SEEN_VERSION, currentVersion)
-            .apply();
+            settings.setBrowseLastSeenVersion(currentVersion);
+        });
     }
 
     private class FileAdapter
@@ -1155,7 +1166,7 @@ public class BrowseActivity extends ForkyzActivity {
                     d.getYear(),
                     d.getMonthValue(),
                     d.getDayOfMonth(),
-                    new Downloaders(activity, activity.prefs, activity.nm)
+                    activity.downloadersProvider
             );
 
             return dpd.getInstance();
@@ -1177,12 +1188,9 @@ public class BrowseActivity extends ForkyzActivity {
                         public void onClick(
                             DialogInterface dialogInterface, int i
                         ) {
-                            Context context = getActivity();
-                            SharedPreferences prefs
-                                = PreferenceManager
-                                    .getDefaultSharedPreferences(context);
-                            Downloaders dls = new Downloaders(context, prefs);
-                            dls.disableNotificationsInPrefs();
+                            BrowseActivity activity
+                                = (BrowseActivity) getActivity();
+                            activity.settings.disableNotifications();
                         }
                     }
                 ).setNegativeButton(
