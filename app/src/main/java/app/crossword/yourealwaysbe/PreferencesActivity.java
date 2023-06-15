@@ -9,11 +9,14 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
 import app.crossword.yourealwaysbe.forkyz.R;
 import app.crossword.yourealwaysbe.util.ThemeHelper;
 import app.crossword.yourealwaysbe.util.NightModeHelper;
 import app.crossword.yourealwaysbe.versions.AndroidVersionUtils;
 
+@AndroidEntryPoint
 public class PreferencesActivity
        extends AppCompatActivity
        implements PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {

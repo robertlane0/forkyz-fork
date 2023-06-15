@@ -15,6 +15,8 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts.OpenDocumentTree;
 import androidx.fragment.app.Fragment;
 
+import javax.inject.Inject;
+
 import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
 import app.crossword.yourealwaysbe.util.BackgroundDownloadManager;
 
@@ -23,6 +25,9 @@ public class LollipopUtil extends KitKatUtil {
 
     private static final String PREF_LEGACY_BACKGROUND_DOWNLOAD
         = "backgroundDownload";
+
+    @Inject
+    BackgroundDownloadManager downloadManager;
 
     private int speechReqCount = 0;
 
@@ -43,7 +48,7 @@ public class LollipopUtil extends KitKatUtil {
             scheduler.cancelAll();
 
             // start new
-            BackgroundDownloadManager.setHourlyBackgroundDownloadPeriod();
+            downloadManager.setHourlyBackgroundDownloadPeriod();
         }
     }
 

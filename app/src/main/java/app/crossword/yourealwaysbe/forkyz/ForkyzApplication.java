@@ -10,6 +10,8 @@ import android.widget.Toast;
 import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 
+import dagger.hilt.android.HiltAndroidApp;
+
 import app.crossword.yourealwaysbe.puz.MovementStrategy;
 import app.crossword.yourealwaysbe.puz.Playboard;
 import app.crossword.yourealwaysbe.puz.Puzzle;
@@ -24,6 +26,7 @@ import app.crossword.yourealwaysbe.versions.AndroidVersionUtils;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+@HiltAndroidApp
 public class ForkyzApplication extends Application {
     private static final Logger LOGGER
         = Logger.getLogger(ForkyzApplication.class.getCanonicalName());

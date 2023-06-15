@@ -12,6 +12,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.BiConsumer;
 import java.util.logging.Logger;
+import javax.inject.Inject;
 
 import android.content.ContentResolver;
 import android.content.SharedPreferences;
@@ -23,6 +24,8 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import androidx.preference.PreferenceManager;
+
+import dagger.hilt.android.lifecycle.HiltViewModel;
 
 import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
 import app.crossword.yourealwaysbe.forkyz.R;
@@ -37,6 +40,7 @@ import app.crossword.yourealwaysbe.util.files.FileHandler;
 import app.crossword.yourealwaysbe.util.files.PuzHandle;
 import app.crossword.yourealwaysbe.util.files.PuzMetaFile;
 
+@HiltViewModel
 public class BrowseActivityViewModel extends ViewModel {
     private static final Logger LOGGER
         = Logger.getLogger(BrowseActivityViewModel.class.getCanonicalName());
@@ -51,7 +55,7 @@ public class BrowseActivityViewModel extends ViewModel {
     private Handler handler = new Handler(Looper.getMainLooper());
 
     private SharedPreferences prefs;
-    private ForkyzSettings settings = ForkyzSettings.getSettings();
+    private ForkyzSettings settings;
 
     private boolean isViewArchive = false;
 
@@ -63,7 +67,9 @@ public class BrowseActivityViewModel extends ViewModel {
     private SingleLiveEvent<Void> puzzleLoadEvents
         = new SingleLiveEvent<>();
 
-    public BrowseActivityViewModel() {
+    @Inject
+    public BrowseActivityViewModel(ForkyzSettings settings) {
+        this.settings = settings;
         isUIBusy.setValue(false);
         prefs = PreferenceManager.getDefaultSharedPreferences(
             ForkyzApplication.getInstance()

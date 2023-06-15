@@ -10,6 +10,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -33,6 +35,7 @@ import app.crossword.yourealwaysbe.settings.ForkyzSettings;
 /**
  * Schedule background downloads using Android WorkManager
  */
+@Singleton
 public class BackgroundDownloadManager {
     private static final Logger LOGGER = Logger.getLogger(
         BackgroundDownloadManager.class.getCanonicalName()
@@ -68,21 +71,26 @@ public class BackgroundDownloadManager {
         )
     );
 
-    private static ForkyzSettings settings = ForkyzSettings.getSettings();
+    private ForkyzSettings settings;
+
+    @Inject
+    BackgroundDownloadManager(ForkyzSettings settings) {
+        this.settings = settings;
+    }
 
     /**
      * For preference activity to detect if config changes
      */
-    public static boolean isBackgroundDownloadConfigPref(String pref) {
+    public boolean isBackgroundDownloadConfigPref(String pref) {
         return CONFIG_PREFERENCES.contains(pref);
     }
 
-    public static boolean isBackgroundDownloadEnabled() {
+    public boolean isBackgroundDownloadEnabled() {
         return getPrefs().getBoolean(PREF_DOWNLOAD_HOURLY, false)
             || getNextDailyDownloadDelay() >= 0;
     }
 
-    public static void updateBackgroundDownloads() {
+    public void updateBackgroundDownloads() {
         cancelBackgroundDownloads();
 
         SharedPreferences prefs = getPrefs();
@@ -94,7 +102,7 @@ public class BackgroundDownloadManager {
             scheduleNextDailyDownload();
     }
 
-    public static void scheduleHourlyDownloads() {
+    public void scheduleHourlyDownloads() {
         LOGGER.info("Scheduling hourly downloads");
 
         PeriodicWorkRequest request
@@ -111,7 +119,7 @@ public class BackgroundDownloadManager {
             );
     }
 
-    public static void scheduleNextDailyDownload() {
+    public void scheduleNextDailyDownload() {
         long nextDelay = getNextDailyDownloadDelay();
         if (nextDelay < 0)
             return;
@@ -132,7 +140,7 @@ public class BackgroundDownloadManager {
             );
     }
 
-    public static boolean checkBackgroundDownloadPendingFlag() {
+    public boolean checkBackgroundDownloadPendingFlag() {
         if (ForkyzApplication.getInstance().isMissingWritePermission())
             return false;
 
@@ -145,7 +153,7 @@ public class BackgroundDownloadManager {
         return isPending;
     }
 
-    public static void clearBackgroundDownloadPendingFlag() {
+    public void clearBackgroundDownloadPendingFlag() {
         SharedPreferences prefs = getPrefs();
 
         prefs.edit()
@@ -156,7 +164,7 @@ public class BackgroundDownloadManager {
     /**
      * Set the download period to 1 hour
      */
-    public static void setHourlyBackgroundDownloadPeriod() {
+    public void setHourlyBackgroundDownloadPeriod() {
         getPrefs().edit()
             .putBoolean(PREF_DOWNLOAD_HOURLY, true)
             .apply();
@@ -169,7 +177,7 @@ public class BackgroundDownloadManager {
      *
      * @return -1 if none to schedule
      */
-    private static long getNextDailyDownloadDelay() {
+    private long getNextDailyDownloadDelay() {
         SharedPreferences prefs = getPrefs();
 
         Set<String> days = prefs.getStringSet(
@@ -190,11 +198,11 @@ public class BackgroundDownloadManager {
         return nextDownloadDelay;
     }
 
-    private static void cancelBackgroundDownloads() {
+    private void cancelBackgroundDownloads() {
         getWorkManager().cancelUniqueWork(DOWNLOAD_WORK_NAME);
     }
 
-    private static Constraints getConstraints() {
+    private Constraints getConstraints() {
         SharedPreferences prefs = getPrefs();
 
         boolean requireUnmetered
@@ -224,7 +232,7 @@ public class BackgroundDownloadManager {
      * @param dayOfWeek 1-7 like java DayOfWeek
      * @param hourOfDay 0-23
      */
-    private static long getDelay(int dayOfWeek, int hourOfDay) {
+    private long getDelay(int dayOfWeek, int hourOfDay) {
         // start from now and adjust
         LocalDateTime now = LocalDateTime.now();
         int nowDayOfWeek = now.getDayOfWeek().getValue();
@@ -240,16 +248,16 @@ public class BackgroundDownloadManager {
         return ChronoUnit.MILLIS.between(now, nextDownload);
     }
 
-    private static SharedPreferences getPrefs() {
+    private SharedPreferences getPrefs() {
         Context context = ForkyzApplication.getInstance();
         return PreferenceManager.getDefaultSharedPreferences(context);
     }
 
-    public static WorkManager getWorkManager() {
+    public WorkManager getWorkManager() {
         return WorkManager.getInstance(ForkyzApplication.getInstance());
     }
 
-    private static abstract class BaseDownloadWorker extends Worker {
+    private abstract class BaseDownloadWorker extends Worker {
         public BaseDownloadWorker(Context context, WorkerParameters params) {
             super(context, params);
         }
@@ -264,7 +272,7 @@ public class BackgroundDownloadManager {
 
             LOGGER.info("Downloading most recent puzzles");
 
-            SharedPreferences prefs = BackgroundDownloadManager.getPrefs();
+            SharedPreferences prefs = getPrefs();
 
             settings.getDownloadersSettings(downloadersSettings -> {
                 NotificationManagerCompat nm
@@ -283,7 +291,7 @@ public class BackgroundDownloadManager {
         }
     }
 
-    public static class HourlyDownloadWorker extends BaseDownloadWorker {
+    public class HourlyDownloadWorker extends BaseDownloadWorker {
         public HourlyDownloadWorker(Context context, WorkerParameters params) {
             super(context, params);
         }
@@ -295,7 +303,7 @@ public class BackgroundDownloadManager {
         }
     }
 
-    public static class DailyDownloadWorker extends BaseDownloadWorker {
+    public class DailyDownloadWorker extends BaseDownloadWorker {
         public DailyDownloadWorker(Context context, WorkerParameters params) {
             super(context, params);
         }

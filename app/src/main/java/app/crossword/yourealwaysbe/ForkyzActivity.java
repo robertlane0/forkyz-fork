@@ -17,6 +17,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.text.HtmlCompat;
 import androidx.preference.PreferenceManager;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
 import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
 import app.crossword.yourealwaysbe.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.util.NightModeHelper;
@@ -26,15 +28,19 @@ import app.crossword.yourealwaysbe.util.files.FileHandlerSAF;
 import app.crossword.yourealwaysbe.versions.AndroidVersionUtils;
 
 import java.util.logging.Logger;
+import javax.inject.Inject;
 
+@AndroidEntryPoint
 public class ForkyzActivity extends AppCompatActivity {
     private static final Logger LOG
         = Logger.getLogger(ForkyzActivity.class.getCanonicalName());
 
+    @Inject
+    protected ForkyzSettings settings;
+
     protected AndroidVersionUtils utils = AndroidVersionUtils.Factory
             .getInstance();
     protected SharedPreferences prefs;
-    protected ForkyzSettings settings = ForkyzSettings.getSettings();
     public NightModeHelper nightMode;
 
     private OnSharedPreferenceChangeListener prefChangeListener

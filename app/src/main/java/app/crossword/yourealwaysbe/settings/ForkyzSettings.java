@@ -17,8 +17,11 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
-import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
+import dagger.hilt.android.qualifiers.ApplicationContext;
+
 import app.crossword.yourealwaysbe.net.Downloader;
 import app.crossword.yourealwaysbe.net.Downloaders;
 import app.crossword.yourealwaysbe.util.files.Accessor;
@@ -31,24 +34,11 @@ import app.crossword.yourealwaysbe.util.files.Accessor;
  *
  * The live data methods can be used to observe certain settings.
  *
- * Use getSettings (singleton pattern)
+ * Use Hilt dependency injection
  */
+@Singleton
 public class ForkyzSettings {
     private static ForkyzSettings instance = null;
-
-    /**
-     * Get settings instance
-     */
-    public static ForkyzSettings getSettings() {
-        if (instance != null)
-            return instance;
-        Context context = ForkyzApplication.getInstance();
-        instance = new ForkyzSettings(
-            PreferenceManager.getDefaultSharedPreferences(context),
-            new Handler(context.getMainLooper())
-        );
-        return instance;
-    }
 
     public static final int BROWSE_SWIPE_DELETE = 0;
     public static final int BROWSE_SWIPE_ARCHIVE = 1;
@@ -254,6 +244,14 @@ public class ForkyzSettings {
                 updateLiveBoolean(key);
             }
         };
+
+    @Inject
+    ForkyzSettings(@ApplicationContext Context context) {
+        this(
+            PreferenceManager.getDefaultSharedPreferences(context),
+            new Handler(context.getMainLooper())
+        );
+    }
 
     /**
      * Package level for testing only

@@ -14,6 +14,8 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceManager;
 import com.google.android.material.color.DynamicColors;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
 import app.crossword.yourealwaysbe.forkyz.R;
 import app.crossword.yourealwaysbe.net.Downloader;
 import app.crossword.yourealwaysbe.net.Downloaders;
@@ -21,8 +23,9 @@ import app.crossword.yourealwaysbe.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.util.BackgroundDownloadManager;
 import app.crossword.yourealwaysbe.util.ThemeHelper;
 
+import javax.inject.Inject;
+
 public class PreferencesSubPages {
-    private static ForkyzSettings settings = ForkyzSettings.getSettings();
 
     public static class SourcesFragment extends PreferencesBaseFragment {
         @Override
@@ -68,7 +71,12 @@ public class PreferencesSubPages {
         }
     }
 
+    @AndroidEntryPoint
     public static class DownloadFragment extends PreferencesBaseFragment {
+
+        @Inject
+        protected ForkyzSettings settings;
+
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.preferences_download, rootKey);
@@ -103,9 +111,14 @@ public class PreferencesSubPages {
         }
     }
 
+    @AndroidEntryPoint
     public static class DownloadBackgroundFragment
             extends PreferencesBaseFragment
             implements SharedPreferences.OnSharedPreferenceChangeListener {
+
+        @Inject
+        BackgroundDownloadManager downloadManager;
+
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(
@@ -133,8 +146,8 @@ public class PreferencesSubPages {
         public void onSharedPreferenceChanged(
             SharedPreferences sharedPreferences, String pref
         ) {
-            if (BackgroundDownloadManager.isBackgroundDownloadConfigPref(pref))
-                BackgroundDownloadManager.updateBackgroundDownloads();
+            if (downloadManager.isBackgroundDownloadConfigPref(pref))
+                downloadManager.updateBackgroundDownloads();
         }
     }
 

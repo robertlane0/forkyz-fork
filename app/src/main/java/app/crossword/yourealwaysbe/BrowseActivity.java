@@ -41,6 +41,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
 import com.leinardi.android.speeddial.SpeedDialActionItem;
 import com.leinardi.android.speeddial.SpeedDialView;
 
@@ -75,7 +77,9 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import javax.inject.Inject;
 
+@AndroidEntryPoint
 public class BrowseActivity extends ForkyzActivity {
 
     /**
@@ -113,6 +117,12 @@ public class BrowseActivity extends ForkyzActivity {
 
     private static final DateTimeFormatter DATE_FORMAT
         = DateTimeFormatter.ofPattern("EEEE\n MMM dd, yyyy");
+
+    @Inject
+    protected MigrationHelper migrationHelper;
+
+    @Inject
+    protected BackgroundDownloadManager backgroundDownloadManager;
 
     /**
      * See note for BROWSER_CLOSE_ACTION
@@ -363,7 +373,7 @@ public class BrowseActivity extends ForkyzActivity {
         );
 
         // Bring up to date
-        MigrationHelper.applyMigrations(this, prefs);
+        migrationHelper.applyMigrations(this, prefs);
 
         // Now create!
 
@@ -523,7 +533,7 @@ public class BrowseActivity extends ForkyzActivity {
         // the UI is re-rendered when they exit the settings dialog.
         if (
             model.getPuzzleFiles().getValue() == null
-            || BackgroundDownloadManager.checkBackgroundDownloadPendingFlag()
+            || backgroundDownloadManager.checkBackgroundDownloadPendingFlag()
         ) {
             if (hasPendingImports()) {
                 Collection<Uri> importUri = getPendingImports();
@@ -641,7 +651,7 @@ public class BrowseActivity extends ForkyzActivity {
     private void checkAutoDownloadNotificationPermissions() {
         settings.getDownloadersSettings(settings -> {
             boolean downloading = settings.getDownloadOnStartup()
-                || BackgroundDownloadManager.isBackgroundDownloadEnabled();
+                || backgroundDownloadManager.isBackgroundDownloadEnabled();
 
             if (settings.isNotificationPermissionNeeded() && downloading)
                 checkRequestNotificationPermissions();
@@ -676,7 +686,7 @@ public class BrowseActivity extends ForkyzActivity {
     private void startLoadPuzzleList(boolean archive) {
         if (!hasWritePermissions) return;
 
-        BackgroundDownloadManager.clearBackgroundDownloadPendingFlag();
+        backgroundDownloadManager.clearBackgroundDownloadPendingFlag();
 
         model.startLoadFiles(archive);
     }

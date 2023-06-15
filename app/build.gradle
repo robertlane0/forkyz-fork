@@ -2,6 +2,7 @@
 plugins {
     id 'com.android.application'
     id 'checkstyle'
+    id 'com.google.dagger.hilt.android'
 }
 
 check.dependsOn 'checkstyle'
@@ -104,9 +105,8 @@ dependencies {
     def lifecycle_version = "2.6.1"
     def room_version = "2.5.1"
     def work_version = "2.8.1"
+    def hilt_version = "2.46.1"
 
-    annotationProcessor "androidx.room:room-compiler:$room_version"
-    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.3'
     implementation "androidx.lifecycle:lifecycle-livedata:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-viewmodel:$lifecycle_version"
     implementation "androidx.room:room-runtime:$room_version"
@@ -124,8 +124,15 @@ dependencies {
     implementation 'com.leinardi.android:speed-dial:3.3.0'
     implementation 'com.github.jgraham0325:words-to-numbers:8a97d258fd'
     implementation 'com.squareup:seismic:1.0.3'
+    implementation "com.google.dagger:hilt-android:$hilt_version"
 
     implementation project(path: ":puzlib", configuration: 'shadow')
+
+    annotationProcessor "androidx.room:room-compiler:$room_version"
+    // thanks: https://stackoverflow.com/a/72105049
+    annotationProcessor "com.google.dagger:hilt-compiler:$hilt_version"
+
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.3'
 
     testImplementation "junit:junit:4.13.2"
     testImplementation "org.mockito:mockito-core:4.9.0"
