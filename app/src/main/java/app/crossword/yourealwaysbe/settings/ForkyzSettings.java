@@ -204,13 +204,26 @@ public class ForkyzSettings {
 
     // public for settings page
     public static final String PREF_AUTO_DOWNLOADERS = "autoDownloaders";
-    private static final String PREF_BROWSE_SORT = "sort";
+    private static final String PREF_BROWSE_CLEANUP_AGE = "cleanupAge";
+    private static final String PREF_BROWSE_CLEANUP_AGE_ARCHIVE
+        = "archiveCleanupAge";
+    private static final String PREF_BROWSE_DELETE_ON_CLEANUP
+        = "deleteOnCleanup";
     private static final String PREF_BROWSE_DISABLE_SWIPE = "disableSwipe";
     private static final String PREF_BROWSE_LAST_DOWNLOAD = "dlLast";
     private static final String PREF_BROWSE_LAST_SEEN_VERSION
         = "lastSeenVersion";
+    private static final String PREF_BROWSE_SORT = "sort";
     private static final String PREF_BROWSE_SWIPE_ACTION = "swipeAction";
-    private static final String PREF_SHOW_COUNT = "showCount";
+
+    private static final String PREF_PLAY_DONT_DELETE_CROSSING
+        = "dontDeleteCrossing";
+    private static final String
+    PREF_PLAY_PRESERVE_CORRECT_LETTERS_IN_SHOW_ERRORS
+        = "preserveCorrectLettersInShowErrors";
+    private static final String PREF_PLAY_SHOW_COUNT = "showCount";
+
+
     private static final String PREF_SUPPRESS_SUMMARY_NOTIFICATIONS
         = "supressSummaryMessages";
     private static final String PREF_SUPPRESS_INDIVIDUAL_NOTIFICATIONS
@@ -221,12 +234,19 @@ public class ForkyzSettings {
     private static final Map<String, Long> LONG_DEFAULTS = new HashMap<>();
     private static final Map<String, String> STRING_DEFAULTS = new HashMap<>();
     static {
-        BOOL_DEFAULTS.put(PREF_SHOW_COUNT, false);
+        STRING_DEFAULTS.put(PREF_BROWSE_CLEANUP_AGE, "-1");
+        STRING_DEFAULTS.put(PREF_BROWSE_CLEANUP_AGE_ARCHIVE, "-1");
+        BOOL_DEFAULTS.put(PREF_BROWSE_DELETE_ON_CLEANUP, false);
         BOOL_DEFAULTS.put(PREF_BROWSE_DISABLE_SWIPE, false);
         LONG_DEFAULTS.put(PREF_BROWSE_LAST_DOWNLOAD, 0L);
         STRING_DEFAULTS.put(PREF_BROWSE_LAST_SEEN_VERSION, "");
-        STRING_DEFAULTS.put(PREF_BROWSE_SWIPE_ACTION, "DELETE");
         INT_DEFAULTS.put(PREF_BROWSE_SORT, 0);
+        STRING_DEFAULTS.put(PREF_BROWSE_SWIPE_ACTION, "DELETE");
+        BOOL_DEFAULTS.put(PREF_PLAY_DONT_DELETE_CROSSING, false);
+        BOOL_DEFAULTS.put(
+            PREF_PLAY_PRESERVE_CORRECT_LETTERS_IN_SHOW_ERRORS, false
+        );
+        BOOL_DEFAULTS.put(PREF_PLAY_SHOW_COUNT, false);
     }
 
     private SharedPreferences prefs;
@@ -262,6 +282,42 @@ public class ForkyzSettings {
         this.prefs.registerOnSharedPreferenceChangeListener(prefChangeListener);
     }
 
+    public void getBrowseCleanupAge(Consumer<String> cb) {
+        getStringPreference(PREF_BROWSE_CLEANUP_AGE, cb);
+    }
+
+    public void getBrowseCleanupAgeArchive(Consumer<String> cb) {
+        getStringPreference(PREF_BROWSE_CLEANUP_AGE_ARCHIVE, cb);
+    }
+
+    public void getBrowseDeleteOnCleanup(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_BROWSE_DELETE_ON_CLEANUP, cb);
+    }
+
+    public void getBrowseDisableSwipe(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_BROWSE_DISABLE_SWIPE, cb);
+    }
+
+    public LiveData<Boolean> liveBrowseDisableSwipe() {
+        return getLiveBoolean(PREF_BROWSE_DISABLE_SWIPE);
+    }
+
+    public void getBrowseLastDownload(Consumer<Long> cb) {
+        getLongPreference(PREF_BROWSE_LAST_DOWNLOAD, cb);
+    }
+
+    public void setBrowseLastDownload(long value) {
+        setLongPreference(PREF_BROWSE_LAST_DOWNLOAD, value);
+    }
+
+    public void getBrowseLastSeenVersion(Consumer<String> cb) {
+        getStringPreference(PREF_BROWSE_LAST_SEEN_VERSION, cb);
+    }
+
+    public void setBrowseLastSeenVersion(String value) {
+        setStringPreference(PREF_BROWSE_LAST_SEEN_VERSION, value);
+    }
+
     public void getBrowseSort(Consumer<Accessor> cb) {
         getIntPreference(PREF_BROWSE_SORT, value -> {
             switch (value) {
@@ -292,30 +348,6 @@ public class ForkyzSettings {
         setIntPreference(PREF_BROWSE_SORT, intValue);
     }
 
-    public void getBrowseDisableSwipe(Consumer<Boolean> cb) {
-        getBooleanPreference(PREF_BROWSE_DISABLE_SWIPE, cb);
-    }
-
-    public LiveData<Boolean> liveBrowseDisableSwipe() {
-        return getLiveBoolean(PREF_BROWSE_DISABLE_SWIPE);
-    }
-
-    public void getBrowseLastDownload(Consumer<Long> cb) {
-        getLongPreference(PREF_BROWSE_LAST_DOWNLOAD, cb);
-    }
-
-    public void setBrowseLastDownload(long value) {
-        setLongPreference(PREF_BROWSE_LAST_DOWNLOAD, value);
-    }
-
-    public void getBrowseLastSeenVersion(Consumer<String> cb) {
-        getStringPreference(PREF_BROWSE_LAST_SEEN_VERSION, cb);
-    }
-
-    public void setBrowseLastSeenVersion(String value) {
-        setStringPreference(PREF_BROWSE_LAST_SEEN_VERSION, value);
-    }
-
     public void getBrowseSwipeAction(Consumer<Integer> cb) {
         getStringPreference(PREF_BROWSE_SWIPE_ACTION, value -> {
             cb.accept("DELETE".equals(value)
@@ -325,12 +357,24 @@ public class ForkyzSettings {
         });
     }
 
-    public void getShowCount(Consumer<Boolean> cb) {
-        getBooleanPreference(PREF_SHOW_COUNT, cb);
+    public void getPlayDontDeleteCrossing(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_PLAY_DONT_DELETE_CROSSING, cb);
     }
 
-    public void setShowCount(boolean value) {
-        setBooleanPreference(PREF_SHOW_COUNT, value);
+    public void getPlayPreserveCorrectLettersInShowErrors(
+        Consumer<Boolean> cb
+    ) {
+        getBooleanPreference(
+            PREF_PLAY_PRESERVE_CORRECT_LETTERS_IN_SHOW_ERRORS, cb
+        );
+    }
+
+    public void getPlayShowCount(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_PLAY_SHOW_COUNT, cb);
+    }
+
+    public void setPlayShowCount(boolean value) {
+        setBooleanPreference(PREF_PLAY_SHOW_COUNT, value);
     }
 
     public void getDownloadersSettings(Consumer<DownloadersSettings> cb) {

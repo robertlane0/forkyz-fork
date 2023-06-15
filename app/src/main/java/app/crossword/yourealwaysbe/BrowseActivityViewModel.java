@@ -15,7 +15,6 @@ import java.util.logging.Logger;
 import javax.inject.Inject;
 
 import android.content.ContentResolver;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
@@ -23,7 +22,6 @@ import android.widget.Toast;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-import androidx.preference.PreferenceManager;
 
 import dagger.hilt.android.lifecycle.HiltViewModel;
 
@@ -54,7 +52,6 @@ public class BrowseActivityViewModel extends ViewModel {
         = Executors.newCachedThreadPool();
     private Handler handler = new Handler(Looper.getMainLooper());
 
-    private SharedPreferences prefs;
     private ForkyzSettings settings;
 
     private boolean isViewArchive = false;
@@ -71,9 +68,6 @@ public class BrowseActivityViewModel extends ViewModel {
     public BrowseActivityViewModel(ForkyzSettings settings) {
         this.settings = settings;
         isUIBusy.setValue(false);
-        prefs = PreferenceManager.getDefaultSharedPreferences(
-            ForkyzApplication.getInstance()
-        );
     }
 
     /**
@@ -177,58 +171,58 @@ public class BrowseActivityViewModel extends ViewModel {
     }
 
     public void cleanUpPuzzles() {
-        threadWithUILock(() -> {
-            FileHandler fileHandler = getFileHandler();
+        settings.getBrowseDeleteOnCleanup(deleteOnCleanup -> {
+        settings.getBrowseCleanupAge(maxAgeString -> {
+        settings.getBrowseCleanupAgeArchive(archiveMaxAgeString -> {
+            threadWithUILock(() -> {
+                FileHandler fileHandler = getFileHandler();
 
-            boolean deleteOnCleanup
-                = prefs.getBoolean("deleteOnCleanup", false);
-            LocalDate maxAge
-                = getMaxAge(prefs.getString("cleanupAge", "-1"));
-            LocalDate archiveMaxAge
-                = getMaxAge(prefs.getString("archiveCleanupAge", "-1"));
+                LocalDate maxAge = getMaxAge(maxAgeString);
+                LocalDate archiveMaxAge = getMaxAge(archiveMaxAgeString);
 
-            DirHandle crosswords
-                = fileHandler.getCrosswordsDirectory();
-            DirHandle archive
-                = fileHandler.getArchiveDirectory();
+                DirHandle crosswords
+                    = fileHandler.getCrosswordsDirectory();
+                DirHandle archive
+                    = fileHandler.getArchiveDirectory();
 
-            List<PuzMetaFile> toArchive = new ArrayList<>();
-            List<PuzMetaFile> toDelete = new ArrayList<>();
+                List<PuzMetaFile> toArchive = new ArrayList<>();
+                List<PuzMetaFile> toDelete = new ArrayList<>();
 
-            List<PuzMetaFile> puzCrosswordFiles
-                = fileHandler.getPuzMetas(crosswords);
-            for (PuzMetaFile pm : puzCrosswordFiles) {
-                boolean doClean
-                    = pm.getComplete() == 100
-                    || (maxAge != null && pm.getDate().isBefore(maxAge));
+                List<PuzMetaFile> puzCrosswordFiles
+                    = fileHandler.getPuzMetas(crosswords);
+                for (PuzMetaFile pm : puzCrosswordFiles) {
+                    boolean doClean
+                        = pm.getComplete() == 100
+                        || (maxAge != null && pm.getDate().isBefore(maxAge));
 
-                if (doClean) {
-                    if (deleteOnCleanup) {
-                        toDelete.add(pm);
-                    } else {
-                        toArchive.add(pm);
+                    if (doClean) {
+                        if (deleteOnCleanup) {
+                            toDelete.add(pm);
+                        } else {
+                            toArchive.add(pm);
+                        }
                     }
                 }
-            }
 
-            if (archiveMaxAge != null) {
-                List<PuzMetaFile> puzArchiveFiles
-                    = fileHandler.getPuzMetas(archive);
-                for (PuzMetaFile pm : puzArchiveFiles) {
-                    if (pm.getDate().isBefore(archiveMaxAge)) {
-                        toDelete.add(pm);
+                if (archiveMaxAge != null) {
+                    List<PuzMetaFile> puzArchiveFiles
+                        = fileHandler.getPuzMetas(archive);
+                    for (PuzMetaFile pm : puzArchiveFiles) {
+                        if (pm.getDate().isBefore(archiveMaxAge)) {
+                            toDelete.add(pm);
+                        }
                     }
                 }
-            }
 
-            for (PuzMetaFile puzMeta : toDelete)
-                fileHandler.delete(puzMeta);
+                for (PuzMetaFile puzMeta : toDelete)
+                    fileHandler.delete(puzMeta);
 
-            for (PuzMetaFile puzMeta : toArchive)
-                fileHandler.moveTo(puzMeta, archive);
+                for (PuzMetaFile puzMeta : toArchive)
+                    fileHandler.moveTo(puzMeta, archive);
 
-            startLoadFiles();
-        });
+                startLoadFiles();
+            });
+        });});});
     }
 
     public void download(LocalDate date, List<Downloader> downloaders) {
@@ -253,55 +247,57 @@ public class BrowseActivityViewModel extends ViewModel {
     }
 
     public void loadPuzzle(PuzMetaFile puzMeta) {
-        threadWithUILock(() -> {
-            FileHandler fileHandler = getFileHandler();
-            try {
-                Puzzle puz = fileHandler.load(puzMeta);
-                if (puz == null || puz.getBoxes() == null) {
-                    throw new IOException(
-                        "Puzzle is null or contains no boxes."
-                    );
-                }
-                handler.post(() -> {
-                    ForkyzApplication application
-                        = ForkyzApplication.getInstance();
-                    application.setBoard(
-                        new Playboard(
-                            puz,
-                            application.getMovementStrategy(),
-                            prefs.getBoolean(
-                                "preserveCorrectLettersInShowErrors", false
-                            ),
-                            prefs.getBoolean("dontDeleteCrossing", true)
-                        ),
-                        puzMeta.getPuzHandle()
-                    );
-                    puzzleLoadEvents.call();
-                });
-            } catch (IOException e) {
-                handler.post(() -> {
-                    String filename = null;
-                    try {
-                        filename = fileHandler.getName(puzMeta.getPuzHandle());
-                    } catch (Exception ee) {
-                        e.printStackTrace();
+        settings.getPlayPreserveCorrectLettersInShowErrors(preserveCorrect -> {
+        settings.getPlayDontDeleteCrossing(dontDeleteCrossing -> {
+            threadWithUILock(() -> {
+                FileHandler fileHandler = getFileHandler();
+                try {
+                    Puzzle puz = fileHandler.load(puzMeta);
+                    if (puz == null || puz.getBoxes() == null) {
+                        throw new IOException(
+                            "Puzzle is null or contains no boxes."
+                        );
                     }
+                    handler.post(() -> {
+                        ForkyzApplication application
+                            = ForkyzApplication.getInstance();
+                        application.setBoard(
+                            new Playboard(
+                                puz,
+                                application.getMovementStrategy(),
+                                preserveCorrect,
+                                dontDeleteCrossing
+                            ),
+                            puzMeta.getPuzHandle()
+                        );
+                        puzzleLoadEvents.call();
+                    });
+                } catch (IOException e) {
+                    handler.post(() -> {
+                        String filename = null;
+                        try {
+                            filename
+                                = fileHandler.getName(puzMeta.getPuzHandle());
+                        } catch (Exception ee) {
+                            ee.printStackTrace();
+                        }
 
-                    ForkyzApplication application
-                        = ForkyzApplication.getInstance();
+                        ForkyzApplication application
+                            = ForkyzApplication.getInstance();
 
-                    Toast t = Toast.makeText(
-                        application,
-                        application.getString(
-                            R.string.unable_to_read_file,
-                            (filename != null ?  filename : "")
-                        ),
-                        Toast.LENGTH_SHORT
-                    );
-                    t.show();
-                });
-            }
-        });
+                        Toast t = Toast.makeText(
+                            application,
+                            application.getString(
+                                R.string.unable_to_read_file,
+                                (filename != null ?  filename : "")
+                            ),
+                            Toast.LENGTH_SHORT
+                        );
+                        t.show();
+                    });
+                }
+            });
+        });});
     }
 
     public void refreshPuzzleMeta(PuzHandle refreshHandle) {
