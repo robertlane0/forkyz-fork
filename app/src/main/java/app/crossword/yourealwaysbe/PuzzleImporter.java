@@ -38,12 +38,11 @@ public class PuzzleImporter {
      * @return new puz handle if succeeded (will return null if failed
      * or uri is null)
      */
-    public static PuzHandle importUri(ContentResolver resolver, Uri uri) {
+    public static PuzHandle importUri(
+        ContentResolver resolver, FileHandler fileHandler, Uri uri
+    ) {
         if (uri == null)
             return null;
-
-        FileHandler fileHandler =
-            ForkyzApplication.getInstance().getFileHandler();
 
         Puzzle puz = null;
 

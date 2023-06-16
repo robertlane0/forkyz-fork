@@ -35,7 +35,7 @@ public class DownloadersTest {
         initialiseMocks(context);
         DownloadersSettings settings = getDownloadersSettings();
         final List<Downloader> downloaders
-            = (new Downloaders(context, settings)).getDownloaders();
+            = (new Downloaders(context, null, settings)).getDownloaders();
         return new AbstractList<Object[]>() {
             @Override
             public int size() { return downloaders.size(); }

@@ -52,11 +52,12 @@ import app.crossword.yourealwaysbe.forkyz.databinding.BrowseBinding;
 import app.crossword.yourealwaysbe.forkyz.databinding.PuzzleListItemBinding;
 import app.crossword.yourealwaysbe.net.Downloader;
 import app.crossword.yourealwaysbe.net.Downloaders;
+import app.crossword.yourealwaysbe.settings.ForkyzSettings.StorageLocation;
 import app.crossword.yourealwaysbe.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.util.BackgroundDownloadManager;
 import app.crossword.yourealwaysbe.util.MigrationHelper;
 import app.crossword.yourealwaysbe.util.files.Accessor;
-import app.crossword.yourealwaysbe.util.files.DirHandle;
+import app.crossword.yourealwaysbe.util.files.FileHandlerProvider;
 import app.crossword.yourealwaysbe.util.files.PuzHandle;
 import app.crossword.yourealwaysbe.util.files.PuzMetaFile;
 import app.crossword.yourealwaysbe.versions.AndroidVersionUtils;
@@ -124,6 +125,9 @@ public class BrowseActivity extends ForkyzActivity {
     @Inject
     protected BackgroundDownloadManager backgroundDownloadManager;
 
+    @Inject
+    protected FileHandlerProvider fileHanderProvider;
+
     /**
      * See note for BROWSER_CLOSE_ACTION
      */
@@ -166,11 +170,6 @@ public class BrowseActivity extends ForkyzActivity {
 
     private BrowseActivityViewModel model;
 
-    private DirHandle archiveFolder
-        = getFileHandler().getArchiveDirectory();
-    private DirHandle crosswordsFolder
-        = getFileHandler().getCrosswordsDirectory();
-
     private BrowseBinding binding;
     private SeparatedRecyclerViewAdapter<FileViewHolder, FileAdapter>
         currentAdapter = null;
@@ -189,8 +188,11 @@ public class BrowseActivity extends ForkyzActivity {
 
     private Consumer<Consumer<Downloaders>> downloadersProvider = cb -> {
         settings.getDownloadersSettings(downloadersSettings -> {
-            cb.accept(new Downloaders(this, downloadersSettings, nm));
-        });
+        fileHanderProvider.get(fileHandler -> {
+            cb.accept(new Downloaders(
+                this, fileHandler, downloadersSettings, nm
+            ));
+        });});
     };
 
     private ActionMode actionMode;
@@ -232,13 +234,19 @@ public class BrowseActivity extends ForkyzActivity {
 
             Set<PuzMetaFile> toAction = new HashSet<>(selected);
 
-            if (id == R.id.browse_action_delete) {
-                model.deletePuzzles(toAction);
-            } else if (id == R.id.browse_action_archive) {
-                model.movePuzzles(toAction, archiveFolder);
-            } else if (id == R.id.browse_action_unarchive) {
-                model.movePuzzles(toAction, crosswordsFolder);
-            }
+            fileHanderProvider.get(fileHandler -> {
+                if (id == R.id.browse_action_delete) {
+                    model.deletePuzzles(toAction);
+                } else if (id == R.id.browse_action_archive) {
+                    model.movePuzzles(
+                        toAction, fileHandler.getArchiveDirectory()
+                    );
+                } else if (id == R.id.browse_action_unarchive) {
+                    model.movePuzzles(
+                        toAction, fileHandler.getCrosswordsDirectory()
+                    );
+                }
+            });
 
             actionMode.finish();
 
@@ -428,17 +436,24 @@ public class BrowseActivity extends ForkyzActivity {
                     PuzMetaFile puzMeta
                         = ((FileViewHolder) viewHolder).getPuzMetaFile();
 
+                    fileHanderProvider.get(fileHandler -> {
                     settings.getBrowseSwipeAction(action -> {
                         if (action == ForkyzSettings.BROWSE_SWIPE_DELETE) {
                             model.deletePuzzle(puzMeta);
                         } else {
                             if (model.getIsViewArchive()) {
-                                model.movePuzzle(puzMeta, crosswordsFolder);
+                                model.movePuzzle(
+                                    puzMeta,
+                                    fileHandler.getCrosswordsDirectory()
+                                );
                             } else {
-                                model.movePuzzle(puzMeta, archiveFolder);
+                                model.movePuzzle(
+                                    puzMeta,
+                                    fileHandler.getArchiveDirectory()
+                                );
                             }
                         }
-                    });
+                    });});
                 }
             });
         helper.attachToRecyclerView(binding.puzzleList);
@@ -446,7 +461,6 @@ public class BrowseActivity extends ForkyzActivity {
         this.nm = NotificationManagerCompat.from(this);
 
         settings.liveBrowseSort().observe(this, accessor -> {
-            System.out.println("FORKYZ: live outer " + accessor);
             loadPuzzleAdapter();
         });
 
@@ -531,24 +545,28 @@ public class BrowseActivity extends ForkyzActivity {
         // A background update will commonly happen when the user turns
         // on the preference for the first time, so check here to ensure
         // the UI is re-rendered when they exit the settings dialog.
-        if (
-            model.getPuzzleFiles().getValue() == null
-            || backgroundDownloadManager.checkBackgroundDownloadPendingFlag()
-        ) {
-            if (hasPendingImports()) {
-                Collection<Uri> importUri = getPendingImports();
-                clearPendingImports();
-                onImportURIsAndFinish(importUri);
+        backgroundDownloadManager.checkBackgroundDownloadPendingFlag(
+            backgroundDownloadPending -> {
+                if (
+                    model.getPuzzleFiles().getValue() == null
+                    || backgroundDownloadPending
+                ) {
+                    if (hasPendingImports()) {
+                        Collection<Uri> importUri = getPendingImports();
+                        clearPendingImports();
+                        onImportURIsAndFinish(importUri);
 
-                // won't be triggered by import if archive is shown
-                if (model.getIsViewArchive())
-                    startLoadPuzzleList();
-            } else {
-                startLoadPuzzleList();
+                        // won't be triggered by import if archive is shown
+                        if (model.getIsViewArchive())
+                            startLoadPuzzleList();
+                    } else {
+                        startLoadPuzzleList();
+                    }
+                } else {
+                    refreshLastAccessedPuzzle();
+                }
             }
-        } else {
-            refreshLastAccessedPuzzle();
-        }
+        );
 
         // previous game ended for now
         ForkyzApplication.getInstance().clearBoard();
@@ -563,25 +581,27 @@ public class BrowseActivity extends ForkyzActivity {
         // permissions checks in onStart to avoid multiple calls via
         // onResume
 
-        if (ForkyzApplication.getInstance().isMissingWritePermission()) {
-            boolean showRationale
-                = ActivityCompat.shouldShowRequestPermissionRationale(
-                    this, Manifest.permission.WRITE_EXTERNAL_STORAGE
-                );
+        ForkyzApplication.getInstance().isMissingWritePermission(missing -> {
+            if (missing) {
+                boolean showRationale
+                    = ActivityCompat.shouldShowRequestPermissionRationale(
+                        this, Manifest.permission.WRITE_EXTERNAL_STORAGE
+                    );
 
-            if (showRationale) {
-                DialogFragment dialog = new StoragePermissionDialog();
-                dialog.show(
-                    getSupportFragmentManager(), "StoragePermissionDialog"
-                );
+                if (showRationale) {
+                    DialogFragment dialog = new StoragePermissionDialog();
+                    dialog.show(
+                        getSupportFragmentManager(), "StoragePermissionDialog"
+                    );
+                } else {
+                    requestWritePermission();
+                }
+
+                return;
             } else {
-                requestWritePermission();
+                hasWritePermissions = true;
             }
-
-            return;
-        } else {
-            hasWritePermissions = true;
-        }
+        });
 
         checkAutoDownloadNotificationPermissions();
     }
@@ -662,21 +682,19 @@ public class BrowseActivity extends ForkyzActivity {
         if (!hasWritePermissions) return;
 
         settings.getBrowseLastDownload(lastDL -> {
-            settings.getDownloadersSettings(downloaderSettings -> {
-                Downloaders dls = new Downloaders(this, downloaderSettings, nm);
+        settings.getDownloadersSettings(downloaderSettings -> {
+        downloadersProvider.accept(dls -> {
+            long downloadCutoff
+                = System.currentTimeMillis() - (long) (12 * 60 * 60 * 1000);
 
-                long downloadCutoff
-                    = System.currentTimeMillis() - (long) (12 * 60 * 60 * 1000);
+            boolean isDownload = downloaderSettings.getDownloadOnStartup()
+                && downloadCutoff > lastDL;
 
-                boolean isDownload = downloaderSettings.getDownloadOnStartup()
-                    && downloadCutoff > lastDL;
-
-                if (isDownload) {
-                    model.download(LocalDate.now(), dls.getAutoDownloaders());
-                    settings.setBrowseLastDownload(System.currentTimeMillis());
-                }
-            });
-        });
+            if (isDownload) {
+                model.download(LocalDate.now(), dls.getAutoDownloaders());
+                settings.setBrowseLastDownload(System.currentTimeMillis());
+            }
+        });});});
     }
 
     private void startLoadPuzzleList() {
@@ -697,11 +715,10 @@ public class BrowseActivity extends ForkyzActivity {
             = model.getPuzzleFiles().getValue();
         if (puzList != null) {
             settings.getBrowseSort(accessor -> {
-                System.out.println("FORKYZ: bet brwose " + accessor);
                 setPuzzleListAdapter(buildList(puzList, accessor), true);
             });
         } else {
-            setPuzzleListAdapter(buildEmptyList(), true);
+            setPuzzleListAdapter(buildEmptyList(), false);
         }
     }
 
@@ -783,10 +800,12 @@ public class BrowseActivity extends ForkyzActivity {
             }
             binding.emptyListingMsg.setVisibility(View.VISIBLE);
 
-            if (ForkyzApplication.getInstance().isInternalStorage())
-                binding.internalStorageMsg.setVisibility(View.VISIBLE);
-            else
-                binding.internalStorageMsg.setVisibility(View.GONE);
+            settings.getFileHandlerSettings(fhSettings -> {
+                if (fhSettings.getStorageLocation() == StorageLocation.INTERNAL)
+                    binding.internalStorageMsg.setVisibility(View.VISIBLE);
+                else
+                    binding.internalStorageMsg.setVisibility(View.GONE);
+            });
         } else {
             binding.emptyListingMsg.setVisibility(View.GONE);
             binding.internalStorageMsg.setVisibility(View.GONE);

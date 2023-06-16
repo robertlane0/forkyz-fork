@@ -10,7 +10,7 @@
         android:key="storageLocation"
         android:defaultValue="@string/internal_storage"
         android:entries="@array/storageLocations"
-        android:entryValues="@array/storageLocations"
+        android:entryValues="@array/storageLocationsValues"
     />
 
     <androidx.preference.Preference

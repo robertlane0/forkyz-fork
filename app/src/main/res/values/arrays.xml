@@ -71,6 +71,11 @@
        <item>@string/external_storage_saf</item>
        <item>@string/external_storage_legacy</item>
      </string-array>
+     <string-array name="storageLocationsValues">
+       <item>App Internal Storage</item>
+       <item>External directory</item>
+       <item>External SD crosswords directory</item>
+     </string-array>
      <string-array name="backgroundDownloadDaysTimeValues">
        <item>0</item>
        <item>1</item>

@@ -22,12 +22,15 @@ import app.crossword.yourealwaysbe.forkyz.databinding.PuzzleInfoDialogBinding;
 import app.crossword.yourealwaysbe.puz.Box;
 import app.crossword.yourealwaysbe.puz.Playboard;
 import app.crossword.yourealwaysbe.puz.Puzzle;
-import app.crossword.yourealwaysbe.util.files.FileHandler;
+import app.crossword.yourealwaysbe.util.files.FileHandlerProvider;
 import app.crossword.yourealwaysbe.util.files.PuzHandle;
 
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Locale;
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 
 public class PuzzleInfoDialogs {
     public static class Finished extends DialogFragment {
@@ -189,7 +192,11 @@ public class PuzzleInfoDialogs {
     }
 
     // kind of a weird extends, but they share finished info
+    @AndroidEntryPoint
     public static class Info extends Finished {
+        @Inject
+        protected FileHandlerProvider fileHandlerProvider;
+
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             Activity activity = getActivity();
@@ -224,14 +231,14 @@ public class PuzzleInfoDialogs {
                 binding.puzzleInfoProgress
                     .setProgress(puz.getPercentComplete());
 
-                FileHandler fileHandler
-                    = ForkyzApplication.getInstance().getFileHandler();
-                PuzHandle handle = getPuzHandle();
-                if (handle != null) {
-                    binding.puzzleInfoFilename.setText(
-                        fileHandler.getUri(handle).toString()
-                    );
-                }
+                fileHandlerProvider.get(fileHandler -> {
+                    PuzHandle handle = getPuzHandle();
+                    if (handle != null) {
+                        binding.puzzleInfoFilename.setText(
+                            fileHandler.getUri(handle).toString()
+                        );
+                    }
+                });
 
                 addIntro(binding);
                 addNotes(binding);

@@ -3,14 +3,17 @@ package app.crossword.yourealwaysbe.util.files;
 
 import java.time.LocalDate;
 
-import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
-
 public class PuzMetaFile
         implements Comparable<PuzMetaFile> {
+    private FileHandler fileHandler;
+
     public PuzHandle handle;
     public MetaCache.MetaRecord meta;
 
-    PuzMetaFile(PuzHandle handle, MetaCache.MetaRecord meta) {
+    PuzMetaFile(
+        FileHandler fileHandler, PuzHandle handle, MetaCache.MetaRecord meta
+    ) {
+        this.fileHandler = fileHandler;
         this.handle = handle;
         this.meta = meta;
     }
@@ -102,6 +105,6 @@ public class PuzMetaFile
     }
 
     private FileHandler getHandler() {
-        return ForkyzApplication.getInstance().getFileHandler();
+        return fileHandler;
     }
 }

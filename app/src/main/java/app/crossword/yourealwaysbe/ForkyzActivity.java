@@ -1,6 +1,5 @@
 package app.crossword.yourealwaysbe;
 
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -19,12 +18,9 @@ import androidx.preference.PreferenceManager;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
-import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
 import app.crossword.yourealwaysbe.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.util.NightModeHelper;
 import app.crossword.yourealwaysbe.util.ThemeHelper;
-import app.crossword.yourealwaysbe.util.files.FileHandler;
-import app.crossword.yourealwaysbe.util.files.FileHandlerSAF;
 import app.crossword.yourealwaysbe.versions.AndroidVersionUtils;
 
 import java.util.logging.Logger;
@@ -43,31 +39,11 @@ public class ForkyzActivity extends AppCompatActivity {
     protected SharedPreferences prefs;
     public NightModeHelper nightMode;
 
-    private OnSharedPreferenceChangeListener prefChangeListener
-        = new OnSharedPreferenceChangeListener() {
-            public void onSharedPreferenceChanged(
-                SharedPreferences prefs, String key
-            ) {
-                if (ForkyzApplication.STORAGE_LOC_PREF.equals(key)
-                        || FileHandlerSAF.SAF_ROOT_URI_PREF.equals(key)) {
-                    ForkyzActivity.this.finish();
-                }
-            }
-        };
-
-    protected FileHandler getFileHandler() {
-        return ForkyzApplication.getInstance().getFileHandler();
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         this.prefs = PreferenceManager.getDefaultSharedPreferences(this);
-
-        this.prefs.registerOnSharedPreferenceChangeListener(prefChangeListener);
-
-        final FileHandler fileHandler = getFileHandler();
 
         doOrientation();
         (new ThemeHelper(this, this.prefs)).themeActivity(this);

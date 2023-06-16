@@ -86,7 +86,7 @@ public class PreferencesSubPages {
         private void setAvailableDownloaders() {
             settings.getDownloadersSettings(downloadersSettings -> {
                 Downloaders dls
-                    = new Downloaders(getActivity(), downloadersSettings);
+                    = new Downloaders(getActivity(), null, downloadersSettings);
                 List<Downloader> downloaders = dls.getDownloaders();
 
                 int len = downloaders.size();

@@ -201,7 +201,6 @@ public class ClueTabs extends LinearLayout
 
         final ClueTabsPagerAdapter adapter = new ClueTabsPagerAdapter();
 
-        System.out.println("FORKYZ: adapter set");
         binding.clueTabsPager.setAdapter(adapter);
 
         binding.clueTabsPager.registerOnPageChangeCallback(

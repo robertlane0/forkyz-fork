@@ -1,23 +1,45 @@
 package app.crossword.yourealwaysbe;
 
+import android.app.Activity;
+import android.app.Dialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.fragment.app.DialogFragment;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference.OnPreferenceChangeListener;
 import androidx.preference.Preference.OnPreferenceClickListener;
 import androidx.preference.Preference;
-import androidx.preference.PreferenceManager;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 
 import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
 import app.crossword.yourealwaysbe.forkyz.R;
+import app.crossword.yourealwaysbe.settings.ForkyzSettings.FileHandlerSettings;
+import app.crossword.yourealwaysbe.settings.ForkyzSettings.StorageLocation;
+import app.crossword.yourealwaysbe.settings.ForkyzSettings;
+import app.crossword.yourealwaysbe.util.files.FileHandlerProvider;
 import app.crossword.yourealwaysbe.util.files.FileHandlerSAF;
 import app.crossword.yourealwaysbe.versions.AndroidVersionUtils;
 
+@AndroidEntryPoint
 public class PreferencesFragment extends PreferencesBaseFragment {
+
+    @Inject
+    protected ForkyzSettings settings;
+
+    @Inject
+    protected FileHandlerProvider fileHandlerProvider;
+
+    private Handler handler;
 
     ActivityResultLauncher<Uri> getSAFURI
         = AndroidVersionUtils.Factory.getInstance()
@@ -26,18 +48,32 @@ public class PreferencesFragment extends PreferencesBaseFragment {
             });
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        handler = new Handler(context.getMainLooper());
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        handler = null;
+    }
+
+    @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+
         // Load the preferences from an XML resource
         setPreferencesFromResource(R.xml.preferences, rootKey);
 
-        findPreference(ForkyzApplication.STORAGE_LOC_PREF)
+        findPreference(ForkyzSettings.PREF_FILE_HANDLER_STORAGE_LOC)
             .setOnPreferenceChangeListener(
                 new OnPreferenceChangeListener() {
                     @Override
                     public boolean onPreferenceChange(
                         Preference preference, Object newValue
                     ) {
-                        return onStorageLocationChange(newValue);
+                        onStorageLocationChange((String) newValue);
+                        return false;
                     }
                 }
             );
@@ -47,13 +83,17 @@ public class PreferencesFragment extends PreferencesBaseFragment {
         findPreference("releaseNotes")
                 .setOnPreferenceClickListener(new OnPreferenceClickListener() {
                 public boolean onPreferenceClick(Preference arg0) {
+                    Activity activity = getActivity();
+                    if (activity == null)
+                        return false;
+
                     Intent i = new Intent(
                         Intent.ACTION_VIEW,
                         Uri.parse("release.html"),
-                        getActivity(),
+                        activity,
                         HTMLActivity.class
                     );
-                    getActivity().startActivity(i);
+                    activity.startActivity(i);
 
                     return true;
                 }
@@ -62,13 +102,17 @@ public class PreferencesFragment extends PreferencesBaseFragment {
         findPreference("license")
                 .setOnPreferenceClickListener(new OnPreferenceClickListener() {
                 public boolean onPreferenceClick(Preference arg0) {
+                    Activity activity = getActivity();
+                    if (activity == null)
+                        return false;
+
                     Intent i = new Intent(
                         Intent.ACTION_VIEW,
                         Uri.parse("license.html"),
-                        getActivity(),
+                        activity,
                         HTMLActivity.class
                     );
-                    getActivity().startActivity(i);
+                    activity.startActivity(i);
                     return true;
                 }
             });
@@ -91,107 +135,154 @@ public class PreferencesFragment extends PreferencesBaseFragment {
      *
      * @return true if change should be committed to prefs
      */
-    private boolean onStorageLocationChange(Object newValue) {
-        SharedPreferences prefs
-            = PreferenceManager .getDefaultSharedPreferences(
-                getActivity().getApplicationContext()
-            );
+    private void onStorageLocationChange(String newValue) {
+        settings.getFileHandlerSettings(fileHandlerSettings -> {
+            Activity activity = getActivity();
+            if (activity == null)
+                return;
 
-        String storageLocation
-            = prefs.getString(ForkyzApplication.STORAGE_LOC_PREF, null);
-        String storageLocationSAFURI
-            = prefs.getString(FileHandlerSAF.SAF_ROOT_URI_PREF, null);
+            StorageLocation newLocation
+                = StorageLocation.fromSettingsValue(newValue);
 
-        boolean selectURI
-            = newValue.equals(getString(R.string.external_storage_saf))
-                && (newValue.equals(storageLocation)
-                    || storageLocationSAFURI == null
-                    || FileHandlerSAF.readHandlerFromPrefs(
-                            getActivity().getApplicationContext()
-                        ) == null
+            boolean isSAF = StorageLocation.EXTERNAL_SAF.equals(newLocation);
+
+            if (isSAF) {
+                FileHandlerSAF fileHandler
+                    = FileHandlerSAF.readHandlerFromSettings(
+                        activity.getApplicationContext(), fileHandlerSettings
+                    );
+
+                if (fileHandler == null) {
+                    if (handler != null) {
+                        handler.post(() -> {
+                            Toast t = Toast.makeText(
+                                activity,
+                                R.string.storage_select_saf_info,
+                                Toast.LENGTH_LONG
+                            );
+                            t.show();
+                            if (getSAFURI != null)
+                                getSAFURI.launch(null);
+                        });
+                    }
+                } else {
+                    settings.setFileHandlerSettings(
+                        fileHandler.getSettings(),
+                        () -> { newFileHandlerAppExit(); }
+                    );
+                }
+            } else {
+                // keep old URIs so they can be reselected in future
+                settings.setFileHandlerSettings(
+                    new FileHandlerSettings(
+                        newLocation,
+                        fileHandlerSettings.getSAFRootURI(),
+                        fileHandlerSettings.getSAFCrosswordsURI(),
+                        fileHandlerSettings.getSAFArchiveURI()
+                    ),
+                    () -> { newFileHandlerAppExit(); }
                 );
-
-        if (selectURI) {
-            Toast t = Toast.makeText(
-                getActivity(),
-                R.string.storage_select_saf_info,
-                Toast.LENGTH_LONG
-            );
-            t.show();
-            if (getSAFURI != null)
-                getSAFURI.launch(null);
-            return false;
-        } else {
-            return true;
-        }
+            }
+        });
     }
 
     private void onNewExternalStorageSAFURI(Uri uri) {
         if (uri == null)
             return;
 
-        boolean setupSuccess = FileHandlerSAF.initialiseSAFPrefs(
-            getActivity().getApplicationContext(), uri
-        ) != null;
+        Activity activity = getActivity();
+        if (activity == null)
+            return;
 
-        if (setupSuccess) {
-            SharedPreferences prefs
-                = PreferenceManager .getDefaultSharedPreferences(
-                    getActivity().getApplicationContext()
-                );
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putString(
-                ForkyzApplication.STORAGE_LOC_PREF,
-                getString(R.string.external_storage_saf)
+        FileHandlerSAF fileHandler = FileHandlerSAF.initialiseSAFForRoot(
+            activity.getApplicationContext(), uri
+        );
+
+        if (fileHandler != null) {
+            settings.setFileHandlerSettings(
+                fileHandler.getSettings(),
+                () -> { newFileHandlerAppExit(); }
             );
-            editor.apply();
-
-            setStorageOptions();
         } else {
-            Toast t = Toast.makeText(
-                getActivity(),
-                R.string.failed_to_initialise_saf,
-                Toast.LENGTH_LONG
+            if (handler != null) {
+                handler.post(() -> {
+                    Toast t = Toast.makeText(
+                        activity,
+                        R.string.failed_to_initialise_saf,
+                        Toast.LENGTH_LONG
+                    );
+                    t.show();
+                });
+            }
+        }
+    }
+
+    private void newFileHandlerAppExit() {
+        fileHandlerProvider.reloadFileHandler();
+        if (handler != null) {
+            StorageChangedDialog dialog = new StorageChangedDialog();
+            dialog.show(
+                getParentFragmentManager(), "StorageChangedDialog"
             );
-            t.show();
         }
     }
 
     private void setStorageOptions() {
-        CharSequence[] entries = new CharSequence[2];
-        CharSequence[] values = new CharSequence[2];
+        settings.getFileHandlerSettings(fhSettings -> {
+            CharSequence[] entries = new CharSequence[2];
+            CharSequence[] values = new CharSequence[2];
 
-        entries[0] = getString(R.string.internal_storage);
-        values[0] = entries[0];
+            entries[0] = getString(R.string.internal_storage);
+            values[0] = StorageLocation.INTERNAL.getSettingsValue();
 
-        if (FileHandlerSAF.isSAFSupported()) {
-            SharedPreferences prefs
-                = PreferenceManager .getDefaultSharedPreferences(
-                    getActivity().getApplicationContext()
+            if (FileHandlerSAF.isSAFSupported()) {
+                String storageLocationSAFURI = fhSettings.getSAFRootURI();
+                if (storageLocationSAFURI == null) {
+                    storageLocationSAFURI =
+                        getString(R.string.external_storage_saf_none_selected);
+                }
+
+                entries[1] =
+                    getString(R.string.external_storage_saf) + " "
+                        + getString(
+                            R.string.external_storage_saf_current_uri,
+                            storageLocationSAFURI
+                        );
+                values[1] = StorageLocation.EXTERNAL_SAF.getSettingsValue();
+            } else {
+                entries[1] = getString(R.string.external_storage_legacy);
+                values[1] = StorageLocation.EXTERNAL_LEGACY.getSettingsValue();
+            }
+
+            ListPreference storageOptions
+                = findPreference(ForkyzSettings.PREF_FILE_HANDLER_STORAGE_LOC);
+
+            storageOptions.setEntries(entries);
+            storageOptions.setEntryValues(values);
+        });
+    }
+
+    public static class StorageChangedDialog extends DialogFragment {
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            MaterialAlertDialogBuilder builder
+                = new MaterialAlertDialogBuilder(getActivity());
+
+            builder.setTitle(R.string.storage_changed_title)
+                .setMessage(R.string.storage_changed_please_restart)
+                .setPositiveButton(
+                    R.string.exit,
+                    (di, i) -> {
+                        ForkyzApplication.getInstance().exitApplication();
+                    }
                 );
 
-            String storageLocationSAFURI
-                = prefs.getString(
-                    FileHandlerSAF.SAF_ROOT_URI_PREF,
-                    getString(R.string.external_storage_saf_none_selected)
-                );
-
-            entries[1] =
-                getString(R.string.external_storage_saf) + " "
-                    + getString(
-                        R.string.external_storage_saf_current_uri,
-                        storageLocationSAFURI
-                    );
-            values[1] = getString(R.string.external_storage_saf);
-        } else {
-            entries[1] = getString(R.string.external_storage_legacy);
-            values[1] = entries[1];
+            return builder.create();
         }
 
-        ListPreference storageOptions
-            = findPreference(ForkyzApplication.STORAGE_LOC_PREF);
-
-        storageOptions.setEntries(entries);
-        storageOptions.setEntryValues(values);
+        @Override
+        public void onCancel(DialogInterface di) {
+            ForkyzApplication.getInstance().exitApplication();
+        }
     }
 }

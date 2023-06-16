@@ -202,6 +202,58 @@ public class ForkyzSettings {
         }
     }
 
+    public static enum StorageLocation {
+        INTERNAL("App Internal Storage"),
+        EXTERNAL_SAF("External directory"),
+        EXTERNAL_LEGACY("External SD crosswords directory");
+
+        private String settingsValue;
+
+        StorageLocation(String settingsValue) {
+            this.settingsValue = settingsValue;
+        }
+
+        public String getSettingsValue() { return settingsValue; }
+
+        public static StorageLocation fromSettingsValue(String value) {
+            if (INTERNAL.getSettingsValue().equals(value))
+                return INTERNAL;
+            else if (EXTERNAL_SAF.getSettingsValue().equals(value))
+                return EXTERNAL_SAF;
+            else if (EXTERNAL_LEGACY.getSettingsValue().equals(value))
+                return EXTERNAL_LEGACY;
+            else
+                throw new IllegalArgumentException(
+                    "Unrecognised StorageLocation: " + value
+                );
+        }
+    }
+
+    // TODO: convert to record class when possible
+    public static class FileHandlerSettings {
+        private StorageLocation storageLocation;
+        private String safRootURI;
+        private String safCrosswordsURI;
+        private String safArchiveURI;
+
+        public FileHandlerSettings(
+            StorageLocation storageLocation,
+            String safRootURI,
+            String safCrosswordsURI,
+            String safArchiveURI
+        ) {
+            this.storageLocation = storageLocation;
+            this.safRootURI = safRootURI;
+            this.safCrosswordsURI = safCrosswordsURI;
+            this.safArchiveURI = safArchiveURI;
+        }
+
+        public StorageLocation getStorageLocation() { return storageLocation; }
+        public String getSAFRootURI() { return safRootURI; }
+        public String getSAFCrosswordsURI() { return safCrosswordsURI; }
+        public String getSAFArchiveURI() { return safArchiveURI; }
+    }
+
     // public for settings page
     public static final String PREF_AUTO_DOWNLOADERS = "autoDownloaders";
     private static final String PREF_BROWSE_CLEANUP_AGE = "cleanupAge";
@@ -215,6 +267,15 @@ public class ForkyzSettings {
         = "lastSeenVersion";
     private static final String PREF_BROWSE_SORT = "sort";
     private static final String PREF_BROWSE_SWIPE_ACTION = "swipeAction";
+
+    private static final String PREF_FILE_HANDLER_SAF_ARCHIVE
+        = "safArchiveFolderUri";
+    private static final String PREF_FILE_HANDLER_SAF_CROSSWORDS
+        = "safCrosswordsFolderUri";
+    private static final String PREF_FILE_HANDLER_SAF_ROOT
+        = "safRootUri";
+    public static final String PREF_FILE_HANDLER_STORAGE_LOC
+        = "storageLocation";
 
     private static final String PREF_PLAY_DONT_DELETE_CROSSING
         = "dontDeleteCrossing";
@@ -354,6 +415,58 @@ public class ForkyzSettings {
                 ? BROWSE_SWIPE_DELETE
                 : BROWSE_SWIPE_ARCHIVE
             );
+        });
+    }
+
+    public void getFileHandlerSettings(Consumer<FileHandlerSettings> cb) {
+        executor.execute(() -> {
+            String storageLocationString = prefs.getString(
+                PREF_FILE_HANDLER_STORAGE_LOC,
+                StorageLocation.INTERNAL.getSettingsValue()
+            );
+            String safRoot = prefs.getString(
+                PREF_FILE_HANDLER_SAF_ROOT, null
+            );
+            String safCrosswords = prefs.getString(
+                PREF_FILE_HANDLER_SAF_CROSSWORDS, null
+            );
+            String safArchive = prefs.getString(
+                PREF_FILE_HANDLER_SAF_ARCHIVE, null
+            );
+
+            handler.post(() -> {
+                cb.accept(new FileHandlerSettings(
+                    StorageLocation.fromSettingsValue(storageLocationString),
+                    safRoot,
+                    safCrosswords,
+                    safArchive
+                ));
+            });
+        });
+    }
+
+    /**
+     * Set file handler and call back when done
+     */
+    public void setFileHandlerSettings(
+        FileHandlerSettings settings, Runnable cb
+    ) {
+        executor.execute(() -> {
+            prefs.edit()
+                .putString(
+                    PREF_FILE_HANDLER_STORAGE_LOC,
+                    settings.getStorageLocation().getSettingsValue()
+                ).putString(
+                    PREF_FILE_HANDLER_SAF_ROOT,
+                    settings.getSAFRootURI()
+                ).putString(
+                    PREF_FILE_HANDLER_SAF_CROSSWORDS,
+                    settings.getSAFCrosswordsURI()
+                ).putString(
+                    PREF_FILE_HANDLER_SAF_ARCHIVE,
+                    settings.getSAFArchiveURI()
+                ).apply();
+            cb.run();
         });
     }
 

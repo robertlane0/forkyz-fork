@@ -42,6 +42,7 @@ public class Downloaders {
     private Context context;
     private NotificationManagerCompat notificationManager;
     private DownloadersSettings settings;
+    private FileHandler fileHandler;
 
     private AndroidVersionUtils utils
         = AndroidVersionUtils.Factory.getInstance();
@@ -49,8 +50,10 @@ public class Downloaders {
     /**
      * Create a downloader instance that does not notify
      */
-    public Downloaders(Context context, DownloadersSettings settings) {
-        this(context, settings, null);
+    public Downloaders(
+        Context context, FileHandler fileHandler, DownloadersSettings settings
+    ) {
+        this(context, fileHandler, settings, null);
     }
 
     /**
@@ -58,13 +61,17 @@ public class Downloaders {
      *
      * Pass a null notification manager if notifications not needed.
      * Notifications only used if not disabled in settings.
+     *
+     * Can pass a null fileHandler if no download methods will be called.
      */
     public Downloaders(
         Context context,
+        FileHandler fileHandler,
         DownloadersSettings settings,
         NotificationManagerCompat notificationManager
     ) {
         this.settings = settings;
+        this.fileHandler = fileHandler;
         this.notificationManager = notificationManager;
         this.context = context;
     }
@@ -139,15 +146,15 @@ public class Downloaders {
     }
 
     private void download(Map<Downloader, LocalDate> puzzlesToDownload) {
+        if (fileHandler == null)
+            return;
+
         boolean hasConnection = utils.hasNetworkConnection(context);
 
         if (!hasConnection) {
             notifyNoConnection();
             return;
         }
-
-        FileHandler fileHandler
-            = ForkyzApplication.getInstance().getFileHandler();
 
         NotificationCompat.Builder not =
                 new NotificationCompat.Builder(context, ForkyzApplication.PUZZLE_DOWNLOAD_CHANNEL_ID)
@@ -222,13 +229,13 @@ public class Downloaders {
         int notificationId,
         Set<String> existingFileNames
     ) {
-        FileHandler fileHandler
-            = ForkyzApplication.getInstance().getFileHandler();
-
-        LOG.info("Downloading " + d.toString());
-
         // failed unless proven otherwise!
         Downloader.DownloadResult result = Downloader.DownloadResult.FAILED;
+
+        if (fileHandler == null)
+            return result;
+
+        LOG.info("Downloading " + d.toString());
 
         try {
             String contentText = context.getString(

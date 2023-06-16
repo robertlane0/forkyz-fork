@@ -2,11 +2,9 @@ package app.crossword.yourealwaysbe.forkyz;
 
 import android.Manifest;
 import android.app.Application;
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.util.DisplayMetrics;
-import android.widget.Toast;
 import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 
@@ -15,16 +13,18 @@ import dagger.hilt.android.HiltAndroidApp;
 import app.crossword.yourealwaysbe.puz.MovementStrategy;
 import app.crossword.yourealwaysbe.puz.Playboard;
 import app.crossword.yourealwaysbe.puz.Puzzle;
+import app.crossword.yourealwaysbe.settings.ForkyzSettings.StorageLocation;
+import app.crossword.yourealwaysbe.settings.ForkyzSettings;
+import app.crossword.yourealwaysbe.util.ExitActivity;
 import app.crossword.yourealwaysbe.util.ThemeHelper;
-import app.crossword.yourealwaysbe.util.files.FileHandler;
-import app.crossword.yourealwaysbe.util.files.FileHandlerInternal;
-import app.crossword.yourealwaysbe.util.files.FileHandlerLegacy;
-import app.crossword.yourealwaysbe.util.files.FileHandlerSAF;
+import app.crossword.yourealwaysbe.util.files.FileHandlerProvider;
 import app.crossword.yourealwaysbe.util.files.PuzHandle;
 import app.crossword.yourealwaysbe.versions.AndroidVersionUtils;
 
 import java.io.IOException;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
+import javax.inject.Inject;
 
 @HiltAndroidApp
 public class ForkyzApplication extends Application {
@@ -32,35 +32,20 @@ public class ForkyzApplication extends Application {
         = Logger.getLogger(ForkyzApplication.class.getCanonicalName());
 
     public static final String PUZZLE_DOWNLOAD_CHANNEL_ID = "forkyz.downloads";
-    public static final String STORAGE_LOC_PREF = "storageLocation";
+
+    @Inject
+    ForkyzSettings settings;
+
+    @Inject
+    FileHandlerProvider fileHandlerProvider;
 
     private static ForkyzApplication INSTANCE;
     private Playboard board;
     private PuzHandle puzHandle;
-    private SharedPreferences settings;
+    private SharedPreferences prefs;
 
-    private FileHandler fileHandler;
-
-    private OnSharedPreferenceChangeListener prefChangeListener
-        = new OnSharedPreferenceChangeListener() {
-            public void onSharedPreferenceChanged(
-                SharedPreferences prefs, String key
-            ) {
-                if (STORAGE_LOC_PREF.equals(key)
-                        || FileHandlerSAF.SAF_ROOT_URI_PREF.equals(key)) {
-                    Toast t = Toast.makeText(
-                        ForkyzApplication.this,
-                        R.string.storage_changed_please_restart,
-                        Toast.LENGTH_LONG
-                    );
-                    t.show();
-                    ForkyzApplication.this.setFileHander();
-                }
-            }
-        };
-
-    public FileHandler getFileHandler() {
-        return fileHandler;
+    public void exitApplication() {
+        ExitActivity.exit(this);
     }
 
     /**
@@ -86,9 +71,6 @@ public class ForkyzApplication extends Application {
 
     /**
      * Save the puzzle
-     *
-     * Will block, but saving is quick, so probably safer to let it
-     * block onPause.
      */
     public void saveBoard() {
         PuzHandle puzHandle = getPuzHandle();
@@ -109,30 +91,28 @@ public class ForkyzApplication extends Application {
             return;
         }
 
-        try {
-            getFileHandler().save(puz, puzHandle);
-        } catch (IOException e) {
-            LOGGER.severe("Error saving puzzle.");
-            e.printStackTrace();
-        }
+        fileHandlerProvider.get(fileHandler -> {
+            // TODO: save off main thread?
+            try {
+                fileHandler.save(puz, puzHandle);
+            } catch (IOException e) {
+                LOGGER.severe("Error saving puzzle.");
+                e.printStackTrace();
+            }
+        });
     }
 
     @Override
     public void onCreate() {
         INSTANCE = this;
-        // Initialize credentials and service object.
-        settings = PreferenceManager.getDefaultSharedPreferences(this);
 
-        initialiseSettings();
-        setFileHander();
-
-        settings.registerOnSharedPreferenceChangeListener(prefChangeListener);
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         super.onCreate();
 
         AndroidVersionUtils.Factory.getInstance().createNotificationChannel(this);
 
-        (new ThemeHelper(this, settings)).themeApplication(this);
+        (new ThemeHelper(this, prefs)).themeApplication(this);
     }
 
     public static boolean isLandscape(DisplayMetrics metrics){
@@ -156,38 +136,27 @@ public class ForkyzApplication extends Application {
             .isMiniTabletish(metrics);
     }
 
-    public SharedPreferences getSettings() {
-        return settings;
-    }
-
     public static ForkyzApplication getInstance(){
         return INSTANCE;
     }
 
-    public boolean isInternalStorage() {
-        String internalStorage = getString(R.string.internal_storage);
-        String locPref
-            = settings.getString(STORAGE_LOC_PREF, internalStorage);
-        return locPref.equals(internalStorage);
-    }
+    public void isMissingWritePermission(Consumer<Boolean> cb) {
+        settings.getFileHandlerSettings(fhs -> {
+            boolean isLegacy = StorageLocation.EXTERNAL_LEGACY.equals(
+                fhs.getStorageLocation()
+            );
 
-    public boolean isLegacyStorage() {
-        String internalStorage = getString(R.string.internal_storage);
-        String legacyStorage = getString(R.string.external_storage_legacy);
-        String locPref
-            = settings.getString(STORAGE_LOC_PREF, internalStorage);
-        return locPref.equals(legacyStorage);
-    }
-
-    public boolean isMissingWritePermission() {
-        return isLegacyStorage()
-            && ContextCompat.checkSelfPermission(
-                this, Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ) != PackageManager.PERMISSION_GRANTED;
+            cb.accept(
+                isLegacy
+                && ContextCompat.checkSelfPermission(
+                    this, Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ) != PackageManager.PERMISSION_GRANTED
+            );
+        });
     }
 
     public MovementStrategy getMovementStrategy() {
-        String stratName = settings.getString(
+        String stratName = prefs.getString(
             "movementStrategy", "MOVE_NEXT_ON_AXIS"
         );
         switch (stratName) {
@@ -202,59 +171,6 @@ public class ForkyzApplication extends Application {
         default:
             LOGGER.severe("Unknown MovementStrategy " + stratName);
             return null;
-        }
-    }
-
-    private void setFileHander() {
-        String locPref
-            = settings.getString(
-                STORAGE_LOC_PREF, getString(R.string.internal_storage)
-            );
-
-        if (locPref.equals(getString(R.string.external_storage_legacy))) {
-            fileHandler = new FileHandlerLegacy(this);
-        } else if (locPref.equals(getString(R.string.external_storage_saf))) {
-            fileHandler = FileHandlerSAF.readHandlerFromPrefs(this);
-        } else {
-            fileHandler = new FileHandlerInternal(this);
-        }
-
-        if (fileHandler == null || !fileHandler.isStorageMounted()) {
-            fileHandler = new FileHandlerInternal(this);
-            Toast t = Toast.makeText(
-                ForkyzApplication.this,
-                R.string.storage_problem_falling_back_internal,
-                Toast.LENGTH_LONG
-            );
-            t.show();
-        }
-
-        if (fileHandler.isStorageFull()) {
-            Toast t = Toast.makeText(
-                ForkyzApplication.this,
-                R.string.storage_full_warning,
-                Toast.LENGTH_LONG
-            );
-            t.show();
-        }
-    }
-
-    /**
-     * Makes sure any settings needed are there
-     *
-     * In particular, storage location is set up before any change listeners
-     * are set. Otherwise they will be called the first time the user goes to
-     * the settings screen.
-     */
-    private void initialiseSettings() {
-        String storageLoc = settings.getString(STORAGE_LOC_PREF, null);
-
-        if (storageLoc == null) {
-            SharedPreferences.Editor editor = settings.edit();
-            editor.putString(
-                STORAGE_LOC_PREF, getString(R.string.internal_storage)
-            );
-            editor.apply();
         }
     }
 }

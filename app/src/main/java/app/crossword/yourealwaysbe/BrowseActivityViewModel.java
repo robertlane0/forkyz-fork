@@ -35,6 +35,7 @@ import app.crossword.yourealwaysbe.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.util.SingleLiveEvent;
 import app.crossword.yourealwaysbe.util.files.DirHandle;
 import app.crossword.yourealwaysbe.util.files.FileHandler;
+import app.crossword.yourealwaysbe.util.files.FileHandlerProvider;
 import app.crossword.yourealwaysbe.util.files.PuzHandle;
 import app.crossword.yourealwaysbe.util.files.PuzMetaFile;
 
@@ -53,6 +54,7 @@ public class BrowseActivityViewModel extends ViewModel {
     private Handler handler = new Handler(Looper.getMainLooper());
 
     private ForkyzSettings settings;
+    private FileHandlerProvider fileHandlerProvider;
 
     private boolean isViewArchive = false;
 
@@ -65,8 +67,11 @@ public class BrowseActivityViewModel extends ViewModel {
         = new SingleLiveEvent<>();
 
     @Inject
-    public BrowseActivityViewModel(ForkyzSettings settings) {
+    public BrowseActivityViewModel(
+        ForkyzSettings settings, FileHandlerProvider fileHandlerProvider
+    ) {
         this.settings = settings;
+        this.fileHandlerProvider = fileHandlerProvider;
         isUIBusy.setValue(false);
     }
 
@@ -103,25 +108,26 @@ public class BrowseActivityViewModel extends ViewModel {
     }
 
     public void startLoadFiles(boolean archive) {
-        threadWithUILock(() -> {
-            FileHandler fileHandler = getFileHandler();
+        fileHandlerProvider.get(fileHandler -> {
+            threadWithUILock(() -> {
 
-            DirHandle directory = archive
-                ? fileHandler.getArchiveDirectory()
-                : fileHandler.getCrosswordsDirectory();
+                DirHandle directory = archive
+                    ? fileHandler.getArchiveDirectory()
+                    : fileHandler.getCrosswordsDirectory();
 
-            List<MutableLiveData<PuzMetaFile>> puzFiles
-                = new ArrayList<>();
+                List<MutableLiveData<PuzMetaFile>> puzFiles
+                    = new ArrayList<>();
 
-            for (PuzMetaFile pm : fileHandler.getPuzMetas(directory)) {
-                puzFiles.add(new MutableLiveData<>(pm));
-            }
+                for (PuzMetaFile pm : fileHandler.getPuzMetas(directory)) {
+                    puzFiles.add(new MutableLiveData<>(pm));
+                }
 
-            // use handler for this so viewArchive changes when
-            // puzzleFiles does
-            handler.post(() -> {
-                setIsViewArchive(archive);
-                puzzleFiles.setValue(puzFiles);
+                // use handler for this so viewArchive changes when
+                // puzzleFiles does
+                handler.post(() -> {
+                    setIsViewArchive(archive);
+                    puzzleFiles.setValue(puzFiles);
+                });
             });
         });
     }
@@ -131,17 +137,17 @@ public class BrowseActivityViewModel extends ViewModel {
     }
 
     public void deletePuzzles(Collection<PuzMetaFile> puzMetas) {
-        threadWithUILock(() -> {
-            FileHandler fileHandler = getFileHandler();
+        fileHandlerProvider.get(fileHandler -> {
+            threadWithUILock(() -> {
+                DirHandle viewedDir = getViewedDirectory(fileHandler);
 
-            DirHandle viewedDir = getViewedDirectory();
+                for (PuzMetaFile puzMeta : puzMetas) {
+                    fileHandler.delete(puzMeta);
 
-            for (PuzMetaFile puzMeta : puzMetas) {
-                fileHandler.delete(puzMeta);
-
-                if (puzMeta.isInDirectory(viewedDir))
-                    removeFromPuzzleList(puzMeta);
-            }
+                    if (puzMeta.isInDirectory(viewedDir))
+                        removeFromPuzzleList(puzMeta);
+                }
+            });
         });
     }
 
@@ -152,21 +158,22 @@ public class BrowseActivityViewModel extends ViewModel {
     public void movePuzzles(
         Collection<PuzMetaFile> puzMetas, DirHandle destDir
     ) {
-        threadWithUILock(() -> {
-            DirHandle directory = getViewedDirectory();
-            FileHandler fileHandler = getFileHandler();
+        fileHandlerProvider.get(fileHandler -> {
+            threadWithUILock(() -> {
+                DirHandle directory = getViewedDirectory(fileHandler);
 
-            for (PuzMetaFile puzMeta : puzMetas) {
-                boolean addToList = destDir.equals(directory);
-                boolean removeFromList = puzMeta.isInDirectory(directory);
+                for (PuzMetaFile puzMeta : puzMetas) {
+                    boolean addToList = destDir.equals(directory);
+                    boolean removeFromList = puzMeta.isInDirectory(directory);
 
-                fileHandler.moveTo(puzMeta, destDir);
+                    fileHandler.moveTo(puzMeta, destDir);
 
-                if (addToList && !removeFromList)
-                    addPuzzleToList(puzMeta);
-                else if (removeFromList && !addToList)
-                    removeFromPuzzleList(puzMeta);
-            }
+                    if (addToList && !removeFromList)
+                        addPuzzleToList(puzMeta);
+                    else if (removeFromList && !addToList)
+                        removeFromPuzzleList(puzMeta);
+                }
+            });
         });
     }
 
@@ -174,9 +181,8 @@ public class BrowseActivityViewModel extends ViewModel {
         settings.getBrowseDeleteOnCleanup(deleteOnCleanup -> {
         settings.getBrowseCleanupAge(maxAgeString -> {
         settings.getBrowseCleanupAgeArchive(archiveMaxAgeString -> {
+        fileHandlerProvider.get(fileHandler -> {
             threadWithUILock(() -> {
-                FileHandler fileHandler = getFileHandler();
-
                 LocalDate maxAge = getMaxAge(maxAgeString);
                 LocalDate archiveMaxAge = getMaxAge(archiveMaxAgeString);
 
@@ -222,17 +228,23 @@ public class BrowseActivityViewModel extends ViewModel {
 
                 startLoadFiles();
             });
-        });});});
+        });});});});
     }
 
     public void download(LocalDate date, List<Downloader> downloaders) {
+        fileHandlerProvider.get(fileHandler -> {
         settings.getDownloadersSettings(downloadersSettings -> {
             downloadExecutorService.execute(() -> {
                 NotificationManagerCompat nm
-                    = NotificationManagerCompat.from(ForkyzApplication.getInstance());
+                    = NotificationManagerCompat.from(
+                        ForkyzApplication.getInstance()
+                    );
 
                 Downloaders dls = new Downloaders(
-                     ForkyzApplication.getInstance(), downloadersSettings, nm
+                     ForkyzApplication.getInstance(),
+                     fileHandler,
+                     downloadersSettings,
+                     nm
                 );
 
                 dls.download(date, downloaders);
@@ -243,14 +255,14 @@ public class BrowseActivityViewModel extends ViewModel {
                     });
                 }
             });
-        });
+        });});
     }
 
     public void loadPuzzle(PuzMetaFile puzMeta) {
         settings.getPlayPreserveCorrectLettersInShowErrors(preserveCorrect -> {
         settings.getPlayDontDeleteCrossing(dontDeleteCrossing -> {
+        fileHandlerProvider.get(fileHandler -> {
             threadWithUILock(() -> {
-                FileHandler fileHandler = getFileHandler();
                 try {
                     Puzzle puz = fileHandler.load(puzMeta);
                     if (puz == null || puz.getBoxes() == null) {
@@ -297,13 +309,12 @@ public class BrowseActivityViewModel extends ViewModel {
                     });
                 }
             });
-        });});
+        });});});
     }
 
     public void refreshPuzzleMeta(PuzHandle refreshHandle) {
+        fileHandlerProvider.get(fileHandler -> {
         threadWithUILock(() -> {
-            FileHandler fileHandler = getFileHandler();
-
             try {
                 PuzMetaFile refreshedMeta
                     = fileHandler.loadPuzMetaFile(refreshHandle);
@@ -326,7 +337,7 @@ public class BrowseActivityViewModel extends ViewModel {
             } catch (IOException e) {
                 LOGGER.warning("Could not refresh puz meta " + e);
             }
-        });
+        });});
     }
 
     /**
@@ -339,41 +350,44 @@ public class BrowseActivityViewModel extends ViewModel {
         boolean forceReload,
         BiConsumer<Boolean, Boolean> callback
     ) {
-        threadWithUILock(() -> {
-            ForkyzApplication application = ForkyzApplication.getInstance();
-            ContentResolver resolver = application.getContentResolver();
+        fileHandlerProvider.get(fileHandler -> {
+            threadWithUILock(() -> {
+                ForkyzApplication application = ForkyzApplication.getInstance();
+                ContentResolver resolver = application.getContentResolver();
 
-            boolean someFailed = false;
-            boolean someSucceeded = false;
-            boolean needsReload = forceReload;
+                boolean someFailed = false;
+                boolean someSucceeded = false;
+                boolean needsReload = forceReload;
 
-            for (Uri uri : uris) {
-                if (uri == null)
-                    continue;
+                for (Uri uri : uris) {
+                    if (uri == null)
+                        continue;
 
-                PuzHandle ph = PuzzleImporter.importUri(resolver, uri);
+                    PuzHandle ph
+                        = PuzzleImporter.importUri(resolver, fileHandler, uri);
 
-                someFailed |= (ph == null);
-                someSucceeded |= (ph != null);
+                    someFailed |= (ph == null);
+                    someSucceeded |= (ph != null);
 
-                if (!getIsViewArchive() && ph != null && !needsReload) {
-                    try {
-                        PuzMetaFile pm = getFileHandler().loadPuzMetaFile(ph);
-                        addPuzzleToList(pm);
-                    } catch (IOException e) {
-                        // fall back to full reload
-                        needsReload = true;
+                    if (!getIsViewArchive() && ph != null && !needsReload) {
+                        try {
+                            PuzMetaFile pm = fileHandler.loadPuzMetaFile(ph);
+                            addPuzzleToList(pm);
+                        } catch (IOException e) {
+                            // fall back to full reload
+                            needsReload = true;
+                        }
                     }
                 }
-            }
 
-            if (needsReload)
-                startLoadFiles();
+                if (needsReload)
+                    startLoadFiles();
 
-            final boolean finalSomeFailed = someFailed;
-            final boolean finalSomeSucceeded = someSucceeded;
-            handler.post(() -> {
-                callback.accept(finalSomeFailed, finalSomeSucceeded);
+                final boolean finalSomeFailed = someFailed;
+                final boolean finalSomeSucceeded = someSucceeded;
+                handler.post(() -> {
+                    callback.accept(finalSomeFailed, finalSomeSucceeded);
+                });
             });
         });
     }
@@ -393,8 +407,7 @@ public class BrowseActivityViewModel extends ViewModel {
     /**
      * crosswords if not viewing archive, else archive
      */
-    private DirHandle getViewedDirectory() {
-        FileHandler fileHandler = getFileHandler();
+    private DirHandle getViewedDirectory(FileHandler fileHandler) {
         return getIsViewArchive()
             ? fileHandler.getArchiveDirectory()
             : fileHandler.getCrosswordsDirectory();
@@ -404,10 +417,6 @@ public class BrowseActivityViewModel extends ViewModel {
     protected void onCleared() {
         executorService.shutdown();
         downloadExecutorService.shutdown();
-    }
-
-    private FileHandler getFileHandler() {
-        return ForkyzApplication.getInstance().getFileHandler();
     }
 
     private void threadWithUILock(Runnable r) {

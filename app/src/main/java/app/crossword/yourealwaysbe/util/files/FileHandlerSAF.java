@@ -12,26 +12,19 @@ import android.annotation.TargetApi;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.DocumentsContract.Document;
 import android.provider.DocumentsContract;
-import androidx.preference.PreferenceManager;
 
+import app.crossword.yourealwaysbe.settings.ForkyzSettings.FileHandlerSettings;
+import app.crossword.yourealwaysbe.settings.ForkyzSettings.StorageLocation;
 import app.crossword.yourealwaysbe.versions.AndroidVersionUtils;
 
 @TargetApi(24)
 public class FileHandlerSAF extends FileHandler {
     private static final Logger LOGGER
         = Logger.getLogger(FileHandlerSAF.class.getCanonicalName());
-
-    public static final String SAF_ROOT_URI_PREF
-        = "safRootUri";
-    private static final String SAF_CROSSWORDS_URI_PREF
-        = "safCrosswordsFolderUri";
-    private static final String SAF_ARCHIVE_URI_PREF
-        = "safArchiveFolderUri";
 
     private static final String ARCHIVE_NAME = "archive";
     private static final String TEMP_NAME = "temp";
@@ -283,23 +276,20 @@ public class FileHandlerSAF extends FileHandler {
      *
      * This will search the contents of rootUri to see if directories
      * already exist (and use them if so). If not, it will create the
-     * required folders.
+     * required folders. It will keep the permission for the Uri if all
+     * is well.
      *
-     * Once this has been called, then readHandlerFromPrefs can be used
-     * to retrieve a handler using these directories.
+     * Once this has been called, the file handler will need saving to
+     * settings for readHandlerFromSettings to work
      *
      * @param applicationContext the application context
      * @param rootUri the root permitted folder for storage
      * @return an initiated file handler if successful, else null
      */
-    public static FileHandlerSAF initialiseSAFPrefs(
+    public static FileHandlerSAF initialiseSAFForRoot(
         Context applicationContext, Uri rootUri
     ) {
         try {
-            SharedPreferences prefs
-                = PreferenceManager.getDefaultSharedPreferences(
-                    applicationContext
-                );
             ContentResolver resolver = applicationContext.getContentResolver();
             String dirId
                 = DocumentsContract.getTreeDocumentId(rootUri);
@@ -354,7 +344,7 @@ public class FileHandlerSAF extends FileHandler {
                 );
             }
 
-            // if all ok, save to prefs and keep permission
+            // if all ok, keep permission
             if (crosswordsFolderUri != null && archiveFolderUri != null) {
 
                 // persist permissions
@@ -363,19 +353,6 @@ public class FileHandlerSAF extends FileHandler {
                         | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                 );
                 resolver.takePersistableUriPermission(rootUri, takeFlags);
-
-                // save locations
-                SharedPreferences.Editor editor = prefs.edit();
-                editor.putString(
-                    SAF_ROOT_URI_PREF, rootUri.toString()
-                );
-                editor.putString(
-                    SAF_CROSSWORDS_URI_PREF, crosswordsFolderUri.toString()
-                );
-                editor.putString(
-                    SAF_ARCHIVE_URI_PREF, archiveFolderUri.toString()
-                );
-                editor.apply();
 
                 return new FileHandlerSAF(
                     applicationContext,
@@ -391,26 +368,33 @@ public class FileHandlerSAF extends FileHandler {
     }
 
     /**
-     * Read handler using locations stored in shared prefs.
+     * Return a settings object for the file handler
+     */
+    public FileHandlerSettings getSettings() {
+        return new FileHandlerSettings(
+            StorageLocation.EXTERNAL_SAF,
+            rootUri.toString(),
+            crosswordsFolderUri.toString(),
+            archiveFolderUri.toString()
+        );
+    }
+
+    /**
+     * Read handler using locations stored in settings.
      *
-     * Requires initialiseSAFPrefs to have been called first. Returns
+     * Requires initialiseSAFSettings to have been called first. Returns
      * null if the handler could not be created. (E.g. if there are no
      * configured directories.) Will reinitialise if the rootUri is
      * still available.
      */
-    public static FileHandlerSAF readHandlerFromPrefs(
-        Context applicationContext
+    public static FileHandlerSAF readHandlerFromSettings(
+        Context applicationContext, FileHandlerSettings fileHandlerSettings
     ) {
-        SharedPreferences prefs
-            = PreferenceManager.getDefaultSharedPreferences(applicationContext);
-
         FileHandlerSAF fileHandler = null;
 
-        String rootFolder = prefs.getString(SAF_ROOT_URI_PREF, null);
-        String crosswordsFolder
-            = prefs.getString(SAF_CROSSWORDS_URI_PREF, null);
-        String archiveFolder
-            = prefs.getString(SAF_ARCHIVE_URI_PREF, null);
+        String rootFolder = fileHandlerSettings.getSAFRootURI();
+        String crosswordsFolder = fileHandlerSettings.getSAFCrosswordsURI();
+        String archiveFolder = fileHandlerSettings.getSAFArchiveURI();
 
         if (rootFolder != null
                 && crosswordsFolder != null
@@ -439,7 +423,7 @@ public class FileHandlerSAF extends FileHandler {
         }
 
         if (fileHandler == null && rootFolder != null) {
-            fileHandler = initialiseSAFPrefs(
+            fileHandler = initialiseSAFForRoot(
                 applicationContext, Uri.parse(rootFolder)
             );
         }

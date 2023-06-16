@@ -248,7 +248,7 @@ public abstract class FileHandler {
 
         MetaCache.MetaRecord metaRecord = metaCache.addRecord(puzHandle, puz);
 
-        return new PuzMetaFile(puzHandle, metaRecord);
+        return new PuzMetaFile(this, puzHandle, metaRecord);
     }
 
     /**
@@ -641,13 +641,13 @@ public abstract class FileHandler {
         MetaCache.MetaRecord metaRecord = cachedMetas.get(puzFileUri);
 
         if (metaRecord != null) {
-            return new PuzMetaFile(ph, metaRecord);
+            return new PuzMetaFile(this, ph, metaRecord);
         } else {
             try {
                 return loadPuzMetaFile(ph);
             } catch (IOException e) {
                 LOGGER.warning("Could not load puz meta for " + ph +": " + e);
-                return new PuzMetaFile(ph, null);
+                return new PuzMetaFile(this, ph, null);
             }
         }
     }

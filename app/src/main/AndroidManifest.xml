@@ -133,6 +133,11 @@
                 <data android:mimeType="application/json" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="app.crossword.yourealwaysbe.util.ExitActivity"
+            android:theme="@style/Theme.Forkyz"
+            android:exported="false"
+        />
         <provider
             android:name="app.crossword.yourealwaysbe.util.files.FileHandlerShared"
             android:authorities="app.crossword.yourealwaysbe.forkyzfiles"

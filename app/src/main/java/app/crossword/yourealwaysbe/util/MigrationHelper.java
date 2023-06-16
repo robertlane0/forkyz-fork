@@ -28,7 +28,7 @@ public class MigrationHelper {
 
         settings.getDownloadersSettings(downloadersSettings -> {
             settings.migrateAutoDownloaders(
-                new Downloaders(context, downloadersSettings)
+                new Downloaders(context, null, downloadersSettings)
             );
         });
     }

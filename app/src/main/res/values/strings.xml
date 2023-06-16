@@ -145,7 +145,8 @@
     <string name="external_storage_saf_current_uri">(Current: %1$s)</string>
     <string name="external_storage_saf_none_selected">no directory selected</string>
     <string name="external_storage_legacy">External SD crosswords directory</string>
-    <string name="storage_changed_please_restart">Storage location changed. Please restart Forkyz.</string>
+    <string name="storage_changed_title">Storage location changed.</string>
+    <string name="storage_changed_please_restart">Please restart Forkyz for the change to take effect.</string>
     <string name="failed_to_initialise_saf">Could not initialise external directory.</string>
     <string name="storage_problem_falling_back_internal">Error accessing configured storage, falling back to internal.</string>
     <string name="storage_full_warning">Warning, storage is low on space. The app may not function correctly.</string>

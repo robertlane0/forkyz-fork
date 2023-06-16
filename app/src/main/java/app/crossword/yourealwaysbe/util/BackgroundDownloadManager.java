@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -31,6 +32,7 @@ import androidx.work.WorkerParameters;
 import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
 import app.crossword.yourealwaysbe.net.Downloaders;
 import app.crossword.yourealwaysbe.settings.ForkyzSettings;
+import app.crossword.yourealwaysbe.util.files.FileHandlerProvider;
 
 /**
  * Schedule background downloads using Android WorkManager
@@ -72,10 +74,14 @@ public class BackgroundDownloadManager {
     );
 
     private ForkyzSettings settings;
+    private FileHandlerProvider fileHandlerProvider;
 
     @Inject
-    BackgroundDownloadManager(ForkyzSettings settings) {
+    BackgroundDownloadManager(
+        ForkyzSettings settings, FileHandlerProvider fileHandlerProvider
+    ) {
         this.settings = settings;
+        this.fileHandlerProvider = fileHandlerProvider;
     }
 
     /**
@@ -140,17 +146,21 @@ public class BackgroundDownloadManager {
             );
     }
 
-    public boolean checkBackgroundDownloadPendingFlag() {
-        if (ForkyzApplication.getInstance().isMissingWritePermission())
-            return false;
+    public void checkBackgroundDownloadPendingFlag(Consumer<Boolean> cb) {
+        ForkyzApplication.getInstance().isMissingWritePermission(missing -> {
+            if (missing) {
+                cb.accept(false);
+            } else {
+                SharedPreferences prefs = getPrefs();
 
-        SharedPreferences prefs = getPrefs();
+                boolean isPending
+                    = prefs.getBoolean(PREF_DOWNLOAD_PENDING, false);
 
-        boolean isPending = prefs.getBoolean(PREF_DOWNLOAD_PENDING, false);
+                clearBackgroundDownloadPendingFlag();
 
-        clearBackgroundDownloadPendingFlag();
-
-        return isPending;
+                cb.accept(isPending);
+            }
+        });
     }
 
     public void clearBackgroundDownloadPendingFlag() {
@@ -265,28 +275,32 @@ public class BackgroundDownloadManager {
         protected void doDownload() {
             ForkyzApplication app = ForkyzApplication.getInstance();
 
-            if (app.isMissingWritePermission()) {
-                LOGGER.info("Skipping download, no write permission");
-                return;
-            }
+            app.isMissingWritePermission(missing -> {
+                if (missing) {
+                    LOGGER.info("Skipping download, no write permission");
+                    return;
+                }
 
-            LOGGER.info("Downloading most recent puzzles");
+                LOGGER.info("Downloading most recent puzzles");
 
-            SharedPreferences prefs = getPrefs();
+                SharedPreferences prefs = getPrefs();
 
-            settings.getDownloadersSettings(downloadersSettings -> {
-                NotificationManagerCompat nm
-                    = NotificationManagerCompat.from(app);
-                final Downloaders dls
-                    = new Downloaders(app, downloadersSettings, nm);
-                LocalDate now = LocalDate.now();
-                dls.downloadLatestInRange(now, now, dls.getAutoDownloaders());
+                settings.getDownloadersSettings(downloadersSettings -> {
+                fileHandlerProvider.get(fileHandler -> {
+                    NotificationManagerCompat nm
+                        = NotificationManagerCompat.from(app);
+                    final Downloaders dls = new Downloaders(
+                        app, fileHandler, downloadersSettings, nm
+                    );
+                    LocalDate now = LocalDate.now();
+                    dls.downloadLatestInRange(now, now, dls.getAutoDownloaders());
 
-                // This is used to tell BrowseActivity that puzzles may have
-                // been updated while paused.
-                prefs.edit()
-                    .putBoolean(PREF_DOWNLOAD_PENDING, true)
-                    .apply();
+                    // This is used to tell BrowseActivity that puzzles may have
+                    // been updated while paused.
+                    prefs.edit()
+                        .putBoolean(PREF_DOWNLOAD_PENDING, true)
+                        .apply();
+                });});
             });
         }
     }
