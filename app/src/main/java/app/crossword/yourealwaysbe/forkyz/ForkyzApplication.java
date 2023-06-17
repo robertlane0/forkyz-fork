@@ -6,7 +6,9 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.util.DisplayMetrics;
 import androidx.core.content.ContextCompat;
+import androidx.hilt.work.HiltWorkerFactory;
 import androidx.preference.PreferenceManager;
+import androidx.work.Configuration;
 
 import dagger.hilt.android.HiltAndroidApp;
 
@@ -27,7 +29,7 @@ import java.util.logging.Logger;
 import javax.inject.Inject;
 
 @HiltAndroidApp
-public class ForkyzApplication extends Application {
+public class ForkyzApplication extends Application implements Configuration.Provider {
     private static final Logger LOGGER
         = Logger.getLogger(ForkyzApplication.class.getCanonicalName());
 
@@ -38,6 +40,11 @@ public class ForkyzApplication extends Application {
 
     @Inject
     FileHandlerProvider fileHandlerProvider;
+
+    // for background downloads
+    // https://developer.android.com/reference/androidx/hilt/work/HiltWorker
+    @Inject
+    HiltWorkerFactory workerFactory;
 
     private static ForkyzApplication INSTANCE;
     private Playboard board;
@@ -113,6 +120,13 @@ public class ForkyzApplication extends Application {
         AndroidVersionUtils.Factory.getInstance().createNotificationChannel(this);
 
         (new ThemeHelper(this, prefs)).themeApplication(this);
+    }
+
+    @Override
+    public Configuration getWorkManagerConfiguration() {
+        return new Configuration.Builder()
+                .setWorkerFactory(workerFactory)
+                .build();
     }
 
     public static boolean isLandscape(DisplayMetrics metrics){

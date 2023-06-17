@@ -669,12 +669,13 @@ public class BrowseActivity extends ForkyzActivity {
 
     private void checkAutoDownloadNotificationPermissions() {
         settings.getDownloadersSettings(settings -> {
-            boolean downloading = settings.getDownloadOnStartup()
-                || backgroundDownloadManager.isBackgroundDownloadEnabled();
+        backgroundDownloadManager.isBackgroundDownloadEnabled(bgDownload -> {
+            boolean downloading = bgDownload
+                || settings.getDownloadOnStartup();
 
             if (settings.isNotificationPermissionNeeded() && downloading)
                 checkRequestNotificationPermissions();
-        });
+        });});
     }
 
     private void autoDownloadIfEnabled() {

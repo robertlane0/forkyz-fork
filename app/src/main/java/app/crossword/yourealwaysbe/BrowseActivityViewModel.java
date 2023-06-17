@@ -314,30 +314,31 @@ public class BrowseActivityViewModel extends ViewModel {
 
     public void refreshPuzzleMeta(PuzHandle refreshHandle) {
         fileHandlerProvider.get(fileHandler -> {
-        threadWithUILock(() -> {
-            try {
-                PuzMetaFile refreshedMeta
-                    = fileHandler.loadPuzMetaFile(refreshHandle);
+            threadWithUILock(() -> {
+                try {
+                    PuzMetaFile refreshedMeta
+                        = fileHandler.loadPuzMetaFile(refreshHandle);
 
-                if (refreshedMeta == null)
-                    return;
+                    if (refreshedMeta == null)
+                        return;
 
-                if (refreshedMeta != null) {
-                    List<MutableLiveData<PuzMetaFile>> pmList
-                        = puzzleFiles.getValue();
+                    if (refreshedMeta != null) {
+                        List<MutableLiveData<PuzMetaFile>> pmList
+                            = puzzleFiles.getValue();
 
-                    int index = -1;
-                    for (MutableLiveData<PuzMetaFile> pm : pmList) {
-                        index += 1;
-                        if (pm.getValue().isSameMainFile(refreshHandle)) {
-                            pm.postValue(refreshedMeta);
+                        int index = -1;
+                        for (MutableLiveData<PuzMetaFile> pm : pmList) {
+                            index += 1;
+                            if (pm.getValue().isSameMainFile(refreshHandle)) {
+                                pm.postValue(refreshedMeta);
+                            }
                         }
                     }
+                } catch (IOException e) {
+                    LOGGER.warning("Could not refresh puz meta " + e);
                 }
-            } catch (IOException e) {
-                LOGGER.warning("Could not refresh puz meta " + e);
-            }
-        });});
+            });
+        });
     }
 
     /**

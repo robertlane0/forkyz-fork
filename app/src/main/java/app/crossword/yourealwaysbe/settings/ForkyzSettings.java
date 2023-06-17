@@ -9,6 +9,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.preference.PreferenceManager;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -254,6 +255,39 @@ public class ForkyzSettings {
         public String getSAFArchiveURI() { return safArchiveURI; }
     }
 
+    // TODO: convert to record class when possible
+    public class BackgroundDownloadSettings {
+        private boolean requireUnmetered;
+        private boolean allowRoaming;
+        private boolean requireCharging;
+        private boolean hourly;
+        private Set<String> days;
+        private int daysTime;
+
+        public BackgroundDownloadSettings(
+            boolean requireUnmetered,
+            boolean allowRoaming,
+            boolean requireCharging,
+            boolean hourly,
+            Set<String> days,
+            int daysTime
+        ) {
+            this.requireUnmetered = requireUnmetered;
+            this.allowRoaming = allowRoaming;
+            this.requireCharging = requireCharging;
+            this.hourly = hourly;
+            this.days = days;
+            this.daysTime = daysTime;
+        }
+
+        public boolean getRequireUnmetered() { return requireUnmetered; }
+        public boolean getAllowRoaming() { return allowRoaming; }
+        public boolean getRequireCharging() { return requireCharging; }
+        public boolean getHourly() { return hourly; }
+        public Set<String> getDays() { return days; }
+        public int getDaysTime() { return daysTime; }
+    }
+
     // public for settings page
     public static final String PREF_AUTO_DOWNLOADERS = "autoDownloaders";
     private static final String PREF_BROWSE_CLEANUP_AGE = "cleanupAge";
@@ -267,6 +301,20 @@ public class ForkyzSettings {
         = "lastSeenVersion";
     private static final String PREF_BROWSE_SORT = "sort";
     private static final String PREF_BROWSE_SWIPE_ACTION = "swipeAction";
+
+    private static final String PREF_DOWNLOAD_UNMETERED
+        = "backgroundDownloadRequireUnmetered";
+    private static final String PREF_DOWNLOAD_ROAMING
+        = "backgroundDownloadAllowRoaming";
+    private static final String PREF_DOWNLOAD_CHARGING
+        = "backgroundDownloadRequireCharging";
+    private static final String PREF_DOWNLOAD_HOURLY
+        = "backgroundDownloadHourly";
+    private static final String PREF_DOWNLOAD_DAYS
+        = "backgroundDownloadDays";
+    private static final String PREF_DOWNLOAD_DAYS_TIME
+        = "backgroundDownloadDaysTime";
+    private static final String PREF_DOWNLOAD_PENDING = "backgroundDlPending";
 
     private static final String PREF_FILE_HANDLER_SAF_ARCHIVE
         = "safArchiveFolderUri";
@@ -290,6 +338,18 @@ public class ForkyzSettings {
     private static final String PREF_SUPPRESS_INDIVIDUAL_NOTIFICATIONS
         = "supressMessages";
 
+    private static final Set<String> BACKGROUND_DOWNLOAD_PREFERENCES
+        = new HashSet<>(
+            Arrays.asList(
+                PREF_DOWNLOAD_UNMETERED,
+                PREF_DOWNLOAD_ROAMING,
+                PREF_DOWNLOAD_CHARGING,
+                PREF_DOWNLOAD_HOURLY,
+                PREF_DOWNLOAD_DAYS,
+                PREF_DOWNLOAD_DAYS_TIME
+            )
+        );
+
     private static final Map<String, Boolean> BOOL_DEFAULTS = new HashMap<>();
     private static final Map<String, Integer> INT_DEFAULTS = new HashMap<>();
     private static final Map<String, Long> LONG_DEFAULTS = new HashMap<>();
@@ -303,6 +363,7 @@ public class ForkyzSettings {
         STRING_DEFAULTS.put(PREF_BROWSE_LAST_SEEN_VERSION, "");
         INT_DEFAULTS.put(PREF_BROWSE_SORT, 0);
         STRING_DEFAULTS.put(PREF_BROWSE_SWIPE_ACTION, "DELETE");
+        BOOL_DEFAULTS.put(PREF_DOWNLOAD_PENDING, false);
         BOOL_DEFAULTS.put(PREF_PLAY_DONT_DELETE_CROSSING, false);
         BOOL_DEFAULTS.put(
             PREF_PLAY_PRESERVE_CORRECT_LETTERS_IN_SHOW_ERRORS, false
@@ -416,6 +477,52 @@ public class ForkyzSettings {
                 : BROWSE_SWIPE_ARCHIVE
             );
         });
+    }
+
+    public void getBackgroundDownloadSettings(
+        Consumer<BackgroundDownloadSettings> cb
+    ) {
+        executor.execute(() -> {
+
+            int timeOfDay = 8;
+            try {
+                timeOfDay = Integer.valueOf(
+                    prefs.getString(PREF_DOWNLOAD_DAYS_TIME, "8")
+                );
+            } catch (NumberFormatException e) {
+                // ignore, keep 8
+            }
+
+            cb.accept(new BackgroundDownloadSettings(
+                prefs.getBoolean(PREF_DOWNLOAD_UNMETERED, true),
+                prefs.getBoolean(PREF_DOWNLOAD_ROAMING, false),
+                prefs.getBoolean(PREF_DOWNLOAD_CHARGING, false),
+                prefs.getBoolean(PREF_DOWNLOAD_HOURLY, false),
+                prefs.getStringSet(PREF_DOWNLOAD_DAYS, Collections.emptySet()),
+                timeOfDay
+            ));
+        });
+    }
+
+    public void setBackgroundDownloadHourly(
+        boolean hourly, Runnable cb
+    ) {
+        setBooleanPreference(PREF_DOWNLOAD_HOURLY, hourly, cb);
+    }
+
+    public void getBackgroundDownloadPending(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_DOWNLOAD_PENDING, cb);
+    }
+
+    public void setBackgroundDownloadPending(boolean pending) {
+        setBooleanPreference(PREF_DOWNLOAD_PENDING, pending);
+    }
+
+    /**
+     * For preference activity to detect if config changes
+     */
+    public boolean isBackgroundDownloadConfigPref(String pref) {
+        return BACKGROUND_DOWNLOAD_PREFERENCES.contains(pref);
     }
 
     public void getFileHandlerSettings(Consumer<FileHandlerSettings> cb) {
@@ -583,8 +690,16 @@ public class ForkyzSettings {
     }
 
     private void setBooleanPreference(String name, boolean value) {
+        setBooleanPreference(name, value, null);
+    }
+
+    private void setBooleanPreference(
+        String name, boolean value, Runnable cb
+    ) {
         executor.execute(() -> {
             prefs.edit().putBoolean(name, value).apply();
+            if (cb != null)
+                cb.run();
         });
     }
 

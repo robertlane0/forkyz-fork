@@ -8,6 +8,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
@@ -16,21 +18,28 @@ import javax.inject.Singleton;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import androidx.concurrent.futures.CallbackToFutureAdapter;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.hilt.work.HiltWorker;
 import androidx.preference.PreferenceManager;
 import androidx.work.Constraints;
 import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.ExistingWorkPolicy;
 import androidx.work.ListenableWorker;
+import androidx.work.ListenableWorker;
 import androidx.work.NetworkType;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
-import androidx.work.Worker;
 import androidx.work.WorkerParameters;
+import com.google.common.util.concurrent.ListenableFuture;
+
+import dagger.assisted.Assisted;
+import dagger.assisted.AssistedInject;
 
 import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
 import app.crossword.yourealwaysbe.net.Downloaders;
+import app.crossword.yourealwaysbe.settings.ForkyzSettings.BackgroundDownloadSettings;
 import app.crossword.yourealwaysbe.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.util.files.FileHandlerProvider;
 
@@ -43,80 +52,47 @@ public class BackgroundDownloadManager {
         BackgroundDownloadManager.class.getCanonicalName()
     );
 
-    private static final String PREF_DOWNLOAD_UNMETERED
-        = "backgroundDownloadRequireUnmetered";
-    private static final String PREF_DOWNLOAD_ROAMING
-        = "backgroundDownloadAllowRoaming";
-    private static final String PREF_DOWNLOAD_CHARGING
-        = "backgroundDownloadRequireCharging";
-
-    private static final String PREF_DOWNLOAD_HOURLY
-        = "backgroundDownloadHourly";
-    private static final String PREF_DOWNLOAD_DAYS
-        = "backgroundDownloadDays";
-    private static final String PREF_DOWNLOAD_DAYS_TIME
-        = "backgroundDownloadDaysTime";
-
     private static final String DOWNLOAD_WORK_NAME_HOURLY
         = "backgroundDownloadHourly";
     private static final String DOWNLOAD_WORK_NAME_DAILY
         = "backgroundDownloadDaily";
 
-    private static final String PREF_DOWNLOAD_PENDING = "backgroundDlPending";
-
-    private static final Set<String> CONFIG_PREFERENCES = new HashSet<>(
-        Arrays.asList(
-            PREF_DOWNLOAD_UNMETERED,
-            PREF_DOWNLOAD_ROAMING,
-            PREF_DOWNLOAD_CHARGING,
-            PREF_DOWNLOAD_HOURLY,
-            PREF_DOWNLOAD_DAYS,
-            PREF_DOWNLOAD_DAYS_TIME
-        )
-    );
-
     private ForkyzSettings settings;
-    private FileHandlerProvider fileHandlerProvider;
 
     @Inject
-    BackgroundDownloadManager(
-        ForkyzSettings settings, FileHandlerProvider fileHandlerProvider
-    ) {
+    BackgroundDownloadManager(ForkyzSettings settings) {
         this.settings = settings;
-        this.fileHandlerProvider = fileHandlerProvider;
     }
 
-    /**
-     * For preference activity to detect if config changes
-     */
-    public boolean isBackgroundDownloadConfigPref(String pref) {
-        return CONFIG_PREFERENCES.contains(pref);
-    }
-
-    public boolean isBackgroundDownloadEnabled() {
-        return getPrefs().getBoolean(PREF_DOWNLOAD_HOURLY, false)
-            || getNextDailyDownloadDelay() >= 0;
+    public void isBackgroundDownloadEnabled(Consumer<Boolean> cb) {
+        settings.getBackgroundDownloadSettings(bgSettings -> {
+            cb.accept(
+                bgSettings.getHourly()
+                || getNextDailyDownloadDelay(bgSettings) >= 0
+            );
+        });
     }
 
     public void updateBackgroundDownloads() {
         cancelBackgroundDownloads();
 
-        SharedPreferences prefs = getPrefs();
-
-        boolean hourly = prefs.getBoolean(PREF_DOWNLOAD_HOURLY, false);
-        if (hourly)
-            scheduleHourlyDownloads();
-        else
-            scheduleNextDailyDownload();
+        settings.getBackgroundDownloadSettings(bgSettings -> {
+            if (bgSettings.getHourly())
+                scheduleHourlyDownloads(bgSettings);
+            else
+                scheduleNextDailyDownload(bgSettings);
+        });
     }
 
-    public void scheduleHourlyDownloads() {
+    private void scheduleHourlyDownloads(
+        BackgroundDownloadSettings bgSettings
+    ) {
         LOGGER.info("Scheduling hourly downloads");
 
         PeriodicWorkRequest request
             = new PeriodicWorkRequest.Builder(
                 HourlyDownloadWorker.class, 1, TimeUnit.HOURS
-            ).setConstraints(getConstraints())
+            ).setConstraints(getConstraints(bgSettings))
             .build();
 
         getWorkManager()
@@ -127,8 +103,10 @@ public class BackgroundDownloadManager {
             );
     }
 
-    public void scheduleNextDailyDownload() {
-        long nextDelay = getNextDailyDownloadDelay();
+    public void scheduleNextDailyDownload(
+        BackgroundDownloadSettings bgSettings
+    ) {
+        long nextDelay = getNextDailyDownloadDelay(bgSettings);
         if (nextDelay < 0)
             return;
 
@@ -136,7 +114,7 @@ public class BackgroundDownloadManager {
 
         OneTimeWorkRequest request
             = new OneTimeWorkRequest.Builder(DailyDownloadWorker.class)
-                .setConstraints(getConstraints())
+                .setConstraints(getConstraints(bgSettings))
                 .setInitialDelay(nextDelay, TimeUnit.MILLISECONDS)
                 .build();
 
@@ -153,35 +131,25 @@ public class BackgroundDownloadManager {
             if (missing) {
                 cb.accept(false);
             } else {
-                SharedPreferences prefs = getPrefs();
-
-                boolean isPending
-                    = prefs.getBoolean(PREF_DOWNLOAD_PENDING, false);
-
-                clearBackgroundDownloadPendingFlag();
-
-                cb.accept(isPending);
+                settings.getBackgroundDownloadPending(isPending -> {
+                    clearBackgroundDownloadPendingFlag();
+                    cb.accept(isPending);
+                });
             }
         });
     }
 
     public void clearBackgroundDownloadPendingFlag() {
-        SharedPreferences prefs = getPrefs();
-
-        prefs.edit()
-            .putBoolean(PREF_DOWNLOAD_PENDING, false)
-            .apply();
+        settings.setBackgroundDownloadPending(false);
     }
 
     /**
      * Set the download period to 1 hour
      */
     public void setHourlyBackgroundDownloadPeriod() {
-        getPrefs().edit()
-            .putBoolean(PREF_DOWNLOAD_HOURLY, true)
-            .apply();
-
-        updateBackgroundDownloads();
+        settings.setBackgroundDownloadHourly(true, () -> {
+            updateBackgroundDownloads();
+        });
     }
 
     /**
@@ -189,14 +157,12 @@ public class BackgroundDownloadManager {
      *
      * @return -1 if none to schedule
      */
-    private long getNextDailyDownloadDelay() {
-        SharedPreferences prefs = getPrefs();
+    private long getNextDailyDownloadDelay(
+        BackgroundDownloadSettings bgSettings
+    ) {
 
-        Set<String> days = prefs.getStringSet(
-            PREF_DOWNLOAD_DAYS, Collections.emptySet()
-        );
-        int downloadTime
-            = Integer.valueOf(prefs.getString(PREF_DOWNLOAD_DAYS_TIME, "8"));
+        Set<String> days = bgSettings.getDays();
+        int downloadTime = bgSettings.getDaysTime();
 
         long nextDownloadDelay = -1;
 
@@ -215,15 +181,12 @@ public class BackgroundDownloadManager {
         getWorkManager().cancelUniqueWork(DOWNLOAD_WORK_NAME_DAILY);
     }
 
-    private Constraints getConstraints() {
-        SharedPreferences prefs = getPrefs();
-
-        boolean requireUnmetered
-            = prefs.getBoolean(PREF_DOWNLOAD_UNMETERED, true);
-        boolean allowRoaming
-            = prefs.getBoolean(PREF_DOWNLOAD_ROAMING, false);
-        boolean requireCharging
-            = prefs.getBoolean(PREF_DOWNLOAD_CHARGING, false);
+    private Constraints getConstraints(
+        BackgroundDownloadSettings bgSettings
+    ) {
+        boolean requireUnmetered = bgSettings.getRequireUnmetered();
+        boolean allowRoaming = bgSettings.getAllowRoaming();
+        boolean requireCharging = bgSettings.getRequireCharging();
 
         Constraints.Builder constraintsBuilder = new Constraints.Builder();
 
@@ -261,21 +224,31 @@ public class BackgroundDownloadManager {
         return ChronoUnit.MILLIS.between(now, nextDownload);
     }
 
-    private SharedPreferences getPrefs() {
-        Context context = ForkyzApplication.getInstance();
-        return PreferenceManager.getDefaultSharedPreferences(context);
-    }
-
     public WorkManager getWorkManager() {
         return WorkManager.getInstance(ForkyzApplication.getInstance());
     }
 
-    private abstract class BaseDownloadWorker extends Worker {
-        public BaseDownloadWorker(Context context, WorkerParameters params) {
+    private abstract static class BaseDownloadWorker extends ListenableWorker {
+        private static ExecutorService downloadExecutorService
+            = Executors.newCachedThreadPool();
+
+        ForkyzSettings settings;
+        FileHandlerProvider fileHandlerProvider;
+
+        public BaseDownloadWorker(
+            Context context,
+            WorkerParameters params,
+            ForkyzSettings settings,
+            FileHandlerProvider fileHandlerProvider
+        ) {
             super(context, params);
+            this.settings = settings;
+            this.fileHandlerProvider = fileHandlerProvider;
         }
 
-        protected void doDownload() {
+        protected void doDownload(
+            CallbackToFutureAdapter.Completer<ListenableWorker.Result> completer
+        ) {
             ForkyzApplication app = ForkyzApplication.getInstance();
 
             app.isMissingWritePermission(missing -> {
@@ -290,47 +263,81 @@ public class BackgroundDownloadManager {
 
                 settings.getDownloadersSettings(downloadersSettings -> {
                 fileHandlerProvider.get(fileHandler -> {
-                    NotificationManagerCompat nm
-                        = NotificationManagerCompat.from(app);
-                    final Downloaders dls = new Downloaders(
-                        app, fileHandler, downloadersSettings, nm
-                    );
-                    LocalDate now = LocalDate.now();
-                    dls.downloadLatestInRange(now, now, dls.getAutoDownloaders());
+                downloadExecutorService.execute(() -> {
+                    try {
+                        NotificationManagerCompat nm
+                            = NotificationManagerCompat.from(app);
+                        final Downloaders dls = new Downloaders(
+                            app, fileHandler, downloadersSettings, nm
+                        );
+                        LocalDate now = LocalDate.now();
+                        dls.downloadLatestInRange(
+                            now, now, dls.getAutoDownloaders()
+                        );
 
-                    // This is used to tell BrowseActivity that puzzles may have
-                    // been updated while paused.
-                    prefs.edit()
-                        .putBoolean(PREF_DOWNLOAD_PENDING, true)
-                        .apply();
-                });});
+                        completer.set(ListenableWorker.Result.success());
+
+                        // This is used to tell BrowseActivity that
+                        // puzzles may have been updated while paused.
+                        settings.setBackgroundDownloadPending(true);
+                    } catch (Exception e) {
+                        completer.setException(e);
+                    }
+                });});});
+            });
+        }
+
+        private SharedPreferences getPrefs() {
+            Context context = ForkyzApplication.getInstance();
+            return PreferenceManager.getDefaultSharedPreferences(context);
+        }
+    }
+
+    @HiltWorker
+    public static class HourlyDownloadWorker extends BaseDownloadWorker {
+        @AssistedInject
+        public HourlyDownloadWorker(
+            @Assisted Context context,
+            @Assisted WorkerParameters params,
+            ForkyzSettings settings,
+            FileHandlerProvider fileHandlerProvider
+        ) {
+            super(context, params, settings, fileHandlerProvider);
+        }
+
+        @Override
+        public ListenableFuture<ListenableWorker.Result> startWork() {
+            return CallbackToFutureAdapter.getFuture(completer -> {
+                doDownload(completer);
+                return "BaseDownloadWorker.doDownload";
             });
         }
     }
 
-    public class HourlyDownloadWorker extends BaseDownloadWorker {
-        public HourlyDownloadWorker(Context context, WorkerParameters params) {
-            super(context, params);
+    @HiltWorker
+    public static class DailyDownloadWorker extends BaseDownloadWorker {
+        BackgroundDownloadManager manager;
+        @AssistedInject
+        public DailyDownloadWorker(
+            @Assisted Context context,
+            @Assisted WorkerParameters params,
+            ForkyzSettings settings,
+            FileHandlerProvider fileHandlerProvider,
+            BackgroundDownloadManager manager
+        ) {
+            super(context, params, settings, fileHandlerProvider);
+            this.manager = manager;
         }
 
         @Override
-        public ListenableWorker.Result doWork() {
-            doDownload();
-            return ListenableWorker.Result.success();
-        }
-    }
-
-    public class DailyDownloadWorker extends BaseDownloadWorker {
-        public DailyDownloadWorker(Context context, WorkerParameters params) {
-            super(context, params);
-        }
-
-        @Override
-        public ListenableWorker.Result doWork() {
-            // do this first in case doDownload goes horribly wrong
-            scheduleNextDailyDownload();
-            doDownload();
-            return ListenableWorker.Result.success();
+        public ListenableFuture<ListenableWorker.Result> startWork() {
+            return CallbackToFutureAdapter.getFuture(completer -> {
+                settings.getBackgroundDownloadSettings(bgSettings -> {
+                    manager.scheduleNextDailyDownload(bgSettings);
+                });
+                doDownload(completer);
+                return "BaseDownloadWorker.doDownload";
+            });
         }
     }
 }

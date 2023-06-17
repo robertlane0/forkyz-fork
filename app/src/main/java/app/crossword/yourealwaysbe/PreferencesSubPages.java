@@ -117,6 +117,9 @@ public class PreferencesSubPages {
             implements SharedPreferences.OnSharedPreferenceChangeListener {
 
         @Inject
+        protected ForkyzSettings settings;
+
+        @Inject
         BackgroundDownloadManager downloadManager;
 
         @Override
@@ -146,7 +149,7 @@ public class PreferencesSubPages {
         public void onSharedPreferenceChanged(
             SharedPreferences sharedPreferences, String pref
         ) {
-            if (downloadManager.isBackgroundDownloadConfigPref(pref))
+            if (settings.isBackgroundDownloadConfigPref(pref))
                 downloadManager.updateBackgroundDownloads();
         }
     }
