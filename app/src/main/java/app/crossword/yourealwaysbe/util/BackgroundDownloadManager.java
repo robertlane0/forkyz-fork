@@ -57,8 +57,10 @@ public class BackgroundDownloadManager {
     private static final String PREF_DOWNLOAD_DAYS_TIME
         = "backgroundDownloadDaysTime";
 
-    private static final String DOWNLOAD_WORK_NAME
-        = "backgroundDownload";
+    private static final String DOWNLOAD_WORK_NAME_HOURLY
+        = "backgroundDownloadHourly";
+    private static final String DOWNLOAD_WORK_NAME_DAILY
+        = "backgroundDownloadDaily";
 
     private static final String PREF_DOWNLOAD_PENDING = "backgroundDlPending";
 
@@ -119,7 +121,7 @@ public class BackgroundDownloadManager {
 
         getWorkManager()
             .enqueueUniquePeriodicWork(
-                DOWNLOAD_WORK_NAME,
+                DOWNLOAD_WORK_NAME_HOURLY,
                 ExistingPeriodicWorkPolicy.UPDATE,
                 request
             );
@@ -140,7 +142,7 @@ public class BackgroundDownloadManager {
 
         getWorkManager()
             .enqueueUniqueWork(
-                DOWNLOAD_WORK_NAME,
+                DOWNLOAD_WORK_NAME_DAILY,
                 ExistingWorkPolicy.REPLACE,
                 request
             );
@@ -209,7 +211,8 @@ public class BackgroundDownloadManager {
     }
 
     private void cancelBackgroundDownloads() {
-        getWorkManager().cancelUniqueWork(DOWNLOAD_WORK_NAME);
+        getWorkManager().cancelUniqueWork(DOWNLOAD_WORK_NAME_HOURLY);
+        getWorkManager().cancelUniqueWork(DOWNLOAD_WORK_NAME_DAILY);
     }
 
     private Constraints getConstraints() {
