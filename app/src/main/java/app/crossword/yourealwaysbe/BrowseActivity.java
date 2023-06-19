@@ -565,11 +565,10 @@ public class BrowseActivity extends ForkyzActivity {
                 } else {
                     refreshLastAccessedPuzzle();
                 }
+                // previous game ended for now
+                ForkyzApplication.getInstance().clearBoard();
             }
         );
-
-        // previous game ended for now
-        ForkyzApplication.getInstance().clearBoard();
 
         autoDownloadIfEnabled();
     }
