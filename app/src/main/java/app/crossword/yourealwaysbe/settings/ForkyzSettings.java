@@ -328,7 +328,8 @@ public class ForkyzSettings {
                     PREF_FILE_HANDLER_SAF_ARCHIVE,
                     settings.getSAFArchiveURI()
                 ).apply();
-            cb.run();
+            if (cb != null)
+                cb.run();
         });
     }
 
