@@ -246,9 +246,13 @@ public class FileHandlerSAF extends FileHandler {
 
     @Override
     public boolean isStorageFull() {
-        return SAFStorageCalculator.isStorageFull(
-            getApplicationContext(), rootUri
-        );
+        // In general storage size doesn't make sense for SAF (e.g. size
+        // of cloud storage). There is a method of getting space [1] for
+        // local directories, but it delays start up by about 0.5s,
+        // which is noticably laggy.
+        //
+        // [1]: https://stackoverflow.com/a/40848958
+        return false;
     }
 
     @Override
