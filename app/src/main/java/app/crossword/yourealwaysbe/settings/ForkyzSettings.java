@@ -81,12 +81,28 @@ public class ForkyzSettings {
     public static final String PREF_FILE_HANDLER_STORAGE_LOC
         = "storageLocation";
 
+    private static final String PREF_PLAY_CLUE_TABS_PAGE
+        = "playActivityClueTabsPage";
     private static final String PREF_PLAY_DONT_DELETE_CROSSING
         = "dontDeleteCrossing";
+    private static final String PREF_PLAY_ENTER_CHANGES_DIRECTION
+        = "enterChangesDirection";
+    private static final String PREF_PLAY_FIT_TO_SCREEN = "fitToScreen";
+    private static final String PREF_PLAY_FULL_SCREEN = "fullScreen";
     private static final String
     PREF_PLAY_PRESERVE_CORRECT_LETTERS_IN_SHOW_ERRORS
         = "preserveCorrectLettersInShowErrors";
+    private static final String PREF_PLAY_RANDOM_CLUE_ON_SHAKE
+        = "randomClueOnShake";
+    private static final String PREF_PLAY_SCALE = "scale";
+    private static final String PREF_PLAY_SCRATCH_MODE = "scratchMode";
     private static final String PREF_PLAY_SHOW_COUNT = "showCount";
+    private static final String PREF_PLAY_SHOW_CLUES_TAB = "showCluesOnPlayScreen";
+    private static final String PREF_PLAY_SHOW_ERRORS_CLUE = "showErrorsClue";
+    private static final String PREF_PLAY_SHOW_ERRORS_CURSOR = "showErrorsCursor";
+    private static final String PREF_PLAY_SHOW_ERRORS_GRID = "showErrors";
+    private static final String PREF_PLAY_SKIP_FILLED = "skipFilled";
+    private static final String PREF_PLAY_SPACE_CHANGE_DIRECTION = "spaceChangesDirection";
 
     private static final String PREF_SUPPRESS_SUMMARY_NOTIFICATIONS
         = "supressSummaryMessages";
@@ -106,6 +122,7 @@ public class ForkyzSettings {
         );
 
     private static final Map<String, Boolean> BOOL_DEFAULTS = new HashMap<>();
+    private static final Map<String, Float> FLOAT_DEFAULTS = new HashMap<>();
     private static final Map<String, Integer> INT_DEFAULTS = new HashMap<>();
     private static final Map<String, Long> LONG_DEFAULTS = new HashMap<>();
     private static final Map<String, String> STRING_DEFAULTS = new HashMap<>();
@@ -119,11 +136,24 @@ public class ForkyzSettings {
         INT_DEFAULTS.put(PREF_BROWSE_SORT, 0);
         STRING_DEFAULTS.put(PREF_BROWSE_SWIPE_ACTION, "DELETE");
         BOOL_DEFAULTS.put(PREF_DOWNLOAD_PENDING, false);
+        INT_DEFAULTS.put(PREF_PLAY_CLUE_TABS_PAGE, 0);
         BOOL_DEFAULTS.put(PREF_PLAY_DONT_DELETE_CROSSING, false);
+        BOOL_DEFAULTS.put(PREF_PLAY_ENTER_CHANGES_DIRECTION, true);
+        BOOL_DEFAULTS.put(PREF_PLAY_FIT_TO_SCREEN, false);
+        BOOL_DEFAULTS.put(PREF_PLAY_FULL_SCREEN, false);
         BOOL_DEFAULTS.put(
             PREF_PLAY_PRESERVE_CORRECT_LETTERS_IN_SHOW_ERRORS, false
         );
+        BOOL_DEFAULTS.put(PREF_PLAY_RANDOM_CLUE_ON_SHAKE, false);
+        FLOAT_DEFAULTS.put(PREF_PLAY_SCALE, 1.0F);
+        BOOL_DEFAULTS.put(PREF_PLAY_SCRATCH_MODE, false);
         BOOL_DEFAULTS.put(PREF_PLAY_SHOW_COUNT, false);
+        BOOL_DEFAULTS.put(PREF_PLAY_SHOW_CLUES_TAB, true);
+        BOOL_DEFAULTS.put(PREF_PLAY_SHOW_ERRORS_CLUE, false);
+        BOOL_DEFAULTS.put(PREF_PLAY_SHOW_ERRORS_CURSOR, false);
+        BOOL_DEFAULTS.put(PREF_PLAY_SHOW_ERRORS_GRID, false);
+        BOOL_DEFAULTS.put(PREF_PLAY_SKIP_FILLED, false);
+        BOOL_DEFAULTS.put(PREF_PLAY_SPACE_CHANGE_DIRECTION, true);
     }
 
     private SharedPreferences prefs;
@@ -333,8 +363,32 @@ public class ForkyzSettings {
         });
     }
 
+    public void getPlayClueTabsPage(Consumer<Integer> cb) {
+        getIntPreference(PREF_PLAY_CLUE_TABS_PAGE, cb);
+    }
+
+    public void setPlayClueTabsPage(int value) {
+        setIntPreference(PREF_PLAY_CLUE_TABS_PAGE, value);
+    }
+
     public void getPlayDontDeleteCrossing(Consumer<Boolean> cb) {
         getBooleanPreference(PREF_PLAY_DONT_DELETE_CROSSING, cb);
+    }
+
+    public void getPlayEnterChangesDirection(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_PLAY_ENTER_CHANGES_DIRECTION, cb);
+    }
+
+    public void getPlayFitToScreen(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_PLAY_FIT_TO_SCREEN, cb);
+    }
+
+    public void getPlayFullScreen(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_PLAY_FULL_SCREEN, cb);
+    }
+
+    public void getPlayRandomClueOnShake(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_PLAY_RANDOM_CLUE_ON_SHAKE, cb);
     }
 
     public void getPlayPreserveCorrectLettersInShowErrors(
@@ -345,12 +399,84 @@ public class ForkyzSettings {
         );
     }
 
+    public void getPlayScale(Consumer<Float> cb) {
+        getFloatPreference(PREF_PLAY_SCALE, cb);
+    }
+
+    public void setPlayScale(float value) {
+        setFloatPreference(PREF_PLAY_SCALE, value);
+    }
+
+    public void getPlayScratchMode(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_PLAY_SCRATCH_MODE, cb);
+    }
+
+    public LiveData<Boolean> livePlayScratchMode() {
+        return getLiveBoolean(PREF_PLAY_SCRATCH_MODE);
+    }
+
+    public void setPlayScratchMode(boolean value) {
+        setBooleanPreference(PREF_PLAY_SCRATCH_MODE, value);
+    }
+
     public void getPlayShowCount(Consumer<Boolean> cb) {
         getBooleanPreference(PREF_PLAY_SHOW_COUNT, cb);
     }
 
     public void setPlayShowCount(boolean value) {
         setBooleanPreference(PREF_PLAY_SHOW_COUNT, value);
+    }
+
+    public void getPlayShowErrorsClue(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_PLAY_SHOW_ERRORS_CLUE, cb);
+    }
+
+    public LiveData<Boolean> livePlayShowErrorsClue() {
+        return getLiveBoolean(PREF_PLAY_SHOW_ERRORS_CLUE);
+    }
+
+    public void setPlayShowErrorsClue(boolean value) {
+        setBooleanPreference(PREF_PLAY_SHOW_ERRORS_CLUE, value);
+    }
+
+    public void getPlayShowErrorsCursor(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_PLAY_SHOW_ERRORS_CURSOR, cb);
+    }
+
+    public LiveData<Boolean> livePlayShowErrorsCursor() {
+        return getLiveBoolean(PREF_PLAY_SHOW_ERRORS_CURSOR);
+    }
+
+    public void setPlayShowErrorsCursor(boolean value) {
+        setBooleanPreference(PREF_PLAY_SHOW_ERRORS_CURSOR, value);
+    }
+
+    public void getPlayShowErrorsGrid(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_PLAY_SHOW_ERRORS_GRID, cb);
+    }
+
+    public LiveData<Boolean> livePlayShowErrorsGrid() {
+        return getLiveBoolean(PREF_PLAY_SHOW_ERRORS_GRID);
+    }
+
+    public void setPlayShowErrorsGrid(boolean value) {
+        setBooleanPreference(PREF_PLAY_SHOW_ERRORS_GRID, value);
+    }
+
+    public void getPlaySkipFilled(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_PLAY_SKIP_FILLED, cb);
+    }
+
+    public void getPlayShowCluesTab(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_PLAY_SHOW_CLUES_TAB, cb);
+    }
+
+    public void setPlayShowCluesTab(boolean value) {
+        setBooleanPreference(PREF_PLAY_SHOW_CLUES_TAB, value);
+    }
+
+    public void getPlaySpaceChangesDirection(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_PLAY_SPACE_CHANGE_DIRECTION, cb);
     }
 
     public void getDownloadersSettings(Consumer<DownloadersSettings> cb) {
@@ -456,6 +582,26 @@ public class ForkyzSettings {
             prefs.edit().putBoolean(name, value).apply();
             if (cb != null)
                 cb.run();
+        });
+    }
+
+    private void getFloatPreference(String name, Consumer<Float> cb) {
+        final Float defaultValue = FLOAT_DEFAULTS.get(name);
+        if (defaultValue == null) {
+            throw new IllegalArgumentException(
+                "Unrecognised Float preference: " + name
+            );
+        }
+
+        executor.execute(() -> {
+            float value = prefs.getFloat(name, defaultValue);
+            handler.post(() -> { cb.accept(value); });
+        });
+    }
+
+    private void setFloatPreference(String name, float value) {
+        executor.execute(() -> {
+            prefs.edit().putFloat(name, value).apply();
         });
     }
 

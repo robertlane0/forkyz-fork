@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.hardware.SensorManager;
 import android.net.Uri;
@@ -66,14 +65,6 @@ public class PlayActivity extends PuzzleActivity
     private static final float ACROSTIC_BOARD_HEIGHT_RATIO_MIN = 0.25F;
     private static final float ACROSTIC_CLUE_TABS_WORD_SCALE = 0.7F;
     private static final float ACROSTIC_CLUE_TABS_HEIGHT_RATIO_MIN = 0.3F;
-    private static final String SHOW_CLUES_TAB = "showCluesOnPlayScreen";
-    private static final String CLUE_TABS_PAGE = "playActivityClueTabsPage";
-    private static final String PREF_SHOW_ERRORS_GRID = "showErrors";
-    private static final String PREF_SHOW_ERRORS_CURSOR = "showErrorsCursor";
-    private static final String PREF_SHOW_ERRORS_CLUE = "showErrorsClue";
-    public static final String SHOW_TIMER = "showTimer";
-    public static final String SCALE = "scale";
-    private static final String PREF_RANDOM_CLUE_ON_SHAKE = "randomClueOnShake";
 
     private PlayBinding binding;
     // clue may be TextView in layout or action bar
@@ -194,19 +185,18 @@ public class PlayActivity extends PuzzleActivity
             binding.boardView
         );
 
-        board.setSkipCompletedLetters(
-            this.prefs.getBoolean("skipFilled", false)
-        );
+        settings.getPlaySkipFilled(board::setSkipCompletedLetters);
 
-        if(this.clue != null) {
+        if (this.clue != null) {
             this.clue.setClickable(true);
             this.clue.setOnClickListener(new OnClickListener() {
                 public void onClick(View arg0) {
-                    if (PlayActivity.this.prefs.getBoolean(SHOW_CLUES_TAB, true)) {
-                        PlayActivity.this.hideClueTabs();
-                    } else {
-                        PlayActivity.this.showClueTabs();
-                    }
+                    settings.getPlayShowCluesTab(show -> {
+                        if (show)
+                            PlayActivity.this.hideClueTabs();
+                        else
+                            PlayActivity.this.showClueTabs();
+                    });
                 }
             });
             ViewCompat.replaceAccessibilityAction(
@@ -257,14 +247,12 @@ public class PlayActivity extends PuzzleActivity
                   int left, int top, int right, int bottom,
                   int leftWas, int topWas, int rightWas, int bottomWas
                 ) {
+                    boolean showCluesTab
+                        = binding.clueTabs.getVisibility() != View.GONE;
                     boolean constrainedDims = false;
 
                     ConstraintSet set = new ConstraintSet();
                     set.clone(binding.constraintLayout);
-
-                    boolean showCluesTab = PlayActivity.this.prefs.getBoolean(
-                        SHOW_CLUES_TAB, true
-                    );
 
                     if (showCluesTab) {
                         int height = bottom - top;
@@ -311,7 +299,9 @@ public class PlayActivity extends PuzzleActivity
                             }
                         }
                     } else {
-                        set.constrainMaxHeight(binding.boardView.getId(), 0);
+                        set.constrainMaxHeight(
+                            binding.boardView.getId(), 0
+                        );
                     }
 
                     set.applyTo(binding.constraintLayout);
@@ -343,7 +333,7 @@ public class PlayActivity extends PuzzleActivity
 
         binding.boardView.setScaleListener(new ScaleListener() {
             public void onScale(float newScale) {
-                prefs.edit().putFloat(SCALE, newScale).apply();
+                settings.setPlayScale(newScale);
             }
         });
 
@@ -354,19 +344,23 @@ public class PlayActivity extends PuzzleActivity
         );
 
         DisplayMetrics metrics = getResources().getDisplayMetrics();
-        if (this.prefs.getBoolean("fitToScreen", false) || (ForkyzApplication.isLandscape(metrics)) && (ForkyzApplication.isTabletish(metrics) || ForkyzApplication.isMiniTabletish(metrics))) {
-            this.handler.postDelayed(fitToScreenTask, 100);
-        }
+        settings.getPlayFitToScreen(fitToScreen -> {
+            if (fitToScreen || (ForkyzApplication.isLandscape(metrics)) && (ForkyzApplication.isTabletish(metrics) || ForkyzApplication.isMiniTabletish(metrics))) {
+                this.handler.postDelayed(fitToScreenTask, 100);
+            }
+        });
 
         setupVoiceButtons(binding.voiceButtonsInclude);
         setupVoiceCommands();
 
         addAccessibilityActions(binding.boardView);
+
+        setupObservers();
     }
 
     private void fitBoardToScreen() {
         float newScale = binding.boardView.fitToView();
-        prefs.edit().putFloat(SCALE, newScale).apply();
+        settings.setPlayScale(newScale);
     }
 
     private static String neverNull(String val) {
@@ -393,10 +387,11 @@ public class PlayActivity extends PuzzleActivity
             support.setEnabled(false);
         }
 
-        menu.findItem(R.id.play_menu_scratch_mode).setChecked(isScratchMode());
+        settings.getPlayScratchMode(scratchMode -> {
+            menu.findItem(R.id.play_menu_scratch_mode).setChecked(scratchMode);
+        });
 
-        boolean canSolve
-            = puz != null && puz.hasSolution();
+        boolean canSolve = puz != null && puz.hasSolution();
 
         MenuItem showErrors = menu.findItem(R.id.play_menu_show_errors);
         MenuItem reveal = menu.findItem(R.id.play_menu_reveal);
@@ -405,26 +400,23 @@ public class PlayActivity extends PuzzleActivity
         reveal.setEnabled(canSolve);
         reveal.setVisible(canSolve);
 
-        boolean showErrorsGrid
-            = this.prefs.getBoolean(PREF_SHOW_ERRORS_GRID, false);
-        boolean showErrorsCursor
-            = this.prefs.getBoolean(PREF_SHOW_ERRORS_CURSOR, false);
-        boolean showErrorsClue
-            = this.prefs.getBoolean(PREF_SHOW_ERRORS_CLUE, false);
+        settings.getPlayShowErrorsClue(showErrorsClue -> {
+        settings.getPlayShowErrorsCursor(showErrorsCursor -> {
+        settings.getPlayShowErrorsGrid(showErrorsGrid -> {
+            int showErrorsTitle =
+                (showErrorsGrid || showErrorsCursor || showErrorsClue)
+                ? R.string.showing_errors
+                : R.string.show_errors;
 
-        int showErrorsTitle =
-            (showErrorsGrid || showErrorsCursor || showErrorsClue)
-            ? R.string.showing_errors
-            : R.string.show_errors;
+            showErrors.setTitle(showErrorsTitle);
 
-        showErrors.setTitle(showErrorsTitle);
-
-        menu.findItem(R.id.play_menu_show_errors_grid)
-            .setChecked(showErrorsGrid);
-        menu.findItem(R.id.play_menu_show_errors_cursor)
-            .setChecked(showErrorsCursor);
-        menu.findItem(R.id.play_menu_show_errors_clue)
-            .setChecked(showErrorsClue);
+            menu.findItem(R.id.play_menu_show_errors_grid)
+                .setChecked(showErrorsGrid);
+            menu.findItem(R.id.play_menu_show_errors_cursor)
+                .setChecked(showErrorsCursor);
+            menu.findItem(R.id.play_menu_show_errors_clue)
+                .setChecked(showErrorsClue);
+        });});});
 
         Box box = (board == null) ? null : board.getCurrentBox();
         boolean hasInitial = !Box.isBlock(box) && box.hasInitialValue();
@@ -496,21 +488,21 @@ public class PlayActivity extends PuzzleActivity
                     break;
 
                 case KeyEvent.KEYCODE_SPACE:
-                    if (prefs.getBoolean("spaceChangesDirection", true)) {
-                        getBoard().toggleSelection();
-                    } else if (isScratchMode()) {
-                        getBoard().playScratchLetter(' ');
-                    } else {
-                        getBoard().playLetter(' ');
-                    }
+                    settings.getPlaySpaceChangesDirection(changesDir -> {
+                        if (changesDir)
+                            getBoard().toggleSelection();
+                        else
+                            playLetter(' ');
+                    });
                     break;
 
                 case KeyEvent.KEYCODE_ENTER:
-                    if (prefs.getBoolean("enterChangesDirection", true)) {
-                        getBoard().toggleSelection();
-                    } else {
-                        getBoard().nextWord();
-                    }
+                    settings.getPlaySpaceChangesDirection(enterChanges -> {
+                        if (enterChanges)
+                            getBoard().toggleSelection();
+                        else
+                            getBoard().nextWord();
+                    });
                     break;
 
                 case KeyEvent.KEYCODE_DEL:
@@ -520,13 +512,8 @@ public class PlayActivity extends PuzzleActivity
 
             char c = Character.toUpperCase(event.getDisplayLabel());
 
-            if (Character.isLetterOrDigit(c)) {
-                if (isScratchMode()) {
-                    getBoard().playScratchLetter(c);
-                } else {
-                    getBoard().playLetter(c);
-                }
-            }
+            if (Character.isLetterOrDigit(c))
+                playLetter(c);
         }
 
         keyboardManager.popBlockHide();
@@ -568,25 +555,15 @@ public class PlayActivity extends PuzzleActivity
                 showRevealPuzzleDialog();
                 return true;
             } else if (id == R.id.play_menu_show_errors_grid) {
-                getBoard().toggleShowErrorsGrid();
-                this.prefs.edit().putBoolean(
-                    PREF_SHOW_ERRORS_GRID, getBoard().isShowErrorsGrid()
-                ).apply();
-                invalidateOptionsMenu();
+                settings.setPlayShowErrorsGrid(!getBoard().isShowErrorsGrid());
                 return true;
             } else if (id == R.id.play_menu_show_errors_clue) {
-                getBoard().toggleShowErrorsClue();
-                this.prefs.edit().putBoolean(
-                    PREF_SHOW_ERRORS_CLUE, getBoard().isShowErrorsClue()
-                ).apply();
-                invalidateOptionsMenu();
+                settings.setPlayShowErrorsClue(!getBoard().isShowErrorsClue());
                 return true;
             } else if (id == R.id.play_menu_show_errors_cursor) {
-                getBoard().toggleShowErrorsCursor();
-                this.prefs.edit().putBoolean(
-                    PREF_SHOW_ERRORS_CURSOR, getBoard().isShowErrorsCursor()
-                ).apply();
-                invalidateOptionsMenu();
+                settings.setPlayShowErrorsCursor(
+                    !getBoard().isShowErrorsCursor()
+                );
                 return true;
             } else if (id == R.id.play_menu_scratch_mode) {
                 toggleScratchMode();
@@ -597,22 +574,22 @@ public class PlayActivity extends PuzzleActivity
                 return true;
             } else if (id == R.id.play_menu_zoom_in) {
                 float newScale = binding.boardView.zoomIn();
-                prefs.edit().putFloat(SCALE, newScale).apply();
+                settings.setPlayScale(newScale);
                 return true;
             } else if (id == R.id.play_menu_zoom_in_max) {
                 float newScale = binding.boardView.zoomInMax();
-                this.prefs.edit().putFloat(SCALE, newScale).apply();
+                settings.setPlayScale(newScale);
                 return true;
             } else if (id == R.id.play_menu_zoom_out) {
                 float newScale = binding.boardView.zoomOut();
-                this.prefs.edit().putFloat(SCALE, newScale).apply();
+                settings.setPlayScale(newScale);
                 return true;
             } else if (id == R.id.play_menu_zoom_fit) {
                 fitBoardToScreen();
                 return true;
             } else if (id == R.id.play_menu_zoom_reset) {
                 float newScale = binding.boardView.zoomReset();
-                this.prefs.edit().putFloat(SCALE, newScale).apply();
+                settings.setPlayScale(newScale);
                 return true;
             } else if (id == R.id.play_menu_info) {
                 showInfoDialog();
@@ -680,9 +657,7 @@ public class PlayActivity extends PuzzleActivity
 
     @Override
     public void onClueTabsPageChange(ClueTabs view, int pageNumber) {
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putInt(CLUE_TABS_PAGE, pageNumber);
-        editor.apply();
+        settings.setPlayClueTabsPage(pageNumber);
     }
 
     public void onPlayboardChange(PlayboardChanges changes) {
@@ -741,11 +716,12 @@ public class PlayActivity extends PuzzleActivity
         this.onConfigurationChanged(getBaseContext().getResources()
                                                     .getConfiguration());
 
-        if (prefs.getBoolean(SHOW_CLUES_TAB, false)) {
-            showClueTabs();
-        } else {
-            hideClueTabs();
-        }
+        settings.getPlayShowCluesTab(showCluesTab -> {
+            if (showCluesTab)
+                showClueTabs();
+            else
+                hideClueTabs();
+        });
 
         setVoiceButtonVisibility();
         registerBoard();
@@ -774,23 +750,22 @@ public class PlayActivity extends PuzzleActivity
             neverNull(puz.getCopyright())
         ));
 
-        syncShowErrors();
-
         binding.boardView.setBoard(board);
 
-        float scale = prefs.getFloat(SCALE, 1.0F);
-        scale = binding.boardView.setCurrentScale(scale);
-        prefs.edit().putFloat(SCALE, scale).apply();
+        settings.getPlayScale(scale-> {
+            scale = binding.boardView.setCurrentScale(scale);
+            settings.setPlayScale(scale);
+        });
 
         binding.clueTabs.setBoard(board);
         binding.clueTabs.setMaxWordScale(ACROSTIC_CLUE_TABS_WORD_SCALE);
         binding.clueTabs.setShowWords(isAcrostic());
-        binding.clueTabs.setPage(prefs.getInt(CLUE_TABS_PAGE, 0));
-        binding.clueTabs.addListener(this);
+        settings.getPlayClueTabsPage(page -> {
+            binding.clueTabs.setPage(page);
+            binding.clueTabs.addListener(this);
+        });
 
-        board.setSkipCompletedLetters(
-            this.prefs.getBoolean("skipFilled", false)
-        );
+        settings.getPlaySkipFilled(board::setSkipCompletedLetters);
         board.setMovementStrategy(this.getMovementStrategy());
         board.addListener(this);
 
@@ -805,8 +780,10 @@ public class PlayActivity extends PuzzleActivity
 
     @Override
     public void hearShake() {
-        if (isRandomClueOnShake())
-            pickRandomUnfilledClue();
+        settings.getPlayRandomClueOnShake(randomClueOnShake -> {
+            if (randomClueOnShake)
+                pickRandomUnfilledClue();
+        });
     }
 
     @Override
@@ -850,28 +827,46 @@ public class PlayActivity extends PuzzleActivity
         }
     }
 
-    private void syncShowErrors() {
-        Playboard board = getBoard();
-        if (board == null)
-            return;
+    private void setupObservers() {
+        settings.livePlayScratchMode().observe(
+            this, value -> { invalidateOptionsMenu(); }
+        );
 
-        boolean showErrorsGrid
-            = this.prefs.getBoolean(PREF_SHOW_ERRORS_GRID, false);
-        if (board.isShowErrorsGrid() != showErrorsGrid) {
-            board.toggleShowErrorsGrid();
-        }
+        settings.livePlayShowErrorsGrid().observe(
+            this,
+            showErrorsGrid -> {
+                Playboard board = getBoard();
+                if (board != null && board.isShowErrorsGrid() != showErrorsGrid) {
+                    board.toggleShowErrorsGrid();
+                }
+                invalidateOptionsMenu();
+            }
+        );
 
-        boolean showErrorsCursor
-            = this.prefs.getBoolean(PREF_SHOW_ERRORS_CURSOR, false);
-        if (board.isShowErrorsCursor() != showErrorsCursor) {
-            board.toggleShowErrorsCursor();
-        }
+        settings.livePlayShowErrorsCursor().observe(
+            this,
+            showErrorsCursor -> {
+                Playboard board = getBoard();
+                if (
+                    board != null &&
+                    board.isShowErrorsCursor() != showErrorsCursor
+                ) {
+                    board.toggleShowErrorsCursor();
+                }
+                invalidateOptionsMenu();
+            }
+        );
 
-        boolean showErrorsClue
-            = this.prefs.getBoolean(PREF_SHOW_ERRORS_CLUE, false);
-        if (board.isShowErrorsClue() != showErrorsClue) {
-            board.toggleShowErrorsClue();
-        }
+        settings.livePlayShowErrorsClue().observe(
+            this,
+            showErrorsClue -> {
+                Playboard board = getBoard();
+                if (board != null && board.isShowErrorsClue() != showErrorsClue) {
+                    board.toggleShowErrorsClue();
+                }
+                invalidateOptionsMenu();
+            }
+        );
     }
 
     private void setClueText() {
@@ -908,11 +903,7 @@ public class PlayActivity extends PuzzleActivity
         }
         set.applyTo(binding.constraintLayout);
 
-        binding.clueTabs.setPage(prefs.getInt(CLUE_TABS_PAGE, 0));
-
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putBoolean(SHOW_CLUES_TAB, true);
-        editor.apply();
+        settings.setPlayShowCluesTab(true);
     }
 
     /**
@@ -926,9 +917,7 @@ public class PlayActivity extends PuzzleActivity
         set.setVisibility(binding.clueTabs.getId(), ConstraintSet.GONE);
         set.applyTo(binding.constraintLayout);
 
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putBoolean(SHOW_CLUES_TAB, false);
-        editor.apply();
+        settings.setPlayShowCluesTab(false);
     }
 
     private void showInfoDialog() {
@@ -942,9 +931,10 @@ public class PlayActivity extends PuzzleActivity
     }
 
     private void setFullScreenMode() {
-        if (prefs.getBoolean("fullScreen", false)) {
-            utils.setFullScreen(getWindow());
-        }
+        settings.getPlayFullScreen(fullScreen -> {
+            if (fullScreen)
+                utils.setFullScreen(getWindow());
+        });
     }
 
     private void actionSupportSource() {
@@ -959,16 +949,10 @@ public class PlayActivity extends PuzzleActivity
         }
     }
 
-    private boolean isScratchMode() {
-        return this.prefs.getBoolean("scratchMode", false);
-    }
-
     private void toggleScratchMode() {
-        boolean scratchMode = isScratchMode();
-        this.prefs.edit().putBoolean(
-            "scratchMode", !scratchMode
-        ).apply();
-        invalidateOptionsMenu();
+        settings.getPlayScratchMode(scratchMode -> {
+            settings.setPlayScratchMode(!scratchMode);
+        });
     }
 
     private void setupVoiceCommands() {
@@ -1079,11 +1063,21 @@ public class PlayActivity extends PuzzleActivity
         if (board == null)
             return;
 
-        if (isScratchMode()) {
-            board.deleteScratchLetter();
-        } else {
-            board.deleteLetter();
-        }
+        settings.getPlayScratchMode(scratchMode -> {
+            if (scratchMode)
+                board.deleteScratchLetter();
+            else
+                board.deleteLetter();
+        });
+    }
+
+    private void playLetter(char c) {
+        settings.getPlayScratchMode(scratchMode -> {
+            if (scratchMode)
+                getBoard().playScratchLetter(c);
+            else
+                getBoard().playLetter(c);
+        });
     }
 
     private boolean isAcrostic() {
@@ -1124,19 +1118,16 @@ public class PlayActivity extends PuzzleActivity
         dialog.show(getSupportFragmentManager(), "PuzzleInfoDialogs.Intro");
     }
 
-    private boolean isRandomClueOnShake() {
-        return prefs.getBoolean(PREF_RANDOM_CLUE_ON_SHAKE, false);
-    }
-
     private void resumeShakeDetection() {
-        if (!isRandomClueOnShake())
-            return;
-
-        if (shakeDetector == null) {
-            shakeDetector = new ShakeDetector(this);
-        }
-
-        shakeDetector.start((SensorManager) getSystemService(SENSOR_SERVICE));
+        settings.getPlayRandomClueOnShake(randomClueOnShake -> {
+            if (randomClueOnShake) {
+                if (shakeDetector == null)
+                    shakeDetector = new ShakeDetector(this);
+                shakeDetector.start(
+                    (SensorManager) getSystemService(SENSOR_SERVICE)
+                );
+            }
+        });
     }
 
     private void pauseShakeDetection() {
