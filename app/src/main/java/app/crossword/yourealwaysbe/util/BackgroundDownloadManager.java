@@ -4,9 +4,6 @@ package app.crossword.yourealwaysbe.util;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -26,7 +23,6 @@ import androidx.work.Constraints;
 import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.ExistingWorkPolicy;
 import androidx.work.ListenableWorker;
-import androidx.work.ListenableWorker;
 import androidx.work.NetworkType;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.PeriodicWorkRequest;
@@ -39,7 +35,7 @@ import dagger.assisted.AssistedInject;
 
 import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
 import app.crossword.yourealwaysbe.net.Downloaders;
-import app.crossword.yourealwaysbe.settings.ForkyzSettings.BackgroundDownloadSettings;
+import app.crossword.yourealwaysbe.settings.BackgroundDownloadSettings;
 import app.crossword.yourealwaysbe.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.util.files.FileHandlerProvider;
 

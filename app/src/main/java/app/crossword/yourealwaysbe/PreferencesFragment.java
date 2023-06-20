@@ -23,9 +23,9 @@ import dagger.hilt.android.AndroidEntryPoint;
 
 import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
 import app.crossword.yourealwaysbe.forkyz.R;
-import app.crossword.yourealwaysbe.settings.ForkyzSettings.FileHandlerSettings;
-import app.crossword.yourealwaysbe.settings.ForkyzSettings.StorageLocation;
+import app.crossword.yourealwaysbe.settings.FileHandlerSettings;
 import app.crossword.yourealwaysbe.settings.ForkyzSettings;
+import app.crossword.yourealwaysbe.settings.StorageLocation;
 import app.crossword.yourealwaysbe.util.files.FileHandlerProvider;
 import app.crossword.yourealwaysbe.util.files.FileHandlerSAF;
 import app.crossword.yourealwaysbe.versions.AndroidVersionUtils;

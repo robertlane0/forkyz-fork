@@ -17,8 +17,8 @@ import android.net.Uri;
 import android.provider.DocumentsContract.Document;
 import android.provider.DocumentsContract;
 
-import app.crossword.yourealwaysbe.settings.ForkyzSettings.FileHandlerSettings;
-import app.crossword.yourealwaysbe.settings.ForkyzSettings.StorageLocation;
+import app.crossword.yourealwaysbe.settings.FileHandlerSettings;
+import app.crossword.yourealwaysbe.settings.StorageLocation;
 import app.crossword.yourealwaysbe.versions.AndroidVersionUtils;
 
 @TargetApi(24)

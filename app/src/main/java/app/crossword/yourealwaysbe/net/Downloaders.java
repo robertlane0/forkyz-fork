@@ -16,7 +16,7 @@ import app.crossword.yourealwaysbe.io.IO;
 import app.crossword.yourealwaysbe.io.JPZIO;
 import app.crossword.yourealwaysbe.io.PrzekrojIO;
 import app.crossword.yourealwaysbe.io.RCIJeuxMFJIO;
-import app.crossword.yourealwaysbe.settings.ForkyzSettings.DownloadersSettings;
+import app.crossword.yourealwaysbe.settings.DownloadersSettings;
 import app.crossword.yourealwaysbe.util.files.FileHandler;
 import app.crossword.yourealwaysbe.versions.AndroidVersionUtils;
 
