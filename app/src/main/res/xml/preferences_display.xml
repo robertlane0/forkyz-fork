@@ -9,7 +9,7 @@
         android:title="@string/theme_preference"
         android:summary="@string/theme_preference_desc"
         android:key="applicationTheme"
-        android:defaultValue="@string/standard_theme_value"
+        android:defaultValue="S"
         android:entries="@array/themeTypeLabels"
         android:entryValues="@array/themeTypeValues"
     />

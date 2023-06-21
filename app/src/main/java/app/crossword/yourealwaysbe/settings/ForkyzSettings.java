@@ -44,6 +44,8 @@ public class ForkyzSettings {
     public static final int BROWSE_SWIPE_DELETE = 0;
     public static final int BROWSE_SWIPE_ARCHIVE = 1;
 
+    private static final String PREF_APP_ORIENTATION_LOCK = "orientationLock";
+
     // public for settings page
     public static final String PREF_AUTO_DOWNLOADERS = "autoDownloaders";
     private static final String PREF_BROWSE_CLEANUP_AGE = "cleanupAge";
@@ -112,6 +114,9 @@ public class ForkyzSettings {
         = "supressSummaryMessages";
     private static final String PREF_SUPPRESS_INDIVIDUAL_NOTIFICATIONS
         = "supressMessages";
+
+    public static final String PREF_THEME = "applicationTheme";
+    private static final String PREF_THEME_LEGACY_USE_DYNAMIC = "useDynamicColors";
 
     private static final Set<String> BACKGROUND_DOWNLOAD_PREFERENCES
         = new HashSet<>(
@@ -193,6 +198,13 @@ public class ForkyzSettings {
         this.prefs = prefs;
         this.handler = handler;
         this.prefs.registerOnSharedPreferenceChangeListener(prefChangeListener);
+    }
+
+    public void getAppOrientationLock(Consumer<Orientation> cb) {
+        executor.execute(() -> {
+            String value = prefs.getString("orientationLock", "UNLOCKED");
+            cb.accept(Orientation.getFromSettingsValue(value));
+        });
     }
 
     /**
@@ -617,6 +629,30 @@ public class ForkyzSettings {
     }
 
     /**
+     * The theme selected by user
+     */
+    public void getTheme(Consumer<Theme> cb) {
+        executor.execute(() -> {
+            String theme = prefs.getString(
+                PREF_THEME, Theme.STANDARD.getSettingsValue()
+            );
+            cb.accept(Theme.getFromSettingsValue(theme));
+        });
+    }
+
+    /**
+     * Blocking version of getting theme
+     *
+     * Needed to apply dynamic colors to application
+     */
+    public Theme getThemeBlocking() {
+        String theme = prefs.getString(
+            PREF_THEME, Theme.STANDARD.getSettingsValue()
+        );
+        return Theme.getFromSettingsValue(theme);
+    }
+
+    /**
      * The settings for downloaders
      *
      * I.e. which ones to use, which ones are automatic, how long before
@@ -684,6 +720,24 @@ public class ForkyzSettings {
 
                 prefs.edit()
                     .putStringSet(PREF_AUTO_DOWNLOADERS, autoDownloaders)
+                    .apply();
+            }
+        });
+    }
+
+    /**
+     * Migrate from legacy theme option
+     *
+     * Used to be two options, now three
+     */
+    public void migrateThemePreferences() {
+        executor.execute(() -> {
+            boolean legacyDynamic
+                = prefs.getBoolean(PREF_THEME_LEGACY_USE_DYNAMIC, false);
+            if (legacyDynamic) {
+               prefs.edit()
+                    .remove(PREF_THEME_LEGACY_USE_DYNAMIC)
+                    .putString(PREF_THEME, Theme.DYNAMIC.getSettingsValue())
                     .apply();
             }
         });

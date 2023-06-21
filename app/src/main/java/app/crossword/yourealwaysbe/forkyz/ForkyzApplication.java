@@ -119,7 +119,7 @@ public class ForkyzApplication extends Application implements Configuration.Prov
 
         AndroidVersionUtils.Factory.getInstance().createNotificationChannel(this);
 
-        (new ThemeHelper(this, prefs)).themeApplication(this);
+        (new ThemeHelper(settings)).themeApplication(this);
     }
 
     @Override

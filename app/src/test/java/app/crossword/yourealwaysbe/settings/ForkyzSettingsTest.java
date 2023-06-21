@@ -48,8 +48,12 @@ public class ForkyzSettingsTest {
 
             if (isGet && isPublic && isNotStatic) {
                 try {
-                    Consumer<Object> cb = value -> {};
-                    method.invoke(settings, cb);
+                    if (method.getParameterCount() == 0) {
+                        method.invoke(settings);
+                    } else {
+                        Consumer<Object> cb = value -> {};
+                        method.invoke(settings, cb);
+                    }
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     fail("Failed to call " + method.getName());
                 }

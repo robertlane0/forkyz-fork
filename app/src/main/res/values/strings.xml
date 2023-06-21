@@ -17,6 +17,7 @@
     <string name="general_puzzle_notes">Free-form notes about puzzle</string>
     <string name="unknown_hint">(No explicit clue)</string>
     <string name="play_activity_title">%1$s - %2$s -> %3$s</string>
+    <string name="no_orientation_lock">Sorry, orientation lock is not supported without fullscreen mode anymore because of an Android change."</string>
 
     <!-- downloading -->
     <string name="download">Download</string>
@@ -537,9 +538,6 @@
     <string name="standard_theme">Standard Theme</string>
     <string name="dynamic_theme">Material You Dynamic Theme</string>
     <string name="legacy_like_theme">Legacy-Like Theme</string>
-    <string name="standard_theme_value">S</string>
-    <string name="dynamic_theme_value">D</string>
-    <string name="legacy_like_theme_value">L</string>
 
     <!-- voice commands -->
     <!-- make sure app/src/main/assets/.. help files match commands here -->

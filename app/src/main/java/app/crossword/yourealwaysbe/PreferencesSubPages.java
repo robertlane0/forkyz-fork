@@ -21,7 +21,6 @@ import app.crossword.yourealwaysbe.net.Downloader;
 import app.crossword.yourealwaysbe.net.Downloaders;
 import app.crossword.yourealwaysbe.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.util.BackgroundDownloadManager;
-import app.crossword.yourealwaysbe.util.ThemeHelper;
 
 import javax.inject.Inject;
 
@@ -203,7 +202,7 @@ public class PreferencesSubPages {
             if (!DynamicColors.isDynamicColorAvailable()) {
 
                 ListPreference themePref
-                    = findPreference(ThemeHelper.PREF_THEME);
+                    = findPreference(ForkyzSettings.PREF_THEME);
 
                 Resources res = getResources();
                 themePref.setEntries(

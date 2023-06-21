@@ -165,17 +165,17 @@
          <item>@string/legacy_like_theme</item>
      </string-array>
      <string-array name="themeTypeValues">
-         <item>@string/standard_theme_value</item>
-         <item>@string/dynamic_theme_value</item>
-         <item>@string/legacy_like_theme_value</item>
+         <item>S</item>
+         <item>D</item>
+         <item>L</item>
      </string-array>
      <string-array name="themeTypeLabelsNoDynamic">
          <item>@string/standard_theme</item>
          <item>@string/legacy_like_theme</item>
      </string-array>
      <string-array name="themeTypeValuesNoDynamic">
-         <item>@string/standard_theme_value</item>
-         <item>@string/legacy_like_theme_value</item>
+         <item>S</item>
+         <item>L</item>
      </string-array>
 
      <string-array name="emptyArray"/>

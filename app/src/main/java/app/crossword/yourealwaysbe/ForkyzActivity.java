@@ -18,6 +18,7 @@ import androidx.preference.PreferenceManager;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
+import app.crossword.yourealwaysbe.forkyz.R;
 import app.crossword.yourealwaysbe.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.util.NightModeHelper;
 import app.crossword.yourealwaysbe.util.ThemeHelper;
@@ -46,7 +47,7 @@ public class ForkyzActivity extends AppCompatActivity {
         this.prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         doOrientation();
-        (new ThemeHelper(this, this.prefs)).themeActivity(this);
+        (new ThemeHelper(settings)).themeActivity(this);
     }
 
     @Override
@@ -69,19 +70,32 @@ public class ForkyzActivity extends AppCompatActivity {
 
     @SuppressWarnings("SourceLockedOrientationActivity")
     private void doOrientation() {
-        try {
-            if ("PORT".equals(prefs.getString("orientationLock", "UNLOCKED"))) {
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            } else if ("LAND"
-                    .equals(prefs.getString("orientationLock", "UNLOCKED"))) {
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-            } else {
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+        settings.getAppOrientationLock(orientation -> {
+            try {
+                switch (orientation) {
+                case PORTRAIT:
+                    setRequestedOrientation(
+                        ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                    );
+                    break;
+                case LANDSCAPE:
+                    setRequestedOrientation(
+                        ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                    );
+                    break;
+                default:
+                    setRequestedOrientation(
+                        ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+                    );
+                }
+            } catch(RuntimeException e) {
+                Toast.makeText(
+                    this,
+                    R.string.no_orientation_lock,
+                    Toast.LENGTH_LONG
+                ).show();
             }
-        } catch(RuntimeException e) {
-            Toast.makeText(this, "Sorry, orientation lock is not supported without " +
-                    "fullscreen mode anymore because of an Android change.", Toast.LENGTH_LONG).show();
-        }
+        });
     }
 
     protected Bitmap createBitmap(String fontFile, String character){

@@ -9,11 +9,14 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 
+import javax.inject.Inject;
+
 import dagger.hilt.android.AndroidEntryPoint;
 
 import app.crossword.yourealwaysbe.forkyz.R;
-import app.crossword.yourealwaysbe.util.ThemeHelper;
+import app.crossword.yourealwaysbe.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.util.NightModeHelper;
+import app.crossword.yourealwaysbe.util.ThemeHelper;
 import app.crossword.yourealwaysbe.versions.AndroidVersionUtils;
 
 @AndroidEntryPoint
@@ -23,6 +26,9 @@ public class PreferencesActivity
 
     public static final String NIGHT_MODE = "nightMode";
 
+    @Inject
+    protected ForkyzSettings settings;
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -31,7 +37,7 @@ public class PreferencesActivity
         SharedPreferences prefs
             = PreferenceManager.getDefaultSharedPreferences(this);
 
-        (new ThemeHelper(this, prefs)).themeActivity(this);
+        (new ThemeHelper(settings)).themeActivity(this);
 
         NightModeHelper nightMode = NightModeHelper.bind(this);
         nightMode.restoreNightMode();

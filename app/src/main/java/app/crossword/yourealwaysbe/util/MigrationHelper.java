@@ -24,7 +24,7 @@ public class MigrationHelper {
         AndroidVersionUtils.Factory.getInstance()
             .migrateLegacyBackgroundDownloads(prefs);
 
-        (new ThemeHelper(context, prefs)).migrateThemePreferences();
+        settings.migrateThemePreferences();
 
         settings.getDownloadersSettings(downloadersSettings -> {
             settings.migrateAutoDownloaders(
