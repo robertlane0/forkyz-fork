@@ -195,18 +195,30 @@ public class ForkyzSettings {
         this.prefs.registerOnSharedPreferenceChangeListener(prefChangeListener);
     }
 
+    /**
+     * Age of a puzzle in the crosswords list to be removed in cleanup
+     */
     public void getBrowseCleanupAge(Consumer<String> cb) {
         getStringPreference(PREF_BROWSE_CLEANUP_AGE, cb);
     }
 
+    /**
+     * Age of a puzzle in the archive list to be removed in cleanup
+     */
     public void getBrowseCleanupAgeArchive(Consumer<String> cb) {
         getStringPreference(PREF_BROWSE_CLEANUP_AGE_ARCHIVE, cb);
     }
 
+    /**
+     * Delete on clean up crosswords list, rather than send to archive
+     */
     public void getBrowseDeleteOnCleanup(Consumer<Boolean> cb) {
         getBooleanPreference(PREF_BROWSE_DELETE_ON_CLEANUP, cb);
     }
 
+    /**
+     * Disable the swipe action in the browse list
+     */
     public void getBrowseDisableSwipe(Consumer<Boolean> cb) {
         getBooleanPreference(PREF_BROWSE_DISABLE_SWIPE, cb);
     }
@@ -215,6 +227,12 @@ public class ForkyzSettings {
         return liveBooleanPreference(PREF_BROWSE_DISABLE_SWIPE);
     }
 
+    /**
+     * The last time a download was triggered when browse started
+     *
+     * Used to trigger automatic downloads on app start if a download
+     * didn't happen recently.
+     */
     public void getBrowseLastDownload(Consumer<Long> cb) {
         getLongPreference(PREF_BROWSE_LAST_DOWNLOAD, cb);
     }
@@ -223,6 +241,11 @@ public class ForkyzSettings {
         setLongPreference(PREF_BROWSE_LAST_DOWNLOAD, value);
     }
 
+    /**
+     * The last version of Forkyz seen on start
+     *
+     * Used to display a welcome on new Forkyz versions
+     */
     public void getBrowseLastSeenVersion(Consumer<String> cb) {
         getStringPreference(PREF_BROWSE_LAST_SEEN_VERSION, cb);
     }
@@ -231,6 +254,9 @@ public class ForkyzSettings {
         setStringPreference(PREF_BROWSE_LAST_SEEN_VERSION, value);
     }
 
+    /**
+     * How to order the puzzles in the browse list
+     */
     public void getBrowseSort(Consumer<Accessor> cb) {
         getIntPreference(PREF_BROWSE_SORT, value -> {
             switch (value) {
@@ -261,6 +287,11 @@ public class ForkyzSettings {
         setIntPreference(PREF_BROWSE_SORT, intValue);
     }
 
+    /**
+     * Whether to delete or archve on swipe
+     *
+     * Value is BROWSE_SWIPE_DELETE or BROWSE_SWIPE_ARCHIVE.
+     */
     public void getBrowseSwipeAction(Consumer<Integer> cb) {
         getStringPreference(PREF_BROWSE_SWIPE_ACTION, value -> {
             cb.accept("DELETE".equals(value)
@@ -270,6 +301,12 @@ public class ForkyzSettings {
         });
     }
 
+    /**
+     * The settings for background downloads
+     *
+     * Things like whether to download every hour, or what day/time to
+     * download. Plus conditions under which download should fire.
+     */
     public void getBackgroundDownloadSettings(
         Consumer<BackgroundDownloadSettings> cb
     ) {
@@ -295,12 +332,20 @@ public class ForkyzSettings {
         });
     }
 
+    /**
+     * Set whether to background download every hour
+     */
     public void setBackgroundDownloadHourly(
         boolean hourly, Runnable cb
     ) {
         setBooleanPreference(PREF_DOWNLOAD_HOURLY, hourly, cb);
     }
 
+    /**
+     * BrowseActivity checks this on resume to know if to refresh list
+     *
+     * I.e. true if a background download happened.
+     */
     public void getBackgroundDownloadPending(Consumer<Boolean> cb) {
         getBooleanPreference(PREF_DOWNLOAD_PENDING, cb);
     }
@@ -310,12 +355,20 @@ public class ForkyzSettings {
     }
 
     /**
+     * If the preference key is a background download key
+     *
      * For preference activity to detect if config changes
      */
     public boolean isBackgroundDownloadConfigPref(String pref) {
         return BACKGROUND_DOWNLOAD_PREFERENCES.contains(pref);
     }
 
+    /**
+     * Gettings the preferences for file handling
+     *
+     * E.g. whether to use internal or custom storage, and where the
+     * custom storage is.
+     */
     public void getFileHandlerSettings(Consumer<FileHandlerSettings> cb) {
         executor.execute(() -> {
             String storageLocationString = prefs.getString(
@@ -369,6 +422,9 @@ public class ForkyzSettings {
         });
     }
 
+    /**
+     * To remember which page of the clue list is selected in PlayActivity
+     */
     public void getPlayClueTabsPage(Consumer<Integer> cb) {
         getIntPreference(PREF_PLAY_CLUE_TABS_PAGE, cb);
     }
@@ -377,26 +433,47 @@ public class ForkyzSettings {
         setIntPreference(PREF_PLAY_CLUE_TABS_PAGE, value);
     }
 
+    /**
+     * Whether to delete characters that may belong to a crossing word
+     */
     public void getPlayDontDeleteCrossing(Consumer<Boolean> cb) {
         getBooleanPreference(PREF_PLAY_DONT_DELETE_CROSSING, cb);
     }
 
+    /**
+     * Whether to change selection direction when enter pressed
+     */
     public void getPlayEnterChangesDirection(Consumer<Boolean> cb) {
         getBooleanPreference(PREF_PLAY_ENTER_CHANGES_DIRECTION, cb);
     }
 
+    /**
+     * Whether to fit puzzle to screen on starting PlayActivity
+     */
     public void getPlayFitToScreen(Consumer<Boolean> cb) {
         getBooleanPreference(PREF_PLAY_FIT_TO_SCREEN, cb);
     }
 
+    /**
+     * Whether to display the app in full screen mode
+     *
+     * I think this doesn't do much on modern phones, but it used to
+     * hide the status bar at the top.
+     */
     public void getPlayFullScreen(Consumer<Boolean> cb) {
         getBooleanPreference(PREF_PLAY_FULL_SCREEN, cb);
     }
 
+    /**
+     * Whether to jump to a random clue when device shaken
+     */
     public void getPlayRandomClueOnShake(Consumer<Boolean> cb) {
         getBooleanPreference(PREF_PLAY_RANDOM_CLUE_ON_SHAKE, cb);
     }
 
+    /**
+     * When errors are show, don't let correct cell entries be changed
+     */
     public void getPlayPreserveCorrectLettersInShowErrors(
         Consumer<Boolean> cb
     ) {
@@ -405,6 +482,9 @@ public class ForkyzSettings {
         );
     }
 
+    /**
+     * Remember the scale/size of the board in the PlayActivity
+     */
     public void getPlayScale(Consumer<Float> cb) {
         getFloatPreference(PREF_PLAY_SCALE, cb);
     }
@@ -413,10 +493,19 @@ public class ForkyzSettings {
         setFloatPreference(PREF_PLAY_SCALE, value);
     }
 
+    /**
+     * Whether to show scratch notes on the play board in grey letters
+     */
     public void getPlayScratchDisplay(Consumer<Boolean> cb) {
         getBooleanPreference(PREF_PLAY_SCRATCH_DISPLAY, cb);
     }
 
+    /**
+     * Whether entered characters should go to scratch notes
+     *
+     * Instead of going to the main response for the cell, enter new
+     * chars as scratch notes for the current clue.
+     */
     public void getPlayScratchMode(Consumer<Boolean> cb) {
         getBooleanPreference(PREF_PLAY_SCRATCH_MODE, cb);
     }
@@ -429,6 +518,9 @@ public class ForkyzSettings {
         setBooleanPreference(PREF_PLAY_SCRATCH_MODE, value);
     }
 
+    /**
+     * Wether to show the clue solution length after the clue hint
+     */
     public void getPlayShowCount(Consumer<Boolean> cb) {
         getBooleanPreference(PREF_PLAY_SHOW_COUNT, cb);
     }
@@ -437,6 +529,9 @@ public class ForkyzSettings {
         setBooleanPreference(PREF_PLAY_SHOW_COUNT, value);
     }
 
+    /**
+     * Whether to highlight errors on completely filled clue entries
+     */
     public void getPlayShowErrorsClue(Consumer<Boolean> cb) {
         getBooleanPreference(PREF_PLAY_SHOW_ERRORS_CLUE, cb);
     }
@@ -449,6 +544,9 @@ public class ForkyzSettings {
         setBooleanPreference(PREF_PLAY_SHOW_ERRORS_CLUE, value);
     }
 
+    /**
+     * Whether to highlight errors in the currently selected cell
+     */
     public void getPlayShowErrorsCursor(Consumer<Boolean> cb) {
         getBooleanPreference(PREF_PLAY_SHOW_ERRORS_CURSOR, cb);
     }
@@ -461,6 +559,9 @@ public class ForkyzSettings {
         setBooleanPreference(PREF_PLAY_SHOW_ERRORS_CURSOR, value);
     }
 
+    /**
+     * Whether to highlight errors anywhere on the grid
+     */
     public void getPlayShowErrorsGrid(Consumer<Boolean> cb) {
         getBooleanPreference(PREF_PLAY_SHOW_ERRORS_GRID, cb);
     }
@@ -473,10 +574,16 @@ public class ForkyzSettings {
         setBooleanPreference(PREF_PLAY_SHOW_ERRORS_GRID, value);
     }
 
+    /**
+     * Whether to skip filled cells when moving to the next
+     */
     public void getPlaySkipFilled(Consumer<Boolean> cb) {
         getBooleanPreference(PREF_PLAY_SKIP_FILLED, cb);
     }
 
+    /**
+     * Whether to show the clue list on the PlayActivity
+     */
     public void getPlayShowCluesTab(Consumer<Boolean> cb) {
         getBooleanPreference(PREF_PLAY_SHOW_CLUES_TAB, cb);
     }
@@ -485,10 +592,18 @@ public class ForkyzSettings {
         setBooleanPreference(PREF_PLAY_SHOW_CLUES_TAB, value);
     }
 
+    /**
+     * Whether pressing space changes the selection direction
+     */
     public void getPlaySpaceChangesDirection(Consumer<Boolean> cb) {
         getBooleanPreference(PREF_PLAY_SPACE_CHANGE_DIRECTION, cb);
     }
 
+    /**
+     * Whether to show the board for each clue in the clue list
+     *
+     * Or just the currently selected clue.
+     */
     public void getClueListShowWords(Consumer<Boolean> cb) {
         getBooleanPreference(PREF_CLUE_LIST_SHOW_WORDS, cb);
     }
@@ -501,6 +616,12 @@ public class ForkyzSettings {
         setBooleanPreference(PREF_CLUE_LIST_SHOW_WORDS, value);
     }
 
+    /**
+     * The settings for downloaders
+     *
+     * I.e. which ones to use, which ones are automatic, how long before
+     * timeout, notifications.
+     */
     public void getDownloadersSettings(Consumer<DownloadersSettings> cb) {
         executor.execute(() -> {
             DownloadersSettings settings = new DownloadersSettings(
@@ -568,6 +689,9 @@ public class ForkyzSettings {
         });
     }
 
+    /**
+     * Suppress app notifications by settings relevant settings to false
+     */
     public void disableNotifications() {
         executor.execute(() -> {
             prefs.edit()
