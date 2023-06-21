@@ -434,7 +434,11 @@ public class NotesActivity extends PuzzleActivity {
             binding.miniboard.setVisibility(View.GONE);
             binding.flagClue.setVisibility(View.GONE);
         } else {
-            binding.miniboard.setBoard(board, getSuppressNotesList());
+            settings.getPlayScratchDisplay(displayScratch -> {
+                binding.miniboard.setBoard(
+                    board, getSuppressNotesList(displayScratch)
+                );
+            });
 
             clueLine.setText(smartHtml(getLongClueText(clue)));
             note = puz.getNote(clue);
@@ -549,8 +553,7 @@ public class NotesActivity extends PuzzleActivity {
         return true;
     }
 
-    private Set<String> getSuppressNotesList() {
-        boolean displayScratch = prefs.getBoolean("displayScratch", false);
+    private Set<String> getSuppressNotesList(boolean displayScratch) {
         if (!displayScratch)
             return null;
 

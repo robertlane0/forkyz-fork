@@ -98,6 +98,7 @@ public class ForkyzSettings {
     private static final String PREF_PLAY_RANDOM_CLUE_ON_SHAKE
         = "randomClueOnShake";
     private static final String PREF_PLAY_SCALE = "scale";
+    private static final String PREF_PLAY_SCRATCH_DISPLAY = "displayScratch";
     private static final String PREF_PLAY_SCRATCH_MODE = "scratchMode";
     private static final String PREF_PLAY_SHOW_COUNT = "showCount";
     private static final String PREF_PLAY_SHOW_CLUES_TAB = "showCluesOnPlayScreen";
@@ -151,6 +152,7 @@ public class ForkyzSettings {
         BOOL_DEFAULTS.put(PREF_PLAY_RANDOM_CLUE_ON_SHAKE, false);
         FLOAT_DEFAULTS.put(PREF_PLAY_SCALE, 1.0F);
         BOOL_DEFAULTS.put(PREF_PLAY_SCRATCH_MODE, false);
+        BOOL_DEFAULTS.put(PREF_PLAY_SCRATCH_DISPLAY, false);
         BOOL_DEFAULTS.put(PREF_PLAY_SHOW_COUNT, false);
         BOOL_DEFAULTS.put(PREF_PLAY_SHOW_CLUES_TAB, true);
         BOOL_DEFAULTS.put(PREF_PLAY_SHOW_ERRORS_CLUE, false);
@@ -409,6 +411,10 @@ public class ForkyzSettings {
 
     public void setPlayScale(float value) {
         setFloatPreference(PREF_PLAY_SCALE, value);
+    }
+
+    public void getPlayScratchDisplay(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_PLAY_SCRATCH_DISPLAY, cb);
     }
 
     public void getPlayScratchMode(Consumer<Boolean> cb) {
