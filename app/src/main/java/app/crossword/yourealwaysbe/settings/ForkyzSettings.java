@@ -364,6 +364,23 @@ public class ForkyzSettings {
     }
 
     /**
+     * Whether to show the board for each clue in the clue list
+     *
+     * Or just the currently selected clue.
+     */
+    public void getClueListShowWords(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_CLUE_LIST_SHOW_WORDS, cb);
+    }
+
+    public LiveData<Boolean> liveClueListShowWords() {
+        return liveBooleanPreference(PREF_CLUE_LIST_SHOW_WORDS);
+    }
+
+    public void setClueListShowWords(boolean value) {
+        setBooleanPreference(PREF_CLUE_LIST_SHOW_WORDS, value);
+    }
+
+    /**
      * Gettings the preferences for file handling
      *
      * E.g. whether to use internal or custom storage, and where the
@@ -597,23 +614,6 @@ public class ForkyzSettings {
      */
     public void getPlaySpaceChangesDirection(Consumer<Boolean> cb) {
         getBooleanPreference(PREF_PLAY_SPACE_CHANGE_DIRECTION, cb);
-    }
-
-    /**
-     * Whether to show the board for each clue in the clue list
-     *
-     * Or just the currently selected clue.
-     */
-    public void getClueListShowWords(Consumer<Boolean> cb) {
-        getBooleanPreference(PREF_CLUE_LIST_SHOW_WORDS, cb);
-    }
-
-    public LiveData<Boolean> liveClueListShowWords() {
-        return liveBooleanPreference(PREF_CLUE_LIST_SHOW_WORDS);
-    }
-
-    public void setClueListShowWords(boolean value) {
-        setBooleanPreference(PREF_CLUE_LIST_SHOW_WORDS, value);
     }
 
     /**
