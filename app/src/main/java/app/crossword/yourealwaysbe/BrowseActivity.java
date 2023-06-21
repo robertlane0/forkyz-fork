@@ -52,7 +52,6 @@ import app.crossword.yourealwaysbe.forkyz.databinding.BrowseBinding;
 import app.crossword.yourealwaysbe.forkyz.databinding.PuzzleListItemBinding;
 import app.crossword.yourealwaysbe.net.Downloader;
 import app.crossword.yourealwaysbe.net.Downloaders;
-import app.crossword.yourealwaysbe.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.settings.StorageLocation;
 import app.crossword.yourealwaysbe.util.BackgroundDownloadManager;
 import app.crossword.yourealwaysbe.util.MigrationHelper;
@@ -438,9 +437,11 @@ public class BrowseActivity extends ForkyzActivity {
 
                     fileHanderProvider.get(fileHandler -> {
                     settings.getBrowseSwipeAction(action -> {
-                        if (action == ForkyzSettings.BROWSE_SWIPE_DELETE) {
+                        switch (action) {
+                        case DELETE:
                             model.deletePuzzle(puzMeta);
-                        } else {
+                            break;
+                        default:
                             if (model.getIsViewArchive()) {
                                 model.movePuzzle(
                                     puzMeta,
@@ -452,6 +453,7 @@ public class BrowseActivity extends ForkyzActivity {
                                     fileHandler.getArchiveDirectory()
                                 );
                             }
+                            break;
                         }
                     });});
                 }

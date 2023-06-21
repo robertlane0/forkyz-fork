@@ -41,9 +41,6 @@ import app.crossword.yourealwaysbe.util.files.Accessor;
 public class ForkyzSettings {
     private static ForkyzSettings instance = null;
 
-    public static final int BROWSE_SWIPE_DELETE = 0;
-    public static final int BROWSE_SWIPE_ARCHIVE = 1;
-
     private static final String PREF_APP_ORIENTATION_LOCK = "orientationLock";
 
     // public for settings page
@@ -143,7 +140,6 @@ public class ForkyzSettings {
         LONG_DEFAULTS.put(PREF_BROWSE_LAST_DOWNLOAD, 0L);
         STRING_DEFAULTS.put(PREF_BROWSE_LAST_SEEN_VERSION, "");
         INT_DEFAULTS.put(PREF_BROWSE_SORT, 0);
-        STRING_DEFAULTS.put(PREF_BROWSE_SWIPE_ACTION, "DELETE");
         BOOL_DEFAULTS.put(PREF_CLUE_LIST_SHOW_WORDS, false);
         BOOL_DEFAULTS.put(PREF_DOWNLOAD_PENDING, false);
         INT_DEFAULTS.put(PREF_PLAY_CLUE_TABS_PAGE, 0);
@@ -301,15 +297,11 @@ public class ForkyzSettings {
 
     /**
      * Whether to delete or archve on swipe
-     *
-     * Value is BROWSE_SWIPE_DELETE or BROWSE_SWIPE_ARCHIVE.
      */
-    public void getBrowseSwipeAction(Consumer<Integer> cb) {
-        getStringPreference(PREF_BROWSE_SWIPE_ACTION, value -> {
-            cb.accept("DELETE".equals(value)
-                ? BROWSE_SWIPE_DELETE
-                : BROWSE_SWIPE_ARCHIVE
-            );
+    public void getBrowseSwipeAction(Consumer<BrowseSwipeAction> cb) {
+        executor.execute(() -> {
+            String value = prefs.getString(PREF_BROWSE_SWIPE_ACTION, "DELETE");
+            cb.accept(BrowseSwipeAction.getFromSettingsValue(value));
         });
     }
 
