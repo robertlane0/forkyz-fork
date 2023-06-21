@@ -3,7 +3,6 @@ package app.crossword.yourealwaysbe;
 import java.util.Objects;
 import java.util.logging.Logger;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -33,8 +32,6 @@ public class ClueListActivity extends PuzzleActivity
     private static final Logger LOG = Logger.getLogger(
         ClueListActivity.class.getCanonicalName()
     );
-
-    private static final String PREF_SHOW_WORDS = "showWordsInClueList";
 
     private ClueListBinding binding;
     private KeyboardManager keyboardManager;
@@ -122,6 +119,14 @@ public class ClueListActivity extends PuzzleActivity
         setupVoiceCommands();
 
         addAccessibilityActions(binding.miniboard);
+
+        settings.liveClueListShowWords().observe(
+            this,
+            showWords -> {
+                setupShowWordsMode(showWords);
+                invalidateOptionsMenu();
+            }
+        );
     }
 
     @Override
@@ -141,8 +146,6 @@ public class ClueListActivity extends PuzzleActivity
         }
 
         binding.miniboard.setBoard(board);
-
-        setupShowWordsMode();
 
         binding.clueTabs.setBoard(board);
         binding.clueTabs.addListener(this);
@@ -164,8 +167,10 @@ public class ClueListActivity extends PuzzleActivity
         boolean result = super.onPrepareOptionsMenu(menu);
 
         if (result) {
-            menu.findItem(R.id.clue_list_menu_show_words)
-                .setChecked(isShowWordsInClueList());
+            settings.getClueListShowWords(showWords -> {
+                menu.findItem(R.id.clue_list_menu_show_words)
+                    .setChecked(showWords);
+            });
         }
 
         return result;
@@ -363,23 +368,14 @@ public class ClueListActivity extends PuzzleActivity
         }
     }
 
-    private boolean isShowWordsInClueList() {
-        return prefs.getBoolean(PREF_SHOW_WORDS, false);
-    }
-
     private void toggleShowWords() {
-        boolean showWords = !isShowWordsInClueList();
-
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putBoolean(PREF_SHOW_WORDS, showWords);
-        editor.apply();
-
-        setupShowWordsMode();
-        invalidateOptionsMenu();
+        settings.getClueListShowWords(showWords -> {
+            settings.setClueListShowWords(!showWords);
+        });
     }
 
-    private void setupShowWordsMode() {
-        if (isShowWordsInClueList()) {
+    private void setupShowWordsMode(boolean showWords) {
+        if (showWords) {
             binding.miniboard.setIncognitoMode(true);
             binding.clueTabs.setShowWords(true);
         } else {
@@ -533,22 +529,24 @@ public class ClueListActivity extends PuzzleActivity
         if (board == null)
             return;
 
-        if(prefs.getBoolean("spaceChangesDirection", true))
-            return;
+        settings.getPlaySpaceChangesDirection(spaceChangesDirection -> {
+            if (spaceChangesDirection)
+                return;
 
-        Word w = board.getCurrentWord();
-        Position last = getCurrentLastPosition();
+            Word w = board.getCurrentWord();
+            Position last = getCurrentLastPosition();
 
-        board.playLetter(' ');
+            board.playLetter(' ');
 
-        Position curr = board.getHighlightLetter();
-        int row = curr.getRow();
-        int col = curr.getCol();
+            Position curr = board.getHighlightLetter();
+            int row = curr.getRow();
+            int col = curr.getCol();
 
-        if (!board.getCurrentWord().equals(w)
-                || Box.isBlock(board.getBoxes()[row][col])) {
-            board.setHighlightLetter(last);
-        }
+            if (!board.getCurrentWord().equals(w)
+                    || Box.isBlock(board.getBoxes()[row][col])) {
+                board.setHighlightLetter(last);
+            }
+        });
     }
 
     private void onBackKey() {

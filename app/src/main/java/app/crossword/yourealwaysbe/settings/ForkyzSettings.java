@@ -58,6 +58,9 @@ public class ForkyzSettings {
     private static final String PREF_BROWSE_SORT = "sort";
     private static final String PREF_BROWSE_SWIPE_ACTION = "swipeAction";
 
+    private static final String PREF_CLUE_LIST_SHOW_WORDS
+        = "showWordsInClueList";
+
     private static final String PREF_DOWNLOAD_UNMETERED
         = "backgroundDownloadRequireUnmetered";
     private static final String PREF_DOWNLOAD_ROAMING
@@ -135,6 +138,7 @@ public class ForkyzSettings {
         STRING_DEFAULTS.put(PREF_BROWSE_LAST_SEEN_VERSION, "");
         INT_DEFAULTS.put(PREF_BROWSE_SORT, 0);
         STRING_DEFAULTS.put(PREF_BROWSE_SWIPE_ACTION, "DELETE");
+        BOOL_DEFAULTS.put(PREF_CLUE_LIST_SHOW_WORDS, false);
         BOOL_DEFAULTS.put(PREF_DOWNLOAD_PENDING, false);
         INT_DEFAULTS.put(PREF_PLAY_CLUE_TABS_PAGE, 0);
         BOOL_DEFAULTS.put(PREF_PLAY_DONT_DELETE_CROSSING, false);
@@ -206,7 +210,7 @@ public class ForkyzSettings {
     }
 
     public LiveData<Boolean> liveBrowseDisableSwipe() {
-        return getLiveBoolean(PREF_BROWSE_DISABLE_SWIPE);
+        return liveBooleanPreference(PREF_BROWSE_DISABLE_SWIPE);
     }
 
     public void getBrowseLastDownload(Consumer<Long> cb) {
@@ -412,7 +416,7 @@ public class ForkyzSettings {
     }
 
     public LiveData<Boolean> livePlayScratchMode() {
-        return getLiveBoolean(PREF_PLAY_SCRATCH_MODE);
+        return liveBooleanPreference(PREF_PLAY_SCRATCH_MODE);
     }
 
     public void setPlayScratchMode(boolean value) {
@@ -432,7 +436,7 @@ public class ForkyzSettings {
     }
 
     public LiveData<Boolean> livePlayShowErrorsClue() {
-        return getLiveBoolean(PREF_PLAY_SHOW_ERRORS_CLUE);
+        return liveBooleanPreference(PREF_PLAY_SHOW_ERRORS_CLUE);
     }
 
     public void setPlayShowErrorsClue(boolean value) {
@@ -444,7 +448,7 @@ public class ForkyzSettings {
     }
 
     public LiveData<Boolean> livePlayShowErrorsCursor() {
-        return getLiveBoolean(PREF_PLAY_SHOW_ERRORS_CURSOR);
+        return liveBooleanPreference(PREF_PLAY_SHOW_ERRORS_CURSOR);
     }
 
     public void setPlayShowErrorsCursor(boolean value) {
@@ -456,7 +460,7 @@ public class ForkyzSettings {
     }
 
     public LiveData<Boolean> livePlayShowErrorsGrid() {
-        return getLiveBoolean(PREF_PLAY_SHOW_ERRORS_GRID);
+        return liveBooleanPreference(PREF_PLAY_SHOW_ERRORS_GRID);
     }
 
     public void setPlayShowErrorsGrid(boolean value) {
@@ -477,6 +481,18 @@ public class ForkyzSettings {
 
     public void getPlaySpaceChangesDirection(Consumer<Boolean> cb) {
         getBooleanPreference(PREF_PLAY_SPACE_CHANGE_DIRECTION, cb);
+    }
+
+    public void getClueListShowWords(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_CLUE_LIST_SHOW_WORDS, cb);
+    }
+
+    public LiveData<Boolean> liveClueListShowWords() {
+        return liveBooleanPreference(PREF_CLUE_LIST_SHOW_WORDS);
+    }
+
+    public void setClueListShowWords(boolean value) {
+        setBooleanPreference(PREF_CLUE_LIST_SHOW_WORDS, value);
     }
 
     public void getDownloadersSettings(Consumer<DownloadersSettings> cb) {
@@ -670,7 +686,7 @@ public class ForkyzSettings {
             getBrowseSort(value -> { liveBrowseSort.setValue(value); });
     }
 
-    private LiveData<Boolean> getLiveBoolean(String name) {
+    private LiveData<Boolean> liveBooleanPreference(String name) {
         MutableLiveData<Boolean> liveData = liveBooleans.get(name);
         if (liveData == null) {
             liveData = new MutableLiveData<Boolean>();
