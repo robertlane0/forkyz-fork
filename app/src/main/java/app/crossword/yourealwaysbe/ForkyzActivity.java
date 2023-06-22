@@ -1,6 +1,5 @@
 package app.crossword.yourealwaysbe;
 
-import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -14,7 +13,6 @@ import android.util.DisplayMetrics;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.text.HtmlCompat;
-import androidx.preference.PreferenceManager;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -37,14 +35,11 @@ public class ForkyzActivity extends AppCompatActivity {
 
     protected AndroidVersionUtils utils = AndroidVersionUtils.Factory
             .getInstance();
-    protected SharedPreferences prefs;
     public NightModeHelper nightMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        this.prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         doOrientation();
         (new ThemeHelper(settings)).themeActivity(this);

@@ -875,7 +875,9 @@ public class PlayActivity extends PuzzleActivity
             return;
 
         Clue c = board.getClue();
-        clue.setText(smartHtml(getLongClueText(c)));
+        getLongClueText(c, text -> {
+            clue.setText(smartHtml(text));
+        });
     }
 
     private void launchClueList() {

@@ -60,6 +60,8 @@ public class ForkyzSettings {
     private static final String PREF_CLUE_LIST_SHOW_WORDS
         = "showWordsInClueList";
 
+    private static final String PREF_DOWNLOAD_LEGACY_BACKGROUND
+        = "backgroundDownload";
     private static final String PREF_DOWNLOAD_UNMETERED
         = "backgroundDownloadRequireUnmetered";
     private static final String PREF_DOWNLOAD_ROAMING
@@ -104,8 +106,23 @@ public class ForkyzSettings {
     private static final String PREF_PLAY_SHOW_ERRORS_CLUE = "showErrorsClue";
     private static final String PREF_PLAY_SHOW_ERRORS_CURSOR = "showErrorsCursor";
     private static final String PREF_PLAY_SHOW_ERRORS_GRID = "showErrors";
+    private static final String PREF_PLAY_SHOW_TIMER = "showTimer";
     private static final String PREF_PLAY_SKIP_FILLED = "skipFilled";
-    private static final String PREF_PLAY_SPACE_CHANGE_DIRECTION = "spaceChangesDirection";
+    private static final String PREF_PLAY_SPACE_CHANGE_DIRECTION
+        = "spaceChangesDirection";
+
+    private static final String PREF_VOICE_ALWAYS_ANNOUNCE_BOX
+        = "alwaysAnnounceBox";
+    private static final String PREF_VOICE_ALWAYS_ANNOUNCE_CLUE
+        = "alwaysAnnounceClue";
+    private static final String PREF_VOICE_BUTTON_ACTIVATES_VOICE
+        = "buttonActivatesVoice";
+    private static final String PREF_VOICE_BUTTON_ANNOUNCE_CLUE
+        = "buttonAnnounceClue";
+    private static final String PREF_VOICE_EQUALS_ANNOUNCE_CLUE
+        = "equalsAnnounceClue";
+    private static final String PREF_VOICE_VOLUME_ACTIVATES_VOICE
+        = "volumeActivatesVoice";
 
     private static final String PREF_SUPPRESS_SUMMARY_NOTIFICATIONS
         = "supressSummaryMessages";
@@ -159,8 +176,15 @@ public class ForkyzSettings {
         BOOL_DEFAULTS.put(PREF_PLAY_SHOW_ERRORS_CLUE, false);
         BOOL_DEFAULTS.put(PREF_PLAY_SHOW_ERRORS_CURSOR, false);
         BOOL_DEFAULTS.put(PREF_PLAY_SHOW_ERRORS_GRID, false);
+        BOOL_DEFAULTS.put(PREF_PLAY_SHOW_TIMER, false);
         BOOL_DEFAULTS.put(PREF_PLAY_SKIP_FILLED, false);
         BOOL_DEFAULTS.put(PREF_PLAY_SPACE_CHANGE_DIRECTION, true);
+        BOOL_DEFAULTS.put(PREF_VOICE_ALWAYS_ANNOUNCE_BOX, false);
+        BOOL_DEFAULTS.put(PREF_VOICE_ALWAYS_ANNOUNCE_CLUE, false);
+        BOOL_DEFAULTS.put(PREF_VOICE_BUTTON_ACTIVATES_VOICE, false);
+        BOOL_DEFAULTS.put(PREF_VOICE_BUTTON_ANNOUNCE_CLUE, false);
+        BOOL_DEFAULTS.put(PREF_VOICE_EQUALS_ANNOUNCE_CLUE, true);
+        BOOL_DEFAULTS.put(PREF_VOICE_VOLUME_ACTIVATES_VOICE, false);
     }
 
     private SharedPreferences prefs;
@@ -462,6 +486,13 @@ public class ForkyzSettings {
     }
 
     /**
+     * Whether to delete characters that may belong to a crossing word
+     */
+    public LiveData<Boolean> livePlayDontDeleteCrossing() {
+        return liveBooleanPreference(PREF_PLAY_DONT_DELETE_CROSSING);
+    }
+
+    /**
      * Whether to change selection direction when enter pressed
      */
     public void getPlayEnterChangesDirection(Consumer<Boolean> cb) {
@@ -500,6 +531,12 @@ public class ForkyzSettings {
     ) {
         getBooleanPreference(
             PREF_PLAY_PRESERVE_CORRECT_LETTERS_IN_SHOW_ERRORS, cb
+        );
+    }
+
+    public LiveData<Boolean> livePlayPreserveCorrectLettersInShowErrors() {
+        return liveBooleanPreference(
+            PREF_PLAY_PRESERVE_CORRECT_LETTERS_IN_SHOW_ERRORS
         );
     }
 
@@ -595,6 +632,14 @@ public class ForkyzSettings {
         setBooleanPreference(PREF_PLAY_SHOW_ERRORS_GRID, value);
     }
 
+    public void getPlayShowTimer(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_PLAY_SHOW_TIMER, cb);
+    }
+
+    public LiveData<Boolean> livePlayShowTimer() {
+        return liveBooleanPreference(PREF_PLAY_SHOW_TIMER);
+    }
+
     /**
      * Whether to skip filled cells when moving to the next
      */
@@ -642,6 +687,48 @@ public class ForkyzSettings {
             PREF_THEME, Theme.STANDARD.getSettingsValue()
         );
         return Theme.getFromSettingsValue(theme);
+    }
+
+    /**
+     * Whether to always announce the current box
+     */
+    public void getVoiceAlwaysAnnounceBox(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_VOICE_ALWAYS_ANNOUNCE_BOX, cb);
+    }
+
+    /**
+     * Whether to always announce the current clue
+     */
+    public void getVoiceAlwaysAnnounceClue(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_VOICE_ALWAYS_ANNOUNCE_CLUE, cb);
+    }
+
+    /**
+     * Whether to show a button for activating voice commands
+     */
+    public void getVoiceButtonActivatesVoice(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_VOICE_BUTTON_ACTIVATES_VOICE, cb);
+    }
+
+    /**
+     * Whether pressing volume down activates voice input
+     */
+    public LiveData<Boolean> liveVoiceVolumeActivatesVoice() {
+        return liveBooleanPreference(PREF_VOICE_VOLUME_ACTIVATES_VOICE);
+    }
+
+    /**
+     * Whether pressing = (?) announces the clue with voice
+     */
+    public LiveData<Boolean> liveVoiceEqualsAnnounceClue() {
+        return liveBooleanPreference(PREF_VOICE_EQUALS_ANNOUNCE_CLUE);
+    }
+
+    /**
+     * Whether to show a button for reading out clue
+     */
+    public void getVoiceButtonAnnounceClue(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_VOICE_BUTTON_ANNOUNCE_CLUE, cb);
     }
 
     /**
@@ -714,6 +801,28 @@ public class ForkyzSettings {
                     .putStringSet(PREF_AUTO_DOWNLOADERS, autoDownloaders)
                     .apply();
             }
+        });
+    }
+
+    /**
+     * Migrate from old way of enabling hourly downloads to new
+     *
+     * Calls back with legacy download value -- true if legacy downloads
+     * were being used.
+     */
+    public void migrateLegacyBackgroundDownloads(Consumer<Boolean> cb) {
+        executor.execute(() -> {
+            boolean legacyEnabled
+                = prefs.getBoolean(PREF_DOWNLOAD_LEGACY_BACKGROUND, false);
+
+            if (legacyEnabled) {
+                // clear old
+                prefs.edit()
+                    .remove(PREF_DOWNLOAD_LEGACY_BACKGROUND)
+                    .apply();
+            }
+
+            cb.accept(legacyEnabled);
         });
     }
 

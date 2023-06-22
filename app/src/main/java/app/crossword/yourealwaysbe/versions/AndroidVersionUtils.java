@@ -8,7 +8,6 @@ import java.util.function.Consumer;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
@@ -26,6 +25,8 @@ import android.view.inputmethod.InputMethodManager;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+
+import app.crossword.yourealwaysbe.settings.ForkyzSettings;
 
 public interface AndroidVersionUtils {
 
@@ -91,7 +92,7 @@ public interface AndroidVersionUtils {
         );
     }
 
-    void migrateLegacyBackgroundDownloads(SharedPreferences prefs);
+    void migrateLegacyBackgroundDownloads(ForkyzSettings settings);
 
     boolean isMiniTabletish(DisplayMetrics metrics);
 

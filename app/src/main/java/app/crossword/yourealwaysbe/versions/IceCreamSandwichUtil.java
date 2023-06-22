@@ -9,7 +9,6 @@ import java.util.function.Consumer;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
@@ -37,6 +36,8 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+
+import app.crossword.yourealwaysbe.settings.ForkyzSettings;
 
 public class IceCreamSandwichUtil implements AndroidVersionUtils {
     @Override
@@ -144,7 +145,7 @@ public class IceCreamSandwichUtil implements AndroidVersionUtils {
     }
 
     @Override
-    public void migrateLegacyBackgroundDownloads(SharedPreferences prefs) {
+    public void migrateLegacyBackgroundDownloads(ForkyzSettings settings) {
         // do nothing: legacy background download needed lollipop
     }
 

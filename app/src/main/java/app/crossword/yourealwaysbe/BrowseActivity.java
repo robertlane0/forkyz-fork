@@ -380,7 +380,7 @@ public class BrowseActivity extends ForkyzActivity {
         );
 
         // Bring up to date
-        migrationHelper.applyMigrations(this, prefs);
+        migrationHelper.applyMigrations(this);
 
         // Now create!
 

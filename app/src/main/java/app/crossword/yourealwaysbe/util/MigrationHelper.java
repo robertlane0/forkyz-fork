@@ -4,7 +4,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 
 import app.crossword.yourealwaysbe.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.net.Downloaders;
@@ -20,9 +19,9 @@ public class MigrationHelper {
         this.settings = settings;
     }
 
-    public void applyMigrations(Context context, SharedPreferences prefs) {
+    public void applyMigrations(Context context) {
         AndroidVersionUtils.Factory.getInstance()
-            .migrateLegacyBackgroundDownloads(prefs);
+            .migrateLegacyBackgroundDownloads(settings);
 
         settings.migrateThemePreferences();
 

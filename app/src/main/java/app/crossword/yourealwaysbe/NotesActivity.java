@@ -440,7 +440,9 @@ public class NotesActivity extends PuzzleActivity {
                 );
             });
 
-            clueLine.setText(smartHtml(getLongClueText(clue)));
+            getLongClueText(clue, text -> {
+                clueLine.setText(smartHtml(text));
+            });
             note = puz.getNote(clue);
             binding.flagClue.setChecked(puz.isFlagged(clue));
             int clueVisibility = isClueOnBoard() ? View.VISIBLE : View.GONE;

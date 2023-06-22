@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -24,6 +23,7 @@ import androidx.core.app.ShareCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.accessibility.AccessibilityViewCommand;
 import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.LiveData;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.jg.wordstonumbers.WordsToNumbersUtil;
@@ -50,6 +50,7 @@ import app.crossword.yourealwaysbe.view.SpecialEntryDialog;
 
 import java.util.Locale;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
@@ -58,23 +59,6 @@ public abstract class PuzzleActivity
         implements Playboard.PlayboardListener {
 
     private static final Logger LOG = Logger.getLogger("app.crossword.yourealwaysbe");
-
-    public static final String SHOW_TIMER = "showTimer";
-    public static final String PRESERVE_CORRECT
-        = "preserveCorrectLettersInShowErrors";
-    public static final String DONT_DELETE_CROSSING = "dontDeleteCrossing";
-    private static final String PREF_VOLUME_ACTIVATES_VOICE
-        = "volumeActivatesVoice";
-    private static final String PREF_BUTTON_ACTIVATES_VOICE
-        = "buttonActivatesVoice";
-    private static final String PREF_BUTTON_ANNOUNCE_CLUE
-        = "buttonAnnounceClue";
-    private static final String PREF_EQUALS_ANNOUNCE_CLUE
-        = "equalsAnnounceClue";
-    private static final String PREF_ALWAYS_ANNOUNCE_CLUE
-        = "alwaysAnnounceClue";
-    private static final String PREF_ALWAYS_ANNOUNCE_BOX
-        = "alwaysAnnounceBox";
 
     private static final String HELP_RESPONSE_TEXT = "helpResponse";
 
@@ -85,6 +69,9 @@ public abstract class PuzzleActivity
     private PlayboardTextRenderer textRenderer;
     private TextToSpeech ttsService = null;
     private boolean ttsReady = false;
+
+    private LiveData<Boolean> volumeActivatesVoice;
+    private LiveData<Boolean> equalsAnnounceClue;
 
     private Runnable updateTimeTask = new Runnable() {
         public void run() {
@@ -101,7 +88,39 @@ public abstract class PuzzleActivity
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
+
+        // get these early to maximise chances of it being ready by the first
+        // volume down press
+        volumeActivatesVoice = settings.liveVoiceVolumeActivatesVoice();
+        equalsAnnounceClue = settings.liveVoiceEqualsAnnounceClue();
+
         startTimer();
+
+        settings.livePlayShowTimer().observe(
+            this,
+            showTimer -> {
+                if (showTimer)
+                    handler.post(updateTimeTask);
+            }
+        );
+
+        settings.livePlayPreserveCorrectLettersInShowErrors().observe(
+            this,
+            preserveCorrect -> {
+                Playboard board = getBoard();
+                if (board != null)
+                    board.setPreserveCorrectLettersInShowErrors(preserveCorrect);
+            }
+        );
+
+        settings.livePlayDontDeleteCrossing().observe(
+            this,
+            dontDelete -> {
+                Playboard board = getBoard();
+                if (board != null)
+                    board.setDontDeleteCrossing(dontDelete);
+            }
+        );
     }
 
     @Override
@@ -133,32 +152,11 @@ public abstract class PuzzleActivity
             ImaginaryTimer timer = new ImaginaryTimer(puz.getTime());
             setTimer(timer);
             timer.start();
-
-            if (prefs.getBoolean(SHOW_TIMER, false)) {
-                handler.post(updateTimeTask);
-            }
         }
     }
 
     public ImaginaryTimer getTimer() {
         return timer;
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-
-        if (prefs.getBoolean(SHOW_TIMER, false)) {
-            handler.post(updateTimeTask);
-        }
-
-        Playboard board = getBoard();
-        if (board != null) {
-            boolean preserveCorrect = prefs.getBoolean(PRESERVE_CORRECT, true);
-            board.setPreserveCorrectLettersInShowErrors(preserveCorrect);
-            boolean noDelCrossing = prefs.getBoolean(DONT_DELETE_CROSSING, false);
-            board.setDontDeleteCrossing(noDelCrossing);
-        }
     }
 
     @Override
@@ -243,10 +241,6 @@ public abstract class PuzzleActivity
             timer.start();
         }
 
-        if (prefs.getBoolean(SHOW_TIMER, false)) {
-            handler.post(updateTimeTask);
-        }
-
         Playboard board = getBoard();
         if (board != null)
             board.addListener(this);
@@ -302,9 +296,10 @@ public abstract class PuzzleActivity
      * But still call super. Only called if the showTimer pref is true
      */
     protected void onTimerUpdate() {
-        if (prefs.getBoolean(SHOW_TIMER, false)) {
-            handler.postDelayed(updateTimeTask, 1000);
-        }
+        settings.getPlayShowTimer(showTimer -> {
+            if (showTimer)
+                handler.postDelayed(updateTimeTask, 1000);
+        });
     }
 
     protected Playboard getBoard(){
@@ -332,9 +327,12 @@ public abstract class PuzzleActivity
         ForkyzApplication.getInstance().saveBoard();
     }
 
-    protected String getLongClueText(Clue clue) {
-        boolean showCount = prefs.getBoolean("showCount", false);
-        return PlayboardTextRenderer.getLongClueText(this, clue, showCount);
+    protected void getLongClueText(Clue clue, Consumer<String> cb) {
+        settings.getPlayShowCount(showCount -> {
+            cb.accept(
+                PlayboardTextRenderer.getLongClueText(this, clue, showCount)
+            );
+        });
     }
 
     protected void launchClueNotes(ClueID cid) {
@@ -407,43 +405,43 @@ public abstract class PuzzleActivity
         String author = (puz == null) ? null : puz.getAuthor();
         Box[] response = board.getCurrentWordBoxes();
 
-        String shareMessage = getShareMessage(
-            puz, clue, response, withResponse
-        );
+        getShareMessage(puz, clue, response, withResponse, shareMessage -> {
+            // ShareCompat from
+            // https://stackoverflow.com/a/39619468/6882587
+            // assume works better than the out-of-date android docs!
+            Intent shareIntent = new ShareCompat.IntentBuilder(this)
+                .setText(shareMessage)
+                .setType("text/plain")
+                .setChooserTitle(getString(R.string.share_clue_title))
+                .createChooserIntent();
 
-        // ShareCompat from
-        // https://stackoverflow.com/a/39619468/6882587
-        // assume works better than the out-of-date android docs!
-        Intent shareIntent = new ShareCompat.IntentBuilder(this)
-            .setText(shareMessage)
-            .setType("text/plain")
-            .setChooserTitle(getString(R.string.share_clue_title))
-            .createChooserIntent();
-
-        startActivity(shareIntent);
+            startActivity(shareIntent);
+        });
     }
 
-    private String getShareMessage(
-        Puzzle puz, Clue clue, Box[] response, boolean withResponse
+    private void getShareMessage(
+        Puzzle puz, Clue clue, Box[] response, boolean withResponse,
+        Consumer<String> cb
     ) {
-        String clueText = getShareClueText(clue);
-        String responseText = withResponse
-            ? getShareResponseText(response)
-            : null;
+        getShareClueText(clue, clueText -> {
+            String responseText = withResponse
+                ? getShareResponseText(response)
+                : null;
 
-        String puzzleDetails = getSharePuzzleDetails(puz);
+            String puzzleDetails = getSharePuzzleDetails(puz);
 
-        if (withResponse) {
-            return getString(
-                R.string.share_clue_response_text,
-                clueText, responseText, puzzleDetails
-            );
-        } else {
-            return getString(
-                R.string.share_clue_text,
-                clueText, puzzleDetails
-            );
-        }
+            if (withResponse) {
+                cb.accept(getString(
+                    R.string.share_clue_response_text,
+                    clueText, responseText, puzzleDetails
+                ));
+            } else {
+                cb.accept(getString(
+                    R.string.share_clue_text,
+                    clueText, puzzleDetails
+                ));
+            }
+        });
     }
 
     private String getShareResponseText(Box[] boxes) {
@@ -462,23 +460,23 @@ public abstract class PuzzleActivity
         return responseText.toString();
     }
 
-    protected String getShareClueText(Clue clue) {
-        boolean showCount = prefs.getBoolean("showCount", false);
+    protected void getShareClueText(Clue clue, Consumer<String> cb) {
+        settings.getPlayShowCount(showCount -> {
+            if (clue == null)
+                cb.accept(getString(R.string.unknown_hint));
 
-        if (clue == null)
-            return getString(R.string.unknown_hint);
+            int wordLen = clue.hasZone() ? clue.getZone().size() : -1;
 
-        int wordLen = clue.hasZone() ? clue.getZone().size() : -1;
-
-        if (showCount && wordLen >= 0) {
-            return getString(
-                R.string.clue_format_short_no_num_no_dir_with_count,
-                clue.getHint(),
-                wordLen
-            );
-        } else {
-            return clue.getHint();
-        }
+            if (showCount && wordLen >= 0) {
+                cb.accept(getString(
+                    R.string.clue_format_short_no_num_no_dir_with_count,
+                    clue.getHint(),
+                    wordLen
+                ));
+            } else {
+                cb.accept(clue.getHint());
+            }
+        });
     }
 
     protected void launchVoiceInput() {
@@ -673,22 +671,16 @@ public abstract class PuzzleActivity
         }
     }
 
+    /**
+     * Get currently known value of volume activates voice
+     *
+     * Needs to be non-blocking so that onKeyUp/Down can return the
+     * right value immediately, so use a live value that may be unknown
+     * (defaults to false)
+     */
     protected boolean isVolumeDownActivatesVoicePref() {
-        return prefs.getBoolean(PREF_VOLUME_ACTIVATES_VOICE, false);
-    }
-
-    /**
-     * Whether to show an on-screen button to activate voice
-     */
-    protected boolean isButtonActivatesVoicePref() {
-        return prefs.getBoolean(PREF_BUTTON_ACTIVATES_VOICE, false);
-    }
-
-    /**
-     * Whether to show an on-screen button to activate voice
-     */
-    protected boolean isButtonAnnounceCluePref() {
-        return prefs.getBoolean(PREF_BUTTON_ANNOUNCE_CLUE, false);
+        Boolean value = volumeActivatesVoice.getValue();
+        return value == null ? false : value;
     }
 
     protected void setupVoiceButtons(VoiceButtonsBinding binding) {
@@ -708,18 +700,20 @@ public abstract class PuzzleActivity
         if (voiceBinding == null)
             return;
 
-        boolean anyButton
-            = isButtonActivatesVoicePref() || isButtonAnnounceCluePref();
+        settings.getVoiceButtonActivatesVoice(buttonVoice -> {
+        settings.getVoiceButtonAnnounceClue(buttonAnnounce -> {
+            boolean anyButton = buttonVoice || buttonAnnounce;
 
-        voiceBinding.voiceButtonsContainer.setVisibility(
-            anyButton ? View.VISIBLE : View.GONE
-        );
-        voiceBinding.voiceButton.setVisibility(
-            isButtonActivatesVoicePref() ? View.VISIBLE : View.GONE
-        );
-        voiceBinding.announceClueButton.setVisibility(
-            isButtonAnnounceCluePref() ? View.VISIBLE : View.GONE
-        );
+            voiceBinding.voiceButtonsContainer.setVisibility(
+                anyButton ? View.VISIBLE : View.GONE
+            );
+            voiceBinding.voiceButton.setVisibility(
+                buttonVoice ? View.VISIBLE : View.GONE
+            );
+            voiceBinding.announceClueButton.setVisibility(
+                buttonAnnounce ? View.VISIBLE : View.GONE
+            );
+        });});
     }
 
     /**
@@ -732,13 +726,15 @@ public abstract class PuzzleActivity
         if (board == null)
             return;
 
-        boolean showCount = prefs.getBoolean("showCount", false);
-        CharSequence clue = PlayboardTextRenderer.getAccessibleCurrentClueWord(
-            this, board, showCount
-        );
+        settings.getPlayShowCount(showCount -> {
+            CharSequence clue
+                = PlayboardTextRenderer.getAccessibleCurrentClueWord(
+                    this, board, showCount
+                );
 
-        if (clue != null)
-            announceText(clue, onlyIfAccessibilityService);
+            if (clue != null)
+                announceText(clue, onlyIfAccessibilityService);
+        });
     }
 
     /**
@@ -775,7 +771,8 @@ public abstract class PuzzleActivity
     }
 
     protected boolean isAnnounceClueEquals() {
-        return prefs.getBoolean(PREF_EQUALS_ANNOUNCE_CLUE, true);
+        Boolean value = equalsAnnounceClue.getValue();
+        return (value == null) ? false : value;
     }
 
     private void handleChangeTimer() {
@@ -808,37 +805,32 @@ public abstract class PuzzleActivity
         return manager != null && manager.isEnabled();
     }
 
-    private boolean isAlwaysAnnounceClue() {
-        return prefs.getBoolean(PREF_ALWAYS_ANNOUNCE_CLUE, false);
-    }
-
-    private boolean isAlwaysAnnounceBox() {
-        return prefs.getBoolean(PREF_ALWAYS_ANNOUNCE_BOX, false);
-    }
-
     private void handleChangeAccessibility(PlayboardChanges changes) {
         boolean accessibilityRunning = isAccessibilityServiceRunning();
-        boolean announceClue = accessibilityRunning || isAlwaysAnnounceClue();
-        boolean announceBox = accessibilityRunning || isAlwaysAnnounceBox();
+        settings.getVoiceAlwaysAnnounceBox(announceBoxSetting -> {
+        settings.getVoiceAlwaysAnnounceClue(announceClueSetting -> {
+            boolean announceBox = accessibilityRunning || announceBoxSetting;
+            boolean announceClue = accessibilityRunning || announceClueSetting;
 
-        if (!announceClue && !announceBox)
-            return;
+            if (!announceClue && !announceBox)
+                return;
 
-        Playboard board = getBoard();
-        if (board == null)
-            return;
+            Playboard board = getBoard();
+            if (board == null)
+                return;
 
-        Position newPos = board.getHighlightLetter();
-        boolean isNewWord = !Objects.equals(
-            changes.getPreviousWord(), changes.getCurrentWord()
-        );
-        boolean isNewPosition
-            = !Objects.equals(changes.getPreviousPosition(), newPos);
+            Position newPos = board.getHighlightLetter();
+            boolean isNewWord = !Objects.equals(
+                changes.getPreviousWord(), changes.getCurrentWord()
+            );
+            boolean isNewPosition
+                = !Objects.equals(changes.getPreviousPosition(), newPos);
 
-        if (isNewWord && announceClue)
-            announceClue(!isAlwaysAnnounceClue());
-        else if (isNewPosition && announceBox)
-            announceBox(!isAlwaysAnnounceBox());
+            if (isNewWord && announceClue)
+                announceClue(!announceClueSetting);
+            else if (isNewPosition && announceBox)
+                announceBox(!announceBoxSetting);
+        });});
     }
 
     /**
