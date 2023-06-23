@@ -12,12 +12,12 @@ import app.crossword.yourealwaysbe.puz.Playboard.Word;
 import app.crossword.yourealwaysbe.puz.Playboard;
 import app.crossword.yourealwaysbe.puz.Position;
 import app.crossword.yourealwaysbe.puz.Puzzle;
+import app.crossword.yourealwaysbe.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.util.WeakSet;
 import app.crossword.yourealwaysbe.view.BoardEditView.BoardClickListener;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.util.AttributeSet;
 import android.view.GestureDetector.OnGestureListener;
@@ -31,7 +31,7 @@ import androidx.core.text.HtmlCompat;
 import androidx.core.view.GestureDetectorCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat;
-import androidx.preference.PreferenceManager;
+import androidx.lifecycle.ViewTreeLifecycleOwner;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -40,6 +40,8 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.tabs.TabLayoutMediator;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -47,8 +49,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
+import javax.inject.Inject;
 
+@AndroidEntryPoint
 public class ClueTabs extends LinearLayout
                       implements Playboard.PlayboardListener {
     private static final Logger LOG = Logger.getLogger("app.crossword.yourealwaysbe");
@@ -56,6 +61,9 @@ public class ClueTabs extends LinearLayout
     public static enum PageType {
         CLUES, HISTORY;
     }
+
+    @Inject
+    protected ForkyzSettings settings;
 
     private ClueTabsBinding binding;
     private Playboard board;
@@ -300,20 +308,22 @@ public class ClueTabs extends LinearLayout
     }
 
     public void onPlayboardChange(PlayboardChanges changes) {
-        if (!isSnapToClue())
-            return;
+        isSnapToClue(snapToClue -> {
+            if (!snapToClue)
+                return;
 
-        ClueID cid = board.getClueID();
-        String listName = (cid == null) ? null : cid.getListName();
+            ClueID cid = board.getClueID();
+            String listName = (cid == null) ? null : cid.getListName();
 
-        if (listName == null)
-            return;
+            if (listName == null)
+                return;
 
-        int listIndex = listNames.indexOf(listName);
-        if (listIndex < 0)
-            return;
+            int listIndex = listNames.indexOf(listName);
+            if (listIndex < 0)
+                return;
 
-        binding.clueTabsPager.setCurrentItem(listIndex);
+            binding.clueTabsPager.setCurrentItem(listIndex);
+        });
     }
 
     /**
@@ -325,19 +335,11 @@ public class ClueTabs extends LinearLayout
             binding.clueTabsPager.getAdapter().notifyDataSetChanged();
     }
 
-    private boolean isSnapToClue() {
-        SharedPreferences prefs
-            = PreferenceManager.getDefaultSharedPreferences(
-                getContext()
-            );
-
-        return forceSnap || prefs.getBoolean("snapClue", false);
-    }
-
-    private boolean isShowCount() {
-        SharedPreferences prefs
-            = PreferenceManager.getDefaultSharedPreferences(getContext());
-        return prefs.getBoolean("showCount", false);
+    private void isSnapToClue(Consumer<Boolean> cb) {
+        if (forceSnap)
+            cb.accept(true);
+        else
+            settings.getClueListSnapToClue(cb::accept);
     }
 
     private void notifyListenersClueClick(Clue clue) {
@@ -539,17 +541,19 @@ public class ClueTabs extends LinearLayout
             clueListAdapter.notifyDataSetChanged();
 
             if (board != null) {
-                if (isSnapToClue()) {
-                    switch (pageType) {
-                    case CLUES:
-                        int position = board.getCurrentClueIndex();
-                        layoutManager.scrollToPositionWithOffset(position, 0);
-                        break;
-                    case HISTORY:
-                        layoutManager.scrollToPositionWithOffset(0, 0);
-                        break;
+                isSnapToClue(snapToClue -> {
+                    if (snapToClue) {
+                        switch (pageType) {
+                        case CLUES:
+                            int position = board.getCurrentClueIndex();
+                            layoutManager.scrollToPositionWithOffset(position, 0);
+                            break;
+                        case HISTORY:
+                            layoutManager.scrollToPositionWithOffset(0, 0);
+                            break;
+                        }
                     }
-                }
+                });
             }
         }
     }
@@ -656,9 +660,6 @@ public class ClueTabs extends LinearLayout
             extends RecyclerView.ViewHolder
             implements Playboard.PlayboardListener {
 
-        //private CheckedTextView clueView;
-        //private View flagView;
-        //private BoardWordEditView boardView;
         private ClueListItemBinding clueBinding;
         private Clue clue;
         private boolean showDirection;
@@ -739,6 +740,12 @@ public class ClueTabs extends LinearLayout
                     null
                 );
             }
+
+            // so we can refresh if changes
+            settings.livePlayShowCount().observe(
+                ViewTreeLifecycleOwner.get(binding.getRoot()),
+                showCount -> { setClueText(); }
+            );
         }
 
         /**
@@ -806,9 +813,15 @@ public class ClueTabs extends LinearLayout
         }
 
         private void setClueText() {
-            clueBinding.clueTextView.setText(
-                HtmlCompat.fromHtml(getClueText(clue), 0)
-            );
+            if (clue == null) {
+                clueBinding.clueTextView.setText("");
+            } else {
+                getClueText(clue, text -> {
+                    clueBinding.clueTextView.setText(
+                        HtmlCompat.fromHtml(text, 0)
+                    );
+                });
+            }
         }
 
         private void setStyle() {
@@ -837,66 +850,68 @@ public class ClueTabs extends LinearLayout
             }
         }
 
-        private String getClueText(Clue clue) {
-            String listName = getShortListName(clue);
-            String displayNum = clue.getDisplayNumber();
-            String hint = clue.getHint();
-            boolean hasCount = clue.hasZone();
-            int count = hasCount ? clue.getZone().size() : -1;
+        private void getClueText(Clue clue, Consumer<String> cb) {
+            settings.getPlayShowCount(showCount -> {
+                String listName = getShortListName(clue);
+                String displayNum = clue.getDisplayNumber();
+                String hint = clue.getHint();
+                boolean hasCount = clue.hasZone();
+                int count = hasCount ? clue.getZone().size() : -1;
 
-            if (showDirection) {
-                if (hasCount && isShowCount()) {
-                    if (displayNum != null) {
-                        return ClueTabs.this.getContext().getString(
-                            R.string.clue_format_short_with_count,
-                            displayNum, listName, hint, count
-                        );
+                if (showDirection) {
+                    if (hasCount && showCount) {
+                        if (displayNum != null) {
+                            cb.accept(ClueTabs.this.getContext().getString(
+                                R.string.clue_format_short_with_count,
+                                displayNum, listName, hint, count
+                            ));
+                        } else {
+                            cb.accept(ClueTabs.this.getContext().getString(
+                                R.string.clue_format_short_no_num_with_count,
+                                listName, hint, count
+                            ));
+                        }
                     } else {
-                        return ClueTabs.this.getContext().getString(
-                            R.string.clue_format_short_no_num_with_count,
-                            listName, hint, count
-                        );
+                        if (displayNum != null) {
+                            cb.accept(ClueTabs.this.getContext().getString(
+                                R.string.clue_format_short,
+                                displayNum, listName, hint
+                            ));
+                        } else {
+                            cb.accept(ClueTabs.this.getContext().getString(
+                                R.string.clue_format_short_no_num,
+                                listName, hint
+                            ));
+                        }
                     }
                 } else {
-                    if (displayNum != null) {
-                        return ClueTabs.this.getContext().getString(
-                            R.string.clue_format_short,
-                            displayNum, listName, hint
-                        );
+                    if (hasCount && showCount) {
+                        if (displayNum != null) {
+                            cb.accept(ClueTabs.this.getContext().getString(
+                                R.string.clue_format_short_no_dir_with_count,
+                                displayNum, hint, count
+                            ));
+                        } else {
+                            cb.accept(ClueTabs.this.getContext().getString(
+                                R.string.clue_format_short_no_num_no_dir_with_count,
+                                hint, count
+                            ));
+                        }
                     } else {
-                        return ClueTabs.this.getContext().getString(
-                            R.string.clue_format_short_no_num,
-                            listName, hint
-                        );
+                        if (displayNum != null) {
+                            cb.accept(ClueTabs.this.getContext().getString(
+                                R.string.clue_format_short_no_dir,
+                                displayNum, hint
+                            ));
+                        } else {
+                            cb.accept(ClueTabs.this.getContext().getString(
+                                R.string.clue_format_short_no_num_no_dir,
+                                hint
+                            ));
+                        }
                     }
                 }
-            } else {
-                if (hasCount && isShowCount()) {
-                    if (displayNum != null) {
-                        return ClueTabs.this.getContext().getString(
-                            R.string.clue_format_short_no_dir_with_count,
-                            displayNum, hint, count
-                        );
-                    } else {
-                        return ClueTabs.this.getContext().getString(
-                            R.string.clue_format_short_no_num_no_dir_with_count,
-                            hint, count
-                        );
-                    }
-                } else {
-                    if (displayNum != null) {
-                        return ClueTabs.this.getContext().getString(
-                            R.string.clue_format_short_no_dir,
-                            displayNum, hint
-                        );
-                    } else {
-                        return ClueTabs.this.getContext().getString(
-                            R.string.clue_format_short_no_num_no_dir,
-                            hint
-                        );
-                    }
-                }
-            }
+            });
         }
 
         private String getShortListName(Clue clue) {

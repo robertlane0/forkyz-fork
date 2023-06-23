@@ -62,6 +62,7 @@ public class ForkyzSettings {
 
     private static final String PREF_CLUE_LIST_SHOW_WORDS
         = "showWordsInClueList";
+    private static final String PREF_CLUE_LIST_SNAP_TO_CLUE = "snapClue";
 
     private static final String PREF_DOWNLOAD_LEGACY_BACKGROUND
         = "backgroundDownload";
@@ -169,6 +170,7 @@ public class ForkyzSettings {
         INT_DEFAULTS.put(PREF_BROWSE_SORT, 0);
         STRING_DEFAULTS.put(PREF_CHAT_GPT_API_KEY, "");
         BOOL_DEFAULTS.put(PREF_CLUE_LIST_SHOW_WORDS, false);
+        BOOL_DEFAULTS.put(PREF_CLUE_LIST_SNAP_TO_CLUE, false);
         BOOL_DEFAULTS.put(PREF_DOWNLOAD_PENDING, false);
         INT_DEFAULTS.put(PREF_PLAY_CLUE_TABS_PAGE, 0);
         BOOL_DEFAULTS.put(PREF_PLAY_DONT_DELETE_CROSSING, false);
@@ -421,6 +423,14 @@ public class ForkyzSettings {
         getBooleanPreference(PREF_CLUE_LIST_SHOW_WORDS, cb);
     }
 
+    /**
+     * Whether to make sure current clue always visible in clue tabs
+     */
+    public void getClueListSnapToClue(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_CLUE_LIST_SNAP_TO_CLUE, cb);
+    }
+
+
     public LiveData<Boolean> liveClueListShowWords() {
         return liveBooleanPreference(PREF_CLUE_LIST_SHOW_WORDS);
     }
@@ -631,6 +641,10 @@ public class ForkyzSettings {
      */
     public void getPlayShowCount(Consumer<Boolean> cb) {
         getBooleanPreference(PREF_PLAY_SHOW_COUNT, cb);
+    }
+
+    public LiveData<Boolean> livePlayShowCount() {
+        return liveBooleanPreference(PREF_PLAY_SHOW_COUNT);
     }
 
     public void setPlayShowCount(boolean value) {
