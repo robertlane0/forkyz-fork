@@ -764,7 +764,7 @@ public class ClueTabs extends LinearLayout
                     // suppress board render until we set the word later
                     clueBinding.miniboard.setBoard(board, true);
                     clueBinding.miniboard.setMaxScale(maxWordScale);
-                    clueBinding.miniboard.setWord(word, Collections.<String>emptySet());
+                    clueBinding.miniboard.setWord(word);
                     clueBinding.miniboard.setVisibility(
                         word == null ? View.GONE : View.VISIBLE
                     );

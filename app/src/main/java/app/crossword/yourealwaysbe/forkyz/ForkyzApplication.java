@@ -2,17 +2,14 @@ package app.crossword.yourealwaysbe.forkyz;
 
 import android.Manifest;
 import android.app.Application;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.util.DisplayMetrics;
 import androidx.core.content.ContextCompat;
 import androidx.hilt.work.HiltWorkerFactory;
-import androidx.preference.PreferenceManager;
 import androidx.work.Configuration;
 
 import dagger.hilt.android.HiltAndroidApp;
 
-import app.crossword.yourealwaysbe.puz.MovementStrategy;
 import app.crossword.yourealwaysbe.puz.Playboard;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.settings.ForkyzSettings;
@@ -49,7 +46,6 @@ public class ForkyzApplication extends Application implements Configuration.Prov
     private static ForkyzApplication INSTANCE;
     private Playboard board;
     private PuzHandle puzHandle;
-    private SharedPreferences prefs;
 
     public void exitApplication() {
         ExitActivity.exit(this);
@@ -113,8 +109,6 @@ public class ForkyzApplication extends Application implements Configuration.Prov
     public void onCreate() {
         INSTANCE = this;
 
-        prefs = PreferenceManager.getDefaultSharedPreferences(this);
-
         super.onCreate();
 
         AndroidVersionUtils.Factory.getInstance().createNotificationChannel(this);
@@ -167,24 +161,5 @@ public class ForkyzApplication extends Application implements Configuration.Prov
                 ) != PackageManager.PERMISSION_GRANTED
             );
         });
-    }
-
-    public MovementStrategy getMovementStrategy() {
-        String stratName = prefs.getString(
-            "movementStrategy", "MOVE_NEXT_ON_AXIS"
-        );
-        switch (stratName) {
-        case "MOVE_NEXT_ON_AXIS":
-            return MovementStrategy.MOVE_NEXT_ON_AXIS;
-        case "STOP_ON_END":
-            return MovementStrategy.STOP_ON_END;
-        case "MOVE_NEXT_CLUE":
-            return MovementStrategy.MOVE_NEXT_CLUE;
-        case "MOVE_PARALLEL_WORD":
-            return MovementStrategy.MOVE_PARALLEL_WORD;
-        default:
-            LOGGER.severe("Unknown MovementStrategy " + stratName);
-            return null;
-        }
     }
 }

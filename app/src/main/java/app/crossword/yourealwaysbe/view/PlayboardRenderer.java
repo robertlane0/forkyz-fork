@@ -70,15 +70,19 @@ public class PlayboardRenderer {
 
     // colors are gotten from context
     public PlayboardRenderer(Playboard board,
-                             float dpi, int widthPixels, boolean hintHighlight,
+                             float dpi, int widthPixels,
                              Context context) {
         this.dpi = dpi;
         this.widthPixels = widthPixels;
         this.board = board;
-        this.hintHighlight = hintHighlight;
+        this.hintHighlight = false;
         this.maxScale = getDeviceMaxScale();
         this.minScale = getDeviceMinScale();
         this.profile = new PaintProfile(context, scale, dpi);
+    }
+
+    public void setHintHighlight(boolean hintHighlight) {
+        this.hintHighlight = hintHighlight;
     }
 
     public float getMaxScale() {

@@ -36,7 +36,6 @@ import app.crossword.yourealwaysbe.forkyz.databinding.PlayBinding;
 import app.crossword.yourealwaysbe.puz.Box;
 import app.crossword.yourealwaysbe.puz.Clue;
 import app.crossword.yourealwaysbe.puz.ClueID;
-import app.crossword.yourealwaysbe.puz.MovementStrategy;
 import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges;
 import app.crossword.yourealwaysbe.puz.Playboard.Word;
 import app.crossword.yourealwaysbe.puz.Playboard;
@@ -71,7 +70,6 @@ public class PlayActivity extends PuzzleActivity
     private TextView clue;
     private Handler handler = new Handler(Looper.getMainLooper());
     private KeyboardManager keyboardManager;
-    private MovementStrategy movement = null;
     private boolean hasInitialValues = false;
     private ShakeDetector shakeDetector = null;
 
@@ -124,8 +122,6 @@ public class PlayActivity extends PuzzleActivity
         utils.finishOnHomeButton(this);
 
         setDefaultKeyMode(Activity.DEFAULT_KEYS_DISABLE);
-
-        MovementStrategy movement = getMovementStrategy();
 
         setFullScreenMode();
 
@@ -766,7 +762,9 @@ public class PlayActivity extends PuzzleActivity
         });
 
         settings.getPlaySkipFilled(board::setSkipCompletedLetters);
-        board.setMovementStrategy(this.getMovementStrategy());
+        settings.getPlayMovementStrategy(movementStrategy -> {
+            board.setMovementStrategy(movementStrategy);
+        });
         board.addListener(this);
 
         keyboardManager.attachKeyboardToView(binding.boardView);
@@ -799,14 +797,6 @@ public class PlayActivity extends PuzzleActivity
         super.onDestroy();
         if (keyboardManager != null)
             keyboardManager.onDestroy();
-    }
-
-    protected MovementStrategy getMovementStrategy() {
-        if (movement != null) {
-            return movement;
-        } else {
-            return ForkyzApplication.getInstance().getMovementStrategy();
-        }
     }
 
     /**

@@ -136,11 +136,13 @@ public abstract class PuzzleActivity
             open.setEnabled(false);
         }
 
-        if (!canRequestHelpForCurrentClue()) {
-            MenuItem help = menu.findItem(R.id.puzzle_menu_ask_chat_gpt);
-            help.setVisible(false);
-            help.setEnabled(false);
-        }
+        canRequestHelpForCurrentClue(canRequest -> {
+            if (!canRequest) {
+                MenuItem help = menu.findItem(R.id.puzzle_menu_ask_chat_gpt);
+                help.setVisible(false);
+                help.setEnabled(false);
+            }
+        });
 
         return true;
     }
@@ -358,10 +360,13 @@ public abstract class PuzzleActivity
         this.startActivity(i);
     }
 
-    private boolean canRequestHelpForCurrentClue() {
+    private void canRequestHelpForCurrentClue(Consumer<Boolean> cb) {
         Playboard board = getBoard();
         Clue clue = board == null ? null : board.getClue();
-        return ChatGPTHelp.isEnabled(this) && clue != null;
+        if (clue == null)
+            cb.accept(false);
+        else
+            ChatGPTHelp.isEnabled(settings, cb);
     }
 
     private void requestHelpForCurrentClue() {
@@ -372,19 +377,27 @@ public abstract class PuzzleActivity
                 Toast.LENGTH_LONG
             );
             t.show();
-        } else if (canRequestHelpForCurrentClue()) {
-            ChatGPTHelp helper = new ChatGPTHelp();
-            helper.requestHelpForCurrentClue(
-                this,
-                getBoard(),
-                (String response) -> {
-                    HelpResponseDialog dialog = new HelpResponseDialog();
-                    Bundle args = new Bundle();
-                    args.putString(HELP_RESPONSE_TEXT, response);
-                    dialog.setArguments(args);
-                    dialog.show(getSupportFragmentManager(), "HelpResponseDialog");
+        } else {
+            canRequestHelpForCurrentClue(canRequest -> {
+                if (canRequest) {
+                    ChatGPTHelp helper = new ChatGPTHelp(settings);
+                    helper.requestHelpForCurrentClue(
+                        this,
+                        getBoard(),
+                        (String response) -> {
+                            HelpResponseDialog dialog
+                                = new HelpResponseDialog();
+                            Bundle args = new Bundle();
+                            args.putString(HELP_RESPONSE_TEXT, response);
+                            dialog.setArguments(args);
+                            dialog.show(
+                                getSupportFragmentManager(),
+                                "HelpResponseDialog"
+                            );
+                        }
+                    );
                 }
-            );
+            });
         }
     }
 
@@ -870,15 +883,16 @@ public abstract class PuzzleActivity
     }
 
     private void handleChangeChatGPT(PlayboardChanges changes) {
-        if (!ChatGPTHelp.isEnabled(this))
-            return;
+        ChatGPTHelp.isEnabled(settings, isEnabled -> {
+            if (isEnabled) {
+                boolean newWord = !Objects.equals(
+                    changes.getPreviousWord(), changes.getCurrentWord()
+                );
 
-        boolean newWord = !Objects.equals(
-            changes.getPreviousWord(), changes.getCurrentWord()
-        );
-
-        if (newWord)
-            invalidateOptionsMenu();
+                if (newWord)
+                    invalidateOptionsMenu();
+            }
+        });
     }
 
     public static class HelpResponseDialog extends DialogFragment {

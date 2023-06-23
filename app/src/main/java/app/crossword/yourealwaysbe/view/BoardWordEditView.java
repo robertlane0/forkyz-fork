@@ -6,12 +6,16 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Consumer;
+import javax.inject.Inject;
 
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+
+import dagger.hilt.android.AndroidEntryPoint;
 
 import app.crossword.yourealwaysbe.puz.ClueID;
 import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges;
@@ -29,12 +33,15 @@ import app.crossword.yourealwaysbe.puz.Zone;
  * Use setWord to specify which word to draw, else current word will be
  * drawn.
  */
+@AndroidEntryPoint
 public class BoardWordEditView extends BoardEditView {
     private Word word;
     private boolean incognitoMode;
     private int originalHeight;
-    private Set<String> suppressNotesList = Collections.<String>emptySet();
+    private Set<String> suppressNotesList;
+    boolean customSuppressNotesList = false;
 
+    @Inject
     public BoardWordEditView(Context context, AttributeSet attrs) {
         super(context, attrs);
         setAllowOverScroll(false);
@@ -78,6 +85,7 @@ public class BoardWordEditView extends BoardEditView {
      */
     public void setBoard(Playboard board, Set<String> suppressNotesList) {
         this.suppressNotesList = suppressNotesList;
+        this.customSuppressNotesList = true;
         setBoard(board);
     }
 
@@ -86,10 +94,29 @@ public class BoardWordEditView extends BoardEditView {
      */
     public void setWord(Word word, Set<String> suppressNotesList) {
         boolean sameWord = Objects.equals(this.word, word);
-        boolean sameList
-            = Objects.equals(this.suppressNotesList, suppressNotesList);
+        boolean sameList = customSuppressNotesList
+            && Objects.equals(this.suppressNotesList, suppressNotesList);
+
         if (!sameWord || !sameList) {
             this.suppressNotesList = suppressNotesList;
+            this.customSuppressNotesList = true;
+            this.word = word;
+            // need to rescale with new word
+            renderToView();
+        }
+    }
+
+    /**
+     * Set word to draw or null to draw current word with default notes
+     *
+     * Default notes depends if user has them enabled
+     */
+    public void setWord(Word word) {
+        boolean sameWord = Objects.equals(this.word, word);
+        boolean sameList = !customSuppressNotesList;
+        if (!sameWord || !sameList) {
+            this.suppressNotesList = null;
+            this.customSuppressNotesList = false;
             this.word = word;
             // need to rescale with new word
             renderToView();
@@ -174,17 +201,21 @@ public class BoardWordEditView extends BoardEditView {
                 ? null
                 : new HashSet<>(changes);
 
-        executorService.execute(() -> {
-            postBitmap(
-                renderer.drawWord(
-                    renderWord,
-                    localChanges,
-                    getSuppressNotesList(),
-                    getContentWidth()
-                ),
-                rescale
-            );
-        });
+        getSettings().getPlaySuppressHintHighlighting(suppressHints -> {
+        getSuppressNotesList(localSuppressNotesList -> {
+            renderer.setHintHighlight(!suppressHints);
+            executorService.execute(() -> {
+                postBitmap(
+                    renderer.drawWord(
+                        renderWord,
+                        localChanges,
+                        localSuppressNotesList,
+                        getContentWidth()
+                    ),
+                    rescale
+                );
+            });
+        });});
     }
 
     @Override
@@ -240,9 +271,17 @@ public class BoardWordEditView extends BoardEditView {
             renderToView();
     }
 
-    @Override
-    protected Set<String> getSuppressNotesList() {
-        return suppressNotesList;
+    private void getSuppressNotesList(Consumer<Set<String>> cb) {
+        if (customSuppressNotesList) {
+            cb.accept(suppressNotesList);
+        } else {
+            getSettings().getPlayScratchDisplay(displayScratch -> {
+                cb.accept(displayScratch
+                    ? Collections.emptySet()
+                    : null
+                );
+            });
+        }
     }
 
     private boolean isRenderingCurrentWord() {

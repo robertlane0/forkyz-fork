@@ -6,9 +6,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import javax.inject.Inject;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.text.InputType;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
@@ -16,13 +16,15 @@ import android.view.View;
 import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
-import androidx.preference.PreferenceManager;
+
+import dagger.hilt.android.AndroidEntryPoint;
 
 import app.crossword.yourealwaysbe.puz.Box;
 import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges;
 import app.crossword.yourealwaysbe.puz.Playboard.Word;
 import app.crossword.yourealwaysbe.puz.Playboard;
 import app.crossword.yourealwaysbe.puz.Position;
+import app.crossword.yourealwaysbe.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.util.BoxInputConnection;
 import app.crossword.yourealwaysbe.util.KeyboardManager;
 
@@ -34,6 +36,7 @@ import app.crossword.yourealwaysbe.util.KeyboardManager;
  * Renders the playboard on change and implements input connection with
  * soft-input.
  */
+@AndroidEntryPoint
 public abstract class BoardEditView
         extends ScrollingImageView
         implements Playboard.PlayboardListener,
@@ -41,7 +44,9 @@ public abstract class BoardEditView
                     KeyboardManager.ManageableView {
     private static final int DOUBLE_CLICK_INTERVAL = 300; // ms
 
-    private SharedPreferences prefs;
+    @Inject
+    protected ForkyzSettings settings;
+
     private Playboard board;
     private boolean wordView;
     private PlayboardRenderer renderer;
@@ -63,7 +68,6 @@ public abstract class BoardEditView
 
     public BoardEditView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        prefs = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     public void setBoard(Playboard board) {
@@ -96,7 +100,6 @@ public abstract class BoardEditView
                 board,
                 metrics.densityDpi,
                 metrics.widthPixels,
-                !prefs.getBoolean("supressHints", false),
                 getContext()
             );
             setMaxScale(renderer.getMaxScale());
@@ -301,19 +304,20 @@ public abstract class BoardEditView
 
         requestFocus();
 
-        boolean doubleTapOn = prefs.getBoolean("doubleTap", false);
         long clickInterval = System.currentTimeMillis() - lastTap;
 
-        if (doubleTapOn && clickInterval < DOUBLE_CLICK_INTERVAL) {
-            fitToView();
-            notifyScaleChange(getCurrentScale());
-        } else {
-            Position position = findPosition(point);
-            if (position != null)
-                onClick(position);
-        }
+        settings.getPlayDoubleTapFitBoard(doubleTapOn -> {
+            if (doubleTapOn && clickInterval < DOUBLE_CLICK_INTERVAL) {
+                fitToView();
+                notifyScaleChange(getCurrentScale());
+            } else {
+                Position position = findPosition(point);
+                if (position != null)
+                    onClick(position);
+            }
 
-        lastTap = System.currentTimeMillis();
+            lastTap = System.currentTimeMillis();
+        });
     }
 
     /**
@@ -343,6 +347,10 @@ public abstract class BoardEditView
         render(null, rescale);
     }
 
+    protected ForkyzSettings getSettings() {
+        return settings;
+    }
+
     /**
      * Render board
      *
@@ -353,12 +361,6 @@ public abstract class BoardEditView
 
     protected PlayboardRenderer getRenderer() { return renderer; }
     protected Playboard getBoard() { return board; }
-    protected SharedPreferences getPrefs() { return prefs; }
-
-    /**
-     * What scratch to suppress when rendering
-     */
-    abstract protected Set<String> getSuppressNotesList();
 
     private String getCurrentResponse() {
         Playboard board = getBoard();

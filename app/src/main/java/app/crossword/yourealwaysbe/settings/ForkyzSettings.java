@@ -25,6 +25,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext;
 
 import app.crossword.yourealwaysbe.net.Downloader;
 import app.crossword.yourealwaysbe.net.Downloaders;
+import app.crossword.yourealwaysbe.puz.MovementStrategy;
 import app.crossword.yourealwaysbe.util.files.Accessor;
 
 /**
@@ -56,6 +57,8 @@ public class ForkyzSettings {
         = "lastSeenVersion";
     private static final String PREF_BROWSE_SORT = "sort";
     private static final String PREF_BROWSE_SWIPE_ACTION = "swipeAction";
+
+    private static final String PREF_CHAT_GPT_API_KEY = "chatGPTAPIKey";
 
     private static final String PREF_CLUE_LIST_SHOW_WORDS
         = "showWordsInClueList";
@@ -89,10 +92,15 @@ public class ForkyzSettings {
         = "playActivityClueTabsPage";
     private static final String PREF_PLAY_DONT_DELETE_CROSSING
         = "dontDeleteCrossing";
+    private static final String PREF_PLAY_DOUBLE_TAP_FIT_BOARD
+        = "doubleTap";
+    private static final String PREF_PLAY_ENSURE_VISIBLE = "ensureVisible";
     private static final String PREF_PLAY_ENTER_CHANGES_DIRECTION
         = "enterChangesDirection";
     private static final String PREF_PLAY_FIT_TO_SCREEN = "fitToScreen";
     private static final String PREF_PLAY_FULL_SCREEN = "fullScreen";
+    private static final String PREF_PLAY_MOVEMENT_STRATEGY
+        = "movementStrategy";
     private static final String
     PREF_PLAY_PRESERVE_CORRECT_LETTERS_IN_SHOW_ERRORS
         = "preserveCorrectLettersInShowErrors";
@@ -110,6 +118,8 @@ public class ForkyzSettings {
     private static final String PREF_PLAY_SKIP_FILLED = "skipFilled";
     private static final String PREF_PLAY_SPACE_CHANGE_DIRECTION
         = "spaceChangesDirection";
+    private static final String PREF_PLAY_SUPPRESS_HINT_HIGHLIGHTING
+        = "supressHints";
 
     private static final String PREF_VOICE_ALWAYS_ANNOUNCE_BOX
         = "alwaysAnnounceBox";
@@ -157,10 +167,13 @@ public class ForkyzSettings {
         LONG_DEFAULTS.put(PREF_BROWSE_LAST_DOWNLOAD, 0L);
         STRING_DEFAULTS.put(PREF_BROWSE_LAST_SEEN_VERSION, "");
         INT_DEFAULTS.put(PREF_BROWSE_SORT, 0);
+        STRING_DEFAULTS.put(PREF_CHAT_GPT_API_KEY, "");
         BOOL_DEFAULTS.put(PREF_CLUE_LIST_SHOW_WORDS, false);
         BOOL_DEFAULTS.put(PREF_DOWNLOAD_PENDING, false);
         INT_DEFAULTS.put(PREF_PLAY_CLUE_TABS_PAGE, 0);
         BOOL_DEFAULTS.put(PREF_PLAY_DONT_DELETE_CROSSING, false);
+        BOOL_DEFAULTS.put(PREF_PLAY_DOUBLE_TAP_FIT_BOARD, false);
+        BOOL_DEFAULTS.put(PREF_PLAY_ENSURE_VISIBLE, true);
         BOOL_DEFAULTS.put(PREF_PLAY_ENTER_CHANGES_DIRECTION, true);
         BOOL_DEFAULTS.put(PREF_PLAY_FIT_TO_SCREEN, false);
         BOOL_DEFAULTS.put(PREF_PLAY_FULL_SCREEN, false);
@@ -179,6 +192,7 @@ public class ForkyzSettings {
         BOOL_DEFAULTS.put(PREF_PLAY_SHOW_TIMER, false);
         BOOL_DEFAULTS.put(PREF_PLAY_SKIP_FILLED, false);
         BOOL_DEFAULTS.put(PREF_PLAY_SPACE_CHANGE_DIRECTION, true);
+        BOOL_DEFAULTS.put(PREF_PLAY_SUPPRESS_HINT_HIGHLIGHTING, false);
         BOOL_DEFAULTS.put(PREF_VOICE_ALWAYS_ANNOUNCE_BOX, false);
         BOOL_DEFAULTS.put(PREF_VOICE_ALWAYS_ANNOUNCE_CLUE, false);
         BOOL_DEFAULTS.put(PREF_VOICE_BUTTON_ACTIVATES_VOICE, false);
@@ -392,6 +406,13 @@ public class ForkyzSettings {
     }
 
     /**
+     * The API key for ask chat gpt for help if set
+     */
+    public void getChatGPTAPIKey(Consumer<String> cb) {
+        getStringPreference(PREF_CHAT_GPT_API_KEY, cb);
+    }
+
+    /**
      * Whether to show the board for each clue in the clue list
      *
      * Or just the currently selected clue.
@@ -486,10 +507,24 @@ public class ForkyzSettings {
     }
 
     /**
+     * Whether double tapping the screen fits the board to screen
+     */
+    public void getPlayDoubleTapFitBoard(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_PLAY_DOUBLE_TAP_FIT_BOARD, cb);
+    }
+
+    /**
      * Whether to delete characters that may belong to a crossing word
      */
     public LiveData<Boolean> livePlayDontDeleteCrossing() {
         return liveBooleanPreference(PREF_PLAY_DONT_DELETE_CROSSING);
+    }
+
+    /**
+     * Ensure the currently selected word/cell is visible on play board
+     */
+    public void getPlayEnsureVisible(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_PLAY_ENSURE_VISIBLE, cb);
     }
 
     /**
@@ -514,6 +549,21 @@ public class ForkyzSettings {
      */
     public void getPlayFullScreen(Consumer<Boolean> cb) {
         getBooleanPreference(PREF_PLAY_FULL_SCREEN, cb);
+    }
+
+    /**
+     * Get the style of movement around the board
+     */
+    public void getPlayMovementStrategy(Consumer<MovementStrategy> cb) {
+        executor.execute(() -> {
+            String strategyString = prefs.getString(
+                PREF_PLAY_MOVEMENT_STRATEGY, "MOVE_NEXT_ON_AXIS"
+            );
+            cb.accept(
+                MovementStrategySetting.getFromSettingsValue(strategyString)
+                    .getMovementStrategy()
+            );
+        });
     }
 
     /**
@@ -663,6 +713,13 @@ public class ForkyzSettings {
      */
     public void getPlaySpaceChangesDirection(Consumer<Boolean> cb) {
         getBooleanPreference(PREF_PLAY_SPACE_CHANGE_DIRECTION, cb);
+    }
+
+    /**
+     * Whether hinted squares should not be highlighted on board view
+     */
+    public void getPlaySuppressHintHighlighting(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_PLAY_SUPPRESS_HINT_HIGHLIGHTING, cb);
     }
 
     /**

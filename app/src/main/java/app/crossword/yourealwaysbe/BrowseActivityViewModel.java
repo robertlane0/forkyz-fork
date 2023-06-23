@@ -270,19 +270,21 @@ public class BrowseActivityViewModel extends ViewModel {
                             "Puzzle is null or contains no boxes."
                         );
                     }
-                    handler.post(() -> {
-                        ForkyzApplication application
-                            = ForkyzApplication.getInstance();
-                        application.setBoard(
-                            new Playboard(
-                                puz,
-                                application.getMovementStrategy(),
-                                preserveCorrect,
-                                dontDeleteCrossing
-                            ),
-                            puzMeta.getPuzHandle()
-                        );
-                        puzzleLoadEvents.call();
+                    settings.getPlayMovementStrategy(movementStrategy -> {
+                        handler.post(() -> {
+                            ForkyzApplication application
+                                = ForkyzApplication.getInstance();
+                            application.setBoard(
+                                new Playboard(
+                                    puz,
+                                    movementStrategy,
+                                    preserveCorrect,
+                                    dontDeleteCrossing
+                                ),
+                                puzMeta.getPuzHandle()
+                            );
+                            puzzleLoadEvents.call();
+                        });
                     });
                 } catch (IOException e) {
                     handler.post(() -> {

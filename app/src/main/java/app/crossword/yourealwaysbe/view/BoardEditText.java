@@ -1,14 +1,11 @@
 package app.crossword.yourealwaysbe.view;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Rect;
 import android.text.InputType;
 import android.util.AttributeSet;
@@ -21,7 +18,6 @@ import android.view.accessibility.AccessibilityNodeInfo;
 import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
-import androidx.preference.PreferenceManager;
 
 import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
 import app.crossword.yourealwaysbe.puz.Box;
@@ -69,8 +65,6 @@ public class BoardEditText
     private boolean[] changes;
     private PlayboardRenderer renderer;
 
-    private SharedPreferences prefs;
-
     private BoardEditFilter[] filters;
 
     public BoardEditText(Context context, AttributeSet as) {
@@ -84,7 +78,6 @@ public class BoardEditText
             null,
             metrics.densityDpi,
             metrics.widthPixels,
-            false,
             context
         );
         this.renderer.setMaxScale(1.0F);
@@ -92,8 +85,6 @@ public class BoardEditText
 
         setAllowOverScroll(false);
         setAllowZoom(false);
-
-        prefs = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     @Override
@@ -475,12 +466,6 @@ public class BoardEditText
         if (getWidth() == 0)
             return;
 
-        boolean displayScratch = prefs.getBoolean("displayScratch", false);
-        Set<String> suppressNotesList
-            = displayScratch
-            ? Collections.emptySet()
-            : null;
-
         boolean[] renderChanges = renderAll
             ? null
             : Arrays.copyOf(changes, changes.length);
@@ -490,7 +475,7 @@ public class BoardEditText
                 boxes,
                 renderChanges,
                 selection,
-                suppressNotesList,
+                null,
                 getContentWidth()
             ));
         });

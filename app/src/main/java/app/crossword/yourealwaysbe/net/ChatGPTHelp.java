@@ -12,8 +12,6 @@ import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import androidx.preference.PreferenceManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,6 +24,7 @@ import app.crossword.yourealwaysbe.puz.Playboard;
 import app.crossword.yourealwaysbe.puz.Position;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.Zone;
+import app.crossword.yourealwaysbe.settings.ForkyzSettings;
 
 public class ChatGPTHelp {
     private static final String CHAT_GPT_API_URL
@@ -33,38 +32,40 @@ public class ChatGPTHelp {
     private static final String CHAT_GPT_MODEL = "text-davinci-003";
     private static final String CHAT_GPT_RESPONSE_CHOICES = "choices";
     private static final String CHAT_GPT_RESPONSE_TEXT = "text";
-    private static final String PREF_CHAT_GPT_API_KEY = "chatGPTAPIKey";
     private static final double CHAT_GPT_TEMPERATURE = 1.0;
     private static final int CHAT_GPT_MAX_TOKENS = 500;
     private static final int HTTP_OK_RESPONSE = 200;
     private static final int QUERY_TIMEOUT = 30000;
 
+    private ForkyzSettings settings;
     private ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    public static boolean isEnabled(Context context) {
-        String apiKey = getAPIKey(context);
-        return apiKey != null && !apiKey.trim().isEmpty();
+    public ChatGPTHelp(ForkyzSettings settings) {
+        this.settings = settings;
+    }
+
+    public static void isEnabled(
+        ForkyzSettings settings, Consumer<Boolean> cb
+    ) {
+        settings.getChatGPTAPIKey(apiKey -> {
+            cb.accept(apiKey != null && !apiKey.trim().isEmpty());
+        });
     }
 
     public void requestHelpForCurrentClue(
         Context context, Playboard board, Consumer<String> callback
     ) {
-        String apiKey = getAPIKey(context);
-        if (apiKey == null) {
-            callback.accept(null);
-        } else {
-            String query = makeQuery(context, board);
-            if (query == null)
+        settings.getChatGPTAPIKey(apiKey -> {
+            if (apiKey == null) {
                 callback.accept(null);
-            else
-                makeRequest(apiKey, query, callback);
-        }
-    }
-
-    private static String getAPIKey(Context context) {
-        SharedPreferences prefs
-            = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getString(PREF_CHAT_GPT_API_KEY, null);
+            } else {
+                String query = makeQuery(context, board);
+                if (query == null)
+                    callback.accept(null);
+                else
+                    makeRequest(apiKey, query, callback);
+            }
+        });
     }
 
     private void makeRequest(

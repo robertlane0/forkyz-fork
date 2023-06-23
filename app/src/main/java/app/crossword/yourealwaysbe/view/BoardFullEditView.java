@@ -5,10 +5,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import javax.inject.Inject;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.util.AttributeSet;
+
+import dagger.hilt.android.AndroidEntryPoint;
 
 import app.crossword.yourealwaysbe.puz.ClueID;
 import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges;
@@ -23,7 +25,9 @@ import app.crossword.yourealwaysbe.puz.Puzzle;
  * Renders the playboard on change and implements input connection with
  * soft-input.
  */
+@AndroidEntryPoint
 public class BoardFullEditView extends BoardEditView {
+    @Inject
     public BoardFullEditView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
@@ -63,12 +67,14 @@ public class BoardFullEditView extends BoardEditView {
         if (board == null)
             return;
 
-        if (isScratchMode()) {
-            if (response != null)
-                board.playScratchLetter(response.charAt(0));
-        } else {
-            board.playLetter(response);
-        }
+        getSettings().getPlayScratchMode(scratchMode -> {
+            if (scratchMode) {
+                if (response != null)
+                    board.playScratchLetter(response.charAt(0));
+            } else {
+                board.playLetter(response);
+            }
+        });
     }
 
     @Override
@@ -77,11 +83,13 @@ public class BoardFullEditView extends BoardEditView {
         if (board == null)
             return;
 
-        if (isScratchMode()) {
-            board.deleteScratchLetter();
-        } else {
-            board.deleteLetter();
-        }
+        getSettings().getPlayScratchMode(scratchMode -> {
+            if (scratchMode) {
+                board.deleteScratchLetter();
+            } else {
+                board.deleteLetter();
+            }
+        });
     }
 
     @Override
@@ -96,12 +104,21 @@ public class BoardFullEditView extends BoardEditView {
                 ? null
                 : new HashSet<>(changes);
 
-        executorService.execute(() -> {
-            postBitmap(
-                renderer.draw(localChanges, getSuppressNotesList()),
-                rescale
-            );
-        });
+        getSettings().getPlayScratchDisplay(displayScratch -> {
+        getSettings().getPlaySuppressHintHighlighting(suppressHints -> {
+            renderer.setHintHighlight(!suppressHints);
+
+            Set<String> suppressNotesList = displayScratch
+                ? Collections.emptySet()
+                : null;
+
+            executorService.execute(() -> {
+                postBitmap(
+                    renderer.draw(localChanges, suppressNotesList),
+                    rescale
+                );
+            });
+        });});
     }
 
     @Override
@@ -132,58 +149,48 @@ public class BoardFullEditView extends BoardEditView {
         }
     }
 
-    @Override
-    protected Set<String> getSuppressNotesList() {
-        boolean displayScratch = getPrefs().getBoolean("displayScratch", false);
-        return displayScratch
-            ? Collections.emptySet()
-            : null;
-    }
-
     private void ensureVisible(Word previousWord) {
         PlayboardRenderer renderer = getRenderer();
         Playboard board = getBoard();
         if (renderer == null || board == null)
             return;
 
-        SharedPreferences prefs = getPrefs();
-
         /*
          * If we jumped to a new word, ensure the first letter is visible.
          * Otherwise, insure that the current letter is visible. Only necessary
          * if the cursor is currently off screen.
          */
-        if (prefs.getBoolean("ensureVisible", true)) {
-            Word currentWord = board.getCurrentWord();
-            Position cursorPos = board.getHighlightLetter();
+        getSettings().getPlayEnsureVisible(ensureVisible -> {
+            if (ensureVisible) {
+                Word currentWord = board.getCurrentWord();
+                Position cursorPos = board.getHighlightLetter();
 
-            Point topLeft;
-            Point bottomRight;
-            Point cursorTopLeft;
-            Point cursorBottomRight;
+                Point topLeft;
+                Point bottomRight;
+                Point cursorTopLeft;
+                Point cursorBottomRight;
 
-            cursorTopLeft = renderer.findPointTopLeft(cursorPos);
-            cursorBottomRight = renderer.findPointBottomRight(cursorPos);
+                cursorTopLeft = renderer.findPointTopLeft(cursorPos);
+                cursorBottomRight = renderer.findPointBottomRight(cursorPos);
 
-            if ((previousWord != null) && previousWord.equals(currentWord)) {
-                topLeft = cursorTopLeft;
-                bottomRight = cursorBottomRight;
-            } else {
-                topLeft = renderer.findPointTopLeft(currentWord);
-                bottomRight = renderer.findPointBottomRight(currentWord);
+                if (
+                    (previousWord != null)
+                    && previousWord.equals(currentWord)
+                ) {
+                    topLeft = cursorTopLeft;
+                    bottomRight = cursorBottomRight;
+                } else {
+                    topLeft = renderer.findPointTopLeft(currentWord);
+                    bottomRight = renderer.findPointBottomRight(currentWord);
+                }
+
+                ensureVisible(bottomRight);
+                ensureVisible(topLeft);
+
+                // ensure the cursor is always on the screen.
+                ensureVisible(cursorBottomRight);
+                ensureVisible(cursorTopLeft);
             }
-
-            ensureVisible(bottomRight);
-            ensureVisible(topLeft);
-
-            // ensure the cursor is always on the screen.
-            ensureVisible(cursorBottomRight);
-            ensureVisible(cursorTopLeft);
-        }
-
-    }
-
-    private boolean isScratchMode() {
-        return getPrefs().getBoolean("scratchMode", false);
+        });
     }
 }
