@@ -13,7 +13,7 @@ import org.junit.runners.Parameterized;
 
 import android.content.Context;
 
-import app.crossword.yourealwaysbe.settings.DownloadersSettings;
+import app.crossword.yourealwaysbe.forkyz.settings.DownloadersSettings;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;

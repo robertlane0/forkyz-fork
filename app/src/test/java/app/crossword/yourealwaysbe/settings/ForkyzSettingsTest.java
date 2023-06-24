@@ -1,5 +1,5 @@
 
-package app.crossword.yourealwaysbe.settings;
+package app.crossword.yourealwaysbe.forkyz.settings;
 
 import android.content.SharedPreferences;
 import android.os.Handler;

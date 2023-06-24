@@ -1,5 +1,5 @@
 
-package app.crossword.yourealwaysbe.settings;
+package app.crossword.yourealwaysbe.forkyz.settings;
 
 public enum StorageLocation {
     INTERNAL("App Internal Storage"),

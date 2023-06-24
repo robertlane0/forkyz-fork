@@ -12,7 +12,7 @@ import app.crossword.yourealwaysbe.puz.Playboard.Word;
 import app.crossword.yourealwaysbe.puz.Playboard;
 import app.crossword.yourealwaysbe.puz.Position;
 import app.crossword.yourealwaysbe.puz.Puzzle;
-import app.crossword.yourealwaysbe.settings.ForkyzSettings;
+import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.util.WeakSet;
 import app.crossword.yourealwaysbe.view.BoardEditView.BoardClickListener;
 

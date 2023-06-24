@@ -31,7 +31,7 @@ import app.crossword.yourealwaysbe.net.Downloader;
 import app.crossword.yourealwaysbe.net.Downloaders;
 import app.crossword.yourealwaysbe.puz.Playboard;
 import app.crossword.yourealwaysbe.puz.Puzzle;
-import app.crossword.yourealwaysbe.settings.ForkyzSettings;
+import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.util.SingleLiveEvent;
 import app.crossword.yourealwaysbe.util.files.DirHandle;
 import app.crossword.yourealwaysbe.util.files.FileHandler;

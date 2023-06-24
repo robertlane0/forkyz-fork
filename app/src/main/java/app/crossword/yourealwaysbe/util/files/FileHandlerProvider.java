@@ -11,8 +11,8 @@ import javax.inject.Singleton;
 import dagger.hilt.android.qualifiers.ApplicationContext;
 
 import app.crossword.yourealwaysbe.forkyz.R;
-import app.crossword.yourealwaysbe.settings.ForkyzSettings;
-import app.crossword.yourealwaysbe.settings.StorageLocation;
+import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
+import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation;
 
 @Singleton
 public class FileHandlerProvider {

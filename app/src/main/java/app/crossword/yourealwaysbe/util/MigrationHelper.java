@@ -5,7 +5,7 @@ import javax.inject.Singleton;
 
 import android.content.Context;
 
-import app.crossword.yourealwaysbe.settings.ForkyzSettings;
+import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.net.Downloaders;
 import app.crossword.yourealwaysbe.versions.AndroidVersionUtils;
 

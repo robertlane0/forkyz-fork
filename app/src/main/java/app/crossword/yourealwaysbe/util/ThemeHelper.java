@@ -5,8 +5,8 @@ import android.app.Application;
 import com.google.android.material.color.DynamicColors;
 
 import app.crossword.yourealwaysbe.forkyz.R;
-import app.crossword.yourealwaysbe.settings.ForkyzSettings;
-import app.crossword.yourealwaysbe.settings.Theme;
+import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
+import app.crossword.yourealwaysbe.forkyz.settings.Theme;
 
 public class ThemeHelper {
     private ForkyzSettings settings;

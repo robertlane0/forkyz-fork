@@ -17,7 +17,6 @@ import android.content.Context;
 import androidx.concurrent.futures.CallbackToFutureAdapter;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.hilt.work.HiltWorker;
-import androidx.preference.PreferenceManager;
 import androidx.work.Constraints;
 import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.ExistingWorkPolicy;
@@ -34,8 +33,8 @@ import dagger.assisted.AssistedInject;
 
 import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
 import app.crossword.yourealwaysbe.net.Downloaders;
-import app.crossword.yourealwaysbe.settings.BackgroundDownloadSettings;
-import app.crossword.yourealwaysbe.settings.ForkyzSettings;
+import app.crossword.yourealwaysbe.forkyz.settings.BackgroundDownloadSettings;
+import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.util.files.FileHandlerProvider;
 
 /**

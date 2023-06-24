@@ -17,7 +17,7 @@ import androidx.fragment.app.Fragment;
 import javax.inject.Inject;
 
 import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
-import app.crossword.yourealwaysbe.settings.ForkyzSettings;
+import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.util.BackgroundDownloadManager;
 
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)

@@ -12,8 +12,8 @@ import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import app.crossword.yourealwaysbe.settings.DayNightMode;
-import app.crossword.yourealwaysbe.settings.ForkyzSettings;
+import app.crossword.yourealwaysbe.forkyz.settings.DayNightMode;
+import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 
 /**
  * Heavily adapted from sources below, description no longer relevant so

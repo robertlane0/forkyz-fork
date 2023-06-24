@@ -39,8 +39,8 @@ import androidx.lifecycle.ViewTreeLifecycleOwner;
 import dagger.hilt.android.AndroidEntryPoint;
 
 import app.crossword.yourealwaysbe.forkyz.R;
-import app.crossword.yourealwaysbe.settings.ForkyzSettings;
-import app.crossword.yourealwaysbe.settings.KeyboardLayout;
+import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
+import app.crossword.yourealwaysbe.forkyz.settings.KeyboardLayout;
 import java.util.logging.Logger;
 
 @AndroidEntryPoint

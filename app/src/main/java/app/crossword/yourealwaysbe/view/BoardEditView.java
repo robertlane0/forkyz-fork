@@ -24,7 +24,7 @@ import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges;
 import app.crossword.yourealwaysbe.puz.Playboard.Word;
 import app.crossword.yourealwaysbe.puz.Playboard;
 import app.crossword.yourealwaysbe.puz.Position;
-import app.crossword.yourealwaysbe.settings.ForkyzSettings;
+import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.util.BoxInputConnection;
 import app.crossword.yourealwaysbe.util.KeyboardManager;
 

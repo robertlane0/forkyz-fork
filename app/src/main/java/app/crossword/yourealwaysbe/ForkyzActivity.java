@@ -17,7 +17,7 @@ import androidx.core.text.HtmlCompat;
 import dagger.hilt.android.AndroidEntryPoint;
 
 import app.crossword.yourealwaysbe.forkyz.R;
-import app.crossword.yourealwaysbe.settings.ForkyzSettings;
+import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.util.NightModeHelper;
 import app.crossword.yourealwaysbe.util.ThemeHelper;
 import app.crossword.yourealwaysbe.versions.AndroidVersionUtils;

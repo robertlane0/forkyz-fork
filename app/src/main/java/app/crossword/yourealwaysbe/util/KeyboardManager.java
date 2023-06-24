@@ -15,8 +15,8 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
 
-import app.crossword.yourealwaysbe.settings.ForkyzSettings;
-import app.crossword.yourealwaysbe.settings.KeyboardMode;
+import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
+import app.crossword.yourealwaysbe.forkyz.settings.KeyboardMode;
 import app.crossword.yourealwaysbe.view.ForkyzKeyboard;
 
 public class KeyboardManager {
