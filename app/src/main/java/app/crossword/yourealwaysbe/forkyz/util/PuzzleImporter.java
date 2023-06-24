@@ -6,10 +6,9 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.logging.Logger;
 
-import android.content.ContentResolver;
+import android.content.Context;
 import android.net.Uri;
 
-import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
 import app.crossword.yourealwaysbe.forkyz.R;
 import app.crossword.yourealwaysbe.puz.io.PuzzleStreamReader;
 import app.crossword.yourealwaysbe.puz.Puzzle;
@@ -23,11 +22,6 @@ public class PuzzleImporter {
     private static final Logger LOGGER
         = Logger.getLogger(PuzzleImporter.class.getCanonicalName());
 
-    private static final String IMPORT_FALLBACK_SOURCE
-        = ForkyzApplication.getInstance().getString(
-            R.string.import_fallback_source
-        );
-
     /** Import from a URI supported by resolver
      *
      * Currently does not use file extension or MIME type. Instead, use puzlib
@@ -38,7 +32,9 @@ public class PuzzleImporter {
      * or uri is null)
      */
     public static PuzHandle importUri(
-        ContentResolver resolver, FileHandler fileHandler, Uri uri
+        Context context,
+        FileHandler fileHandler,
+        Uri uri
     ) {
         if (uri == null)
             return null;
@@ -47,7 +43,9 @@ public class PuzzleImporter {
 
         try {
             puz = PuzzleStreamReader.parseInputStatic(
-                new BufferedInputStream(resolver.openInputStream(uri))
+                new BufferedInputStream(
+                    context.getContentResolver().openInputStream(uri)
+                )
             );
         } catch (FileNotFoundException e) {
             LOGGER.info("FileNotFoundException with " + uri);
@@ -57,7 +55,7 @@ public class PuzzleImporter {
             return null;
 
         ensurePuzDate(puz);
-        ensurePuzSource(puz);
+        ensurePuzSource(context, puz);
 
         try {
             return fileHandler.saveNewPuzzle(
@@ -74,7 +72,7 @@ public class PuzzleImporter {
      *
      * Fall back to author, title, fallback
      */
-    private static void ensurePuzSource(Puzzle puz) {
+    private static void ensurePuzSource(Context context, Puzzle puz) {
         String source = puz.getSource();
         if (source == null || source.isEmpty())
             puz.setSource(puz.getAuthor());
@@ -83,7 +81,7 @@ public class PuzzleImporter {
             puz.setSource(puz.getTitle());
         source = puz.getSource();
         if (source == null || source.isEmpty())
-            puz.setSource(IMPORT_FALLBACK_SOURCE);
+            puz.setSource(context.getString(R.string.import_fallback_source));
     }
 
     private static void ensurePuzDate(Puzzle puz) {

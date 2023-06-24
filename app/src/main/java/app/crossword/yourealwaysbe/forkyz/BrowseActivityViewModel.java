@@ -15,7 +15,6 @@ import java.util.logging.Logger;
 import javax.inject.Inject;
 
 import android.app.Application;
-import android.content.ContentResolver;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
@@ -357,9 +356,6 @@ public class BrowseActivityViewModel extends AndroidViewModel {
     ) {
         fileHandlerProvider.get(fileHandler -> {
             threadWithUILock(() -> {
-                Application application = getApplication();
-                ContentResolver resolver = application.getContentResolver();
-
                 boolean someFailed = false;
                 boolean someSucceeded = false;
                 boolean needsReload = forceReload;
@@ -368,8 +364,9 @@ public class BrowseActivityViewModel extends AndroidViewModel {
                     if (uri == null)
                         continue;
 
-                    PuzHandle ph
-                        = PuzzleImporter.importUri(resolver, fileHandler, uri);
+                    PuzHandle ph = PuzzleImporter.importUri(
+                        getApplication(), fileHandler, uri
+                    );
 
                     someFailed |= (ph == null);
                     someSucceeded |= (ph != null);
