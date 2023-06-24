@@ -44,9 +44,9 @@ import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand;
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands;
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerShared;
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle;
-import app.crossword.yourealwaysbe.view.PlayboardTextRenderer;
-import app.crossword.yourealwaysbe.view.PuzzleInfoDialogs;
-import app.crossword.yourealwaysbe.view.SpecialEntryDialog;
+import app.crossword.yourealwaysbe.forkyz.view.PlayboardTextRenderer;
+import app.crossword.yourealwaysbe.forkyz.view.PuzzleInfoDialogs;
+import app.crossword.yourealwaysbe.forkyz.view.SpecialEntryDialog;
 
 import java.util.Locale;
 import java.util.Objects;

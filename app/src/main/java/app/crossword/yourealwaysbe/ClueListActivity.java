@@ -23,9 +23,9 @@ import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.Zone;
 import app.crossword.yourealwaysbe.forkyz.util.KeyboardManager;
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand;
-import app.crossword.yourealwaysbe.view.BoardEditView.BoardClickListener;
-import app.crossword.yourealwaysbe.view.ClueEditDialog;
-import app.crossword.yourealwaysbe.view.ClueTabs;
+import app.crossword.yourealwaysbe.forkyz.view.BoardEditView.BoardClickListener;
+import app.crossword.yourealwaysbe.forkyz.view.ClueEditDialog;
+import app.crossword.yourealwaysbe.forkyz.view.ClueTabs;
 
 public class ClueListActivity extends PuzzleActivity
                               implements ClueTabs.ClueTabsListener {

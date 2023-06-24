@@ -21,7 +21,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:theme="@style/clueLineStyle"
         />
-        <app.crossword.yourealwaysbe.view.BoardFullEditView
+        <app.crossword.yourealwaysbe.forkyz.view.BoardFullEditView
             android:id="@+id/board_view"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -54,7 +54,7 @@
                 android:layout_height="wrap_content"
             />
         </LinearLayout>
-        <app.crossword.yourealwaysbe.view.ClueTabs
+        <app.crossword.yourealwaysbe.forkyz.view.ClueTabs
             android:id="@+id/clue_tabs"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -63,7 +63,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
         />
-        <app.crossword.yourealwaysbe.view.ForkyzKeyboard
+        <app.crossword.yourealwaysbe.forkyz.view.ForkyzKeyboard
             android:id="@+id/keyboard_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -1,4 +1,4 @@
-package app.crossword.yourealwaysbe.view.recycler;
+package app.crossword.yourealwaysbe.forkyz.view.recycler;
 
 /**
  * Created by rcooper on 7/23/15.

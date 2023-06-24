@@ -1,5 +1,5 @@
 
-package app.crossword.yourealwaysbe.view;
+package app.crossword.yourealwaysbe.forkyz.view;
 
 import java.util.Collection;
 import java.util.Collections;

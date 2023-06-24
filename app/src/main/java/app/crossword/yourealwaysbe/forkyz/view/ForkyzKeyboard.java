@@ -3,7 +3,7 @@
  * First principles approach preferred instead.
  */
 
-package app.crossword.yourealwaysbe.view;
+package app.crossword.yourealwaysbe.forkyz.view;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

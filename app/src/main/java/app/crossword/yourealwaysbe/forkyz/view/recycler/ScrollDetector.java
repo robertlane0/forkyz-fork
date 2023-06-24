@@ -1,4 +1,4 @@
-package app.crossword.yourealwaysbe.view.recycler;
+package app.crossword.yourealwaysbe.forkyz.view.recycler;
 
 import android.content.Context;
 import android.view.GestureDetector;

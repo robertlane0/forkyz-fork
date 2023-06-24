@@ -38,11 +38,11 @@ import app.crossword.yourealwaysbe.puz.Zone;
 import app.crossword.yourealwaysbe.forkyz.util.KeyboardManager;
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
-import app.crossword.yourealwaysbe.view.BoardEditText.BoardEditFilter;
-import app.crossword.yourealwaysbe.view.BoardEditText;
-import app.crossword.yourealwaysbe.view.BoardEditView.BoardClickListener;
-import app.crossword.yourealwaysbe.view.ScrollingImageView.Point;
-import app.crossword.yourealwaysbe.view.ScrollingImageView;
+import app.crossword.yourealwaysbe.forkyz.view.BoardEditText.BoardEditFilter;
+import app.crossword.yourealwaysbe.forkyz.view.BoardEditText;
+import app.crossword.yourealwaysbe.forkyz.view.BoardEditView.BoardClickListener;
+import app.crossword.yourealwaysbe.forkyz.view.ScrollingImageView.Point;
+import app.crossword.yourealwaysbe.forkyz.view.ScrollingImageView;
 
 public class NotesActivity extends PuzzleActivity {
     private static final Logger LOG = Logger.getLogger(

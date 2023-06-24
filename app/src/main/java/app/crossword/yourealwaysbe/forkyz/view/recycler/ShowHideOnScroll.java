@@ -1,4 +1,4 @@
-package app.crossword.yourealwaysbe.view.recycler;
+package app.crossword.yourealwaysbe.forkyz.view.recycler;
 
 import android.view.View;
 import android.view.animation.Animation;

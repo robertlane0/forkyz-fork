@@ -1,10 +1,10 @@
-package app.crossword.yourealwaysbe.view;
+package app.crossword.yourealwaysbe.forkyz.view;
 
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.ScaleGestureDetector.OnScaleGestureListener;
 
-import app.crossword.yourealwaysbe.view.ScrollingImageView.AuxTouchHandler;
+import app.crossword.yourealwaysbe.forkyz.view.ScrollingImageView.AuxTouchHandler;
 
 public class MultitouchHandler implements OnScaleGestureListener, AuxTouchHandler {
     private ScaleGestureDetector scaleDetector;

@@ -1,4 +1,4 @@
-package app.crossword.yourealwaysbe.view;
+package app.crossword.yourealwaysbe.forkyz.view;
 
 import java.util.logging.Logger;
 
@@ -58,7 +58,7 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
 
         try {
             aux = (AuxTouchHandler) Class.forName(
-                "app.crossword.yourealwaysbe.view.MultitouchHandler"
+                "app.crossword.yourealwaysbe.forkyz.view.MultitouchHandler"
             ).newInstance();
             aux.init(this);
         } catch (IllegalAccessException e) {

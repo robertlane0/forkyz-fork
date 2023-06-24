@@ -1,4 +1,4 @@
-package app.crossword.yourealwaysbe.view;
+package app.crossword.yourealwaysbe.forkyz.view;
 
 import app.crossword.yourealwaysbe.forkyz.R;
 import app.crossword.yourealwaysbe.forkyz.databinding.ClueListItemBinding;
@@ -14,7 +14,7 @@ import app.crossword.yourealwaysbe.puz.Playboard;
 import app.crossword.yourealwaysbe.puz.Position;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.util.WeakSet;
-import app.crossword.yourealwaysbe.view.BoardEditView.BoardClickListener;
+import app.crossword.yourealwaysbe.forkyz.view.BoardEditView.BoardClickListener;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

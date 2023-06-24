@@ -34,7 +34,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/board_lab"
                 />
-                <app.crossword.yourealwaysbe.view.BoardWordEditView
+                <app.crossword.yourealwaysbe.forkyz.view.BoardWordEditView
                     android:id="@+id/miniboard"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
@@ -50,7 +50,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/scratch_lab"
                 />
-                <app.crossword.yourealwaysbe.view.BoardEditText
+                <app.crossword.yourealwaysbe.forkyz.view.BoardEditText
                     android:id="@+id/scratch_miniboard"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
@@ -93,7 +93,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/anagram_source_lab"
                 />
-                <app.crossword.yourealwaysbe.view.BoardEditText
+                <app.crossword.yourealwaysbe.forkyz.view.BoardEditText
                     android:id="@+id/anagram_source"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
@@ -109,7 +109,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/anagram_solution_lab"
                 />
-                <app.crossword.yourealwaysbe.view.BoardEditText
+                <app.crossword.yourealwaysbe.forkyz.view.BoardEditText
                     android:id="@+id/anagram_solution"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
@@ -127,7 +127,7 @@
             android:layout_height="wrap_content"
             android:layout_width="fill_parent"
         />
-        <app.crossword.yourealwaysbe.view.ForkyzKeyboard
+        <app.crossword.yourealwaysbe.forkyz.view.ForkyzKeyboard
             android:id="@+id/keyboard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

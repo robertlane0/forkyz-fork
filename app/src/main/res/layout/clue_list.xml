@@ -8,7 +8,7 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
     >
-        <app.crossword.yourealwaysbe.view.BoardWordEditView
+        <app.crossword.yourealwaysbe.forkyz.view.BoardWordEditView
             android:id="@+id/miniboard"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -18,7 +18,7 @@
             android:layout_marginTop="0sp"
             android:layout_marginBottom="4sp"
         />
-        <app.crossword.yourealwaysbe.view.ClueTabs
+        <app.crossword.yourealwaysbe.forkyz.view.ClueTabs
             android:id="@+id/clue_tabs"
             android:layout_width="fill_parent"
             android:layout_height="0dp"
@@ -30,7 +30,7 @@
             android:layout_height="wrap_content"
             android:layout_width="fill_parent"
         />
-        <app.crossword.yourealwaysbe.view.ForkyzKeyboard
+        <app.crossword.yourealwaysbe.forkyz.view.ForkyzKeyboard
             android:id="@+id/keyboard"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"

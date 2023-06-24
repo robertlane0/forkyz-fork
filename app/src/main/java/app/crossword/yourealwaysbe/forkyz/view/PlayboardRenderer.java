@@ -1,4 +1,4 @@
-package app.crossword.yourealwaysbe.view;
+package app.crossword.yourealwaysbe.forkyz.view;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -32,7 +32,7 @@ import app.crossword.yourealwaysbe.puz.PuzImage;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.Zone;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
-import app.crossword.yourealwaysbe.view.ScrollingImageView.Point;
+import app.crossword.yourealwaysbe.forkyz.view.ScrollingImageView.Point;
 
 import java.util.Collection;
 import java.util.Collections;

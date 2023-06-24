@@ -1,5 +1,5 @@
 
-package app.crossword.yourealwaysbe.view;
+package app.crossword.yourealwaysbe.forkyz.view;
 
 import android.app.Dialog;
 import android.content.Context;

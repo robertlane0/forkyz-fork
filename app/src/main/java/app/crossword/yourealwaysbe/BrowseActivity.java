@@ -60,8 +60,8 @@ import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider;
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle;
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzMetaFile;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
-import app.crossword.yourealwaysbe.view.recycler.RemovableRecyclerViewAdapter;
-import app.crossword.yourealwaysbe.view.recycler.SeparatedRecyclerViewAdapter;
+import app.crossword.yourealwaysbe.forkyz.view.recycler.RemovableRecyclerViewAdapter;
+import app.crossword.yourealwaysbe.forkyz.view.recycler.SeparatedRecyclerViewAdapter;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

@@ -43,11 +43,11 @@ import app.crossword.yourealwaysbe.puz.Position;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.forkyz.util.KeyboardManager;
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand;
-import app.crossword.yourealwaysbe.view.BoardEditView.BoardClickListener;
-import app.crossword.yourealwaysbe.view.ClueTabs;
-import app.crossword.yourealwaysbe.view.ForkyzKeyboard;
-import app.crossword.yourealwaysbe.view.PuzzleInfoDialogs;
-import app.crossword.yourealwaysbe.view.ScrollingImageView.ScaleListener;
+import app.crossword.yourealwaysbe.forkyz.view.BoardEditView.BoardClickListener;
+import app.crossword.yourealwaysbe.forkyz.view.ClueTabs;
+import app.crossword.yourealwaysbe.forkyz.view.ForkyzKeyboard;
+import app.crossword.yourealwaysbe.forkyz.view.PuzzleInfoDialogs;
+import app.crossword.yourealwaysbe.forkyz.view.ScrollingImageView.ScaleListener;
 
 import java.util.ArrayList;
 import java.util.List;

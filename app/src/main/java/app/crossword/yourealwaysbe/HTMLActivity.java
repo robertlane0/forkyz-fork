@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 import app.crossword.yourealwaysbe.forkyz.databinding.HtmlViewBinding;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
-import app.crossword.yourealwaysbe.view.recycler.ShowHideOnScroll;
+import app.crossword.yourealwaysbe.forkyz.view.recycler.ShowHideOnScroll;
 
 public class HTMLActivity extends ForkyzActivity {
     private AndroidVersionUtils utils

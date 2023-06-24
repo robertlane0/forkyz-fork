@@ -17,7 +17,7 @@ import android.view.inputmethod.InputMethodManager;
 
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.settings.KeyboardMode;
-import app.crossword.yourealwaysbe.view.ForkyzKeyboard;
+import app.crossword.yourealwaysbe.forkyz.view.ForkyzKeyboard;
 
 public class KeyboardManager {
     private static final Logger LOG = Logger.getLogger(KeyboardManager.class.getCanonicalName());

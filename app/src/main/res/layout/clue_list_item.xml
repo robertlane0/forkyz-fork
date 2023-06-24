@@ -37,7 +37,7 @@
             />
         </FrameLayout>
 
-        <app.crossword.yourealwaysbe.view.BoardWordEditView
+        <app.crossword.yourealwaysbe.forkyz.view.BoardWordEditView
             android:id="@+id/miniboard"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"

@@ -1,4 +1,4 @@
-package app.crossword.yourealwaysbe.view;
+package app.crossword.yourealwaysbe.forkyz.view;
 
 import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
