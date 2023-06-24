@@ -20,10 +20,12 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
+import dagger.hilt.android.qualifiers.ApplicationContext;
 
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation;
+import app.crossword.yourealwaysbe.forkyz.util.ExitActivity;
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider;
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerSAF;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
@@ -260,7 +262,13 @@ public class PreferencesFragment extends PreferencesBaseFragment {
         });
     }
 
+    @AndroidEntryPoint
     public static class StorageChangedDialog extends DialogFragment {
+
+        @Inject
+        @ApplicationContext
+        protected Context applicationContext;
+
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             MaterialAlertDialogBuilder builder
@@ -270,9 +278,7 @@ public class PreferencesFragment extends PreferencesBaseFragment {
                 .setMessage(R.string.storage_changed_please_restart)
                 .setPositiveButton(
                     R.string.exit,
-                    (di, i) -> {
-                        ForkyzApplication.getInstance().exitApplication();
-                    }
+                    (di, i) -> { exitApplication(); }
                 );
 
             return builder.create();
@@ -280,7 +286,11 @@ public class PreferencesFragment extends PreferencesBaseFragment {
 
         @Override
         public void onCancel(DialogInterface di) {
-            ForkyzApplication.getInstance().exitApplication();
+            exitApplication();
+        }
+
+        private void exitApplication() {
+            ExitActivity.exit(applicationContext);
         }
     }
 }

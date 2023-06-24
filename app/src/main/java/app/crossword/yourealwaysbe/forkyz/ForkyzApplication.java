@@ -12,7 +12,6 @@ import dagger.hilt.android.HiltAndroidApp;
 
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation;
-import app.crossword.yourealwaysbe.forkyz.util.ExitActivity;
 import app.crossword.yourealwaysbe.forkyz.util.ThemeHelper;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 
@@ -36,10 +35,6 @@ public class ForkyzApplication extends Application implements Configuration.Prov
     HiltWorkerFactory workerFactory;
 
     private static ForkyzApplication INSTANCE;
-
-    public void exitApplication() {
-        ExitActivity.exit(this);
-    }
 
     @Override
     public void onCreate() {
