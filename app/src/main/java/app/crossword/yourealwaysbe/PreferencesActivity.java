@@ -17,7 +17,7 @@ import app.crossword.yourealwaysbe.forkyz.R;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.util.NightModeHelper;
 import app.crossword.yourealwaysbe.forkyz.util.ThemeHelper;
-import app.crossword.yourealwaysbe.versions.AndroidVersionUtils;
+import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 
 @AndroidEntryPoint
 public class PreferencesActivity

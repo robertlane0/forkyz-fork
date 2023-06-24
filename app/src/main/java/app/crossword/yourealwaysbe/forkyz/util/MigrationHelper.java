@@ -7,7 +7,7 @@ import android.content.Context;
 
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.net.Downloaders;
-import app.crossword.yourealwaysbe.versions.AndroidVersionUtils;
+import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 
 @Singleton
 public class MigrationHelper {

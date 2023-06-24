@@ -25,7 +25,7 @@ import app.crossword.yourealwaysbe.puz.Playboard;
 import app.crossword.yourealwaysbe.puz.Position;
 import app.crossword.yourealwaysbe.forkyz.util.BoxInputConnection;
 import app.crossword.yourealwaysbe.forkyz.util.KeyboardManager;
-import app.crossword.yourealwaysbe.versions.AndroidVersionUtils;
+import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 
 public class BoardEditText
         extends ScrollingImageView

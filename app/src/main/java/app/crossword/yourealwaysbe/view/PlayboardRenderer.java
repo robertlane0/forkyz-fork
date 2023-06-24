@@ -31,7 +31,7 @@ import app.crossword.yourealwaysbe.puz.Position;
 import app.crossword.yourealwaysbe.puz.PuzImage;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.Zone;
-import app.crossword.yourealwaysbe.versions.AndroidVersionUtils;
+import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 import app.crossword.yourealwaysbe.view.ScrollingImageView.Point;
 
 import java.util.Collection;

@@ -17,7 +17,7 @@ import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
 import androidx.core.view.inputmethod.EditorInfoCompat;
 
-import app.crossword.yourealwaysbe.versions.AndroidVersionUtils;
+import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 
 public class BoxInputConnection extends BaseInputConnection {
 

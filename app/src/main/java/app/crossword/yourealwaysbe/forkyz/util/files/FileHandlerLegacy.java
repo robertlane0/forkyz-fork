@@ -6,7 +6,7 @@ import java.util.logging.Logger;
 import android.content.Context;
 import android.os.Environment;
 
-import app.crossword.yourealwaysbe.versions.AndroidVersionUtils;
+import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 
 /**
  * Implementation of original Shortyz file access directly working with

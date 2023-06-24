@@ -1,4 +1,4 @@
-package app.crossword.yourealwaysbe.versions;
+package app.crossword.yourealwaysbe.forkyz.versions;
 
 import java.io.IOException;
 import java.util.UUID;

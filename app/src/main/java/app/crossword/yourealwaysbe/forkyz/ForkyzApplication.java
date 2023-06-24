@@ -18,7 +18,7 @@ import app.crossword.yourealwaysbe.forkyz.util.ExitActivity;
 import app.crossword.yourealwaysbe.forkyz.util.ThemeHelper;
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider;
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle;
-import app.crossword.yourealwaysbe.versions.AndroidVersionUtils;
+import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 
 import java.io.IOException;
 import java.util.function.Consumer;
