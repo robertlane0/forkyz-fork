@@ -14,14 +14,15 @@ import java.util.function.BiConsumer;
 import java.util.logging.Logger;
 import javax.inject.Inject;
 
+import android.app.Application;
 import android.content.ContentResolver;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.widget.Toast;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import dagger.hilt.android.lifecycle.HiltViewModel;
 
@@ -40,7 +41,7 @@ import app.crossword.yourealwaysbe.puz.Playboard;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 
 @HiltViewModel
-public class BrowseActivityViewModel extends ViewModel {
+public class BrowseActivityViewModel extends AndroidViewModel {
     private static final Logger LOGGER
         = Logger.getLogger(BrowseActivityViewModel.class.getCanonicalName());
 
@@ -69,10 +70,12 @@ public class BrowseActivityViewModel extends ViewModel {
 
     @Inject
     public BrowseActivityViewModel(
+        Application application,
         ForkyzSettings settings,
         FileHandlerProvider fileHandlerProvider,
         CurrentPuzzleHolder currentPuzzleHolder
     ) {
+        super(application);
         this.settings = settings;
         this.fileHandlerProvider = fileHandlerProvider;
         this.currentPuzzleHolder = currentPuzzleHolder;
@@ -240,12 +243,10 @@ public class BrowseActivityViewModel extends ViewModel {
         settings.getDownloadersSettings(downloadersSettings -> {
             downloadExecutorService.execute(() -> {
                 NotificationManagerCompat nm
-                    = NotificationManagerCompat.from(
-                        ForkyzApplication.getInstance()
-                    );
+                    = NotificationManagerCompat.from(getApplication());
 
                 Downloaders dls = new Downloaders(
-                     ForkyzApplication.getInstance(),
+                     getApplication(),
                      fileHandler,
                      downloadersSettings,
                      nm
@@ -298,9 +299,8 @@ public class BrowseActivityViewModel extends ViewModel {
                             ee.printStackTrace();
                         }
 
-                        ForkyzApplication application
-                            = ForkyzApplication.getInstance();
 
+                        Application application = getApplication();
                         Toast t = Toast.makeText(
                             application,
                             application.getString(
@@ -357,7 +357,7 @@ public class BrowseActivityViewModel extends ViewModel {
     ) {
         fileHandlerProvider.get(fileHandler -> {
             threadWithUILock(() -> {
-                ForkyzApplication application = ForkyzApplication.getInstance();
+                Application application = getApplication();
                 ContentResolver resolver = application.getContentResolver();
 
                 boolean someFailed = false;
