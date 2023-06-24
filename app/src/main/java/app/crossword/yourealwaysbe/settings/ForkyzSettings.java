@@ -89,8 +89,10 @@ public class ForkyzSettings {
     public static final String PREF_FILE_HANDLER_STORAGE_LOC
         = "storageLocation";
 
+    private static final String PREF_KEYBOARD_HAPTIC = "keyboardHaptic";
     private static final String PREF_KEYBOARD_HIDE_BUTTON
         = "keyboardHideButton";
+    private static final String PREF_KEYBOARD_LAYOUT = "keyboardLayout";
     private static final String PREF_KEYBOARD_MODE = "keyboardShowHide";
     private static final String PREF_KEYBOARD_NATIVE = "useNativeKeyboard";
 
@@ -177,6 +179,7 @@ public class ForkyzSettings {
         BOOL_DEFAULTS.put(PREF_CLUE_LIST_SHOW_WORDS, false);
         BOOL_DEFAULTS.put(PREF_CLUE_LIST_SNAP_TO_CLUE, false);
         BOOL_DEFAULTS.put(PREF_DOWNLOAD_PENDING, false);
+        BOOL_DEFAULTS.put(PREF_KEYBOARD_HAPTIC, true);
         BOOL_DEFAULTS.put(PREF_KEYBOARD_HIDE_BUTTON, false);
         BOOL_DEFAULTS.put(PREF_KEYBOARD_NATIVE, false);
         INT_DEFAULTS.put(PREF_PLAY_CLUE_TABS_PAGE, 0);
@@ -215,12 +218,15 @@ public class ForkyzSettings {
     private ExecutorService executor = Executors.newSingleThreadExecutor();
 
     private MutableLiveData<Accessor> liveBrowseSort;
+    private MutableLiveData<KeyboardLayout> liveKeyboardLayout;
     private Map<String, MutableLiveData<Boolean>> liveBooleans = new HashMap<>();
 
     private OnSharedPreferenceChangeListener prefChangeListener
         = (prefs, key) -> {
             if (PREF_BROWSE_SORT.equals(key)) {
                 updateLiveBrowseSort();
+            } else if (PREF_KEYBOARD_LAYOUT.equals(key)) {
+                updateLiveKeyboardLayout();
             } else if (liveBooleans.containsKey(key)) {
                 updateLiveBoolean(key);
             }
@@ -506,13 +512,10 @@ public class ForkyzSettings {
     }
 
     /**
-     * The show/hide behaviour of the keyboard
+     * If the Forkyz keyboard gives haptic feedback
      */
-    public void getKeyboardMode(Consumer<KeyboardMode> cb) {
-        String modePref = prefs.getString(
-            PREF_KEYBOARD_MODE, KeyboardMode.HIDE_MANUAL.getSettingsValue()
-        );
-        cb.accept(KeyboardMode.getFromSettingsValue(modePref));
+    public void getKeyboardHaptic(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_KEYBOARD_HAPTIC, cb);
     }
 
     /**
@@ -520,6 +523,39 @@ public class ForkyzSettings {
      */
     public void getKeyboardHideButton(Consumer<Boolean> cb) {
         getBooleanPreference(PREF_KEYBOARD_HIDE_BUTTON, cb);
+    }
+
+    /**
+     * Get layout of Forkyz keyboard
+     */
+    public void getKeyboardLayout(Consumer<KeyboardLayout> cb) {
+        executor.execute(() -> {
+            String value = prefs.getString(
+                PREF_KEYBOARD_LAYOUT,
+                KeyboardLayout.QWERTY.getSettingsValue()
+            );
+            handler.post(() -> {
+                cb.accept(KeyboardLayout.getFromSettingsValue(value));
+            });
+        });
+    }
+
+    public LiveData<KeyboardLayout> liveKeyboardLayout() {
+        if (liveKeyboardLayout == null) {
+            liveKeyboardLayout = new MutableLiveData<KeyboardLayout>();
+            updateLiveKeyboardLayout();
+        }
+        return liveKeyboardLayout;
+    }
+
+    /**
+     * The show/hide behaviour of the keyboard
+     */
+    public void getKeyboardMode(Consumer<KeyboardMode> cb) {
+        String modePref = prefs.getString(
+            PREF_KEYBOARD_MODE, KeyboardMode.HIDE_MANUAL.getSettingsValue()
+        );
+        cb.accept(KeyboardMode.getFromSettingsValue(modePref));
     }
 
     /**
@@ -1071,6 +1107,11 @@ public class ForkyzSettings {
     private void updateLiveBrowseSort() {
         if (liveBrowseSort != null)
             getBrowseSort(value -> { liveBrowseSort.setValue(value); });
+    }
+
+    private void updateLiveKeyboardLayout() {
+        if (liveKeyboardLayout != null)
+            getKeyboardLayout(value -> { liveKeyboardLayout.setValue(value); });
     }
 
     private LiveData<Boolean> liveBooleanPreference(String name) {

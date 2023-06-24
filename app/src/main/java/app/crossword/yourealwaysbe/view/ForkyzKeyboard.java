@@ -8,13 +8,13 @@ package app.crossword.yourealwaysbe.view;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import javax.inject.Inject;
 
 import android.content.Context;
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.os.Handler;
 import android.os.Looper;
@@ -34,11 +34,16 @@ import androidx.annotation.IntDef;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.core.view.LayoutInflaterCompat;
-import androidx.preference.PreferenceManager;
+import androidx.lifecycle.ViewTreeLifecycleOwner;
+
+import dagger.hilt.android.AndroidEntryPoint;
 
 import app.crossword.yourealwaysbe.forkyz.R;
+import app.crossword.yourealwaysbe.settings.ForkyzSettings;
+import app.crossword.yourealwaysbe.settings.KeyboardLayout;
 import java.util.logging.Logger;
 
+@AndroidEntryPoint
 public class ForkyzKeyboard
     extends LinearLayout
     implements View.OnTouchListener, View.OnClickListener {
@@ -48,14 +53,21 @@ public class ForkyzKeyboard
 
     private static final String FORKYZ_TEXT_KEY = "ForkyzTextKey";
     private static final String FORKYZ_IMAGE_KEY = "ForkyzImageKey";
-    private static final String PREF_KEYBOARD_LAYOUT = "keyboardLayout";
-    private static final String PREF_KEYBOARD_HAPTIC = "keyboardHaptic";
-    private static final String DEFAULT_KEYBOARD_LAYOUT = "0";
-    private static final int[] KEYBOARD_LAYOUTS = {
-        R.layout.forkyz_keyboard_qwerty,
-        R.layout.forkyz_keyboard_qwertz,
-        R.layout.forkyz_keyboard_dvorak,
-        R.layout.forkyz_keyboard_colemak
+    private static final EnumMap<KeyboardLayout, Integer> KEYBOARD_LAYOUTS;
+    static {
+        KEYBOARD_LAYOUTS = new EnumMap<>(KeyboardLayout.class);
+        KEYBOARD_LAYOUTS.put(
+            KeyboardLayout.QWERTY, R.layout.forkyz_keyboard_qwerty
+        );
+        KEYBOARD_LAYOUTS.put(
+            KeyboardLayout.QWERTZ, R.layout.forkyz_keyboard_qwertz
+        );
+        KEYBOARD_LAYOUTS.put(
+            KeyboardLayout.DVORAK, R.layout.forkyz_keyboard_dvorak
+        );
+        KEYBOARD_LAYOUTS.put(
+            KeyboardLayout.COLEMAK, R.layout.forkyz_keyboard_colemak
+        );
     };
 
     private static final int KEY_REPEAT_DELAY = 300;
@@ -88,24 +100,18 @@ public class ForkyzKeyboard
         public void fireKeyDown();
     }
 
+    @Inject
+    protected ForkyzSettings settings;
+
     private Handler handler = new Handler(Looper.getMainLooper());
 
-    private SparseArray<KeyActor> keyActors;
-    private SparseArray<Timer> keyTimers;
+    private SparseArray<KeyActor> keyActors = new SparseArray<>();
+    private SparseArray<Timer> keyTimers = new SparseArray<>();
     private InputConnection inputConnection;
     private int countKeysDown = 0;
-    private List<Integer> specialKeyViewIds;
+    private List<Integer> specialKeyViewIds = new ArrayList<>();
     private SpecialKeyListener specialKeyListener = null;
-
-    private OnSharedPreferenceChangeListener prefChangeListener
-        = new OnSharedPreferenceChangeListener() {
-            public void onSharedPreferenceChanged(
-                SharedPreferences prefs, String key
-            ) {
-                if (PREF_KEYBOARD_LAYOUT.equals(key))
-                    createView(getContext());
-            }
-        };
+    private boolean showHideButton = true;
 
     public ForkyzKeyboard(Context context) {
         this(context, null, 0);
@@ -120,10 +126,16 @@ public class ForkyzKeyboard
     ) {
         super(context, attrs, defStyleAttr);
         setFocusable(false);
-        createView(context);
+    }
 
-        PreferenceManager.getDefaultSharedPreferences(context)
-            .registerOnSharedPreferenceChangeListener(prefChangeListener);
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        // need to do this here: there's no life cycle owner until attached
+        settings.liveKeyboardLayout().observe(
+            ViewTreeLifecycleOwner.get(this),
+            keyboardLayout -> { createView(getContext(), keyboardLayout); }
+        );
     }
 
     /**
@@ -139,11 +151,13 @@ public class ForkyzKeyboard
         case MotionEvent.ACTION_DOWN:
             onKeyDown(view.getId());
             view.setPressed(true);
-            if (performHaptic()) {
-                view.performHapticFeedback(
-                    HapticFeedbackConstants.KEYBOARD_TAP
-                );
-            }
+            settings.getKeyboardHaptic(haptic -> {
+                if (haptic) {
+                    view.performHapticFeedback(
+                        HapticFeedbackConstants.KEYBOARD_TAP
+                    );
+                }
+            });
             return true;
         case MotionEvent.ACTION_UP:
             view.setPressed(false);
@@ -205,8 +219,10 @@ public class ForkyzKeyboard
      * Whether to show or hide the keyboard hide button row
      */
     public synchronized void setShowHideButton(boolean show) {
+        showHideButton = show;
         View hideRow = findViewById(R.id.hide_row);
-        hideRow.setVisibility(show ? View.VISIBLE : View.GONE);
+        if (hideRow != null)
+            hideRow.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     /**
@@ -233,20 +249,23 @@ public class ForkyzKeyboard
     private synchronized void countKeyDown() { countKeysDown++; }
     private synchronized void countKeyUp() { countKeysDown--; }
 
-    private synchronized void createView(Context context) {
+    private synchronized void createView(
+        Context context, KeyboardLayout keyboardLayout
+    ) {
         // clear any old state (if config change)
         cancelKeyTimers();
         removeAllViews();
-        keyActors = new SparseArray<>();
-        keyTimers = new SparseArray<>();
-        specialKeyViewIds = new ArrayList<>();;
+        keyActors.clear();
+        keyTimers.clear();
+        specialKeyViewIds.clear();
 
         // inflate new state
         LayoutInflater inflater = (LayoutInflater)
             context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater = inflater.cloneInContext(context);
         LayoutInflaterCompat.setFactory2(inflater, new FKFactory());
-        inflater.inflate(getKeyboardLayout(context), this, true);
+
+        inflater.inflate(KEYBOARD_LAYOUTS.get(keyboardLayout), this, true);
 
         // initially hide unless special key listener is set
         setupSpecialKeys();
@@ -257,31 +276,8 @@ public class ForkyzKeyboard
                 ForkyzKeyboard.this.setVisibility(View.GONE);
             }
         });
-    }
 
-    private int getKeyboardLayout(Context context) {
-        // Determines keyboard layout based on shared preferences
-        // I'm not fully keen on this -- it would be nice to keep app settings
-        // out of here. But the alternative of inflating with a default layout
-        // then having the KeyboardManager reinflating if needed seems like
-        // overkill.
-        SharedPreferences prefs
-            = PreferenceManager.getDefaultSharedPreferences(context);
-
-        String keyboardLayoutString = prefs.getString(
-            PREF_KEYBOARD_LAYOUT, DEFAULT_KEYBOARD_LAYOUT
-        );
-
-        try {
-            int keyboardLayout = Integer.valueOf(keyboardLayoutString);
-
-            if (keyboardLayout < 0 || keyboardLayout >= KEYBOARD_LAYOUTS.length)
-                keyboardLayout = Integer.valueOf(DEFAULT_KEYBOARD_LAYOUT);
-
-            return KEYBOARD_LAYOUTS[keyboardLayout];
-        } catch (NumberFormatException e) {
-            return KEYBOARD_LAYOUTS[Integer.valueOf(DEFAULT_KEYBOARD_LAYOUT)];
-        }
+        setShowHideButton(showHideButton);
     }
 
     private synchronized void setSpecialKeyVisibilty(int visibility) {
@@ -409,12 +405,6 @@ public class ForkyzKeyboard
         KeyActor actor = keyActors.get(keyId);
         if (actor != null)
             actor.fireKeyDown();
-    }
-
-    private boolean performHaptic() {
-        SharedPreferences prefs
-            = PreferenceManager.getDefaultSharedPreferences(getContext());
-        return prefs.getBoolean(PREF_KEYBOARD_HAPTIC, true);
     }
 
     private class FKFactory implements LayoutInflater.Factory2 {
