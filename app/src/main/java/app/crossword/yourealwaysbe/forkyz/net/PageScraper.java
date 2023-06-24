@@ -19,8 +19,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import app.crossword.yourealwaysbe.io.IO;
-import app.crossword.yourealwaysbe.io.PuzzleParser;
+import app.crossword.yourealwaysbe.puz.io.IO;
+import app.crossword.yourealwaysbe.puz.io.PuzzleParser;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.PuzzleBuilder;
 

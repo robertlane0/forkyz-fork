@@ -4,7 +4,7 @@ package app.crossword.yourealwaysbe.forkyz.net;
 import java.time.DayOfWeek;
 import java.time.Duration;
 
-import app.crossword.yourealwaysbe.io.JPZIO;
+import app.crossword.yourealwaysbe.puz.io.JPZIO;
 
 /**
  * King Digital Downloader

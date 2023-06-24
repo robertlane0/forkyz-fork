@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import app.crossword.yourealwaysbe.io.RaetselZentraleSchwedenJSONIO;
+import app.crossword.yourealwaysbe.puz.io.RaetselZentraleSchwedenJSONIO;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 
 /**

@@ -13,7 +13,7 @@ import java.util.Map;
 
 import net.iharder.Base64;
 
-import app.crossword.yourealwaysbe.io.StreamUtils;
+import app.crossword.yourealwaysbe.puz.io.StreamUtils;
 import app.crossword.yourealwaysbe.util.PuzzleUtils;
 
 public class PuzzleBuilder {

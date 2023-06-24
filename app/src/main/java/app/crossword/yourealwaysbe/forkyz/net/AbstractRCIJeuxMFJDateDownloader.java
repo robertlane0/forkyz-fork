@@ -7,7 +7,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Map;
 
-import app.crossword.yourealwaysbe.io.RCIJeuxMFJIO;
+import app.crossword.yourealwaysbe.puz.io.RCIJeuxMFJIO;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 
 /**

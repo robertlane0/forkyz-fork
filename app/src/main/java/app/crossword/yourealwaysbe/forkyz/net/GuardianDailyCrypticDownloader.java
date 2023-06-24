@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.util.Map;
 
-import app.crossword.yourealwaysbe.io.GuardianJSONIO;
+import app.crossword.yourealwaysbe.puz.io.GuardianJSONIO;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 
 /**

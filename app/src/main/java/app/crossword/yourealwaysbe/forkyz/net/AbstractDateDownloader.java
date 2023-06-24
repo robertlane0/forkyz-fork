@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import app.crossword.yourealwaysbe.io.PuzzleParser;
+import app.crossword.yourealwaysbe.puz.io.PuzzleParser;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 
 /**

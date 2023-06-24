@@ -18,7 +18,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import app.crossword.yourealwaysbe.io.KeesingXMLIO;
+import app.crossword.yourealwaysbe.puz.io.KeesingXMLIO;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 
 /**

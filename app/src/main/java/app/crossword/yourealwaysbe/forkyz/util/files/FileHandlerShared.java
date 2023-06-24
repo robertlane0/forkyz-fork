@@ -17,7 +17,7 @@ import android.os.Handler;
 import android.os.Looper;
 import androidx.core.content.FileProvider;
 
-import app.crossword.yourealwaysbe.io.IPuzIO;
+import app.crossword.yourealwaysbe.puz.io.IPuzIO;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.forkyz.util.AppPuzzleUtils;
 

@@ -26,9 +26,9 @@ import java.util.logging.Logger;
 import android.content.Context;
 import android.net.Uri;
 
-import app.crossword.yourealwaysbe.io.IO;
-import app.crossword.yourealwaysbe.io.IPuzIO;
-import app.crossword.yourealwaysbe.io.StreamUtils;
+import app.crossword.yourealwaysbe.puz.io.IO;
+import app.crossword.yourealwaysbe.puz.io.IPuzIO;
+import app.crossword.yourealwaysbe.puz.io.StreamUtils;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 
 /**

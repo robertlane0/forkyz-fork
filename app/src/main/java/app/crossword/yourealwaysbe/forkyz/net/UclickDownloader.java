@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.util.Locale;
 import java.util.Set;
 
-import app.crossword.yourealwaysbe.io.UclickXMLIO;
+import app.crossword.yourealwaysbe.puz.io.UclickXMLIO;
 
 /**
  * Uclick XML Puzzles

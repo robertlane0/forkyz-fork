@@ -13,9 +13,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import app.crossword.yourealwaysbe.io.IO;
-import app.crossword.yourealwaysbe.io.IOTest;
-import app.crossword.yourealwaysbe.io.IPuzIO;
+import app.crossword.yourealwaysbe.puz.io.IO;
+import app.crossword.yourealwaysbe.puz.io.IOTest;
+import app.crossword.yourealwaysbe.puz.io.IPuzIO;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;

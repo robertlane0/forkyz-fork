@@ -1,6 +1,6 @@
 package app.crossword.yourealwaysbe.forkyz.net;
 
-import app.crossword.yourealwaysbe.io.PuzzleStreamReader;
+import app.crossword.yourealwaysbe.puz.io.PuzzleStreamReader;
 
 import java.time.Duration;
 
