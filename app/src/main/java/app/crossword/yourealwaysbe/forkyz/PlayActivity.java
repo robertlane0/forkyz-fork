@@ -1,4 +1,4 @@
-package app.crossword.yourealwaysbe;
+package app.crossword.yourealwaysbe.forkyz;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -30,9 +30,15 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import com.squareup.seismic.ShakeDetector;
 
-import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
-import app.crossword.yourealwaysbe.forkyz.R;
 import app.crossword.yourealwaysbe.forkyz.databinding.PlayBinding;
+import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer;
+import app.crossword.yourealwaysbe.forkyz.util.KeyboardManager;
+import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand;
+import app.crossword.yourealwaysbe.forkyz.view.BoardEditView.BoardClickListener;
+import app.crossword.yourealwaysbe.forkyz.view.ClueTabs;
+import app.crossword.yourealwaysbe.forkyz.view.ForkyzKeyboard;
+import app.crossword.yourealwaysbe.forkyz.view.PuzzleInfoDialogs;
+import app.crossword.yourealwaysbe.forkyz.view.ScrollingImageView.ScaleListener;
 import app.crossword.yourealwaysbe.puz.Box;
 import app.crossword.yourealwaysbe.puz.Clue;
 import app.crossword.yourealwaysbe.puz.ClueID;
@@ -41,13 +47,6 @@ import app.crossword.yourealwaysbe.puz.Playboard.Word;
 import app.crossword.yourealwaysbe.puz.Playboard;
 import app.crossword.yourealwaysbe.puz.Position;
 import app.crossword.yourealwaysbe.puz.Puzzle;
-import app.crossword.yourealwaysbe.forkyz.util.KeyboardManager;
-import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand;
-import app.crossword.yourealwaysbe.forkyz.view.BoardEditView.BoardClickListener;
-import app.crossword.yourealwaysbe.forkyz.view.ClueTabs;
-import app.crossword.yourealwaysbe.forkyz.view.ForkyzKeyboard;
-import app.crossword.yourealwaysbe.forkyz.view.PuzzleInfoDialogs;
-import app.crossword.yourealwaysbe.forkyz.view.ScrollingImageView.ScaleListener;
 
 import java.util.ArrayList;
 import java.util.List;

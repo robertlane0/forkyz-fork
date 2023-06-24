@@ -1,4 +1,4 @@
-package app.crossword.yourealwaysbe;
+package app.crossword.yourealwaysbe.forkyz.util;
 
 import android.app.Activity;
 import android.app.Dialog;

@@ -1,4 +1,4 @@
-package app.crossword.yourealwaysbe;
+package app.crossword.yourealwaysbe.forkyz;
 
 import java.util.Objects;
 import java.util.logging.Logger;
@@ -11,8 +11,12 @@ import android.view.MenuItem;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat;
 
-import app.crossword.yourealwaysbe.forkyz.R;
 import app.crossword.yourealwaysbe.forkyz.databinding.ClueListBinding;
+import app.crossword.yourealwaysbe.forkyz.util.KeyboardManager;
+import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand;
+import app.crossword.yourealwaysbe.forkyz.view.BoardEditView.BoardClickListener;
+import app.crossword.yourealwaysbe.forkyz.view.ClueEditDialog;
+import app.crossword.yourealwaysbe.forkyz.view.ClueTabs;
 import app.crossword.yourealwaysbe.puz.Box;
 import app.crossword.yourealwaysbe.puz.Clue;
 import app.crossword.yourealwaysbe.puz.ClueID;
@@ -21,11 +25,6 @@ import app.crossword.yourealwaysbe.puz.Playboard;
 import app.crossword.yourealwaysbe.puz.Position;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.Zone;
-import app.crossword.yourealwaysbe.forkyz.util.KeyboardManager;
-import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand;
-import app.crossword.yourealwaysbe.forkyz.view.BoardEditView.BoardClickListener;
-import app.crossword.yourealwaysbe.forkyz.view.ClueEditDialog;
-import app.crossword.yourealwaysbe.forkyz.view.ClueTabs;
 
 public class ClueListActivity extends PuzzleActivity
                               implements ClueTabs.ClueTabsListener {

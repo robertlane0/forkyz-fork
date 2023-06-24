@@ -17,49 +17,49 @@
         android:title="@string/select_sources"
         android:summary="@string/select_sources_desc"
         android:key="sourcesOptions"
-        app:fragment="app.crossword.yourealwaysbe.PreferencesSubPages$SourcesFragment"
+        app:fragment="app.crossword.yourealwaysbe.forkyz.PreferencesSubPages$SourcesFragment"
     />
 
     <androidx.preference.Preference
         android:title="@string/download_settings"
         android:summary="@string/download_settings_desc"
         android:key="downloadOptions"
-        app:fragment="app.crossword.yourealwaysbe.PreferencesSubPages$DownloadFragment"
+        app:fragment="app.crossword.yourealwaysbe.forkyz.PreferencesSubPages$DownloadFragment"
     />
 
     <androidx.preference.Preference
         android:title="@string/browser_settings"
         android:summary="@string/browser_settings_desc"
         android:key="browserOptions"
-        app:fragment="app.crossword.yourealwaysbe.PreferencesSubPages$BrowserFragment"
+        app:fragment="app.crossword.yourealwaysbe.forkyz.PreferencesSubPages$BrowserFragment"
     />
 
     <androidx.preference.Preference
         android:title="@string/display_settings"
         android:summary="@string/display_settings_desc"
         android:key="displayOptions"
-        app:fragment="app.crossword.yourealwaysbe.PreferencesSubPages$DisplayFragment"
+        app:fragment="app.crossword.yourealwaysbe.forkyz.PreferencesSubPages$DisplayFragment"
     />
 
     <androidx.preference.Preference
         android:title="@string/keyboard_settings"
         android:summary="@string/keyboard_settings_desc"
         android:key="keyboardOptions"
-        app:fragment="app.crossword.yourealwaysbe.PreferencesSubPages$KeyboardFragment"
+        app:fragment="app.crossword.yourealwaysbe.forkyz.PreferencesSubPages$KeyboardFragment"
     />
 
     <androidx.preference.Preference
         android:title="@string/interaction_settings"
         android:summary="@string/interaction_settings_desc"
         android:key="keyboardOptions"
-        app:fragment="app.crossword.yourealwaysbe.PreferencesSubPages$InteractionFragment"
+        app:fragment="app.crossword.yourealwaysbe.forkyz.PreferencesSubPages$InteractionFragment"
     />
 
     <androidx.preference.Preference
         android:title="@string/voice_settings"
         android:summary="@string/voice_settings_desc"
         android:key="voiceOptions"
-        app:fragment="app.crossword.yourealwaysbe.PreferencesSubPages$VoiceFragment"
+        app:fragment="app.crossword.yourealwaysbe.forkyz.PreferencesSubPages$VoiceFragment"
     />
 
     <androidx.preference.PreferenceCategory

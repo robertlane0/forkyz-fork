@@ -1,4 +1,4 @@
-package app.crossword.yourealwaysbe;
+package app.crossword.yourealwaysbe.forkyz;
 
 import java.util.List;
 
@@ -16,7 +16,6 @@ import com.google.android.material.color.DynamicColors;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
-import app.crossword.yourealwaysbe.forkyz.R;
 import app.crossword.yourealwaysbe.forkyz.net.Downloader;
 import app.crossword.yourealwaysbe.forkyz.net.Downloaders;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;

@@ -1,10 +1,8 @@
 
-package app.crossword.yourealwaysbe;
+package app.crossword.yourealwaysbe.forkyz;
 
 import android.app.Activity;
 import androidx.preference.PreferenceFragmentCompat;
-
-import app.crossword.yourealwaysbe.forkyz.R;
 
 public abstract class PreferencesBaseFragment extends PreferenceFragmentCompat {
     @Override

@@ -1,4 +1,4 @@
-package app.crossword.yourealwaysbe;
+package app.crossword.yourealwaysbe.forkyz;
 
 import java.util.Collections;
 import java.util.Locale;
@@ -24,8 +24,15 @@ import androidx.core.widget.TextViewCompat;
 import androidx.fragment.app.DialogFragment;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-import app.crossword.yourealwaysbe.forkyz.R;
 import app.crossword.yourealwaysbe.forkyz.databinding.NotesBinding;
+import app.crossword.yourealwaysbe.forkyz.util.KeyboardManager;
+import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand;
+import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
+import app.crossword.yourealwaysbe.forkyz.view.BoardEditText.BoardEditFilter;
+import app.crossword.yourealwaysbe.forkyz.view.BoardEditText;
+import app.crossword.yourealwaysbe.forkyz.view.BoardEditView.BoardClickListener;
+import app.crossword.yourealwaysbe.forkyz.view.ScrollingImageView.Point;
+import app.crossword.yourealwaysbe.forkyz.view.ScrollingImageView;
 import app.crossword.yourealwaysbe.puz.Box;
 import app.crossword.yourealwaysbe.puz.Clue;
 import app.crossword.yourealwaysbe.puz.ClueID;
@@ -35,14 +42,6 @@ import app.crossword.yourealwaysbe.puz.Playboard;
 import app.crossword.yourealwaysbe.puz.Position;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.Zone;
-import app.crossword.yourealwaysbe.forkyz.util.KeyboardManager;
-import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand;
-import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
-import app.crossword.yourealwaysbe.forkyz.view.BoardEditText.BoardEditFilter;
-import app.crossword.yourealwaysbe.forkyz.view.BoardEditText;
-import app.crossword.yourealwaysbe.forkyz.view.BoardEditView.BoardClickListener;
-import app.crossword.yourealwaysbe.forkyz.view.ScrollingImageView.Point;
-import app.crossword.yourealwaysbe.forkyz.view.ScrollingImageView;
 
 public class NotesActivity extends PuzzleActivity {
     private static final Logger LOG = Logger.getLogger(

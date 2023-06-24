@@ -9,18 +9,18 @@
         android:title="@string/daily_crosswords"
         android:summary="@string/daily_crosswords_desc"
         android:key="selectDaily"
-        app:fragment="app.crossword.yourealwaysbe.PreferencesSubPages$DailyFragment"
+        app:fragment="app.crossword.yourealwaysbe.forkyz.PreferencesSubPages$DailyFragment"
     />
     <androidx.preference.Preference
         android:title="@string/weekly_crosswords"
         android:summary="@string/weekly_crosswords_desc"
         android:key="selectWeekly"
-        app:fragment="app.crossword.yourealwaysbe.PreferencesSubPages$WeeklyFragment"
+        app:fragment="app.crossword.yourealwaysbe.forkyz.PreferencesSubPages$WeeklyFragment"
     />
     <androidx.preference.Preference
         android:title="@string/scraper_sources"
         android:summary="@string/scraper_sources_desc"
         android:key="selectExperimental"
-        app:fragment="app.crossword.yourealwaysbe.PreferencesSubPages$ScraperFragment"
+        app:fragment="app.crossword.yourealwaysbe.forkyz.PreferencesSubPages$ScraperFragment"
     />
 </androidx.preference.PreferenceScreen>

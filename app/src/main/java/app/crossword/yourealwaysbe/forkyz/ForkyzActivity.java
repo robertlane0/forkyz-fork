@@ -1,4 +1,4 @@
-package app.crossword.yourealwaysbe;
+package app.crossword.yourealwaysbe.forkyz;
 
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -16,7 +16,6 @@ import androidx.core.text.HtmlCompat;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
-import app.crossword.yourealwaysbe.forkyz.R;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.util.NightModeHelper;
 import app.crossword.yourealwaysbe.forkyz.util.ThemeHelper;

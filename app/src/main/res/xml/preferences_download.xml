@@ -16,7 +16,7 @@
         android:title="@string/background_download_opts"
         android:summary="@string/background_download_opts_desc"
         android:key="backgroundDownloadOptions"
-        app:fragment="app.crossword.yourealwaysbe.PreferencesSubPages$DownloadBackgroundFragment"
+        app:fragment="app.crossword.yourealwaysbe.forkyz.PreferencesSubPages$DownloadBackgroundFragment"
     />
 
     <androidx.preference.MultiSelectListPreference

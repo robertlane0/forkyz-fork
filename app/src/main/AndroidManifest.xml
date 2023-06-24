@@ -76,7 +76,7 @@
     >
         <activity
             tools:ignore="UnusedAttribute"
-            android:name="app.crossword.yourealwaysbe.PlayActivity"
+            android:name="app.crossword.yourealwaysbe.forkyz.PlayActivity"
             android:hardwareAccelerated="false"
             android:configChanges="keyboard|keyboardHidden|orientation"
             android:theme="@style/Theme.Forkyz"
@@ -85,32 +85,32 @@
         >
         </activity>
         <activity
-            android:name="app.crossword.yourealwaysbe.PreferencesActivity"
+            android:name="app.crossword.yourealwaysbe.forkyz.PreferencesActivity"
             android:label="@string/settings_label"
             android:theme="@style/Theme.Forkyz"
             android:exported="false"
         />
         <activity
-            android:name="app.crossword.yourealwaysbe.ClueListActivity"
+            android:name="app.crossword.yourealwaysbe.forkyz.ClueListActivity"
             android:label="@string/clues_list_label"
             android:theme="@style/Theme.Forkyz"
             android:configChanges="orientation"
             android:exported="false"
         />
         <activity
-            android:name="app.crossword.yourealwaysbe.NotesActivity"
+            android:name="app.crossword.yourealwaysbe.forkyz.NotesActivity"
             android:label="@string/notes_label"
             android:theme="@style/Theme.Forkyz"
             android:exported="false"
         />
         <activity
-            android:name="app.crossword.yourealwaysbe.HTMLActivity"
+            android:name="app.crossword.yourealwaysbe.forkyz.HTMLActivity"
             android:label="@string/html_label"
             android:theme="@style/Theme.Forkyz"
             android:exported="false"
         />
         <activity
-            android:name="app.crossword.yourealwaysbe.BrowseActivity"
+            android:name="app.crossword.yourealwaysbe.forkyz.BrowseActivity"
             android:configChanges="orientation"
             android:theme="@style/Theme.Forkyz"
             tools:ignore="AppLinkUrlError"

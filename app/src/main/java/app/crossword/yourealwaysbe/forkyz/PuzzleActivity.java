@@ -1,4 +1,4 @@
-package app.crossword.yourealwaysbe;
+package app.crossword.yourealwaysbe.forkyz;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -28,17 +28,9 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.jg.wordstonumbers.WordsToNumbersUtil;
 
-import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
-import app.crossword.yourealwaysbe.forkyz.R;
 import app.crossword.yourealwaysbe.forkyz.databinding.VoiceButtonsBinding;
 import app.crossword.yourealwaysbe.forkyz.net.ChatGPTHelp;
-import app.crossword.yourealwaysbe.puz.Box;
-import app.crossword.yourealwaysbe.puz.Clue;
-import app.crossword.yourealwaysbe.puz.ClueID;
-import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges;
-import app.crossword.yourealwaysbe.puz.Playboard;
-import app.crossword.yourealwaysbe.puz.Position;
-import app.crossword.yourealwaysbe.puz.Puzzle;
+import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer;
 import app.crossword.yourealwaysbe.forkyz.util.SpeechContract;
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand;
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands;
@@ -47,6 +39,13 @@ import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle;
 import app.crossword.yourealwaysbe.forkyz.view.PlayboardTextRenderer;
 import app.crossword.yourealwaysbe.forkyz.view.PuzzleInfoDialogs;
 import app.crossword.yourealwaysbe.forkyz.view.SpecialEntryDialog;
+import app.crossword.yourealwaysbe.puz.Box;
+import app.crossword.yourealwaysbe.puz.Clue;
+import app.crossword.yourealwaysbe.puz.ClueID;
+import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges;
+import app.crossword.yourealwaysbe.puz.Playboard;
+import app.crossword.yourealwaysbe.puz.Position;
+import app.crossword.yourealwaysbe.puz.Puzzle;
 
 import java.util.Locale;
 import java.util.Objects;

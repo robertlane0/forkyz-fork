@@ -1,4 +1,4 @@
-package app.crossword.yourealwaysbe;
+package app.crossword.yourealwaysbe.forkyz;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -45,8 +45,6 @@ import dagger.hilt.android.AndroidEntryPoint;
 import com.leinardi.android.speeddial.SpeedDialActionItem;
 import com.leinardi.android.speeddial.SpeedDialView;
 
-import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
-import app.crossword.yourealwaysbe.forkyz.R;
 import app.crossword.yourealwaysbe.forkyz.databinding.BrowseBinding;
 import app.crossword.yourealwaysbe.forkyz.databinding.PuzzleListItemBinding;
 import app.crossword.yourealwaysbe.forkyz.net.Downloader;
@@ -54,6 +52,7 @@ import app.crossword.yourealwaysbe.forkyz.net.Downloaders;
 import app.crossword.yourealwaysbe.forkyz.settings.DayNightMode;
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation;
 import app.crossword.yourealwaysbe.forkyz.util.BackgroundDownloadManager;
+import app.crossword.yourealwaysbe.forkyz.util.DownloadPickerDialogBuilder;
 import app.crossword.yourealwaysbe.forkyz.util.MigrationHelper;
 import app.crossword.yourealwaysbe.forkyz.util.files.Accessor;
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider;
