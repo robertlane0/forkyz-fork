@@ -13,7 +13,7 @@ import app.crossword.yourealwaysbe.puz.Playboard.Word;
 import app.crossword.yourealwaysbe.puz.Playboard;
 import app.crossword.yourealwaysbe.puz.Position;
 import app.crossword.yourealwaysbe.puz.Puzzle;
-import app.crossword.yourealwaysbe.util.WeakSet;
+import app.crossword.yourealwaysbe.puz.util.WeakSet;
 import app.crossword.yourealwaysbe.forkyz.view.BoardEditView.BoardClickListener;
 
 import android.annotation.SuppressLint;

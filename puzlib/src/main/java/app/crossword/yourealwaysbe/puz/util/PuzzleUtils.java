@@ -1,5 +1,5 @@
 
-package app.crossword.yourealwaysbe.util;
+package app.crossword.yourealwaysbe.puz.util;
 
 import app.crossword.yourealwaysbe.puz.Box;
 import app.crossword.yourealwaysbe.puz.Clue;

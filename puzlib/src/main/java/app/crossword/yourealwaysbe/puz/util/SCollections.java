@@ -1,4 +1,4 @@
-package app.crossword.yourealwaysbe.util;
+package app.crossword.yourealwaysbe.puz.util;
 
 import java.util.Collection;
 import java.util.Collections;

@@ -4,7 +4,7 @@ import app.crossword.yourealwaysbe.puz.Box;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.PuzzleBuilder;
 
-import static app.crossword.yourealwaysbe.util.HtmlUtil.htmlString;
+import static app.crossword.yourealwaysbe.puz.util.HtmlUtil.htmlString;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;

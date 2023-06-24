@@ -11,8 +11,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import app.crossword.yourealwaysbe.util.PuzzleUtils;
-import app.crossword.yourealwaysbe.util.WeakSet;
+import app.crossword.yourealwaysbe.puz.util.PuzzleUtils;
+import app.crossword.yourealwaysbe.puz.util.WeakSet;
 
 public class Playboard implements Serializable {
     private static final Logger LOG = Logger.getLogger(Playboard.class.getCanonicalName());

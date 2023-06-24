@@ -1,5 +1,5 @@
 
-package app.crossword.yourealwaysbe.util;
+package app.crossword.yourealwaysbe.puz.util;
 
 import org.junit.jupiter.api.Test;
 

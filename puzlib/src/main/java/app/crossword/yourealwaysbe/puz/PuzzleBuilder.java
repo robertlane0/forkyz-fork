@@ -14,7 +14,7 @@ import java.util.Map;
 import net.iharder.Base64;
 
 import app.crossword.yourealwaysbe.puz.io.StreamUtils;
-import app.crossword.yourealwaysbe.util.PuzzleUtils;
+import app.crossword.yourealwaysbe.puz.util.PuzzleUtils;
 
 public class PuzzleBuilder {
     private final Puzzle puzzle = new Puzzle();

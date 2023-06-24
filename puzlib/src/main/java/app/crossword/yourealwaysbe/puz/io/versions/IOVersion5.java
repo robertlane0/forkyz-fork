@@ -5,7 +5,7 @@ import app.crossword.yourealwaysbe.puz.Clue;
 import app.crossword.yourealwaysbe.puz.ClueID;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.PuzzleMeta;
-import app.crossword.yourealwaysbe.util.PuzzleUtils;
+import app.crossword.yourealwaysbe.puz.util.PuzzleUtils;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

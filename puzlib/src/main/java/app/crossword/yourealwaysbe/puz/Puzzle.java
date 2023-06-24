@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import app.crossword.yourealwaysbe.util.CollectionUtils;
+import app.crossword.yourealwaysbe.puz.util.CollectionUtils;
 
 import java.util.logging.Logger;
 

@@ -7,7 +7,7 @@ import app.crossword.yourealwaysbe.puz.Position;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.PuzzleBuilder;
 import app.crossword.yourealwaysbe.puz.Zone;
-import app.crossword.yourealwaysbe.util.HtmlUtil;
+import app.crossword.yourealwaysbe.puz.util.HtmlUtil;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;

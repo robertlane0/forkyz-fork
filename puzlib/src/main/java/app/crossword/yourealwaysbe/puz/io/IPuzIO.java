@@ -38,11 +38,11 @@ import app.crossword.yourealwaysbe.puz.PuzImage;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.PuzzleBuilder;
 import app.crossword.yourealwaysbe.puz.Zone;
-import app.crossword.yourealwaysbe.util.HtmlUtil;
-import app.crossword.yourealwaysbe.util.PuzzleUtils;
+import app.crossword.yourealwaysbe.puz.util.HtmlUtil;
+import app.crossword.yourealwaysbe.puz.util.PuzzleUtils;
 
-import static app.crossword.yourealwaysbe.util.HtmlUtil.htmlString;
-import static app.crossword.yourealwaysbe.util.HtmlUtil.unHtmlString;
+import static app.crossword.yourealwaysbe.puz.util.HtmlUtil.htmlString;
+import static app.crossword.yourealwaysbe.puz.util.HtmlUtil.unHtmlString;
 
 /**
  * Read IPuz from a stream.

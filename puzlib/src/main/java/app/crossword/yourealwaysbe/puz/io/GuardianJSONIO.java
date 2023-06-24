@@ -23,7 +23,7 @@ import app.crossword.yourealwaysbe.puz.Position;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.PuzzleBuilder;
 import app.crossword.yourealwaysbe.puz.Zone;
-import app.crossword.yourealwaysbe.util.PuzzleUtils;
+import app.crossword.yourealwaysbe.puz.util.PuzzleUtils;
 
 /**
  * Read a character stream of JSON data in the format used by the
