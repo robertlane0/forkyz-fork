@@ -23,8 +23,8 @@ import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
 import app.crossword.yourealwaysbe.puz.Box;
 import app.crossword.yourealwaysbe.puz.Playboard;
 import app.crossword.yourealwaysbe.puz.Position;
-import app.crossword.yourealwaysbe.util.BoxInputConnection;
-import app.crossword.yourealwaysbe.util.KeyboardManager;
+import app.crossword.yourealwaysbe.forkyz.util.BoxInputConnection;
+import app.crossword.yourealwaysbe.forkyz.util.KeyboardManager;
 import app.crossword.yourealwaysbe.versions.AndroidVersionUtils;
 
 public class BoardEditText

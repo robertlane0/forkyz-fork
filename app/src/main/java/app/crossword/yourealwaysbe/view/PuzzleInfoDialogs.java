@@ -22,8 +22,8 @@ import app.crossword.yourealwaysbe.forkyz.databinding.PuzzleInfoDialogBinding;
 import app.crossword.yourealwaysbe.puz.Box;
 import app.crossword.yourealwaysbe.puz.Playboard;
 import app.crossword.yourealwaysbe.puz.Puzzle;
-import app.crossword.yourealwaysbe.util.files.FileHandlerProvider;
-import app.crossword.yourealwaysbe.util.files.PuzHandle;
+import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider;
+import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle;
 
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;

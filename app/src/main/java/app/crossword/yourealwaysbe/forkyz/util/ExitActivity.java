@@ -1,5 +1,5 @@
 
-package app.crossword.yourealwaysbe.util;
+package app.crossword.yourealwaysbe.forkyz.util;
 
 import android.content.Context;
 import android.content.Intent;

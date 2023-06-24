@@ -25,8 +25,8 @@ import app.crossword.yourealwaysbe.puz.Playboard.Word;
 import app.crossword.yourealwaysbe.puz.Playboard;
 import app.crossword.yourealwaysbe.puz.Position;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
-import app.crossword.yourealwaysbe.util.BoxInputConnection;
-import app.crossword.yourealwaysbe.util.KeyboardManager;
+import app.crossword.yourealwaysbe.forkyz.util.BoxInputConnection;
+import app.crossword.yourealwaysbe.forkyz.util.KeyboardManager;
 
 /**
  * A live view of the playboard

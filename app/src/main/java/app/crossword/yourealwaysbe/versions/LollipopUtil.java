@@ -18,7 +18,7 @@ import javax.inject.Inject;
 
 import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
-import app.crossword.yourealwaysbe.util.BackgroundDownloadManager;
+import app.crossword.yourealwaysbe.forkyz.util.BackgroundDownloadManager;
 
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class LollipopUtil extends KitKatUtil {

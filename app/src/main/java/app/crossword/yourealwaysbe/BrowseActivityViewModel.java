@@ -32,12 +32,12 @@ import app.crossword.yourealwaysbe.forkyz.net.Downloaders;
 import app.crossword.yourealwaysbe.puz.Playboard;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
-import app.crossword.yourealwaysbe.util.SingleLiveEvent;
-import app.crossword.yourealwaysbe.util.files.DirHandle;
-import app.crossword.yourealwaysbe.util.files.FileHandler;
-import app.crossword.yourealwaysbe.util.files.FileHandlerProvider;
-import app.crossword.yourealwaysbe.util.files.PuzHandle;
-import app.crossword.yourealwaysbe.util.files.PuzMetaFile;
+import app.crossword.yourealwaysbe.forkyz.util.SingleLiveEvent;
+import app.crossword.yourealwaysbe.forkyz.util.files.DirHandle;
+import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler;
+import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider;
+import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle;
+import app.crossword.yourealwaysbe.forkyz.util.files.PuzMetaFile;
 
 @HiltViewModel
 public class BrowseActivityViewModel extends ViewModel {

@@ -1,5 +1,5 @@
 
-package app.crossword.yourealwaysbe.util;
+package app.crossword.yourealwaysbe.forkyz.util;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -35,7 +35,7 @@ import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
 import app.crossword.yourealwaysbe.forkyz.net.Downloaders;
 import app.crossword.yourealwaysbe.forkyz.settings.BackgroundDownloadSettings;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
-import app.crossword.yourealwaysbe.util.files.FileHandlerProvider;
+import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider;
 
 /**
  * Schedule background downloads using Android WorkManager

@@ -4,6 +4,7 @@ import app.crossword.yourealwaysbe.forkyz.R;
 import app.crossword.yourealwaysbe.forkyz.databinding.ClueListItemBinding;
 import app.crossword.yourealwaysbe.forkyz.databinding.ClueTabsBinding;
 import app.crossword.yourealwaysbe.forkyz.databinding.ClueTabsPageBinding;
+import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.puz.Clue;
 import app.crossword.yourealwaysbe.puz.ClueID;
 import app.crossword.yourealwaysbe.puz.ClueList;
@@ -12,7 +13,6 @@ import app.crossword.yourealwaysbe.puz.Playboard.Word;
 import app.crossword.yourealwaysbe.puz.Playboard;
 import app.crossword.yourealwaysbe.puz.Position;
 import app.crossword.yourealwaysbe.puz.Puzzle;
-import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.util.WeakSet;
 import app.crossword.yourealwaysbe.view.BoardEditView.BoardClickListener;
 

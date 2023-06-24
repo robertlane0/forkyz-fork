@@ -13,9 +13,9 @@ import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
 import app.crossword.yourealwaysbe.forkyz.R;
 import app.crossword.yourealwaysbe.io.PuzzleStreamReader;
 import app.crossword.yourealwaysbe.puz.Puzzle;
-import app.crossword.yourealwaysbe.util.AppPuzzleUtils;
-import app.crossword.yourealwaysbe.util.files.FileHandler;
-import app.crossword.yourealwaysbe.util.files.PuzHandle;
+import app.crossword.yourealwaysbe.forkyz.util.AppPuzzleUtils;
+import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler;
+import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle;
 
 /**
  * Takes an arbitrary URI and tries to convert to a puzzle and import

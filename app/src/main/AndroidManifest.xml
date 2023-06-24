@@ -134,12 +134,12 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="app.crossword.yourealwaysbe.util.ExitActivity"
+            android:name="app.crossword.yourealwaysbe.forkyz.util.ExitActivity"
             android:theme="@style/Theme.Forkyz"
             android:exported="false"
         />
         <provider
-            android:name="app.crossword.yourealwaysbe.util.files.FileHandlerShared"
+            android:name="app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerShared"
             android:authorities="app.crossword.yourealwaysbe.forkyzfiles"
             android:exported="false"
             android:grantUriPermissions="true"

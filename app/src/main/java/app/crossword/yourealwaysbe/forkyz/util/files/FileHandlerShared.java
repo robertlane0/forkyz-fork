@@ -1,5 +1,5 @@
 
-package app.crossword.yourealwaysbe.util.files;
+package app.crossword.yourealwaysbe.forkyz.util.files;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -19,7 +19,7 @@ import androidx.core.content.FileProvider;
 
 import app.crossword.yourealwaysbe.io.IPuzIO;
 import app.crossword.yourealwaysbe.puz.Puzzle;
-import app.crossword.yourealwaysbe.util.AppPuzzleUtils;
+import app.crossword.yourealwaysbe.forkyz.util.AppPuzzleUtils;
 
 public class FileHandlerShared extends FileProvider {
     private static final Logger LOGGER

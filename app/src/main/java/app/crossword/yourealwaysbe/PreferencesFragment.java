@@ -26,8 +26,8 @@ import app.crossword.yourealwaysbe.forkyz.R;
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation;
-import app.crossword.yourealwaysbe.util.files.FileHandlerProvider;
-import app.crossword.yourealwaysbe.util.files.FileHandlerSAF;
+import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider;
+import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerSAF;
 import app.crossword.yourealwaysbe.versions.AndroidVersionUtils;
 
 @AndroidEntryPoint

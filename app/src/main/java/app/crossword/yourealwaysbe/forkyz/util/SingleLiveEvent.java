@@ -16,7 +16,7 @@
 
 // from: https://github.com/android/architecture-samples/blob/dev-todo-mvvm-live/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/SingleLiveEvent.java
 
-package app.crossword.yourealwaysbe.util;
+package app.crossword.yourealwaysbe.forkyz.util;
 
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;

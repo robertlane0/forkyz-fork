@@ -20,7 +20,7 @@ import app.crossword.yourealwaysbe.forkyz.R;
 import app.crossword.yourealwaysbe.forkyz.net.Downloader;
 import app.crossword.yourealwaysbe.forkyz.net.Downloaders;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
-import app.crossword.yourealwaysbe.util.BackgroundDownloadManager;
+import app.crossword.yourealwaysbe.forkyz.util.BackgroundDownloadManager;
 
 import javax.inject.Inject;
 

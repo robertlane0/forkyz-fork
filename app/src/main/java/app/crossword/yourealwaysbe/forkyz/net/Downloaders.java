@@ -17,7 +17,7 @@ import app.crossword.yourealwaysbe.io.JPZIO;
 import app.crossword.yourealwaysbe.io.PrzekrojIO;
 import app.crossword.yourealwaysbe.io.RCIJeuxMFJIO;
 import app.crossword.yourealwaysbe.forkyz.settings.DownloadersSettings;
-import app.crossword.yourealwaysbe.util.files.FileHandler;
+import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler;
 import app.crossword.yourealwaysbe.versions.AndroidVersionUtils;
 
 import java.time.Duration;
