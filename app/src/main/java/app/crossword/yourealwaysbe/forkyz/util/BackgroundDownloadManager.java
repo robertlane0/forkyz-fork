@@ -120,23 +120,6 @@ public class BackgroundDownloadManager {
             );
     }
 
-    public void checkBackgroundDownloadPendingFlag(Consumer<Boolean> cb) {
-        ForkyzApplication.getInstance().isMissingWritePermission(missing -> {
-            if (missing) {
-                cb.accept(false);
-            } else {
-                settings.getBackgroundDownloadPending(isPending -> {
-                    clearBackgroundDownloadPendingFlag();
-                    cb.accept(isPending);
-                });
-            }
-        });
-    }
-
-    public void clearBackgroundDownloadPendingFlag() {
-        settings.setBackgroundDownloadPending(false);
-    }
-
     /**
      * Set the download period to 1 hour
      */
@@ -271,7 +254,7 @@ public class BackgroundDownloadManager {
 
                         // This is used to tell BrowseActivity that
                         // puzzles may have been updated while paused.
-                        settings.setBackgroundDownloadPending(true);
+                        settings.setBrowseNewPuzzle(true);
                     } catch (Exception e) {
                         completer.setException(e);
                     }

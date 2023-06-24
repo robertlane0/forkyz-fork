@@ -50,6 +50,7 @@ import app.crossword.yourealwaysbe.forkyz.databinding.PuzzleListItemBinding;
 import app.crossword.yourealwaysbe.forkyz.net.Downloader;
 import app.crossword.yourealwaysbe.forkyz.net.Downloaders;
 import app.crossword.yourealwaysbe.forkyz.settings.DayNightMode;
+import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation;
 import app.crossword.yourealwaysbe.forkyz.util.BackgroundDownloadManager;
 import app.crossword.yourealwaysbe.forkyz.util.DownloadPickerDialogBuilder;
@@ -538,30 +539,28 @@ public class BrowseActivity extends ForkyzActivity {
         // A background update will commonly happen when the user turns
         // on the preference for the first time, so check here to ensure
         // the UI is re-rendered when they exit the settings dialog.
-        backgroundDownloadManager.checkBackgroundDownloadPendingFlag(
-            backgroundDownloadPending -> {
-                if (
-                    model.getPuzzleFiles().getValue() == null
-                    || backgroundDownloadPending
-                ) {
-                    if (hasPendingImports()) {
-                        Collection<Uri> importUri = getPendingImports();
-                        clearPendingImports();
-                        onImportURIsAndFinish(importUri);
+        checkNewPuzzle(newPuzzle -> {
+            if (
+                model.getPuzzleFiles().getValue() == null
+                || newPuzzle
+            ) {
+                if (hasPendingImports()) {
+                    Collection<Uri> importUri = getPendingImports();
+                    clearPendingImports();
+                    onImportURIsAndFinish(importUri);
 
-                        // won't be triggered by import if archive is shown
-                        if (model.getIsViewArchive())
-                            startLoadPuzzleList();
-                    } else {
+                    // won't be triggered by import if archive is shown
+                    if (model.getIsViewArchive())
                         startLoadPuzzleList();
-                    }
                 } else {
-                    refreshLastAccessedPuzzle();
+                    startLoadPuzzleList();
                 }
-                // previous game ended for now
-                clearCurrentBoard();
+            } else {
+                refreshLastAccessedPuzzle();
             }
-        );
+            // previous game ended for now
+            clearCurrentBoard();
+        });
 
         autoDownloadIfEnabled();
     }
@@ -597,6 +596,25 @@ public class BrowseActivity extends ForkyzActivity {
 
         checkAutoDownloadNotificationPermissions();
     }
+
+    public void checkNewPuzzle(Consumer<Boolean> cb) {
+        ForkyzApplication.getInstance().isMissingWritePermission(missing -> {
+            if (missing) {
+                cb.accept(false);
+            } else {
+                settings.getBrowseNewPuzzle(newPuzzle -> {
+                    clearNewPuzzleFlag();
+                    cb.accept(newPuzzle);
+                });
+            }
+        });
+    }
+
+    public void clearNewPuzzleFlag() {
+        settings.setBrowseNewPuzzle(false);
+    }
+
+
 
     private void refreshLastAccessedPuzzle() {
         final PuzHandle lastAccessed = getCurrentPuzHandle();
@@ -696,7 +714,7 @@ public class BrowseActivity extends ForkyzActivity {
     private void startLoadPuzzleList(boolean archive) {
         if (!hasWritePermissions) return;
 
-        backgroundDownloadManager.clearBackgroundDownloadPendingFlag();
+        clearNewPuzzleFlag();
 
         model.startLoadFiles(archive);
     }
@@ -1297,7 +1315,12 @@ public class BrowseActivity extends ForkyzActivity {
         }
     }
 
+    @AndroidEntryPoint
     public static class ImportedNowFinishDialog extends DialogFragment {
+
+        @Inject
+        protected ForkyzSettings settings;
+
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             BrowseActivity activity = (BrowseActivity) getActivity();
@@ -1313,6 +1336,9 @@ public class BrowseActivity extends ForkyzActivity {
             int message = success
                 ? R.string.import_success_long
                 : R.string.import_failure_long;
+
+            // even if some failed, there might still be a new one
+            settings.setBrowseNewPuzzle(true);
 
             builder.setTitle(R.string.imports_title)
                 .setMessage(message)

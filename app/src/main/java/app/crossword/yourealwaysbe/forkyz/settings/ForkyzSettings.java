@@ -59,6 +59,7 @@ public class ForkyzSettings {
     private static final String PREF_BROWSE_LAST_DOWNLOAD = "dlLast";
     private static final String PREF_BROWSE_LAST_SEEN_VERSION
         = "lastSeenVersion";
+    private static final String PREF_BROWSE_NEW_PUZZLE = "browseNewPuzzle";
     private static final String PREF_BROWSE_SORT = "sort";
     private static final String PREF_BROWSE_SWIPE_ACTION = "swipeAction";
 
@@ -82,7 +83,6 @@ public class ForkyzSettings {
         = "backgroundDownloadDays";
     private static final String PREF_DOWNLOAD_DAYS_TIME
         = "backgroundDownloadDaysTime";
-    private static final String PREF_DOWNLOAD_PENDING = "backgroundDlPending";
 
     private static final String PREF_FILE_HANDLER_SAF_ARCHIVE
         = "safArchiveFolderUri";
@@ -175,11 +175,11 @@ public class ForkyzSettings {
         BOOL_DEFAULTS.put(PREF_BROWSE_DISABLE_SWIPE, false);
         LONG_DEFAULTS.put(PREF_BROWSE_LAST_DOWNLOAD, 0L);
         STRING_DEFAULTS.put(PREF_BROWSE_LAST_SEEN_VERSION, "");
+        BOOL_DEFAULTS.put(PREF_BROWSE_NEW_PUZZLE, false);
         INT_DEFAULTS.put(PREF_BROWSE_SORT, 0);
         STRING_DEFAULTS.put(PREF_CHAT_GPT_API_KEY, "");
         BOOL_DEFAULTS.put(PREF_CLUE_LIST_SHOW_WORDS, false);
         BOOL_DEFAULTS.put(PREF_CLUE_LIST_SNAP_TO_CLUE, false);
-        BOOL_DEFAULTS.put(PREF_DOWNLOAD_PENDING, false);
         BOOL_DEFAULTS.put(PREF_KEYBOARD_HAPTIC, true);
         BOOL_DEFAULTS.put(PREF_KEYBOARD_HIDE_BUTTON, false);
         BOOL_DEFAULTS.put(PREF_KEYBOARD_NATIVE, false);
@@ -372,6 +372,19 @@ public class ForkyzSettings {
     }
 
     /**
+     * BrowseActivity checks this on resume to know if to refresh list
+     *
+     * I.e. true if a puzzle added to puzzles without browse knowing otherwise.
+     */
+    public void getBrowseNewPuzzle(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_BROWSE_NEW_PUZZLE, cb);
+    }
+
+    public void setBrowseNewPuzzle(boolean pending) {
+        setBooleanPreference(PREF_BROWSE_NEW_PUZZLE, pending);
+    }
+
+    /**
      * How to order the puzzles in the browse list
      */
     public void getBrowseSort(Consumer<Accessor> cb) {
@@ -457,19 +470,6 @@ public class ForkyzSettings {
         boolean hourly, Runnable cb
     ) {
         setBooleanPreference(PREF_DOWNLOAD_HOURLY, hourly, cb);
-    }
-
-    /**
-     * BrowseActivity checks this on resume to know if to refresh list
-     *
-     * I.e. true if a background download happened.
-     */
-    public void getBackgroundDownloadPending(Consumer<Boolean> cb) {
-        getBooleanPreference(PREF_DOWNLOAD_PENDING, cb);
-    }
-
-    public void setBackgroundDownloadPending(boolean pending) {
-        setBooleanPreference(PREF_DOWNLOAD_PENDING, pending);
     }
 
     /**
