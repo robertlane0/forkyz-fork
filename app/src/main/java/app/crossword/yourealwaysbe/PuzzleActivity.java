@@ -31,7 +31,7 @@ import org.jg.wordstonumbers.WordsToNumbersUtil;
 import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
 import app.crossword.yourealwaysbe.forkyz.R;
 import app.crossword.yourealwaysbe.forkyz.databinding.VoiceButtonsBinding;
-import app.crossword.yourealwaysbe.net.ChatGPTHelp;
+import app.crossword.yourealwaysbe.forkyz.net.ChatGPTHelp;
 import app.crossword.yourealwaysbe.puz.Box;
 import app.crossword.yourealwaysbe.puz.Clue;
 import app.crossword.yourealwaysbe.puz.ClueID;

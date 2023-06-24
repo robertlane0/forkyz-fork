@@ -23,8 +23,8 @@ import javax.inject.Singleton;
 
 import dagger.hilt.android.qualifiers.ApplicationContext;
 
-import app.crossword.yourealwaysbe.net.Downloader;
-import app.crossword.yourealwaysbe.net.Downloaders;
+import app.crossword.yourealwaysbe.forkyz.net.Downloader;
+import app.crossword.yourealwaysbe.forkyz.net.Downloaders;
 import app.crossword.yourealwaysbe.puz.MovementStrategy;
 import app.crossword.yourealwaysbe.util.files.Accessor;
 

@@ -1,5 +1,5 @@
 
-package app.crossword.yourealwaysbe.net;
+package app.crossword.yourealwaysbe.forkyz.net;
 
 import java.time.LocalDate;
 import java.util.AbstractList;

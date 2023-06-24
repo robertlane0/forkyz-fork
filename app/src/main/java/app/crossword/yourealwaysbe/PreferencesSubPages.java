@@ -17,8 +17,8 @@ import com.google.android.material.color.DynamicColors;
 import dagger.hilt.android.AndroidEntryPoint;
 
 import app.crossword.yourealwaysbe.forkyz.R;
-import app.crossword.yourealwaysbe.net.Downloader;
-import app.crossword.yourealwaysbe.net.Downloaders;
+import app.crossword.yourealwaysbe.forkyz.net.Downloader;
+import app.crossword.yourealwaysbe.forkyz.net.Downloaders;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.util.BackgroundDownloadManager;
 

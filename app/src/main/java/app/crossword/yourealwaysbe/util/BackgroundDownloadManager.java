@@ -32,7 +32,7 @@ import dagger.assisted.Assisted;
 import dagger.assisted.AssistedInject;
 
 import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
-import app.crossword.yourealwaysbe.net.Downloaders;
+import app.crossword.yourealwaysbe.forkyz.net.Downloaders;
 import app.crossword.yourealwaysbe.forkyz.settings.BackgroundDownloadSettings;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.util.files.FileHandlerProvider;

@@ -1,4 +1,4 @@
-package app.crossword.yourealwaysbe.net;
+package app.crossword.yourealwaysbe.forkyz.net;
 
 import app.crossword.yourealwaysbe.io.PuzzleStreamReader;
 

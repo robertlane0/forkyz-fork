@@ -19,9 +19,9 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import app.crossword.yourealwaysbe.forkyz.R;
 import app.crossword.yourealwaysbe.forkyz.databinding.DownloadDialogBinding;
-import app.crossword.yourealwaysbe.net.Downloader;
-import app.crossword.yourealwaysbe.net.Downloaders;
-import app.crossword.yourealwaysbe.net.DummyDownloader;
+import app.crossword.yourealwaysbe.forkyz.net.Downloader;
+import app.crossword.yourealwaysbe.forkyz.net.Downloaders;
+import app.crossword.yourealwaysbe.forkyz.net.DummyDownloader;
 
 import java.time.Duration;
 import java.time.LocalDate;
