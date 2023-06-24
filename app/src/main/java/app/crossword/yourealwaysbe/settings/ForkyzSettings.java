@@ -89,6 +89,11 @@ public class ForkyzSettings {
     public static final String PREF_FILE_HANDLER_STORAGE_LOC
         = "storageLocation";
 
+    private static final String PREF_KEYBOARD_HIDE_BUTTON
+        = "keyboardHideButton";
+    private static final String PREF_KEYBOARD_MODE = "keyboardShowHide";
+    private static final String PREF_KEYBOARD_NATIVE = "useNativeKeyboard";
+
     private static final String PREF_PLAY_CLUE_TABS_PAGE
         = "playActivityClueTabsPage";
     private static final String PREF_PLAY_DONT_DELETE_CROSSING
@@ -172,6 +177,8 @@ public class ForkyzSettings {
         BOOL_DEFAULTS.put(PREF_CLUE_LIST_SHOW_WORDS, false);
         BOOL_DEFAULTS.put(PREF_CLUE_LIST_SNAP_TO_CLUE, false);
         BOOL_DEFAULTS.put(PREF_DOWNLOAD_PENDING, false);
+        BOOL_DEFAULTS.put(PREF_KEYBOARD_HIDE_BUTTON, false);
+        BOOL_DEFAULTS.put(PREF_KEYBOARD_NATIVE, false);
         INT_DEFAULTS.put(PREF_PLAY_CLUE_TABS_PAGE, 0);
         BOOL_DEFAULTS.put(PREF_PLAY_DONT_DELETE_CROSSING, false);
         BOOL_DEFAULTS.put(PREF_PLAY_DOUBLE_TAP_FIT_BOARD, false);
@@ -496,6 +503,30 @@ public class ForkyzSettings {
             if (cb != null)
                 cb.run();
         });
+    }
+
+    /**
+     * The show/hide behaviour of the keyboard
+     */
+    public void getKeyboardMode(Consumer<KeyboardMode> cb) {
+        String modePref = prefs.getString(
+            PREF_KEYBOARD_MODE, KeyboardMode.HIDE_MANUAL.getSettingsValue()
+        );
+        cb.accept(KeyboardMode.getFromSettingsValue(modePref));
+    }
+
+    /**
+     * If the keyboard has a hide button
+     */
+    public void getKeyboardHideButton(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_KEYBOARD_HIDE_BUTTON, cb);
+    }
+
+    /**
+     * Use native keyboard instead of the Forkyz keyboard
+     */
+    public void getKeyboardNative(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_KEYBOARD_NATIVE, cb);
     }
 
     /**

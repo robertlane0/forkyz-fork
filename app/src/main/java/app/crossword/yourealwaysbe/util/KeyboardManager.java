@@ -4,34 +4,28 @@
 
 package app.crossword.yourealwaysbe.util;
 
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
-import androidx.preference.PreferenceManager;
 
-import app.crossword.yourealwaysbe.forkyz.R;
+import app.crossword.yourealwaysbe.settings.ForkyzSettings;
+import app.crossword.yourealwaysbe.settings.KeyboardMode;
 import app.crossword.yourealwaysbe.view.ForkyzKeyboard;
 
 public class KeyboardManager {
     private static final Logger LOG = Logger.getLogger(KeyboardManager.class.getCanonicalName());
 
-    private static final String PREF_KEYBOARD_MODE = "keyboardShowHide";
-
     private Activity activity;
-    private SharedPreferences prefs;
+    private ForkyzSettings settings;
     private ForkyzKeyboard keyboardView;
     private int blockHideDepth = 0;
-
-    private enum KeyboardMode {
-        ALWAYS_SHOW, HIDE_MANUAL, SHOW_SPARINGLY, NEVER_SHOW
-    }
 
     /**
      * A view that can be set to take native input
@@ -64,24 +58,28 @@ public class KeyboardManager {
      * To use, pass on calls to the implemented methods below.
      *
      * @param activity the activity the keyboard is for
+     * @param settings the settings instance for the app
      * @param keyboardView the keyboard view of the activity
      * @param initialView the view that should have focus immediately if
      * keyboard always show
      */
     public KeyboardManager(
         Activity activity,
+        ForkyzSettings settings,
         ForkyzKeyboard keyboardView,
         ManageableView initialView
     ) {
         this.activity = activity;
-        this.prefs = PreferenceManager.getDefaultSharedPreferences(activity);
+        this.settings = settings;
         this.keyboardView = keyboardView;
 
-        if (getKeyboardMode() == KeyboardMode.ALWAYS_SHOW) {
-            showKeyboard(initialView);
-        } else {
-            hideKeyboard();
-        }
+        settings.getKeyboardMode(mode -> {
+            if (mode == KeyboardMode.ALWAYS_SHOW) {
+                showKeyboard(initialView);
+            } else {
+                hideKeyboard();
+            }
+        });
     }
 
     /**
@@ -90,10 +88,10 @@ public class KeyboardManager {
     public void onResume() {
         setHideRowVisibility();
 
-        boolean isNativeKeyboard = isNativeKeyboard();
-
-        if (isNativeKeyboard)
-            keyboardView.setVisibility(View.GONE);
+        settings.getKeyboardNative(nativeKeyboard -> {
+            if (nativeKeyboard)
+                keyboardView.setVisibility(View.GONE);
+        });
 
         setSoftInputLayout();
     }
@@ -129,35 +127,40 @@ public class KeyboardManager {
         if (view == null)
             return;
 
-        boolean isNativeKeyboard = isNativeKeyboard();
-        boolean nativeChanged = manageableView.setNativeInput(isNativeKeyboard);
+        settings.getKeyboardNative(nativeKeyboard -> {
+            boolean nativeChanged
+                = manageableView.setNativeInput(nativeKeyboard);
 
-        if (
-            getKeyboardMode() != KeyboardMode.NEVER_SHOW
-            && view.requestFocus()
-        ) {
-            if (isNativeKeyboard) {
-                InputMethodManager imm = getInputMethodManager();
-                if (nativeChanged)
-                    imm.restartInput(view);
-                imm.showSoftInput(view, 0);
-                keyboardView.setVisibility(View.GONE);
-            } else {
-                keyboardView.setVisibility(View.VISIBLE);
-                attachForkyzKeyboardToView(manageableView);
-            }
-        }
+            settings.getKeyboardMode(mode -> {
+                if (mode != KeyboardMode.NEVER_SHOW && view.requestFocus()) {
+                    if (nativeKeyboard) {
+                        InputMethodManager imm = getInputMethodManager();
+                        if (nativeChanged)
+                            imm.restartInput(view);
+                        imm.showSoftInput(view, 0);
+                        keyboardView.setVisibility(View.GONE);
+                    } else {
+                        keyboardView.setVisibility(View.VISIBLE);
+                        attachForkyzKeyboardToView(manageableView);
+                    }
+                }
+            });
+        });
     }
 
     /**
      * Attach the keyboard to a view without changing visibilty
      */
     public void attachKeyboardToView(ManageableView view) {
-        if (!isNativeKeyboard())
-            attachForkyzKeyboardToView(view);
+        settings.getKeyboardNative(nativeKeyboard -> {
+            if (!nativeKeyboard)
+                attachForkyzKeyboardToView(view);
+        });
     }
 
-    public boolean hideKeyboard() { return hideKeyboard(false); }
+    public void hideKeyboard() { hideKeyboard(false); }
+
+    public void hideKeyboard(boolean force) { hideKeyboard(force, null); }
 
     /**
      * Hide the keyboard unless the user always wants it
@@ -166,34 +169,37 @@ public class KeyboardManager {
      *
      * @param force force hide the keyboard, even if user has set always
      * show
-     * @return true if the hide request was not blocked by settings or
-     * pushBlockHide
+     * @param cb accept true if the hide request was not blocked by settings or
+     * pushBlockHide or null if don't care
      */
-    public boolean hideKeyboard(boolean force) {
-        KeyboardMode mode = getKeyboardMode();
-        boolean prefHide =
-            mode != KeyboardMode.ALWAYS_SHOW
-                && mode != KeyboardMode.HIDE_MANUAL;
-        boolean softHide =
-            prefHide && !keyboardView.hasKeysDown() && !isBlockHide();
-        boolean doHide = force || softHide;
+    public void hideKeyboard(boolean force, Consumer<Boolean> cb) {
+        settings.getKeyboardMode(mode -> {
+        settings.getKeyboardNative(nativeKeyboard -> {
+            boolean prefHide =
+                mode != KeyboardMode.ALWAYS_SHOW
+                    && mode != KeyboardMode.HIDE_MANUAL;
+            boolean softHide =
+                prefHide && !keyboardView.hasKeysDown() && !isBlockHide();
+            boolean doHide = force || softHide;
 
-        if (doHide) {
-            if (isNativeKeyboard()) {
-                View focus = activity.getCurrentFocus();
-                if (focus != null) {
-                    // turn off native input if can
-                    if (focus instanceof ManageableView)
-                        ((ManageableView) focus).setNativeInput(false);
-                    InputMethodManager imm = getInputMethodManager();
-                    imm.hideSoftInputFromWindow(focus.getWindowToken(), 0);
+            if (doHide) {
+                if (nativeKeyboard) {
+                    View focus = activity.getCurrentFocus();
+                    if (focus != null) {
+                        // turn off native input if can
+                        if (focus instanceof ManageableView)
+                            ((ManageableView) focus).setNativeInput(false);
+                        InputMethodManager imm = getInputMethodManager();
+                        imm.hideSoftInputFromWindow(focus.getWindowToken(), 0);
+                    }
+                } else {
+                    keyboardView.setVisibility(View.GONE);
                 }
-            } else {
-                keyboardView.setVisibility(View.GONE);
             }
-        }
 
-        return doHide;
+            if (cb != null)
+                cb.accept(doHide);
+        });});
     }
 
     /**
@@ -202,16 +208,18 @@ public class KeyboardManager {
      * Will hide the inapp/native keyboard if needed
      */
     public void onFocusNativeView(View view, boolean gainFocus) {
-        if (!isNativeKeyboard()) {
-            if (gainFocus) {
-                hideKeyboard(true);
-            } else {
-                InputMethodManager imm = getInputMethodManager();
-                if (imm != null) {
-                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        settings.getKeyboardNative(nativeKeyboard -> {
+            if (!nativeKeyboard) {
+                if (gainFocus) {
+                    hideKeyboard(true);
+                } else {
+                    InputMethodManager imm = getInputMethodManager();
+                    if (imm != null) {
+                        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                    }
                 }
             }
-        }
+        });
     }
 
     /**
@@ -219,15 +227,21 @@ public class KeyboardManager {
      *
      * Hides keyboard if mode allows it.
      *
-     * @return true if key press was consumed, false if it should be
-     * passed on
+     * @param cb accept true if key press was consumed, false if it
+     * should be passed on
      */
-    public boolean handleBackKey() {
-        boolean force = getKeyboardMode() != KeyboardMode.ALWAYS_SHOW;
-        boolean toHide =
-            keyboardView.getVisibility() == View.VISIBLE
-                && !isKeyboardHideButton();
-        return toHide && hideKeyboard(force);
+    public void handleBackKey(Consumer<Boolean> cb) {
+        settings.getKeyboardMode(mode -> {
+        settings.getKeyboardHideButton(hideButton -> {
+            boolean force = mode != KeyboardMode.ALWAYS_SHOW;
+            boolean toHide =
+                keyboardView.getVisibility() == View.VISIBLE
+                    && !hideButton;
+            hideKeyboard(
+                force,
+                hidden -> { cb.accept(toHide && hidden); }
+            );
+        });});
     }
 
     /**
@@ -245,42 +259,19 @@ public class KeyboardManager {
 
     private boolean isBlockHide() { return blockHideDepth > 0; }
 
-    private KeyboardMode getKeyboardMode() {
-        String never = activity.getString(R.string.keyboard_never_show);
-        String back = activity.getString(R.string.keyboard_hide_manual);
-        String spare = activity.getString(R.string.keyboard_show_sparingly);
-        String always = activity.getString(R.string.keyboard_always_show);
-
-        String modePref = prefs.getString(PREF_KEYBOARD_MODE, back);
-
-        if (never.equals(modePref))
-            return KeyboardMode.NEVER_SHOW;
-        else if (back.equals(modePref))
-            return KeyboardMode.HIDE_MANUAL;
-        else if (always.equals(modePref))
-            return KeyboardMode.ALWAYS_SHOW;
-        else
-            return KeyboardMode.SHOW_SPARINGLY;
-    }
-
     private void setHideRowVisibility() {
-        if (isKeyboardHideButton()) {
-            KeyboardMode mode = getKeyboardMode();
-            keyboardView.setShowHideButton(
-                mode == KeyboardMode.HIDE_MANUAL
-                    || mode == KeyboardMode.SHOW_SPARINGLY
-            );
-        } else {
-            keyboardView.setShowHideButton(false);
-        }
-    }
-
-    private boolean isKeyboardHideButton() {
-        return prefs.getBoolean("keyboardHideButton", false);
-    }
-
-    private boolean isNativeKeyboard() {
-        return prefs.getBoolean("useNativeKeyboard", false);
+        settings.getKeyboardHideButton(hideButton -> {
+            if (hideButton) {
+                settings.getKeyboardMode(mode -> {
+                    keyboardView.setShowHideButton(
+                        mode == KeyboardMode.HIDE_MANUAL
+                            || mode == KeyboardMode.SHOW_SPARINGLY
+                    );
+                });
+            } else {
+                keyboardView.setShowHideButton(false);
+            }
+        });
     }
 
     /**
@@ -289,18 +280,21 @@ public class KeyboardManager {
      * E.g. always show or always hide when native
      */
     private void setSoftInputLayout() {
-        if (isNativeKeyboard()) {
-            KeyboardMode mode = getKeyboardMode();
-            if (mode == KeyboardMode.ALWAYS_SHOW) {
-                activity.getWindow().setSoftInputMode(
-                    WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE
-                );
-            } else if (mode == KeyboardMode.NEVER_SHOW) {
-                activity.getWindow().setSoftInputMode(
-                    WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN
-                );
+        settings.getKeyboardNative(nativeKeyboard -> {
+            if (nativeKeyboard) {
+                settings.getKeyboardMode(mode -> {
+                    if (mode == KeyboardMode.ALWAYS_SHOW) {
+                        activity.getWindow().setSoftInputMode(
+                            WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE
+                        );
+                    } else if (mode == KeyboardMode.NEVER_SHOW) {
+                        activity.getWindow().setSoftInputMode(
+                            WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN
+                        );
+                    }
+                });
             }
-        }
+        });
     }
 
     private void attachForkyzKeyboardToView(ManageableView view) {

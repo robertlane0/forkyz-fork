@@ -112,7 +112,7 @@ public class ClueListActivity extends PuzzleActivity
         );
 
         keyboardManager = new KeyboardManager(
-            this, binding.keyboard, binding.miniboard
+            this, settings, binding.keyboard, binding.miniboard
         );
 
         setupVoiceButtons(binding.voiceButtonsInclude);
@@ -550,8 +550,10 @@ public class ClueListActivity extends PuzzleActivity
     }
 
     private void onBackKey() {
-        if (!keyboardManager.handleBackKey())
-            this.finish();
+        keyboardManager.handleBackKey(keyHandled -> {
+            if (!keyHandled)
+                this.finish();
+        });
     }
 
     /**

@@ -283,7 +283,8 @@ public class NotesActivity extends PuzzleActivity {
             null
         );
 
-        keyboardManager = new KeyboardManager(this, binding.keyboard, null);
+        keyboardManager
+            = new KeyboardManager(this, settings, binding.keyboard, null);
         keyboardManager.showKeyboard(
             isPuzzleNotes() ? binding.scratchMiniboard : binding.miniboard
         );
@@ -834,8 +835,10 @@ public class NotesActivity extends PuzzleActivity {
     }
 
     private void onBackKey() {
-        if (!keyboardManager.handleBackKey())
-            this.finish();
+        keyboardManager.handleBackKey(keyHandled -> {
+            if (!keyHandled)
+                this.finish();
+        });
     }
 
     public static class TransferResponseRequestDialog extends DialogFragment {

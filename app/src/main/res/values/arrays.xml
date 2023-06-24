@@ -49,10 +49,10 @@
        <item>@string/keyboard_never_show</item>
      </string-array>
      <string-array name="keyboardShowHideValues">
-       <item>@string/keyboard_always_show</item>
-       <item>@string/keyboard_hide_manual</item>
-       <item>@string/keyboard_show_sparingly</item>
-       <item>@string/keyboard_never_show</item>
+       <item>Always show</item>
+       <item>Hide keyboard manually</item>
+       <item>Show sparingly</item>
+       <item>Never show</item>
      </string-array>
      <string-array name="keyboardLayoutsLabels">
        <item>@string/keyboard_qwerty</item>

@@ -176,9 +176,7 @@ public class PlayActivity extends PuzzleActivity
         );
 
         keyboardManager = new KeyboardManager(
-            this,
-            binding.keyboardView,
-            binding.boardView
+            this, settings, binding.keyboardView, binding.boardView
         );
 
         settings.getPlaySkipFilled(board::setSkipCompletedLetters);
@@ -450,9 +448,10 @@ public class PlayActivity extends PuzzleActivity
         // hide because of it
         if (keyCode == KeyEvent.KEYCODE_BACK
                 || keyCode == KeyEvent.KEYCODE_ESCAPE) {
-            if (!keyboardManager.handleBackKey()) {
-                this.finish();
-            }
+            keyboardManager.handleBackKey(keyHandled -> {
+                if (!keyHandled)
+                    this.finish();
+            });
         }
 
         keyboardManager.pushBlockHide();
@@ -1046,8 +1045,10 @@ public class PlayActivity extends PuzzleActivity
     }
 
     private void onBackKey() {
-        if (!keyboardManager.handleBackKey())
-            this.finish();
+        keyboardManager.handleBackKey(keyHandled -> {
+            if (!keyHandled)
+                this.finish();
+        });
     }
 
     private void onDeleteKey() {
