@@ -252,8 +252,13 @@ public class ForkyzSettings {
 
     public void getAppOrientationLock(Consumer<Orientation> cb) {
         executor.execute(() -> {
-            String value = prefs.getString("orientationLock", "UNLOCKED");
-            cb.accept(Orientation.getFromSettingsValue(value));
+            String value = prefs.getString(
+                PREF_APP_ORIENTATION_LOCK,
+                Orientation.UNLOCKED.getSettingsValue()
+            );
+            handler.post(() -> {
+                cb.accept(Orientation.getFromSettingsValue(value));
+            });
         });
     }
 
@@ -405,7 +410,9 @@ public class ForkyzSettings {
     public void getBrowseSwipeAction(Consumer<BrowseSwipeAction> cb) {
         executor.execute(() -> {
             String value = prefs.getString(PREF_BROWSE_SWIPE_ACTION, "DELETE");
-            cb.accept(BrowseSwipeAction.getFromSettingsValue(value));
+            handler.post(() -> {
+                cb.accept(BrowseSwipeAction.getFromSettingsValue(value));
+            });
         });
     }
 
@@ -419,7 +426,6 @@ public class ForkyzSettings {
         Consumer<BackgroundDownloadSettings> cb
     ) {
         executor.execute(() -> {
-
             int timeOfDay = 8;
             try {
                 timeOfDay = Integer.valueOf(
@@ -429,14 +435,18 @@ public class ForkyzSettings {
                 // ignore, keep 8
             }
 
-            cb.accept(new BackgroundDownloadSettings(
-                prefs.getBoolean(PREF_DOWNLOAD_UNMETERED, true),
-                prefs.getBoolean(PREF_DOWNLOAD_ROAMING, false),
-                prefs.getBoolean(PREF_DOWNLOAD_CHARGING, false),
-                prefs.getBoolean(PREF_DOWNLOAD_HOURLY, false),
-                prefs.getStringSet(PREF_DOWNLOAD_DAYS, Collections.emptySet()),
-                timeOfDay
-            ));
+            final int finalTimeOfDay = timeOfDay;
+
+            handler.post(() -> {
+                cb.accept(new BackgroundDownloadSettings(
+                    prefs.getBoolean(PREF_DOWNLOAD_UNMETERED, true),
+                    prefs.getBoolean(PREF_DOWNLOAD_ROAMING, false),
+                    prefs.getBoolean(PREF_DOWNLOAD_CHARGING, false),
+                    prefs.getBoolean(PREF_DOWNLOAD_HOURLY, false),
+                    prefs.getStringSet(PREF_DOWNLOAD_DAYS, Collections.emptySet()),
+                    finalTimeOfDay
+                ));
+            });
         });
     }
 
@@ -558,7 +568,7 @@ public class ForkyzSettings {
                     settings.getSAFArchiveURI()
                 ).apply();
             if (cb != null)
-                cb.run();
+                handler.post(() -> { cb.run(); });
         });
     }
 
@@ -687,10 +697,12 @@ public class ForkyzSettings {
             String strategyString = prefs.getString(
                 PREF_PLAY_MOVEMENT_STRATEGY, "MOVE_NEXT_ON_AXIS"
             );
-            cb.accept(
-                MovementStrategySetting.getFromSettingsValue(strategyString)
-                    .getMovementStrategy()
-            );
+            handler.post(() -> {
+                cb.accept(
+                    MovementStrategySetting.getFromSettingsValue(strategyString)
+                        .getMovementStrategy()
+                );
+            });
         });
     }
 
@@ -987,7 +999,7 @@ public class ForkyzSettings {
                     .apply();
             }
 
-            cb.accept(legacyEnabled);
+            handler.post(() -> { cb.accept(legacyEnabled); });
         });
     }
 
@@ -1047,7 +1059,7 @@ public class ForkyzSettings {
         executor.execute(() -> {
             prefs.edit().putBoolean(name, value).apply();
             if (cb != null)
-                cb.run();
+                handler.post(cb);
         });
     }
 
