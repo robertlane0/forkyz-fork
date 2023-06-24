@@ -14,7 +14,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import androidx.concurrent.futures.CallbackToFutureAdapter;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.hilt.work.HiltWorker;
@@ -255,8 +254,6 @@ public class BackgroundDownloadManager {
 
                 LOGGER.info("Downloading most recent puzzles");
 
-                SharedPreferences prefs = getPrefs();
-
                 settings.getDownloadersSettings(downloadersSettings -> {
                 fileHandlerProvider.get(fileHandler -> {
                 downloadExecutorService.execute(() -> {
@@ -281,11 +278,6 @@ public class BackgroundDownloadManager {
                     }
                 });});});
             });
-        }
-
-        private SharedPreferences getPrefs() {
-            Context context = ForkyzApplication.getInstance();
-            return PreferenceManager.getDefaultSharedPreferences(context);
         }
     }
 
