@@ -202,7 +202,7 @@ public class PreferencesSubPages {
             if (!DynamicColors.isDynamicColorAvailable()) {
 
                 ListPreference themePref
-                    = findPreference(ForkyzSettings.PREF_THEME);
+                    = findPreference(ForkyzSettings.PREF_APP_THEME);
 
                 Resources res = getResources();
                 themePref.setEntries(

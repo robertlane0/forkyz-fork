@@ -25,7 +25,6 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.view.ActionMode;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -52,6 +51,7 @@ import app.crossword.yourealwaysbe.forkyz.databinding.BrowseBinding;
 import app.crossword.yourealwaysbe.forkyz.databinding.PuzzleListItemBinding;
 import app.crossword.yourealwaysbe.net.Downloader;
 import app.crossword.yourealwaysbe.net.Downloaders;
+import app.crossword.yourealwaysbe.settings.DayNightMode;
 import app.crossword.yourealwaysbe.settings.StorageLocation;
 import app.crossword.yourealwaysbe.util.BackgroundDownloadManager;
 import app.crossword.yourealwaysbe.util.MigrationHelper;
@@ -286,7 +286,11 @@ public class BrowseActivity extends ForkyzActivity {
         inflater.inflate(R.menu.browse_menu, menu);
 
         MenuItem item = menu.findItem(R.id.browse_menu_app_theme);
-        if (item != null) item.setIcon(getNightModeIcon());
+        if (item != null) {
+            nightMode.getCurrentMode(mode -> {
+                item.setIcon(getNightModeIcon(mode));
+            });
+        }
 
         viewCrosswordsArchiveMenuItem
             = menu.findItem(R.id.browse_menu_archives);
@@ -296,21 +300,8 @@ public class BrowseActivity extends ForkyzActivity {
         return true;
     }
 
-    private void nextNightMode() {
-        nightMode.next();
-        if(nightMode.isNightMode()){
-            AppCompatDelegate.setDefaultNightMode(
-                AppCompatDelegate.MODE_NIGHT_YES
-            );
-        } else {
-            AppCompatDelegate.setDefaultNightMode(
-                AppCompatDelegate.MODE_NIGHT_NO
-            );
-        }
-    }
-
-    private int getNightModeIcon() {
-        switch (nightMode.getCurrentMode()) {
+    private int getNightModeIcon(DayNightMode mode) {
+        switch (mode) {
         case DAY: return R.drawable.day_mode;
         case NIGHT: return R.drawable.night_mode;
         case SYSTEM: return R.drawable.system_daynight_mode;
@@ -327,8 +318,9 @@ public class BrowseActivity extends ForkyzActivity {
         int id = item.getItemId();
 
         if (id == R.id.browse_menu_app_theme) {
-            nextNightMode();
-            item.setIcon(getNightModeIcon());
+            nightMode.next(newMode -> {
+                item.setIcon(getNightModeIcon(newMode));
+            });
             return true;
         } else if (id == R.id.browse_menu_settings) {
             Intent settingsIntent = new Intent(this, PreferencesActivity.class);

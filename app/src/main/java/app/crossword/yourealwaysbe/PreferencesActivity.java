@@ -39,7 +39,7 @@ public class PreferencesActivity
 
         (new ThemeHelper(settings)).themeActivity(this);
 
-        NightModeHelper nightMode = NightModeHelper.bind(this);
+        NightModeHelper nightMode = NightModeHelper.bind(this, settings);
         nightMode.restoreNightMode();
 
         AndroidVersionUtils utils = AndroidVersionUtils.Factory.getInstance();

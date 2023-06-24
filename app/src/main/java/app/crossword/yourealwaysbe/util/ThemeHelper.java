@@ -17,12 +17,12 @@ public class ThemeHelper {
 
     public void themeApplication(Application app) {
         // has to be blocking: a late theme change won't get picked up
-        if (settings.getThemeBlocking() == Theme.DYNAMIC)
+        if (settings.getAppThemeBlocking() == Theme.DYNAMIC)
             DynamicColors.applyToActivitiesIfAvailable(app);
     }
 
     public void themeActivity(Activity activity) {
-        settings.getTheme(theme -> {
+        settings.getAppTheme(theme -> {
             if (theme == Theme.LEGACY_LIKE)
                 activity.setTheme(R.style.Theme_Forkyz_LegacyLike);
         });

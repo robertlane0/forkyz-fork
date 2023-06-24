@@ -43,6 +43,10 @@ public class ForkyzSettings {
     private static ForkyzSettings instance = null;
 
     private static final String PREF_APP_ORIENTATION_LOCK = "orientationLock";
+    public static final String PREF_APP_THEME = "applicationTheme";
+    private static final String PREF_APP_THEME_LEGACY_USE_DYNAMIC
+        = "useDynamicColors";
+    private static final String PREF_APP_DAY_NIGHT_MODE = "uiTheme";
 
     // public for settings page
     public static final String PREF_AUTO_DOWNLOADERS = "autoDownloaders";
@@ -146,9 +150,6 @@ public class ForkyzSettings {
         = "supressSummaryMessages";
     private static final String PREF_SUPPRESS_INDIVIDUAL_NOTIFICATIONS
         = "supressMessages";
-
-    public static final String PREF_THEME = "applicationTheme";
-    private static final String PREF_THEME_LEGACY_USE_DYNAMIC = "useDynamicColors";
 
     private static final Set<String> BACKGROUND_DOWNLOAD_PREFERENCES
         = new HashSet<>(
@@ -254,6 +255,56 @@ public class ForkyzSettings {
             String value = prefs.getString("orientationLock", "UNLOCKED");
             cb.accept(Orientation.getFromSettingsValue(value));
         });
+    }
+
+    /**
+     * Whether to use day theme, night theme, or follow system
+     */
+    public void getAppDayNightMode(Consumer<DayNightMode> cb) {
+        executor.execute(() -> {
+            String mode = prefs.getString(
+                PREF_APP_DAY_NIGHT_MODE,
+                DayNightMode.DAY.getSettingsValue()
+            );
+            handler.post(() -> {
+                cb.accept(DayNightMode.getFromSettingsValue(mode));
+            });
+        });
+    }
+
+    public void setAppDayNightMode(DayNightMode mode, Runnable cb) {
+        executor.execute(() -> {
+            prefs.edit()
+                .putString(PREF_APP_DAY_NIGHT_MODE, mode.getSettingsValue())
+                .apply();
+            handler.post(cb);
+        });
+    }
+
+    /**
+     * The theme selected by user
+     */
+    public void getAppTheme(Consumer<Theme> cb) {
+        executor.execute(() -> {
+            String theme = prefs.getString(
+                PREF_APP_THEME, Theme.STANDARD.getSettingsValue()
+            );
+            handler.post(() -> {
+                cb.accept(Theme.getFromSettingsValue(theme));
+            });
+        });
+    }
+
+    /**
+     * Blocking version of getting theme
+     *
+     * Needed to apply dynamic colors to application
+     */
+    public Theme getAppThemeBlocking() {
+        String theme = prefs.getString(
+            PREF_APP_THEME, Theme.STANDARD.getSettingsValue()
+        );
+        return Theme.getFromSettingsValue(theme);
     }
 
     /**
@@ -804,30 +855,6 @@ public class ForkyzSettings {
     }
 
     /**
-     * The theme selected by user
-     */
-    public void getTheme(Consumer<Theme> cb) {
-        executor.execute(() -> {
-            String theme = prefs.getString(
-                PREF_THEME, Theme.STANDARD.getSettingsValue()
-            );
-            cb.accept(Theme.getFromSettingsValue(theme));
-        });
-    }
-
-    /**
-     * Blocking version of getting theme
-     *
-     * Needed to apply dynamic colors to application
-     */
-    public Theme getThemeBlocking() {
-        String theme = prefs.getString(
-            PREF_THEME, Theme.STANDARD.getSettingsValue()
-        );
-        return Theme.getFromSettingsValue(theme);
-    }
-
-    /**
      * Whether to always announce the current box
      */
     public void getVoiceAlwaysAnnounceBox(Consumer<Boolean> cb) {
@@ -972,11 +999,11 @@ public class ForkyzSettings {
     public void migrateThemePreferences() {
         executor.execute(() -> {
             boolean legacyDynamic
-                = prefs.getBoolean(PREF_THEME_LEGACY_USE_DYNAMIC, false);
+                = prefs.getBoolean(PREF_APP_THEME_LEGACY_USE_DYNAMIC, false);
             if (legacyDynamic) {
                prefs.edit()
-                    .remove(PREF_THEME_LEGACY_USE_DYNAMIC)
-                    .putString(PREF_THEME, Theme.DYNAMIC.getSettingsValue())
+                    .remove(PREF_APP_THEME_LEGACY_USE_DYNAMIC)
+                    .putString(PREF_APP_THEME, Theme.DYNAMIC.getSettingsValue())
                     .apply();
             }
         });

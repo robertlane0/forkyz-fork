@@ -1,18 +1,19 @@
 package app.crossword.yourealwaysbe.util;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.preference.PreferenceManager;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import app.crossword.yourealwaysbe.settings.DayNightMode;
+import app.crossword.yourealwaysbe.settings.ForkyzSettings;
 
 /**
  * Heavily adapted from sources below, description no longer relevant so
@@ -23,20 +24,14 @@ import java.util.logging.Logger;
   */
 public class NightModeHelper {
 
-    public enum Mode {
-        DAY, NIGHT, SYSTEM;
-    }
-
-    private static int sUiNightMode = Configuration.UI_MODE_NIGHT_NO;
-    private static String UI_THEME = "uiTheme";
-    private static Mode DEFAULT_MODE = Mode.DAY;
-
     private WeakReference<AppCompatActivity> mActivity;
-    private Mode currentMode;
-    private SharedPreferences prefs;
+    private ForkyzSettings settings;
 
-    public static NightModeHelper bind(AppCompatActivity activity) {
-        NightModeHelper helper = new NightModeHelper(activity);
+    public static NightModeHelper bind(
+        AppCompatActivity activity,
+        ForkyzSettings settings
+    ) {
+        NightModeHelper helper = new NightModeHelper(activity, settings);
         helper.restoreNightMode();
 
         // This may seem pointless but it forces the Theme to be reloaded
@@ -47,72 +42,71 @@ public class NightModeHelper {
         return helper;
     }
 
-    private NightModeHelper(AppCompatActivity activity) {
-        mActivity = new WeakReference<>(activity);
-        prefs = PreferenceManager.getDefaultSharedPreferences(activity);
-        currentMode = Mode.valueOf(
-            prefs.getString(UI_THEME, DEFAULT_MODE.name())
-        );
+    private NightModeHelper(
+        AppCompatActivity activity, ForkyzSettings settings
+    ) {
+        this.mActivity = new WeakReference<>(activity);
+        this.settings = settings;
     }
 
-    public void next() {
-        switch (currentMode) {
-        case DAY:
-            setMode(Mode.NIGHT);
-            break;
-        case NIGHT:
-            setMode(Mode.SYSTEM);
-            break;
-        case SYSTEM:
-            setMode(Mode.DAY);
-            break;
-        }
+    /**
+     * After changing theme, calls back with new mode
+     *
+     * Can pass null if don't care
+     */
+    public void next(Consumer<DayNightMode> cb) {
+        settings.getAppDayNightMode(currentMode -> {
+            switch (currentMode) {
+            case DAY:
+                setMode(DayNightMode.NIGHT);
+                if (cb != null)
+                    cb.accept(DayNightMode.NIGHT);
+                break;
+            case NIGHT:
+                setMode(DayNightMode.SYSTEM);
+                if (cb != null)
+                    cb.accept(DayNightMode.SYSTEM);
+                break;
+            case SYSTEM:
+                setMode(DayNightMode.DAY);
+                if (cb != null)
+                    cb.accept(DayNightMode.DAY);
+                break;
+            }
+        });
     }
 
-    public void setMode(Mode mode) {
-        currentMode = mode;
-
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(UI_THEME, currentMode.name());
-        editor.apply();
-
-        restoreNightMode();
+    public void setMode(DayNightMode mode) {
+        settings.setAppDayNightMode(mode, () -> { restoreNightMode(); });
     }
 
     public void restoreNightMode() {
         AppCompatActivity activity = mActivity.get();
         if (activity != null) {
-            switch (currentMode) {
-            case DAY:
-                AppCompatDelegate.setDefaultNightMode(
-                    AppCompatDelegate.MODE_NIGHT_NO
-                );
-                break;
-            case NIGHT:
-                AppCompatDelegate.setDefaultNightMode(
-                    AppCompatDelegate.MODE_NIGHT_YES
-                );
-                break;
-            case SYSTEM:
-                AppCompatDelegate.setDefaultNightMode(
-                    AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-                );
-                break;
-            }
+            getCurrentMode(currentMode -> {
+                switch (currentMode) {
+                case DAY:
+                    AppCompatDelegate.setDefaultNightMode(
+                        AppCompatDelegate.MODE_NIGHT_NO
+                    );
+                    break;
+                case NIGHT:
+                    AppCompatDelegate.setDefaultNightMode(
+                        AppCompatDelegate.MODE_NIGHT_YES
+                    );
+                    break;
+                case SYSTEM:
+                    AppCompatDelegate.setDefaultNightMode(
+                        AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+                    );
+                    break;
+                }
+            });
         }
     }
 
-    public Mode getCurrentMode() {
-        return currentMode;
-    }
-
-    public boolean isNightMode(){
-        switch (currentMode) {
-        case DAY: return false;
-        case NIGHT: return true;
-        case SYSTEM: return getSystemNightMode();
-        default: return false;
-        }
+    public void getCurrentMode(Consumer<DayNightMode> cb) {
+        settings.getAppDayNightMode(cb);
     }
 
     public void unbind() {

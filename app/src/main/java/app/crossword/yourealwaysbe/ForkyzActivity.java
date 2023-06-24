@@ -56,7 +56,7 @@ public class ForkyzActivity extends AppCompatActivity {
         super.onResume();
 
         if(nightMode == null) {
-            nightMode = NightModeHelper.bind(this);
+            nightMode = NightModeHelper.bind(this, settings);
             nightMode.restoreNightMode();
         }
 
