@@ -6,7 +6,7 @@ import java.time.Duration;
 
 /**
  * Custom daily downloader
- * URL: prefs.getString("customDailyLink", "")
+ * URL: customDailyLink from settings
  * Date = Daily
  */
 public class CustomDailyDownloader extends AbstractDateDownloader {
