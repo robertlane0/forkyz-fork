@@ -12,12 +12,12 @@ import androidx.core.text.HtmlCompat;
 import androidx.fragment.app.DialogFragment;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
 import app.crossword.yourealwaysbe.forkyz.PuzzleActivity;
 import app.crossword.yourealwaysbe.forkyz.R;
 import app.crossword.yourealwaysbe.forkyz.databinding.CompletedBinding;
 import app.crossword.yourealwaysbe.forkyz.databinding.CompletionInfoBinding;
 import app.crossword.yourealwaysbe.forkyz.databinding.PuzzleInfoDialogBinding;
+import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder;
 import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer;
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider;
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle;
@@ -33,10 +33,14 @@ import javax.inject.Inject;
 import dagger.hilt.android.AndroidEntryPoint;
 
 public class PuzzleInfoDialogs {
+    @AndroidEntryPoint
     public static class Finished extends DialogFragment {
         private static final long SECONDS = 1000;
         private static final long MINUTES = SECONDS * 60;
         private static final long HOURS = MINUTES * 60;
+
+        @Inject
+        protected CurrentPuzzleHolder currentPuzzleHolder;
 
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -51,7 +55,7 @@ public class PuzzleInfoDialogs {
             builder.setView(binding.getRoot())
                 .setTitle(activity.getString(R.string.puzzle_finished_title));
 
-            Puzzle puz = getPuzzle();
+            Puzzle puz = getPuzzle(currentPuzzleHolder);
             if (puz == null)
                 return builder.create();
 
@@ -197,6 +201,9 @@ public class PuzzleInfoDialogs {
         @Inject
         protected FileHandlerProvider fileHandlerProvider;
 
+        @Inject
+        protected CurrentPuzzleHolder currentPuzzleHolder;
+
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             Activity activity = getActivity();
@@ -208,7 +215,7 @@ public class PuzzleInfoDialogs {
                 activity.getLayoutInflater()
             );
 
-            Puzzle puz = getPuzzle();
+            Puzzle puz = getPuzzle(currentPuzzleHolder);
             if (puz != null) {
                 binding.puzzleInfoTitle.setText(smartHtml(puz.getTitle()));
                 binding.puzzleInfoAuthor.setText(puz.getAuthor());
@@ -259,11 +266,11 @@ public class PuzzleInfoDialogs {
         }
 
         private PuzHandle getPuzHandle() {
-            return ForkyzApplication.getInstance().getPuzHandle();
+            return currentPuzzleHolder.getPuzHandle();
         }
 
         private void addIntro(PuzzleInfoDialogBinding binding) {
-            Puzzle puz = getPuzzle();
+            Puzzle puz = getPuzzle(currentPuzzleHolder);
             if (puz == null)
                 return;
 
@@ -279,7 +286,7 @@ public class PuzzleInfoDialogs {
         }
 
         private void addNotes(PuzzleInfoDialogBinding binding) {
-            Puzzle puz = getPuzzle();
+            Puzzle puz = getPuzzle(currentPuzzleHolder);
             if (puz == null || !puz.hasNotes()) {
                 binding.puzzleInfoNotesTitle.setVisibility(View.GONE);
                 binding.puzzleInfoNotes.setVisibility(View.GONE);
@@ -355,7 +362,7 @@ public class PuzzleInfoDialogs {
         }
 
         private void addCompletedInfo(PuzzleInfoDialogBinding binding) {
-            Puzzle puz = getPuzzle();
+            Puzzle puz = getPuzzle(currentPuzzleHolder);
             if (puz == null || puz.getPercentComplete() < 100) {
                 binding.puzzleInfoCompletedTitle.setVisibility(View.GONE);
                 binding.puzzleInfoCompletedPadding.setVisibility(View.GONE);
@@ -384,13 +391,17 @@ public class PuzzleInfoDialogs {
         }
     }
 
+    @AndroidEntryPoint
     public static class Intro extends DialogFragment {
+        @Inject
+        protected CurrentPuzzleHolder currentPuzzleHolder;
+
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             MaterialAlertDialogBuilder builder
                 = new MaterialAlertDialogBuilder(getActivity());
 
-            Puzzle puz = getPuzzle();
+            Puzzle puz = getPuzzle(currentPuzzleHolder);
             if (puz != null && puz.hasIntroMessage()) {
                 builder.setTitle(getString(R.string.introduction))
                     .setMessage(smartHtml(puz.getIntroMessage()))
@@ -399,14 +410,15 @@ public class PuzzleInfoDialogs {
 
             return builder.create();
         }
+
     }
 
     private static Spanned smartHtml(String text) {
         return text == null ? null : HtmlCompat.fromHtml(text, 0);
     }
 
-    private static Puzzle getPuzzle() {
-        Playboard board = ForkyzApplication.getInstance().getBoard();
+    private static Puzzle getPuzzle(CurrentPuzzleHolder currentPuzzleHolder) {
+        Playboard board = currentPuzzleHolder.getBoard();
         return board == null ? null : board.getPuzzle();
     }
 }

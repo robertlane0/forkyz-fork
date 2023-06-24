@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
+import javax.inject.Inject;
 
 import android.content.Context;
 import android.graphics.Rect;
@@ -19,14 +20,16 @@ import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 
-import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
-import app.crossword.yourealwaysbe.puz.Box;
-import app.crossword.yourealwaysbe.puz.Playboard;
-import app.crossword.yourealwaysbe.puz.Position;
+import dagger.hilt.android.AndroidEntryPoint;
+
+import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.util.BoxInputConnection;
 import app.crossword.yourealwaysbe.forkyz.util.KeyboardManager;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
+import app.crossword.yourealwaysbe.puz.Box;
+import app.crossword.yourealwaysbe.puz.Position;
 
+@AndroidEntryPoint
 public class BoardEditText
         extends ScrollingImageView
         implements BoxInputConnection.BoxInputListener,
@@ -34,6 +37,9 @@ public class BoardEditText
 
     private static final Logger LOG
         = Logger.getLogger(BoardEditText.class.getCanonicalName());
+
+    @Inject
+    protected ForkyzSettings settings;
 
     // for rendering
     protected final ExecutorService executorService
@@ -420,37 +426,39 @@ public class BoardEditText
         return Box.BLANK.equals(String.valueOf(c));
     }
 
-    private void onNewResponse(char c) {
-        if (!isAcceptableCharacterResponse(c))
+    private void onNewResponse(char character) {
+        if (!isAcceptableCharacterResponse(character))
             return;
 
-        c = filterReplacement(c, selection);
+        final char c = filterReplacement(character, selection);
 
         if (c != '\0') {
-            int col = getSelectedCol();
+            settings.getPlaySkipFilled(skipCompleted -> {
+                int col = getSelectedCol();
 
-            // we'll update later if the selection doesn't change
-            setResponseNoInputConnectionUpdate(col, c);
+                // we'll update later if the selection doesn't change
+                setResponseNoInputConnectionUpdate(col, c);
 
-            if (col < boxes.length - 1) {
-                col += 1;
-                int nextPos = col;
-
-                while (getBoard().isSkipCompletedLetters() &&
-                       !boxes[col].isBlank() &&
-                       col < boxes.length - 1) {
+                if (col < boxes.length - 1) {
                     col += 1;
+                    int nextPos = col;
+
+                    while (skipCompleted &&
+                           !boxes[col].isBlank() &&
+                           col < boxes.length - 1) {
+                        col += 1;
+                    }
+
+                    if (boxes[col].isBlank())
+                        setSelectedCol(col);
+                    else
+                        setSelectedCol(nextPos);
+                } else {
+                    updateInputConnection();
                 }
 
-                if (boxes[col].isBlank())
-                    setSelectedCol(col);
-                else
-                    setSelectedCol(nextPos);
-            } else {
-                updateInputConnection();
-            }
-
-            this.render();
+                this.render();
+            });
         } else {
             // Needs updating else thinks there's a character in the
             // buffer, when it was refused
@@ -517,10 +525,6 @@ public class BoardEditText
         }
 
         return newChar;
-    }
-
-    private Playboard getBoard(){
-        return ForkyzApplication.getInstance().getBoard();
     }
 
     private int findPosition(Point point) {

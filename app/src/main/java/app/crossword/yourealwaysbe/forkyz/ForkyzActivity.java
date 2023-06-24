@@ -1,5 +1,8 @@
 package app.crossword.yourealwaysbe.forkyz;
 
+import java.util.logging.Logger;
+import javax.inject.Inject;
+
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -17,12 +20,12 @@ import androidx.core.text.HtmlCompat;
 import dagger.hilt.android.AndroidEntryPoint;
 
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
+import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder;
 import app.crossword.yourealwaysbe.forkyz.util.NightModeHelper;
 import app.crossword.yourealwaysbe.forkyz.util.ThemeHelper;
+import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
-
-import java.util.logging.Logger;
-import javax.inject.Inject;
+import app.crossword.yourealwaysbe.puz.Playboard;
 
 @AndroidEntryPoint
 public class ForkyzActivity extends AppCompatActivity {
@@ -31,6 +34,9 @@ public class ForkyzActivity extends AppCompatActivity {
 
     @Inject
     protected ForkyzSettings settings;
+
+    @Inject
+    protected CurrentPuzzleHolder currentPuzzleHolder;
 
     protected AndroidVersionUtils utils = AndroidVersionUtils.Factory
             .getInstance();
@@ -111,5 +117,24 @@ public class ForkyzActivity extends AppCompatActivity {
 
     protected static Spanned smartHtml(String text) {
         return text == null ? null : HtmlCompat.fromHtml(text, 0);
+    }
+
+    /**
+     * Set the board and base file of the puzzle loaded on it
+     */
+    protected void setCurrentBoard(Playboard board, PuzHandle puzHandle) {
+        currentPuzzleHolder.setBoard(board, puzHandle);
+    }
+
+    protected Playboard getCurrentBoard() {
+        return currentPuzzleHolder.getBoard();
+    }
+
+    protected PuzHandle getCurrentPuzHandle() {
+        return currentPuzzleHolder.getPuzHandle();
+    }
+
+    protected void clearCurrentBoard() {
+        currentPuzzleHolder.clearBoard();
     }
 }

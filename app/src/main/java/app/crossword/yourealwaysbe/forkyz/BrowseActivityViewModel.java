@@ -28,6 +28,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel;
 import app.crossword.yourealwaysbe.forkyz.net.Downloader;
 import app.crossword.yourealwaysbe.forkyz.net.Downloaders;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
+import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder;
 import app.crossword.yourealwaysbe.forkyz.util.PuzzleImporter;
 import app.crossword.yourealwaysbe.forkyz.util.SingleLiveEvent;
 import app.crossword.yourealwaysbe.forkyz.util.files.DirHandle;
@@ -54,6 +55,7 @@ public class BrowseActivityViewModel extends ViewModel {
 
     private ForkyzSettings settings;
     private FileHandlerProvider fileHandlerProvider;
+    private CurrentPuzzleHolder currentPuzzleHolder;
 
     private boolean isViewArchive = false;
 
@@ -67,10 +69,13 @@ public class BrowseActivityViewModel extends ViewModel {
 
     @Inject
     public BrowseActivityViewModel(
-        ForkyzSettings settings, FileHandlerProvider fileHandlerProvider
+        ForkyzSettings settings,
+        FileHandlerProvider fileHandlerProvider,
+        CurrentPuzzleHolder currentPuzzleHolder
     ) {
         this.settings = settings;
         this.fileHandlerProvider = fileHandlerProvider;
+        this.currentPuzzleHolder = currentPuzzleHolder;
         isUIBusy.setValue(false);
     }
 
@@ -271,9 +276,7 @@ public class BrowseActivityViewModel extends ViewModel {
                     }
                     settings.getPlayMovementStrategy(movementStrategy -> {
                         handler.post(() -> {
-                            ForkyzApplication application
-                                = ForkyzApplication.getInstance();
-                            application.setBoard(
+                            currentPuzzleHolder.setBoard(
                                 new Playboard(
                                     puz,
                                     movementStrategy,

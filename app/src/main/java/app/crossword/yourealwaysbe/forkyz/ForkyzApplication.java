@@ -10,17 +10,12 @@ import androidx.work.Configuration;
 
 import dagger.hilt.android.HiltAndroidApp;
 
-import app.crossword.yourealwaysbe.puz.Playboard;
-import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation;
 import app.crossword.yourealwaysbe.forkyz.util.ExitActivity;
 import app.crossword.yourealwaysbe.forkyz.util.ThemeHelper;
-import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider;
-import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 
-import java.io.IOException;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 import javax.inject.Inject;
@@ -35,74 +30,15 @@ public class ForkyzApplication extends Application implements Configuration.Prov
     @Inject
     ForkyzSettings settings;
 
-    @Inject
-    FileHandlerProvider fileHandlerProvider;
-
     // for background downloads
     // https://developer.android.com/reference/androidx/hilt/work/HiltWorker
     @Inject
     HiltWorkerFactory workerFactory;
 
     private static ForkyzApplication INSTANCE;
-    private Playboard board;
-    private PuzHandle puzHandle;
 
     public void exitApplication() {
         ExitActivity.exit(this);
-    }
-
-    /**
-     * Set the board and base file of the puzzle loaded on it
-     */
-    public void setBoard(Playboard board, PuzHandle puzHandle){
-        this.board = board;
-        this.puzHandle = puzHandle;
-    }
-
-    public void clearBoard() {
-        this.board = null;
-        this.puzHandle = null;
-    }
-
-    public Playboard getBoard() {
-         return board;
-    }
-
-    public PuzHandle getPuzHandle() {
-        return puzHandle;
-    }
-
-    /**
-     * Save the puzzle
-     */
-    public void saveBoard() {
-        PuzHandle puzHandle = getPuzHandle();
-        if (puzHandle == null) {
-            LOGGER.severe("No puz handle to save puzzle to.");
-            return;
-        }
-
-        Playboard board = getBoard();
-        if (board == null) {
-            LOGGER.severe("No board to save.");
-            return;
-        }
-
-        Puzzle puz = board.getPuzzle();
-        if (puz == null) {
-            LOGGER.severe("No puzzle associated to the board to save.");
-            return;
-        }
-
-        fileHandlerProvider.get(fileHandler -> {
-            // TODO: save off main thread?
-            try {
-                fileHandler.save(puz, puzHandle);
-            } catch (IOException e) {
-                LOGGER.severe("Error saving puzzle.");
-                e.printStackTrace();
-            }
-        });
     }
 
     @Override

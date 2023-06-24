@@ -63,6 +63,8 @@ public class ClueListActivity extends PuzzleActivity
      */
     @Override
     public void onCreate(Bundle icicle) {
+        super.onCreate(icicle);
+
         Playboard board = getBoard();
         Puzzle puz = getPuzzle();
 
@@ -77,8 +79,6 @@ public class ClueListActivity extends PuzzleActivity
 
         binding = ClueListBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
-        super.onCreate(icicle);
 
         utils.holographic(this);
         utils.finishOnHomeButton(this);

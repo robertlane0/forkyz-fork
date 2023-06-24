@@ -559,7 +559,7 @@ public class BrowseActivity extends ForkyzActivity {
                     refreshLastAccessedPuzzle();
                 }
                 // previous game ended for now
-                ForkyzApplication.getInstance().clearBoard();
+                clearCurrentBoard();
             }
         );
 
@@ -599,8 +599,7 @@ public class BrowseActivity extends ForkyzActivity {
     }
 
     private void refreshLastAccessedPuzzle() {
-        final PuzHandle lastAccessed
-            = ForkyzApplication.getInstance().getPuzHandle();
+        final PuzHandle lastAccessed = getCurrentPuzHandle();
         if (lastAccessed == null)
             return;
         model.refreshPuzzleMeta(lastAccessed);

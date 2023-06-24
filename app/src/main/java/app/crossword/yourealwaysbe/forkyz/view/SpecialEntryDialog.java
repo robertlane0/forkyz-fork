@@ -1,6 +1,8 @@
 
 package app.crossword.yourealwaysbe.forkyz.view;
 
+import javax.inject.Inject;
+
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,8 +14,10 @@ import android.widget.EditText;
 import androidx.fragment.app.DialogFragment;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
+import dagger.hilt.android.AndroidEntryPoint;
+
 import app.crossword.yourealwaysbe.forkyz.R;
+import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder;
 import app.crossword.yourealwaysbe.puz.Box;
 import app.crossword.yourealwaysbe.puz.Playboard;
 
@@ -23,7 +27,12 @@ import app.crossword.yourealwaysbe.puz.Playboard;
  * Pass the board to the constructor. The dialog will play the special letter
  * when entered.
  */
+@AndroidEntryPoint
 public class SpecialEntryDialog extends DialogFragment {
+
+    @Inject
+    protected CurrentPuzzleHolder currentPuzzleHolder;
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         LayoutInflater inflater = (LayoutInflater)
@@ -41,7 +50,7 @@ public class SpecialEntryDialog extends DialogFragment {
         builder.setTitle(getString(R.string.special_entry))
             .setView(layout);
 
-        Playboard board = ForkyzApplication.getInstance().getBoard();
+        Playboard board = currentPuzzleHolder.getBoard();
         if (board == null)
             return builder.create();
 

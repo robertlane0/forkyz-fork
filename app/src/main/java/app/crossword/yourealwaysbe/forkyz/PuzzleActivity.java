@@ -1,5 +1,13 @@
 package app.crossword.yourealwaysbe.forkyz;
 
+import java.io.IOException;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.logging.Logger;
+import java.util.regex.Pattern;
+import javax.inject.Inject;
+
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
@@ -26,6 +34,8 @@ import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.LiveData;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
 import org.jg.wordstonumbers.WordsToNumbersUtil;
 
 import app.crossword.yourealwaysbe.forkyz.databinding.VoiceButtonsBinding;
@@ -34,6 +44,7 @@ import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer;
 import app.crossword.yourealwaysbe.forkyz.util.SpeechContract;
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand;
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands;
+import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider;
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerShared;
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle;
 import app.crossword.yourealwaysbe.forkyz.view.PlayboardTextRenderer;
@@ -47,12 +58,7 @@ import app.crossword.yourealwaysbe.puz.Playboard;
 import app.crossword.yourealwaysbe.puz.Position;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 
-import java.util.Locale;
-import java.util.Objects;
-import java.util.function.Consumer;
-import java.util.logging.Logger;
-import java.util.regex.Pattern;
-
+@AndroidEntryPoint
 public abstract class PuzzleActivity
         extends ForkyzActivity
         implements Playboard.PlayboardListener {
@@ -60,6 +66,9 @@ public abstract class PuzzleActivity
     private static final Logger LOG = Logger.getLogger("app.crossword.yourealwaysbe");
 
     private static final String HELP_RESPONSE_TEXT = "helpResponse";
+
+    @Inject
+    protected FileHandlerProvider fileHandlerProvider;
 
     private VoiceButtonsBinding voiceBinding = null;
     private boolean firstPlay = false;
@@ -304,13 +313,44 @@ public abstract class PuzzleActivity
     }
 
     protected Playboard getBoard(){
-        return ForkyzApplication.getInstance().getBoard();
+        return getCurrentBoard();
     }
 
     protected Puzzle getPuzzle() {
         Playboard board = getBoard();
         return (board == null) ? null : getBoard().getPuzzle();
     }
+
+    protected void saveBoard() {
+        PuzHandle puzHandle = getCurrentPuzHandle();
+        if (puzHandle == null) {
+            LOG.severe("No puz handle to save puzzle to.");
+            return;
+        }
+
+        Playboard board = getCurrentBoard();
+        if (board == null) {
+            LOG.severe("No board to save.");
+            return;
+        }
+
+        Puzzle puz = board.getPuzzle();
+        if (puz == null) {
+            LOG.severe("No puzzle associated to the board to save.");
+            return;
+        }
+
+        fileHandlerProvider.get(fileHandler -> {
+            // TODO: save off main thread?
+            try {
+                fileHandler.save(puz, puzHandle);
+            } catch (IOException e) {
+                LOG.severe("Error saving puzzle.");
+                e.printStackTrace();
+            }
+        });
+    }
+
 
     protected boolean isFirstPlay() {
         return firstPlay;
@@ -321,11 +361,7 @@ public abstract class PuzzleActivity
     }
 
     protected PuzHandle getPuzHandle() {
-        return ForkyzApplication.getInstance().getPuzHandle();
-    }
-
-    protected void saveBoard() {
-        ForkyzApplication.getInstance().saveBoard();
+        return getCurrentPuzHandle();
     }
 
     protected void getLongClueText(Clue clue, Consumer<String> cb) {
