@@ -23,6 +23,9 @@ public class FileHandlerLegacy extends FileHandlerJavaFile {
     }
 
     @Override
+    public boolean needsWriteExternalStoragePermission() { return true; }
+
+    @Override
     public boolean isStorageMounted() {
         return Environment.MEDIA_MOUNTED.equals(
             Environment.getExternalStorageState()

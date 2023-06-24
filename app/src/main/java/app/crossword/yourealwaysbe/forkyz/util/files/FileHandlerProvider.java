@@ -1,12 +1,15 @@
 
 package app.crossword.yourealwaysbe.forkyz.util.files;
 
-import android.content.Context;
-import android.widget.Toast;
-
 import java.util.function.Consumer;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.widget.Toast;
+import androidx.core.content.ContextCompat;
 
 import dagger.hilt.android.qualifiers.ApplicationContext;
 
@@ -43,6 +46,23 @@ public class FileHandlerProvider {
 
     public void reloadFileHandler() {
         fileHandler = null;
+    }
+
+    /**
+     * Returns true if WRITE_EXTERNAL_STORAGE permission is needed/missing
+     */
+    public void isMissingWritePermission(Consumer<Boolean> cb) {
+        get(fileHandler -> {
+            boolean needsPerm
+                = fileHandler.needsWriteExternalStoragePermission();
+
+            cb.accept(
+                needsPerm
+                && ContextCompat.checkSelfPermission(
+                    applicationContext, Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ) != PackageManager.PERMISSION_GRANTED
+            );
+        });
     }
 
     private void createFileHandler(Consumer<FileHandler> cb) {

@@ -30,8 +30,8 @@ import com.google.common.util.concurrent.ListenableFuture;
 
 import dagger.assisted.Assisted;
 import dagger.assisted.AssistedInject;
+import dagger.hilt.android.qualifiers.ApplicationContext;
 
-import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
 import app.crossword.yourealwaysbe.forkyz.net.Downloaders;
 import app.crossword.yourealwaysbe.forkyz.settings.BackgroundDownloadSettings;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
@@ -51,10 +51,15 @@ public class BackgroundDownloadManager {
     private static final String DOWNLOAD_WORK_NAME_DAILY
         = "backgroundDownloadDaily";
 
+    private Context applicationContext;
     private ForkyzSettings settings;
 
     @Inject
-    BackgroundDownloadManager(ForkyzSettings settings) {
+    BackgroundDownloadManager(
+        @ApplicationContext Context applicationContext,
+        ForkyzSettings settings
+    ) {
+        this.applicationContext = applicationContext;
         this.settings = settings;
     }
 
@@ -202,7 +207,7 @@ public class BackgroundDownloadManager {
     }
 
     public WorkManager getWorkManager() {
-        return WorkManager.getInstance(ForkyzApplication.getInstance());
+        return WorkManager.getInstance(applicationContext);
     }
 
     private abstract static class BaseDownloadWorker extends ListenableWorker {
@@ -226,9 +231,7 @@ public class BackgroundDownloadManager {
         protected void doDownload(
             CallbackToFutureAdapter.Completer<ListenableWorker.Result> completer
         ) {
-            ForkyzApplication app = ForkyzApplication.getInstance();
-
-            app.isMissingWritePermission(missing -> {
+            fileHandlerProvider.isMissingWritePermission(missing -> {
                 if (missing) {
                     LOGGER.info("Skipping download, no write permission");
                     return;
@@ -241,9 +244,14 @@ public class BackgroundDownloadManager {
                 downloadExecutorService.execute(() -> {
                     try {
                         NotificationManagerCompat nm
-                            = NotificationManagerCompat.from(app);
+                            = NotificationManagerCompat.from(
+                                getApplicationContext()
+                            );
                         final Downloaders dls = new Downloaders(
-                            app, fileHandler, downloadersSettings, nm
+                            getApplicationContext(),
+                            fileHandler,
+                            downloadersSettings,
+                            nm
                         );
                         LocalDate now = LocalDate.now();
                         dls.downloadLatestInRange(

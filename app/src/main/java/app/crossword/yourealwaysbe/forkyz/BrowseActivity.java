@@ -572,7 +572,7 @@ public class BrowseActivity extends ForkyzActivity {
         // permissions checks in onStart to avoid multiple calls via
         // onResume
 
-        ForkyzApplication.getInstance().isMissingWritePermission(missing -> {
+        fileHanderProvider.isMissingWritePermission(missing -> {
             if (missing) {
                 boolean showRationale
                     = ActivityCompat.shouldShowRequestPermissionRationale(
@@ -598,7 +598,7 @@ public class BrowseActivity extends ForkyzActivity {
     }
 
     public void checkNewPuzzle(Consumer<Boolean> cb) {
-        ForkyzApplication.getInstance().isMissingWritePermission(missing -> {
+        fileHanderProvider.isMissingWritePermission(missing -> {
             if (missing) {
                 cb.accept(false);
             } else {

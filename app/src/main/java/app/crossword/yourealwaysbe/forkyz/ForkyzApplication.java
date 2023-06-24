@@ -1,26 +1,23 @@
 package app.crossword.yourealwaysbe.forkyz;
 
-import android.Manifest;
 import android.app.Application;
-import android.content.pm.PackageManager;
 import android.util.DisplayMetrics;
-import androidx.core.content.ContextCompat;
 import androidx.hilt.work.HiltWorkerFactory;
 import androidx.work.Configuration;
 
 import dagger.hilt.android.HiltAndroidApp;
 
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
-import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation;
 import app.crossword.yourealwaysbe.forkyz.util.ThemeHelper;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 
-import java.util.function.Consumer;
 import java.util.logging.Logger;
 import javax.inject.Inject;
 
 @HiltAndroidApp
-public class ForkyzApplication extends Application implements Configuration.Provider {
+public class ForkyzApplication
+        extends Application
+        implements Configuration.Provider {
     private static final Logger LOGGER
         = Logger.getLogger(ForkyzApplication.class.getCanonicalName());
 
@@ -77,20 +74,5 @@ public class ForkyzApplication extends Application implements Configuration.Prov
 
     public static ForkyzApplication getInstance(){
         return INSTANCE;
-    }
-
-    public void isMissingWritePermission(Consumer<Boolean> cb) {
-        settings.getFileHandlerSettings(fhs -> {
-            boolean isLegacy = StorageLocation.EXTERNAL_LEGACY.equals(
-                fhs.getStorageLocation()
-            );
-
-            cb.accept(
-                isLegacy
-                && ContextCompat.checkSelfPermission(
-                    this, Manifest.permission.WRITE_EXTERNAL_STORAGE
-                ) != PackageManager.PERMISSION_GRANTED
-            );
-        });
     }
 }

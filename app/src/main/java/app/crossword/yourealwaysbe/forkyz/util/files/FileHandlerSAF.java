@@ -74,6 +74,9 @@ public class FileHandlerSAF extends FileHandler {
     }
 
     @Override
+    public boolean needsWriteExternalStoragePermission() { return false; }
+
+    @Override
     public DirHandle getCrosswordsDirectory() {
         return new DirHandle(crosswordsFolderUri);
     }

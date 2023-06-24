@@ -81,6 +81,7 @@ public abstract class FileHandler {
     public abstract DirHandle getArchiveDirectory();
     public abstract boolean isStorageMounted();
     public abstract boolean isStorageFull();
+    public abstract boolean needsWriteExternalStoragePermission();
 
     protected abstract FileHandle getFileHandle(Uri uri);
     protected abstract boolean exists(DirHandle dir);
