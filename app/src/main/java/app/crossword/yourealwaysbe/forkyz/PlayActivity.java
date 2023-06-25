@@ -338,7 +338,11 @@ public class PlayActivity extends PuzzleActivity
 
         DisplayMetrics metrics = getResources().getDisplayMetrics();
         settings.getPlayFitToScreen(fitToScreen -> {
-            if (fitToScreen || (ForkyzApplication.isLandscape(metrics)) && (ForkyzApplication.isTabletish(metrics) || ForkyzApplication.isMiniTabletish(metrics))) {
+            if (fitToScreen || (
+                    isLandscape(metrics)
+                    && (isTabletish(metrics) || isMiniTabletish(metrics))
+                )
+            ) {
                 this.handler.postDelayed(fitToScreenTask, 100);
             }
         });
@@ -1178,6 +1182,25 @@ public class PlayActivity extends PuzzleActivity
             return true;
 
         return false;
+    }
+
+    private static boolean isLandscape(DisplayMetrics metrics){
+        return metrics.widthPixels > metrics.heightPixels;
+    }
+
+    private static boolean isTabletish(DisplayMetrics metrics) {
+        double x = Math.pow(metrics.widthPixels / metrics.xdpi, 2);
+        double y = Math.pow(metrics.heightPixels / metrics.ydpi, 2);
+        double screenInches = Math.sqrt(x + y);
+        if (screenInches > 9) { // look for a 9" or larger screen.
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private boolean isMiniTabletish(DisplayMetrics metrics) {
+        return utils.isMiniTabletish(metrics);
     }
 
     public static class RevealPuzzleDialog extends DialogFragment {

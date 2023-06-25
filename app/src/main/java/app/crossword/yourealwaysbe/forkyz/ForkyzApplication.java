@@ -1,7 +1,6 @@
 package app.crossword.yourealwaysbe.forkyz;
 
 import android.app.Application;
-import android.util.DisplayMetrics;
 import androidx.hilt.work.HiltWorkerFactory;
 import androidx.work.Configuration;
 
@@ -49,27 +48,6 @@ public class ForkyzApplication
         return new Configuration.Builder()
                 .setWorkerFactory(workerFactory)
                 .build();
-    }
-
-    public static boolean isLandscape(DisplayMetrics metrics){
-        return metrics.widthPixels > metrics.heightPixels;
-    }
-
-    public static boolean isTabletish(DisplayMetrics metrics) {
-        double x = Math.pow(metrics.widthPixels / metrics.xdpi, 2);
-        double y = Math.pow(metrics.heightPixels / metrics.ydpi, 2);
-        double screenInches = Math.sqrt(x + y);
-        if (screenInches > 9) { // look for a 9" or larger screen.
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public static boolean isMiniTabletish(DisplayMetrics metrics) {
-        return AndroidVersionUtils.Factory
-            .getInstance()
-            .isMiniTabletish(metrics);
     }
 
     public static ForkyzApplication getInstance(){
