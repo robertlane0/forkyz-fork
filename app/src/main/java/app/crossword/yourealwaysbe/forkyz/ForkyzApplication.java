@@ -30,12 +30,8 @@ public class ForkyzApplication
     @Inject
     HiltWorkerFactory workerFactory;
 
-    private static ForkyzApplication INSTANCE;
-
     @Override
     public void onCreate() {
-        INSTANCE = this;
-
         super.onCreate();
 
         AndroidVersionUtils.Factory.getInstance().createNotificationChannel(this);
@@ -48,9 +44,5 @@ public class ForkyzApplication
         return new Configuration.Builder()
                 .setWorkerFactory(workerFactory)
                 .build();
-    }
-
-    public static ForkyzApplication getInstance(){
-        return INSTANCE;
     }
 }
