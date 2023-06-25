@@ -21,14 +21,12 @@ import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 
 public class BoxInputConnection extends BaseInputConnection {
 
-    private static final AndroidVersionUtils utils
-        = AndroidVersionUtils.Factory.getInstance();
-
     private static final int INPUT_TYPE =
         InputType.TYPE_CLASS_TEXT
         | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS
         | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS;
 
+    private AndroidVersionUtils utils;
     private BoardEditable boardEditable;
     private View targetView;
     private BoxInputListener listener;
@@ -43,11 +41,13 @@ public class BoxInputConnection extends BaseInputConnection {
 
     public BoxInputConnection(
         View targetView,
+        AndroidVersionUtils utils,
         String initialResponse,
         BoxInputListener listener
     ) {
         super(targetView, true);
         this.targetView = targetView;
+        this.utils = utils;
         this.boardEditable = new BoardEditable(initialResponse);
         this.listener = listener;
     }

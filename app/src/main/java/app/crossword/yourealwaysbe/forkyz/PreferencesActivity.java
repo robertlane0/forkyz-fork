@@ -26,6 +26,9 @@ public class PreferencesActivity
     public static final String NIGHT_MODE = "nightMode";
 
     @Inject
+    protected AndroidVersionUtils utils;
+
+    @Inject
     protected ForkyzSettings settings;
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +44,6 @@ public class PreferencesActivity
         NightModeHelper nightMode = NightModeHelper.bind(this, settings);
         nightMode.restoreNightMode();
 
-        AndroidVersionUtils utils = AndroidVersionUtils.Factory.getInstance();
         utils.holographic(this);
 
         if (savedInstanceState == null) {

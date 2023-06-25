@@ -36,6 +36,7 @@ import app.crossword.yourealwaysbe.forkyz.net.Downloaders;
 import app.crossword.yourealwaysbe.forkyz.settings.BackgroundDownloadSettings;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider;
+import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 
 /**
  * Schedule background downloads using Android WorkManager
@@ -215,15 +216,18 @@ public class BackgroundDownloadManager {
             = Executors.newCachedThreadPool();
 
         ForkyzSettings settings;
+        AndroidVersionUtils utils;
         FileHandlerProvider fileHandlerProvider;
 
         public BaseDownloadWorker(
             Context context,
             WorkerParameters params,
+            AndroidVersionUtils utils,
             ForkyzSettings settings,
             FileHandlerProvider fileHandlerProvider
         ) {
             super(context, params);
+            this.utils = utils;
             this.settings = settings;
             this.fileHandlerProvider = fileHandlerProvider;
         }
@@ -249,6 +253,7 @@ public class BackgroundDownloadManager {
                             );
                         final Downloaders dls = new Downloaders(
                             getApplicationContext(),
+                            utils,
                             fileHandler,
                             downloadersSettings,
                             nm
@@ -277,10 +282,11 @@ public class BackgroundDownloadManager {
         public HourlyDownloadWorker(
             @Assisted Context context,
             @Assisted WorkerParameters params,
+            AndroidVersionUtils utils,
             ForkyzSettings settings,
             FileHandlerProvider fileHandlerProvider
         ) {
-            super(context, params, settings, fileHandlerProvider);
+            super(context, params, utils, settings, fileHandlerProvider);
         }
 
         @Override
@@ -299,11 +305,12 @@ public class BackgroundDownloadManager {
         public DailyDownloadWorker(
             @Assisted Context context,
             @Assisted WorkerParameters params,
+            AndroidVersionUtils utils,
             ForkyzSettings settings,
             FileHandlerProvider fileHandlerProvider,
             BackgroundDownloadManager manager
         ) {
-            super(context, params, settings, fileHandlerProvider);
+            super(context, params, utils, settings, fileHandlerProvider);
             this.manager = manager;
         }
 

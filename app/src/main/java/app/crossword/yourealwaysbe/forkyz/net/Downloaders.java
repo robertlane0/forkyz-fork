@@ -43,17 +43,18 @@ public class Downloaders {
     private NotificationManagerCompat notificationManager;
     private DownloadersSettings settings;
     private FileHandler fileHandler;
-
-    private AndroidVersionUtils utils
-        = AndroidVersionUtils.Factory.getInstance();
+    private AndroidVersionUtils utils;
 
     /**
      * Create a downloader instance that does not notify
      */
     public Downloaders(
-        Context context, FileHandler fileHandler, DownloadersSettings settings
+        Context context,
+        AndroidVersionUtils utils,
+        FileHandler fileHandler,
+        DownloadersSettings settings
     ) {
-        this(context, fileHandler, settings, null);
+        this(context, utils, fileHandler, settings, null);
     }
 
     /**
@@ -66,14 +67,16 @@ public class Downloaders {
      */
     public Downloaders(
         Context context,
+        AndroidVersionUtils utils,
         FileHandler fileHandler,
         DownloadersSettings settings,
         NotificationManagerCompat notificationManager
     ) {
-        this.settings = settings;
-        this.fileHandler = fileHandler;
-        this.notificationManager = notificationManager;
         this.context = context;
+        this.utils = utils;
+        this.fileHandler = fileHandler;
+        this.settings = settings;
+        this.notificationManager = notificationManager;
     }
 
     public List<Downloader> getDownloaders(LocalDate date) {

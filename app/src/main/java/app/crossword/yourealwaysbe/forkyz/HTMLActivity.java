@@ -1,11 +1,5 @@
 package app.crossword.yourealwaysbe.forkyz;
 
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.view.MenuItem;
-import androidx.core.text.HtmlCompat;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -13,15 +7,27 @@ import java.nio.charset.Charset;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
+import javax.inject.Inject;
+
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.view.MenuItem;
+import androidx.core.text.HtmlCompat;
+
+import dagger.hilt.android.AndroidEntryPoint;
 
 import app.crossword.yourealwaysbe.forkyz.databinding.HtmlViewBinding;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 import app.crossword.yourealwaysbe.forkyz.view.recycler.ShowHideOnScroll;
 
+@AndroidEntryPoint
 public class HTMLActivity extends ForkyzActivity {
-    private AndroidVersionUtils utils
-        = AndroidVersionUtils.Factory.getInstance();
     private static final Charset CHARSET = Charset.forName("UTF-8");
+
+    @Inject
+    protected AndroidVersionUtils utils;
+
 
     private ExecutorService executorService
         = Executors.newSingleThreadExecutor();

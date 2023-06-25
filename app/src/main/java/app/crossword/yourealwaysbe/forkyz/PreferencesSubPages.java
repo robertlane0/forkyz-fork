@@ -20,6 +20,7 @@ import app.crossword.yourealwaysbe.forkyz.net.Downloader;
 import app.crossword.yourealwaysbe.forkyz.net.Downloaders;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.util.BackgroundDownloadManager;
+import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 
 import javax.inject.Inject;
 
@@ -73,6 +74,9 @@ public class PreferencesSubPages {
     public static class DownloadFragment extends PreferencesBaseFragment {
 
         @Inject
+        protected AndroidVersionUtils utils;
+
+        @Inject
         protected ForkyzSettings settings;
 
         @Override
@@ -83,8 +87,9 @@ public class PreferencesSubPages {
 
         private void setAvailableDownloaders() {
             settings.getDownloadersSettings(downloadersSettings -> {
-                Downloaders dls
-                    = new Downloaders(getActivity(), null, downloadersSettings);
+                Downloaders dls = new Downloaders(
+                    getActivity(), utils, null, downloadersSettings
+                );
                 List<Downloader> downloaders = dls.getDownloaders();
 
                 int len = downloaders.size();

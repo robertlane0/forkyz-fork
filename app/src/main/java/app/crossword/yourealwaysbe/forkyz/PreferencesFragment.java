@@ -34,6 +34,9 @@ import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 public class PreferencesFragment extends PreferencesBaseFragment {
 
     @Inject
+    protected AndroidVersionUtils utils;
+
+    @Inject
     protected ForkyzSettings settings;
 
     @Inject
@@ -41,11 +44,17 @@ public class PreferencesFragment extends PreferencesBaseFragment {
 
     private Handler handler;
 
-    ActivityResultLauncher<Uri> getSAFURI
-        = AndroidVersionUtils.Factory.getInstance()
-            .registerForSAFUriResult(this, (uri) -> {
-                onNewExternalStorageSAFURI(uri);
-            });
+    // set in onCreate
+    ActivityResultLauncher<Uri> getSAFURI;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        getSAFURI = utils.registerForSAFUriResult(this, (uri) -> {
+            onNewExternalStorageSAFURI(uri);
+        });
+    }
 
     @Override
     public void onAttach(Context context) {
@@ -235,7 +244,7 @@ public class PreferencesFragment extends PreferencesBaseFragment {
             entries[0] = getString(R.string.internal_storage);
             values[0] = StorageLocation.INTERNAL.getSettingsValue();
 
-            if (FileHandlerSAF.isSAFSupported()) {
+            if (FileHandlerSAF.isSAFSupported(utils)) {
                 String storageLocationSAFURI = fhSettings.getSAFRootURI();
                 if (storageLocationSAFURI == null) {
                     storageLocationSAFURI =

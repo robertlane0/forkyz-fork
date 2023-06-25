@@ -14,6 +14,7 @@ import org.junit.runners.Parameterized;
 import android.content.Context;
 
 import app.crossword.yourealwaysbe.forkyz.settings.DownloadersSettings;
+import app.crossword.yourealwaysbe.forkyz.versions.TiramisuUtil;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
@@ -34,8 +35,10 @@ public class DownloadersTest {
         Context context = mock(Context.class);
         initialiseMocks(context);
         DownloadersSettings settings = getDownloadersSettings();
-        final List<Downloader> downloaders
-            = (new Downloaders(context, null, settings)).getDownloaders();
+        Downloaders dls = new Downloaders(
+            context, new TiramisuUtil(), null, settings
+        );
+        final List<Downloader> downloaders = dls.getDownloaders();
         return new AbstractList<Object[]>() {
             @Override
             public int size() { return downloaders.size(); }

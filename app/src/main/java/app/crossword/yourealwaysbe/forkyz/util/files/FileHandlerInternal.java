@@ -28,13 +28,11 @@ public class FileHandlerInternal extends FileHandlerJavaFile {
     }
 
     @Override
-    public boolean isStorageFull() {
+    public boolean isStorageFull(AndroidVersionUtils utils) {
         try {
-            return AndroidVersionUtils.Factory
-                .getInstance()
-                .isInternalStorageFull(
-                    getApplicationContext(), MINIMUM_STORAGE_REQUIRED
-                );
+            return utils.isInternalStorageFull(
+                getApplicationContext(), MINIMUM_STORAGE_REQUIRED
+            );
         } catch (IOException e) {
             // we don't know it's not full...
             return false;

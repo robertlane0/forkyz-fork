@@ -179,17 +179,14 @@ public class BrowseActivity extends ForkyzActivity {
     private MenuItem viewCrosswordsArchiveMenuItem;
     private Collection<Uri> pendingImports = null;
 
-    ActivityResultLauncher<String> getImportURI =
-        utils.registerForUriContentsResult(
-            this,
-            uris -> { onImportURIs(uris); }
-        );
+    // setup in onCreate as utils injection needed
+    ActivityResultLauncher<String> getImportURI;
 
     private Consumer<Consumer<Downloaders>> downloadersProvider = cb -> {
         settings.getDownloadersSettings(downloadersSettings -> {
         fileHanderProvider.get(fileHandler -> {
             cb.accept(new Downloaders(
-                this, fileHandler, downloadersSettings, nm
+                this, utils, fileHandler, downloadersSettings, nm
             ));
         });});
     };
@@ -375,6 +372,11 @@ public class BrowseActivity extends ForkyzActivity {
         migrationHelper.applyMigrations(this);
 
         // Now create!
+
+        getImportURI = utils.registerForUriContentsResult(
+            this,
+            uris -> { onImportURIs(uris); }
+        );
 
         binding = BrowseBinding.inflate(getLayoutInflater());
         this.setContentView(binding.getRoot());
@@ -1281,14 +1283,18 @@ public class BrowseActivity extends ForkyzActivity {
         }
     }
 
+    @AndroidEntryPoint
     public static class NewVersionDialog extends DialogFragment {
+
+        @Inject
+        protected AndroidVersionUtils utils;
+
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             Activity activity = getActivity();
 
             String versionName
-                = AndroidVersionUtils.Factory.getInstance()
-                    .getApplicationVersionName(activity);
+                = utils.getApplicationVersionName(activity);
             String title
                 = getString(R.string.new_version_title, versionName);
 

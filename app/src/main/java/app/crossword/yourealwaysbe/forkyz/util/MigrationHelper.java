@@ -14,27 +14,29 @@ public class MigrationHelper {
 
     private ForkyzSettings settings;
     private BackgroundDownloadManager downloadManager;
+    private AndroidVersionUtils utils;
 
     @Inject
     MigrationHelper(
+        AndroidVersionUtils utils,
         ForkyzSettings settings,
         BackgroundDownloadManager downloadManager
     ) {
+        this.utils = utils;
         this.settings = settings;
         this.downloadManager = downloadManager;
     }
 
     public void applyMigrations(Context context) {
-        AndroidVersionUtils.Factory.getInstance()
-            .migrateLegacyBackgroundDownloads(
-                context, settings, downloadManager
-            );
+        utils.migrateLegacyBackgroundDownloads(
+            context, settings, downloadManager
+        );
 
         settings.migrateThemePreferences();
 
         settings.getDownloadersSettings(downloadersSettings -> {
             settings.migrateAutoDownloaders(
-                new Downloaders(context, null, downloadersSettings)
+                new Downloaders(context, utils, null, downloadersSettings)
             );
         });
     }

@@ -41,6 +41,9 @@ public class BoardEditText
     @Inject
     protected ForkyzSettings settings;
 
+    @Inject
+    protected AndroidVersionUtils utils;
+
     // for rendering
     protected final ExecutorService executorService
         = Executors.newSingleThreadExecutor();
@@ -84,7 +87,8 @@ public class BoardEditText
             null,
             metrics.densityDpi,
             metrics.widthPixels,
-            context
+            context,
+            utils
         );
         this.renderer.setMaxScale(1.0F);
         this.renderer.setMinScale(0.6F);
@@ -309,6 +313,7 @@ public class BoardEditText
         if (onCheckIsTextEditor()) {
             currentInputConnection = new BoxInputConnection(
                 this,
+                utils,
                 getSelectedResponse(),
                 this
             );
@@ -575,9 +580,7 @@ public class BoardEditText
     }
 
     private boolean isAcceptableCharacterResponse(char c) {
-        return AndroidVersionUtils.Factory
-            .getInstance()
-            .isAcceptableCharacterResponse(c);
+        return utils.isAcceptableCharacterResponse(c);
     }
 
     /**

@@ -26,10 +26,11 @@ import java.util.logging.Logger;
 import android.content.Context;
 import android.net.Uri;
 
+import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
+import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.io.IO;
 import app.crossword.yourealwaysbe.puz.io.IPuzIO;
 import app.crossword.yourealwaysbe.puz.io.StreamUtils;
-import app.crossword.yourealwaysbe.puz.Puzzle;
 
 /**
  * Abstraction layer for file operations
@@ -80,7 +81,7 @@ public abstract class FileHandler {
     public abstract DirHandle getCrosswordsDirectory();
     public abstract DirHandle getArchiveDirectory();
     public abstract boolean isStorageMounted();
-    public abstract boolean isStorageFull();
+    public abstract boolean isStorageFull(AndroidVersionUtils utils);
     public abstract boolean needsWriteExternalStoragePermission();
 
     protected abstract FileHandle getFileHandle(Uri uri);

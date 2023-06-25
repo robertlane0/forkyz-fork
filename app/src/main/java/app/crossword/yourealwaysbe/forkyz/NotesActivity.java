@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.logging.Logger;
+import javax.inject.Inject;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -23,6 +24,8 @@ import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.Accessibilit
 import androidx.core.widget.TextViewCompat;
 import androidx.fragment.app.DialogFragment;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
+import dagger.hilt.android.AndroidEntryPoint;
 
 import app.crossword.yourealwaysbe.forkyz.databinding.NotesBinding;
 import app.crossword.yourealwaysbe.forkyz.util.KeyboardManager;
@@ -840,18 +843,22 @@ public class NotesActivity extends PuzzleActivity {
         });
     }
 
+    @AndroidEntryPoint
     public static class TransferResponseRequestDialog extends DialogFragment {
+
+        @Inject
+        protected AndroidVersionUtils utils;
+
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             final NotesActivity activity = (NotesActivity) getActivity();
 
             Bundle args = getArguments();
-            TransferResponseRequest request =
-                AndroidVersionUtils.Factory.getInstance().getSerializable(
-                    args,
-                    TRANSFER_RESPONSE_REQUEST_KEY,
-                    TransferResponseRequest.class
-                );
+            TransferResponseRequest request = utils.getSerializable(
+                args,
+                TRANSFER_RESPONSE_REQUEST_KEY,
+                TransferResponseRequest.class
+            );
 
             MaterialAlertDialogBuilder builder
                 = new MaterialAlertDialogBuilder(activity);

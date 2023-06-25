@@ -19,14 +19,15 @@ import android.view.inputmethod.InputConnection;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
+import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
+import app.crossword.yourealwaysbe.forkyz.util.BoxInputConnection;
+import app.crossword.yourealwaysbe.forkyz.util.KeyboardManager;
+import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 import app.crossword.yourealwaysbe.puz.Box;
 import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges;
 import app.crossword.yourealwaysbe.puz.Playboard.Word;
 import app.crossword.yourealwaysbe.puz.Playboard;
 import app.crossword.yourealwaysbe.puz.Position;
-import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
-import app.crossword.yourealwaysbe.forkyz.util.BoxInputConnection;
-import app.crossword.yourealwaysbe.forkyz.util.KeyboardManager;
 
 /**
  * A live view of the playboard
@@ -46,6 +47,9 @@ public abstract class BoardEditView
 
     @Inject
     protected ForkyzSettings settings;
+
+    @Inject
+    protected AndroidVersionUtils utils;
 
     private Playboard board;
     private boolean wordView;
@@ -100,7 +104,8 @@ public abstract class BoardEditView
                 board,
                 metrics.densityDpi,
                 metrics.widthPixels,
-                getContext()
+                getContext(),
+                utils
             );
             setMaxScale(renderer.getMaxScale());
             setMinScale(renderer.getMinScale());
@@ -257,6 +262,7 @@ public abstract class BoardEditView
         if (onCheckIsTextEditor()) {
             currentInputConnection = new BoxInputConnection(
                 this,
+                utils,
                 getCurrentResponse(),
                 this
             );

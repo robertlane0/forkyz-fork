@@ -16,20 +16,24 @@ import dagger.hilt.android.qualifiers.ApplicationContext;
 import app.crossword.yourealwaysbe.forkyz.R;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation;
+import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 
 @Singleton
 public class FileHandlerProvider {
     private Context applicationContext;
     private ForkyzSettings settings;
 
+    private AndroidVersionUtils utils;
     private FileHandler fileHandler;
 
     @Inject
     public FileHandlerProvider(
         @ApplicationContext Context applicationContext,
+        AndroidVersionUtils utils,
         ForkyzSettings settings
     ) {
         this.applicationContext = applicationContext;
+        this.utils = utils;
         this.settings = settings;
     }
 
@@ -95,7 +99,7 @@ public class FileHandlerProvider {
                 t.show();
             }
 
-            if (fh.isStorageFull()) {
+            if (fh.isStorageFull(utils)) {
                 Toast t = Toast.makeText(
                     applicationContext,
                     R.string.storage_full_warning,

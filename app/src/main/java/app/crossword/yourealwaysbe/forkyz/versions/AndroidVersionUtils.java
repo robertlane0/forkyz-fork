@@ -26,6 +26,11 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import dagger.Module;
+import dagger.Provides;
+import dagger.hilt.InstallIn;
+import dagger.hilt.components.SingletonComponent;
+
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.util.BackgroundDownloadManager;
 
@@ -41,31 +46,29 @@ public interface AndroidVersionUtils {
 
     void onActionBarWithText(SubMenu reveal);
 
-    class Factory {
-        private static AndroidVersionUtils INSTANCE;
-
-        public static AndroidVersionUtils getInstance() {
-            if (INSTANCE != null)
-                return INSTANCE;
-
+    @Module
+    @InstallIn(SingletonComponent.class)
+    public static class Factory {
+        @Provides
+        public static AndroidVersionUtils provideAndroidVersionUtils() {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-                return INSTANCE = new TiramisuUtil();
+                return new TiramisuUtil();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
-                return INSTANCE = new RUtil();
+                return new RUtil();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
-                return INSTANCE = new PieUtil();
+                return new PieUtil();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                return INSTANCE = new OreoUtil();
+                return new OreoUtil();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-                return INSTANCE = new MarshmallowUtil();
+                return new MarshmallowUtil();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                return INSTANCE = new LollipopUtil();
+                return new LollipopUtil();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
-                return INSTANCE = new JellyBeanMR2Util();
+                return new JellyBeanMR2Util();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
-                return INSTANCE = new JellyBeanMR1Util();
+                return new JellyBeanMR1Util();
 
-            return INSTANCE = new IceCreamSandwichUtil();
+            return new IceCreamSandwichUtil();
         }
     }
 

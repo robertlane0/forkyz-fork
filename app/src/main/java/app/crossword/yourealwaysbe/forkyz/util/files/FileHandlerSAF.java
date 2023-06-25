@@ -46,8 +46,8 @@ public class FileHandlerSAF extends FileHandler {
         public long getLastModified() { return lastModified; }
     }
 
-    public static boolean isSAFSupported() {
-        return AndroidVersionUtils.Factory.getInstance().isSAFSupported();
+    public static boolean isSAFSupported(AndroidVersionUtils utils) {
+        return utils.isSAFSupported();
     }
 
     /**
@@ -248,7 +248,7 @@ public class FileHandlerSAF extends FileHandler {
     }
 
     @Override
-    public boolean isStorageFull() {
+    public boolean isStorageFull(AndroidVersionUtils utils) {
         // In general storage size doesn't make sense for SAF (e.g. size
         // of cloud storage). There is a method of getting space [1] for
         // local directories, but it delays start up by about 0.5s,

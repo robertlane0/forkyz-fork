@@ -36,6 +36,7 @@ import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler;
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider;
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle;
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzMetaFile;
+import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 import app.crossword.yourealwaysbe.puz.Playboard;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 
@@ -53,6 +54,7 @@ public class BrowseActivityViewModel extends AndroidViewModel {
         = Executors.newCachedThreadPool();
     private Handler handler = new Handler(Looper.getMainLooper());
 
+    private AndroidVersionUtils utils;
     private ForkyzSettings settings;
     private FileHandlerProvider fileHandlerProvider;
     private CurrentPuzzleHolder currentPuzzleHolder;
@@ -70,11 +72,13 @@ public class BrowseActivityViewModel extends AndroidViewModel {
     @Inject
     public BrowseActivityViewModel(
         Application application,
+        AndroidVersionUtils utils,
         ForkyzSettings settings,
         FileHandlerProvider fileHandlerProvider,
         CurrentPuzzleHolder currentPuzzleHolder
     ) {
         super(application);
+        this.utils = utils;
         this.settings = settings;
         this.fileHandlerProvider = fileHandlerProvider;
         this.currentPuzzleHolder = currentPuzzleHolder;
@@ -246,6 +250,7 @@ public class BrowseActivityViewModel extends AndroidViewModel {
 
                 Downloaders dls = new Downloaders(
                      getApplication(),
+                     utils,
                      fileHandler,
                      downloadersSettings,
                      nm

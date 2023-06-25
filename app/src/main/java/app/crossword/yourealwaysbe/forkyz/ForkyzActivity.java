@@ -38,8 +38,9 @@ public class ForkyzActivity extends AppCompatActivity {
     @Inject
     protected CurrentPuzzleHolder currentPuzzleHolder;
 
-    protected AndroidVersionUtils utils = AndroidVersionUtils.Factory
-            .getInstance();
+    @Inject
+    protected AndroidVersionUtils utils;
+
     public NightModeHelper nightMode;
 
     @Override

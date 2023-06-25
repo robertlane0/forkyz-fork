@@ -51,9 +51,10 @@ public class PlayboardRenderer {
     private static final int DEFAULT_PUZZLE_WIDTH = 15;
     private static final float BASE_BOX_SIZE_INCHES = 0.25F;
     private static final Logger LOG = Logger.getLogger(PlayboardRenderer.class.getCanonicalName());
-    private static final Typeface TYPEFACE_SEMI_BOLD_SANS =
-        AndroidVersionUtils.Factory.getInstance().getSemiBoldTypeface();
     private static final float DESCENT_FUDGE_FACTOR = 1.3F;
+
+    // set in constructor
+    private final Typeface TYPEFACE_SEMI_BOLD_SANS;
 
     private PaintProfile profile;
     private Bitmap bitmap;
@@ -64,14 +65,16 @@ public class PlayboardRenderer {
     private float minScale;
     private boolean hintHighlight;
     private int widthPixels;
-
-    private final static AndroidVersionUtils versionUtils
-        = AndroidVersionUtils.Factory.getInstance();
+    private AndroidVersionUtils versionUtils;
 
     // colors are gotten from context
-    public PlayboardRenderer(Playboard board,
-                             float dpi, int widthPixels,
-                             Context context) {
+    public PlayboardRenderer(
+        Playboard board,
+        float dpi, int widthPixels,
+        Context context, AndroidVersionUtils versionUtils
+    ) {
+        TYPEFACE_SEMI_BOLD_SANS = versionUtils.getSemiBoldTypeface();
+
         this.dpi = dpi;
         this.widthPixels = widthPixels;
         this.board = board;
@@ -79,6 +82,7 @@ public class PlayboardRenderer {
         this.maxScale = getDeviceMaxScale();
         this.minScale = getDeviceMinScale();
         this.profile = new PaintProfile(context, scale, dpi);
+        this.versionUtils = versionUtils;
     }
 
     public void setHintHighlight(boolean hintHighlight) {
@@ -1239,7 +1243,7 @@ public class PlayboardRenderer {
         return box.getIsPartOfClues().contains(cid);
     }
 
-    private static void drawText(
+    private void drawText(
         Canvas canvas,
         CharSequence text,
         int x, int  y, int width,
@@ -1250,7 +1254,7 @@ public class PlayboardRenderer {
         );
     }
 
-    private static void drawText(
+    private void drawText(
         Canvas canvas,
         CharSequence text,
         int x, int  y, int width, Layout.Alignment align,
@@ -1291,13 +1295,13 @@ public class PlayboardRenderer {
         }
     }
 
-    private static void drawHtmlText(
+    private void drawHtmlText(
         Canvas canvas, String text, int x, int y, int width, TextPaint style
     ) {
         drawText(canvas, HtmlCompat.fromHtml(text, 0), x, y, width, style);
     }
 
-    private static void drawHtmlText(
+    private void drawHtmlText(
         Canvas canvas, String text,
         int x, int y, int width, Layout.Alignment align,
         TextPaint style
@@ -1591,7 +1595,7 @@ public class PlayboardRenderer {
         return false;
     }
 
-    private static class PaintProfile {
+    private class PaintProfile {
         // box colours also can be used for text for "transparent" text
         // (e.g. highlighted error cells)
         private final TextPaint cellBox = new TextPaint();

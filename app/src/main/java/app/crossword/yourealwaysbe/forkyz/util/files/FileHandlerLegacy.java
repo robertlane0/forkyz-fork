@@ -33,12 +33,10 @@ public class FileHandlerLegacy extends FileHandlerJavaFile {
     }
 
     @Override
-    public boolean isStorageFull() {
-        return AndroidVersionUtils.Factory
-            .getInstance()
-            .isExternalStorageDirectoryFull(
-                Environment.getExternalStorageDirectory(),
-                MINIMUM_STORAGE_REQUIRED
-            );
+    public boolean isStorageFull(AndroidVersionUtils utils) {
+        return utils.isExternalStorageDirectoryFull(
+            Environment.getExternalStorageDirectory(),
+            MINIMUM_STORAGE_REQUIRED
+        );
     }
 }

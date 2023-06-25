@@ -23,7 +23,10 @@ public class ForkyzApplication
     public static final String PUZZLE_DOWNLOAD_CHANNEL_ID = "forkyz.downloads";
 
     @Inject
-    ForkyzSettings settings;
+    protected AndroidVersionUtils utils;
+
+    @Inject
+    protected ForkyzSettings settings;
 
     // for background downloads
     // https://developer.android.com/reference/androidx/hilt/work/HiltWorker
@@ -34,7 +37,7 @@ public class ForkyzApplication
     public void onCreate() {
         super.onCreate();
 
-        AndroidVersionUtils.Factory.getInstance().createNotificationChannel(this);
+        utils.createNotificationChannel(this);
 
         (new ThemeHelper(settings)).themeApplication(this);
     }
