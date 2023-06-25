@@ -38,6 +38,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
+import app.crossword.yourealwaysbe.forkyz.util.BackgroundDownloadManager;
 
 public class IceCreamSandwichUtil implements AndroidVersionUtils {
     @Override
@@ -145,7 +146,11 @@ public class IceCreamSandwichUtil implements AndroidVersionUtils {
     }
 
     @Override
-    public void migrateLegacyBackgroundDownloads(ForkyzSettings settings) {
+    public void migrateLegacyBackgroundDownloads(
+        Context context,
+        ForkyzSettings settings,
+        BackgroundDownloadManager downloadManager
+    ) {
         // do nothing: legacy background download needed lollipop
     }
 

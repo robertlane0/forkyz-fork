@@ -27,6 +27,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
+import app.crossword.yourealwaysbe.forkyz.util.BackgroundDownloadManager;
 
 public interface AndroidVersionUtils {
 
@@ -92,7 +93,11 @@ public interface AndroidVersionUtils {
         );
     }
 
-    void migrateLegacyBackgroundDownloads(ForkyzSettings settings);
+    void migrateLegacyBackgroundDownloads(
+        Context context,
+        ForkyzSettings settings,
+        BackgroundDownloadManager downloadManager
+    );
 
     boolean isMiniTabletish(DisplayMetrics metrics);
 

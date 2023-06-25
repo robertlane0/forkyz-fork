@@ -14,27 +14,24 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts.OpenDocumentTree;
 import androidx.fragment.app.Fragment;
 
-import javax.inject.Inject;
-
-import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.util.BackgroundDownloadManager;
 
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class LollipopUtil extends KitKatUtil {
 
-    @Inject
-    BackgroundDownloadManager downloadManager;
-
     private int speechReqCount = 0;
 
     @Override
-    public void migrateLegacyBackgroundDownloads(ForkyzSettings settings) {
+    public void migrateLegacyBackgroundDownloads(
+        Context context,
+        ForkyzSettings settings,
+        BackgroundDownloadManager downloadManager
+    ) {
         settings.migrateLegacyBackgroundDownloads(legacyEnabled -> {
             if (legacyEnabled) {
-                ForkyzApplication app = ForkyzApplication.getInstance();
-                JobScheduler scheduler = (JobScheduler)
-                    app.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+                JobScheduler scheduler = (JobScheduler) context
+                    .getSystemService(Context.JOB_SCHEDULER_SERVICE);
                 scheduler.cancelAll();
 
                 // start new
