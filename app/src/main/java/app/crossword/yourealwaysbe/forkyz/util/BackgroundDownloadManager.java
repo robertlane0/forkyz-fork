@@ -28,9 +28,13 @@ import androidx.work.WorkManager;
 import androidx.work.WorkerParameters;
 import com.google.common.util.concurrent.ListenableFuture;
 
+import dagger.Module;
+import dagger.Provides;
 import dagger.assisted.Assisted;
 import dagger.assisted.AssistedInject;
+import dagger.hilt.InstallIn;
 import dagger.hilt.android.qualifiers.ApplicationContext;
+import dagger.hilt.components.SingletonComponent;
 
 import app.crossword.yourealwaysbe.forkyz.net.Downloaders;
 import app.crossword.yourealwaysbe.forkyz.settings.BackgroundDownloadSettings;
@@ -47,20 +51,34 @@ public class BackgroundDownloadManager {
         BackgroundDownloadManager.class.getCanonicalName()
     );
 
+    @Module
+    @InstallIn(SingletonComponent.class)
+    public static class WorkManagerModule {
+        @Provides
+        public static WorkManager provideWorkManager(
+            @ApplicationContext Context applicationContext
+        ) {
+            return WorkManager.getInstance(applicationContext);
+        }
+    }
+
     private static final String DOWNLOAD_WORK_NAME_HOURLY
         = "backgroundDownloadHourly";
     private static final String DOWNLOAD_WORK_NAME_DAILY
         = "backgroundDownloadDaily";
 
     private Context applicationContext;
+    private WorkManager workManager;
     private ForkyzSettings settings;
 
     @Inject
     BackgroundDownloadManager(
         @ApplicationContext Context applicationContext,
+        WorkManager workManager,
         ForkyzSettings settings
     ) {
         this.applicationContext = applicationContext;
+        this.workManager = workManager;
         this.settings = settings;
     }
 
@@ -207,9 +225,7 @@ public class BackgroundDownloadManager {
         return ChronoUnit.MILLIS.between(now, nextDownload);
     }
 
-    public WorkManager getWorkManager() {
-        return WorkManager.getInstance(applicationContext);
-    }
+    private WorkManager getWorkManager() { return workManager; }
 
     private abstract static class BaseDownloadWorker extends ListenableWorker {
         private static ExecutorService downloadExecutorService
