@@ -17,7 +17,7 @@ import com.google.android.material.color.DynamicColors;
 import dagger.hilt.android.AndroidEntryPoint;
 
 import app.crossword.yourealwaysbe.forkyz.net.Downloader;
-import app.crossword.yourealwaysbe.forkyz.net.Downloaders;
+import app.crossword.yourealwaysbe.forkyz.net.DownloadersProvider;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.util.BackgroundDownloadManager;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
@@ -77,7 +77,7 @@ public class PreferencesSubPages {
         protected AndroidVersionUtils utils;
 
         @Inject
-        protected ForkyzSettings settings;
+        protected DownloadersProvider downloadersProvider;
 
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -86,10 +86,7 @@ public class PreferencesSubPages {
         }
 
         private void setAvailableDownloaders() {
-            settings.getDownloadersSettings(downloadersSettings -> {
-                Downloaders dls = new Downloaders(
-                    getActivity(), utils, null, downloadersSettings
-                );
+            downloadersProvider.get(dls -> {
                 List<Downloader> downloaders = dls.getDownloaders();
 
                 int len = downloaders.size();

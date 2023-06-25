@@ -19,14 +19,13 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.widget.Toast;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
 import dagger.hilt.android.lifecycle.HiltViewModel;
 
 import app.crossword.yourealwaysbe.forkyz.net.Downloader;
-import app.crossword.yourealwaysbe.forkyz.net.Downloaders;
+import app.crossword.yourealwaysbe.forkyz.net.DownloadersProvider;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder;
 import app.crossword.yourealwaysbe.forkyz.util.PuzzleImporter;
@@ -58,6 +57,7 @@ public class BrowseActivityViewModel extends AndroidViewModel {
     private ForkyzSettings settings;
     private FileHandlerProvider fileHandlerProvider;
     private CurrentPuzzleHolder currentPuzzleHolder;
+    private DownloadersProvider downloadersProvider;
 
     private boolean isViewArchive = false;
 
@@ -75,13 +75,15 @@ public class BrowseActivityViewModel extends AndroidViewModel {
         AndroidVersionUtils utils,
         ForkyzSettings settings,
         FileHandlerProvider fileHandlerProvider,
-        CurrentPuzzleHolder currentPuzzleHolder
+        CurrentPuzzleHolder currentPuzzleHolder,
+        DownloadersProvider downloadersProvider
     ) {
         super(application);
         this.utils = utils;
         this.settings = settings;
         this.fileHandlerProvider = fileHandlerProvider;
         this.currentPuzzleHolder = currentPuzzleHolder;
+        this.downloadersProvider = downloadersProvider;
         isUIBusy.setValue(false);
     }
 
@@ -242,29 +244,14 @@ public class BrowseActivityViewModel extends AndroidViewModel {
     }
 
     public void download(LocalDate date, List<Downloader> downloaders) {
-        fileHandlerProvider.get(fileHandler -> {
-        settings.getDownloadersSettings(downloadersSettings -> {
+        downloadersProvider.get(dls -> {
             downloadExecutorService.execute(() -> {
-                NotificationManagerCompat nm
-                    = NotificationManagerCompat.from(getApplication());
-
-                Downloaders dls = new Downloaders(
-                     getApplication(),
-                     utils,
-                     fileHandler,
-                     downloadersSettings,
-                     nm
-                );
-
                 dls.download(date, downloaders);
-
                 if (!getIsViewArchive()) {
-                    handler.post(() -> {
-                        startLoadFiles();
-                    });
+                    handler.post(() -> { startLoadFiles(); });
                 }
             });
-        });});
+        });
     }
 
     public void loadPuzzle(PuzMetaFile puzMeta) {

@@ -21,6 +21,7 @@ import app.crossword.yourealwaysbe.forkyz.R;
 import app.crossword.yourealwaysbe.forkyz.databinding.DownloadDialogBinding;
 import app.crossword.yourealwaysbe.forkyz.net.Downloader;
 import app.crossword.yourealwaysbe.forkyz.net.Downloaders;
+import app.crossword.yourealwaysbe.forkyz.net.DownloadersProvider;
 import app.crossword.yourealwaysbe.forkyz.net.DummyDownloader;
 
 import java.time.Duration;
@@ -29,7 +30,6 @@ import java.time.format.TextStyle;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 /**
@@ -63,7 +63,7 @@ public class DownloadPickerDialogBuilder {
         Activity a,
         final OnDownloadSelectedListener downloadButtonListener,
         int year, int monthOfYear, int dayOfMonth,
-        Consumer<Consumer<Downloaders>> downloadersProvider
+        DownloadersProvider downloadersProvider
     ) {
         this.activity = a;
         this.downloadDate = LocalDate.of(year, monthOfYear,  dayOfMonth);
@@ -117,7 +117,7 @@ public class DownloadPickerDialogBuilder {
                 }
             });
 
-        downloadersProvider.accept(downloaders -> {
+        downloadersProvider.get(downloaders -> {
             this.downloaders = downloaders;
             updatePuzzleSelect();
         });

@@ -48,7 +48,7 @@ import com.leinardi.android.speeddial.SpeedDialView;
 import app.crossword.yourealwaysbe.forkyz.databinding.BrowseBinding;
 import app.crossword.yourealwaysbe.forkyz.databinding.PuzzleListItemBinding;
 import app.crossword.yourealwaysbe.forkyz.net.Downloader;
-import app.crossword.yourealwaysbe.forkyz.net.Downloaders;
+import app.crossword.yourealwaysbe.forkyz.net.DownloadersProvider;
 import app.crossword.yourealwaysbe.forkyz.settings.DayNightMode;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation;
@@ -127,6 +127,9 @@ public class BrowseActivity extends ForkyzActivity {
     @Inject
     protected FileHandlerProvider fileHanderProvider;
 
+    @Inject
+    protected DownloadersProvider downloadersProvider;
+
     /**
      * See note for BROWSER_CLOSE_ACTION
      */
@@ -181,15 +184,6 @@ public class BrowseActivity extends ForkyzActivity {
 
     // setup in onCreate as utils injection needed
     ActivityResultLauncher<String> getImportURI;
-
-    private Consumer<Consumer<Downloaders>> downloadersProvider = cb -> {
-        settings.getDownloadersSettings(downloadersSettings -> {
-        fileHanderProvider.get(fileHandler -> {
-            cb.accept(new Downloaders(
-                this, utils, fileHandler, downloadersSettings, nm
-            ));
-        });});
-    };
 
     private ActionMode actionMode;
     private final ActionMode.Callback actionModeCallback = new ActionMode.Callback() {
@@ -695,7 +689,7 @@ public class BrowseActivity extends ForkyzActivity {
 
         settings.getBrowseLastDownload(lastDL -> {
         settings.getDownloadersSettings(downloaderSettings -> {
-        downloadersProvider.accept(dls -> {
+        downloadersProvider.get(dls -> {
             long downloadCutoff
                 = System.currentTimeMillis() - (long) (12 * 60 * 60 * 1000);
 
@@ -1178,7 +1172,11 @@ public class BrowseActivity extends ForkyzActivity {
         }
     }
 
+    @AndroidEntryPoint
     public static class DownloadDialog extends DialogFragment {
+        @Inject
+        DownloadersProvider downloadersProvider;
+
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             DownloadPickerDialogBuilder.OnDownloadSelectedListener
@@ -1207,7 +1205,7 @@ public class BrowseActivity extends ForkyzActivity {
                     d.getYear(),
                     d.getMonthValue(),
                     d.getDayOfMonth(),
-                    activity.downloadersProvider
+                    downloadersProvider
             );
 
             return dpd.getInstance();

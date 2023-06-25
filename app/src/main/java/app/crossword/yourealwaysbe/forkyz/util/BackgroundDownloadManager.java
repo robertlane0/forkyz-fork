@@ -15,7 +15,6 @@ import javax.inject.Singleton;
 
 import android.content.Context;
 import androidx.concurrent.futures.CallbackToFutureAdapter;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.hilt.work.HiltWorker;
 import androidx.work.Constraints;
 import androidx.work.ExistingPeriodicWorkPolicy;
@@ -36,7 +35,7 @@ import dagger.hilt.InstallIn;
 import dagger.hilt.android.qualifiers.ApplicationContext;
 import dagger.hilt.components.SingletonComponent;
 
-import app.crossword.yourealwaysbe.forkyz.net.Downloaders;
+import app.crossword.yourealwaysbe.forkyz.net.DownloadersProvider;
 import app.crossword.yourealwaysbe.forkyz.settings.BackgroundDownloadSettings;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider;
@@ -234,18 +233,21 @@ public class BackgroundDownloadManager {
         ForkyzSettings settings;
         AndroidVersionUtils utils;
         FileHandlerProvider fileHandlerProvider;
+        DownloadersProvider downloadersProvider;
 
         public BaseDownloadWorker(
             Context context,
             WorkerParameters params,
             AndroidVersionUtils utils,
             ForkyzSettings settings,
-            FileHandlerProvider fileHandlerProvider
+            FileHandlerProvider fileHandlerProvider,
+            DownloadersProvider downloadersProvider
         ) {
             super(context, params);
             this.utils = utils;
             this.settings = settings;
             this.fileHandlerProvider = fileHandlerProvider;
+            this.downloadersProvider = downloadersProvider;
         }
 
         protected void doDownload(
@@ -259,21 +261,9 @@ public class BackgroundDownloadManager {
 
                 LOGGER.info("Downloading most recent puzzles");
 
-                settings.getDownloadersSettings(downloadersSettings -> {
-                fileHandlerProvider.get(fileHandler -> {
+                downloadersProvider.get(dls -> {
                 downloadExecutorService.execute(() -> {
                     try {
-                        NotificationManagerCompat nm
-                            = NotificationManagerCompat.from(
-                                getApplicationContext()
-                            );
-                        final Downloaders dls = new Downloaders(
-                            getApplicationContext(),
-                            utils,
-                            fileHandler,
-                            downloadersSettings,
-                            nm
-                        );
                         LocalDate now = LocalDate.now();
                         dls.downloadLatestInRange(
                             now, now, dls.getAutoDownloaders()
@@ -287,7 +277,7 @@ public class BackgroundDownloadManager {
                     } catch (Exception e) {
                         completer.setException(e);
                     }
-                });});});
+                });});
             });
         }
     }
@@ -300,9 +290,13 @@ public class BackgroundDownloadManager {
             @Assisted WorkerParameters params,
             AndroidVersionUtils utils,
             ForkyzSettings settings,
-            FileHandlerProvider fileHandlerProvider
+            FileHandlerProvider fileHandlerProvider,
+            DownloadersProvider downloadersProvider
         ) {
-            super(context, params, utils, settings, fileHandlerProvider);
+            super(
+                context, params,
+                utils, settings, fileHandlerProvider, downloadersProvider
+            );
         }
 
         @Override
@@ -324,9 +318,13 @@ public class BackgroundDownloadManager {
             AndroidVersionUtils utils,
             ForkyzSettings settings,
             FileHandlerProvider fileHandlerProvider,
-            BackgroundDownloadManager manager
+            BackgroundDownloadManager manager,
+            DownloadersProvider downloadersProvider
         ) {
-            super(context, params, utils, settings, fileHandlerProvider);
+            super(
+                context, params,
+                utils, settings, fileHandlerProvider, downloadersProvider
+            );
             this.manager = manager;
         }
 
