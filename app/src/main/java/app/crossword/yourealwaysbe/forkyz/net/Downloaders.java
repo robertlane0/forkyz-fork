@@ -127,7 +127,8 @@ public class Downloaders {
 
         HashMap<Downloader, LocalDate> puzzlesToDownload = new HashMap<Downloader, LocalDate>();
         for (Downloader d : downloaders) {
-            puzzlesToDownload.put(d, date);
+            if (d.isAvailable(date))
+                puzzlesToDownload.put(d, date);
         }
 
         download(puzzlesToDownload);
