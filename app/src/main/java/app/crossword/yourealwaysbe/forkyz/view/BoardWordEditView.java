@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 import javax.inject.Inject;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
@@ -205,15 +206,16 @@ public class BoardWordEditView extends BoardEditView {
         getSuppressNotesList(localSuppressNotesList -> {
             renderer.setHintHighlight(!suppressHints);
             executorService.execute(() -> {
-                postBitmap(
-                    renderer.drawWord(
-                        renderWord,
-                        localChanges,
-                        localSuppressNotesList,
-                        getContentWidth()
-                    ),
-                    rescale
+                Bitmap bitmap = renderer.drawWord(
+                    renderWord,
+                    localChanges,
+                    localSuppressNotesList,
+                    getContentWidth()
                 );
+                handler.post(() -> {
+                    if (isRendering())
+                        setBitmap(bitmap, rescale);
+                });
             });
         });});
     }

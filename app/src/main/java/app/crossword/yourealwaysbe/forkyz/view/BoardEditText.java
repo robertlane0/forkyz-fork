@@ -7,7 +7,9 @@ import java.util.logging.Logger;
 import javax.inject.Inject;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Rect;
+import android.os.Handler;
 import android.text.InputType;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
@@ -45,8 +47,9 @@ public class BoardEditText
     protected AndroidVersionUtils utils;
 
     // for rendering
-    protected final ExecutorService executorService
+    private final ExecutorService executorService
         = Executors.newSingleThreadExecutor();
+    private final Handler handler;
 
     private BoxInputConnection currentInputConnection = null;
     private boolean nativeInput = false;
@@ -78,6 +81,8 @@ public class BoardEditText
 
     public BoardEditText(Context context, AttributeSet as) {
         super(context, as);
+
+        handler = new Handler(context.getMainLooper());
 
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
 
@@ -484,13 +489,14 @@ public class BoardEditText
             : Arrays.copyOf(changes, changes.length);
 
         executorService.execute(() -> {
-            postBitmap(renderer.drawBoxes(
+            Bitmap bitmap = renderer.drawBoxes(
                 boxes,
                 renderChanges,
                 selection,
                 null,
                 getContentWidth()
-            ));
+            );
+            handler.post(() -> { setBitmap(bitmap); });
         });
 
         clearChanges();

@@ -8,6 +8,7 @@ import java.util.Set;
 import javax.inject.Inject;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.util.AttributeSet;
 
 import dagger.hilt.android.AndroidEntryPoint;
@@ -113,10 +114,10 @@ public class BoardFullEditView extends BoardEditView {
                 : null;
 
             executorService.execute(() -> {
-                postBitmap(
-                    renderer.draw(localChanges, suppressNotesList),
-                    rescale
-                );
+                Bitmap bitmap = renderer.draw(localChanges, suppressNotesList);
+                handler.post(() -> {
+                    setBitmap(bitmap, rescale);
+                });
             });
         });});
     }

@@ -9,6 +9,7 @@ import java.util.concurrent.Executors;
 import javax.inject.Inject;
 
 import android.content.Context;
+import android.os.Handler;
 import android.text.InputType;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
@@ -64,6 +65,7 @@ public abstract class BoardEditView
     // ScrollingImageView
     protected final ExecutorService executorService
         = Executors.newSingleThreadExecutor();
+    protected final Handler handler;
 
     public interface BoardClickListener {
         default void onClick(Position position, Word previousWord) { }
@@ -72,6 +74,7 @@ public abstract class BoardEditView
 
     public BoardEditView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        handler = new Handler(context.getMainLooper());
     }
 
     public void setBoard(Playboard board) {

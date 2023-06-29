@@ -4,7 +4,6 @@ import java.util.logging.Logger;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.GestureDetector.OnGestureListener;
@@ -34,12 +33,9 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
     private int boardStickyBorder;
     private int gestureStartX;
     private int gestureStartY;
-    private Handler handler;
 
     public ScrollingImageView(Context context, AttributeSet as) {
         super(context, as);
-
-        handler = new Handler(context.getMainLooper());
 
         gestureDetector = new GestureDetectorCompat(context, this);
         gestureDetector.setIsLongpressEnabled(true);
@@ -68,14 +64,6 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-    }
-
-    public void postBitmap(Bitmap bitmap) {
-        handler.post(() -> { setBitmap(bitmap); });
-    }
-
-    public void postBitmap(Bitmap bitmap, boolean rescale) {
-        handler.post(() -> { setBitmap(bitmap, rescale); });
     }
 
     public void setBitmap(Bitmap bitmap) {
