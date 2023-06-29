@@ -203,7 +203,7 @@ public class BrowseActivity extends ForkyzActivity {
             }
 
             for (int i = 0; i < menu.size(); i++) {
-                utils.onActionBarWithText(menu.getItem(i));
+                onActionBarWithText(menu.getItem(i));
             }
 
             setSpeedDialVisibility(View.GONE);
@@ -374,6 +374,9 @@ public class BrowseActivity extends ForkyzActivity {
 
         binding = BrowseBinding.inflate(getLayoutInflater());
         this.setContentView(binding.getRoot());
+        setSupportActionBar(binding.toolbar);
+        setupBottomInsets(binding.content);
+        setupBottomInsets(binding.speedDialAdd);
 
         setDefaultKeyMode(DEFAULT_KEYS_SHORTCUT);
         binding.puzzleList.setLayoutManager(new LinearLayoutManager(this));
@@ -998,6 +1001,12 @@ public class BrowseActivity extends ForkyzActivity {
 
             settings.setBrowseLastSeenVersion(currentVersion);
         });
+    }
+
+    private void onActionBarWithText(MenuItem a) {
+        a.setShowAsAction(
+            MenuItem.SHOW_AS_ACTION_WITH_TEXT + MenuItem.SHOW_AS_ACTION_IF_ROOM
+        );
     }
 
     private class FileAdapter

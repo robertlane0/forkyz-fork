@@ -18,7 +18,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat;
 import androidx.core.widget.TextViewCompat;
@@ -70,8 +69,6 @@ public class NotesActivity extends PuzzleActivity {
 
     private NotesBinding binding;
     private KeyboardManager keyboardManager;
-    // may be layout clueLine or action bar clue line
-    private TextView clueLine;
 
     private Random rand = new Random();
 
@@ -106,22 +103,19 @@ public class NotesActivity extends PuzzleActivity {
         binding = NotesBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        utils.holographic(this);
-        utils.finishOnHomeButton(this);
-
-        clueLine = binding.clueLine;
-        if (clueLine.getVisibility() != View.GONE) {
-            clueLine.setVisibility(View.GONE);
-            clueLine
-                = (TextView) utils
-                    .onActionBarCustom(this, R.layout.clue_line_only)
-                    .findViewById(R.id.clueLine);
-        }
+        setSupportActionBar(binding.toolbar);
+        holographic();
+        finishOnHomeButton();
+        setupBottomInsets(binding.content);
 
         int clueTextSize
             = getResources().getInteger(R.integer.clue_text_size);
         TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
-            clueLine, 5, clueTextSize, 1, TypedValue.COMPLEX_UNIT_SP
+            binding.clueHolder.clueLine,
+            5,
+            clueTextSize,
+            1,
+            TypedValue.COMPLEX_UNIT_SP
         );
 
         binding.miniboard.setAllowOverScroll(false);
@@ -431,7 +425,7 @@ public class NotesActivity extends PuzzleActivity {
         Note note;
 
         if (isPuzzleNotes()) {
-            clueLine.setText(getString(R.string.player_notes));
+            binding.clueHolder.clueLine.setText(getString(R.string.player_notes));
             note = puz.getPlayerNote();
             binding.miniboardLab.setVisibility(View.GONE);
             binding.miniboard.setVisibility(View.GONE);
@@ -444,7 +438,7 @@ public class NotesActivity extends PuzzleActivity {
             });
 
             getLongClueText(clue, text -> {
-                clueLine.setText(smartHtml(text));
+                binding.clueHolder.clueLine.setText(smartHtml(text));
             });
             note = puz.getNote(clue);
             binding.flagClue.setChecked(puz.isFlagged(clue));

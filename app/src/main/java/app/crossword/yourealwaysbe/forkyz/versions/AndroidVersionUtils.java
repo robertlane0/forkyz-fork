@@ -17,8 +17,6 @@ import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.util.DisplayMetrics;
-import android.view.MenuItem;
-import android.view.SubMenu;
 import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
@@ -35,16 +33,6 @@ import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.util.BackgroundDownloadManager;
 
 public interface AndroidVersionUtils {
-
-    void setContext(Context ctx);
-
-    void finishOnHomeButton(AppCompatActivity a);
-
-    void holographic(AppCompatActivity playActivity);
-
-    void onActionBarWithText(MenuItem a);
-
-    void onActionBarWithText(SubMenu reveal);
 
     @Module
     @InstallIn(SingletonComponent.class)
@@ -71,14 +59,6 @@ public interface AndroidVersionUtils {
             return new IceCreamSandwichUtil();
         }
     }
-
-    View onActionBarCustom(AppCompatActivity a, int id);
-
-    void hideActionBar(AppCompatActivity a);
-
-    void onActionBarWithoutText(MenuItem a);
-
-    void hideTitleOnPortrait(AppCompatActivity a);
 
     void createNotificationChannel(Context context);
 
@@ -183,4 +163,21 @@ public interface AndroidVersionUtils {
      * Get the current application version name
      */
     String getApplicationVersionName(Context context);
+
+    /**
+     * See setupBottomInsets
+     */
+    public void setDecorFitsSystemWindows(Window window, boolean fits);
+
+    /**
+     * Set margins on view to avoid system bars/ime on bottom/side
+     *
+     * Needed with setDecorFitsSystemWindows(.., true) for app bar
+     * overlap status bar. Else bottom bars/ime overlap app.
+     *
+     * Do nothing before API 21 since inset monitoring not supported
+     * before. So use version utils setDecorFitsSystemWindows which does
+     * nothing before API 21.
+     */
+    public void setupBottomInsets(View view);
 }

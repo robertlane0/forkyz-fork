@@ -13,7 +13,9 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
+import android.view.View;
 import android.widget.Toast;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.text.HtmlCompat;
 
@@ -46,9 +48,9 @@ public class ForkyzActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        doOrientation();
         (new ThemeHelper(settings)).themeActivity(this);
+        utils.setDecorFitsSystemWindows(getWindow(), false);
+        doOrientation();
     }
 
     @Override
@@ -137,5 +139,39 @@ public class ForkyzActivity extends AppCompatActivity {
 
     protected void clearCurrentBoard() {
         currentPuzzleHolder.clearBoard();
+    }
+
+    protected void finishOnHomeButton() {
+        ActionBar bar = getSupportActionBar();
+        if(bar == null){
+            return;
+        }
+        bar.setDisplayHomeAsUpEnabled(true);
+        View home = findViewById(android.R.id.home);
+        if(home != null){
+            home.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View arg0) {
+                    finish();
+                }
+            });
+        }
+    }
+
+    protected void holographic() {
+        ActionBar bar = getSupportActionBar();
+        if (bar != null) {
+            bar.setDisplayHomeAsUpEnabled(true);
+        }
+    }
+
+    /**
+     * Call this during onCreate for bottommost views of layout
+     *
+     * Because we setDecorFitsSystemWindows to false, we have to manager
+     * our own insets. Calling this method on bottom most view makes
+     * sure it is not hidden by the keyboard and navigation buttons.
+     */
+    protected void setupBottomInsets(View view) {
+        utils.setupBottomInsets(view);
     }
 }

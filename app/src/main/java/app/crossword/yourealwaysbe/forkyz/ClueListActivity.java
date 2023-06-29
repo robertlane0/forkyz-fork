@@ -80,8 +80,10 @@ public class ClueListActivity extends PuzzleActivity
         binding = ClueListBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        utils.holographic(this);
-        utils.finishOnHomeButton(this);
+        setSupportActionBar(binding.toolbar);
+        holographic();
+        finishOnHomeButton();
+        setupBottomInsets(binding.content);
 
         binding.miniboard.setAllowOverScroll(false);
 

@@ -1,8 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!-- most styles in styles-common.xml in values folder -->
 <resources>
     <style name="keyboardHideBarStyle" parent="Theme.Forkyz">
         <item name="android:background">#000000</item>
         <item name="android:tint">#ffffff</item>
+    </style>
+    <style
+        name="appBarLayoutStyle"
+        parent="Widget.Material3.AppBarLayout"
+    >
+        <!-- use stateListAnimator in values-21 -->
+        <!-- not sure this will work here, but worth a try, looks ok without it
+        -->
+        <item name="elevation">4dp</item>
     </style>
 </resources>
 

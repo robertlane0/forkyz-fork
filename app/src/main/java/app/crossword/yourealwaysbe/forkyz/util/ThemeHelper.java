@@ -22,9 +22,10 @@ public class ThemeHelper {
     }
 
     public void themeActivity(Activity activity) {
-        settings.getAppTheme(theme -> {
-            if (theme == Theme.LEGACY_LIKE)
-                activity.setTheme(R.style.Theme_Forkyz_LegacyLike);
-        });
+        // needs to be blocking so can be done before super.onCreate in
+        // ForkyzActivity
+        Theme theme = settings.getAppThemeBlocking();
+        if (theme == Theme.LEGACY_LIKE)
+            activity.setTheme(R.style.Theme_Forkyz_LegacyLike);
     }
 }

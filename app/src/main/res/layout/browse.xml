@@ -15,59 +15,78 @@
             android:layout_height="fill_parent"
             android:orientation="vertical"
         >
-            <TextView
-                android:id="@+id/empty_listing_msg"
-                android:layout_width="wrap_content"
+            <com.google.android.material.appbar.AppBarLayout
+                android:id="@+id/app_bar_layout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="@string/no_puzzles_download_or_configure_storage"
-                android:visibility="gone"
-                android:textSize="15sp"
-                android:padding="30sp"
-            />
-            <TextView
-                android:id="@+id/internal_storage_msg"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="@string/internal_storage_description"
-                android:visibility="gone"
-                android:textSize="15sp"
-                android:padding="30sp"
-            />
-            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-                    android:id="@+id/swipe_container"
-                    android:layout_width="fill_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
+                android:fitsSystemWindows="true"
             >
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/puzzle_list"
-                    android:layout_width="fill_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                <com.google.android.material.appbar.MaterialToolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
                 />
-            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+            </com.google.android.material.appbar.AppBarLayout>
             <LinearLayout
-                android:id="@+id/please_wait_notice"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
-                android:visibility="gone"
+                android:id="@+id/content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
             >
-                <ProgressBar
+                <TextView
+                    android:id="@+id/empty_listing_msg"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:indeterminate="true"
+                    android:layout_gravity="center"
+                    android:text="@string/no_puzzles_download_or_configure_storage"
+                    android:visibility="gone"
+                    android:textSize="15sp"
+                    android:padding="30sp"
                 />
                 <TextView
+                    android:id="@+id/internal_storage_msg"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/please_wait"
-                    android:textSize="20sp"
+                    android:layout_gravity="center"
+                    android:text="@string/internal_storage_description"
+                    android:visibility="gone"
+                    android:textSize="15sp"
+                    android:padding="30sp"
                 />
+                <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                        android:id="@+id/swipe_container"
+                        android:layout_width="fill_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                >
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/puzzle_list"
+                        android:layout_width="fill_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                    />
+                </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+                <LinearLayout
+                    android:id="@+id/please_wait_notice"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:visibility="gone"
+                >
+                    <ProgressBar
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:indeterminate="true"
+                    />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/please_wait"
+                        android:textSize="20sp"
+                    />
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
         <com.leinardi.android.speeddial.SpeedDialOverlayLayout

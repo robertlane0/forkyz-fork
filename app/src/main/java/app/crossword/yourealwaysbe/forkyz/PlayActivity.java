@@ -20,7 +20,6 @@ import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.widget.TextView;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat;
@@ -65,8 +64,6 @@ public class PlayActivity extends PuzzleActivity
     private static final float ACROSTIC_CLUE_TABS_HEIGHT_RATIO_MIN = 0.3F;
 
     private PlayBinding binding;
-    // clue may be TextView in layout or action bar
-    private TextView clue;
     private Handler handler = new Handler(Looper.getMainLooper());
     private KeyboardManager keyboardManager;
     private boolean hasInitialValues = false;
@@ -116,26 +113,14 @@ public class PlayActivity extends PuzzleActivity
 
         binding = PlayBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
-        utils.holographic(this);
-        utils.finishOnHomeButton(this);
+        setSupportActionBar(binding.toolbar);
+        holographic();
+        finishOnHomeButton();
+        setupBottomInsets(binding.constraintLayout);
 
         setDefaultKeyMode(Activity.DEFAULT_KEYS_DISABLE);
 
         setFullScreenMode();
-
-        clue = binding.clueLine;
-        if (clue.getVisibility() != View.GONE) {
-            ConstraintSet set = new ConstraintSet();
-            set.clone(binding.constraintLayout);
-            set.setVisibility(clue.getId(), ConstraintSet.GONE);
-            set.applyTo(binding.constraintLayout);
-
-            View custom = utils.onActionBarCustom(this, R.layout.clue_line_only);
-            if (custom != null) {
-                clue = custom.findViewById(R.id.clueLine);
-            }
-        }
 
         binding.clueTabs.setOnClueLongClickDescription(
             getString(R.string.open_clue_notes)
@@ -180,37 +165,35 @@ public class PlayActivity extends PuzzleActivity
 
         settings.getPlaySkipFilled(board::setSkipCompletedLetters);
 
-        if (this.clue != null) {
-            this.clue.setClickable(true);
-            this.clue.setOnClickListener(new OnClickListener() {
-                public void onClick(View arg0) {
-                    settings.getPlayShowCluesTab(show -> {
-                        if (show)
-                            PlayActivity.this.hideClueTabs();
-                        else
-                            PlayActivity.this.showClueTabs();
-                    });
-                }
-            });
-            ViewCompat.replaceAccessibilityAction(
-                this.clue,
-                AccessibilityActionCompat.ACTION_CLICK,
-                getText(R.string.toggle_clue_tabs),
-                null
-            );
-            this.clue.setOnLongClickListener(new OnLongClickListener() {
-                public boolean onLongClick(View arg0) {
-                    PlayActivity.this.launchClueList();
-                    return true;
-                }
-            });
-            ViewCompat.replaceAccessibilityAction(
-                this.clue,
-                AccessibilityActionCompat.ACTION_LONG_CLICK,
-                getText(R.string.open_clue_list),
-                null
-            );
-        }
+        binding.clueHolder.clueLine.setClickable(true);
+        binding.clueHolder.clueLine.setOnClickListener(new OnClickListener() {
+            public void onClick(View arg0) {
+                settings.getPlayShowCluesTab(show -> {
+                    if (show)
+                        PlayActivity.this.hideClueTabs();
+                    else
+                        PlayActivity.this.showClueTabs();
+                });
+            }
+        });
+        ViewCompat.replaceAccessibilityAction(
+            binding.clueHolder.clueLine,
+            AccessibilityActionCompat.ACTION_CLICK,
+            getText(R.string.toggle_clue_tabs),
+            null
+        );
+        binding.clueHolder.clueLine.setOnLongClickListener(new OnLongClickListener() {
+            public boolean onLongClick(View arg0) {
+                PlayActivity.this.launchClueList();
+                return true;
+            }
+        });
+        ViewCompat.replaceAccessibilityAction(
+            binding.clueHolder.clueLine,
+            AccessibilityActionCompat.ACTION_LONG_CLICK,
+            getText(R.string.open_clue_list),
+            null
+        );
 
         this.registerForContextMenu(binding.boardView);
         binding.boardView.addBoardClickListener(new BoardClickListener() {
@@ -333,7 +316,11 @@ public class PlayActivity extends PuzzleActivity
         int clueTextSize
             = getResources().getInteger(R.integer.clue_text_size);
         TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
-            clue, 5, clueTextSize, 1, TypedValue.COMPLEX_UNIT_SP
+            binding.clueHolder.clueLine,
+            5,
+            clueTextSize,
+            1,
+            TypedValue.COMPLEX_UNIT_SP
         );
 
         DisplayMetrics metrics = getResources().getDisplayMetrics();
@@ -868,7 +855,7 @@ public class PlayActivity extends PuzzleActivity
 
         Clue c = board.getClue();
         getLongClueText(c, text -> {
-            clue.setText(smartHtml(text));
+            binding.clueHolder.clueLine.setText(smartHtml(text));
         });
     }
 

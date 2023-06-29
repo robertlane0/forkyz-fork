@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!-- common to all variants day/night/v21 &c. -->
 <!-- extra styles in styles.xml in variant folders -->
 <resources>
@@ -36,11 +37,6 @@
     <style name="puzzleListItemStyle" parent="Theme.Forkyz">
         <item name="android:background">@drawable/puzzle_list_background</item>
     </style>
-    <style name="clueLineStyle" parent="Theme.Forkyz">
-        <item name="android:background">?attr/colorPrimary</item>
-        <item name="titleTextColor">?attr/colorOnPrimary</item>
-        <item name="android:textColor">?attr/colorOnPrimary</item>
-    </style>
     <style name="clueLineOnlyStyle" parent="Theme.Forkyz">
         <item name="titleTextColor">?attr/colorOnSurface</item>
         <item name="android:textColor">?attr/colorOnSurface</item>
@@ -48,4 +44,12 @@
     <style name="clueListItemStyle" parent="Widget.Material3.CheckedTextView">
         <item name="android:textSize">16sp</item>
     </style>
+    <style
+        name="toolbarStyle"
+        parent="Widget.Material3.Toolbar.Surface"
+    />
+    <style
+        name="actionBarStyle"
+        parent="@style/ThemeOverlay.Material3.ActionBar"
+    />
 </resources>

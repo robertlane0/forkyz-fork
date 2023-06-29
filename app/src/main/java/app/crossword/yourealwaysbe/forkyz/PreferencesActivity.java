@@ -2,7 +2,6 @@ package app.crossword.yourealwaysbe.forkyz;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.preference.Preference;
@@ -14,13 +13,11 @@ import javax.inject.Inject;
 import dagger.hilt.android.AndroidEntryPoint;
 
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
-import app.crossword.yourealwaysbe.forkyz.util.NightModeHelper;
-import app.crossword.yourealwaysbe.forkyz.util.ThemeHelper;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 
 @AndroidEntryPoint
 public class PreferencesActivity
-       extends AppCompatActivity
+       extends ForkyzActivity
        implements PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
 
     public static final String NIGHT_MODE = "nightMode";
@@ -36,21 +33,18 @@ public class PreferencesActivity
 
         setContentView(R.layout.preferences_activity);
 
+        setSupportActionBar(findViewById(R.id.toolbar));
+        holographic();
+        setupBottomInsets(findViewById(R.id.content));
+
         SharedPreferences prefs
             = PreferenceManager.getDefaultSharedPreferences(this);
 
-        (new ThemeHelper(settings)).themeActivity(this);
-
-        NightModeHelper nightMode = NightModeHelper.bind(this, settings);
-        nightMode.restoreNightMode();
-
-        utils.holographic(this);
-
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                                       .replace(R.id.preferencesActivity,
-                                                new PreferencesFragment())
-                                       .commit();
+            getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.preferences_layout, new PreferencesFragment())
+                .commit();
         }
     }
 
@@ -84,7 +78,7 @@ public class PreferencesActivity
 
         // Replace the existing Fragment with the new Fragment
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.preferencesActivity, fragment)
+                .replace(R.id.preferences_layout, fragment)
                 .addToBackStack(null)
                 .commit();
         return true;

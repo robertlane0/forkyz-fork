@@ -4,36 +4,55 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
 >
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
+        android:orientation="vertical"
     >
-        <app.crossword.yourealwaysbe.forkyz.view.BoardWordEditView
-            android:id="@+id/miniboard"
-            android:layout_width="fill_parent"
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/app_bar_layout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:contentDescription="@string/current_word"
-            android:layout_marginTop="0sp"
-            android:layout_marginBottom="4sp"
-        />
-        <app.crossword.yourealwaysbe.forkyz.view.ClueTabs
-            android:id="@+id/clue_tabs"
+            android:fitsSystemWindows="true"
+        >
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+            />
+        </com.google.android.material.appbar.AppBarLayout>
+        <LinearLayout
+            android:id="@+id/content"
+            android:orientation="vertical"
             android:layout_width="fill_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-        />
-        <include
-            layout="@layout/voice_buttons"
-            android:id="@+id/voice_buttons_include"
-            android:layout_height="wrap_content"
-            android:layout_width="fill_parent"
-        />
-        <app.crossword.yourealwaysbe.forkyz.view.ForkyzKeyboard
-            android:id="@+id/keyboard"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-        />
+            android:layout_height="fill_parent"
+        >
+            <app.crossword.yourealwaysbe.forkyz.view.BoardWordEditView
+                android:id="@+id/miniboard"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:contentDescription="@string/current_word"
+                android:layout_marginTop="0sp"
+                android:layout_marginBottom="4sp"
+            />
+            <app.crossword.yourealwaysbe.forkyz.view.ClueTabs
+                android:id="@+id/clue_tabs"
+                android:layout_width="fill_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+            />
+            <include
+                layout="@layout/voice_buttons"
+                android:id="@+id/voice_buttons_include"
+                android:layout_height="wrap_content"
+                android:layout_width="fill_parent"
+            />
+            <app.crossword.yourealwaysbe.forkyz.view.ForkyzKeyboard
+                android:id="@+id/keyboard"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+            />
+        </LinearLayout>
     </LinearLayout>
 </layout>

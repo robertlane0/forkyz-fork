@@ -14,6 +14,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.view.MenuItem;
 import androidx.core.text.HtmlCompat;
+import androidx.core.view.WindowCompat;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -38,12 +39,17 @@ public class HTMLActivity extends ForkyzActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
 
         binding = HtmlViewBinding.inflate(getLayoutInflater());
 
-        utils.holographic(this);
-        utils.finishOnHomeButton(this);
-        this.setContentView(binding.getRoot());
+        setSupportActionBar(binding.toolbar);
+
+        holographic();
+        finishOnHomeButton();
+        setContentView(binding.getRoot());
+        setupBottomInsets(binding.scrollView);
+        setupBottomInsets(binding.backButton);
 
         String assetName = this.getIntent().getData().toString();
         startLoadAssetName(assetName);
