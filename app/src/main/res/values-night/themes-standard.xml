@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Forkyz.Standard" parent="Theme.Forkyz">
+        <!-- don't tint with primary in non-dynamic standard theme -->
+        <item name="elevationOverlayColor">#fff</item>
+    </style>
+</resources>

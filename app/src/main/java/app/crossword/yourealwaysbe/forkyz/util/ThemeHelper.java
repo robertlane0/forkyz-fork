@@ -22,10 +22,19 @@ public class ThemeHelper {
     }
 
     public void themeActivity(Activity activity) {
-        // needs to be blocking so can be done before super.onCreate in
-        // ForkyzActivity
+        // needs to be blocking so can be done before end of onCreate in
+        // ForkyzActivity (else toolbar not themed)
         Theme theme = settings.getAppThemeBlocking();
-        if (theme == Theme.LEGACY_LIKE)
+        switch (theme) {
+        case STANDARD:
+            activity.setTheme(R.style.Theme_Forkyz_Standard);
+            break;
+        case LEGACY_LIKE:
             activity.setTheme(R.style.Theme_Forkyz_LegacyLike);
+            break;
+        default:
+            // keep main theme
+            break;
+        }
     }
 }
