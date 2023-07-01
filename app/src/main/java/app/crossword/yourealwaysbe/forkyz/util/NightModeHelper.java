@@ -1,8 +1,6 @@
 package app.crossword.yourealwaysbe.forkyz.util;
 
 import android.content.Context;
-import android.content.res.Configuration;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
@@ -19,7 +17,7 @@ import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
  * Heavily adapted from sources below, description no longer relevant so
  * removed.
  *
- * Original ource: https://gist.github.com/slightfoot/c508cdc8828a478572e0
+ * Original source: https://gist.github.com/slightfoot/c508cdc8828a478572e0
  * Adapted for Shortyz by Simon Lightfoot <simon@demondevelopers.com>
   */
 public class NightModeHelper {
@@ -109,19 +107,6 @@ public class NightModeHelper {
         settings.getAppDayNightMode(cb);
     }
 
-    public void unbind() {
-        mActivity.clear();
-    }
-
-    @NonNull
-    private AppCompatActivity getActivity() {
-        AppCompatActivity activity = mActivity.get();
-        if (activity == null) {
-            throw new IllegalStateException("No activity is currently bound.");
-        }
-        return activity;
-    }
-
     /**
      * Helper method to get the theme resource id. Warning, accessing non-public methods is
      * a no-no and there is no guarantee this will work.
@@ -140,16 +125,5 @@ public class NightModeHelper {
             Logger.getAnonymousLogger().log(Level.WARNING, "Exception getting theme", e);
         }
         return 0;
-    }
-
-    private boolean getSystemNightMode() {
-        AppCompatActivity activity = mActivity.get();
-        if (activity == null)
-            return false;
-
-        int mode = (activity.getResources().getConfiguration().uiMode &
-                    Configuration.UI_MODE_NIGHT_MASK);
-
-        return mode == Configuration.UI_MODE_NIGHT_YES;
     }
 }
