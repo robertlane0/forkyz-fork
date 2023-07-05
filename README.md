@@ -105,7 +105,7 @@ Current downloaders are De Standaard, De Telegraaf, Guardian Daily Cryptic, Hamb
 
 ## Compilation
 
-Gradle should compile fine as long as you have Java 11 or above.
+Gradle should compile fine as long as you have Java 17 or above.
 
     $ ./gradlew assembleRelease
 
