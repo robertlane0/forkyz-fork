@@ -1,5 +1,10 @@
 # Forkyz Changelog
 
+## Version 43
+
+- Large back-end rework to settings management and other parts (please report issues).
+- Minor bug fixes, consistency improvements, and slight theme change.
+
 ## Version 42
 
 - New Forkyz Scanner app submitted to FDroid (scans photos, images, PDF).
