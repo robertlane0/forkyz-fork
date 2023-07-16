@@ -345,6 +345,61 @@ public class PlayboardTest {
     }
 
     @TestWithAndWithoutBlockObjects
+    public void testCycleUnfilled(boolean blockObjects) throws Exception {
+        Puzzle puz = loadTestPuz(blockObjects);
+        Playboard board = new Playboard(puz);
+        board.setSkipCompletedLetters(true);
+        board.setMovementStrategy(
+            new MovementStrategy.CycleUnfilled(
+                MovementStrategy.MOVE_NEXT_ON_AXIS
+            )
+        );
+
+        // Across
+        board.playLetter('A');
+        moveToPosition(board, 0, 4);
+        board.playLetter('A');
+        assertPosition(board, 0, 1);
+        board.playLetter('A');
+        board.playLetter('A');
+        board.playLetter('A');
+        assertPosition(board, 0, 6);
+        moveToPosition(board, 0, 9);
+        board.playLetter('A');
+        assertPosition(board, 0, 6);
+
+        // make sure don't toggle direction if loop to same spot
+        moveToPosition(board, 0, 4);
+        ClueID cid = board.getClueID();
+        board.playLetter(Box.BLANK);
+        assertPosition(board, 0, 4);
+        assertEquals(cid, board.getClueID());
+
+        // Down
+        moveToPosition(board, 0, 0);
+        board.toggleSelection();
+
+        board.playLetter('A');
+        moveToPosition(board, 3, 0);
+        board.playLetter('A');
+        assertPosition(board, 1, 0);
+        board.playLetter('A');
+        board.playLetter('A');
+        assertPosition(board, 5, 0);
+
+        // Down / Back
+        moveToPosition(board, 11, 0);
+        board.deleteLetter();
+        assertPosition(board, 8, 0);
+
+        // Across / Back
+        moveToPosition(board, 0, 11);
+        board.toggleSelection();
+        board.deleteLetter();
+        assertPosition(board, 0, 9);
+    }
+
+    @TestWithAndWithoutBlockObjects
     public void testPlayFullMoveAxis(boolean blockObjects) throws Exception {
         checkNoMoveFullGrid(blockObjects, MovementStrategy.MOVE_NEXT_ON_AXIS);
     }
@@ -362,6 +417,18 @@ public class PlayboardTest {
     @TestWithAndWithoutBlockObjects
     public void testPlayFullMoveParallelWord(boolean blockObjects) throws Exception {
         checkNoMoveFullGrid(blockObjects, MovementStrategy.MOVE_PARALLEL_WORD);
+    }
+
+    @TestWithAndWithoutBlockObjects
+    public void testPlayFullMoveCycleUnfilled(
+        boolean blockObjects
+    ) throws Exception {
+        checkNoMoveFullGrid(
+            blockObjects,
+            new MovementStrategy.CycleUnfilled(
+                MovementStrategy.MOVE_NEXT_ON_AXIS
+            )
+        );
     }
 
     @TestWithAndWithoutBlockObjects

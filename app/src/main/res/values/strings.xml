@@ -210,6 +210,8 @@
     <string name="movement_style_desc">Select what happens when you type past the end of a word.</string>
     <string name="skip_filled">Skip Filled Boxes</string>
     <string name="skip_filled_desc">Toggles the skipping of filled boxes when you enter a new letter.</string>
+    <string name="cycle_unfilled">Cycle on Unfilled Words </string>
+    <string name="cycle_unfilled_desc">When the end of a word is reached, return to the beginning if the word is not complete. Else use selected movement strategy.</string>
     <string name="preserve_correct">Preserve Correct Boxes when Showing Errors</string>
     <string name="preserve_correct_desc">Keeps you from overwriting a correct box when you are in \'Show Errors\' mode.</string>
     <string name="space_change_dir">Space Changes Direction</string>

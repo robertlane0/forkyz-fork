@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Objects;
 
 public interface MovementStrategy extends Serializable {
+    Word move(Playboard board, boolean skipCompletedLetters);
+    Word back(Playboard board);
 
     MovementStrategy MOVE_NEXT_ON_AXIS = new MovementStrategy() {
         @Override
@@ -483,8 +485,55 @@ public interface MovementStrategy extends Serializable {
         }
     };
 
-    Word move(Playboard board, boolean skipCompletedLetters);
+    /**
+     * Return to start of unfilled word, or delegate to inner strategy
+     *
+     * When moving forwards, cycle current word if it has not been completed.
+     * If it has, delegate to another strategy given during construction.
+     *
+     * Going back is always a delegation.
+     */
+    public class CycleUnfilled implements MovementStrategy {
+        MovementStrategy innerStrategy;
 
-    Word back(Playboard board);
+        public CycleUnfilled(MovementStrategy innerStrategy) {
+            this.innerStrategy = innerStrategy;
+        }
 
+        public Word move(Playboard board, boolean skipCompletedLetters) {
+            Position startPos = board.getHighlightLetter();
+            Word word = board.moveZoneForward(skipCompletedLetters);
+            Position newPos = board.getHighlightLetter();
+
+            if (Objects.equals(startPos, newPos)) {
+                Clue clue = board.getClue();
+                Puzzle puz = board.getPuzzle();
+
+                if (
+                    clue == null
+                    || puz == null
+                    || clue.getZone().isEmpty()
+                    || board.isFilledClueID(clue.getClueID())
+                ) {
+                    word = innerStrategy.move(board, skipCompletedLetters);
+                } else {
+                    Position start = clue.getZone().getPosition(0);
+                    Box box = puz.checkedGetBox(start);
+
+                    Position next = start;
+                    if (box != null && !box.isBlank())
+                        next = board.findNextZone(start, skipCompletedLetters);
+
+                    if (next != null)
+                        board.setHighlightLetter(next, clue.getClueID());
+                }
+            }
+
+            return word;
+        }
+
+        public Word back(Playboard board) {
+            return innerStrategy.back(board);
+        }
+    }
 }

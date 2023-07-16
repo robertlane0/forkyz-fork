@@ -128,6 +128,7 @@ public class ForkyzSettings {
     private static final String PREF_PLAY_SHOW_ERRORS_GRID = "showErrors";
     private static final String PREF_PLAY_SHOW_TIMER = "showTimer";
     private static final String PREF_PLAY_SKIP_FILLED = "skipFilled";
+    private static final String PREF_PLAY_CYCLE_UNFILLED = "cycleUnfilled";
     private static final String PREF_PLAY_SPACE_CHANGE_DIRECTION
         = "spaceChangesDirection";
     private static final String PREF_PLAY_SUPPRESS_HINT_HIGHLIGHTING
@@ -204,6 +205,7 @@ public class ForkyzSettings {
         BOOL_DEFAULTS.put(PREF_PLAY_SHOW_ERRORS_GRID, false);
         BOOL_DEFAULTS.put(PREF_PLAY_SHOW_TIMER, false);
         BOOL_DEFAULTS.put(PREF_PLAY_SKIP_FILLED, false);
+        BOOL_DEFAULTS.put(PREF_PLAY_CYCLE_UNFILLED, false);
         BOOL_DEFAULTS.put(PREF_PLAY_SPACE_CHANGE_DIRECTION, true);
         BOOL_DEFAULTS.put(PREF_PLAY_SUPPRESS_HINT_HIGHLIGHTING, false);
         BOOL_DEFAULTS.put(PREF_VOICE_ALWAYS_ANNOUNCE_BOX, false);
@@ -697,11 +699,19 @@ public class ForkyzSettings {
             String strategyString = prefs.getString(
                 PREF_PLAY_MOVEMENT_STRATEGY, "MOVE_NEXT_ON_AXIS"
             );
+            boolean cycleUnfilled = prefs.getBoolean(
+                PREF_PLAY_CYCLE_UNFILLED, false
+            );
+
             handler.post(() -> {
-                cb.accept(
-                    MovementStrategySetting.getFromSettingsValue(strategyString)
-                        .getMovementStrategy()
-                );
+                MovementStrategy strategy
+                    = MovementStrategySetting.getFromSettingsValue(
+                            strategyString
+                        ).getMovementStrategy();
+                if (cycleUnfilled)
+                    strategy = new MovementStrategy.CycleUnfilled(strategy);
+
+                cb.accept(strategy);
             });
         });
     }

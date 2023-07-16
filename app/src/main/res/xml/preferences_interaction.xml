@@ -36,6 +36,13 @@
     />
 
     <androidx.preference.CheckBoxPreference
+        android:title="@string/cycle_unfilled"
+        android:defaultValue="false"
+        android:summary="@string/cycle_unfilled_desc"
+        android:key="cycleUnfilled"
+    />
+
+    <androidx.preference.CheckBoxPreference
         android:title="@string/double_tap_zoom"
         android:defaultValue="false"
         android:summary="@string/double_tap_zoom_desc"
