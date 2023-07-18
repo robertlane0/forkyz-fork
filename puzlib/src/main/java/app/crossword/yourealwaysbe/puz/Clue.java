@@ -18,6 +18,7 @@ public class Clue implements Serializable {
     private String label;
     private String hint;
     private Zone zone;
+    private boolean flagged = false;
 
     public Clue(
         String listName,
@@ -61,6 +62,8 @@ public class Clue implements Serializable {
     public String getHint() { return hint; }
     public boolean hasZone() { return zone.size() != 0; }
     public Zone getZone() { return zone; }
+    public boolean isFlagged() { return flagged; }
+    public void setFlagged(boolean flagged) { this.flagged = flagged; }
 
     /**
      * The number that should be displayed with the clue
@@ -95,7 +98,8 @@ public class Clue implements Serializable {
             && Objects.equals(getClueNumber(), other.getClueNumber())
             && Objects.equals(getLabel(), other.getLabel())
             && Objects.equals(getHint(), other.getHint())
-            && Objects.equals(getZone(), other.getZone());
+            && Objects.equals(getZone(), other.getZone())
+            && isFlagged() == other.isFlagged();
     }
 
     @Override
@@ -113,5 +117,4 @@ public class Clue implements Serializable {
         this.hint = (hint == null) ? "" : hint;
     }
 }
-
 

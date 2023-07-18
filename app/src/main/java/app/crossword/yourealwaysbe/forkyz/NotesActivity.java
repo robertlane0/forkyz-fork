@@ -441,7 +441,7 @@ public class NotesActivity extends PuzzleActivity {
                 binding.clueHolder.clueLine.setText(smartHtml(text));
             });
             note = puz.getNote(clue);
-            binding.flagClue.setChecked(puz.isFlagged(clue));
+            binding.flagClue.setChecked(clue.isFlagged());
             int clueVisibility = isClueOnBoard() ? View.VISIBLE : View.GONE;
             binding.miniboardLab.setVisibility(clueVisibility);
             binding.miniboard.setVisibility(clueVisibility);

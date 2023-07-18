@@ -843,7 +843,7 @@ public class ClueTabs extends LinearLayout
             clueBinding.clueTextView.setChecked(selected);
 
             Puzzle puz = board.getPuzzle();
-            if (puz != null && puz.isFlagged(clue)) {
+            if (puz != null && clue.isFlagged()) {
                 clueBinding.clueFlagView.setVisibility(View.VISIBLE);
             } else {
                 clueBinding.clueFlagView.setVisibility(View.INVISIBLE);

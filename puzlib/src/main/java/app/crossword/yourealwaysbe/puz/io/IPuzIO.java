@@ -2336,12 +2336,18 @@ public class IPuzIO implements PuzzleParser {
         writer.newLine();
 
         // guarantee writing order
-        List<ClueID> flagged = new ArrayList<>(puz.getFlaggedClues());
-        Collections.sort(flagged);
+        List<Clue> clues = new ArrayList<>();
+        for (Clue clue : puz.getAllClues()) {
+            if (clue.isFlagged())
+                clues.add(clue);
+        }
+        Collections.sort(clues, (clue1, clue2) -> {
+            return clue1.getClueID().compareTo(clue2.getClueID());
+        });
 
-        for (ClueID cnd : flagged) {
+        for (Clue clue : clues) {
             writer.indent(2);
-            writeClueID(cnd, writer);
+            writeClueID(clue.getClueID(), writer);
             writer.newLine();
         }
 

@@ -365,9 +365,12 @@ public class IPuzIOTest {
             ClueList across = puz.getClues("Across");
             ClueList vertical = puz.getClues("Vertical");
 
-            ClueID cidA1 = across.getClueByNumber("1").getClueID();
-            ClueID cidA3 = across.getClueByNumber("3").getClueID();
-            ClueID cidV1 = vertical.getClueByNumber("1").getClueID();
+            Clue clueA1 = across.getClueByNumber("1");
+            Clue clueA3 = across.getClueByNumber("3");
+            Clue clueV1 = vertical.getClueByNumber("1");
+            ClueID cidA1 = clueA1.getClueID();
+            ClueID cidA3 = clueA3.getClueID();
+            ClueID cidV1 = clueV1.getClueID();
             ClueID cidV2 = vertical.getClueByNumber("2").getClueID();
 
             puz.setSupportUrl("http://test.url");
@@ -387,8 +390,8 @@ public class IPuzIOTest {
                 cidV2,
                 new Note("test5", "test6\nnew line", "test7", "test8")
             );
-            puz.flagClue(cidA3, true);
-            puz.flagClue(cidV1, true);
+            clueA3.setFlagged(true);
+            clueV1.setFlagged(true);
 
             puz.setPlayerNote(
                 new Note("scratch", "a note", "anagsrc", "anagsol")
@@ -432,9 +435,9 @@ public class IPuzIOTest {
             assertEquals(boxes2[0][1].getResponder(), "Test");
             assertFalse(boxes2[0][1].isCheated());
             assertTrue(boxes2[1][0].isCheated());
-            assertTrue(puz.isFlagged(cidV1));
-            assertTrue(puz.isFlagged(cidA3));
-            assertFalse(puz.isFlagged(cidA1));
+            assertTrue(clueV1.isFlagged());
+            assertTrue(clueA3.isFlagged());
+            assertFalse(clueA1.isFlagged());
             assertEquals(puz.getPinnedClueID(), cidA3);
 
             assertEquals(puz, puz2);

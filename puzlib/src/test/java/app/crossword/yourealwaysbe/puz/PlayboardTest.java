@@ -513,7 +513,7 @@ public class PlayboardTest {
         final ClueID cid = new ClueID("Across", 10);
         Clue clue = puz.getClue(cid);
 
-        assertFalse(puz.isFlagged(cid));
+        assertFalse(clue.isFlagged());
 
         final AtomicBoolean notified = new AtomicBoolean(false);
         Playboard.PlayboardListener listener = (changes) -> {
@@ -526,7 +526,7 @@ public class PlayboardTest {
         board.addListener(listener);
         board.flagClue(clue, true);
 
-        assertTrue(puz.isFlagged(cid));
+        assertTrue(clue.isFlagged());
         assertTrue(notified.get());
     }
 

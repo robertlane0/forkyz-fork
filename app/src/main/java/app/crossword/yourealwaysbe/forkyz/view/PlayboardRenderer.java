@@ -746,12 +746,14 @@ public class PlayboardRenderer {
         boolean flagDown = false;
 
         for (ClueID cid : box.getIsPartOfClues()) {
-            if (box.isStartOf(cid) && puz.isFlagged(cid)) {
-                if (isClueProbablyAcross(cid))
-                    flagAcross = true;
-                else
-                    flagDown = true;
-
+            if (box.isStartOf(cid)) {
+                Clue clue = puz.getClue(cid);
+                if (clue != null && clue.isFlagged()) {
+                    if (isClueProbablyAcross(cid))
+                        flagAcross = true;
+                    else
+                        flagDown = true;
+                }
             }
         }
 

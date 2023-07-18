@@ -1367,9 +1367,11 @@ public class Playboard implements Serializable {
      * Call this instead of puzzle.flagClue to update listeners
      */
     public void flagClue(Clue clue, boolean flag) {
-        puzzle.flagClue(clue, flag);
-        flagClueChange(clue);
-        notifyChange();
+        if (clue != null) {
+            clue.setFlagged(flag);
+            flagClueChange(clue);
+            notifyChange();
+        }
     }
 
     private void flagNotifying(boolean isNotifying) {

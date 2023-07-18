@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -56,7 +55,6 @@ public class Puzzle implements Serializable{
 
     private LinkedList<ClueID> historyList = new LinkedList<>();
 
-    private Set<ClueID> flaggedClues = new HashSet<>();
     private List<PuzImage> images = new LinkedList<>();
 
     // a clue/word to display permanently somewhere
@@ -783,9 +781,6 @@ public class Puzzle implements Serializable{
             return false;
         }
 
-        if (!flaggedClues.equals(other.flaggedClues))
-            return false;
-
         if (!Objects.equals(playerNote, other.playerNote))
             return false;
 
@@ -824,7 +819,6 @@ public class Puzzle implements Serializable{
         result = (prime * result) + ((title == null) ? 0 : title.hashCode());
         result = (prime * result) + width;
         result = (prime *result) + clueNotes.hashCode();
-        result = (prime * result) + flaggedClues.hashCode();
         result = (prime * result) + Objects.hashCode(playerNote);
         result = (prime * result) + Objects.hashCode(images);
         result = (prime * result) + Objects.hash(
@@ -876,36 +870,6 @@ public class Puzzle implements Serializable{
 
     public List<ClueID> getHistory() {
         return historyList;
-    }
-
-    /**
-     * Flag or unflag clue
-     */
-    public void flagClue(ClueID clueID, boolean flag) {
-        if (clueID == null)
-            return;
-
-        if (flag)
-            flaggedClues.add(clueID);
-        else
-            flaggedClues.remove(clueID);
-    }
-
-    public void flagClue(Clue clue, boolean flag) {
-        if (clue != null)
-            flagClue(clue.getClueID(), flag);
-    }
-
-    public boolean isFlagged(ClueID clueID) {
-        return flaggedClues.contains(clueID);
-    }
-
-    public boolean isFlagged(Clue clue) {
-        return (clue == null) ? false : isFlagged(clue.getClueID());
-    }
-
-    public Collection<ClueID> getFlaggedClues() {
-        return flaggedClues;
     }
 
     public void addImage(PuzImage image) {

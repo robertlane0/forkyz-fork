@@ -163,7 +163,9 @@ public class PuzzleBuilder {
     }
 
     public PuzzleBuilder flagClue(ClueID clueId, boolean flag) {
-        puzzle.flagClue(clueId, flag);
+        Clue clue = clueId == null ? null : puzzle.getClue(clueId);
+        if (clue != null)
+            clue.setFlagged(flag);
         return this;
     }
 
