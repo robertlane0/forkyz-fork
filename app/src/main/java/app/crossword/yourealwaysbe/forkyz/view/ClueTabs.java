@@ -5,6 +5,8 @@ import app.crossword.yourealwaysbe.forkyz.databinding.ClueListItemBinding;
 import app.crossword.yourealwaysbe.forkyz.databinding.ClueTabsBinding;
 import app.crossword.yourealwaysbe.forkyz.databinding.ClueTabsPageBinding;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
+import app.crossword.yourealwaysbe.forkyz.util.ColorUtils;
+import app.crossword.yourealwaysbe.forkyz.view.BoardEditView.BoardClickListener;
 import app.crossword.yourealwaysbe.puz.Clue;
 import app.crossword.yourealwaysbe.puz.ClueID;
 import app.crossword.yourealwaysbe.puz.ClueList;
@@ -14,7 +16,6 @@ import app.crossword.yourealwaysbe.puz.Playboard;
 import app.crossword.yourealwaysbe.puz.Position;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.util.WeakSet;
-import app.crossword.yourealwaysbe.forkyz.view.BoardEditView.BoardClickListener;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -27,6 +28,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import androidx.core.content.ContextCompat;
 import androidx.core.text.HtmlCompat;
 import androidx.core.view.GestureDetectorCompat;
 import androidx.core.view.ViewCompat;
@@ -845,6 +847,17 @@ public class ClueTabs extends LinearLayout
             Puzzle puz = board.getPuzzle();
             if (puz != null && clue.isFlagged()) {
                 clueBinding.clueFlagView.setVisibility(View.VISIBLE);
+                if (clue.isDefaultFlagColor()) {
+                    clueBinding.clueFlagView.setBackgroundColor(
+                        ContextCompat.getColor(
+                            ClueTabs.this.getContext(), R.color.flagColor
+                        )
+                    );
+                } else {
+                    clueBinding.clueFlagView.setBackgroundColor(
+                        ColorUtils.addAlpha(clue.getFlagColor())
+                    );
+                }
             } else {
                 clueBinding.clueFlagView.setVisibility(View.INVISIBLE);
             }

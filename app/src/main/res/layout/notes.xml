@@ -100,10 +100,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="end"
-                        android:button="@null"
-                        android:drawableRight="?android:attr/listChoiceIndicatorMultiple"
-                        android:drawableEnd="?android:attr/listChoiceIndicatorMultiple"
                         android:text="@string/flag_clue"
+                        android:paddingEnd="4dp"
+                        android:paddingRight="4dp"
                     />
                     <TextView
                         android:id="@+id/anagram_source_lab"

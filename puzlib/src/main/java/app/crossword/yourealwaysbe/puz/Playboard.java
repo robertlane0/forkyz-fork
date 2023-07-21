@@ -1374,6 +1374,17 @@ public class Playboard implements Serializable {
         }
     }
 
+    /**
+     * Call this instead of setting color directly to update listeners
+     */
+    public void setFlagColor(Clue clue, int color) {
+        if (clue != null) {
+            clue.setFlagColor(color);
+            flagClueChange(clue);
+            notifyChange();
+        }
+    }
+
     private void flagNotifying(boolean isNotifying) {
         // if stopping notifying, clear pending removals
         boolean stoppingNotifying = !isNotifying && this.isNotifying;

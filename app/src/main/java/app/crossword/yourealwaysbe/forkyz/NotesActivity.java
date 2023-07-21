@@ -11,6 +11,7 @@ import javax.inject.Inject;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.KeyEvent;
@@ -20,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat;
+import androidx.core.widget.CompoundButtonCompat;
 import androidx.core.widget.TextViewCompat;
 import androidx.fragment.app.DialogFragment;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -27,18 +29,21 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import dagger.hilt.android.AndroidEntryPoint;
 
 import app.crossword.yourealwaysbe.forkyz.databinding.NotesBinding;
+import app.crossword.yourealwaysbe.forkyz.util.ColorUtils;
 import app.crossword.yourealwaysbe.forkyz.util.KeyboardManager;
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 import app.crossword.yourealwaysbe.forkyz.view.BoardEditText.BoardEditFilter;
 import app.crossword.yourealwaysbe.forkyz.view.BoardEditText;
 import app.crossword.yourealwaysbe.forkyz.view.BoardEditView.BoardClickListener;
+import app.crossword.yourealwaysbe.forkyz.view.ChooseFlagColorDialog;
 import app.crossword.yourealwaysbe.forkyz.view.ScrollingImageView.Point;
 import app.crossword.yourealwaysbe.forkyz.view.ScrollingImageView;
 import app.crossword.yourealwaysbe.puz.Box;
 import app.crossword.yourealwaysbe.puz.Clue;
 import app.crossword.yourealwaysbe.puz.ClueID;
 import app.crossword.yourealwaysbe.puz.Note;
+import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges;
 import app.crossword.yourealwaysbe.puz.Playboard.Word;
 import app.crossword.yourealwaysbe.puz.Playboard;
 import app.crossword.yourealwaysbe.puz.Position;
@@ -69,6 +74,7 @@ public class NotesActivity extends PuzzleActivity {
 
     private NotesBinding binding;
     private KeyboardManager keyboardManager;
+    private ColorStateList defaultFlagColors;
 
     private Random rand = new Random();
 
@@ -76,8 +82,12 @@ public class NotesActivity extends PuzzleActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // just here to note the only menu item is handled by parent
-        return super.onOptionsItemSelected(item);
+        if (item.getItemId() == R.id.puzzle_menu_flag_color) {
+            onFlagClueSelected();
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
+        }
     }
 
     /**
@@ -279,6 +289,20 @@ public class NotesActivity extends PuzzleActivity {
             null
         );
 
+        binding.flagClue.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                NotesActivity.this.onFlagClueSelected();
+                return true;
+            }
+        });
+        ViewCompat.replaceAccessibilityAction(
+            binding.flagClue,
+            AccessibilityActionCompat.ACTION_LONG_CLICK,
+            getText(R.string.choose_flag_color),
+            null
+        );
+
         keyboardManager
             = new KeyboardManager(this, settings, binding.keyboard, null);
         keyboardManager.showKeyboard(
@@ -343,6 +367,50 @@ public class NotesActivity extends PuzzleActivity {
         super.onDestroy();
         if (keyboardManager != null)
             keyboardManager.onDestroy();
+    }
+
+    private void onFlagClueSelected() {
+        Clue clue = getNotesClue();
+        if (clue == null)
+            return;
+
+        // assume if want color then want flagged
+        if (!binding.flagClue.isChecked()) {
+            binding.flagClue.setChecked(true);
+            setFlagClueColor();
+        }
+
+        DialogFragment dialog = new ChooseFlagColorDialog();
+        Bundle args = new Bundle();
+        ChooseFlagColorDialog.addClueToBundle(args, clue);
+        dialog.setArguments(args);
+        dialog.show(getSupportFragmentManager(), "ChooseFlagColorDialog");
+    }
+
+    private void setFlagClueColor() {
+        Clue clue = getNotesClue();
+        if (clue == null)
+            return;
+
+        if (clue.isDefaultFlagColor()) {
+            if (defaultFlagColors != null) {
+                CompoundButtonCompat.setButtonTintList(
+                    binding.flagClue, defaultFlagColors
+                );
+            }
+        } else {
+            // save so can restore later
+            if (defaultFlagColors == null) {
+                defaultFlagColors = CompoundButtonCompat.getButtonTintList(
+                    binding.flagClue
+                );
+            }
+
+            CompoundButtonCompat.setButtonTintList(
+                binding.flagClue,
+                ColorStateList.valueOf(ColorUtils.addAlpha(clue.getFlagColor()))
+            );
+        }
     }
 
     private boolean onMiniboardKeyUp(int keyCode, KeyEvent event) {
@@ -442,6 +510,7 @@ public class NotesActivity extends PuzzleActivity {
             });
             note = puz.getNote(clue);
             binding.flagClue.setChecked(clue.isFlagged());
+            setFlagClueColor();
             int clueVisibility = isClueOnBoard() ? View.VISIBLE : View.GONE;
             binding.miniboardLab.setVisibility(clueVisibility);
             binding.miniboard.setVisibility(clueVisibility);
@@ -551,6 +620,18 @@ public class NotesActivity extends PuzzleActivity {
 
         return true;
     }
+
+    @Override
+    public void onPlayboardChange(PlayboardChanges changes) {
+        super.onPlayboardChange(changes);
+
+        Playboard board = getBoard();
+        ClueID cid = (board == null) ? null : board.getClueID();
+
+        if (cid != null && changes.getChangedClueIDs().contains(cid))
+            setFlagClueColor();
+    }
+
 
     private Set<String> getSuppressNotesList(boolean displayScratch) {
         if (!displayScratch)

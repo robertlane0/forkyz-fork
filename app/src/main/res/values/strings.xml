@@ -114,6 +114,8 @@
     <string name="transfer_scratch_to_board">Transfer scratch contents to board</string>
     <string name="shuffle_anagram_source">Shuffle anagram source letters</string>
     <string name="transfer_anagram_solution_to_board">Transfer anagram solution to board</string>
+    <string name="flag_color_title">Set Flag Color</string>
+    <string name="choose_flag_color">Choose flag color.</string>
 
     <!-- clue formats -->
     <string name="clue_format_short_no_dir">%1$s. %2$s</string>

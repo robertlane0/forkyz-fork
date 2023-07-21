@@ -21,6 +21,9 @@ import androidx.core.content.ContextCompat;
 import androidx.core.text.HtmlCompat;
 
 import app.crossword.yourealwaysbe.forkyz.R;
+import app.crossword.yourealwaysbe.forkyz.util.ColorUtils;
+import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
+import app.crossword.yourealwaysbe.forkyz.view.ScrollingImageView.Point;
 import app.crossword.yourealwaysbe.puz.Box;
 import app.crossword.yourealwaysbe.puz.Clue;
 import app.crossword.yourealwaysbe.puz.ClueID;
@@ -31,8 +34,6 @@ import app.crossword.yourealwaysbe.puz.Position;
 import app.crossword.yourealwaysbe.puz.PuzImage;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.Zone;
-import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
-import app.crossword.yourealwaysbe.forkyz.view.ScrollingImageView.Point;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -742,22 +743,22 @@ public class PlayboardRenderer {
 
         Puzzle puz = board.getPuzzle();
 
-        boolean flagAcross = false;
-        boolean flagDown = false;
+        Clue flagAcross = null;
+        Clue flagDown = null;
 
         for (ClueID cid : box.getIsPartOfClues()) {
             if (box.isStartOf(cid)) {
                 Clue clue = puz.getClue(cid);
                 if (clue != null && clue.isFlagged()) {
                     if (isClueProbablyAcross(cid))
-                        flagAcross = true;
+                        flagAcross = clue;
                     else
-                        flagDown = true;
+                        flagDown = clue;
                 }
             }
         }
 
-        if (flagDown) {
+        if (flagDown != null) {
             String clueNumber = box.getClueNumber();
             int numDigits = clueNumber == null ? 0 : clueNumber.length();
             int numWidth = numDigits * numberTextSize / 2;
@@ -767,17 +768,17 @@ public class PlayboardRenderer {
                 x + boxSize - barSize,
                 y + 2 * barSize
             );
-            canvas.drawRect(bar, profile.getFlag());
+            canvas.drawRect(bar, profile.getFlag(flagDown));
         }
 
-        if (flagAcross) {
+        if (flagAcross != null) {
             Rect bar = new Rect(
                 x + 1 * barSize,
                 y + barSize + numberOffset + numberTextSize,
                 x + 2 * barSize,
                 y + boxSize - barSize
             );
-            canvas.drawRect(bar, profile.getFlag());
+            canvas.drawRect(bar, profile.getFlag(flagAcross));
         }
     }
 
@@ -1849,8 +1850,15 @@ public class PlayboardRenderer {
             return errorHighlight;
         }
 
-        public Paint getFlag() {
-            return flag;
+        public Paint getFlag(Clue clue) {
+            if (clue.isDefaultFlagColor()) {
+                return flag;
+            } else {
+                Paint customFlag = new Paint();
+                // clue colors have a 0 alpha channel, so fix
+                customFlag.setColor(ColorUtils.addAlpha(clue.getFlagColor()));
+                return customFlag;
+            }
         }
 
         public int getBoxSize() { return boxSize; }
