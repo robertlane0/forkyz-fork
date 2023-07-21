@@ -163,9 +163,18 @@ public class PuzzleBuilder {
     }
 
     public PuzzleBuilder flagClue(ClueID clueId, boolean flag) {
+        flagClue(clueId, flag, Clue.DEFAULT_FLAG_COLOR);
+        return this;
+    }
+
+    public PuzzleBuilder flagClue(
+        ClueID clueId, boolean flag, int flagColor
+    ) {
         Clue clue = clueId == null ? null : puzzle.getClue(clueId);
-        if (clue != null)
+        if (clue != null) {
             clue.setFlagged(flag);
+            clue.setFlagColor(flagColor);
+        }
         return this;
     }
 

@@ -392,6 +392,7 @@ public class IPuzIOTest {
             );
             clueA3.setFlagged(true);
             clueV1.setFlagged(true);
+            clueV1.setFlagColor(0x0000ff00);
 
             puz.setPlayerNote(
                 new Note("scratch", "a note", "anagsrc", "anagsol")
@@ -436,7 +437,10 @@ public class IPuzIOTest {
             assertFalse(boxes2[0][1].isCheated());
             assertTrue(boxes2[1][0].isCheated());
             assertTrue(clueV1.isFlagged());
+            assertFalse(clueV1.isDefaultFlagColor());
+            assertEquals(clueV1.getFlagColor(), 0x0000ff00);
             assertTrue(clueA3.isFlagged());
+            assertTrue(clueA3.isDefaultFlagColor());
             assertFalse(clueA1.isFlagged());
             assertEquals(puz.getPinnedClueID(), cidA3);
 

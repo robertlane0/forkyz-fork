@@ -1528,10 +1528,15 @@ public class IPuzIO implements PuzzleParser {
         JSONArray flagsJson = playData.getJSONArray(FIELD_FLAGGED_CLUES);
 
         for (int i = 0; i < flagsJson.length(); i++) {
-            JSONObject cndJson = flagsJson.getJSONObject(i);
-            ClueID cnd = decodeClueID(cndJson, builder);
-            if (cnd != null)
-                builder.flagClue(cnd, true);
+            JSONObject flagJson = flagsJson.getJSONObject(i);
+            ClueID cid = decodeClueID(flagJson, builder);
+            if (cid != null) {
+                Integer color = readColor(flagJson.optString(FIELD_COLOR));
+                if (color != null)
+                    builder.flagClue(cid, true, color);
+                else
+                    builder.flagClue(cid, true);
+            }
         }
     }
 
@@ -2346,8 +2351,16 @@ public class IPuzIO implements PuzzleParser {
         });
 
         for (Clue clue : clues) {
+            ClueID cid = clue.getClueID();
             writer.indent(2);
-            writeClueID(clue.getClueID(), writer);
+
+            writer.object();
+            writeClueIDFields(cid, writer);
+            if (!clue.isDefaultFlagColor()) {
+                writer.key(FIELD_COLOR).value(colorToHex(clue.getFlagColor()));
+            }
+            writer.endObject();
+
             writer.newLine();
         }
 
@@ -2363,10 +2376,21 @@ public class IPuzIO implements PuzzleParser {
         ClueID cid, FormatableJSONWriter writer
     ) throws IOException {
         if (cid != null) {
-            writer.object()
-                .key(FIELD_CLUE_LISTNAME).value(cid.getListName())
-                .key(FIELD_CLUE_INDEX).value(cid.getIndex())
-                .endObject();
+            writer.object();
+            writeClueIDFields(cid, writer);
+            writer.endObject();
+        }
+    }
+
+    /**
+     * Write ClueID fields without wrapping in an object
+     */
+    private static void writeClueIDFields(
+        ClueID cid, FormatableJSONWriter writer
+    ) throws IOException {
+        if (cid != null) {
+            writer.key(FIELD_CLUE_LISTNAME).value(cid.getListName())
+                .key(FIELD_CLUE_INDEX).value(cid.getIndex());
         }
     }
 

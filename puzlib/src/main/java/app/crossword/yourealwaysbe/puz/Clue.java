@@ -10,6 +10,8 @@ import java.util.Objects;
  * Must have a listName and index, number is optional.
  */
 public class Clue implements Serializable {
+    public static final int DEFAULT_FLAG_COLOR = -1;
+
     private ClueID clueID;
     // because sometimes numbers are alphabetic
     private String number;
@@ -19,6 +21,8 @@ public class Clue implements Serializable {
     private String hint;
     private Zone zone;
     private boolean flagged = false;
+    // 0x00rrggbb or DEFAULT_FLAG_COLOR
+    private int flagColor = DEFAULT_FLAG_COLOR;
 
     public Clue(
         String listName,
@@ -64,6 +68,25 @@ public class Clue implements Serializable {
     public Zone getZone() { return zone; }
     public boolean isFlagged() { return flagged; }
     public void setFlagged(boolean flagged) { this.flagged = flagged; }
+
+    /**
+     * 0x00rrggbb or DEFAULT_FLAG_COLOR
+     */
+    public int getFlagColor() { return flagColor; }
+
+    /**
+     * If no custom flag color has been set
+     */
+    public boolean isDefaultFlagColor() {
+        return flagColor == DEFAULT_FLAG_COLOR;
+    }
+
+    /**
+     * 0x00rrggbb or DEFAULT_FLAG_COLOR
+     */
+    public void setFlagColor(int flagColor) {
+        this.flagColor = flagColor;
+    }
 
     /**
      * The number that should be displayed with the clue
