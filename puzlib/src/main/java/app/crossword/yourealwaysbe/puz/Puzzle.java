@@ -915,7 +915,9 @@ public class Puzzle implements Serializable{
                     + " zone has a block box at position " + pos
                 );
             }
-            box.setCluePosition(clue.getClueID(), offset);
+            // prefer earlier positions if multiple
+            if (!box.hasCluePosition(clue.getClueID()))
+                box.setCluePosition(clue.getClueID(), offset);
         }
     }
 }

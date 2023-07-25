@@ -392,6 +392,13 @@ public class Box implements Serializable {
     }
 
     /**
+     * If a position has already been set for this clue
+     */
+    public boolean hasCluePosition(ClueID clueId) {
+        return cluePositions.containsKey(clueId);
+    }
+
+    /**
      * Get position of box in clue
      *
      * @return postion or -1 if not in clue
