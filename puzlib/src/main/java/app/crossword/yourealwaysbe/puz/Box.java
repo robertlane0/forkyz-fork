@@ -337,8 +337,8 @@ public class Box implements Serializable {
     /**
      * @returns true if box is part of the clue
      */
-    public boolean isPartOf(ClueID clueId) {
-        return cluePositions.containsKey(clueId);
+    public boolean isPartOf(ClueID clueID) {
+        return cluePositions.containsKey(clueID);
     }
 
     public boolean isPartOf(Clue clue) {
@@ -387,24 +387,24 @@ public class Box implements Serializable {
      * @param position if part of a clue, the position in the
      * word
      */
-    public void setCluePosition(ClueID clueId, int position) {
-        cluePositions.put(clueId, position);
+    public void setCluePosition(ClueID clueID, int position) {
+        cluePositions.put(clueID, position);
     }
 
     /**
      * If a position has already been set for this clue
      */
-    public boolean hasCluePosition(ClueID clueId) {
-        return cluePositions.containsKey(clueId);
+    public boolean hasCluePosition(ClueID clueID) {
+        return cluePositions.containsKey(clueID);
     }
 
     /**
      * Get position of box in clue
      *
-     * @return postion or -1 if not in clue
+     * @return position or -1 if not in clue
      */
-    public int getCluePosition(ClueID clueId) {
-        Integer pos = cluePositions.get(clueId);
+    public int getCluePosition(ClueID clueID) {
+        Integer pos = cluePositions.get(clueID);
         return (pos == null) ? -1 : pos;
     }
 
