@@ -1,5 +1,10 @@
 # Forkyz Changelog
 
+## Version 44
+
+- Add cycle on unfilled words option in settings.
+- Add multi-coloured flags (long press flag clue on notes or use menu).
+
 ## Version 43
 
 - Large back-end rework to settings management and other parts (please report issues).

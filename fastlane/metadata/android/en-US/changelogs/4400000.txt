@@ -1,0 +1,2 @@
+- Add cycle on unfilled words option in settings.
+- Add multi-coloured flags (long press flag clue on notes or use menu).
