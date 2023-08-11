@@ -125,7 +125,7 @@ public class BrowseActivity extends ForkyzActivity {
     protected BackgroundDownloadManager backgroundDownloadManager;
 
     @Inject
-    protected FileHandlerProvider fileHanderProvider;
+    protected FileHandlerProvider fileHandlerProvider;
 
     @Inject
     protected DownloadersProvider downloadersProvider;
@@ -167,7 +167,10 @@ public class BrowseActivity extends ForkyzActivity {
      */
     private ActivityResultLauncher<String> writeStorageLauncher
         = registerForActivityResult(new RequestPermission(), isGranted -> {
-            hasWritePermissions = isGranted;
+            // do things that would have been abandoned by permission
+            // missing
+            autoDownloadIfEnabled();
+            startLoadPuzzleList();
         });
 
     private BrowseActivityViewModel model;
@@ -177,7 +180,6 @@ public class BrowseActivity extends ForkyzActivity {
         currentAdapter = null;
     private Handler handler = new Handler(Looper.getMainLooper());
     private NotificationManagerCompat nm;
-    private boolean hasWritePermissions;
     private Set<PuzMetaFile> selected = new HashSet<>();
     private MenuItem viewCrosswordsArchiveMenuItem;
     private Collection<Uri> pendingImports = null;
@@ -224,7 +226,7 @@ public class BrowseActivity extends ForkyzActivity {
 
             Set<PuzMetaFile> toAction = new HashSet<>(selected);
 
-            fileHanderProvider.get(fileHandler -> {
+            fileHandlerProvider.get(fileHandler -> {
                 if (id == R.id.browse_action_delete) {
                     model.deletePuzzles(toAction);
                 } else if (id == R.id.browse_action_archive) {
@@ -426,7 +428,7 @@ public class BrowseActivity extends ForkyzActivity {
                     PuzMetaFile puzMeta
                         = ((FileViewHolder) viewHolder).getPuzMetaFile();
 
-                    fileHanderProvider.get(fileHandler -> {
+                    fileHandlerProvider.get(fileHandler -> {
                     settings.getBrowseSwipeAction(action -> {
                         switch (action) {
                         case DELETE:
@@ -571,7 +573,7 @@ public class BrowseActivity extends ForkyzActivity {
         // permissions checks in onStart to avoid multiple calls via
         // onResume
 
-        fileHanderProvider.isMissingWritePermission(missing -> {
+        fileHandlerProvider.isMissingWritePermission(missing -> {
             if (missing) {
                 boolean showRationale
                     = ActivityCompat.shouldShowRequestPermissionRationale(
@@ -588,8 +590,6 @@ public class BrowseActivity extends ForkyzActivity {
                 }
 
                 return;
-            } else {
-                hasWritePermissions = true;
             }
         });
 
@@ -597,7 +597,7 @@ public class BrowseActivity extends ForkyzActivity {
     }
 
     public void checkNewPuzzle(Consumer<Boolean> cb) {
-        fileHanderProvider.isMissingWritePermission(missing -> {
+        fileHandlerProvider.isMissingWritePermission(missing -> {
             if (missing) {
                 cb.accept(false);
             } else {
@@ -688,22 +688,24 @@ public class BrowseActivity extends ForkyzActivity {
     }
 
     private void autoDownloadIfEnabled() {
-        if (!hasWritePermissions) return;
+        fileHandlerProvider.isMissingWritePermission(missing -> {
+            if (missing) return;
 
-        settings.getBrowseLastDownload(lastDL -> {
-        settings.getDownloadersSettings(downloaderSettings -> {
-        downloadersProvider.get(dls -> {
-            long downloadCutoff
-                = System.currentTimeMillis() - (long) (12 * 60 * 60 * 1000);
+            settings.getBrowseLastDownload(lastDL -> {
+            settings.getDownloadersSettings(downloaderSettings -> {
+            downloadersProvider.get(dls -> {
+                long downloadCutoff
+                    = System.currentTimeMillis() - (long) (12 * 60 * 60 * 1000);
 
-            boolean isDownload = downloaderSettings.getDownloadOnStartup()
-                && downloadCutoff > lastDL;
+                boolean isDownload = downloaderSettings.getDownloadOnStartup()
+                    && downloadCutoff > lastDL;
 
-            if (isDownload) {
-                model.download(LocalDate.now(), dls.getAutoDownloaders());
-                settings.setBrowseLastDownload(System.currentTimeMillis());
-            }
-        });});});
+                if (isDownload) {
+                    model.download(LocalDate.now(), dls.getAutoDownloaders());
+                    settings.setBrowseLastDownload(System.currentTimeMillis());
+                }
+            });});});
+        });
     }
 
     private void startLoadPuzzleList() {
@@ -711,11 +713,11 @@ public class BrowseActivity extends ForkyzActivity {
     }
 
     private void startLoadPuzzleList(boolean archive) {
-        if (!hasWritePermissions) return;
-
-        clearNewPuzzleFlag();
-
-        model.startLoadFiles(archive);
+        fileHandlerProvider.isMissingWritePermission(missing -> {
+            if (missing) return;
+            clearNewPuzzleFlag();
+            model.startLoadFiles(archive);
+        });
     }
 
     private void loadPuzzleAdapter() {
