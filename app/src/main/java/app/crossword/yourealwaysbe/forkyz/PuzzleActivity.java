@@ -188,16 +188,22 @@ public abstract class PuzzleActivity
             return true;
         } else if (id == R.id.puzzle_menu_share_clue) {
             shareClue(false);
+            return true;
         } else if (id == R.id.puzzle_menu_share_clue_response) {
             shareClue(true);
+            return true;
         } else if (id == R.id.puzzle_menu_share_puzzle_full) {
             sharePuzzle(false);
+            return true;
         } else if (id == R.id.puzzle_menu_share_puzzle_orig) {
             sharePuzzle(true);
+            return true;
         } else if (id == R.id.puzzle_menu_open_share_url) {
             openShareUrl();
+            return true;
         } else if (id == R.id.puzzle_menu_ask_chat_gpt) {
             requestHelpForCurrentClue();
+            return true;
         } else if (id == R.id.clue_list_menu_edit_clue) {
             editClue();
             return true;
