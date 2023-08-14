@@ -43,4 +43,8 @@
             />
         </menu>
     </item>
+    <item
+        android:id="@+id/clue_list_menu_edit_clue"
+        android:title="@string/edit_clue"
+    />
 </menu>

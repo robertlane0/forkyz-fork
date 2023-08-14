@@ -47,6 +47,7 @@ import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands;
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider;
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerShared;
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle;
+import app.crossword.yourealwaysbe.forkyz.view.ClueEditDialog;
 import app.crossword.yourealwaysbe.forkyz.view.PlayboardTextRenderer;
 import app.crossword.yourealwaysbe.forkyz.view.PuzzleInfoDialogs;
 import app.crossword.yourealwaysbe.forkyz.view.SpecialEntryDialog;
@@ -197,6 +198,9 @@ public abstract class PuzzleActivity
             openShareUrl();
         } else if (id == R.id.puzzle_menu_ask_chat_gpt) {
             requestHelpForCurrentClue();
+        } else if (id == R.id.clue_list_menu_edit_clue) {
+            editClue();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -928,6 +932,11 @@ public abstract class PuzzleActivity
                     invalidateOptionsMenu();
             }
         });
+    }
+
+    private void editClue() {
+        ClueEditDialog dialog = new ClueEditDialog();
+        dialog.show(getSupportFragmentManager(), "ClueEditDialog");
     }
 
     public static class HelpResponseDialog extends DialogFragment {

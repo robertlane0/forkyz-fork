@@ -492,8 +492,9 @@ public class NotesActivity extends PuzzleActivity {
 
         Note note;
 
+        setClueLineText();
+
         if (isPuzzleNotes()) {
-            binding.clueHolder.clueLine.setText(getString(R.string.player_notes));
             note = puz.getPlayerNote();
             binding.miniboardLab.setVisibility(View.GONE);
             binding.miniboard.setVisibility(View.GONE);
@@ -505,9 +506,6 @@ public class NotesActivity extends PuzzleActivity {
                 );
             });
 
-            getLongClueText(clue, text -> {
-                binding.clueHolder.clueLine.setText(smartHtml(text));
-            });
             note = puz.getNote(clue);
             binding.flagClue.setChecked(clue.isFlagged());
             setFlagClueColor();
@@ -628,10 +626,11 @@ public class NotesActivity extends PuzzleActivity {
         Playboard board = getBoard();
         ClueID cid = (board == null) ? null : board.getClueID();
 
-        if (cid != null && changes.getChangedClueIDs().contains(cid))
+        if (cid != null && changes.getChangedClueIDs().contains(cid)) {
+            setClueLineText();
             setFlagClueColor();
+        }
     }
-
 
     private Set<String> getSuppressNotesList(boolean displayScratch) {
         if (!displayScratch)
@@ -1048,5 +1047,24 @@ public class NotesActivity extends PuzzleActivity {
             return true;
         }
         return false;
+    }
+
+    private void setClueLineText() {
+        if (isPuzzleNotes()) {
+            binding.clueHolder.clueLine.setText(
+                getString(R.string.player_notes)
+            );
+        } else {
+            Clue clue = getNotesClue();
+            if (clue != null) {
+                getLongClueText(clue, text -> {
+                    binding.clueHolder.clueLine.setText(smartHtml(text));
+                });
+            } else {
+                binding.clueHolder.clueLine.setText(
+                    getString(R.string.unknown_hint)
+                );
+            }
+        }
     }
 }
