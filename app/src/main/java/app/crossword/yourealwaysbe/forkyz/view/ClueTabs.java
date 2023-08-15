@@ -443,7 +443,8 @@ public class ClueTabs extends LinearLayout
     }
 
     private class ClueListHolder
-            extends RecyclerView.ViewHolder {
+            extends RecyclerView.ViewHolder
+            implements Playboard.PlayboardListener {
 
         private ClueTabsPageBinding pageBinding;
         private ClueListAdapter clueListAdapter;
@@ -481,6 +482,18 @@ public class ClueTabs extends LinearLayout
             pageBinding.tabClueList.addItemDecoration(new DividerItemDecoration(
                 context, DividerItemDecoration.VERTICAL
             ));
+
+            if (ClueTabs.this.board != null)
+                ClueTabs.this.board.addListener(this);
+        }
+
+        @Override
+        public void onPlayboardChange(PlayboardChanges changes) {
+            boolean wordChange = !Objects.equals(
+                changes.getPreviousWord(), changes.getCurrentWord()
+            );
+            if (wordChange)
+                snapToClueIfEnabled();
         }
 
         /**
@@ -542,16 +555,21 @@ public class ClueTabs extends LinearLayout
 
             clueListAdapter.notifyDataSetChanged();
 
+            snapToClueIfEnabled();
+        }
+
+        private void snapToClueIfEnabled() {
+            Playboard board = ClueTabs.this.board;
             if (board != null) {
                 isSnapToClue(snapToClue -> {
                     if (snapToClue) {
                         switch (pageType) {
                         case CLUES:
                             int position = board.getCurrentClueIndex();
-                            layoutManager.scrollToPositionWithOffset(position, 0);
+                            layoutManager.scrollToPosition(position);
                             break;
                         case HISTORY:
-                            layoutManager.scrollToPositionWithOffset(0, 0);
+                            layoutManager.scrollToPosition(0);
                             break;
                         }
                     }
