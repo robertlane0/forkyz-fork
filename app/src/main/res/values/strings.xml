@@ -203,11 +203,11 @@
     <string name="keyboard_layout">Keyboard Layout</string>
     <string name="keyboard_layout_desc">The layout of the in-app keyboard.</string>
     <string name="snap_current">Snap to Current Word</string>
-    <string name="snap_current_desc">Toggles the auto-scrolling of the playboard to the current play position</string>
+    <string name="snap_current_desc">Toggles auto-scrolling of the playboard to the current play position</string>
     <string name="show_length">Show Length</string>
     <string name="show_length_desc">Shows the number of letters in the answer on the clue line</string>
     <string name="scroll_to_clue">Scroll To Clue</string>
-    <string name="scroll_to_clue_desc">Toggles the auto-scrolling to the selected clue in the clues list. (Works like Forkyz 1)</string>
+    <string name="scroll_to_clue_desc">Toggles auto-scrolling to the selected clue in the clues list. (Works like Shortyz 1)</string>
     <string name="movement_style">Movement Style</string>
     <string name="movement_style_desc">Select what happens when you type past the end of a word.</string>
     <string name="skip_filled">Skip Filled Boxes</string>
