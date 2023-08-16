@@ -76,6 +76,7 @@
                 app:layout_constraintBottom_toBottomOf="@id/keyboard_view"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                android:visibility="gone"
             />
             <app.crossword.yourealwaysbe.forkyz.view.ForkyzKeyboard
                 android:id="@+id/keyboard_view"
@@ -85,6 +86,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                android:visibility="gone"
             />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>
