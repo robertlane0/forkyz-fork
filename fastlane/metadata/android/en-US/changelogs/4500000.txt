@@ -1,0 +1,3 @@
+- Fix broken autodownloads
+- Add edit clue to notes page menu
+- Fix scroll to clue behaviour

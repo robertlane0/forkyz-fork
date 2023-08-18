@@ -1,5 +1,11 @@
 # Forkyz Changelog
 
+## Version 45
+
+- Fix broken autodownloads
+- Add edit clue to notes page menu
+- Fix scroll to clue behaviour
+
 ## Version 44
 
 - Add cycle on unfilled words option in settings.
