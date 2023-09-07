@@ -2,6 +2,8 @@
 
 mkdir ../public
 
+mv ipuz.html ../public/ipuz.html
+
 for file in *.md
 do
     target=../public/$(basename -s .md $file).html

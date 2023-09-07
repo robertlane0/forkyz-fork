@@ -127,9 +127,11 @@ Copyright (C) 2010-2016 Robert Cooper (and 2018- Forkyz Contributors)
 
 Licensed under the GNU General Public License, Version 3
 
-ipuz is a trademark of Puzzazz, used with permission
+ipuz is a trademark of Puzzazz, used with permission.
+The IPuz spec is reproduced [here][ipuz-spec].
 
 [changelogs]: https://hague.gitlab.io/forkyz/changes.html
 [forkyz-scanner]: https://gitlab.com/Hague/forkyzscanner
 [gnome-crosswords]: https://gitlab.gnome.org/jrb/crosswords
 [online-sources]: https://hague.gitlab.io/forkyz/
+[ipuz-spec]: https://hague.gitlab.com/forkyz/ipuz.html
