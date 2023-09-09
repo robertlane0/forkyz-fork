@@ -242,7 +242,9 @@ public abstract class FileHandler {
      *
      * @return null if could not be loaded
      */
-    public synchronized PuzMetaFile loadPuzMetaFile(PuzHandle puzHandle) throws IOException {
+    public synchronized PuzMetaFile loadPuzMetaFile(
+        PuzHandle puzHandle
+    ) throws IOException {
         Puzzle puz = load(puzHandle);
 
         if (puz == null)
@@ -607,7 +609,7 @@ public abstract class FileHandler {
     }
 
     /**
-     * Load .puz/.forkyz file data into the loadedPuzMetas array
+     * Load .ipuz file data into the loadedPuzMetas array
      *
      * @param dirHandle the directory the files are in
      * @param files the list of files in the directory

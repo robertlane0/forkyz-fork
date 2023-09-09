@@ -1,6 +1,7 @@
 package app.crossword.yourealwaysbe.forkyz.util;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -54,8 +55,8 @@ public class PuzzleImporter {
         if (puz == null)
             return null;
 
-        ensurePuzDate(puz);
-        ensurePuzSource(context, puz);
+        ensurePuzDate(puz, uri);
+        ensurePuzSource(context, puz, uri);
 
         try {
             return fileHandler.saveNewPuzzle(
@@ -72,20 +73,40 @@ public class PuzzleImporter {
      *
      * Fall back to author, title, fallback
      */
-    private static void ensurePuzSource(Context context, Puzzle puz) {
-        String source = puz.getSource();
+    private static void ensurePuzSource(
+        Context context, Puzzle puz, Uri puzUri
+    ) {
+        String source = AppPuzzleUtils.deriveSource(
+            puz.getSource(),
+            getFileName(puzUri),
+            puz.getAuthor(),
+            puz.getTitle()
+        );
+
         if (source == null || source.isEmpty())
-            puz.setSource(puz.getAuthor());
-        source = puz.getSource();
-        if (source == null || source.isEmpty())
-            puz.setSource(puz.getTitle());
-        source = puz.getSource();
-        if (source == null || source.isEmpty())
-            puz.setSource(context.getString(R.string.import_fallback_source));
+            source = context.getString(R.string.import_fallback_source);
+
+        puz.setSource(source);
     }
 
-    private static void ensurePuzDate(Puzzle puz) {
-        if (puz.getDate() == null)
-            puz.setDate(LocalDate.now());
+    private static void ensurePuzDate(Puzzle puz, Uri puzUri) {
+        LocalDate date = AppPuzzleUtils.deriveDate(
+            puz.getDate(), getFileName(puzUri)
+        );
+        if (date == null)
+            date = LocalDate.now();
+
+        puz.setDate(date);
+    }
+
+    private static String getFileName(Uri puzUri) {
+        if (puzUri == null)
+            return null;
+
+        String path = puzUri.getPath();
+        if (path != null)
+            return new File(path).getName();
+
+        return null;
     }
 }

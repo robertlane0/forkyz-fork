@@ -34,7 +34,7 @@ public class Puzzle implements Serializable{
     private String introMessage;
     private String completionMessage;
     private Map<String, MutableClueList> clueLists = new HashMap<>();
-    private LocalDate pubdate = LocalDate.now();
+    private LocalDate pubdate = null;
     private String source;
     private String sourceUrl;
     private String shareUrl;

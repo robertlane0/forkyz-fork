@@ -3,6 +3,8 @@ package app.crossword.yourealwaysbe.forkyz.util.files;
 
 import java.time.LocalDate;
 
+import app.crossword.yourealwaysbe.forkyz.util.AppPuzzleUtils;
+
 public class PuzMetaFile
         implements Comparable<PuzMetaFile> {
     private FileHandler fileHandler;
@@ -62,11 +64,16 @@ public class PuzMetaFile
     }
 
     public LocalDate getDate() {
-        if (meta == null || meta.getDate() == null) {
-            return getHandler().getModifiedDate(handle.getMainFileHandle());
-        } else {
-            return meta.getDate();
+        LocalDate date = null;
+        if (meta != null) {
+            String fileName = getHandler().getName(handle.getMainFileHandle());
+            date = AppPuzzleUtils.deriveDate(meta.getDate(), fileName);
         }
+
+        if (date == null)
+            date = getHandler().getModifiedDate(handle.getMainFileHandle());
+
+        return date;
     }
 
     public int getComplete() {
@@ -77,10 +84,21 @@ public class PuzMetaFile
         return (meta == null) ? 0 : meta.getPercentFilled();
     }
 
+    /**
+     * Returns something that can be used as source
+     *
+     * May fall back to derived alternatives if no true source set.
+     */
     public String getSource() {
-        return ((meta == null) || (meta.getSource() == null))
-            ? "Unknown"
-            : meta.getSource();
+        if (meta != null) {
+            String fileName = getHandler().getName(handle.getMainFileHandle());
+            String source = AppPuzzleUtils.deriveSource(
+                meta.getSource(), fileName, meta.getAuthor(), meta.getTitle()
+            );
+            if (source != null)
+                return source;
+        }
+        return "Unknown";
     }
 
     public String getTitle() {

@@ -46,15 +46,21 @@ public class IOVersion1 implements IOVersion {
 
     public PuzzleMeta readMeta(DataInputStream dis) throws IOException {
         PuzzleMeta meta = new PuzzleMeta();
+
         meta.author = IO.readNullTerminatedString(dis, getCharset());
         meta.source = IO.readNullTerminatedString(dis, getCharset());
         meta.title = IO.readNullTerminatedString(dis, getCharset());
-        meta.date =
-            Instant.ofEpochMilli(dis.readLong())
+
+        long dateEpoch = dis.readLong();
+        meta.date = (dateEpoch == 0)
+            ? null
+            : Instant.ofEpochMilli(dis.readLong())
                 .atZone(ZoneId.systemDefault())
                 .toLocalDate();
+
         meta.percentComplete = dis.readInt();
         meta.percentFilled = meta.percentComplete;
+
         return meta;
     }
 
