@@ -187,7 +187,10 @@ public class PreferencesFragment extends PreferencesBaseFragment {
                         newLocation,
                         fileHandlerSettings.getSAFRootURI(),
                         fileHandlerSettings.getSAFCrosswordsURI(),
-                        fileHandlerSettings.getSAFArchiveURI()
+                        fileHandlerSettings.getSAFArchiveURI(),
+                        fileHandlerSettings.getSAFToImportURI(),
+                        fileHandlerSettings.getSAFToImportDoneURI(),
+                        fileHandlerSettings.getSAFToImportFailedURI()
                     ),
                     () -> { newFileHandlerAppExit(); }
                 );

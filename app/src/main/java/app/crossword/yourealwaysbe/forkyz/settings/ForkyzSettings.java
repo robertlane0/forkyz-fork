@@ -90,6 +90,12 @@ public class ForkyzSettings {
         = "safCrosswordsFolderUri";
     private static final String PREF_FILE_HANDLER_SAF_ROOT
         = "safRootUri";
+    private static final String PREF_FILE_HANDLER_SAF_TO_IMPORT
+        = "safToImportFolderUri";
+    private static final String PREF_FILE_HANDLER_SAF_TO_IMPORT_DONE
+        = "safToImportDoneFolderUri";
+    private static final String PREF_FILE_HANDLER_SAF_TO_IMPORT_FAILED
+        = "safToImportFailedFolderUri";
     public static final String PREF_FILE_HANDLER_STORAGE_LOC
         = "storageLocation";
 
@@ -536,13 +542,25 @@ public class ForkyzSettings {
             String safArchive = prefs.getString(
                 PREF_FILE_HANDLER_SAF_ARCHIVE, null
             );
+            String safToImport = prefs.getString(
+                PREF_FILE_HANDLER_SAF_TO_IMPORT, null
+            );
+            String safToImportDone = prefs.getString(
+                PREF_FILE_HANDLER_SAF_TO_IMPORT_DONE, null
+            );
+            String safToImportFailed = prefs.getString(
+                PREF_FILE_HANDLER_SAF_TO_IMPORT_FAILED, null
+            );
 
             handler.post(() -> {
                 cb.accept(new FileHandlerSettings(
                     StorageLocation.fromSettingsValue(storageLocationString),
                     safRoot,
                     safCrosswords,
-                    safArchive
+                    safArchive,
+                    safToImport,
+                    safToImportDone,
+                    safToImportFailed
                 ));
             });
         });

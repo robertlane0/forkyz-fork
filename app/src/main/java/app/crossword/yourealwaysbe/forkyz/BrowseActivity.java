@@ -564,6 +564,7 @@ public class BrowseActivity extends ForkyzActivity {
         });
 
         autoDownloadIfEnabled();
+        model.processToImportDirectory();
     }
 
     @Override

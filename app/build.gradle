@@ -37,7 +37,6 @@ android {
         namespace "app.crossword.yourealwaysbe.forkyz"
         minSdkVersion 14
         targetSdkVersion 33
-        testInstrumentationRunner "android.test.InstrumentationTestRunner"
         multiDexEnabled true
         vectorDrawables {
             useSupportLibrary true
@@ -55,6 +54,12 @@ android {
         coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
     }
 
     signingConfigs {
@@ -99,6 +104,12 @@ android {
             options.compilerArgs << '-Xlint:all' << '-Xlint:-processing'
         }
     }
+
+    // overrides 4.11 dependency of 
+    // com.github.jgraham0325:words-to-numbers:8a97d258fd'
+    configurations.all {
+        resolutionStrategy.force 'junit:junit:4.13.2'
+    }
 }
 
 dependencies {
@@ -137,10 +148,11 @@ dependencies {
 
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.3'
 
-    testImplementation "junit:junit:4.13.2"
-    testImplementation "org.mockito:mockito-core:4.9.0"
+    testImplementation 'junit:junit:4.13.2'
     // thanks https://stackoverflow.com/a/30759769
     testImplementation 'org.json:json:20080701'
+    testImplementation 'org.mockito:mockito-core:4.9.0'
+    testImplementation 'org.robolectric:robolectric:4.10.3'
 
     // To avoid duplicate classes pulled in by libraries
     // https://stackoverflow.com/a/75298544/6882587

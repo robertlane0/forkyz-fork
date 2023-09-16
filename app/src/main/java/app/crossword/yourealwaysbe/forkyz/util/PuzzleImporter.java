@@ -2,19 +2,23 @@ package app.crossword.yourealwaysbe.forkyz.util;
 
 import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import android.content.Context;
 import android.net.Uri;
 
 import app.crossword.yourealwaysbe.forkyz.R;
-import app.crossword.yourealwaysbe.puz.io.PuzzleStreamReader;
-import app.crossword.yourealwaysbe.puz.Puzzle;
+import app.crossword.yourealwaysbe.forkyz.util.files.DirHandle;
+import app.crossword.yourealwaysbe.forkyz.util.files.FileHandle;
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler;
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle;
+import app.crossword.yourealwaysbe.puz.Puzzle;
+import app.crossword.yourealwaysbe.puz.io.PuzzleStreamReader;
 
 /**
  * Takes an arbitrary URI and tries to convert to a puzzle and import
@@ -33,39 +37,58 @@ public class PuzzleImporter {
      * or uri is null)
      */
     public static PuzHandle importUri(
-        Context context,
-        FileHandler fileHandler,
-        Uri uri
+        Context context, FileHandler fileHandler, Uri uri
     ) {
         if (uri == null)
             return null;
 
-        Puzzle puz = null;
-
-        try {
-            puz = PuzzleStreamReader.parseInputStatic(
-                new BufferedInputStream(
-                    context.getContentResolver().openInputStream(uri)
-                )
-            );
-        } catch (FileNotFoundException e) {
-            LOGGER.info("FileNotFoundException with " + uri);
-        }
-
-        if (puz == null)
-            return null;
-
-        ensurePuzDate(puz, uri);
-        ensurePuzSource(context, puz, uri);
-
-        try {
-            return fileHandler.saveNewPuzzle(
-                puz, AppPuzzleUtils.generateFileName(puz)
+        try (
+            InputStream is = new BufferedInputStream(
+                context.getContentResolver().openInputStream(uri)
+            )
+        ) {
+            return importInputStream(
+                context, fileHandler, is, getFileName(uri)
             );
         } catch (IOException e) {
-            LOGGER.severe("Failed to save imported puzzle: " + e);
             return null;
         }
+    }
+
+    public static List<PuzHandle> processToImportDirectory(
+        Context context, FileHandler fileHandler
+    ) {
+        List<PuzHandle> importedFiles = new ArrayList<>();
+
+        DirHandle toImportDir
+            = fileHandler.getToImportDirectory();
+
+        for (FileHandle fh : fileHandler.listFiles(toImportDir)) {
+            try (InputStream is = fileHandler.getBufferedInputStream(fh)) {
+                PuzHandle ph = PuzzleImporter.importInputStream(
+                    context, fileHandler, is, fileHandler.getName(fh)
+                );
+                if (ph == null) {
+                    // deliberately only get once needed to avoid
+                    // unneeded dir creation in java file mode
+                    // (currently SAF creates all dirs upfront)
+                    DirHandle toImportFailedDir
+                        = fileHandler.getToImportFailedDirectory();
+                    fileHandler.moveTo(fh, toImportDir, toImportFailedDir);
+                } else {
+                    DirHandle toImportDoneDir
+                        = fileHandler.getToImportDoneDirectory();
+                    importedFiles.add(ph);
+                    fileHandler.moveTo(fh, toImportDir, toImportDoneDir);
+                }
+            } catch (IOException e) {
+                DirHandle toImportFailedDir
+                    = fileHandler.getToImportFailedDirectory();
+                fileHandler.moveTo(fh, toImportDir, toImportFailedDir);
+            }
+        }
+
+        return importedFiles;
     }
 
     /**
@@ -74,11 +97,11 @@ public class PuzzleImporter {
      * Fall back to author, title, fallback
      */
     private static void ensurePuzSource(
-        Context context, Puzzle puz, Uri puzUri
+        Context context, Puzzle puz, String fileName
     ) {
         String source = AppPuzzleUtils.deriveSource(
             puz.getSource(),
-            getFileName(puzUri),
+            fileName,
             puz.getAuthor(),
             puz.getTitle()
         );
@@ -89,24 +112,45 @@ public class PuzzleImporter {
         puz.setSource(source);
     }
 
-    private static void ensurePuzDate(Puzzle puz, Uri puzUri) {
-        LocalDate date = AppPuzzleUtils.deriveDate(
-            puz.getDate(), getFileName(puzUri)
-        );
+    private static void ensurePuzDate(Puzzle puz, String fileName) {
+        LocalDate date = AppPuzzleUtils.deriveDate(puz.getDate(), fileName);
         if (date == null)
             date = LocalDate.now();
-
         puz.setDate(date);
     }
 
-    private static String getFileName(Uri puzUri) {
-        if (puzUri == null)
+    private static String getFileName(Uri uri) {
+        if (uri == null)
             return null;
 
-        String path = puzUri.getPath();
+        String path = uri.getPath();
         if (path != null)
             return new File(path).getName();
 
         return null;
+    }
+
+    private static PuzHandle importInputStream(
+        Context context,
+        FileHandler fileHandler,
+        InputStream is,
+        String fileName
+    ) throws IOException {
+        Puzzle puz = puz = PuzzleStreamReader.parseInputStatic(is);
+        if (puz == null)
+            return null;
+
+        ensurePuzDate(puz, fileName);
+        ensurePuzSource(context, puz, fileName);
+
+        try {
+            return fileHandler.saveNewPuzzle(
+                puz, AppPuzzleUtils.generateFileName(puz)
+            );
+        } catch (IOException e) {
+            LOGGER.severe("Failed to save imported puzzle: " + e);
+            return null;
+        }
+
     }
 }

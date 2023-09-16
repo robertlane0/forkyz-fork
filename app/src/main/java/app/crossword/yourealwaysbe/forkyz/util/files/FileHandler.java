@@ -78,20 +78,32 @@ public abstract class FileHandler {
         this.metaCache = new MetaCache(applicationContext, this);
     }
 
+    /**
+     * For testing allow a meta cache to be passed in
+     */
+    protected FileHandler(Context applicationContext, MetaCache metaCache) {
+        this.applicationContext = applicationContext;
+        this.metaCache = metaCache;
+    }
+
     public abstract DirHandle getCrosswordsDirectory();
     public abstract DirHandle getArchiveDirectory();
+    public abstract DirHandle getToImportDirectory();
+    public abstract DirHandle getToImportDoneDirectory();
+    public abstract DirHandle getToImportFailedDirectory();
     public abstract boolean isStorageMounted();
     public abstract boolean isStorageFull(AndroidVersionUtils utils);
     public abstract boolean needsWriteExternalStoragePermission();
+    public abstract Iterable<FileHandle> listFiles(final DirHandle dir);
+    public abstract String getName(FileHandle f);
 
-    protected abstract FileHandle getFileHandle(Uri uri);
     protected abstract boolean exists(DirHandle dir);
     protected abstract boolean exists(FileHandle file);
-    protected abstract Iterable<FileHandle> listFiles(final DirHandle dir);
     protected abstract Uri getUri(DirHandle f);
     protected abstract Uri getUri(FileHandle f);
-    protected abstract String getName(FileHandle f);
     protected abstract long getLastModified(FileHandle file);
+
+    protected abstract FileHandle getFileHandle(Uri uri);
 
     /**
      * Get output stream to file, erasing previous contents
@@ -101,6 +113,36 @@ public abstract class FileHandler {
 
     protected abstract InputStream getInputStream(FileHandle fileHandle)
         throws IOException;
+
+    /**
+     * Create a new file in the directory with the given display name
+     *
+     * Do not save puzzles using these file handles, instead go via
+     * save(Puzzle, DirHandle, String) that will use the preferred
+     * backend file format for puzzles.
+     *
+     * Return null if could not be created. E.g. if the file already
+     * exists.
+     */
+    protected abstract FileHandle createFileHandle(
+        DirHandle dir, String fileName, String mimeType
+    );
+
+    /**
+     * Provide a moveTo implementation
+     *
+     * Assume in a synced class
+     */
+    protected abstract void moveToUnsync(
+        FileHandle fileHandle, DirHandle srcDirHandle, DirHandle destDirHandle
+    );
+
+    /**
+     * Provide a delete implementation
+     *
+     * Assume in a synced class
+     */
+    protected abstract void deleteUnsync(FileHandle fileHandle);
 
     public Uri getUri(PuzHandle puzHandle) {
         return getUri(puzHandle.getMainFileHandle());
@@ -195,6 +237,19 @@ public abstract class FileHandler {
 
         // TODO: can we move record instead? What is new Uri?
         metaCache.deleteRecord(ph);
+    }
+
+    /**
+     * Move a file to a different directory
+     *
+     * @param fileHandle file to move
+     * @param srcDirHandle the directory containing the file to move
+     * @param destDirHandle the destination directory
+     */
+    public synchronized void moveTo(
+        FileHandle fileHandle, DirHandle srcDirHandle, DirHandle destDirHandle
+    ) {
+        moveToUnsync(fileHandle, srcDirHandle, destDirHandle);
     }
 
     /**
@@ -359,60 +414,24 @@ public abstract class FileHandler {
         }
     }
 
+    public BufferedInputStream getBufferedInputStream(FileHandle fileHandle)
+        throws IOException {
+        return new BufferedInputStream(getInputStream(fileHandle));
+    }
+
     protected LocalDate getModifiedDate(FileHandle file) {
         return Instant.ofEpochMilli(getLastModified(file))
                     .atZone(ZoneId.systemDefault())
                     .toLocalDate();
     }
 
-    /**
-     * Create a new file in the directory with the given display name
-     *
-     * Do not save puzzles using these file handles, instead go via
-     * save(Puzzle, DirHandle, String) that will use the preferred
-     * backend file format for puzzles.
-     *
-     * Return null if could not be created. E.g. if the file already
-     * exists.
-     */
-    protected abstract FileHandle createFileHandle(
-        DirHandle dir, String fileName, String mimeType
-    );
-
-    /**
-     * Provide a moveTo implementation
-     *
-     * Assume in a synced class
-     */
-    protected abstract void moveToUnsync(
-        FileHandle fileHandle, DirHandle srcDirHandle, DirHandle destDirHandle
-    );
-
-    /**
-     * Provide a delete implementation
-     *
-     * Assume in a synced class
-     */
-    protected abstract void deleteUnsync(FileHandle fileHandle);
-
     protected BufferedOutputStream getBufferedOutputStream(FileHandle fileHandle)
         throws IOException {
         return new BufferedOutputStream(getOutputStream(fileHandle));
     }
 
-    protected BufferedInputStream getBufferedInputStream(FileHandle fileHandle)
-        throws IOException {
-        return new BufferedInputStream(getInputStream(fileHandle));
-    }
-
     protected synchronized void delete(FileHandle fileHandle) {
         deleteUnsync(fileHandle);
-    }
-
-    protected synchronized void moveTo(
-        FileHandle fileHandle, DirHandle srcDirHandle, DirHandle destDirHandle
-    ) {
-        moveToUnsync(fileHandle, srcDirHandle, destDirHandle);
     }
 
     protected String getMetaFileName(FileHandle puzFile) {

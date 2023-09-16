@@ -103,6 +103,8 @@
                         android:text="@string/flag_clue"
                         android:paddingEnd="4dp"
                         android:paddingRight="4dp"
+                        android:paddingStart="4dp"
+                        android:paddingLeft="4dp"
                     />
                     <TextView
                         android:id="@+id/anagram_source_lab"

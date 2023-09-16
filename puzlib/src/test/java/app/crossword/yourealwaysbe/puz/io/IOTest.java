@@ -13,7 +13,6 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.time.LocalDate;
 
 import org.junit.jupiter.api.Test;
 
@@ -139,7 +138,6 @@ public class IOTest {
                 InputStream isp = new FileInputStream(tmp)
             ) {
                 Puzzle p = IO.loadNative(isp);
-                p.setDate(LocalDate.now());
                 p.setSource("Unit Test");
                 // Check HTML stripped/restored
                 p.setNotes("X &nbsp; X<br/>");

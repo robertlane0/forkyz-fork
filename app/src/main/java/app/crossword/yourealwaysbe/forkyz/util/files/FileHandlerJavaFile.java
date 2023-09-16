@@ -30,19 +30,80 @@ public abstract class FileHandlerJavaFile extends FileHandler {
         this.rootDirectory = rootDirectory;
     }
 
+    /**
+     * For testing purposes, allow a meta cache to be passed in
+     */
+    public FileHandlerJavaFile(
+        Context applicationContext, MetaCache metaCache, File rootDirectory
+    ) {
+        super(applicationContext, metaCache);
+        this.rootDirectory = rootDirectory;
+    }
+
     @Override
     public DirHandle getCrosswordsDirectory() {
-        File cwDir =
-            new File(getRootDirectory(), "crosswords");
-        cwDir.mkdirs();
-        return new DirHandle(cwDir);
+        return getGenericDirectory("crosswords");
     }
 
     @Override
     public DirHandle getArchiveDirectory() {
-        File arDir = new File(getRootDirectory(), "crosswords/archive");
-        arDir.mkdirs();
-        return new DirHandle(arDir);
+        return getGenericDirectory("crosswords/archive");
+    }
+
+    @Override
+    public DirHandle getToImportDirectory() {
+        return getGenericDirectory("crosswords/to-import");
+    }
+
+    @Override
+    public DirHandle getToImportDoneDirectory() {
+        return getGenericDirectory("crosswords/to-import-done");
+    }
+
+    @Override
+    public DirHandle getToImportFailedDirectory() {
+        return getGenericDirectory("crosswords/to-import-failed");
+    }
+
+    @Override
+    public Iterable<FileHandle> listFiles(final DirHandle dir) {
+        return new Iterable<FileHandle>() {
+            public Iterator<FileHandle> iterator() {
+                return new Iterator<FileHandle>() {
+                    private int pos = 0;
+                    private File[] files = dir.getFile().listFiles();
+                    private File next = getNext();
+
+                    public boolean hasNext() {
+                        return next != null;
+                    }
+
+                    public FileHandle next() {
+                        File result = next;
+                        next = getNext();
+                        return new FileHandle(result);
+                    }
+
+                    private File getNext() {
+                        if (files == null)
+                            return null;
+
+                        while (pos < files.length) {
+                            next = files[pos++];
+                            if (next.isFile())
+                                return next;
+                        }
+
+                        return null;
+                    }
+                };
+            }
+        };
+    }
+
+    @Override
+    public String getName(FileHandle f) {
+        return f.getFile().getName();
     }
 
     @Override
@@ -61,26 +122,6 @@ public abstract class FileHandlerJavaFile extends FileHandler {
     }
 
     @Override
-    protected Iterable<FileHandle> listFiles(final DirHandle dir) {
-        return new Iterable<FileHandle>() {
-            public Iterator<FileHandle> iterator() {
-                return new Iterator<FileHandle>() {
-                    private int pos = 0;
-                    private File[] files = dir.getFile().listFiles();
-
-                    public boolean hasNext() {
-                        return files == null ? false : pos < files.length;
-                    }
-
-                    public FileHandle next() {
-                        return new FileHandle(files[pos++]);
-                    }
-                };
-            }
-        };
-    }
-
-    @Override
     protected Uri getUri(DirHandle d) {
         return d.getUri();
     }
@@ -88,11 +129,6 @@ public abstract class FileHandlerJavaFile extends FileHandler {
     @Override
     protected Uri getUri(FileHandle f) {
         return f.getUri();
-    }
-
-    @Override
-    protected String getName(FileHandle f) {
-        return f.getFile().getName();
     }
 
     @Override
@@ -139,5 +175,11 @@ public abstract class FileHandlerJavaFile extends FileHandler {
 
     private File getRootDirectory() {
         return rootDirectory;
+    }
+
+    private DirHandle getGenericDirectory(String path) {
+        File dir = new File(getRootDirectory(), path);
+        dir.mkdirs();
+        return new DirHandle(dir);
     }
 }

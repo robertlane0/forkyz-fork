@@ -84,7 +84,7 @@ public class BrowseActivityViewModel extends AndroidViewModel {
         this.fileHandlerProvider = fileHandlerProvider;
         this.currentPuzzleHolder = currentPuzzleHolder;
         this.downloadersProvider = downloadersProvider;
-        isUIBusy.setValue(false);
+        isUIBusy.postValue(false);
     }
 
     /**
@@ -382,6 +382,31 @@ public class BrowseActivityViewModel extends AndroidViewModel {
                 handler.post(() -> {
                     callback.accept(finalSomeFailed, finalSomeSucceeded);
                 });
+            });
+        });
+    }
+
+    /**
+     * Process to-import folder
+     *
+     * Import puzzles in there, move successful files to to-import-done
+     */
+    public void processToImportDirectory() {
+        fileHandlerProvider.get(fileHandler -> {
+            threadWithUILock(() -> {
+                List<PuzHandle> imported
+                    = PuzzleImporter.processToImportDirectory(
+                        getApplication(), fileHandler
+                    );
+
+                for (PuzHandle ph : imported) {
+                    try {
+                        PuzMetaFile pm = fileHandler.loadPuzMetaFile(ph);
+                        addPuzzleToList(pm);
+                    } catch (IOException e) {
+                        LOGGER.warning("Could not load meta for handle " + ph);
+                    }
+                }
             });
         });
     }
