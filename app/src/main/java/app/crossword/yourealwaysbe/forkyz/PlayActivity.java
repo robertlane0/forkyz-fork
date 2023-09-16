@@ -1107,7 +1107,8 @@ public class PlayActivity extends PuzzleActivity
                 if (shakeDetector == null)
                     shakeDetector = new ShakeDetector(this);
                 shakeDetector.start(
-                    (SensorManager) getSystemService(SENSOR_SERVICE)
+                    (SensorManager) getSystemService(SENSOR_SERVICE),
+                    SensorManager.SENSOR_DELAY_GAME
                 );
             }
         });
