@@ -84,6 +84,8 @@ Puzzles can be obtained in three ways:
 * scanning with the [Forkyz Scanner][forkyz-scanner] companion app, or
 * use the built-in downloaders.
 
+Importing files can be done either by using the "+" button in the puzzle list page, or by dropping files into the "to-import" directory.
+
 Files for import can be downloaded from a [number of websites][online-sources], or anywhere else you find them. I generally prefer this method over the downloaders since you get involved with the community.
 
 Supported import file formats (can be zipped or unzipped):
