@@ -550,6 +550,9 @@ public class FileHandlerSAF extends FileHandler {
         // do a search
         Uri[] desiredUris = new Uri[names.length];
         try (
+            // would be nice to select only folders, but selection args
+            // are ignored atmo
+            // https://stackoverflow.com/a/61214849/6882587
             Cursor cursor = resolver.query(
                 childrenUri,
                 new String[] {
