@@ -71,6 +71,12 @@ public class FileHandlerProvider {
 
     private void createFileHandler(Consumer<FileHandler> cb) {
         settings.getFileHandlerSettings(fileHandlerSettings -> {
+            // check hasn't been made in the meantime
+            if (fileHandler != null) {
+                cb.accept(fileHandler);
+                return;
+            }
+
             FileHandler fh;
 
             StorageLocation loc = fileHandlerSettings.getStorageLocation();
