@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.BiConsumer;
@@ -28,6 +29,7 @@ import app.crossword.yourealwaysbe.forkyz.net.Downloader;
 import app.crossword.yourealwaysbe.forkyz.net.DownloadersProvider;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder;
+import app.crossword.yourealwaysbe.forkyz.util.FilteredList;
 import app.crossword.yourealwaysbe.forkyz.util.PuzzleImporter;
 import app.crossword.yourealwaysbe.forkyz.util.SingleLiveEvent;
 import app.crossword.yourealwaysbe.forkyz.util.files.DirHandle;
@@ -61,8 +63,9 @@ public class BrowseActivityViewModel extends AndroidViewModel {
 
     private boolean isViewArchive = false;
 
-    private MutableLiveData<List<MutableLiveData<PuzMetaFile>>> puzzleFiles
-        = new MutableLiveData<>();
+    private MutableLiveData<FilteredList<MutableLiveData<PuzMetaFile>>>
+        puzzleFiles = new MutableLiveData<>();
+    private MutableLiveData<String> puzzleFilter = new MutableLiveData<>();
     // busy with something that isn't downloading
     private MutableLiveData<Boolean> isUIBusy
         = new MutableLiveData<Boolean>();
@@ -84,7 +87,17 @@ public class BrowseActivityViewModel extends AndroidViewModel {
         this.fileHandlerProvider = fileHandlerProvider;
         this.currentPuzzleHolder = currentPuzzleHolder;
         this.downloadersProvider = downloadersProvider;
+
         isUIBusy.postValue(false);
+        this.puzzleFilter.observeForever(this::setNewPuzzleFilter);
+    }
+
+    public MutableLiveData<String> getPuzzleFilter() {
+        return puzzleFilter;
+    }
+
+    public void clearPuzzleFilter() {
+        getPuzzleFilter().postValue(null);
     }
 
     /**
@@ -98,7 +111,7 @@ public class BrowseActivityViewModel extends AndroidViewModel {
      * The puzzle list might have items added to it, a new value will be
      * posted, containing the same list with the new item at the end.
      */
-    public MutableLiveData<List<MutableLiveData<PuzMetaFile>>>
+    public MutableLiveData<FilteredList<MutableLiveData<PuzMetaFile>>>
     getPuzzleFiles() {
         return puzzleFiles;
     }
@@ -127,8 +140,8 @@ public class BrowseActivityViewModel extends AndroidViewModel {
                     ? fileHandler.getArchiveDirectory()
                     : fileHandler.getCrosswordsDirectory();
 
-                List<MutableLiveData<PuzMetaFile>> puzFiles
-                    = new ArrayList<>();
+                FilteredList<MutableLiveData<PuzMetaFile>> puzFiles
+                    = new FilteredList<>(this::metaMatches);
 
                 for (PuzMetaFile pm : fileHandler.getPuzMetas(directory)) {
                     puzFiles.add(new MutableLiveData<>(pm));
@@ -138,7 +151,7 @@ public class BrowseActivityViewModel extends AndroidViewModel {
                 // puzzleFiles does
                 handler.post(() -> {
                     setIsViewArchive(archive);
-                    puzzleFiles.setValue(puzFiles);
+                    setNewPuzzleList(puzFiles);
                 });
             });
         });
@@ -455,11 +468,31 @@ public class BrowseActivityViewModel extends AndroidViewModel {
      * Don't add the same file twice!
      */
     private void addPuzzleToList(PuzMetaFile puzMeta) {
-        List<MutableLiveData<PuzMetaFile>> files = puzzleFiles.getValue();
-        if (files != null) {
-            files.add(new MutableLiveData<>(puzMeta));
-            puzzleFiles.postValue(files);
-        }
+        FilteredList<MutableLiveData<PuzMetaFile>> files
+            = puzzleFiles.getValue();
+
+        if (files == null)
+            return;
+
+        files.add(new MutableLiveData<>(puzMeta));
+        puzzleFiles.postValue(files);
+    }
+
+    private void setNewPuzzleList(
+        FilteredList<MutableLiveData<PuzMetaFile>> newList
+    ) {
+        setNewPuzzleListAndFilter(newList, puzzleFilter.getValue());
+    }
+
+    private void setNewPuzzleFilter(String filterValue) {
+        setNewPuzzleListAndFilter(puzzleFiles.getValue(), filterValue);
+    }
+
+    private void setNewPuzzleListAndFilter(
+        FilteredList<MutableLiveData<PuzMetaFile>> newList, String newFilter
+    ) {
+        newList.applyFilter(newFilter);
+        puzzleFiles.setValue(newList);
     }
 
     /**
@@ -488,5 +521,35 @@ public class BrowseActivityViewModel extends AndroidViewModel {
                 .remove(delIndex)
                 .postValue(null);
         }
+    }
+
+    private boolean metaMatches(
+        MutableLiveData<PuzMetaFile> pmLiveData, String filterText
+    ) {
+        PuzMetaFile pm = (pmLiveData == null) ? null : pmLiveData.getValue();
+
+        if (pm == null)
+            return false;
+
+        if (filterText == null)
+            return false;
+
+        Locale locale = Locale.getDefault();
+
+        filterText = filterText.toUpperCase(locale);
+
+        if (pm.getCaption().toUpperCase(locale).contains(filterText))
+            return true;
+
+        if (pm.getTitle().toUpperCase(locale).contains(filterText))
+            return true;
+
+        if (pm.getAuthor().toUpperCase(locale).contains(filterText))
+            return true;
+
+        if (pm.getSource().toUpperCase(locale).contains(filterText))
+            return true;
+
+        return false;
     }
 }

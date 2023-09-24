@@ -86,6 +86,9 @@
     <string name="new_version_title">Welcome to Forkyz Version %1$s</string>
     <string name="new_version_message">A list of changes is available in the release notes in settings.</string>
     <string name="view_release_notes">View Changes</string>
+    <string name="filter_hint">Filter Text</string>
+    <string name="close_filter_desc">Close Filter</string>
+    <string name="filter_puzzles">Filter Puzzles</string>
 
     <!-- play page -->
     <string name="open_clue_list">Open clue list</string>

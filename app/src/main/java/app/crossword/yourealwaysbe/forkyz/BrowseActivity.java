@@ -310,7 +310,10 @@ public class BrowseActivity extends ForkyzActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.browse_menu_app_theme) {
+        if (id == R.id.browse_menu_filter) {
+            showPuzzleFilter();
+            return true;
+        } else if (id == R.id.browse_menu_app_theme) {
             nightMode.next(newMode -> {
                 item.setIcon(getNightModeIcon(newMode));
             });
@@ -467,6 +470,8 @@ public class BrowseActivity extends ForkyzActivity {
             BrowseActivity.this.loadPuzzleAdapter();
             binding.swipeContainer.setRefreshing(false);
         });
+        binding.setViewModel(model);
+        binding.setLifecycleOwner(this);
 
         model.getIsUIBusy().observe(this, (isBusy) -> {
             if (isBusy)
@@ -488,6 +493,8 @@ public class BrowseActivity extends ForkyzActivity {
                  }
              }
          );
+
+        setupPuzzleFilter();
 
         setViewCrosswordsOrArchiveUI();
         // populated properly inside onResume or with puzzle list
@@ -1010,6 +1017,27 @@ public class BrowseActivity extends ForkyzActivity {
         a.setShowAsAction(
             MenuItem.SHOW_AS_ACTION_WITH_TEXT + MenuItem.SHOW_AS_ACTION_IF_ROOM
         );
+    }
+
+    private void setupPuzzleFilter() {
+        binding.closeFilterButton.setOnClickListener(view -> {
+            closePuzzleFilter();
+        });
+
+        String filterValue = model.getPuzzleFilter().getValue();
+        binding.filterPanel.setVisibility(
+            filterValue == null ? View.GONE : View.VISIBLE
+        );
+    }
+
+    private void showPuzzleFilter() {
+        model.getPuzzleFilter().setValue("");
+        binding.filterPanel.setVisibility(View.VISIBLE);
+    }
+
+    private void closePuzzleFilter() {
+        model.clearPuzzleFilter();
+        binding.filterPanel.setVisibility(View.GONE);
     }
 
     private class FileAdapter

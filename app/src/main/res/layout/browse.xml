@@ -3,6 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
 >
+    <data>
+        <variable
+            name="view_model"
+            type="app.crossword.yourealwaysbe.forkyz.BrowseActivityViewModel"
+        />
+    </data>
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
@@ -33,6 +39,44 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical"
             >
+                <LinearLayout
+                    android:id="@+id/filter_panel"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:visibility="gone"
+                >
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="@string/filter_hint"
+                        android:padding="4dp"
+                    >
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/filter_edit_box"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="text"
+                            android:autofillHints=".AUTOFILL_HINT_NOT_APPLICABLE"
+                            android:text="@={view_model.puzzleFilter}"
+                        />
+                    </com.google.android.material.textfield.TextInputLayout>
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/close_filter_button"
+                        android:layout_height="wrap_content"
+                        android:layout_width="40dp"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginEnd="4dp"
+                        android:layout_marginLeft="4dp"
+                        android:layout_marginRight="4dp"
+                        app:icon="@drawable/ic_close"
+                        android:contentDescription="@string/close_filter_desc"
+                        app:iconPadding="0dp"
+                        app:iconGravity="textStart"
+                        style="@style/Widget.Material3.Button.ElevatedButton"
+                    />
+                </LinearLayout>
                 <TextView
                     android:id="@+id/empty_listing_msg"
                     android:layout_width="wrap_content"

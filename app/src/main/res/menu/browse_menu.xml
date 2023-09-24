@@ -4,6 +4,12 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
 >
     <item
+        android:id="@+id/browse_menu_filter"
+        android:icon="@drawable/ic_search"
+        android:title="@string/filter_puzzles"
+        app:showAsAction="ifRoom"
+    />
+    <item
         android:id="@+id/browse_menu_app_theme"
         android:icon="@drawable/system_daynight_mode"
         android:title="@string/app_theme"
