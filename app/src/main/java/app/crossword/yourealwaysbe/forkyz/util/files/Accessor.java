@@ -8,7 +8,7 @@ public interface Accessor extends Comparator<PuzMetaFile> {
     Accessor DATE_ASC = new Accessor() {
             public String getLabel(PuzMetaFile o) {
                 DateTimeFormatter df
-                    = DateTimeFormatter.ofPattern("EEEE MMM dd, yyyy");
+                    = DateTimeFormatter.ofPattern("EEEE dd MMM yyyy");
 
                 return df.format(o.getDate());
             }
@@ -22,7 +22,7 @@ public interface Accessor extends Comparator<PuzMetaFile> {
     Accessor DATE_DESC = new Accessor() {
             public String getLabel(PuzMetaFile o) {
                 DateTimeFormatter df
-                    = DateTimeFormatter.ofPattern("EEEE MMM dd, yyyy");
+                    = DateTimeFormatter.ofPattern("EEEE dd MMM yyyy");
 
                 return df.format(o.getDate());
             }

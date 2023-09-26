@@ -116,7 +116,7 @@ public class BrowseActivity extends ForkyzActivity {
         = Logger.getLogger(BrowseActivity.class.getCanonicalName());
 
     private static final DateTimeFormatter DATE_FORMAT
-        = DateTimeFormatter.ofPattern("EEEE\n MMM dd, yyyy");
+        = DateTimeFormatter.ofPattern("EEEE\ndd MMM\nyyyy");
 
     @Inject
     protected MigrationHelper migrationHelper;

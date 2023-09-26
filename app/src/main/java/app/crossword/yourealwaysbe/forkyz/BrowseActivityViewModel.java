@@ -4,6 +4,7 @@ package app.crossword.yourealwaysbe.forkyz;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.Period;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -45,6 +46,9 @@ import app.crossword.yourealwaysbe.puz.Puzzle;
 public class BrowseActivityViewModel extends AndroidViewModel {
     private static final Logger LOGGER
         = Logger.getLogger(BrowseActivityViewModel.class.getCanonicalName());
+
+    private static final DateTimeFormatter MATCHER_DATE_FORMAT
+        = DateTimeFormatter.ofPattern("EEEE dd MMM yyyy");
 
     // important that it is single thread to avoid multiple
     // simultaneous operations
@@ -548,6 +552,13 @@ public class BrowseActivityViewModel extends AndroidViewModel {
             return true;
 
         if (pm.getSource().toUpperCase(locale).contains(filterText))
+            return true;
+
+        if (
+            MATCHER_DATE_FORMAT.format(pm.getDate())
+                .toUpperCase(locale)
+                .contains(filterText)
+        )
             return true;
 
         return false;
