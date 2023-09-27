@@ -29,12 +29,38 @@ public class AppPuzzleUtilsTest {
     }
 
     @Test
-    public void testDeriveSourceFile() {
+    public void testDeriveSourceFileXWordDL() {
         assertEquals(
             "FileSource",
             AppPuzzleUtils.deriveSource(
                 null,
                 "FileSource - 20230101 - FileTitle.puz",
+                "Author",
+                "Title"
+            )
+        );
+    }
+
+    @Test
+    public void testDeriveSourceFileForkyz() {
+        assertEquals(
+            "FileSource",
+            AppPuzzleUtils.deriveSource(
+                null,
+                "2023-1-15-FileSource.ipuz",
+                "Author",
+                "Title"
+            )
+        );
+    }
+
+    @Test
+    public void testDeriveSourceFileForkyzUUID() {
+        assertEquals(
+            "FileSource",
+            AppPuzzleUtils.deriveSource(
+                null,
+                "2023-1-15-FileSource-a1b2c3d4.ipuz",
                 "Author",
                 "Title"
             )
@@ -92,12 +118,22 @@ public class AppPuzzleUtilsTest {
 
     }
 
-    public void testDeriveDateFile() {
+    public void testDeriveDateFileXWordDL() {
         assertEquals(
             null,
             AppPuzzleUtils.deriveDate(
                 LocalDate.of(2023, 01, 02),
                 "FileSource - 20230101 - FileTitle.puz"
+            )
+        );
+    }
+
+    public void testDeriveDateFileForkyz() {
+        assertEquals(
+            null,
+            AppPuzzleUtils.deriveDate(
+                LocalDate.of(2023, 01, 12),
+                "2023-1-12-FileSource.ipuz"
             )
         );
 

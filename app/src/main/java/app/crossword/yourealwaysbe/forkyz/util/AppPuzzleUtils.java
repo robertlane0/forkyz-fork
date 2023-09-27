@@ -19,15 +19,18 @@ public class AppPuzzleUtils {
     private static final String FILE_NAME_REMOVE_CHARS = "[^A-Za-z0-9]";
 
     // source - yyyymmdd - title.puz (title optional)
-    private static final Pattern XWORD_DL_FILENAME_FORMATS
-        = Pattern.compile(
-            "(.*) - (\\d{8})(?: - .*)?\\.\\w*",
-            Pattern.CASE_INSENSITIVE
-        );
-    private static final int XWORD_DL_SOURCE_GRP = 1;
-    private static final int XWORD_DL_DATE_GRP = 2;
-    private static final DateTimeFormatter XWORD_DL_DATE_FORMATTER
-        = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US);
+    private static final FilenameFormat[] FILE_NAME_FORMATS
+        = new FilenameFormat[] {
+            // Default xword-dl format
+            new FilenameFormat(
+                "(.*) - (\\d{8})(?: - .*)?\\.\\w*", 1, 2, "yyyyMMdd"
+            ),
+            // Forkyz style file names
+            new FilenameFormat(
+                "(\\d{4}-\\d{1,2}-\\d{1,2})-(\\w*)(?:-.*)?\\.\\w*",
+                2, 1, "yyyy-M-d"
+            )
+        };
 
     /**
      * Generate a file name for the given puzzle
@@ -70,9 +73,11 @@ public class AppPuzzleUtils {
             return source;
 
         if (filename != null && !filename.isEmpty()) {
-            Matcher matcher = XWORD_DL_FILENAME_FORMATS.matcher(filename);
-            if (matcher.find())
-                return matcher.group(XWORD_DL_SOURCE_GRP);
+            for (FilenameFormat fmt : FILE_NAME_FORMATS) {
+                Matcher matcher = fmt.regex.matcher(filename);
+                if (matcher.find())
+                    return matcher.group(fmt.sourceGrp);
+            }
         }
 
         if (author != null && !author.isEmpty())
@@ -97,19 +102,41 @@ public class AppPuzzleUtils {
             return date;
 
         if (filename != null) {
-            Matcher matcher = XWORD_DL_FILENAME_FORMATS.matcher(filename);
-            if (matcher.find()) {
-                try {
-                    return LocalDate.parse(
-                        matcher.group(XWORD_DL_DATE_GRP),
-                        XWORD_DL_DATE_FORMATTER
-                    );
-                } catch (DateTimeParseException e) {
-                    // fall through
+            for (FilenameFormat fmt : FILE_NAME_FORMATS) {
+                Matcher matcher = fmt.regex.matcher(filename);
+                if (matcher.find()) {
+                    try {
+                        return LocalDate.parse(
+                            matcher.group(fmt.dateGrp), fmt.dateFormat
+                        );
+                    } catch (DateTimeParseException e) {
+                        // fall through
+                    }
                 }
             }
         }
 
         return null;
+    }
+
+    // TODO: make record class once supported
+    private static class FilenameFormat {
+        final Pattern regex;
+        final int dateGrp;
+        final int sourceGrp;
+        final DateTimeFormatter dateFormat;
+
+        FilenameFormat(
+            String regex,
+            int sourceGrp,
+            int dateGrp,
+            String dateFormat
+        ) {
+            this.regex = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+            this.sourceGrp = sourceGrp;
+            this.dateGrp = dateGrp;
+            this.dateFormat
+                = DateTimeFormatter.ofPattern(dateFormat, Locale.US);
+        }
     }
 }
