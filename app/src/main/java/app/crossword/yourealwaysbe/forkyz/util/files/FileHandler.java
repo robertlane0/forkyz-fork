@@ -464,16 +464,7 @@ public abstract class FileHandler {
 
     private synchronized Puzzle load(PuzHandle.Puz ph) throws IOException {
         FileHandle metaFile = ph.getMetaFileHandle();
-        if (metaFile == null) {
-            try (
-                DataInputStream fis
-                    = new DataInputStream(
-                        getBufferedInputStream(
-                            ph.getMainFileHandle()))
-            ) {
-                return IO.loadNative(fis);
-            }
-        } else {
+        if (metaFile != null) {
             try (
                 DataInputStream pis
                     = new DataInputStream(
@@ -485,7 +476,23 @@ public abstract class FileHandler {
                             ph.getMetaFileHandle()))
             ) {
                 return IO.load(pis, mis);
+            } catch (IOException e) {
+                LOGGER.warning(
+                    "Could not load "
+                    + ph.getMainFileHandle().getUri()
+                    + ". Trying again without metadata."
+                );
+                // fall through to try without meta
             }
+        }
+
+        try (
+            DataInputStream fis
+                = new DataInputStream(
+                    getBufferedInputStream(
+                        ph.getMainFileHandle()))
+        ) {
+            return IO.loadNative(fis);
         }
     }
 
