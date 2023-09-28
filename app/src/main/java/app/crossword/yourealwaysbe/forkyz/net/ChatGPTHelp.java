@@ -4,6 +4,7 @@ package app.crossword.yourealwaysbe.forkyz.net;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -31,6 +32,8 @@ public class ChatGPTHelp {
         = "https://api.openai.com/v1/completions";
     private static final String CHAT_GPT_MODEL = "text-davinci-003";
     private static final String CHAT_GPT_RESPONSE_CHOICES = "choices";
+    private static final String CHAT_GPT_RESPONSE_ERROR = "error";
+    private static final String CHAT_GPT_RESPONSE_MESSAGE = "message";
     private static final String CHAT_GPT_RESPONSE_TEXT = "text";
     private static final double CHAT_GPT_TEMPERATURE = 1.0;
     private static final int CHAT_GPT_MAX_TOKENS = 500;
@@ -103,28 +106,23 @@ public class ChatGPTHelp {
             BufferedOutputStream os
                 = new BufferedOutputStream(conn.getOutputStream())
         ) {
-            byte[] bytes
-                = data.toString().getBytes("utf-8");
+            byte[] bytes = data.toString().getBytes("utf-8");
             os.write(bytes, 0, bytes.length);
         }
     }
 
     private String getQueryResponse(HttpURLConnection conn)
             throws IOException, JSONException {
-        if (conn.getResponseCode() != HTTP_OK_RESPONSE)
-            return null;
+        if (conn.getResponseCode() != HTTP_OK_RESPONSE) {
+            try (InputStream is = conn.getErrorStream()) {
+                JSONObject json = streamToJSON(is);
+                return json.getJSONObject(CHAT_GPT_RESPONSE_ERROR)
+                        .getString(CHAT_GPT_RESPONSE_MESSAGE);
+            }
+        }
 
-        try (
-            BufferedReader is = new BufferedReader(
-                new InputStreamReader(conn.getInputStream())
-            )
-        ) {
-            StringBuilder sb = new StringBuilder();
-            String line;
-            while ((line = is.readLine()) != null)
-                sb.append(line);
-
-            JSONObject response = new JSONObject(sb.toString());
+        try (InputStream is = conn.getInputStream()) {
+            JSONObject response = streamToJSON(is);
             JSONArray choices
                 = response.getJSONArray(CHAT_GPT_RESPONSE_CHOICES);
             JSONObject first = choices.getJSONObject(0);
@@ -194,6 +192,22 @@ public class ChatGPTHelp {
             );
         } else {
             return context.getString(R.string.help_query_just_clue, clue);
+        }
+    }
+
+    private JSONObject streamToJSON(
+        InputStream is
+    ) throws IOException, JSONException {
+        try (
+            BufferedReader bis = new BufferedReader(
+                new InputStreamReader(is)
+            )
+        ) {
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = bis.readLine()) != null)
+                sb.append(line);
+            return new JSONObject(sb.toString());
         }
     }
 }
