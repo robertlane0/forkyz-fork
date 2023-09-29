@@ -63,36 +63,17 @@ android {
     }
 
     signingConfigs {
-        if (file(System.getProperty("user.home") + "/androidkeystore").exists()) {
-            debugSigned {
-                storeFile file(System.getProperty("user.home") + "/androidkeystore")
-                storePassword props.getProperty("storePassword")
-                keyAlias "key_alias"
-                keyPassword props.getProperty("keyPassword")
-            }
-        }
         release {
-            storeFile file(System.getProperty("user.home") + "/androidkeystore")
-            storePassword props.getProperty("storePassword")
-            keyAlias "key_alias"
-            keyPassword props.getProperty("keyPassword")
+           storeFile file(System.getenv('ANDROID_KEY_STOREFILE'))
+           storePassword System.getenv('ANDROID_KEYSTORE_PASSWORD')
+           keyAlias System.getenv('ANDROID_KEY_ALIAS')
+           keyPassword System.getenv('ANDROID_KEYSTORE_PASSWORD')
         }
     }
 
     buildTypes {
-        debug {
-        }
-        if (file(System.getProperty("user.home") + "/androidkeystore").exists()) {
-            debugSigned {
-                signingConfig signingConfigs.debugSigned
-            }
-        }
-        if (file(System.getProperty("user.home") + "/androidkeystore").exists()) {
-            release {
-                signingConfig signingConfigs.release
-                minifyEnabled true
-                proguardFile file('src/main/assemble/proguard-android.txt')
-            }
+        release {
+            signingConfig signingConfigs.release
         }
     }
 
