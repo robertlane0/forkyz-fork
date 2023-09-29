@@ -3,7 +3,7 @@
 
 Many crossword compilers and fans host web pages where puzzles can be
 downloaded. Below is a list of sources known to Forkyz. Please [raise an
-issue on our GitHub page][issues] if you would like to add a source or
+issue on the GitLab page][issues] if you would like to add a source or
 make a correction.
 
 Forkyz will attempt to open any file you give it, but look out for
@@ -60,7 +60,7 @@ The majority of the links on this page come from [Michael F. Gill
 * [XWords by a Ladee][xwords-by-aladee] -- by Brooke.
 
 [mokelfish]: http://bbtp.net/puzzle/links.html
-[issues]: https://github.com/yourealwaysbe/forkyz/issues
+[issues]: https://gitlab.com/Hague/forkyz/-/issues
 
 [andrew-marc-greene]: http://www.greenehouse.com/a/puzzles/
 [arctan-x-words]: http://arctanxwords.blogspot.com/
