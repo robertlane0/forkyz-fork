@@ -111,9 +111,11 @@ Current downloaders are De Standaard, De Telegraaf, Guardian Daily Cryptic, Hamb
 
 Gradle should compile fine as long as you have Java 17 or above.
 
-    $ ./gradlew assembleRelease
+    $ ./gradlew assembleDebug
 
-You will then need to handle signing/installing the apk. Hopefully this is standard.
+Or to build and install, with device connected
+
+    $ ./gradlew installDebug
 
 ## Project Structure
 
