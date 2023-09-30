@@ -8,6 +8,8 @@ follow a standard across/down set-up) and other customisations.
      alt="Get it on F-Droid"
      height="80">](https://f-droid.org/packages/app.crossword.yourealwaysbe.forkyz/)
 
+[Release APKs][releases] can be installed directly.
+
 [Forkyz Scanner][forkyz-scanner] is a companion app for scanning crosswords from the camera, images, or PDFs.
 
 ## Features
@@ -137,3 +139,4 @@ The IPuz spec is reproduced [here][ipuz-spec].
 [gnome-crosswords]: https://gitlab.gnome.org/jrb/crosswords
 [online-sources]: https://hague.gitlab.io/forkyz/
 [ipuz-spec]: https://hague.gitlab.com/forkyz/ipuz.html
+[releases]: https://gitlab.com/Hague/forkyz/-/releases
