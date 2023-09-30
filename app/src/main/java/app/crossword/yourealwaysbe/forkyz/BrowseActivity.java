@@ -1025,9 +1025,8 @@ public class BrowseActivity extends ForkyzActivity {
         });
 
         String filterValue = model.getPuzzleFilter().getValue();
-        binding.filterPanel.setVisibility(
-            filterValue == null ? View.GONE : View.VISIBLE
-        );
+        boolean noFilter = filterValue == null || filterValue.isEmpty();
+        binding.filterPanel.setVisibility(noFilter ? View.GONE : View.VISIBLE);
     }
 
     private void showPuzzleFilter() {
