@@ -1,5 +1,12 @@
 # Forkyz Changelog
 
+## Version 46
+
+- Add filter to puzzle list
+- Automatically import files from "to-import" folder
+- Infer some metadata from filename if needed (supports default xword-dl and Forkyz conventions)
+- Report ChatGPT error messages in response
+
 ## Version 45
 
 - Fix broken autodownloads
