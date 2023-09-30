@@ -18,5 +18,6 @@ nvim app/src/main/AndroidManifest.xml
 
 echo "Ready to commit!"
 echo "Don't forget to git add the new changelog."
+echo "Don't forget to start your runner for the release tag."
 
 git status
