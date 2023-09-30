@@ -35,10 +35,13 @@ release_job:
   rules:
     - if: $CI_COMMIT_TAG
   script:
-    - echo "running release_job"
+    - export CHANGELOG_FILE=$(echo $CI_COMMIT_TAG | sed 's/v\(.*\)/\100000.txt/')
+    - export CHANGELOG_PATH="fastlane/metadata/android/en-US/changelogs/$CHANGELOG_FILE"
+    - echo "# Changes\n" > release_changelog.txt
+    - cat "$CHANGELOG_PATH" >> release_changelog.txt
   release:
     tag_name: '$CI_COMMIT_TAG'
-    description: '$CI_COMMIT_TAG'
+    description: 'release_changelog.txt'
     assets:
       links:
         - name: App APK Install File

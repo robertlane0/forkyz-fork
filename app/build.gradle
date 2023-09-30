@@ -64,10 +64,10 @@ android {
 
     signingConfigs {
         release {
-           storeFile file(System.getenv('ANDROID_KEY_STOREFILE'))
-           storePassword System.getenv('ANDROID_KEYSTORE_PASSWORD')
-           keyAlias System.getenv('ANDROID_KEY_ALIAS')
-           keyPassword System.getenv('ANDROID_KEYSTORE_PASSWORD')
+            storeFile getReleaseKeyStoreFile()
+            storePassword System.getenv('ANDROID_KEYSTORE_PASSWORD')
+            keyAlias System.getenv('ANDROID_KEY_ALIAS')
+            keyPassword System.getenv('ANDROID_KEYSTORE_PASSWORD')
         }
     }
 
@@ -91,6 +91,11 @@ android {
     configurations.all {
         resolutionStrategy.force 'junit:junit:4.13.2'
     }
+}
+
+File getReleaseKeyStoreFile() {
+    String filename = System.getenv('ANDROID_KEY_STOREFILE')
+    return filename ? file(filename) : null
 }
 
 dependencies {
