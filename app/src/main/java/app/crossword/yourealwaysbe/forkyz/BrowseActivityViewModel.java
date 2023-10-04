@@ -495,7 +495,8 @@ public class BrowseActivityViewModel extends AndroidViewModel {
     private void setNewPuzzleListAndFilter(
         FilteredList<MutableLiveData<PuzMetaFile>> newList, String newFilter
     ) {
-        newList.applyFilter(newFilter);
+        if (newList != null)
+            newList.applyFilter(newFilter);
         puzzleFiles.setValue(newList);
     }
 
