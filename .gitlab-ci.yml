@@ -38,11 +38,11 @@ release_job:
     - export CHANGELOG_FILE=$(echo $CI_COMMIT_TAG | sed 's/v\(.*\)/\100000.txt/')
     - export CHANGELOG_PATH="fastlane/metadata/android/en-US/changelogs/$CHANGELOG_FILE"
     - touch release_changelog.txt
-    -
-      if [ -f "$CHANGELOG_PATH" ];
+    - |
+      if [ -f "$CHANGELOG_PATH" ]
       then
-        echo -e "# Changes\n" > release_changelog.txt';
-        cat "$CHANGELOG_PATH" >> release_changelog.txt';
+        echo -e "# Changes\n" > release_changelog.txt
+        cat "$CHANGELOG_PATH" >> release_changelog.txt
       fi
   release:
     tag_name: '$CI_COMMIT_TAG'
