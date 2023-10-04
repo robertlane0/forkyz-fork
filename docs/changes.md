@@ -1,5 +1,9 @@
 # Forkyz Changelog
 
+## Version 47
+
+Fix crash on start on some devices.
+
 ## Version 46
 
 - Add filter to puzzle list
