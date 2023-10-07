@@ -53,7 +53,7 @@ release_job:
           filepath: /apk
           url: "https://gitlab.com/Hague/forkyz/-/jobs/$JOB_ID/artifacts/raw/app/build/outputs/apk/release/app-release.apk"
 
-pages_job:
+pages:
   stage: pages
   image: node:lts
   script:
