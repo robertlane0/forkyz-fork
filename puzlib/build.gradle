@@ -20,8 +20,8 @@ dependencies {
     implementation 'org.hjson:hjson:3.0.0'
     implementation 'net.iharder:base64:2.3.9'
 
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
 
     shadowJar {
         relocate 'org.json', 'app.crossword.yourealwaysbe.org.json'
