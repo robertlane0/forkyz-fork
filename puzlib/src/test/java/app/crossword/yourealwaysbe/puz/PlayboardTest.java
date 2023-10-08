@@ -390,13 +390,13 @@ public class PlayboardTest {
         // Down / Back
         moveToPosition(board, 11, 0);
         board.deleteLetter();
-        assertPosition(board, 8, 0);
+        assertPosition(board, 14, 0);
 
         // Across / Back
         moveToPosition(board, 0, 11);
         board.toggleSelection();
         board.deleteLetter();
-        assertPosition(board, 0, 9);
+        assertPosition(board, 0, 14);
     }
 
     @TestWithAndWithoutBlockObjects

@@ -533,7 +533,32 @@ public interface MovementStrategy extends Serializable {
         }
 
         public Word back(Playboard board) {
-            return innerStrategy.back(board);
+            Position startPos = board.getHighlightLetter();
+            Word word = board.moveZoneBack(false);
+            Position newPos = board.getHighlightLetter();
+
+            if (Objects.equals(startPos, newPos)) {
+                Clue clue = board.getClue();
+                Puzzle puz = board.getPuzzle();
+
+                if (
+                    clue == null
+                    || puz == null
+                    || clue.getZone().isEmpty()
+                    || board.isFilledClueID(clue.getClueID())
+                ) {
+                    word = innerStrategy.back(board);
+                } else {
+                    Zone clueZone = clue.getZone();
+                    Position end = clueZone.getPosition(clueZone.size() - 1);
+                    Box box = puz.checkedGetBox(end);
+
+                    if (box != null)
+                        board.setHighlightLetter(end, clue.getClueID());
+                }
+            }
+
+            return word;
         }
     }
 }
