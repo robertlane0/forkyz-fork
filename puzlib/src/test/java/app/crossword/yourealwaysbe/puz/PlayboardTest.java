@@ -129,6 +129,7 @@ public class PlayboardTest {
          //    A
          //
          // then delete from E back, B and D should remain
+         // B and D should also be skipped
 
          moveToPosition(board, 1, 0);
          board.playLetter('A');
@@ -144,8 +145,12 @@ public class PlayboardTest {
          board.playLetter('A');
 
          moveToPosition(board, 1, 4);
-         for (int i = 0; i < 5; i++)
-             board.deleteLetter();
+         board.deleteLetter();
+         assertPosition(board, 1, 4);
+         board.deleteLetter();
+         assertPosition(board, 1, 2);
+         board.deleteLetter();
+         assertPosition(board, 1, 0);
 
          assertBoxBlank(puz, 1, 0);
          assertBoxLetter(puz, 1, 1, "B");
@@ -153,6 +158,37 @@ public class PlayboardTest {
          assertBoxLetter(puz, 1, 3, "D");
          assertBoxBlank(puz, 1, 4);
     }
+
+    @TestWithAndWithoutBlockObjects
+    public void testDeletePreserveCorrect(boolean blockObjects) throws Exception {
+         Puzzle puz = loadTestPuz(blockObjects);
+
+         Playboard board = new Playboard(puz);
+         board.setShowErrorsGrid(true);
+         board.setMovementStrategy(MovementStrategy.MOVE_NEXT_CLUE);
+
+         // Reveal full puzzle, but make one letter wrong
+         //
+         // IRINY
+         //
+         // then delete from Y back
+         // should skip to I because it is not correct
+
+         board.revealPuzzle();
+
+         moveToPosition(board, 1, 2);
+         board.playLetter('I');
+
+         board.setPreserveCorrectLettersInShowErrors(true);
+
+         moveToPosition(board, 1, 4);
+         board.deleteLetter();
+         assertPosition(board, 1, 2);
+         assertBoxBlank(puz, 1, 2);
+         board.deleteLetter();
+         assertPosition(board, 1, 2);
+    }
+
 
     @TestWithAndWithoutBlockObjects
     public void testMoveNextOnAxis(boolean blockObjects) throws Exception {
