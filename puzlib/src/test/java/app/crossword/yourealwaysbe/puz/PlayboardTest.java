@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class PlayboardTest {
 
@@ -445,8 +446,19 @@ public class PlayboardTest {
         // Across / Back
         moveToPosition(board, 0, 11);
         board.toggleSelection();
+
+        // cycle only happens if we delay delete
         board.deleteLetter();
-        assertPosition(board, 0, 14);
+        assertPosition(board, 0, 11);
+        board.deleteLetter();
+        assertPosition(board, 0, 11);
+        try {
+            Thread.sleep(200);
+            board.deleteLetter();
+            assertPosition(board, 0, 14);
+        } catch (InterruptedException e) {
+            fail(e);
+        }
     }
 
     @TestWithAndWithoutBlockObjects
