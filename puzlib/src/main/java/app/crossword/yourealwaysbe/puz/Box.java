@@ -275,7 +275,7 @@ public class Box implements Serializable {
     }
 
     /**
-     * True if box has solution (i.e. not '\0')
+     * True if box has solution (i.e. not null)
      */
     public boolean hasSolution() {
         return getSolution() != null;
@@ -296,7 +296,7 @@ public class Box implements Serializable {
     }
 
     public void setSolution(String solution) {
-        this.solution = String.valueOf(solution);
+        this.solution = solution;
     }
 
     /**
