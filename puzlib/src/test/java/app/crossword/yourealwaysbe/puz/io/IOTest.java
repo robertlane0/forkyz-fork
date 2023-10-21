@@ -23,6 +23,7 @@ import app.crossword.yourealwaysbe.puz.Note;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -37,6 +38,10 @@ public class IOTest {
 
     public static InputStream getTestPuzzleRebusInputStream() {
         return JPZIOTest.class.getResourceAsStream("/test_rebus.puz");
+    }
+
+    public static InputStream getTestPuzzleEmptySolInputStream() {
+        return IOTest.class.getResourceAsStream("/test_empty_sol.puz");
     }
 
     public static void assertIsTestPuzzle1(Puzzle puz) {
@@ -289,6 +294,31 @@ public class IOTest {
             ) {
                 Puzzle pin = IO.load(isp2, ism);
                 assertEquals(puz, pin);
+            }
+        }
+    }
+
+    @Test
+    public void testEmptySolution() throws Exception {
+        try (InputStream is = getTestPuzzleEmptySolInputStream()) {
+            Puzzle puz = IO.loadNative(is);
+            assertFalse(puz.hasSolution());
+
+            File tmp = File.createTempFile("test", ".puz");
+            tmp.deleteOnExit();
+
+            try (
+                OutputStream puzOS = new FileOutputStream(tmp);
+            ) {
+                IO.saveNative(puz, puzOS);
+            }
+
+            try (
+                DataInputStream isp2
+                    = new DataInputStream(new FileInputStream(tmp));
+            ) {
+                Puzzle pin = IO.loadNative(isp2);
+                assertFalse(pin.hasSolution());
             }
         }
     }

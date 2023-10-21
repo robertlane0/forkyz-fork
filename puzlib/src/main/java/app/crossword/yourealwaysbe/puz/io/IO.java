@@ -33,8 +33,11 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 public class IO implements PuzzleParser {
     public static final String FILE_MAGIC = "ACROSS&DOWN";
@@ -71,8 +74,16 @@ public class IO implements PuzzleParser {
     // string to use if a clue is missing
     private static final String UNKNOWN_CLUE = "-";
 
+    // X is the official char for a blank solution, i've seen D used
+    // e.g. by Private Eye
+    private static final char EMPTY_SOL_CHAR = 'X';
+    private static final Set<String> EMPTY_SOLS= new HashSet<>(
+        Arrays.asList(String.valueOf(EMPTY_SOL_CHAR), "D")
+    );
+
     public static final String ACROSS_LIST = "Across";
     public static final String DOWN_LIST = "Down";
+
 
     public static int cksum_region(byte[] data, int offset, int length,
                                    int cksum) {
@@ -272,6 +283,8 @@ public class IO implements PuzzleParser {
             applyRebus(rebusBoard, solRebusTable, usrRebusTable, builder);
         }
 
+        removeSolutionIfBlank(builder);
+
         return builder.getPuzzle();
     }
 
@@ -432,16 +445,19 @@ public class IO implements PuzzleParser {
 
         Box[][] boxes = puz.getBoxes();
 
+        boolean hasSolution = puz.hasSolution();
         for (int x = 0; x < boxes.length; x++) {
             for (int y = 0; y < boxes[x].length; y++) {
                 if (Box.isBlock(boxes[x][y])) {
                     tmpDos.writeByte('.');
-                } else {
+                } else if (hasSolution) {
                     String sSol = boxes[x][y].getSolution();
                     byte val = (sSol == null || sSol.isEmpty())
                         ? 0
                         : (byte) sSol.charAt(0);
                     tmpDos.writeByte(val);
+                } else {
+                    tmpDos.writeByte(EMPTY_SOL_CHAR);
                 }
             }
         }
@@ -893,6 +909,35 @@ public class IO implements PuzzleParser {
                 }
             }
         }
+    }
+
+    private static void removeSolutionIfBlank(PuzzleBuilder builder) {
+        int height = builder.getHeight();
+        int width = builder.getWidth();
+
+        String emptySol = null;
+
+        // search through for all same char being X or D.
+        // if counter example found, return
+        for (int row = 0; row < height; row++) {
+            for (int col = 0; col < width; col++) {
+                Box box = builder.getBox(row, col);
+                if (!Box.isBlock(box)) {
+                    if (emptySol == null) {
+                        if (box.hasSolution()) {
+                            emptySol = box.getSolution();
+                            if (!EMPTY_SOLS.contains(emptySol))
+                                return;
+                        }
+                    } else if (!Objects.equals(emptySol, box.getSolution())) {
+                        return;
+                    }
+                }
+            }
+        }
+
+        // if we made it this far then it's an empty solution
+        builder.removeSolution();
     }
 
     private static void writeGEXT(
