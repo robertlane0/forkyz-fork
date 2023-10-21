@@ -33,11 +33,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class IOTest {
 
     public static InputStream getTestPuzzle1InputStream() {
-        return JPZIOTest.class.getResourceAsStream("/test.puz");
+        return IOTest.class.getResourceAsStream("/test.puz");
     }
 
     public static InputStream getTestPuzzleRebusInputStream() {
-        return JPZIOTest.class.getResourceAsStream("/test_rebus.puz");
+        return IOTest.class.getResourceAsStream("/test_rebus.puz");
     }
 
     public static InputStream getTestPuzzleEmptySolInputStream() {
