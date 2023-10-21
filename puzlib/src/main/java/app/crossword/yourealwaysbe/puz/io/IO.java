@@ -81,6 +81,8 @@ public class IO implements PuzzleParser {
         Arrays.asList(String.valueOf(EMPTY_SOL_CHAR), "D")
     );
 
+    private static final char BLANK = '-';
+
     public static final String ACROSS_LIST = "Across";
     public static final String DOWN_LIST = "Down";
 
@@ -175,7 +177,8 @@ public class IO implements PuzzleParser {
 
                 if (solution != '.') {
                     boxes[x][y] = new Box();
-                    boxes[x][y].setSolution((char) solution);
+                    if (solution != 0 && solution != BLANK)
+                        boxes[x][y].setSolution(solution);
                 }
             }
         }
@@ -188,7 +191,7 @@ public class IO implements PuzzleParser {
 
                 if (answer == '.') {
                     continue;
-                } else if (answer == '-') {
+                } else if (answer == BLANK) {
                     boxes[x][y].setBlank();
                 } else if (!Box.isBlock(boxes[x][y])) {
                     boxes[x][y].setResponse(answer);
@@ -453,7 +456,7 @@ public class IO implements PuzzleParser {
                 } else if (hasSolution) {
                     String sSol = boxes[x][y].getSolution();
                     byte val = (sSol == null || sSol.isEmpty())
-                        ? 0
+                        ? (byte) BLANK
                         : (byte) sSol.charAt(0);
                     tmpDos.writeByte(val);
                 } else {
@@ -469,10 +472,10 @@ public class IO implements PuzzleParser {
                 } else {
                     String sRes = boxes[x][y].getResponse();
                     byte val = (sRes == null || sRes.isEmpty())
-                        ? 0
+                        ? (byte) BLANK
                         : (byte) sRes.charAt(0);
 
-                    tmpDos.writeByte((boxes[x][y].isBlank()) ? '-' : val);
+                    tmpDos.writeByte((boxes[x][y].isBlank()) ? BLANK : val);
                 }
             }
         }

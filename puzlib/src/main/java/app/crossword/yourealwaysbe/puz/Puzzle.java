@@ -399,12 +399,10 @@ public class Puzzle implements Serializable{
 
         for (int x = 0; x < boxes.length; x++) {
             for (int y = 0; y < boxes[x].length; y++) {
-                if (!Box.isBlock(boxes[x][y])) {
+                Box box = boxes[x][y];
+                if (!Box.isBlock(box)) {
                     total++;
-
-                    if (Objects.equals(
-                        boxes[x][y].getResponse(), boxes[x][y].getSolution()
-                    )) {
+                    if (Objects.equals(box.getResponse(), box.getSolution())) {
                         correct++;
                     }
                 }
