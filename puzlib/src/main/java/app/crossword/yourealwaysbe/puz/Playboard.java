@@ -514,13 +514,16 @@ public class Playboard implements Serializable {
         // If preserving letters, skip over them
         // break if we hit a wall or loop all the way around
         Position startPosition = getHighlightLetter();
+        ClueID startClueID = getClueID();
         Position lastPosition = startPosition;
         while (isDontDeleteCurrent()) {
             this.previousLetter();
 
             Position newPosition = getHighlightLetter();
-            boolean stuck = Objects.equals(newPosition, startPosition)
-                || Objects.equals(newPosition, lastPosition);
+            boolean stuck = (
+                Objects.equals(newPosition, startPosition)
+                    && Objects.equals(startClueID, getClueID())
+            ) || Objects.equals(newPosition, lastPosition);
 
             if (stuck)
                 break;

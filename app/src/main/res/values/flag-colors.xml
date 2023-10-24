@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="flagColor">@color/errorColor</color>
+    <!-- default flag color in colors.xml -->
     <color name="flagColor1">#15c71d</color>
     <color name="flagColor2">#e100d6</color>
     <color name="flagColor3">#d5c500</color>

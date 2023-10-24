@@ -1,8 +1,16 @@
 # Forkyz Changelog
 
+## Version 48
+
+- Skip letters that won't be deleted when backspacing
+- When cycle unfilled words is enabled, cycle backwards as well as forwards
+- Detect .puz files with "no solution" (i.e. either all answers X or all D)
+- Brighten default flag colour in night mode
+- Fix floating action button position on some devices
+
 ## Version 47
 
-Fix crash on start on some devices.
+- Fix crash on start on some devices.
 
 ## Version 46
 

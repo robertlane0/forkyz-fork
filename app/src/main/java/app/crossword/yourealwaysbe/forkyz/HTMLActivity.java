@@ -48,8 +48,7 @@ public class HTMLActivity extends ForkyzActivity {
         holographic();
         finishOnHomeButton();
         setContentView(binding.getRoot());
-        setupBottomInsets(binding.scrollView);
-        setupBottomInsets(binding.backButton);
+        setupBottomInsets(binding.content);
 
         String assetName = this.getIntent().getData().toString();
         startLoadAssetName(assetName);
@@ -92,7 +91,7 @@ public class HTMLActivity extends ForkyzActivity {
                 String htmlData
                     = reader.lines().collect(Collectors.joining("\n"));
                 handler.post(() -> {
-                    binding.content.setText(HtmlCompat.fromHtml(htmlData, 0));
+                    binding.text.setText(HtmlCompat.fromHtml(htmlData, 0));
                 });
             } catch (IOException e) {
                 handler.post(() -> {

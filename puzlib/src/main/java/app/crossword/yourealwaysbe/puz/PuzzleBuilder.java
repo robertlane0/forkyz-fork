@@ -398,6 +398,25 @@ public class PuzzleBuilder {
         return numberPositions;
     }
 
+    /**
+     * Empty the solution in the puzzle
+     */
+    public PuzzleBuilder removeSolution() {
+        Box[][] boxes = puzzle.getBoxes();
+
+        for (int row = 0; row < puzzle.getHeight(); row++) {
+            for (int col = 0; col < puzzle.getWidth(); col++) {
+                Box box = boxes[row][col];
+                if (!Box.isBlock(box))
+                    box.setSolution(null);
+            }
+        }
+
+        puzzle.setSolutionChecksum((short) 0);
+
+        return this;
+    }
+
     private void invalidateNumberPosition() {
         numberPositions = null;
     }

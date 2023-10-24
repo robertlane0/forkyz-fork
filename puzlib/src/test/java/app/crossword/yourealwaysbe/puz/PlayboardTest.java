@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class PlayboardTest {
 
@@ -187,8 +188,22 @@ public class PlayboardTest {
          assertBoxBlank(puz, 1, 2);
          board.deleteLetter();
          assertPosition(board, 1, 2);
-    }
 
+         // do twice to end up across again
+         board.deleteLetter();
+         assertPosition(board, 1, 2);
+
+         // check ok when all correct (no infinite loops)
+         board.revealPuzzle();
+         board.deleteLetter();
+         assertPosition(board, 1, 1);
+
+         board.setMovementStrategy(MovementStrategy.STOP_ON_END);
+         board.deleteLetter();
+         assertPosition(board, 1, 0);
+         board.deleteLetter();
+         assertPosition(board, 1, 0);
+    }
 
     @TestWithAndWithoutBlockObjects
     public void testMoveNextOnAxis(boolean blockObjects) throws Exception {
@@ -431,8 +446,19 @@ public class PlayboardTest {
         // Across / Back
         moveToPosition(board, 0, 11);
         board.toggleSelection();
+
+        // cycle only happens if we delay delete
         board.deleteLetter();
-        assertPosition(board, 0, 14);
+        assertPosition(board, 0, 11);
+        board.deleteLetter();
+        assertPosition(board, 0, 11);
+        try {
+            Thread.sleep(200);
+            board.deleteLetter();
+            assertPosition(board, 0, 14);
+        } catch (InterruptedException e) {
+            fail(e);
+        }
     }
 
     @TestWithAndWithoutBlockObjects

@@ -42,6 +42,7 @@
     <color name="errorColor">#f00</color>
     <color name="errorHighlightColor">#f00</color>
     <color name="cellColor">#fff</color>
+    <color name="flagColor">@color/errorColor</color>
 
     <color name="screenFade">#66eaeaea</color>
 

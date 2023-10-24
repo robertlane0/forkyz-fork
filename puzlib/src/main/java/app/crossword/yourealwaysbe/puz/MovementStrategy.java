@@ -488,13 +488,16 @@ public interface MovementStrategy extends Serializable {
     /**
      * Return to start of unfilled word, or delegate to inner strategy
      *
-     * When moving forwards, cycle current word if it has not been completed.
-     * If it has, delegate to another strategy given during construction.
-     *
-     * Going back is always a delegation.
+     * When moving forwards or backwards, cycle current word if it has
+     * not been completed. If it has, delegate to another strategy given
+     * during construction. Backwards doesn't fire if the backs are
+     * coming rapidly (e.g. keyboard held down).
      */
     public class CycleUnfilled implements MovementStrategy {
-        MovementStrategy innerStrategy;
+        private static final long BACK_CYCLE_DELAY = 150; // ms
+
+        private MovementStrategy innerStrategy;
+        private long lastBack = -1;
 
         public CycleUnfilled(MovementStrategy innerStrategy) {
             this.innerStrategy = innerStrategy;
@@ -548,7 +551,7 @@ public interface MovementStrategy extends Serializable {
                     || board.isFilledClueID(clue.getClueID())
                 ) {
                     word = innerStrategy.back(board);
-                } else {
+                } else if (!isPauseBackCycle()) {
                     Zone clueZone = clue.getZone();
                     Position end = clueZone.getPosition(clueZone.size() - 1);
                     Box box = puz.checkedGetBox(end);
@@ -558,7 +561,26 @@ public interface MovementStrategy extends Serializable {
                 }
             }
 
+            recordBack();
+
             return word;
+        }
+
+        private void recordBack() {
+            lastBack = System.currentTimeMillis();
+        }
+
+        /**
+         * If should cycle this delete
+         *
+         * Added a pause since the last delete so that holding down
+         * delete pauses at the start of the word to give the user a
+         * chance to avoid cycling
+         */
+        private boolean isPauseBackCycle() {
+            return (lastBack < 0)
+                ? false
+                : System.currentTimeMillis() < lastBack + BACK_CYCLE_DELAY;
         }
     }
 }

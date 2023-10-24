@@ -9,32 +9,29 @@
             type="app.crossword.yourealwaysbe.forkyz.BrowseActivityViewModel"
         />
     </data>
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
+    <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
+        android:orientation="vertical"
     >
-        <LinearLayout
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/app_bar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fitsSystemWindows="true"
+        >
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+            />
+        </com.google.android.material.appbar.AppBarLayout>
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:id="@+id/content"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:orientation="vertical"
         >
-            <com.google.android.material.appbar.AppBarLayout
-                android:id="@+id/app_bar_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fitsSystemWindows="true"
-            >
-                <com.google.android.material.appbar.MaterialToolbar
-                    android:id="@+id/toolbar"
-                    android:layout_width="match_parent"
-                    android:layout_height="?attr/actionBarSize"
-                />
-            </com.google.android.material.appbar.AppBarLayout>
             <LinearLayout
-                android:id="@+id/content"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
@@ -132,25 +129,25 @@
                     />
                 </LinearLayout>
             </LinearLayout>
-        </LinearLayout>
-        <com.leinardi.android.speeddial.SpeedDialOverlayLayout
-            android:id="@+id/speed_dial_overlay"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:theme="@style/speedDialOverlayStyle"
-        />
-        <com.leinardi.android.speeddial.SpeedDialView
-            android:id="@+id/speed_dial_add"
-            android:layout_gravity="end|bottom"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:contentDescription="@string/add_puzzle"
-            app:sdMainFabClosedSrc="@drawable/ic_add"
-            app:sdMainFabOpenedSrc="@drawable/ic_add"
-            app:sdOverlayLayout="@id/speed_dial_overlay"
-            app:layout_behavior="@string/speeddial_scrolling_view_snackbar_behavior"
-            android:theme="?speedDialStyle"
-        />
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+            <com.leinardi.android.speeddial.SpeedDialOverlayLayout
+                android:id="@+id/speed_dial_overlay"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:theme="@style/speedDialOverlayStyle"
+            />
+            <com.leinardi.android.speeddial.SpeedDialView
+                android:id="@+id/speed_dial_add"
+                android:layout_gravity="end|bottom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:contentDescription="@string/add_puzzle"
+                app:sdMainFabClosedSrc="@drawable/ic_add"
+                app:sdMainFabOpenedSrc="@drawable/ic_add"
+                app:sdOverlayLayout="@id/speed_dial_overlay"
+                app:layout_behavior="@string/speeddial_scrolling_view_snackbar_behavior"
+                android:theme="?speedDialStyle"
+            />
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+    </LinearLayout>
 </layout>
