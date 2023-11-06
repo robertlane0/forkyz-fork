@@ -417,8 +417,8 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
     }
 
     public interface ClickListener {
-        default void onContextMenu(Point e) { };
-        default void onTap(Point e) { };
+        default void onContextMenu(Point e) { }
+        default void onTap(Point e) { }
     }
 
     public interface ScaleListener {
