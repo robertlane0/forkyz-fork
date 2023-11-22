@@ -482,7 +482,7 @@ public class PlayActivity extends PuzzleActivity
                     break;
 
                 case KeyEvent.KEYCODE_ENTER:
-                    settings.getPlaySpaceChangesDirection(enterChanges -> {
+                    settings.getPlayEnterChangesDirection(enterChanges -> {
                         if (enterChanges)
                             getBoard().toggleSelection();
                         else
