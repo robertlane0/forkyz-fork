@@ -11,7 +11,9 @@ import javax.inject.Inject;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -58,6 +60,7 @@ import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges;
 import app.crossword.yourealwaysbe.puz.Playboard;
 import app.crossword.yourealwaysbe.puz.Position;
 import app.crossword.yourealwaysbe.puz.Puzzle;
+import app.crossword.yourealwaysbe.puz.Zone;
 
 @AndroidEntryPoint
 public abstract class PuzzleActivity
@@ -66,7 +69,15 @@ public abstract class PuzzleActivity
 
     private static final Logger LOG = Logger.getLogger("app.crossword.yourealwaysbe");
 
-    private static final String HELP_RESPONSE_TEXT = "helpResponse";
+    protected static final String HELP_RESPONSE_TEXT = "helpResponse";
+    private static final String CROSSWORD_SOLVER
+        = "org.billthefarmer.crossword";
+    protected static final String CROSSWORD_SOLVER_MAIN
+        = "org.billthefarmer.crossword.Main";
+    protected static final String CROSSWORD_SOLVER_ANAGRAM
+        = "org.billthefarmer.crossword.Anagram";
+    private static final String CROSSWORD_SOLVER_WEBSITE_URL
+        = "https://billthefarmer.github.io/crossword";
 
     @Inject
     protected FileHandlerProvider fileHandlerProvider;
@@ -146,12 +157,28 @@ public abstract class PuzzleActivity
         }
 
         canRequestHelpForCurrentClue(canRequest -> {
+        settings.getExtCrosswordSolverEnabled(solverEnabled -> {
+            boolean extEnabled = canRequest || solverEnabled;
+
+            if (!extEnabled) {
+                MenuItem ext = menu.findItem(R.id.puzzle_menu_external_tools);
+                ext.setVisible(false);
+                ext.setEnabled(false);
+            }
+
             if (!canRequest) {
                 MenuItem help = menu.findItem(R.id.puzzle_menu_ask_chat_gpt);
                 help.setVisible(false);
                 help.setEnabled(false);
             }
-        });
+
+            if (!solverEnabled) {
+                MenuItem solver
+                    = menu.findItem(R.id.puzzle_menu_crossword_solver);
+                solver.setVisible(false);
+                solver.setEnabled(false);
+            }
+        });});
 
         return true;
     }
@@ -206,6 +233,9 @@ public abstract class PuzzleActivity
             return true;
         } else if (id == R.id.clue_list_menu_edit_clue) {
             editClue();
+            return true;
+        } else if (id == R.id.puzzle_menu_crossword_solver) {
+            callCrosswordSolver();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -964,5 +994,92 @@ public abstract class PuzzleActivity
 
             return builder.create();
         }
+    }
+
+    /**
+     * Call billthefarmer's crossword solver
+     *
+     * Protected to allow overriding by activity. Default behaviour is to send
+     * the currently selected board word to the Crossword Solver app.
+     *
+     * Uses org.billthefarmer.crossword
+     */
+    protected void callCrosswordSolver() {
+        Playboard board = getBoard();
+        Zone zone = (board == null) ? null : board.getCurrentZone();
+        if (zone == null)
+            return;
+
+        Puzzle puz = getPuzzle();
+        if (puz == null)
+            return;
+
+        StringBuilder request = new StringBuilder();
+
+        for (Position pos : zone) {
+            Box box = puz.checkedGetBox(pos);
+            if (!Box.isBlock(box) && !box.isBlank()) {
+                String response = box.getResponse();
+                request.append(response);
+            } else {
+                request.append(".");
+            }
+        }
+
+        launchCrosswordSolver(CROSSWORD_SOLVER_MAIN, request.toString());
+    }
+
+    /**
+     * Launch billthefarmer's crossword solver
+     *
+     * @param activity either CROSSWORD_SOLVER_MAIN (missing letters) or
+     * CROSSWORD_SOLVER_ANAGRAM (anagrams)
+     * @param request the request text, use . for blanks, just the letters for
+     * anagrams
+     */
+    protected void launchCrosswordSolver(String activity, String request) {
+        try {
+            Intent i = new Intent();
+            i.setComponent(
+                new ComponentName(CROSSWORD_SOLVER, activity)
+            );
+            i.putExtra(android.content.Intent.EXTRA_TEXT, request);
+            startActivity(i);
+        } catch (ActivityNotFoundException e) {
+            DialogFragment dialog = new NoCrosswordSolverDialog();
+            dialog.show(
+                getSupportFragmentManager(), "NoCrosswordSolverDialog"
+            );
+        }
+    }
+
+    public static class NoCrosswordSolverDialog extends DialogFragment {
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            Activity activity = getActivity();
+
+            MaterialAlertDialogBuilder builder
+                = new MaterialAlertDialogBuilder(activity);
+
+            builder.setTitle(R.string.crossword_solver_not_installed)
+                .setMessage(R.string.crossword_solver_install_msg)
+                .setNegativeButton(
+                    R.string.website,
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(
+                            DialogInterface dialogInterface, int i
+                        ) {
+                            Intent intent = new Intent(Intent.ACTION_VIEW);
+                            intent.setData(
+                                Uri.parse(CROSSWORD_SOLVER_WEBSITE_URL)
+                            );
+                            activity.startActivity(intent);
+                        }
+                    }
+                ).setPositiveButton(android.R.string.ok, null);
+
+            return builder.create();
+       }
     }
 }

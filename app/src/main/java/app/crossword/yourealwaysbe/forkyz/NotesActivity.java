@@ -85,6 +85,11 @@ public class NotesActivity extends PuzzleActivity {
         if (item.getItemId() == R.id.puzzle_menu_flag_color) {
             onFlagClueSelected();
             return true;
+        } else if (
+            item.getItemId() == R.id.notes_menu_crossword_solver_anagram
+        ) {
+            callAnagramSolver();
+            return true;
         } else {
             return super.onOptionsItemSelected(item);
         }
@@ -1065,6 +1070,46 @@ public class NotesActivity extends PuzzleActivity {
                     getString(R.string.unknown_hint)
                 );
             }
+        }
+    }
+
+    /**
+     * Override to use scratch for puzzle notes page or if scratch focussed
+     */
+    protected void callCrosswordSolver() {
+        View focused = getWindow().getCurrentFocus();
+        int id = (focused == null) ? -1 : focused.getId();
+        if (id == R.id.scratch_miniboard || isPuzzleNotes()) {
+            StringBuilder request = new StringBuilder();
+            getLetters(binding.scratchMiniboard, true, request);
+            launchCrosswordSolver(CROSSWORD_SOLVER_MAIN, request.toString());
+        } else {
+            super.callCrosswordSolver();
+        }
+    }
+
+    private void callAnagramSolver() {
+        StringBuilder request = new StringBuilder();
+
+        getLetters(binding.anagramSource, false, request);
+        getLetters(binding.anagramSolution, false, request);
+
+        launchCrosswordSolver(CROSSWORD_SOLVER_ANAGRAM, request.toString());
+    }
+
+    /**
+     * Get letters from an edit text view
+     *
+     * @param source the edit text view
+     * @param withBlanks whether to ignore the blank squares or add them
+     * @param letters a string builder to put the letters into
+     */
+    private void getLetters(
+        BoardEditText source, boolean withBlanks, StringBuilder letters
+    ) {
+        for (int i = 0; i < source.getLength(); i++) {
+            if (withBlanks || !source.isBlank(i))
+                letters.append(source.getResponse(i));
         }
     }
 }

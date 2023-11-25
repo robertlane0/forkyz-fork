@@ -1636,7 +1636,7 @@ public class Playboard implements Serializable {
      * detached cells if the highlighted cell is in them. Else, just
      * return a zone with the current position.
      */
-    private Zone getCurrentZone() {
+    public Zone getCurrentZone() {
         Clue clue = getPuzzle().getClue(getClueID());
         if (clue == null || !clue.hasZone()) {
             Position highlight = getHighlightLetter();

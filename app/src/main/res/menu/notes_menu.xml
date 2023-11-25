@@ -13,9 +13,25 @@
         android:title="@string/flag_color_title"
     />
     <item
-        android:id="@+id/puzzle_menu_ask_chat_gpt"
-        android:title="@string/help_query_chat_gpt"
-    />
+        android:id="@+id/puzzle_menu_external_tools"
+        android:icon="@android:drawable/ic_menu_view"
+        android:title="@string/external_tools"
+    >
+        <menu>
+            <item
+                android:id="@+id/puzzle_menu_crossword_solver"
+                android:title="@string/help_crossword_solver"
+            />
+            <item
+                android:id="@+id/notes_menu_crossword_solver_anagram"
+                android:title="@string/help_crossword_solver_anagram"
+            />
+            <item
+                android:id="@+id/puzzle_menu_ask_chat_gpt"
+                android:title="@string/help_query_chat_gpt"
+            />
+        </menu>
+    </item>
     <item
         android:id="@+id/puzzle_menu_share"
         android:title="@string/share"

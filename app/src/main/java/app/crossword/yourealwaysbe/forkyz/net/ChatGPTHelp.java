@@ -50,7 +50,7 @@ public class ChatGPTHelp {
     public static void isEnabled(
         ForkyzSettings settings, Consumer<Boolean> cb
     ) {
-        settings.getChatGPTAPIKey(apiKey -> {
+        settings.getExtChatGPTAPIKey(apiKey -> {
             cb.accept(apiKey != null && !apiKey.trim().isEmpty());
         });
     }
@@ -58,7 +58,7 @@ public class ChatGPTHelp {
     public void requestHelpForCurrentClue(
         Context context, Playboard board, Consumer<String> callback
     ) {
-        settings.getChatGPTAPIKey(apiKey -> {
+        settings.getExtChatGPTAPIKey(apiKey -> {
             if (apiKey == null) {
                 callback.accept(null);
             } else {

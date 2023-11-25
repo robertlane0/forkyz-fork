@@ -63,7 +63,9 @@ public class ForkyzSettings {
     private static final String PREF_BROWSE_SORT = "sort";
     private static final String PREF_BROWSE_SWIPE_ACTION = "swipeAction";
 
-    private static final String PREF_CHAT_GPT_API_KEY = "chatGPTAPIKey";
+    private static final String PREF_EXT_CHAT_GPT_API_KEY = "chatGPTAPIKey";
+    private static final String PREF_EXT_CROSSWORD_SOLVER_ENABLED
+        = "crosswordSolverEnabled";
 
     private static final String PREF_CLUE_LIST_SHOW_WORDS
         = "showWordsInClueList";
@@ -184,9 +186,10 @@ public class ForkyzSettings {
         STRING_DEFAULTS.put(PREF_BROWSE_LAST_SEEN_VERSION, "");
         BOOL_DEFAULTS.put(PREF_BROWSE_NEW_PUZZLE, false);
         INT_DEFAULTS.put(PREF_BROWSE_SORT, 0);
-        STRING_DEFAULTS.put(PREF_CHAT_GPT_API_KEY, "");
         BOOL_DEFAULTS.put(PREF_CLUE_LIST_SHOW_WORDS, false);
         BOOL_DEFAULTS.put(PREF_CLUE_LIST_SNAP_TO_CLUE, false);
+        STRING_DEFAULTS.put(PREF_EXT_CHAT_GPT_API_KEY, "");
+        BOOL_DEFAULTS.put(PREF_EXT_CROSSWORD_SOLVER_ENABLED, true);
         BOOL_DEFAULTS.put(PREF_KEYBOARD_HAPTIC, true);
         BOOL_DEFAULTS.put(PREF_KEYBOARD_HIDE_BUTTON, false);
         BOOL_DEFAULTS.put(PREF_KEYBOARD_NATIVE, false);
@@ -490,13 +493,6 @@ public class ForkyzSettings {
     }
 
     /**
-     * The API key for ask chat gpt for help if set
-     */
-    public void getChatGPTAPIKey(Consumer<String> cb) {
-        getStringPreference(PREF_CHAT_GPT_API_KEY, cb);
-    }
-
-    /**
      * Whether to show the board for each clue in the clue list
      *
      * Or just the currently selected clue.
@@ -519,6 +515,17 @@ public class ForkyzSettings {
 
     public void setClueListShowWords(boolean value) {
         setBooleanPreference(PREF_CLUE_LIST_SHOW_WORDS, value);
+    }
+
+    /**
+     * The API key for ask chat gpt for help if set
+     */
+    public void getExtChatGPTAPIKey(Consumer<String> cb) {
+        getStringPreference(PREF_EXT_CHAT_GPT_API_KEY, cb);
+    }
+
+    public void getExtCrosswordSolverEnabled(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_EXT_CROSSWORD_SOLVER_ENABLED, cb);
     }
 
     /**

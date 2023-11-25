@@ -52,6 +52,15 @@
         </menu>
     </item>
     <item
+        android:id="@+id/play_menu_scratch_mode"
+        android:title="@string/scratch_mode"
+        android:checkable="true"
+    />
+    <item
+        android:id="@+id/puzzle_menu_special_entry"
+        android:title="@string/special_entry"
+    />
+    <item
         android:id="@+id/play_menu_show_errors"
         android:icon="@android:drawable/ic_menu_view"
         android:title="@string/show_errors"
@@ -74,11 +83,6 @@
             />
         </menu>
     </item>
-    <item
-        android:id="@+id/play_menu_scratch_mode"
-        android:title="@string/scratch_mode"
-        android:checkable="true"
-    />
     <item
         android:id="@+id/play_menu_reveal"
         android:icon="@android:drawable/ic_menu_view"
@@ -112,6 +116,22 @@
         </menu>
     </item>
     <item
+        android:id="@+id/puzzle_menu_external_tools"
+        android:icon="@android:drawable/ic_menu_view"
+        android:title="@string/external_tools"
+    >
+        <menu>
+            <item
+                android:id="@+id/puzzle_menu_crossword_solver"
+                android:title="@string/help_crossword_solver"
+            />
+            <item
+                android:id="@+id/puzzle_menu_ask_chat_gpt"
+                android:title="@string/help_query_chat_gpt"
+            />
+        </menu>
+    </item>
+    <item
         android:id="@+id/play_menu_info"
         android:icon="@android:drawable/ic_menu_info_details"
         android:title="@string/info"
@@ -119,14 +139,6 @@
     <item
         android:id="@+id/play_menu_support_source"
         android:title="@string/support_puzzle_source"
-    />
-    <item
-        android:id="@+id/puzzle_menu_special_entry"
-        android:title="@string/special_entry"
-    />
-    <item
-        android:id="@+id/puzzle_menu_ask_chat_gpt"
-        android:title="@string/help_query_chat_gpt"
     />
     <item
         android:id="@+id/puzzle_menu_share"

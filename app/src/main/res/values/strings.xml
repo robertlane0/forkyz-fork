@@ -370,6 +370,9 @@
     <string name="external_tools_settings_desc">Options for integration with external apps.</string>
     <string name="crossword_solver_enabled">Enable Crossword Solver</string>
     <string name="crossword_solver_enabled_desc">Enable calls to billthefarmer\'s Crossword solver app.</string>
+    <string name="crossword_solver_not_installed">Crossword Solver Not Installed</string>
+    <string name="crossword_solver_install_msg">Please install billthefarmer\'s Crossword solver or disable this tool in the external tool settings.</string>
+    <string name="website">Website</string>
 
     <!-- menus general -->
     <string name="help">Help</string>
@@ -414,6 +417,9 @@
     <string name="menu_notes">Notes</string>
     <string name="menu_notes_clue">Clue</string>
     <string name="menu_notes_player">Puzzle</string>
+    <string name="external_tools">External Tools</string>
+    <string name="help_crossword_solver">Crossword Solver</string>
+    <string name="help_crossword_solver_anagram">Anagram Solver</string>
 
     <!-- Clue Tabs -->
     <string name="clue_tab_history">History</string>
