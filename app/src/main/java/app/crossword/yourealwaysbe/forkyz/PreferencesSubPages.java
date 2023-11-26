@@ -215,4 +215,11 @@ public class PreferencesSubPages {
             }
         }
     }
+
+    public static class ExternalToolsFragment extends PreferencesBaseFragment {
+        @Override
+        public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+            setPreferencesFromResource(R.xml.preferences_external, rootKey);
+        }
+    }
 }

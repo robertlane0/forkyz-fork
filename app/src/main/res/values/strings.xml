@@ -365,6 +365,12 @@
     <string name="custom_url">Source URL</string>
     <string name="custom_url_desc">Enter URL formatted according to Java\'s DateTimeFormatter. The puzzle can be in any supported format.</string>
 
+    <!-- preferences external -->
+    <string name="external_tools_settings">External Tool Settings</string>
+    <string name="external_tools_settings_desc">Options for integration with external apps.</string>
+    <string name="crossword_solver_enabled">Enable Crossword Solver</string>
+    <string name="crossword_solver_enabled_desc">Enable calls to billthefarmer\'s Crossword solver app.</string>
+
     <!-- menus general -->
     <string name="help">Help</string>
     <string name="settings">Settings</string>

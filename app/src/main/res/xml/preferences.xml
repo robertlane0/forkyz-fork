@@ -62,6 +62,13 @@
         app:fragment="app.crossword.yourealwaysbe.forkyz.PreferencesSubPages$VoiceFragment"
     />
 
+    <androidx.preference.Preference
+        android:title="@string/external_tools_settings"
+        android:summary="@string/external_tools_settings_desc"
+        android:key="externalTools"
+        app:fragment="app.crossword.yourealwaysbe.forkyz.PreferencesSubPages$ExternalToolsFragment"
+    />
+
     <androidx.preference.PreferenceCategory
         android:title="@string/about_forkyz"
     >
