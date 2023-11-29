@@ -1,5 +1,5 @@
 
-package app.crossword.yourealwaysbe.forkyz.net;
+package app.crossword.yourealwaysbe.forkyz.tools;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;

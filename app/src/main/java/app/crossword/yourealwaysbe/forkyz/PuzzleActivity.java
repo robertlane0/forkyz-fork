@@ -39,8 +39,8 @@ import dagger.hilt.android.AndroidEntryPoint;
 import org.jg.wordstonumbers.WordsToNumbersUtil;
 
 import app.crossword.yourealwaysbe.forkyz.databinding.VoiceButtonsBinding;
-import app.crossword.yourealwaysbe.forkyz.net.ChatGPTHelp;
-import app.crossword.yourealwaysbe.forkyz.util.CrosswordSolver;
+import app.crossword.yourealwaysbe.forkyz.tools.ChatGPTHelp;
+import app.crossword.yourealwaysbe.forkyz.tools.CrosswordSolver;
 import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer;
 import app.crossword.yourealwaysbe.forkyz.util.SpeechContract;
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand;
