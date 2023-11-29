@@ -30,6 +30,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 
 import app.crossword.yourealwaysbe.forkyz.databinding.NotesBinding;
 import app.crossword.yourealwaysbe.forkyz.util.ColorUtils;
+import app.crossword.yourealwaysbe.forkyz.util.CrosswordSolver;
 import app.crossword.yourealwaysbe.forkyz.util.KeyboardManager;
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
@@ -1082,7 +1083,7 @@ public class NotesActivity extends PuzzleActivity {
         if (id == R.id.scratch_miniboard || isPuzzleNotes()) {
             StringBuilder request = new StringBuilder();
             getLetters(binding.scratchMiniboard, true, request);
-            launchCrosswordSolver(CROSSWORD_SOLVER_MAIN, request.toString());
+            CrosswordSolver.launchMain(this, request.toString());
         } else {
             super.callCrosswordSolver();
         }
@@ -1094,7 +1095,7 @@ public class NotesActivity extends PuzzleActivity {
         getLetters(binding.anagramSource, false, request);
         getLetters(binding.anagramSolution, false, request);
 
-        launchCrosswordSolver(CROSSWORD_SOLVER_ANAGRAM, request.toString());
+        CrosswordSolver.launchAnagram(this, request.toString());
     }
 
     /**
