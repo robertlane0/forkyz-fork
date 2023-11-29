@@ -1113,4 +1113,21 @@ public class NotesActivity extends PuzzleActivity {
                 letters.append(source.getResponse(i));
         }
     }
+
+    /**
+     * Override to use scratch for puzzle notes page or if scratch focussed
+     */
+    protected void callExternalDictionary() {
+        View focused = getWindow().getCurrentFocus();
+        int id = (focused == null) ? -1 : focused.getId();
+        if (id == R.id.scratch_miniboard || isPuzzleNotes()) {
+            settings.getExtDictionary(dictionary -> {
+                StringBuilder request = new StringBuilder();
+                getLetters(binding.scratchMiniboard, true, request);
+                dictionary.query(this, request.toString());
+            });
+        } else {
+            super.callExternalDictionary();
+        }
+    }
 }

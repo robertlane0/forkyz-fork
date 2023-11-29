@@ -149,7 +149,11 @@ public abstract class PuzzleActivity
 
         canRequestHelpForCurrentClue(canRequest -> {
         settings.getExtCrosswordSolverEnabled(solverEnabled -> {
-            boolean extEnabled = canRequest || solverEnabled;
+        settings.getExtDictionary(dictionary -> {
+            boolean extEnabled =
+                canRequest
+                || solverEnabled
+                || dictionary != null;
 
             if (!extEnabled) {
                 MenuItem ext = menu.findItem(R.id.puzzle_menu_external_tools);
@@ -169,7 +173,14 @@ public abstract class PuzzleActivity
                 solver.setVisible(false);
                 solver.setEnabled(false);
             }
-        });});
+
+            if (dictionary == null) {
+                MenuItem help
+                    = menu.findItem(R.id.puzzle_menu_external_dictionary);
+                help.setVisible(false);
+                help.setEnabled(false);
+            }
+        });});});
 
         return true;
     }
@@ -227,6 +238,9 @@ public abstract class PuzzleActivity
             return true;
         } else if (id == R.id.puzzle_menu_crossword_solver) {
             callCrosswordSolver();
+            return true;
+        } else if (id == R.id.puzzle_menu_external_dictionary) {
+            callExternalDictionary();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -1018,5 +1032,31 @@ public abstract class PuzzleActivity
         }
 
         CrosswordSolver.launchMain(this, request.toString());
+    }
+
+    protected void callExternalDictionary() {
+        Playboard board = getBoard();
+        Zone zone = (board == null) ? null : board.getCurrentZone();
+        if (zone == null)
+            return;
+
+        Puzzle puz = getPuzzle();
+        if (puz == null)
+            return;
+
+        settings.getExtDictionary(dictionary -> {
+            if (dictionary == null)
+                return;
+
+            StringBuilder request = new StringBuilder();
+
+            for (Position pos : zone) {
+                Box box = puz.checkedGetBox(pos);
+                if (box != null)
+                    request.append(box.getResponse());
+            }
+
+            dictionary.query(this, request.toString());
+        });
     }
 }

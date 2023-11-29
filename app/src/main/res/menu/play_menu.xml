@@ -122,6 +122,10 @@
     >
         <menu>
             <item
+                android:id="@+id/puzzle_menu_external_dictionary"
+                android:title="@string/help_external_dictionary"
+            />
+            <item
                 android:id="@+id/puzzle_menu_crossword_solver"
                 android:title="@string/help_crossword_solver"
             />

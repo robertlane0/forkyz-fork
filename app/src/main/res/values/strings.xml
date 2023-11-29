@@ -366,6 +366,8 @@
     <string name="custom_url_desc">Enter URL formatted according to Java\'s DateTimeFormatter. The puzzle can be in any supported format.</string>
 
     <!-- preferences external -->
+    <string name="external_dictionary">External Dictionary</string>
+    <string name="external_dictionary_desc">External dictionary for looking up entries.</string>
     <string name="external_tools_settings">External Tool Settings</string>
     <string name="external_tools_settings_desc">Options for integration with external apps.</string>
     <string name="crossword_solver_enabled">Enable Crossword Solver</string>
@@ -418,6 +420,7 @@
     <string name="menu_notes_clue">Clue</string>
     <string name="menu_notes_player">Puzzle</string>
     <string name="external_tools">External Tools</string>
+    <string name="help_external_dictionary">Dictionary</string>
     <string name="help_crossword_solver">Crossword Solver</string>
     <string name="help_crossword_solver_anagram">Anagram Solver</string>
 

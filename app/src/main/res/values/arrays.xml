@@ -184,6 +184,14 @@
          <item>Color 3</item>
          <item>Color 4</item>
      </string-array>
+     <string-array name="external_dictionary_labels">
+         <item>None</item>
+         <item>The Free Dictionary (web)</item>
+     </string-array>
+     <string-array name="external_dictionary_values">
+         <item>NONE</item>
+         <item>FREE</item>
+     </string-array>
 
      <string-array name="emptyArray"/>
 </resources>

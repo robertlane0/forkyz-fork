@@ -5,6 +5,14 @@
     android:title="@string/external_tools_settings"
     android:key="externalTools"
 >
+    <androidx.preference.ListPreference
+        android:title="@string/external_dictionary"
+        android:summary="@string/external_dictionary_desc"
+        android:key="externalDictionary"
+        android:defaultValue="1"
+        android:entries="@array/external_dictionary_labels"
+        android:entryValues="@array/external_dictionary_values"
+    />
     <androidx.preference.CheckBoxPreference
         android:title="@string/crossword_solver_enabled"
         android:defaultValue="true"

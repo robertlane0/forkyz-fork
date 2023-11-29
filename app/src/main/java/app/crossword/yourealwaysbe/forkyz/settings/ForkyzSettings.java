@@ -25,8 +25,9 @@ import dagger.hilt.android.qualifiers.ApplicationContext;
 
 import app.crossword.yourealwaysbe.forkyz.net.Downloader;
 import app.crossword.yourealwaysbe.forkyz.net.Downloaders;
-import app.crossword.yourealwaysbe.puz.MovementStrategy;
+import app.crossword.yourealwaysbe.forkyz.tools.ExternalDictionary;
 import app.crossword.yourealwaysbe.forkyz.util.files.Accessor;
+import app.crossword.yourealwaysbe.puz.MovementStrategy;
 
 /**
  * Async settings
@@ -66,6 +67,7 @@ public class ForkyzSettings {
     private static final String PREF_EXT_CHAT_GPT_API_KEY = "chatGPTAPIKey";
     private static final String PREF_EXT_CROSSWORD_SOLVER_ENABLED
         = "crosswordSolverEnabled";
+    private static final String PREF_EXT_DICTIONARY = "externalDictionary";
 
     private static final String PREF_CLUE_LIST_SHOW_WORDS
         = "showWordsInClueList";
@@ -526,6 +528,18 @@ public class ForkyzSettings {
 
     public void getExtCrosswordSolverEnabled(Consumer<Boolean> cb) {
         getBooleanPreference(PREF_EXT_CROSSWORD_SOLVER_ENABLED, cb);
+    }
+
+    public void getExtDictionary(Consumer<ExternalDictionary> cb) {
+        executor.execute(() -> {
+            String value = prefs.getString(PREF_EXT_DICTIONARY, "FREE");
+            handler.post(() -> {
+                if ("NONE".equals(value))
+                    cb.accept(null);
+                else
+                    cb.accept(ExternalDictionary.FREE_DICTIONARY);
+            });
+        });
     }
 
     /**
