@@ -372,9 +372,6 @@
     <string name="external_tools_settings_desc">Options for integration with external apps.</string>
     <string name="crossword_solver_enabled">Enable Crossword Solver</string>
     <string name="crossword_solver_enabled_desc">Enable calls to billthefarmer\'s Crossword solver app.</string>
-    <string name="crossword_solver_not_installed">Crossword Solver Not Installed</string>
-    <string name="crossword_solver_install_msg">Please install billthefarmer\'s Crossword solver or disable this tool in the external tool settings.</string>
-    <string name="website">Website</string>
 
     <!-- menus general -->
     <string name="help">Help</string>
@@ -615,4 +612,10 @@
     <string name="chat_gpt_api_key">ChatGPT API Key</string>
     <string name="chat_gpt_api_key_desc">You need an API key to use ChatGPT help. You can get an API Key from your Open AI account settings.</string>
     <string name="chat_gpt_api_key_message">ChatGPT is an external network service run by OpenAI requiring a network connection. Its responses are not filtered by Forkyz and may be misleading, give away the answer, or be otherwise problematic. Use at your own risk.</string>
+
+    <!-- external apps -->
+    <string name="crossword_solver">Crossword Solver</string>
+    <string name="external_app_not_installed">%1$s Not Installed</string>
+    <string name="external_app_install_msg">Please install %1$s or disable this tool in the external tool settings.</string>
+    <string name="website">Website</string>
 </resources>

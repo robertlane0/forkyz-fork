@@ -1,17 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.tools;
 
-import android.app.Activity;
-import android.app.Dialog;
-import android.content.ActivityNotFoundException;
-import android.content.ComponentName;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.DialogFragment;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import app.crossword.yourealwaysbe.forkyz.R;
 
@@ -71,49 +61,14 @@ public class CrosswordSolver {
     private static void launchCrosswordSolver(
         AppCompatActivity forkyzActivity, String solverActivity, String request
     ) {
-        try {
-            Intent i = new Intent();
-            i.setComponent(
-                new ComponentName(CROSSWORD_SOLVER, solverActivity)
-            );
-            i.putExtra(android.content.Intent.EXTRA_TEXT, request);
-            forkyzActivity.startActivity(i);
-        } catch (ActivityNotFoundException e) {
-            DialogFragment dialog = new NoCrosswordSolverDialog();
-            dialog.show(
-                forkyzActivity.getSupportFragmentManager(),
-                "NoCrosswordSolverDialog"
-            );
-        }
-    }
-
-    public static class NoCrosswordSolverDialog extends DialogFragment {
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            Activity activity = getActivity();
-
-            MaterialAlertDialogBuilder builder
-                = new MaterialAlertDialogBuilder(activity);
-
-            builder.setTitle(R.string.crossword_solver_not_installed)
-                .setMessage(R.string.crossword_solver_install_msg)
-                .setNegativeButton(
-                    R.string.website,
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(
-                            DialogInterface dialogInterface, int i
-                        ) {
-                            Intent intent = new Intent(Intent.ACTION_VIEW);
-                            intent.setData(
-                                Uri.parse(CROSSWORD_SOLVER_WEBSITE_URL)
-                            );
-                            activity.startActivity(intent);
-                        }
-                    }
-                ).setPositiveButton(android.R.string.ok, null);
-
-            return builder.create();
-       }
+        ExternalCaller.launchApp(
+            forkyzActivity,
+            CROSSWORD_SOLVER,
+            solverActivity,
+            android.content.Intent.EXTRA_TEXT,
+            request,
+            forkyzActivity.getString(R.string.crossword_solver),
+            CROSSWORD_SOLVER_WEBSITE_URL
+        );
     }
 }
