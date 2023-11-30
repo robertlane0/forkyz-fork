@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.net.Uri;
 import androidx.appcompat.app.AppCompatActivity;
 
+import app.crossword.yourealwaysbe.forkyz.R;
+
 public abstract class ExternalDictionary {
 
     /**
@@ -28,6 +30,22 @@ public abstract class ExternalDictionary {
                     String.format(Locale.getDefault(), URL_FORMAT, word)
                 ));
                 activity.startActivity(intent);
+            }
+        };
+
+    public static final ExternalDictionary QUICK_DIC
+        = new ExternalDictionary() {
+            @Override
+            public void query(AppCompatActivity activity, String word) {
+                ExternalCaller.launchApp(
+                    activity,
+                    "de.reimardoeffinger.quickdic",
+                    "com.hughes.android.dictionary.DictionaryActivity",
+                    "searchToken",
+                    word,
+                    activity.getString(R.string.quick_dic),
+                    "https://github.com/rdoeffinger/Dictionary/releases"
+                );
             }
         };
 }

@@ -615,6 +615,7 @@
 
     <!-- external apps -->
     <string name="crossword_solver">Crossword Solver</string>
+    <string name="quick_dic">QuickDic</string>
     <string name="external_app_not_installed">%1$s Not Installed</string>
     <string name="external_app_install_msg">Please install %1$s or disable this tool in the external tool settings.</string>
     <string name="website">Website</string>

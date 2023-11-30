@@ -536,6 +536,8 @@ public class ForkyzSettings {
             handler.post(() -> {
                 if ("NONE".equals(value))
                     cb.accept(null);
+                else if ("QUICK".equals(value))
+                    cb.accept(ExternalDictionary.QUICK_DIC);
                 else
                     cb.accept(ExternalDictionary.FREE_DICTIONARY);
             });
