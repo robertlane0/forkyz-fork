@@ -538,6 +538,8 @@ public class ForkyzSettings {
                     cb.accept(null);
                 else if ("QUICK".equals(value))
                     cb.accept(ExternalDictionary.QUICK_DIC);
+                else if ("AARD2".equals(value))
+                    cb.accept(ExternalDictionary.AARD2);
                 else
                     cb.accept(ExternalDictionary.FREE_DICTIONARY);
             });

@@ -188,11 +188,13 @@
          <item>None</item>
          <item>The Free Dictionary (web)</item>
          <item>@string/quick_dic</item>
+         <item>@string/aard2</item>
      </string-array>
      <string-array name="external_dictionary_values">
          <item>NONE</item>
          <item>FREE</item>
          <item>QUICK</item>
+         <item>AARD2</item>
      </string-array>
 
      <string-array name="emptyArray"/>

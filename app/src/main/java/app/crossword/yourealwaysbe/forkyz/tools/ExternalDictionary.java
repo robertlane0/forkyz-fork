@@ -3,6 +3,7 @@ package app.crossword.yourealwaysbe.forkyz.tools;
 
 import java.util.Locale;
 
+import android.app.SearchManager;
 import android.content.Intent;
 import android.net.Uri;
 import androidx.appcompat.app.AppCompatActivity;
@@ -45,6 +46,21 @@ public abstract class ExternalDictionary {
                     word,
                     activity.getString(R.string.quick_dic),
                     "https://github.com/rdoeffinger/Dictionary/releases"
+                );
+            }
+        };
+
+    public static final ExternalDictionary AARD2
+        = new ExternalDictionary() {
+            @Override
+            public void query(AppCompatActivity activity, String word) {
+                ExternalCaller.launchIntent(
+                    activity,
+                    "aard2.lookup",
+                    SearchManager.QUERY,
+                    word,
+                    activity.getString(R.string.aard2),
+                    "https://aarddict.org/"
                 );
             }
         };
