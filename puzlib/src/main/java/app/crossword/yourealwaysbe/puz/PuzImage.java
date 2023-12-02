@@ -11,6 +11,8 @@ import java.util.Objects;
  * either be a url to a file, or a data url in base64.
  */
 public class PuzImage implements Serializable {
+    private static final long serialVersionUID = 1296894387919009041L;
+
     private String url;
     private int row;
     private int col;

@@ -13,6 +13,8 @@ public interface MovementStrategy extends Serializable {
     Word back(Playboard board);
 
     MovementStrategy MOVE_NEXT_ON_AXIS = new MovementStrategy() {
+        private static final long serialVersionUID = 1077147975393769893L;
+
         @Override
         public Word move(Playboard board, boolean skipCompletedLetters) {
             Position startPos = board.getHighlightLetter();
@@ -77,6 +79,8 @@ public interface MovementStrategy extends Serializable {
     };
 
     MovementStrategy STOP_ON_END = new MovementStrategy() {
+        private static final long serialVersionUID = 4632350074150370031L;
+
         @Override
         public Word move(Playboard board, boolean skipCompletedLetters) {
             return board.moveZoneForward(skipCompletedLetters);
@@ -89,6 +93,8 @@ public interface MovementStrategy extends Serializable {
     };
 
     MovementStrategy MOVE_NEXT_CLUE = new MovementStrategy() {
+        private static final long serialVersionUID = 74778805344577390L;
+
         @Override
         public Word move(Playboard board, boolean skipCompletedLetters) {
             return move(board, skipCompletedLetters, null, null, null, null);
@@ -231,6 +237,8 @@ public interface MovementStrategy extends Serializable {
     };
 
     MovementStrategy MOVE_PARALLEL_WORD = new MovementStrategy() {
+        private static final long serialVersionUID = 510674345153239180L;
+
         @Override
         public Word move(Playboard board, boolean skipCompletedLetters) {
             return move(board, skipCompletedLetters, null);
@@ -494,6 +502,8 @@ public interface MovementStrategy extends Serializable {
      * coming rapidly (e.g. keyboard held down).
      */
     public class CycleUnfilled implements MovementStrategy {
+        private static final long serialVersionUID = 501614123509807492L;
+
         private static final long BACK_CYCLE_DELAY = 150; // ms
 
         private MovementStrategy innerStrategy;

@@ -80,6 +80,7 @@ public class JPZIO implements PuzzleParser {
         = Logger.getLogger("app.crossword.yourealwaysbe");
 
     public static class JPZIOException extends Exception {
+        private static final long serialVersionUID = 7282078884926685757L;
         public JPZIOException(String msg) { super(msg); }
     }
 
@@ -87,6 +88,8 @@ public class JPZIO implements PuzzleParser {
     private static final String ACROSTIC_QUOTE_HINT = "Quote";
 
     private static class ClueInfo extends ClueID {
+        private static final long serialVersionUID = 7114093029494561830L;
+
         private String clueNumber;
         private String hint;
         private String zoneID;

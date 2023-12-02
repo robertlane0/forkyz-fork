@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.logging.Logger;
 
 public class Note implements Serializable {
+    private static final long serialVersionUID = 1695240845022852352L;
+
     private static final Logger LOG
         = Logger.getLogger(Note.class.getCanonicalName());
 

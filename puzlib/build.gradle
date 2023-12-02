@@ -36,4 +36,13 @@ dependencies {
             options.release = 8
         }
     }
+
+    tasks.withType(JavaCompile) {
+        configure(options) {
+            // -processing as adding room annotation processor library
+            // causes warnings about unprocessed annotations for an
+            // unclear reason
+            options.compilerArgs << '-Xlint:all' << '-Xlint:-processing'
+        }
+    }
 }

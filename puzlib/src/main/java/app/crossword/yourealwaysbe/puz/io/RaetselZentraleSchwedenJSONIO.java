@@ -47,6 +47,7 @@ public class RaetselZentraleSchwedenJSONIO implements PuzzleParser {
     private static final String EMPTY_CELL = "+";
 
     public static class RZSFormatException extends Exception {
+        private static final long serialVersionUID = 5710058656901918269L;
         public RZSFormatException(String msg) { super(msg); }
     }
 

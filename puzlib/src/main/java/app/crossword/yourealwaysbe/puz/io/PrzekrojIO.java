@@ -39,6 +39,7 @@ public class PrzekrojIO implements PuzzleParser {
      * An unfancy exception indicating error while parsing
      */
     public static class PrzFormatException extends Exception {
+        private static final long serialVersionUID = 3223598715520514002L;
         public PrzFormatException(String msg) { super(msg); }
     }
 

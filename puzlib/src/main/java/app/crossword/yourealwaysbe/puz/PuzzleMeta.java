@@ -12,6 +12,7 @@ import java.util.Objects;
  * TODO: rename!
  */
 public class PuzzleMeta implements Serializable {
+    private static final long serialVersionUID = 8186225059888351752L;
 
     public static class ListNum {
         private String listName;

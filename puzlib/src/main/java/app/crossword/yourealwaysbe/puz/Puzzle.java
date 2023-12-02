@@ -25,6 +25,8 @@ import java.util.logging.Logger;
  * Note objects which do not support it.
  */
 public class Puzzle implements Serializable{
+    private static final long serialVersionUID = 4424966800816624115L;
+
     private static final Logger LOG = Logger.getLogger("app.crossword.yourealwaysbe");
 
     private String author;

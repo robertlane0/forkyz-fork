@@ -85,6 +85,7 @@ public class KeesingXMLIO implements PuzzleParser {
     );
 
     public static class KeesingXMLParserException extends Exception {
+        private static final long serialVersionUID = 1083227738212688481L;
         public KeesingXMLParserException(String msg) {
             super(msg);
         }

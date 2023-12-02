@@ -10,6 +10,8 @@ import java.util.Objects;
  * Must have a listName and index, number is optional.
  */
 public class Clue implements Serializable {
+    private static final long serialVersionUID = 2973710091235898521L;
+
     public static final int DEFAULT_FLAG_COLOR = -1;
 
     private ClueID clueID;

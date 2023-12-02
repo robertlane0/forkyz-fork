@@ -39,6 +39,7 @@ public class RCIJeuxMFJIO implements PuzzleParser {
     private static final char JOIN_DASH = '–';
 
     public static class MFJFormatException extends Exception {
+        private static final long serialVersionUID = 6288124829707522643L;
         public MFJFormatException(String msg) { super(msg); }
     }
 

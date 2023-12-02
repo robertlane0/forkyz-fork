@@ -30,6 +30,7 @@ public class AmuseLabsJSONIO implements PuzzleParser {
      * An unfancy exception indicating error while parsing
      */
     public static class AmuseLabsFormatException extends Exception {
+        private static final long serialVersionUID = 2649433759853212815L;
         public AmuseLabsFormatException(String msg) { super(msg); }
     }
 

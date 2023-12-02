@@ -333,6 +333,7 @@ public class IPuzIO implements PuzzleParser {
      * An unfancy exception indicating error while parsing
      */
     public static class IPuzFormatException extends Exception {
+        private static final long serialVersionUID = 5890275381530098661L;
         public IPuzFormatException(String msg) { super(msg); }
     }
 

@@ -15,6 +15,8 @@ import app.crossword.yourealwaysbe.puz.util.PuzzleUtils;
 import app.crossword.yourealwaysbe.puz.util.WeakSet;
 
 public class Playboard implements Serializable {
+    private static final long serialVersionUID = 4593768901101043503L;
+
     private static final Logger LOG = Logger.getLogger(Playboard.class.getCanonicalName());
 
     private MovementStrategy movementStrategy = MovementStrategy.MOVE_NEXT_ON_AXIS;
@@ -1735,6 +1737,8 @@ public class Playboard implements Serializable {
      * A Zone and possibly the clue it goes with (null if no clue).
      */
     public static class Word implements Serializable {
+        private static final long serialVersionUID = 7726718778003961317L;
+
         private final Zone zone;
         private final ClueID clueID;
 

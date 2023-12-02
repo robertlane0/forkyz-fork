@@ -13,6 +13,8 @@ import java.util.List;
  * in a line across or down, but can be any sequence.
  */
 public class Zone implements Iterable<Position>, Serializable {
+    private static final long serialVersionUID = 1883316891012999786L;
+
     private final List<Position> positions = new ArrayList<>();
 
     public boolean hasPosition(Position pos) {

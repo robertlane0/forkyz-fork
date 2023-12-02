@@ -8,6 +8,8 @@ import java.util.Objects;
 import java.util.TreeMap;
 
 public class Box implements Serializable {
+    private static final long serialVersionUID = 5432015770689391374L;
+
     public static final String BLANK = " ";
     private static final int NOCOLOR = -1;
 

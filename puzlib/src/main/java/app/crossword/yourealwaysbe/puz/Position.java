@@ -5,6 +5,8 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 public class Position implements Serializable {
+    private static final long serialVersionUID = 2876695329908768560L;
+
     private int row;
     private int col;
 
