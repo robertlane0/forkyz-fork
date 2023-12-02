@@ -73,7 +73,6 @@ public class AbstractRCIJeuxMFJDateDownloader extends AbstractDateDownloader {
     @Override
     protected String getSourceUrl(LocalDate date) {
         long cwNumber = getCrosswordNumber(date);
-        System.out.println(String.format(Locale.US, this.sourceUrlFormat, cwNumber));
         return String.format(Locale.US, this.sourceUrlFormat, cwNumber);
     }
 
