@@ -123,6 +123,8 @@ public class ForkyzSettings {
     private static final String PREF_PLAY_FULL_SCREEN = "fullScreen";
     private static final String PREF_PLAY_MOVEMENT_STRATEGY
         = "movementStrategy";
+    private static final String PREF_PLAY_PREDICT_ANAGRAM_CHARS
+        = "predictAnagramChars";
     private static final String
     PREF_PLAY_PRESERVE_CORRECT_LETTERS_IN_SHOW_ERRORS
         = "preserveCorrectLettersInShowErrors";
@@ -202,6 +204,7 @@ public class ForkyzSettings {
         BOOL_DEFAULTS.put(PREF_PLAY_ENTER_CHANGES_DIRECTION, true);
         BOOL_DEFAULTS.put(PREF_PLAY_FIT_TO_SCREEN, false);
         BOOL_DEFAULTS.put(PREF_PLAY_FULL_SCREEN, false);
+        BOOL_DEFAULTS.put(PREF_PLAY_PREDICT_ANAGRAM_CHARS, true);
         BOOL_DEFAULTS.put(
             PREF_PLAY_PRESERVE_CORRECT_LETTERS_IN_SHOW_ERRORS, false
         );
@@ -764,6 +767,15 @@ public class ForkyzSettings {
      */
     public void getPlayRandomClueOnShake(Consumer<Boolean> cb) {
         getBooleanPreference(PREF_PLAY_RANDOM_CLUE_ON_SHAKE, cb);
+    }
+
+    /**
+     * Whether to try to guess the source chars of an anagram
+     *
+     * On notes page, predict by matching against clue
+     */
+    public void getPlayPredictAnagramChars(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_PLAY_PREDICT_ANAGRAM_CHARS, cb);
     }
 
     /**

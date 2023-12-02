@@ -6,6 +6,8 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.inject.Inject;
 
 import android.app.Dialog;
@@ -259,6 +261,17 @@ public class NotesActivity extends PuzzleActivity {
                         binding.anagramSource.setResponse(i, cj);
                         binding.anagramSource.setResponse(j, ci);
                     }
+                }
+            }
+        );
+        binding.anagramSource.setSelectionListener(
+            new BoardEditText.SelectionListener() {
+                @Override
+                public void onSelect(int pos) {
+                    if (pos >= 0)
+                        predictAnagramChars();
+                    else
+                        clearAnagramPrediction();
                 }
             }
         );
@@ -555,6 +568,32 @@ public class NotesActivity extends PuzzleActivity {
                     }
                 }
             }
+
+            @Override
+            public void postChange(int pos, char oldChar, boolean isDelete) {
+                settings.getPlayPredictAnagramChars(predict -> {
+                    if (!predict)
+                        return;
+
+                    String prediction = predictAnagramChars();
+
+                    // only enter a prediction if it exists and is a blank
+                    // entry that didn't delete a non-blank, and is not
+                    // a delete (that could have deleted a blank)
+                    if (
+                        prediction != null
+                        && binding.anagramSource.isBlank(pos)
+                        && BoardEditText.isBlank(oldChar)
+                        && !isDelete
+                    ) {
+                        binding.anagramSource.setFromString(prediction);
+                        binding.anagramSource.setSelectedCol(
+                            prediction.length() - 1
+                        );
+                        numAnagramLetters = prediction.length();
+                    }
+                });
+            }
         };
 
         binding.anagramSource.setFilters(
@@ -586,17 +625,17 @@ public class NotesActivity extends PuzzleActivity {
         if (note != null) {
             binding.notesBox.setText(note.getText());
 
-            binding.scratchMiniboard.setFromString(note.getScratch());
+            binding.scratchMiniboard.initialiseFromString(note.getScratch());
 
             String src = note.getAnagramSource();
             if (src != null) {
-                binding.anagramSource.setFromString(src);
+                binding.anagramSource.initialiseFromString(src);
                 numAnagramLetters += binding.anagramSource.getNumNonBlank();
             }
 
             String sol = note.getAnagramSolution();
             if (sol != null) {
-                binding.anagramSolution.setFromString(sol);
+                binding.anagramSolution.initialiseFromString(sol);
                 numAnagramLetters +=  binding.anagramSolution.getNumNonBlank();
             }
         }
@@ -1129,5 +1168,95 @@ public class NotesActivity extends PuzzleActivity {
         } else {
             super.callExternalDictionary();
         }
+    }
+
+    /**
+     * Predict rest of letters for anagram
+     *
+     * Sets prediction to anagram shadow and returns it too. Returns
+     * null if no prediction. Only predicts if the selected position is
+     * after the characters entered so far.
+     */
+    private String predictAnagramChars(){
+        clearAnagramPrediction();
+
+        if (isPuzzleNotes())
+            return null;
+
+        Playboard board = getBoard();
+        Clue clue = (board == null) ? null : board.getClue();
+        if (clue == null)
+            return null;
+
+        // only make a prediction if all characters are at the
+        // start of the source box (i.e. user is currently
+        // filling)
+        int numLeadChars = countLeadChars();
+        if (numLeadChars == 0 || numLeadChars != numAnagramLetters)
+            return null;
+
+        String leadChars = binding.anagramSource.toString(true);
+        String hint = clue.getHint();
+
+        // only predict if not editing lead chars
+        if (binding.anagramSource.getSelectedCol() < leadChars.length())
+            return null;
+
+        // case insensitive trick:
+        // https://www.baeldung.com/java-case-insensitive-string-matching
+        Pattern p = Pattern.compile("(?i)" + leadChars);
+        Matcher m = p.matcher(hint);
+        if (!m.find())
+            return null;
+
+        String prediction = getUpperLetters(
+            hint, m.start(), binding.anagramSource.getLength()
+        );
+
+        binding.anagramSource.setShadow(prediction);
+
+        return prediction;
+    }
+
+    /**
+     * Number of non-blank chars at start of source edit
+     */
+    private int countLeadChars() {
+        int numLeadChars = 0;
+        int len = binding.anagramSource.getLength();
+        for (int i = 0; i < len; i++) {
+            if (binding.anagramSource.isBlank(i))
+                break;
+            numLeadChars++;
+        }
+        return numLeadChars;
+    }
+
+    /**
+     * Get alphabetic chars from string in uppercase
+     *
+     * @param source string to get from
+     * @param start char to start from
+     * @param length max num chars to get
+     * @return string up to length chars only alphabetical or
+     * number converted to upper case
+     */
+    private String getUpperLetters(
+        String source, int start, int length
+    ) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = start; i < source.length(); i++) {
+            char c = source.charAt(i);
+            if (utils.isAlphabetic(c)) {
+                sb.append(Character.toUpperCase(c));
+                if (sb.length() >= length)
+                    break;
+            }
+        }
+        return sb.toString();
+    }
+
+    private void clearAnagramPrediction() {
+        binding.anagramSource.clearShadow();
     }
 }

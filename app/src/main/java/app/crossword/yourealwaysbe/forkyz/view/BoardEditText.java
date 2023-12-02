@@ -70,12 +70,27 @@ public class BoardEditText
          * if the replacement is not allowed
          */
         public char filter(char oldChar, char newChar, int pos);
+
+        /**
+         * @param pos the position the new char was put
+         * @param oldChar the char that was overwritten
+         */
+        default void postChange(int pos, char oldChar, boolean isDelete) { }
+    }
+
+    public interface SelectionListener {
+        /**
+         * Notify when selected pos change, -1 when lose focus
+         */
+        void onSelect(int pos);
     }
 
     private Position selection = new Position(0, -1);
     private Box[] boxes;
     private boolean[] changes;
     private PlayboardRenderer renderer;
+    private String shadow;
+    private SelectionListener selectionListener = null;
 
     private BoardEditFilter[] filters;
 
@@ -100,6 +115,13 @@ public class BoardEditText
 
         setAllowOverScroll(false);
         setAllowZoom(false);
+    }
+
+    /**
+     * Get notified when selected cell changes
+     */
+    public void setSelectionListener(SelectionListener selectionListener) {
+        this.selectionListener = selectionListener;
     }
 
     @Override
@@ -148,6 +170,7 @@ public class BoardEditText
     public void onDeleteResponse() {
         if (boxes != null) {
             int col = getSelectedCol();
+            char oldChar = getResponse(col);
 
             if (boxes[col].isBlank() && col > 0) {
                 flagChanged(col);
@@ -158,6 +181,8 @@ public class BoardEditText
                 boxes[col].setBlank();
                 flagChanged(col);
             }
+
+            notifyPostChange(col, oldChar, true);
 
             this.render();
             updateInputConnection();
@@ -257,7 +282,32 @@ public class BoardEditText
             setResponse(pos, c.charAt(0));
     }
 
+    /**
+     * Fill the existing boxes from the string
+     *
+     * Overwrite from start to end or length of text
+     */
     public void setFromString(String text) {
+        if (text == null)
+            return;
+
+        int end = Math.min(text.length(), boxes.length);
+
+        for (int i = 0; i < end; i++) {
+            boxes[i].setResponse(text.charAt(i));
+            flagChanged(i);
+        }
+
+        render();
+        updateInputConnection();
+    }
+
+    /**
+     * Initialise the boxes and length from the given string
+     *
+     * Creates new boxes of given length
+     */
+    public void initialiseFromString(String text) {
         if (text == null) {
             boxes = null;
         } else {
@@ -281,15 +331,51 @@ public class BoardEditText
         }
     }
 
-    public String toString() {
-        if (boxes == null) {
-            return "";
+    /**
+     * Set a string to display in the boxes as a note
+     *
+     * Can be used e.g. for predictive text. Will be displayed as
+     * smaller chars
+     */
+    public void setShadow(String shadow) {
+        int oldLen = (this.shadow == null) ? 0 : this.shadow.length();
+        int newLen = (shadow == null) ? 0 : shadow.length();
+        int len = Math.max(oldLen, newLen);
+        len = Math.min(len, boxes.length);
+
+        // only flag changes for blank cells that would show new shadow
+        for (int i = 0; i < len; i++) {
+            if (isBlank(i))
+                flagChanged(i);
         }
+
+        this.shadow = shadow;
+
+        render();
+    }
+
+    public void clearShadow() {
+        setShadow(null);
+    }
+
+    public String toString() {
+        return toString(false);
+    }
+
+    /**
+     * Convert to string
+     *
+     * @param skipBlanks don't include blank boxes
+     */
+    public String toString(boolean skipBlanks) {
+        if (boxes == null)
+            return "";
 
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < boxes.length; i++) {
-            sb.append(boxes[i].getResponse());
+            if (!skipBlanks || !boxes[i].isBlank())
+                sb.append(boxes[i].getResponse());
         }
 
         return sb.toString();
@@ -436,6 +522,21 @@ public class BoardEditText
         return Box.BLANK.equals(String.valueOf(c));
     }
 
+    public int getSelectedCol() {
+        return selection.getCol();
+    }
+
+    public void setSelectedCol(int col) {
+        flagChanged(selection.getCol(), col);
+        selection.setCol(col);
+        updateInputConnection();
+        sendAccessibilityEvent(
+            AccessibilityEvent.TYPE_VIEW_TEXT_SELECTION_CHANGED
+        );
+        if (selectionListener != null)
+            selectionListener.onSelect(col);
+    }
+
     private void onNewResponse(char character) {
         if (!isAcceptableCharacterResponse(character))
             return;
@@ -444,11 +545,13 @@ public class BoardEditText
 
         if (c != '\0') {
             settings.getPlaySkipFilled(skipCompleted -> {
-                int col = getSelectedCol();
+                int enteredCol = getSelectedCol();
+                char oldChar = getResponse(enteredCol);
 
                 // we'll update later if the selection doesn't change
-                setResponseNoInputConnectionUpdate(col, c);
+                setResponseNoInputConnectionUpdate(enteredCol, c);
 
+                int col = enteredCol;
                 if (col < boxes.length - 1) {
                     col += 1;
                     int nextPos = col;
@@ -466,6 +569,8 @@ public class BoardEditText
                 } else {
                     updateInputConnection();
                 }
+
+                notifyPostChange(enteredCol, oldChar, false);
 
                 this.render();
             });
@@ -491,6 +596,7 @@ public class BoardEditText
         executorService.execute(() -> {
             Bitmap bitmap = renderer.drawBoxes(
                 boxes,
+                shadow,
                 renderChanges,
                 selection,
                 null,
@@ -553,19 +659,6 @@ public class BoardEditText
             return box;
         else
             return -1;
-    }
-
-    private int getSelectedCol() {
-        return selection.getCol();
-    }
-
-    private void setSelectedCol(int col) {
-        flagChanged(selection.getCol(), col);
-        selection.setCol(col);
-        updateInputConnection();
-        sendAccessibilityEvent(
-            AccessibilityEvent.TYPE_VIEW_TEXT_SELECTION_CHANGED
-        );
     }
 
     private String getSelectedResponse() {
@@ -636,5 +729,15 @@ public class BoardEditText
         }
 
         return false;
+    }
+
+    private void notifyPostChange(int pos, char oldChar, boolean isDelete) {
+        if (filters == null)
+            return;
+
+        for (BoardEditFilter filter : filters) {
+            if (filter != null)
+                filter.postChange(pos, oldChar, isDelete);
+        }
     }
 }

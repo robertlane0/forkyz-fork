@@ -252,6 +252,8 @@
     <string name="theme_preference_desc">Select application theme (requires restart).</string>
     <string name="random_clue_on_shake">Random Clue on Shake</string>
     <string name="random_clue_on_shake_desc">Jump to a random unfilled clue when shake detected in main puzzle activity.</string>
+    <string name="predict_anagram_chars">Predict Anagram Characters</string>
+    <string name="predict_anagram_chars_desc">Predict anagram source in notes by matching against current clue. Space accepts a prediction.</string>
 
     <!-- preferences download -->
     <string name="auto_downloaders">Automatic Download Sources</string>

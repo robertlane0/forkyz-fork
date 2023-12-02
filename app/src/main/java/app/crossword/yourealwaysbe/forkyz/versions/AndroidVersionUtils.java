@@ -180,4 +180,11 @@ public interface AndroidVersionUtils {
      * nothing before API 21.
      */
     public void setupBottomInsets(View view);
+
+    /**
+     * Character.isAlphabetic
+     *
+     * Defaults to isLetter pre KITKAT
+     */
+    public boolean isAlphabetic(char c);
 }

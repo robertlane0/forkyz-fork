@@ -84,4 +84,11 @@
         android:key="randomClueOnShake"
     />
 
+    <androidx.preference.CheckBoxPreference
+        android:title="@string/predict_anagram_chars"
+        android:defaultValue="true"
+        android:summary="@string/predict_anagram_chars_desc"
+        android:key="predictAnagramChars"
+    />
+
 </androidx.preference.PreferenceScreen>

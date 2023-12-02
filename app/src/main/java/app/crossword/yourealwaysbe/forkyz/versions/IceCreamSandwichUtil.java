@@ -228,4 +228,9 @@ public class IceCreamSandwichUtil implements AndroidVersionUtils {
     public void setupBottomInsets(View view) {
         // do nothing
     }
+
+    @Override
+    public boolean isAlphabetic(char c) {
+        return Character.isLetter(c);
+    }
 }

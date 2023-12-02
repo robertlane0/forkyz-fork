@@ -273,6 +273,7 @@ public class PlayboardRenderer {
                 x, y,
                 pos.getRow(), pos.getCol(),
                 boxes[i],
+                null,
                 null, highlight,
                 suppressNotesLists,
                 false
@@ -296,6 +297,9 @@ public class PlayboardRenderer {
      * Draw the boxes
      *
      * @param boxes boxes to draw
+     * @param shadowString string of characters to display as "notes",
+     * one for each box or null if none, shown is blank and has no
+     * puzzle notes to show
      * @param changes array of positions that have changed (should be
      * rendered). Can be null to draw all.
      * @param highlight the position in the box list to highlight
@@ -304,6 +308,7 @@ public class PlayboardRenderer {
      */
     synchronized public Bitmap drawBoxes(
         Box[] boxes,
+        String shadowString,
         boolean[] changes,
         Position highlight,
         Set<String> suppressNotesLists,
@@ -336,12 +341,17 @@ public class PlayboardRenderer {
             if (changes != null && !changes[i])
                 continue;
 
+            String shadow = null;
+            if (shadowString != null && i < shadowString.length())
+                shadow = Character.toString(shadowString.charAt(i));
+
             int x = (i % width) * boxSize;
             int y = (i / width) * boxSize;
             this.drawBox(canvas,
                          x, y,
                          0, i,
                          boxes[i],
+                         shadow,
                          null,
                          highlight,
                          suppressNotesLists,
@@ -502,6 +512,8 @@ public class PlayboardRenderer {
     /**
      * Draw an individual box
      *
+     * @param shadow a character to display if the box is blank and has no
+     * other notes to show. Ignored if null.
      * @param fullBoard whether to draw details that only make sense when the
      * full board can be seen.
      * @param suppressNotesLists set of lists to not draw notes from.
@@ -512,6 +524,7 @@ public class PlayboardRenderer {
                          int x, int y,
                          int row, int col,
                          Box box,
+                         String shadow,
                          Word currentWord,
                          Position highlight,
                          Set<String> suppressNotesLists,
@@ -555,9 +568,10 @@ public class PlayboardRenderer {
             }
 
             if (box.isBlank()) {
-                if (suppressNotesLists != null) {
+                if (suppressNotesLists != null || shadow != null) {
                     drawBoxNotes(
-                        canvas, x, y, box, inCurrentWord, suppressNotesLists
+                        canvas, x, y, box,
+                        shadow, inCurrentWord, suppressNotesLists
                     );
                 }
             } else {
@@ -1068,9 +1082,14 @@ public class PlayboardRenderer {
         );
     }
 
+    /** Draw the notes for a box
+     *
+     * @param shadow a character to display as a note if there is nothing
+     * else in the box or null if none
+     */
     private void drawBoxNotes(
         Canvas canvas, int x, int y, Box box,
-        boolean inCurrentWord, Set<String> suppressNotesLists
+        String shadow, boolean inCurrentWord, Set<String> suppressNotesLists
     ) {
         PaintProfile profile = getProfile();
         int boxSize = profile.getBoxSize();
@@ -1109,6 +1128,10 @@ public class PlayboardRenderer {
                 noteStringDown =
                     Character.toString(noteChar);
             }
+        }
+
+        if (noteStringAcross == null && noteStringDown == null) {
+            noteStringAcross = shadow;
         }
 
         float[] mWidth = new float[1];
@@ -1417,7 +1440,7 @@ public class PlayboardRenderer {
                 canvas,
                 x, y, row, col,
                 boxes[row][col],
-                currentWord, highlight,
+                null, currentWord, highlight,
                 suppressNotesLists,
                 true
             );
@@ -1540,7 +1563,7 @@ public class PlayboardRenderer {
                     canvas,
                     x, y, row, col,
                     boxes[row][col],
-                    currentWord, highlight,
+                    null, currentWord, highlight,
                     suppressNotesLists,
                     true
                 );
