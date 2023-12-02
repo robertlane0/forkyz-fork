@@ -356,7 +356,10 @@ public class PuzzleBuilder {
             String imgUrl = image.getURL();
             if (imgUrl == null)
                 continue;
-            if (imgUrl.substring(0, 5).equalsIgnoreCase("data:"))
+            if (
+                imgUrl.length() >= 6
+                && imgUrl.substring(0, 5).equalsIgnoreCase("data:")
+            )
                 continue;
 
             try {

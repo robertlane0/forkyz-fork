@@ -625,12 +625,12 @@ public class Downloaders {
 
         if (settings.getScrapePrzekroj()) {
             downloaders.add(new PageScraper(
-                ".*krzyzowki/\\d+",
+                "https://przekroj.org/krzyzowki/.*",
                 new PrzekrojIO(),
-                "https://przekroj.pl/rozrywka/krzyzowki/",
+                "https://przekroj.org/humor-rozmaitosci/krzyzowki/",
                 "przekroj",
                 context.getString(R.string.przekroj),
-                "https://przekroj.pl/shop/kiosk",
+                "https://przekroj.pl/sklep",
                 true, // share file url
                 false // read top down
             ));
