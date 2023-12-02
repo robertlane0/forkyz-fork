@@ -17,7 +17,7 @@ import java.util.Map;
 public class SeparatedRecyclerViewAdapter<
     BodyHolder extends RecyclerView.ViewHolder,
     SectionAdapter extends RemovableRecyclerViewAdapter<BodyHolder>
-> extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements Dismissable {
+> extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static int HEADER = Integer.MIN_VALUE;
 
     private LinkedHashMap<String, SectionAdapter> sections = new LinkedHashMap<>();
@@ -32,6 +32,22 @@ public class SeparatedRecyclerViewAdapter<
     ) {
         this.textViewId = textViewId;
         this.bodyHolderClass = bodyHolderClass;
+        registerAdapterDataObserver(
+            new RecyclerView.AdapterDataObserver() {
+                @Override
+                public void onItemRangeMoved(
+                    int fromPosition, int toPosition, int itemCount
+                ) {
+                    clearEmptySections();
+                }
+                @Override
+                public void onItemRangeRemoved(
+                    int positionStart, int itemCount
+                ) {
+                    clearEmptySections();
+                }
+            }
+        );
     }
 
     @Override
@@ -183,28 +199,20 @@ public class SeparatedRecyclerViewAdapter<
         return this.sections.values();
     }
 
-    @Override
-    public void onItemDismiss(int position) {
-       int sectionPosition = 0;
-       for (Map.Entry<String, SectionAdapter> entry : new LinkedList<>(this.sections.entrySet())) {
-            int size = entry.getValue().getItemCount() + 1;
-            if (position < sectionPosition + size) {
-                int index = position - sectionPosition;
-                if (index == 0) {
-                    return;
-                } else {
-                    entry.getValue().remove(index - 1);
-                    notifyItemRemoved(position);
-                    if(entry.getValue().getItemCount() == 0){
-                        this.sections.remove(entry.getKey());
-                        notifyItemRemoved(position - 1);
-                    }
-                    break;
-                }
-            }
-            sectionPosition += size;
-        }
+    private void clearEmptySections() {
+        for (
+            Map.Entry<String, SectionAdapter> entry
+                : new LinkedList<>(this.sections.entrySet())
+        ) {
+            String header = entry.getKey();
+            SectionAdapter section = entry.getValue();
 
+            if(section.getItemCount() == 0){
+                int offset = getSectionOffset(header);
+                this.sections.remove(header);
+                notifyItemRemoved(offset);
+            }
+        }
     }
 
     public static class SimpleTextViewHolder extends RecyclerView.ViewHolder {
