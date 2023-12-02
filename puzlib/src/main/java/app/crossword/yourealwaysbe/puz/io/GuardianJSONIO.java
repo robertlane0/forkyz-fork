@@ -12,7 +12,6 @@ import java.util.logging.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONTokener;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -23,6 +22,7 @@ import app.crossword.yourealwaysbe.puz.Position;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.PuzzleBuilder;
 import app.crossword.yourealwaysbe.puz.Zone;
+import app.crossword.yourealwaysbe.puz.util.JSONParser;
 import app.crossword.yourealwaysbe.puz.util.PuzzleUtils;
 
 /**
@@ -54,9 +54,9 @@ public class GuardianJSONIO implements PuzzleParser {
      */
     public static Puzzle readFromJSON(InputStream is) {
         try {
-            JSONObject json = new JSONObject(new JSONTokener(is));
+            JSONObject json = JSONParser.parse(is);
             return readPuzzleFromJSON(json);
-        } catch (JSONException e) {
+        } catch (IOException e) {
             return null;
         }
     }
@@ -67,9 +67,7 @@ public class GuardianJSONIO implements PuzzleParser {
             String cwJson = doc.select(".js-crossword")
                                .attr("data-crossword-data");
             if (!cwJson.isEmpty()) {
-                return readPuzzleFromJSON(
-                    new JSONObject(new JSONTokener(cwJson))
-                );
+                return readPuzzleFromJSON(JSONParser.parse(cwJson));
             }
         } catch (IOException e) {
             // pass through
@@ -79,7 +77,7 @@ public class GuardianJSONIO implements PuzzleParser {
 
     public static Puzzle readPuzzle(String jsonString) {
         try {
-            JSONObject json = new JSONObject(jsonString);
+            JSONObject json = JSONParser.parse(jsonString);
             return readPuzzleFromJSON(json);
         } catch (JSONException e) {
             LOG.severe("Could not read Guardian JSON: " + e);

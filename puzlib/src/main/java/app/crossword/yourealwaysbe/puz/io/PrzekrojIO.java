@@ -10,7 +10,6 @@ import java.util.logging.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONTokener;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -19,6 +18,7 @@ import app.crossword.yourealwaysbe.puz.Box;
 import app.crossword.yourealwaysbe.puz.PuzImage;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.PuzzleBuilder;
+import app.crossword.yourealwaysbe.puz.util.JSONParser;
 
 /**
  * Read crosswords from https://przekroj.pl
@@ -53,9 +53,7 @@ public class PrzekrojIO implements PuzzleParser {
 
             Puzzle puz = null;
             try {
-                puz = readPuzzleFromJSON(
-                    new JSONObject(new JSONTokener(copy))
-                );
+                puz = readPuzzleFromJSON(JSONParser.parse(copy));
             } catch (JSONException e) {
                 // fall through
             }
@@ -68,13 +66,10 @@ public class PrzekrojIO implements PuzzleParser {
                     .replace("&quot;", "\"");
                 String title = doc.select("article").attr("data-title");
 
-                puz = readPuzzleFromJSON(
-                    new JSONObject(new JSONTokener(cwJson))
-                );
+                puz = readPuzzleFromJSON(JSONParser.parse(cwJson));
                 if (title != null)
                     puz.setTitle(title);
             }
-
             return puz;
         } catch (IOException | JSONException | PrzFormatException e) {
             LOG.info("Could not read Przekroj crossword: " + e);

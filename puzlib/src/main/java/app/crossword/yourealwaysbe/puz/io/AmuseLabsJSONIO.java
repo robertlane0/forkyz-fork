@@ -9,11 +9,11 @@ import java.util.logging.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONTokener;
 
 import app.crossword.yourealwaysbe.puz.Box;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.PuzzleBuilder;
+import app.crossword.yourealwaysbe.puz.util.JSONParser;
 
 /**
  * Read a character stream of JSON data in the format used by the
@@ -40,7 +40,7 @@ public class AmuseLabsJSONIO implements PuzzleParser {
 
     public static Puzzle readPuzzle(InputStream is) throws IOException {
         try {
-            JSONObject json = new JSONObject(new JSONTokener(is));
+            JSONObject json = JSONParser.parse(is);
             return readPuzzleFromJSON(json);
         } catch (AmuseLabsFormatException | JSONException e) {
             LOG.severe("Could not read Amuse Labs JSON: " + e);
@@ -50,7 +50,7 @@ public class AmuseLabsJSONIO implements PuzzleParser {
 
     public static Puzzle readPuzzle(String jsonString) {
         try {
-            JSONObject json = new JSONObject(jsonString);
+            JSONObject json = JSONParser.parse(jsonString);
             return readPuzzleFromJSON(json);
         } catch (AmuseLabsFormatException | JSONException e) {
             LOG.severe("Could not read Amuse Labs JSON: " + e);

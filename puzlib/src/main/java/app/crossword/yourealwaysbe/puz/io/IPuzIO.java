@@ -25,7 +25,6 @@ import java.util.logging.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONTokener;
 import org.json.JSONWriter;
 
 import app.crossword.yourealwaysbe.puz.Box;
@@ -40,6 +39,7 @@ import app.crossword.yourealwaysbe.puz.PuzzleBuilder;
 import app.crossword.yourealwaysbe.puz.Zone;
 import app.crossword.yourealwaysbe.puz.util.HtmlUtil;
 import app.crossword.yourealwaysbe.puz.util.PuzzleUtils;
+import app.crossword.yourealwaysbe.puz.util.JSONParser;
 
 import static app.crossword.yourealwaysbe.puz.util.HtmlUtil.htmlString;
 import static app.crossword.yourealwaysbe.puz.util.HtmlUtil.unHtmlString;
@@ -343,7 +343,7 @@ public class IPuzIO implements PuzzleParser {
 
     public static Puzzle readPuzzle(InputStream is) throws IOException {
         try {
-            JSONObject json = new JSONObject(new JSONTokener(is));
+            JSONObject json = JSONParser.parse(is);
 
             checkIPuzVersion(json);
             Puzzle.Kind kind = getPuzKind(json);
