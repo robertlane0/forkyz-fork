@@ -38,10 +38,11 @@ public abstract class ExternalDictionary {
         = new ExternalDictionary() {
             @Override
             public void query(AppCompatActivity activity, String word) {
-                ExternalCaller.launchIntent(
+                ExternalCaller.launchApp(
                     activity,
-                    "com.hughes.action.ACTION_SEARCH_DICT",
-                    SearchManager.QUERY,
+                    "de.reimardoeffinger.quickdic",
+                    "com.hughes.android.dictionary.DictionaryActivity",
+                    "searchToken",
                     word,
                     activity.getString(R.string.quick_dic),
                     "https://github.com/rdoeffinger/Dictionary/releases"

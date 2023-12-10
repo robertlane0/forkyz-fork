@@ -53,6 +53,9 @@ public class ExternalCaller {
             i.setComponent(
                 new ComponentName(externalPackage, externalActivity)
             );
+            i.addFlags(
+                Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP
+            );
             i.putExtra(dataField, data);
             forkyzActivity.startActivity(i);
         } catch (ActivityNotFoundException e) {
@@ -83,6 +86,9 @@ public class ExternalCaller {
     ) {
         try {
             Intent i = new Intent(intentName);
+            i.addFlags(
+                Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP
+            );
             i.putExtra(dataField, data);
             forkyzActivity.startActivity(i);
         } catch (ActivityNotFoundException e) {
