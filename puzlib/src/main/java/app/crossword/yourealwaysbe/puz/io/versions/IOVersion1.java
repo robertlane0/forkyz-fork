@@ -54,7 +54,7 @@ public class IOVersion1 implements IOVersion {
         long dateEpoch = dis.readLong();
         meta.date = (dateEpoch == 0)
             ? null
-            : Instant.ofEpochMilli(dis.readLong())
+            : Instant.ofEpochMilli(dateEpoch)
                 .atZone(ZoneId.systemDefault())
                 .toLocalDate();
 
@@ -91,8 +91,7 @@ public class IOVersion1 implements IOVersion {
             dos.writeLong(0);
         } else {
             dos.writeLong(
-                date.atStartOfDay()
-                    .atZone(ZoneId.systemDefault())
+                date.atStartOfDay(ZoneId.systemDefault())
                     .toInstant()
                     .toEpochMilli()
             );
