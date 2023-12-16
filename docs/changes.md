@@ -1,5 +1,13 @@
 # Forkyz Changelog
 
+## Version 49
+
+- Add external tools menu and settings (billthefarmer's Crossword solver, dictionaries, ChatGPT).
+- Predict anagram letters in notes (interaction settings).
+- Fix enter changes direction, Przekroj download, and reading of legacy date metadata.
+- Make parsing of some puzzle files (JSON) more lenient.
+- Clear empty sections when moving/deleting puzzles.
+
 ## Version 48
 
 - Skip letters that won't be deleted when backspacing
