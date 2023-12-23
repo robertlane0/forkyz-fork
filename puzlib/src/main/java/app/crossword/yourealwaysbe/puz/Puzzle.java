@@ -269,7 +269,10 @@ public class Puzzle implements Serializable{
                             if (box != null && box.hasClueNumber()) {
                                 String number = box.getClueNumber();
                                 ClueList clues = getCurrentClueList();
-                                if (clues.hasClueByNumber(number))
+                                if (
+                                    clues != null
+                                    && clues.hasClueByNumber(number)
+                                )
                                     return;
                             }
                             moveOneStep();
@@ -292,7 +295,9 @@ public class Puzzle implements Serializable{
                     }
 
                     private String getCurrentListName() {
-                        return listNames.get(listIndex);
+                        return (listIndex < listNames.size())
+                            ? listNames.get(listIndex)
+                            : null;
                     }
 
                     private ClueList getCurrentClueList() {
