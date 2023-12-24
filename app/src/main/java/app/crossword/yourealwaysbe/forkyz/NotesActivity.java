@@ -668,8 +668,7 @@ public class NotesActivity extends PuzzleActivity {
     public void onPlayboardChange(PlayboardChanges changes) {
         super.onPlayboardChange(changes);
 
-        Playboard board = getBoard();
-        ClueID cid = (board == null) ? null : board.getClueID();
+        ClueID cid = getNotesClueID();
 
         if (cid != null && changes.getChangedClueIDs().contains(cid)) {
             setClueLineText();
@@ -1025,12 +1024,7 @@ public class NotesActivity extends PuzzleActivity {
      *
      * Will return null if isPuzzleNotes
      */
-    private Clue getNotesClue() {
-        Playboard board = getBoard();
-        Puzzle puz = getPuzzle();
-        if (puz == null)
-            return null;
-
+    private ClueID getNotesClueID() {
         Intent intent = getIntent();
         String listName = intent.getStringExtra(CLUE_NOTE_LISTNAME);
         int index = intent.getIntExtra(CLUE_NOTE_INDEX, -1);
@@ -1038,9 +1032,24 @@ public class NotesActivity extends PuzzleActivity {
         if (listName == null || index < 0)
             return null;
 
-        ClueID cid = new ClueID(listName, index);
+        return new ClueID(listName, index);
+    }
 
-        return puz.getClue(cid);
+    /**
+     * Read clue id from intent, or null if not valid or not present
+     *
+     * Will return null if isPuzzleNotes
+     */
+    private Clue getNotesClue() {
+        Playboard board = getBoard();
+        Puzzle puz = getPuzzle();
+        if (puz == null)
+            return null;
+
+        ClueID cid = getNotesClueID();
+        return cid == null
+            ? null
+            : puz.getClue(cid);
     }
 
     private boolean isPuzzleNotes() {
