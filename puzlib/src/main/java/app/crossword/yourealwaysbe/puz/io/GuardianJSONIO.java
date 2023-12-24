@@ -56,7 +56,7 @@ public class GuardianJSONIO implements PuzzleParser {
         try {
             JSONObject json = JSONParser.parse(is);
             return readPuzzleFromJSON(json);
-        } catch (IOException e) {
+        } catch (IOException | JSONException e) {
             return null;
         }
     }
@@ -66,10 +66,9 @@ public class GuardianJSONIO implements PuzzleParser {
             Document doc = Jsoup.parse(is, null, "");
             String cwJson = doc.select(".js-crossword")
                                .attr("data-crossword-data");
-            if (!cwJson.isEmpty()) {
+            if (!cwJson.isEmpty())
                 return readPuzzleFromJSON(JSONParser.parse(cwJson));
-            }
-        } catch (IOException e) {
+        } catch (IOException | JSONException e) {
             // pass through
         }
         return null;
