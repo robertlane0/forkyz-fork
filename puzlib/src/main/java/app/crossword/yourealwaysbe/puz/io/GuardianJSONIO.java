@@ -132,8 +132,9 @@ public class GuardianJSONIO implements PuzzleParser {
                 continue;
 
             String num = String.valueOf(entry.getInt("number"));
-            String clueSol = entry.getString("solution");
+            String clueSol = entry.optString("solution");
             String direction = entry.getString("direction");
+            int length = entry.getInt("length");
 
             int dx = 0;
             int dy = 0;
@@ -144,13 +145,15 @@ public class GuardianJSONIO implements PuzzleParser {
 
             int boxX = x;
             int boxY = y;
-            for (int j = 0; j < clueSol.length(); j++) {
+            for (int j = 0; j < length; j++) {
                 if (boxX >= numCols || boxY >= numRows)
                     break;
 
                 if (boxes[boxY][boxX] == null)
                     boxes[boxY][boxX] = new Box();
-                boxes[boxY][boxX].setSolution(clueSol.charAt(j));
+
+                if (clueSol != null && j < clueSol.length())
+                    boxes[boxY][boxX].setSolution(clueSol.charAt(j));
 
                 boxX += dx;
                 boxY += dy;
