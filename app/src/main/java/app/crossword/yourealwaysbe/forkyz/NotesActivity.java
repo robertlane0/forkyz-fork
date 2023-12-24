@@ -388,6 +388,11 @@ public class NotesActivity extends PuzzleActivity {
             keyboardManager.onDestroy();
     }
 
+    @Override
+    protected void editClue() {
+        editClue(getNotesClueID());
+    }
+
     private void onFlagClueSelected() {
         Clue clue = getNotesClue();
         if (clue == null)

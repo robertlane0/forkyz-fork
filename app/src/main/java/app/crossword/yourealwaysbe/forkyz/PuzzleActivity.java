@@ -868,6 +868,34 @@ public abstract class PuzzleActivity
         return (value == null) ? false : value;
     }
 
+    /**
+     * Handles user request to edit clue
+     *
+     * Calls through to editClue(cid) where cid is the id of the
+     * currently selected clue on the board. May be overridden by
+     * subclasses to edit a different default clue.
+     */
+    protected void editClue() {
+        Playboard board = currentPuzzleHolder.getBoard();
+        ClueID cid = (board == null) ? null : board.getClueID();
+        editClue(cid);
+    }
+
+    /**
+     * Open dialog to edit given clue
+     */
+    protected void editClue(ClueID cid) {
+        if (cid == null)
+            return;
+
+        ClueEditDialog dialog = new ClueEditDialog();
+        Bundle args = new Bundle();
+        args.putString(ClueEditDialog.CLUE_LISTNAME, cid.getListName());
+        args.putInt(ClueEditDialog.CLUE_INDEX, cid.getIndex());
+        dialog.setArguments(args);
+        dialog.show(getSupportFragmentManager(), "ClueEditDialog");
+    }
+
     private void handleChangeTimer() {
         Puzzle puz = getPuzzle();
         if (puz == null)
@@ -973,11 +1001,6 @@ public abstract class PuzzleActivity
                     invalidateOptionsMenu();
             }
         });
-    }
-
-    private void editClue() {
-        ClueEditDialog dialog = new ClueEditDialog();
-        dialog.show(getSupportFragmentManager(), "ClueEditDialog");
     }
 
     public static class HelpResponseDialog extends DialogFragment {
