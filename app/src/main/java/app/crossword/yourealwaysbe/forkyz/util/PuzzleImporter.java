@@ -4,6 +4,8 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,11 +35,15 @@ public class PuzzleImporter {
      * that tries each known format in turn until one succeeds. Clunky, but
      * hopefully robust.
      *
+     * Will try local content resolver first, then attempt treating uri as a
+     * remote URL
+     *
+     * @param timeout download timeout if uri is not local
      * @return new puz handle if succeeded (will return null if failed
      * or uri is null)
      */
     public static PuzHandle importUri(
-        Context context, FileHandler fileHandler, Uri uri
+        Context context, FileHandler fileHandler, Uri uri, int timeout
     ) {
         if (uri == null)
             return null;
@@ -51,7 +57,16 @@ public class PuzzleImporter {
                 context, fileHandler, is, getFileName(uri)
             );
         } catch (IOException e) {
-            return null;
+            try (
+                InputStream is = getRemoteInputStream(uri.toString(), timeout)
+            ) {
+                return importInputStream(
+                    context, fileHandler, is, getFileName(uri)
+                );
+            } catch (IOException e2) {
+                // we tried
+                return null;
+            }
         }
     }
 
@@ -152,5 +167,17 @@ public class PuzzleImporter {
             return null;
         }
 
+    }
+
+    private static BufferedInputStream getRemoteInputStream(
+        String url, int timeout
+    ) throws IOException {
+        HttpURLConnection conn
+            = (HttpURLConnection) (new URL(url)).openConnection();
+        conn.setConnectTimeout(timeout);
+        conn.setReadTimeout(timeout);
+        conn.setRequestProperty("Connection", "close");
+        conn.setRequestProperty("Accept","*/*");
+        return new BufferedInputStream(conn.getInputStream());
     }
 }

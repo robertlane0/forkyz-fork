@@ -75,6 +75,8 @@ public class ForkyzSettings {
 
     private static final String PREF_DOWNLOAD_LEGACY_BACKGROUND
         = "backgroundDownload";
+    private static final String PREF_DOWNLOAD_TIMEOUT = "downloadTimeout";
+    private static final String PREF_DOWNLOAD_TIMEOUT_DEFAULT = "30000";
     private static final String PREF_DOWNLOAD_UNMETERED
         = "backgroundDownloadRequireUnmetered";
     private static final String PREF_DOWNLOAD_ROAMING
@@ -192,6 +194,9 @@ public class ForkyzSettings {
         INT_DEFAULTS.put(PREF_BROWSE_SORT, 0);
         BOOL_DEFAULTS.put(PREF_CLUE_LIST_SHOW_WORDS, false);
         BOOL_DEFAULTS.put(PREF_CLUE_LIST_SNAP_TO_CLUE, false);
+        STRING_DEFAULTS.put(
+            PREF_DOWNLOAD_TIMEOUT, PREF_DOWNLOAD_TIMEOUT_DEFAULT
+        );
         STRING_DEFAULTS.put(PREF_EXT_CHAT_GPT_API_KEY, "");
         BOOL_DEFAULTS.put(PREF_EXT_CROSSWORD_SOLVER_ENABLED, true);
         BOOL_DEFAULTS.put(PREF_KEYBOARD_HAPTIC, true);
@@ -1017,10 +1022,18 @@ public class ForkyzSettings {
                 prefs.getStringSet(
                     PREF_AUTO_DOWNLOADERS, Collections.emptySet()
                 ),
-                Integer.valueOf(prefs.getString("downloadTimeout", "30000")),
+                Integer.valueOf(prefs.getString(
+                    PREF_DOWNLOAD_TIMEOUT, PREF_DOWNLOAD_TIMEOUT_DEFAULT
+                )),
                 prefs.getBoolean("dlOnStartup", false)
             );
             handler.post(() -> { cb.accept(settings); });
+        });
+    }
+
+    public void getDownloadTimeout(Consumer<Integer> cb) {
+        getStringPreference(PREF_DOWNLOAD_TIMEOUT, value -> {
+            cb.accept(Integer.valueOf(value));
         });
     }
 

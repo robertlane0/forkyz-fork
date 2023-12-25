@@ -364,6 +364,7 @@ public class BrowseActivityViewModel extends AndroidViewModel {
         BiConsumer<Boolean, Boolean> callback
     ) {
         fileHandlerProvider.get(fileHandler -> {
+        settings.getDownloadTimeout(timeout -> {
             threadWithUILock(() -> {
                 boolean someFailed = false;
                 boolean someSucceeded = false;
@@ -374,7 +375,7 @@ public class BrowseActivityViewModel extends AndroidViewModel {
                         continue;
 
                     PuzHandle ph = PuzzleImporter.importUri(
-                        getApplication(), fileHandler, uri
+                        getApplication(), fileHandler, uri, timeout
                     );
 
                     someFailed |= (ph == null);
@@ -400,7 +401,7 @@ public class BrowseActivityViewModel extends AndroidViewModel {
                     callback.accept(finalSomeFailed, finalSomeSucceeded);
                 });
             });
-        });
+        });});
     }
 
     /**

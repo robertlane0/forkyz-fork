@@ -502,6 +502,10 @@ public class BrowseActivity extends ForkyzActivity {
 
         checkNewVersion();
 
+        handleCreateIntent();
+    }
+
+    private void handleCreateIntent() {
         // If this was started by a file open or a share
         Intent intent = getIntent();
         String action = intent.getAction();
@@ -509,9 +513,15 @@ public class BrowseActivity extends ForkyzActivity {
             // loaded by onResume
             setPendingImport(intent.getData());
         } else if (Intent.ACTION_SEND.equals(action)) {
-            setPendingImport(IntentCompat.getParcelableExtra(
-                intent, Intent.EXTRA_STREAM, Uri.class
-            ));
+            if (intent.hasExtra(Intent.EXTRA_TEXT)) {
+                setPendingImport(
+                    Uri.parse(intent.getStringExtra(Intent.EXTRA_TEXT))
+                );
+            } else {
+                setPendingImport(IntentCompat.getParcelableExtra(
+                    intent, Intent.EXTRA_STREAM, Uri.class
+                ));
+            }
         } else if (Intent.ACTION_SEND_MULTIPLE.equals(action)) {
             setPendingImports(IntentCompat.getParcelableArrayListExtra(
                 intent, Intent.EXTRA_STREAM, Uri.class
