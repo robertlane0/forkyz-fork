@@ -635,6 +635,24 @@ public class Puzzle implements Serializable{
     }
 
     /**
+     * Returns true if some box has a flag set
+     */
+    public boolean hasBoxFlags() {
+        if (boxes == null)
+            return false;
+
+        for (int row = 0; row < boxes.length; row++) {
+            for (int col = 0; col < boxes[row].length; col++) {
+                Box box = boxes[row][col];
+                if (!Box.isBlock(box) && box.isFlagged())
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Returns true if some box has a shape
      */
     public boolean hasShaped() {

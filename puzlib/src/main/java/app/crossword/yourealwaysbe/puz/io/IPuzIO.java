@@ -253,6 +253,8 @@ public class IPuzIO implements PuzzleParser {
 
     private static final String FIELD_BOX_EXTRAS = "boxextras";
     private static final String FIELD_BOX_CHEATED = "cheated";
+    private static final String FIELD_BOX_FLAGGED = "flagged";
+    private static final String FIELD_BOX_FLAG_COLOR = "flagcolor";
     private static final String FIELD_BOX_RESPONDER = "responder";
     private static final String FIELD_COMPLETION_TIME = "completiontime";
     private static final String FIELD_PCNT_COMPLETE = "percentcomplete";
@@ -1365,6 +1367,14 @@ public class IPuzIO implements PuzzleParser {
                             boxJson.getString(FIELD_BOX_RESPONDER)
                         );
                     }
+                    if (boxJson.has(FIELD_BOX_FLAGGED)) {
+                        box.setFlagged(boxJson.getBoolean(FIELD_BOX_FLAGGED));
+                    }
+                    if (boxJson.has(FIELD_BOX_FLAG_COLOR)) {
+                        box.setFlagColor(
+                            readColor(boxJson.optString(FIELD_BOX_FLAG_COLOR))
+                        );
+                    }
                 }
             }
         }
@@ -2448,7 +2458,12 @@ public class IPuzIO implements PuzzleParser {
      */
     private static void writeBoxExtras(Puzzle puz, FormatableJSONWriter writer)
             throws IOException {
-        if (!puz.hasCheated() && !puz.hasResponders())
+        boolean hasBoxExtras =
+            puz.hasCheated()
+            || puz.hasResponders()
+            || puz.hasBoxFlags();
+
+        if (!hasBoxExtras)
             return;
 
         Box[][] boxes = puz.getBoxes();
@@ -2473,6 +2488,12 @@ public class IPuzIO implements PuzzleParser {
                     String responder = box.getResponder();
                     if (responder != null)
                         writer.key(FIELD_BOX_RESPONDER).value(responder);
+                    if (box.isFlagged())
+                        writer.key(FIELD_BOX_FLAGGED).value(true);
+                    if (!box.isDefaultFlagColor()) {
+                        writer.key(FIELD_BOX_FLAG_COLOR)
+                            .value(colorToHex(box.getFlagColor()));
+                    }
                 }
 
                 writer.endObject();

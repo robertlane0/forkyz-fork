@@ -10,6 +10,8 @@ import java.util.TreeMap;
 public class Box implements Serializable {
     private static final long serialVersionUID = 5432015770689391374L;
 
+    public static final int DEFAULT_FLAG_COLOR = -1;
+
     public static final String BLANK = " ";
     private static final int NOCOLOR = -1;
 
@@ -46,6 +48,10 @@ public class Box implements Serializable {
     private int color = NOCOLOR;
     private int textColor = NOCOLOR;
     private int barColor = NOCOLOR;
+
+    private boolean flagged = false;
+    // 0x00rrggbb or DEFAULT_FLAG_COLOR
+    private int flagColor = DEFAULT_FLAG_COLOR;
 
     @Override
     public boolean equals(Object obj) {
@@ -136,6 +142,12 @@ public class Box implements Serializable {
                     return false;
             }
         }
+
+        if (isFlagged() != other.isFlagged())
+            return false;
+        if (getFlagColor() != other.getFlagColor())
+            return false;
+
         return true;
     }
 
@@ -157,7 +169,7 @@ public class Box implements Serializable {
         result = (prime * result) + Objects.hash(getSolution());
         result = (prime * result) + getColor() + getTextColor() + getBarColor();
         result = (prime * result) + (isBlock() ? 1231 : 1237);
-        // ignore marks, too awkward and probably empty
+        // ignore marks and flags, too awkward and probably empty
 
         return result;
     }
@@ -491,4 +503,38 @@ public class Box implements Serializable {
     public void setColor(int color) { this.color = color; }
     public void setTextColor(int textColor) { this.textColor = textColor; }
     public void setBarColor(int barColor) { this.barColor = barColor; }
+
+    public boolean isFlagged() { return flagged; }
+
+    /**
+     * Flag box
+     *
+     * During play, call Playboard.flagPosition to make sure listeners
+     * updated.
+     */
+    public void setFlagged(boolean flagged) { this.flagged = flagged; }
+
+    /**
+     * 0x00rrggbb or DEFAULT_FLAG_COLOR
+     */
+    public int getFlagColor() { return flagColor; }
+
+    /**
+     * If no custom flag color has been set
+     */
+    public boolean isDefaultFlagColor() {
+        return flagColor == DEFAULT_FLAG_COLOR;
+    }
+
+    /**
+     * Set flag color
+     *
+     * 0x00rrggbb or DEFAULT_FLAG_COLOR.
+     *
+     * During play, call Playboard.setFlagColor to make sure listeners
+     * are updated.
+     */
+    public void setFlagColor(int flagColor) {
+        this.flagColor = flagColor;
+    }
 }

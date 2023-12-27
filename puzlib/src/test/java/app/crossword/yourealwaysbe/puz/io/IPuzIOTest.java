@@ -406,6 +406,9 @@ public class IPuzIOTest {
             boxes[1][2].setResponse("Y");
             boxes[0][1].setResponder("Test");
             boxes[1][0].setCheated(true);
+            boxes[1][1].setFlagged(true);
+            boxes[1][0].setFlagged(true);
+            boxes[1][0].setFlagColor(0x0000ff00);
 
             puz.setPinnedClueID(cidA3);
 
@@ -436,6 +439,11 @@ public class IPuzIOTest {
             assertEquals(boxes2[0][1].getResponder(), "Test");
             assertFalse(boxes2[0][1].isCheated());
             assertTrue(boxes2[1][0].isCheated());
+            assertTrue(boxes2[1][1].isFlagged());
+            assertTrue(boxes2[1][1].isDefaultFlagColor());
+            assertTrue(boxes[1][0].isFlagged());
+            assertFalse(boxes[1][0].isDefaultFlagColor());
+            assertEquals(boxes[1][0].getFlagColor(), 0x0000ff00);
             assertTrue(clueV1.isFlagged());
             assertFalse(clueV1.isDefaultFlagColor());
             assertEquals(clueV1.getFlagColor(), 0x0000ff00);
