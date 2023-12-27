@@ -22,6 +22,10 @@
                 android:id="@+id/play_menu_player_notes"
                 android:title="@string/menu_notes_player"
             />
+            <item
+                android:id="@+id/puzzle_menu_flag_cell_toggle"
+                android:title="@string/menu_flag_cell_toggle"
+            />
         </menu>
     </item>
     <item

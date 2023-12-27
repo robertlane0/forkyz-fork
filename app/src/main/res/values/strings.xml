@@ -117,7 +117,7 @@
     <string name="transfer_scratch_to_board">Transfer scratch contents to board</string>
     <string name="shuffle_anagram_source">Shuffle anagram source letters</string>
     <string name="transfer_anagram_solution_to_board">Transfer anagram solution to board</string>
-    <string name="flag_color_title">Set Flag Color</string>
+    <string name="flag_color_title">Set Clue Flag Color</string>
     <string name="choose_flag_color">Choose flag color.</string>
 
     <!-- clue formats -->
@@ -384,6 +384,7 @@
     <string name="share_puzzle_full">Current Puzzle</string>
     <string name="share_puzzle_orig">Blank Puzzle</string>
     <string name="share_puzzle_open_share_url">Open Share URL</string>
+    <string name="menu_flag_cell_toggle">Toggle Cell Flag</string>
 
     <!-- clue list menu -->
     <string name="menu_clue_notes">Clue Notes</string>

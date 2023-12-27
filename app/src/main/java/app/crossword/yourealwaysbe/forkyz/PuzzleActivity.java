@@ -48,6 +48,7 @@ import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands;
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider;
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerShared;
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle;
+import app.crossword.yourealwaysbe.forkyz.view.ChooseFlagColorDialog;
 import app.crossword.yourealwaysbe.forkyz.view.ClueEditDialog;
 import app.crossword.yourealwaysbe.forkyz.view.PlayboardTextRenderer;
 import app.crossword.yourealwaysbe.forkyz.view.PuzzleInfoDialogs;
@@ -241,6 +242,9 @@ public abstract class PuzzleActivity
             return true;
         } else if (id == R.id.puzzle_menu_external_dictionary) {
             callExternalDictionary();
+            return true;
+        } else if (id == R.id.puzzle_menu_flag_cell_toggle) {
+            toggleCellFlag();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -1081,5 +1085,31 @@ public abstract class PuzzleActivity
 
             dictionary.query(this, request.toString());
         });
+    }
+
+    /**
+     * Flag currently selected cell
+     */
+    private void toggleCellFlag() {
+        Playboard board = getBoard();
+        Puzzle puz = getPuzzle();
+        if (board == null || puz == null)
+            return;
+
+        Position pos = board.getHighlightLetter();
+        Box box = puz.checkedGetBox(pos);
+        if (pos == null || box == null)
+            return;
+
+        if (box.isFlagged()) {
+            board.flagPosition(pos, false);
+        } else {
+            // let diagog set flag
+            DialogFragment dialog = new ChooseFlagColorDialog();
+            Bundle args = new Bundle();
+            ChooseFlagColorDialog.addBoxPositionToBundle(args, pos);
+            dialog.setArguments(args);
+            dialog.show(getSupportFragmentManager(), "ChooseFlagColorDialog");
+        }
     }
 }
