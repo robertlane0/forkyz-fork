@@ -1198,6 +1198,7 @@ public class BrowseActivity extends ForkyzActivity {
     private class FileViewHolder extends RecyclerView.ViewHolder {
         private PuzzleListItemBinding itemBinding;
         private PuzMetaFile puzMetaFile;
+        private boolean showPercentageCorrect = false;
 
         public FileViewHolder(PuzzleListItemBinding itemBinding) {
             super(itemBinding.getRoot());
@@ -1211,6 +1212,14 @@ public class BrowseActivity extends ForkyzActivity {
                     } else {
                         itemBinding.puzzleDate.setVisibility(View.GONE);
                     }
+                }
+            );
+
+            settings.liveBrowseShowPercentageCorrect().observe(
+                BrowseActivity.this,
+                showPercentageCorrect -> {
+                    this.showPercentageCorrect = showPercentageCorrect;
+                    setPercentage();
                 }
             );
         }
@@ -1248,12 +1257,7 @@ public class BrowseActivity extends ForkyzActivity {
 
             itemBinding.puzzleName.setText(smartHtml(title));
 
-            itemBinding.puzzleProgress.setPercentFilled(
-                puzMetaFile.getFilled()
-            );
-            itemBinding.puzzleProgress.setComplete(
-                puzMetaFile.getComplete() == 100
-            );
+            setPercentage();
 
             // add author if not already in title or caption
             // case insensitive trick:
@@ -1281,6 +1285,20 @@ public class BrowseActivity extends ForkyzActivity {
 
         public PuzMetaFile getPuzMetaFile() {
             return puzMetaFile;
+        }
+
+        private void setPercentage() {
+            if (puzMetaFile == null)
+                return;
+
+            itemBinding.puzzleProgress.setPercentFilled(
+                showPercentageCorrect
+                    ? puzMetaFile.getComplete()
+                    : puzMetaFile.getFilled()
+            );
+            itemBinding.puzzleProgress.setComplete(
+                puzMetaFile.getComplete() == 100
+            );
         }
     }
 

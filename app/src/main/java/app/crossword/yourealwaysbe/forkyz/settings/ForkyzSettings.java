@@ -61,6 +61,8 @@ public class ForkyzSettings {
     private static final String PREF_BROWSE_LAST_SEEN_VERSION
         = "lastSeenVersion";
     private static final String PREF_BROWSE_NEW_PUZZLE = "browseNewPuzzle";
+    private static final String PREF_BROWSE_SHOW_PERCENTAGE_CORRECT
+        = "browseShowPercentageCorrect";
     private static final String PREF_BROWSE_SORT = "sort";
     private static final String PREF_BROWSE_SWIPE_ACTION = "swipeAction";
 
@@ -191,6 +193,7 @@ public class ForkyzSettings {
         LONG_DEFAULTS.put(PREF_BROWSE_LAST_DOWNLOAD, 0L);
         STRING_DEFAULTS.put(PREF_BROWSE_LAST_SEEN_VERSION, "");
         BOOL_DEFAULTS.put(PREF_BROWSE_NEW_PUZZLE, false);
+        BOOL_DEFAULTS.put(PREF_BROWSE_SHOW_PERCENTAGE_CORRECT, false);
         INT_DEFAULTS.put(PREF_BROWSE_SORT, 0);
         BOOL_DEFAULTS.put(PREF_CLUE_LIST_SHOW_WORDS, false);
         BOOL_DEFAULTS.put(PREF_CLUE_LIST_SNAP_TO_CLUE, false);
@@ -403,6 +406,10 @@ public class ForkyzSettings {
 
     public void setBrowseNewPuzzle(boolean pending) {
         setBooleanPreference(PREF_BROWSE_NEW_PUZZLE, pending);
+    }
+
+    public LiveData<Boolean> liveBrowseShowPercentageCorrect() {
+        return liveBooleanPreference(PREF_BROWSE_SHOW_PERCENTAGE_CORRECT);
     }
 
     /**

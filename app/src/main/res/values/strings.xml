@@ -254,6 +254,8 @@
     <string name="random_clue_on_shake_desc">Jump to a random unfilled clue when shake detected in main puzzle activity.</string>
     <string name="predict_anagram_chars">Predict Anagram Characters</string>
     <string name="predict_anagram_chars_desc">Predict anagram source in notes by matching against current clue. Space accepts a prediction.</string>
+    <string name="browse_show_percentage_correct">Show Percentage Correct</string>
+    <string name="browse_show_percentage_correct_desc">Show percentage of correct cells instead of percentage of filled cells next to puzzle (like Shortyz).</string>
 
     <!-- preferences download -->
     <string name="auto_downloaders">Automatic Download Sources</string>
