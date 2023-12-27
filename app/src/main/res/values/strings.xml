@@ -37,6 +37,7 @@
     <string name="import_failure">Some imports failed</string>
     <string name="import_success_long">The selected puzzles were imported into Forkyz.</string>
     <string name="import_failure_long">Some puzzles were not imported into Forkyz.</string>
+    <string name="pa_puzzles">PA Puzzles</string>
 
     <!-- permissions -->
     <string name="perm_read_desc">Requested on older devices to read saved puzzles.</string>

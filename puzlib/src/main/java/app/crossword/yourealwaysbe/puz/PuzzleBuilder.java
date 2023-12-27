@@ -266,6 +266,30 @@ public class PuzzleBuilder {
         return clues == null ? 0 : clues.size();
     }
 
+    /**
+     * Get standard across zone for clue with number
+     *
+     * Returns null if number not found
+     */
+    public Zone getAcrossZone(String number) {
+        Position start = getNumberPositions().get(number);
+        return (start != null)
+            ? PuzzleUtils.getAcrossZone(puzzle, start)
+            : null;
+    }
+
+    /**
+     * Get standard down zone for clue with number
+     *
+     * Returns null if number not found
+     */
+    public Zone getDownZone(String number) {
+        Position start = getNumberPositions().get(number);
+        return (start != null)
+            ? PuzzleUtils.getDownZone(puzzle, start)
+            : null;
+    }
+
     public PuzzleBuilder addAcrossClue(String listName, BasicClue basicClue) {
         return addAcrossClue(
             listName,
@@ -284,12 +308,7 @@ public class PuzzleBuilder {
         String listName, String number, String label, String hint
     ) {
         int index = getNextClueIndex(listName);
-        Zone zone = null;
-
-        Position start = getNumberPositions().get(number);
-        if (start != null) {
-            zone = PuzzleUtils.getAcrossZone(puzzle, start);
-        }
+        Zone zone = getAcrossZone(number);
 
         puzzle.addClue(new Clue(listName, index, number, label, hint, zone));
 
@@ -314,12 +333,7 @@ public class PuzzleBuilder {
         String listName, String number, String label, String hint
     ) {
         int index = getNextClueIndex(listName);
-        Zone zone = null;
-
-        Position start = getNumberPositions().get(number);
-        if (start != null) {
-            zone = PuzzleUtils.getDownZone(puzzle, start);
-        }
+        Zone zone = getDownZone(number);
 
         puzzle.addClue(
             new Clue(listName, index, number, label, hint, zone)
