@@ -15,32 +15,36 @@ public class StreamUtils {
     /**
      * If given input stream, returns unzipped input stream
      *
-     * Returns copy of original stream if not zipped.
+     * Returns a stream with marksSupported. Is (a copy of) original stream if
+     * not zipped.
      *
      * Closing return stream has no effect (it's a byte array stream).
      */
-    public static ByteArrayInputStream unzipOrPassThrough(InputStream is)
+    public static InputStream unzipOrPassThrough(InputStream is)
             throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        copyStream(is, baos);
+        InputStream resetableInputStream = is;
+        if (!resetableInputStream.markSupported()) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            copyStream(is, baos);
+            resetableInputStream = new ByteArrayInputStream(baos.toByteArray());
+        }
 
         try (
-            ZipInputStream zis = new ZipInputStream(
-                new ByteArrayInputStream(baos.toByteArray())
-            )
+            ZipInputStream zis = new ZipInputStream(resetableInputStream)
         ) {
             ZipEntry entry = zis.getNextEntry();
             while (entry.isDirectory()) {
                 entry = zis.getNextEntry();
             }
-            baos = new ByteArrayOutputStream();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
             copyStream(zis, baos);
+            resetableInputStream = new ByteArrayInputStream(baos.toByteArray());
         } catch (Exception e) {
             // not zipped
         }
 
-        return new ByteArrayInputStream(baos.toByteArray());
+        return resetableInputStream;
     }
 
     /**
