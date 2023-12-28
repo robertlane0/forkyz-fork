@@ -1,11 +1,9 @@
 
 package app.crossword.yourealwaysbe.forkyz.net;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.regex.Pattern;
 
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
@@ -18,34 +16,26 @@ import app.crossword.yourealwaysbe.puz.io.PAPuzzlesIO;
 public class PAPuzzlesStreamScraper extends AbstractStreamScraper {
     private static final Pattern PA_PUZZLES_URL_RE
         = Pattern.compile(".*pa-puzzles.com.*", Pattern.CASE_INSENSITIVE);
+    private static final String PA_PUZZLES_URL_EXTRACT = "$0";
+
+    private static final String DEFAULT_SOURCE = "PA Puzzles";
 
     @Override
     public Puzzle parseInput(InputStream is) throws Exception {
-        try {
-            Document doc = Jsoup.parse(is, null, "");
-            Element iframe = doc.selectFirst("iframe");
+        Document doc = getDocument(is);
+        Puzzle puz = htmlElementScrape(
+            doc,
+            "iframe", "src",
+            PA_PUZZLES_URL_RE, PA_PUZZLES_URL_EXTRACT,
+            new PAPuzzlesIO()
+        );
+        if (puz != null) {
+            puz.setSource(DEFAULT_SOURCE);
 
-            if (iframe != null) {
-                String src = iframe.attr("src");
-                if (PA_PUZZLES_URL_RE.matcher(src).matches()) {
-                    Puzzle puz = PAPuzzlesIO.readPuzzle(
-                        getInputStream(src)
-                    );
-                    if (puz != null) {
-                        puz.setSource("PA Puzzles");
-
-                        Element title = doc.selectFirst("title");
-                        if (title != null)
-                            puz.setTitle(title.text().trim());
-
-                        return puz;
-                    }
-                }
-            }
-        } catch (IOException e) {
-            // we tried
+            Element title = doc.selectFirst("title");
+            if (title != null)
+                puz.setTitle(title.text().trim());
         }
-
-        return null;
+        return puz;
     }
 }
