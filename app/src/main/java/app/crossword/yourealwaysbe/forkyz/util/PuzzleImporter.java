@@ -16,6 +16,7 @@ import android.net.Uri;
 import app.crossword.yourealwaysbe.forkyz.R;
 import app.crossword.yourealwaysbe.forkyz.net.CrosswordNexusStreamScraper;
 import app.crossword.yourealwaysbe.forkyz.net.PAPuzzlesStreamScraper;
+import app.crossword.yourealwaysbe.forkyz.net.RaetselZentraleSchwedenStreamScraper;
 import app.crossword.yourealwaysbe.forkyz.util.files.DirHandle;
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandle;
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler;
@@ -34,7 +35,8 @@ public class PuzzleImporter {
 
     private static PuzzleParser[] STREAM_SCRAPERS = new PuzzleParser[] {
         new CrosswordNexusStreamScraper(),
-        new PAPuzzlesStreamScraper()
+        new PAPuzzlesStreamScraper(),
+        new RaetselZentraleSchwedenStreamScraper()
     };
 
     /** Import from a URI supported by resolver

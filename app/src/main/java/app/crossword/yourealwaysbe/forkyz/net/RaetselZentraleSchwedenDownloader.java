@@ -1,8 +1,7 @@
 package app.crossword.yourealwaysbe.forkyz.net;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.net.URL;
 import java.time.DayOfWeek;
 import java.time.Duration;
@@ -11,8 +10,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Locale;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import app.crossword.yourealwaysbe.puz.io.RaetselZentraleSchwedenJSONIO;
 import app.crossword.yourealwaysbe.puz.Puzzle;
@@ -36,13 +33,6 @@ public class RaetselZentraleSchwedenDownloader
 
     private static final String ID_URL_FORMAT
         = "https://raetsel.raetselzentrale.de/l/%s/schwede";
-    private static final String JSON_URL_FORMAT
-        = "https://raetsel.raetselzentrale.de/api/r/%s";
-
-    private static final Pattern PUZZLE_ID_PAT = Pattern.compile(
-        "window.__riddleId = (\\d*);"
-    );
-    private static final int PUZZLE_ID_GROUP = 1;
 
     private String idUrl;
 
@@ -83,7 +73,12 @@ public class RaetselZentraleSchwedenDownloader
 
     @Override
     protected String getSourceUrl(LocalDate date) {
-        return getJSONUrl(null);
+        try(InputStream is = getInputStream(new URL(idUrl), null)) {
+            return RaetselZentraleSchwedenStreamScraper.getAPIURL(is);
+        } catch (IOException e) {
+            // fall through
+        }
+        return null;
     }
 
     @Override
@@ -97,26 +92,5 @@ public class RaetselZentraleSchwedenDownloader
             puz.setDate(date);
         }
         return puz;
-    }
-
-    private String getJSONUrl(Map<String, String> headers) {
-        try(
-            BufferedReader reader = new BufferedReader(
-                new InputStreamReader(getInputStream(new URL(idUrl), headers))
-            )
-        ) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                Matcher matcher = PUZZLE_ID_PAT.matcher(line);
-                if (matcher.find()) {
-                    String id = matcher.group(PUZZLE_ID_GROUP);
-                    return String.format(Locale.US, JSON_URL_FORMAT, id);
-                }
-            }
-        } catch (IOException e) {
-            // fall through
-            e.printStackTrace();
-        }
-        return null;
     }
 }
