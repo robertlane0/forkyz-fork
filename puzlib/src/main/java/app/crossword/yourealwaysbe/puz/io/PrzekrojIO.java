@@ -13,6 +13,7 @@ import org.json.JSONObject;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
 import app.crossword.yourealwaysbe.puz.Box;
 import app.crossword.yourealwaysbe.puz.PuzImage;
@@ -26,7 +27,7 @@ import app.crossword.yourealwaysbe.puz.util.JSONParser;
  * First interpret io stream as JSON, if that fails, try it as an HTML file and
  * try to extract JSON from it.
  *
- * Does not set title/author/date (not in JSON)
+ * Does not set title/author/date (not in JSON) unless gets something from HTML
  */
 public class PrzekrojIO implements PuzzleParser {
     private static final Logger LOG
@@ -34,6 +35,8 @@ public class PrzekrojIO implements PuzzleParser {
 
     private static final String ACROSS_LIST = "Poziomo";
     private static final String DOWN_LIST = "Pionowo";
+
+    private static final String DEFAULT_SOURCE = "Przekroj";
 
     /**
      * An unfancy exception indicating error while parsing
@@ -66,11 +69,21 @@ public class PrzekrojIO implements PuzzleParser {
                     .attr("data-json")
                     .replace("&quot;", "\"");
                 String title = doc.select("article").attr("data-title");
+                if (title == null || title.isEmpty()) {
+                    Element titleEle = doc.selectFirst("title");
+                    if (titleEle != null)
+                        title = titleEle.text().trim();
+                }
 
                 puz = readPuzzleFromJSON(JSONParser.parse(cwJson));
                 if (title != null)
-                    puz.setTitle(title);
+                    puz.setTitle(title);;
             }
+
+            String source = puz.getSource();
+            if (source == null || source.isEmpty())
+                puz.setSource(DEFAULT_SOURCE);
+
             return puz;
         } catch (IOException | JSONException | PrzFormatException e) {
             LOG.info("Could not read Przekroj crossword: " + e);
