@@ -166,7 +166,8 @@ public class PrzekrojIO implements PuzzleParser {
             int width = image.getInt("w");
             int height = image.getInt("h");
 
-            builder.addImage(new PuzImage(url, row, col, width, height));
+            if (url != null && !url.isEmpty())
+                builder.addImage(new PuzImage(url, row, col, width, height));
         }
     }
 }

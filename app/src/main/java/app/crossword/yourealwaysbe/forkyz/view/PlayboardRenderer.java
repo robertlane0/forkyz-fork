@@ -1393,6 +1393,9 @@ public class PlayboardRenderer {
 
     private void tagImageWithBitmap(PuzImage image) {
         String url = image.getURL();
+        if (url == null || url.length() < 5)
+            return;
+
         if (url.substring(0, 5).equalsIgnoreCase("data:")) {
             int start = url.indexOf(",") + 1;
             if (start > 0) {
