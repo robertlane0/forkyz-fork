@@ -18,6 +18,7 @@ public class DownloadersSettings {
     private boolean downloadLeParisienF2;
     private boolean downloadLeParisienF3;
     private boolean downloadLeParisienF4;
+    private boolean downloadMetroCryptic;
     private boolean downloadNewsday;
     private boolean downloadPremier;
     private boolean downloadSheffer;
@@ -51,6 +52,7 @@ public class DownloadersSettings {
         boolean downloadLeParisienF2,
         boolean downloadLeParisienF3,
         boolean downloadLeParisienF4,
+        boolean downloadMetroCryptic,
         boolean downloadNewsday,
         boolean downloadPremier,
         boolean downloadSheffer,
@@ -84,6 +86,7 @@ public class DownloadersSettings {
         this.downloadLeParisienF2 = downloadLeParisienF2;
         this.downloadLeParisienF3 = downloadLeParisienF3;
         this.downloadLeParisienF4 = downloadLeParisienF4;
+        this.downloadMetroCryptic = downloadMetroCryptic;
         this.downloadNewsday = downloadNewsday;
         this.downloadPremier = downloadPremier;
         this.downloadSheffer = downloadSheffer;
@@ -130,6 +133,7 @@ public class DownloadersSettings {
     public boolean getDownloadLeParisienF4() {
         return downloadLeParisienF4;
     }
+    public boolean getDownloadMetroCryptic() { return downloadMetroCryptic; }
     public boolean getDownloadNewsday() { return downloadNewsday; }
     public boolean getDownloadPremier() { return downloadPremier; }
     public boolean getDownloadSheffer() { return downloadSheffer; }

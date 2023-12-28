@@ -3,10 +3,10 @@ package app.crossword.yourealwaysbe.forkyz.net;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Map.Entry;
 import java.util.Map;
+
+import app.crossword.yourealwaysbe.forkyz.util.NetUtils;
 
 /**
  * Base class for downloaders
@@ -28,19 +28,6 @@ public abstract class AbstractDownloader implements Downloader {
     protected BufferedInputStream getInputStream(
         URL url, Map<String, String> headers
     ) throws IOException {
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        int timeout = getTimeout();
-        conn.setConnectTimeout(timeout);
-        conn.setReadTimeout(timeout);
-        conn.setRequestProperty("Connection", "close");
-        conn.setRequestProperty("Accept","*/*");
-
-        if (headers != null) {
-            for (Entry<String, String> e : headers.entrySet()){
-                conn.setRequestProperty(e.getKey(), e.getValue());
-            }
-        }
-
-        return new BufferedInputStream(conn.getInputStream());
+        return NetUtils.getInputStream(url, headers, getTimeout());
     }
 }

@@ -5,29 +5,22 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import android.content.Context;
 import android.net.Uri;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-
 import app.crossword.yourealwaysbe.forkyz.R;
+import app.crossword.yourealwaysbe.forkyz.net.PAPuzzlesStreamScraper;
 import app.crossword.yourealwaysbe.forkyz.util.files.DirHandle;
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandle;
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler;
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle;
 import app.crossword.yourealwaysbe.puz.Puzzle;
-import app.crossword.yourealwaysbe.puz.io.PAPuzzlesIO;
+import app.crossword.yourealwaysbe.puz.io.PuzzleParser;
 import app.crossword.yourealwaysbe.puz.io.PuzzleStreamReader;
 import app.crossword.yourealwaysbe.puz.io.StreamUtils;
 
@@ -38,8 +31,9 @@ public class PuzzleImporter {
     private static final Logger LOGGER
         = Logger.getLogger(PuzzleImporter.class.getCanonicalName());
 
-    private static final Pattern PA_PUZZLES_URL_RE
-        = Pattern.compile(".*pa-puzzles.com.*", Pattern.CASE_INSENSITIVE);
+    private static PuzzleParser[] STREAM_SCRAPERS = new PuzzleParser[] {
+        new PAPuzzlesStreamScraper()
+    };
 
     /** Import from a URI supported by resolver
      *
@@ -170,9 +164,9 @@ public class PuzzleImporter {
         String fileName,
         int timeout
     ) throws IOException {
-        ByteArrayInputStream bis = StreamUtils.copyInputStream(is);
+        ByteArrayInputStream bis = StreamUtils.makeByteArrayInputStream(is);
 
-        Puzzle puz = puz = PuzzleStreamReader.parseInputStatic(bis);
+        Puzzle puz = PuzzleStreamReader.parseInputStatic(bis);
         if (puz == null) {
             bis.reset();
             puz = importPuzzleFromWebPage(context, bis, timeout);
@@ -198,13 +192,7 @@ public class PuzzleImporter {
     private static BufferedInputStream getRemoteInputStream(
         String url, int timeout
     ) throws IOException {
-        HttpURLConnection conn
-            = (HttpURLConnection) (new URL(url)).openConnection();
-        conn.setConnectTimeout(timeout);
-        conn.setReadTimeout(timeout);
-        conn.setRequestProperty("Connection", "close");
-        conn.setRequestProperty("Accept","*/*");
-        return new BufferedInputStream(conn.getInputStream());
+        return NetUtils.getInputStream(url, null, timeout);
     }
 
     /**
@@ -219,31 +207,22 @@ public class PuzzleImporter {
     private static Puzzle importPuzzleFromWebPage(
         Context context, InputStream is, int timeout
     ) {
-        Puzzle puz = null;
-
         try {
-            Document doc = Jsoup.parse(is, null, "");
-            Element iframe = doc.selectFirst("iframe");
-
-            if (iframe != null) {
-                String src = iframe.attr("src");
-                if (puz == null && PA_PUZZLES_URL_RE.matcher(src).matches()) {
-                    puz = PAPuzzlesIO.readPuzzle(
-                        getRemoteInputStream(src, timeout)
-                    );
-                    if (puz != null) {
-                        puz.setSource(context.getString(R.string.pa_puzzles));
-
-                        Element title = doc.selectFirst("title");
-                        if (title != null)
-                            puz.setTitle(title.text().trim());
-                    }
+            ByteArrayInputStream bis = StreamUtils.makeByteArrayInputStream(is);
+            for (PuzzleParser parser : STREAM_SCRAPERS) {
+                bis.reset();
+                try {
+                    Puzzle puz = parser.parseInput(bis);
+                    if (puz != null)
+                        return puz;
+                } catch (Exception e) {
+                    // on to the next
                 }
             }
         } catch (IOException e) {
             // we tried
         }
 
-        return puz;
+        return null;
     }
 }

@@ -22,6 +22,8 @@ import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -494,6 +496,22 @@ public class Downloaders {
                 300,
                 LocalDate.of(2023, 3, 4),
                 1
+            ));
+        }
+
+        if (settings.getDownloadMetroCryptic()) {
+            downloaders.add(new AbstractDateDownloader(
+                "metrocryptic",
+                context.getString(R.string.metro_cryptic),
+                Downloader.DATE_WEEKDAY,
+                Duration.ZERO,
+                "https://metro.co.uk/",
+                new PAPuzzlesStreamScraper(),
+                "'https://metro.co.uk/puzzles/"
+                    + "cryptic-crosswords-online-free-daily-word-puzzle/'",
+                "'https://metro.co.uk/puzzles/"
+                    + "cryptic-crosswords-online-free-daily-word-puzzle/'",
+                ZonedDateTime.now(ZoneId.of("Europe/London")).toLocalDate()
             ));
         }
 

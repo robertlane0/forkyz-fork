@@ -13,6 +13,23 @@ public class StreamUtils {
     public static final int DEFAULT_BUFFER_SIZE = 1024;
 
     /**
+     * Make given input stream into a ByteArrayInputStream
+     *
+     * By copying into a buffer if needs be. Either you get back the original
+     * input stream, or a ByteArrayInputStream that doesn't need closing.
+     */
+    public static ByteArrayInputStream makeByteArrayInputStream(
+        InputStream is
+    ) throws IOException {
+        if (is instanceof ByteArrayInputStream)
+            return (ByteArrayInputStream) is;
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        copyStream(is, baos);
+        return  new ByteArrayInputStream(baos.toByteArray());
+    }
+
+    /**
      * If given input stream, returns unzipped input stream
      *
      * Returns a stream with marksSupported. Is (a copy of) original stream if
@@ -23,15 +40,9 @@ public class StreamUtils {
     public static InputStream unzipOrPassThrough(InputStream is)
             throws IOException {
 
-        InputStream resetableInputStream = is;
-        if (!resetableInputStream.markSupported()) {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            copyStream(is, baos);
-            resetableInputStream = new ByteArrayInputStream(baos.toByteArray());
-        }
-
+        ByteArrayInputStream bis = makeByteArrayInputStream(is);
         try (
-            ZipInputStream zis = new ZipInputStream(resetableInputStream)
+            ZipInputStream zis = new ZipInputStream(bis)
         ) {
             ZipEntry entry = zis.getNextEntry();
             while (entry.isDirectory()) {
@@ -39,12 +50,13 @@ public class StreamUtils {
             }
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             copyStream(zis, baos);
-            resetableInputStream = new ByteArrayInputStream(baos.toByteArray());
+            bis = new ByteArrayInputStream(baos.toByteArray());
         } catch (Exception e) {
             // not zipped
+            bis.reset();
         }
 
-        return resetableInputStream;
+        return bis;
     }
 
     /**
