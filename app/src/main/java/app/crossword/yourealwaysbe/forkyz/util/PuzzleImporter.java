@@ -14,17 +14,12 @@ import android.content.Context;
 import android.net.Uri;
 
 import app.crossword.yourealwaysbe.forkyz.R;
-import app.crossword.yourealwaysbe.forkyz.net.AmuseLabsStreamScraper;
-import app.crossword.yourealwaysbe.forkyz.net.CrosswordNexusStreamScraper;
-import app.crossword.yourealwaysbe.forkyz.net.PAPuzzlesStreamScraper;
-import app.crossword.yourealwaysbe.forkyz.net.PzzlStreamScraper;
-import app.crossword.yourealwaysbe.forkyz.net.RaetselZentraleSchwedenStreamScraper;
+import app.crossword.yourealwaysbe.forkyz.net.GenericStreamScraper;
 import app.crossword.yourealwaysbe.forkyz.util.files.DirHandle;
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandle;
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler;
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle;
 import app.crossword.yourealwaysbe.puz.Puzzle;
-import app.crossword.yourealwaysbe.puz.io.PuzzleParser;
 import app.crossword.yourealwaysbe.puz.io.PuzzleStreamReader;
 import app.crossword.yourealwaysbe.puz.io.StreamUtils;
 
@@ -34,14 +29,6 @@ import app.crossword.yourealwaysbe.puz.io.StreamUtils;
 public class PuzzleImporter {
     private static final Logger LOGGER
         = Logger.getLogger(PuzzleImporter.class.getCanonicalName());
-
-    private static PuzzleParser[] STREAM_SCRAPERS = new PuzzleParser[] {
-        new AmuseLabsStreamScraper(),
-        new CrosswordNexusStreamScraper(),
-        new PAPuzzlesStreamScraper(),
-        new PzzlStreamScraper(),
-        new RaetselZentraleSchwedenStreamScraper()
-    };
 
     /** Import from a URI supported by resolver
      *
@@ -216,21 +203,11 @@ public class PuzzleImporter {
         Context context, InputStream is, int timeout
     ) {
         try {
-            ByteArrayInputStream bis = StreamUtils.makeByteArrayInputStream(is);
-            for (PuzzleParser parser : STREAM_SCRAPERS) {
-                bis.reset();
-                try {
-                    Puzzle puz = parser.parseInput(bis);
-                    if (puz != null)
-                        return puz;
-                } catch (Exception e) {
-                    // on to the next
-                }
-            }
-        } catch (IOException e) {
-            // we tried
+            GenericStreamScraper scraper = new GenericStreamScraper();
+            scraper.setTimeout(timeout);
+            return scraper.parseInput(is);
+        } catch (Exception e) {
+            return null;
         }
-
-        return null;
     }
 }
