@@ -24,6 +24,14 @@ public class StreamScrapersTest {
     }
 
     @Test
+    public void testKeesing() throws Exception {
+        testScraper(
+            "https://www.standaard.be/kruiswoordraadsel",
+            new KeesingStreamScraper()
+        );
+    }
+
+    @Test
     public void testPAPuzzles() throws Exception {
         testScraper(
             "https://metro.co.uk/puzzles/quick-crosswords-online-free-daily-word-puzzle/",
