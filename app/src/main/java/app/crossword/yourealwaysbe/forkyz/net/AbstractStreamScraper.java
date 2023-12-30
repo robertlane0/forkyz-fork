@@ -1,6 +1,8 @@
 
 package app.crossword.yourealwaysbe.forkyz.net;
 
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,6 +40,22 @@ import app.crossword.yourealwaysbe.puz.io.PuzzleParser;
 public abstract class AbstractStreamScraper implements PuzzleParser {
     private int timeoutMillis = 30000;
 
+    /**
+     * Check each line against the regex return group
+     */
+    protected static class RegexScrape {
+        private Pattern regex;
+        private int group;
+
+        public RegexScrape(Pattern regex, int group) {
+            this.regex = regex;
+            this.group = group;
+        }
+
+        public Pattern getRegex() { return regex; }
+        public int getGroup() { return group; }
+    }
+
     @Override
     public abstract Puzzle parseInput (InputStream is) throws Exception;
 
@@ -71,7 +89,7 @@ public abstract class AbstractStreamScraper implements PuzzleParser {
      * returned)
      * @param selector css selector of elements to look at
      * @param attribute attribute of element to look at
-     * @param regex regex to match attribute
+     * @param regexScrape the regex scrape to use
      * @param extractString Java replacement string to turn match (of
      * full string) into the url. E.g. "$0" just to use the whole match.
      * @param urlParser used to parse the contents of the found URL
@@ -101,6 +119,59 @@ public abstract class AbstractStreamScraper implements PuzzleParser {
         }
 
         return null;
+    }
+
+    /**
+     * Parse all of is and match against given regexes
+     *
+     * Return array of results, that is extract string for each match.
+     * Null for those that did not match.
+     *
+     * Checks each line against each regex. I.e. doesn't stop at the first
+     * match for a given line. Keeps first match for each regex.
+     *
+     * Will silently abort and return what we have so far if IOException.
+     */
+    public static String[] regexScrape(
+        InputStream is, RegexScrape[] regexScrapes
+    ) {
+        String[] results = new String[regexScrapes.length];
+        try {
+            BufferedReader reader = new BufferedReader(
+                new InputStreamReader(is)
+            );
+
+            // stop when reaches num of scrapes
+            int countFreshHits = 0;
+
+            String line;
+            while (
+                (line = reader.readLine()) != null
+                    && countFreshHits < regexScrapes.length
+            ) {
+                for (int i = 0; i < regexScrapes.length; i++) {
+                    if (results[i] != null)
+                        continue;
+
+                    Matcher matcher = regexScrapes[i].getRegex().matcher(line);
+                    if (matcher.find()) {
+                        results[i] = matcher.group(regexScrapes[i].getGroup());
+                        countFreshHits += 1;
+                    }
+                }
+            }
+        } catch (IOException e) {
+            // fall through
+        }
+        return results;
+    }
+
+    /**
+     * Convencience method for regexScrape with one match
+     */
+    public static String regexScrape(InputStream is, RegexScrape regexScrapes) {
+        RegexScrape[] scrapes = { regexScrapes };
+        return regexScrape(is, scrapes)[0];
     }
 
     /**

@@ -1,13 +1,9 @@
 
 package app.crossword.yourealwaysbe.forkyz.net;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.Locale;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import app.crossword.yourealwaysbe.puz.Puzzle;
@@ -37,14 +33,16 @@ public class RaetselZentraleSchwedenStreamScraper
     // Note <iframe> may be generated in javascript. Hamburger uses
     // pagespeed_iframe... So look for something that looks like it's
     // creating it.
-    private static final Pattern SECOND_STAGE_URL_RE = Pattern.compile(
-        "iframe[^>]*src=\"([^\"]*raetsel\\.raetselzentrale\\.de[^\"]*)\""
-    );
-    private static final int SECOND_STAGE_URL_GRP = 1;
-    private static final Pattern PUZZLE_ID_PAT = Pattern.compile(
-        "window.__riddleId = (\\d*);"
-    );
-    private static final int PUZZLE_ID_GROUP = 1;
+    private static final RegexScrape SECOND_STAGE_URL_MATCH
+        = new RegexScrape(
+            Pattern.compile(
+                "iframe[^>]*src=\"([^\"]*raetsel\\.raetselzentrale\\.de[^\"]*)\""
+            ),
+            1
+        );
+
+    private static final RegexScrape PUZZLE_ID_MATCH
+        = new RegexScrape(Pattern.compile("window.__riddleId = (\\d*);"), 1);
 
     private static final String DEFAULT_SOURCE = "Raetsel Zentrale";
 
@@ -86,22 +84,7 @@ public class RaetselZentraleSchwedenStreamScraper
      * parsed doc doesn't seem to work. Perhaps the HTML is funky.
      */
     public String getSecondStageURL(InputStream is) {
-        try {
-            BufferedReader reader = new BufferedReader(
-                new InputStreamReader(is)
-            );
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                Matcher matcher = SECOND_STAGE_URL_RE.matcher(line);
-                if (matcher.find()) {
-                    return matcher.group(SECOND_STAGE_URL_GRP);
-                }
-            }
-        } catch (IOException e) {
-            // fall through
-        }
-        return null;
+        return regexScrape(is, SECOND_STAGE_URL_MATCH);
     }
 
     /**
@@ -128,23 +111,12 @@ public class RaetselZentraleSchwedenStreamScraper
      * Gets API URL from input stream, does not close, or null
      */
     public static String getAPIURL(InputStream is) {
-        try {
-            BufferedReader reader = new BufferedReader(
-                new InputStreamReader(is)
-            );
+        String id = regexScrape(is, PUZZLE_ID_MATCH);
+        if (id != null)
+            return String.format(Locale.US, JSON_URL_FORMAT, id);
+        else
+            return null;
 
-            String line;
-            while ((line = reader.readLine()) != null) {
-                Matcher matcher = PUZZLE_ID_PAT.matcher(line);
-                if (matcher.find()) {
-                    String id = matcher.group(PUZZLE_ID_GROUP);
-                    return String.format(Locale.US, JSON_URL_FORMAT, id);
-                }
-            }
-        } catch (IOException e) {
-            // fall through
-        }
-        return null;
     }
 
     private class SecondStageParser implements PuzzleParser {
