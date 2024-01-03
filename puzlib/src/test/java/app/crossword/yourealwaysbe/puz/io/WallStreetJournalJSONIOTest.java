@@ -8,7 +8,9 @@ import org.junit.jupiter.api.Test;
 
 import app.crossword.yourealwaysbe.puz.Box;
 import app.crossword.yourealwaysbe.puz.ClueList;
+import app.crossword.yourealwaysbe.puz.Position;
 import app.crossword.yourealwaysbe.puz.Puzzle;
+import app.crossword.yourealwaysbe.puz.Zone;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -55,6 +57,16 @@ public class WallStreetJournalJSONIOTest {
         assertEquals(acrossClues.getClueByNumber("21").getHint(), "Clue 21a");
         assertEquals(downClues.getClueByNumber("1").getHint(), "Clue 1d");
         assertEquals(downClues.getClueByNumber("2").getHint(), "Clue 2d");
+
+        Zone zone5a = acrossClues.getClueByNumber("5").getZone();
+        assertEquals(zone5a.size(), 3);
+        assertEquals(zone5a.getPosition(0), new Position(0, 5));
+        assertEquals(zone5a.getPosition(2), new Position(0, 7));
+
+        Zone zone14d = downClues.getClueByNumber("18").getZone();
+        assertEquals(zone14d.size(), 4);
+        assertEquals(zone14d.getPosition(0), new Position(2, 8));
+        assertEquals(zone14d.getPosition(3), new Position(5, 8));
     }
 
     @Test

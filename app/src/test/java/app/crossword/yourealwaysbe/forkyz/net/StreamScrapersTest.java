@@ -8,12 +8,15 @@ import org.junit.Test;
 import static org.junit.Assert.assertNotNull;
 
 import app.crossword.yourealwaysbe.forkyz.util.NetUtils;
+import app.crossword.yourealwaysbe.forkyz.versions.TiramisuUtil;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.io.PuzzleParser;
 
 public class StreamScrapersTest {
 
     private static final int TIMEOUT = 30000;
+
+    private static final TiramisuUtil utils = new TiramisuUtil();
 
     @Test
     public void testCrosswordNexus() throws Exception {
@@ -57,6 +60,14 @@ public class StreamScrapersTest {
         );
     }
 
+    @Test
+    public void testWSJ() throws Exception {
+        testScraperApache(
+            "https://www.wsj.com/articles/snack-time-wednesday-crossword-january-3-b09d36c8",
+            new WSJStreamScraper(new TiramisuUtil())
+        );
+    }
+
     /**
      * Test scraper gets a puzzle from the URL
      */
@@ -64,6 +75,20 @@ public class StreamScrapersTest {
         String url, PuzzleParser scraper
     ) throws Exception {
         try (InputStream is = NetUtils.getInputStream(url, null, TIMEOUT)) {
+            Puzzle puz = scraper.parseInput(is);
+            assertNotNull(puz);
+        }
+    }
+
+    /**
+     * Test scraper gets a puzzle from the URL
+     *
+     * Uses Apache HTTP client
+     */
+    private static void testScraperApache(
+        String url, PuzzleParser scraper
+    ) throws Exception {
+        try (InputStream is = utils.apacheGetInputStream(url, null, TIMEOUT)) {
             Puzzle puz = scraper.parseInput(is);
             assertNotNull(puz);
         }

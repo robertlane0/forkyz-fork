@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.io.StreamUtils;
 
@@ -14,22 +15,26 @@ import app.crossword.yourealwaysbe.puz.io.StreamUtils;
  * Return first successful puzzle.
  */
 public class GenericStreamScraper extends AbstractStreamScraper {
-    private static AbstractStreamScraper[] STREAM_SCRAPERS
-        = new AbstractStreamScraper[] {
+    private AbstractStreamScraper[] streamScrapers;
+
+    public GenericStreamScraper(AndroidVersionUtils utils) {
+        streamScrapers = new AbstractStreamScraper[] {
             // WIP
             // new AmuseLabsStreamScraper(),
             new CrosswordNexusStreamScraper(),
             new KeesingStreamScraper(),
             new PAPuzzlesStreamScraper(),
             new PzzlStreamScraper(),
-            new RaetselZentraleSchwedenStreamScraper()
+            new RaetselZentraleSchwedenStreamScraper(),
+            new WSJStreamScraper(utils)
         };
+    }
 
     @Override
     public Puzzle parseInput (InputStream is) throws Exception {
         try {
             ByteArrayInputStream bis = StreamUtils.makeByteArrayInputStream(is);
-            for (AbstractStreamScraper scraper : STREAM_SCRAPERS) {
+            for (AbstractStreamScraper scraper : streamScrapers) {
                 bis.reset();
                 scraper.setTimeout(getTimeout());
                 try {

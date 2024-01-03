@@ -375,7 +375,7 @@ public class BrowseActivityViewModel extends AndroidViewModel {
                         continue;
 
                     PuzHandle ph = PuzzleImporter.importUri(
-                        getApplication(), fileHandler, uri, timeout
+                        getApplication(), fileHandler, utils, uri, timeout
                     );
 
                     someFailed |= (ph == null);
@@ -414,7 +414,7 @@ public class BrowseActivityViewModel extends AndroidViewModel {
             threadWithUILock(() -> {
                 List<PuzHandle> imported
                     = PuzzleImporter.processToImportDirectory(
-                        getApplication(), fileHandler
+                        getApplication(), fileHandler, utils
                     );
 
                 for (PuzHandle ph : imported) {
