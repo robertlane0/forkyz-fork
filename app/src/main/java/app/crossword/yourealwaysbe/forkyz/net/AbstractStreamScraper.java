@@ -80,10 +80,38 @@ public abstract class AbstractStreamScraper implements PuzzleParser {
     }
 
     /**
+     * From HTML pick out a particular URL
+     *
+     * @param doc Jsoup document to search (or null, meaning null
+     * returned)
+     * @param selector css selector of elements to look at
+     * @param attribute attribute of element to look at
+     * @param regexScrape the regex scrape to use
+     * @param extractString Java replacement string to turn match (of
+     * full string) into the url. E.g. "$0" just to use the whole match.
+     * @return first found url or null
+     */
+    protected static String htmlElementFindURL(
+        Document doc,
+        String selector, String attribute,
+        Pattern regex, String extractString
+    ) {
+        if (doc == null)
+            return null;
+        for (Element ele : doc.select(selector)) {
+            String att = ele.attr(attribute);
+            Matcher m = regex.matcher(att);
+            if (m.matches())
+                return m.replaceFirst(extractString);
+        }
+
+        return null;
+    }
+
+    /**
      * From HTML pick out a particular URL to fetch and parse
      *
-     * Tries all until one found, then uses urlParser on the page
-     * pointed to.
+     * Tries first found URL, uses urlParser on the page pointed to.
      *
      * @param doc Jsoup document to search (or null, meaning null
      * returned)
@@ -103,22 +131,21 @@ public abstract class AbstractStreamScraper implements PuzzleParser {
     ) {
         if (doc == null)
             return null;
-        for (Element ele : doc.select(selector)) {
-            String att = ele.attr(attribute);
-            Matcher m = regex.matcher(att);
-            if (m.matches()) {
-                String url = m.replaceFirst(extractString);
-                try (InputStream urlIS = getInputStream(url)) {
-                    Puzzle puz = urlParser.parseInput(urlIS);
-                    if (puz != null)
-                        return puz;
-                } catch (Exception e) {
-                    // on to the next
-                }
+
+        String url = htmlElementFindURL(
+            doc, selector, attribute, regex, extractString
+        );
+
+        Puzzle puz = null;
+        if (url != null) {
+            try (InputStream urlIS = getInputStream(url)) {
+                puz = urlParser.parseInput(urlIS);
+            } catch (Exception e) {
+                // we tried
             }
         }
 
-        return null;
+        return puz;
     }
 
     /**
@@ -177,7 +204,7 @@ public abstract class AbstractStreamScraper implements PuzzleParser {
     /**
      * Parse input as HTML, return document or null
      */
-    protected Document getDocument(InputStream is) {
+    protected static Document getDocument(InputStream is) {
         try {
             return Jsoup.parse(is, null, "");
         } catch (IOException e) {
