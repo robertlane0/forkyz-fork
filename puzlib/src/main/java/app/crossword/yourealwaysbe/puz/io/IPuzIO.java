@@ -329,7 +329,7 @@ public class IPuzIO implements PuzzleParser {
     };
     private static final int DEFINED_COLOURS_MAX_DIGITS
         = ((int) Math.log10(DEFINED_COLORS.length)) + 1;
-    private static final int HIGHLIGHT_COLOR = DEFINED_COLORS[3];
+    public static final int HIGHLIGHT_COLOR = DEFINED_COLORS[3];
 
     /**
      * An unfancy exception indicating error while parsing
