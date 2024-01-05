@@ -26,7 +26,8 @@ public class PuzzleStreamReader implements PuzzleParser {
         new KeesingXMLIO(),
         new PAPuzzlesIO(),
         new AMUniversalJSONIO(),
-        new WallStreetJournalJSONIO()
+        new WallStreetJournalJSONIO(),
+        new SpoonbillIO()
     };
 
     /**
