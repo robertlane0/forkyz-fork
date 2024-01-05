@@ -23,7 +23,9 @@ public class PuzzleStreamReader implements PuzzleParser {
         new RCIJeuxMFJIO(),
         new PrzekrojIO(),
         new KeesingXMLIO(),
-        new AMUniversalJSONIO()
+        new PAPuzzlesIO(),
+        new AMUniversalJSONIO(),
+        new WallStreetJournalJSONIO()
     };
 
     /**
