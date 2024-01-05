@@ -41,7 +41,7 @@ import app.crossword.yourealwaysbe.puz.util.JSONParser;
  * "notepad": "<notes/html>"
  * "jnotes": "<notes/html>"
  */
-public class XWordJSONIO implements PuzzleParser {
+public class XWordJSONIO extends AbstractJSONIO {
     private static final Logger LOG
         = Logger.getLogger(XWordJSONIO.class.getCanonicalName());
 
@@ -209,16 +209,5 @@ public class XWordJSONIO implements PuzzleParser {
                 );
             }
         }
-    }
-
-    private static String optStringNull(JSONObject json, String field) {
-        String value = json.optString(field);
-        if (isJSONNull(value) || value.isEmpty())
-            return null;
-        return value;
-    }
-
-    private static boolean isJSONNull(Object obj) {
-        return obj == null || JSONObject.NULL.equals(obj);
     }
 }

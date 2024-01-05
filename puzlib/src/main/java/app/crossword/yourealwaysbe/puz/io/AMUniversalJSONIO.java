@@ -46,7 +46,7 @@ import app.crossword.yourealwaysbe.puz.util.JSONParser;
  * "Width"
  * "Height"
  */
-public class AMUniversalJSONIO implements PuzzleParser {
+public class AMUniversalJSONIO extends AbstractJSONIO {
     private static final Logger LOG
         = Logger.getLogger(AMUniversalJSONIO.class.getCanonicalName());
 
@@ -83,9 +83,9 @@ public class AMUniversalJSONIO implements PuzzleParser {
         JSONObject json
     ) throws JSONException, AMUniversalFormatException {
         PuzzleBuilder builder = new PuzzleBuilder(getBoxes(json))
-            .setTitle(json.optString("Title"))
-            .setAuthor(json.optString("Author"))
-            .setCopyright(json.optString("Copyright"))
+            .setTitle(optStringNull(json, "Title"))
+            .setAuthor(optStringNull(json, "Author"))
+            .setCopyright(optStringNull(json, "Copyright"))
             .setDate(getDate(json));
 
         addClues(json, builder);
@@ -95,7 +95,7 @@ public class AMUniversalJSONIO implements PuzzleParser {
 
     private static LocalDate getDate(JSONObject json) {
         try {
-            String date = json.optString("Date");
+            String date = optStringNull(json, "Date");
             return (date == null)
                 ? null
                 : LocalDate.parse(date, DATE_FORMATTER);
@@ -160,10 +160,10 @@ public class AMUniversalJSONIO implements PuzzleParser {
 
     private static void addClues(JSONObject json, PuzzleBuilder builder)
             throws JSONException, AMUniversalFormatException {
-        String across = json.optString("AcrossClue");
+        String across = optStringNull(json, "AcrossClue");
         if (across != null)
             addCluesFromString(across, builder, true);
-        String down = json.optString("DownClue");
+        String down = optStringNull(json, "DownClue");
         if (down != null)
             addCluesFromString(down, builder, false);
     }

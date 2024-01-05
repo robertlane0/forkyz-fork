@@ -29,7 +29,7 @@ import app.crossword.yourealwaysbe.puz.util.PuzzleUtils;
  * Read a character stream of JSON data in the format used by the
  * Guardian.
  */
-public class GuardianJSONIO implements PuzzleParser {
+public class GuardianJSONIO extends AbstractJSONIO {
     private static final Logger LOG
         = Logger.getLogger(GuardianJSONIO.class.getCanonicalName());
 
@@ -94,11 +94,11 @@ public class GuardianJSONIO implements PuzzleParser {
         JSONObject json
     ) throws JSONException {
         PuzzleBuilder builder = new PuzzleBuilder(getBoxes(json))
-            .setTitle(json.optString("name"));
+            .setTitle(optStringNull(json, "name"));
 
         JSONObject creator = json.optJSONObject("creator");
         if (creator != null)
-            builder.setAuthor(creator.optString("name"));
+            builder.setAuthor(optStringNull(creator, "name"));
 
         if (json.has("date")) {
             long epochMillis = json.getLong("date");
@@ -132,7 +132,7 @@ public class GuardianJSONIO implements PuzzleParser {
                 continue;
 
             String num = String.valueOf(entry.getInt("number"));
-            String clueSol = entry.optString("solution");
+            String clueSol = optStringNull(entry, "solution");
             String direction = entry.getString("direction");
             int length = entry.getInt("length");
 

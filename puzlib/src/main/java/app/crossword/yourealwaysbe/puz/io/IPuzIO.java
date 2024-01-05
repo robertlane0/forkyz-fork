@@ -65,7 +65,7 @@ import static app.crossword.yourealwaysbe.puz.util.HtmlUtil.unHtmlString;
  *
  * http://www.ipuz.org/
  */
-public class IPuzIO implements PuzzleParser {
+public class IPuzIO extends AbstractJSONIO {
     private static final Logger LOG
         = Logger.getLogger(IPuzIO.class.getCanonicalName());
 
@@ -2574,20 +2574,6 @@ public class IPuzIO implements PuzzleParser {
         return String.format(
             HEX_COLOR_FORMAT, color & 0x00ffffff
         );
-    }
-
-    /**
-     * Reads field from json, returns null if not there or empty val
-     */
-    private static String optStringNull(JSONObject json, String field) {
-        String value = json.optString(field);
-        if (value == null || value.isEmpty())
-            return null;
-        return value;
-    }
-
-    private static boolean isJSONNull(Object obj) {
-        return obj == null || JSONObject.NULL.equals(obj);
     }
 
     /**

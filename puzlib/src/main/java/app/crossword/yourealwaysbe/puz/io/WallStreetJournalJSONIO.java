@@ -54,7 +54,7 @@ import app.crossword.yourealwaysbe.puz.util.JSONParser;
  *   ]
  * }
  */
-public class WallStreetJournalJSONIO implements PuzzleParser {
+public class WallStreetJournalJSONIO extends AbstractJSONIO {
     private static final Logger LOG
         = Logger.getLogger(AmuseLabsJSONIO.class.getCanonicalName());
 
@@ -264,12 +264,5 @@ public class WallStreetJournalJSONIO implements PuzzleParser {
                 zone.addPosition(new Position(row, col));
 
         return zone;
-    }
-
-    private static String optStringNull(JSONObject obj, String field) {
-        String value = obj.optString(field);
-        if (value == null || value.isEmpty())
-            return null;
-        return value;
     }
 }
