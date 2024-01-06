@@ -18,6 +18,7 @@ public class PuzzleStreamReader implements PuzzleParser {
         new BrainsOnlyIO(),
         new KingFeaturesPlaintextIO(),
         new XWordJSONIO(),
+        new XDIO(),
         new GuardianJSONIO(),
         new AmuseLabsJSONIO(),
         new RaetselZentraleSchwedenJSONIO(),
