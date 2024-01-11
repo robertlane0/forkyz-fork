@@ -1,0 +1,42 @@
+exolve-begin
+  exolve-title: Test title 
+  exolve-setter: Test author
+  exolve-copyright: Test copyright
+  exolve-email: test@email.com
+  exolve-credits: Tester: test
+  exolve-credits: Tester 2: test2
+  exolve-preamble:
+    Test preamble
+    Multiple lines
+  # comment
+  exolve-prelude:
+    Test prelude
+  exolve-explanations:
+    Everything is explained.
+  exolve-width: 5
+  exolve-height: 6
+  exolve-reversals: a2-e2
+  exolve-color: green 1a A6
+  exolve-color: b4 #f00 2d
+  exolve-grid:
+    XX@AX&&
+    X_.X| .X|_
+    X~X+ X XB
+    X.C!.X
+    X&1&2XX
+    X...X
+  exolve-across:
+    1 . Clue 1a (5) ANNOT1a
+    All filler
+    #a4 [N] Clue Na (5)
+    4 Clue 4a
+    6 Clue 6a (some words) ANNOT6a
+    8 *
+  exolve-down:
+    1 Clue 1d (5)
+    2 Clue 2d (5)*
+    3, 4a & [N] Clue ~{{mystyle}3d}~ [] ANNOT3d
+    6 Starts elsewhere
+  exolve-nodir: NODIR
+    #a6 #r5c3 #c4r2 [A] ClueA
+exolve-end

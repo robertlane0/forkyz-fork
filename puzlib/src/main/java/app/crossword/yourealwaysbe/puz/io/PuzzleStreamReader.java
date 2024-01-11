@@ -28,7 +28,8 @@ public class PuzzleStreamReader implements PuzzleParser {
         new PAPuzzlesIO(),
         new AMUniversalJSONIO(),
         new WallStreetJournalJSONIO(),
-        new SpoonbillIO()
+        new SpoonbillIO(),
+        new ExolveIO()
     };
 
     /**

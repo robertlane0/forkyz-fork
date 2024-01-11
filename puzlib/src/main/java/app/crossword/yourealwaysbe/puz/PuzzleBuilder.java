@@ -7,9 +7,11 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.iharder.Base64;
 
@@ -215,11 +217,26 @@ public class PuzzleBuilder {
      * numbers
      */
     public PuzzleBuilder autoNumberBoxes() throws IllegalArgumentException {
+        return autoNumberBoxes(Collections.<Position>emptySet());
+    }
+
+    /**
+     * Number puzzle boxes according to standard system
+     *
+     * @param skipNumberCells cells not to auto number. They are skipped
+     * and the number goes to the next standard cell to number.
+     * @throws IllegalArgumentException if mismatch with existing
+     * numbers
+     */
+    public PuzzleBuilder autoNumberBoxes(
+        Set<Position> skipNumberCells
+    ) throws IllegalArgumentException {
         int clueCount = 1;
 
         for (int row = 0; row < puzzle.getHeight(); row++) {
             for (int col = 0; col < puzzle.getWidth(); col++) {
-                Box box = puzzle.checkedGetBox(row, col);
+                Position pos = new Position(row, col);
+                Box box = puzzle.checkedGetBox(pos);
 
                 if (Box.isBlock(box)) {
                     continue;
@@ -231,7 +248,7 @@ public class PuzzleBuilder {
                 String boxNumber = box.getClueNumber();
                 String autoNumber = String.valueOf(clueCount);
 
-                if (isStart) {
+                if (isStart && !skipNumberCells.contains(pos)) {
                     if (boxNumber != null && !boxNumber.equals(autoNumber)) {
                         throw new IllegalArgumentException(
                             "Box clue number " + boxNumber
@@ -273,6 +290,13 @@ public class PuzzleBuilder {
      */
     public Zone getAcrossZone(String number) {
         Position start = getNumberPositions().get(number);
+        return getAcrossZone(start);
+    }
+
+    /**
+     * Get standard across zone from a position
+     */
+    public Zone getAcrossZone(Position start) {
         return (start != null)
             ? PuzzleUtils.getAcrossZone(puzzle, start)
             : null;
@@ -285,6 +309,13 @@ public class PuzzleBuilder {
      */
     public Zone getDownZone(String number) {
         Position start = getNumberPositions().get(number);
+        return getDownZone(start);
+    }
+
+    /**
+     * Get standard down zone from a position
+     */
+    public Zone getDownZone(Position start) {
         return (start != null)
             ? PuzzleUtils.getDownZone(puzzle, start)
             : null;
