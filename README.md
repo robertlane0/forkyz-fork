@@ -111,6 +111,7 @@ Supported import file formats (can be zipped or unzipped):
 * Raetsel Zentrale Schwedenratsel JSON,
 * Uclick XML,
 * Wall Street Journal JSON,
+* .xd,
 * XWord JSON.
 
 Current downloaders are De Standaard, De Telegraaf, Guardian Daily Cryptic, Hamburger Abendblatt, Independent Daily Cryptic, Thomas Joseph Crossword, Le Parisien, Metro (UK), Newsday, Sheffer Crossword, Universal Crosssword, USA Today, Jonesin' Crosswords, Premier Crossword, the Wall Street Journal (Sat/Sun), Keglar's Cryptics, Cryptic Cru Archives, Private Eye, and Przekroj Magazine.
