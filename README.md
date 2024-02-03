@@ -84,7 +84,7 @@ Puzzles can be obtained in several ways:
 
 * import files,
 * scanning with the [Forkyz Scanner][forkyz-scanner] companion app,
-* share from a web browser, or
+* share a URL from a web browser, or
 * use the built-in downloaders.
 
 ### Importing Files
@@ -99,6 +99,7 @@ Supported import file formats (can be zipped or unzipped):
 * AM Universal JSON,
 * AmuseLabs JSON,
 * BrainsOnly TXT,
+* Exolve,
 * Guardian JSON and HTML,
 * IPuz (crosswords and acrostics only),
 * JPZ,
@@ -121,6 +122,7 @@ From an online puzzle page, you can use your browser's "share" function to share
 This only works for a limited number of sites, but may work for sites using similar crossword software. It has been tested with:
 
 * Crossword Nexus,
+* Exolve,
 * Guardian,
 * Hamburger Abendblatt (embedded from Raetsel Zentrale),
 * De Standaard (embedded crosswords from Keesing),
