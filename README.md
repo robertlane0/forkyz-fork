@@ -109,6 +109,7 @@ Supported import file formats (can be zipped or unzipped):
 * Przekroj Magazine JSON and HTML,
 * RCI Jeux Mots-Fleches HJSON,
 * Raetsel Zentrale Schwedenratsel JSON,
+* Spoonbill,
 * Uclick XML,
 * Wall Street Journal JSON,
 * .xd,
