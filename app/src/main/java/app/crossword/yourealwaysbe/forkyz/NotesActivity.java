@@ -1216,15 +1216,18 @@ public class NotesActivity extends PuzzleActivity {
         if (binding.anagramSource.getSelectedCol() < leadChars.length())
             return null;
 
+        // strip HTML and spaces
+        String strippedHint = hint.replaceAll("<[^>]*>|[^\\p{IsAlphabetic}]", "");
+
         // case insensitive trick:
         // https://www.baeldung.com/java-case-insensitive-string-matching
         Pattern p = Pattern.compile("(?i)" + leadChars);
-        Matcher m = p.matcher(hint);
+        Matcher m = p.matcher(strippedHint);
         if (!m.find())
             return null;
 
         String prediction = getUpperLetters(
-            hint, m.start(), binding.anagramSource.getLength()
+            strippedHint, m.start(), binding.anagramSource.getLength()
         );
 
         binding.anagramSource.setShadow(prediction);
