@@ -400,6 +400,13 @@ public class Puzzle implements Serializable{
         return completionMessage;
     }
 
+    /**
+     * Get percentage of filled solutions that are correct
+     *
+     * If the box has no solutions in the box, then percent complete is
+     * 0. If some boxes have some solutions and some don't, then percent
+     * is the percent of boxes with a defined solution.
+     */
     public int getPercentComplete() {
         int total = 0;
         int correct = 0;
@@ -407,7 +414,7 @@ public class Puzzle implements Serializable{
         for (int x = 0; x < boxes.length; x++) {
             for (int y = 0; y < boxes[x].length; y++) {
                 Box box = boxes[x][y];
-                if (!Box.isBlock(box)) {
+                if (!Box.isBlock(box) && box.hasSolution()) {
                     total++;
                     if (Objects.equals(box.getResponse(), box.getSolution())) {
                         correct++;
