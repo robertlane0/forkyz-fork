@@ -1,5 +1,14 @@
 # Forkyz Changelog
 
+## Version 50
+
+- Import puzzles by sharing a URL with Forkyz (works with links to puzzle files and webpages for Crossword Nexus, Exolve, Guardian, Hamburger Abendblatt, Metro (UK), Przekroj, De Standaard, De Telegraaf, Wall Street Journal (sometimes), and similar).
+- Support new input formats (AM Universal JSON, Exolve, PA Puzzles HTML, Spoonbill, Wall Street Journal JSON, .xd, XWord).
+- Downloader for UK Metro daily cryptic.
+- Ability to flag cells.
+- Add show percentage correct option in puzzle browser.
+- Editing of unselectable clues.
+
 ## Version 49
 
 - Add external tools menu and settings (billthefarmer's Crossword solver, dictionaries, ChatGPT).
