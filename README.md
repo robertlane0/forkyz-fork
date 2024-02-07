@@ -80,11 +80,14 @@ Support for block, bar, and acrostic puzzles. Puzzles don't have to be across/do
 
 ## Obtaining Puzzles
 
-Puzzles can be obtained in three ways:
+Puzzles can be obtained in several ways:
 
 * import files,
-* scanning with the [Forkyz Scanner][forkyz-scanner] companion app, or
+* scanning with the [Forkyz Scanner][forkyz-scanner] companion app,
+* share a URL from a web browser, or
 * use the built-in downloaders.
+
+### Importing Files
 
 Importing files can be done either by using the "+" button in the puzzle list page, or by dropping files into the "to-import" directory.
 
@@ -93,19 +96,42 @@ Files for import can be downloaded from a [number of websites][online-sources], 
 Supported import file formats (can be zipped or unzipped):
 
 * Across Lite (.puz),
+* AM Universal JSON,
 * AmuseLabs JSON,
 * BrainsOnly TXT,
+* Exolve,
 * Guardian JSON and HTML,
 * IPuz (crosswords and acrostics only),
 * JPZ,
 * Keesing XML,
 * King Features TXT,
+* PAPuzzles HTML,
 * Przekroj Magazine JSON and HTML,
 * RCI Jeux Mots-Fleches HJSON,
 * Raetsel Zentrale Schwedenratsel JSON,
-* Uclick XML.
+* Spoonbill,
+* Uclick XML,
+* Wall Street Journal JSON,
+* .xd,
+* XWord JSON.
 
-Current downloaders are De Standaard, De Telegraaf, Guardian Daily Cryptic, Hamburger Abendblatt, Independent Daily Cryptic, Thomas Joseph Crossword, Le Parisien, Newsday, Sheffer Crossword, Universal Crosssword, USA Today, Jonesin' Crosswords, Premier Crossword, the Wall Street Journal (Sat/Sun), Keglar's Cryptics, Cryptic Cru Archives, Private Eye, and Przekroj Magazine.
+Current downloaders are De Standaard, De Telegraaf, Guardian Daily Cryptic, Hamburger Abendblatt, Independent Daily Cryptic, Thomas Joseph Crossword, Le Parisien, Metro (UK), Newsday, Sheffer Crossword, Universal Crosssword, USA Today, Jonesin' Crosswords, Premier Crossword, the Wall Street Journal (Sat/Sun), Keglar's Cryptics, Cryptic Cru Archives, Private Eye, and Przekroj Magazine.
+
+### Sharing From a Browser
+
+From an online puzzle page, you can use your browser's "share" function to share the URL with Forkyz. Forkyz will attempt to retrieve the crossword from the website.
+
+This only works for a limited number of sites, but may work for sites using similar crossword software. It has been tested with:
+
+* Crossword Nexus,
+* Exolve,
+* Guardian,
+* Hamburger Abendblatt (embedded from Raetsel Zentrale),
+* De Standaard (embedded crosswords from Keesing),
+* Metro (embedded from PA Puzzles),
+* De Telegraaf (embedded from Pzzl.net),
+* Przekroj,
+* Wall Street Journal.
 
 ## Compilation
 

@@ -13,34 +13,50 @@ public class StreamUtils {
     public static final int DEFAULT_BUFFER_SIZE = 1024;
 
     /**
+     * Make given input stream into a ByteArrayInputStream
+     *
+     * By copying into a buffer if needs be. Either you get back the original
+     * input stream, or a ByteArrayInputStream that doesn't need closing.
+     */
+    public static ByteArrayInputStream makeByteArrayInputStream(
+        InputStream is
+    ) throws IOException {
+        if (is instanceof ByteArrayInputStream)
+            return (ByteArrayInputStream) is;
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        copyStream(is, baos);
+        return  new ByteArrayInputStream(baos.toByteArray());
+    }
+
+    /**
      * If given input stream, returns unzipped input stream
      *
-     * Returns copy of original stream if not zipped.
+     * Returns a stream with marksSupported. Is (a copy of) original stream if
+     * not zipped.
      *
      * Closing return stream has no effect (it's a byte array stream).
      */
-    public static ByteArrayInputStream unzipOrPassThrough(InputStream is)
+    public static InputStream unzipOrPassThrough(InputStream is)
             throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        copyStream(is, baos);
-
+        ByteArrayInputStream bis = makeByteArrayInputStream(is);
         try (
-            ZipInputStream zis = new ZipInputStream(
-                new ByteArrayInputStream(baos.toByteArray())
-            )
+            ZipInputStream zis = new ZipInputStream(bis)
         ) {
             ZipEntry entry = zis.getNextEntry();
             while (entry.isDirectory()) {
                 entry = zis.getNextEntry();
             }
-            baos = new ByteArrayOutputStream();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
             copyStream(zis, baos);
+            bis = new ByteArrayInputStream(baos.toByteArray());
         } catch (Exception e) {
             // not zipped
+            bis.reset();
         }
 
-        return new ByteArrayInputStream(baos.toByteArray());
+        return bis;
     }
 
     /**

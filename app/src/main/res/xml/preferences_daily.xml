@@ -64,6 +64,11 @@
         android:title="@string/le_parisien_daily_f4"
     />
     <androidx.preference.CheckBoxPreference
+        android:defaultValue="true"
+        android:key="downloadMetroCryptic"
+        android:title="@string/metro_cryptic"
+    />
+    <androidx.preference.CheckBoxPreference
         android:title="@string/newsday"
         android:defaultValue="true"
         android:key="downloadNewsday"

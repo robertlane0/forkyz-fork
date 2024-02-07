@@ -69,6 +69,13 @@ public class Clue implements Serializable {
     public boolean hasZone() { return zone.size() != 0; }
     public Zone getZone() { return zone; }
     public boolean isFlagged() { return flagged; }
+
+    /**
+     * Flag clue
+     *
+     * During play, call Playboard.flagClue to make sure listeners
+     * updated.
+     */
     public void setFlagged(boolean flagged) { this.flagged = flagged; }
 
     /**
@@ -84,7 +91,12 @@ public class Clue implements Serializable {
     }
 
     /**
+     * Set flag color
+     *
      * 0x00rrggbb or DEFAULT_FLAG_COLOR
+     *
+     * During play, call Playboard.setFlagColor to make sure listeners
+     * updated.
      */
     public void setFlagColor(int flagColor) {
         this.flagColor = flagColor;

@@ -1409,6 +1409,30 @@ public class Playboard implements Serializable {
         }
     }
 
+    /**
+     * Call this instead of setting box flag directly to update listeners
+     */
+    public void flagPosition(Position pos, boolean flag) {
+        Box box = puzzle.checkedGetBox(pos);
+        if (box != null) {
+            box.setFlagged(flag);
+            flagChange(pos);
+            notifyChange();
+        }
+    }
+
+    /**
+     * Call instead of setting box color directly to update listeners
+     */
+    public void setFlagColor(Position pos, int color) {
+        Box box = puzzle.checkedGetBox(pos);
+        if (box != null) {
+            box.setFlagColor(color);
+            flagChange(pos);
+            notifyChange();
+        }
+    }
+
     private void flagNotifying(boolean isNotifying) {
         // if stopping notifying, clear pending removals
         boolean stoppingNotifying = !isNotifying && this.isNotifying;

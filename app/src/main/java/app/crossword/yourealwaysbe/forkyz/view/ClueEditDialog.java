@@ -14,7 +14,9 @@ import app.crossword.yourealwaysbe.forkyz.R;
 import app.crossword.yourealwaysbe.forkyz.databinding.ClueEditDialogBinding;
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder;
 import app.crossword.yourealwaysbe.puz.Clue;
+import app.crossword.yourealwaysbe.puz.ClueID;
 import app.crossword.yourealwaysbe.puz.Playboard;
+import app.crossword.yourealwaysbe.puz.Puzzle;
 
 /**
  * Dialog to insert special characters into board
@@ -24,6 +26,12 @@ import app.crossword.yourealwaysbe.puz.Playboard;
  */
 @AndroidEntryPoint
 public class ClueEditDialog extends DialogFragment {
+    /**
+     * Start with args for Clue ID to edit
+     */
+    public static final String CLUE_LISTNAME = "clueListName";
+    public static final String CLUE_INDEX = "clueIndex";
+
     @Inject
     protected CurrentPuzzleHolder currentPuzzleHolder;
 
@@ -38,9 +46,9 @@ public class ClueEditDialog extends DialogFragment {
         builder.setTitle(getString(R.string.edit_clue))
             .setView(binding.getRoot());
 
-        final Playboard board = currentPuzzleHolder.getBoard();
-        final Clue clue = (board == null) ? null : board.getClue();
-        if (clue == null)
+        Playboard board = currentPuzzleHolder.getBoard();
+        final Clue clue = getClueToEdit();
+        if (board == null || clue == null)
             return builder.create();
 
         String hint = clue.getHint();
@@ -59,4 +67,20 @@ public class ClueEditDialog extends DialogFragment {
 
         return builder.create();
     }
+
+    private Clue getClueToEdit() {
+        Playboard board = currentPuzzleHolder.getBoard();
+        Puzzle puz = board == null ? null : board.getPuzzle();
+        if (puz == null)
+            return null;
+
+        Bundle args = getArguments();
+        String listName = args.getString(CLUE_LISTNAME);
+        int index = args.getInt(CLUE_INDEX, -1);
+
+        if (listName == null || index < 0)
+            return null;
+
+        return puz.getClue(new ClueID(listName, index));
+   }
 }

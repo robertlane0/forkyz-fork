@@ -1,6 +1,5 @@
 package app.crossword.yourealwaysbe.puz.io;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Logger;
@@ -18,12 +17,19 @@ public class PuzzleStreamReader implements PuzzleParser {
         new UclickXMLIO(),
         new BrainsOnlyIO(),
         new KingFeaturesPlaintextIO(),
+        new XWordJSONIO(),
+        new XDIO(),
         new GuardianJSONIO(),
         new AmuseLabsJSONIO(),
         new RaetselZentraleSchwedenJSONIO(),
         new RCIJeuxMFJIO(),
         new PrzekrojIO(),
-        new KeesingXMLIO()
+        new KeesingXMLIO(),
+        new PAPuzzlesIO(),
+        new AMUniversalJSONIO(),
+        new WallStreetJournalJSONIO(),
+        new SpoonbillIO(),
+        new ExolveIO()
     };
 
     /**
@@ -39,7 +45,7 @@ public class PuzzleStreamReader implements PuzzleParser {
 
     public static Puzzle parseInputStatic(InputStream is) {
         try {
-            ByteArrayInputStream unzipped = StreamUtils.unzipOrPassThrough(is);
+            InputStream unzipped = StreamUtils.unzipOrPassThrough(is);
             for (PuzzleParser parser : PARSERS) {
                 try {
                     unzipped.reset();

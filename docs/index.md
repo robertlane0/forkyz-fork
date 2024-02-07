@@ -46,6 +46,7 @@ The majority of the links on this page come from [Michael F. Gill
 * [Mokelfish][mokelfish-puzzles] -- "Multi-part variety word and logic puzzles by Michael F. Gill"
 * [Nathan Curtis][nathan-curtis] -- a variety of puzzles via Patreon, free and via subscription.
 * [Neville Fogarty][neville-fogarty].
+* [NYT Crosswords][nyt-crosswords] -- archive of New York Times crosswords, 1976-2018.
 * [Out of Left Field][outofleftfield] -- former The Nation crossword compilers Joshua Kosman and Henri Picciotto now releasing cryptics via Patreon.
 * [Outside the Box Puzzles][outside-the-box] -- subscription required, puzzles available in JPZ, untested.
 * [Private Eye][private-eye] -- (roughly) fortnightly cryptics downloadable as .puz files.
@@ -98,6 +99,7 @@ The majority of the links on this page come from [Michael F. Gill
 [mad-dog-cryptics]: https://maddogcryptics.com/
 [mokelfish-puzzles]: https://bbtp.net/puzzle/
 [nathan-curtis]: https://www.patreon.com/nathancurtis
+[nyt-crosswords]: https://github.com/doshea/nyt_crosswords
 [neville-fogarty]: https://nevillefogarty.wordpress.com/
 [outofleftfield]: http://www.leftfieldcryptics.com/
 [outside-the-box]: https://www.joonpahk.com/blog/2021/04/12/year-6-variety-puzzle-16-starting-square-hint/

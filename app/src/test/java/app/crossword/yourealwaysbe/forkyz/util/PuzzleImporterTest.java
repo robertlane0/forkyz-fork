@@ -27,6 +27,7 @@ import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerJavaFile;
 import app.crossword.yourealwaysbe.forkyz.util.files.MetaCache;
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzMetaFile;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
+import app.crossword.yourealwaysbe.forkyz.versions.TiramisuUtil;
 import app.crossword.yourealwaysbe.puz.io.StreamUtils;
 
 import static org.junit.Assert.assertEquals;
@@ -62,7 +63,9 @@ public class PuzzleImporterTest {
 
         // do import
         FileHandler fileHandler = getFileHandler();
-        PuzzleImporter.processToImportDirectory(context, fileHandler);
+        PuzzleImporter.processToImportDirectory(
+            context, fileHandler, new TiramisuUtil()
+        );
 
         // see what file system is like now
         Set<String> expectedToImport = Collections.emptySet();

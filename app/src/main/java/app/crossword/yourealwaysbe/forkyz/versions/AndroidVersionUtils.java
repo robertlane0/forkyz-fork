@@ -1,9 +1,11 @@
 package app.crossword.yourealwaysbe.forkyz.versions;
 
+import java.io.InputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import android.app.Activity;
@@ -187,4 +189,18 @@ public interface AndroidVersionUtils {
      * Defaults to isLetter pre KITKAT
      */
     public boolean isAlphabetic(char c);
+
+    /**
+     * Get url with Apache HttpClient
+     *
+     * Only for API 19 and above, else calls through to
+     * NetUtils.getInputStream
+     *
+     * @param url
+     * @param headers headers to add to request
+     * @param timeout timeout in ms for get
+     */
+    public InputStream apacheGetInputStream(
+        String url, Map<String, String> headers, int timeout
+    ) throws IOException;
 }

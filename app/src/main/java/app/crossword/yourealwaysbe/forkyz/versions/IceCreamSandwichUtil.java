@@ -2,9 +2,11 @@ package app.crossword.yourealwaysbe.forkyz.versions;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import android.app.Activity;
@@ -34,6 +36,7 @@ import androidx.fragment.app.Fragment;
 
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.util.BackgroundDownloadManager;
+import app.crossword.yourealwaysbe.forkyz.util.NetUtils;
 
 public class IceCreamSandwichUtil implements AndroidVersionUtils {
 
@@ -233,4 +236,12 @@ public class IceCreamSandwichUtil implements AndroidVersionUtils {
     public boolean isAlphabetic(char c) {
         return Character.isLetter(c);
     }
+
+    @Override
+    public InputStream apacheGetInputStream(
+        String url, Map<String, String> headers, int timeout
+    ) throws IOException {
+        return NetUtils.getInputStream(url, headers, timeout);
+    }
 }
+

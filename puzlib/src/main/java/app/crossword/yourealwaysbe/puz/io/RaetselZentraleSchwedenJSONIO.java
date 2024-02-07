@@ -27,7 +27,7 @@ import app.crossword.yourealwaysbe.puz.util.JSONParser;
  * Swedish crosswords are the ones where the clues themselves appear in
  * the grid, with arrows pointing to the box where the answer starts.
  */
-public class RaetselZentraleSchwedenJSONIO implements PuzzleParser {
+public class RaetselZentraleSchwedenJSONIO extends AbstractJSONIO {
     private static final Logger LOG
         = Logger.getLogger(RaetselZentraleSchwedenJSONIO.class.getCanonicalName());
 

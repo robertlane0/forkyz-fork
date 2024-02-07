@@ -48,6 +48,7 @@ import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands;
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider;
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerShared;
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle;
+import app.crossword.yourealwaysbe.forkyz.view.ChooseFlagColorDialog;
 import app.crossword.yourealwaysbe.forkyz.view.ClueEditDialog;
 import app.crossword.yourealwaysbe.forkyz.view.PlayboardTextRenderer;
 import app.crossword.yourealwaysbe.forkyz.view.PuzzleInfoDialogs;
@@ -241,6 +242,9 @@ public abstract class PuzzleActivity
             return true;
         } else if (id == R.id.puzzle_menu_external_dictionary) {
             callExternalDictionary();
+            return true;
+        } else if (id == R.id.puzzle_menu_flag_cell_toggle) {
+            toggleCellFlag();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -868,6 +872,34 @@ public abstract class PuzzleActivity
         return (value == null) ? false : value;
     }
 
+    /**
+     * Handles user request to edit clue
+     *
+     * Calls through to editClue(cid) where cid is the id of the
+     * currently selected clue on the board. May be overridden by
+     * subclasses to edit a different default clue.
+     */
+    protected void editClue() {
+        Playboard board = currentPuzzleHolder.getBoard();
+        ClueID cid = (board == null) ? null : board.getClueID();
+        editClue(cid);
+    }
+
+    /**
+     * Open dialog to edit given clue
+     */
+    protected void editClue(ClueID cid) {
+        if (cid == null)
+            return;
+
+        ClueEditDialog dialog = new ClueEditDialog();
+        Bundle args = new Bundle();
+        args.putString(ClueEditDialog.CLUE_LISTNAME, cid.getListName());
+        args.putInt(ClueEditDialog.CLUE_INDEX, cid.getIndex());
+        dialog.setArguments(args);
+        dialog.show(getSupportFragmentManager(), "ClueEditDialog");
+    }
+
     private void handleChangeTimer() {
         Puzzle puz = getPuzzle();
         if (puz == null)
@@ -975,11 +1007,6 @@ public abstract class PuzzleActivity
         });
     }
 
-    private void editClue() {
-        ClueEditDialog dialog = new ClueEditDialog();
-        dialog.show(getSupportFragmentManager(), "ClueEditDialog");
-    }
-
     public static class HelpResponseDialog extends DialogFragment {
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -1058,5 +1085,31 @@ public abstract class PuzzleActivity
 
             dictionary.query(this, request.toString());
         });
+    }
+
+    /**
+     * Flag currently selected cell
+     */
+    private void toggleCellFlag() {
+        Playboard board = getBoard();
+        Puzzle puz = getPuzzle();
+        if (board == null || puz == null)
+            return;
+
+        Position pos = board.getHighlightLetter();
+        Box box = puz.checkedGetBox(pos);
+        if (pos == null || box == null)
+            return;
+
+        if (box.isFlagged()) {
+            board.flagPosition(pos, false);
+        } else {
+            // let diagog set flag
+            DialogFragment dialog = new ChooseFlagColorDialog();
+            Bundle args = new Bundle();
+            ChooseFlagColorDialog.addBoxPositionToBundle(args, pos);
+            dialog.setArguments(args);
+            dialog.show(getSupportFragmentManager(), "ChooseFlagColorDialog");
+        }
     }
 }

@@ -1,0 +1,76 @@
+TXWordGrid3 Test author
+Test title
+Solve
+15
+15
+axxxx1x1xxxxxxx
+x1x1xxxb1x1x1x1
+xxxxx1x1xxxxxxx
+x1x1xxxx1x1x1x1
+xxxxx1x1xxxxxxx
+x111xxxxx1x1x1x
+xxxxx1x1x1xxxxx
+x1x1xxxxxxx1x1x
+xxxxx1x1x1xxxxx
+x1x1x1xxxxx111x
+xxxxxxx1x1xxxxx
+1x1x1x1xxxx1x1x
+xxxxxxx1x1xxxxx
+1x1x1x1xxxx1x1x
+xxxxxxx1x1xxxxx
+23
+  1| 1| 1| 5|xxxxx|Test clue 1a
+  5| 1| 9| 7|xxxxxxx|xxxx'x xxxx xxx xxxxxx xx xxx xxxxxxxxx
+  9| 2| 5| 4|xxxx|xxx xxxxxxxx, xxxx xxxx xxxxxxx xxxxx xxxx
+ 10| 3| 1| 5|xxxxx|xxxx xxxxxxxx xx xxxxxx xxxxx xx xxx xxxxx, xxx xxx x xxxxxx xx xxx xxxx
+ 11| 3| 9| 7|xxxxxxx|xxxxxxx xxxxxxxxx xxxx xx xxxx xxx
+ 12| 4| 5| 4|xxxx|xxxxxx xxxx xxxxxxx xxx xxxx xx
+ 13| 5| 1| 5|xxxxx|x xx, xxx x xxxx, xxxx xx xxxx
+ 14| 5| 9| 7|xxxxxxx|xxxxxxx xxx xxxxxxx xxx xxxxxx
+ 18| 6| 5| 5|xxxxx|xxxxx xxxxx xxxxxx
+ 19| 7| 1| 5|xxxxx|Test clue 19a
+ 21| 7|11| 5|xxxxx|xxxxxxx xxxxxxxx
+ 22| 8| 5| 7|xxxxxxx|xxxxxxxxxxxxx xxxx xx xxxx xxxx xxxxxxxx xxxxxxx?
+ 23| 9| 1| 5|xxxxx|x xxxxxx, xx x xxx xxxx, xx xxxxxx
+ 24| 9|11| 5|xxxxx|xx xxx xxxxxxx xxxxxx xxxxx xxxxxxx
+ 25|10| 7| 5|xxxxx|xxxxx xxx xxxxx xxx xxx xx xxx xxxxxxxx
+ 26|11| 1| 7|xxxxxxx|xxxx xxx xxxxx xx xx xxxxxxxxx xxxx xxxxxxx xx xxx xxx xx xxxxx
+ 30|11|11| 5|xxxxx|xxxxx xxxxxxxxx xx xxxxxxxxx xxx xxxx xxx xxxxx
+ 32|12| 8| 4|xxxx|xxx'x xxxx xxxx xxxxxxx xxxxxxxxx xxxxxxxxxx
+ 33|13| 1| 7|xxxxxxx|xxxxxxxx xxxxxx xxxxxx xxxxx, xxxxxxxxx xx xxxxxxx xxxx xxxxxxxxx xxxxxxxxx xx xxx
+ 34|13|11| 5|xxxxx|xxxxx xxx xxxxxx xxxxxxx xxxx xxxx xxxxxx
+ 35|14| 8| 4|xxxx|xxx xxxxxx xx xxx xxxxx
+ 36|15| 1| 7|xxxxxxx|x xxx xxx?  xxxxxxx!
+ 37|15|11| 5|xxxxx|xxxx xxxxxxxx xx xxx xx xxxxxx
+16
+  1| 1| 1|11|xxxxxxxxxxx|xxxxxxxx xxxx xx xxxxxxxxx xxx xxxxxx xx xxxxxx xxxx xx xxx xxxxxx?
+  2| 1| 3| 5|xxxxx|Test clue 2d
+  3| 1| 5|11|xxxxxxxxxxx|xxx xx xxxxxxx xxxxx xxxx xx xxxx x xxxxxxxx xxxxxx
+  4| 1| 7|11|xxxxxxxxxxx|xxxxxxxxxx xxxx xxxxxxx xx xxxxx xxx xxxx
+  6| 1|10| 5|xxxxx|xx! xxxx xxxxxx xxxx xxxxxx xxxxxxxx xxxxx
+  7| 1|12| 5|xxxxx|xxxxxxxxx xx x xxxx xx xxxx xxxxxxxxxxx xxxxx xxxxxxxx xxxxxxxxxx
+  8| 1|14| 5|xxxxx|xxxxxxxx xx xx xxxxxxxxxxxxx xxxx
+ 14| 5| 9|11|xxxxxxxxxxx|Test clue 14d
+ 15| 5|11|11|xxxxxxxxxxx|xxxx xxxxxxxxxxx xxx xxx xxxxxx xx xxx xxxx
+ 16| 5|13| 5|xxxxx|xxxxxx xxxx x xxxx xxxxxxxx xxxxx xx xx xxxxxxxxxx
+ 17| 5|15|11|xxxxxxxxxxx|x xxxx xx xxx xxxxxxx xxxx - xx xxxx xxx xxxxxx?
+ 20| 7| 3| 5|xxxxx|xxxxx xxxxxx xx xxxxxxxxxx xxxx
+ 27|11| 2| 5|xxxxx|xxxxxx xx xxx xxxxxxxx
+ 28|11| 4| 5|xxxxx|xxxxxxx xx xxxxxx xxxx xx xxxx
+ 29|11| 6| 5|xxxxx|xxxxxxxx xx x xxxxx xx xxxxxxxxxxxxxxx xxxxxx x xxxxx xxx-xxxxxxxx
+ 31|11|13| 5|xxxxx|xxxxxxxx xxxxx xxxxx xxxx xx xxxxxxx
+xxxxx1010000000
+x1x1x0001010101
+xxxxx1010000000
+x1x1x0001010101
+xxxxx1010000000
+x111x0000101010
+xxxxx1010100000
+x1x1x0000001010
+xxxxx1010100000
+x1x1x1000001110
+xxxxxxx10100000
+101010100001010
+000000010100000
+101010100001010
+000000010100000

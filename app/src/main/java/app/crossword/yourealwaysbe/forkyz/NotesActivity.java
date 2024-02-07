@@ -388,6 +388,11 @@ public class NotesActivity extends PuzzleActivity {
             keyboardManager.onDestroy();
     }
 
+    @Override
+    protected void editClue() {
+        editClue(getNotesClueID());
+    }
+
     private void onFlagClueSelected() {
         Clue clue = getNotesClue();
         if (clue == null)
@@ -668,8 +673,7 @@ public class NotesActivity extends PuzzleActivity {
     public void onPlayboardChange(PlayboardChanges changes) {
         super.onPlayboardChange(changes);
 
-        Playboard board = getBoard();
-        ClueID cid = (board == null) ? null : board.getClueID();
+        ClueID cid = getNotesClueID();
 
         if (cid != null && changes.getChangedClueIDs().contains(cid)) {
             setClueLineText();
@@ -1025,12 +1029,7 @@ public class NotesActivity extends PuzzleActivity {
      *
      * Will return null if isPuzzleNotes
      */
-    private Clue getNotesClue() {
-        Playboard board = getBoard();
-        Puzzle puz = getPuzzle();
-        if (puz == null)
-            return null;
-
+    private ClueID getNotesClueID() {
         Intent intent = getIntent();
         String listName = intent.getStringExtra(CLUE_NOTE_LISTNAME);
         int index = intent.getIntExtra(CLUE_NOTE_INDEX, -1);
@@ -1038,9 +1037,24 @@ public class NotesActivity extends PuzzleActivity {
         if (listName == null || index < 0)
             return null;
 
-        ClueID cid = new ClueID(listName, index);
+        return new ClueID(listName, index);
+    }
 
-        return puz.getClue(cid);
+    /**
+     * Read clue id from intent, or null if not valid or not present
+     *
+     * Will return null if isPuzzleNotes
+     */
+    private Clue getNotesClue() {
+        Playboard board = getBoard();
+        Puzzle puz = getPuzzle();
+        if (puz == null)
+            return null;
+
+        ClueID cid = getNotesClueID();
+        return cid == null
+            ? null
+            : puz.getClue(cid);
     }
 
     private boolean isPuzzleNotes() {
@@ -1202,15 +1216,18 @@ public class NotesActivity extends PuzzleActivity {
         if (binding.anagramSource.getSelectedCol() < leadChars.length())
             return null;
 
+        // strip HTML and spaces
+        String strippedHint = hint.replaceAll("<[^>]*>|[^\\p{IsAlphabetic}]", "");
+
         // case insensitive trick:
         // https://www.baeldung.com/java-case-insensitive-string-matching
         Pattern p = Pattern.compile("(?i)" + leadChars);
-        Matcher m = p.matcher(hint);
+        Matcher m = p.matcher(strippedHint);
         if (!m.find())
             return null;
 
         String prediction = getUpperLetters(
-            hint, m.start(), binding.anagramSource.getLength()
+            strippedHint, m.start(), binding.anagramSource.getLength()
         );
 
         binding.anagramSource.setShadow(prediction);

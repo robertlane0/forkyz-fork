@@ -25,6 +25,8 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission;
+import androidx.fragment.app.FragmentManager;
+
 import androidx.appcompat.view.ActionMode;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -104,9 +106,25 @@ public class BrowseActivity extends ForkyzActivity {
         = "app.crossword.yourealwaysbe.BROWSER_CLOSE_TASK_ID";
 
     /**
-     * So the imports complete dialog knows if there was success or not
+     * Notification that intent imports have finished
+     *
+     * Esp if URL download, the activity might get restarted due to
+     * config changes while the import is happening. To handle this, the
+     * compete message is broadcast to the current version of the
+     * activity.
      */
-    private static final String IMPORT_SUCCESS = "importSuccess";
+    private static final String INTENT_IMPORT_COMPLETE_ACTION
+        = "app.crossword.yourealwaysbe.INTENT_IMPORT_COMPLETE_ACTION";
+    /**
+     * ID of task that completed intent import
+     */
+    private static final String INTENT_IMPORT_TASK_ID
+        = "app.crossword.yourealwaysbe.INTENT_IMPORT_TASK_ID";
+    /**
+     * Whether some succeeded (bool)
+     */
+    private static final String INTENT_IMPORT_SUCCESS
+        = "app.crossword.yourealwaysbe.INTENT_IMPORT_SUCCESS";
 
     // allow import of all docs (parser will take care of detecting if it's a
     // puzzle that's recognised)
@@ -148,6 +166,39 @@ public class BrowseActivity extends ForkyzActivity {
             }
         }
     };
+
+    /**
+     * See note for INTENT_IMPORT_COMPLETE_ACTION
+     */
+    private BroadcastReceiver intentImportCompleteReceiver
+        = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context arg0, Intent intent) {
+                String action = intent.getAction();
+                if (action.equals(INTENT_IMPORT_COMPLETE_ACTION)) {
+                    int myTaskId = BrowseActivity.this.getTaskId();
+                    int otherTaskId = intent.getIntExtra(
+                        INTENT_IMPORT_TASK_ID, myTaskId
+                    );
+
+                    if (myTaskId == otherTaskId) {
+                        ImportedNowFinishDialog dialog
+                            = new ImportedNowFinishDialog();
+                        Bundle args = new Bundle();
+                        args.putBoolean(
+                            INTENT_IMPORT_SUCCESS,
+                            intent.getBooleanExtra(
+                                INTENT_IMPORT_SUCCESS, false
+                            )
+                        );
+                        dialog.setArguments(args);
+                        FragmentManager fm = getSupportFragmentManager();
+                        if (!fm.isDestroyed())
+                            dialog.show(fm, "ImportedNowFinishDialog");
+                    }
+                }
+            }
+        };
 
     /**
      * When POST_NOTIFICATIONS permission needed
@@ -362,9 +413,13 @@ public class BrowseActivity extends ForkyzActivity {
             )
         );
 
-        // listen for others closing us down
+        // listen for broadcasts
         registerReceiver(
             closeActionReceiver, new IntentFilter(BROWSER_CLOSE_ACTION)
+        );
+        registerReceiver(
+            intentImportCompleteReceiver,
+            new IntentFilter(INTENT_IMPORT_COMPLETE_ACTION)
         );
 
         // Bring up to date
@@ -502,6 +557,20 @@ public class BrowseActivity extends ForkyzActivity {
 
         checkNewVersion();
 
+        handleCreateIntent(savedInstanceState);
+    }
+
+    /**
+     * Handle create intent given saved state
+     *
+     * Includes reading pending imports from saved instance state
+     */
+    private void handleCreateIntent(Bundle savedInstanceState) {
+        // if there's a saved state, then this is not the first time we've seen
+        // the intent, so ignore it
+        if (savedInstanceState != null)
+            return;
+
         // If this was started by a file open or a share
         Intent intent = getIntent();
         String action = intent.getAction();
@@ -509,9 +578,15 @@ public class BrowseActivity extends ForkyzActivity {
             // loaded by onResume
             setPendingImport(intent.getData());
         } else if (Intent.ACTION_SEND.equals(action)) {
-            setPendingImport(IntentCompat.getParcelableExtra(
-                intent, Intent.EXTRA_STREAM, Uri.class
-            ));
+            if (intent.hasExtra(Intent.EXTRA_TEXT)) {
+                setPendingImport(
+                    Uri.parse(intent.getStringExtra(Intent.EXTRA_TEXT))
+                );
+            } else {
+                setPendingImport(IntentCompat.getParcelableExtra(
+                    intent, Intent.EXTRA_STREAM, Uri.class
+                ));
+            }
         } else if (Intent.ACTION_SEND_MULTIPLE.equals(action)) {
             setPendingImports(IntentCompat.getParcelableArrayListExtra(
                 intent, Intent.EXTRA_STREAM, Uri.class
@@ -539,7 +614,6 @@ public class BrowseActivity extends ForkyzActivity {
         super.onDestroy();
     }
 
-    @Override
     protected void onResume() {
         super.onResume();
 
@@ -912,12 +986,12 @@ public class BrowseActivity extends ForkyzActivity {
     private void onImportURIsAndFinish(Collection<Uri> uri) {
         if (uri != null) {
             model.importURIs(uri, true, (someFailed, someSucceeded) -> {
-                ImportedNowFinishDialog dialog = new ImportedNowFinishDialog();
-                Bundle args = new Bundle();
-                args.putBoolean(IMPORT_SUCCESS, !someFailed && someSucceeded);
-                dialog.setArguments(args);
-                dialog.show(
-                    getSupportFragmentManager(), "ImportedNowFinishDialog"
+                sendBroadcast(
+                    new Intent(INTENT_IMPORT_COMPLETE_ACTION).putExtra(
+                        INTENT_IMPORT_TASK_ID, getTaskId()
+                    ).putExtra(
+                        INTENT_IMPORT_SUCCESS, !someFailed && someSucceeded
+                    )
                 );
             });
         }
@@ -1124,6 +1198,7 @@ public class BrowseActivity extends ForkyzActivity {
     private class FileViewHolder extends RecyclerView.ViewHolder {
         private PuzzleListItemBinding itemBinding;
         private PuzMetaFile puzMetaFile;
+        private boolean showPercentageCorrect = false;
 
         public FileViewHolder(PuzzleListItemBinding itemBinding) {
             super(itemBinding.getRoot());
@@ -1137,6 +1212,14 @@ public class BrowseActivity extends ForkyzActivity {
                     } else {
                         itemBinding.puzzleDate.setVisibility(View.GONE);
                     }
+                }
+            );
+
+            settings.liveBrowseShowPercentageCorrect().observe(
+                BrowseActivity.this,
+                showPercentageCorrect -> {
+                    this.showPercentageCorrect = showPercentageCorrect;
+                    setPercentage();
                 }
             );
         }
@@ -1174,12 +1257,7 @@ public class BrowseActivity extends ForkyzActivity {
 
             itemBinding.puzzleName.setText(smartHtml(title));
 
-            itemBinding.puzzleProgress.setPercentFilled(
-                puzMetaFile.getFilled()
-            );
-            itemBinding.puzzleProgress.setComplete(
-                puzMetaFile.getComplete() == 100
-            );
+            setPercentage();
 
             // add author if not already in title or caption
             // case insensitive trick:
@@ -1207,6 +1285,20 @@ public class BrowseActivity extends ForkyzActivity {
 
         public PuzMetaFile getPuzMetaFile() {
             return puzMetaFile;
+        }
+
+        private void setPercentage() {
+            if (puzMetaFile == null)
+                return;
+
+            itemBinding.puzzleProgress.setPercentFilled(
+                showPercentageCorrect
+                    ? puzMetaFile.getComplete()
+                    : puzMetaFile.getFilled()
+            );
+            itemBinding.puzzleProgress.setComplete(
+                puzMetaFile.getComplete() == 100
+            );
         }
     }
 
@@ -1370,10 +1462,10 @@ public class BrowseActivity extends ForkyzActivity {
             Bundle args = getArguments();
             boolean success = false;
             if (args != null)
-                success = args.getBoolean(IMPORT_SUCCESS, false);
+                success = args.getBoolean(INTENT_IMPORT_SUCCESS, false);
 
             MaterialAlertDialogBuilder builder
-                = new MaterialAlertDialogBuilder(getActivity());
+                = new MaterialAlertDialogBuilder(activity);
 
             int message = success
                 ? R.string.import_success_long

@@ -24,9 +24,11 @@ import app.crossword.yourealwaysbe.forkyz.databinding.ChooseFlagColorDialogBindi
 import app.crossword.yourealwaysbe.forkyz.databinding.FlagColorItemBinding;
 import app.crossword.yourealwaysbe.forkyz.util.ColorUtils;
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder;
+import app.crossword.yourealwaysbe.puz.Box;
 import app.crossword.yourealwaysbe.puz.Clue;
 import app.crossword.yourealwaysbe.puz.ClueID;
 import app.crossword.yourealwaysbe.puz.Playboard;
+import app.crossword.yourealwaysbe.puz.Position;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 
 /**
@@ -36,21 +38,32 @@ import app.crossword.yourealwaysbe.puz.Puzzle;
 public class ChooseFlagColorDialog extends DialogFragment {
     private static final String ARG_CLUE_LIST_NAME = "listName";
     private static final String ARG_CLUE_INDEX = "clueIndex";
+    private static final String ARG_POS_ROW = "posRow";
+    private static final String ARG_POS_COL = "posCol";
 
     @Inject
     protected CurrentPuzzleHolder currentPuzzleHolder;
 
     private ChooseFlagColorDialogBinding binding;
     RecyclerView.Adapter<FlagColorHolder> adapter;
-    private Clue clue;
-    private Playboard board;
     private String[] colorOptions;
     private int selectedColorIndex = 0;
 
+    /**
+     * Either add a clue or a cell before showing
+     */
     public static void addClueToBundle(Bundle bundle, Clue clue) {
         ClueID cid = clue.getClueID();
         bundle.putString(ARG_CLUE_LIST_NAME, cid.getListName());
         bundle.putInt(ARG_CLUE_INDEX, cid.getIndex());
+    }
+
+    /**
+     * Either add a clue or a cell position before showing
+     */
+    public static void addBoxPositionToBundle(Bundle bundle, Position pos) {
+        bundle.putInt(ARG_POS_ROW, pos.getRow());
+        bundle.putInt(ARG_POS_COL, pos.getCol());
     }
 
     @Override
@@ -60,16 +73,18 @@ public class ChooseFlagColorDialog extends DialogFragment {
         if (activity == null || puz == null)
             return null;
 
-        ClueID cid = getClueIDFromBundle(getArguments());
-        clue = puz.getClue(cid);
-        if (clue == null)
+        Bundle args = getArguments();
+        Clue clue = puz.getClue(getClueIDFromBundle(args));
+        Position pos = getBoxPositionFromBundle(args);
+
+        if (clue == null && pos == null)
             return null;
 
         binding = ChooseFlagColorDialogBinding.inflate(
             activity.getLayoutInflater()
         );
 
-        setColorOptions();
+        setColorOptions(clue, pos);
 
         MaterialAlertDialogBuilder builder
             = new MaterialAlertDialogBuilder(activity);
@@ -82,8 +97,16 @@ public class ChooseFlagColorDialog extends DialogFragment {
                 (dialog, which) -> {
                     int color = getColor(selectedColorIndex);
                     Playboard board = getBoard();
-                    if (board != null)
-                        board.setFlagColor(clue, color);
+                    if (board != null) {
+                        if (clue != null) {
+                            board.flagClue(clue, true);
+                            board.setFlagColor(clue, color);
+                        }
+                        if (pos != null) {
+                            board.flagPosition(pos, true);
+                            board.setFlagColor(pos, color);
+                        }
+                    }
                 }
             )
             .setNegativeButton(
@@ -104,13 +127,28 @@ public class ChooseFlagColorDialog extends DialogFragment {
         return board.getPuzzle();
     }
 
-    private void setColorOptions() {
+    /**
+     * Set color options based on passed clue/pos
+     *
+     * Clue/pos can be null (preferably not both!)
+     */
+    private void setColorOptions(Clue clue, Position pos) {
         colorOptions = getResources().getStringArray(
             R.array.flag_color_labels
         );
 
+        int argColor = getColor(0);
+        if (clue != null) {
+            argColor = clue.getFlagColor();
+        } else if (pos != null) {
+            Puzzle puz = getPuzzle();
+            Box box = (puz == null) ? null : puz.checkedGetBox(pos);
+            if (box != null)
+                argColor = box.getFlagColor();
+        }
+
         for (int i = 0; i < colorOptions.length; i++) {
-            if (getColor(i) == clue.getFlagColor()) {
+            if (getColor(i) == argColor) {
                 selectedColorIndex = i;
                 break;
             }
@@ -178,10 +216,31 @@ public class ChooseFlagColorDialog extends DialogFragment {
         return ColorUtils.delAlpha(ContextCompat.getColor(getContext(), id));
     }
 
+    /**
+     * Get supplied clue ID or null
+     */
     private ClueID getClueIDFromBundle(Bundle bundle) {
+        boolean hasClueID
+            = bundle.containsKey(ARG_CLUE_LIST_NAME)
+                && bundle.containsKey(ARG_CLUE_INDEX);
+        if (!hasClueID)
+            return null;
+
         String listName = bundle.getString(ARG_CLUE_LIST_NAME);
         int index = bundle.getInt(ARG_CLUE_INDEX);
         return new ClueID(listName, index);
+    }
+
+    private Position getBoxPositionFromBundle(Bundle bundle) {
+        boolean hasBoxPosition
+            = bundle.containsKey(ARG_POS_ROW)
+                && bundle.containsKey(ARG_POS_COL);
+        if (!hasBoxPosition)
+            return null;
+
+        int row = bundle.getInt(ARG_POS_ROW);
+        int col = bundle.getInt(ARG_POS_COL);
+        return new Position(row, col);
     }
 
     private class FlagColorHolder extends RecyclerView.ViewHolder {

@@ -1,0 +1,8 @@
+exolve-begin
+  exolve-option: rebus-cells
+  exolve-width: 3
+  exolve-height: 2
+  exolve-grid:
+    ONE* .*     TWO*
+    .*   THREE* .*
+exolve-end

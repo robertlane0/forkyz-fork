@@ -1,0 +1,46 @@
+Title: Test {*title*}
+Author: Test {/author/}
+Copyright: This is {_the_} {-copyright-}
+Rebus: 1=ONE 2=TWO 3=THREE 4=FOUR
+Date: 2024-01-10
+Description: description
+Notes: notes
+Cluegroup: X=Extra
+Special: circle
+
+
+1XXAX#XxXX#2XXX
+XXXXX#XXXX#XXXX
+XXXXX#XXXX#XXXX
+XXXX#XXXX#XXXXX
+XXX#XBXX#XXX###
+##XXXX#XXXXXXXX
+XXXXX#XXXXX#XXX
+XXXX#XXXXX#XXXX
+XXX#XXXXX#XXXXX
+XXXXXXXX#XXXX##
+###XXX#XXXX#XXX
+3XXXX#XXXX#4XXX
+XXXX#XXXX#XXXXX
+XXXX#XXXX#XXXXX
+XXXX#XXXX#XXXXX
+
+
+A1. Clue A1 ~ XXXXXXXX
+A6. Clue A6 \ new line. ~ XXXX
+A10. Clue A10 ~ XXXXXXXXXX
+
+D1. Clue D1 ~ XXXXXXXX
+D2. Clue D2 ~ XXXXX
+D3. Clue D3 ~ XXXXXXXXXX
+D3 ^Note: this is a note about D3
+
+X1. Extra clue ~ XXXX
+
+YZ. Anon clue 1
+ZX. Anon clue 2
+
+
+Free form
+
+notes

@@ -117,7 +117,7 @@
     <string name="transfer_scratch_to_board">Transfer scratch contents to board</string>
     <string name="shuffle_anagram_source">Shuffle anagram source letters</string>
     <string name="transfer_anagram_solution_to_board">Transfer anagram solution to board</string>
-    <string name="flag_color_title">Set Flag Color</string>
+    <string name="flag_color_title">Set Clue Flag Color</string>
     <string name="choose_flag_color">Choose flag color.</string>
 
     <!-- clue formats -->
@@ -254,6 +254,8 @@
     <string name="random_clue_on_shake_desc">Jump to a random unfilled clue when shake detected in main puzzle activity.</string>
     <string name="predict_anagram_chars">Predict Anagram Characters</string>
     <string name="predict_anagram_chars_desc">Predict anagram source in notes by matching against current clue. Space accepts a prediction.</string>
+    <string name="browse_show_percentage_correct">Show Percentage Correct</string>
+    <string name="browse_show_percentage_correct_desc">Show percentage of correct cells instead of percentage of filled cells next to puzzle (like Shortyz).</string>
 
     <!-- preferences download -->
     <string name="auto_downloaders">Automatic Download Sources</string>
@@ -333,6 +335,7 @@
     <string name="uclick_copyright">uclick LLC</string>
     <string name="de_standaard">(FL) De Standaard</string>
     <string name="de_standaard_desc">Daily crossword in Flemish</string>
+    <string name="metro_cryptic">Metro Cryptic</string>
 
     <!-- preferences weekly -->
     <string name="updates_thursdays">Updates Thursdays</string>
@@ -384,6 +387,7 @@
     <string name="share_puzzle_full">Current Puzzle</string>
     <string name="share_puzzle_orig">Blank Puzzle</string>
     <string name="share_puzzle_open_share_url">Open Share URL</string>
+    <string name="menu_flag_cell_toggle">Toggle Cell Flag</string>
 
     <!-- clue list menu -->
     <string name="menu_clue_notes">Clue Notes</string>

@@ -29,7 +29,7 @@ import app.crossword.yourealwaysbe.puz.util.PuzzleUtils;
  * Read a character stream of JSON data in the format used by the
  * Guardian.
  */
-public class GuardianJSONIO implements PuzzleParser {
+public class GuardianJSONIO extends AbstractJSONIO {
     private static final Logger LOG
         = Logger.getLogger(GuardianJSONIO.class.getCanonicalName());
 
@@ -56,7 +56,7 @@ public class GuardianJSONIO implements PuzzleParser {
         try {
             JSONObject json = JSONParser.parse(is);
             return readPuzzleFromJSON(json);
-        } catch (IOException e) {
+        } catch (IOException | JSONException e) {
             return null;
         }
     }
@@ -66,10 +66,9 @@ public class GuardianJSONIO implements PuzzleParser {
             Document doc = Jsoup.parse(is, null, "");
             String cwJson = doc.select(".js-crossword")
                                .attr("data-crossword-data");
-            if (!cwJson.isEmpty()) {
+            if (!cwJson.isEmpty())
                 return readPuzzleFromJSON(JSONParser.parse(cwJson));
-            }
-        } catch (IOException e) {
+        } catch (IOException | JSONException e) {
             // pass through
         }
         return null;
@@ -95,11 +94,11 @@ public class GuardianJSONIO implements PuzzleParser {
         JSONObject json
     ) throws JSONException {
         PuzzleBuilder builder = new PuzzleBuilder(getBoxes(json))
-            .setTitle(json.optString("name"));
+            .setTitle(optStringNull(json, "name"));
 
         JSONObject creator = json.optJSONObject("creator");
         if (creator != null)
-            builder.setAuthor(creator.optString("name"));
+            builder.setAuthor(optStringNull(creator, "name"));
 
         if (json.has("date")) {
             long epochMillis = json.getLong("date");
@@ -133,8 +132,9 @@ public class GuardianJSONIO implements PuzzleParser {
                 continue;
 
             String num = String.valueOf(entry.getInt("number"));
-            String clueSol = entry.getString("solution");
+            String clueSol = optStringNull(entry, "solution");
             String direction = entry.getString("direction");
+            int length = entry.getInt("length");
 
             int dx = 0;
             int dy = 0;
@@ -145,13 +145,15 @@ public class GuardianJSONIO implements PuzzleParser {
 
             int boxX = x;
             int boxY = y;
-            for (int j = 0; j < clueSol.length(); j++) {
+            for (int j = 0; j < length; j++) {
                 if (boxX >= numCols || boxY >= numRows)
                     break;
 
                 if (boxes[boxY][boxX] == null)
                     boxes[boxY][boxX] = new Box();
-                boxes[boxY][boxX].setSolution(clueSol.charAt(j));
+
+                if (clueSol != null && j < clueSol.length())
+                    boxes[boxY][boxX].setSolution(clueSol.charAt(j));
 
                 boxX += dx;
                 boxY += dy;

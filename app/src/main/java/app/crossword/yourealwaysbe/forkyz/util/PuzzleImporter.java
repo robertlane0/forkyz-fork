@@ -1,6 +1,7 @@
 package app.crossword.yourealwaysbe.forkyz.util;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,12 +14,15 @@ import android.content.Context;
 import android.net.Uri;
 
 import app.crossword.yourealwaysbe.forkyz.R;
+import app.crossword.yourealwaysbe.forkyz.net.GenericStreamScraper;
 import app.crossword.yourealwaysbe.forkyz.util.files.DirHandle;
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandle;
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler;
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle;
+import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.io.PuzzleStreamReader;
+import app.crossword.yourealwaysbe.puz.io.StreamUtils;
 
 /**
  * Takes an arbitrary URI and tries to convert to a puzzle and import
@@ -33,11 +37,19 @@ public class PuzzleImporter {
      * that tries each known format in turn until one succeeds. Clunky, but
      * hopefully robust.
      *
+     * Will try local content resolver first, then attempt treating uri as a
+     * remote URL
+     *
+     * @param timeout download timeout if uri is not local
      * @return new puz handle if succeeded (will return null if failed
      * or uri is null)
      */
     public static PuzHandle importUri(
-        Context context, FileHandler fileHandler, Uri uri
+        Context context,
+        FileHandler fileHandler,
+        AndroidVersionUtils utils,
+        Uri uri,
+        int timeout
     ) {
         if (uri == null)
             return null;
@@ -48,15 +60,24 @@ public class PuzzleImporter {
             )
         ) {
             return importInputStream(
-                context, fileHandler, is, getFileName(uri)
+                context, fileHandler, utils, is, getFileName(uri), timeout
             );
         } catch (IOException e) {
-            return null;
+            try (
+                InputStream is = getRemoteInputStream(uri.toString(), timeout)
+            ) {
+                return importInputStream(
+                    context, fileHandler, utils, is, getFileName(uri), timeout
+                );
+            } catch (IOException e2) {
+                // we tried
+                return null;
+            }
         }
     }
 
     public static List<PuzHandle> processToImportDirectory(
-        Context context, FileHandler fileHandler
+        Context context, FileHandler fileHandler, AndroidVersionUtils utils
     ) {
         List<PuzHandle> importedFiles = new ArrayList<>();
 
@@ -65,8 +86,8 @@ public class PuzzleImporter {
 
         for (FileHandle fh : fileHandler.listFiles(toImportDir)) {
             try (InputStream is = fileHandler.getBufferedInputStream(fh)) {
-                PuzHandle ph = PuzzleImporter.importInputStream(
-                    context, fileHandler, is, fileHandler.getName(fh)
+                PuzHandle ph = importInputStream(
+                    context, fileHandler, utils, is, fileHandler.getName(fh), 0
                 );
                 if (ph == null) {
                     // deliberately only get once needed to avoid
@@ -130,13 +151,28 @@ public class PuzzleImporter {
         return null;
     }
 
+    /**
+     * Import input stream
+     *
+     * Try first as a local file, but then see if it's a webpage that we
+     * recognise (may include further web lookups).
+     */
     private static PuzHandle importInputStream(
         Context context,
         FileHandler fileHandler,
+        AndroidVersionUtils utils,
         InputStream is,
-        String fileName
+        String fileName,
+        int timeout
     ) throws IOException {
-        Puzzle puz = puz = PuzzleStreamReader.parseInputStatic(is);
+        ByteArrayInputStream bis = StreamUtils.makeByteArrayInputStream(is);
+
+        Puzzle puz = PuzzleStreamReader.parseInputStatic(bis);
+        if (puz == null) {
+            bis.reset();
+            puz = importPuzzleFromWebPage(context, utils, bis, timeout);
+        }
+
         if (puz == null)
             return null;
 
@@ -152,5 +188,32 @@ public class PuzzleImporter {
             return null;
         }
 
+    }
+
+    private static BufferedInputStream getRemoteInputStream(
+        String url, int timeout
+    ) throws IOException {
+        return NetUtils.getInputStream(url, null, timeout);
+    }
+
+    /**
+     * Try to extract puzzle from recognised webpages
+     *
+     * These are usually those where the puzzle is a step or two away.
+     * E.g. the metro website has an embedded iframe with a puzzle that can be
+     * parsed.
+     *
+     * @param timeout the timeout to use when following urls
+     */
+    private static Puzzle importPuzzleFromWebPage(
+        Context context, AndroidVersionUtils utils, InputStream is, int timeout
+    ) {
+        try {
+            GenericStreamScraper scraper = new GenericStreamScraper(utils);
+            scraper.setTimeout(timeout);
+            return scraper.parseInput(is);
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

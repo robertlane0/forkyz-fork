@@ -52,6 +52,9 @@ public class Zone implements Iterable<Position>, Serializable {
     }
 
     public void appendZone(Zone zone) {
+        if (zone == null)
+            return;
+
         for (Position pos : zone)
             addPosition(pos);
     }

@@ -19,7 +19,7 @@ import app.crossword.yourealwaysbe.puz.util.JSONParser;
  * Read a character stream of JSON data in the format used by the
  * Amuse Labs.
  */
-public class AmuseLabsJSONIO implements PuzzleParser {
+public class AmuseLabsJSONIO extends AbstractJSONIO {
     private static final Logger LOG
         = Logger.getLogger(AmuseLabsJSONIO.class.getCanonicalName());
 
@@ -184,12 +184,5 @@ public class AmuseLabsJSONIO implements PuzzleParser {
                 }
             }
         }
-    }
-
-    private static String optStringNull(JSONObject obj, String field) {
-        String value = obj.optString(field);
-        if (value == null || value.isEmpty())
-            return null;
-        return value;
     }
 }

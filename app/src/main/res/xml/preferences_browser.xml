@@ -45,4 +45,11 @@
         android:entries="@array/swipeActionLabels"
         android:entryValues="@array/swipeActionValues"
     />
+
+    <androidx.preference.CheckBoxPreference
+        android:title="@string/browse_show_percentage_correct"
+        android:defaultValue="false"
+        android:summary="@string/browse_show_percentage_correct_desc"
+        android:key="browseShowPercentageCorrect"
+    />
 </androidx.preference.PreferenceScreen>

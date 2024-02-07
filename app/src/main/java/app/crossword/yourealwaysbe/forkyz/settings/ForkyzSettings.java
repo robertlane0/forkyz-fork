@@ -61,6 +61,8 @@ public class ForkyzSettings {
     private static final String PREF_BROWSE_LAST_SEEN_VERSION
         = "lastSeenVersion";
     private static final String PREF_BROWSE_NEW_PUZZLE = "browseNewPuzzle";
+    private static final String PREF_BROWSE_SHOW_PERCENTAGE_CORRECT
+        = "browseShowPercentageCorrect";
     private static final String PREF_BROWSE_SORT = "sort";
     private static final String PREF_BROWSE_SWIPE_ACTION = "swipeAction";
 
@@ -75,6 +77,8 @@ public class ForkyzSettings {
 
     private static final String PREF_DOWNLOAD_LEGACY_BACKGROUND
         = "backgroundDownload";
+    private static final String PREF_DOWNLOAD_TIMEOUT = "downloadTimeout";
+    private static final String PREF_DOWNLOAD_TIMEOUT_DEFAULT = "30000";
     private static final String PREF_DOWNLOAD_UNMETERED
         = "backgroundDownloadRequireUnmetered";
     private static final String PREF_DOWNLOAD_ROAMING
@@ -189,9 +193,13 @@ public class ForkyzSettings {
         LONG_DEFAULTS.put(PREF_BROWSE_LAST_DOWNLOAD, 0L);
         STRING_DEFAULTS.put(PREF_BROWSE_LAST_SEEN_VERSION, "");
         BOOL_DEFAULTS.put(PREF_BROWSE_NEW_PUZZLE, false);
+        BOOL_DEFAULTS.put(PREF_BROWSE_SHOW_PERCENTAGE_CORRECT, false);
         INT_DEFAULTS.put(PREF_BROWSE_SORT, 0);
         BOOL_DEFAULTS.put(PREF_CLUE_LIST_SHOW_WORDS, false);
         BOOL_DEFAULTS.put(PREF_CLUE_LIST_SNAP_TO_CLUE, false);
+        STRING_DEFAULTS.put(
+            PREF_DOWNLOAD_TIMEOUT, PREF_DOWNLOAD_TIMEOUT_DEFAULT
+        );
         STRING_DEFAULTS.put(PREF_EXT_CHAT_GPT_API_KEY, "");
         BOOL_DEFAULTS.put(PREF_EXT_CROSSWORD_SOLVER_ENABLED, true);
         BOOL_DEFAULTS.put(PREF_KEYBOARD_HAPTIC, true);
@@ -398,6 +406,10 @@ public class ForkyzSettings {
 
     public void setBrowseNewPuzzle(boolean pending) {
         setBooleanPreference(PREF_BROWSE_NEW_PUZZLE, pending);
+    }
+
+    public LiveData<Boolean> liveBrowseShowPercentageCorrect() {
+        return liveBooleanPreference(PREF_BROWSE_SHOW_PERCENTAGE_CORRECT);
     }
 
     /**
@@ -994,6 +1006,7 @@ public class ForkyzSettings {
                 prefs.getBoolean("downloadLeParisienF2", true),
                 prefs.getBoolean("downloadLeParisienF3", true),
                 prefs.getBoolean("downloadLeParisienF4", true),
+                prefs.getBoolean("downloadMetroCryptic", true),
                 prefs.getBoolean("downloadNewsday", true),
                 prefs.getBoolean("downloadPremier", true),
                 prefs.getBoolean("downloadSheffer", true),
@@ -1017,10 +1030,18 @@ public class ForkyzSettings {
                 prefs.getStringSet(
                     PREF_AUTO_DOWNLOADERS, Collections.emptySet()
                 ),
-                Integer.valueOf(prefs.getString("downloadTimeout", "30000")),
+                Integer.valueOf(prefs.getString(
+                    PREF_DOWNLOAD_TIMEOUT, PREF_DOWNLOAD_TIMEOUT_DEFAULT
+                )),
                 prefs.getBoolean("dlOnStartup", false)
             );
             handler.post(() -> { cb.accept(settings); });
+        });
+    }
+
+    public void getDownloadTimeout(Consumer<Integer> cb) {
+        getStringPreference(PREF_DOWNLOAD_TIMEOUT, value -> {
+            cb.accept(Integer.valueOf(value));
         });
     }
 

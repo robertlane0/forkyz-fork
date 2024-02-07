@@ -794,6 +794,18 @@ public class PlayboardRenderer {
             );
             canvas.drawRect(bar, profile.getFlag(flagAcross));
         }
+
+        // flag on cell
+        if (box.isFlagged()) {
+            Rect bar = new Rect(
+                x + boxSize - 1 * barSize,
+                y + barSize + numberOffset + numberTextSize,
+                x + boxSize - 2 * barSize,
+                y + boxSize - barSize
+            );
+            canvas.drawRect(bar, profile.getFlag(box));
+        }
+
     }
 
     private void drawBoxShape(
@@ -1381,6 +1393,9 @@ public class PlayboardRenderer {
 
     private void tagImageWithBitmap(PuzImage image) {
         String url = image.getURL();
+        if (url == null || url.length() < 5)
+            return;
+
         if (url.substring(0, 5).equalsIgnoreCase("data:")) {
             int start = url.indexOf(",") + 1;
             if (start > 0) {
@@ -1880,6 +1895,17 @@ public class PlayboardRenderer {
                 Paint customFlag = new Paint();
                 // clue colors have a 0 alpha channel, so fix
                 customFlag.setColor(ColorUtils.addAlpha(clue.getFlagColor()));
+                return customFlag;
+            }
+        }
+
+        public Paint getFlag(Box box) {
+            if (box.isDefaultFlagColor()) {
+                return flag;
+            } else {
+                Paint customFlag = new Paint();
+                // clue colors have a 0 alpha channel, so fix
+                customFlag.setColor(ColorUtils.addAlpha(box.getFlagColor()));
                 return customFlag;
             }
         }
