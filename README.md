@@ -166,5 +166,5 @@ The IPuz spec is reproduced [here][ipuz-spec].
 [forkyz-scanner]: https://gitlab.com/Hague/forkyzscanner
 [gnome-crosswords]: https://gitlab.gnome.org/jrb/crosswords
 [online-sources]: https://hague.gitlab.io/forkyz/
-[ipuz-spec]: https://hague.gitlab.com/forkyz/ipuz.html
+[ipuz-spec]: https://hague.gitlab.io/forkyz/ipuz.html
 [releases]: https://gitlab.com/Hague/forkyz/-/releases
