@@ -126,6 +126,7 @@ public class ForkyzSettings {
         = "enterChangesDirection";
     private static final String PREF_PLAY_FIT_TO_SCREEN = "fitToScreen";
     private static final String PREF_PLAY_FULL_SCREEN = "fullScreen";
+    private static final String PREF_PLAY_GRID_RATIO = "gridRatio";
     private static final String PREF_PLAY_MOVEMENT_STRATEGY
         = "movementStrategy";
     private static final String PREF_PLAY_PREDICT_ANAGRAM_CHARS
@@ -246,6 +247,7 @@ public class ForkyzSettings {
 
     private MutableLiveData<Accessor> liveBrowseSort;
     private MutableLiveData<KeyboardDisplay> liveKeyboardDisplay;
+    private MutableLiveData<GridRatio> livePlayGridRatio;
     private Map<String, MutableLiveData<Boolean>> liveBooleans = new HashMap<>();
 
     private OnSharedPreferenceChangeListener prefChangeListener
@@ -256,6 +258,8 @@ public class ForkyzSettings {
                 updateLiveKeyboardDisplay();
             } else if (PREF_KEYBOARD_LAYOUT.equals(key)) {
                 updateLiveKeyboardDisplay();
+            } else if (PREF_PLAY_GRID_RATIO.equals(key)) {
+                updateLivePlayGridRatio();
             } else if (liveBooleans.containsKey(key)) {
                 updateLiveBoolean(key);
             }
@@ -766,6 +770,29 @@ public class ForkyzSettings {
     }
 
     /**
+     * Get grid ratio when clue tabs showing on play screen
+     */
+    public void getPlayGridRatio(Consumer<GridRatio> cb) {
+        executor.execute(() -> {
+            String value = prefs.getString(
+                PREF_PLAY_GRID_RATIO,
+                GridRatio.ONE_TO_ONE.getSettingsValue()
+            );
+            handler.post(() -> {
+                cb.accept(GridRatio.getFromSettingsValue(value));
+            });
+        });
+    }
+
+    public LiveData<GridRatio> livePlayGridRatio() {
+        if (livePlayGridRatio == null) {
+            livePlayGridRatio = new MutableLiveData<GridRatio>();
+            updateLivePlayGridRatio();
+        }
+        return livePlayGridRatio;
+    }
+
+    /**
      * Get the style of movement around the board
      */
     public void getPlayMovementStrategy(Consumer<MovementStrategy> cb) {
@@ -1259,6 +1286,11 @@ public class ForkyzSettings {
                 );
             });});
         }
+    }
+
+    private void updateLivePlayGridRatio() {
+        if (livePlayGridRatio != null)
+            getPlayGridRatio(value -> { livePlayGridRatio.setValue(value); });
     }
 
     private LiveData<Boolean> liveBooleanPreference(String name) {

@@ -64,4 +64,13 @@
         android:entries="@array/orientationLockLabels"
         android:entryValues="@array/orientationLockValues"
     />
+
+    <androidx.preference.ListPreference
+        android:title="@string/grid_ratio"
+        android:summary="@string/grid_ratio_desc"
+        android:key="gridRatio"
+        android:defaultValue="0"
+        android:entries="@array/grid_ratio_labels"
+        android:entryValues="@array/grid_ratio_values"
+    />
 </androidx.preference.PreferenceScreen>

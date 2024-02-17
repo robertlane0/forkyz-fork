@@ -372,6 +372,15 @@
     <string name="custom_url">Source URL</string>
     <string name="custom_url_desc">Enter URL formatted according to Java\'s DateTimeFormatter. The puzzle can be in any supported format.</string>
 
+    <!-- preferences display (some) -->
+    <string name="grid_ratio">Grid Size</string>
+    <string name="grid_ratio_desc">The size of the grid in portrait mode when clue tabs are showing.</string>
+    <string name="grid_ratio_one_to_one">Square</string>
+    <string name="grid_ratio_thirty_pcnt">30% display height</string>
+    <string name="grid_ratio_forty_pcnt">40% display height</string>
+    <string name="grid_ratio_fifty_pcnt">50% display height</string>
+    <string name="grid_ratio_sixty_pcnt">60% display height</string>
+
     <!-- preferences external -->
     <string name="external_dictionary">External Dictionary</string>
     <string name="external_dictionary_desc">External dictionary for looking up entries.</string>

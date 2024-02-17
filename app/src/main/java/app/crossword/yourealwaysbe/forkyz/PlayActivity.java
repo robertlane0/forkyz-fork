@@ -30,6 +30,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.squareup.seismic.ShakeDetector;
 
 import app.crossword.yourealwaysbe.forkyz.databinding.PlayBinding;
+import app.crossword.yourealwaysbe.forkyz.settings.GridRatio;
 import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer;
 import app.crossword.yourealwaysbe.forkyz.util.KeyboardManager;
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand;
@@ -58,7 +59,6 @@ public class PlayActivity extends PuzzleActivity
                                      ClueTabs.ClueTabsListener,
                                      ShakeDetector.Listener {
     private static final Logger LOG = Logger.getLogger("app.crossword.yourealwaysbe");
-    private static final float BOARD_DIM_RATIO = 1.0F;
     private static final float ACROSTIC_BOARD_HEIGHT_RATIO_MIN = 0.25F;
     private static final float ACROSTIC_CLUE_TABS_WORD_SCALE = 0.7F;
     private static final float ACROSTIC_CLUE_TABS_HEIGHT_RATIO_MIN = 0.3F;
@@ -68,6 +68,9 @@ public class PlayActivity extends PuzzleActivity
     private KeyboardManager keyboardManager;
     private boolean hasInitialValues = false;
     private ShakeDetector shakeDetector = null;
+
+    // Proper value is loaded before this is used anyway
+    private GridRatio currentGridRatio = GridRatio.ONE_TO_ONE;
 
     private Runnable fitToScreenTask = new Runnable() {
         @Override
@@ -240,14 +243,16 @@ public class PlayActivity extends PuzzleActivity
                                 .getConfiguration()
                                 .orientation;
 
-                        boolean portrait
-                            = orientation == Configuration.ORIENTATION_PORTRAIT;
+                        boolean portrait = (
+                            orientation
+                                == Configuration.ORIENTATION_PORTRAIT
+                        );
 
                         if (portrait) {
                             int maxHeight = 0;
+                            DisplayMetrics metrics
+                                = getResources().getDisplayMetrics();
                             if (isAcrostic()) {
-                                DisplayMetrics metrics
-                                    = getResources().getDisplayMetrics();
                                 maxHeight = (int)(
                                     ACROSTIC_BOARD_HEIGHT_RATIO_MIN
                                         * metrics.heightPixels
@@ -264,7 +269,31 @@ public class PlayActivity extends PuzzleActivity
                                     );
                                 }
                             } else {
-                                maxHeight = (int)(BOARD_DIM_RATIO * width);
+                                switch (currentGridRatio) {
+                                case ONE_TO_ONE:
+                                    maxHeight = width;
+                                    break;
+                                case THIRTY_PCNT:
+                                    maxHeight = (int)(
+                                        0.3 * metrics.heightPixels
+                                    );
+                                    break;
+                                case FORTY_PCNT:
+                                    maxHeight = (int)(
+                                        0.4 * metrics.heightPixels
+                                    );
+                                    break;
+                                case FIFTY_PCNT:
+                                    maxHeight = (int)(
+                                        0.5 * metrics.heightPixels
+                                    );
+                                    break;
+                                case SIXTY_PCNT:
+                                    maxHeight = (int)(
+                                        0.6 * metrics.heightPixels
+                                    );
+                                    break;
+                                }
                             }
 
                             if (height > maxHeight) {
@@ -701,13 +730,6 @@ public class PlayActivity extends PuzzleActivity
         this.onConfigurationChanged(getBaseContext().getResources()
                                                     .getConfiguration());
 
-        settings.getPlayShowCluesTab(showCluesTab -> {
-            if (showCluesTab)
-                showClueTabs();
-            else
-                hideClueTabs();
-        });
-
         setVoiceButtonVisibility();
         registerBoard();
 
@@ -846,6 +868,22 @@ public class PlayActivity extends PuzzleActivity
                 invalidateOptionsMenu();
             }
         );
+
+        settings.livePlayGridRatio().observe(
+            this,
+            gridRatio -> {
+                if (currentGridRatio != gridRatio)
+                    makeClueTabsInvisible();
+                currentGridRatio = gridRatio;
+                settings.getPlayShowCluesTab(showCluesTab -> {
+                    if (showCluesTab) {
+                        showClueTabs();
+                    } else {
+                        hideClueTabs();
+                    }
+                });
+            }
+        );
     }
 
     private void setClueText() {
@@ -893,12 +931,22 @@ public class PlayActivity extends PuzzleActivity
      * Updates shared prefs.
      */
     private void hideClueTabs() {
+        makeClueTabsInvisible();
+        settings.setPlayShowCluesTab(false);
+    }
+
+    /**
+     * Hides clue tabs but does not change show clue tabs setting
+     *
+     * Normally use hideClueTabs. This is also used when gridRatio
+     * changes as setting the grid max height cannot make the grid
+     * larger.
+     */
+    private void makeClueTabsInvisible() {
         ConstraintSet set = new ConstraintSet();
         set.clone(binding.constraintLayout);
         set.setVisibility(binding.clueTabs.getId(), ConstraintSet.GONE);
         set.applyTo(binding.constraintLayout);
-
-        settings.setPlayShowCluesTab(false);
     }
 
     private void showInfoDialog() {
