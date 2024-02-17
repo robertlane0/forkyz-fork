@@ -92,12 +92,16 @@ public class BrainsOnlyIO implements PuzzleParser {
             String line = readLineAtOffset(reader, 0);
 
             boolean nextCircled = false;
+            boolean nextShaded = false;
             boolean addToPrevious = false;
             int across = 0;
             for(int i = 0; i < line.length(); i++){
                 char c = line.charAt(i);
                 if (c == '%') {
                     nextCircled = true;
+                    continue;
+                } else if (c == '^') {
+                    nextShaded = true;
                     continue;
                 } else if (c == ',') {
                     addToPrevious = true;
@@ -113,6 +117,8 @@ public class BrainsOnlyIO implements PuzzleParser {
                         b.setSolution(c);
                         if (nextCircled)
                             b.setShape(Box.Shape.CIRCLE);
+                        if (nextShaded)
+                            b.setColor(IPuzIO.HIGHLIGHT_COLOR);
                         boxes[down][across] = b;
                     }
 
@@ -120,6 +126,7 @@ public class BrainsOnlyIO implements PuzzleParser {
                 }
 
                 nextCircled = false;
+                nextShaded = false;
                 addToPrevious = false;
             }
 

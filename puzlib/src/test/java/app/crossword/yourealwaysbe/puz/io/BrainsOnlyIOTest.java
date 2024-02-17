@@ -47,6 +47,9 @@ public class BrainsOnlyIOTest  {
         assertEquals(boxes[5][2].getShape(), Box.Shape.CIRCLE);
         assertFalse(boxes[5][3].hasShape());
 
+        assertFalse(boxes[2][2].hasColor());
+        assertTrue(boxes[2][3].hasColor());
+
         ClueList acrossClues = puz.getClues("Across");
         ClueList downClues = puz.getClues("Down");
 
