@@ -1051,6 +1051,7 @@ public class ForkyzSettings {
                 prefs.getBoolean("downloadLeParisienF4", true),
                 prefs.getBoolean("downloadMetroCryptic", true),
                 prefs.getBoolean("downloadNewsday", true),
+                prefs.getBoolean("downloadNewYorkTimesSyndicated", true),
                 prefs.getBoolean("downloadPremier", true),
                 prefs.getBoolean("downloadSheffer", true),
                 prefs.getBoolean("downloadUniversal", true),

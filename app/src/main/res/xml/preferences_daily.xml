@@ -74,6 +74,11 @@
         android:key="downloadNewsday"
     />
     <androidx.preference.CheckBoxPreference
+        android:title="@string/new_york_times_syndicated"
+        android:defaultValue="true"
+        android:key="downloadNewYorkTimesSyndicated"
+    />
+    <androidx.preference.CheckBoxPreference
         android:title="@string/sheffer_crossword"
         android:summary="@string/updates_mon_sat"
         android:defaultValue="true"

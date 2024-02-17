@@ -531,6 +531,23 @@ public class Downloaders {
             ));
         }
 
+        if (settings.getDownloadNewYorkTimesSyndicated()) {
+            downloaders.add(new AbstractDateDownloader(
+                "nytsyndicated",
+                context.getString(R.string.new_york_times_syndicated),
+                Downloader.DATE_DAILY,
+                Duration.ofHours(5), // guess midnight NY
+                "https://www.seattletimes.com/games-nytimes-crossword/",
+                new BrainsOnlyIO(),
+                "'https://nytsyn.pzzl.com/nytsyn-crossword-mh/"
+                    + "nytsyncrossword?date='"
+                    + "yyMMdd",
+                "'https://nytsyn.pzzl.com/cwd_seattle/#/s/'"
+                    + "yyMMdd",
+                LocalDate.now().plusDays(-7)
+            ));
+        }
+
         if (settings.getDownloadPremier()) {
             downloaders.add(new KingDigitalDownloader(
                 "Premier",
