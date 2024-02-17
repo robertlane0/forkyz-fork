@@ -24,7 +24,7 @@ public class GenericStreamScraper extends AbstractStreamScraper {
             new CrosswordNexusStreamScraper(),
             new KeesingStreamScraper(),
             new PAPuzzlesStreamScraper(),
-            new PzzlStreamScraper(),
+            new PzzlNetStreamScraper(),
             new RaetselZentraleSchwedenStreamScraper(),
             new WSJStreamScraper(utils)
         };

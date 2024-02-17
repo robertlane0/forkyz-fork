@@ -45,10 +45,10 @@ public class StreamScrapersTest {
     //Some URL weirdness -- gets forbidden but works on phone -- perhaps
     //cookies from visiting via web first? Look for new URL or create one.
     //@Test
-    //public void testPzzl() throws Exception {
+    //public void testPzzlNet() throws Exception {
     //    testScraper(
     //        "https://www.telegraaf.nl/puzzels/kruiswoord/detail-1",
-    //        new PzzlStreamScraper()
+    //        new PzzlNetStreamScraper()
     //    );
     //}
 

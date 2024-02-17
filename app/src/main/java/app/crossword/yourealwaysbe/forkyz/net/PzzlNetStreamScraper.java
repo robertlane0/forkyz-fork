@@ -15,7 +15,7 @@ import app.crossword.yourealwaysbe.puz.io.BrainsOnlyIO;
  * then get pzzl.net/servlet/<id>/netcrossword?date=<date> and it's BrainsOnly
  * text.
  */
-public class PzzlStreamScraper extends AbstractStreamScraper {
+public class PzzlNetStreamScraper extends AbstractStreamScraper {
     private static final RegexScrape ID_MATCH =
         new RegexScrape(Pattern.compile("pzzl.net/app/([^/]*)/"), 1);
     private static final RegexScrape DATE_MATCH =
