@@ -31,6 +31,13 @@
     />
 
     <androidx.preference.CheckBoxPreference
+        android:title="@string/keyboard_compact"
+        android:defaultValue="false"
+        android:summary="@string/keyboard_compact_desc"
+        android:key="keyboardCompact"
+    />
+
+    <androidx.preference.CheckBoxPreference
         android:title="@string/keyboard_use_native"
         android:defaultValue="false"
         android:summary="@string/keyboard_use_native_desc"

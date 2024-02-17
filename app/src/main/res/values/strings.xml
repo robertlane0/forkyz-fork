@@ -248,6 +248,8 @@
     <string name="keyboard_haptic_desc">Vibrate on keyboard keypress.</string>
     <string name="keyboard_use_native">Use native keyboard</string>
     <string name="keyboard_use_native_desc">Use system soft input method. Still a bit experimental.</string>
+    <string name="keyboard_compact">Compact Forkyz Keyboard</string>
+    <string name="keyboard_compact_desc">Reduce the vertical space usage of the built-in Forkyz keyboard.</string>
     <string name="theme_preference">Theme</string>
     <string name="theme_preference_desc">Select application theme (requires restart).</string>
     <string name="random_clue_on_shake">Random Clue on Shake</string>

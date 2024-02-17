@@ -40,6 +40,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 
 import app.crossword.yourealwaysbe.forkyz.R;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
+import app.crossword.yourealwaysbe.forkyz.settings.KeyboardDisplay;
 import app.crossword.yourealwaysbe.forkyz.settings.KeyboardLayout;
 import java.util.logging.Logger;
 
@@ -132,9 +133,9 @@ public class ForkyzKeyboard
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         // need to do this here: there's no life cycle owner until attached
-        settings.liveKeyboardLayout().observe(
+        settings.liveKeyboardDisplay().observe(
             ViewTreeLifecycleOwner.get(this),
-            keyboardLayout -> { createView(getContext(), keyboardLayout); }
+            keyboardDisplay -> { createView(getContext(), keyboardDisplay); }
         );
     }
 
@@ -250,7 +251,7 @@ public class ForkyzKeyboard
     private synchronized void countKeyUp() { countKeysDown--; }
 
     private synchronized void createView(
-        Context context, KeyboardLayout keyboardLayout
+        Context context, KeyboardDisplay keyboardDisplay
     ) {
         // clear any old state (if config change)
         cancelKeyTimers();
@@ -263,9 +264,16 @@ public class ForkyzKeyboard
         LayoutInflater inflater = (LayoutInflater)
             context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater = inflater.cloneInContext(context);
-        LayoutInflaterCompat.setFactory2(inflater, new FKFactory());
+        LayoutInflaterCompat.setFactory2(
+            inflater,
+            new FKFactory(keyboardDisplay)
+        );
 
-        inflater.inflate(KEYBOARD_LAYOUTS.get(keyboardLayout), this, true);
+        inflater.inflate(
+            KEYBOARD_LAYOUTS.get(keyboardDisplay.getLayout()),
+            this,
+            true
+        );
 
         // initially hide unless special key listener is set
         setupSpecialKeys();
@@ -408,6 +416,12 @@ public class ForkyzKeyboard
     }
 
     private class FKFactory implements LayoutInflater.Factory2 {
+        private KeyboardDisplay keyboardDisplay;
+
+        public FKFactory(KeyboardDisplay keyboardDisplay) {
+            this.keyboardDisplay = keyboardDisplay;
+        }
+
         @Override
         public View onCreateView(
             View parent, String tag, Context context, AttributeSet attrs
@@ -480,7 +494,11 @@ public class ForkyzKeyboard
                 int btnPaddingPcnt
                     = context
                         .getResources()
-                        .getInteger(R.integer.keyboardButtonPaddingPcnt);
+                        .getInteger(
+                            keyboardDisplay.getCompact()
+                                ? R.integer.keyboardButtonPaddingPcntCompact
+                                : R.integer.keyboardButtonPaddingPcnt
+                        );
                 int dispHght
                     = context.getResources().getDisplayMetrics().heightPixels;
                 int paddingTopBot = (int) ((btnPaddingPcnt / 100.0) * dispHght);

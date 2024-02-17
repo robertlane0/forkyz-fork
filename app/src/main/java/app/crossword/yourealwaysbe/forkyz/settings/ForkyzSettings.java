@@ -107,6 +107,7 @@ public class ForkyzSettings {
     public static final String PREF_FILE_HANDLER_STORAGE_LOC
         = "storageLocation";
 
+    private static final String PREF_KEYBOARD_COMPACT = "keyboardCompact";
     private static final String PREF_KEYBOARD_HAPTIC = "keyboardHaptic";
     private static final String PREF_KEYBOARD_HIDE_BUTTON
         = "keyboardHideButton";
@@ -202,6 +203,7 @@ public class ForkyzSettings {
         );
         STRING_DEFAULTS.put(PREF_EXT_CHAT_GPT_API_KEY, "");
         BOOL_DEFAULTS.put(PREF_EXT_CROSSWORD_SOLVER_ENABLED, true);
+        BOOL_DEFAULTS.put(PREF_KEYBOARD_COMPACT, false);
         BOOL_DEFAULTS.put(PREF_KEYBOARD_HAPTIC, true);
         BOOL_DEFAULTS.put(PREF_KEYBOARD_HIDE_BUTTON, false);
         BOOL_DEFAULTS.put(PREF_KEYBOARD_NATIVE, false);
@@ -243,15 +245,17 @@ public class ForkyzSettings {
     private ExecutorService executor = Executors.newSingleThreadExecutor();
 
     private MutableLiveData<Accessor> liveBrowseSort;
-    private MutableLiveData<KeyboardLayout> liveKeyboardLayout;
+    private MutableLiveData<KeyboardDisplay> liveKeyboardDisplay;
     private Map<String, MutableLiveData<Boolean>> liveBooleans = new HashMap<>();
 
     private OnSharedPreferenceChangeListener prefChangeListener
         = (prefs, key) -> {
             if (PREF_BROWSE_SORT.equals(key)) {
                 updateLiveBrowseSort();
+            } else if (PREF_KEYBOARD_COMPACT.equals(key)) {
+                updateLiveKeyboardDisplay();
             } else if (PREF_KEYBOARD_LAYOUT.equals(key)) {
-                updateLiveKeyboardLayout();
+                updateLiveKeyboardDisplay();
             } else if (liveBooleans.containsKey(key)) {
                 updateLiveBoolean(key);
             }
@@ -633,6 +637,26 @@ public class ForkyzSettings {
     }
 
     /**
+     * If the Forkyz keyboard should be vertically compact
+     */
+    public void getKeyboardCompact(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_KEYBOARD_COMPACT, cb);
+    }
+
+    /**
+     * Keep a live view of the display params
+     *
+     * E.g. layout and whether compact
+     */
+    public LiveData<KeyboardDisplay> liveKeyboardDisplay() {
+        if (liveKeyboardDisplay == null) {
+            liveKeyboardDisplay = new MutableLiveData<KeyboardDisplay>();
+            updateLiveKeyboardDisplay();
+        }
+        return liveKeyboardDisplay;
+    }
+
+    /**
      * If the Forkyz keyboard gives haptic feedback
      */
     public void getKeyboardHaptic(Consumer<Boolean> cb) {
@@ -659,14 +683,6 @@ public class ForkyzSettings {
                 cb.accept(KeyboardLayout.getFromSettingsValue(value));
             });
         });
-    }
-
-    public LiveData<KeyboardLayout> liveKeyboardLayout() {
-        if (liveKeyboardLayout == null) {
-            liveKeyboardLayout = new MutableLiveData<KeyboardLayout>();
-            updateLiveKeyboardLayout();
-        }
-        return liveKeyboardLayout;
     }
 
     /**
@@ -1234,9 +1250,15 @@ public class ForkyzSettings {
             getBrowseSort(value -> { liveBrowseSort.setValue(value); });
     }
 
-    private void updateLiveKeyboardLayout() {
-        if (liveKeyboardLayout != null)
-            getKeyboardLayout(value -> { liveKeyboardLayout.setValue(value); });
+    private void updateLiveKeyboardDisplay() {
+        if (liveKeyboardDisplay != null) {
+            getKeyboardLayout(layout -> {
+            getKeyboardCompact(compact -> {
+                liveKeyboardDisplay.setValue(
+                    new KeyboardDisplay(layout, compact)
+                );
+            });});
+        }
     }
 
     private LiveData<Boolean> liveBooleanPreference(String name) {
