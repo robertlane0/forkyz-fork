@@ -30,7 +30,7 @@ public class PzzlNetStreamScraper extends AbstractStreamScraper {
         = "https://pzzl.net/servlet/%s/netcrossword?date=%s";
 
     @Override
-    public Puzzle parseInput(InputStream is) throws Exception {
+    public Puzzle parseInput(InputStream is, String url) throws Exception {
         String txtURL = getTxtURL(is);
 
         if (txtURL == null)

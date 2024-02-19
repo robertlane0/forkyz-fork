@@ -42,7 +42,7 @@ public class WSJStreamScraper extends AbstractStreamScraper {
         = "https://www.wsj.com/%s/data.json";
 
     @Override
-    public Puzzle parseInput(InputStream is) throws Exception {
+    public Puzzle parseInput(InputStream is, String url) throws Exception {
         String jsonURL = getJSONURL(is);
 
         if (jsonURL == null)

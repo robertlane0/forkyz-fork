@@ -29,7 +29,7 @@ public class AmuseLabsStreamScraper extends AbstractStreamScraper {
     private static final String DEFAULT_SOURCE = "AmuseLabs";
 
     @Override
-    public Puzzle parseInput(InputStream is) throws Exception {
+    public Puzzle parseInput(InputStream is, String url) throws Exception {
         // so we can reuse
         ByteArrayInputStream bis = StreamUtils.makeByteArrayInputStream(is);
         PuzzleParser secondStage = new SecondStageParser();

@@ -31,14 +31,14 @@ public class GenericStreamScraper extends AbstractStreamScraper {
     }
 
     @Override
-    public Puzzle parseInput (InputStream is) throws Exception {
+    public Puzzle parseInput(InputStream is, String url) throws Exception {
         try {
             ByteArrayInputStream bis = StreamUtils.makeByteArrayInputStream(is);
             for (AbstractStreamScraper scraper : streamScrapers) {
                 bis.reset();
                 scraper.setTimeout(getTimeout());
                 try {
-                    Puzzle puz = scraper.parseInput(bis);
+                    Puzzle puz = scraper.parseInput(bis, url);
                     if (puz != null)
                         return puz;
                 } catch (Exception e) {

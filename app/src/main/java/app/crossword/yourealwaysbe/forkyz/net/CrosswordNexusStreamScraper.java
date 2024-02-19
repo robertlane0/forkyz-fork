@@ -21,7 +21,7 @@ public class CrosswordNexusStreamScraper extends AbstractStreamScraper {
     private static final String DEFAULT_SOURCE = "Crossword Nexus";
 
     @Override
-    public Puzzle parseInput(InputStream is) throws Exception {
+    public Puzzle parseInput(InputStream is, String url) throws Exception {
         Document doc = getDocument(is);
         Puzzle puz = htmlElementScrape(
             doc,

@@ -55,7 +55,7 @@ public class KeesingStreamScraper extends AbstractStreamScraper {
     private static final String DEFAULT_SOURCE = "Keesing";
 
     @Override
-    public Puzzle parseInput(InputStream is) throws Exception {
+    public Puzzle parseInput(InputStream is, String url) throws Exception {
         // get customerID and puzzleID
         RegexScrape[] matchers = { CUSTOMER_ID_MATCH, PUZZLE_ID_MATCH };
         String[] results = regexScrape(is, matchers);

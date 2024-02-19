@@ -37,7 +37,7 @@ import app.crossword.yourealwaysbe.puz.io.PuzzleParser;
  *
  * Bit janky that it's a copy-paste of AbstractDownloader..
  */
-public abstract class AbstractStreamScraper implements PuzzleParser {
+public abstract class AbstractStreamScraper implements StreamScraper {
     private int timeoutMillis = 30000;
 
     /**
@@ -57,7 +57,14 @@ public abstract class AbstractStreamScraper implements PuzzleParser {
     }
 
     @Override
-    public abstract Puzzle parseInput (InputStream is) throws Exception;
+    public Puzzle parseInput(InputStream is) throws Exception {
+        return parseInput(is, null);
+    }
+
+    @Override
+    public abstract Puzzle parseInput(
+        InputStream is, String url
+    ) throws Exception;
 
     public void setTimeout(int timeoutMillis) {
         this.timeoutMillis = timeoutMillis;
