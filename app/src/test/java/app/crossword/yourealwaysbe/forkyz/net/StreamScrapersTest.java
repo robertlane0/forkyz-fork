@@ -68,14 +68,30 @@ public class StreamScrapersTest {
         );
     }
 
+    @Test
+    public void testSeattle() throws Exception {
+        testScraper(
+            "https://www.seattletimes.com/games-nytimes-crossword/",
+            new PzzlComStreamScraper()
+        );
+    }
+
+    @Test
+    public void testPzzlCom() throws Exception {
+        testScraper(
+            "https://nytsyn.pzzl.com/cwd_seattle/",
+            new PzzlComStreamScraper()
+        );
+    }
+
     /**
      * Test scraper gets a puzzle from the URL
      */
     private static void testScraper(
-        String url, PuzzleParser scraper
+        String url, StreamScraper scraper
     ) throws Exception {
         try (InputStream is = NetUtils.getInputStream(url, null, TIMEOUT)) {
-            Puzzle puz = scraper.parseInput(is);
+            Puzzle puz = scraper.parseInput(is, url);
             assertNotNull(puz);
         }
     }
