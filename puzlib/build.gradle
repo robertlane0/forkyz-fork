@@ -5,24 +5,23 @@ plugins {
     id 'com.github.johnrengelman.shadow'
 }
 
-group 'app.crossword.yourealwaysbe'
+java {
+    group 'app.crossword.yourealwaysbe'
 
-test { useJUnitPlatform() }
+    test { useJUnitPlatform() }
 
-dependencies {
-    def junitVersion = '5.9.1'
-    testImplementation "org.junit.jupiter:junit-jupiter:$junitVersion"
-    testImplementation "org.junit.jupiter:junit-jupiter-params:$junitVersion"
+    dependencies {
+        def junitVersion = '5.9.1'
+        testImplementation "org.junit.jupiter:junit-jupiter:$junitVersion"
+        testImplementation "org.junit.jupiter:junit-jupiter-params:$junitVersion"
 
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.2'
-    implementation 'net.iharder:base64:2.3.9'
-    implementation 'org.apache.commons:commons-text:1.9'
-    implementation 'org.hjson:hjson:3.0.0'
-    implementation 'org.json:json:20210307'
-    implementation 'org.jsoup:jsoup:1.13.1'
-
-    sourceCompatibility JavaVersion.VERSION_1_8
-    targetCompatibility JavaVersion.VERSION_1_8
+        implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.2'
+        implementation 'net.iharder:base64:2.3.9'
+        implementation 'org.apache.commons:commons-text:1.9'
+        implementation 'org.hjson:hjson:3.0.0'
+        implementation 'org.json:json:20210307'
+        implementation 'org.jsoup:jsoup:1.13.1'
+    }
 
     shadowJar {
         relocate 'org.json', 'app.crossword.yourealwaysbe.org.json'
@@ -32,17 +31,16 @@ dependencies {
     // https://www.morling.dev/blog/bytebuffer-and-the-dreaded-nosuchmethoderror/
     // https://github.com/danilovesky/workcraft/commit/6901b6e2de001c720d5e744ac877878c8931f2a7
     compileJava {
+        sourceCompatibility JavaVersion.VERSION_1_8.toString()
+        targetCompatibility JavaVersion.VERSION_1_8.toString()
+
         if (JavaVersion.current().isJava9Compatible()) {
             options.release = 8
         }
-    }
 
-    tasks.withType(JavaCompile) {
-        configure(options) {
-            // -processing as adding room annotation processor library
-            // causes warnings about unprocessed annotations for an
-            // unclear reason
-            options.compilerArgs << '-Xlint:all' << '-Xlint:-processing'
-        }
+        // -processing as adding room annotation processor library
+        // causes warnings about unprocessed annotations for an
+        // unclear reason
+        options.compilerArgs << '-Xlint:all' << '-Xlint:-processing'
     }
 }

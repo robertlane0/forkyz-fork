@@ -52,18 +52,8 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
         // the get-go
         setImageViewParams(1, 1);
 
-        try {
-            aux = (AuxTouchHandler) Class.forName(
-                "app.crossword.yourealwaysbe.forkyz.view.MultitouchHandler"
-            ).newInstance();
-            aux.init(this);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+        aux = new MultitouchHandler();
+        aux.init(this);
     }
 
     public void setBitmap(Bitmap bitmap) {

@@ -25,6 +25,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 
 import androidx.appcompat.view.ActionMode;
@@ -414,12 +415,17 @@ public class BrowseActivity extends ForkyzActivity {
         );
 
         // listen for broadcasts
-        registerReceiver(
-            closeActionReceiver, new IntentFilter(BROWSER_CLOSE_ACTION)
+        ContextCompat.registerReceiver(
+            this,
+            closeActionReceiver,
+            new IntentFilter(BROWSER_CLOSE_ACTION),
+            ContextCompat.RECEIVER_NOT_EXPORTED
         );
-        registerReceiver(
+        ContextCompat.registerReceiver(
+            this,
             intentImportCompleteReceiver,
-            new IntentFilter(INTENT_IMPORT_COMPLETE_ACTION)
+            new IntentFilter(INTENT_IMPORT_COMPLETE_ACTION),
+            ContextCompat.RECEIVER_NOT_EXPORTED
         );
 
         // Bring up to date
