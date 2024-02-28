@@ -15,6 +15,13 @@
     />
 
     <androidx.preference.CheckBoxPreference
+        android:title="@string/clue_below_grid"
+        android:defaultValue="false"
+        android:summary="@string/clue_below_grid_desc"
+        android:key="clueBelowGrid"
+    />
+
+    <androidx.preference.CheckBoxPreference
         android:title="@string/fit_screen_start"
         android:defaultValue="false"
         android:summary="@string/fit_screen_start_desc"

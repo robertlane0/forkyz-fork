@@ -16,7 +16,6 @@
     <string name="general_clue_notes">Free-form notes about clue</string>
     <string name="general_puzzle_notes">Free-form notes about puzzle</string>
     <string name="unknown_hint">(No explicit clue)</string>
-    <string name="play_activity_title">%1$s - %2$s -> %3$s</string>
     <string name="no_orientation_lock">Sorry, orientation lock is not supported without fullscreen mode anymore because of an Android change."</string>
 
     <!-- downloading -->
@@ -381,6 +380,8 @@
     <string name="grid_ratio_forty_pcnt">40% display height</string>
     <string name="grid_ratio_fifty_pcnt">50% display height</string>
     <string name="grid_ratio_sixty_pcnt">60% display height</string>
+    <string name="clue_below_grid">Clue below grid</string>
+    <string name="clue_below_grid_desc">Display the selected clue below the grid instead of in the app title bar.</string>
 
     <!-- preferences external -->
     <string name="external_dictionary">External Dictionary</string>

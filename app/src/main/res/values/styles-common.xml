@@ -41,6 +41,9 @@
         <item name="titleTextColor">?attr/colorOnSurface</item>
         <item name="android:textColor">?attr/colorOnSurface</item>
     </style>
+    <style name="clueLineButtonStyle" parent="Widget.Material3.Button.IconButton">
+        <item name="iconTint">?attr/colorOnSurface</item>
+    </style>
     <style name="clueListItemStyle" parent="Widget.Material3.CheckedTextView">
         <item name="android:textSize">16sp</item>
     </style>

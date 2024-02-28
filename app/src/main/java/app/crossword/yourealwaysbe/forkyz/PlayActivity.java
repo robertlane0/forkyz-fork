@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.KeyEvent;
@@ -20,6 +21,7 @@ import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.TextView;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat;
@@ -168,35 +170,8 @@ public class PlayActivity extends PuzzleActivity
 
         settings.getPlaySkipFilled(board::setSkipCompletedLetters);
 
-        binding.clueHolder.clueLine.setClickable(true);
-        binding.clueHolder.clueLine.setOnClickListener(new OnClickListener() {
-            public void onClick(View arg0) {
-                settings.getPlayShowCluesTab(show -> {
-                    if (show)
-                        PlayActivity.this.hideClueTabs();
-                    else
-                        PlayActivity.this.showClueTabs();
-                });
-            }
-        });
-        ViewCompat.replaceAccessibilityAction(
-            binding.clueHolder.clueLine,
-            AccessibilityActionCompat.ACTION_CLICK,
-            getText(R.string.toggle_clue_tabs),
-            null
-        );
-        binding.clueHolder.clueLine.setOnLongClickListener(new OnLongClickListener() {
-            public boolean onLongClick(View arg0) {
-                PlayActivity.this.launchClueList();
-                return true;
-            }
-        });
-        ViewCompat.replaceAccessibilityAction(
-            binding.clueHolder.clueLine,
-            AccessibilityActionCompat.ACTION_LONG_CLICK,
-            getText(R.string.open_clue_list),
-            null
-        );
+        createClueLine(binding.clueHolder.clueLine);
+        createClueLine(binding.clueLineBelowGrid.clueText);
 
         this.registerForContextMenu(binding.boardView);
         binding.boardView.addBoardClickListener(new BoardClickListener() {
@@ -342,14 +317,20 @@ public class PlayActivity extends PuzzleActivity
             }
         });
 
-        int clueTextSize
-            = getResources().getInteger(R.integer.clue_text_size);
-        TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
-            binding.clueHolder.clueLine,
-            5,
-            clueTextSize,
-            1,
-            TypedValue.COMPLEX_UNIT_SP
+
+        binding.clueLineBelowGrid.prevClueButton.setOnClickListener(
+            view -> {
+                Playboard b = getBoard();
+                if (b != null)
+                    b.previousWord();
+            }
+        );
+        binding.clueLineBelowGrid.nextClueButton.setOnClickListener(
+            view -> {
+                Playboard b = getBoard();
+                if (b != null)
+                    b.nextWord();
+            }
         );
 
         DisplayMetrics metrics = getResources().getDisplayMetrics();
@@ -750,13 +731,7 @@ public class PlayActivity extends PuzzleActivity
             return;
         }
 
-        setTitle(getString(
-            R.string.play_activity_title,
-            neverNull(puz.getTitle()),
-            neverNull(puz.getAuthor()),
-            neverNull(puz.getCopyright())
-        ));
-
+        setActivityTitle();
         binding.boardView.setBoard(board);
 
         settings.getPlayScale(scale-> {
@@ -884,6 +859,21 @@ public class PlayActivity extends PuzzleActivity
                 });
             }
         );
+
+        settings.livePlayClueBelowGrid().observe(
+            this,
+            belowGrid -> {
+                binding.clueLineBelowGrid.layout.setVisibility(
+                    belowGrid ? View.VISIBLE : View.GONE
+                );
+
+                if (!belowGrid)
+                    setClueLineTextSize(binding.clueHolder.clueLine);
+
+                setClueText();
+                setActivityTitle();
+            }
+        );
     }
 
     private void setClueText() {
@@ -893,8 +883,16 @@ public class PlayActivity extends PuzzleActivity
 
         Clue c = board.getClue();
         getLongClueText(c, text -> {
-            binding.clueHolder.clueLine.setText(smartHtml(text));
-        });
+        settings.getPlayClueBelowGrid(belowGrid -> {
+            Spanned htmlText = smartHtml(text);
+            if (belowGrid) {
+                binding.clueLineBelowGrid.clueText.setText(
+                    htmlText
+                );
+            } else {
+                binding.clueHolder.clueLine.setText(htmlText);
+            }
+        });});
     }
 
     private void launchClueList() {
@@ -1237,6 +1235,94 @@ public class PlayActivity extends PuzzleActivity
 
     private boolean isMiniTabletish(DisplayMetrics metrics) {
         return utils.isMiniTabletish(metrics);
+    }
+
+    /**
+     * Setup the clue line click listeners &c.
+     *
+     * Move into a method since there are two clue lines to set up: the one in
+     * the title and the one under the board, depending on what is configured
+     * to be used.
+     */
+    private void createClueLine(TextView clueLine) {
+        clueLine.setClickable(true);
+        clueLine.setOnClickListener(new OnClickListener() {
+            public void onClick(View arg0) {
+                settings.getPlayShowCluesTab(show -> {
+                    if (show)
+                        PlayActivity.this.hideClueTabs();
+                    else
+                        PlayActivity.this.showClueTabs();
+                });
+            }
+        });
+        ViewCompat.replaceAccessibilityAction(
+            clueLine,
+            AccessibilityActionCompat.ACTION_CLICK,
+            getText(R.string.toggle_clue_tabs),
+            null
+        );
+        clueLine.setOnLongClickListener(new OnLongClickListener() {
+            public boolean onLongClick(View arg0) {
+                PlayActivity.this.launchClueList();
+                return true;
+            }
+        });
+        ViewCompat.replaceAccessibilityAction(
+            clueLine,
+            AccessibilityActionCompat.ACTION_LONG_CLICK,
+            getText(R.string.open_clue_list),
+            null
+        );
+
+        setClueLineTextSize(clueLine);
+    }
+
+    private void setClueLineTextSize(TextView clueLine) {
+        int clueTextSize
+            = getResources().getInteger(R.integer.clue_text_size);
+        int minClueTextSize
+            = getResources().getInteger(R.integer.min_clue_text_size);
+
+        TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
+            clueLine,
+            minClueTextSize,
+            clueTextSize,
+            1,
+            TypedValue.COMPLEX_UNIT_SP
+        );
+    }
+
+    private String getPuzzleTitle() {
+        Puzzle puz = getPuzzle();
+        if (puz == null) {
+            return getString(R.string.app_name);
+        } else {
+            String title = puz.getTitle();
+            if (title != null)
+                return title;
+            title = puz.getSource();
+            if (title != null)
+                return title;
+            return getString(R.string.app_name);
+        }
+    }
+
+    private void setActivityTitle() {
+        String title = getPuzzleTitle();
+        setTitle(title);
+        settings.getPlayClueBelowGrid(belowGrid -> {
+            if (belowGrid) {
+                binding.clueHolder.clueLine.setText(title);
+                TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
+                    binding.clueHolder.clueLine,
+                    getResources().getInteger(R.integer.min_clue_text_size),
+                    getResources().getInteger(R.integer.title_text_size),
+                    1,
+                    TypedValue.COMPLEX_UNIT_SP
+                );
+            }
+        });
     }
 
     public static class RevealPuzzleDialog extends DialogFragment {

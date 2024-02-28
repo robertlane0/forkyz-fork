@@ -56,7 +56,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toBottomOf="@id/board_view"
-                app:layout_constraintBottom_toTopOf="@id/clue_tabs"
+                app:layout_constraintBottom_toTopOf="@id/clue_line_below_grid"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:background="@color/blockColor"
@@ -68,11 +68,22 @@
                     android:layout_height="wrap_content"
                 />
             </LinearLayout>
+            <include
+                android:id="@+id/clue_line_below_grid"
+                layout="@layout/clue_line_below_grid"
+                android:layout_width="fill_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:layout_constraintTop_toBottomOf="@id/voice_buttons_wrapper"
+                app:layout_constraintBottom_toTopOf="@id/clue_tabs"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:visibility="gone"
+            />
             <app.crossword.yourealwaysbe.forkyz.view.ClueTabs
                 android:id="@+id/clue_tabs"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                app:layout_constraintTop_toBottomOf="@id/voice_buttons_wrapper"
+                app:layout_constraintTop_toBottomOf="@id/clue_line_below_grid"
                 app:layout_constraintBottom_toBottomOf="@id/keyboard_view"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

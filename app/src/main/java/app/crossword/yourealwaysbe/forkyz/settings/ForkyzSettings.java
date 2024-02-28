@@ -115,6 +115,8 @@ public class ForkyzSettings {
     private static final String PREF_KEYBOARD_MODE = "keyboardShowHide";
     private static final String PREF_KEYBOARD_NATIVE = "useNativeKeyboard";
 
+    private static final String PREF_PLAY_CLUE_BELOW_GRID
+        = "clueBelowGrid";
     private static final String PREF_PLAY_CLUE_TABS_PAGE
         = "playActivityClueTabsPage";
     private static final String PREF_PLAY_DONT_DELETE_CROSSING
@@ -208,6 +210,7 @@ public class ForkyzSettings {
         BOOL_DEFAULTS.put(PREF_KEYBOARD_HAPTIC, true);
         BOOL_DEFAULTS.put(PREF_KEYBOARD_HIDE_BUTTON, false);
         BOOL_DEFAULTS.put(PREF_KEYBOARD_NATIVE, false);
+        BOOL_DEFAULTS.put(PREF_PLAY_CLUE_BELOW_GRID, false);
         INT_DEFAULTS.put(PREF_PLAY_CLUE_TABS_PAGE, 0);
         BOOL_DEFAULTS.put(PREF_PLAY_DONT_DELETE_CROSSING, false);
         BOOL_DEFAULTS.put(PREF_PLAY_DOUBLE_TAP_FIT_BOARD, false);
@@ -704,6 +707,24 @@ public class ForkyzSettings {
      */
     public void getKeyboardNative(Consumer<Boolean> cb) {
         getBooleanPreference(PREF_KEYBOARD_NATIVE, cb);
+    }
+
+    /**
+     * Whether to display the currently selected clue below the grid
+     *
+     * Default is in the title bar
+     */
+    public void getPlayClueBelowGrid(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_PLAY_CLUE_BELOW_GRID, cb);
+    }
+
+    /**
+     * Whether to display the currently selected clue below the grid
+     *
+     * Default is in the title bar
+     */
+    public LiveData<Boolean> livePlayClueBelowGrid() {
+        return liveBooleanPreference(PREF_PLAY_CLUE_BELOW_GRID);
     }
 
     /**
