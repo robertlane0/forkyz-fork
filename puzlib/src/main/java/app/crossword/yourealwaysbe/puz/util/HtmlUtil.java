@@ -6,11 +6,11 @@ import java.util.Map;
 
 import org.apache.commons.text.StringEscapeUtils;
 import org.jsoup.Jsoup;
-import org.jsoup.safety.Whitelist;
+import org.jsoup.safety.Safelist;
 
 public class HtmlUtil {
     // IPuz tags not to strip from HTML (preserve line breaks)
-    private static final Whitelist JSOUP_CLEAN_WHITELIST = new Whitelist();
+    private static final Safelist JSOUP_CLEAN_WHITELIST = new Safelist();
     static {
         JSOUP_CLEAN_WHITELIST.addTags("br");
     }

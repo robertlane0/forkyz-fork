@@ -2,7 +2,7 @@
 plugins {
     id 'checkstyle'
     id 'java'
-    id 'com.github.johnrengelman.shadow'
+    id 'io.github.goooler.shadow'
 }
 
 java {
@@ -11,16 +11,17 @@ java {
     test { useJUnitPlatform() }
 
     dependencies {
-        def junitVersion = '5.9.1'
+        def junitVersion = '5.10.2'
         testImplementation "org.junit.jupiter:junit-jupiter:$junitVersion"
         testImplementation "org.junit.jupiter:junit-jupiter-params:$junitVersion"
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-        implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.2'
+        implementation 'com.fasterxml.jackson.core:jackson-databind:2.16.1'
         implementation 'net.iharder:base64:2.3.9'
-        implementation 'org.apache.commons:commons-text:1.9'
-        implementation 'org.hjson:hjson:3.0.0'
-        implementation 'org.json:json:20210307'
-        implementation 'org.jsoup:jsoup:1.13.1'
+        implementation 'org.apache.commons:commons-text:1.11.0'
+        implementation 'org.hjson:hjson:3.1.0'
+        implementation 'org.json:json:20240205'
+        implementation 'org.jsoup:jsoup:1.17.2'
     }
 
     shadowJar {
