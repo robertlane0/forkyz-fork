@@ -411,7 +411,7 @@ public class BrowseActivity extends ForkyzActivity {
         sendBroadcast(
             new Intent(BROWSER_CLOSE_ACTION).putExtra(
                 BROWSER_CLOSE_TASK_ID, getTaskId()
-            )
+            ).setPackage(getPackageName())
         );
 
         // listen for broadcasts
@@ -997,7 +997,7 @@ public class BrowseActivity extends ForkyzActivity {
                         INTENT_IMPORT_TASK_ID, getTaskId()
                     ).putExtra(
                         INTENT_IMPORT_SUCCESS, !someFailed && someSucceeded
-                    )
+                    ).setPackage(getPackageName())
                 );
             });
         }
