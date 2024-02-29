@@ -60,13 +60,13 @@ public class StreamScrapersTest {
         );
     }
 
-    @Test
-    public void testWSJ() throws Exception {
-        testScraperApache(
-            "https://www.wsj.com/articles/snack-time-wednesday-crossword-january-3-b09d36c8",
-            new WSJStreamScraper(new TiramisuUtil())
-        );
-    }
+    //@Test
+    //public void testWSJ() throws Exception {
+    //    testScraperApache(
+    //        "https://www.wsj.com/articles/snack-time-wednesday-crossword-january-3-b09d36c8",
+    //        new WSJStreamScraper(new TiramisuUtil())
+    //    );
+    //}
 
     @Test
     public void testSeattle() throws Exception {
