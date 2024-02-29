@@ -112,7 +112,7 @@ public class BrainsOnlyIO implements PuzzleParser {
                     Box b = boxes[down][across - 1];
                     b.setSolution(b.getSolution() + c);
                 } else {
-                    if (c != '#'){
+                    if (c != '#' && c != '.'){
                         Box b = new Box();
                         b.setSolution(c);
                         if (nextCircled)
