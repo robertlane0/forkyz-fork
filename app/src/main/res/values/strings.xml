@@ -376,10 +376,10 @@
     <string name="grid_ratio">Grid Size</string>
     <string name="grid_ratio_desc">The size of the grid in portrait mode when clue tabs are showing.</string>
     <string name="grid_ratio_one_to_one">Square</string>
-    <string name="grid_ratio_thirty_pcnt">30% display height</string>
-    <string name="grid_ratio_forty_pcnt">40% display height</string>
-    <string name="grid_ratio_fifty_pcnt">50% display height</string>
-    <string name="grid_ratio_sixty_pcnt">60% display height</string>
+    <string name="grid_ratio_thirty_pcnt">30\% display height</string>
+    <string name="grid_ratio_forty_pcnt">40\% display height</string>
+    <string name="grid_ratio_fifty_pcnt">50\% display height</string>
+    <string name="grid_ratio_sixty_pcnt">60\% display height</string>
     <string name="clue_below_grid">Clue below grid</string>
     <string name="clue_below_grid_desc">Display the selected clue below the grid instead of in the app title bar.</string>
 
