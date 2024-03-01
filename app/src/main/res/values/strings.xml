@@ -163,7 +163,7 @@
     <string name="weekly_crosswords">Weekly Crosswords</string>
     <string name="weekly_crosswords_desc">Puzzles which update weekly.</string>
     <string name="scraper_sources">Page Scrapers</string>
-    <string name="scraper_sources_desc">Online puzzle archives</string>
+    <string name="scraper_sources_desc">Online puzzle archives.</string>
     <string name="browser_settings">Browser Settings</string>
     <string name="browser_settings_desc">Behaviour and appearance of the puzzle list page.</string>
     <string name="interaction_settings">Interaction Settings</string>
@@ -176,17 +176,17 @@
     <string name="display_settings_desc">Appearance of the app and displayed puzzle grid.</string>
     <string name="download_settings">Download Settings</string>
     <string name="download_settings_desc">Behaviour of the puzzle download features.</string>
-    <string name="fit_screen_start">Fit to screen when starting</string>
+    <string name="fit_screen_start">Fit to Screen When Starting</string>
     <string name="fit_screen_start_desc">Best-fits the puzzle when you start.</string>
     <string name="automatic_download">Automatic Download</string>
-    <string name="automatic_download_desc">Download today\'s puzzles when starting the application</string>
+    <string name="automatic_download_desc">Download today\'s puzzles when starting the application.</string>
     <string name="background_download_opts">Background Download Settings</string>
     <string name="background_download_opts_desc">Configure background downloads.</string>
     <string name="no_summary_download_notifs">No Summary Download Notification</string>
     <string name="no_summary_download_notifs_desc">Prevents summary download notification from appearing in the notifications list.</string>
     <string name="no_puzzle_download_notifs">No Individual Download Notifications</string>
     <string name="no_puzzle_download_notifs_desc">Prevents a notification for each puzzle download from appearing in the notifications list.</string>
-    <string name="download_timeout">Download timeout</string>
+    <string name="download_timeout">Download Timeout</string>
     <string name="download_timeout_desc">How long to try downloading a puzzle before giving up.</string>
     <string name="fifteen_seconds">15 seconds</string>
     <string name="thirty_seconds">30 seconds</string>
@@ -195,7 +195,7 @@
     <string name="no_hint_highlighting">No Hint Highlighting</string>
     <string name="no_hint_highlighting_desc">Prevents the pink boxes indicating \'hints\' in the form of reveals or show errors.</string>
     <string name="delete_on_cleanup">Delete on Cleanup</string>
-    <string name="delete_on_cleanup_desc">Delete rather than archive old puzzles</string>
+    <string name="delete_on_cleanup_desc">Delete rather than archive old puzzles.</string>
     <string name="cleanup_unfinished">Cleanup Unfinished</string>
     <string name="cleanup_unfinished_desc">Determines how old an unfinished puzzle must be before it is archived/deleted.</string>
     <string name="cleanup_archives">Cleanup Archives</string>
@@ -205,11 +205,11 @@
     <string name="keyboard_layout">Keyboard Layout</string>
     <string name="keyboard_layout_desc">The layout of the in-app keyboard.</string>
     <string name="snap_current">Snap to Current Word</string>
-    <string name="snap_current_desc">Toggles auto-scrolling of the playboard to the current play position</string>
+    <string name="snap_current_desc">Toggles auto-scrolling of the playboard to the current play position.</string>
     <string name="show_length">Show Length</string>
-    <string name="show_length_desc">Shows the number of letters in the answer on the clue line</string>
+    <string name="show_length_desc">Shows the number of letters in the answer on the clue line.</string>
     <string name="scroll_to_clue">Scroll To Clue</string>
-    <string name="scroll_to_clue_desc">Toggles auto-scrolling to the selected clue in the clues list. (Works like Shortyz 1)</string>
+    <string name="scroll_to_clue_desc">Toggles auto-scrolling to the selected clue in the clues list. (Works like Shortyz 1.)</string>
     <string name="movement_style">Movement Style</string>
     <string name="movement_style_desc">Select what happens when you type past the end of a word.</string>
     <string name="skip_filled">Skip Filled Boxes</string>
@@ -229,15 +229,15 @@
     <string name="full_screen">Full Screen</string>
     <string name="full_screen_desc">Hides the notification bar.\nYou must leave and re-enter a puzzle to apply.</string>
     <string name="orientation_lock">Orientation Lock</string>
-    <string name="orientation_lock_desc">Locks the screen location</string>
+    <string name="orientation_lock_desc">Locks the screen orientation.</string>
     <string name="disable_swipe">Disable Swipe</string>
     <string name="disable_swipe_desc">Disables swiping to dismiss on the list view.</string>
     <string name="swipe_action">Swipe Action</string>
-    <string name="swipe_action_desc">Select delete or archive on swipe</string>
+    <string name="swipe_action_desc">Select delete or archive on swipe.</string>
     <string name="display_scratch">Display Scratch</string>
     <string name="display_scratch_desc">Display scratch notes on play board.</string>
-    <string name="dont_delete_crossing">Don\'t delete crossing words</string>
-    <string name="dont_delete_crossing_desc">When deleting, don\'t delete a letter if it is part of a filled-in crossing word</string>
+    <string name="dont_delete_crossing">Don\'t Delete Crossing Words</string>
+    <string name="dont_delete_crossing_desc">When deleting, don\'t delete a letter if it is part of a filled-in crossing word.</string>
     <string name="about_forkyz">About Forkyz</string>
     <string name="release_notes">Release Notes</string>
     <string name="license">License</string>
@@ -245,7 +245,7 @@
     <string name="keyboard_hide_button_desc">Show a keyboard hide button instead of using the navigation back button.</string>
     <string name="keyboard_haptic">Keyboard Haptic Feedback</string>
     <string name="keyboard_haptic_desc">Vibrate on keyboard keypress.</string>
-    <string name="keyboard_use_native">Use native keyboard</string>
+    <string name="keyboard_use_native">Use Native Keyboard</string>
     <string name="keyboard_use_native_desc">Use system soft input method. Still a bit experimental.</string>
     <string name="keyboard_compact">Compact Forkyz Keyboard</string>
     <string name="keyboard_compact_desc">Reduce the vertical space usage of the built-in Forkyz keyboard.</string>
@@ -311,21 +311,21 @@
     <string name="background_download_sun">Sunday</string>
 
     <!-- preferences daily -->
-    <string name="updates_mon_fri">Updates Monday-Friday</string>
-    <string name="updates_mon_sat">Updates Monday-Saturday</string>
-    <string name="updates_daily">Updates Daily</string>
+    <string name="updates_mon_fri">Updates Monday-Friday.</string>
+    <string name="updates_mon_sat">Updates Monday-Saturday.</string>
+    <string name="updates_daily">Updates Daily.</string>
     <string name="hamburger_abendblatt_daily">(DE) Hamburger Abendblatt</string>
-    <string name="hamburger_abendblatt_daily_desc">Daily crossword in German</string>
+    <string name="hamburger_abendblatt_daily_desc">Daily crossword in German.</string>
     <string name="vingminutes">(FR) 20 Minutes</string>
-    <string name="vingminutes_desc">Daily crossword in French, Level 2</string>
+    <string name="vingminutes_desc">Daily crossword in French, Level 2.</string>
     <string name="le_parisien_daily_f1">(FR) Le Parisien Force 1</string>
-    <string name="le_parisien_daily_f1_desc">Daily crossword in French, level 1</string>
+    <string name="le_parisien_daily_f1_desc">Daily crossword in French, level 1.</string>
     <string name="le_parisien_daily_f2">(FR) Le Parisien Force 2</string>
-    <string name="le_parisien_daily_f2_desc">Daily crossword in French, level 2</string>
+    <string name="le_parisien_daily_f2_desc">Daily crossword in French, level 2.</string>
     <string name="le_parisien_daily_f3">(FR) Le Parisien Force 3</string>
-    <string name="le_parisien_daily_f3_desc">Daily crossword in French, level 3</string>
+    <string name="le_parisien_daily_f3_desc">Daily crossword in French, level 3.</string>
     <string name="le_parisien_daily_f4">(FR) Le Parisien Force 4</string>
-    <string name="le_parisien_daily_f4_desc">Daily crossword in French, level 4</string>
+    <string name="le_parisien_daily_f4_desc">Daily crossword in French, level 4.</string>
     <string name="guardian_daily">Guardian Daily Cryptic</string>
     <string name="independent_daily">Independent Daily Cryptic</string>
     <string name="newsday">Newsday</string>
@@ -336,12 +336,12 @@
     <string name="usa_today">USA Today</string>
     <string name="uclick_copyright">uclick LLC</string>
     <string name="de_standaard">(FL) De Standaard</string>
-    <string name="de_standaard_desc">Daily crossword in Flemish</string>
+    <string name="de_standaard_desc">Daily crossword in Flemish.</string>
     <string name="metro_cryptic">Metro Cryptic</string>
 
     <!-- preferences weekly -->
-    <string name="updates_thursdays">Updates Thursdays</string>
-    <string name="updates_sundays">Updates Sundays</string>
+    <string name="updates_thursdays">Updates Thursdays.</string>
+    <string name="updates_sundays">Updates Sundays.</string>
     <string name="regular_sized">Regular Sized</string>
     <string name="large_sized">Large Sized</string>
     <string name="jonesin_crosswords">Jonesin\' Crosswords</string>
@@ -349,7 +349,7 @@
     <string name="wall_street_journal">The Wall Street Journal</string>
     <string name="washington_post_sunday">The Washington Post Sunday</string>
     <string name="de_telegraaf">(DU) De Telegraaf</string>
-    <string name="de_telegraaf_desc">Updates Sundays, in Dutch</string>
+    <string name="de_telegraaf_desc">Updates Sundays, in Dutch.</string>
 
     <!--  preferences scrapers -->
     <string name="cru_puzzle_workshop">Cryptic Cru Workshop Archive</string>
@@ -363,12 +363,12 @@
     <string name="about_scrapes">About These Sources</string>
 
     <!-- preferences custom -->
-    <string name="custom_daily">Custom daily puzzle source</string>
+    <string name="custom_daily">Custom Daily Puzzle Source</string>
     <string name="custom_daily_title">Custom daily</string>
-    <string name="custom">Use custom source</string>
-    <string name="custom_desc">Specify source URL below</string>
-    <string name="custom_title">Puzzle name</string>
-    <string name="custom_title_desc">Enter title for puzzle list</string>
+    <string name="custom">Use Custom Source</string>
+    <string name="custom_desc">Specify source URL below.</string>
+    <string name="custom_title">Puzzle Name</string>
+    <string name="custom_title_desc">Enter title for puzzle list.</string>
     <string name="custom_url">Source URL</string>
     <string name="custom_url_desc">Enter URL formatted according to Java\'s DateTimeFormatter. The puzzle can be in any supported format.</string>
 
@@ -380,7 +380,7 @@
     <string name="grid_ratio_forty_pcnt">40\% display height</string>
     <string name="grid_ratio_fifty_pcnt">50\% display height</string>
     <string name="grid_ratio_sixty_pcnt">60\% display height</string>
-    <string name="clue_below_grid">Clue below grid</string>
+    <string name="clue_below_grid">Clue Below Grid</string>
     <string name="clue_below_grid_desc">Display the selected clue below the grid instead of in the app title bar.</string>
 
     <!-- preferences external -->
@@ -602,21 +602,21 @@
     <string name="command_announce_clue">Announce</string>
     <string name="command_current_clue_help">Help</string>
     <string name="command_jump_random">Jump</string>
-    <string name="voice_with_volume">Volume down activates voice</string>
+    <string name="voice_with_volume">Volume Down Activates Voice</string>
     <string name="voice_with_volume_desc">Use the volume down key to activate voice command input during play.</string>
-    <string name="voice_with_button">Show button to activate voice</string>
+    <string name="voice_with_button">Show Button to Activate Voice</string>
     <string name="voice_with_button_desc">Add an on-screen button to activate voice command input.</string>
     <string name="about_voice_commands">About Voice Commands</string>
-    <string name="announce_clue_button">Show button to announce clue</string>
+    <string name="announce_clue_button">Show Button to Announce Clue</string>
     <string name="announce_clue_button_desc">Add an on-screen button to announce current clue and word contents. Uses accessibility service if running.</string>
     <string name="speech_not_ready">Speech service not ready.</string>
     <string name="voice_command">Voice Command</string>
     <string name="announce_clue_label">Announce Clue</string>
-    <string name="announce_clue_equals">Announce clue with equals key</string>
+    <string name="announce_clue_equals">Announce Clue with Equals Key</string>
     <string name="announce_clue_equals_desc">Press equals key to announce current clue and word.</string>
-    <string name="announce_clue_always">Always announce clues</string>
+    <string name="announce_clue_always">Always Announce Clues</string>
     <string name="announce_clue_always_desc">Always announce clues on change, not just when an accessibility service is active.</string>
-    <string name="announce_box_always">Always announce boxes</string>
+    <string name="announce_box_always">Always Announce Boxes</string>
     <string name="announce_box_always_desc">Always announce box contents on change, not just when an accessibility service is active.</string>
 
     <!-- Ask AI for Help -->
