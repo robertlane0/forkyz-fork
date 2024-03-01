@@ -77,7 +77,6 @@
         <activity
             tools:ignore="UnusedAttribute"
             android:name="app.crossword.yourealwaysbe.forkyz.PlayActivity"
-            android:hardwareAccelerated="false"
             android:configChanges="keyboard|keyboardHidden|orientation"
             android:theme="@style/Theme.Forkyz"
             android:windowSoftInputMode="adjustResize"

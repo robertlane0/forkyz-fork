@@ -317,7 +317,6 @@ public class PlayActivity extends PuzzleActivity
             }
         });
 
-
         binding.clueLineBelowGrid.prevClueButton.setOnClickListener(
             view -> {
                 Playboard b = getBoard();

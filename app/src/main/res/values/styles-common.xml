@@ -42,6 +42,7 @@
         <item name="android:textColor">?attr/colorOnSurface</item>
     </style>
     <style name="clueLineButtonStyle" parent="Widget.Material3.Button.IconButton">
+        <item name="android:foreground">?attr/selectableItemBackground</item>
         <item name="iconTint">?attr/colorOnSurface</item>
     </style>
     <style name="clueListItemStyle" parent="Widget.Material3.CheckedTextView">
