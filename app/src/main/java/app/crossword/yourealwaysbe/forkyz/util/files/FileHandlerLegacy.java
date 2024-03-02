@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 
 import android.content.Context;
 import android.os.Environment;
+import android.os.StatFs;
 
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 
@@ -34,9 +35,12 @@ public class FileHandlerLegacy extends FileHandlerJavaFile {
 
     @Override
     public boolean isStorageFull(AndroidVersionUtils utils) {
-        return utils.isExternalStorageDirectoryFull(
-            Environment.getExternalStorageDirectory(),
-            MINIMUM_STORAGE_REQUIRED
+        StatFs stats = new StatFs(
+            Environment.getExternalStorageDirectory().getAbsolutePath()
+        );
+        return (
+            stats.getAvailableBlocksLong() * stats.getBlockSizeLong()
+                < MINIMUM_STORAGE_REQUIRED
         );
     }
 }

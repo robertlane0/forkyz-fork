@@ -39,8 +39,6 @@
                     android:paddingBottom="?dialogPreferredPadding"
                     android:paddingStart="?dialogPreferredPadding"
                     android:paddingEnd="?dialogPreferredPadding"
-                    android:paddingLeft="?dialogPreferredPadding"
-                    android:paddingRight="?dialogPreferredPadding"
                 />
             </ScrollView>
             <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -49,7 +47,6 @@
                 android:layout_height="wrap_content"
                 app:fabSize="normal"
                 android:layout_alignParentBottom="true"
-                android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"
                 android:layout_margin="16dp"
                 android:contentDescription="@string/back"

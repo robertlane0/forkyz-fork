@@ -31,9 +31,7 @@
                 android:gravity="center_vertical"
                 android:checkMark="?android:attr/listChoiceIndicatorSingle"
                 android:paddingStart="?android:attr/listPreferredItemPaddingStart"
-                android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"
                 android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
-                android:paddingRight="?android:attr/listPreferredItemPaddingRight"
                 android:theme="@style/clueListItemStyle"
             />
         </FrameLayout>
@@ -46,9 +44,7 @@
             android:focusableInTouchMode="false"
             android:contentDescription="@string/clue_word"
             android:paddingStart="?android:attr/listPreferredItemPaddingStart"
-            android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"
             android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
-            android:paddingRight="?android:attr/listPreferredItemPaddingRight"
             android:layout_marginTop="2sp"
             android:layout_marginBottom="4sp"
         />

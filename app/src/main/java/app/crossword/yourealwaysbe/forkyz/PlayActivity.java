@@ -335,8 +335,7 @@ public class PlayActivity extends PuzzleActivity
         DisplayMetrics metrics = getResources().getDisplayMetrics();
         settings.getPlayFitToScreen(fitToScreen -> {
             if (fitToScreen || (
-                    isLandscape(metrics)
-                    && (isTabletish(metrics) || isMiniTabletish(metrics))
+                    isLandscape(metrics) && isTabletish(metrics)
                 )
             ) {
                 this.handler.postDelayed(fitToScreenTask, 100);
@@ -1230,10 +1229,6 @@ public class PlayActivity extends PuzzleActivity
         } else {
             return false;
         }
-    }
-
-    private boolean isMiniTabletish(DisplayMetrics metrics) {
-        return utils.isMiniTabletish(metrics);
     }
 
     /**

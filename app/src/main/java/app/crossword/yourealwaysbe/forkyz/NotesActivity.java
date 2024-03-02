@@ -457,7 +457,7 @@ public class NotesActivity extends PuzzleActivity {
 
         char c = Character.toUpperCase(event.getDisplayLabel());
 
-        if (utils.isAcceptableCharacterResponse(c)) {
+        if (isAcceptableCharacterResponse(c)) {
             Playboard board = getBoard();
             if (board != null) {
                 Word w = board.getCurrentWord();
@@ -1264,7 +1264,7 @@ public class NotesActivity extends PuzzleActivity {
         StringBuilder sb = new StringBuilder();
         for (int i = start; i < source.length(); i++) {
             char c = source.charAt(i);
-            if (utils.isAlphabetic(c)) {
+            if (Character.isAlphabetic(c)) {
                 sb.append(Character.toUpperCase(c));
                 if (sb.length() >= length)
                     break;
@@ -1275,5 +1275,9 @@ public class NotesActivity extends PuzzleActivity {
 
     private void clearAnagramPrediction() {
         binding.anagramSource.clearShadow();
+    }
+
+    private boolean isAcceptableCharacterResponse(char c) {
+        return !Character.isISOControl(c) && !Character.isSurrogate(c);
     }
 }

@@ -23,8 +23,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 
@@ -433,9 +435,14 @@ public class BrowseActivity extends ForkyzActivity {
 
         // Now create!
 
-        getImportURI = utils.registerForUriContentsResult(
-            this,
-            uris -> { onImportURIs(uris); }
+        getImportURI = registerForActivityResult(
+            new ActivityResultContracts.GetMultipleContents(),
+            new ActivityResultCallback<List<Uri>>() {
+                @Override
+                public void onActivityResult(List<Uri> uris) {
+                    onImportURIs(uris);
+                }
+            }
         );
 
         binding = BrowseBinding.inflate(getLayoutInflater());

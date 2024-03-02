@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
+import app.crossword.yourealwaysbe.forkyz.util.NetUtils;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.io.WallStreetJournalJSONIO;
@@ -50,7 +51,7 @@ public class WSJStreamScraper extends AbstractStreamScraper {
 
         try(
             InputStream jsonIS
-                = utils.apacheGetInputStream(jsonURL, null, getTimeout())
+                = NetUtils.apacheGetInputStream(jsonURL, null, getTimeout())
         ) {
             Puzzle puz = WallStreetJournalJSONIO.readPuzzle(jsonIS);
             if (puz != null) {

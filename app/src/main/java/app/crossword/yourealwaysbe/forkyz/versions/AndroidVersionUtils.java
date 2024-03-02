@@ -1,11 +1,7 @@
 package app.crossword.yourealwaysbe.forkyz.versions;
 
-import java.io.InputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
 import android.app.Activity;
@@ -18,12 +14,10 @@ import android.speech.tts.TextToSpeech;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
-import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import dagger.Module;
@@ -53,12 +47,8 @@ public interface AndroidVersionUtils {
                 return new MarshmallowUtil();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
                 return new LollipopUtil();
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
-                return new JellyBeanMR2Util();
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
-                return new JellyBeanMR1Util();
 
-            return new IceCreamSandwichUtil();
+            return new KitKatUtil();
         }
     }
 
@@ -84,13 +74,7 @@ public interface AndroidVersionUtils {
         BackgroundDownloadManager downloadManager
     );
 
-    boolean isMiniTabletish(DisplayMetrics metrics);
-
     void setFullScreen(Window window);
-
-    ActivityResultLauncher<String> registerForUriContentsResult(
-        AppCompatActivity activity, Consumer<List<Uri>> uriConsumer
-    );
 
     void finishAndRemoveTask(Activity activity);
 
@@ -100,22 +84,11 @@ public interface AndroidVersionUtils {
         Context context, long minimumBytesFree
     ) throws IOException;
 
-    boolean isExternalStorageDirectoryFull(
-        File directory, long minimumBytesFree
-    );
-
     boolean isSAFSupported();
 
     ActivityResultLauncher<Uri> registerForSAFUriResult(
         Fragment fragment, Consumer<Uri> uriConsumer
     );
-
-    /**
-     * True if the character can go into a box
-     *
-     * I.e. not a control char of some kind
-     */
-    boolean isAcceptableCharacterResponse(char c);
 
     boolean hasNetworkConnection(Context context);
 
@@ -143,13 +116,6 @@ public interface AndroidVersionUtils {
      * If rationale is needed when requesting notification permission
      */
     boolean shouldShowRequestNotificationPermissionRationale(Activity activity);
-
-    /**
-     * Calls announceForAccessibility on view if available
-     *
-     * And text not null
-     */
-    void announceForAccessibility(View view, CharSequence text);
 
     /**
      * Call invalidateInput or restartInput as available
@@ -182,25 +148,4 @@ public interface AndroidVersionUtils {
      * nothing before API 21.
      */
     public void setupBottomInsets(View view);
-
-    /**
-     * Character.isAlphabetic
-     *
-     * Defaults to isLetter pre KITKAT
-     */
-    public boolean isAlphabetic(char c);
-
-    /**
-     * Get url with Apache HttpClient
-     *
-     * Only for API 19 and above, else calls through to
-     * NetUtils.getInputStream
-     *
-     * @param url
-     * @param headers headers to add to request
-     * @param timeout timeout in ms for get
-     */
-    public InputStream apacheGetInputStream(
-        String url, Map<String, String> headers, int timeout
-    ) throws IOException;
 }

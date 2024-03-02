@@ -965,9 +965,9 @@ public abstract class PuzzleActivity
         CharSequence text, boolean onlyIfAccessibilityService
     ) {
         if (isAccessibilityServiceRunning()) {
-            utils.announceForAccessibility(
-                findViewById(android.R.id.content), text
-            );
+            View content = findViewById(android.R.id.content);
+            if (content != null && text != null)
+                content.announceForAccessibility(text);
         } else if (!onlyIfAccessibilityService) {
             if (ttsService == null) {
                 ttsService = new TextToSpeech(

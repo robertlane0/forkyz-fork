@@ -8,15 +8,13 @@ import org.junit.Test;
 import static org.junit.Assert.assertNotNull;
 
 import app.crossword.yourealwaysbe.forkyz.util.NetUtils;
-import app.crossword.yourealwaysbe.forkyz.versions.TiramisuUtil;
+//import app.crossword.yourealwaysbe.forkyz.versions.TiramisuUtil;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.io.PuzzleParser;
 
 public class StreamScrapersTest {
 
     private static final int TIMEOUT = 30000;
-
-    private static final TiramisuUtil utils = new TiramisuUtil();
 
     @Test
     public void testCrosswordNexus() throws Exception {
@@ -104,7 +102,9 @@ public class StreamScrapersTest {
     private static void testScraperApache(
         String url, PuzzleParser scraper
     ) throws Exception {
-        try (InputStream is = utils.apacheGetInputStream(url, null, TIMEOUT)) {
+        try (
+            InputStream is = NetUtils.apacheGetInputStream(url, null, TIMEOUT)
+        ) {
             Puzzle puz = scraper.parseInput(is);
             assertNotNull(puz);
         }

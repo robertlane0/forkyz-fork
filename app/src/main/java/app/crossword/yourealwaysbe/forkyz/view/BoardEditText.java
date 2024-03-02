@@ -679,7 +679,7 @@ public class BoardEditText
     }
 
     private boolean isAcceptableCharacterResponse(char c) {
-        return utils.isAcceptableCharacterResponse(c);
+        return !Character.isISOControl(c) && !Character.isSurrogate(c);
     }
 
     /**
