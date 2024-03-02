@@ -971,13 +971,17 @@ public class Playboard implements Serializable {
         Position curPos = this.getHighlightLetter();
         Position newPos = getClueEnd(getClueID());
 
+        pushNotificationDisabled();
+
         if (!Objects.equals(newPos, curPos)) {
-            pushNotificationDisabled();
             setHighlightLetter(newPos);
-            popNotificationDisabled();
         }
 
         MovementStrategy.MOVE_NEXT_CLUE.move(this, skipCompletedLetters);
+
+        popNotificationDisabled();
+
+        setHighlightLetter(getClueStart(getClueID()));
 
         return previous;
     }
