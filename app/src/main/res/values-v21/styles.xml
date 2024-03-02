@@ -4,7 +4,7 @@
     <style name="keyboardHideBarStyle" parent="Theme.Forkyz">
         <item name="android:backgroundTint">#000000</item>
         <item name="android:background">#000000</item>
-        <item name="android:tint">#ffffff</item>
+        <item name="materialButtonStyle">@style/keyboardHideButtonStyle</item>
     </style>
     <style
         name="appBarLayoutStyle"

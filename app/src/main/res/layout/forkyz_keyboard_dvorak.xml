@@ -25,7 +25,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="3"
-            app:srcCompat="@drawable/delete"
+            app:icon="@drawable/delete"
             android:contentDescription="@string/key_delete"
             app:keyCode="67"
         />
@@ -34,7 +34,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="3"
-            app:srcCompat="@drawable/ic_change_direction"
+            app:icon="@drawable/ic_change_direction"
             android:contentDescription="@string/change_direction"
             app:specialKeyCode="0"
         />
@@ -283,7 +283,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="2"
-            app:srcCompat="@drawable/arrow_up"
+            app:icon="@drawable/arrow_up"
+            app:iconSize="@dimen/keyboardArrowSize"
             android:contentDescription="@string/key_up"
             app:keyCode="19"
         />
@@ -292,7 +293,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="2"
-            app:srcCompat="@drawable/arrow_down"
+            app:icon="@drawable/arrow_down"
+            app:iconSize="@dimen/keyboardArrowSize"
             android:contentDescription="@string/key_down"
             app:keyCode="20"
         />
@@ -301,7 +303,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="2"
-            app:srcCompat="@drawable/ic_prev_clue"
+            app:icon="@drawable/ic_prev_clue"
             android:contentDescription="@string/prev_clue"
             app:specialKeyCode="2"
         />
@@ -316,7 +318,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="6"
             android:layout_gravity="center"
-            app:srcCompat="@drawable/space"
+            app:icon="@drawable/space"
             android:contentDescription="@string/key_space"
             app:keyCode="62"
         />
@@ -330,7 +332,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="2"
-            app:srcCompat="@drawable/ic_next_clue"
+            app:icon="@drawable/ic_next_clue"
             android:contentDescription="@string/next_clue"
             app:specialKeyCode="1"
         />
@@ -339,7 +341,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="2"
-            app:srcCompat="@drawable/arrow_left"
+            app:icon="@drawable/arrow_left"
+            app:iconSize="@dimen/keyboardArrowSize"
             android:contentDescription="@string/key_left"
             app:keyCode="21"
         />
@@ -348,7 +351,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="2"
-            app:srcCompat="@drawable/arrow_right"
+            app:icon="@drawable/arrow_right"
+            app:iconSize="@dimen/keyboardArrowSize"
             android:contentDescription="@string/key_right"
             app:keyCode="22"
         />
@@ -361,7 +365,7 @@
         android:orientation="vertical"
         android:theme="@style/keyboardHideBarStyle"
     >
-        <ImageButton
+        <Button
             android:id="@+id/key_hide"
             android:layout_width="wrap_content"
             android:layout_height="40sp"
@@ -371,7 +375,7 @@
             android:paddingEnd="10sp"
             android:layout_marginLeft="20sp"
             android:layout_marginStart="20sp"
-            app:srcCompat="@drawable/ic_keyboard_hide"
+            app:icon="@drawable/ic_keyboard_hide"
             android:contentDescription="@string/hide_keyboard"
         />
     </LinearLayout>

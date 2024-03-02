@@ -27,14 +27,13 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
-import android.widget.ImageButton;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.IntDef;
-import androidx.appcompat.widget.AppCompatButton;
-import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.core.view.LayoutInflaterCompat;
 import androidx.lifecycle.ViewTreeLifecycleOwner;
+import com.google.android.material.button.MaterialButton;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -278,7 +277,7 @@ public class ForkyzKeyboard
         // initially hide unless special key listener is set
         setupSpecialKeys();
 
-        ImageButton hideButton = (ImageButton) findViewById(R.id.key_hide);
+        Button hideButton = (Button) findViewById(R.id.key_hide);
         hideButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 ForkyzKeyboard.this.setVisibility(View.GONE);
@@ -427,12 +426,12 @@ public class ForkyzKeyboard
             View parent, String tag, Context context, AttributeSet attrs
         ) {
             if (FORKYZ_TEXT_KEY.equals(tag)) {
-                TextView view = new AppCompatButton(context, attrs);
+                TextView view = new MaterialButton(context, attrs);
                 setButtonPadding(view, context, attrs);
                 setupButton(view, context, attrs);
                 return view;
             } else if (FORKYZ_IMAGE_KEY.equals(tag)) {
-                View view = new AppCompatImageButton(context, attrs);
+                View view = new MaterialButton(context, attrs);
                 setButtonPadding(view, context, attrs);
                 setupButton(view, context, attrs);
                 return view;

@@ -8,26 +8,33 @@
     <style name="submenuHeaderStyle" parent="Widget.Material3.PopupMenu">
     </style>
     <style name="keyboardStyle" parent="Theme.Forkyz">
-        <item name="buttonStyle">@style/keyboardButtonStyle</item>
-        <item name="android:buttonStyle">@style/keyboardButtonStyle</item>
-        <item name="imageButtonStyle">@style/keyboardImageButtonStyle</item>
-        <item name="android:imageButtonStyle">@style/keyboardImageButtonStyle</item>
+        <item name="materialButtonStyle">@style/keyboardButtonStyle</item>
     </style>
-    <style name="keyboardButtonStyle" parent="Theme.Forkyz">
+    <style
+        name="keyboardButtonStyle"
+        parent="Widget.Material3.Button.IconButton"
+    >
         <item name="android:textSize">@dimen/keyboardTextSize</item>
+        <item name="android:textColor">?attr/colorOnBackground</item>
         <item name="android:gravity">center</item>
-        <item name="android:background">?attr/selectableItemBackground</item>
-        <item name="android:tint">?attr/colorOnBackground</item>
-    </style>
-    <style name="keyboardImageButtonStyle" parent="Theme.Forkyz">
-        <item name="android:background">?attr/selectableItemBackground</item>
-        <item name="android:gravity">center</item>
-        <item name="android:tint">?attr/colorOnBackground</item>
+        <item name="iconTint">?attr/colorOnBackground</item>
+        <item name="iconGravity">textStart</item>
+        <item name="android:insetLeft">0dp</item>
+        <item name="android:insetRight">0dp</item>
     </style>
     <style name="keyboardDividerStyle" parent="Theme.Forkyz">
         <item name="android:background">?attr/colorOutline</item>
     </style>
     <!-- keyboardHideBarStyle in styles.xml in variant folders -->
+    <style
+        name="keyboardHideButtonStyle"
+        parent="Widget.Material3.Button.IconButton"
+    >
+        <item name="android:gravity">center</item>
+        <item name="iconTint">#ffffff</item>
+        <item name="iconGravity">textStart</item>
+        <item name="rippleColor">#555555</item>
+    </style>
     <style name="speedDialStyle">
         <item name="colorOnPrimaryContainer">?attr/colorOnPrimary</item>
     </style>
@@ -41,8 +48,10 @@
         <item name="titleTextColor">?attr/colorOnSurface</item>
         <item name="android:textColor">?attr/colorOnSurface</item>
     </style>
-    <style name="clueLineButtonStyle" parent="Widget.Material3.Button.IconButton">
-        <item name="android:foreground">?attr/selectableItemBackground</item>
+    <style
+        name="clueLineButtonStyle"
+        parent="Widget.Material3.Button.IconButton"
+    >
         <item name="iconTint">?attr/colorOnSurface</item>
     </style>
     <style name="clueListItemStyle" parent="Widget.Material3.CheckedTextView">
