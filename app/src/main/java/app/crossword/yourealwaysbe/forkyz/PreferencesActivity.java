@@ -36,6 +36,7 @@ public class PreferencesActivity
         setSupportActionBar(findViewById(R.id.toolbar));
         holographic();
         setupBottomInsets(findViewById(R.id.content));
+        setStatusBarElevation(findViewById(R.id.app_bar_layout));
 
         SharedPreferences prefs
             = PreferenceManager.getDefaultSharedPreferences(this);

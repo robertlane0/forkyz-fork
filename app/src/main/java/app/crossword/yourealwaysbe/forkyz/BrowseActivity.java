@@ -449,6 +449,7 @@ public class BrowseActivity extends ForkyzActivity {
         this.setContentView(binding.getRoot());
         setSupportActionBar(binding.toolbar);
         setupBottomInsets(binding.content);
+        setStatusBarElevation(binding.appBarLayout);
 
         setDefaultKeyMode(DEFAULT_KEYS_SHORTCUT);
         binding.puzzleList.setLayoutManager(new LinearLayoutManager(this));
@@ -1502,5 +1503,4 @@ public class BrowseActivity extends ForkyzActivity {
             getActivity().finish();
         }
     }
-
 }

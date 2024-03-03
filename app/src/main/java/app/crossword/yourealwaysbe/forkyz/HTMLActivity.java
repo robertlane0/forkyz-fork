@@ -49,6 +49,7 @@ public class HTMLActivity extends ForkyzActivity {
         finishOnHomeButton();
         setContentView(binding.getRoot());
         setupBottomInsets(binding.content);
+        setStatusBarElevation(binding.appBarLayout);
 
         String assetName = this.getIntent().getData().toString();
         startLoadAssetName(assetName);

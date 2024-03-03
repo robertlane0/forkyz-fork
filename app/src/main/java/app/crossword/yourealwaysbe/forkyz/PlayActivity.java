@@ -122,6 +122,7 @@ public class PlayActivity extends PuzzleActivity
         holographic();
         finishOnHomeButton();
         setupBottomInsets(binding.constraintLayout);
+        setStatusBarElevation(binding.appBarLayout);
 
         setDefaultKeyMode(Activity.DEFAULT_KEYS_DISABLE);
 

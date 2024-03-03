@@ -80,6 +80,7 @@ public class ClueListActivity extends PuzzleActivity
         holographic();
         finishOnHomeButton();
         setupBottomInsets(binding.content);
+        setStatusBarElevation(binding.appBarLayout);
 
         binding.miniboard.setAllowOverScroll(false);
 

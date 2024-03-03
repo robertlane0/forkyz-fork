@@ -18,6 +18,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.text.HtmlCompat;
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.shape.MaterialShapeDrawable;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -173,5 +175,19 @@ public class ForkyzActivity extends AppCompatActivity {
      */
     protected void setupBottomInsets(View view) {
         utils.setupBottomInsets(view);
+    }
+
+    /**
+     * Set the elevation to match the app bar
+     *
+     * Uses @dimen/appBarElevation rather than the default material which is to
+     * have no app bar elevation unless there is some scrolling involved.
+     */
+    protected void setStatusBarElevation(AppBarLayout appBarLayout) {
+        appBarLayout.setStatusBarForeground(
+            MaterialShapeDrawable.createWithElevationOverlay(
+                this, getResources().getDimension(R.dimen.appBarElevation)
+            )
+        );
     }
 }

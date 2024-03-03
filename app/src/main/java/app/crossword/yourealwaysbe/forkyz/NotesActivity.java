@@ -125,6 +125,7 @@ public class NotesActivity extends PuzzleActivity {
         holographic();
         finishOnHomeButton();
         setupBottomInsets(binding.content);
+        setStatusBarElevation(binding.appBarLayout);
 
         int clueTextSize
             = getResources().getInteger(R.integer.clue_text_size);
