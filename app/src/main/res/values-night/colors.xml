@@ -30,6 +30,12 @@
     <color name="inversePrimary">#52a9df</color>
     <color name="surfaceTint">#999</color>
 
+    <color name="surfaceContainerLowest">#222</color>
+    <color name="surfaceContainerLow">#282828</color>
+    <color name="surfaceContainer">#2a2a2a</color>
+    <color name="surfaceContainerHigh">#2b2b2b</color>
+    <color name="surfaceContainerHighest">#2d2d2d</color>
+
     <color name="cellColor">#333</color>
     <color name="blockColor">#000</color>
     <color name="onBlockColor">#aaa</color>

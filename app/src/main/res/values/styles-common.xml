@@ -65,4 +65,7 @@
         name="actionBarStyle"
         parent="@style/ThemeOverlay.Material3.ActionBar"
     />
+    <style name="datePickerStyle">
+        <item name="android:textColor">@color/primary</item>
+    </style>
 </resources>

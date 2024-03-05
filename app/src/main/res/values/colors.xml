@@ -30,6 +30,12 @@
     <color name="inversePrimary">#bdaa87</color>
     <color name="surfaceTint">@color/primary</color>
 
+    <color name="surfaceContainerLowest">#eaeaea</color>
+    <color name="surfaceContainerLow">#e1e2e4</color>
+    <color name="surfaceContainer">#dedfe1</color>
+    <color name="surfaceContainerHigh">#dcdde0</color>
+    <color name="surfaceContainerHighest">#dadbdf</color>
+
     <color name="currentWordHighlightColor">#FFAE57</color>
     <color name="currentLetterHighlightColor">#EB6000</color>
     <color name="cheatedColor">#FFE0E0</color>
@@ -55,4 +61,9 @@
     <color name="primaryDark">#334465</color>
     <color name="speedDialTint">#ff669900</color>
     <color name="speedDialIconTint">#fff</color>
+    <color name="legacySurfaceContainerLowest">#eaeaea</color>
+    <color name="legacySurfaceContainerLow">#eaeaea</color>
+    <color name="legacySurfaceContainer">#eaeaea</color>
+    <color name="legacySurfaceContainerHigh">#eaeaea</color>
+    <color name="legacySurfaceContainerHighest">#eaeaea</color>
 </resources>

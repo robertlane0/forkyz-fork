@@ -3,6 +3,22 @@
     <!-- base variant to be extended for v21+ and below -->
     <style name="Theme.Forkyz.LegacyLike.Base" parent="Theme.Forkyz">
         <item name="elevationOverlayColor">#fff</item>
+        <item name="colorSurfaceContainerLowest">
+            @color/legacySurfaceContainerLowest
+        </item>
+        <item name="colorSurfaceContainerLow">
+            @color/legacySurfaceContainerLow
+        </item>
+        <item name="colorSurfaceContainer">
+            @color/legacySurfaceContainer
+        </item>
+        <item name="colorSurfaceContainerHigh">
+            @color/legacySurfaceContainerHigh
+        </item>
+        <item name="colorSurfaceContainerHighest">
+            @color/legacySurfaceContainerHighest
+        </item>
+
         <item name="toolbarStyle">@style/legacyToolbar</item>
         <item name="appBarLayoutStyle">@style/legacyAppBarLayout</item>
         <!-- not actionBarTheme like in standard theme, weirdly -->
