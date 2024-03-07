@@ -17,13 +17,6 @@ task checkstyle(type: Checkstyle) {
 }
 
 android {
-    Properties props = new Properties()
-
-    def propsPath = System.getProperty("user.home") + "/androidkeyinfo.properties"
-
-    if (new File(propsPath).exists())
-        props.load(new FileInputStream(propsPath))
-
     dataBinding.enabled = true
 
     compileSdkVersion 34
