@@ -48,7 +48,7 @@ android {
                 ]
             }
         }
-     }
+    }
 
     compileOptions.with {
         coreLibraryDesugaringEnabled true
