@@ -1,5 +1,13 @@
 # Forkyz Changelog
 
+## Version 51
+
+- Add compact option for Forkyz keyboard (keyboard settings).
+- Add grid/clue ratio option for Play screen (display settings).
+- Add optional clue line below grid (display settings).
+- Add NYT Syndicated downloader and Pzzl.com share-import.
+- Target Android 14, update libs, min version KitKat now.
+
 ## Version 50
 
 - Import puzzles by sharing a URL with Forkyz (works with links to puzzle files and webpages for Crossword Nexus, Exolve, Guardian, Hamburger Abendblatt, Metro (UK), Przekroj, De Standaard, De Telegraaf, Wall Street Journal (sometimes), and similar).

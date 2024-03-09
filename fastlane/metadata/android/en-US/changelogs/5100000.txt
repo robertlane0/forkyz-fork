@@ -1,0 +1,5 @@
+- Add compact option for Forkyz keyboard (keyboard settings).
+- Add grid/clue ratio option for Play screen (display settings).
+- Add optional clue line below grid (display settings).
+- Add NYT Syndicated downloader and Pzzl.com share-import.
+- Target Android 14, update libs, min version KitKat now.
