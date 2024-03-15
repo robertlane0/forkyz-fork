@@ -269,10 +269,16 @@ public class NotesActivity extends PuzzleActivity {
             new BoardEditText.SelectionListener() {
                 @Override
                 public void onSelect(int pos) {
-                    if (pos >= 0)
-                        predictAnagramChars();
-                    else
+                    if (pos >= 0) {
+                        settings.getPlayPredictAnagramChars(predict -> {
+                            if (predict)
+                                predictAnagramChars();
+                            else
+                                clearAnagramPrediction();
+                        });
+                    } else {
                         clearAnagramPrediction();
+                    }
                 }
             }
         );
@@ -578,8 +584,10 @@ public class NotesActivity extends PuzzleActivity {
             @Override
             public void postChange(int pos, char oldChar, boolean isDelete) {
                 settings.getPlayPredictAnagramChars(predict -> {
-                    if (!predict)
+                    if (!predict) {
+                        clearAnagramPrediction();
                         return;
+                    }
 
                     String prediction = predictAnagramChars();
 
