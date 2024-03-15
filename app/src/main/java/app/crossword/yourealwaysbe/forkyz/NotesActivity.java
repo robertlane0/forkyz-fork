@@ -259,9 +259,10 @@ public class NotesActivity extends PuzzleActivity {
                         int j = rand.nextInt(len);
                         char ci = binding.anagramSource.getResponse(i);
                         char cj = binding.anagramSource.getResponse(j);
-                        binding.anagramSource.setResponse(i, cj);
-                        binding.anagramSource.setResponse(j, ci);
+                        binding.anagramSource.setResponse(i, cj, false);
+                        binding.anagramSource.setResponse(j, ci, false);
                     }
+                    binding.anagramSource.render();
                 }
             }
         );
@@ -628,8 +629,9 @@ public class NotesActivity extends PuzzleActivity {
             }
 
             public char filter(char oldChar, char newChar, int pos) {
-                boolean changed
-                    = NotesActivity.this.preAnagramSolResponse(pos, newChar);
+                boolean changed = NotesActivity.this.preAnagramSolResponse(
+                    pos, newChar, true
+                );
                 return changed ? newChar : '\0';
             }
         };
@@ -726,12 +728,14 @@ public class NotesActivity extends PuzzleActivity {
                 String newResponse = boxes[i].getResponse();
                 if (newResponse != null && !newResponse.isEmpty()) {
                     char newChar = newResponse.charAt(0);
-                    boolean allowed = preAnagramSolResponse(i, newChar);
+                    boolean allowed = preAnagramSolResponse(i, newChar, false);
                     if (allowed)
-                        binding.anagramSolution.setResponse(i, newChar);
+                        binding.anagramSolution.setResponse(i, newChar, false);
                 }
             }
         }
+        binding.anagramSource.render();
+        binding.anagramSolution.render();
     }
 
     private boolean hasConflict(Box[] source,
@@ -760,9 +764,10 @@ public class NotesActivity extends PuzzleActivity {
         int length = Math.min(boxes.length, view.getLength());
         for (int i = 0; i < length; i++) {
             if (!boxes[i].isBlank()) {
-                view.setResponse(i, boxes[i].getResponse());
+                view.setResponse(i, boxes[i].getResponse(), false);
             }
         }
+        view.render();
     }
 
     /**
@@ -770,14 +775,18 @@ public class NotesActivity extends PuzzleActivity {
      *
      * Changes source/sol boxes by moving required letters around.
      *
+     * @param whether to render changes right away (if false, render
+     * will need to be called on the anagram source and solution later)
      * @return true if play of letter can proceed
      */
-    private boolean preAnagramSolResponse(int pos, char newChar) {
+    private boolean preAnagramSolResponse(
+        int pos, char newChar, boolean render
+    ) {
         char oldChar = binding.anagramSolution.getResponse(pos);
         int sourceLen = binding.anagramSource.getLength();
         for (int i = 0; i < sourceLen; i++) {
             if (binding.anagramSource.getResponse(i) == newChar) {
-                binding.anagramSource.setResponse(i, oldChar);
+                binding.anagramSource.setResponse(i, oldChar, render);
                 return true;
             }
         }
@@ -786,7 +795,7 @@ public class NotesActivity extends PuzzleActivity {
         int solLen = binding.anagramSolution.getLength();
         for (int i = 0; i < solLen; i++) {
             if (binding.anagramSolution.getResponse(i) == newChar) {
-                binding.anagramSolution.setResponse(i, oldChar);
+                binding.anagramSolution.setResponse(i, oldChar, render);
                 return true;
             }
         }
@@ -1201,29 +1210,33 @@ public class NotesActivity extends PuzzleActivity {
      * after the characters entered so far.
      */
     private String predictAnagramChars(){
-        clearAnagramPrediction();
-
         if (isPuzzleNotes())
             return null;
 
         Playboard board = getBoard();
         Clue clue = (board == null) ? null : board.getClue();
-        if (clue == null)
+        if (clue == null) {
+            clearAnagramPrediction();
             return null;
+        }
 
         // only make a prediction if all characters are at the
         // start of the source box (i.e. user is currently
         // filling)
         int numLeadChars = countLeadChars();
-        if (numLeadChars == 0 || numLeadChars != numAnagramLetters)
+        if (numLeadChars == 0 || numLeadChars != numAnagramLetters) {
+            clearAnagramPrediction();
             return null;
+        }
 
         String leadChars = binding.anagramSource.toString(true);
         String hint = clue.getHint();
 
         // only predict if not editing lead chars
-        if (binding.anagramSource.getSelectedCol() < leadChars.length())
+        if (binding.anagramSource.getSelectedCol() < leadChars.length()) {
+            clearAnagramPrediction();
             return null;
+        }
 
         // strip HTML and spaces
         String strippedHint = hint.replaceAll("<[^>]*>|[^\\p{IsAlphabetic}]", "");
@@ -1232,8 +1245,10 @@ public class NotesActivity extends PuzzleActivity {
         // https://www.baeldung.com/java-case-insensitive-string-matching
         Pattern p = Pattern.compile("(?i)" + leadChars);
         Matcher m = p.matcher(strippedHint);
-        if (!m.find())
+        if (!m.find()) {
+            clearAnagramPrediction();
             return null;
+        }
 
         String prediction = getUpperLetters(
             strippedHint, m.start(), binding.anagramSource.getLength()

@@ -1,6 +1,7 @@
 package app.crossword.yourealwaysbe.forkyz.view;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
@@ -151,9 +152,10 @@ public class BoardEditText
 
         int box = findPosition(point);
         if (box >= 0) {
-            setSelectedCol(box);
-            BoardEditText.this.render();
-            updateInputConnection();
+            if (setSelectedCol(box)) {
+                BoardEditText.this.render();
+                updateInputConnection();
+            }
         }
 
         super.onTap(point);
@@ -264,22 +266,49 @@ public class BoardEditText
     }
 
     public void setResponse(int pos, char c) {
-        setResponseNoInputConnectionUpdate(pos, c);
+        setResponse(pos, c, true);
+    }
+
+
+    /**
+     * Set response at pos and choose if render
+     *
+     * If not rendering, render() needs to be called separately when
+     * done. Used to avoid multiple renders for a sequence of updates.
+     */
+    public void setResponse(int pos, char c, boolean render) {
+        setResponseNoInputConnectionUpdate(pos, c, render);
         updateInputConnection();
     }
 
+    /**
+     * Do with render
+     */
     public void setResponseNoInputConnectionUpdate(int pos, char c) {
+        setResponseNoInputConnectionUpdate(pos, c, true);
+    }
+
+    /**
+     * Can choose not to render if you'll do it later anyway
+     */
+    public void setResponseNoInputConnectionUpdate(
+        int pos, char c, boolean render
+    ) {
         if (boxes != null && 0 <= pos && pos < boxes.length) {
             boxes[pos].setResponse(c);
             flagChanged(pos);
-            render();
+            if (render)
+                render();
             sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_TEXT_CHANGED);
         }
     }
 
-    public void setResponse(int pos, String c) {
+    /**
+     * See setResponse(int, char, boolean)
+     */
+    public void setResponse(int pos, String c, boolean render) {
         if (c != null && !c.isEmpty())
-            setResponse(pos, c.charAt(0));
+            setResponse(pos, c.charAt(0), render);
     }
 
     /**
@@ -335,9 +364,12 @@ public class BoardEditText
      * Set a string to display in the boxes as a note
      *
      * Can be used e.g. for predictive text. Will be displayed as
-     * smaller chars
+     * smaller chars. Does nothing if same shadow passed.
      */
     public void setShadow(String shadow) {
+        if (Objects.equals(this.shadow, shadow))
+            return;
+
         int oldLen = (this.shadow == null) ? 0 : this.shadow.length();
         int newLen = (shadow == null) ? 0 : shadow.length();
         int len = Math.max(oldLen, newLen);
@@ -526,7 +558,13 @@ public class BoardEditText
         return selection.getCol();
     }
 
-    public void setSelectedCol(int col) {
+    /**
+     * Returns true if changed
+     */
+    public boolean setSelectedCol(int col) {
+        if (col == selection.getCol())
+            return false;
+
         flagChanged(selection.getCol(), col);
         selection.setCol(col);
         updateInputConnection();
@@ -535,6 +573,8 @@ public class BoardEditText
         );
         if (selectionListener != null)
             selectionListener.onSelect(col);
+
+        return true;
     }
 
     private void onNewResponse(char character) {
@@ -549,7 +589,7 @@ public class BoardEditText
                 char oldChar = getResponse(enteredCol);
 
                 // we'll update later if the selection doesn't change
-                setResponseNoInputConnectionUpdate(enteredCol, c);
+                setResponseNoInputConnectionUpdate(enteredCol, c, false);
 
                 int col = enteredCol;
                 if (col < boxes.length - 1) {
@@ -581,7 +621,7 @@ public class BoardEditText
         }
     }
 
-    private void render() {
+    public void render() {
         render(false);
     }
 
