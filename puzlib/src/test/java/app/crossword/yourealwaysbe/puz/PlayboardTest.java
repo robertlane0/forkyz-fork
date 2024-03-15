@@ -592,6 +592,21 @@ public class PlayboardTest {
         assertTrue(notified.get());
     }
 
+    /**
+     * Test failure https://gitlab.com/Hague/forkyz/-/issues/86
+     */
+    @TestWithAndWithoutBlockObjects
+    public void testNextWord(boolean blockObjects) throws Exception {
+         Puzzle puz = loadTestPuz(blockObjects);
+         Playboard board = new Playboard(puz);
+
+         moveToPosition(board, 0, 0);
+         board.nextWord();
+
+         assertPosition(board, 0, 6);
+         assertEquals(board.getClueID().getListName(), "Across");
+    }
+
     private void checkNoMoveFullGrid(
         boolean blockObjects, MovementStrategy moveStrat
     ) throws Exception {

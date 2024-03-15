@@ -981,7 +981,7 @@ public class Playboard implements Serializable {
 
         popNotificationDisabled();
 
-        setHighlightLetter(getClueStart(getClueID()));
+        notifyChange();
 
         return previous;
     }
