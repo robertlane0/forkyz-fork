@@ -114,10 +114,17 @@ public class BoardFullEditView extends BoardEditView {
                 : null;
 
             executorService.execute(() -> {
-                Bitmap bitmap = renderer.draw(localChanges, suppressNotesList);
-                handler.post(() -> {
-                    setBitmap(bitmap, rescale);
-                });
+                try {
+                    lockRenderer();
+                    Bitmap bitmap = renderer.draw(localChanges, suppressNotesList);
+                    handler.post(() -> {
+                        try { setBitmap(bitmap, rescale); }
+                        finally { unlockRenderer(); }
+                    });
+                } catch (Exception e) {
+                    unlockRenderer();
+                    throw e;
+                }
             });
         });});
     }

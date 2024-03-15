@@ -4,8 +4,10 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Semaphore;
 import java.util.logging.Logger;
 import javax.inject.Inject;
+
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -51,6 +53,8 @@ public class BoardEditText
     private final ExecutorService executorService
         = Executors.newSingleThreadExecutor();
     private final Handler handler;
+    // so we don't render while we're posting a bitmap
+    private final Semaphore renderLock = new Semaphore(1);
 
     private BoxInputConnection currentInputConnection = null;
     private boolean nativeInput = false;
@@ -634,15 +638,24 @@ public class BoardEditText
             : Arrays.copyOf(changes, changes.length);
 
         executorService.execute(() -> {
-            Bitmap bitmap = renderer.drawBoxes(
-                boxes,
-                shadow,
-                renderChanges,
-                selection,
-                null,
-                getContentWidth()
-            );
-            handler.post(() -> { setBitmap(bitmap); });
+            try {
+                lockRenderer();
+                Bitmap bitmap = renderer.drawBoxes(
+                    boxes,
+                    shadow,
+                    renderChanges,
+                    selection,
+                    null,
+                    getContentWidth()
+                );
+                handler.post(() -> {
+                    try { setBitmap(bitmap); }
+                    finally { unlockRenderer(); }
+                });
+            } catch (Exception e) {
+                unlockRenderer();
+                throw e;
+            }
         });
 
         clearChanges();
@@ -780,4 +793,17 @@ public class BoardEditText
                 filter.postChange(pos, oldChar, isDelete);
         }
     }
+
+    /**
+     * Use these to ensure only one thread working on render bitmap
+     */
+    private void lockRenderer() {
+        try {
+            renderLock.acquire();
+        } catch (InterruptedException e) {
+            // um...
+        }
+    }
+
+    private void unlockRenderer() { renderLock.release(); }
 }

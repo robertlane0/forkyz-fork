@@ -206,16 +206,26 @@ public class BoardWordEditView extends BoardEditView {
         getSuppressNotesList(localSuppressNotesList -> {
             renderer.setHintHighlight(!suppressHints);
             executorService.execute(() -> {
-                Bitmap bitmap = renderer.drawWord(
-                    renderWord,
-                    localChanges,
-                    localSuppressNotesList,
-                    getContentWidth()
-                );
-                handler.post(() -> {
-                    if (isRendering())
-                        setBitmap(bitmap, rescale);
-                });
+                try {
+                    lockRenderer();
+                    Bitmap bitmap = renderer.drawWord(
+                        renderWord,
+                        localChanges,
+                        localSuppressNotesList,
+                        getContentWidth()
+                    );
+                    handler.post(() -> {
+                        try {
+                            if (isRendering())
+                                setBitmap(bitmap, rescale);
+                        } finally {
+                            unlockRenderer();
+                        }
+                    });
+                } catch (Exception e) {
+                    unlockRenderer();
+                    throw e;
+                }
             });
         });});
     }

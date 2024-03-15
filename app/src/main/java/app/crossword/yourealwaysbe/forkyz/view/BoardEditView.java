@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Semaphore;
 import javax.inject.Inject;
 
 import android.content.Context;
@@ -66,6 +67,8 @@ public abstract class BoardEditView
     protected final ExecutorService executorService
         = Executors.newSingleThreadExecutor();
     protected final Handler handler;
+    // so we don't render while we're posting a bitmap
+    private final Semaphore renderLock = new Semaphore(1);
 
     public interface BoardClickListener {
         default void onClick(Position position, Word previousWord) { }
@@ -370,6 +373,19 @@ public abstract class BoardEditView
 
     protected PlayboardRenderer getRenderer() { return renderer; }
     protected Playboard getBoard() { return board; }
+
+    /**
+     * Use these to ensure only one thread working on render bitmap
+     */
+    protected void lockRenderer() {
+        try {
+            renderLock.acquire();
+        } catch (InterruptedException e) {
+            // um...
+        }
+    }
+
+    protected void unlockRenderer() { renderLock.release(); }
 
     private String getCurrentResponse() {
         Playboard board = getBoard();
