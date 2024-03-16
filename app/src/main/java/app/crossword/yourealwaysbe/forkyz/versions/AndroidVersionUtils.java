@@ -39,6 +39,8 @@ public interface AndroidVersionUtils {
                 return new TiramisuUtil();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
                 return new RUtil();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                return new QUtil();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
                 return new PieUtil();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
@@ -148,4 +150,11 @@ public interface AndroidVersionUtils {
      * nothing before API 21.
      */
     public void setupBottomInsets(View view);
+
+    /**
+     * A regex for filtering all non alphabetic chars and tags from clue text
+     *
+     * (Before Android 10 "Alphabetic", since "IsAlphabetic")
+     */
+    public String getFilterClueToAlphabeticRegex();
 }

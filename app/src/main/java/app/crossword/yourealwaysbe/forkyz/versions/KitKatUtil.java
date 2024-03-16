@@ -169,4 +169,9 @@ public class KitKatUtil implements AndroidVersionUtils {
     public void setupBottomInsets(View view) {
         // do nothing
     }
+
+    @Override
+    public String getFilterClueToAlphabeticRegex() {
+        return "<[^>]*>|[^\\p{Alphabetic}]";
+    }
 }

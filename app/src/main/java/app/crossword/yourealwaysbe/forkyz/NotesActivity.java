@@ -1239,7 +1239,9 @@ public class NotesActivity extends PuzzleActivity {
         }
 
         // strip HTML and spaces
-        String strippedHint = hint.replaceAll("<[^>]*>|[^\\p{IsAlphabetic}]", "");
+        String strippedHint = hint.replaceAll(
+            utils.getFilterClueToAlphabeticRegex(), ""
+        );
 
         // case insensitive trick:
         // https://www.baeldung.com/java-case-insensitive-string-matching

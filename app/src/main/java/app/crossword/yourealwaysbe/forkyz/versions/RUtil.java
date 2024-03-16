@@ -7,7 +7,7 @@ import android.view.WindowInsets;
 import android.view.WindowInsetsController;
 
 @TargetApi(Build.VERSION_CODES.R)
-public class RUtil extends PieUtil {
+public class RUtil extends QUtil {
     @Override
     public void setFullScreen(Window window) {
         WindowInsetsController insetsController
