@@ -16,7 +16,6 @@ java {
         testImplementation "org.junit.jupiter:junit-jupiter-params:$junitVersion"
         testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-        implementation 'com.fasterxml.jackson.core:jackson-databind:2.16.1'
         implementation 'net.iharder:base64:2.3.9'
         implementation 'org.apache.commons:commons-text:1.11.0'
         implementation 'org.hjson:hjson:3.1.0'
