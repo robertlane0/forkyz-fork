@@ -269,7 +269,6 @@ public class MetaCache {
     }
 
     private CachedMetaDao getDao() {
-        System.out.println("Application context " + applicationContext);
         return CachedMetaDB.getInstance(applicationContext).cachedMetaDao();
     }
 }
