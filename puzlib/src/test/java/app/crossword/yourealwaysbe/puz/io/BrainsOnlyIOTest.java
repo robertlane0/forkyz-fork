@@ -22,7 +22,7 @@ public class BrainsOnlyIOTest  {
     }
 
     public static void assertIsTestPuzzle1(Puzzle puz) {
-        assertEquals("SODA SPEAK", puz.getTitle());
+        assertEquals("02/07/14 SODA SPEAK", puz.getTitle());
         assertEquals(
             "S.N. &amp; Robert Francis, edited by Stanley Newman",
             puz.getAuthor()
@@ -79,7 +79,7 @@ public class BrainsOnlyIOTest  {
         Puzzle puz = BrainsOnlyIO.parse(BrainsOnlyIOTest.class.getResourceAsStream("/brainsonly2.txt"));
         assertEquals(
             puz.getTitle(),
-            "OCCUPIED NATIONS: Surrounding the long answers"
+            "02/09/14 OCCUPIED NATIONS: Surrounding the long answers"
         );
         ClueList acrossClues = puz.getClues("Across");
         assertEquals(

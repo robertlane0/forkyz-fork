@@ -55,10 +55,7 @@ public class BrainsOnlyIO implements PuzzleParser {
             new InputStreamReader(is, CHARSET)
         );
         String title = readLineAtOffset(reader, 4);
-        int startIndex = title.indexOf(" ") + 1;
-        String puzTitle = htmlString(
-            title.substring(startIndex >= 0 ? startIndex : 0)
-        );
+        String puzTitle = htmlString(title);
         String author = readLineAtOffset(reader, 1);
 
         // Not sure if note should be part of author line or a separate line
