@@ -28,7 +28,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentManager;
 
 import androidx.appcompat.view.ActionMode;
 import androidx.core.app.ActivityCompat;
@@ -55,10 +54,10 @@ import app.crossword.yourealwaysbe.forkyz.databinding.PuzzleListItemBinding;
 import app.crossword.yourealwaysbe.forkyz.net.Downloader;
 import app.crossword.yourealwaysbe.forkyz.net.DownloadersProvider;
 import app.crossword.yourealwaysbe.forkyz.settings.DayNightMode;
-import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation;
 import app.crossword.yourealwaysbe.forkyz.util.BackgroundDownloadManager;
 import app.crossword.yourealwaysbe.forkyz.util.DownloadPickerDialogBuilder;
+import app.crossword.yourealwaysbe.forkyz.util.ImportedNowFinishDialogActivity;
 import app.crossword.yourealwaysbe.forkyz.util.MigrationHelper;
 import app.crossword.yourealwaysbe.forkyz.util.files.Accessor;
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider;
@@ -98,14 +97,14 @@ public class BrowseActivity extends ForkyzActivity {
      * prevents the user from returning to a puzzle from the home screen
      * (annoying)
      */
-    private static final String BROWSER_CLOSE_ACTION
+    public static final String BROWSER_CLOSE_ACTION
         = "app.crossword.yourealwaysbe.BROWSER_CLOSE_ACTION";
     /**
      * The task ID of the BrowseActivity requesting the close
      *
      * To avoid closing self
      */
-    private static final String BROWSER_CLOSE_TASK_ID
+    public static final String BROWSER_CLOSE_TASK_ID
         = "app.crossword.yourealwaysbe.BROWSER_CLOSE_TASK_ID";
 
     /**
@@ -126,7 +125,7 @@ public class BrowseActivity extends ForkyzActivity {
     /**
      * Whether some succeeded (bool)
      */
-    private static final String INTENT_IMPORT_SUCCESS
+    public static final String INTENT_IMPORT_SUCCESS
         = "app.crossword.yourealwaysbe.INTENT_IMPORT_SUCCESS";
 
     // allow import of all docs (parser will take care of detecting if it's a
@@ -185,19 +184,16 @@ public class BrowseActivity extends ForkyzActivity {
                     );
 
                     if (myTaskId == otherTaskId) {
-                        ImportedNowFinishDialog dialog
-                            = new ImportedNowFinishDialog();
-                        Bundle args = new Bundle();
-                        args.putBoolean(
-                            INTENT_IMPORT_SUCCESS,
-                            intent.getBooleanExtra(
-                                INTENT_IMPORT_SUCCESS, false
-                            )
+                        Intent i = new Intent(
+                            BrowseActivity.this,
+                            ImportedNowFinishDialogActivity.class
                         );
-                        dialog.setArguments(args);
-                        FragmentManager fm = getSupportFragmentManager();
-                        if (!fm.isDestroyed())
-                            dialog.show(fm, "ImportedNowFinishDialog");
+                        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        i.putExtra(
+                            INTENT_IMPORT_SUCCESS,
+                            intent.getBooleanExtra(INTENT_IMPORT_SUCCESS, false)
+                        );
+                        BrowseActivity.this.startActivity(i);
                     }
                 }
             }
@@ -1460,47 +1456,6 @@ public class BrowseActivity extends ForkyzActivity {
                 ).setNegativeButton(R.string.close, null);
 
             return builder.create();
-        }
-    }
-
-    @AndroidEntryPoint
-    public static class ImportedNowFinishDialog extends DialogFragment {
-
-        @Inject
-        protected ForkyzSettings settings;
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            BrowseActivity activity = (BrowseActivity) getActivity();
-
-            Bundle args = getArguments();
-            boolean success = false;
-            if (args != null)
-                success = args.getBoolean(INTENT_IMPORT_SUCCESS, false);
-
-            MaterialAlertDialogBuilder builder
-                = new MaterialAlertDialogBuilder(activity);
-
-            int message = success
-                ? R.string.import_success_long
-                : R.string.import_failure_long;
-
-            // even if some failed, there might still be a new one
-            settings.setBrowseNewPuzzle(true);
-
-            builder.setTitle(R.string.imports_title)
-                .setMessage(message)
-                .setPositiveButton(
-                    R.string.exit,
-                    (di, i) -> { activity.finish(); }
-                );
-
-            return builder.create();
-        }
-
-        @Override
-        public void onCancel(DialogInterface di) {
-            getActivity().finish();
         }
     }
 }
