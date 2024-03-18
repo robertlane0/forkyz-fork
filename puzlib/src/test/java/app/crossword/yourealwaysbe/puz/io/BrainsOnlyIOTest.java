@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
 
 import app.crossword.yourealwaysbe.puz.Box;
 import app.crossword.yourealwaysbe.puz.ClueID;
@@ -28,6 +29,7 @@ public class BrainsOnlyIOTest  {
             puz.getAuthor()
         );
         assertEquals("Test note", puz.getNotes());
+        assertEquals(LocalDate.of(2014, 2, 7), puz.getDate());
 
         Box[][] boxes = puz.getBoxes();
 

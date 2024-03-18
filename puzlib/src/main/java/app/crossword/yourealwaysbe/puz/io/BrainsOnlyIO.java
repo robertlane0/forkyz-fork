@@ -14,6 +14,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 
 /**
@@ -30,6 +32,8 @@ public class BrainsOnlyIO implements PuzzleParser {
     private static final String DOWN_LIST = "Down";
     private static final String NOTEPAD_START_TAG = "<NOTEPAD>";
     private static final String NOTEPAD_END_TAG = "</NOTEPAD>";
+    private static final DateTimeFormatter DATE_FORMATTER
+        = DateTimeFormatter.ofPattern("yyMMdd");
 
     public static boolean convertBrainsOnly(InputStream is, DataOutputStream os, LocalDate date){
         try {
@@ -54,7 +58,9 @@ public class BrainsOnlyIO implements PuzzleParser {
         BufferedReader reader = new BufferedReader(
             new InputStreamReader(is, CHARSET)
         );
-        String title = readLineAtOffset(reader, 4);
+
+        String date = readLineAtOffset(reader, 2);
+        String title = readLineAtOffset(reader, 1);
         String puzTitle = htmlString(title);
         String author = readLineAtOffset(reader, 1);
 
@@ -85,7 +91,7 @@ public class BrainsOnlyIO implements PuzzleParser {
         }
         readLineAtOffset(reader, 4);
         Box[][] boxes = new Box[height][width];
-        for(int down = 0; down < height; down++){
+        for (int down = 0; down < height; down++) {
             String line = readLineAtOffset(reader, 0);
 
             boolean nextCircled = false;
@@ -137,11 +143,19 @@ public class BrainsOnlyIO implements PuzzleParser {
                 );
         }
 
+        LocalDate parsedDate = null;
+        try {
+            parsedDate = LocalDate.parse(date, DATE_FORMATTER);
+        } catch (DateTimeParseException e) {
+            // fall through with no date
+        }
+
         PuzzleBuilder builder = new PuzzleBuilder(boxes);
         builder.autoNumberBoxes()
             .setTitle(puzTitle)
             .setAuthor(author)
-            .setNotes(notes);
+            .setNotes(notes)
+            .setDate(parsedDate);
 
         readLineAtOffset(reader, 0);
         ArrayList<String> acrossClues = new ArrayList<String>();
