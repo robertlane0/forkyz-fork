@@ -1,5 +1,13 @@
 # Forkyz Changelog
 
+## Version 52
+
+- Fix erratic next clue button.
+- Fix crash on load on Android 7.
+- Fix crash in anagram helper on Android 9 and prediction setting.
+- Fix crash on external puzzle import.
+- Read date and full title in Brains Only format.
+
 ## Version 51
 
 - Add compact option for Forkyz keyboard (keyboard settings).
