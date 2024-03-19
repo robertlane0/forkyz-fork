@@ -129,9 +129,9 @@ dependencies {
     annotationProcessor "androidx.room:room-compiler:$room_version"
     // thanks: https://stackoverflow.com/a/72105049
     annotationProcessor "com.google.dagger:hilt-compiler:$hilt_version"
-    annotationProcessor "androidx.hilt:hilt-compiler:1.0.0"
+    annotationProcessor "androidx.hilt:hilt-compiler:1.2.0"
 
-    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.3'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
 
     testImplementation 'junit:junit:4.13.2'
     // thanks https://stackoverflow.com/a/30759769
