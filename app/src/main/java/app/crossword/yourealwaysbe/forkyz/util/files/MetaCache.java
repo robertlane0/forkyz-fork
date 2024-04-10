@@ -187,17 +187,18 @@ public class MetaCache {
     }
 
     private Context applicationContext;
-    private FileHandler fileHandler;
 
-    public MetaCache(Context applicationContext, FileHandler fileHandler) {
+    public MetaCache(Context applicationContext) {
         this.applicationContext = applicationContext;
-        this.fileHandler = fileHandler;
     }
 
     /**
      * Returns all cached meta data records for the given directory
      */
-    public Map<Uri, MetaRecord> getDirCache(DirHandle dirHandle) {
+    public Map<Uri, MetaRecord> getDirCache(
+        FileHandler fileHandler,
+        DirHandle dirHandle
+    ) {
         Uri dirUri = fileHandler.getUri(dirHandle);
         Map<Uri, MetaRecord> cache = new HashMap<>();
         for (CachedMeta cm : getDao().getDirCache(dirUri)) {
@@ -219,7 +220,11 @@ public class MetaCache {
     /**
      * Cache meta for a file URI, returns new record
      */
-    public MetaRecord addRecord(PuzHandle puzHandle, Puzzle puz) {
+    public MetaRecord addRecord(
+        FileHandler fileHandler,
+        PuzHandle puzHandle,
+        Puzzle puz
+    ) {
         CachedMeta cm = new CachedMeta();
         cm.mainFileUri = fileHandler.getUri(puzHandle.getMainFileHandle());
 
@@ -254,7 +259,7 @@ public class MetaCache {
     /**
      * Remove a record from the cache
      */
-    public void deleteRecord(PuzHandle puzHandle) {
+    public void deleteRecord(FileHandler fileHandler, PuzHandle puzHandle) {
         getDao().delete(fileHandler.getUri(puzHandle.getMainFileHandle()));
     }
 
@@ -262,7 +267,7 @@ public class MetaCache {
      * Remove all records from directory that are not in the handles
      */
     public void cleanupCache(
-        DirHandle dir, List<PuzMetaFile> puzMetaFiles
+        FileHandler fileHandler, DirHandle dir, List<PuzMetaFile> puzMetaFiles
     ) {
         Uri dirUri = fileHandler.getUri(dir);
         getDao().deleteOutside(dirUri, puzMetaFiles);

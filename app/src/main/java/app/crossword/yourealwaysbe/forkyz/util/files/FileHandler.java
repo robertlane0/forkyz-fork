@@ -75,7 +75,7 @@ public abstract class FileHandler {
 
     protected FileHandler(Context applicationContext) {
         this.applicationContext = applicationContext;
-        this.metaCache = new MetaCache(applicationContext, this);
+        this.metaCache = new MetaCache(applicationContext);
     }
 
     /**
@@ -203,7 +203,7 @@ public abstract class FileHandler {
             }
         });
 
-        metaCache.deleteRecord(ph);
+        metaCache.deleteRecord(this, ph);
     }
 
     public synchronized void moveTo(
@@ -236,7 +236,7 @@ public abstract class FileHandler {
         });
 
         // TODO: can we move record instead? What is new Uri?
-        metaCache.deleteRecord(ph);
+        metaCache.deleteRecord(this, ph);
     }
 
     /**
@@ -261,12 +261,12 @@ public abstract class FileHandler {
         Iterable<FileHandle> rawFileList = listFiles(dirHandle);
 
         Map<Uri, MetaCache.MetaRecord> cachedMetas
-            = metaCache.getDirCache(dirHandle);
+            = metaCache.getDirCache(this, dirHandle);
 
         loadMetasFromPuzFiles(dirHandle, rawFileList, cachedMetas, metas);
         loadMetasFromIPuzFiles(dirHandle, rawFileList, cachedMetas, metas);
 
-        metaCache.cleanupCache(dirHandle, metas);
+        metaCache.cleanupCache(this, dirHandle, metas);
 
         return metas;
     }
@@ -305,7 +305,9 @@ public abstract class FileHandler {
         if (puz == null)
             return null;
 
-        MetaCache.MetaRecord metaRecord = metaCache.addRecord(puzHandle, puz);
+        MetaCache.MetaRecord metaRecord = metaCache.addRecord(
+            this, puzHandle, puz
+        );
 
         return new PuzMetaFile(this, puzHandle, metaRecord);
     }
@@ -339,7 +341,7 @@ public abstract class FileHandler {
         });
 
         if (puz != null)
-            metaCache.addRecord(ph, puz);
+            metaCache.addRecord(this, ph, puz);
 
         return puz;
     }
@@ -375,7 +377,7 @@ public abstract class FileHandler {
         // the main thread).
         if (success) {
             executorService.execute(() -> {
-                metaCache.addRecord(ph, puz);
+                metaCache.addRecord(this, ph, puz);
             });
         }
     }
