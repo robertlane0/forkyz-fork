@@ -283,7 +283,7 @@ public class AbstractDateDownloader extends AbstractDownloader {
         // available date this relies on puzzles being weekly according
         // to our model include this day last week in case current day
         // not yet available
-        int lookAhead = -1;
+        long lookAhead = -1;
         Duration availabilityOffset = getUTCAvailabilityOffset();
         if (availabilityOffset != null)
             lookAhead += availabilityOffset.toDays();
