@@ -22,7 +22,7 @@ public class Playboard implements Serializable {
     private MovementStrategy movementStrategy = MovementStrategy.MOVE_NEXT_ON_AXIS;
     private Puzzle puzzle;
     private String responder;
-    private List<String> sortedClueListNames = new ArrayList<>();
+    private ArrayList<String> sortedClueListNames = new ArrayList<>();
     private boolean showErrorsGrid;
     private boolean showErrorsCursor;
     private boolean showErrorsClue;
@@ -41,15 +41,16 @@ public class Playboard implements Serializable {
     // selected
     private boolean selectDetachedZone = true;
 
-    private Set<PlayboardListener> listeners = WeakSet.buildSet();
-    private Set<PlayboardListener> pendingListenerRemovals = WeakSet.buildSet();
-    private Set<PlayboardListener> pendingListenerAdditions
+    private transient Set<PlayboardListener> listeners = WeakSet.buildSet();
+    private transient Set<PlayboardListener> pendingListenerRemovals
+        = WeakSet.buildSet();
+    private transient Set<PlayboardListener> pendingListenerAdditions
         = WeakSet.buildSet();
     private boolean isNotifying = false;
     private int notificationDisabledDepth = 0;
 
-    private Set<Position> changedPositions = new HashSet<>();
-    private Set<ClueID> changedClueIDs = new HashSet<>();
+    private HashSet<Position> changedPositions = new HashSet<>();
+    private HashSet<ClueID> changedClueIDs = new HashSet<>();
     // reuse same one for all notifications
     private PlayboardChanges notificationChanges = new PlayboardChanges();
 

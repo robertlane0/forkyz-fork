@@ -6,14 +6,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 class MutableClueList implements ClueList, Serializable {
     private static final long serialVersionUID = 5559785136857192666L;
 
-    List<Clue> clues = new ArrayList<>();
-    Map<String, Clue> numberedClueMap = new HashMap<>();
+    ArrayList<Clue> clues = new ArrayList<>();
+    HashMap<String, Clue> numberedClueMap = new HashMap<>();
 
     /**
      * Add a clue to the list

@@ -4,7 +4,6 @@ package app.crossword.yourealwaysbe.puz;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * Representation of a word on the grid
@@ -15,7 +14,7 @@ import java.util.List;
 public class Zone implements Iterable<Position>, Serializable {
     private static final long serialVersionUID = 1883316891012999786L;
 
-    private final List<Position> positions = new ArrayList<>();
+    private final ArrayList<Position> positions = new ArrayList<>();
 
     public boolean hasPosition(Position pos) {
         return positions.contains(pos);
