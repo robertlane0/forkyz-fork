@@ -27,16 +27,9 @@ java {
         relocate 'org.json', 'app.crossword.yourealwaysbe.org.json'
     }
 
-    // thanks to
-    // https://www.morling.dev/blog/bytebuffer-and-the-dreaded-nosuchmethoderror/
-    // https://github.com/danilovesky/workcraft/commit/6901b6e2de001c720d5e744ac877878c8931f2a7
     compileJava {
-        sourceCompatibility JavaVersion.VERSION_1_8.toString()
-        targetCompatibility JavaVersion.VERSION_1_8.toString()
-
-        if (JavaVersion.current().isJava9Compatible()) {
-            options.release = 8
-        }
+        sourceCompatibility JavaVersion.VERSION_17.toString()
+        targetCompatibility JavaVersion.VERSION_17.toString()
 
         // -processing as adding room annotation processor library
         // causes warnings about unprocessed annotations for an
