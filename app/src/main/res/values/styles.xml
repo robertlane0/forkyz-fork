@@ -5,14 +5,5 @@
         <item name="android:background">#000000</item>
         <item name="materialButtonStyle">@style/keyboardHideButtonStyle</item>
     </style>
-    <style
-        name="appBarLayoutStyle"
-        parent="Widget.Material3.AppBarLayout"
-    >
-        <!-- use stateListAnimator in values-21 -->
-        <!-- not sure this will work here, but worth a try, looks ok without it
-        -->
-        <item name="elevation">4dp</item>
-    </style>
 </resources>
 

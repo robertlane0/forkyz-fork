@@ -57,10 +57,7 @@
     <style name="clueListItemStyle" parent="Widget.Material3.CheckedTextView">
         <item name="android:textSize">16sp</item>
     </style>
-    <style
-        name="toolbarStyle"
-        parent="Widget.Material3.Toolbar.Surface"
-    />
+    <style name="toolbarStyle" parent="Widget.Material3.Toolbar" />
     <style
         name="actionBarStyle"
         parent="@style/ThemeOverlay.Material3.ActionBar"

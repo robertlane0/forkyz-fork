@@ -3,7 +3,7 @@
 <resources>
     <style
         name="legacyAppBarLayout"
-        parent="Widget.Material3.AppBarLayout"
+        parent="Widget.MaterialComponents.AppBarLayout.Surface"
     >
         <item name="background">@color/primary</item>
         <item name="android:background">@color/primary</item>

@@ -169,7 +169,7 @@ public class ForkyzActivity extends AppCompatActivity {
     /**
      * Call this during onCreate for bottommost views of layout
      *
-     * Because we setDecorFitsSystemWindows to false, we have to manager
+     * Because we setDecorFitsSystemWindows to false, we have to manage
      * our own insets. Calling this method on bottom most view makes
      * sure it is not hidden by the keyboard and navigation buttons.
      */
@@ -185,9 +185,7 @@ public class ForkyzActivity extends AppCompatActivity {
      */
     protected void setStatusBarElevation(AppBarLayout appBarLayout) {
         appBarLayout.setStatusBarForeground(
-            MaterialShapeDrawable.createWithElevationOverlay(
-                this, getResources().getDimension(R.dimen.appBarElevation)
-            )
+            MaterialShapeDrawable.createWithElevationOverlay(this)
         );
     }
 }
