@@ -444,6 +444,7 @@ public class BrowseActivity extends ForkyzActivity {
         binding = BrowseBinding.inflate(getLayoutInflater());
         this.setContentView(binding.getRoot());
         setSupportActionBar(binding.toolbar);
+        setupSideInsets(binding.toolbar);
         setupBottomInsets(binding.content);
         setupBottomInsets(binding.speedDialAdd);
         setStatusBarElevation(binding.appBarLayout);

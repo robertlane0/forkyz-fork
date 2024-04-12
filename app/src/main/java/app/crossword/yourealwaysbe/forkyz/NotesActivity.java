@@ -124,6 +124,7 @@ public class NotesActivity extends PuzzleActivity {
         setSupportActionBar(binding.toolbar);
         holographic();
         finishOnHomeButton();
+        setupSideInsets(binding.toolbar);
         setupBottomInsets(binding.content);
         setStatusBarElevation(binding.appBarLayout);
 

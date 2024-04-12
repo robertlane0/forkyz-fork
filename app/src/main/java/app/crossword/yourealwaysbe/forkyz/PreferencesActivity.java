@@ -2,6 +2,7 @@ package app.crossword.yourealwaysbe.forkyz;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.preference.Preference;
@@ -33,8 +34,10 @@ public class PreferencesActivity
 
         setContentView(R.layout.preferences_activity);
 
-        setSupportActionBar(findViewById(R.id.toolbar));
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         holographic();
+        setupSideInsets(toolbar);
         setupBottomInsets(findViewById(R.id.content));
         setStatusBarElevation(findViewById(R.id.app_bar_layout));
 

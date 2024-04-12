@@ -172,9 +172,22 @@ public class ForkyzActivity extends AppCompatActivity {
      * Because we setDecorFitsSystemWindows to false, we have to manage
      * our own insets. Calling this method on bottom most view makes
      * sure it is not hidden by the keyboard and navigation buttons.
+     *
+     * Assumes view also touches sides, so sets side insets
      */
     protected void setupBottomInsets(View view) {
-        utils.setupBottomInsets(view);
+        utils.setupInsets(view, true, true);
+    }
+
+    /**
+     * Call this during onCreate for views of layout touching sides
+     *
+     * Because we setDecorFitsSystemWindows to false, we have to manage our own
+     * insets. Calling this method on a view makes sure it is not hidden by the
+     * navigation buttons in landscape.
+     */
+    protected void setupSideInsets(View view) {
+        utils.setupInsets(view, true, false);
     }
 
     /**

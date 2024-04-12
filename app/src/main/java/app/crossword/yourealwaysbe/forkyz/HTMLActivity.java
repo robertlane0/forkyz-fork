@@ -48,6 +48,7 @@ public class HTMLActivity extends ForkyzActivity {
         holographic();
         finishOnHomeButton();
         setContentView(binding.getRoot());
+        setupSideInsets(binding.toolbar);
         setupBottomInsets(binding.backButton);
         setupBottomInsets(binding.scrollView);
         setStatusBarElevation(binding.appBarLayout);

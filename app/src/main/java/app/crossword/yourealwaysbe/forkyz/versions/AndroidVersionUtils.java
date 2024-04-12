@@ -149,7 +149,7 @@ public interface AndroidVersionUtils {
      * before. So use version utils setDecorFitsSystemWindows which does
      * nothing before API 21.
      */
-    public void setupBottomInsets(View view);
+    public void setupInsets(View view, boolean sides, boolean bottom);
 
     /**
      * A regex for filtering all non alphabetic chars and tags from clue text

@@ -166,7 +166,7 @@ public class KitKatUtil implements AndroidVersionUtils {
     }
 
     @Override
-    public void setupBottomInsets(View view) {
+    public void setupInsets(View view, boolean sides, boolean bottom) {
         // do nothing
     }
 

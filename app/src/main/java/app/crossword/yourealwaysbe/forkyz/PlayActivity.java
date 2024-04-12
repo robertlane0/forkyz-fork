@@ -121,6 +121,7 @@ public class PlayActivity extends PuzzleActivity
         setSupportActionBar(binding.toolbar);
         holographic();
         finishOnHomeButton();
+        setupSideInsets(binding.toolbar);
         setupBottomInsets(binding.constraintLayout);
         setStatusBarElevation(binding.appBarLayout);
 

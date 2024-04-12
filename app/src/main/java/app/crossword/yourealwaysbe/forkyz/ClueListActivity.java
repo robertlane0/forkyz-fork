@@ -79,6 +79,7 @@ public class ClueListActivity extends PuzzleActivity
         setSupportActionBar(binding.toolbar);
         holographic();
         finishOnHomeButton();
+        setupSideInsets(binding.toolbar);
         setupBottomInsets(binding.content);
         setStatusBarElevation(binding.appBarLayout);
 
