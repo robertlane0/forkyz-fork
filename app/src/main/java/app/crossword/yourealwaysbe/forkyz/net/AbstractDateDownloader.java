@@ -307,10 +307,11 @@ public class AbstractDateDownloader extends AbstractDownloader {
     /**
      * How far back in time to look when searching for latest puzzle
      *
-     * Default is 7 days, but subclasses may want to vary.
+     * Default is 8 days, but subclasses may want to vary. (To account for
+     * slight hour differences, one week is a bit too precise.)
      */
     protected int getLatestDateWindow() {
-        return 7;
+        return 8;
     }
 
     /**
