@@ -237,7 +237,10 @@
     <string name="display_scratch">Display Scratch</string>
     <string name="display_scratch_desc">Display scratch notes on play board.</string>
     <string name="dont_delete_crossing">Don\'t Delete Crossing Words</string>
-    <string name="dont_delete_crossing_desc">When deleting, don\'t delete a letter if it is part of a filled-in crossing word.</string>
+    <string name="dont_delete_crossing_desc">When deleting, don\'t delete a letter if it is part of a crossing word.</string>
+    <string name="delete_crossing_delete">Delete all cells</string>
+    <string name="delete_crossing_preserve_filled_words">Don\'t delete crossing filled words.</string>
+    <string name="delete_crossing_preserve_filled_cells">Don\'t delete crossing partially filled words.</string>
     <string name="about_forkyz">About Forkyz</string>
     <string name="release_notes">Release Notes</string>
     <string name="license">License</string>

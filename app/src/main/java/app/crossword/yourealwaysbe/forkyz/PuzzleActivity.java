@@ -56,7 +56,6 @@ import app.crossword.yourealwaysbe.forkyz.view.SpecialEntryDialog;
 import app.crossword.yourealwaysbe.puz.Box;
 import app.crossword.yourealwaysbe.puz.Clue;
 import app.crossword.yourealwaysbe.puz.ClueID;
-import app.crossword.yourealwaysbe.puz.Playboard.DeleteCrossingMode;
 import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges;
 import app.crossword.yourealwaysbe.puz.Playboard;
 import app.crossword.yourealwaysbe.puz.Position;
@@ -126,15 +125,12 @@ public abstract class PuzzleActivity
             }
         );
 
-        settings.livePlayDontDeleteCrossing().observe(
+        settings.livePlayDeleteCrossingMode().observe(
             this,
-            dontDelete -> {
-                DeleteCrossingMode mode = dontDelete
-                    ? DeleteCrossingMode.PRESERVE_FILLED_CELLS
-                    : DeleteCrossingMode.DELETE;
+            deleteCrossingMode -> {
                 Playboard board = getBoard();
                 if (board != null)
-                    board.setDeleteCrossingMode(mode);
+                    board.setDeleteCrossingMode(deleteCrossingMode);
             }
         );
     }

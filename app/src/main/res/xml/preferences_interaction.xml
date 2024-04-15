@@ -49,11 +49,13 @@
         android:key="doubleTap"
     />
 
-    <androidx.preference.CheckBoxPreference
+    <androidx.preference.ListPreference
         android:title="@string/dont_delete_crossing"
-        android:defaultValue="false"
         android:summary="@string/dont_delete_crossing_desc"
-        android:key="dontDeleteCrossing"
+        android:defaultValue="DELETE"
+        android:entries="@array/delete_crossing_mode_labels"
+        android:entryValues="@array/delete_crossing_mode_values"
+        android:key="deleteCrossingMode"
     />
 
     <androidx.preference.CheckBoxPreference
