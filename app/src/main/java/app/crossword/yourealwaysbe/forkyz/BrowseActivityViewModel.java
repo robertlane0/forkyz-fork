@@ -274,6 +274,7 @@ public class BrowseActivityViewModel extends AndroidViewModel {
     public void loadPuzzle(PuzMetaFile puzMeta) {
         settings.getPlayPreserveCorrectLettersInShowErrors(preserveCorrect -> {
         settings.getPlayDontDeleteCrossing(dontDeleteCrossing -> {
+        settings.getPlayMovementStrategy(movementStrategy -> {
         fileHandlerProvider.get(fileHandler -> {
             threadWithUILock(() -> {
                 try {
@@ -283,19 +284,17 @@ public class BrowseActivityViewModel extends AndroidViewModel {
                             "Puzzle is null or contains no boxes."
                         );
                     }
-                    settings.getPlayMovementStrategy(movementStrategy -> {
-                        handler.post(() -> {
-                            currentPuzzleHolder.setBoard(
-                                new Playboard(
-                                    puz,
-                                    movementStrategy,
-                                    preserveCorrect,
-                                    dontDeleteCrossing
-                                ),
-                                puzMeta.getPuzHandle()
-                            );
-                            puzzleLoadEvents.call();
-                        });
+                    handler.post(() -> {
+                        currentPuzzleHolder.setBoard(
+                            new Playboard(
+                                puz,
+                                movementStrategy,
+                                preserveCorrect,
+                                dontDeleteCrossing
+                            ),
+                            puzMeta.getPuzHandle()
+                        );
+                        puzzleLoadEvents.call();
                     });
                 } catch (IOException e) {
                     handler.post(() -> {
@@ -321,7 +320,7 @@ public class BrowseActivityViewModel extends AndroidViewModel {
                     });
                 }
             });
-        });});});
+        });});});});
     }
 
     public void refreshPuzzleMeta(PuzHandle refreshHandle) {
