@@ -77,87 +77,150 @@ public class PlayboardTest {
 
     @TestWithAndWithoutBlockObjects
     public void testDeleteLetter(boolean blockObjects) throws Exception {
-         Puzzle puz = loadTestPuz(blockObjects);
+        Puzzle puz = loadTestPuz(blockObjects);
 
-         Playboard board = new Playboard(puz);
-         board.setDontDeleteCrossing(false);
+        Playboard board = new Playboard(puz);
+        board.setDeleteCrossingMode(Playboard.DeleteCrossingMode.DELETE);
 
-         // Create
-         //
-         //  A
-         // ABCDE
-         //    A
-         //
-         // then delete from E back, row should be empty
+        // Create
+        //
+        //  A
+        // ABCDE
+        //    A
+        //
+        // then delete from E back, row should be empty
 
-         moveToPosition(board, 1, 0);
-         board.playLetter('A');
-         board.playLetter('B');
-         board.playLetter('C');
-         board.playLetter('D');
-         board.playLetter('E');
+        moveToPosition(board, 1, 0);
+        board.playLetter('A');
+        board.playLetter('B');
+        board.playLetter('C');
+        board.playLetter('D');
+        board.playLetter('E');
 
-         moveToPosition(board, 0, 1);
-         board.playLetter('A');
+        moveToPosition(board, 0, 1);
+        board.playLetter('A');
 
-         moveToPosition(board, 2, 3);
-         board.playLetter('A');
+        moveToPosition(board, 2, 3);
+        board.playLetter('A');
 
-         moveToPosition(board, 1, 4);
-         for (int i = 0; i < 5; i++)
-             board.deleteLetter();
+        moveToPosition(board, 1, 4);
+        for (int i = 0; i < 5; i++)
+            board.deleteLetter();
 
-         assertBoxBlank(puz, 1, 0);
-         assertBoxBlank(puz, 1, 1);
-         assertBoxBlank(puz, 1, 2);
-         assertBoxBlank(puz, 1, 3);
-         assertBoxBlank(puz, 1, 4);
-         assertBoxLetter(puz, 0, 1, "A");
-         assertBoxLetter(puz, 2, 3, "A");
+        assertBoxBlank(puz, 1, 0);
+        assertBoxBlank(puz, 1, 1);
+        assertBoxBlank(puz, 1, 2);
+        assertBoxBlank(puz, 1, 3);
+        assertBoxBlank(puz, 1, 4);
+        assertBoxLetter(puz, 0, 1, "A");
+        assertBoxLetter(puz, 2, 3, "A");
     }
 
     @TestWithAndWithoutBlockObjects
-    public void testDeleteLetterCrossing(boolean blockObjects) throws Exception {
-         Puzzle puz = loadTestPuz(blockObjects);
+    public void testDeleteLetterCrossingWords(
+        boolean blockObjects
+    ) throws Exception {
+        Puzzle puz = loadTestPuz(blockObjects);
 
-         Playboard board = new Playboard(puz);
-         board.setDontDeleteCrossing(true);
+        Playboard board = new Playboard(puz);
+        board.setDeleteCrossingMode(
+           Playboard.DeleteCrossingMode.PRESERVE_FILLED_WORDS
+        );
 
-         // Create
-         //
-         //  A
-         // ABCDE
-         //    A
-         //
-         // then delete from E back, B and D should remain
-         // B and D should also be skipped
+        // Create
+        //
+        //  A
+        // ABCDE
+        //  A A
+        //  A
+        //
+        // then delete from E back, D should remain
+        // D should also be skipped
 
-         moveToPosition(board, 1, 0);
-         board.playLetter('A');
-         board.playLetter('B');
-         board.playLetter('C');
-         board.playLetter('D');
-         board.playLetter('E');
+        moveToPosition(board, 1, 0);
+        board.playLetter('A');
+        board.playLetter('B');
+        board.playLetter('C');
+        board.playLetter('D');
+        board.playLetter('E');
 
-         moveToPosition(board, 0, 1);
-         board.playLetter('A');
+        moveToPosition(board, 0, 1);
+        board.playLetter('A');
+        moveToPosition(board, 2, 1);
+        board.playLetter('A');
+        moveToPosition(board, 3, 1);
+        board.playLetter('A');
 
-         moveToPosition(board, 2, 3);
-         board.playLetter('A');
+        moveToPosition(board, 2, 3);
+        board.playLetter('A');
 
-         moveToPosition(board, 1, 4);
-         board.deleteLetter();
-         assertPosition(board, 1, 4);
-         board.deleteLetter();
-         assertPosition(board, 1, 2);
-         board.deleteLetter();
-         assertPosition(board, 1, 0);
+        moveToPosition(board, 1, 4);
+        board.deleteLetter();
+        assertPosition(board, 1, 4);
+        board.deleteLetter();
+        assertPosition(board, 1, 3);
+        board.deleteLetter();
+        assertPosition(board, 1, 2);
+        board.deleteLetter();
+        assertPosition(board, 1, 0);
 
-         assertBoxBlank(puz, 1, 0);
-         assertBoxLetter(puz, 1, 1, "B");
-         assertBoxBlank(puz, 1, 2);
-         assertBoxLetter(puz, 1, 3, "D");
-         assertBoxBlank(puz, 1, 4);
+        assertBoxLetter(puz, 1, 1, "B");
+        assertBoxBlank(puz, 1, 2);
+        assertBoxBlank(puz, 1, 3);
+        assertBoxBlank(puz, 1, 4);
+    }
+
+    @TestWithAndWithoutBlockObjects
+    public void testDeleteLetterCrossingCells(
+        boolean blockObjects
+    ) throws Exception {
+        Puzzle puz = loadTestPuz(blockObjects);
+
+        Playboard board = new Playboard(puz);
+        board.setDeleteCrossingMode(
+           Playboard.DeleteCrossingMode.PRESERVE_FILLED_CELLS
+        );
+
+        // Create
+        //
+        //  A
+        // ABCDE
+        //  A A
+        //  A
+        //
+        // then delete from E back, B and D should remain
+        // B and D should also be skipped
+
+        moveToPosition(board, 1, 0);
+        board.playLetter('A');
+        board.playLetter('B');
+        board.playLetter('C');
+        board.playLetter('D');
+        board.playLetter('E');
+
+        moveToPosition(board, 0, 1);
+        board.playLetter('A');
+        moveToPosition(board, 2, 1);
+        board.playLetter('A');
+        moveToPosition(board, 3, 1);
+        board.playLetter('A');
+
+        moveToPosition(board, 2, 3);
+        board.playLetter('A');
+
+        moveToPosition(board, 1, 4);
+        board.deleteLetter();
+        assertPosition(board, 1, 4);
+        board.deleteLetter();
+        assertPosition(board, 1, 2);
+        board.deleteLetter();
+        assertPosition(board, 1, 0);
+
+        assertBoxBlank(puz, 1, 0);
+        assertBoxLetter(puz, 1, 1, "B");
+        assertBoxBlank(puz, 1, 2);
+        assertBoxLetter(puz, 1, 3, "D");
+        assertBoxBlank(puz, 1, 4);
     }
 
     @TestWithAndWithoutBlockObjects

@@ -39,6 +39,7 @@ import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider;
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle;
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzMetaFile;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
+import app.crossword.yourealwaysbe.puz.Playboard.DeleteCrossingMode;
 import app.crossword.yourealwaysbe.puz.Playboard;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 
@@ -285,12 +286,17 @@ public class BrowseActivityViewModel extends AndroidViewModel {
                         );
                     }
                     handler.post(() -> {
+                        DeleteCrossingMode deleteCrossingMode
+                            = dontDeleteCrossing
+                                ? DeleteCrossingMode.PRESERVE_FILLED_CELLS
+                                : DeleteCrossingMode.DELETE;
+
                         currentPuzzleHolder.setBoard(
                             new Playboard(
                                 puz,
                                 movementStrategy,
                                 preserveCorrect,
-                                dontDeleteCrossing
+                                deleteCrossingMode
                             ),
                             puzMeta.getPuzHandle()
                         );

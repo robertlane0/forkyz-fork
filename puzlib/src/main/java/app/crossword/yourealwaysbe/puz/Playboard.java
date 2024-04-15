@@ -19,6 +19,18 @@ public class Playboard implements Serializable {
 
     private static final Logger LOG = Logger.getLogger(Playboard.class.getCanonicalName());
 
+    /**
+     * What to do with cells that are filled by crossing words
+     * DELETE: delete clears all cells
+     * PRESERVE_FILLED_WORDS: delete does not delete cells in crossing
+     * words if the crossing word is completely full
+     * PRESERVE_FILLED_CELLS: delete does not delete cells if the
+     * neighbouring cell of a crossing word is also filled
+     */
+    public enum DeleteCrossingMode {
+        DELETE, PRESERVE_FILLED_WORDS, PRESERVE_FILLED_CELLS
+    }
+
     private MovementStrategy movementStrategy = MovementStrategy.MOVE_NEXT_ON_AXIS;
     private Puzzle puzzle;
     private String responder;
@@ -28,7 +40,7 @@ public class Playboard implements Serializable {
     private boolean showErrorsClue;
     private boolean skipCompletedLetters;
     private boolean preserveCorrectLettersInShowErrors;
-    private boolean dontDeleteCrossing;
+    private DeleteCrossingMode deleteCrossingMode = DeleteCrossingMode.DELETE;
     private Word previousWord = null;
     private Position previousPosition = null;
     // used by findZoneDelta to track last index to handle clues with
@@ -57,10 +69,10 @@ public class Playboard implements Serializable {
     public Playboard(Puzzle puzzle,
                      MovementStrategy movementStrategy,
                      boolean preserveCorrectLettersInShowErrors,
-                     boolean dontDeleteCrossing){
+                     DeleteCrossingMode deleteCrossingMode){
         this(puzzle, movementStrategy);
         this.preserveCorrectLettersInShowErrors = preserveCorrectLettersInShowErrors;
-        this.dontDeleteCrossing = dontDeleteCrossing;
+        this.deleteCrossingMode = deleteCrossingMode;
     }
 
     public Playboard(Puzzle puzzle, MovementStrategy movementStrategy) {
@@ -96,8 +108,8 @@ public class Playboard implements Serializable {
     /**
      * Whether to delete characters from crossing words
      */
-    public void setDontDeleteCrossing(boolean value){
-        this.dontDeleteCrossing = value;
+    public void setDeleteCrossingMode(DeleteCrossingMode value){
+        this.deleteCrossingMode = value;
     }
 
     public Box[][] getBoxes() {
@@ -594,14 +606,29 @@ public class Playboard implements Serializable {
         );
 
         // don't delete crossing doesn't make sense for acrostic
-        boolean skipAdjacent = dontDeleteCrossing
+        boolean skipAdjacent =
+            deleteCrossingMode != DeleteCrossingMode.DELETE
             && !Puzzle.Kind.ACROSTIC.equals(puzzle.getKind())
-            && currentBoxHasFilledAdjacent();
+            && currentBoxHasFilledAdjacent(
+                deleteCrossingMode == DeleteCrossingMode.PRESERVE_FILLED_WORDS
+            );
 
         return skipCorrect || skipAdjacent;
     }
 
-    private boolean currentBoxHasFilledAdjacent() {
+    /**
+     * Where current cell has an adjacent word with filled cells
+     *
+     * Looks at words that have the currently selected cell, but are not
+     * the currently selected word (crossing). Determines whether cell
+     * is part of a crossing word that is completed by checking if
+     * adjacent cells have entries in the crossing word. If
+     * filledWordsOnly is true, then the entire crossing word must be
+     * filled for the cell to be considered to have an adjacent word
+     * will filled cells. Else, just neighbouring cells in the crossing
+     * word have to be filled.
+     */
+    private boolean currentBoxHasFilledAdjacent(boolean filledWordsOnly) {
         ClueID currentCID = getClueID();
         if (currentCID == null)
             return false;
@@ -614,23 +641,27 @@ public class Playboard implements Serializable {
             if (currentCID.equals(otherCID))
                 continue;
 
-            Zone zone = puzzle.getClue(otherCID).getZone();
-            int curPos = zone.indexOf(currentPos);
-            Position posBefore = (curPos > 0)
-                ? zone.getPosition(curPos - 1)
-                : null;
+            if (filledWordsOnly) {
+                return isFilledClueID(otherCID);
+            } else {
+                Zone zone = puzzle.getClue(otherCID).getZone();
+                int curPos = zone.indexOf(currentPos);
+                Position posBefore = (curPos > 0)
+                    ? zone.getPosition(curPos - 1)
+                    : null;
 
-            Box boxBefore = puzzle.checkedGetBox(posBefore);
-            if (!Box.isBlock(boxBefore) && !boxBefore.isBlank())
-                return true;
+                Box boxBefore = puzzle.checkedGetBox(posBefore);
+                if (!Box.isBlock(boxBefore) && !boxBefore.isBlank())
+                    return true;
 
-            Position posAfter = (curPos < zone.size() - 1)
-                ? zone.getPosition(curPos + 1)
-                : null;
+                Position posAfter = (curPos < zone.size() - 1)
+                    ? zone.getPosition(curPos + 1)
+                    : null;
 
-            Box boxAfter = puzzle.checkedGetBox(posAfter);
-            if (!Box.isBlock(boxAfter) && !boxAfter.isBlank())
-                return true;
+                Box boxAfter = puzzle.checkedGetBox(posAfter);
+                if (!Box.isBlock(boxAfter) && !boxAfter.isBlank())
+                    return true;
+            }
         }
 
         return false;
