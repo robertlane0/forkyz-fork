@@ -487,30 +487,6 @@ public class Playboard implements Serializable {
     }
 
     /**
-     * If the clue has been filled in correctly
-     *
-     * Only false if there is an error in there somewhere
-     */
-    public boolean isCorrectClueID(ClueID clueID) {
-        Zone zone = getZone(clueID);
-
-        if(zone == null || zone.isEmpty())
-            return true;
-
-        Box[][] boxes = getBoxes();
-
-        for (Position pos : zone) {
-            Box box = boxes[pos.getRow()][pos.getCol()];
-            boolean error = !box.isBlank()
-                && !Objects.equals(box.getResponse(), box.getSolution());
-            if (error)
-                return false;
-        }
-
-        return true;
-    }
-
-    /**
      * Handler for the backspace key.  Uses the following algorithm:
      * -If current box is empty, move back one character.  If not, stay still.
      * -Delete the letter in the current box.
