@@ -56,7 +56,6 @@
     <string name="online_sources_url">https://hague.gitlab.io/forkyz</string>
     <string name="import_puzzle">Import Puzzle</string>
     <string name="download_puzzles">Download Puzzles</string>
-    <string name="back">Back</string>
     <string name="no_puzzles_download_or_configure_storage">No puzzles found. Download puzzles with the button below or configure a storage directory in settings.</string>
     <string name="no_puzzles">No puzzles found.</string>
     <string name="unable_to_read_file">Unable to read file %1$s</string>
