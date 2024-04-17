@@ -557,6 +557,43 @@ public class PlayboardTest {
     }
 
     @TestWithAndWithoutBlockObjects
+    public void testNextWord(boolean blockObjects) throws Exception {
+        Puzzle puz = loadTestPuz(blockObjects);
+        Playboard board = new Playboard(puz);
+
+        // reveal grid bar one character in the middle of the grid
+        // select clue after it
+        // test go forward
+
+        board.revealPuzzle();
+
+        moveToPosition(board, 2, 5);
+        board.deleteLetter();
+
+        // first without skipping, end up at start of word
+        moveToPosition(board, 1, 12);
+        board.nextWord();
+        assertPosition(board, 2, 0);
+
+        // then with skipping, end up at empty cell
+        board.setSkipCompletedLetters(true);
+        moveToPosition(board, 1, 12);
+        board.nextWord();
+        assertPosition(board, 2, 5);
+
+        // if go back again, keep same cell (but end up in down direction)
+        board.nextWord();
+        assertPosition(board, 2, 5);
+
+        // fill board, check nextWord doesn't loop but ends up at
+        // end of word
+        board.toggleSelection();
+        board.playLetter('A');
+        board.nextWord();
+        assertPosition(board, 2, 9);
+    }
+
+    @TestWithAndWithoutBlockObjects
     public void testPreviousWord(boolean blockObjects) throws Exception {
         Puzzle puz = loadTestPuz(blockObjects);
         Playboard board = new Playboard(puz);
