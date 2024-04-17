@@ -557,6 +557,43 @@ public class PlayboardTest {
     }
 
     @TestWithAndWithoutBlockObjects
+    public void testPreviousWord(boolean blockObjects) throws Exception {
+        Puzzle puz = loadTestPuz(blockObjects);
+        Playboard board = new Playboard(puz);
+
+        // reveal grid bar one character in the middle of the grid
+        // select clue after it
+        // test go back
+
+        board.revealPuzzle();
+
+        moveToPosition(board, 2, 5);
+        board.deleteLetter();
+
+        // first without skipping, end up at start of word
+        moveToPosition(board, 2, 12);
+        board.previousWord();
+        assertPosition(board, 2, 0);
+
+        // then with skipping, end up at empty cell
+        board.setSkipCompletedLetters(true);
+        moveToPosition(board, 2, 12);
+        board.previousWord();
+        assertPosition(board, 2, 5);
+
+        // if go back again, keep same cell (but end up in down direction)
+        board.previousWord();
+        assertPosition(board, 2, 5);
+
+        // fill board, check previousWord doesn't loop but ends up at
+        // start of word
+        board.toggleSelection();
+        board.playLetter('A');
+        board.previousWord();
+        assertPosition(board, 2, 0);
+    }
+
+    @TestWithAndWithoutBlockObjects
     public void testDetachedWord(boolean blockObjects) throws Exception {
         Puzzle puz = loadTestDetachedPuz(blockObjects);
         Playboard board = new Playboard(puz);
@@ -659,7 +696,7 @@ public class PlayboardTest {
      * Test failure https://gitlab.com/Hague/forkyz/-/issues/86
      */
     @TestWithAndWithoutBlockObjects
-    public void testNextWord(boolean blockObjects) throws Exception {
+    public void testNextWordBug86(boolean blockObjects) throws Exception {
          Puzzle puz = loadTestPuz(blockObjects);
          Playboard board = new Playboard(puz);
 

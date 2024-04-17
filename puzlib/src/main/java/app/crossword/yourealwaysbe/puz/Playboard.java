@@ -1138,8 +1138,13 @@ public class Playboard implements Serializable {
 
     /**
      * Moves to start of previous word regardless of movement strategy
+     *
+     * Start takes skipCompletedLetters into account and highlights
+     * first empty cell in previous word. If no empty cell, then just
+     * start of word.
      */
     public Word previousWord() {
+        ClueID previousCID = getClueID();
         Word previous = getCurrentWord();
 
         Position curPos = getHighlightLetter();
@@ -1150,11 +1155,34 @@ public class Playboard implements Serializable {
         if (!Objects.equals(curPos, newPos))
             this.setHighlightLetter(newPos);
 
-        MovementStrategy.MOVE_NEXT_CLUE.back(this);
+        boolean goBack = true;
+        while (goBack) {
+            // only go back again if discovered needed later
+            goBack = false;
+
+            // Idea: use back for move_next_clue, which takes us to
+            // previous clue. Move to the start of that clue. Then
+            // search for blank cell to move to. If none found, try
+            // going around the loop again, unless we've already reached
+            // the originally selected clue
+
+            MovementStrategy.MOVE_NEXT_CLUE.back(this);
+
+            ClueID newCID = getClueID();
+            Position start = getClueStart(newCID);
+            setHighlightLetter(start);
+
+            Box box = puzzle.checkedGetBox(start);
+            if (box != null && skipBox(box, skipCompletedLetters)) {
+                moveZoneForward(skipCompletedLetters);
+                goBack = Objects.equals(start, getHighlightLetter())
+                    && !Objects.equals(previousCID, newCID);
+            }
+        }
 
         popNotificationDisabled();
 
-        setHighlightLetter(getClueStart(getClueID()));
+        notifyChange();
 
         return previous;
     }
