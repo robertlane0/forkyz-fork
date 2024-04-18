@@ -67,6 +67,10 @@
                 android:title="@string/share_puzzle_full"
             />
             <item
+                android:id="@+id/puzzle_menu_share_puzzle_without_extensions"
+                android:title="@string/share_puzzle_without_extensions"
+            />
+            <item
                 android:id="@+id/puzzle_menu_share_puzzle_orig"
                 android:title="@string/share_puzzle_orig"
             />

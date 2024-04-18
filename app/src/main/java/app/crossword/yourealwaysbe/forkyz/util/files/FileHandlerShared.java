@@ -41,17 +41,18 @@ public class FileHandlerShared extends FileProvider {
      * Runs off main thread to save file, calls back on main thread with
      * uriCallback.
      *
-     * @param writeOriginal whether to omit current play data such as
+     * @param writeBlank whether to omit current play data such as
      * flagged clues and filled in letters
+     * @param omitExtensions whether to omit Forkyz IPuz extensions
      */
     synchronized public static void getShareUri(
-        Context context, Puzzle puz, boolean writeOriginal,
+        Context context, Puzzle puz, boolean writeBlank, boolean omitExtensions,
         Consumer<Uri> uriCallback
     ) {
         executorService.execute(() -> {
             cleanCache(context);
             final Uri uri = getShareUriBackground(
-                context, puz, writeOriginal, uriCallback
+                context, puz, writeBlank, omitExtensions, uriCallback
             );
             handler.post(() -> {
                 uriCallback.accept(uri);
@@ -70,7 +71,10 @@ public class FileHandlerShared extends FileProvider {
     }
 
     synchronized static private Uri getShareUriBackground(
-        Context context, Puzzle puz, boolean writeOriginal,
+        Context context,
+        Puzzle puz,
+        boolean writeBlank,
+        boolean omitExtensions,
         Consumer<Uri> uriCallback
     ) {
         String fileName = AppPuzzleUtils.generateFileName(puz)
@@ -82,7 +86,7 @@ public class FileHandlerShared extends FileProvider {
                 new FileOutputStream(shareFile)
             )
         ) {
-            IPuzIO.writePuzzle(puz, os, writeOriginal);
+            IPuzIO.writePuzzle(puz, os, writeBlank, omitExtensions);
         } catch (IOException e) {
             LOGGER.severe("Could not create file for sharing: " + e);
             return null;

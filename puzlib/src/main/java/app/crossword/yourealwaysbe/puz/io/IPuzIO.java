@@ -1721,14 +1721,17 @@ public class IPuzIO extends AbstractJSONIO {
 
     public static void writePuzzle(Puzzle puz, OutputStream os)
             throws IOException {
-        writePuzzle(puz, os, false);
+        writePuzzle(puz, os, false, false);
     }
 
     /**
      * Write puzzle to os using WRITE_CHARSET
      */
     public static void writePuzzle(
-        Puzzle puz, OutputStream os, boolean omitPlayState
+        Puzzle puz,
+        OutputStream os,
+        boolean omitPlayState,
+        boolean omitExtensions
     ) throws IOException {
         BufferedWriter writer = null;
         try {
@@ -1745,7 +1748,9 @@ public class IPuzIO extends AbstractJSONIO {
             writeMetaData(puz, jsonWriter);
             writeBoxes(puz, jsonWriter, omitPlayState);
             writeClues(puz, jsonWriter);
-            writeExtensions(puz, jsonWriter, omitPlayState);
+
+            if (!omitExtensions)
+                writeExtensions(puz, jsonWriter, omitPlayState);
 
             jsonWriter.endObject();
             jsonWriter.newLine();
