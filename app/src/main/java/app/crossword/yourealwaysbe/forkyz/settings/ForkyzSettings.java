@@ -134,6 +134,8 @@ public class ForkyzSettings {
         = "dontDeleteCrossing";
     private static final String PREF_PLAY_MOVEMENT_STRATEGY
         = "movementStrategy";
+    private static final String PREF_PLAY_PLAY_LETTER_UNDO_ENABLED
+        = "playLetterUndoEnabled";
     private static final String PREF_PLAY_PREDICT_ANAGRAM_CHARS
         = "predictAnagramChars";
     private static final String
@@ -236,6 +238,7 @@ public class ForkyzSettings {
         BOOL_DEFAULTS.put(PREF_PLAY_SHOW_TIMER, false);
         BOOL_DEFAULTS.put(PREF_PLAY_SKIP_FILLED, false);
         BOOL_DEFAULTS.put(PREF_PLAY_CYCLE_UNFILLED, false);
+        BOOL_DEFAULTS.put(PREF_PLAY_PLAY_LETTER_UNDO_ENABLED, false);
         BOOL_DEFAULTS.put(PREF_PLAY_SPACE_CHANGE_DIRECTION, true);
         BOOL_DEFAULTS.put(PREF_PLAY_SUPPRESS_HINT_HIGHLIGHTING, false);
         BOOL_DEFAULTS.put(PREF_VOICE_ALWAYS_ANNOUNCE_BOX, false);
@@ -863,6 +866,13 @@ public class ForkyzSettings {
      */
     public void getPlayRandomClueOnShake(Consumer<Boolean> cb) {
         getBooleanPreference(PREF_PLAY_RANDOM_CLUE_ON_SHAKE, cb);
+    }
+
+    /**
+     * Whether to use play letter undo stack on Playboard
+     */
+    public void getPlayPlayLetterUndoEnabled(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_PLAY_PLAY_LETTER_UNDO_ENABLED, cb);
     }
 
     /**

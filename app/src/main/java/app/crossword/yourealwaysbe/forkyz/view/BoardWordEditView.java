@@ -157,7 +157,7 @@ public class BoardWordEditView extends BoardEditView {
     public void onDeleteResponse() {
         Playboard board = getBoard();
         if (board != null)
-            board.deleteLetter();
+            board.deleteOrUndoLetter();
     }
 
     @Override

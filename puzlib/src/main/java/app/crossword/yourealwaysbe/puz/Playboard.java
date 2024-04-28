@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.Stack;
 import java.util.logging.Logger;
 
 import app.crossword.yourealwaysbe.puz.util.PuzzleUtils;
@@ -65,6 +66,8 @@ public class Playboard implements Serializable {
     private HashSet<ClueID> changedClueIDs = new HashSet<>();
     // reuse same one for all notifications
     private PlayboardChanges notificationChanges = new PlayboardChanges();
+    private PlayLetterUndoStack playLetterUndoStack
+        = new PlayLetterUndoStack(false);
 
     public Playboard(Puzzle puzzle,
                      MovementStrategy movementStrategy,
@@ -99,6 +102,13 @@ public class Playboard implements Serializable {
         // there will be no listeners at this point, but the call also
         // does a bit of bookkeeping / setup for the next use
         notifyChange();
+    }
+
+    /**
+     * Whether to record played letters and undo on delete
+     */
+    public void setPlayLetterUndoStackEnabled(boolean enabled) {
+        playLetterUndoStack.setEnabled(enabled);
     }
 
     public void setPreserveCorrectLettersInShowErrors(boolean value){
@@ -248,6 +258,8 @@ public class Playboard implements Serializable {
     }
 
     public Word setHighlightLetter(Position highlightLetter) {
+        playLetterUndoStack.clearIfEnabled();
+
         Word w = this.getCurrentWord();
 
         if (highlightLetter == null)
@@ -303,6 +315,8 @@ public class Playboard implements Serializable {
     public Word setHighlightLetter(Position highlightLetter, ClueID cid) {
         if (cid == null)
             return setHighlightLetter(highlightLetter);
+
+        playLetterUndoStack.clearIfEnabled();
 
         Word w = getCurrentWord();
 
@@ -491,42 +505,59 @@ public class Playboard implements Serializable {
      * -If current box is empty, move back one character.  If not, stay still.
      * -Delete the letter in the current box.
      */
-    public Word deleteLetter() {
+    public Word deleteOrUndoLetter() {
         Box currentBox = this.getCurrentBox();
         Word wordToReturn = this.getCurrentWord();
 
         pushNotificationDisabled();
 
-        if (currentBox.isBlank() || isDontDeleteCurrent()) {
-            wordToReturn = this.previousLetter();
-            currentBox = this.getCurrentBox();
-        }
+        // do a standard delete if undo stack is empty
+        if (playLetterUndoStack.isEmpty()) {
+            if (currentBox.isBlank() || isDontDeleteCurrent()) {
+                wordToReturn = this.previousLetter();
+                currentBox = this.getCurrentBox();
+            }
 
-        // If preserving letters, skip over them
-        // break if we hit a wall or loop all the way around
-        Position startPosition = getHighlightLetter();
-        ClueID startClueID = getClueID();
-        Position lastPosition = startPosition;
-        while (isDontDeleteCurrent()) {
-            this.previousLetter();
+            // If preserving letters, skip over them
+            // break if we hit a wall or loop all the way around
+            Position startPosition = getHighlightLetter();
+            ClueID startClueID = getClueID();
+            Position lastPosition = startPosition;
+            while (isDontDeleteCurrent()) {
+                this.previousLetter();
 
-            Position newPosition = getHighlightLetter();
-            boolean stuck = (
-                Objects.equals(newPosition, startPosition)
-                    && Objects.equals(startClueID, getClueID())
-            ) || Objects.equals(newPosition, lastPosition);
+                Position newPosition = getHighlightLetter();
+                boolean stuck = (
+                    Objects.equals(newPosition, startPosition)
+                        && Objects.equals(startClueID, getClueID())
+                ) || Objects.equals(newPosition, lastPosition);
 
-            if (stuck)
-                break;
-            else
-                lastPosition = newPosition;
-        }
+                if (stuck)
+                    break;
+                else
+                    lastPosition = newPosition;
+            }
 
-        if (!isDontDeleteCurrent()) {
-            currentBox = this.getCurrentBox();
-            if (currentBox != null) {
-                currentBox.setBlank();
-                flagChange(getHighlightLetter());
+            if (!isDontDeleteCurrent()) {
+                currentBox = this.getCurrentBox();
+                if (currentBox != null) {
+                    currentBox.setBlank();
+                    flagChange(getHighlightLetter());
+                }
+            }
+        } else {
+            // Grab the last position a letter was entered and pop it from the list.
+            PlayLetterInfo undo = playLetterUndoStack.pop();
+            Position pos = undo.getPosition();
+            // Jump back to last box and delete the letter.
+            currentBox = puzzle.checkedGetBox(pos);
+            if(currentBox != null) {
+                currentBox.setResponse(undo.getOldResponse());
+                playLetterUndoStack.pushClearDisabled();
+                setHighlightLetter(pos);
+                playLetterUndoStack.popClearDisabled();
+                puzzle.setCurrentClueID(undo.getClueID());
+                flagChange(pos);
             }
         }
 
@@ -1057,7 +1088,7 @@ public class Playboard implements Serializable {
             Position current = getHighlightLetter();
             if (!Objects.equals(current, pos))
                 setHighlightLetter(pos);
-            deleteLetter();
+            deleteOrUndoLetter();
         }
 
         Position currentPos = getHighlightLetter();
@@ -1089,12 +1120,20 @@ public class Playboard implements Serializable {
             return this.getCurrentWord();
         } else {
             pushNotificationDisabled();
+
+            pushPlayLetterUndoStackCurrent();
+
             b.setResponse(letter);
             b.setResponder(this.responder);
             flagChange(pos);
-            Word next = this.nextLetter();
-            popNotificationDisabled();
 
+            // movement normally clears undo stack but we want to keep
+            // it here
+            playLetterUndoStack.pushClearDisabled();
+            Word next = this.nextLetter();
+            playLetterUndoStack.popClearDisabled();
+
+            popNotificationDisabled();
             notifyChange();
 
             return next;
@@ -1358,6 +1397,8 @@ public class Playboard implements Serializable {
      * the current direction first.
      */
     public Word toggleSelection() {
+        playLetterUndoStack.clearIfEnabled();
+
         Word w = this.getCurrentWord();
 
         Box box = puzzle.checkedGetBox(getHighlightLetter());
@@ -1796,6 +1837,16 @@ public class Playboard implements Serializable {
     }
 
     /**
+     * Add current board position to play letter undo stack
+     */
+    private void pushPlayLetterUndoStackCurrent() {
+        Position pos = getHighlightLetter();
+        Box box = puzzle.checkedGetBox(pos);
+        String response = (box == null) ? null : box.getResponse();
+        playLetterUndoStack.push(pos, getClueID(), response);
+    }
+
+    /**
      * A word on the grid
      *
      * A Zone and possibly the clue it goes with (null if no clue).
@@ -1939,5 +1990,88 @@ public class Playboard implements Serializable {
          * List of clues that have had num/hint edited or flagged
          */
         public Collection<ClueID> getChangedClueIDs() { return changedClueIDs; }
+    }
+
+    /**
+     * Position of a play letter in undo stack
+     */
+    private static class PlayLetterInfo {
+        private Position position;
+        private ClueID clueID;
+        private String oldResponse;
+
+        public PlayLetterInfo(
+            Position position, ClueID clueID, String oldResponse
+        ) {
+            this.position = position;
+            this.clueID = clueID;
+            this.oldResponse = oldResponse;
+        }
+
+        public Position getPosition() { return position; }
+        public ClueID getClueID() { return clueID; }
+        public String getOldResponse() { return oldResponse; }
+    }
+
+    /**
+     * For managing an undo stack of played letters
+     */
+    private static class PlayLetterUndoStack {
+        private int clearDisabledDepth = 0;
+        private Stack<PlayLetterInfo> undoStack = new Stack<>();
+        private boolean enabled;
+
+        public PlayLetterUndoStack(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        /**
+         * Stack will be cleared and not accept push if disabled
+         */
+        public void setEnabled(boolean enabled) {
+            if (!enabled)
+                undoStack.clear();
+            this.enabled = enabled;
+        }
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        /**
+         * Clear if clearing is enabled (not if whole stack is enabled)
+         */
+        public void clearIfEnabled() {
+            if (!isClearDisabled())
+                undoStack.clear();
+        }
+
+        public void pushClearDisabled() {
+            clearDisabledDepth += 1;
+        }
+
+        public void popClearDisabled() {
+            if (isClearDisabled())
+                clearDisabledDepth -= 1;
+        }
+
+        private boolean isClearDisabled() {
+            return clearDisabledDepth > 0;
+        }
+
+        public void push(Position position, ClueID clueID, String oldResponse) {
+            if (!enabled)
+                return;
+
+            undoStack.push(new PlayLetterInfo(position, clueID, oldResponse));
+        }
+
+        public PlayLetterInfo pop() {
+            return undoStack.pop();
+        }
+
+        public boolean isEmpty() {
+            return undoStack.isEmpty();
+        }
     }
 }

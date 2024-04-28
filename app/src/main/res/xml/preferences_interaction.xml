@@ -66,6 +66,13 @@
     />
 
     <androidx.preference.CheckBoxPreference
+        android:title="@string/play_letter_undo"
+        android:defaultValue="false"
+        android:summary="@string/play_letter_undo_desc"
+        android:key="playLetterUndoEnabled"
+    />
+
+    <androidx.preference.CheckBoxPreference
         android:title="@string/space_change_dir"
         android:defaultValue="false"
         android:summary="@string/space_change_dir_desc"

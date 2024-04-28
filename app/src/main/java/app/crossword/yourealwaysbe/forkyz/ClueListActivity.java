@@ -515,7 +515,7 @@ public class ClueListActivity extends PuzzleActivity
         Word w = board.getCurrentWord();
         Position first = getCurrentFirstPosition();
 
-        board.deleteLetter();
+        board.deleteOrUndoLetter();
 
         Position p = board.getHighlightLetter();
         if (!w.checkInWord(p) && first != null) {

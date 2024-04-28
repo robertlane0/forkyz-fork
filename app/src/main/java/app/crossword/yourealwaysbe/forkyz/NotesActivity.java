@@ -969,7 +969,7 @@ public class NotesActivity extends PuzzleActivity {
             first = zone.getPosition(0);
         }
 
-        board.deleteLetter();
+        board.deleteOrUndoLetter();
 
         Position p = board.getHighlightLetter();
 

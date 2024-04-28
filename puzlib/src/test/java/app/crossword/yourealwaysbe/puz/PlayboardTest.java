@@ -105,7 +105,7 @@ public class PlayboardTest {
 
         moveToPosition(board, 1, 4);
         for (int i = 0; i < 5; i++)
-            board.deleteLetter();
+            board.deleteOrUndoLetter();
 
         assertBoxBlank(puz, 1, 0);
         assertBoxBlank(puz, 1, 1);
@@ -155,13 +155,13 @@ public class PlayboardTest {
         board.playLetter('A');
 
         moveToPosition(board, 1, 4);
-        board.deleteLetter();
+        board.deleteOrUndoLetter();
         assertPosition(board, 1, 4);
-        board.deleteLetter();
+        board.deleteOrUndoLetter();
         assertPosition(board, 1, 3);
-        board.deleteLetter();
+        board.deleteOrUndoLetter();
         assertPosition(board, 1, 2);
-        board.deleteLetter();
+        board.deleteOrUndoLetter();
         assertPosition(board, 1, 0);
 
         assertBoxLetter(puz, 1, 1, "B");
@@ -209,11 +209,11 @@ public class PlayboardTest {
         board.playLetter('A');
 
         moveToPosition(board, 1, 4);
-        board.deleteLetter();
+        board.deleteOrUndoLetter();
         assertPosition(board, 1, 4);
-        board.deleteLetter();
+        board.deleteOrUndoLetter();
         assertPosition(board, 1, 2);
-        board.deleteLetter();
+        board.deleteOrUndoLetter();
         assertPosition(board, 1, 0);
 
         assertBoxBlank(puz, 1, 0);
@@ -246,25 +246,25 @@ public class PlayboardTest {
          board.setPreserveCorrectLettersInShowErrors(true);
 
          moveToPosition(board, 1, 4);
-         board.deleteLetter();
+         board.deleteOrUndoLetter();
          assertPosition(board, 1, 2);
          assertBoxBlank(puz, 1, 2);
-         board.deleteLetter();
+         board.deleteOrUndoLetter();
          assertPosition(board, 1, 2);
 
          // do twice to end up across again
-         board.deleteLetter();
+         board.deleteOrUndoLetter();
          assertPosition(board, 1, 2);
 
          // check ok when all correct (no infinite loops)
          board.revealPuzzle();
-         board.deleteLetter();
+         board.deleteOrUndoLetter();
          assertPosition(board, 1, 1);
 
          board.setMovementStrategy(MovementStrategy.STOP_ON_END);
-         board.deleteLetter();
+         board.deleteOrUndoLetter();
          assertPosition(board, 1, 0);
-         board.deleteLetter();
+         board.deleteOrUndoLetter();
          assertPosition(board, 1, 0);
     }
 
@@ -299,19 +299,19 @@ public class PlayboardTest {
 
         // Down / Back
         moveToPosition(board, 5, 6);
-        board.deleteLetter();
-        board.deleteLetter();
+        board.deleteOrUndoLetter();
+        board.deleteOrUndoLetter();
         assertPosition(board, 3, 6);
         for (int i = 0; i < 5; i++)
-            board.deleteLetter();
+            board.deleteOrUndoLetter();
 
         // Across / Back
         moveToPosition(board, 0, 6);
         board.toggleSelection();
-        board.deleteLetter();
+        board.deleteOrUndoLetter();
         assertPosition(board, 0, 4);
         for (int i = 0; i < 6; i++)
-            board.deleteLetter();
+            board.deleteOrUndoLetter();
         assertPosition(board, 0, 0);
     }
 
@@ -340,14 +340,14 @@ public class PlayboardTest {
 
         // Down / Back
         moveToPosition(board, 5, 6);
-        board.deleteLetter();
-        board.deleteLetter();
+        board.deleteOrUndoLetter();
+        board.deleteOrUndoLetter();
         assertPosition(board, 5, 6);
 
         // Across / Back
         moveToPosition(board, 0, 6);
         board.toggleSelection();
-        board.deleteLetter();
+        board.deleteOrUndoLetter();
         assertPosition(board, 0, 6);
     }
 
@@ -378,22 +378,22 @@ public class PlayboardTest {
         assertPosition(board, 0, 7);
 
         // Down / Back
-        board.deleteLetter();
-        board.deleteLetter();
+        board.deleteOrUndoLetter();
+        board.deleteOrUndoLetter();
         assertPosition(board, 3, 6);
 
         // Across / Back
         moveToPosition(board, 0, 6);
         board.toggleSelection();
-        board.deleteLetter();
-        board.deleteLetter();
+        board.deleteOrUndoLetter();
+        board.deleteOrUndoLetter();
         assertPosition(board, 0, 4);
         for (int i = 0; i < 5; i++)
-            board.deleteLetter();
+            board.deleteOrUndoLetter();
         // wrap to down clues
         assertPosition(board, 14, 10);
         for (int i = 0; i < 3; i++)
-            board.deleteLetter();
+            board.deleteOrUndoLetter();
         assertPosition(board, 14, 14);
 
         // Wrap across
@@ -403,7 +403,7 @@ public class PlayboardTest {
 
         // Wrap down
         board.toggleSelection();
-        board.deleteLetter();
+        board.deleteOrUndoLetter();
         // wrap to across clues
         assertPosition(board, 14, 10);
         board.playLetter('A');
@@ -441,20 +441,20 @@ public class PlayboardTest {
 
         // Down / Back
         for (int i = 0; i < 5; i++)
-            board.deleteLetter();
+            board.deleteOrUndoLetter();
         assertPosition(board, 3, 13);
         for (int i = 0; i < 100; i++)
-            board.deleteLetter();
+            board.deleteOrUndoLetter();
         assertPosition(board, 0, 0);
 
         // Across / Back
         moveToPosition(board, 14, 3);
         board.toggleSelection();
         for (int i = 0; i < 5; i++)
-            board.deleteLetter();
+            board.deleteOrUndoLetter();
         assertPosition(board, 13, 3);
         for (int i = 0; i < 100; i++)
-            board.deleteLetter();
+            board.deleteOrUndoLetter();
         assertPosition(board, 0, 0);
     }
 
@@ -503,7 +503,7 @@ public class PlayboardTest {
 
         // Down / Back
         moveToPosition(board, 11, 0);
-        board.deleteLetter();
+        board.deleteOrUndoLetter();
         assertPosition(board, 14, 0);
 
         // Across / Back
@@ -511,13 +511,13 @@ public class PlayboardTest {
         board.toggleSelection();
 
         // cycle only happens if we delay delete
-        board.deleteLetter();
+        board.deleteOrUndoLetter();
         assertPosition(board, 0, 11);
-        board.deleteLetter();
+        board.deleteOrUndoLetter();
         assertPosition(board, 0, 11);
         try {
             Thread.sleep(200);
-            board.deleteLetter();
+            board.deleteOrUndoLetter();
             assertPosition(board, 0, 14);
         } catch (InterruptedException e) {
             fail(e);
@@ -568,7 +568,7 @@ public class PlayboardTest {
         board.revealPuzzle();
 
         moveToPosition(board, 2, 5);
-        board.deleteLetter();
+        board.deleteOrUndoLetter();
 
         // first without skipping, end up at start of word
         moveToPosition(board, 1, 12);
@@ -605,7 +605,7 @@ public class PlayboardTest {
         board.revealPuzzle();
 
         moveToPosition(board, 2, 5);
-        board.deleteLetter();
+        board.deleteOrUndoLetter();
 
         // first without skipping, end up at start of word
         moveToPosition(board, 2, 12);
@@ -742,6 +742,40 @@ public class PlayboardTest {
 
          assertPosition(board, 0, 6);
          assertEquals(board.getClueID().getListName(), "Across");
+    }
+
+    @Test
+    public void testPlayLetterUndoStack() throws Exception {
+        Puzzle puz = loadTestPuz(false);
+        Playboard board = new Playboard(puz);
+
+        board.setPlayLetterUndoStackEnabled(true);
+
+        moveToPosition(board, 0, 0);
+        board.playLetter('A');
+        board.playLetter('B');
+        board.playLetter('C');
+
+        // undo stack cleared to here
+        moveToPosition(board, 0, 1);
+        board.playLetter('D');
+        board.playLetter('E');
+
+        // undoes E
+        board.deleteOrUndoLetter();
+        // undoes D
+        board.deleteOrUndoLetter();
+
+        assertBoxLetter(puz, 0, 1, "B");
+        assertBoxLetter(puz, 0, 2, "C");
+
+        // undo stack clear, deletes B
+        board.deleteOrUndoLetter();
+        // undo stack clear, deletes A
+        board.deleteOrUndoLetter();
+
+        assertBoxBlank(puz, 0, 0);
+        assertBoxBlank(puz, 0, 1);
     }
 
     private void checkNoMoveFullGrid(

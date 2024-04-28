@@ -751,6 +751,9 @@ public class PlayActivity extends PuzzleActivity
         settings.getPlayMovementStrategy(movementStrategy -> {
             board.setMovementStrategy(movementStrategy);
         });
+        settings.getPlayPlayLetterUndoEnabled(
+            board::setPlayLetterUndoStackEnabled
+        );
         board.addListener(this);
 
         keyboardManager.attachKeyboardToView(binding.boardView);
@@ -1096,7 +1099,7 @@ public class PlayActivity extends PuzzleActivity
             if (scratchMode)
                 board.deleteScratchLetter();
             else
-                board.deleteLetter();
+                board.deleteOrUndoLetter();
         });
     }
 
