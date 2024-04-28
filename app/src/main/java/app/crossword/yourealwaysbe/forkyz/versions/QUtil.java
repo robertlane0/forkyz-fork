@@ -7,6 +7,6 @@ import android.os.Build;
 public class QUtil extends PieUtil {
     @Override
     public String getFilterClueToAlphabeticRegex() {
-        return "<[^>]*>|[^\\p{IsAlphabetic}]";
+        return "&[^;]*;|<[^>]*>|[^\\p{IsAlphabetic}]";
     }
 }

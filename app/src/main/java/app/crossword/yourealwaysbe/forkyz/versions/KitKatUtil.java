@@ -172,6 +172,6 @@ public class KitKatUtil implements AndroidVersionUtils {
 
     @Override
     public String getFilterClueToAlphabeticRegex() {
-        return "<[^>]*>|[^\\p{Alphabetic}]";
+        return "&[^;]*;|<[^>]*>|[^\\p{Alphabetic}]";
     }
 }
