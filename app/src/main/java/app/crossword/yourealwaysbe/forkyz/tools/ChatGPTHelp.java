@@ -30,7 +30,7 @@ import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 public class ChatGPTHelp {
     private static final String CHAT_GPT_API_URL
         = "https://api.openai.com/v1/completions";
-    private static final String CHAT_GPT_MODEL = "text-davinci-003";
+    private static final String CHAT_GPT_MODEL = "gpt-3.5-turbo-instruct";
     private static final String CHAT_GPT_RESPONSE_CHOICES = "choices";
     private static final String CHAT_GPT_RESPONSE_ERROR = "error";
     private static final String CHAT_GPT_RESPONSE_MESSAGE = "message";
