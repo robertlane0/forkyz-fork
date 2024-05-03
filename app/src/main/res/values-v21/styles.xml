@@ -6,13 +6,5 @@
         <item name="android:background">#000000</item>
         <item name="materialButtonStyle">@style/keyboardHideButtonStyle</item>
     </style>
-    <style
-        name="appBarLayoutStyle"
-        parent="Widget.Material3.AppBarLayout"
-    >
-        <!-- thanks to https://stackoverflow.com/a/45703684/6882587 -->
-        <!-- possible confirmation: https://developer.android.com/reference/com/google/android/material/appbar/AppBarLayout#setTargetElevation(float) -->
-        <item name="android:stateListAnimator">@anim/app_bar_elevation</item>
-    </style>
 </resources>
 

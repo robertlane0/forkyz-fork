@@ -23,6 +23,7 @@ import android.content.res.ColorStateList;
 import android.util.AttributeSet;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.GestureDetector.SimpleOnGestureListener;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -30,7 +31,6 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import androidx.core.content.ContextCompat;
 import androidx.core.text.HtmlCompat;
-import androidx.core.view.GestureDetectorCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat;
 import androidx.lifecycle.ViewTreeLifecycleOwner;
@@ -982,7 +982,7 @@ public class ClueTabs extends LinearLayout
                 }
             };
 
-        GestureDetectorCompat tabSwipeDetector = new GestureDetectorCompat(
+        GestureDetector tabSwipeDetector = new GestureDetector(
             binding.clueTabsTabLayout.getContext(), tabSwipeListener
         );
 

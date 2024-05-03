@@ -1,7 +1,7 @@
 {
     "version": "http://ipuz.org/v2",
     "kind": [ "http://ipuz.org/crossword#1" ],
-    "title": "Test &amp; puzzle",
+    "title": "Test &amp; puzzle \u2018",
     "author": "Test author",
     "copyright": "Test copyright",
     "intro": "Intro",

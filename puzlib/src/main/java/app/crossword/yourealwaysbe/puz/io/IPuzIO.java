@@ -1721,14 +1721,17 @@ public class IPuzIO extends AbstractJSONIO {
 
     public static void writePuzzle(Puzzle puz, OutputStream os)
             throws IOException {
-        writePuzzle(puz, os, false);
+        writePuzzle(puz, os, false, false);
     }
 
     /**
      * Write puzzle to os using WRITE_CHARSET
      */
     public static void writePuzzle(
-        Puzzle puz, OutputStream os, boolean omitPlayState
+        Puzzle puz,
+        OutputStream os,
+        boolean omitPlayState,
+        boolean omitExtensions
     ) throws IOException {
         BufferedWriter writer = null;
         try {
@@ -1745,7 +1748,9 @@ public class IPuzIO extends AbstractJSONIO {
             writeMetaData(puz, jsonWriter);
             writeBoxes(puz, jsonWriter, omitPlayState);
             writeClues(puz, jsonWriter);
-            writeExtensions(puz, jsonWriter, omitPlayState);
+
+            if (!omitExtensions)
+                writeExtensions(puz, jsonWriter, omitPlayState);
 
             jsonWriter.endObject();
             jsonWriter.newLine();
@@ -1784,13 +1789,14 @@ public class IPuzIO extends AbstractJSONIO {
     private static void writeMetaData(Puzzle puz, FormatableJSONWriter writer)
             throws IOException {
         writer
-            .keyValueNonNull(FIELD_TITLE, puz.getTitle())
-            .keyValueNonNull(FIELD_AUTHOR, puz.getAuthor())
-            .keyValueNonNull(FIELD_COPYRIGHT, puz.getCopyright())
-            .keyValueNonNull(FIELD_INTRO, puz.getIntroMessage())
-            .keyValueNonNull(FIELD_NOTES, puz.getNotes())
-            .keyValueNonNull(FIELD_EXPLANATION, puz.getCompletionMessage())
-            .keyValueNonNull(FIELD_URL, puz.getSourceUrl())
+            .keyValueNonNull(FIELD_TITLE, htmlUnicode(puz.getTitle()))
+            .keyValueNonNull(FIELD_AUTHOR, htmlUnicode(puz.getAuthor()))
+            .keyValueNonNull(FIELD_COPYRIGHT, htmlUnicode(puz.getCopyright()))
+            .keyValueNonNull(FIELD_INTRO, htmlUnicode(puz.getIntroMessage()))
+            .keyValueNonNull(FIELD_NOTES, htmlUnicode(puz.getNotes()))
+            .keyValueNonNull(
+                FIELD_EXPLANATION, htmlUnicode(puz.getCompletionMessage())
+            ).keyValueNonNull(FIELD_URL, puz.getSourceUrl())
             .keyValueNonNull(FIELD_PUBLISHER, puz.getSource());
 
         LocalDate date = puz.getDate();
@@ -2148,7 +2154,7 @@ public class IPuzIO extends AbstractJSONIO {
 
                 writer.indent(3)
                     .key(FIELD_CLUE_HINT)
-                    .value(clue.getHint());
+                    .value(htmlUnicode(clue.getHint()));
                 writer.newLine();
 
                 if (clue.hasZone()) {
@@ -2573,6 +2579,60 @@ public class IPuzIO extends AbstractJSONIO {
         // ignore alpha channel
         return String.format(
             HEX_COLOR_FORMAT, color & 0x00ffffff
+        );
+    }
+
+    /**
+     * Convert json \\u characters into &x...;
+     *
+     * org.json converts certain characters into \\uxxxx notation, which
+     * is rejected by Puzzazz. Convert to these into html entity.
+     */
+    private static String htmlUnicode(String s) {
+        if (hasJSONUChar(s)) {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < s.length(); i++) {
+                char c = s.charAt(i);
+                if (isJSONUChar(c)) {
+                    // adapted from org.json
+                    sb.append("&#x");
+                    String hhhh = Integer.toHexString(c);
+                    sb.append("0000", 0, 4 - hhhh.length());
+                    sb.append(hhhh);
+                    sb.append(";");
+                } else {
+                    sb.append(c);
+                }
+            }
+            return sb.toString();
+        } else {
+            return s;
+        }
+    }
+
+    /**
+     * If some char in the string would be escaped by org.json
+     */
+    private static boolean hasJSONUChar(String s) {
+        if (s == null)
+            return false;
+
+        for (int i = 0; i < s.length(); i++) {
+            if (isJSONUChar(s.charAt(i)))
+                return true;
+        }
+        return false;
+    }
+
+    /*
+     * If c is a char org.json would escape as \\uxxxx
+     *
+     * Condition taken from JSONObject implementation
+     */
+    private static boolean isJSONUChar(char c) {
+        return (
+            c < ' ' || (c >= '\u0080' && c < '\u00a0')
+            || (c >= '\u2000' && c < '\u2100')
         );
     }
 

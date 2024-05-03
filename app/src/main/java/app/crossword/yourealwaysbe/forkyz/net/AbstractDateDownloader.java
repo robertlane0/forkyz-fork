@@ -283,7 +283,7 @@ public class AbstractDateDownloader extends AbstractDownloader {
         // available date this relies on puzzles being weekly according
         // to our model include this day last week in case current day
         // not yet available
-        int lookAhead = -1;
+        long lookAhead = -1;
         Duration availabilityOffset = getUTCAvailabilityOffset();
         if (availabilityOffset != null)
             lookAhead += availabilityOffset.toDays();
@@ -307,10 +307,11 @@ public class AbstractDateDownloader extends AbstractDownloader {
     /**
      * How far back in time to look when searching for latest puzzle
      *
-     * Default is 7 days, but subclasses may want to vary.
+     * Default is 8 days, but subclasses may want to vary. (To account for
+     * slight hour differences, one week is a bit too precise.)
      */
     protected int getLatestDateWindow() {
-        return 7;
+        return 8;
     }
 
     /**

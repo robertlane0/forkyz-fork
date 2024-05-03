@@ -9,16 +9,17 @@
             type="app.crossword.yourealwaysbe.forkyz.BrowseActivityViewModel"
         />
     </data>
-    <LinearLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:orientation="vertical"
     >
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/app_bar_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fitsSystemWindows="true"
+            app:liftOnScroll="true"
+            app:liftOnScrollTargetViewId="@id/puzzle_list"
         >
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/toolbar"
@@ -26,128 +27,123 @@
                 android:layout_height="?attr/actionBarSize"
             />
         </com.google.android.material.appbar.AppBarLayout>
-        <androidx.coordinatorlayout.widget.CoordinatorLayout
+        <LinearLayout
             android:id="@+id/content"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
         >
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
+                android:id="@+id/filter_panel"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="gone"
             >
-                <LinearLayout
-                    android:id="@+id/filter_panel"
-                    android:layout_width="fill_parent"
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:visibility="gone"
+                    android:layout_weight="1"
+                    android:hint="@string/filter_hint"
+                    android:padding="4dp"
                 >
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:hint="@string/filter_hint"
-                        android:padding="4dp"
-                    >
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/filter_edit_box"
-                            android:layout_width="fill_parent"
-                            android:layout_height="wrap_content"
-                            android:inputType="text"
-                            android:autofillHints=".AUTOFILL_HINT_NOT_APPLICABLE"
-                            android:text="@={view_model.puzzleFilter}"
-                        />
-                    </com.google.android.material.textfield.TextInputLayout>
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/close_filter_button"
-                        android:layout_height="wrap_content"
-                        android:layout_width="40dp"
-                        android:layout_marginStart="4dp"
-                        android:layout_marginEnd="4dp"
-                        android:layout_marginLeft="4dp"
-                        android:layout_marginRight="4dp"
-                        app:icon="@drawable/ic_close"
-                        android:contentDescription="@string/close_filter_desc"
-                        app:iconPadding="0dp"
-                        app:iconGravity="textStart"
-                        style="@style/Widget.Material3.Button.ElevatedButton"
-                    />
-                </LinearLayout>
-                <TextView
-                    android:id="@+id/empty_listing_msg"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="@string/no_puzzles_download_or_configure_storage"
-                    android:visibility="gone"
-                    android:textSize="15sp"
-                    android:padding="30sp"
-                />
-                <TextView
-                    android:id="@+id/internal_storage_msg"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="@string/internal_storage_description"
-                    android:visibility="gone"
-                    android:textSize="15sp"
-                    android:padding="30sp"
-                />
-                <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-                        android:id="@+id/swipe_container"
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/filter_edit_box"
                         android:layout_width="fill_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                >
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/puzzle_list"
-                        android:layout_width="fill_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                        android:layout_height="wrap_content"
+                        android:inputType="text"
+                        android:autofillHints=".AUTOFILL_HINT_NOT_APPLICABLE"
+                        android:text="@={view_model.puzzleFilter}"
                     />
-                </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-                <LinearLayout
-                    android:id="@+id/please_wait_notice"
-                    android:layout_width="fill_parent"
+                </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/close_filter_button"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center"
-                    android:visibility="gone"
-                >
-                    <ProgressBar
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:indeterminate="true"
-                    />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/please_wait"
-                        android:textSize="20sp"
-                    />
-                </LinearLayout>
+                    android:layout_width="40dp"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginEnd="4dp"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginRight="4dp"
+                    app:icon="@drawable/ic_close"
+                    android:contentDescription="@string/close_filter_desc"
+                    app:iconPadding="0dp"
+                    app:iconGravity="textStart"
+                    style="@style/Widget.Material3.Button.ElevatedButton"
+                />
             </LinearLayout>
-            <com.leinardi.android.speeddial.SpeedDialOverlayLayout
-                android:id="@+id/speed_dial_overlay"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:theme="@style/speedDialOverlayStyle"
-            />
-            <com.leinardi.android.speeddial.SpeedDialView
-                android:id="@+id/speed_dial_add"
-                android:layout_gravity="end|bottom"
+            <TextView
+                android:id="@+id/empty_listing_msg"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:contentDescription="@string/add_puzzle"
-                app:sdMainFabClosedSrc="@drawable/ic_add"
-                app:sdMainFabOpenedSrc="@drawable/ic_add"
-                app:sdOverlayLayout="@id/speed_dial_overlay"
-                app:layout_behavior="@string/speeddial_scrolling_view_snackbar_behavior"
-                android:theme="?speedDialStyle"
+                android:layout_gravity="center"
+                android:text="@string/no_puzzles_download_or_configure_storage"
+                android:visibility="gone"
+                android:textSize="15sp"
+                android:padding="30sp"
             />
-        </androidx.coordinatorlayout.widget.CoordinatorLayout>
-    </LinearLayout>
+            <TextView
+                android:id="@+id/internal_storage_msg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/internal_storage_description"
+                android:visibility="gone"
+                android:textSize="15sp"
+                android:padding="30sp"
+            />
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                    android:id="@+id/swipe_container"
+                    android:layout_width="fill_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+            >
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/puzzle_list"
+                    android:layout_width="fill_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                />
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+            <LinearLayout
+                android:id="@+id/please_wait_notice"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:visibility="gone"
+            >
+                <ProgressBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:indeterminate="true"
+                />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/please_wait"
+                    android:textSize="20sp"
+                />
+            </LinearLayout>
+        </LinearLayout>
+        <com.leinardi.android.speeddial.SpeedDialOverlayLayout
+            android:id="@+id/speed_dial_overlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:theme="@style/speedDialOverlayStyle"
+        />
+        <com.leinardi.android.speeddial.SpeedDialView
+            android:id="@+id/speed_dial_add"
+            android:layout_gravity="end|bottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:contentDescription="@string/add_puzzle"
+            app:sdMainFabClosedSrc="@drawable/ic_add"
+            app:sdMainFabOpenedSrc="@drawable/ic_add"
+            app:sdOverlayLayout="@id/speed_dial_overlay"
+            app:layout_behavior="@string/speeddial_scrolling_view_snackbar_behavior"
+            android:theme="?speedDialStyle"
+        />
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

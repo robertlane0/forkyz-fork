@@ -125,12 +125,12 @@ public abstract class PuzzleActivity
             }
         );
 
-        settings.livePlayDontDeleteCrossing().observe(
+        settings.livePlayDeleteCrossingMode().observe(
             this,
-            dontDelete -> {
+            deleteCrossingMode -> {
                 Playboard board = getBoard();
                 if (board != null)
-                    board.setDontDeleteCrossing(dontDelete);
+                    board.setDeleteCrossingMode(deleteCrossingMode);
             }
         );
     }
@@ -223,10 +223,13 @@ public abstract class PuzzleActivity
             shareClue(true);
             return true;
         } else if (id == R.id.puzzle_menu_share_puzzle_full) {
-            sharePuzzle(false);
+            sharePuzzle(false, false);
+            return true;
+        } else if (id == R.id.puzzle_menu_share_puzzle_without_extensions) {
+            sharePuzzle(false, true);
             return true;
         } else if (id == R.id.puzzle_menu_share_puzzle_orig) {
-            sharePuzzle(true);
+            sharePuzzle(true, true);
             return true;
         } else if (id == R.id.puzzle_menu_open_share_url) {
             openShareUrl();
@@ -734,13 +737,13 @@ public abstract class PuzzleActivity
         }
     }
 
-    private void sharePuzzle(boolean writeOriginal) {
+    private void sharePuzzle(boolean writeBlank, boolean omitExtensions) {
         final Puzzle puz = getPuzzle();
         if (puz == null)
             return;
 
         FileHandlerShared.getShareUri(
-            getApplicationContext(), getPuzzle(), writeOriginal,
+            getApplicationContext(), getPuzzle(), writeBlank, omitExtensions,
             (puzUri) -> {
                 String mimeType = FileHandlerShared.getShareUriMimeType();
                 String puzzleDetails = getSharePuzzleDetails(puz);

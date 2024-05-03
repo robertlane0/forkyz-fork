@@ -92,7 +92,7 @@ public class LollipopUtil extends KitKatUtil {
     }
 
     @Override
-    public void setupBottomInsets(View view) {
+    public void setupInsets(View view, boolean sides, boolean bottom) {
         MarginLayoutParams origMlp
             = (MarginLayoutParams) view.getLayoutParams();
         // keep own copies because above object will change with view
@@ -110,9 +110,12 @@ public class LollipopUtil extends KitKatUtil {
 
                 MarginLayoutParams mlp
                     = (MarginLayoutParams) v.getLayoutParams();
-                mlp.leftMargin = insets.left + origLeftMargin;
-                mlp.bottomMargin = insets.bottom + origBottomMargin;
-                mlp.rightMargin = insets.right + origRightMargin;
+                if (sides) {
+                    mlp.leftMargin = insets.left + origLeftMargin;
+                    mlp.rightMargin = insets.right + origRightMargin;
+                }
+                if (bottom)
+                    mlp.bottomMargin = insets.bottom + origBottomMargin;
                 v.setLayoutParams(mlp);
 
                 return WindowInsetsCompat.CONSUMED;

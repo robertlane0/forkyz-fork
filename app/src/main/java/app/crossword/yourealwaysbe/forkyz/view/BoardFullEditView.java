@@ -88,7 +88,7 @@ public class BoardFullEditView extends BoardEditView {
             if (scratchMode) {
                 board.deleteScratchLetter();
             } else {
-                board.deleteLetter();
+                board.deleteOrUndoLetter();
             }
         });
     }

@@ -124,6 +124,7 @@ public class NotesActivity extends PuzzleActivity {
         setSupportActionBar(binding.toolbar);
         holographic();
         finishOnHomeButton();
+        setupSideInsets(binding.toolbar);
         setupBottomInsets(binding.content);
         setStatusBarElevation(binding.appBarLayout);
 
@@ -968,7 +969,7 @@ public class NotesActivity extends PuzzleActivity {
             first = zone.getPosition(0);
         }
 
-        board.deleteLetter();
+        board.deleteOrUndoLetter();
 
         Position p = board.getHighlightLetter();
 

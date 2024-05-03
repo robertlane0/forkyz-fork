@@ -1,5 +1,14 @@
 # Forkyz Changelog
 
+## Version 53
+
+- Update ChatGPT model (thanks Adam Cole).
+- Add "play letter undo stack" (interaction settings, thanks @jimmylord).
+- Make previous clue respect "skip complete letters".
+- Change "show errors clue" to only show wrong letters as hinted.
+- Refine "don't delete crossing" options (interaction settings).
+- Make theme a bit more "Material 3".
+
 ## Version 52
 
 - Fix erratic next clue button.

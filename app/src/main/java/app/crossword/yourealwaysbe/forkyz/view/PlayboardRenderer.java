@@ -1242,31 +1242,21 @@ public class PlayboardRenderer {
             return false;
 
         boolean correct = Objects.equals(box.getSolution(), box.getResponse());
-        boolean highlight = false;
-
-        if (board.isShowErrorsGrid())
-            highlight |= !correct;
-
-        if (board.isShowErrorsCursor() && hasCursor)
-            highlight |= !correct;
-
-        if (board.isShowErrorsClue())
-            highlight |= isPartOfCurrentClueWithErrors(box);
-
-        return highlight;
-    }
-
-    private boolean isPartOfCurrentClueWithErrors(Box box) {
-        if (board == null)
+        if (correct)
             return false;
 
-        ClueID cid = board.getClueID();
-
-        boolean isPart = box.getIsPartOfClues().contains(cid)
-            && board.isFilledClueID(cid)
-            && !board.isCorrectClueID(cid);
-
-        return isPart;
+        // it's wrong, so when do we highlight?
+        if (board.isShowErrorsGrid()) {
+            return true;
+        } else if (board.isShowErrorsCursor() && hasCursor) {
+            return true;
+        } else if (board.isShowErrorsClue()) {
+            ClueID cid = board.getClueID();
+            return box.getIsPartOfClues().contains(cid)
+                && board.isFilledClueID(cid);
+        } else {
+            return false;
+        }
     }
 
     private boolean isPartOfCurrentClue(Position pos) {

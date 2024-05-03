@@ -56,7 +56,6 @@
     <string name="online_sources_url">https://hague.gitlab.io/forkyz</string>
     <string name="import_puzzle">Import Puzzle</string>
     <string name="download_puzzles">Download Puzzles</string>
-    <string name="back">Back</string>
     <string name="no_puzzles_download_or_configure_storage">No puzzles found. Download puzzles with the button below or configure a storage directory in settings.</string>
     <string name="no_puzzles">No puzzles found.</string>
     <string name="unable_to_read_file">Unable to read file %1$s</string>
@@ -237,7 +236,10 @@
     <string name="display_scratch">Display Scratch</string>
     <string name="display_scratch_desc">Display scratch notes on play board.</string>
     <string name="dont_delete_crossing">Don\'t Delete Crossing Words</string>
-    <string name="dont_delete_crossing_desc">When deleting, don\'t delete a letter if it is part of a filled-in crossing word.</string>
+    <string name="dont_delete_crossing_desc">When deleting, don\'t delete a letter if it is part of a crossing word.</string>
+    <string name="delete_crossing_delete">Delete all cells</string>
+    <string name="delete_crossing_preserve_filled_words">Don\'t delete crossing filled words.</string>
+    <string name="delete_crossing_preserve_filled_cells">Don\'t delete crossing partially filled words.</string>
     <string name="about_forkyz">About Forkyz</string>
     <string name="release_notes">Release Notes</string>
     <string name="license">License</string>
@@ -257,6 +259,8 @@
     <string name="predict_anagram_chars_desc">Predict anagram source in notes by matching against current clue. Space accepts a prediction.</string>
     <string name="browse_show_percentage_correct">Show Percentage Correct</string>
     <string name="browse_show_percentage_correct_desc">Show percentage of correct cells instead of percentage of filled cells next to puzzle (like Shortyz).</string>
+    <string name="play_letter_undo">Played Letter Undo Stack</string>
+    <string name="play_letter_undo_desc">Delete undoes recently played letters or deletes if no recent letters to undo.</string>
 
     <!-- preferences download -->
     <string name="auto_downloaders">Automatic Download Sources</string>
@@ -398,6 +402,7 @@
     <string name="share_clue">Clue</string>
     <string name="share_clue_response">Clue with Board</string>
     <string name="share_puzzle_full">Current Puzzle</string>
+    <string name="share_puzzle_without_extensions">Puzzle No IPuz Extensions</string>
     <string name="share_puzzle_orig">Blank Puzzle</string>
     <string name="share_puzzle_open_share_url">Open Share URL</string>
     <string name="menu_flag_cell_toggle">Toggle Cell Flag</string>
@@ -421,7 +426,7 @@
     <string name="showing_errors">Showing Errors</string>
     <string name="show_errors_full_grid">Grid</string>
     <string name="show_errors_cursor">Cursor</string>
-    <string name="show_errors_clue">Clue</string>
+    <string name="show_errors_clue">Filled Word</string>
     <string name="scratch_mode">Scratch Mode</string>
     <string name="reveal">Reveal</string>
     <string name="initial_letter">Initial Letter</string>

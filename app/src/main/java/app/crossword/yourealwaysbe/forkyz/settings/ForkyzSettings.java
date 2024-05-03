@@ -28,6 +28,7 @@ import app.crossword.yourealwaysbe.forkyz.net.Downloaders;
 import app.crossword.yourealwaysbe.forkyz.tools.ExternalDictionary;
 import app.crossword.yourealwaysbe.forkyz.util.files.Accessor;
 import app.crossword.yourealwaysbe.puz.MovementStrategy;
+import app.crossword.yourealwaysbe.puz.Playboard.DeleteCrossingMode;
 
 /**
  * Async settings
@@ -119,8 +120,8 @@ public class ForkyzSettings {
         = "clueBelowGrid";
     private static final String PREF_PLAY_CLUE_TABS_PAGE
         = "playActivityClueTabsPage";
-    private static final String PREF_PLAY_DONT_DELETE_CROSSING
-        = "dontDeleteCrossing";
+    private static final String PREF_PLAY_DELETE_CROSSING_MODE
+        = "deleteCrossingMode";
     private static final String PREF_PLAY_DOUBLE_TAP_FIT_BOARD
         = "doubleTap";
     private static final String PREF_PLAY_ENSURE_VISIBLE = "ensureVisible";
@@ -129,8 +130,12 @@ public class ForkyzSettings {
     private static final String PREF_PLAY_FIT_TO_SCREEN = "fitToScreen";
     private static final String PREF_PLAY_FULL_SCREEN = "fullScreen";
     private static final String PREF_PLAY_GRID_RATIO = "gridRatio";
+    private static final String PREF_PLAY_LEGACY_DONT_DELETE_CROSSING
+        = "dontDeleteCrossing";
     private static final String PREF_PLAY_MOVEMENT_STRATEGY
         = "movementStrategy";
+    private static final String PREF_PLAY_PLAY_LETTER_UNDO_ENABLED
+        = "playLetterUndoEnabled";
     private static final String PREF_PLAY_PREDICT_ANAGRAM_CHARS
         = "predictAnagramChars";
     private static final String
@@ -212,7 +217,6 @@ public class ForkyzSettings {
         BOOL_DEFAULTS.put(PREF_KEYBOARD_NATIVE, false);
         BOOL_DEFAULTS.put(PREF_PLAY_CLUE_BELOW_GRID, false);
         INT_DEFAULTS.put(PREF_PLAY_CLUE_TABS_PAGE, 0);
-        BOOL_DEFAULTS.put(PREF_PLAY_DONT_DELETE_CROSSING, false);
         BOOL_DEFAULTS.put(PREF_PLAY_DOUBLE_TAP_FIT_BOARD, false);
         BOOL_DEFAULTS.put(PREF_PLAY_ENSURE_VISIBLE, true);
         BOOL_DEFAULTS.put(PREF_PLAY_ENTER_CHANGES_DIRECTION, true);
@@ -234,6 +238,7 @@ public class ForkyzSettings {
         BOOL_DEFAULTS.put(PREF_PLAY_SHOW_TIMER, false);
         BOOL_DEFAULTS.put(PREF_PLAY_SKIP_FILLED, false);
         BOOL_DEFAULTS.put(PREF_PLAY_CYCLE_UNFILLED, false);
+        BOOL_DEFAULTS.put(PREF_PLAY_PLAY_LETTER_UNDO_ENABLED, false);
         BOOL_DEFAULTS.put(PREF_PLAY_SPACE_CHANGE_DIRECTION, true);
         BOOL_DEFAULTS.put(PREF_PLAY_SUPPRESS_HINT_HIGHLIGHTING, false);
         BOOL_DEFAULTS.put(PREF_VOICE_ALWAYS_ANNOUNCE_BOX, false);
@@ -251,6 +256,7 @@ public class ForkyzSettings {
     private MutableLiveData<Accessor> liveBrowseSort;
     private MutableLiveData<KeyboardDisplay> liveKeyboardDisplay;
     private MutableLiveData<GridRatio> livePlayGridRatio;
+    private MutableLiveData<DeleteCrossingMode> livePlayDeleteCrossingMode;
     private Map<String, MutableLiveData<Boolean>> liveBooleans = new HashMap<>();
 
     private OnSharedPreferenceChangeListener prefChangeListener
@@ -261,6 +267,8 @@ public class ForkyzSettings {
                 updateLiveKeyboardDisplay();
             } else if (PREF_KEYBOARD_LAYOUT.equals(key)) {
                 updateLiveKeyboardDisplay();
+            } else if (PREF_PLAY_DELETE_CROSSING_MODE.equals(key)) {
+                updateLivePlayDeleteCrossingMode();
             } else if (PREF_PLAY_GRID_RATIO.equals(key)) {
                 updateLivePlayGridRatio();
             } else if (liveBooleans.containsKey(key)) {
@@ -741,8 +749,18 @@ public class ForkyzSettings {
     /**
      * Whether to delete characters that may belong to a crossing word
      */
-    public void getPlayDontDeleteCrossing(Consumer<Boolean> cb) {
-        getBooleanPreference(PREF_PLAY_DONT_DELETE_CROSSING, cb);
+    public void getPlayDeleteCrossingMode(Consumer<DeleteCrossingMode> cb) {
+        executor.execute(() -> {
+            String modeString = prefs.getString(
+                PREF_PLAY_DELETE_CROSSING_MODE, "DELETE"
+            );
+            handler.post(() -> {
+                DeleteCrossingMode mode
+                    = DeleteCrossingModeSetting.getFromSettingsValue(modeString)
+                        .getDeleteCrossingMode();
+                cb.accept(mode);
+            });
+        });
     }
 
     /**
@@ -755,8 +773,13 @@ public class ForkyzSettings {
     /**
      * Whether to delete characters that may belong to a crossing word
      */
-    public LiveData<Boolean> livePlayDontDeleteCrossing() {
-        return liveBooleanPreference(PREF_PLAY_DONT_DELETE_CROSSING);
+    public LiveData<DeleteCrossingMode> livePlayDeleteCrossingMode() {
+        if (livePlayDeleteCrossingMode == null) {
+            livePlayDeleteCrossingMode
+                = new MutableLiveData<DeleteCrossingMode>();
+            updateLivePlayDeleteCrossingMode();
+        }
+        return livePlayDeleteCrossingMode;
     }
 
     /**
@@ -843,6 +866,13 @@ public class ForkyzSettings {
      */
     public void getPlayRandomClueOnShake(Consumer<Boolean> cb) {
         getBooleanPreference(PREF_PLAY_RANDOM_CLUE_ON_SHAKE, cb);
+    }
+
+    /**
+     * Whether to use play letter undo stack on Playboard
+     */
+    public void getPlayPlayLetterUndoEnabled(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_PLAY_PLAY_LETTER_UNDO_ENABLED, cb);
     }
 
     /**
@@ -1164,10 +1194,30 @@ public class ForkyzSettings {
             boolean legacyDynamic
                 = prefs.getBoolean(PREF_APP_THEME_LEGACY_USE_DYNAMIC, false);
             if (legacyDynamic) {
-               prefs.edit()
+                prefs.edit()
                     .remove(PREF_APP_THEME_LEGACY_USE_DYNAMIC)
                     .putString(PREF_APP_THEME, Theme.DYNAMIC.getSettingsValue())
                     .apply();
+            }
+        });
+    }
+
+    /**
+     * Migrate from boolean dontDeleteCrossing to DeleteCrossingMode
+     */
+    public void migrateDontDeleteCrossing() {
+        executor.execute(() -> {
+            boolean legacyDontDeleteCrossing = prefs.getBoolean(
+                PREF_PLAY_LEGACY_DONT_DELETE_CROSSING, false
+            );
+            if (legacyDontDeleteCrossing) {
+                prefs.edit()
+                    .remove(PREF_PLAY_LEGACY_DONT_DELETE_CROSSING)
+                    .putString(
+                        PREF_PLAY_DELETE_CROSSING_MODE,
+                        DeleteCrossingModeSetting.PRESERVE_FILLED_CELLS
+                            .getSettingsValue()
+                    ).apply();
             }
         });
     }
@@ -1307,6 +1357,14 @@ public class ForkyzSettings {
                     new KeyboardDisplay(layout, compact)
                 );
             });});
+        }
+    }
+
+    private void updateLivePlayDeleteCrossingMode() {
+        if (livePlayDeleteCrossingMode != null) {
+            getPlayDeleteCrossingMode(value -> {
+                livePlayDeleteCrossingMode.setValue(value);
+            });
         }
     }
 

@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -35,7 +34,7 @@ public class Puzzle implements Serializable{
     private String title;
     private String introMessage;
     private String completionMessage;
-    private Map<String, MutableClueList> clueLists = new HashMap<>();
+    private HashMap<String, MutableClueList> clueLists = new HashMap<>();
     private LocalDate pubdate = null;
     private String source;
     private String sourceUrl;
@@ -52,12 +51,12 @@ public class Puzzle implements Serializable{
     private Position position;
     private ClueID currentclueID;
 
-    private Map<ClueID, Note> clueNotes = new HashMap<>();
+    private HashMap<ClueID, Note> clueNotes = new HashMap<>();
     private Note playerNote;
 
     private LinkedList<ClueID> historyList = new LinkedList<>();
 
-    private List<PuzImage> images = new LinkedList<>();
+    private LinkedList<PuzImage> images = new LinkedList<>();
 
     // a clue/word to display permanently somewhere
     private ClueID pinnedClueID;

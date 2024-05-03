@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Common to all variants night/day/v21/&c. -->
-    <!-- Theme.Forkyz.DayNightBase in themes.xml in variant folder -->
-    <style name="Theme.Forkyz" parent="Theme.Forkyz.DayNightBase">
+    <!-- Theme.Forkyz.DayNightBaseVersioned in themes.xml in variant folder -->
+    <style name="Theme.Forkyz" parent="Theme.Forkyz.DayNightBaseVersioned">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="windowActionModeOverlay">true</item> 
@@ -52,7 +52,6 @@
         <item name="clueTabsBackground">?attr/colorSurface</item>
         <item name="toolbarStyle">@style/toolbarStyle</item>
         <item name="actionBarTheme">@style/actionBarStyle</item>
-        <item name="appBarLayoutStyle">@style/appBarLayoutStyle</item>
     </style>
 
     <style name="Theme.Forkyz.Floating" parent="Theme.Forkyz">

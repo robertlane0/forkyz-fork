@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- base variant theme used in themes-common.xml in values -->
+    <!-- base variant theme with extra version values used in themes-common.xml
+         in values -->
     <style
-        name="Theme.Forkyz.DayNightBase"
-        parent="Theme.Material3.DynamicColors.Dark"
+        name="Theme.Forkyz.DayNightBaseVersioned"
+        parent="Theme.Forkyz.DayNightBase"
     >
-        <!-- move to themes-common for transparent bar in day theme too -->
         <item name="android:statusBarColor">@android:color/transparent </item>
         <item name="android:windowLightStatusBar">?attr/isLightTheme</item>
     </style>

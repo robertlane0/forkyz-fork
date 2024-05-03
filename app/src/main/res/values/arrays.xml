@@ -210,6 +210,16 @@
        <item>3</item>
        <item>4</item>
      </string-array>
+     <string-array name="delete_crossing_mode_labels">
+       <item>@string/delete_crossing_delete</item>
+       <item>@string/delete_crossing_preserve_filled_words</item>
+       <item>@string/delete_crossing_preserve_filled_cells</item>
+     </string-array>
+     <string-array name="delete_crossing_mode_values">
+       <item>DELETE</item>
+       <item>PRESERVE_FILLED_WORDS</item>
+       <item>PRESERVE_FILLED_CELLS</item>
+     </string-array>
 
      <string-array name="emptyArray"/>
 </resources>

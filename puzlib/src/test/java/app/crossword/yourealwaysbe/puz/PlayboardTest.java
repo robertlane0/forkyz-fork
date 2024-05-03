@@ -77,87 +77,150 @@ public class PlayboardTest {
 
     @TestWithAndWithoutBlockObjects
     public void testDeleteLetter(boolean blockObjects) throws Exception {
-         Puzzle puz = loadTestPuz(blockObjects);
+        Puzzle puz = loadTestPuz(blockObjects);
 
-         Playboard board = new Playboard(puz);
-         board.setDontDeleteCrossing(false);
+        Playboard board = new Playboard(puz);
+        board.setDeleteCrossingMode(Playboard.DeleteCrossingMode.DELETE);
 
-         // Create
-         //
-         //  A
-         // ABCDE
-         //    A
-         //
-         // then delete from E back, row should be empty
+        // Create
+        //
+        //  A
+        // ABCDE
+        //    A
+        //
+        // then delete from E back, row should be empty
 
-         moveToPosition(board, 1, 0);
-         board.playLetter('A');
-         board.playLetter('B');
-         board.playLetter('C');
-         board.playLetter('D');
-         board.playLetter('E');
+        moveToPosition(board, 1, 0);
+        board.playLetter('A');
+        board.playLetter('B');
+        board.playLetter('C');
+        board.playLetter('D');
+        board.playLetter('E');
 
-         moveToPosition(board, 0, 1);
-         board.playLetter('A');
+        moveToPosition(board, 0, 1);
+        board.playLetter('A');
 
-         moveToPosition(board, 2, 3);
-         board.playLetter('A');
+        moveToPosition(board, 2, 3);
+        board.playLetter('A');
 
-         moveToPosition(board, 1, 4);
-         for (int i = 0; i < 5; i++)
-             board.deleteLetter();
+        moveToPosition(board, 1, 4);
+        for (int i = 0; i < 5; i++)
+            board.deleteOrUndoLetter();
 
-         assertBoxBlank(puz, 1, 0);
-         assertBoxBlank(puz, 1, 1);
-         assertBoxBlank(puz, 1, 2);
-         assertBoxBlank(puz, 1, 3);
-         assertBoxBlank(puz, 1, 4);
-         assertBoxLetter(puz, 0, 1, "A");
-         assertBoxLetter(puz, 2, 3, "A");
+        assertBoxBlank(puz, 1, 0);
+        assertBoxBlank(puz, 1, 1);
+        assertBoxBlank(puz, 1, 2);
+        assertBoxBlank(puz, 1, 3);
+        assertBoxBlank(puz, 1, 4);
+        assertBoxLetter(puz, 0, 1, "A");
+        assertBoxLetter(puz, 2, 3, "A");
     }
 
     @TestWithAndWithoutBlockObjects
-    public void testDeleteLetterCrossing(boolean blockObjects) throws Exception {
-         Puzzle puz = loadTestPuz(blockObjects);
+    public void testDeleteLetterCrossingWords(
+        boolean blockObjects
+    ) throws Exception {
+        Puzzle puz = loadTestPuz(blockObjects);
 
-         Playboard board = new Playboard(puz);
-         board.setDontDeleteCrossing(true);
+        Playboard board = new Playboard(puz);
+        board.setDeleteCrossingMode(
+           Playboard.DeleteCrossingMode.PRESERVE_FILLED_WORDS
+        );
 
-         // Create
-         //
-         //  A
-         // ABCDE
-         //    A
-         //
-         // then delete from E back, B and D should remain
-         // B and D should also be skipped
+        // Create
+        //
+        //  A
+        // ABCDE
+        //  A A
+        //  A
+        //
+        // then delete from E back, D should remain
+        // D should also be skipped
 
-         moveToPosition(board, 1, 0);
-         board.playLetter('A');
-         board.playLetter('B');
-         board.playLetter('C');
-         board.playLetter('D');
-         board.playLetter('E');
+        moveToPosition(board, 1, 0);
+        board.playLetter('A');
+        board.playLetter('B');
+        board.playLetter('C');
+        board.playLetter('D');
+        board.playLetter('E');
 
-         moveToPosition(board, 0, 1);
-         board.playLetter('A');
+        moveToPosition(board, 0, 1);
+        board.playLetter('A');
+        moveToPosition(board, 2, 1);
+        board.playLetter('A');
+        moveToPosition(board, 3, 1);
+        board.playLetter('A');
 
-         moveToPosition(board, 2, 3);
-         board.playLetter('A');
+        moveToPosition(board, 2, 3);
+        board.playLetter('A');
 
-         moveToPosition(board, 1, 4);
-         board.deleteLetter();
-         assertPosition(board, 1, 4);
-         board.deleteLetter();
-         assertPosition(board, 1, 2);
-         board.deleteLetter();
-         assertPosition(board, 1, 0);
+        moveToPosition(board, 1, 4);
+        board.deleteOrUndoLetter();
+        assertPosition(board, 1, 4);
+        board.deleteOrUndoLetter();
+        assertPosition(board, 1, 3);
+        board.deleteOrUndoLetter();
+        assertPosition(board, 1, 2);
+        board.deleteOrUndoLetter();
+        assertPosition(board, 1, 0);
 
-         assertBoxBlank(puz, 1, 0);
-         assertBoxLetter(puz, 1, 1, "B");
-         assertBoxBlank(puz, 1, 2);
-         assertBoxLetter(puz, 1, 3, "D");
-         assertBoxBlank(puz, 1, 4);
+        assertBoxLetter(puz, 1, 1, "B");
+        assertBoxBlank(puz, 1, 2);
+        assertBoxBlank(puz, 1, 3);
+        assertBoxBlank(puz, 1, 4);
+    }
+
+    @TestWithAndWithoutBlockObjects
+    public void testDeleteLetterCrossingCells(
+        boolean blockObjects
+    ) throws Exception {
+        Puzzle puz = loadTestPuz(blockObjects);
+
+        Playboard board = new Playboard(puz);
+        board.setDeleteCrossingMode(
+           Playboard.DeleteCrossingMode.PRESERVE_FILLED_CELLS
+        );
+
+        // Create
+        //
+        //  A
+        // ABCDE
+        //  A A
+        //  A
+        //
+        // then delete from E back, B and D should remain
+        // B and D should also be skipped
+
+        moveToPosition(board, 1, 0);
+        board.playLetter('A');
+        board.playLetter('B');
+        board.playLetter('C');
+        board.playLetter('D');
+        board.playLetter('E');
+
+        moveToPosition(board, 0, 1);
+        board.playLetter('A');
+        moveToPosition(board, 2, 1);
+        board.playLetter('A');
+        moveToPosition(board, 3, 1);
+        board.playLetter('A');
+
+        moveToPosition(board, 2, 3);
+        board.playLetter('A');
+
+        moveToPosition(board, 1, 4);
+        board.deleteOrUndoLetter();
+        assertPosition(board, 1, 4);
+        board.deleteOrUndoLetter();
+        assertPosition(board, 1, 2);
+        board.deleteOrUndoLetter();
+        assertPosition(board, 1, 0);
+
+        assertBoxBlank(puz, 1, 0);
+        assertBoxLetter(puz, 1, 1, "B");
+        assertBoxBlank(puz, 1, 2);
+        assertBoxLetter(puz, 1, 3, "D");
+        assertBoxBlank(puz, 1, 4);
     }
 
     @TestWithAndWithoutBlockObjects
@@ -183,25 +246,25 @@ public class PlayboardTest {
          board.setPreserveCorrectLettersInShowErrors(true);
 
          moveToPosition(board, 1, 4);
-         board.deleteLetter();
+         board.deleteOrUndoLetter();
          assertPosition(board, 1, 2);
          assertBoxBlank(puz, 1, 2);
-         board.deleteLetter();
+         board.deleteOrUndoLetter();
          assertPosition(board, 1, 2);
 
          // do twice to end up across again
-         board.deleteLetter();
+         board.deleteOrUndoLetter();
          assertPosition(board, 1, 2);
 
          // check ok when all correct (no infinite loops)
          board.revealPuzzle();
-         board.deleteLetter();
+         board.deleteOrUndoLetter();
          assertPosition(board, 1, 1);
 
          board.setMovementStrategy(MovementStrategy.STOP_ON_END);
-         board.deleteLetter();
+         board.deleteOrUndoLetter();
          assertPosition(board, 1, 0);
-         board.deleteLetter();
+         board.deleteOrUndoLetter();
          assertPosition(board, 1, 0);
     }
 
@@ -236,19 +299,19 @@ public class PlayboardTest {
 
         // Down / Back
         moveToPosition(board, 5, 6);
-        board.deleteLetter();
-        board.deleteLetter();
+        board.deleteOrUndoLetter();
+        board.deleteOrUndoLetter();
         assertPosition(board, 3, 6);
         for (int i = 0; i < 5; i++)
-            board.deleteLetter();
+            board.deleteOrUndoLetter();
 
         // Across / Back
         moveToPosition(board, 0, 6);
         board.toggleSelection();
-        board.deleteLetter();
+        board.deleteOrUndoLetter();
         assertPosition(board, 0, 4);
         for (int i = 0; i < 6; i++)
-            board.deleteLetter();
+            board.deleteOrUndoLetter();
         assertPosition(board, 0, 0);
     }
 
@@ -277,14 +340,14 @@ public class PlayboardTest {
 
         // Down / Back
         moveToPosition(board, 5, 6);
-        board.deleteLetter();
-        board.deleteLetter();
+        board.deleteOrUndoLetter();
+        board.deleteOrUndoLetter();
         assertPosition(board, 5, 6);
 
         // Across / Back
         moveToPosition(board, 0, 6);
         board.toggleSelection();
-        board.deleteLetter();
+        board.deleteOrUndoLetter();
         assertPosition(board, 0, 6);
     }
 
@@ -315,22 +378,22 @@ public class PlayboardTest {
         assertPosition(board, 0, 7);
 
         // Down / Back
-        board.deleteLetter();
-        board.deleteLetter();
+        board.deleteOrUndoLetter();
+        board.deleteOrUndoLetter();
         assertPosition(board, 3, 6);
 
         // Across / Back
         moveToPosition(board, 0, 6);
         board.toggleSelection();
-        board.deleteLetter();
-        board.deleteLetter();
+        board.deleteOrUndoLetter();
+        board.deleteOrUndoLetter();
         assertPosition(board, 0, 4);
         for (int i = 0; i < 5; i++)
-            board.deleteLetter();
+            board.deleteOrUndoLetter();
         // wrap to down clues
         assertPosition(board, 14, 10);
         for (int i = 0; i < 3; i++)
-            board.deleteLetter();
+            board.deleteOrUndoLetter();
         assertPosition(board, 14, 14);
 
         // Wrap across
@@ -340,7 +403,7 @@ public class PlayboardTest {
 
         // Wrap down
         board.toggleSelection();
-        board.deleteLetter();
+        board.deleteOrUndoLetter();
         // wrap to across clues
         assertPosition(board, 14, 10);
         board.playLetter('A');
@@ -378,20 +441,20 @@ public class PlayboardTest {
 
         // Down / Back
         for (int i = 0; i < 5; i++)
-            board.deleteLetter();
+            board.deleteOrUndoLetter();
         assertPosition(board, 3, 13);
         for (int i = 0; i < 100; i++)
-            board.deleteLetter();
+            board.deleteOrUndoLetter();
         assertPosition(board, 0, 0);
 
         // Across / Back
         moveToPosition(board, 14, 3);
         board.toggleSelection();
         for (int i = 0; i < 5; i++)
-            board.deleteLetter();
+            board.deleteOrUndoLetter();
         assertPosition(board, 13, 3);
         for (int i = 0; i < 100; i++)
-            board.deleteLetter();
+            board.deleteOrUndoLetter();
         assertPosition(board, 0, 0);
     }
 
@@ -440,7 +503,7 @@ public class PlayboardTest {
 
         // Down / Back
         moveToPosition(board, 11, 0);
-        board.deleteLetter();
+        board.deleteOrUndoLetter();
         assertPosition(board, 14, 0);
 
         // Across / Back
@@ -448,13 +511,13 @@ public class PlayboardTest {
         board.toggleSelection();
 
         // cycle only happens if we delay delete
-        board.deleteLetter();
+        board.deleteOrUndoLetter();
         assertPosition(board, 0, 11);
-        board.deleteLetter();
+        board.deleteOrUndoLetter();
         assertPosition(board, 0, 11);
         try {
             Thread.sleep(200);
-            board.deleteLetter();
+            board.deleteOrUndoLetter();
             assertPosition(board, 0, 14);
         } catch (InterruptedException e) {
             fail(e);
@@ -491,6 +554,80 @@ public class PlayboardTest {
                 MovementStrategy.MOVE_NEXT_ON_AXIS
             )
         );
+    }
+
+    @TestWithAndWithoutBlockObjects
+    public void testNextWord(boolean blockObjects) throws Exception {
+        Puzzle puz = loadTestPuz(blockObjects);
+        Playboard board = new Playboard(puz);
+
+        // reveal grid bar one character in the middle of the grid
+        // select clue after it
+        // test go forward
+
+        board.revealPuzzle();
+
+        moveToPosition(board, 2, 5);
+        board.deleteOrUndoLetter();
+
+        // first without skipping, end up at start of word
+        moveToPosition(board, 1, 12);
+        board.nextWord();
+        assertPosition(board, 2, 0);
+
+        // then with skipping, end up at empty cell
+        board.setSkipCompletedLetters(true);
+        moveToPosition(board, 1, 12);
+        board.nextWord();
+        assertPosition(board, 2, 5);
+
+        // if go back again, keep same cell (but end up in down direction)
+        board.nextWord();
+        assertPosition(board, 2, 5);
+
+        // fill board, check nextWord doesn't loop but ends up at
+        // end of word
+        board.toggleSelection();
+        board.playLetter('A');
+        board.nextWord();
+        assertPosition(board, 2, 9);
+    }
+
+    @TestWithAndWithoutBlockObjects
+    public void testPreviousWord(boolean blockObjects) throws Exception {
+        Puzzle puz = loadTestPuz(blockObjects);
+        Playboard board = new Playboard(puz);
+
+        // reveal grid bar one character in the middle of the grid
+        // select clue after it
+        // test go back
+
+        board.revealPuzzle();
+
+        moveToPosition(board, 2, 5);
+        board.deleteOrUndoLetter();
+
+        // first without skipping, end up at start of word
+        moveToPosition(board, 2, 12);
+        board.previousWord();
+        assertPosition(board, 2, 0);
+
+        // then with skipping, end up at empty cell
+        board.setSkipCompletedLetters(true);
+        moveToPosition(board, 2, 12);
+        board.previousWord();
+        assertPosition(board, 2, 5);
+
+        // if go back again, keep same cell (but end up in down direction)
+        board.previousWord();
+        assertPosition(board, 2, 5);
+
+        // fill board, check previousWord doesn't loop but ends up at
+        // start of word
+        board.toggleSelection();
+        board.playLetter('A');
+        board.previousWord();
+        assertPosition(board, 2, 0);
     }
 
     @TestWithAndWithoutBlockObjects
@@ -596,7 +733,7 @@ public class PlayboardTest {
      * Test failure https://gitlab.com/Hague/forkyz/-/issues/86
      */
     @TestWithAndWithoutBlockObjects
-    public void testNextWord(boolean blockObjects) throws Exception {
+    public void testNextWordBug86(boolean blockObjects) throws Exception {
          Puzzle puz = loadTestPuz(blockObjects);
          Playboard board = new Playboard(puz);
 
@@ -605,6 +742,40 @@ public class PlayboardTest {
 
          assertPosition(board, 0, 6);
          assertEquals(board.getClueID().getListName(), "Across");
+    }
+
+    @Test
+    public void testPlayLetterUndoStack() throws Exception {
+        Puzzle puz = loadTestPuz(false);
+        Playboard board = new Playboard(puz);
+
+        board.setPlayLetterUndoStackEnabled(true);
+
+        moveToPosition(board, 0, 0);
+        board.playLetter('A');
+        board.playLetter('B');
+        board.playLetter('C');
+
+        // undo stack cleared to here
+        moveToPosition(board, 0, 1);
+        board.playLetter('D');
+        board.playLetter('E');
+
+        // undoes E
+        board.deleteOrUndoLetter();
+        // undoes D
+        board.deleteOrUndoLetter();
+
+        assertBoxLetter(puz, 0, 1, "B");
+        assertBoxLetter(puz, 0, 2, "C");
+
+        // undo stack clear, deletes B
+        board.deleteOrUndoLetter();
+        // undo stack clear, deletes A
+        board.deleteOrUndoLetter();
+
+        assertBoxBlank(puz, 0, 0);
+        assertBoxBlank(puz, 0, 1);
     }
 
     private void checkNoMoveFullGrid(

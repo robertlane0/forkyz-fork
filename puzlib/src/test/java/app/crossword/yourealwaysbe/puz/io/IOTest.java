@@ -47,7 +47,7 @@ public class IOTest {
     public static void assertIsTestPuzzle1(Puzzle puz) {
         assertEquals("NY Times, Fri, Nov 13, 2009", puz.getTitle());
         assertEquals("Dana Motley / Will Shortz", puz.getAuthor());
-        assertEquals("© 2009, The New York Times", puz.getCopyright());
+        assertEquals("&copy; 2009, The New York Times", puz.getCopyright());
 
         Box[][] boxes = puz.getBoxes();
 
@@ -69,7 +69,7 @@ public class IOTest {
 
         assertEquals(
             acrossClues.getClueByNumber("1").getHint(),
-            "Bring to perfection"
+            "&lt;ring to perfection"
         );
         assertEquals(
             acrossClues.getClueByNumber("23").getHint(),

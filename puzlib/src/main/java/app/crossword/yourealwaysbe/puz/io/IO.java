@@ -207,9 +207,15 @@ public class IO implements PuzzleParser {
 
         builder.setSolutionChecksum(solutionChecksum);
         builder.setScrambled(scrambled);
-        builder.setTitle(readNullTerminatedString(input, charset));
-        builder.setAuthor(readNullTerminatedString(input, charset));
-        builder.setCopyright(readNullTerminatedString(input, charset));
+        builder.setTitle(
+            htmlString(readNullTerminatedString(input, charset))
+        );
+        builder.setAuthor(
+            htmlString(readNullTerminatedString(input, charset))
+        );
+        builder.setCopyright(
+            htmlString(readNullTerminatedString(input, charset))
+        );
 
         for (int x = 0; x < builder.getHeight(); x++) {
             for (int y = 0; y < builder.getWidth(); y++) {
@@ -224,14 +230,14 @@ public class IO implements PuzzleParser {
                 if (builder.isStartClue(x, y, true) && (clueNumber != null)) {
                     String value = readNullTerminatedString(input, charset);
                     builder.addAcrossClue(
-                        ACROSS_LIST, clueNumber, value
+                        ACROSS_LIST, clueNumber, htmlString(value)
                     );
                 }
 
                 if (builder.isStartClue(x, y, false) && (clueNumber != null)) {
                     String value = readNullTerminatedString(input, charset);
                     builder.addDownClue(
-                        DOWN_LIST, clueNumber, value
+                        DOWN_LIST, clueNumber, htmlString(value)
                     );
                 }
             }

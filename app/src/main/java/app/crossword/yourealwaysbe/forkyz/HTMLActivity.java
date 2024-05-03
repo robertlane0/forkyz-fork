@@ -20,7 +20,6 @@ import dagger.hilt.android.AndroidEntryPoint;
 
 import app.crossword.yourealwaysbe.forkyz.databinding.HtmlViewBinding;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
-import app.crossword.yourealwaysbe.forkyz.view.recycler.ShowHideOnScroll;
 
 @AndroidEntryPoint
 public class HTMLActivity extends ForkyzActivity {
@@ -48,14 +47,12 @@ public class HTMLActivity extends ForkyzActivity {
         holographic();
         finishOnHomeButton();
         setContentView(binding.getRoot());
-        setupBottomInsets(binding.content);
+        setupSideInsets(binding.toolbar);
+        setupBottomInsets(binding.scrollView);
         setStatusBarElevation(binding.appBarLayout);
 
         String assetName = this.getIntent().getData().toString();
         startLoadAssetName(assetName);
-        binding.backButton.setOnClickListener((v) -> { finish(); });
-
-        setScrollListener();
     }
 
     @Override
@@ -70,14 +67,6 @@ public class HTMLActivity extends ForkyzActivity {
             return true;
         }
         return false;
-    }
-
-    // suppress because ShowHideOnScroll does not consume/handle clicks
-    @SuppressWarnings("ClickableViewAccessibility")
-    private void setScrollListener() {
-        binding.scrollView.setOnTouchListener(
-            new ShowHideOnScroll(binding.backButton)
-        );
     }
 
     private void startLoadAssetName(String assetName) {

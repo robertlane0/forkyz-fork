@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.Stack;
 import java.util.logging.Logger;
 
 import app.crossword.yourealwaysbe.puz.util.PuzzleUtils;
@@ -19,16 +20,28 @@ public class Playboard implements Serializable {
 
     private static final Logger LOG = Logger.getLogger(Playboard.class.getCanonicalName());
 
+    /**
+     * What to do with cells that are filled by crossing words
+     * DELETE: delete clears all cells
+     * PRESERVE_FILLED_WORDS: delete does not delete cells in crossing
+     * words if the crossing word is completely full
+     * PRESERVE_FILLED_CELLS: delete does not delete cells if the
+     * neighbouring cell of a crossing word is also filled
+     */
+    public enum DeleteCrossingMode {
+        DELETE, PRESERVE_FILLED_WORDS, PRESERVE_FILLED_CELLS
+    }
+
     private MovementStrategy movementStrategy = MovementStrategy.MOVE_NEXT_ON_AXIS;
     private Puzzle puzzle;
     private String responder;
-    private List<String> sortedClueListNames = new ArrayList<>();
+    private ArrayList<String> sortedClueListNames = new ArrayList<>();
     private boolean showErrorsGrid;
     private boolean showErrorsCursor;
     private boolean showErrorsClue;
     private boolean skipCompletedLetters;
     private boolean preserveCorrectLettersInShowErrors;
-    private boolean dontDeleteCrossing;
+    private DeleteCrossingMode deleteCrossingMode = DeleteCrossingMode.DELETE;
     private Word previousWord = null;
     private Position previousPosition = null;
     // used by findZoneDelta to track last index to handle clues with
@@ -41,25 +54,28 @@ public class Playboard implements Serializable {
     // selected
     private boolean selectDetachedZone = true;
 
-    private Set<PlayboardListener> listeners = WeakSet.buildSet();
-    private Set<PlayboardListener> pendingListenerRemovals = WeakSet.buildSet();
-    private Set<PlayboardListener> pendingListenerAdditions
+    private transient Set<PlayboardListener> listeners = WeakSet.buildSet();
+    private transient Set<PlayboardListener> pendingListenerRemovals
+        = WeakSet.buildSet();
+    private transient Set<PlayboardListener> pendingListenerAdditions
         = WeakSet.buildSet();
     private boolean isNotifying = false;
     private int notificationDisabledDepth = 0;
 
-    private Set<Position> changedPositions = new HashSet<>();
-    private Set<ClueID> changedClueIDs = new HashSet<>();
+    private HashSet<Position> changedPositions = new HashSet<>();
+    private HashSet<ClueID> changedClueIDs = new HashSet<>();
     // reuse same one for all notifications
     private PlayboardChanges notificationChanges = new PlayboardChanges();
+    private PlayLetterUndoStack playLetterUndoStack
+        = new PlayLetterUndoStack(false);
 
     public Playboard(Puzzle puzzle,
                      MovementStrategy movementStrategy,
                      boolean preserveCorrectLettersInShowErrors,
-                     boolean dontDeleteCrossing){
+                     DeleteCrossingMode deleteCrossingMode){
         this(puzzle, movementStrategy);
         this.preserveCorrectLettersInShowErrors = preserveCorrectLettersInShowErrors;
-        this.dontDeleteCrossing = dontDeleteCrossing;
+        this.deleteCrossingMode = deleteCrossingMode;
     }
 
     public Playboard(Puzzle puzzle, MovementStrategy movementStrategy) {
@@ -88,6 +104,13 @@ public class Playboard implements Serializable {
         notifyChange();
     }
 
+    /**
+     * Whether to record played letters and undo on delete
+     */
+    public void setPlayLetterUndoStackEnabled(boolean enabled) {
+        playLetterUndoStack.setEnabled(enabled);
+    }
+
     public void setPreserveCorrectLettersInShowErrors(boolean value){
         this.preserveCorrectLettersInShowErrors = value;
     }
@@ -95,8 +118,8 @@ public class Playboard implements Serializable {
     /**
      * Whether to delete characters from crossing words
      */
-    public void setDontDeleteCrossing(boolean value){
-        this.dontDeleteCrossing = value;
+    public void setDeleteCrossingMode(DeleteCrossingMode value){
+        this.deleteCrossingMode = value;
     }
 
     public Box[][] getBoxes() {
@@ -235,6 +258,8 @@ public class Playboard implements Serializable {
     }
 
     public Word setHighlightLetter(Position highlightLetter) {
+        playLetterUndoStack.clearIfEnabled();
+
         Word w = this.getCurrentWord();
 
         if (highlightLetter == null)
@@ -290,6 +315,8 @@ public class Playboard implements Serializable {
     public Word setHighlightLetter(Position highlightLetter, ClueID cid) {
         if (cid == null)
             return setHighlightLetter(highlightLetter);
+
+        playLetterUndoStack.clearIfEnabled();
 
         Word w = getCurrentWord();
 
@@ -474,70 +501,63 @@ public class Playboard implements Serializable {
     }
 
     /**
-     * If the clue has been filled in correctly
-     *
-     * Only false if there is an error in there somewhere
-     */
-    public boolean isCorrectClueID(ClueID clueID) {
-        Zone zone = getZone(clueID);
-
-        if(zone == null || zone.isEmpty())
-            return true;
-
-        Box[][] boxes = getBoxes();
-
-        for (Position pos : zone) {
-            Box box = boxes[pos.getRow()][pos.getCol()];
-            boolean error = !box.isBlank()
-                && !Objects.equals(box.getResponse(), box.getSolution());
-            if (error)
-                return false;
-        }
-
-        return true;
-    }
-
-    /**
      * Handler for the backspace key.  Uses the following algorithm:
      * -If current box is empty, move back one character.  If not, stay still.
      * -Delete the letter in the current box.
      */
-    public Word deleteLetter() {
+    public Word deleteOrUndoLetter() {
         Box currentBox = this.getCurrentBox();
         Word wordToReturn = this.getCurrentWord();
 
         pushNotificationDisabled();
 
-        if (currentBox.isBlank() || isDontDeleteCurrent()) {
-            wordToReturn = this.previousLetter();
-            currentBox = this.getCurrentBox();
-        }
+        // do a standard delete if undo stack is empty
+        if (playLetterUndoStack.isEmpty()) {
+            if (currentBox.isBlank() || isDontDeleteCurrent()) {
+                wordToReturn = this.previousLetter();
+                currentBox = this.getCurrentBox();
+            }
 
-        // If preserving letters, skip over them
-        // break if we hit a wall or loop all the way around
-        Position startPosition = getHighlightLetter();
-        ClueID startClueID = getClueID();
-        Position lastPosition = startPosition;
-        while (isDontDeleteCurrent()) {
-            this.previousLetter();
+            // If preserving letters, skip over them
+            // break if we hit a wall or loop all the way around
+            Position startPosition = getHighlightLetter();
+            ClueID startClueID = getClueID();
+            Position lastPosition = startPosition;
+            while (isDontDeleteCurrent()) {
+                this.previousLetter();
 
-            Position newPosition = getHighlightLetter();
-            boolean stuck = (
-                Objects.equals(newPosition, startPosition)
-                    && Objects.equals(startClueID, getClueID())
-            ) || Objects.equals(newPosition, lastPosition);
+                Position newPosition = getHighlightLetter();
+                boolean stuck = (
+                    Objects.equals(newPosition, startPosition)
+                        && Objects.equals(startClueID, getClueID())
+                ) || Objects.equals(newPosition, lastPosition);
 
-            if (stuck)
-                break;
-            else
-                lastPosition = newPosition;
-        }
+                if (stuck)
+                    break;
+                else
+                    lastPosition = newPosition;
+            }
 
-        if (!isDontDeleteCurrent()) {
-            currentBox = this.getCurrentBox();
-            if (currentBox != null) {
-                currentBox.setBlank();
-                flagChange(getHighlightLetter());
+            if (!isDontDeleteCurrent()) {
+                currentBox = this.getCurrentBox();
+                if (currentBox != null) {
+                    currentBox.setBlank();
+                    flagChange(getHighlightLetter());
+                }
+            }
+        } else {
+            // Grab the last position a letter was entered and pop it from the list.
+            PlayLetterInfo undo = playLetterUndoStack.pop();
+            Position pos = undo.getPosition();
+            // Jump back to last box and delete the letter.
+            currentBox = puzzle.checkedGetBox(pos);
+            if(currentBox != null) {
+                currentBox.setResponse(undo.getOldResponse());
+                playLetterUndoStack.pushClearDisabled();
+                setHighlightLetter(pos);
+                playLetterUndoStack.popClearDisabled();
+                puzzle.setCurrentClueID(undo.getClueID());
+                flagChange(pos);
             }
         }
 
@@ -593,14 +613,29 @@ public class Playboard implements Serializable {
         );
 
         // don't delete crossing doesn't make sense for acrostic
-        boolean skipAdjacent = dontDeleteCrossing
+        boolean skipAdjacent =
+            deleteCrossingMode != DeleteCrossingMode.DELETE
             && !Puzzle.Kind.ACROSTIC.equals(puzzle.getKind())
-            && currentBoxHasFilledAdjacent();
+            && currentBoxHasFilledAdjacent(
+                deleteCrossingMode == DeleteCrossingMode.PRESERVE_FILLED_WORDS
+            );
 
         return skipCorrect || skipAdjacent;
     }
 
-    private boolean currentBoxHasFilledAdjacent() {
+    /**
+     * Where current cell has an adjacent word with filled cells
+     *
+     * Looks at words that have the currently selected cell, but are not
+     * the currently selected word (crossing). Determines whether cell
+     * is part of a crossing word that is completed by checking if
+     * adjacent cells have entries in the crossing word. If
+     * filledWordsOnly is true, then the entire crossing word must be
+     * filled for the cell to be considered to have an adjacent word
+     * will filled cells. Else, just neighbouring cells in the crossing
+     * word have to be filled.
+     */
+    private boolean currentBoxHasFilledAdjacent(boolean filledWordsOnly) {
         ClueID currentCID = getClueID();
         if (currentCID == null)
             return false;
@@ -613,23 +648,27 @@ public class Playboard implements Serializable {
             if (currentCID.equals(otherCID))
                 continue;
 
-            Zone zone = puzzle.getClue(otherCID).getZone();
-            int curPos = zone.indexOf(currentPos);
-            Position posBefore = (curPos > 0)
-                ? zone.getPosition(curPos - 1)
-                : null;
+            if (filledWordsOnly) {
+                return isFilledClueID(otherCID);
+            } else {
+                Zone zone = puzzle.getClue(otherCID).getZone();
+                int curPos = zone.indexOf(currentPos);
+                Position posBefore = (curPos > 0)
+                    ? zone.getPosition(curPos - 1)
+                    : null;
 
-            Box boxBefore = puzzle.checkedGetBox(posBefore);
-            if (!Box.isBlock(boxBefore) && !boxBefore.isBlank())
-                return true;
+                Box boxBefore = puzzle.checkedGetBox(posBefore);
+                if (!Box.isBlock(boxBefore) && !boxBefore.isBlank())
+                    return true;
 
-            Position posAfter = (curPos < zone.size() - 1)
-                ? zone.getPosition(curPos + 1)
-                : null;
+                Position posAfter = (curPos < zone.size() - 1)
+                    ? zone.getPosition(curPos + 1)
+                    : null;
 
-            Box boxAfter = puzzle.checkedGetBox(posAfter);
-            if (!Box.isBlock(boxAfter) && !boxAfter.isBlank())
-                return true;
+                Box boxAfter = puzzle.checkedGetBox(posAfter);
+                if (!Box.isBlock(boxAfter) && !boxAfter.isBlank())
+                    return true;
+            }
         }
 
         return false;
@@ -1049,7 +1088,7 @@ public class Playboard implements Serializable {
             Position current = getHighlightLetter();
             if (!Objects.equals(current, pos))
                 setHighlightLetter(pos);
-            deleteLetter();
+            deleteOrUndoLetter();
         }
 
         Position currentPos = getHighlightLetter();
@@ -1081,12 +1120,20 @@ public class Playboard implements Serializable {
             return this.getCurrentWord();
         } else {
             pushNotificationDisabled();
+
+            pushPlayLetterUndoStackCurrent();
+
             b.setResponse(letter);
             b.setResponder(this.responder);
             flagChange(pos);
-            Word next = this.nextLetter();
-            popNotificationDisabled();
 
+            // movement normally clears undo stack but we want to keep
+            // it here
+            playLetterUndoStack.pushClearDisabled();
+            Word next = this.nextLetter();
+            playLetterUndoStack.popClearDisabled();
+
+            popNotificationDisabled();
             notifyChange();
 
             return next;
@@ -1130,8 +1177,13 @@ public class Playboard implements Serializable {
 
     /**
      * Moves to start of previous word regardless of movement strategy
+     *
+     * Start takes skipCompletedLetters into account and highlights
+     * first empty cell in previous word. If no empty cell, then just
+     * start of word.
      */
     public Word previousWord() {
+        ClueID previousCID = getClueID();
         Word previous = getCurrentWord();
 
         Position curPos = getHighlightLetter();
@@ -1142,11 +1194,34 @@ public class Playboard implements Serializable {
         if (!Objects.equals(curPos, newPos))
             this.setHighlightLetter(newPos);
 
-        MovementStrategy.MOVE_NEXT_CLUE.back(this);
+        boolean goBack = true;
+        while (goBack) {
+            // only go back again if discovered needed later
+            goBack = false;
+
+            // Idea: use back for move_next_clue, which takes us to
+            // previous clue. Move to the start of that clue. Then
+            // search for blank cell to move to. If none found, try
+            // going around the loop again, unless we've already reached
+            // the originally selected clue
+
+            MovementStrategy.MOVE_NEXT_CLUE.back(this);
+
+            ClueID newCID = getClueID();
+            Position start = getClueStart(newCID);
+            setHighlightLetter(start);
+
+            Box box = puzzle.checkedGetBox(start);
+            if (box != null && skipBox(box, skipCompletedLetters)) {
+                moveZoneForward(skipCompletedLetters);
+                goBack = Objects.equals(start, getHighlightLetter())
+                    && !Objects.equals(previousCID, newCID);
+            }
+        }
 
         popNotificationDisabled();
 
-        setHighlightLetter(getClueStart(getClueID()));
+        notifyChange();
 
         return previous;
     }
@@ -1322,6 +1397,8 @@ public class Playboard implements Serializable {
      * the current direction first.
      */
     public Word toggleSelection() {
+        playLetterUndoStack.clearIfEnabled();
+
         Word w = this.getCurrentWord();
 
         Box box = puzzle.checkedGetBox(getHighlightLetter());
@@ -1760,6 +1837,16 @@ public class Playboard implements Serializable {
     }
 
     /**
+     * Add current board position to play letter undo stack
+     */
+    private void pushPlayLetterUndoStackCurrent() {
+        Position pos = getHighlightLetter();
+        Box box = puzzle.checkedGetBox(pos);
+        String response = (box == null) ? null : box.getResponse();
+        playLetterUndoStack.push(pos, getClueID(), response);
+    }
+
+    /**
      * A word on the grid
      *
      * A Zone and possibly the clue it goes with (null if no clue).
@@ -1903,5 +1990,88 @@ public class Playboard implements Serializable {
          * List of clues that have had num/hint edited or flagged
          */
         public Collection<ClueID> getChangedClueIDs() { return changedClueIDs; }
+    }
+
+    /**
+     * Position of a play letter in undo stack
+     */
+    private static class PlayLetterInfo {
+        private Position position;
+        private ClueID clueID;
+        private String oldResponse;
+
+        public PlayLetterInfo(
+            Position position, ClueID clueID, String oldResponse
+        ) {
+            this.position = position;
+            this.clueID = clueID;
+            this.oldResponse = oldResponse;
+        }
+
+        public Position getPosition() { return position; }
+        public ClueID getClueID() { return clueID; }
+        public String getOldResponse() { return oldResponse; }
+    }
+
+    /**
+     * For managing an undo stack of played letters
+     */
+    private static class PlayLetterUndoStack {
+        private int clearDisabledDepth = 0;
+        private Stack<PlayLetterInfo> undoStack = new Stack<>();
+        private boolean enabled;
+
+        public PlayLetterUndoStack(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        /**
+         * Stack will be cleared and not accept push if disabled
+         */
+        public void setEnabled(boolean enabled) {
+            if (!enabled)
+                undoStack.clear();
+            this.enabled = enabled;
+        }
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        /**
+         * Clear if clearing is enabled (not if whole stack is enabled)
+         */
+        public void clearIfEnabled() {
+            if (!isClearDisabled())
+                undoStack.clear();
+        }
+
+        public void pushClearDisabled() {
+            clearDisabledDepth += 1;
+        }
+
+        public void popClearDisabled() {
+            if (isClearDisabled())
+                clearDisabledDepth -= 1;
+        }
+
+        private boolean isClearDisabled() {
+            return clearDisabledDepth > 0;
+        }
+
+        public void push(Position position, ClueID clueID, String oldResponse) {
+            if (!enabled)
+                return;
+
+            undoStack.push(new PlayLetterInfo(position, clueID, oldResponse));
+        }
+
+        public PlayLetterInfo pop() {
+            return undoStack.pop();
+        }
+
+        public boolean isEmpty() {
+            return undoStack.isEmpty();
+        }
     }
 }

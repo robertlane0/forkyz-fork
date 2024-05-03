@@ -3,7 +3,7 @@ package app.crossword.yourealwaysbe.puz;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.List;
+import java.util.LinkedList;
 import java.util.Objects;
 
 /**
@@ -37,7 +37,7 @@ public class PuzzleMeta implements Serializable {
     public String supportUrl;
     public Position position;
     public boolean across;
-    public List<ListNum> historyList;
+    public LinkedList<ListNum> historyList;
     public Note[] acrossNotes;
     public Note[] downNotes;
     public Note playerNote;

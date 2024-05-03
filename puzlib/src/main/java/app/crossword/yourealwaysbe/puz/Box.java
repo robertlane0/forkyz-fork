@@ -2,7 +2,6 @@ package app.crossword.yourealwaysbe.puz;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.TreeMap;
@@ -25,7 +24,7 @@ public class Box implements Serializable {
     private String clueNumber;
     // for each clue this box is a part of, the index of the cell it is
     // the clue word, sorted for consistency of cycling through clues
-    private NavigableMap<ClueID, Integer> cluePositions = new TreeMap<>();
+    private TreeMap<ClueID, Integer> cluePositions = new TreeMap<>();
 
     public enum Bar { NONE, SOLID, DASHED, DOTTED };
     private Bar barTop = Bar.NONE;
