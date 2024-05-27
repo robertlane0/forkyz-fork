@@ -523,7 +523,7 @@ public class Playboard implements Serializable {
             Position startPosition = getHighlightLetter();
             ClueID startClueID = getClueID();
             Position lastPosition = startPosition;
-            while (isDontDeleteCurrent()) {
+            while (!currentBox.isBlank() && isDontDeleteCurrent()) {
                 this.previousLetter();
 
                 Position newPosition = getHighlightLetter();
@@ -595,7 +595,8 @@ public class Playboard implements Serializable {
     /**
      * Returns true if the current letter should not be deleted
      *
-     * E.g. because it is correct and show errors is show
+     * E.g. because it is correct and show errors is show. Being blank
+     * is not a reason for not deleting the current box.
      */
     private boolean isDontDeleteCurrent() {
         Box currentBox = getCurrentBox();
