@@ -54,6 +54,16 @@ public class PlayboardRenderer {
     private static final Logger LOG = Logger.getLogger(PlayboardRenderer.class.getCanonicalName());
     private static final float DESCENT_FUDGE_FACTOR = 1.3F;
 
+    // RecordingCanvas will not draw bitmaps bigger than its own
+    // constant MAX_BITMAP_SIZE, which at as of 2024/05/28 was at least
+    // 100mb.
+    // https://android.googlesource.com/platform/frameworks/base/+/refs/heads/main/graphics/java/android/graphics/RecordingCanvas.java
+    // MAX_BITMAP_SIZE is public in RecordingCanvas, but @hide-ed.
+    // 5115 is 100mb / 4 (4 bytes per pixel) and square rooted to get
+    // the size of one dimension. Subtract 5 for good measure.
+    private static final int MAX_BITMAP_DIM = 5115;
+    private static final float DEFAULT_MAX_SCALE = 2.2F;
+
     // set in constructor
     private final Typeface TYPEFACE_SEMI_BOLD_SANS;
 
@@ -106,21 +116,28 @@ public class PlayboardRenderer {
         this.minScale = minScale;
     }
 
+    /**
+     * Get max scale supportable
+     *
+     * This aims for 2.2F but changes it if either that's not large
+     * enough to fit the screen. Keeps it small enough to avoid bitmaps
+     * to large for canvases
+     */
     public float getDeviceMaxScale(){
-        float retValue;
-        // inches * pixels per inch * units
-        retValue = 2.2F;
         Puzzle puz = (board == null) ? null : board.getPuzzle();
         int width = (puz == null) ? DEFAULT_PUZZLE_WIDTH : puz.getWidth();
+
+        // Calc scale needed to make large enough to fit screen
         float puzzleBaseSizeInInches = width * BASE_BOX_SIZE_INCHES;
         //leave a 1/16th in gutter on the puzzle.
         float fitToScreen =  (dpi * (puzzleBaseSizeInInches + 0.0625F)) / dpi;
 
-        if(retValue < fitToScreen){
-            retValue = fitToScreen;
-        }
+        float maxScaleByBitmap
+            = (float) MAX_BITMAP_DIM / (puzzleBaseSizeInInches * dpi);
 
-        return retValue;
+        return Math.min(
+            Math.max(DEFAULT_MAX_SCALE, fitToScreen), maxScaleByBitmap
+        );
     }
 
     public float getDeviceMinScale(){
@@ -176,9 +193,9 @@ public class PlayboardRenderer {
 
             drawBoardBoxes(canvas, changes, suppressNotesLists);
             drawPinnedClue(canvas, changes, suppressNotesLists);
+
             if (changes == null)
                 drawImages(canvas);
-
             return bitmap;
         } catch (OutOfMemoryError e) {
             return bitmap;
