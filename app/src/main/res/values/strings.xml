@@ -199,10 +199,6 @@
     <string name="cleanup_unfinished_desc">Determines how old an unfinished puzzle must be before it is archived/deleted.</string>
     <string name="cleanup_archives">Cleanup Archives</string>
     <string name="cleanup_archives_desc">Determines how old an archived puzzle must be before it is deleted.</string>
-    <string name="keyboard_showhide">Show/Hide In-App Keyboard</string>
-    <string name="keyboard_showhide_desc">The show/hide behaviour of the in-app keyboard.</string>
-    <string name="keyboard_layout">Keyboard Layout</string>
-    <string name="keyboard_layout_desc">The layout of the in-app keyboard.</string>
     <string name="snap_current">Snap to Current Word</string>
     <string name="snap_current_desc">Toggles auto-scrolling of the playboard to the current play position.</string>
     <string name="show_length">Show Length</string>
@@ -243,14 +239,6 @@
     <string name="about_forkyz">About Forkyz</string>
     <string name="release_notes">Release Notes</string>
     <string name="license">License</string>
-    <string name="keyboard_hide_button">Keyboard Hide Button</string>
-    <string name="keyboard_hide_button_desc">Show a keyboard hide button instead of using the navigation back button.</string>
-    <string name="keyboard_haptic">Keyboard Haptic Feedback</string>
-    <string name="keyboard_haptic_desc">Vibrate on keyboard keypress.</string>
-    <string name="keyboard_use_native">Use Native Keyboard</string>
-    <string name="keyboard_use_native_desc">Use system soft input method. Still a bit experimental.</string>
-    <string name="keyboard_compact">Compact Forkyz Keyboard</string>
-    <string name="keyboard_compact_desc">Reduce the vertical space usage of the built-in Forkyz keyboard.</string>
     <string name="theme_preference">Theme</string>
     <string name="theme_preference_desc">Select application theme (requires restart).</string>
     <string name="random_clue_on_shake">Random Clue on Shake</string>
@@ -261,6 +249,25 @@
     <string name="browse_show_percentage_correct_desc">Show percentage of correct cells instead of percentage of filled cells next to puzzle (like Shortyz).</string>
     <string name="play_letter_undo">Played Letter Undo Stack</string>
     <string name="play_letter_undo_desc">Delete undoes recently played letters or deletes if no recent letters to undo.</string>
+
+    <!-- preference keyboard -->
+    <string name="keyboard_showhide">Show/Hide In-App Keyboard</string>
+    <string name="keyboard_showhide_desc">The show/hide behaviour of the in-app keyboard.</string>
+    <string name="keyboard_layout">Keyboard Layout</string>
+    <string name="keyboard_layout_desc">The layout of the in-app keyboard.</string>
+    <string name="keyboard_hide_button">Keyboard Hide Button</string>
+    <string name="keyboard_hide_button_desc">Show a keyboard hide button instead of using the navigation back button.</string>
+    <string name="keyboard_haptic">Keyboard Haptic Feedback</string>
+    <string name="keyboard_haptic_desc">Vibrate on keyboard keypress.</string>
+    <string name="keyboard_use_native">Use Native Keyboard</string>
+    <string name="keyboard_use_native_desc">Use system soft input method. Still a bit experimental.</string>
+    <string name="keyboard_compact">Compact Forkyz Keyboard</string>
+    <string name="keyboard_compact_desc">Reduce the vertical space usage of the built-in Forkyz keyboard.</string>
+    <string name="keyboard_repeat_delay">Key Repeat Delay</string>
+    <string name="keyboard_repeat_delay_desc">Delay in milliseconds before a held key starts repeating. Zero means no repeat.</string>
+    <string name="keyboard_repeat_interval">Key Repeat Interval</string>
+    <string name="keyboard_repeat_interval_desc">Delay in milliseconds between held key repeats. Zero means no repeat.</string>
+    <string name="enter_a_number">Enter a number</string>
 
     <!-- preferences download -->
     <string name="auto_downloaders">Automatic Download Sources</string>

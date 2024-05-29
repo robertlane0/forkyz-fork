@@ -115,6 +115,10 @@ public class ForkyzSettings {
     private static final String PREF_KEYBOARD_LAYOUT = "keyboardLayout";
     private static final String PREF_KEYBOARD_MODE = "keyboardShowHide";
     private static final String PREF_KEYBOARD_NATIVE = "useNativeKeyboard";
+    private static final String PREF_KEYBOARD_REPEAT_DELAY
+        = "keyboardRepeatDelay";
+    private static final String PREF_KEYBOARD_REPEAT_INTERVAL
+        = "keyboardRepeatInterval";
 
     private static final String PREF_PLAY_CLUE_BELOW_GRID
         = "clueBelowGrid";
@@ -211,10 +215,6 @@ public class ForkyzSettings {
         );
         STRING_DEFAULTS.put(PREF_EXT_CHAT_GPT_API_KEY, "");
         BOOL_DEFAULTS.put(PREF_EXT_CROSSWORD_SOLVER_ENABLED, true);
-        BOOL_DEFAULTS.put(PREF_KEYBOARD_COMPACT, false);
-        BOOL_DEFAULTS.put(PREF_KEYBOARD_HAPTIC, true);
-        BOOL_DEFAULTS.put(PREF_KEYBOARD_HIDE_BUTTON, false);
-        BOOL_DEFAULTS.put(PREF_KEYBOARD_NATIVE, false);
         BOOL_DEFAULTS.put(PREF_PLAY_CLUE_BELOW_GRID, false);
         INT_DEFAULTS.put(PREF_PLAY_CLUE_TABS_PAGE, 0);
         BOOL_DEFAULTS.put(PREF_PLAY_DOUBLE_TAP_FIT_BOARD, false);
@@ -254,7 +254,7 @@ public class ForkyzSettings {
     private ExecutorService executor = Executors.newSingleThreadExecutor();
 
     private MutableLiveData<Accessor> liveBrowseSort;
-    private MutableLiveData<KeyboardDisplay> liveKeyboardDisplay;
+    private MutableLiveData<KeyboardSettings> liveKeyboardSettings;
     private MutableLiveData<GridRatio> livePlayGridRatio;
     private MutableLiveData<DeleteCrossingMode> livePlayDeleteCrossingMode;
     private Map<String, MutableLiveData<Boolean>> liveBooleans = new HashMap<>();
@@ -263,10 +263,17 @@ public class ForkyzSettings {
         = (prefs, key) -> {
             if (PREF_BROWSE_SORT.equals(key)) {
                 updateLiveBrowseSort();
-            } else if (PREF_KEYBOARD_COMPACT.equals(key)) {
-                updateLiveKeyboardDisplay();
-            } else if (PREF_KEYBOARD_LAYOUT.equals(key)) {
-                updateLiveKeyboardDisplay();
+            } else if (
+                PREF_KEYBOARD_COMPACT.equals(key)
+                || PREF_KEYBOARD_HAPTIC.equals(key)
+                || PREF_KEYBOARD_HIDE_BUTTON.equals(key)
+                || PREF_KEYBOARD_LAYOUT.equals(key)
+                || PREF_KEYBOARD_MODE.equals(key)
+                || PREF_KEYBOARD_NATIVE.equals(key)
+                || PREF_KEYBOARD_REPEAT_DELAY.equals(key)
+                || PREF_KEYBOARD_REPEAT_INTERVAL.equals(key)
+            ) {
+                updateLiveKeyboardSettings();
             } else if (PREF_PLAY_DELETE_CROSSING_MODE.equals(key)) {
                 updateLivePlayDeleteCrossingMode();
             } else if (PREF_PLAY_GRID_RATIO.equals(key)) {
@@ -651,70 +658,31 @@ public class ForkyzSettings {
         });
     }
 
-    /**
-     * If the Forkyz keyboard should be vertically compact
-     */
-    public void getKeyboardCompact(Consumer<Boolean> cb) {
-        getBooleanPreference(PREF_KEYBOARD_COMPACT, cb);
-    }
-
-    /**
-     * Keep a live view of the display params
-     *
-     * E.g. layout and whether compact
-     */
-    public LiveData<KeyboardDisplay> liveKeyboardDisplay() {
-        if (liveKeyboardDisplay == null) {
-            liveKeyboardDisplay = new MutableLiveData<KeyboardDisplay>();
-            updateLiveKeyboardDisplay();
-        }
-        return liveKeyboardDisplay;
-    }
-
-    /**
-     * If the Forkyz keyboard gives haptic feedback
-     */
-    public void getKeyboardHaptic(Consumer<Boolean> cb) {
-        getBooleanPreference(PREF_KEYBOARD_HAPTIC, cb);
-    }
-
-    /**
-     * If the keyboard has a hide button
-     */
-    public void getKeyboardHideButton(Consumer<Boolean> cb) {
-        getBooleanPreference(PREF_KEYBOARD_HIDE_BUTTON, cb);
-    }
-
-    /**
-     * Get layout of Forkyz keyboard
-     */
-    public void getKeyboardLayout(Consumer<KeyboardLayout> cb) {
-        executor.execute(() -> {
-            String value = prefs.getString(
-                PREF_KEYBOARD_LAYOUT,
-                KeyboardLayout.QWERTY.getSettingsValue()
-            );
-            handler.post(() -> {
-                cb.accept(KeyboardLayout.getFromSettingsValue(value));
+    public void getKeyboardSettings(Consumer<KeyboardSettings> cb) {
+        // use value cached in liveKeyboardSettings or create cache
+        if (
+            liveKeyboardSettings == null
+            || !liveKeyboardSettings.isInitialized()
+        ) {
+            getFreshKeyboardSettings(ks -> {
+                handler.post(() -> { cb.accept(ks); });
             });
-        });
+            // create a cache for future if needed
+            liveKeyboardSettings();
+        } else {
+            cb.accept(liveKeyboardSettings.getValue());
+        }
     }
 
     /**
-     * The show/hide behaviour of the keyboard
+     * Keep a live view of the keyboard settings
      */
-    public void getKeyboardMode(Consumer<KeyboardMode> cb) {
-        String modePref = prefs.getString(
-            PREF_KEYBOARD_MODE, KeyboardMode.HIDE_MANUAL.getSettingsValue()
-        );
-        cb.accept(KeyboardMode.getFromSettingsValue(modePref));
-    }
-
-    /**
-     * Use native keyboard instead of the Forkyz keyboard
-     */
-    public void getKeyboardNative(Consumer<Boolean> cb) {
-        getBooleanPreference(PREF_KEYBOARD_NATIVE, cb);
+    public LiveData<KeyboardSettings> liveKeyboardSettings() {
+        if (liveKeyboardSettings == null) {
+            liveKeyboardSettings = new MutableLiveData<KeyboardSettings>();
+            updateLiveKeyboardSettings();
+        }
+        return liveKeyboardSettings;
     }
 
     /**
@@ -1349,14 +1317,9 @@ public class ForkyzSettings {
             getBrowseSort(value -> { liveBrowseSort.setValue(value); });
     }
 
-    private void updateLiveKeyboardDisplay() {
-        if (liveKeyboardDisplay != null) {
-            getKeyboardLayout(layout -> {
-            getKeyboardCompact(compact -> {
-                liveKeyboardDisplay.setValue(
-                    new KeyboardDisplay(layout, compact)
-                );
-            });});
+    private void updateLiveKeyboardSettings() {
+        if (liveKeyboardSettings != null) {
+            getFreshKeyboardSettings(liveKeyboardSettings::setValue);
         }
     }
 
@@ -1387,5 +1350,44 @@ public class ForkyzSettings {
         MutableLiveData<Boolean> liveData = liveBooleans.get(name);
         if (liveData != null)
             getBooleanPreference(name, value -> { liveData.setValue(value); });
+    }
+
+    /**
+     * Get a fresh copy of keyboard settings without using cached live
+     * settings
+     */
+    private void getFreshKeyboardSettings(Consumer<KeyboardSettings> cb) {
+        executor.execute(() -> {
+            String value = prefs.getString(
+                PREF_KEYBOARD_LAYOUT,
+                KeyboardLayout.QWERTY.getSettingsValue()
+            );
+            String modePref = prefs.getString(
+                PREF_KEYBOARD_MODE, KeyboardMode.HIDE_MANUAL.getSettingsValue()
+            );
+
+            KeyboardSettings settings = new KeyboardSettings(
+                prefs.getBoolean(PREF_KEYBOARD_COMPACT, false),
+                prefs.getBoolean(PREF_KEYBOARD_HAPTIC, true),
+                prefs.getBoolean(PREF_KEYBOARD_HIDE_BUTTON, false),
+                KeyboardLayout.getFromSettingsValue(value),
+                KeyboardMode.getFromSettingsValue(modePref),
+                getIntegerFromStringPref(PREF_KEYBOARD_REPEAT_DELAY, 300),
+                getIntegerFromStringPref(PREF_KEYBOARD_REPEAT_INTERVAL, 75),
+                prefs.getBoolean(PREF_KEYBOARD_NATIVE, false)
+            );
+
+            handler.post(() -> { cb.accept(settings); });
+        });
+    }
+
+    private int getIntegerFromStringPref(String name, int fallbackValue) {
+        try {
+            return Integer.parseInt(
+                prefs.getString(name, String.valueOf(fallbackValue))
+            );
+        } catch (NumberFormatException e) {
+            return fallbackValue;
+        }
     }
 }

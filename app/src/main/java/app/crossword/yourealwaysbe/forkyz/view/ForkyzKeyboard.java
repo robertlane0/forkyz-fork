@@ -39,7 +39,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 
 import app.crossword.yourealwaysbe.forkyz.R;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
-import app.crossword.yourealwaysbe.forkyz.settings.KeyboardDisplay;
+import app.crossword.yourealwaysbe.forkyz.settings.KeyboardSettings;
 import app.crossword.yourealwaysbe.forkyz.settings.KeyboardLayout;
 import java.util.logging.Logger;
 
@@ -69,9 +69,6 @@ public class ForkyzKeyboard
             KeyboardLayout.COLEMAK, R.layout.forkyz_keyboard_colemak
         );
     };
-
-    private static final int KEY_REPEAT_DELAY = 300;
-    private static final int KEY_REPEAT_INTERVAL = 75;
 
     public static final int KEY_CHANGE_CLUE_DIRECTION = 0;
     public static final int KEY_NEXT_CLUE = 1;
@@ -132,9 +129,9 @@ public class ForkyzKeyboard
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         // need to do this here: there's no life cycle owner until attached
-        settings.liveKeyboardDisplay().observe(
+        settings.liveKeyboardSettings().observe(
             ViewTreeLifecycleOwner.get(this),
-            keyboardDisplay -> { createView(getContext(), keyboardDisplay); }
+            ks -> { createView(getContext(), ks); }
         );
     }
 
@@ -151,8 +148,8 @@ public class ForkyzKeyboard
         case MotionEvent.ACTION_DOWN:
             onKeyDown(view.getId());
             view.setPressed(true);
-            settings.getKeyboardHaptic(haptic -> {
-                if (haptic) {
+            settings.getKeyboardSettings(ks -> {
+                if (ks.getHaptic()) {
                     view.performHapticFeedback(
                         HapticFeedbackConstants.KEYBOARD_TAP
                     );
@@ -250,7 +247,7 @@ public class ForkyzKeyboard
     private synchronized void countKeyUp() { countKeysDown--; }
 
     private synchronized void createView(
-        Context context, KeyboardDisplay keyboardDisplay
+        Context context, KeyboardSettings keyboardSettings
     ) {
         // clear any old state (if config change)
         cancelKeyTimers();
@@ -265,11 +262,11 @@ public class ForkyzKeyboard
         inflater = inflater.cloneInContext(context);
         LayoutInflaterCompat.setFactory2(
             inflater,
-            new FKFactory(keyboardDisplay)
+            new FKFactory(keyboardSettings)
         );
 
         inflater.inflate(
-            KEYBOARD_LAYOUTS.get(keyboardDisplay.getLayout()),
+            KEYBOARD_LAYOUTS.get(keyboardSettings.getLayout()),
             this,
             true
         );
@@ -350,18 +347,26 @@ public class ForkyzKeyboard
         countKeyDown();
         sendKeyDown(keyId);
 
-        final Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                // post key events on main thread
-                handler.post(() -> {
-                    sendKeyUp(keyId);
-                    sendKeyDown(keyId);
-                });
-            }
-        }, KEY_REPEAT_DELAY, KEY_REPEAT_INTERVAL);
-        setKeyTimer(keyId, timer);
+        settings.getKeyboardSettings(ks -> {
+            int delay = ks.getRepeatDelay();
+            int interval = ks.getRepeatInterval();
+
+            if (delay == 0 || interval == 0)
+                return;
+
+            final Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    // post key events on main thread
+                    handler.post(() -> {
+                        sendKeyUp(keyId);
+                        sendKeyDown(keyId);
+                    });
+                }
+            }, delay, interval);
+            setKeyTimer(keyId, timer);
+        });
     }
 
     private synchronized void setKeyTimer(int keyId, Timer timer) {
@@ -415,10 +420,10 @@ public class ForkyzKeyboard
     }
 
     private class FKFactory implements LayoutInflater.Factory2 {
-        private KeyboardDisplay keyboardDisplay;
+        private KeyboardSettings keyboardSettings;
 
-        public FKFactory(KeyboardDisplay keyboardDisplay) {
-            this.keyboardDisplay = keyboardDisplay;
+        public FKFactory(KeyboardSettings keyboardSettings) {
+            this.keyboardSettings = keyboardSettings;
         }
 
         @Override
@@ -494,7 +499,7 @@ public class ForkyzKeyboard
                     = context
                         .getResources()
                         .getInteger(
-                            keyboardDisplay.getCompact()
+                            keyboardSettings.getCompact()
                                 ? R.integer.keyboardButtonPaddingPcntCompact
                                 : R.integer.keyboardButtonPaddingPcnt
                         );
