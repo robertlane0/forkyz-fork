@@ -22,7 +22,6 @@
     <color name="surface">@color/background</color>
     <color name="onSurface">@color/onBackground</color>
     <color name="surfaceVariant">#333</color>
-    <color name="surfaceVariantPressed">#222</color>
     <color name="onSurfaceVariant">#bbb</color>
     <color name="outline">#8C9199</color>
     <color name="inverseOnSurface">#444</color>

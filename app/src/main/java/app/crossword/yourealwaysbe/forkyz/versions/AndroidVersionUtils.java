@@ -47,10 +47,8 @@ public interface AndroidVersionUtils {
                 return new OreoUtil();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
                 return new MarshmallowUtil();
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                return new LollipopUtil();
 
-            return new KitKatUtil();
+            return new LollipopUtil();
         }
     }
 

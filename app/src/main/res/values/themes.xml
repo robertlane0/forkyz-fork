@@ -2,6 +2,15 @@
 <resources>
     <!-- base variant theme used in themes-common.xml in values -->
     <style
+        name="Theme.Forkyz.DayNightBaseVersioned"
+        parent="Theme.Forkyz.DayNightBase"
+    >
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    <!--<item name="android:navigationBarColor">@android:color/transparent</item>-->
+    </style>
+
+    <!-- base for all versioned alternatives -->
+    <style
         name="Theme.Forkyz.DayNightBase"
         parent="Theme.Material3.DynamicColors.Light"
     >
