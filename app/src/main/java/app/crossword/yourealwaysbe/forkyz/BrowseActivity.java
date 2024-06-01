@@ -782,22 +782,8 @@ public class BrowseActivity extends ForkyzActivity {
 
     private void autoDownloadIfEnabled() {
         fileHandlerProvider.isMissingWritePermission(missing -> {
-            if (missing) return;
-
-            settings.getBrowseLastDownload(lastDL -> {
-            settings.getDownloadersSettings(downloaderSettings -> {
-            downloadersProvider.get(dls -> {
-                long downloadCutoff
-                    = System.currentTimeMillis() - (long) (12 * 60 * 60 * 1000);
-
-                boolean isDownload = downloaderSettings.getDownloadOnStartup()
-                    && downloadCutoff > lastDL;
-
-                if (isDownload) {
-                    model.download(LocalDate.now(), dls.getAutoDownloaders());
-                    settings.setBrowseLastDownload(System.currentTimeMillis());
-                }
-            });});});
+            if (!missing)
+                model.autoDownloadIfRequired();
         });
     }
 

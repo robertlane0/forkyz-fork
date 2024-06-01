@@ -271,6 +271,42 @@ public class BrowseActivityViewModel extends AndroidViewModel {
         });
     }
 
+    /**
+     * Runs autodownload if it hasn't run too recently
+     *
+     * Runs async but only runs one request at a time to avoid parallel
+     * auto download jobs.
+     */
+    public void autoDownloadIfRequired() {
+        downloadExecutorService.execute(() -> {
+            settings.getDownloadersSettings(downloaderSettings -> {
+            downloadersProvider.get(dls -> {
+                // Should not run in parallel with other auto downloads.
+                // If multiple calls are made rapidly, the first will
+                // lock the block below and update lastDL so future
+                // blocks don't redownload. Could have used a separate
+                // single-thread autodownload executor instead, but this
+                // avoids an extra thread and field variable.
+                synchronized (BrowseActivityViewModel.this) {
+                    long lastDL = settings.getBrowseLastDownloadSync();
+                    long downloadCutoff = System.currentTimeMillis()
+                        - (long) (12 * 60 * 60 * 1000);
+
+                    boolean isDownload
+                        = downloaderSettings.getDownloadOnStartup()
+                        && downloadCutoff > lastDL;
+
+                    if (isDownload) {
+                        settings.setBrowseLastDownloadSync(
+                            System.currentTimeMillis()
+                        );
+                        download(LocalDate.now(), dls.getAutoDownloaders());
+                    }
+                }
+            ;});});
+        });
+    }
+
     public void loadPuzzle(PuzMetaFile puzMeta) {
         settings.getPlayPreserveCorrectLettersInShowErrors(preserveCorrect -> {
         settings.getPlayDeleteCrossingMode(deleteCrossingMode -> {

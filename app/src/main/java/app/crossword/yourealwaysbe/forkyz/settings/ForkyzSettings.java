@@ -399,13 +399,20 @@ public class ForkyzSettings {
      *
      * Used to trigger automatic downloads on app start if a download
      * didn't happen recently.
+     *
+     * Runs sychronously, avoid usage on main thread.
      */
-    public void getBrowseLastDownload(Consumer<Long> cb) {
-        getLongPreference(PREF_BROWSE_LAST_DOWNLOAD, cb);
+    public long getBrowseLastDownloadSync() {
+        return getLongPreferenceSync(PREF_BROWSE_LAST_DOWNLOAD);
     }
 
-    public void setBrowseLastDownload(long value) {
-        setLongPreference(PREF_BROWSE_LAST_DOWNLOAD, value);
+    /**
+     * Set last time download was triggered by browse
+     *
+     * Runs synchronously, avoid on main thread
+     */
+    public void setBrowseLastDownloadSync(long value) {
+        setLongPreferenceSync(PREF_BROWSE_LAST_DOWNLOAD, value);
     }
 
     /**
@@ -1273,13 +1280,7 @@ public class ForkyzSettings {
     }
 
     private void getLongPreference(String name, Consumer<Long> cb) {
-        final Long defaultValue = LONG_DEFAULTS.get(name);
-        if (defaultValue == null) {
-            throw new IllegalArgumentException(
-                "Unrecognised Long preference: " + name
-            );
-        }
-
+        final Long defaultValue = getLongDefaultValue(name);
         executor.execute(() -> {
             long value = prefs.getLong(name, defaultValue);
             handler.post(() -> { cb.accept(value); });
@@ -1288,8 +1289,37 @@ public class ForkyzSettings {
 
     private void setLongPreference(String name, long value) {
         executor.execute(() -> {
-            prefs.edit().putLong(name, value).apply();
+            setLongPreferenceSync(name, value);
         });
+    }
+
+    /**
+     * Get pref synchronously, avoid on main thread
+     */
+    private long getLongPreferenceSync(String name) {
+        return prefs.getLong(name, getLongDefaultValue(name));
+    }
+
+    /**
+     * Set pref synchronously, avoid on main thread
+     */
+    private void setLongPreferenceSync(String name, long value) {
+        prefs.edit().putLong(name, value).apply();
+    }
+
+    /**
+     * Get default value for preference
+     *
+     * @throws IllegalArgumentException if not found
+     */
+    private long getLongDefaultValue(String name) {
+        final Long defaultValue = LONG_DEFAULTS.get(name);
+        if (defaultValue == null) {
+            throw new IllegalArgumentException(
+                "Unrecognised Long preference: " + name
+            );
+        }
+        return defaultValue;
     }
 
     private void getStringPreference(String name, Consumer<String> cb) {
