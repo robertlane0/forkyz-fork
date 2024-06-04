@@ -275,9 +275,12 @@ public class BrowseActivityViewModel extends AndroidViewModel {
      * Runs autodownload if it hasn't run too recently
      *
      * Runs async but only runs one request at a time to avoid parallel
-     * auto download jobs.
+     * auto download jobs. Don't do anything if no network
      */
     public void autoDownloadIfRequired() {
+        if (!utils.hasNetworkConnection(getApplication()))
+            return;
+
         downloadExecutorService.execute(() -> {
             settings.getDownloadersSettings(downloaderSettings -> {
             downloadersProvider.get(dls -> {
