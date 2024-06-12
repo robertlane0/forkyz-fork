@@ -1,5 +1,12 @@
 # Forkyz Changelog
 
+## Version 54
+
+- Configure built-in keyboard repeat (keyboard settings).
+- Wait until internet available before auto-download.
+- Min Android version bumped to 5 (SDK21, library updates).
+- Fix crash when zooming into maximum.
+
 ## Version 53
 
 - Update ChatGPT model (thanks Adam Cole).
