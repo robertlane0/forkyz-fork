@@ -318,7 +318,7 @@ public class BoardEditText
     /**
      * Fill the existing boxes from the string
      *
-     * Overwrite from start to end or length of text
+     * Overwrite from start to end or length of text. Does not filter entries.
      */
     public void setFromString(String text) {
         if (text == null)
@@ -334,6 +334,35 @@ public class BoardEditText
         render();
         updateInputConnection();
     }
+
+    /**
+     * Fill the existing boxes from the boxes responses
+     *
+     * Overwrite from start to end or length of text. Runs each entry through
+     * the filter.
+     */
+    public void enterFromBoxes(Box[] source, boolean copyBlanks) {
+        if (source == null)
+            return;
+
+        int end = Math.min(source.length, boxes.length);
+
+        for (int i = 0; i < end; i++) {
+            if (copyBlanks || !source[i].isBlank()) {
+                char c = filterReplacement(
+                    source[i].getResponse().charAt(0), new Position(0, i)
+                );
+                if (c != '\0') {
+                    boxes[i].setResponse(c);
+                    flagChanged(i);
+                }
+            }
+        }
+
+        render();
+        updateInputConnection();
+    }
+
 
     /**
      * Initialise the boxes and length from the given string

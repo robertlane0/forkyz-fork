@@ -110,11 +110,10 @@
     <string name="transfer_overwrite_warning">Transferring the response conflicts with existing entries. Overwrite anyway?</string>
     <string name="flag_clue">Flag clue</string>
     <string name="player_notes">Puzzle Notes</string>
-    <string name="transfer_board_to_scratch_or_anagram">Transfer board contents to scratch or anagram</string>
-    <string name="transfer_scratch_to_notes">Transfer scratch contents to free notes</string>
-    <string name="transfer_scratch_to_board">Transfer scratch contents to board</string>
+    <string name="transfer_board_to_focussed_view">Transfer board contents to currently focussed view</string>
+    <string name="transfer_scratch_to_focussed_view">Transfer scratch contents to the currently focussed view</string>
     <string name="shuffle_anagram_source">Shuffle anagram source letters</string>
-    <string name="transfer_anagram_solution_to_board">Transfer anagram solution to board</string>
+    <string name="transfer_anagram_solution_to_focussed_view">Transfer anagram solution to focussed view</string>
     <string name="flag_color_title">Set Clue Flag Color</string>
     <string name="choose_flag_color">Choose flag color.</string>
 

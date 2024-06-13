@@ -69,10 +69,14 @@ public class NotesActivity extends PuzzleActivity {
         = "transferResponseRequest";
 
     private enum TransferResponseRequest {
+        SCRATCH_TO_ANAGRAM_SOL,
+        SCRATCH_TO_ANAGRAM_SOURCE,
         SCRATCH_TO_BOARD,
         ANAGRAM_SOL_TO_BOARD,
+        ANAGRAM_SOL_TO_SCRATCH,
         BOARD_TO_SCRATCH,
-        BOARD_TO_ANAGRAM_SOL
+        BOARD_TO_ANAGRAM_SOL,
+        BOARD_TO_ANAGRAM_SOURCE
     }
 
     private NotesBinding binding;
@@ -155,19 +159,23 @@ public class NotesActivity extends PuzzleActivity {
                     NotesActivity.this.executeTransferResponseRequest(
                         TransferResponseRequest.BOARD_TO_SCRATCH, true
                     );
-                } else if (
-                    id == R.id.anagram_solution || id == R.id.anagram_source
-                ) {
+                } else if (id == R.id.anagram_solution) {
                     NotesActivity.this.executeTransferResponseRequest(
                         TransferResponseRequest.BOARD_TO_ANAGRAM_SOL, true
                     );
+                } else if (id == R.id.anagram_source) {
+                    NotesActivity.this.executeTransferResponseRequest(
+                        TransferResponseRequest.BOARD_TO_ANAGRAM_SOURCE, true
+                    );
+                } else if (id == R.id.notes_box) {
+                    copyCurrentWordToNotes();
                 }
             }
         });
         ViewCompat.replaceAccessibilityAction(
             binding.miniboard,
             AccessibilityActionCompat.ACTION_LONG_CLICK,
-            getText(R.string.transfer_board_to_scratch_or_anagram),
+            getText(R.string.transfer_board_to_focussed_view),
             null
         );
 
@@ -187,20 +195,6 @@ public class NotesActivity extends PuzzleActivity {
                     NotesActivity.this.onBoardViewFocusChanged(gainFocus);
                 }
             }
-        );
-
-        binding.notesBox.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                NotesActivity.this.moveScratchToNote();
-                return true;
-            }
-        });
-        ViewCompat.replaceAccessibilityAction(
-            binding.notesBox,
-            AccessibilityActionCompat.ACTION_LONG_CLICK,
-            getText(R.string.transfer_scratch_to_notes),
-            null
         );
 
         binding.notesBox.setOnFocusChangeListener(
@@ -227,10 +221,26 @@ public class NotesActivity extends PuzzleActivity {
 
                 @Override
                 public void onContextMenu(Point point) {
-                    if (isClueOnBoard()) {
+                    View focused = getWindow().getCurrentFocus();
+                    int id = focused.getId();
+                    if (id == R.id.notes_box) {
+                        moveBoardEditTextToNotes(binding.scratchMiniboard);
+                    } else if (id == R.id.anagram_source) {
                         executeTransferResponseRequest(
-                            TransferResponseRequest.SCRATCH_TO_BOARD, true
+                            TransferResponseRequest.SCRATCH_TO_ANAGRAM_SOURCE,
+                            true
                         );
+                    } else if (id == R.id.anagram_solution) {
+                        executeTransferResponseRequest(
+                            TransferResponseRequest.SCRATCH_TO_ANAGRAM_SOL,
+                            true
+                        );
+                    } else {
+                        if (isClueOnBoard()) {
+                            executeTransferResponseRequest(
+                                TransferResponseRequest.SCRATCH_TO_BOARD, true
+                            );
+                        }
                     }
                 }
             }
@@ -238,7 +248,7 @@ public class NotesActivity extends PuzzleActivity {
         ViewCompat.replaceAccessibilityAction(
             binding.scratchMiniboard,
             AccessibilityActionCompat.ACTION_LONG_CLICK,
-            getText(R.string.transfer_scratch_to_board),
+            getText(R.string.transfer_scratch_to_focussed_view),
             null
         );
 
@@ -302,10 +312,21 @@ public class NotesActivity extends PuzzleActivity {
 
                 @Override
                 public void onContextMenu(Point point) {
-                    if (isClueOnBoard()) {
+                    View focused = getWindow().getCurrentFocus();
+                    int id = focused.getId();
+                    if (id == R.id.scratch_miniboard) {
                         executeTransferResponseRequest(
-                            TransferResponseRequest.ANAGRAM_SOL_TO_BOARD, true
+                            TransferResponseRequest.ANAGRAM_SOL_TO_SCRATCH, true
                         );
+                    } else if (id == R.id.notes_box) {
+                        moveBoardEditTextToNotes(binding.anagramSolution);
+                    } else {
+                        if (isClueOnBoard()) {
+                            executeTransferResponseRequest(
+                                TransferResponseRequest.ANAGRAM_SOL_TO_BOARD,
+                                true
+                            );
+                        }
                     }
                 }
             }
@@ -313,7 +334,7 @@ public class NotesActivity extends PuzzleActivity {
         ViewCompat.replaceAccessibilityAction(
             binding.anagramSolution,
             AccessibilityActionCompat.ACTION_LONG_CLICK,
-            getText(R.string.transfer_anagram_solution_to_board),
+            getText(R.string.transfer_anagram_solution_to_focussed_view),
             null
         );
 
@@ -708,35 +729,46 @@ public class NotesActivity extends PuzzleActivity {
             return Collections.singleton(list);
     }
 
-    private void moveScratchToNote() {
+    private void moveBoardEditTextToNotes(BoardEditText bet) {
         String notesText = binding.notesBox.getText().toString();
+        String betText = bet.toString().trim();
 
-        String scratchText = binding.scratchMiniboard.toString().trim();
+        if (!betText.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(notesText);
 
-        if (scratchText.length() > 0) {
             if (notesText.length() > 0)
-                notesText += "\n";
-            notesText += scratchText;
+                sb.append("\n");
+            sb.append(betText);
 
-            binding.scratchMiniboard.clear();
-            binding.notesBox.setText(notesText);
+            bet.clear();
+            binding.notesBox.setText(sb.toString());
         }
     }
 
-    private void copyBoxesToAnagramSol(Box[] boxes) {
-        for (int i = 0; i < boxes.length; i++) {
-            if (!boxes[i].isBlank()) {
-                String newResponse = boxes[i].getResponse();
-                if (newResponse != null && !newResponse.isEmpty()) {
-                    char newChar = newResponse.charAt(0);
-                    boolean allowed = preAnagramSolResponse(i, newChar, false);
-                    if (allowed)
-                        binding.anagramSolution.setResponse(i, newChar, false);
-                }
-            }
+    private void copyCurrentWordToNotes() {
+        Playboard board = getBoard();
+        if (board == null)
+            return;
+
+        StringBuilder sb = new StringBuilder();
+        Box[] curWordBoxes = board.getCurrentWordBoxes();
+        for (int i = 0; i < curWordBoxes.length; i++) {
+            if (curWordBoxes[i] != null)
+                sb.append(curWordBoxes[i].getResponse());
         }
-        binding.anagramSource.render();
-        binding.anagramSolution.render();
+        String curWord = sb.toString().trim();
+
+        if (!curWord.isEmpty()) {
+            sb = new StringBuilder();
+            sb.append(binding.notesBox.getText().toString());
+
+            if (sb.length() > 0)
+                sb.append("\n");
+            sb.append(curWord);
+
+            binding.notesBox.setText(sb.toString());
+        }
     }
 
     private boolean hasConflict(Box[] source,
@@ -755,20 +787,6 @@ public class NotesActivity extends PuzzleActivity {
             }
         }
         return false;
-    }
-
-    /**
-     * Copies non-blank characters from response to the view
-     */
-    private void overlayBoxesOnBoardView(Box[] boxes,
-                                         BoardEditText view) {
-        int length = Math.min(boxes.length, view.getLength());
-        for (int i = 0; i < length; i++) {
-            if (!boxes[i].isBlank()) {
-                view.setResponse(i, boxes[i].getResponse(), false);
-            }
-        }
-        view.render();
     }
 
     /**
@@ -826,6 +844,20 @@ public class NotesActivity extends PuzzleActivity {
 
         if (confirmOverwrite) {
             switch (request) {
+            case SCRATCH_TO_ANAGRAM_SOL:
+                conflict = hasConflict(
+                    binding.scratchMiniboard.getBoxes(),
+                    binding.anagramSolution.getBoxes(),
+                    false
+                );
+                break;
+            case SCRATCH_TO_ANAGRAM_SOURCE:
+                conflict = hasConflict(
+                    binding.scratchMiniboard.getBoxes(),
+                    binding.anagramSource.getBoxes(),
+                    true
+                );
+                break;
             case SCRATCH_TO_BOARD:
                 conflict = hasConflict(
                     binding.scratchMiniboard.getBoxes(), curWordBoxes, true
@@ -842,7 +874,15 @@ public class NotesActivity extends PuzzleActivity {
                 );
                 break;
             case BOARD_TO_ANAGRAM_SOL:
-                conflict = false;
+                conflict = hasConflict(
+                    curWordBoxes, binding.anagramSolution.getBoxes(), false
+                );
+                break;
+            case BOARD_TO_ANAGRAM_SOURCE:
+                conflict = hasConflict(
+                    curWordBoxes, binding.anagramSource.getBoxes(), false
+                );
+                break;
             }
         }
 
@@ -850,17 +890,35 @@ public class NotesActivity extends PuzzleActivity {
             confirmAndExecuteTransferRequest(request);
         } else {
             switch (request) {
+            case SCRATCH_TO_ANAGRAM_SOL:
+                binding.anagramSolution.enterFromBoxes(
+                    binding.scratchMiniboard.getBoxes(), false
+                );
+                break;
+            case SCRATCH_TO_ANAGRAM_SOURCE:
+                binding.anagramSource.enterFromBoxes(
+                    binding.scratchMiniboard.getBoxes(), true
+                );
+                break;
             case SCRATCH_TO_BOARD:
                 board.setCurrentWord(binding.scratchMiniboard.getBoxes());
                 break;
             case ANAGRAM_SOL_TO_BOARD:
                 board.setCurrentWord(binding.anagramSolution.getBoxes());
                 break;
+            case ANAGRAM_SOL_TO_SCRATCH:
+                binding.scratchMiniboard.enterFromBoxes(
+                    binding.anagramSolution.getBoxes(), true
+                );
+                break;
             case BOARD_TO_SCRATCH:
-                overlayBoxesOnBoardView(curWordBoxes, binding.scratchMiniboard);
+                binding.scratchMiniboard.enterFromBoxes(curWordBoxes, false);
                 break;
             case BOARD_TO_ANAGRAM_SOL:
-                copyBoxesToAnagramSol(curWordBoxes);
+                binding.anagramSolution.enterFromBoxes(curWordBoxes, false);
+                break;
+            case BOARD_TO_ANAGRAM_SOURCE:
+                binding.anagramSource.enterFromBoxes(curWordBoxes, false);
                 break;
             }
         }
