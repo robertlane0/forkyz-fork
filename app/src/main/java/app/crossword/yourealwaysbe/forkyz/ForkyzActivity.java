@@ -14,10 +14,15 @@ import android.os.Bundle;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.ViewGroup.MarginLayoutParams;
 import android.widget.Toast;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
 import androidx.core.text.HtmlCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.shape.MaterialShapeDrawable;
 
@@ -51,7 +56,7 @@ public class ForkyzActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         (new ThemeHelper(settings)).themeActivity(this);
-        utils.setDecorFitsSystemWindows(getWindow(), false);
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         doOrientation();
     }
 
@@ -176,7 +181,7 @@ public class ForkyzActivity extends AppCompatActivity {
      * Assumes view also touches sides, so sets side insets
      */
     protected void setupBottomInsets(View view) {
-        utils.setupInsets(view, true, true);
+        setupInsets(view, true, true);
     }
 
     /**
@@ -187,7 +192,7 @@ public class ForkyzActivity extends AppCompatActivity {
      * navigation buttons in landscape.
      */
     protected void setupSideInsets(View view) {
-        utils.setupInsets(view, true, false);
+        setupInsets(view, true, false);
     }
 
     /**
@@ -199,6 +204,45 @@ public class ForkyzActivity extends AppCompatActivity {
     protected void setStatusBarElevation(AppBarLayout appBarLayout) {
         appBarLayout.setStatusBarForeground(
             MaterialShapeDrawable.createWithElevationOverlay(this)
+        );
+    }
+
+    /**
+     * Set margins on view to avoid system bars/ime on bottom/side
+     *
+     * Needed with setDecorFitsSystemWindows(.., true) for app bar
+     * overlap status bar. Else bottom bars/ime overlap app.
+     */
+    public void setupInsets(View view, boolean sides, boolean bottom) {
+        MarginLayoutParams origMlp
+            = (MarginLayoutParams) view.getLayoutParams();
+        // keep own copies because above object will change with view
+        int origLeftMargin = origMlp.leftMargin;
+        int origBottomMargin = origMlp.bottomMargin;
+        int origRightMargin = origMlp.rightMargin;
+
+        ViewCompat.setOnApplyWindowInsetsListener(
+            view,
+            (v, windowInsets) -> {
+                Insets insets = windowInsets.getInsets(
+                    WindowInsetsCompat.Type.systemBars()
+                    | WindowInsetsCompat.Type.ime()
+                );
+
+                MarginLayoutParams mlp
+                    = (MarginLayoutParams) v.getLayoutParams();
+                if (sides) {
+                    mlp.leftMargin = insets.left + origLeftMargin;
+                    mlp.rightMargin = insets.right + origRightMargin;
+                }
+                if (bottom)
+                    mlp.bottomMargin = insets.bottom + origBottomMargin;
+                v.setLayoutParams(mlp);
+
+                // do not consume insets -- it prevents other views
+                // avoiding system bars/ime on older Android versions
+                return windowInsets;
+            }
         );
     }
 }

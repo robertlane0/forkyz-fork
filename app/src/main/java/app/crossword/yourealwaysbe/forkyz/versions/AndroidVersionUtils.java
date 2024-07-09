@@ -133,23 +133,6 @@ public interface AndroidVersionUtils {
     String getApplicationVersionName(Context context);
 
     /**
-     * See setupBottomInsets
-     */
-    public void setDecorFitsSystemWindows(Window window, boolean fits);
-
-    /**
-     * Set margins on view to avoid system bars/ime on bottom/side
-     *
-     * Needed with setDecorFitsSystemWindows(.., true) for app bar
-     * overlap status bar. Else bottom bars/ime overlap app.
-     *
-     * Do nothing before API 21 since inset monitoring not supported
-     * before. So use version utils setDecorFitsSystemWindows which does
-     * nothing before API 21.
-     */
-    public void setupInsets(View view, boolean sides, boolean bottom);
-
-    /**
      * A regex for filtering all non alphabetic chars and tags from clue text
      *
      * (Before Android 10 "Alphabetic", since "IsAlphabetic")

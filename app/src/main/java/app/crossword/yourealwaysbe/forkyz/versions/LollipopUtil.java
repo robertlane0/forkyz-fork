@@ -13,14 +13,12 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.view.View;
-import android.view.ViewGroup.MarginLayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -28,10 +26,6 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts.OpenDocumentTree;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
@@ -193,43 +187,6 @@ public class LollipopUtil implements AndroidVersionUtils {
         } catch (NameNotFoundException e) {
             return null;
         }
-    }
-
-    @Override
-    public void setDecorFitsSystemWindows(Window window, boolean fits) {
-        WindowCompat.setDecorFitsSystemWindows(window, fits);
-    }
-
-    @Override
-    public void setupInsets(View view, boolean sides, boolean bottom) {
-        MarginLayoutParams origMlp
-            = (MarginLayoutParams) view.getLayoutParams();
-        // keep own copies because above object will change with view
-        int origLeftMargin = origMlp.leftMargin;
-        int origBottomMargin = origMlp.bottomMargin;
-        int origRightMargin = origMlp.rightMargin;
-
-        ViewCompat.setOnApplyWindowInsetsListener(
-            view,
-            (v, windowInsets) -> {
-                Insets insets = windowInsets.getInsets(
-                    WindowInsetsCompat.Type.systemBars()
-                    | WindowInsetsCompat.Type.ime()
-                );
-
-                MarginLayoutParams mlp
-                    = (MarginLayoutParams) v.getLayoutParams();
-                if (sides) {
-                    mlp.leftMargin = insets.left + origLeftMargin;
-                    mlp.rightMargin = insets.right + origRightMargin;
-                }
-                if (bottom)
-                    mlp.bottomMargin = insets.bottom + origBottomMargin;
-                v.setLayoutParams(mlp);
-
-                return WindowInsetsCompat.CONSUMED;
-            }
-        );
     }
 
     @Override
