@@ -158,7 +158,8 @@ public abstract class FileHandlerJavaFile extends FileHandler {
     ) {
         File file = fileHandle.getFile();
         File directory = destDirHandle.getFile();
-        file.renameTo(new File(directory, file.getName()));
+        File newFile = getUniqueFile(directory, file.getName());
+        file.renameTo(newFile);
     }
 
     @Override
@@ -181,5 +182,38 @@ public abstract class FileHandlerJavaFile extends FileHandler {
         File dir = new File(getRootDirectory(), path);
         dir.mkdirs();
         return new DirHandle(dir);
+    }
+
+    /**
+     * Get a unique file name for the directory
+     *
+     * E.g. dir/name.txt comes back as dir/name (1).txt if dir/name.txt
+     * already exists
+     */
+    private File getUniqueFile(File directory, String name) {
+        File targetFile = new File(directory, name);
+        File newFile = targetFile;
+
+        int counter = 1;
+        String basename = null;
+        String extension = null;
+
+        while (newFile.exists()) {
+            if (basename == null) {
+                int i = name.lastIndexOf(".");
+                if (i >= 0) {
+                    basename = name.substring(0, i);
+                    extension = name.substring(i);
+                } else {
+                    basename = name;
+                    extension = "";
+                }
+            }
+            String newName = basename + " (" + counter + ")" + extension;
+
+            newFile = new File(directory, newName);
+        }
+
+        return newFile;
     }
 }

@@ -20,6 +20,7 @@ import android.provider.DocumentsContract;
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings;
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
+import app.crossword.yourealwaysbe.puz.io.StreamUtils;
 
 @TargetApi(24)
 public class FileHandlerSAF extends FileHandler {
@@ -41,14 +42,17 @@ public class FileHandlerSAF extends FileHandler {
     public static class Meta {
         private String name;
         private long lastModified;
+        private String mimeType;
 
-        public Meta(String name, long lastModified) {
+        public Meta(String name, long lastModified, String mimeType) {
             this.name = name;
             this.lastModified = lastModified;
+            this.mimeType = mimeType;
         }
 
         public String getName() { return name; }
         public long getLastModified() { return lastModified; }
+        public String getMimeType() { return mimeType; }
     }
 
     public static boolean isSAFSupported(AndroidVersionUtils utils) {
@@ -151,7 +155,9 @@ public class FileHandlerSAF extends FileHandler {
                         dirUri, id
                     );
 
-                    files.add(new FileHandle(uri, new Meta(name, modified)));
+                    files.add(
+                        new FileHandle(uri, new Meta(name, modified, mimeType))
+                    );
                 }
             }
         }
@@ -231,6 +237,38 @@ public class FileHandlerSAF extends FileHandler {
                 destDirHandle + " failed."
             );
             e.printStackTrace();
+        } catch (IllegalStateException e) {
+            try {
+                // assume name clash and do a copy
+                // createDocument will choose a new name if needed
+                // but the copy process is manual
+                Uri newUri = DocumentsContract.createDocument(
+                    getContentResolver(),
+                    destDirHandle.getUri(),
+                    getMimeType(fileHandle),
+                    getName(fileHandle)
+                );
+                try (
+                    InputStream is = getBufferedInputStream(fileHandle);
+                    OutputStream os
+                        = getBufferedOutputStream(getFileHandle(newUri))
+                ) {
+                    StreamUtils.copyStream(is, os);
+                    DocumentsContract.deleteDocument(
+                        getContentResolver(), fileHandle.getUri()
+                    );
+                }
+            } catch (
+                IllegalArgumentException
+                | IllegalStateException
+                | IOException e2
+            ) {
+                LOGGER.severe(
+                    "Attempt to move " + fileHandle + " to " +
+                    destDirHandle + " failed."
+                );
+                e.printStackTrace();
+            }
         }
     }
 
@@ -294,7 +332,8 @@ public class FileHandlerSAF extends FileHandler {
             );
             if (uri != null) {
                 return new FileHandle(
-                    uri, new Meta(fileName, System.currentTimeMillis())
+                    uri,
+                    new Meta(fileName, System.currentTimeMillis(), mimeType)
                 );
             }
         } catch (FileNotFoundException e) {
@@ -491,7 +530,8 @@ public class FileHandlerSAF extends FileHandler {
                 uri,
                 new String[] {
                     Document.COLUMN_DISPLAY_NAME,
-                    Document.COLUMN_LAST_MODIFIED
+                    Document.COLUMN_LAST_MODIFIED,
+                    Document.COLUMN_MIME_TYPE
                 },
                 null, null, null
             )
@@ -501,7 +541,8 @@ public class FileHandlerSAF extends FileHandler {
                     c.getString(0),
                     // avoid exception crash if last modified is not known
                     // e.g. when opening firefox download urls
-                    getLongColumnWithDefault(c, 1, System.currentTimeMillis())
+                    getLongColumnWithDefault(c, 1, System.currentTimeMillis()),
+                    c.getString(2)
                 );
             } else {
                 return null;
@@ -521,6 +562,10 @@ public class FileHandlerSAF extends FileHandler {
 
     private ContentResolver getContentResolver() {
         return getApplicationContext().getContentResolver();
+    }
+
+    public String getMimeType(FileHandle f) {
+        return f.getSAFMeta().getMimeType();
     }
 
     /**

@@ -86,6 +86,39 @@ public class PuzzleImporterTest {
         assertEquals(expectedCrosswordTitles, getCrosswordTitles());
     }
 
+    @Test
+    public void testCopySameFile() throws IOException {
+        // create file system
+        File crosswords = getCrosswordsFolder();
+        File toImport = getToImportFolder();
+        File toImportDone = getToImportDoneFolder();
+
+        File testIPuz = new File(toImport, "test.ipuz");
+        copyResourceToFile("/test.ipuz", testIPuz);
+
+        // do import
+        FileHandler fileHandler = getFileHandler();
+        PuzzleImporter.processToImportDirectory(
+            context, fileHandler, new TiramisuUtil()
+        );
+
+        // one more time
+        testIPuz = new File(toImport, "test.ipuz");
+        copyResourceToFile("/test.ipuz", testIPuz);
+        PuzzleImporter.processToImportDirectory(
+            context, fileHandler, new TiramisuUtil()
+        );
+
+        // see what file system is like now
+        Set<String> expectedToImport = Collections.emptySet();
+        Set<String> expectedToImportDone = Set.of(new String[] {
+            "test.ipuz", "test (1).ipuz"
+        });
+
+        assertEquals(expectedToImport, Set.of(toImport.list()));
+        assertEquals(expectedToImportDone, Set.of(toImportDone.list()));
+    }
+
     private Set<String> getDirectoryFiles(File directory) {
         return Arrays.stream(directory.listFiles())
             .filter(f -> f.isFile())
