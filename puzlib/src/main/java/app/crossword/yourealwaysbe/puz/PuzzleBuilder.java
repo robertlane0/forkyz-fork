@@ -9,6 +9,7 @@ import java.net.URLConnection;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -79,9 +80,49 @@ public class PuzzleBuilder {
         return this;
     }
 
+    /**
+     * Add a clue to the puzzle
+     *
+     * Will check the zone matches the boxes and delete any positions
+     * in the zone that it finds are not valid (e.g. blocks can't be
+     * part of clue positions.
+     */
     public PuzzleBuilder addClue(Clue clue) {
-        puzzle.addClue(clue);
+        Clue cleanClue = sanitizeClueZone(clue);
+        puzzle.addClue(cleanClue);
         return this;
+    }
+
+    /**
+     * Removed bad positions from clue if needed
+     *
+     * Returns original clue object if all good, else a clone with bad
+     * zone positions removed.
+     */
+    private Clue sanitizeClueZone(Clue clue) {
+        Set<Position> badPositions = new HashSet<>();
+        for (Position pos : clue.getZone()) {
+            if (Box.isBlock(getBox(pos)))
+                badPositions.add(pos);
+        }
+
+        if (badPositions.isEmpty()) {
+            return clue;
+        } else {
+            Zone newZone = new Zone();
+            for (Position pos : clue.getZone()) {
+                if (!badPositions.contains(pos))
+                    newZone.addPosition(pos);
+            }
+            return new Clue(
+                clue.getClueID().getListName(),
+                clue.getClueID().getIndex(),
+                clue.getClueNumber(),
+                clue.getLabel(),
+                clue.getHint(),
+                newZone
+            );
+        }
     }
 
     public PuzzleBuilder setSolutionChecksum(short checkSum) {
