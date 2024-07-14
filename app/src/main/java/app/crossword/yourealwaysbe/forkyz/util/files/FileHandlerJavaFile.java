@@ -191,8 +191,7 @@ public abstract class FileHandlerJavaFile extends FileHandler {
      * already exists
      */
     private File getUniqueFile(File directory, String name) {
-        File targetFile = new File(directory, name);
-        File newFile = targetFile;
+        File newFile = new File(directory, name);
 
         int counter = 1;
         String basename = null;
