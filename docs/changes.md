@@ -1,5 +1,12 @@
 # Forkyz Changelog
 
+## Version 55
+
+- Change long-press behaviour on notes page (long-pressing a widget copies to the currently focussed widget).
+- Fix UI overlap that occurred on some Android versions.
+- Fix to-import crash on duplicate filenames.
+- Also predict anagram chars when the clue is not on the board.
+
 ## Version 54
 
 - Configure built-in keyboard repeat (keyboard settings).
