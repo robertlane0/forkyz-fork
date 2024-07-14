@@ -1269,11 +1269,7 @@ public class NotesActivity extends PuzzleActivity {
      * after the characters entered so far.
      */
     private String predictAnagramChars(){
-        if (isPuzzleNotes())
-            return null;
-
-        Playboard board = getBoard();
-        Clue clue = (board == null) ? null : board.getClue();
+        Clue clue = getNotesClue();
         if (clue == null) {
             clearAnagramPrediction();
             return null;
