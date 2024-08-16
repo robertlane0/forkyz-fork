@@ -16,6 +16,7 @@ The majority of the links on this page come from [Michael F. Gill
 * [arctan(x)words][arctan-x-words] -- by Christopher Adams.
 * [Andrew Marc Greene][andrew-marc-greene] -- some puzzles have PUZ links.
 * [Aries Puzzles][aries-puzzles] -- monthly puzzles by Andrew Ries. Rows gardens, marching bands, twists and turns, &c.
+* [AV Club Xwords][avcx] -- almost daily crosswords and cryptics, requires subscription, free samples available.
 * [Avid Puzzler][avid-puzzler] -- by David Gold.
 * [Beneath the Surface][beneath-the-surface] -- by Kyle Dolan.
 * Big Dave's [Monthly Prize][big-dave-monthly], [Weekly Non-Prize][big-dave-weekly], and [Rookie Corner][big-dave-rookie].
@@ -66,6 +67,7 @@ The majority of the links on this page come from [Michael F. Gill
 [andrew-marc-greene]: http://www.greenehouse.com/a/puzzles/
 [arctan-x-words]: http://arctanxwords.blogspot.com/
 [aries-puzzles]: https://www.ariespuzzles.com/
+[avcx]: https://avxwords.com/
 [avid-puzzler]: https://avidpuzzler.blogspot.com/
 [beneath-the-surface]: https://beneaththesurfacepuzzles.blogspot.com/
 [beq]: https://www.brendanemmettquigley.com/
