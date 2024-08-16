@@ -19,7 +19,7 @@ The majority of the links on this page come from [Michael F. Gill
 * [AV Club Xwords][avcx] -- almost daily crosswords and cryptics, requires subscription, free samples available.
 * [Avid Puzzler][avid-puzzler] -- by David Gold.
 * [Beneath the Surface][beneath-the-surface] -- by Kyle Dolan.
-* Big Dave's [Monthly Prize][big-dave-monthly], [Weekly Non-Prize][big-dave-weekly], and [Rookie Corner][big-dave-rookie].
+* Big Dave's [Monthly Prize][big-dave-monthly], [Weekly Non-Prize][big-dave-weekly], [Rookie Corner][big-dave-rookie], and [Special Puzzles][big-dave-special].
 * [Brendan Emmet Quigley][beq] -- custom puzzle creator, releasing some puzzles online.
 * [CommuniCrossings][communicrossings] -- homepage of Steve Weyer.
 * [Crosshare][crosshare] -- ad-free, open-source crossword puzzles.
@@ -71,9 +71,10 @@ The majority of the links on this page come from [Michael F. Gill
 [avid-puzzler]: https://avidpuzzler.blogspot.com/
 [beneath-the-surface]: https://beneaththesurfacepuzzles.blogspot.com/
 [beq]: https://www.brendanemmettquigley.com/
-[big-dave-monthly]: http://crypticcrosswords.net/puzzles/monthly-prize-puzzles/
+[big-dave-monthly]: http://crypticcrosswords.net/puzzles/prize-puzzles
+[big-dave-special]: http://crypticcrosswords.net/puzzles/special-puzzles/
 [big-dave-rookie]: http://crypticcrosswords.net/puzzles/rookie-corner/
-[big-dave-weekly]: http://crypticcrosswords.net/puzzles/not-the-saturday-prize-puzzles/
+[big-dave-weekly]: http://crypticcrosswords.net/puzzles/ntspp-puzzles/
 [communicrossings]: https://communicrossings.com/crosswords-weyer
 [crosshare]: https://crosshare.org/
 [crossweird]: https://www.crossweirdpuzzles.com
@@ -82,7 +83,7 @@ The majority of the links on this page come from [Michael F. Gill
 [cruzzles]: https://cruzzles.blogspot.com/
 [crypticcru]: https://archive.nytimes.com/www.nytimes.com/premium/xword/cryptic-archive.html
 [cryptivore]: https://cryptivore.com/
-[daily-crossword-links]: https://crosswordlinks.substack.com/
+[daily-crossword-links]: https://dailycrosswordlinks.com/
 [diary]: https://crosswordfiend.com/
 [glentopher]: https://glentopher.blogspot.com/
 [grids-these-days]: http://gridsthesedays.blogspot.com/
@@ -104,11 +105,11 @@ The majority of the links on this page come from [Michael F. Gill
 [nyt-crosswords]: https://github.com/doshea/nyt_crosswords
 [neville-fogarty]: https://nevillefogarty.wordpress.com/
 [outofleftfield]: http://www.leftfieldcryptics.com/
-[outside-the-box]: https://www.joonpahk.com/blog/2021/04/12/year-6-variety-puzzle-16-starting-square-hint/
+[outside-the-box]: https://www.joonpahk.com
 [private-eye]: https://www.private-eye.co.uk/crossword
 [puzzles-that-need-a-home]: https://puzzlesthatneedahome.blogspot.com/
 [rackenfracker]: https://www.therackenfracker.com/
-[sids-grids]: https://www.sidsgrids.com/home/categories/crossword-puzzles
+[sids-grids]: https://www.sidsgrids.com
 [something-different]: https://dandoesnotblog.blogspot.com/2020/04/something-different.html
 [square-pursuit]: https://squarepursuit.com/
 [squarechase]: https://www.patreon.com/squarechase
