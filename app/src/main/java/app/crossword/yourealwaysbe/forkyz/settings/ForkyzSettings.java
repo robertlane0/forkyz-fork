@@ -162,6 +162,8 @@ public class ForkyzSettings {
         = "spaceChangesDirection";
     private static final String PREF_PLAY_SUPPRESS_HINT_HIGHLIGHTING
         = "supressHints";
+    private static final String PREF_PLAY_INDICATE_SHOW_ERRORS
+        = "indicateShowErrors";
 
     private static final String PREF_VOICE_ALWAYS_ANNOUNCE_BOX
         = "alwaysAnnounceBox";
@@ -241,6 +243,7 @@ public class ForkyzSettings {
         BOOL_DEFAULTS.put(PREF_PLAY_PLAY_LETTER_UNDO_ENABLED, false);
         BOOL_DEFAULTS.put(PREF_PLAY_SPACE_CHANGE_DIRECTION, true);
         BOOL_DEFAULTS.put(PREF_PLAY_SUPPRESS_HINT_HIGHLIGHTING, false);
+        BOOL_DEFAULTS.put(PREF_PLAY_INDICATE_SHOW_ERRORS, true);
         BOOL_DEFAULTS.put(PREF_VOICE_ALWAYS_ANNOUNCE_BOX, false);
         BOOL_DEFAULTS.put(PREF_VOICE_ALWAYS_ANNOUNCE_CLUE, false);
         BOOL_DEFAULTS.put(PREF_VOICE_BUTTON_ACTIVATES_VOICE, false);
@@ -1010,6 +1013,17 @@ public class ForkyzSettings {
      */
     public void getPlaySuppressHintHighlighting(Consumer<Boolean> cb) {
         getBooleanPreference(PREF_PLAY_SUPPRESS_HINT_HIGHLIGHTING, cb);
+    }
+
+    /**
+     * Whether to indicate show errors status (i.e. whether turned on)
+     */
+    public void getPlayIndicateShowErrors(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_PLAY_INDICATE_SHOW_ERRORS, cb);
+    }
+
+    public LiveData<Boolean> livePlayIndicateShowErrors() {
+        return liveBooleanPreference(PREF_PLAY_INDICATE_SHOW_ERRORS);
     }
 
     /**

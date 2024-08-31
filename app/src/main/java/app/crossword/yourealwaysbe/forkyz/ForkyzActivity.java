@@ -4,12 +4,14 @@ import java.util.logging.Logger;
 import javax.inject.Inject;
 
 import android.content.pm.ActivityInfo;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
@@ -50,7 +52,8 @@ public class ForkyzActivity extends AppCompatActivity {
     @Inject
     protected AndroidVersionUtils utils;
 
-    public NightModeHelper nightMode;
+    protected NightModeHelper nightMode;
+    private Drawable originalStatusBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -198,13 +201,39 @@ public class ForkyzActivity extends AppCompatActivity {
     /**
      * Set the elevation to match the app bar
      *
-     * Uses @dimen/appBarElevation rather than the default material which is to
-     * have no app bar elevation unless there is some scrolling involved.
+     * As per Material3 docs
      */
     protected void setStatusBarElevation(AppBarLayout appBarLayout) {
         appBarLayout.setStatusBarForeground(
             MaterialShapeDrawable.createWithElevationOverlay(this)
         );
+    }
+
+    /**
+     * Set color of status bar
+     *
+     * Calling reset will reset the status bar to what it was the first
+     * time this method was used. I would call setStatusBarElevation
+     * first if you want to be able to reset to that.
+     */
+    protected void setStatusBarColor(AppBarLayout appBarLayout, int color) {
+        if (originalStatusBar == null)
+            originalStatusBar = appBarLayout.getStatusBarForeground();
+        appBarLayout.setStatusBarForeground(
+            MaterialShapeDrawable.createWithElevationOverlay(
+                this, 0, ColorStateList.valueOf(color)
+            )
+        );
+    }
+
+    /**
+     * Reset status bar to original color when setStatusBarColor first called
+     *
+     * Does nothing if no original set by call to setStatusBarColor.
+     */
+    protected void resetStatusBarColor(AppBarLayout appBarLayout) {
+        if (originalStatusBar != null)
+            appBarLayout.setStatusBarForeground(originalStatusBar);
     }
 
     /**

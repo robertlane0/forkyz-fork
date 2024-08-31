@@ -43,6 +43,13 @@
     />
 
     <androidx.preference.CheckBoxPreference
+        android:title="@string/indicate_show_errors"
+        android:defaultValue="true"
+        android:summary="@string/indicate_show_errors_desc"
+        android:key="indicateShowErrors"
+    />
+
+    <androidx.preference.CheckBoxPreference
         android:title="@string/show_length"
         android:defaultValue="false"
         android:summary="@string/show_length_desc"

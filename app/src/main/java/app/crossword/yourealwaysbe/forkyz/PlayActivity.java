@@ -23,10 +23,12 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.TextView;
 import androidx.constraintlayout.widget.ConstraintSet;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat;
 import androidx.core.widget.TextViewCompat;
 import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.Observer;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import com.squareup.seismic.ShakeDetector;
@@ -877,6 +879,47 @@ public class PlayActivity extends PuzzleActivity
                 setActivityTitle();
             }
         );
+
+        Observer<Boolean> showErrorsObserver = v -> { setStatusBarColor(); };
+        settings.livePlayIndicateShowErrors().observe(this, showErrorsObserver);
+        settings.livePlayShowErrorsClue().observe(this, showErrorsObserver);
+        settings.livePlayShowErrorsCursor().observe(this, showErrorsObserver);
+        settings.livePlayShowErrorsGrid().observe(this, showErrorsObserver);
+    }
+
+    /**
+     * Set status based on current values of show errors
+     *
+     * Uses LiveData.getValue, does nothing if settings not live yet
+     */
+    private void setStatusBarColor() {
+        Boolean indicateShowErrors
+            = settings.livePlayIndicateShowErrors().getValue();
+        Boolean showErrorsClue = settings.livePlayShowErrorsClue().getValue();
+        Boolean showErrorsCursor
+            = settings.livePlayShowErrorsCursor().getValue();
+        Boolean showErrorsGrid = settings.livePlayShowErrorsGrid().getValue();
+
+        if (
+            indicateShowErrors == null
+            || showErrorsClue == null
+            || showErrorsCursor == null
+            || showErrorsGrid == null
+        )
+            return;
+
+        if (
+            indicateShowErrors && (
+                showErrorsClue || showErrorsCursor || showErrorsGrid
+            )
+        ) {
+            setStatusBarColor(
+                binding.appBarLayout,
+                ContextCompat.getColor(this, R.color.cheatedColor)
+            );
+        } else {
+            resetStatusBarColor(binding.appBarLayout);
+        }
     }
 
     private void setClueText() {

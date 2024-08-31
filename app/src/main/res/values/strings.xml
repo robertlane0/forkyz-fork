@@ -192,6 +192,8 @@
     <string name="sixty_seconds">1 minute</string>
     <string name="no_hint_highlighting">No Hint Highlighting</string>
     <string name="no_hint_highlighting_desc">Prevents the pink boxes indicating \'hints\' in the form of reveals or show errors.</string>
+    <string name="indicate_show_errors">Indicate Show Errors</string>
+    <string name="indicate_show_errors_desc">Change status bar color when show errors enabled.</string>
     <string name="delete_on_cleanup">Delete on Cleanup</string>
     <string name="delete_on_cleanup_desc">Delete rather than archive old puzzles.</string>
     <string name="cleanup_unfinished">Cleanup Unfinished</string>
