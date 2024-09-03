@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.json.JSONArray;
@@ -43,8 +44,14 @@ public class RaetselZentraleSchwedenJSONIO extends AbstractJSONIO {
     private static final String ARROW_RIGHT_DOWN = "4";
     private static final String ARROW_LEFT_DOWN = "5";
     private static final String ARROW_DOWN = "6";
-    private static final String MULTI_CLUE_CELL = ":";
     private static final String EMPTY_CELL = "+";
+
+    private static final Set<String> MULTI_CLUE_CELLS = Set.of(
+        // seen
+        "7", "8", "9", ":", ";", "@", "=",
+        // supposed
+        "<", ">", "?"
+    );
 
     public static class RZSFormatException extends Exception {
         private static final long serialVersionUID = 5710058656901918269L;
@@ -310,9 +317,9 @@ public class RaetselZentraleSchwedenJSONIO extends AbstractJSONIO {
             return true;
         if (ARROW_DOWN.equals(cellValue))
             return true;
-        if (MULTI_CLUE_CELL.equals(cellValue))
-            return true;
         if (EMPTY_CELL.equals(cellValue))
+            return true;
+        if (MULTI_CLUE_CELLS.contains(cellValue))
             return true;
         return false;
     }
