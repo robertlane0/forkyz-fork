@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "32c54e47fb809c02ca8b1c40c44617c5",
+    "identityHash": "9887fdb9cf6b70199b6a75201165d2f2",
     "entities": [
       {
         "tableName": "cachedMeta",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`mainFileUri` TEXT NOT NULL, `metaFileUri` TEXT, `directoryUri` TEXT NOT NULL, `isUpdatable` INTEGER NOT NULL, `date` INTEGER, `percentComplete` INTEGER NOT NULL, `percentFilled` INTEGER NOT NULL, `source` TEXT, `title` TEXT, `author` TEXT, PRIMARY KEY(`mainFileUri`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`mainFileUri` TEXT NOT NULL, `metaFileUri` TEXT, `directoryUri` TEXT NOT NULL, `isUpdatable` INTEGER NOT NULL, `date` INTEGER, `percentComplete` INTEGER NOT NULL, `percentFilled` INTEGER NOT NULL, `source` TEXT, `title` TEXT, `author` TEXT, `rating` INTEGER NOT NULL, PRIMARY KEY(`mainFileUri`))",
         "fields": [
           {
             "fieldPath": "mainFileUri",
@@ -67,6 +67,12 @@
             "columnName": "author",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "rating",
+            "columnName": "rating",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -82,7 +88,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '32c54e47fb809c02ca8b1c40c44617c5')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9887fdb9cf6b70199b6a75201165d2f2')"
     ]
   }
 }

@@ -52,4 +52,11 @@
         android:summary="@string/browse_show_percentage_correct_desc"
         android:key="browseShowPercentageCorrect"
     />
+
+    <androidx.preference.CheckBoxPreference
+        android:title="@string/browse_always_show_rating"
+        android:defaultValue="false"
+        android:summary="@string/browse_always_show_rating_desc"
+        android:key="browseAlwaysShowRating"
+    />
 </androidx.preference.PreferenceScreen>

@@ -1220,6 +1220,17 @@ public class BrowseActivity extends ForkyzActivity {
                     setPercentage();
                 }
             );
+
+            settings.liveBrowseAlwaysShowRating().observe(
+                BrowseActivity.this,
+                alwaysShow -> {
+                    itemBinding.puzzleRating.setVisibility(
+                        (alwaysShow || model.getIsViewArchive())
+                        ? View.VISIBLE
+                        : View.GONE
+                    );
+                }
+            );
         }
 
         public void setPuzMetaFile(PuzMetaFile puzMetaFile) {
@@ -1278,6 +1289,11 @@ public class BrowseActivity extends ForkyzActivity {
 
             setListItemColor(
                 itemBinding.getRoot(), selected.contains(puzMetaFile)
+            );
+
+            int maxRating = getResources().getInteger(R.integer.max_rating);
+            itemBinding.puzzleRating.setRating(
+                Math.min(puzMetaFile.getRating(), maxRating)
             );
         }
 

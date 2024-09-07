@@ -93,6 +93,11 @@ public class MetaCache {
         // from db version 2
         @ColumnInfo
         public String author;
+
+        // from db version 3
+        @ColumnInfo
+        @NonNull
+        public char rating;
     }
 
     @Dao
@@ -136,7 +141,7 @@ public class MetaCache {
         }
     }
 
-    @Database(entities = {CachedMeta.class}, version = 2)
+    @Database(entities = {CachedMeta.class}, version = 3)
     public static abstract class CachedMetaDB extends RoomDatabase {
         private static CachedMetaDB instance = null;
 
@@ -155,11 +160,21 @@ public class MetaCache {
             }
         };
 
+        private static final Migration MIGRATION_2_3 = new Migration(2, 3) {
+            @Override
+            public void migrate(SupportSQLiteDatabase database) {
+                database.execSQL(
+                    "ALTER TABLE cachedMeta "
+                    + "ADD COLUMN rating INTEGER NOT NULL DEFAULT 0"
+                );
+            }
+        };
+
         public static CachedMetaDB getInstance(Context applicationContext) {
             if (instance == null) {
                 instance = Room.databaseBuilder(
                     applicationContext, CachedMetaDB.class, "meta-cache-db"
-                ).addMigrations(MIGRATION_l_2)
+                ).addMigrations(MIGRATION_l_2, MIGRATION_2_3)
                 .build();
             }
             return instance;
@@ -184,6 +199,7 @@ public class MetaCache {
         public String getSource() { return dbRow.source; }
         public String getTitle() { return dbRow.title; }
         public String getAuthor() { return dbRow.author; }
+        public char getRating() { return dbRow.rating; }
     }
 
     private Context applicationContext;
@@ -250,6 +266,7 @@ public class MetaCache {
         cm.source = puz.getSource();
         cm.title = puz.getTitle();
         cm.author = puz.getAuthor();
+        cm.rating = puz.getRating();
 
         getDao().insertAll(cm);
 

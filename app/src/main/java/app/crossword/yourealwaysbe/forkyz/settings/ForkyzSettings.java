@@ -52,6 +52,9 @@ public class ForkyzSettings {
 
     // public for settings page
     public static final String PREF_AUTO_DOWNLOADERS = "autoDownloaders";
+
+    private static final String PREF_BROWSE_ALWAYS_SHOW_RATING
+        = "browseAlwaysShowRating";
     private static final String PREF_BROWSE_CLEANUP_AGE = "cleanupAge";
     private static final String PREF_BROWSE_CLEANUP_AGE_ARCHIVE
         = "archiveCleanupAge";
@@ -201,6 +204,7 @@ public class ForkyzSettings {
     private static final Map<String, Long> LONG_DEFAULTS = new HashMap<>();
     private static final Map<String, String> STRING_DEFAULTS = new HashMap<>();
     static {
+        BOOL_DEFAULTS.put(PREF_BROWSE_ALWAYS_SHOW_RATING, false);
         STRING_DEFAULTS.put(PREF_BROWSE_CLEANUP_AGE, "-1");
         STRING_DEFAULTS.put(PREF_BROWSE_CLEANUP_AGE_ARCHIVE, "-1");
         BOOL_DEFAULTS.put(PREF_BROWSE_DELETE_ON_CLEANUP, false);
@@ -363,6 +367,17 @@ public class ForkyzSettings {
             PREF_APP_THEME, Theme.STANDARD.getSettingsValue()
         );
         return Theme.getFromSettingsValue(theme);
+    }
+
+    /**
+     * Whether to show the rating on the main puzzle list
+     */
+    public void getBrowseAlwaysShowRating(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_BROWSE_ALWAYS_SHOW_RATING, cb);
+    }
+
+    public LiveData<Boolean> liveBrowseAlwaysShowRating() {
+        return liveBooleanPreference(PREF_BROWSE_ALWAYS_SHOW_RATING);
     }
 
     /**

@@ -84,6 +84,10 @@ public class PuzMetaFile
         return (meta == null) ? 0 : meta.getPercentFilled();
     }
 
+    public char getRating() {
+        return (meta == null) ? 0 : meta.getRating();
+    }
+
     /**
      * Returns something that can be used as source
      *
