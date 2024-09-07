@@ -416,6 +416,7 @@ public class IPuzIOTest {
             boxes[1][0].setFlagColor(0x0000ff00);
 
             puz.setPinnedClueID(cidA3);
+            puz.setRating((char) 5);
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             IPuzIO.writePuzzle(puz, baos);
@@ -456,6 +457,7 @@ public class IPuzIOTest {
             assertTrue(clueA3.isDefaultFlagColor());
             assertFalse(clueA1.isFlagged());
             assertEquals(puz.getPinnedClueID(), cidA3);
+            assertEquals(puz.getRating(), (char) 5);
 
             // get around html entity rewrite
             puz.setTitle(puz2.getTitle());

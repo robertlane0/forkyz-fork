@@ -276,6 +276,7 @@ public class IPuzIO extends AbstractJSONIO {
     private static final String FIELD_NOTE_ANAGRAM_SOL
         = "anagramsolution";
     private static final String FIELD_FLAGGED_CLUES = "flaggedclues";
+    private static final String FIELD_RATING = "rating";
 
     private static final DateTimeFormatter DATE_FORMATTER_V1
         = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.US);
@@ -1332,6 +1333,9 @@ public class IPuzIO extends AbstractJSONIO {
 
         if (playData.has(FIELD_COMPLETION_TIME))
             builder.setTime(playData.getLong(FIELD_COMPLETION_TIME));
+
+        if (playData.has(FIELD_RATING))
+            builder.setRating((char) playData.getInt(FIELD_RATING));
     }
 
     /**
@@ -2226,7 +2230,9 @@ public class IPuzIO extends AbstractJSONIO {
 
             writer.keyValueNonNull(1, FIELD_COMPLETION_TIME, puz.getTime())
                 .keyValueNonNull(1, FIELD_PCNT_FILLED, puz.getPercentFilled())
-                .keyValueNonNull(1, FIELD_PCNT_COMPLETE, puz.getPercentComplete());
+                .keyValueNonNull(
+                    1, FIELD_PCNT_COMPLETE, puz.getPercentComplete()
+                ).keyValueNonNull(1, FIELD_RATING, (int) puz.getRating());
 
             writer.endObject();
             writer.newLine();

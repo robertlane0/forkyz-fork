@@ -46,6 +46,7 @@ public class Puzzle implements Serializable{
     private long playedTime;
     private boolean scrambled;
     public short solutionChecksum;
+    private char rating;
 
     // current play position data needed for saving state...
     private Position position;
@@ -143,6 +144,14 @@ public class Puzzle implements Serializable{
 
     public String getAuthor() {
         return author;
+    }
+
+    public char getRating() {
+        return rating;
+    }
+
+    public void setRating(char rating) {
+        this.rating = rating;
     }
 
     /**
@@ -829,6 +838,9 @@ public class Puzzle implements Serializable{
             return false;
 
         if (!Objects.equals(kind, other.kind))
+            return false;
+
+        if (rating != other.rating)
             return false;
 
         return true;

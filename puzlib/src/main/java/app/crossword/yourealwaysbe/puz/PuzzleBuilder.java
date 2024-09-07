@@ -165,6 +165,11 @@ public class PuzzleBuilder {
         return this;
     }
 
+    public PuzzleBuilder setRating(char rating) {
+        puzzle.setRating(rating);
+        return this;
+    }
+
     public PuzzleBuilder setPlayerNote(Note playerNote) {
         puzzle.setPlayerNote(playerNote);
         return this;
