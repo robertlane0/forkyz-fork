@@ -9,5 +9,6 @@
     <integer name="unfilled_clue_alpha">255</integer>
     <integer name="disabled_downloader_alpha">150</integer>
     <integer name="enabled_downloader_alpha">255</integer>
+    <integer name="max_rating">5</integer>
 </resources>
 

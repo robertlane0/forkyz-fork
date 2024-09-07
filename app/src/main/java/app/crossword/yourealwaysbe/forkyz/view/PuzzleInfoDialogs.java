@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Spanned;
 import android.view.View;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import androidx.core.text.HtmlCompat;
 import androidx.fragment.app.DialogFragment;
@@ -60,6 +61,7 @@ public class PuzzleInfoDialogs {
                 return builder.create();
 
             populateFinishedInfo(puz, binding.completionInfo);
+            setupRating(puz, binding.puzzleRating);
 
             String shareMessage = getShareMessage(puz);
 
@@ -135,6 +137,17 @@ public class PuzzleInfoDialogs {
                 Locale.getDefault(), "%d", totalBoxes
             ));
             binding.cheatedBoxes.setText(cheatedString);
+        }
+
+        protected void setupRating(Puzzle puz, RatingBar ratingBar) {
+            int maxRating = ratingBar.getResources()
+                .getInteger(R.integer.max_rating);
+            ratingBar.setRating(Math.min(puz.getRating(), maxRating));
+            ratingBar.setOnRatingBarChangeListener(
+                (rb, rating, fu) -> {
+                    puz.setRating((char) Math.min(rating, maxRating));
+                }
+            );
         }
 
         private String getShareMessage(Puzzle puz) {
@@ -250,6 +263,7 @@ public class PuzzleInfoDialogs {
                 addIntro(binding);
                 addNotes(binding);
                 addCompletedInfo(binding);
+                setupRating(puz, binding.puzzleInfoRating);
             }
 
             builder.setView(binding.getRoot());
