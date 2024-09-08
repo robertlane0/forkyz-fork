@@ -407,7 +407,7 @@
     <string name="wall_street_journal">The Wall Street Journal</string>
     <string name="washington_post_sunday">The Washington Post Sunday</string>
     <string name="de_telegraaf">(DU) De Telegraaf</string>
-    <string name="de_telegraaf_desc">Updates Sundays, in Dutch.</string>
+    <string name="de_telegraaf_desc">Updates Saturdays, in Dutch.</string>
 
     <!--  preferences scrapers -->
     <string name="cru_puzzle_workshop">Cryptic Cru Workshop Archive</string>
