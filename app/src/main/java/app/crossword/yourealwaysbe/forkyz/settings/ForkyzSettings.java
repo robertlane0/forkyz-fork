@@ -168,6 +168,9 @@ public class ForkyzSettings {
     private static final String PREF_PLAY_INDICATE_SHOW_ERRORS
         = "indicateShowErrors";
 
+    private static final String PREF_RATINGS_DISABLE_RATINGS
+        = "disableRatings";
+
     private static final String PREF_VOICE_ALWAYS_ANNOUNCE_BOX
         = "alwaysAnnounceBox";
     private static final String PREF_VOICE_ALWAYS_ANNOUNCE_CLUE
@@ -248,6 +251,7 @@ public class ForkyzSettings {
         BOOL_DEFAULTS.put(PREF_PLAY_SPACE_CHANGE_DIRECTION, true);
         BOOL_DEFAULTS.put(PREF_PLAY_SUPPRESS_HINT_HIGHLIGHTING, false);
         BOOL_DEFAULTS.put(PREF_PLAY_INDICATE_SHOW_ERRORS, true);
+        BOOL_DEFAULTS.put(PREF_RATINGS_DISABLE_RATINGS, false);
         BOOL_DEFAULTS.put(PREF_VOICE_ALWAYS_ANNOUNCE_BOX, false);
         BOOL_DEFAULTS.put(PREF_VOICE_ALWAYS_ANNOUNCE_CLUE, false);
         BOOL_DEFAULTS.put(PREF_VOICE_BUTTON_ACTIVATES_VOICE, false);
@@ -264,6 +268,7 @@ public class ForkyzSettings {
     private MutableLiveData<KeyboardSettings> liveKeyboardSettings;
     private MutableLiveData<GridRatio> livePlayGridRatio;
     private MutableLiveData<DeleteCrossingMode> livePlayDeleteCrossingMode;
+    private MutableLiveData<RatingsSettings> liveRatingsSettings;
     private Map<String, MutableLiveData<Boolean>> liveBooleans = new HashMap<>();
 
     private OnSharedPreferenceChangeListener prefChangeListener
@@ -285,6 +290,11 @@ public class ForkyzSettings {
                 updateLivePlayDeleteCrossingMode();
             } else if (PREF_PLAY_GRID_RATIO.equals(key)) {
                 updateLivePlayGridRatio();
+            } else if (
+                PREF_BROWSE_ALWAYS_SHOW_RATING.equals(key)
+                || PREF_RATINGS_DISABLE_RATINGS.equals(key)
+            ) {
+                updateLiveRatingsSettings();
             } else if (liveBooleans.containsKey(key)) {
                 updateLiveBoolean(key);
             }
@@ -367,17 +377,6 @@ public class ForkyzSettings {
             PREF_APP_THEME, Theme.STANDARD.getSettingsValue()
         );
         return Theme.getFromSettingsValue(theme);
-    }
-
-    /**
-     * Whether to show the rating on the main puzzle list
-     */
-    public void getBrowseAlwaysShowRating(Consumer<Boolean> cb) {
-        getBooleanPreference(PREF_BROWSE_ALWAYS_SHOW_RATING, cb);
-    }
-
-    public LiveData<Boolean> liveBrowseAlwaysShowRating() {
-        return liveBooleanPreference(PREF_BROWSE_ALWAYS_SHOW_RATING);
     }
 
     /**
@@ -1041,6 +1040,15 @@ public class ForkyzSettings {
         return liveBooleanPreference(PREF_PLAY_INDICATE_SHOW_ERRORS);
     }
 
+    public LiveData<RatingsSettings> liveRatingsSettings() {
+        if (liveRatingsSettings == null) {
+            liveRatingsSettings = new MutableLiveData<RatingsSettings>();
+            updateLiveRatingsSettings();
+        }
+        return liveRatingsSettings;
+
+    }
+
     /**
      * Whether to always announce the current box
      */
@@ -1395,6 +1403,17 @@ public class ForkyzSettings {
             getPlayGridRatio(value -> { livePlayGridRatio.setValue(value); });
     }
 
+    private void updateLiveRatingsSettings() {
+        if (liveRatingsSettings != null) {
+            executor.execute(() -> {
+                RatingsSettings settings = new RatingsSettings(
+                    prefs.getBoolean(PREF_RATINGS_DISABLE_RATINGS, false),
+                    prefs.getBoolean(PREF_BROWSE_ALWAYS_SHOW_RATING, false)
+                );
+                liveRatingsSettings.postValue(settings);
+            });
+        }
+    }
     private LiveData<Boolean> liveBooleanPreference(String name) {
         MutableLiveData<Boolean> liveData = liveBooleans.get(name);
         if (liveData == null) {

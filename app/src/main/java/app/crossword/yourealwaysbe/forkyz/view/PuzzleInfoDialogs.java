@@ -18,6 +18,7 @@ import app.crossword.yourealwaysbe.forkyz.R;
 import app.crossword.yourealwaysbe.forkyz.databinding.CompletedBinding;
 import app.crossword.yourealwaysbe.forkyz.databinding.CompletionInfoBinding;
 import app.crossword.yourealwaysbe.forkyz.databinding.PuzzleInfoDialogBinding;
+import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder;
 import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer;
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider;
@@ -42,6 +43,9 @@ public class PuzzleInfoDialogs {
 
         @Inject
         protected CurrentPuzzleHolder currentPuzzleHolder;
+
+        @Inject
+        protected ForkyzSettings settings;
 
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -146,6 +150,17 @@ public class PuzzleInfoDialogs {
             ratingBar.setOnRatingBarChangeListener(
                 (rb, rating, fu) -> {
                     puz.setRating((char) Math.min(rating, maxRating));
+                }
+            );
+
+            settings.liveRatingsSettings().observe(
+                this,
+                ratingsSettings -> {
+                    ratingBar.setVisibility(
+                        ratingsSettings.disableRatings()
+                        ? View.GONE
+                        : View.VISIBLE
+                    );
                 }
             );
         }

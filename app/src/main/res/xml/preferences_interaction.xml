@@ -100,4 +100,10 @@
         android:key="predictAnagramChars"
     />
 
+    <androidx.preference.CheckBoxPreference
+        android:title="@string/disable_ratings"
+        android:defaultValue="false"
+        android:summary="@string/disable_ratings_desc"
+        android:key="disableRatings"
+    />
 </androidx.preference.PreferenceScreen>

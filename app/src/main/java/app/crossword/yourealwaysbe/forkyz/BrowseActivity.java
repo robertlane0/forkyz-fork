@@ -1221,13 +1221,15 @@ public class BrowseActivity extends ForkyzActivity {
                 }
             );
 
-            settings.liveBrowseAlwaysShowRating().observe(
+            settings.liveRatingsSettings().observe(
                 BrowseActivity.this,
-                alwaysShow -> {
+                settings -> {
+                    boolean visible = !settings.disableRatings() && (
+                        settings.browseAlwaysShowRating()
+                        || model.getIsViewArchive()
+                    );
                     itemBinding.puzzleRating.setVisibility(
-                        (alwaysShow || model.getIsViewArchive())
-                        ? View.VISIBLE
-                        : View.GONE
+                        visible ? View.VISIBLE : View.GONE
                     );
                 }
             );

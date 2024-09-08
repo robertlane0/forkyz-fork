@@ -27,6 +27,7 @@
                 android:stepSize="1"
                 android:isIndicator="false"
                 android:paddingTop="4dp"
+                android:visibility="gone"
             />
             <include
                 android:id="@+id/completion_info"

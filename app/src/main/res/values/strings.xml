@@ -252,6 +252,8 @@
     <string name="play_letter_undo_desc">Delete undoes recently played letters or deletes if no recent letters to undo.</string>
     <string name="browse_always_show_rating">Always Show Rating</string>
     <string name="browse_always_show_rating_desc">Show the puzzle rating on all puzzle lists, not just the archives.</string>
+    <string name="disable_ratings">Disable Ratings</string>
+    <string name="disable_ratings_desc">Don\'t show ratings bars anywhere in the interface.</string>
 
     <!-- preference keyboard -->
     <string name="keyboard_showhide">Show/Hide In-App Keyboard</string>

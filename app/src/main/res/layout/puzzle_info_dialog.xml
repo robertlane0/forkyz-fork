@@ -149,6 +149,7 @@
             android:stepSize="1"
             android:isIndicator="false"
             android:paddingTop="4dp"
+            android:visibility="gone"
         />
     </LinearLayout>
 </layout>
