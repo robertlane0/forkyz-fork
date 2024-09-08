@@ -318,12 +318,12 @@ public class Downloaders {
 
         Notification not
             = new NotificationCompat.Builder(
-            context, ForkyzApplication.PUZZLE_DOWNLOAD_CHANNEL_ID
-        ).setSmallIcon(android.R.drawable.stat_sys_download_done)
-            .setContentIntent(getContentIntent())
-            .setContentTitle(context.getString(messageId, name))
-            .setWhen(System.currentTimeMillis())
-            .build();
+                context, ForkyzApplication.PUZZLE_DOWNLOAD_CHANNEL_ID
+            ).setSmallIcon(android.R.drawable.stat_sys_download_done)
+                .setContentIntent(getContentIntent())
+                .setContentTitle(context.getString(messageId, name))
+                .setWhen(System.currentTimeMillis())
+                .build();
 
         if (canNotify()) {
             this.notificationManager.notify(i, not);
