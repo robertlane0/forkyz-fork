@@ -296,7 +296,7 @@ public class BrowseActivityViewModel extends AndroidViewModel {
                         - (long) (12 * 60 * 60 * 1000);
 
                     boolean isDownload
-                        = downloaderSettings.getDownloadOnStartup()
+                        = downloaderSettings.downloadOnStartup()
                         && downloadCutoff > lastDL;
 
                     if (isDownload) {

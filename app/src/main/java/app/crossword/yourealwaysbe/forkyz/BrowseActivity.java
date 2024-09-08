@@ -773,7 +773,7 @@ public class BrowseActivity extends ForkyzActivity {
         settings.getDownloadersSettings(settings -> {
         backgroundDownloadManager.isBackgroundDownloadEnabled(bgDownload -> {
             boolean downloading = bgDownload
-                || settings.getDownloadOnStartup();
+                || settings.downloadOnStartup();
 
             if (settings.isNotificationPermissionNeeded() && downloading)
                 checkRequestNotificationPermissions();
@@ -891,7 +891,7 @@ public class BrowseActivity extends ForkyzActivity {
             binding.emptyListingMsg.setVisibility(View.VISIBLE);
 
             settings.getFileHandlerSettings(fhSettings -> {
-                if (fhSettings.getStorageLocation() == StorageLocation.INTERNAL)
+                if (fhSettings.storageLocation() == StorageLocation.INTERNAL)
                     binding.internalStorageMsg.setVisibility(View.VISIBLE);
                 else
                     binding.internalStorageMsg.setVisibility(View.GONE);

@@ -84,7 +84,7 @@ public class BackgroundDownloadManager {
     public void isBackgroundDownloadEnabled(Consumer<Boolean> cb) {
         settings.getBackgroundDownloadSettings(bgSettings -> {
             cb.accept(
-                bgSettings.getHourly()
+                bgSettings.hourly()
                 || getNextDailyDownloadDelay(bgSettings) >= 0
             );
         });
@@ -94,7 +94,7 @@ public class BackgroundDownloadManager {
         cancelBackgroundDownloads();
 
         settings.getBackgroundDownloadSettings(bgSettings -> {
-            if (bgSettings.getHourly())
+            if (bgSettings.hourly())
                 scheduleHourlyDownloads(bgSettings);
             else
                 scheduleNextDailyDownload(bgSettings);
@@ -161,8 +161,8 @@ public class BackgroundDownloadManager {
         BackgroundDownloadSettings bgSettings
     ) {
 
-        Set<String> days = bgSettings.getDays();
-        int downloadTime = bgSettings.getDaysTime();
+        Set<String> days = bgSettings.days();
+        int downloadTime = bgSettings.daysTime();
 
         long nextDownloadDelay = -1;
 
@@ -184,9 +184,9 @@ public class BackgroundDownloadManager {
     private Constraints getConstraints(
         BackgroundDownloadSettings bgSettings
     ) {
-        boolean requireUnmetered = bgSettings.getRequireUnmetered();
-        boolean allowRoaming = bgSettings.getAllowRoaming();
-        boolean requireCharging = bgSettings.getRequireCharging();
+        boolean requireUnmetered = bgSettings.requireUnmetered();
+        boolean allowRoaming = bgSettings.allowRoaming();
+        boolean requireCharging = bgSettings.requireCharging();
 
         Constraints.Builder constraintsBuilder = new Constraints.Builder();
 

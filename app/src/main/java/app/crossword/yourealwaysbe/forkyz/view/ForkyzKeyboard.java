@@ -149,7 +149,7 @@ public class ForkyzKeyboard
             onKeyDown(view.getId());
             view.setPressed(true);
             settings.getKeyboardSettings(ks -> {
-                if (ks.getHaptic()) {
+                if (ks.haptic()) {
                     view.performHapticFeedback(
                         HapticFeedbackConstants.KEYBOARD_TAP
                     );
@@ -266,7 +266,7 @@ public class ForkyzKeyboard
         );
 
         inflater.inflate(
-            KEYBOARD_LAYOUTS.get(keyboardSettings.getLayout()),
+            KEYBOARD_LAYOUTS.get(keyboardSettings.layout()),
             this,
             true
         );
@@ -348,8 +348,8 @@ public class ForkyzKeyboard
         sendKeyDown(keyId);
 
         settings.getKeyboardSettings(ks -> {
-            int delay = ks.getRepeatDelay();
-            int interval = ks.getRepeatInterval();
+            int delay = ks.repeatDelay();
+            int interval = ks.repeatInterval();
 
             if (delay == 0 || interval == 0)
                 return;
@@ -499,7 +499,7 @@ public class ForkyzKeyboard
                     = context
                         .getResources()
                         .getInteger(
-                            keyboardSettings.getCompact()
+                            keyboardSettings.compact()
                                 ? R.integer.keyboardButtonPaddingPcntCompact
                                 : R.integer.keyboardButtonPaddingPcnt
                         );

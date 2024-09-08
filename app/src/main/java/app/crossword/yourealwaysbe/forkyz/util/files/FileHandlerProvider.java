@@ -79,7 +79,7 @@ public class FileHandlerProvider {
 
             FileHandler fh;
 
-            StorageLocation loc = fileHandlerSettings.getStorageLocation();
+            StorageLocation loc = fileHandlerSettings.storageLocation();
 
             switch (loc) {
             case EXTERNAL_LEGACY:

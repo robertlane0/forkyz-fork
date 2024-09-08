@@ -666,16 +666,16 @@ public class ForkyzSettings {
             prefs.edit()
                 .putString(
                     PREF_FILE_HANDLER_STORAGE_LOC,
-                    settings.getStorageLocation().getSettingsValue()
+                    settings.storageLocation().getSettingsValue()
                 ).putString(
                     PREF_FILE_HANDLER_SAF_ROOT,
-                    settings.getSAFRootURI()
+                    settings.safRootURI()
                 ).putString(
                     PREF_FILE_HANDLER_SAF_CROSSWORDS,
-                    settings.getSAFCrosswordsURI()
+                    settings.safCrosswordsURI()
                 ).putString(
                     PREF_FILE_HANDLER_SAF_ARCHIVE,
-                    settings.getSAFArchiveURI()
+                    settings.safArchiveURI()
                 ).apply();
             if (cb != null)
                 handler.post(() -> { cb.run(); });

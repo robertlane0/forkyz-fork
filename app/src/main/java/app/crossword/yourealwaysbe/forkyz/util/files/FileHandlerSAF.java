@@ -447,13 +447,13 @@ public class FileHandlerSAF extends FileHandler {
     ) {
         FileHandlerSAF fileHandler = null;
 
-        String rootFolder = fileHandlerSettings.getSAFRootURI();
-        String crosswordsFolder = fileHandlerSettings.getSAFCrosswordsURI();
-        String archiveFolder = fileHandlerSettings.getSAFArchiveURI();
-        String toImportFolder = fileHandlerSettings.getSAFToImportURI();
-        String toImportDoneFolder = fileHandlerSettings.getSAFToImportDoneURI();
+        String rootFolder = fileHandlerSettings.safRootURI();
+        String crosswordsFolder = fileHandlerSettings.safCrosswordsURI();
+        String archiveFolder = fileHandlerSettings.safArchiveURI();
+        String toImportFolder = fileHandlerSettings.safToImportURI();
+        String toImportDoneFolder = fileHandlerSettings.safToImportDoneURI();
         String toImportFailedFolder
-            = fileHandlerSettings.getSAFToImportFailedURI();
+            = fileHandlerSettings.safToImportFailedURI();
 
         if (
             rootFolder != null

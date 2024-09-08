@@ -185,12 +185,12 @@ public class PreferencesFragment extends PreferencesBaseFragment {
                 settings.setFileHandlerSettings(
                     new FileHandlerSettings(
                         newLocation,
-                        fileHandlerSettings.getSAFRootURI(),
-                        fileHandlerSettings.getSAFCrosswordsURI(),
-                        fileHandlerSettings.getSAFArchiveURI(),
-                        fileHandlerSettings.getSAFToImportURI(),
-                        fileHandlerSettings.getSAFToImportDoneURI(),
-                        fileHandlerSettings.getSAFToImportFailedURI()
+                        fileHandlerSettings.safRootURI(),
+                        fileHandlerSettings.safCrosswordsURI(),
+                        fileHandlerSettings.safArchiveURI(),
+                        fileHandlerSettings.safToImportURI(),
+                        fileHandlerSettings.safToImportDoneURI(),
+                        fileHandlerSettings.safToImportFailedURI()
                     ),
                     () -> { newFileHandlerAppExit(); }
                 );
@@ -248,7 +248,7 @@ public class PreferencesFragment extends PreferencesBaseFragment {
             values[0] = StorageLocation.INTERNAL.getSettingsValue();
 
             if (FileHandlerSAF.isSAFSupported(utils)) {
-                String storageLocationSAFURI = fhSettings.getSAFRootURI();
+                String storageLocationSAFURI = fhSettings.safRootURI();
                 if (storageLocationSAFURI == null) {
                     storageLocationSAFURI =
                         getString(R.string.external_storage_saf_none_selected);
