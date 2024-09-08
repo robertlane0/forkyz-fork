@@ -17,8 +17,9 @@ import app.crossword.yourealwaysbe.puz.util.WeakSet;
 
 public class Playboard implements Serializable {
     private static final long serialVersionUID = 4593768901101043503L;
-
     private static final Logger LOG = Logger.getLogger(Playboard.class.getCanonicalName());
+
+    private static final long PAUSE_DELETE_DELAY = 150; // ms
 
     /**
      * What to do with cells that are filled by crossing words
@@ -61,6 +62,7 @@ public class Playboard implements Serializable {
         = WeakSet.buildSet();
     private boolean isNotifying = false;
     private int notificationDisabledDepth = 0;
+    private long pauseDeleteUntil = -1;
 
     private HashSet<Position> changedPositions = new HashSet<>();
     private HashSet<ClueID> changedClueIDs = new HashSet<>();
@@ -509,6 +511,15 @@ public class Playboard implements Serializable {
         Box currentBox = this.getCurrentBox();
         Word wordToReturn = this.getCurrentWord();
 
+        if (isPausedDelete()) {
+            // pause again to make user stop sending rapid deletes
+            pauseDelete();
+            // notify needed for android keyboard (bit of a hack i
+            // guess)
+            notifyChange();
+            return wordToReturn;
+        }
+
         pushNotificationDisabled();
 
         // do a standard delete if undo stack is empty
@@ -551,7 +562,7 @@ public class Playboard implements Serializable {
             Position pos = undo.getPosition();
             // Jump back to last box and delete the letter.
             currentBox = puzzle.checkedGetBox(pos);
-            if(currentBox != null) {
+            if (currentBox != null) {
                 currentBox.setResponse(undo.getOldResponse());
                 playLetterUndoStack.pushClearDisabled();
                 setHighlightLetter(pos);
@@ -559,6 +570,10 @@ public class Playboard implements Serializable {
                 puzzle.setCurrentClueID(undo.getClueID());
                 flagChange(pos);
             }
+            // pause delete when empty stack reached to provide a
+            // natural break from held delete
+            if (playLetterUndoStack.isEmpty())
+                pauseDelete();
         }
 
         popNotificationDisabled();
@@ -1845,6 +1860,20 @@ public class Playboard implements Serializable {
         Box box = puzzle.checkedGetBox(pos);
         String response = (box == null) ? null : box.getResponse();
         playLetterUndoStack.push(pos, getClueID(), response);
+    }
+
+    private void pauseDelete() {
+        pauseDeleteUntil = System.currentTimeMillis() + PAUSE_DELETE_DELAY;
+    }
+
+    /**
+     * If delete is paused by pauseDelete
+     */
+    private boolean isPausedDelete() {
+        return (
+            0 <= pauseDeleteUntil
+            && System.currentTimeMillis() < pauseDeleteUntil
+        );
     }
 
     /**
