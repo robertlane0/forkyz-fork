@@ -1,5 +1,12 @@
 # Forkyz Changelog
 
+## Version 56
+
+- Add puzzle ratings feature via puzzle info dialog.
+- Indicate in status bar when show errors is active.
+- Support most recent Hamburger Abendblatt puzzles.
+- Add keyboard pause at end of undo stack.
+
 ## Version 55
 
 - Change long-press behaviour on notes page (long-pressing a widget copies to the currently focussed widget).
