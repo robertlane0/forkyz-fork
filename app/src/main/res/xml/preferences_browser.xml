@@ -59,4 +59,11 @@
         android:summary="@string/browse_always_show_rating_desc"
         android:key="browseAlwaysShowRating"
     />
+
+    <androidx.preference.CheckBoxPreference
+        android:title="@string/browse_indicate_if_solution"
+        android:defaultValue="false"
+        android:summary="@string/browse_indicate_if_solution_desc"
+        android:key="browseIndicateIfSolution"
+    />
 </androidx.preference.PreferenceScreen>

@@ -187,6 +187,8 @@
     <string name="disable_swipe_desc">Disables swiping to dismiss on the list view.</string>
     <string name="swipe_action">Swipe Action</string>
     <string name="swipe_action_desc">Select delete or archive on swipe.</string>
+    <string name="browse_indicate_if_solution">Indicate if Puzzle has a Solution</string>
+    <string name="browse_indicate_if_solution_desc">Display a lightbulb if the puzzle comes with answers that can be revealed, used to check errors, and detect puzzle completion.</string>
 
     <!-- preferences custom -->
     <string name="custom_daily">Custom Daily Puzzle Source</string>

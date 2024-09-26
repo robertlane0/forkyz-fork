@@ -1233,6 +1233,11 @@ public class BrowseActivity extends ForkyzActivity {
                     );
                 }
             );
+
+            settings.liveBrowseIndicateIfSolution().observe(
+                BrowseActivity.this,
+                indicate -> { setIndicateSolutionVisibility(); }
+            );
         }
 
         public void setPuzMetaFile(PuzMetaFile puzMetaFile) {
@@ -1298,9 +1303,7 @@ public class BrowseActivity extends ForkyzActivity {
                 Math.min(puzMetaFile.getRating(), maxRating)
             );
 
-            itemBinding.hasSolution.setVisibility(
-                puzMetaFile.hasSolution() ? View.VISIBLE : View.GONE
-            );
+            setIndicateSolutionVisibility();
         }
 
         public PuzMetaFile getPuzMetaFile() {
@@ -1319,6 +1322,18 @@ public class BrowseActivity extends ForkyzActivity {
             itemBinding.puzzleProgress.setComplete(
                 puzMetaFile.getComplete() == 100
             );
+        }
+
+        private void setIndicateSolutionVisibility() {
+            if (puzMetaFile == null)
+                return;
+
+            settings.getBrowseIndicateIfSolution(indicate -> {
+                boolean show = indicate && puzMetaFile.hasSolution();
+                itemBinding.hasSolution.setVisibility(
+                    show ? View.VISIBLE : View.GONE
+                );
+            });
         }
     }
 

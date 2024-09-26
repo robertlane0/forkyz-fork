@@ -61,6 +61,8 @@ public class ForkyzSettings {
     private static final String PREF_BROWSE_DELETE_ON_CLEANUP
         = "deleteOnCleanup";
     private static final String PREF_BROWSE_DISABLE_SWIPE = "disableSwipe";
+    private static final String PREF_BROWSE_INDICATE_IF_SOLUTION
+        = "browseIndicateIfSolution";
     private static final String PREF_BROWSE_LAST_DOWNLOAD = "dlLast";
     private static final String PREF_BROWSE_LAST_SEEN_VERSION
         = "lastSeenVersion";
@@ -212,6 +214,7 @@ public class ForkyzSettings {
         STRING_DEFAULTS.put(PREF_BROWSE_CLEANUP_AGE_ARCHIVE, "-1");
         BOOL_DEFAULTS.put(PREF_BROWSE_DELETE_ON_CLEANUP, false);
         BOOL_DEFAULTS.put(PREF_BROWSE_DISABLE_SWIPE, false);
+        BOOL_DEFAULTS.put(PREF_BROWSE_INDICATE_IF_SOLUTION, false);
         LONG_DEFAULTS.put(PREF_BROWSE_LAST_DOWNLOAD, 0L);
         STRING_DEFAULTS.put(PREF_BROWSE_LAST_SEEN_VERSION, "");
         BOOL_DEFAULTS.put(PREF_BROWSE_NEW_PUZZLE, false);
@@ -409,6 +412,17 @@ public class ForkyzSettings {
 
     public LiveData<Boolean> liveBrowseDisableSwipe() {
         return liveBooleanPreference(PREF_BROWSE_DISABLE_SWIPE);
+    }
+
+    /**
+     * Whether to indicate in browse if puzzle has answers in data
+     */
+    public void getBrowseIndicateIfSolution(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_BROWSE_INDICATE_IF_SOLUTION, cb);
+    }
+
+    public LiveData<Boolean> liveBrowseIndicateIfSolution() {
+        return liveBooleanPreference(PREF_BROWSE_INDICATE_IF_SOLUTION);
     }
 
     /**
