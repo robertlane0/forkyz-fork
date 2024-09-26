@@ -908,8 +908,12 @@ public class PlayActivity extends PuzzleActivity
         )
             return;
 
+        Puzzle puz = getPuzzle();
         if (
-            indicateShowErrors && (
+            puz != null
+            && puz.hasSolution()
+            && indicateShowErrors
+            && (
                 showErrorsClue || showErrorsCursor || showErrorsGrid
             )
         ) {
