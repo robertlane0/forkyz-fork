@@ -1297,6 +1297,10 @@ public class BrowseActivity extends ForkyzActivity {
             itemBinding.puzzleRating.setRating(
                 Math.min(puzMetaFile.getRating(), maxRating)
             );
+
+            itemBinding.hasSolution.setVisibility(
+                puzMetaFile.hasSolution() ? View.VISIBLE : View.GONE
+            );
         }
 
         public PuzMetaFile getPuzMetaFile() {

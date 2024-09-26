@@ -98,6 +98,10 @@ public class MetaCache {
         @ColumnInfo
         @NonNull
         public char rating;
+
+        // from db version 4
+        @ColumnInfo
+        public boolean hasSolution;
     }
 
     @Dao
@@ -141,7 +145,7 @@ public class MetaCache {
         }
     }
 
-    @Database(entities = {CachedMeta.class}, version = 3)
+    @Database(entities = {CachedMeta.class}, version = 4)
     public static abstract class CachedMetaDB extends RoomDatabase {
         private static CachedMetaDB instance = null;
 
@@ -170,11 +174,21 @@ public class MetaCache {
             }
         };
 
+        private static final Migration MIGRATION_3_4 = new Migration(3, 4) {
+            @Override
+            public void migrate(SupportSQLiteDatabase database) {
+                database.execSQL(
+                    "ALTER TABLE cachedMeta "
+                    + "ADD COLUMN hasSolution INTEGER NOT NULL DEFAULT 0"
+                );
+            }
+        };
+
         public static CachedMetaDB getInstance(Context applicationContext) {
             if (instance == null) {
                 instance = Room.databaseBuilder(
                     applicationContext, CachedMetaDB.class, "meta-cache-db"
-                ).addMigrations(MIGRATION_l_2, MIGRATION_2_3)
+                ).addMigrations(MIGRATION_l_2, MIGRATION_2_3, MIGRATION_3_4)
                 .build();
             }
             return instance;
@@ -200,6 +214,11 @@ public class MetaCache {
         public String getTitle() { return dbRow.title; }
         public String getAuthor() { return dbRow.author; }
         public char getRating() { return dbRow.rating; }
+        public boolean hasSolution() {
+            // because old puzzles have false as the default infer from percent
+            // complete
+            return dbRow.hasSolution || dbRow.percentComplete > 0;
+        }
     }
 
     private Context applicationContext;
@@ -267,6 +286,7 @@ public class MetaCache {
         cm.title = puz.getTitle();
         cm.author = puz.getAuthor();
         cm.rating = puz.getRating();
+        cm.hasSolution = puz.hasSolution();
 
         getDao().insertAll(cm);
 

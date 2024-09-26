@@ -88,6 +88,10 @@ public class PuzMetaFile
         return (meta == null) ? 0 : meta.getRating();
     }
 
+    public boolean hasSolution() {
+        return (meta == null) ? false : meta.hasSolution();
+    }
+
     /**
      * Returns something that can be used as source
      *

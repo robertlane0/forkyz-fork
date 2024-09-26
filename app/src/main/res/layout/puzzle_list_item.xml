@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
 >
     <RelativeLayout
         android:layout_width="fill_parent"
@@ -87,5 +88,14 @@
                 />
             </LinearLayout>
         </LinearLayout>
+        <ImageView
+            android:id="@+id/has_solution"
+            android:layout_width="10dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            app:srcCompat="@drawable/ic_solution"
+            android:visibility="gone"
+        />
     </RelativeLayout>
 </layout>
