@@ -68,7 +68,7 @@ public class PlayboardRenderer {
     private final Typeface TYPEFACE_SEMI_BOLD_SANS;
 
     private PaintProfile profile;
-    private Bitmap bitmap;
+    private BitmapGrid bitmapGrid;
     private Playboard board;
     private float dpi;
     private float scale = 1.0F;
@@ -157,7 +157,7 @@ public class PlayboardRenderer {
         } else if (Float.isNaN(scale)) {
             scale = 1.0f;
         }
-        this.bitmap = null;
+        this.bitmapGrid = null;
         this.scale = scale;
 
         profile.setScale(scale, dpi);
@@ -177,7 +177,7 @@ public class PlayboardRenderer {
      * lookup.
      * @param suppressNotesLists as in drawBox
      */
-    synchronized public Bitmap draw(
+    synchronized public BitmapGrid draw(
         Collection<Position> changes, Set<String> suppressNotesLists
     ) {
         try {
@@ -189,16 +189,18 @@ public class PlayboardRenderer {
             if (newBitmap)
                 changes = null;
 
-            Canvas canvas = new Canvas(bitmap);
+            Canvas canvas = new Canvas(
+                bitmapGrid.getCell(0, 0).getCreateBitmap()
+            );
 
             drawBoardBoxes(canvas, changes, suppressNotesLists);
             drawPinnedClue(canvas, changes, suppressNotesLists);
 
             if (changes == null)
                 drawImages(canvas);
-            return bitmap;
+            return bitmapGrid;
         } catch (OutOfMemoryError e) {
-            return bitmap;
+            return bitmapGrid;
         }
     }
 
@@ -214,7 +216,7 @@ public class PlayboardRenderer {
      * contain positions outside of current word.
      * @param suppressNotesLists as in drawBox
      */
-    synchronized public Bitmap drawWord(
+    synchronized public BitmapGrid drawWord(
         Collection<Position> changes,
         Set<String> suppressNotesLists,
         int wrapWidth
@@ -227,7 +229,7 @@ public class PlayboardRenderer {
     /**
      * Draw word suppressing no notes
      */
-    synchronized public Bitmap drawWord(
+    synchronized public BitmapGrid drawWord(
         Word word,
         Collection<Position> changes,
         int wrapWidth
@@ -249,7 +251,7 @@ public class PlayboardRenderer {
      * @param wrapWidth if non-zero, wrap word after width (in pixels)
      * exceeded
      */
-    synchronized public Bitmap drawWord(
+    synchronized public BitmapGrid drawWord(
         Word word,
         Collection<Position> changes,
         Set<String> suppressNotesLists,
@@ -275,7 +277,9 @@ public class PlayboardRenderer {
         if (initialiseBitmap(width, height))
             changes = null;
 
-        Canvas canvas = new Canvas(bitmap);
+        Canvas canvas = new Canvas(
+            bitmapGrid.getCell(0, 0).getCreateBitmap()
+        );
 
         for (int i = 0; i < boxes.length; i++) {
             Position pos = zone.getPosition(i);
@@ -307,7 +311,7 @@ public class PlayboardRenderer {
             }
         }
 
-        return bitmap;
+        return bitmapGrid;
     }
 
     /**
@@ -323,7 +327,7 @@ public class PlayboardRenderer {
      * @param suppressNotesLists as in drawBox
      * @param wrapWidth if non-zero, wrap after this number of pixels
      */
-    synchronized public Bitmap drawBoxes(
+    synchronized public BitmapGrid drawBoxes(
         Box[] boxes,
         String shadowString,
         boolean[] changes,
@@ -352,7 +356,9 @@ public class PlayboardRenderer {
         if (initialiseBitmap(width, height))
             changes = null;
 
-        Canvas canvas = new Canvas(bitmap);
+        Canvas canvas = new Canvas(
+            bitmapGrid.getCell(0, 0).getCreateBitmap()
+        );
 
         for (int i = 0; i < boxes.length; i++) {
             if (changes != null && !changes[i])
@@ -385,7 +391,7 @@ public class PlayboardRenderer {
             }
         }
 
-        return bitmap;
+        return bitmapGrid;
     }
 
     /**
@@ -482,7 +488,7 @@ public class PlayboardRenderer {
     synchronized public float fitTo(
         int width, int height, int numBoxesWidth, int numBoxesHeight
     ) {
-        this.bitmap = null;
+        this.bitmapGrid = null;
         float newScaleWidth = calculateScale(width, numBoxesWidth);
         float newScaleHeight = calculateScale(height, numBoxesHeight);
         setScale(Math.min(newScaleWidth, newScaleHeight));
@@ -490,13 +496,13 @@ public class PlayboardRenderer {
     }
 
     synchronized public float fitWidthTo(int width, int numBoxes) {
-        this.bitmap = null;
+        this.bitmapGrid = null;
         setScale(calculateScale(width, numBoxes));
         return getScale();
     }
 
     synchronized public float zoomIn() {
-        this.bitmap = null;
+        this.bitmapGrid = null;
         this.scale = scale * 1.25F;
         if(scale > this.getMaxScale()){
             this.scale = this.getMaxScale();
@@ -505,7 +511,7 @@ public class PlayboardRenderer {
     }
 
     synchronized public float zoomOut() {
-        this.bitmap = null;
+        this.bitmapGrid = null;
         this.scale = scale / 1.25F;
         if(scale < this.getMinScale()){
             scale = this.getMinScale();
@@ -514,13 +520,13 @@ public class PlayboardRenderer {
     }
 
     synchronized public float zoomReset() {
-        this.bitmap = null;
+        this.bitmapGrid = null;
         this.scale = 1.0F;
         return scale;
     }
 
     synchronized public float zoomInMax() {
-        this.bitmap = null;
+        this.bitmapGrid = null;
         this.scale = getMaxScale();
 
         return scale;
@@ -1507,15 +1513,16 @@ public class PlayboardRenderer {
      * @return true if a new (blank) bitmap created, else old one used
      */
     private boolean initialiseBitmap(int width, int height) {
-        if (bitmap != null)
+        if (bitmapGrid != null)
             return false;
 
         int boxSize = getBoxSize();
+        int fullWidth = width * boxSize;
+        int fullHeight = height * boxSize;
 
-        bitmap = Bitmap.createBitmap(
-            width * boxSize, height * boxSize, Bitmap.Config.ARGB_8888
+        bitmapGrid = new BitmapGrid(
+            fullWidth, fullHeight, Math.max(fullWidth, fullHeight)
         );
-        bitmap.eraseColor(Color.TRANSPARENT);
 
         return true;
     }

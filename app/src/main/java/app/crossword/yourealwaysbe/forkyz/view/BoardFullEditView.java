@@ -116,7 +116,8 @@ public class BoardFullEditView extends BoardEditView {
             executorService.execute(() -> {
                 try {
                     lockRenderer();
-                    Bitmap bitmap = renderer.draw(localChanges, suppressNotesList);
+                    BitmapGrid bitmap
+                        = renderer.draw(localChanges, suppressNotesList);
                     handler.post(() -> {
                         try { setBitmap(bitmap, rescale); }
                         finally { unlockRenderer(); }

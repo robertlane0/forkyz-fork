@@ -669,7 +669,7 @@ public class BoardEditText
         executorService.execute(() -> {
             try {
                 lockRenderer();
-                Bitmap bitmap = renderer.drawBoxes(
+                BitmapGrid bitmap = renderer.drawBoxes(
                     boxes,
                     shadow,
                     renderChanges,

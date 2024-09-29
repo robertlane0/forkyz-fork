@@ -208,7 +208,7 @@ public class BoardWordEditView extends BoardEditView {
             executorService.execute(() -> {
                 try {
                     lockRenderer();
-                    Bitmap bitmap = renderer.drawWord(
+                    BitmapGrid bitmap = renderer.drawWord(
                         renderWord,
                         localChanges,
                         localSuppressNotesList,

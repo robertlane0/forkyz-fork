@@ -290,8 +290,8 @@ public abstract class BoardEditView
     protected void onScale(float scale, Point center) {
         lastTap = System.currentTimeMillis();
 
-        int w = getImageView().getWidth();
-        int h = getImageView().getHeight();
+        int w = getImageWidth();
+        int h = getImageHeight();
         scale = renderer.fitTo(w, h);
 
         super.onScale(scale, center);
