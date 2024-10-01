@@ -116,23 +116,23 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
             // set bitmaps and dimensions
             for (int row = 0; row < numRows; row++) {
                 for (int col = 0; col < numCols; col++) {
-                    BitmapGrid.Cell cell = bitmap.getCell(row, col);
-                    if (cell == null)
+                    BitmapGrid.Tile tile = bitmap.getTile(row, col);
+                    if (tile == null)
                         continue;
 
                     int viewIdx = row * numCols + col;
                     ImageView imageView
                         = (ImageView) imageGrid.getChildAt(viewIdx);
-                    imageView.setImageBitmap(cell.getBitmap());
+                    imageView.setImageBitmap(tile.getBitmap());
 
-                    int cellWidth = cell.getWidth();
-                    int cellHeight = cell.getHeight();
+                    int tileWidth = tile.getWidth();
+                    int tileHeight = tile.getHeight();
 
                     if (rescale) {
                         subImageSizes[viewIdx] = new ImageSize(
-                            cellWidth, cellHeight
+                            tileWidth, tileHeight
                         );
-                        setViewParams(imageView, cellWidth, cellHeight);
+                        setViewParams(imageView, tileWidth, tileHeight);
                     }
                 }
             }

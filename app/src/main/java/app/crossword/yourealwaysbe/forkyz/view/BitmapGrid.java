@@ -11,19 +11,19 @@ import app.crossword.yourealwaysbe.puz.Position;
  */
 public class BitmapGrid {
     /**
-     * A cell in the grid
+     * A tile in the grid
      *
-     * Each cell should be the same width/height except the last row and
+     * Each tile should be the same width/height except the last row and
      * column that might be short in the relevant direction.
      *
      * Null bitmap means transparent.
      */
-    public static class Cell {
+    public static class Tile {
         private Bitmap bitmap;
         private int width;
         private int height;
 
-        public Cell(int width, int height) {
+        public Tile(int width, int height) {
             this.width = width;
             this.height = height;
         }
@@ -32,7 +32,7 @@ public class BitmapGrid {
         public int getHeight() { return height; }
 
         /**
-         * Get bitmap or null if this cell doesn't have one
+         * Get bitmap or null if this tile doesn't have one
          */
         public Bitmap getBitmap() { return bitmap; }
 
@@ -50,41 +50,41 @@ public class BitmapGrid {
         }
     }
 
-    private Cell[][] grid;
+    private Tile[][] grid;
     private int numRows;
     private int numCols;
     private int width;
     private int height;
-    private int cellSize;
+    private int tileSize;
 
     /**
      * Build a grid structure
      *
-     * Splits into cellSize x cellSize squares, except for the end
+     * Splits into tileSize x tileSize squares, except for the end
      * pieces that just hold the leftovers.
      *
      * @param width full bitmap width
      * @param height full bitmap height
-     * @param cellSize split into squares of (up to) this size
+     * @param tileSize split into squares of (up to) this size
      */
-    public BitmapGrid(int width, int height, int cellSize) {
+    public BitmapGrid(int width, int height, int tileSize) {
         this.width = width;
         this.height = height;
-        this.cellSize = cellSize;
-        this.numRows = height / cellSize + ((height % cellSize > 0) ? 1 : 0);
-        this.numCols = width / cellSize + ((width % cellSize > 0) ? 1 : 0);
+        this.tileSize = tileSize;
+        this.numRows = height / tileSize + ((height % tileSize > 0) ? 1 : 0);
+        this.numCols = width / tileSize + ((width % tileSize > 0) ? 1 : 0);
 
-        this.grid = new Cell[numRows][numCols];
+        this.grid = new Tile[numRows][numCols];
 
         for (int row = 0; row < numRows; row++) {
             for (int col = 0; col < numCols; col++) {
-                int cellWidth = col == numCols - 1 && width % cellSize > 0
-                    ? width % cellSize
-                    : cellSize;
-                int cellHeight = row == numRows - 1 && height % cellSize > 0
-                    ? height % cellSize
-                    : cellSize;
-                grid[row][col] = new Cell(cellWidth, cellHeight);
+                int tileWidth = col == numCols - 1 && width % tileSize > 0
+                    ? width % tileSize
+                    : tileSize;
+                int tileHeight = row == numRows - 1 && height % tileSize > 0
+                    ? height % tileSize
+                    : tileSize;
+                grid[row][col] = new Tile(tileWidth, tileHeight);
             }
         }
     }
@@ -93,9 +93,9 @@ public class BitmapGrid {
     public int getHeight() { return height; }
     public int getNumRows() { return numRows; }
     public int getNumCols() { return numCols; }
-    public int getCellSize() { return cellSize; }
+    public int getTileSize() { return tileSize; }
 
-    public Cell getCell(int row, int col) {
+    public Tile getTile(int row, int col) {
         if (
             0 <= row && row < grid.length
             && 0 <= col && col < grid[row].length
@@ -114,7 +114,7 @@ public class BitmapGrid {
             0 <= x && x < getWidth()
             && 0 <= y && y < getHeight()
         ) {
-            return new Position(y / cellSize, x / cellSize);
+            return new Position(y / tileSize, x / tileSize);
         } else {
             return null;
         }

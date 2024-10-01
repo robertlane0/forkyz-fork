@@ -1103,7 +1103,7 @@ public class PlayboardRenderer {
 
         if (highlightError(box, isHighlighted)) {
             if (isHighlighted) {
-                thisLetter = profile.getCellColor();
+                thisLetter = profile.getColor();
             } else if (inCurrentWord) {
                 thisLetter = profile.getErrorHighlight();
             }
@@ -1752,15 +1752,15 @@ public class PlayboardRenderer {
 
         for (int row = 0; row < numRows; row++) {
             for (int col = 0; col < numCols; col++) {
-                BitmapGrid.Cell cell = bitmapGrid.getCell(row, col);
+                BitmapGrid.Tile tile = bitmapGrid.getTile(row, col);
                 // never null
-                if (cell != null) {
-                    canvases[row][col] = new Canvas(cell.getCreateBitmap());
+                if (tile != null) {
+                    canvases[row][col] = new Canvas(tile.getCreateBitmap());
                     canvases[row][col].translate(-offsetX, -offsetY);
 
-                    offsetX += cell.getWidth();
+                    offsetX += tile.getWidth();
                     if (col == numCols - 1)
-                        offsetY += cell.getHeight();
+                        offsetY += tile.getHeight();
                 }
             }
             offsetX = 0;
@@ -1934,7 +1934,7 @@ public class PlayboardRenderer {
                return getRelativePaint(cellBox, box.getColor());
         }
 
-        public TextPaint getCellColor() {
+        public TextPaint getColor() {
             return cellBox;
         }
 
@@ -1944,7 +1944,7 @@ public class PlayboardRenderer {
                return base;
             } else {
                 Paint mixedPaint = new Paint(base);
-                Paint cell = getCellColor();
+                Paint cell = getColor();
                 mixedPaint.setColor(getRelativeColor(
                     cell.getColor(), box.getTextColor()
                 ));
@@ -1967,7 +1967,7 @@ public class PlayboardRenderer {
                return base;
             } else {
                 Paint mixedPaint = new Paint(base);
-                Paint cell = getCellColor();
+                Paint cell = getColor();
                 mixedPaint.setColor(getRelativeColor(
                     cell.getColor(), box.getBarColor()
                 ));
@@ -2101,7 +2101,7 @@ public class PlayboardRenderer {
                return base;
             } else {
                 TextPaint mixedPaint = new TextPaint(base);
-                Paint cell = getCellColor();
+                Paint cell = getColor();
                 mixedPaint.setColor(getRelativeColor(
                     cell.getColor(), box.getTextColor()
                 ));
