@@ -4,6 +4,8 @@ package app.crossword.yourealwaysbe.forkyz.view;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 
+import app.crossword.yourealwaysbe.puz.Position;
+
 /**
  * A "large" bitmap made up of a grid of smaller ones
  */
@@ -53,6 +55,7 @@ public class BitmapGrid {
     private int numCols;
     private int width;
     private int height;
+    private int cellSize;
 
     /**
      * Build a grid structure
@@ -67,23 +70,20 @@ public class BitmapGrid {
     public BitmapGrid(int width, int height, int cellSize) {
         this.width = width;
         this.height = height;
-        this.numRows = (int) Math.ceil((double) width / cellSize);
-        this.numCols = (int) Math.ceil((double) height / cellSize);
-
-        System.out.println("FORKYZ: w " + width + " h " + height);
-        System.out.println("FORKYZ: nr " + numRows + " nc " + numCols);
+        this.cellSize = cellSize;
+        this.numRows = height / cellSize + ((height % cellSize > 0) ? 1 : 0);
+        this.numCols = width / cellSize + ((width % cellSize > 0) ? 1 : 0);
 
         this.grid = new Cell[numRows][numCols];
 
         for (int row = 0; row < numRows; row++) {
             for (int col = 0; col < numCols; col++) {
-                int cellWidth = col == numCols - 1 && width != cellSize
+                int cellWidth = col == numCols - 1 && width % cellSize > 0
                     ? width % cellSize
                     : cellSize;
-                int cellHeight = row == numRows - 1 && height != cellSize
+                int cellHeight = row == numRows - 1 && height % cellSize > 0
                     ? height % cellSize
                     : cellSize;
-                System.out.println("FORKYZ: r " + row + " c " + col + " w " + cellWidth + " h " + cellHeight);
                 grid[row][col] = new Cell(cellWidth, cellHeight);
             }
         }
@@ -93,6 +93,7 @@ public class BitmapGrid {
     public int getHeight() { return height; }
     public int getNumRows() { return numRows; }
     public int getNumCols() { return numCols; }
+    public int getCellSize() { return cellSize; }
 
     public Cell getCell(int row, int col) {
         if (
@@ -100,6 +101,20 @@ public class BitmapGrid {
             && 0 <= col && col < grid[row].length
         ) {
             return grid[row][col];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Get the tile position containing pixel (x, y) or null
+     */
+    public Position getPixelPosition(int x, int y) {
+        if (
+            0 <= x && x < getWidth()
+            && 0 <= y && y < getHeight()
+        ) {
+            return new Position(y / cellSize, x / cellSize);
         } else {
             return null;
         }

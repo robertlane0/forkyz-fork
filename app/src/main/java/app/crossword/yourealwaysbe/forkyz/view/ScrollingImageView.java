@@ -36,6 +36,10 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
     private int gestureStartY;
 
     private GridLayout imageGrid;
+    // the "true" size of each bitmap in the grid in child order of
+    // imageGrid
+    private ImageSize[] subImageSizes;
+    private ImageSize fullImageSize;
 
     public ScrollingImageView(Context context, AttributeSet as) {
         super(context, as);
@@ -80,34 +84,43 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
      * doesn't match the previous one in num rows and cols.
      */
     public void setBitmap(BitmapGrid bitmap, boolean rescale) {
-        if (bitmap == null) {
+        int numRows = bitmap == null ? 0 : bitmap.getNumRows();
+        int numCols = bitmap == null ? 0 : bitmap.getNumCols();
+        if (numRows == 0 || numCols == 0) {
             imageGrid.removeAllViews();
             setViewParams(imageGrid, 1, 1);
+            subImageSizes = null;
+            fullImageSize = null;
         } else {
             // rescale if we had to change grid layout
             rescale |= imageGrid.getRowCount() != bitmap.getNumRows()
                 || imageGrid.getColumnCount() != bitmap.getNumCols();
 
-            // set image grid to correct grid size and child count
-            imageGrid.setRowCount(bitmap.getNumRows());
-            imageGrid.setColumnCount(bitmap.getNumCols());
-
-            int numNewViews = bitmap.getNumRows() * bitmap.getNumCols();
-            int curNumViews = imageGrid.getChildCount();
-
-            if (numNewViews < curNumViews) {
-                imageGrid.removeViews(numNewViews, curNumViews - numNewViews);
-            } else if (curNumViews < numNewViews) {
-                for (int i = curNumViews; i < numNewViews; i++) {
-                    imageGrid.addView(new ImageView(getContext()));
+            if (rescale) {
+                // would be nicer to reuse all views, but a naive
+                // implementation would cause crashes when Android
+                // noticed the child views didn't agree with the parent
+                // on row/col counts
+                imageGrid.removeAllViews();
+                subImageSizes = new ImageSize[numRows * numCols];
+                for (int row = 0; row < numRows; row++) {
+                    for (int col = 0; col < numCols; col++) {
+                        imageGrid.addView(new ImageView(getContext()));
+                    }
                 }
+                // set image grid to correct grid size and child count
+                imageGrid.setRowCount(bitmap.getNumRows());
+                imageGrid.setColumnCount(bitmap.getNumCols());
             }
 
             // set bitmaps and dimensions
-            int viewIdx = 0;
-            for (int row = 0; row < bitmap.getNumRows(); row++, viewIdx++) {
-                for (int col = 0; col < bitmap.getNumCols(); col++, viewIdx++) {
+            for (int row = 0; row < numRows; row++) {
+                for (int col = 0; col < numCols; col++) {
                     BitmapGrid.Cell cell = bitmap.getCell(row, col);
+                    if (cell == null)
+                        continue;
+
+                    int viewIdx = row * numCols + col;
                     ImageView imageView
                         = (ImageView) imageGrid.getChildAt(viewIdx);
                     imageView.setImageBitmap(cell.getBitmap());
@@ -115,13 +128,21 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
                     int cellWidth = cell.getWidth();
                     int cellHeight = cell.getHeight();
 
-                    if (rescale)
+                    if (rescale) {
+                        subImageSizes[viewIdx] = new ImageSize(
+                            cellWidth, cellHeight
+                        );
                         setViewParams(imageView, cellWidth, cellHeight);
+                    }
                 }
             }
 
-            if (rescale)
+            if (rescale) {
                 setViewParams(imageGrid, bitmap.getWidth(), bitmap.getHeight());
+                fullImageSize = new ImageSize(
+                    bitmap.getWidth(), bitmap.getHeight()
+                );
+            }
         }
     }
 
@@ -394,19 +415,40 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
             return;
         }
 
+        int h;
+        int w;
+
         for (int i = 0; i < imageGrid.getChildCount(); i++) {
-            ImageView imageView = (ImageView) imageGrid.getChildAt(i);
-            int h = imageView.getHeight();
-            int w = imageView.getWidth();
-            h *= scale;
-            w *= scale;
+            View imageView = imageGrid.getChildAt(i);
+            if (
+                subImageSizes != null
+                && i < subImageSizes.length
+                && subImageSizes[i] != null
+            ) {
+                h = subImageSizes[i].height();
+                w = subImageSizes[i].width();
+                h *= runningScale;
+                w *= runningScale;
+            } else {
+                h = imageView.getHeight();
+                w = imageView.getWidth();
+                h *= scale;
+                w *= scale;
+            }
             setViewParams(imageView, w, h);
         }
 
-        int h = imageGrid.getHeight();
-        int w = imageGrid.getWidth();
-        h *= scale;
-        w *= scale;
+        if (fullImageSize != null) {
+            h = fullImageSize.height();
+            w = fullImageSize.width();
+            h *= runningScale;
+            w *= runningScale;
+        } else {
+            h = imageGrid.getHeight();
+            w = imageGrid.getWidth();
+            h *= scale;
+            w *= scale;
+        }
         setViewParams(imageGrid, w, h);
 
         this.scaleScrollLocation.fixScroll(w, h);
@@ -590,4 +632,12 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
             ScrollingImageView.this.scrollTo(newScrollX, newScrollY);
         }
     }
+
+    /**
+     * Used to record original size of an image in the grid
+     */
+    private record ImageSize(
+        int width,
+        int height
+    ) { }
 }

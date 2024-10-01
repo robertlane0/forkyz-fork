@@ -59,10 +59,13 @@ public class PlayboardRenderer {
     // 100mb.
     // https://android.googlesource.com/platform/frameworks/base/+/refs/heads/main/graphics/java/android/graphics/RecordingCanvas.java
     // MAX_BITMAP_SIZE is public in RecordingCanvas, but @hide-ed.
-    // 5115 is 100mb / 4 (4 bytes per pixel) and square rooted to get
-    // the size of one dimension. Subtract 5 for good measure.
-    private static final int MAX_BITMAP_DIM = 5115;
-    private static final float DEFAULT_MAX_SCALE = 2.2F;
+    // 100mb / 4 (4 bytes per pixel) and square rooted to get
+    // the size of one dimension is just over 5000 pixels square. Use a
+    // lot less here and tile instead!
+    // TODO: choose a better bitmap dim (500 is bit small for modern
+    // screens to avoid overtiling)
+    private static final int MAX_BITMAP_DIM = 500;
+    private static final float MAX_SCALE = 2.2F;
 
     // set in constructor
     private final Typeface TYPEFACE_SEMI_BOLD_SANS;
@@ -132,12 +135,7 @@ public class PlayboardRenderer {
         //leave a 1/16th in gutter on the puzzle.
         float fitToScreen =  (dpi * (puzzleBaseSizeInInches + 0.0625F)) / dpi;
 
-        float maxScaleByBitmap
-            = (float) MAX_BITMAP_DIM / (puzzleBaseSizeInInches * dpi);
-
-        return Math.min(
-            Math.max(DEFAULT_MAX_SCALE, fitToScreen), maxScaleByBitmap
-        );
+        return Math.max(MAX_SCALE, fitToScreen);
     }
 
     public float getDeviceMinScale(){
@@ -189,15 +187,15 @@ public class PlayboardRenderer {
             if (newBitmap)
                 changes = null;
 
-            Canvas canvas = new Canvas(
-                bitmapGrid.getCell(0, 0).getCreateBitmap()
-            );
+            Canvas[][] canvases = makeBitmapGridCanvases();
+            if (canvases == null)
+                return bitmapGrid;
 
-            drawBoardBoxes(canvas, changes, suppressNotesLists);
-            drawPinnedClue(canvas, changes, suppressNotesLists);
+            drawBoardBoxes(canvases, changes, suppressNotesLists);
+            drawPinnedClue(canvases, changes, suppressNotesLists);
 
             if (changes == null)
-                drawImages(canvas);
+                drawImages(canvases);
             return bitmapGrid;
         } catch (OutOfMemoryError e) {
             return bitmapGrid;
@@ -277,9 +275,7 @@ public class PlayboardRenderer {
         if (initialiseBitmap(width, height))
             changes = null;
 
-        Canvas canvas = new Canvas(
-            bitmapGrid.getCell(0, 0).getCreateBitmap()
-        );
+        Canvas[][] canvases = makeBitmapGridCanvases();
 
         for (int i = 0; i < boxes.length; i++) {
             Position pos = zone.getPosition(i);
@@ -289,16 +285,20 @@ public class PlayboardRenderer {
 
             int x = (i % width) * boxSize;
             int y = (i / width) * boxSize;
-            this.drawBox(
-                canvas,
-                x, y,
-                pos.getRow(), pos.getCol(),
-                boxes[i],
-                null,
-                null, highlight,
-                suppressNotesLists,
-                false
-            );
+
+            Canvas canvas = getCanvas(canvases, x, y);
+            if (canvas != null) {
+                this.drawBox(
+                    canvas,
+                    x, y,
+                    pos.getRow(), pos.getCol(),
+                    boxes[i],
+                    null,
+                    null, highlight,
+                    suppressNotesLists,
+                    false
+                );
+            }
         }
 
         // draw highlight outline again as it will have been overpainted
@@ -307,7 +307,9 @@ public class PlayboardRenderer {
             int idx = zone.indexOf(highlight);
             if (idx > -1) {
                 int x = idx * boxSize;
-                drawBoxOutline(canvas, x, 0, profile.getCurrentLetterBox());
+                Canvas canvas = getCanvas(canvases, x, 0);
+                if (canvas != null)
+                    drawBoxOutline(canvas, x, 0, profile.getCurrentLetterBox());
             }
         }
 
@@ -356,9 +358,7 @@ public class PlayboardRenderer {
         if (initialiseBitmap(width, height))
             changes = null;
 
-        Canvas canvas = new Canvas(
-            bitmapGrid.getCell(0, 0).getCreateBitmap()
-        );
+        Canvas[][] canvases = makeBitmapGridCanvases();
 
         for (int i = 0; i < boxes.length; i++) {
             if (changes != null && !changes[i])
@@ -370,24 +370,32 @@ public class PlayboardRenderer {
 
             int x = (i % width) * boxSize;
             int y = (i / width) * boxSize;
-            this.drawBox(canvas,
-                         x, y,
-                         0, i,
-                         boxes[i],
-                         shadow,
-                         null,
-                         highlight,
-                         suppressNotesLists,
-                         false);
+
+            Canvas canvas = getCanvas(canvases, x, y);
+            if (canvas != null) {
+                this.drawBox(
+                    canvas,
+                    x, y,
+                    0, i,
+                    boxes[i],
+                    shadow,
+                    null,
+                    highlight,
+                    suppressNotesLists,
+                    false
+                );
+            }
         }
 
         if (highlight != null) {
             PaintProfile profile = getProfile();
             int col = highlight.getCol();
             if (col >= 0 && col < boxes.length) {
-                drawBoxOutline(
-                    canvas, col * boxSize, 0, profile.getCurrentLetterBox()
-                );
+                int x = col * boxSize;
+                int y = 0;
+                Canvas canvas = getCanvas(canvases, x, y);
+                if (canvas != null)
+                    drawBoxOutline(canvas, x, y, profile.getCurrentLetterBox());
             }
         }
 
@@ -1374,9 +1382,9 @@ public class PlayboardRenderer {
         );
     }
 
-    private void drawImages(Canvas canvas) {
+    private void drawImages(Canvas[][] canvases) {
         Puzzle puz = (board == null) ? null : board.getPuzzle();
-        if (puz == null)
+        if (puz == null || bitmapGrid == null)
             return;
 
         int boxSize = getBoxSize();
@@ -1394,12 +1402,41 @@ public class PlayboardRenderer {
                 int endx = startx + image.getWidth() * boxSize;
                 int endy = starty + image.getHeight() * boxSize;
 
-                canvas.drawBitmap(
-                    bmp,
-                    new Rect(0, 0, bmp.getWidth(), bmp.getHeight()),
-                    new Rect(startx, starty, endx, endy),
-                    null
-                );
+                // draw bitmap on each tile it covers
+                // (feels like this could be more efficient)$
+
+                Position tileStart
+                    = bitmapGrid.getPixelPosition(startx, starty);
+                Position tileEnd
+                    = bitmapGrid.getPixelPosition(endx, endy);
+
+                int startRow = tileStart == null ? 0 : tileStart.getRow();
+                int startCol = tileStart == null ? 0 : tileStart.getCol();
+                int endRow = tileEnd == null
+                    ? bitmapGrid.getNumRows()
+                    : tileEnd.getRow();
+                int endCol = tileEnd == null
+                    ? bitmapGrid.getNumCols()
+                    : tileEnd.getCol();
+
+                for (int row = startRow; row <= endRow; row++) {
+                    for (int col = startCol; col <= endCol; col++) {
+                        if (row < 0 || row > canvases.length)
+                            continue;
+                        if (col < 0 || col > canvases[row].length)
+                            continue;
+
+                        Canvas canvas = canvases[row][col];
+                        if (canvas != null) {
+                            canvas.drawBitmap(
+                                bmp,
+                                new Rect(0, 0, bmp.getWidth(), bmp.getHeight()),
+                                new Rect(startx, starty, endx, endy),
+                                null
+                            );
+                        }
+                    }
+                }
             }
         }
     }
@@ -1433,7 +1470,7 @@ public class PlayboardRenderer {
      * @param suppressNotesLists as in drawBox
      */
     private void drawPinnedClue(
-        Canvas canvas, Collection<Position> changes,
+        Canvas[][] canvases, Collection<Position> changes,
         Set<String> suppressNotesLists
     ) {
         Puzzle puz = this.board.getPuzzle();
@@ -1464,14 +1501,17 @@ public class PlayboardRenderer {
             int row = pos.getRow();
             int col = pos.getCol();
 
-            this.drawBox(
-                canvas,
-                x, y, row, col,
-                boxes[row][col],
-                null, currentWord, highlight,
-                suppressNotesLists,
-                true
-            );
+            Canvas canvas = getCanvas(canvases, x, y);
+            if (canvas != null) {
+                this.drawBox(
+                    canvas,
+                    x, y, row, col,
+                    boxes[row][col],
+                    null, currentWord, highlight,
+                    suppressNotesLists,
+                    true
+                );
+            }
         }
 
         // draw highlight outline again as it will have been overpainted
@@ -1480,9 +1520,38 @@ public class PlayboardRenderer {
             int idx = pinnedZone.indexOf(highlight);
             if (idx > -1) {
                 int x = (pinnedCol + idx) * boxSize;
-                drawBoxOutline(canvas, x, y, profile.getCurrentLetterBox());
+                Canvas canvas = getCanvas(canvases, x, y);
+                if (canvas != null)
+                    drawBoxOutline(canvas, x, y, profile.getCurrentLetterBox());
             }
         }
+    }
+
+    /**
+     * Find the canvas to use for the given pixel
+     *
+     * Assuming canvases is the same shape tile-wise as bitmapGrid.
+     *
+     * Returns null if not found, no bitmapGrid, &c.
+     */
+    private Canvas getCanvas(Canvas[][] canvases, int x, int y) {
+        if (bitmapGrid == null || canvases == null)
+            return null;
+
+        Position tilePos = bitmapGrid.getPixelPosition(x, y);
+        if (tilePos == null)
+            return null;
+
+        int row = tilePos.getRow();
+        int col = tilePos.getCol();
+
+        if (row < 0 || row >= canvases.length)
+            return null;
+
+        if (col < 0 || col >= canvases[row].length)
+            return null;
+
+        return canvases[row][col];
     }
 
     /**
@@ -1520,9 +1589,10 @@ public class PlayboardRenderer {
         int fullWidth = width * boxSize;
         int fullHeight = height * boxSize;
 
-        bitmapGrid = new BitmapGrid(
-            fullWidth, fullHeight, Math.max(fullWidth, fullHeight)
-        );
+        int cellsPerTile = MAX_BITMAP_DIM / boxSize;
+        int tileSize = cellsPerTile * boxSize;
+
+        bitmapGrid = new BitmapGrid(fullWidth, fullHeight, tileSize);
 
         return true;
     }
@@ -1553,7 +1623,8 @@ public class PlayboardRenderer {
     /**
      * Refresh board (current word) on canvas or draw all
      *
-     * @param canvas canvas to draw on
+     * @param canvas canvas matrix matching bitmapGrid tiles with a
+     * non-null canvas if the tile should be drawn
      * @param boxSize the size of a box
      * @param changes the positions that have changed since the last
      * draw (can be null, which means render all)
@@ -1562,7 +1633,7 @@ public class PlayboardRenderer {
      * draw none, empty means draw all)
      */
     private void drawBoardBoxes(
-        Canvas canvas,
+        Canvas[][] canvases,
         Collection<Position> changes,
         Set<String> suppressNotesLists
     ) {
@@ -1588,14 +1659,18 @@ public class PlayboardRenderer {
 
                 int x = col * boxSize;
                 int y = row * boxSize;
-                this.drawBox(
-                    canvas,
-                    x, y, row, col,
-                    boxes[row][col],
-                    null, currentWord, highlight,
-                    suppressNotesLists,
-                    true
-                );
+
+                Canvas canvas = getCanvas(canvases, x, y);
+                if (canvas != null) {
+                    this.drawBox(
+                        canvas,
+                        x, y, row, col,
+                        boxes[row][col],
+                        null, currentWord, highlight,
+                        suppressNotesLists,
+                        true
+                    );
+                }
             }
         }
 
@@ -1604,7 +1679,15 @@ public class PlayboardRenderer {
             PaintProfile profile = getProfile();
             int curX = highlight.getCol() * boxSize;
             int curY = highlight.getRow() * boxSize;
-            drawBoxOutline(canvas, curX, curY, profile.getCurrentLetterBox());
+
+            Canvas canvas = getCanvas(canvases, curX, curY);
+            if (canvas != null) {
+                drawBoxOutline(
+                    canvas,
+                    curX, curY,
+                    profile.getCurrentLetterBox()
+                );
+            }
         }
     }
 
@@ -1648,6 +1731,42 @@ public class PlayboardRenderer {
             return true;
 
         return false;
+    }
+
+    /**
+     * Get a matrix of canvases for drawing on tiles of the bitmapGrid
+     *
+     * Each tile will contain an exact number of puzzle cells.
+     */
+    private Canvas[][] makeBitmapGridCanvases() {
+        if (bitmapGrid == null)
+            return null;
+
+        int numRows = bitmapGrid.getNumRows();
+        int numCols = bitmapGrid.getNumCols();
+
+        Canvas[][] canvases = new Canvas[numRows][numCols];
+
+        int offsetX = 0;
+        int offsetY = 0;
+
+        for (int row = 0; row < numRows; row++) {
+            for (int col = 0; col < numCols; col++) {
+                BitmapGrid.Cell cell = bitmapGrid.getCell(row, col);
+                // never null
+                if (cell != null) {
+                    canvases[row][col] = new Canvas(cell.getCreateBitmap());
+                    canvases[row][col].translate(-offsetX, -offsetY);
+
+                    offsetX += cell.getWidth();
+                    if (col == numCols - 1)
+                        offsetY += cell.getHeight();
+                }
+            }
+            offsetX = 0;
+        }
+
+        return canvases;
     }
 
     private class PaintProfile {
