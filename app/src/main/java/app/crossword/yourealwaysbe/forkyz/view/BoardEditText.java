@@ -10,7 +10,6 @@ import javax.inject.Inject;
 
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.os.Handler;
 import android.text.InputType;

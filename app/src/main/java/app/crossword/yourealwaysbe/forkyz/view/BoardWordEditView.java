@@ -10,7 +10,6 @@ import java.util.function.Consumer;
 import javax.inject.Inject;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;

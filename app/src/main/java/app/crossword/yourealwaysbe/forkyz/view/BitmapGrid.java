@@ -3,6 +3,7 @@ package app.crossword.yourealwaysbe.forkyz.view;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Rect;
 
 import app.crossword.yourealwaysbe.puz.Position;
 
@@ -37,6 +38,11 @@ public class BitmapGrid {
         public Bitmap getBitmap() { return bitmap; }
 
         /**
+         * If bitmap is not null
+         */
+        public boolean hasBitmap() { return bitmap != null; }
+
+        /**
          * Get bitmap for drawing on, create if needed
          */
         public Bitmap getCreateBitmap() {
@@ -47,6 +53,10 @@ public class BitmapGrid {
                 bitmap.eraseColor(Color.TRANSPARENT);
             }
             return bitmap;
+        }
+
+        public void destroyBitmap() {
+            bitmap = null;
         }
     }
 
@@ -108,6 +118,8 @@ public class BitmapGrid {
 
     /**
      * Get the tile position containing pixel (x, y) or null
+     *
+     * I.e. row/col of tile in tile grid (not puzzle cell grid)
      */
     public Position getPixelPosition(int x, int y) {
         if (
@@ -115,6 +127,28 @@ public class BitmapGrid {
             && 0 <= y && y < getHeight()
         ) {
             return new Position(y / tileSize, x / tileSize);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * The rect covered by the tile
+     *
+     * Null if out of bounds
+     */
+    public Rect getTileRect(int row, int col) {
+        if (
+            0 <= row && row < getNumRows()
+            && 0 <= col && col < getNumCols()
+        ) {
+            Tile tile = getTile(row, col);
+            int startX = col * tileSize;
+            int startY = row * tileSize;
+            int endX = startX + ((tile == null) ? tileSize : tile.getWidth());
+            int endY = startY + ((tile == null) ? tileSize : tile.getHeight());
+
+            return new Rect(startX, startY, endX, endY);
         } else {
             return null;
         }

@@ -3,7 +3,7 @@ package app.crossword.yourealwaysbe.forkyz.view;
 import java.util.logging.Logger;
 
 import android.content.Context;
-import android.graphics.Bitmap;
+import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.GestureDetector.OnGestureListener;
@@ -34,6 +34,9 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
     private int boardStickyBorder;
     private int gestureStartX;
     private int gestureStartY;
+    // count of num requests to block scroll end for internal scroll
+    // movements
+    private int numBlockScrollEnd = 0;
 
     private GridLayout imageGrid;
     // the "true" size of each bitmap in the grid in child order of
@@ -238,17 +241,30 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
         int currentY = this.getScrollY();
         int currentMaxY = this.getHeight() + this.getScrollY();
 
+        boolean scrolled = false;
+
+        pushBlockScrollEnd();
+
         if (x < currentX) {
             this.scrollTo(x, currentY);
+            scrolled = true;
         } else if (x > currentMaxX) {
             this.scrollTo(x - this.getWidth(), currentY);
+            scrolled = true;
         }
 
         if (y < currentY) {
             this.scrollTo(currentX, y);
+            scrolled = true;
         } else if (y > currentMaxY) {
             this.scrollTo(currentX, y - this.getHeight());
+            scrolled = true;
         }
+
+        popBlockScrollEnd();
+
+        if (scrolled)
+            scrollEnd();
     }
 
     public boolean onDown(MotionEvent e) {
@@ -326,6 +342,7 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
         this.allowZoom = allowZoom;
     }
 
+    @Override
     public void scrollBy(int x, int y) {
         int curX = this.getScrollX();
         int curY = this.getScrollY();
@@ -383,11 +400,17 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
             (!allowOverScroll || newY < boardStickyBorder))
             newY = 0;
 
-        super.scrollTo(newX, newY);
+        scrollTo(newX, newY);
     }
 
+    @Override
     public void scrollTo(int x, int y) {
-        super.scrollTo(x, y);
+        if (x != getScrollX() || y != getScrollY()) {
+            super.scrollTo(x, y);
+
+            if (!isBlockScrollEnd())
+                scrollEnd();
+        }
     }
 
     public void zoom(float scale, int x, int y) {
@@ -482,6 +505,7 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
     private void onTouchStart() {
         gestureStartX = getScrollX();
         gestureStartY = getScrollY();
+        pushBlockScrollEnd();
     }
 
     /**
@@ -490,7 +514,11 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
      * Currently does nothing
      */
     private void onTouchEnd() {
-        // pass
+        popBlockScrollEnd();
+        if (gestureStartX != getScrollX() || gestureStartY != getScrollY()) {
+            if (!isBlockScrollEnd())
+                scrollEnd();
+        }
     }
 
     /**
@@ -500,6 +528,14 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
      */
     private void onTouchCancel() {
         scrollTo(gestureStartX, gestureStartY);
+        popBlockScrollEnd();
+    }
+
+    /**
+     * Called when a scrolling gesture has finished, or scroll jumped
+     */
+    protected void scrollEnd() {
+        // Do nothing, for overriding
     }
 
     public interface AuxTouchHandler {
@@ -515,6 +551,26 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
 
     public interface ScaleListener {
         void onScale(float scale);
+    }
+
+    /**
+     * The area visible on screen
+     *
+     * Not limited to the size of the bitmap. Takes scroll position into
+     * account. Does not go below 0. E.g. if the x range was 100-600
+     * then those 500 pixels of the bitmap could be visible, if the
+     * bitmap were wide enough.
+     */
+    public Rect getVisibleRect() {
+        Point topLeft = resolveToImagePoint(0, 0);
+        Point bottomRight = resolveToImagePoint(getWidth(), getHeight());
+        Rect rect = new Rect(
+            Math.max(0, topLeft.x),
+            Math.max(0, topLeft.y),
+            Math.max(0, bottomRight.x),
+            Math.max(0, bottomRight.y)
+        );
+        return rect;
     }
 
     /**
@@ -569,6 +625,19 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
             lp.height = height;
             view.setLayoutParams(lp);
         }
+    }
+
+    private void pushBlockScrollEnd() {
+        numBlockScrollEnd += 1;
+    }
+
+    private void popBlockScrollEnd() {
+        if (numBlockScrollEnd > 0)
+            numBlockScrollEnd -= 1;
+    }
+
+    private boolean isBlockScrollEnd() {
+        return numBlockScrollEnd > 0;
     }
 
     public static class Point {
@@ -629,7 +698,9 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
             int newScrollX = newPoint.x - this.absoluteX;
             int newScrollY = newPoint.y - this.absoluteY;
 
-            ScrollingImageView.this.scrollTo(newScrollX, newScrollY);
+            pushBlockScrollEnd();
+            scrollTo(newScrollX, newScrollY);
+            popBlockScrollEnd();
         }
     }
 

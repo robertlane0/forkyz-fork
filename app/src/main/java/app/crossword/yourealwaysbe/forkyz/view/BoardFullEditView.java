@@ -8,8 +8,9 @@ import java.util.Set;
 import javax.inject.Inject;
 
 import android.content.Context;
-import android.graphics.Bitmap;
+import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -28,9 +29,19 @@ import app.crossword.yourealwaysbe.puz.Puzzle;
  */
 @AndroidEntryPoint
 public class BoardFullEditView extends BoardEditView {
+    // how far off screen in inches to still draw grid
+    private static final int SCREEN_OVERDRAW = 2;
+
+    // screen overdraw in pixels
+    private int screenOverdrawPx;
+
     @Inject
     public BoardFullEditView(Context context, AttributeSet attrs) {
         super(context, attrs);
+
+        DisplayMetrics metrics
+            = getContext().getResources().getDisplayMetrics();
+        screenOverdrawPx = metrics.densityDpi * SCREEN_OVERDRAW;
     }
 
     @Override
@@ -116,8 +127,9 @@ public class BoardFullEditView extends BoardEditView {
             executorService.execute(() -> {
                 try {
                     lockRenderer();
-                    BitmapGrid bitmap
-                        = renderer.draw(localChanges, suppressNotesList);
+                    BitmapGrid bitmap = renderer.draw(
+                        localChanges, suppressNotesList, getRenderRect()
+                    );
                     handler.post(() -> {
                         try { setBitmap(bitmap, rescale); }
                         finally { unlockRenderer(); }
@@ -156,6 +168,23 @@ public class BoardFullEditView extends BoardEditView {
                 notifyClick(position, previousWord);
             }
         }
+    }
+
+    @Override
+    protected void scrollEnd() {
+        super.scrollEnd();
+        render(Collections.emptySet());
+    }
+
+    /**
+     * The area of grid to draw during render
+     *
+     * Will be visible rect, plus a buffer
+     */
+    private Rect getRenderRect() {
+        Rect rect = getVisibleRect();
+        rect.inset(-screenOverdrawPx, -screenOverdrawPx);
+        return rect;
     }
 
     private void ensureVisible(Word previousWord) {
