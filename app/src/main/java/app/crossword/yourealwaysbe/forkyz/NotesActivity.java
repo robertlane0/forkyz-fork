@@ -130,7 +130,7 @@ public class NotesActivity extends PuzzleActivity {
         finishOnHomeButton();
         setupSideInsets(binding.toolbar);
         setupBottomInsets(binding.content);
-        setStatusBarElevation(binding.appBarLayout);
+        setupStatusBar(binding.appBarLayout);
 
         int clueTextSize
             = getResources().getInteger(R.integer.clue_text_size);

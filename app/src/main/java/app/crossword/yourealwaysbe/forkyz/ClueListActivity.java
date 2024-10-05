@@ -81,7 +81,7 @@ public class ClueListActivity extends PuzzleActivity
         finishOnHomeButton();
         setupSideInsets(binding.toolbar);
         setupBottomInsets(binding.content);
-        setStatusBarElevation(binding.appBarLayout);
+        setupStatusBar(binding.appBarLayout);
 
         binding.miniboard.setAllowOverScroll(false);
 

@@ -28,10 +28,13 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.core.app.ShareCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.accessibility.AccessibilityViewCommand;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
+import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import dagger.hilt.android.AndroidEntryPoint;
@@ -1089,6 +1092,64 @@ public abstract class PuzzleActivity
             dictionary.query(this, request.toString());
         });
     }
+
+    /**
+     * Setup status bar stuff
+     *
+     * Elevation and colour to match show errors
+     */
+    protected void setupStatusBar(AppBarLayout appBarLayout) {
+        setStatusBarElevation(appBarLayout);
+
+        Observer<Boolean> showErrorsObserver = v -> {
+            setStatusBarColor(appBarLayout);
+        };
+        settings.livePlayIndicateShowErrors().observe(this, showErrorsObserver);
+        settings.livePlayShowErrorsClue().observe(this, showErrorsObserver);
+        settings.livePlayShowErrorsCursor().observe(this, showErrorsObserver);
+        settings.livePlayShowErrorsGrid().observe(this, showErrorsObserver);
+
+    }
+
+    /**
+     * Set status based on current values of show errors
+     *
+     * Uses LiveData.getValue, does nothing if settings not live yet
+     */
+    private void setStatusBarColor(AppBarLayout appBarLayout) {
+        Boolean indicateShowErrors
+            = settings.livePlayIndicateShowErrors().getValue();
+        Boolean showErrorsClue = settings.livePlayShowErrorsClue().getValue();
+        Boolean showErrorsCursor
+            = settings.livePlayShowErrorsCursor().getValue();
+        Boolean showErrorsGrid = settings.livePlayShowErrorsGrid().getValue();
+
+        if (
+            indicateShowErrors == null
+            || showErrorsClue == null
+            || showErrorsCursor == null
+            || showErrorsGrid == null
+        )
+            return;
+
+        Puzzle puz = getPuzzle();
+        if (
+            puz != null
+            && puz.hasSolution()
+            && indicateShowErrors
+            && (
+                showErrorsClue || showErrorsCursor || showErrorsGrid
+            )
+        ) {
+            setStatusBarColor(
+                appBarLayout,
+                ContextCompat.getColor(this, R.color.cheatedColor)
+            );
+        } else {
+            resetStatusBarColor(appBarLayout);
+        }
+    }
+
 
     /**
      * Flag currently selected cell
