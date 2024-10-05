@@ -56,6 +56,7 @@ import app.crossword.yourealwaysbe.forkyz.view.ChooseFlagColorDialog;
 import app.crossword.yourealwaysbe.forkyz.view.ClueEditDialog;
 import app.crossword.yourealwaysbe.forkyz.view.PlayboardTextRenderer;
 import app.crossword.yourealwaysbe.forkyz.view.PuzzleInfoDialogs;
+import app.crossword.yourealwaysbe.forkyz.view.PuzzleInfoDialogs;
 import app.crossword.yourealwaysbe.forkyz.view.SpecialEntryDialog;
 import app.crossword.yourealwaysbe.puz.Box;
 import app.crossword.yourealwaysbe.puz.Clue;
@@ -306,6 +307,9 @@ public abstract class PuzzleActivity
         } else if (id == R.id.puzzle_menu_reveal_puzzle) {
             showRevealPuzzleDialog();
             return true;
+        } else if (id == R.id.puzzle_menu_info) {
+            showInfoDialog();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -520,6 +524,11 @@ public abstract class PuzzleActivity
     private void showRevealPuzzleDialog() {
         DialogFragment dialog = new RevealPuzzleDialog();
         dialog.show(getSupportFragmentManager(), "RevealPuzzleDialog");
+    }
+
+    private void showInfoDialog() {
+        DialogFragment dialog = new PuzzleInfoDialogs.Info();
+        dialog.show(getSupportFragmentManager(), "PuzzleInfoDialgs.Info");
     }
 
     private void canRequestHelpForCurrentClue(Consumer<Boolean> cb) {

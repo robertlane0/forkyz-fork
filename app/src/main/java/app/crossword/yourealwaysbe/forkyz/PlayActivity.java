@@ -512,9 +512,6 @@ public class PlayActivity extends PuzzleActivity
                 float newScale = binding.boardView.zoomReset();
                 settings.setPlayScale(newScale);
                 return true;
-            } else if (id == R.id.play_menu_info) {
-                showInfoDialog();
-                return true;
             } else if (id == R.id.play_menu_clues) {
                 PlayActivity.this.launchClueList();
                 return true;
@@ -833,11 +830,6 @@ public class PlayActivity extends PuzzleActivity
         set.clone(binding.constraintLayout);
         set.setVisibility(binding.clueTabs.getId(), ConstraintSet.GONE);
         set.applyTo(binding.constraintLayout);
-    }
-
-    private void showInfoDialog() {
-        DialogFragment dialog = new PuzzleInfoDialogs.Info();
-        dialog.show(getSupportFragmentManager(), "PuzzleInfoDialgs.Info");
     }
 
     private void setFullScreenMode() {

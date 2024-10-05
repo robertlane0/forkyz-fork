@@ -92,6 +92,11 @@
         </menu>
     </item>
     <item
+        android:id="@+id/puzzle_menu_info"
+        android:icon="@android:drawable/ic_menu_info_details"
+        android:title="@string/info"
+    />
+    <item
         android:id="@+id/puzzle_menu_share"
         android:title="@string/share"
     >
