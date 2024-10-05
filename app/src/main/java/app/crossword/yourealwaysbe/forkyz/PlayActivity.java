@@ -367,21 +367,6 @@ public class PlayActivity extends PuzzleActivity
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        super.onPrepareOptionsMenu(menu);
-
-        Puzzle puz = getPuzzle();
-
-        if (puz == null || puz.getSupportUrl() == null) {
-            MenuItem support = menu.findItem(R.id.play_menu_support_source);
-            support.setVisible(false);
-            support.setEnabled(false);
-        }
-
-        return true;
-    }
-
-    @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         boolean handled = isHandledKey(keyCode, event);
         if (!handled)
@@ -529,9 +514,6 @@ public class PlayActivity extends PuzzleActivity
                     HTMLActivity.class
                 );
                 this.startActivity(helpIntent);
-                return true;
-            } else if (id == R.id.play_menu_support_source) {
-                actionSupportSource();
                 return true;
             }
         }
@@ -837,18 +819,6 @@ public class PlayActivity extends PuzzleActivity
             if (fullScreen)
                 utils.setFullScreen(getWindow());
         });
-    }
-
-    private void actionSupportSource() {
-        Puzzle puz = getPuzzle();
-        if (puz != null) {
-            String supportUrl = puz.getSupportUrl();
-            if (supportUrl != null) {
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse(supportUrl));
-                startActivity(i);
-            }
-        }
     }
 
     private void setupVoiceCommands() {

@@ -114,6 +114,10 @@
         android:title="@string/info"
     />
     <item
+        android:id="@+id/puzzle_menu_support_source"
+        android:title="@string/support_puzzle_source"
+    />
+    <item
         android:id="@+id/puzzle_menu_share"
         android:icon="@android:drawable/ic_menu_share"
         android:title="@string/share"

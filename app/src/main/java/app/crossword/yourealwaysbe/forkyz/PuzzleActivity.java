@@ -209,6 +209,12 @@ public abstract class PuzzleActivity
         menu.findItem(R.id.puzzle_menu_reveal_initial_letters)
             .setVisible(getHasInitialValues());
 
+        if (puz == null || puz.getSupportUrl() == null) {
+            MenuItem support = menu.findItem(R.id.puzzle_menu_support_source);
+            support.setVisible(false);
+            support.setEnabled(false);
+        }
+
         return true;
     }
 
@@ -309,6 +315,9 @@ public abstract class PuzzleActivity
             return true;
         } else if (id == R.id.puzzle_menu_info) {
             showInfoDialog();
+            return true;
+        } else if (id == R.id.puzzle_menu_support_source) {
+            actionSupportSource();
             return true;
         }
 
@@ -529,6 +538,18 @@ public abstract class PuzzleActivity
     private void showInfoDialog() {
         DialogFragment dialog = new PuzzleInfoDialogs.Info();
         dialog.show(getSupportFragmentManager(), "PuzzleInfoDialgs.Info");
+    }
+
+    private void actionSupportSource() {
+        Puzzle puz = getPuzzle();
+        if (puz != null) {
+            String supportUrl = puz.getSupportUrl();
+            if (supportUrl != null) {
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(supportUrl));
+                startActivity(i);
+            }
+        }
     }
 
     private void canRequestHelpForCurrentClue(Consumer<Boolean> cb) {
