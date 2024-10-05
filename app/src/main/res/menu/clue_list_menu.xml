@@ -149,4 +149,9 @@
             />
         </menu>
     </item>
+    <item
+        android:id="@+id/puzzle_menu_help"
+        android:icon="@android:drawable/ic_menu_help"
+        android:title="@string/help"
+    />
 </menu>

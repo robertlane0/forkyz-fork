@@ -506,15 +506,6 @@ public class PlayActivity extends PuzzleActivity
             } else if (id == R.id.play_menu_player_notes) {
                 launchPuzzleNotes();
                 return true;
-            } else if (id == R.id.play_menu_help) {
-                Intent helpIntent = new Intent(
-                    Intent.ACTION_VIEW,
-                    Uri.parse("playscreen.html"),
-                    this,
-                    HTMLActivity.class
-                );
-                this.startActivity(helpIntent);
-                return true;
             }
         }
 

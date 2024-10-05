@@ -319,6 +319,15 @@ public abstract class PuzzleActivity
         } else if (id == R.id.puzzle_menu_support_source) {
             actionSupportSource();
             return true;
+        } else if (id == R.id.puzzle_menu_help) {
+            Intent helpIntent = new Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("play.html"),
+                this,
+                HTMLActivity.class
+            );
+            this.startActivity(helpIntent);
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
