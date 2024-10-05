@@ -12,6 +12,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -84,6 +85,7 @@ public abstract class PuzzleActivity
     private PlayboardTextRenderer textRenderer;
     private TextToSpeech ttsService = null;
     private boolean ttsReady = false;
+    private boolean hasInitialValues = false;
 
     private LiveData<Boolean> volumeActivatesVoice;
     private LiveData<Boolean> equalsAnnounceClue;
@@ -118,7 +120,9 @@ public abstract class PuzzleActivity
         if (!super.onPrepareOptionsMenu(menu))
             return false;
 
+        Playboard board = getBoard();
         Puzzle puz = getPuzzle();
+
         String shareUrl = puz == null ? null : puz.getShareUrl();
         if (shareUrl == null || shareUrl.isEmpty()) {
             MenuItem open = menu.findItem(R.id.puzzle_menu_open_share_url);
@@ -190,6 +194,19 @@ public abstract class PuzzleActivity
             menu.findItem(R.id.puzzle_menu_show_errors_clue)
                 .setChecked(showErrorsClue);
         });});});
+
+
+        MenuItem reveal = menu.findItem(R.id.puzzle_menu_reveal);
+        reveal.setEnabled(canSolve);
+        reveal.setVisible(canSolve);
+
+        Box box = (board == null) ? null : board.getCurrentBox();
+        boolean hasInitial = !Box.isBlock(box) && box.hasInitialValue();
+        menu.findItem(R.id.puzzle_menu_reveal_initial_letter)
+            .setVisible(hasInitial);
+
+        menu.findItem(R.id.puzzle_menu_reveal_initial_letters)
+            .setVisible(getHasInitialValues());
 
         return true;
     }
@@ -271,6 +288,24 @@ public abstract class PuzzleActivity
                 !getBoard().isShowErrorsCursor()
             );
             return true;
+        } else if (id == R.id.puzzle_menu_reveal_initial_letter) {
+            getBoard().revealInitialLetter();
+            return true;
+        } else if (id == R.id.puzzle_menu_reveal_letter) {
+            getBoard().revealLetter();
+            return true;
+        } else if (id == R.id.puzzle_menu_reveal_word) {
+            getBoard().revealWord();
+            return true;
+        } if (id == R.id.puzzle_menu_reveal_initial_letters) {
+            getBoard().revealInitialLetters();
+            return true;
+        } else if (id == R.id.puzzle_menu_reveal_errors) {
+            getBoard().revealErrors();
+            return true;
+        } else if (id == R.id.puzzle_menu_reveal_puzzle) {
+            showRevealPuzzleDialog();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -329,6 +364,11 @@ public abstract class PuzzleActivity
         Playboard board = getBoard();
         if (board != null)
             board.addListener(this);
+
+        hasInitialValues = puz != null && puz.hasInitialValueCells();
+
+        // anything in puzzle could have changed
+        invalidateOptionsMenu();
     }
 
     @Override
@@ -373,6 +413,13 @@ public abstract class PuzzleActivity
             break;
         }
         return super.onKeyUp(keyCode, event);
+    }
+
+    /**
+     * Whether the current puzzle has initial values
+     */
+    protected boolean getHasInitialValues() {
+        return hasInitialValues;
     }
 
     /**
@@ -468,6 +515,11 @@ public abstract class PuzzleActivity
     protected void launchPuzzleNotes() {
         Intent i = new Intent(this, NotesActivity.class);
         this.startActivity(i);
+    }
+
+    private void showRevealPuzzleDialog() {
+        DialogFragment dialog = new RevealPuzzleDialog();
+        dialog.show(getSupportFragmentManager(), "RevealPuzzleDialog");
     }
 
     private void canRequestHelpForCurrentClue(Consumer<Boolean> cb) {
@@ -1267,6 +1319,38 @@ public abstract class PuzzleActivity
             ChooseFlagColorDialog.addBoxPositionToBundle(args, pos);
             dialog.setArguments(args);
             dialog.show(getSupportFragmentManager(), "ChooseFlagColorDialog");
+        }
+    }
+
+    public static class RevealPuzzleDialog extends DialogFragment {
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            MaterialAlertDialogBuilder builder
+                = new MaterialAlertDialogBuilder(getActivity());
+
+            builder.setTitle(getString(R.string.reveal_puzzle))
+                .setMessage(getString(R.string.are_you_sure))
+                .setPositiveButton(
+                    R.string.ok,
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            Playboard board
+                                = ((PuzzleActivity) getActivity()).getBoard();
+                            if (board != null)
+                                 board.revealPuzzle();
+                        }
+                    }
+                )
+                .setNegativeButton(
+                    R.string.cancel,
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    }
+                );
+
+            return builder.create();
         }
     }
 }

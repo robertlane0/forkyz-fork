@@ -36,6 +36,38 @@
         </menu>
     </item>
     <item
+        android:id="@+id/puzzle_menu_reveal"
+        android:icon="@android:drawable/ic_menu_view"
+        android:title="@string/reveal"
+    >
+        <menu>
+            <item
+                android:id="@+id/puzzle_menu_reveal_initial_letter"
+                android:title="@string/initial_letter"
+            />
+            <item
+                android:id="@+id/puzzle_menu_reveal_letter"
+                android:title="@string/letter"
+            />
+            <item
+                android:id="@+id/puzzle_menu_reveal_word"
+                android:title="@string/word"
+            />
+            <item
+                android:id="@+id/puzzle_menu_reveal_initial_letters"
+                android:title="@string/initial_letters"
+            />
+            <item
+                android:id="@+id/puzzle_menu_reveal_errors"
+                android:title="@string/errors"
+            />
+            <item
+                android:id="@+id/puzzle_menu_reveal_puzzle"
+                android:title="@string/puzzle"
+            />
+        </menu>
+    </item>
+    <item
         android:id="@+id/puzzle_menu_external_tools"
         android:icon="@android:drawable/ic_menu_view"
         android:title="@string/external_tools"

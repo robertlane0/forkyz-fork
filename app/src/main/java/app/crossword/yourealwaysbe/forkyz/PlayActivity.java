@@ -2,7 +2,6 @@ package app.crossword.yourealwaysbe.forkyz;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.hardware.SensorManager;
@@ -68,7 +67,6 @@ public class PlayActivity extends PuzzleActivity
     private PlayBinding binding;
     private Handler handler = new Handler(Looper.getMainLooper());
     private KeyboardManager keyboardManager;
-    private boolean hasInitialValues = false;
     private ShakeDetector shakeDetector = null;
 
     // Proper value is loaded before this is used anyway
@@ -372,7 +370,6 @@ public class PlayActivity extends PuzzleActivity
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
 
-        Playboard board = getBoard();
         Puzzle puz = getPuzzle();
 
         if (puz == null || puz.getSupportUrl() == null) {
@@ -380,19 +377,6 @@ public class PlayActivity extends PuzzleActivity
             support.setVisible(false);
             support.setEnabled(false);
         }
-
-        boolean canSolve = puz != null && puz.hasSolution();
-        MenuItem reveal = menu.findItem(R.id.play_menu_reveal);
-        reveal.setEnabled(canSolve);
-        reveal.setVisible(canSolve);
-
-        Box box = (board == null) ? null : board.getCurrentBox();
-        boolean hasInitial = !Box.isBlock(box) && box.hasInitialValue();
-        menu.findItem(R.id.play_menu_reveal_initial_letter)
-            .setVisible(hasInitial);
-
-        menu.findItem(R.id.play_menu_reveal_initial_letters)
-            .setVisible(hasInitialValues);
 
         return true;
     }
@@ -505,25 +489,7 @@ public class PlayActivity extends PuzzleActivity
         }
 
         if (getBoard() != null) {
-            if (id == R.id.play_menu_reveal_initial_letter) {
-                getBoard().revealInitialLetter();
-                return true;
-            } if (id == R.id.play_menu_reveal_letter) {
-                getBoard().revealLetter();
-                return true;
-            } else if (id == R.id.play_menu_reveal_word) {
-                getBoard().revealWord();
-                return true;
-            } if (id == R.id.play_menu_reveal_initial_letters) {
-                getBoard().revealInitialLetters();
-                return true;
-            } else if (id == R.id.play_menu_reveal_errors) {
-                getBoard().revealErrors();
-                return true;
-            } else if (id == R.id.play_menu_reveal_puzzle) {
-                showRevealPuzzleDialog();
-                return true;
-            } else if (id == R.id.play_menu_settings) {
+            if (id == R.id.play_menu_settings) {
                 Intent i = new Intent(this, PreferencesActivity.class);
                 this.startActivity(i);
                 return true;
@@ -633,7 +599,7 @@ public class PlayActivity extends PuzzleActivity
         setClueText();
 
         // changed cells could mean change in reveal letters options
-        if (hasInitialValues)
+        if (getHasInitialValues())
             invalidateOptionsMenu();
     }
 
@@ -720,7 +686,6 @@ public class PlayActivity extends PuzzleActivity
 
         setClueText();
 
-        hasInitialValues = puz.hasInitialValueCells();
         // always invalidate as anything in puzzle could have changed
         invalidateOptionsMenu();
     }
@@ -873,11 +838,6 @@ public class PlayActivity extends PuzzleActivity
     private void showInfoDialog() {
         DialogFragment dialog = new PuzzleInfoDialogs.Info();
         dialog.show(getSupportFragmentManager(), "PuzzleInfoDialgs.Info");
-    }
-
-    private void showRevealPuzzleDialog() {
-        DialogFragment dialog = new RevealPuzzleDialog();
-        dialog.show(getSupportFragmentManager(), "RevealPuzzleDialog");
     }
 
     private void setFullScreenMode() {
@@ -1236,37 +1196,5 @@ public class PlayActivity extends PuzzleActivity
                 );
             }
         });
-    }
-
-    public static class RevealPuzzleDialog extends DialogFragment {
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            MaterialAlertDialogBuilder builder
-                = new MaterialAlertDialogBuilder(getActivity());
-
-            builder.setTitle(getString(R.string.reveal_puzzle))
-                .setMessage(getString(R.string.are_you_sure))
-                .setPositiveButton(
-                    R.string.ok,
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            Playboard board
-                                = ((PlayActivity) getActivity()).getBoard();
-                            if (board != null)
-                                 board.revealPuzzle();
-                        }
-                    }
-                )
-                .setNegativeButton(
-                    R.string.cancel,
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    }
-                );
-
-            return builder.create();
-        }
     }
 }
