@@ -496,12 +496,6 @@ public class PlayActivity extends PuzzleActivity
             } else if (id == R.id.play_menu_clues) {
                 PlayActivity.this.launchClueList();
                 return true;
-            } else if (id == R.id.play_menu_clue_notes) {
-                launchClueNotes(getBoard().getClueID());
-                return true;
-            } else if (id == R.id.play_menu_player_notes) {
-                launchPuzzleNotes();
-                return true;
             }
         }
 

@@ -37,13 +37,7 @@ public class ClueListActivity extends PuzzleActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.clue_list_menu_clue_notes) {
-            launchClueNotes(getBoard().getClueID());
-            return true;
-        } else if (id == R.id.clue_list_menu_puzzle_notes) {
-            launchPuzzleNotes();
-            return true;
-        } else if (id == R.id.clue_list_menu_show_words) {
+        if (id == R.id.clue_list_menu_show_words) {
             toggleShowWords();
             return true;
         }

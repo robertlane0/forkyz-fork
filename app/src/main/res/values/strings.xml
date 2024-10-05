@@ -109,7 +109,6 @@
     <string name="copy_conflict">Copy Conflict</string>
     <string name="transfer_overwrite_warning">Transferring the response conflicts with existing entries. Overwrite anyway?</string>
     <string name="flag_clue">Flag clue</string>
-    <string name="player_notes">Puzzle Notes</string>
     <string name="transfer_board_to_focussed_view">Transfer board contents to currently focussed view</string>
     <string name="transfer_scratch_to_focussed_view">Transfer scratch contents to the currently focussed view</string>
     <string name="shuffle_anagram_source">Shuffle anagram source letters</string>
@@ -441,10 +440,10 @@
     <string name="share_puzzle_orig">Blank Puzzle</string>
     <string name="share_puzzle_open_share_url">Open Share URL</string>
     <string name="menu_flag_cell_toggle">Toggle Cell Flag</string>
+    <string name="menu_notes_clue">Clue Notes</string>
+    <string name="menu_notes_puzzle">Puzzle Notes</string>
 
     <!-- clue list menu -->
-    <string name="menu_clue_notes">Clue Notes</string>
-    <string name="menu_puzzle_notes">Puzzle Notes</string>
     <string name="show_all_words_clue_list">Show all words</string>
 
     <!-- play menu -->
@@ -473,8 +472,6 @@
     <string name="info">Info</string>
     <string name="support_puzzle_source">Support Puzzle Source</string>
     <string name="menu_notes">Notes</string>
-    <string name="menu_notes_clue">Clue</string>
-    <string name="menu_notes_player">Puzzle</string>
     <string name="external_tools">External Tools</string>
     <string name="help_external_dictionary">Dictionary</string>
     <string name="help_crossword_solver">Crossword Solver</string>

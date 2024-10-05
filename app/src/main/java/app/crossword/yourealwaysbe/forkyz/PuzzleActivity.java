@@ -278,6 +278,12 @@ public abstract class PuzzleActivity
         } else if (id == R.id.puzzle_menu_external_dictionary) {
             callExternalDictionary();
             return true;
+        } else if (id == R.id.puzzle_menu_clue_notes) {
+            launchClueNotes(getBoard().getClueID());
+            return true;
+        } else if (id == R.id.puzzle_menu_puzzle_notes) {
+            launchPuzzleNotes();
+            return true;
         } else if (id == R.id.puzzle_menu_flag_cell_toggle) {
             toggleCellFlag();
             return true;

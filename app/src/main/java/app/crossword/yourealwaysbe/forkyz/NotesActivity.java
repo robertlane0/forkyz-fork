@@ -1189,7 +1189,7 @@ public class NotesActivity extends PuzzleActivity {
     private void setClueLineText() {
         if (isPuzzleNotes()) {
             binding.clueHolder.clueLine.setText(
-                getString(R.string.player_notes)
+                getString(R.string.puzzle_notes)
             );
         } else {
             Clue clue = getNotesClue();
