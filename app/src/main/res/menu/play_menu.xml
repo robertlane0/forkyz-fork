@@ -186,7 +186,7 @@
         android:title="@string/help"
     />
     <item
-        android:id="@+id/play_menu_settings"
+        android:id="@+id/puzzle_menu_settings"
         android:icon="@android:drawable/ic_menu_preferences"
         android:title="@string/settings"
     />

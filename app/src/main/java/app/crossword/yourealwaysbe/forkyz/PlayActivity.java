@@ -474,11 +474,7 @@ public class PlayActivity extends PuzzleActivity
         }
 
         if (getBoard() != null) {
-            if (id == R.id.play_menu_settings) {
-                Intent i = new Intent(this, PreferencesActivity.class);
-                this.startActivity(i);
-                return true;
-            } else if (id == R.id.play_menu_zoom_in) {
+            if (id == R.id.play_menu_zoom_in) {
                 float newScale = binding.boardView.zoomIn();
                 settings.setPlayScale(newScale);
                 return true;

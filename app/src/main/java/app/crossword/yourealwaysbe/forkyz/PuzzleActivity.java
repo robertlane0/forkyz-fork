@@ -328,6 +328,10 @@ public abstract class PuzzleActivity
             );
             this.startActivity(helpIntent);
             return true;
+        } else if (id == R.id.puzzle_menu_settings) {
+            Intent i = new Intent(this, PreferencesActivity.class);
+            this.startActivity(i);
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
