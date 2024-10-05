@@ -382,31 +382,9 @@ public class PlayActivity extends PuzzleActivity
         }
 
         boolean canSolve = puz != null && puz.hasSolution();
-
-        MenuItem showErrors = menu.findItem(R.id.play_menu_show_errors);
         MenuItem reveal = menu.findItem(R.id.play_menu_reveal);
-        showErrors.setEnabled(canSolve);
-        showErrors.setVisible(canSolve);
         reveal.setEnabled(canSolve);
         reveal.setVisible(canSolve);
-
-        settings.getPlayShowErrorsClue(showErrorsClue -> {
-        settings.getPlayShowErrorsCursor(showErrorsCursor -> {
-        settings.getPlayShowErrorsGrid(showErrorsGrid -> {
-            int showErrorsTitle =
-                (showErrorsGrid || showErrorsCursor || showErrorsClue)
-                ? R.string.showing_errors
-                : R.string.show_errors;
-
-            showErrors.setTitle(showErrorsTitle);
-
-            menu.findItem(R.id.play_menu_show_errors_grid)
-                .setChecked(showErrorsGrid);
-            menu.findItem(R.id.play_menu_show_errors_cursor)
-                .setChecked(showErrorsCursor);
-            menu.findItem(R.id.play_menu_show_errors_clue)
-                .setChecked(showErrorsClue);
-        });});});
 
         Box box = (board == null) ? null : board.getCurrentBox();
         boolean hasInitial = !Box.isBlock(box) && box.hasInitialValue();
@@ -544,17 +522,6 @@ public class PlayActivity extends PuzzleActivity
                 return true;
             } else if (id == R.id.play_menu_reveal_puzzle) {
                 showRevealPuzzleDialog();
-                return true;
-            } else if (id == R.id.play_menu_show_errors_grid) {
-                settings.setPlayShowErrorsGrid(!getBoard().isShowErrorsGrid());
-                return true;
-            } else if (id == R.id.play_menu_show_errors_clue) {
-                settings.setPlayShowErrorsClue(!getBoard().isShowErrorsClue());
-                return true;
-            } else if (id == R.id.play_menu_show_errors_cursor) {
-                settings.setPlayShowErrorsCursor(
-                    !getBoard().isShowErrorsCursor()
-                );
                 return true;
             } else if (id == R.id.play_menu_settings) {
                 Intent i = new Intent(this, PreferencesActivity.class);
@@ -800,42 +767,6 @@ public class PlayActivity extends PuzzleActivity
     }
 
     private void setupObservers() {
-        settings.livePlayShowErrorsGrid().observe(
-            this,
-            showErrorsGrid -> {
-                Playboard board = getBoard();
-                if (board != null && board.isShowErrorsGrid() != showErrorsGrid) {
-                    board.toggleShowErrorsGrid();
-                }
-                invalidateOptionsMenu();
-            }
-        );
-
-        settings.livePlayShowErrorsCursor().observe(
-            this,
-            showErrorsCursor -> {
-                Playboard board = getBoard();
-                if (
-                    board != null &&
-                    board.isShowErrorsCursor() != showErrorsCursor
-                ) {
-                    board.toggleShowErrorsCursor();
-                }
-                invalidateOptionsMenu();
-            }
-        );
-
-        settings.livePlayShowErrorsClue().observe(
-            this,
-            showErrorsClue -> {
-                Playboard board = getBoard();
-                if (board != null && board.isShowErrorsClue() != showErrorsClue) {
-                    board.toggleShowErrorsClue();
-                }
-                invalidateOptionsMenu();
-            }
-        );
-
         settings.livePlayGridRatio().observe(
             this,
             gridRatio -> {

@@ -167,6 +167,30 @@ public abstract class PuzzleActivity
                 item.setChecked(scratchMode);
         });
 
+        boolean canSolve = puz != null && puz.hasSolution();
+
+        MenuItem showErrors = menu.findItem(R.id.puzzle_menu_show_errors);
+        showErrors.setEnabled(canSolve);
+        showErrors.setVisible(canSolve);
+
+        settings.getPlayShowErrorsClue(showErrorsClue -> {
+        settings.getPlayShowErrorsCursor(showErrorsCursor -> {
+        settings.getPlayShowErrorsGrid(showErrorsGrid -> {
+            int showErrorsTitle =
+                (showErrorsGrid || showErrorsCursor || showErrorsClue)
+                ? R.string.showing_errors
+                : R.string.show_errors;
+
+            showErrors.setTitle(showErrorsTitle);
+
+            menu.findItem(R.id.puzzle_menu_show_errors_grid)
+                .setChecked(showErrorsGrid);
+            menu.findItem(R.id.puzzle_menu_show_errors_cursor)
+                .setChecked(showErrorsCursor);
+            menu.findItem(R.id.puzzle_menu_show_errors_clue)
+                .setChecked(showErrorsClue);
+        });});});
+
         return true;
     }
 
@@ -236,7 +260,19 @@ public abstract class PuzzleActivity
         } else if (id == R.id.puzzle_menu_scratch_mode) {
             toggleScratchMode();
             return true;
+        } else if (id == R.id.puzzle_menu_show_errors_grid) {
+            settings.setPlayShowErrorsGrid(!getBoard().isShowErrorsGrid());
+            return true;
+        } else if (id == R.id.puzzle_menu_show_errors_clue) {
+            settings.setPlayShowErrorsClue(!getBoard().isShowErrorsClue());
+            return true;
+        } else if (id == R.id.puzzle_menu_show_errors_cursor) {
+            settings.setPlayShowErrorsCursor(
+                !getBoard().isShowErrorsCursor()
+            );
+            return true;
         }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -1123,6 +1159,42 @@ public abstract class PuzzleActivity
 
         settings.livePlayScratchMode().observe(
             this, value -> { invalidateOptionsMenu(); }
+        );
+
+        settings.livePlayShowErrorsGrid().observe(
+            this,
+            showErrorsGrid -> {
+                Playboard board = getBoard();
+                if (board != null && board.isShowErrorsGrid() != showErrorsGrid) {
+                    board.toggleShowErrorsGrid();
+                }
+                invalidateOptionsMenu();
+            }
+        );
+
+        settings.livePlayShowErrorsCursor().observe(
+            this,
+            showErrorsCursor -> {
+                Playboard board = getBoard();
+                if (
+                    board != null &&
+                    board.isShowErrorsCursor() != showErrorsCursor
+                ) {
+                    board.toggleShowErrorsCursor();
+                }
+                invalidateOptionsMenu();
+            }
+        );
+
+        settings.livePlayShowErrorsClue().observe(
+            this,
+            showErrorsClue -> {
+                Playboard board = getBoard();
+                if (board != null && board.isShowErrorsClue() != showErrorsClue) {
+                    board.toggleShowErrorsClue();
+                }
+                invalidateOptionsMenu();
+            }
         );
     }
 

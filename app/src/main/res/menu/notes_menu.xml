@@ -13,6 +13,29 @@
         android:title="@string/flag_color_title"
     />
     <item
+        android:id="@+id/puzzle_menu_show_errors"
+        android:icon="@android:drawable/ic_menu_view"
+        android:title="@string/show_errors"
+    >
+        <menu>
+            <item
+                android:id="@+id/puzzle_menu_show_errors_cursor"
+                android:title="@string/show_errors_cursor"
+                android:checkable="true"
+            />
+            <item
+                android:id="@+id/puzzle_menu_show_errors_clue"
+                android:title="@string/show_errors_clue"
+                android:checkable="true"
+            />
+            <item
+                android:id="@+id/puzzle_menu_show_errors_grid"
+                android:title="@string/show_errors_full_grid"
+                android:checkable="true"
+            />
+        </menu>
+    </item>
+    <item
         android:id="@+id/puzzle_menu_external_tools"
         android:icon="@android:drawable/ic_menu_view"
         android:title="@string/external_tools"
