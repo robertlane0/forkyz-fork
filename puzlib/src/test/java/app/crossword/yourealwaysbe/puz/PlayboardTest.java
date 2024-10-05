@@ -766,6 +766,13 @@ public class PlayboardTest {
         // undoes D
         board.deleteOrUndoLetter();
 
+        // wait at end of undo stack
+        try {
+            Thread.sleep(200);
+        } catch (InterruptedException e) {
+            fail(e);
+        }
+
         assertBoxLetter(puz, 0, 1, "B");
         assertBoxLetter(puz, 0, 2, "C");
 
