@@ -1,11 +1,9 @@
 package app.crossword.yourealwaysbe.forkyz;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.hardware.SensorManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -26,7 +24,6 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat;
 import androidx.core.widget.TextViewCompat;
 import androidx.fragment.app.DialogFragment;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import com.squareup.seismic.ShakeDetector;
 
@@ -40,7 +37,6 @@ import app.crossword.yourealwaysbe.forkyz.view.ClueTabs;
 import app.crossword.yourealwaysbe.forkyz.view.ForkyzKeyboard;
 import app.crossword.yourealwaysbe.forkyz.view.PuzzleInfoDialogs;
 import app.crossword.yourealwaysbe.forkyz.view.ScrollingImageView.ScaleListener;
-import app.crossword.yourealwaysbe.puz.Box;
 import app.crossword.yourealwaysbe.puz.Clue;
 import app.crossword.yourealwaysbe.puz.ClueID;
 import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges;

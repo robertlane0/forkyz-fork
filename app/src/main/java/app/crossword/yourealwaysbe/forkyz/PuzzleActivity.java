@@ -56,7 +56,6 @@ import app.crossword.yourealwaysbe.forkyz.view.ChooseFlagColorDialog;
 import app.crossword.yourealwaysbe.forkyz.view.ClueEditDialog;
 import app.crossword.yourealwaysbe.forkyz.view.PlayboardTextRenderer;
 import app.crossword.yourealwaysbe.forkyz.view.PuzzleInfoDialogs;
-import app.crossword.yourealwaysbe.forkyz.view.PuzzleInfoDialogs;
 import app.crossword.yourealwaysbe.forkyz.view.SpecialEntryDialog;
 import app.crossword.yourealwaysbe.puz.Box;
 import app.crossword.yourealwaysbe.puz.Clue;
