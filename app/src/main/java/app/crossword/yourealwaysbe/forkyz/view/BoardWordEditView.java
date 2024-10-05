@@ -146,20 +146,6 @@ public class BoardWordEditView extends BoardEditView {
     }
 
     @Override
-    public void onNewResponse(String response) {
-        Playboard board = getBoard();
-        if (board != null)
-            board.playLetter(response);
-    }
-
-    @Override
-    public void onDeleteResponse() {
-        Playboard board = getBoard();
-        if (board != null)
-            board.deleteOrUndoLetter();
-    }
-
-    @Override
     public Position findPosition(Point point) {
         PlayboardRenderer renderer = getRenderer();
         if (renderer == null)

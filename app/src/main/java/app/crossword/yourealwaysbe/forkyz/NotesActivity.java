@@ -143,6 +143,7 @@ public class NotesActivity extends PuzzleActivity {
         );
 
         binding.miniboard.setAllowOverScroll(false);
+        binding.miniboard.setIgnoreScratchMode(true);
         binding.miniboard.addBoardClickListener(new BoardClickListener() {
             @Override
             public void onClick(Position position, Word previousWord) {

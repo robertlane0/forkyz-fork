@@ -110,32 +110,7 @@ public abstract class PuzzleActivity
         equalsAnnounceClue = settings.liveVoiceEqualsAnnounceClue();
 
         startTimer();
-
-        settings.livePlayShowTimer().observe(
-            this,
-            showTimer -> {
-                if (showTimer)
-                    handler.post(updateTimeTask);
-            }
-        );
-
-        settings.livePlayPreserveCorrectLettersInShowErrors().observe(
-            this,
-            preserveCorrect -> {
-                Playboard board = getBoard();
-                if (board != null)
-                    board.setPreserveCorrectLettersInShowErrors(preserveCorrect);
-            }
-        );
-
-        settings.livePlayDeleteCrossingMode().observe(
-            this,
-            deleteCrossingMode -> {
-                Playboard board = getBoard();
-                if (board != null)
-                    board.setDeleteCrossingMode(deleteCrossingMode);
-            }
-        );
+        setupObservers();
     }
 
     @Override
@@ -185,6 +160,12 @@ public abstract class PuzzleActivity
                 help.setEnabled(false);
             }
         });});});
+
+        settings.getPlayScratchMode(scratchMode -> {
+            MenuItem item = menu.findItem(R.id.puzzle_menu_scratch_mode);
+            if (item != null)
+                item.setChecked(scratchMode);
+        });
 
         return true;
     }
@@ -251,6 +232,9 @@ public abstract class PuzzleActivity
             return true;
         } else if (id == R.id.puzzle_menu_flag_cell_toggle) {
             toggleCellFlag();
+            return true;
+        } else if (id == R.id.puzzle_menu_scratch_mode) {
+            toggleScratchMode();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -1108,7 +1092,44 @@ public abstract class PuzzleActivity
         settings.livePlayShowErrorsClue().observe(this, showErrorsObserver);
         settings.livePlayShowErrorsCursor().observe(this, showErrorsObserver);
         settings.livePlayShowErrorsGrid().observe(this, showErrorsObserver);
+    }
 
+    private void setupObservers() {
+        settings.livePlayShowTimer().observe(
+            this,
+            showTimer -> {
+                if (showTimer)
+                    handler.post(updateTimeTask);
+            }
+        );
+
+        settings.livePlayPreserveCorrectLettersInShowErrors().observe(
+            this,
+            preserveCorrect -> {
+                Playboard board = getBoard();
+                if (board != null)
+                    board.setPreserveCorrectLettersInShowErrors(preserveCorrect);
+            }
+        );
+
+        settings.livePlayDeleteCrossingMode().observe(
+            this,
+            deleteCrossingMode -> {
+                Playboard board = getBoard();
+                if (board != null)
+                    board.setDeleteCrossingMode(deleteCrossingMode);
+            }
+        );
+
+        settings.livePlayScratchMode().observe(
+            this, value -> { invalidateOptionsMenu(); }
+        );
+    }
+
+    private void toggleScratchMode() {
+        settings.getPlayScratchMode(scratchMode -> {
+            settings.setPlayScratchMode(!scratchMode);
+        });
     }
 
     /**

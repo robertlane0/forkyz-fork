@@ -74,37 +74,6 @@ public class BoardFullEditView extends BoardEditView {
     }
 
     @Override
-    public void onNewResponse(String response) {
-        Playboard board = getBoard();
-        if (board == null)
-            return;
-
-        getSettings().getPlayScratchMode(scratchMode -> {
-            if (scratchMode) {
-                if (response != null)
-                    board.playScratchLetter(response.charAt(0));
-            } else {
-                board.playLetter(response);
-            }
-        });
-    }
-
-    @Override
-    public void onDeleteResponse() {
-        Playboard board = getBoard();
-        if (board == null)
-            return;
-
-        getSettings().getPlayScratchMode(scratchMode -> {
-            if (scratchMode) {
-                board.deleteScratchLetter();
-            } else {
-                board.deleteOrUndoLetter();
-            }
-        });
-    }
-
-    @Override
     public void render(Collection<Position> changes, boolean rescale) {
         PlayboardRenderer renderer = getRenderer();
         Playboard board = getBoard();

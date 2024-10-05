@@ -250,22 +250,8 @@ public class ClueListActivity extends PuzzleActivity
         Playboard board = getBoard();
         char c = Character.toUpperCase(event.getDisplayLabel());
 
-        if (board != null && Character.isLetterOrDigit(c)) {
-            Word w = board.getCurrentWord();
-            Position last = getCurrentLastPosition();
-
-            board.playLetter(c);
-
-            Position p = board.getHighlightLetter();
-            int row = p.getRow();
-            int col = p.getCol();
-
-            if (!board.getCurrentWord().equals(w)
-                    || Box.isBlock(board.getBoxes()[row][col])) {
-                board.setHighlightLetter(last);
-            }
-            return true;
-        }
+        if (board != null && Character.isLetterOrDigit(c))
+            playLetter(c);
 
         return true;
     }
@@ -515,12 +501,17 @@ public class ClueListActivity extends PuzzleActivity
         Word w = board.getCurrentWord();
         Position first = getCurrentFirstPosition();
 
-        board.deleteOrUndoLetter();
+        settings.getPlayScratchMode(scratchMode -> {
+            if (scratchMode)
+                board.deleteScratchLetter();
+            else
+                board.deleteOrUndoLetter();
 
-        Position p = board.getHighlightLetter();
-        if (!w.checkInWord(p) && first != null) {
-            board.setHighlightLetter(first);
-        }
+            Position p = board.getHighlightLetter();
+            if (!w.checkInWord(p) && first != null) {
+                board.setHighlightLetter(first);
+            }
+        });
     }
 
     private void onSpaceKey() {
@@ -531,11 +522,23 @@ public class ClueListActivity extends PuzzleActivity
         settings.getPlaySpaceChangesDirection(spaceChangesDirection -> {
             if (spaceChangesDirection)
                 return;
+            playLetter(' ');
+        });
+    }
+
+    private void playLetter(char c) {
+        settings.getPlayScratchMode(scratchMode -> {
+            Playboard board = getBoard();
+            if (board == null)
+                return;
 
             Word w = board.getCurrentWord();
             Position last = getCurrentLastPosition();
 
-            board.playLetter(' ');
+            if (scratchMode)
+                board.playScratchLetter(c);
+            else
+                board.playLetter(c);
 
             Position curr = board.getHighlightLetter();
             int row = curr.getRow();

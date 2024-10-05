@@ -60,6 +60,7 @@ public abstract class BoardEditView
     private long lastTap = 0;
     private BoxInputConnection currentInputConnection = null;
     private boolean nativeInput = false;
+    private boolean ignoreScratchMode = false;
 
     // For use by implementers of render to avoid on-main-thread
     // rendering. Bitmap can be set with postBitmap in
@@ -82,6 +83,10 @@ public abstract class BoardEditView
 
     public void setBoard(Playboard board) {
         setBoard(board, false);
+    }
+
+    public void setIgnoreScratchMode(boolean ignoreScratchMode) {
+        this.ignoreScratchMode = ignoreScratchMode;
     }
 
     /**
@@ -250,6 +255,37 @@ public abstract class BoardEditView
         boolean changed = this.nativeInput != nativeInput;
         this.nativeInput = nativeInput;
         return changed;
+    }
+
+    @Override
+    public void onNewResponse(String response) {
+        Playboard board = getBoard();
+        if (board == null)
+            return;
+
+        getSettings().getPlayScratchMode(scratchMode -> {
+            if (!ignoreScratchMode && scratchMode) {
+                if (response != null)
+                    board.playScratchLetter(response.charAt(0));
+            } else {
+                board.playLetter(response);
+            }
+        });
+    }
+
+    @Override
+    public void onDeleteResponse() {
+        Playboard board = getBoard();
+        if (board == null)
+            return;
+
+        getSettings().getPlayScratchMode(scratchMode -> {
+            if (!ignoreScratchMode && scratchMode) {
+                board.deleteScratchLetter();
+            } else {
+                board.deleteOrUndoLetter();
+            }
+        });
     }
 
     @Override

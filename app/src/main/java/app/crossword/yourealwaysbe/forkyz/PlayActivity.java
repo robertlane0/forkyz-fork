@@ -381,10 +381,6 @@ public class PlayActivity extends PuzzleActivity
             support.setEnabled(false);
         }
 
-        settings.getPlayScratchMode(scratchMode -> {
-            menu.findItem(R.id.play_menu_scratch_mode).setChecked(scratchMode);
-        });
-
         boolean canSolve = puz != null && puz.hasSolution();
 
         MenuItem showErrors = menu.findItem(R.id.play_menu_show_errors);
@@ -559,9 +555,6 @@ public class PlayActivity extends PuzzleActivity
                 settings.setPlayShowErrorsCursor(
                     !getBoard().isShowErrorsCursor()
                 );
-                return true;
-            } else if (id == R.id.play_menu_scratch_mode) {
-                toggleScratchMode();
                 return true;
             } else if (id == R.id.play_menu_settings) {
                 Intent i = new Intent(this, PreferencesActivity.class);
@@ -807,10 +800,6 @@ public class PlayActivity extends PuzzleActivity
     }
 
     private void setupObservers() {
-        settings.livePlayScratchMode().observe(
-            this, value -> { invalidateOptionsMenu(); }
-        );
-
         settings.livePlayShowErrorsGrid().observe(
             this,
             showErrorsGrid -> {
@@ -977,12 +966,6 @@ public class PlayActivity extends PuzzleActivity
                 startActivity(i);
             }
         }
-    }
-
-    private void toggleScratchMode() {
-        settings.getPlayScratchMode(scratchMode -> {
-            settings.setPlayScratchMode(!scratchMode);
-        });
     }
 
     private void setupVoiceCommands() {

@@ -56,7 +56,7 @@
         </menu>
     </item>
     <item
-        android:id="@+id/play_menu_scratch_mode"
+        android:id="@+id/puzzle_menu_scratch_mode"
         android:title="@string/scratch_mode"
         android:checkable="true"
     />

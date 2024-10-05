@@ -16,6 +16,11 @@
         android:title="@string/menu_flag_cell_toggle"
     />
     <item
+        android:id="@+id/puzzle_menu_scratch_mode"
+        android:title="@string/scratch_mode"
+        android:checkable="true"
+    />
+    <item
         android:id="@+id/puzzle_menu_special_entry"
         android:title="@string/special_entry"
     />
