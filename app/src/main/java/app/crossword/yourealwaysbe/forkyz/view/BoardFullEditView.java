@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.view;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -14,6 +13,7 @@ import android.util.DisplayMetrics;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
+import app.crossword.yourealwaysbe.forkyz.view.PlayboardRenderer.RenderChanges;
 import app.crossword.yourealwaysbe.puz.ClueID;
 import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges;
 import app.crossword.yourealwaysbe.puz.Playboard.Word;
@@ -68,22 +68,24 @@ public class BoardFullEditView extends BoardEditView {
 
     @Override
     public void onPlayboardChange(PlayboardChanges changes) {
-        render(changes.getCellChanges());
+        render(changes);
         ensureVisible(changes.getPreviousWord());
         super.onPlayboardChange(changes);
     }
 
     @Override
-    public void render(Collection<Position> changes, boolean rescale) {
+    public void render(PlayboardChanges changes, boolean rescale) {
         PlayboardRenderer renderer = getRenderer();
         Playboard board = getBoard();
         if (renderer == null || board == null)
             return;
 
-        Collection<Position> localChanges
-            = (changes == null)
-                ? null
-                : new HashSet<>(changes);
+        RenderChanges renderChanges = changes == null
+            ? null
+            : new RenderChanges(
+                new HashSet<>(changes.getCellChanges()),
+                new HashSet<>(changes.getChangedClueIDs())
+            );
 
         getSettings().getPlayScratchDisplay(displayScratch -> {
         getSettings().getPlaySuppressHintHighlighting(suppressHints -> {
@@ -97,7 +99,7 @@ public class BoardFullEditView extends BoardEditView {
                 try {
                     lockRenderer();
                     BitmapGrid bitmap = renderer.draw(
-                        localChanges, suppressNotesList, getRenderRect()
+                        renderChanges, suppressNotesList, getRenderRect()
                     );
                     handler.post(() -> {
                         try { setBitmap(bitmap, rescale); }
@@ -142,7 +144,7 @@ public class BoardFullEditView extends BoardEditView {
     @Override
     protected void scrollEnd() {
         super.scrollEnd();
-        render(Collections.emptySet());
+        render(PlayboardChanges.getEmptyChanges());
     }
 
     /**

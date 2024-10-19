@@ -339,6 +339,11 @@ public class NotesActivity extends PuzzleActivity {
             null
         );
 
+        binding.flagClue.setOnCheckedChangeListener((v, isChecked) -> {
+            Clue clue = getNotesClue();
+            if (clue != null)
+                board.flagClue(clue, isChecked);
+        });
         binding.flagClue.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {

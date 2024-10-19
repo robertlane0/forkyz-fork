@@ -15,6 +15,14 @@
                 android:id="@+id/puzzle_menu_puzzle_notes"
                 android:title="@string/menu_notes_puzzle"
             />
+            <item
+                android:id="@+id/puzzle_menu_flag_clue_toggle"
+                android:title="@string/menu_flag_clue_toggle"
+            />
+            <item
+                android:id="@+id/puzzle_menu_flag_cell_toggle"
+                android:title="@string/menu_flag_cell_toggle"
+            />
         </menu>
     </item>
     <item

@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.view;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -387,7 +386,7 @@ public abstract class BoardEditView
         render(false);
     }
 
-    protected void render(Collection<Position> changes) {
+    protected void render(PlayboardChanges changes) {
         render(changes, false);
     }
 
@@ -402,10 +401,9 @@ public abstract class BoardEditView
     /**
      * Render board
      *
-     * @param changes collection of positions on the board that have
-     * changed. Null means render all again.
+     * @param changes playboard changes or null for render all
      */
-    abstract protected void render(Collection<Position> changes, boolean rescale);
+    abstract protected void render(PlayboardChanges changes, boolean rescale);
 
     protected PlayboardRenderer getRenderer() { return renderer; }
     protected Playboard getBoard() { return board; }

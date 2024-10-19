@@ -13,6 +13,10 @@
         android:title="@string/flag_color_title"
     />
     <item
+        android:id="@+id/puzzle_menu_flag_cell_toggle"
+        android:title="@string/menu_flag_cell_toggle"
+    />
+    <item
         android:id="@+id/puzzle_menu_show_errors"
         android:icon="@android:drawable/ic_menu_view"
         android:title="@string/show_errors"

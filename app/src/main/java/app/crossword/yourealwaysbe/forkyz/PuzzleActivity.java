@@ -283,6 +283,9 @@ public abstract class PuzzleActivity
         } else if (id == R.id.puzzle_menu_puzzle_notes) {
             launchPuzzleNotes();
             return true;
+        } else if (id == R.id.puzzle_menu_flag_clue_toggle) {
+            toggleClueFlag();
+            return true;
         } else if (id == R.id.puzzle_menu_flag_cell_toggle) {
             toggleCellFlag();
             return true;
@@ -1343,6 +1346,28 @@ public abstract class PuzzleActivity
         }
     }
 
+    /**
+     * Flag currently selected clue and choose colour
+     */
+    private void toggleClueFlag() {
+        Playboard board = getBoard();
+        if (board == null)
+            return;
+
+        Clue clue = board.getClue();
+        if (clue == null)
+            return;
+
+        if (clue.isFlagged()) {
+            board.flagClue(clue, false);
+        } else {
+            DialogFragment dialog = new ChooseFlagColorDialog();
+            Bundle args = new Bundle();
+            ChooseFlagColorDialog.addClueToBundle(args, clue);
+            dialog.setArguments(args);
+            dialog.show(getSupportFragmentManager(), "ChooseFlagColorDialog");
+        }
+    }
 
     /**
      * Flag currently selected cell

@@ -17,6 +17,7 @@ import android.view.ViewTreeObserver;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
+import app.crossword.yourealwaysbe.forkyz.view.PlayboardRenderer.RenderChanges;
 import app.crossword.yourealwaysbe.puz.ClueID;
 import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges;
 import app.crossword.yourealwaysbe.puz.Playboard.Word;
@@ -138,8 +139,8 @@ public class BoardWordEditView extends BoardEditView {
                 && !Objects.equals(currentWord, previousWord)
             ) {
                 renderToView();
-            } else if (redrawNeeded(currentWord, previousWord, cellChanges)) {
-                render(cellChanges);
+            } else if (redrawNeeded(currentWord, previousWord, changes)) {
+                render(changes);
             }
         }
         super.onPlayboardChange(changes);
@@ -170,7 +171,7 @@ public class BoardWordEditView extends BoardEditView {
     }
 
     @Override
-    public void render(Collection<Position> changes, boolean rescale) {
+    public void render(PlayboardChanges changes, boolean rescale) {
         // don't draw until we get onSizeChanged
         if (!isRendering()) {
             return;
@@ -182,10 +183,12 @@ public class BoardWordEditView extends BoardEditView {
 
         Word renderWord = getRenderWord();
 
-        Collection<Position> localChanges
-            = (changes == null)
-                ? null
-                : new HashSet<>(changes);
+        RenderChanges renderChanges = changes == null
+            ? null
+            : new RenderChanges(
+                new HashSet<>(changes.getCellChanges()),
+                new HashSet<>(changes.getChangedClueIDs())
+            );
 
         getSettings().getPlaySuppressHintHighlighting(suppressHints -> {
         getSuppressNotesList(localSuppressNotesList -> {
@@ -195,7 +198,7 @@ public class BoardWordEditView extends BoardEditView {
                     lockRenderer();
                     BitmapGrid bitmap = renderer.drawWord(
                         renderWord,
-                        localChanges,
+                        renderChanges,
                         localSuppressNotesList,
                         getContentWidth()
                     );
@@ -363,9 +366,11 @@ public class BoardWordEditView extends BoardEditView {
     }
 
     private boolean redrawNeeded(
-        Word currentWord, Word previousWord, Collection<Position> changes
+        Word currentWord, Word previousWord, PlayboardChanges changes
     ) {
-        if (changes == null)
+        Collection<Position> cellChanges
+            = changes == null ? null : changes.getCellChanges();
+        if (cellChanges == null)
             return true;
 
         Zone zone = getRenderWordZone();
@@ -373,9 +378,17 @@ public class BoardWordEditView extends BoardEditView {
             return false;
 
         for (Position position : zone) {
-            if (changes.contains(position))
+            if (cellChanges.contains(position))
                 return true;
         }
+
+        Playboard board = getBoard();
+        ClueID cid = board == null ? null : board.getClueID();
+        if (cid == null)
+            return false;
+
+        if (changes.getChangedClueIDs().contains(cid))
+            return true;
 
         return false;
     }

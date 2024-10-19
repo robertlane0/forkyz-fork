@@ -1952,7 +1952,7 @@ public class Playboard implements Serializable {
         public void onPlayboardChange(PlayboardChanges changes);
     }
 
-    public static class PlayboardChanges {
+    public static class PlayboardChanges implements Cloneable {
         private Word currentWord;
         private Word previousWord;
         private Position previousPosition;
@@ -1960,6 +1960,21 @@ public class Playboard implements Serializable {
         private boolean historyChange;
         private int lastHistoryIndex;
         private Collection<ClueID> changedClueIDs;
+
+        private static PlayboardChanges emptyChanges = new PlayboardChanges();
+        static {
+            emptyChanges.currentWord = null;
+            emptyChanges.previousWord = null;
+            emptyChanges.previousPosition = null;
+            emptyChanges.cellChanges = Collections.emptySet();
+            emptyChanges.historyChange = false;
+            emptyChanges.lastHistoryIndex = -1;
+            emptyChanges.changedClueIDs = Collections.emptySet();
+        }
+
+        public static PlayboardChanges getEmptyChanges() {
+            return emptyChanges;
+        }
 
         private void setValues(
             Word currentWord,
@@ -1981,6 +1996,8 @@ public class Playboard implements Serializable {
 
         /**
          * The currently selected word
+         *
+         * May only be null if gotten via getEmptyChanges().
          */
         public Word getCurrentWord() { return currentWord; }
 

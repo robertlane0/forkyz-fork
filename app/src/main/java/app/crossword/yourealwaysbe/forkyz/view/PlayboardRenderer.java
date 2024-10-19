@@ -81,6 +81,11 @@ public class PlayboardRenderer {
     private int displayWidthPixels;
     private AndroidVersionUtils versionUtils;
 
+    public static record RenderChanges(
+        Collection<Position> changedPositions,
+        Collection<ClueID> changedClueIDs
+    ) { }
+
     // colors are gotten from context
     public PlayboardRenderer(
         Playboard board,
@@ -171,15 +176,13 @@ public class PlayboardRenderer {
      *
      * Refreshes current word and reset word if not null
      *
-     * @param changes a collection of positions that have changed since the
-     * last draw (can be null for all). Recommended to have a fast
-     * lookup.
+     * @param changes the changes or null for redraw all
      * @param suppressNotesLists as in drawBox
      * @param visibleRect area that will be visible (can be used to
      * avoid drawing outside of it). Null means draw all.
      */
     synchronized public BitmapGrid draw(
-        Collection<Position> changes,
+        RenderChanges changes,
         Set<String> suppressNotesLists,
         Rect visibleRect
     ) {
@@ -213,13 +216,11 @@ public class PlayboardRenderer {
     /**
      * Draw current word
      *
-     * @param changes positions that have changed since last draw (may
-     * be null for all). Recommend using something with fast lookup. May
-     * contain positions outside of current word.
+     * @param changes changes to render or null for draw all
      * @param suppressNotesLists as in drawBox
      */
     synchronized public BitmapGrid drawWord(
-        Collection<Position> changes,
+        RenderChanges changes,
         Set<String> suppressNotesLists,
         int wrapWidth
     ) {
@@ -233,7 +234,7 @@ public class PlayboardRenderer {
      */
     synchronized public BitmapGrid drawWord(
         Word word,
-        Collection<Position> changes,
+        RenderChanges changes,
         int wrapWidth
     ) {
         // call draw word with empty list
@@ -246,16 +247,14 @@ public class PlayboardRenderer {
      * Draw given word
      *
      * @param word word to draw
-     * @param changes collection of positions changed since last draw.
-     * Can be null to render all. Can contain more positions than word.
-     * Recommend something with fast lookup.
+     * @param changes changes to render or null for render all
      * @param suppressNotesLists as in drawBox
      * @param wrapWidth if non-zero, wrap word after width (in pixels)
      * exceeded
      */
     synchronized public BitmapGrid drawWord(
         Word word,
-        Collection<Position> changes,
+        RenderChanges changes,
         Set<String> suppressNotesLists,
         int wrapWidth
     ) {
@@ -605,9 +604,7 @@ public class PlayboardRenderer {
                 drawBoxBars(canvas, x, y, box);
 
             drawBoxMarks(canvas, x, y, box, inCurrentWord);
-            if (fullBoard) {
-                drawBoxFlags(canvas, x, y, box);
-            }
+            drawBoxFlags(canvas, x, y, box);
 
             if (box.isBlank()) {
                 if (suppressNotesLists != null || shadow != null) {
@@ -819,7 +816,9 @@ public class PlayboardRenderer {
         int numberOffset = profile.getNumberOffset();
         int numberTextSize = profile.getNumberTextSize();
 
-        Puzzle puz = board.getPuzzle();
+        Puzzle puz = board == null ? null : board.getPuzzle();
+        if (puz == null)
+            return;
 
         Clue flagAcross = null;
         Clue flagDown = null;
@@ -1324,15 +1323,30 @@ public class PlayboardRenderer {
     }
 
     private boolean isPartOfCurrentClue(Position pos) {
-        if (board == null)
+        ClueID cid = board == null ? null : board.getClueID();
+        return cid != null && isPartOfClue(pos, cid);
+    }
+
+    private boolean isPartOfClue(Position pos, ClueID cid) {
+        if (pos == null || board == null || cid == null)
             return false;
 
         Box box = board.getPuzzle().checkedGetBox(pos);
-        ClueID cid = board.getClueID();
-        if (box == null || cid == null)
+        if (box == null)
             return false;
 
         return box.getIsPartOfClues().contains(cid);
+    }
+
+    private boolean isStartOfClue(Position pos, ClueID cid) {
+        if (pos == null || board == null || cid == null)
+            return false;
+
+        Box box = board.getPuzzle().checkedGetBox(pos);
+        if (box == null)
+            return false;
+
+        return box.isStartOf(cid);
     }
 
     private void drawText(
@@ -1523,7 +1537,7 @@ public class PlayboardRenderer {
      */
     private void drawPinnedClue(
         TileCanvas[][] canvases,
-        Collection<Position> changes,
+        RenderChanges changes,
         Set<String> suppressNotesLists
     ) {
         Puzzle puz = this.board.getPuzzle();
@@ -1704,15 +1718,14 @@ public class PlayboardRenderer {
      * non-null TileCanvas if the tile should be drawn. New canvases
      * drawn in full, else just changes.
      * @param boxSize the size of a box
-     * @param changes the positions that have changed since the last
-     * draw (can be null, which means render all)
+     * @param changes the changes or null for redraw all
      * @param renderAll whether to just draw the whole board anyway
      * @param suppressNotesLists the notes lists not to draw (null means
      * draw none, empty means draw all)
      */
     private void drawBoardBoxes(
         TileCanvas[][] canvases,
-        Collection<Position> changes,
+        RenderChanges changes,
         Set<String> suppressNotesLists
     ) {
         Puzzle puz = board.getPuzzle();
@@ -1793,15 +1806,28 @@ public class PlayboardRenderer {
      * this one may have changed (e.g. because of show errors clue, the
      * completion of the clue can cause a change).
      */
-    private boolean isRenderPos(Position pos, Collection<Position> changes) {
+    private boolean isRenderPos(Position pos, RenderChanges changes) {
         if (board == null)
             return false;
 
-        if (changes == null || changes.contains(pos))
+        if (changes == null)
+            return true;
+
+        if (changes.changedPositions() == null)
+            return true;
+
+        if (changes.changedPositions().contains(pos))
             return true;
 
         if (board.isShowErrorsClue() && isPartOfCurrentClue(pos))
             return true;
+
+        for (ClueID cid : changes.changedClueIDs()) {
+            // only need to rerender first box of changed clues because it's
+            // num or flag changes only
+            if (isStartOfClue(pos, cid))
+                return true;
+        }
 
         return false;
     }
