@@ -1,5 +1,12 @@
 # Forkyz Changelog
 
+## Version 57
+
+- Render puzzle in (on-screen-ish) tiles (for large grids and high zooms).
+- Option to indicate in puzzle list if puzzle has a solution (browser settings).
+- Consistency improvements in status bar show errors indication.
+- Add full range of options to clue list and notes pages.
+
 ## Version 56
 
 - Add puzzle ratings feature via puzzle info dialog.

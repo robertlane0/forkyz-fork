@@ -1,0 +1,4 @@
+- Render puzzle in (on-screen-ish) tiles (for large grids and high zooms).
+- Option to indicate in puzzle list if puzzle has a solution (browser settings).
+- Consistency improvements in status bar show errors indication.
+- Add full range of options to clue list and notes pages.
