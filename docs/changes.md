@@ -1,5 +1,9 @@
 # Forkyz Changelog
 
+## Version 58
+
+- Fix crash on show errors.
+
 ## Version 57
 
 - Render puzzle in (on-screen-ish) tiles (for large grids and high zooms).
