@@ -80,12 +80,7 @@ public class BoardFullEditView extends BoardEditView {
         if (renderer == null || board == null)
             return;
 
-        RenderChanges renderChanges = changes == null
-            ? null
-            : new RenderChanges(
-                new HashSet<>(changes.getCellChanges()),
-                new HashSet<>(changes.getChangedClueIDs())
-            );
+        RenderChanges renderChanges = getRenderChanges(changes);
 
         getSettings().getPlayScratchDisplay(displayScratch -> {
         getSettings().getPlaySuppressHintHighlighting(suppressHints -> {

@@ -1,6 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.view;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -24,6 +25,7 @@ import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.util.BoxInputConnection;
 import app.crossword.yourealwaysbe.forkyz.util.KeyboardManager;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
+import app.crossword.yourealwaysbe.forkyz.view.PlayboardRenderer.RenderChanges;
 import app.crossword.yourealwaysbe.puz.Box;
 import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges;
 import app.crossword.yourealwaysbe.puz.Playboard.Word;
@@ -420,6 +422,22 @@ public abstract class BoardEditView
     }
 
     protected void unlockRenderer() { renderLock.release(); }
+
+    /**
+     * Extract render changes object from playboard changes
+     *
+     * May return null if whole board changes or changes is null
+     */
+    protected RenderChanges getRenderChanges(PlayboardChanges changes) {
+        Collection<Position> cellChanges
+            = changes == null ? null : changes.getCellChanges();
+        return cellChanges == null
+            ? null
+            : new RenderChanges(
+                new HashSet<>(cellChanges),
+                new HashSet<>(changes.getChangedClueIDs())
+            );
+    }
 
     private String getCurrentResponse() {
         Playboard board = getBoard();

@@ -183,12 +183,7 @@ public class BoardWordEditView extends BoardEditView {
 
         Word renderWord = getRenderWord();
 
-        RenderChanges renderChanges = changes == null
-            ? null
-            : new RenderChanges(
-                new HashSet<>(changes.getCellChanges()),
-                new HashSet<>(changes.getChangedClueIDs())
-            );
+        RenderChanges renderChanges = getRenderChanges(changes);
 
         getSettings().getPlaySuppressHintHighlighting(suppressHints -> {
         getSuppressNotesList(localSuppressNotesList -> {
