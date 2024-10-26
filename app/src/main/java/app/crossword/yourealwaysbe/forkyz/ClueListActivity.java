@@ -239,6 +239,13 @@ public class ClueListActivity extends PuzzleActivity
         case KeyEvent.KEYCODE_SPACE:
             onSpaceKey();
             return true;
+
+        case KeyEvent.KEYCODE_TAB:
+            if (event.hasModifiers(KeyEvent.META_SHIFT_ON))
+                onUpKey();
+            else
+                onDownKey();
+            return true;
         }
 
         Playboard board = getBoard();
@@ -615,6 +622,7 @@ public class ClueListActivity extends PuzzleActivity
         case KeyEvent.KEYCODE_DPAD_RIGHT:
         case KeyEvent.KEYCODE_DEL:
         case KeyEvent.KEYCODE_SPACE:
+        case KeyEvent.KEYCODE_TAB:
             return true;
         }
 

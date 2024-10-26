@@ -442,6 +442,13 @@ public class PlayActivity extends PuzzleActivity
                 case KeyEvent.KEYCODE_DEL:
                     onDeleteKey();
                     break;
+
+                case KeyEvent.KEYCODE_TAB:
+                    if (event.hasModifiers(KeyEvent.META_SHIFT_ON))
+                        getBoard().previousWord();
+                    else
+                        getBoard().nextWord();
+                    return true;
             }
 
             char c = Character.toUpperCase(event.getDisplayLabel());
@@ -1024,6 +1031,7 @@ public class PlayActivity extends PuzzleActivity
         case KeyEvent.KEYCODE_SPACE:
         case KeyEvent.KEYCODE_ENTER:
         case KeyEvent.KEYCODE_DEL:
+        case KeyEvent.KEYCODE_TAB:
             return true;
         }
 
