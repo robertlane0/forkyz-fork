@@ -395,10 +395,11 @@ public class PlayActivity extends PuzzleActivity
 
         keyboardManager.pushBlockHide();
 
-        if (getBoard() != null) {
+        Playboard board = getBoard();
+        if (board != null) {
             switch (keyCode) {
                 case KeyEvent.KEYCODE_SEARCH:
-                    getBoard().nextWord();
+                    board.nextWord();
                     break;
 
                 case KeyEvent.KEYCODE_DPAD_DOWN:
@@ -418,13 +419,13 @@ public class PlayActivity extends PuzzleActivity
                     break;
 
                 case KeyEvent.KEYCODE_DPAD_CENTER:
-                    getBoard().toggleSelection();
+                    board.toggleSelection();
                     break;
 
                 case KeyEvent.KEYCODE_SPACE:
                     settings.getPlaySpaceChangesDirection(changesDir -> {
                         if (changesDir)
-                            getBoard().toggleSelection();
+                            board.toggleSelection();
                         else
                             playLetter(' ');
                     });
@@ -433,9 +434,9 @@ public class PlayActivity extends PuzzleActivity
                 case KeyEvent.KEYCODE_ENTER:
                     settings.getPlayEnterChangesDirection(enterChanges -> {
                         if (enterChanges)
-                            getBoard().toggleSelection();
+                            board.toggleSelection();
                         else
-                            getBoard().nextWord();
+                            board.nextWord();
                     });
                     break;
 
@@ -445,16 +446,17 @@ public class PlayActivity extends PuzzleActivity
 
                 case KeyEvent.KEYCODE_TAB:
                     if (event.hasModifiers(KeyEvent.META_SHIFT_ON))
-                        getBoard().previousWord();
+                        board.previousWord();
                     else
-                        getBoard().nextWord();
-                    return true;
+                        board.nextWord();
+                    break;
+
+                default:
+                    char c = Character.toUpperCase(event.getDisplayLabel());
+                    if (Character.isLetterOrDigit(c))
+                        playLetter(c);
+                    break;
             }
-
-            char c = Character.toUpperCase(event.getDisplayLabel());
-
-            if (Character.isLetterOrDigit(c))
-                playLetter(c);
         }
 
         keyboardManager.popBlockHide();
