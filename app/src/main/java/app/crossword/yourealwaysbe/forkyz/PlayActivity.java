@@ -1123,9 +1123,7 @@ public class PlayActivity extends PuzzleActivity
             );
             Puzzle puz = getPuzzle();
             if (puz != null) {
-                int proportionalHeight = (int)(
-                    getPuzzleHeightRatio() * metrics.widthPixels
-                );
+                int proportionalHeight = (int)(getPuzzleHeightRatio() * width);
                 maxHeight = Math.max(maxHeight, proportionalHeight);
             }
         } else {
