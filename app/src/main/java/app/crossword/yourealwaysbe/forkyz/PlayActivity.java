@@ -56,7 +56,10 @@ public class PlayActivity extends PuzzleActivity
                                      ClueTabs.ClueTabsListener,
                                      ShakeDetector.Listener {
     private static final Logger LOG = Logger.getLogger("app.crossword.yourealwaysbe");
+    // min height in portrait
     private static final float ACROSTIC_BOARD_HEIGHT_RATIO_MIN = 0.25F;
+    // max width in landscape
+    private static final float ACROSTIC_BOARD_WIDTH_RATIO_MAX = 0.7F;
     private static final float ACROSTIC_CLUE_TABS_WORD_SCALE = 0.7F;
     private static final float ACROSTIC_CLUE_TABS_HEIGHT_RATIO_MIN = 0.3F;
 
@@ -585,19 +588,21 @@ public class PlayActivity extends PuzzleActivity
     }
 
     private void setupObservers() {
-        settings.livePlayGridRatio().observe(
+        settings.livePlayGridRatioPortrait().observe(
             this,
             gridRatio -> {
-                if (currentGridRatio != gridRatio)
-                    makeClueTabsInvisible();
-                currentGridRatio = gridRatio;
-                settings.getPlayShowCluesTab(showCluesTab -> {
-                    if (showCluesTab) {
-                        showClueTabs();
-                    } else {
-                        hideClueTabs();
-                    }
-                });
+                if (!isPortrait())
+                    return;
+                updateGridRatio(gridRatio);
+            }
+        );
+
+        settings.livePlayGridRatioLandscape().observe(
+            this,
+            gridRatio -> {
+                if (isPortrait())
+                    return;
+                updateGridRatio(gridRatio);
             }
         );
 
@@ -1042,7 +1047,7 @@ public class PlayActivity extends PuzzleActivity
         Puzzle puz = getPuzzle();
         return puz == null
             ? 1
-            : (float) puz.getHeight() / puz.getWidth();
+            : ((float) puz.getHeight()) / puz.getWidth();
     }
 
 
@@ -1062,29 +1067,23 @@ public class PlayActivity extends PuzzleActivity
             int height = bottom - top;
             int width = right - left;
 
-            int orientation = PlayActivity.this
-                .getResources()
-                .getConfiguration()
-                .orientation;
-
-            boolean portrait = (
-                orientation == Configuration.ORIENTATION_PORTRAIT
-            );
-
-            if (portrait) {
+            if (isPortrait()) {
                 constrainedDims |=
                     addBoardViewConstraintsPortrait(width, height, set);
+            } else {
+                constrainedDims |=
+                    addBoardViewConstraintsLandscape(width, height, set);
             }
         } else {
+            set.constrainMaxWidth(binding.boardView.getId(), 0);
             set.constrainMaxHeight(binding.boardView.getId(), 0);
         }
 
         set.applyTo(binding.constraintLayout);
 
-        // if the view changed size, then rescale the view
-        // cannot change layout during a layout change, so
-        // use a predraw listener that requests a new layout
-        // and returns false to cancel the current draw
+        // if the view changed size, then rescale the view cannot change layout
+        // during a layout change, so use a predraw listener that requests a
+        // new layout and returns false to cancel the current draw
         if (constrainedDims ||
             left != leftWas || right != rightWas ||
             top != topWas || bottom != bottomWas) {
@@ -1159,5 +1158,88 @@ public class PlayActivity extends PuzzleActivity
         } else {
             return false;
         }
+    }
+
+    /**
+     * Constraint size of board view in landscape mode
+     *
+     * For current user preferences.
+     *
+     * @param width the proposed target width of the boardView
+     * @param height the proposed target height of the boardView
+     * @param set the constraint set to add to
+     * @returns true if a constraint added
+     */
+    private boolean addBoardViewConstraintsLandscape(
+        int width, int height, ConstraintSet set
+    ) {
+        int maxWidth = 0;
+        DisplayMetrics metrics = getResources().getDisplayMetrics();
+
+        if (isAcrostic()) {
+            maxWidth = (int)(
+                ACROSTIC_BOARD_WIDTH_RATIO_MAX * metrics.widthPixels
+            );
+            Puzzle puz = getPuzzle();
+            if (puz != null) {
+                int proportionalWidth = (int)(
+                    (1 / getPuzzleHeightRatio()) * height
+                );
+                maxWidth = Math.min(maxWidth, proportionalWidth);
+            }
+        } else {
+            switch (currentGridRatio) {
+            case PUZZLE_SHAPE:
+                float ratio = 1 / getPuzzleHeightRatio();
+                maxWidth = (int)(ratio * height);
+                break;
+            case ONE_TO_ONE:
+                maxWidth = height;
+                break;
+            case THIRTY_PCNT:
+                maxWidth = (int)(0.3 * metrics.widthPixels);
+                break;
+            case FORTY_PCNT:
+                maxWidth = (int)(0.4 * metrics.widthPixels);
+                break;
+            case FIFTY_PCNT:
+                maxWidth = (int)(0.5 * metrics.widthPixels);
+                break;
+            case SIXTY_PCNT:
+                maxWidth = (int)(0.6 * metrics.widthPixels);
+                break;
+            }
+        }
+
+        if (width > maxWidth) {
+            set.constrainMaxWidth(binding.boardView.getId(), maxWidth);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * If device in portrait or landscape mode
+     */
+    private boolean isPortrait() {
+        int orientation = getResources().getConfiguration().orientation;
+        return orientation == Configuration.ORIENTATION_PORTRAIT;
+    }
+
+    /**
+     * Change grid ratio if clue tabs showing
+     */
+    private void updateGridRatio(GridRatio gridRatio) {
+        if (currentGridRatio != gridRatio)
+            makeClueTabsInvisible();
+        currentGridRatio = gridRatio;
+        settings.getPlayShowCluesTab(showCluesTab -> {
+            if (showCluesTab) {
+                showClueTabs();
+            } else {
+                hideClueTabs();
+            }
+        });
     }
 }

@@ -138,7 +138,9 @@ public class ForkyzSettings {
         = "enterChangesDirection";
     private static final String PREF_PLAY_FIT_TO_SCREEN = "fitToScreen";
     private static final String PREF_PLAY_FULL_SCREEN = "fullScreen";
-    private static final String PREF_PLAY_GRID_RATIO = "gridRatio";
+    private static final String PREF_PLAY_GRID_RATIO_LANDSCAPE
+        = "gridRatioLand";
+    private static final String PREF_PLAY_GRID_RATIO_PORTRAIT = "gridRatio";
     private static final String PREF_PLAY_LEGACY_DONT_DELETE_CROSSING
         = "dontDeleteCrossing";
     private static final String PREF_PLAY_MOVEMENT_STRATEGY
@@ -269,7 +271,8 @@ public class ForkyzSettings {
 
     private MutableLiveData<Accessor> liveBrowseSort;
     private MutableLiveData<KeyboardSettings> liveKeyboardSettings;
-    private MutableLiveData<GridRatio> livePlayGridRatio;
+    private MutableLiveData<GridRatio> livePlayGridRatioLandscape;
+    private MutableLiveData<GridRatio> livePlayGridRatioPortrait;
     private MutableLiveData<DeleteCrossingMode> livePlayDeleteCrossingMode;
     private MutableLiveData<RatingsSettings> liveRatingsSettings;
     private Map<String, MutableLiveData<Boolean>> liveBooleans = new HashMap<>();
@@ -291,8 +294,10 @@ public class ForkyzSettings {
                 updateLiveKeyboardSettings();
             } else if (PREF_PLAY_DELETE_CROSSING_MODE.equals(key)) {
                 updateLivePlayDeleteCrossingMode();
-            } else if (PREF_PLAY_GRID_RATIO.equals(key)) {
-                updateLivePlayGridRatio();
+            } else if (PREF_PLAY_GRID_RATIO_LANDSCAPE.equals(key)) {
+                updateLivePlayGridRatioLandscape();
+            } else if (PREF_PLAY_GRID_RATIO_PORTRAIT.equals(key)) {
+                updateLivePlayGridRatioPortrait();
             } else if (
                 PREF_BROWSE_ALWAYS_SHOW_RATING.equals(key)
                 || PREF_RATINGS_DISABLE_RATINGS.equals(key)
@@ -820,12 +825,12 @@ public class ForkyzSettings {
     }
 
     /**
-     * Get grid ratio when clue tabs showing on play screen
+     * Get grid ratio when clue tabs showing on play screen landscape mode
      */
-    public void getPlayGridRatio(Consumer<GridRatio> cb) {
+    public void getPlayGridRatioLandscape(Consumer<GridRatio> cb) {
         executor.execute(() -> {
             String value = prefs.getString(
-                PREF_PLAY_GRID_RATIO,
+                PREF_PLAY_GRID_RATIO_LANDSCAPE,
                 GridRatio.PUZZLE_SHAPE.getSettingsValue()
             );
             handler.post(() -> {
@@ -834,12 +839,35 @@ public class ForkyzSettings {
         });
     }
 
-    public LiveData<GridRatio> livePlayGridRatio() {
-        if (livePlayGridRatio == null) {
-            livePlayGridRatio = new MutableLiveData<GridRatio>();
-            updateLivePlayGridRatio();
+    public LiveData<GridRatio> livePlayGridRatioLandscape() {
+        if (livePlayGridRatioLandscape == null) {
+            livePlayGridRatioLandscape = new MutableLiveData<GridRatio>();
+            updateLivePlayGridRatioLandscape();
         }
-        return livePlayGridRatio;
+        return livePlayGridRatioLandscape;
+    }
+
+    /**
+     * Get grid ratio when clue tabs showing on play screen
+     */
+    public void getPlayGridRatioPortrait(Consumer<GridRatio> cb) {
+        executor.execute(() -> {
+            String value = prefs.getString(
+                PREF_PLAY_GRID_RATIO_PORTRAIT,
+                GridRatio.PUZZLE_SHAPE.getSettingsValue()
+            );
+            handler.post(() -> {
+                cb.accept(GridRatio.getFromSettingsValue(value));
+            });
+        });
+    }
+
+    public LiveData<GridRatio> livePlayGridRatioPortrait() {
+        if (livePlayGridRatioPortrait == null) {
+            livePlayGridRatioPortrait = new MutableLiveData<GridRatio>();
+            updateLivePlayGridRatioPortrait();
+        }
+        return livePlayGridRatioPortrait;
     }
 
     /**
@@ -1412,9 +1440,18 @@ public class ForkyzSettings {
         }
     }
 
-    private void updateLivePlayGridRatio() {
-        if (livePlayGridRatio != null)
-            getPlayGridRatio(value -> { livePlayGridRatio.setValue(value); });
+    private void updateLivePlayGridRatioLandscape() {
+        if (livePlayGridRatioLandscape != null)
+            getPlayGridRatioLandscape(
+                value -> { livePlayGridRatioLandscape.setValue(value); }
+            );
+    }
+
+    private void updateLivePlayGridRatioPortrait() {
+        if (livePlayGridRatioPortrait != null)
+            getPlayGridRatioPortrait(
+                value -> { livePlayGridRatioPortrait.setValue(value); }
+            );
     }
 
     private void updateLiveRatingsSettings() {
