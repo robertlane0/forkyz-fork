@@ -66,7 +66,7 @@ public class PlayActivity extends PuzzleActivity
     private ShakeDetector shakeDetector = null;
 
     // Proper value is loaded before this is used anyway
-    private GridRatio currentGridRatio = GridRatio.ONE_TO_ONE;
+    private GridRatio currentGridRatio = GridRatio.PUZZLE_SHAPE;
 
     private Runnable fitToScreenTask = new Runnable() {
         @Override
@@ -241,6 +241,10 @@ public class PlayActivity extends PuzzleActivity
                                 }
                             } else {
                                 switch (currentGridRatio) {
+                                case PUZZLE_SHAPE:
+                                    float ratio = getPuzzleHeightRatio();
+                                    maxHeight = (int)(ratio * width);
+                                    break;
                                 case ONE_TO_ONE:
                                     maxHeight = width;
                                     break;
@@ -1145,5 +1149,15 @@ public class PlayActivity extends PuzzleActivity
                 );
             }
         });
+    }
+
+    /**
+     * puzzle height / puzzle width or 1 if no puzzle
+     */
+    private float getPuzzleHeightRatio() {
+        Puzzle puz = getPuzzle();
+        return puz == null
+            ? 1
+            : (float) puz.getHeight() / puz.getWidth();
     }
 }

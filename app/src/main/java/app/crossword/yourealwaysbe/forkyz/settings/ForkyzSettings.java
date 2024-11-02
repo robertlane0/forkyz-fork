@@ -826,7 +826,7 @@ public class ForkyzSettings {
         executor.execute(() -> {
             String value = prefs.getString(
                 PREF_PLAY_GRID_RATIO,
-                GridRatio.ONE_TO_ONE.getSettingsValue()
+                GridRatio.PUZZLE_SHAPE.getSettingsValue()
             );
             handler.post(() -> {
                 cb.accept(GridRatio.getFromSettingsValue(value));

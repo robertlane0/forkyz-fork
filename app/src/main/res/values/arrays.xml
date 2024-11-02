@@ -197,6 +197,7 @@
          <item>AARD2</item>
      </string-array>
      <string-array name="grid_ratio_labels">
+       <item>@string/grid_ratio_puzzle</item>
        <item>@string/grid_ratio_one_to_one</item>
        <item>@string/grid_ratio_thirty_pcnt</item>
        <item>@string/grid_ratio_forty_pcnt</item>
@@ -204,6 +205,7 @@
        <item>@string/grid_ratio_sixty_pcnt</item>
      </string-array>
      <string-array name="grid_ratio_values">
+       <item>5</item>
        <item>0</item>
        <item>1</item>
        <item>2</item>
