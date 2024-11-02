@@ -192,123 +192,7 @@ public class PlayActivity extends PuzzleActivity
         // constrain to 1:1 if clueTabs is showing
         // or half of screen if acrostic
         binding.boardView.addOnLayoutChangeListener(
-            new View.OnLayoutChangeListener() {
-                public void onLayoutChange(View v,
-                  int left, int top, int right, int bottom,
-                  int leftWas, int topWas, int rightWas, int bottomWas
-                ) {
-                    boolean showCluesTab
-                        = binding.clueTabs.getVisibility() != View.GONE;
-                    boolean constrainedDims = false;
-
-                    ConstraintSet set = new ConstraintSet();
-                    set.clone(binding.constraintLayout);
-
-                    if (showCluesTab) {
-                        int height = bottom - top;
-                        int width = right - left;
-
-                        int orientation
-                            = PlayActivity.this
-                                .getResources()
-                                .getConfiguration()
-                                .orientation;
-
-                        boolean portrait = (
-                            orientation
-                                == Configuration.ORIENTATION_PORTRAIT
-                        );
-
-                        if (portrait) {
-                            int maxHeight = 0;
-                            DisplayMetrics metrics
-                                = getResources().getDisplayMetrics();
-                            if (isAcrostic()) {
-                                maxHeight = (int)(
-                                    ACROSTIC_BOARD_HEIGHT_RATIO_MIN
-                                        * metrics.heightPixels
-                                );
-                                Puzzle puz = getPuzzle();
-                                if (puz != null) {
-                                    int proportionalHeight = (int)(
-                                        ((float) puz.getHeight())
-                                            / puz.getWidth()
-                                            * metrics.widthPixels
-                                    );
-                                    maxHeight = Math.max(
-                                        maxHeight, proportionalHeight
-                                    );
-                                }
-                            } else {
-                                switch (currentGridRatio) {
-                                case PUZZLE_SHAPE:
-                                    float ratio = getPuzzleHeightRatio();
-                                    maxHeight = (int)(ratio * width);
-                                    break;
-                                case ONE_TO_ONE:
-                                    maxHeight = width;
-                                    break;
-                                case THIRTY_PCNT:
-                                    maxHeight = (int)(
-                                        0.3 * metrics.heightPixels
-                                    );
-                                    break;
-                                case FORTY_PCNT:
-                                    maxHeight = (int)(
-                                        0.4 * metrics.heightPixels
-                                    );
-                                    break;
-                                case FIFTY_PCNT:
-                                    maxHeight = (int)(
-                                        0.5 * metrics.heightPixels
-                                    );
-                                    break;
-                                case SIXTY_PCNT:
-                                    maxHeight = (int)(
-                                        0.6 * metrics.heightPixels
-                                    );
-                                    break;
-                                }
-                            }
-
-                            if (height > maxHeight) {
-                                constrainedDims = true;
-                                set.constrainMaxHeight(
-                                    binding.boardView.getId(), maxHeight
-                                );
-                            }
-                        }
-                    } else {
-                        set.constrainMaxHeight(
-                            binding.boardView.getId(), 0
-                        );
-                    }
-
-                    set.applyTo(binding.constraintLayout);
-
-                    // if the view changed size, then rescale the view
-                    // cannot change layout during a layout change, so
-                    // use a predraw listener that requests a new layout
-                    // and returns false to cancel the current draw
-                    if (constrainedDims ||
-                        left != leftWas || right != rightWas ||
-                        top != topWas || bottom != bottomWas) {
-                        binding.boardView
-                            .getViewTreeObserver()
-                            .addOnPreDrawListener(
-                                new ViewTreeObserver.OnPreDrawListener() {
-                                    public boolean onPreDraw() {
-                                        binding.boardView.relayout();
-                                        binding.boardView
-                                            .getViewTreeObserver()
-                                            .removeOnPreDrawListener(this);
-                                        return false;
-                                    }
-                                }
-                            );
-                    }
-                }
-            }
+            this::onBoardViewLayoutChange
         );
 
         binding.boardView.setScaleListener(new ScaleListener() {
@@ -1159,5 +1043,121 @@ public class PlayActivity extends PuzzleActivity
         return puz == null
             ? 1
             : (float) puz.getHeight() / puz.getWidth();
+    }
+
+
+    private void onBoardViewLayoutChange(
+        View v,
+        int left, int top, int right, int bottom,
+        int leftWas, int topWas, int rightWas, int bottomWas
+    ) {
+        boolean showCluesTab
+            = binding.clueTabs.getVisibility() != View.GONE;
+        boolean constrainedDims = false;
+
+        ConstraintSet set = new ConstraintSet();
+        set.clone(binding.constraintLayout);
+
+        if (showCluesTab) {
+            int height = bottom - top;
+            int width = right - left;
+
+            int orientation = PlayActivity.this
+                .getResources()
+                .getConfiguration()
+                .orientation;
+
+            boolean portrait = (
+                orientation == Configuration.ORIENTATION_PORTRAIT
+            );
+
+            if (portrait) {
+                constrainedDims |=
+                    addBoardViewConstraintsPortrait(width, height, set);
+            }
+        } else {
+            set.constrainMaxHeight(binding.boardView.getId(), 0);
+        }
+
+        set.applyTo(binding.constraintLayout);
+
+        // if the view changed size, then rescale the view
+        // cannot change layout during a layout change, so
+        // use a predraw listener that requests a new layout
+        // and returns false to cancel the current draw
+        if (constrainedDims ||
+            left != leftWas || right != rightWas ||
+            top != topWas || bottom != bottomWas) {
+            binding.boardView
+                .getViewTreeObserver()
+                .addOnPreDrawListener(
+                    new ViewTreeObserver.OnPreDrawListener() {
+                        public boolean onPreDraw() {
+                            binding.boardView.relayout();
+                            binding.boardView.getViewTreeObserver()
+                                .removeOnPreDrawListener(this);
+                            return false;
+                        }
+                    }
+                );
+        }
+    }
+
+    /**
+     * Constraint size of board view in portrait mode
+     *
+     * For current user preferences.
+     *
+     * @param width the proposed target width of the boardView
+     * @param height the proposed target height of the boardView
+     * @param set the constraint set to add to
+     * @returns true if a constraint added
+     */
+    private boolean addBoardViewConstraintsPortrait(
+        int width, int height, ConstraintSet set
+    ) {
+        int maxHeight = 0;
+        DisplayMetrics metrics = getResources().getDisplayMetrics();
+        if (isAcrostic()) {
+            maxHeight = (int)(
+                ACROSTIC_BOARD_HEIGHT_RATIO_MIN * metrics.heightPixels
+            );
+            Puzzle puz = getPuzzle();
+            if (puz != null) {
+                int proportionalHeight = (int)(
+                    getPuzzleHeightRatio() * metrics.widthPixels
+                );
+                maxHeight = Math.max(maxHeight, proportionalHeight);
+            }
+        } else {
+            switch (currentGridRatio) {
+            case PUZZLE_SHAPE:
+                float ratio = getPuzzleHeightRatio();
+                maxHeight = (int)(ratio * width);
+                break;
+            case ONE_TO_ONE:
+                maxHeight = width;
+                break;
+            case THIRTY_PCNT:
+                maxHeight = (int)(0.3 * metrics.heightPixels);
+                break;
+            case FORTY_PCNT:
+                maxHeight = (int)(0.4 * metrics.heightPixels);
+                break;
+            case FIFTY_PCNT:
+                maxHeight = (int)(0.5 * metrics.heightPixels);
+                break;
+            case SIXTY_PCNT:
+                maxHeight = (int)(0.6 * metrics.heightPixels);
+                break;
+            }
+        }
+
+        if (height > maxHeight) {
+            set.constrainMaxHeight(binding.boardView.getId(), maxHeight);
+            return true;
+        } else {
+            return false;
+        }
     }
 }
