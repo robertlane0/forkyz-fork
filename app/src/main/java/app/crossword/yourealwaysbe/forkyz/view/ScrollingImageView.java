@@ -60,63 +60,32 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
 
         // have some initial presence so that view can have focus from
         // the get-go
-        addView(imageGrid);
         setViewParams(imageGrid, 1, 1);
+        addView(imageGrid);
 
         aux = new MultitouchHandler();
         aux.init(this);
     }
 
     public int getImageWidth() {
-        return imageGrid.getWidth();
+        return imageGrid.getMeasuredWidth();
     }
 
     public int getImageHeight() {
-        return imageGrid.getHeight();
-    }
-
-    public void setBitmap(BitmapGrid bitmap) {
-        this.setBitmap(bitmap, true);
+        return imageGrid.getMeasuredHeight();
     }
 
     /**
      * Set the bitmap
      *
      * Replaces current image display with the new one. Will resize all
-     * views to match the bitmap if rescale is true or the given bitmap
-     * doesn't match the previous one in num rows and cols.
+     * views if needed.
      */
-    public void setBitmap(BitmapGrid bitmap, boolean rescale) {
+    public void setBitmap(BitmapGrid bitmap) {
+        presetImageSize(bitmap);
         int numRows = bitmap == null ? 0 : bitmap.getNumRows();
         int numCols = bitmap == null ? 0 : bitmap.getNumCols();
-        if (numRows == 0 || numCols == 0) {
-            imageGrid.removeAllViews();
-            setViewParams(imageGrid, 1, 1);
-            subImageSizes = null;
-            fullImageSize = null;
-        } else {
-            // rescale if we had to change grid layout
-            rescale |= imageGrid.getRowCount() != bitmap.getNumRows()
-                || imageGrid.getColumnCount() != bitmap.getNumCols();
-
-            if (rescale) {
-                // would be nicer to reuse all views, but a naive
-                // implementation would cause crashes when Android
-                // noticed the child views didn't agree with the parent
-                // on row/col counts
-                imageGrid.removeAllViews();
-                subImageSizes = new ImageSize[numRows * numCols];
-                for (int row = 0; row < numRows; row++) {
-                    for (int col = 0; col < numCols; col++) {
-                        imageGrid.addView(new ImageView(getContext()));
-                    }
-                }
-                // set image grid to correct grid size and child count
-                imageGrid.setRowCount(bitmap.getNumRows());
-                imageGrid.setColumnCount(bitmap.getNumCols());
-            }
-
-            // set bitmaps and dimensions
+        if (numRows > 0 && numCols > 0) {
             for (int row = 0; row < numRows; row++) {
                 for (int col = 0; col < numCols; col++) {
                     BitmapGrid.Tile tile = bitmap.getTile(row, col);
@@ -126,34 +95,18 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
                     int viewIdx = row * numCols + col;
                     ImageView imageView
                         = (ImageView) imageGrid.getChildAt(viewIdx);
-                    imageView.setImageBitmap(tile.getBitmap());
-
-                    int tileWidth = tile.getWidth();
-                    int tileHeight = tile.getHeight();
-
-                    if (rescale) {
-                        subImageSizes[viewIdx] = new ImageSize(
-                            tileWidth, tileHeight
-                        );
-                        setViewParams(imageView, tileWidth, tileHeight);
-                    }
+                    if (imageView != null)
+                        imageView.setImageBitmap(tile.getBitmap());
                 }
-            }
-
-            if (rescale) {
-                setViewParams(imageGrid, bitmap.getWidth(), bitmap.getHeight());
-                fullImageSize = new ImageSize(
-                    bitmap.getWidth(), bitmap.getHeight()
-                );
             }
         }
     }
 
     // This method is a hack needed in PlayActivity when clue tabs are
     // shown. The constrain of the board to 1:1 seems to have no effect
-    // until render(true) is called.
+    // until render() is called.
     public void relayout() {
-        setViewParams(imageGrid, getImageWidth(), getImageHeight());
+        setViewParams(imageGrid, getImageWidth(), getImageHeight(), true);
     }
 
     public void setContextMenuListener(ClickListener l) {
@@ -198,9 +151,9 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
 
     public boolean isVisible(Point p) {
         int currentMinX = this.getScrollX();
-        int currentMaxX = this.getWidth() + this.getScrollX();
+        int currentMaxX = this.getMeasuredWidth() + this.getScrollX();
         int currentMinY = this.getScrollY();
-        int currentMaxY = this.getHeight() + this.getScrollY();
+        int currentMaxY = this.getMeasuredHeight() + this.getScrollY();
 
         return (p.x >= currentMinX) && (p.x <= currentMaxX)
             && (p.y >= currentMinY) && (p.y <= currentMaxY);
@@ -230,16 +183,16 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
 
     public void ensureVisible(Point p) {
         // do not scroll before we have dimensions
-        if (this.getWidth() == 0 || this.getHeight() == 0)
+        if (this.getMeasuredWidth() == 0 || this.getMeasuredHeight() == 0)
             return;
 
         int x = p.x;
         int y = p.y;
 
         int currentX = this.getScrollX();
-        int currentMaxX = this.getWidth() + this.getScrollX();
+        int currentMaxX = this.getMeasuredWidth() + this.getScrollX();
         int currentY = this.getScrollY();
-        int currentMaxY = this.getHeight() + this.getScrollY();
+        int currentMaxY = this.getMeasuredHeight() + this.getScrollY();
 
         boolean scrolled = false;
 
@@ -249,7 +202,7 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
             this.scrollTo(x, currentY);
             scrolled = true;
         } else if (x > currentMaxX) {
-            this.scrollTo(x - this.getWidth(), currentY);
+            this.scrollTo(x - this.getMeasuredWidth(), currentY);
             scrolled = true;
         }
 
@@ -257,7 +210,7 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
             this.scrollTo(currentX, y);
             scrolled = true;
         } else if (y > currentMaxY) {
-            this.scrollTo(currentX, y - this.getHeight());
+            this.scrollTo(currentX, y - this.getMeasuredHeight());
             scrolled = true;
         }
 
@@ -349,8 +302,8 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
         int newX = curX + x;
         int newY = curY + y;
 
-        int screenWidth = this.getWidth();
-        int screenHeight = this.getHeight();
+        int screenWidth = this.getMeasuredWidth();
+        int screenHeight = this.getMeasuredHeight();
         int boardWidth = this.getImageWidth();
         int boardHeight= this.getImageHeight();
 
@@ -453,8 +406,8 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
                 h *= runningScale;
                 w *= runningScale;
             } else {
-                h = imageView.getHeight();
-                w = imageView.getWidth();
+                h = imageView.getMeasuredHeight();
+                w = imageView.getMeasuredWidth();
                 h *= scale;
                 w *= scale;
             }
@@ -467,8 +420,8 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
             h *= runningScale;
             w *= runningScale;
         } else {
-            h = imageGrid.getHeight();
-            w = imageGrid.getWidth();
+            h = imageGrid.getMeasuredHeight();
+            w = imageGrid.getMeasuredWidth();
             h *= scale;
             w *= scale;
         }
@@ -495,6 +448,84 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
 
         this.scaleScrollLocation = null;
         runningScale = 1.0f;
+    }
+
+    /**
+     * Set size of image view
+     *
+     * Just uses shape of bitmap, doesn't show any of the data.
+     */
+    private void presetImageSize(BitmapGrid bitmap) {
+        int numRows = bitmap == null ? 0 : bitmap.getNumRows();
+        int numCols = bitmap == null ? 0 : bitmap.getNumCols();
+        if (numRows == 0 || numCols == 0) {
+            imageGrid.removeAllViews();
+            setViewParams(imageGrid, 1, 1);
+            subImageSizes = null;
+            fullImageSize = null;
+        } else {
+            // rescale if we had to change grid layout
+            boolean newTileDims = subImageSizes == null
+                || imageGrid.getRowCount() != numRows
+                || imageGrid.getColumnCount() != bitmap.getNumCols();
+
+            if (newTileDims) {
+                // would be nicer to reuse all views, but a naive
+                // implementation would cause crashes when Android
+                // noticed the child views didn't agree with the parent
+                // on row/col counts
+                imageGrid.removeAllViews();
+
+                // set image grid to correct grid size and child count
+                imageGrid.setRowCount(numRows);
+                imageGrid.setColumnCount(bitmap.getNumCols());
+
+                subImageSizes = new ImageSize[numRows * numCols];
+                for (int row = 0; row < numRows; row++) {
+                    for (int col = 0; col < numCols; col++) {
+                        imageGrid.addView(new ImageView(getContext()));
+                    }
+                }
+            }
+
+            // set bitmaps and dimensions
+            for (int row = 0; row < numRows; row++) {
+                for (int col = 0; col < numCols; col++) {
+                    BitmapGrid.Tile tile = bitmap.getTile(row, col);
+                    if (tile == null)
+                        continue;
+
+                    int viewIdx = row * numCols + col;
+                    ImageView imageView
+                        = (ImageView) imageGrid.getChildAt(viewIdx);
+
+                    int tileWidth = tile.getWidth();
+                    int tileHeight = tile.getHeight();
+
+                    boolean newSubSize = subImageSizes[viewIdx] == null
+                        || subImageSizes[viewIdx].width() != tileWidth
+                        || subImageSizes[viewIdx].height() != tileHeight;
+
+                    if (newSubSize) {
+                        subImageSizes[viewIdx] = new ImageSize(
+                            tileWidth, tileHeight
+                        );
+                        setViewParams(imageView, tileWidth, tileHeight);
+                    }
+                }
+            }
+
+            boolean newSize = fullImageSize == null
+                || fullImageSize.width() != bitmap.getWidth()
+                || fullImageSize.height() != bitmap.getHeight();
+
+            if (newSize) {
+                setViewParams(imageGrid, bitmap.getWidth(), bitmap.getHeight());
+                fullImageSize = new ImageSize(
+                    bitmap.getWidth(), bitmap.getHeight()
+                );
+            }
+        }
     }
 
     /**
@@ -563,7 +594,9 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
      */
     public Rect getVisibleRect() {
         Point topLeft = resolveToImagePoint(0, 0);
-        Point bottomRight = resolveToImagePoint(getWidth(), getHeight());
+        Point bottomRight = resolveToImagePoint(
+            getMeasuredWidth(), getMeasuredHeight()
+        );
         Rect rect = new Rect(
             Math.max(0, topLeft.x),
             Math.max(0, topLeft.y),
@@ -613,18 +646,32 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
     }
 
     /**
+     * Change view params, return if change made
+     */
+    private boolean setViewParams(View view, int width, int height) {
+        return setViewParams(view, width, height, false);
+    }
+
+    /**
      * Change image size, add to view if needed
      *
      * Ignores if view has not been attached / has not current layout
-     * params.
+     * params, unless force set.
      */
-    private void setViewParams(View view, int width, int height) {
+    private boolean setViewParams(
+        View view, int width, int height, boolean force
+    ) {
         ViewGroup.LayoutParams lp = view.getLayoutParams();
         if (lp != null) {
-            lp.width = width;
-            lp.height = height;
-            view.setLayoutParams(lp);
+            boolean change = lp.width != width || lp.height != height;
+            if (force || change) {
+                lp.width = width;
+                lp.height = height;
+                view.setLayoutParams(lp);
+                return true;
+            }
         }
+        return false;
     }
 
     private void pushBlockScrollEnd() {
@@ -675,9 +722,9 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
 
         public ScrollLocation(Point p, View view) {
             this.percentAcrossImage
-                = (double) p.x / (double) view.getWidth();
+                = (double) p.x / (double) view.getMeasuredWidth();
             this.percentDownImage
-                = (double) p.y / (double) view.getHeight();
+                = (double) p.y / (double) view.getMeasuredHeight();
             this.absoluteX = p.x - ScrollingImageView.this.getScrollX();
             this.absoluteY = p.y - ScrollingImageView.this.getScrollY();
         }

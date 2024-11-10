@@ -58,8 +58,8 @@ public class BoardFullEditView extends BoardEditView {
             return -1;
 
         scrollTo(0, 0);
-        int w = getWidth();
-        int h = getHeight();
+        int w = getMeasuredWidth();
+        int h = getMeasuredHeight();
         float scale = renderer.fitTo(w, h);
         setCurrentScale(scale);
         return scale;
@@ -73,7 +73,7 @@ public class BoardFullEditView extends BoardEditView {
     }
 
     @Override
-    public void render(PlayboardChanges changes, boolean rescale) {
+    public void render(PlayboardChanges changes) {
         PlayboardRenderer renderer = getRenderer();
         Playboard board = getBoard();
         if (renderer == null || board == null)
@@ -96,7 +96,7 @@ public class BoardFullEditView extends BoardEditView {
                         renderChanges, suppressNotesList, getRenderRect()
                     );
                     handler.post(() -> {
-                        try { setBitmap(bitmap, rescale); }
+                        try { setBitmap(bitmap); }
                         finally { unlockRenderer(); }
                     });
                 } catch (Exception e) {

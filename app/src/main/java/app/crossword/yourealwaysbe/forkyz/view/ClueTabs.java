@@ -21,6 +21,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.GestureDetector;
@@ -29,6 +30,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.content.ContextCompat;
 import androidx.core.text.HtmlCompat;
 import androidx.core.view.ViewCompat;
@@ -40,6 +42,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
 import dagger.hilt.android.AndroidEntryPoint;
@@ -58,7 +61,13 @@ import javax.inject.Inject;
 @AndroidEntryPoint
 public class ClueTabs extends LinearLayout
                       implements Playboard.PlayboardListener {
-    private static final Logger LOG = Logger.getLogger("app.crossword.yourealwaysbe");
+    private static final Logger LOG
+        = Logger.getLogger("app.crossword.yourealwaysbe");
+
+    /**
+     * How wide before enable multiple clue lists
+     */
+    private static final float DOUBLE_UP_WIDTH_INCH = 3.0F;
 
     public static enum PageType {
         CLUES, HISTORY;
@@ -209,57 +218,20 @@ public class ClueTabs extends LinearLayout
         listNames.addAll(puz.getClueListNames());
         Collections.sort(listNames);
 
-        final ClueTabsPagerAdapter adapter = new ClueTabsPagerAdapter();
-
-        binding.clueTabsPager.setAdapter(adapter);
-
-        binding.clueTabsPager.registerOnPageChangeCallback(
-            new ViewPager2.OnPageChangeCallback() {
-                public void onPageSelected(int position) {
-                    ClueTabs.this.notifyListenersPageChanged(position);
-                }
-            }
-        );
-
-        new TabLayoutMediator(
-            binding.clueTabsTabLayout,
-            binding.clueTabsPager,
-            (tab, position) -> { tab.setText(adapter.getPageTitle(position)); }
-        ).attach();
-
-        setTabLayoutOnTouchListener();
-
-        LinearLayout tabStrip = (LinearLayout) binding.clueTabsTabLayout.getChildAt(0);
-        for (int i = 0; i < tabStrip.getChildCount(); i++) {
-            View view = tabStrip.getChildAt(i);
-            view.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    ClueTabs.this.notifyListenersTabsBarLongClick();
-                    return true;
-                }
-            });
-            if (onBarLongClickDescription != null) {
-                ViewCompat.replaceAccessibilityAction(
-                    view,
-                    AccessibilityActionCompat.ACTION_LONG_CLICK,
-                    onBarLongClickDescription,
-                    null
-                );
-            }
-        }
+        setupPager(binding.clueTabsPager0, binding.clueTabsTabLayout0, 0);
+        setupPager(binding.clueTabsPager1, binding.clueTabsTabLayout1, 1);
 
         listenBoard();
     }
 
     public void setPage(int pageNumber) {
-        binding.clueTabsPager.setCurrentItem(pageNumber, false);
+        binding.clueTabsPager0.setCurrentItem(pageNumber, false);
     }
 
     public PageType getCurrentPageType() {
-        int curPage = binding.clueTabsPager.getCurrentItem();
+        int curPage = binding.clueTabsPager0.getCurrentItem();
         ClueTabsPagerAdapter adapter
-            = (ClueTabsPagerAdapter) binding.clueTabsPager.getAdapter();
+            = (ClueTabsPagerAdapter) binding.clueTabsPager0.getAdapter();
         return adapter.getPageType(curPage);
     }
 
@@ -267,23 +239,23 @@ public class ClueTabs extends LinearLayout
      * Name of current list or null if oob or history
      */
     public String getCurrentPageListName() {
-        int curPage = binding.clueTabsPager.getCurrentItem();
+        int curPage = binding.clueTabsPager0.getCurrentItem();
         ClueTabsPagerAdapter adapter
-            = (ClueTabsPagerAdapter) binding.clueTabsPager.getAdapter();
+            = (ClueTabsPagerAdapter) binding.clueTabsPager0.getAdapter();
         return adapter.getPageListName(curPage);
     }
 
     public void nextPage() {
-        int curPage = binding.clueTabsPager.getCurrentItem();
-        int numPages = binding.clueTabsPager.getAdapter().getItemCount();
-        binding.clueTabsPager.setCurrentItem((curPage + 1) % numPages, false);
+        int curPage = binding.clueTabsPager0.getCurrentItem();
+        int numPages = binding.clueTabsPager0.getAdapter().getItemCount();
+        binding.clueTabsPager0.setCurrentItem((curPage + 1) % numPages, false);
     }
 
     public void prevPage() {
-        int curPage = binding.clueTabsPager.getCurrentItem();
-        int numPages = binding.clueTabsPager.getAdapter().getItemCount();
+        int curPage = binding.clueTabsPager0.getCurrentItem();
+        int numPages = binding.clueTabsPager0.getAdapter().getItemCount();
         int nextPage = curPage == 0 ? numPages - 1 : curPage - 1;
-        binding.clueTabsPager.setCurrentItem(nextPage, false);
+        binding.clueTabsPager0.setCurrentItem(nextPage, false);
     }
 
     /**
@@ -324,8 +296,85 @@ public class ClueTabs extends LinearLayout
             if (listIndex < 0)
                 return;
 
-            binding.clueTabsPager.setCurrentItem(listIndex);
+            binding.clueTabsPager0.setCurrentItem(listIndex);
         });
+    }
+
+    @Override
+    protected void onSizeChanged(
+        int newWidth, int newHeight, int oldWidth, int oldHeight
+    ) {
+        super.onSizeChanged(newWidth, newHeight, oldWidth, oldHeight);
+
+        int visible = isDouble() ? View.VISIBLE : View.GONE;
+        binding.clueTabsPager1.setVisibility(visible);
+        binding.clueTabsTabLayout1.setVisibility(visible);
+
+        int csVisible = isDouble() ? ConstraintSet.VISIBLE : ConstraintSet.GONE;
+        ConstraintSet set = new ConstraintSet();
+        set.clone(binding.constraintLayout);
+        set.setVisibility(binding.clueTabsPager1.getId(), csVisible);
+        set.setVisibility(binding.clueTabsTabLayout1.getId(), csVisible);
+        set.applyTo(binding.constraintLayout);
+    }
+
+    /**
+     * If double clue tabs
+     */
+    private boolean isDouble() {
+        DisplayMetrics metrics
+            = getContext().getResources().getDisplayMetrics();
+        System.out.println("FORKYZ: double " + (metrics.densityDpi * DOUBLE_UP_WIDTH_INCH) + " vs " + getMeasuredWidth());
+        return metrics.densityDpi * DOUBLE_UP_WIDTH_INCH < getMeasuredWidth();
+    }
+
+    /**
+     * Setup one of the clue tabs windows
+     *
+     * @param viewIdx whether it's the first or second set of tabs and pager
+     */
+    private void setupPager(ViewPager2 pager, TabLayout tabs, int viewIdx) {
+        ClueTabsPagerAdapter adapter = new ClueTabsPagerAdapter();
+
+        pager.setAdapter(adapter);
+
+        new TabLayoutMediator(
+            tabs,
+            pager,
+            (tab, position) -> { tab.setText(adapter.getPageTitle(position)); }
+        ).attach();
+
+        setTabLayoutOnTouchListener(tabs);
+
+        LinearLayout tabStrip = (LinearLayout) tabs.getChildAt(0);
+        for (int i = 0; i < tabStrip.getChildCount(); i++) {
+            View view = tabStrip.getChildAt(i);
+            view.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    ClueTabs.this.notifyListenersTabsBarLongClick();
+                    return true;
+                }
+            });
+            if (onBarLongClickDescription != null) {
+                ViewCompat.replaceAccessibilityAction(
+                    view,
+                    AccessibilityActionCompat.ACTION_LONG_CLICK,
+                    onBarLongClickDescription,
+                    null
+                );
+            }
+        }
+
+        pager.setCurrentItem(viewIdx % adapter.getItemCount(), false);
+
+        pager.registerOnPageChangeCallback(
+            new ViewPager2.OnPageChangeCallback() {
+                public void onPageSelected(int position) {
+                    ClueTabs.this.notifyListenersPageChanged(position);
+                }
+            }
+        );
     }
 
     /**
@@ -333,8 +382,10 @@ public class ClueTabs extends LinearLayout
      */
     @SuppressLint("NotifyDataSetChanged")
     private void refresh() {
-        if (binding.clueTabsPager.getAdapter() != null)
-            binding.clueTabsPager.getAdapter().notifyDataSetChanged();
+        if (binding.clueTabsPager0.getAdapter() != null)
+            binding.clueTabsPager0.getAdapter().notifyDataSetChanged();
+        if (binding.clueTabsPager1.getAdapter() != null)
+            binding.clueTabsPager1.getAdapter().notifyDataSetChanged();
     }
 
     private void isSnapToClue(Consumer<Boolean> cb) {
@@ -957,7 +1008,7 @@ public class ClueTabs extends LinearLayout
 
     // suppress because the swipe detector does not consume clicks
     @SuppressWarnings("ClickableViewAccessibility")
-    private void setTabLayoutOnTouchListener() {
+    private void setTabLayoutOnTouchListener(TabLayout tabs) {
         OnGestureListener tabSwipeListener
             = new SimpleOnGestureListener() {
                 // as recommended by the docs
@@ -983,10 +1034,10 @@ public class ClueTabs extends LinearLayout
             };
 
         GestureDetector tabSwipeDetector = new GestureDetector(
-            binding.clueTabsTabLayout.getContext(), tabSwipeListener
+            tabs.getContext(), tabSwipeListener
         );
 
-        binding.clueTabsTabLayout.setOnTouchListener(new OnTouchListener() {
+        tabs.setOnTouchListener(new OnTouchListener() {
             public boolean onTouch(View v, MotionEvent e) {
                 return tabSwipeDetector.onTouchEvent(e);
             }

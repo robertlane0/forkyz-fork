@@ -128,7 +128,7 @@ public abstract class BoardEditView
             setCurrentScale(scale, true);
 
             if (!noRender)
-                render(true);
+                render();
 
             // TODO: needed?
             //setFocusable(true);
@@ -196,7 +196,7 @@ public abstract class BoardEditView
 
         super.setCurrentScale(scale);
         if (!noRender && Float.compare(scale, oldScale) != 0) {
-            render(true);
+            render();
         }
 
         return scale;
@@ -333,7 +333,7 @@ public abstract class BoardEditView
 
         super.onScale(scale, center);
 
-        render(true);
+        render();
     }
 
     @Override
@@ -384,20 +384,12 @@ public abstract class BoardEditView
         }
     }
 
-    protected void render() {
-        render(false);
-    }
-
-    protected void render(PlayboardChanges changes) {
-        render(changes, false);
-    }
-
-    protected void render(boolean rescale) {
-        render(null, rescale);
-    }
-
     protected ForkyzSettings getSettings() {
         return settings;
+    }
+
+    protected void render() {
+        render(null);
     }
 
     /**
@@ -405,7 +397,7 @@ public abstract class BoardEditView
      *
      * @param changes playboard changes or null for render all
      */
-    abstract protected void render(PlayboardChanges changes, boolean rescale);
+    abstract protected void render(PlayboardChanges changes);
 
     protected PlayboardRenderer getRenderer() { return renderer; }
     protected Playboard getBoard() { return board; }

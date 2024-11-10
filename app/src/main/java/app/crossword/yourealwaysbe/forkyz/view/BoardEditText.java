@@ -17,7 +17,6 @@ import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.view.inputmethod.BaseInputConnection;
@@ -133,20 +132,11 @@ public class BoardEditText
         int newWidth, int newHeight, int oldWidth, int oldHeight
     ) {
         super.onSizeChanged(newWidth, newHeight, oldWidth, oldHeight);
-        // do after layout pass (has no effect during pass)
-        getViewTreeObserver().addOnPreDrawListener(
-            new ViewTreeObserver.OnPreDrawListener() {
-                public boolean onPreDraw() {
-                    getViewTreeObserver().removeOnPreDrawListener(this);
-                    scrollTo(0, 0);
-                    int width = getContentWidth();
-                    int len = boxes == null ? 0 : boxes.length;
-                    renderer.fitWidthTo(width, len);
-                    render(true);
-                    return true;
-                }
-            }
-        );
+        scrollTo(0, 0);
+        int width = getContentWidth();
+        int len = boxes == null ? 0 : boxes.length;
+        renderer.fitWidthTo(width, len);
+        render(true);
     }
 
     @Override

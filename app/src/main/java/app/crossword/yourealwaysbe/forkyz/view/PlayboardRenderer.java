@@ -36,7 +36,6 @@ import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.Zone;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -100,7 +99,7 @@ public class PlayboardRenderer {
         this.hintHighlight = false;
         this.maxScale = getDeviceMaxScale();
         this.minScale = getDeviceMinScale();
-        this.profile = new PaintProfile(context, scale, dpi);
+        this.profile = new PaintProfile(context, scale);
         this.versionUtils = versionUtils;
     }
 
@@ -151,20 +150,12 @@ public class PlayboardRenderer {
     }
 
     synchronized public void setScale(float scale) {
-        float maxScale = getMaxScale();
-        float minScale = getMinScale();
+        scale = boundScale(scale);
 
-        if (scale > maxScale) {
-            scale = maxScale;
-        } else if (scale < minScale) {
-            scale = minScale;
-        } else if (Float.isNaN(scale)) {
-            scale = 1.0f;
-        }
         this.bitmapGrid = null;
         this.scale = scale;
 
-        profile.setScale(scale, dpi);
+        profile.setScale(scale);
     }
 
     public float getScale() {
@@ -209,38 +200,16 @@ public class PlayboardRenderer {
         }
     }
 
+    /**
+     * getNumBoxesPerRow at current scale
+     */
     public int getNumBoxesPerRow(int wrapWidth) {
-        return wrapWidth / getBoxSize();
+        return getNumBoxesPerRow(wrapWidth, getScale());
     }
 
-    /**
-     * Draw current word
-     *
-     * @param changes changes to render or null for draw all
-     * @param suppressNotesLists as in drawBox
-     */
-    synchronized public BitmapGrid drawWord(
-        RenderChanges changes,
-        Set<String> suppressNotesLists,
-        int wrapWidth
-    ) {
-        return drawWord(
-            this.board.getCurrentWord(), changes, suppressNotesLists, wrapWidth
-        );
-    }
-
-    /**
-     * Draw word suppressing no notes
-     */
-    synchronized public BitmapGrid drawWord(
-        Word word,
-        RenderChanges changes,
-        int wrapWidth
-    ) {
-        // call draw word with empty list
-        return drawWord(
-            word, changes, Collections.<String>emptySet(), wrapWidth
-        );
+    public int getNumBoxesPerRow(int wrapWidth, float scale) {
+        int boxSize = calcBoxSize(scale);
+        return wrapWidth / boxSize;
     }
 
     /**
@@ -263,17 +232,11 @@ public class PlayboardRenderer {
         int boxSize = getBoxSize();
         Position highlight = board.getHighlightLetter();
 
-        int height;
-        int width;
-
-        if (wrapWidth > 0) {
-            int boxesPerRow = getNumBoxesPerRow(wrapWidth);
-            height = (int) Math.ceil(boxes.length / (float) boxesPerRow);
-            width = Math.min(boxesPerRow, boxes.length);
-        } else {
-            height = 1;
-            width = boxes.length;
-        }
+        Position dims = getBoxesDimsForWidth(
+            wrapWidth, boxes.length, getScale()
+        );
+        int height = dims.getRow();
+        int width = dims.getCol();
 
         if (initialiseBitmap(width, height))
             changes = null;
@@ -346,20 +309,17 @@ public class PlayboardRenderer {
 
         int boxSize = getBoxSize();
 
-        int height;
-        int width;
-
-        if (wrapWidth > 0) {
-            int boxesPerRow = getNumBoxesPerRow(wrapWidth);
-            height = (int) Math.ceil(boxes.length / (float) boxesPerRow);
-            width = Math.min(boxesPerRow, boxes.length);
-        } else {
-            height = 1;
-            width = boxes.length;
-        }
+        Position dims = getBoxesDimsForWidth(
+            wrapWidth, boxes.length, getScale()
+        );
+        int height = dims.getRow();
+        int width = dims.getCol();
 
         if (initialiseBitmap(width, height))
             changes = null;
+
+        if (width == 0 || height == 0)
+            return bitmapGrid;
 
         TileCanvas[][] canvases = makeBitmapGridCanvases();
 
@@ -506,6 +466,17 @@ public class PlayboardRenderer {
         return getScale();
     }
 
+    /**
+     * Calc needed scale to fix boxes to width and bound to min/max
+     */
+    public float calculateScale(int numPixels, int numBoxes) {
+        double density = (double) dpi * (double) BASE_BOX_SIZE_INCHES;
+        float newScale = (float) (
+            (double) numPixels / (double) numBoxes / density
+        );
+        return boundScale(newScale);
+    }
+
     synchronized public float fitWidthTo(int width, int numBoxes) {
         this.bitmapGrid = null;
         setScale(calculateScale(width, numBoxes));
@@ -541,6 +512,47 @@ public class PlayboardRenderer {
         this.scale = getMaxScale();
 
         return scale;
+    }
+
+    /**
+     * Bound scale to set min/max
+     */
+    private float boundScale(float scale) {
+        float maxScale = getMaxScale();
+        float minScale = getMinScale();
+
+        if (scale > maxScale) {
+            return maxScale;
+        } else if (scale < minScale) {
+            return minScale;
+        } else if (Float.isNaN(scale)) {
+            return 1.0f;
+        } else {
+            return scale;
+        }
+    }
+
+    /**
+     * The number of rows/cols when rendering numBoxes at wrapWidth
+     *
+     * In drawBoxes mode
+     */
+    private Position getBoxesDimsForWidth(
+        int wrapWidth, int numBoxes, float scale
+    ) {
+        int rows;
+        int cols;
+
+        if (wrapWidth > 0) {
+            int boxesPerRow = getNumBoxesPerRow(wrapWidth, scale);
+            rows = (int) Math.ceil(numBoxes / (float) boxesPerRow);
+            cols = Math.min(boxesPerRow, numBoxes);
+        } else {
+            rows = 1;
+            cols = numBoxes;
+        }
+
+        return new Position(rows, cols);
     }
 
     /**
@@ -1417,11 +1429,6 @@ public class PlayboardRenderer {
         );
     }
 
-    private float calculateScale(int numPixels, int numBoxes) {
-        double density = (double) dpi * (double) BASE_BOX_SIZE_INCHES;
-        return (float) ((double) numPixels / (double) numBoxes / density);
-    }
-
     private int getTotalHeight(TextPaint style) {
         return (int) Math.ceil(
             - style.ascent()
@@ -1897,6 +1904,17 @@ public class PlayboardRenderer {
         return canvases;
     }
 
+    /**
+     * Box size at given scale
+     */
+    private int calcBoxSize(float scale) {
+        int boxSize = (int) (BASE_BOX_SIZE_INCHES * dpi * scale);
+        if (boxSize == 0) {
+            boxSize = (int) (BASE_BOX_SIZE_INCHES * dpi * 0.25F);
+        }
+        return boxSize;
+    }
+
     private class PaintProfile {
         // box colours also can be used for text for "transparent" text
         // (e.g. highlighted error cells)
@@ -1935,7 +1953,7 @@ public class PlayboardRenderer {
         private int textOffset = boxSize / 30;
         private int shapeStrokeWidth = Math.max(1, boxSize / 15);
 
-        public PaintProfile(Context context, float scale, float dpi) {
+        public PaintProfile(Context context, float scale) {
             int blockColor
                 = ContextCompat.getColor(context, R.color.blockColor);
             int cellColor = ContextCompat.getColor(context, R.color.cellColor);
@@ -2052,7 +2070,7 @@ public class PlayboardRenderer {
             cheated.setColor(cheatedColor);
             flag.setColor(flagColor);
 
-            setScale(scale, dpi);
+            setScale(scale);
         }
 
         public TextPaint getBoxColor(Box box) {
@@ -2181,8 +2199,8 @@ public class PlayboardRenderer {
         public int getTextOffset() { return textOffset; }
         public int getShapeStrokeWidth() { return shapeStrokeWidth; }
 
-        public void setScale(float scale, float dpi) {
-            boxSize = calcBoxSize(scale, dpi);
+        public void setScale(float scale) {
+            boxSize = calcBoxSize(scale);
             numberTextSize = boxSize / 4;
             miniNoteTextSize = boxSize / 2;
             noteTextSize = Math.round(boxSize * 0.6F);
@@ -2235,14 +2253,6 @@ public class PlayboardRenderer {
                 ));
                 return mixedPaint;
             }
-        }
-
-        private int calcBoxSize(float scale, float dpi) {
-            int boxSize = (int) (BASE_BOX_SIZE_INCHES * dpi * scale);
-            if (boxSize == 0) {
-                boxSize = (int) (BASE_BOX_SIZE_INCHES * dpi * 0.25F);
-            }
-            return boxSize;
         }
 
         /**

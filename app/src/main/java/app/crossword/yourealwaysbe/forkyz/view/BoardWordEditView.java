@@ -12,7 +12,6 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -67,7 +66,7 @@ public class BoardWordEditView extends BoardEditView {
                 params.height = 1;
             } else {
                 params.height = originalHeight;
-                scheduleRenderToViewOnRedraw();
+                renderToView();
             }
 
             setLayoutParams(params);
@@ -170,7 +169,7 @@ public class BoardWordEditView extends BoardEditView {
     }
 
     @Override
-    public void render(PlayboardChanges changes, boolean rescale) {
+    public void render(PlayboardChanges changes) {
         // don't draw until we get onSizeChanged
         if (!isRendering()) {
             return;
@@ -199,7 +198,7 @@ public class BoardWordEditView extends BoardEditView {
                     handler.post(() -> {
                         try {
                             if (isRendering())
-                                setBitmap(bitmap, rescale);
+                                setBitmap(bitmap);
                         } finally {
                             unlockRenderer();
                         }
@@ -221,8 +220,7 @@ public class BoardWordEditView extends BoardEditView {
         if (!isRendering())
             return;
 
-        // do after layout pass (has no effect during pass)
-        scheduleRenderToViewOnRedraw();
+        renderToView();
     }
 
     @Override
@@ -259,7 +257,7 @@ public class BoardWordEditView extends BoardEditView {
     }
 
     @Override
-    protected void onVisibilityChanged (View changedView, int visibility) {
+    protected void onVisibilityChanged(View changedView, int visibility) {
         super.onVisibilityChanged(changedView, visibility);
         if (visibility == View.VISIBLE)
             renderToView();
@@ -321,7 +319,14 @@ public class BoardWordEditView extends BoardEditView {
      * Width of the usable area inside the view (sans padding)
      */
     private int getContentWidth() {
-        return getWidth() - getPaddingLeft() - getPaddingRight();
+        return getContentWidth(getMeasuredWidth());
+    }
+
+    /**
+     * getContentWidth for given total view width
+     */
+    private int getContentWidth(int totalWidth) {
+        return totalWidth - getPaddingLeft() - getPaddingRight();
     }
 
     /**
@@ -331,32 +336,22 @@ public class BoardWordEditView extends BoardEditView {
      * visible
      */
     private boolean isRendering() {
-        return !incognitoMode && getWidth() != 0 && getVisibility() == VISIBLE;
+        return !incognitoMode
+            && getMeasuredWidth() != 0
+            && getVisibility() == VISIBLE;
     }
 
     /**
      * Render after making sure fits view size
      *
-     * Does a full redraw
+     * Does a full redraw, returns true if change in size
      */
     private void renderToView() {
         // don't render during fitToView because we want to
         // guarantee rendering (and fitToView won't render
         // if the scale doesn't change).
         fitToView(true);
-        render(true);
-    }
-
-    private void scheduleRenderToViewOnRedraw() {
-        getViewTreeObserver().addOnPreDrawListener(
-            new ViewTreeObserver.OnPreDrawListener() {
-                public boolean onPreDraw() {
-                    getViewTreeObserver().removeOnPreDrawListener(this);
-                    renderToView();
-                    return true;
-                }
-            }
-        );
+        render();
     }
 
     private boolean redrawNeeded(
