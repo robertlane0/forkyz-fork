@@ -148,8 +148,18 @@ public class Playboard implements Serializable {
      * Or null if none selected
      */
     public ClueList getCurrentClueList() {
+        String name = getCurrentClueListName();
+        return (name == null) ? null : puzzle.getClues(name);
+    }
+
+    /**
+     * Gets the currently selected clue list name from the puzzle
+     *
+     * Or null if none selected
+     */
+    public String getCurrentClueListName() {
         ClueID clueID = getClueID();
-        return (clueID == null) ? null : puzzle.getClues(clueID.getListName());
+        return (clueID == null) ? null : clueID.getListName();
     }
 
     /**

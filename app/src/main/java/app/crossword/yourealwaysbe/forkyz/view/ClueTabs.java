@@ -309,7 +309,14 @@ public class ClueTabs extends LinearLayout
             if (listIndex < 0)
                 return;
 
-            binding.clueTabsPager0.setCurrentItem(listIndex);
+            boolean listShown
+                = binding.clueTabsPager0.getCurrentItem() == listIndex || (
+                    binding.clueTabsPager1.getVisibility() == View.VISIBLE
+                    && binding.clueTabsPager1.getCurrentItem() == listIndex
+                );
+
+            if (!listShown)
+                binding.clueTabsPager0.setCurrentItem(listIndex);
         });
     }
 
@@ -644,8 +651,11 @@ public class ClueTabs extends LinearLayout
                     if (snapToClue) {
                         switch (pageType) {
                         case CLUES:
-                            int position = board.getCurrentClueIndex();
-                            layoutManager.scrollToPosition(position);
+                            String curList = board.getCurrentClueListName();
+                            if (Objects.equals(listName, curList)) {
+                                int position = board.getCurrentClueIndex();
+                                layoutManager.scrollToPosition(position);
+                            }
                             break;
                         case HISTORY:
                             layoutManager.scrollToPosition(0);
