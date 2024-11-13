@@ -4,6 +4,7 @@ import app.crossword.yourealwaysbe.forkyz.R;
 import app.crossword.yourealwaysbe.forkyz.databinding.ClueListItemBinding;
 import app.crossword.yourealwaysbe.forkyz.databinding.ClueTabsBinding;
 import app.crossword.yourealwaysbe.forkyz.databinding.ClueTabsPageBinding;
+import app.crossword.yourealwaysbe.forkyz.settings.ClueTabsDouble;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.util.ColorUtils;
 import app.crossword.yourealwaysbe.forkyz.view.BoardEditView.BoardClickListener;
@@ -20,6 +21,7 @@ import app.crossword.yourealwaysbe.puz.util.WeakSet;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.content.res.Configuration;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.GestureDetector.OnGestureListener;
@@ -35,6 +37,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.text.HtmlCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat;
+import androidx.lifecycle.ViewTreeLifecycleOwner;
 import androidx.lifecycle.ViewTreeLifecycleOwner;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -156,6 +159,16 @@ public class ClueTabs extends LinearLayout
         LayoutInflater inflater = (LayoutInflater)
             context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         binding = ClueTabsBinding.inflate(inflater, this, true);
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        // no lifecycle owner until attached
+        settings.liveClueListClueTabsDouble().observe(
+            ViewTreeLifecycleOwner.get(this),
+            value -> { setDouble(); }
+        );
     }
 
     public void setOnClueClickDescription(String description) {
@@ -305,7 +318,10 @@ public class ClueTabs extends LinearLayout
         int newWidth, int newHeight, int oldWidth, int oldHeight
     ) {
         super.onSizeChanged(newWidth, newHeight, oldWidth, oldHeight);
+        setDouble();
+    }
 
+    private void setDouble() {
         int visible = isDouble() ? View.VISIBLE : View.GONE;
         binding.clueTabsPager1.setVisibility(visible);
         binding.clueTabsTabLayout1.setVisibility(visible);
@@ -322,10 +338,22 @@ public class ClueTabs extends LinearLayout
      * If double clue tabs
      */
     private boolean isDouble() {
-        DisplayMetrics metrics
-            = getContext().getResources().getDisplayMetrics();
-        System.out.println("FORKYZ: double " + (metrics.densityDpi * DOUBLE_UP_WIDTH_INCH) + " vs " + getMeasuredWidth());
-        return metrics.densityDpi * DOUBLE_UP_WIDTH_INCH < getMeasuredWidth();
+        ClueTabsDouble dbl = settings.liveClueListClueTabsDouble().getValue();
+        if (dbl == null)
+            return false;
+
+        switch(dbl) {
+        case LANDSCAPE:
+            int orientation = getResources().getConfiguration().orientation;
+            return orientation == Configuration.ORIENTATION_LANDSCAPE;
+        case WIDE:
+            DisplayMetrics metrics
+                = getContext().getResources().getDisplayMetrics();
+            return metrics.densityDpi * DOUBLE_UP_WIDTH_INCH < getMeasuredWidth();
+        case NEVER:
+        default:
+            return false;
+        }
     }
 
     /**

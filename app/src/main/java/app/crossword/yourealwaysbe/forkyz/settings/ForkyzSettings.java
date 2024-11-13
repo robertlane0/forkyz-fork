@@ -77,6 +77,8 @@ public class ForkyzSettings {
         = "crosswordSolverEnabled";
     private static final String PREF_EXT_DICTIONARY = "externalDictionary";
 
+    private static final String PREF_CLUE_LIST_CLUE_TABS_DOUBLE
+        = "clueTabsDouble";
     private static final String PREF_CLUE_LIST_SHOW_WORDS
         = "showWordsInClueList";
     private static final String PREF_CLUE_LIST_SNAP_TO_CLUE = "snapClue";
@@ -270,6 +272,7 @@ public class ForkyzSettings {
     private ExecutorService executor = Executors.newSingleThreadExecutor();
 
     private MutableLiveData<Accessor> liveBrowseSort;
+    private MutableLiveData<ClueTabsDouble> liveClueListClueTabsDouble;
     private MutableLiveData<KeyboardSettings> liveKeyboardSettings;
     private MutableLiveData<GridRatio> livePlayGridRatioLandscape;
     private MutableLiveData<GridRatio> livePlayGridRatioPortrait;
@@ -281,6 +284,8 @@ public class ForkyzSettings {
         = (prefs, key) -> {
             if (PREF_BROWSE_SORT.equals(key)) {
                 updateLiveBrowseSort();
+            } else if (PREF_CLUE_LIST_CLUE_TABS_DOUBLE.equals(key)) {
+                updateLiveClueListClueTabsDouble();
             } else if (
                 PREF_KEYBOARD_COMPACT.equals(key)
                 || PREF_KEYBOARD_HAPTIC.equals(key)
@@ -576,6 +581,27 @@ public class ForkyzSettings {
      */
     public boolean isBackgroundDownloadConfigPref(String pref) {
         return BACKGROUND_DOWNLOAD_PREFERENCES.contains(pref);
+    }
+
+    /**
+     * When to double up the clue tabs display
+     */
+    public void getClueListClueTabsDouble(Consumer<ClueTabsDouble> cb) {
+        executor.execute(() -> {
+            String value = prefs.getString(
+                PREF_CLUE_LIST_CLUE_TABS_DOUBLE, "NEVER");
+            handler.post(() -> {
+                cb.accept(ClueTabsDouble.getFromSettingsValue(value));
+            });
+        });
+    }
+
+    public LiveData<ClueTabsDouble> liveClueListClueTabsDouble() {
+        if (liveClueListClueTabsDouble == null) {
+            liveClueListClueTabsDouble = new MutableLiveData<ClueTabsDouble>();
+            updateLiveClueListClueTabsDouble();
+        }
+        return liveClueListClueTabsDouble;
     }
 
     /**
@@ -1424,6 +1450,14 @@ public class ForkyzSettings {
     private void updateLiveBrowseSort() {
         if (liveBrowseSort != null)
             getBrowseSort(value -> { liveBrowseSort.setValue(value); });
+    }
+
+    private void updateLiveClueListClueTabsDouble() {
+        if (liveClueListClueTabsDouble != null) {
+            getClueListClueTabsDouble(value -> {
+                liveClueListClueTabsDouble.setValue(value);
+            });
+        }
     }
 
     private void updateLiveKeyboardSettings() {

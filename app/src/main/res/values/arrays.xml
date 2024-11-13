@@ -222,6 +222,16 @@
        <item>PRESERVE_FILLED_WORDS</item>
        <item>PRESERVE_FILLED_CELLS</item>
      </string-array>
+     <string-array name="clue_tabs_double_labels">
+       <item>@string/clue_tabs_double_never</item>
+       <item>@string/clue_tabs_double_landscape</item>
+       <item>@string/clue_tabs_double_wide</item>
+     </string-array>
+     <string-array name="clue_tabs_double_values">
+       <item>NEVER</item>
+       <item>LANDSCAPE</item>
+       <item>WIDE</item>
+     </string-array>
 
      <string-array name="emptyArray"/>
 </resources>

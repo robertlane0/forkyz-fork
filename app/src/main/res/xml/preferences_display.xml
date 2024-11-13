@@ -87,6 +87,7 @@
         android:entries="@array/grid_ratio_labels"
         android:entryValues="@array/grid_ratio_values"
     />
+
     <androidx.preference.ListPreference
         android:title="@string/grid_ratio_landscape"
         android:summary="@string/grid_ratio_landscape_desc"
@@ -94,5 +95,14 @@
         android:defaultValue="5"
         android:entries="@array/grid_ratio_labels"
         android:entryValues="@array/grid_ratio_values"
+    />
+
+    <androidx.preference.ListPreference
+        android:title="@string/clue_tabs_double"
+        android:summary="@string/clue_tabs_double_desc"
+        android:key="clueTabsDouble"
+        android:defaultValue="NEVER"
+        android:entries="@array/clue_tabs_double_labels"
+        android:entryValues="@array/clue_tabs_double_values"
     />
 </androidx.preference.PreferenceScreen>
