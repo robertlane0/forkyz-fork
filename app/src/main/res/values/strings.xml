@@ -264,6 +264,7 @@
     <string name="clue_tabs_double_never">Never</string>
     <string name="clue_tabs_double_landscape">Landscape Orientation</string>
     <string name="clue_tabs_double_wide">More than 3in width</string>
+    <string name="clue_tabs_double_always">Always</string>
 
     <!-- preferences download -->
     <string name="auto_downloaders">Automatic Download Sources</string>

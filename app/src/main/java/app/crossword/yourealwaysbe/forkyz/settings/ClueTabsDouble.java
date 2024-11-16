@@ -6,7 +6,8 @@ import java.util.Objects;
 public enum ClueTabsDouble {
     NEVER("NEVER"),
     LANDSCAPE("LANDSCAPE"),
-    WIDE("WIDE");
+    WIDE("WIDE"),
+    ALWAYS("ALWAYS");
 
     private String settingsValue;
 

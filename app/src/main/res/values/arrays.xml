@@ -226,11 +226,13 @@
        <item>@string/clue_tabs_double_never</item>
        <item>@string/clue_tabs_double_landscape</item>
        <item>@string/clue_tabs_double_wide</item>
+       <item>@string/clue_tabs_double_always</item>
      </string-array>
      <string-array name="clue_tabs_double_values">
        <item>NEVER</item>
        <item>LANDSCAPE</item>
        <item>WIDE</item>
+       <item>ALWAYS</item>
      </string-array>
 
      <string-array name="emptyArray"/>

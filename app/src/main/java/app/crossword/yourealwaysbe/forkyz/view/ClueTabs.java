@@ -350,6 +350,8 @@ public class ClueTabs extends LinearLayout
             return false;
 
         switch(dbl) {
+        case ALWAYS:
+            return true;
         case LANDSCAPE:
             int orientation = getResources().getConfiguration().orientation;
             return orientation == Configuration.ORIENTATION_LANDSCAPE;

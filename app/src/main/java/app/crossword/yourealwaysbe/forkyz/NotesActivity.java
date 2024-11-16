@@ -223,7 +223,7 @@ public class NotesActivity extends PuzzleActivity {
                 @Override
                 public void onContextMenu(Point point) {
                     View focused = getWindow().getCurrentFocus();
-                    int id = focused.getId();
+                    int id = focused == null ? R.id.miniboard : focused.getId();
                     if (id == R.id.notes_box) {
                         moveBoardEditTextToNotes(binding.scratchMiniboard);
                     } else if (id == R.id.anagram_source) {
