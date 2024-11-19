@@ -432,11 +432,6 @@ public class PlayActivity extends PuzzleActivity
         hideClueTabs();
     }
 
-    @Override
-    public void onClueTabsPageChange(ClueTabs view, int pageNumber) {
-        settings.setPlayClueTabsPage(pageNumber);
-    }
-
     public void onPlayboardChange(PlayboardChanges changes) {
         super.onPlayboardChange(changes);
 
@@ -482,6 +477,8 @@ public class PlayActivity extends PuzzleActivity
             board.removeListener(this);
 
         binding.clueTabs.removeListener(this);
+        settings.setPlayClueTabsPage(0, binding.clueTabs.getCurrentPage(0));
+        settings.setPlayClueTabsPage(1, binding.clueTabs.getCurrentPage(1));
 
         pauseShakeDetection();
     }
@@ -524,10 +521,13 @@ public class PlayActivity extends PuzzleActivity
         binding.clueTabs.setBoard(board);
         binding.clueTabs.setMaxWordScale(ACROSTIC_CLUE_TABS_WORD_SCALE);
         binding.clueTabs.setShowWords(isAcrostic());
-        settings.getPlayClueTabsPage(page -> {
-            binding.clueTabs.setPage(page);
+        settings.getPlayClueTabsPage(0, page0 -> {
+        settings.getPlayClueTabsPage(1, page1 -> {
+            // TODO: save/restore both pages
+            binding.clueTabs.setPage(0, page0);
+            binding.clueTabs.setPage(1, page1);
             binding.clueTabs.addListener(this);
-        });
+        });});
 
         settings.getPlaySkipFilled(board::setSkipCompletedLetters);
         settings.getPlayMovementStrategy(movementStrategy -> {

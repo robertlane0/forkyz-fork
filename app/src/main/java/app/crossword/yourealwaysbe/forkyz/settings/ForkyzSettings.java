@@ -129,8 +129,8 @@ public class ForkyzSettings {
 
     private static final String PREF_PLAY_CLUE_BELOW_GRID
         = "clueBelowGrid";
-    private static final String PREF_PLAY_CLUE_TABS_PAGE
-        = "playActivityClueTabsPage";
+    private static final String[] PREF_PLAY_CLUE_TABS_PAGES
+        = { "playActivityClueTabsPage", "playActivityClueTabsPage1" };
     private static final String PREF_PLAY_DELETE_CROSSING_MODE
         = "deleteCrossingMode";
     private static final String PREF_PLAY_DOUBLE_TAP_FIT_BOARD
@@ -232,7 +232,8 @@ public class ForkyzSettings {
         STRING_DEFAULTS.put(PREF_EXT_CHAT_GPT_API_KEY, "");
         BOOL_DEFAULTS.put(PREF_EXT_CROSSWORD_SOLVER_ENABLED, true);
         BOOL_DEFAULTS.put(PREF_PLAY_CLUE_BELOW_GRID, false);
-        INT_DEFAULTS.put(PREF_PLAY_CLUE_TABS_PAGE, 0);
+        for (int i = 0; i < PREF_PLAY_CLUE_TABS_PAGES.length; i++)
+            INT_DEFAULTS.put(PREF_PLAY_CLUE_TABS_PAGES[i], i);
         BOOL_DEFAULTS.put(PREF_PLAY_DOUBLE_TAP_FIT_BOARD, false);
         BOOL_DEFAULTS.put(PREF_PLAY_ENSURE_VISIBLE, true);
         BOOL_DEFAULTS.put(PREF_PLAY_ENTER_CHANGES_DIRECTION, true);
@@ -775,12 +776,14 @@ public class ForkyzSettings {
     /**
      * To remember which page of the clue list is selected in PlayActivity
      */
-    public void getPlayClueTabsPage(Consumer<Integer> cb) {
-        getIntPreference(PREF_PLAY_CLUE_TABS_PAGE, cb);
+    public void getPlayClueTabsPage(int pageNum, Consumer<Integer> cb) {
+        if (0 <= pageNum && pageNum < PREF_PLAY_CLUE_TABS_PAGES.length)
+            getIntPreference(PREF_PLAY_CLUE_TABS_PAGES[pageNum], cb);
     }
 
-    public void setPlayClueTabsPage(int value) {
-        setIntPreference(PREF_PLAY_CLUE_TABS_PAGE, value);
+    public void setPlayClueTabsPage(int pageNum, int value) {
+        if (0 <= pageNum && pageNum < PREF_PLAY_CLUE_TABS_PAGES.length)
+            setIntPreference(PREF_PLAY_CLUE_TABS_PAGES[pageNum], value);
     }
 
     /**

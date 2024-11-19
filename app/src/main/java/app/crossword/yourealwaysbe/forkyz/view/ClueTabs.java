@@ -32,12 +32,12 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.content.ContextCompat;
 import androidx.core.text.HtmlCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat;
-import androidx.lifecycle.ViewTreeLifecycleOwner;
 import androidx.lifecycle.ViewTreeLifecycleOwner;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -62,7 +62,7 @@ import java.util.logging.Logger;
 import javax.inject.Inject;
 
 @AndroidEntryPoint
-public class ClueTabs extends LinearLayout
+public class ClueTabs extends ConstraintLayout
                       implements Playboard.PlayboardListener {
     private static final Logger LOG
         = Logger.getLogger("app.crossword.yourealwaysbe");
@@ -91,6 +91,9 @@ public class ClueTabs extends LinearLayout
     private String onClueLongClickDescription = null;
     private String onBarLongClickDescription = null;
     private String onClueBoardClickDescription = null;
+
+    // workaround for making setPage work with ViewPager2 quirks
+    private PagerState[] pagerStates = { new PagerState(), new PagerState() };
 
     public static interface ClueTabsListener {
         /**
@@ -145,13 +148,6 @@ public class ClueTabs extends LinearLayout
          * @param view the view calling
          */
         default void onClueTabsBarLongclick(ClueTabs view) { }
-
-        /**
-         * When the user changes the page being viewed
-         *
-         * @param view the view calling
-         */
-        default void onClueTabsPageChange(ClueTabs view, int pageNumber) { }
     }
 
     public ClueTabs(Context context, AttributeSet as) {
@@ -159,6 +155,21 @@ public class ClueTabs extends LinearLayout
         LayoutInflater inflater = (LayoutInflater)
             context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         binding = ClueTabsBinding.inflate(inflater, this, true);
+
+        binding.clueTabsPager0.addOnLayoutChangeListener(
+            (View v,
+             int left, int top, int right, int bottom,
+             int oldLeft, int oldTop, int oldRight, int oldBottom) -> {
+                onPagerSizeChange(0, right - left, bottom - top);
+            }
+        );
+        binding.clueTabsPager1.addOnLayoutChangeListener(
+            (View v,
+             int left, int top, int right, int bottom,
+             int oldLeft, int oldTop, int oldRight, int oldBottom) -> {
+                onPagerSizeChange(1, right - left, bottom - top);
+            }
+        );
     }
 
     @Override
@@ -237,38 +248,74 @@ public class ClueTabs extends LinearLayout
         listenBoard();
     }
 
-    public void setPage(int pageNumber) {
-        binding.clueTabsPager0.setCurrentItem(pageNumber, false);
+    /**
+     * Set the page of the viewIdx-th clue tab
+     *
+     * Currently only two clue tab views, so viewIdx should be 0 or 1.
+     */
+    public void setPage(int viewIdx, int pageNumber) {
+        // This is very hairy trying to deal with the asynchronicity and
+        // quirks of ViewPager2. Cannot set the page too early in the
+        // view pager setup, so need to save a pending change. But then
+        // (see onSizeChange) it will reset to the initial page if the
+        // size gets to 0, so need to save and restore states. Lots of
+        // post() requests all need to line up.
+
+        ViewPager2 pager = getPager(viewIdx);
+        PagerState state = getPagerState(viewIdx);
+        if (pager == null || state == null)
+            return;
+
+        if (state.pagerInitialised)
+            pager.setCurrentItem(pageNumber, false);
+        else
+            state.pendingSetPage = pageNumber;
+
+        // clobber any saved state as it is no longer relevant
+        state.savedCurrentPage = -1;
     }
 
-    public PageType getCurrentPageType() {
-        int curPage = binding.clueTabsPager0.getCurrentItem();
+    /**
+     * Returns -1 if oob
+     */
+    public int getCurrentPage(int viewIdx) {
+        PagerState state = getPagerState(viewIdx);
+        if (state == null)
+            return -1;
+
+        if (state.savedCurrentPage >= 0) {
+            return state.savedCurrentPage;
+        } else if (!state.pagerInitialised && state.pendingSetPage >= 0) {
+            return state.pendingSetPage;
+        } else {
+            ViewPager2 pager = getPager(viewIdx);
+            return (pager == null) ? -1 : pager.getCurrentItem();
+        }
+    }
+
+    /**
+     * Returns null if oob
+     */
+    public PageType getCurrentPageType(int viewIdx) {
+        ViewPager2 pager = getPager(viewIdx);
+        int curPage = getCurrentPage(viewIdx);
+
+        if (pager == null || curPage < 0)
+            return null;
+
         ClueTabsPagerAdapter adapter
-            = (ClueTabsPagerAdapter) binding.clueTabsPager0.getAdapter();
+            = (ClueTabsPagerAdapter) pager.getAdapter();
         return adapter.getPageType(curPage);
     }
 
     /**
      * Name of current list or null if oob or history
      */
-    public String getCurrentPageListName() {
-        int curPage = binding.clueTabsPager0.getCurrentItem();
+    public String getCurrentPageListName(int viewIdx) {
+        int curPage = getCurrentPage(viewIdx);
         ClueTabsPagerAdapter adapter
             = (ClueTabsPagerAdapter) binding.clueTabsPager0.getAdapter();
         return adapter.getPageListName(curPage);
-    }
-
-    public void nextPage() {
-        int curPage = binding.clueTabsPager0.getCurrentItem();
-        int numPages = binding.clueTabsPager0.getAdapter().getItemCount();
-        binding.clueTabsPager0.setCurrentItem((curPage + 1) % numPages, false);
-    }
-
-    public void prevPage() {
-        int curPage = binding.clueTabsPager0.getCurrentItem();
-        int numPages = binding.clueTabsPager0.getAdapter().getItemCount();
-        int nextPage = curPage == 0 ? numPages - 1 : curPage - 1;
-        binding.clueTabsPager0.setCurrentItem(nextPage, false);
     }
 
     /**
@@ -310,13 +357,14 @@ public class ClueTabs extends LinearLayout
                 return;
 
             boolean listShown
-                = binding.clueTabsPager0.getCurrentItem() == listIndex || (
+                = getCurrentPage(0) == listIndex || (
                     binding.clueTabsPager1.getVisibility() == View.VISIBLE
-                    && binding.clueTabsPager1.getCurrentItem() == listIndex
+                    && getCurrentPage(1) == listIndex
                 );
 
-            if (!listShown)
+            if (!listShown) {
                 binding.clueTabsPager0.setCurrentItem(listIndex);
+            }
         });
     }
 
@@ -325,7 +373,43 @@ public class ClueTabs extends LinearLayout
         int newWidth, int newHeight, int oldWidth, int oldHeight
     ) {
         super.onSizeChanged(newWidth, newHeight, oldWidth, oldHeight);
-        setDouble();
+        if (newWidth > 0 && newHeight > 0) {
+            post(() -> { setDouble(); });
+        }
+
+        // save pages for layout change
+        // layout change of size 0 doesn't get called until the
+        // pages are visible again.
+        // Isn't Android great!
+        for (int i = 0; i < pagerStates.length; i++) {
+            pagerStates[i].pageOnLastSizeChange = getCurrentPage(i);
+        }
+    }
+
+    private void onPagerSizeChange(int viewIdx, int width, int height) {
+        // Size changes seem to reset view pagers to first page when the
+        // view becomes 0-sized. Need to save/restore. I suspect there
+        // is a proper way to do this, but i don't know what it is.
+        PagerState state = getPagerState(viewIdx);
+        if (state == null)
+            return;
+
+        if (width > 0 && height > 0) {
+            if (state.savedCurrentPage >= 0) {
+                post(() -> {
+                    int page = state.savedCurrentPage;
+                    // might have been overwritten by setPage
+                    if (page >= 0)
+                        setPage(viewIdx, state.savedCurrentPage);
+                    state.savedCurrentPage = -1;
+                });
+            }
+        } else {
+            // because the layout change is too late and the current
+            // page has changed already, use the page saved on last size
+            // which is called early enough
+            state.savedCurrentPage = state.pageOnLastSizeChange;
+        }
     }
 
     private void setDouble() {
@@ -366,12 +450,23 @@ public class ClueTabs extends LinearLayout
     }
 
     /**
+     * Pagers being remade, so clear any pending/setup info
+     */
+    private void resetPagerInitialiseState(int viewIdx) {
+        if (viewIdx < 0 || viewIdx > pagerStates.length)
+            return;
+        pagerStates[viewIdx] = new PagerState();
+    }
+
+    /**
      * Setup one of the clue tabs windows
      *
      * @param viewIdx whether it's the first or second set of tabs and pager
      */
     private void setupPager(ViewPager2 pager, TabLayout tabs, int viewIdx) {
-        ClueTabsPagerAdapter adapter = new ClueTabsPagerAdapter();
+        ClueTabsPagerAdapter adapter = new ClueTabsPagerAdapter(viewIdx);
+
+        resetPagerInitialiseState(viewIdx);
 
         pager.setAdapter(adapter);
 
@@ -404,14 +499,6 @@ public class ClueTabs extends LinearLayout
         }
 
         pager.setCurrentItem(viewIdx % adapter.getItemCount(), false);
-
-        pager.registerOnPageChangeCallback(
-            new ViewPager2.OnPageChangeCallback() {
-                public void onPageSelected(int position) {
-                    ClueTabs.this.notifyListenersPageChanged(position);
-                }
-            }
-        );
     }
 
     /**
@@ -462,11 +549,6 @@ public class ClueTabs extends LinearLayout
             listener.onClueTabsBarSwipeDown(this);
     }
 
-    private void notifyListenersPageChanged(int pageNumber) {
-        for (ClueTabsListener listener : listeners)
-            listener.onClueTabsPageChange(this, pageNumber);
-    }
-
     private void listenBoard() {
         if (board != null && !listening) {
             board.addListener(this);
@@ -481,7 +563,31 @@ public class ClueTabs extends LinearLayout
         }
     }
 
-    private class ClueTabsPagerAdapter extends RecyclerView.Adapter<ClueListHolder> {
+    private void onClueTabsPagerBind(int viewIdx) {
+        PagerState state = getPagerState(viewIdx);
+        if (state != null && !state.pagerInitialised) {
+            state.pagerInitialised = true;
+            if (state.pendingSetPage >= 0) {
+                post(() -> {
+                    setPage(viewIdx, state.pendingSetPage);
+                    state.pendingSetPage = -1;
+                });
+            }
+        }
+    }
+
+    private class ClueTabsPagerAdapter
+            extends RecyclerView.Adapter<ClueListHolder> {
+
+        public int pagerIndex;
+
+        /**
+         * Construct adapter for the pager at given index
+         */
+        public ClueTabsPagerAdapter(int pagerIndex) {
+            this.pagerIndex = pagerIndex;
+        }
+
         @Override
         public ClueListHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             LayoutInflater inflater = (LayoutInflater) parent.getContext()
@@ -495,6 +601,7 @@ public class ClueTabs extends LinearLayout
         @Override
         public void onBindViewHolder(ClueListHolder holder, int position) {
             holder.setContents(getPageType(position), getPageTitle(position));
+            onClueTabsPagerBind(pagerIndex);
         }
 
         public PageType getPageType(int position) {
@@ -1082,6 +1189,56 @@ public class ClueTabs extends LinearLayout
                 return tabSwipeDetector.onTouchEvent(e);
             }
         });
+    }
+
+    /**
+     * Get pager state or null if oob
+     */
+    private PagerState getPagerState(int viewIdx) {
+        return (viewIdx >= 0 && viewIdx < pagerStates.length)
+            ? pagerStates[viewIdx]
+            : null;
+    }
+
+    /**
+     * null if oob
+     */
+    private ViewPager2 getPager(int viewIdx) {
+        switch (viewIdx) {
+        case 0:
+            return binding.clueTabsPager0;
+        case 1:
+            return binding.clueTabsPager1;
+        default:
+            return null;
+        }
+    }
+
+    /**
+     * Used for managing odd behaviour of ViewPager2
+     *
+     * Can't setCurrentItem until some layout stuff complete. Resets to
+     * page 0 on show/hide. Need to workaround this.
+     */
+    private static class PagerState {
+        // if the view has drawn and setCurrentItem will work
+        public boolean pagerInitialised = false;
+        // if a setPage is waiting for init (-1 if not)
+        public int pendingSetPage = -1;
+        // save current page if view was hidden (or -1)
+        public int savedCurrentPage = -1;
+        // because onLayoutChange doesn't get called until page has been
+        // reset...
+        public int pageOnLastSizeChange = -1;
+
+        public String toString() {
+            return "PagerState("
+                + "pagerInitialised=" + pagerInitialised + ","
+                + "pendingSetPage=" + pendingSetPage + ","
+                + "savedCurrentPage=" + savedCurrentPage
+                + "savedCurrentPage=" + savedCurrentPage
+                + ")";
+        }
     }
 }
 

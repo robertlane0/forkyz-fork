@@ -305,19 +305,19 @@ public class ClueListActivity extends PuzzleActivity
      */
     private void selectFirstSelectableClue(boolean searchForwards) {
         boolean selectedClue = false;
-        String startPage = binding.clueTabs.getCurrentPageListName();
+        String startPage = binding.clueTabs.getCurrentPageListName(0);
         do {
            selectedClue = selectFirstClue();
            if (!selectedClue) {
                if (searchForwards)
-                   binding.clueTabs.nextPage();
+                   nextList();
                else
-                   binding.clueTabs.prevPage();
+                   prevList();
             }
         } while (
             !selectedClue
             && !Objects.equals(
-                startPage, binding.clueTabs.getCurrentPageListName()
+                startPage, binding.clueTabs.getCurrentPageListName(0)
             )
         );
     }
@@ -328,11 +328,13 @@ public class ClueListActivity extends PuzzleActivity
      * Returns false if no selectable clue
      */
     private boolean selectFirstClue() {
+        // TODO: think how this should work for multi lists -- should use
+        // current puzzle list i think, not first clue tab page type
         Playboard board = getBoard();
         Puzzle puz = getPuzzle();
-        switch (binding.clueTabs.getCurrentPageType()) {
+        switch (binding.clueTabs.getCurrentPageType(0)) {
         case CLUES:
-            String listName = binding.clueTabs.getCurrentPageListName();
+            String listName = binding.clueTabs.getCurrentPageListName(0);
             int firstClue = puz.getClues(listName).getFirstZonedIndex();
             if (firstClue < 0) {
                 return false;
@@ -401,14 +403,14 @@ public class ClueListActivity extends PuzzleActivity
         registerVoiceCommand(new VoiceCommand(
             getString(R.string.command_next),
             args -> {
-                binding.clueTabs.nextPage();
+                nextList();
                 selectFirstClue();
             }
         ));
         registerVoiceCommand(new VoiceCommand(
             getString(R.string.command_previous),
             args -> {
-                binding.clueTabs.prevPage();
+                prevList();
                 selectFirstClue();
             }
         ));
@@ -432,7 +434,7 @@ public class ClueListActivity extends PuzzleActivity
         if (!board.getHighlightLetter().equals(first)) {
             board.moveZoneBack(false);
         } else {
-            binding.clueTabs.prevPage();
+            prevList();
             selectFirstSelectableClue(false);
         }
     }
@@ -447,7 +449,7 @@ public class ClueListActivity extends PuzzleActivity
         if (!board.getHighlightLetter().equals(last)) {
             board.moveZoneForward(false);
         } else {
-            binding.clueTabs.nextPage();
+            nextList();
             selectFirstSelectableClue(true);
         }
     }
@@ -631,5 +633,13 @@ public class ClueListActivity extends PuzzleActivity
             return true;
 
         return false;
+    }
+
+    private void nextList() {
+        // TODO
+    }
+
+    private void prevList() {
+        // TODO
     }
 }
