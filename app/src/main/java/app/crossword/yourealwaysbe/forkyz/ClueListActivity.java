@@ -1,5 +1,6 @@
 package app.crossword.yourealwaysbe.forkyz;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.logging.Logger;
 
@@ -31,8 +32,11 @@ public class ClueListActivity extends PuzzleActivity
         ClueListActivity.class.getCanonicalName()
     );
 
+    private final static String STATE_CURRENT_LIST_NUM = "currentListNum";
+
     private ClueListBinding binding;
     private KeyboardManager keyboardManager;
+    private int currentListNum = 0;
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -120,6 +124,21 @@ public class ClueListActivity extends PuzzleActivity
                 invalidateOptionsMenu();
             }
         );
+
+        binding.clueTabs.setBoard(board);
+        ensureCurrentClueShown();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle state) {
+        super.onSaveInstanceState(state);
+        state.putInt(STATE_CURRENT_LIST_NUM, currentListNum);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle state) {
+        super.onRestoreInstanceState(state);
+        currentListNum = state.getInt(STATE_CURRENT_LIST_NUM, 0);
     }
 
     @Override
@@ -305,7 +324,8 @@ public class ClueListActivity extends PuzzleActivity
      */
     private void selectFirstSelectableClue(boolean searchForwards) {
         boolean selectedClue = false;
-        String startPage = binding.clueTabs.getCurrentPageListName(0);
+        String startPage
+            = binding.clueTabs.getPageListName(getCurrentListNum());
         do {
            selectedClue = selectFirstClue();
            if (!selectedClue) {
@@ -317,7 +337,8 @@ public class ClueListActivity extends PuzzleActivity
         } while (
             !selectedClue
             && !Objects.equals(
-                startPage, binding.clueTabs.getCurrentPageListName(0)
+                startPage,
+                binding.clueTabs.getPageListName(getCurrentListNum())
             )
         );
     }
@@ -325,16 +346,20 @@ public class ClueListActivity extends PuzzleActivity
     /**
      * Selects first clue in cur list
      *
-     * Returns false if no selectable clue
+     * @returns false if no selectable clue
      */
     private boolean selectFirstClue() {
-        // TODO: think how this should work for multi lists -- should use
-        // current puzzle list i think, not first clue tab page type
+        int listNum = getCurrentListNum();
+        ClueTabs.PageType pageType = binding.clueTabs.getPageType(listNum);
+        if (pageType == null)
+            return false;
+
         Playboard board = getBoard();
         Puzzle puz = getPuzzle();
-        switch (binding.clueTabs.getCurrentPageType(0)) {
+
+        switch (pageType) {
         case CLUES:
-            String listName = binding.clueTabs.getCurrentPageListName(0);
+            String listName = binding.clueTabs.getPageListName(listNum);
             int firstClue = puz.getClues(listName).getFirstZonedIndex();
             if (firstClue < 0) {
                 return false;
@@ -429,13 +454,14 @@ public class ClueListActivity extends PuzzleActivity
         if (board == null)
             return;
 
+
         Position first = getCurrentFirstPosition();
 
         if (!board.getHighlightLetter().equals(first)) {
             board.moveZoneBack(false);
         } else {
-            prevList();
-            selectFirstSelectableClue(false);
+            if (prevList())
+                selectFirstSelectableClue(false);
         }
     }
 
@@ -449,12 +475,18 @@ public class ClueListActivity extends PuzzleActivity
         if (!board.getHighlightLetter().equals(last)) {
             board.moveZoneForward(false);
         } else {
-            nextList();
-            selectFirstSelectableClue(true);
+            if (nextList())
+                selectFirstSelectableClue(true);
         }
     }
 
     private void onUpKey() {
+        ClueTabs.PageType pageType
+            = binding.clueTabs.getPageType(getCurrentListNum());
+        // do nothing on history
+        if (pageType == null || pageType == ClueTabs.PageType.HISTORY)
+            return;
+
         Playboard board = getBoard();
         Puzzle puz = getPuzzle();
         if (board == null || puz == null)
@@ -476,23 +508,41 @@ public class ClueListActivity extends PuzzleActivity
     }
 
     private void onDownKey() {
+        ClueTabs.PageType pageType
+            = binding.clueTabs.getPageType(getCurrentListNum());
+        if (pageType == null)
+            return;
+
         Playboard board = getBoard();
         Puzzle puz = getPuzzle();
         if (board == null || puz == null)
             return;
 
-        ClueID cid = board.getClueID();
-        String curList = cid == null ? null : cid.getListName();
-        int curClueIndex = cid == null ? -1 : cid.getIndex();
+        switch (pageType) {
+        case CLUES:
+            ClueID cid = board.getClueID();
+            String curList = cid == null ? null : cid.getListName();
+            int curClueIndex = cid == null ? -1 : cid.getIndex();
 
-        if (curList != null && curClueIndex >= 0) {
-            int next = puz.getClues(curList)
-                .getNextZonedIndex(curClueIndex, true);
-            binding.clueTabs.setForceSnap(true);
-            board.jumpToClue(new ClueID(curList, next));
-            binding.clueTabs.setForceSnap(false);
-        } else {
-            selectFirstSelectableClue(true);
+            if (curList != null && curClueIndex >= 0) {
+                int next = puz.getClues(curList)
+                    .getNextZonedIndex(curClueIndex, true);
+                binding.clueTabs.setForceSnap(true);
+                board.jumpToClue(new ClueID(curList, next));
+                binding.clueTabs.setForceSnap(false);
+            } else {
+                selectFirstSelectableClue(true);
+            }
+            break;
+        case HISTORY:
+            List<ClueID> history = puz.getHistory();
+            if (history.size() > 2) {
+                binding.clueTabs.setForceSnap(true);
+                // always at top of history
+                board.jumpToClue(history.get(1));
+                binding.clueTabs.setForceSnap(false);
+            }
+           break;
         }
     }
 
@@ -635,11 +685,64 @@ public class ClueListActivity extends PuzzleActivity
         return false;
     }
 
-    private void nextList() {
-        // TODO
+    /**
+     * Move to next list, return true if change
+     */
+    private boolean nextList() {
+        return setCurrentListNum(
+            binding.clueTabs.getNextListNum(getCurrentListNum())
+        );
     }
 
-    private void prevList() {
-        // TODO
+    /**
+     * Move to prev list, return true if change
+     */
+    private boolean prevList() {
+        return setCurrentListNum(
+            binding.clueTabs.getPrevListNum(getCurrentListNum())
+        );
+    }
+
+    /**
+     * Update current list, return true if change
+     */
+    private boolean setCurrentListNum(int listNum) {
+        binding.clueTabs.ensureListShown(listNum, currentListNum);
+
+        if (currentListNum != listNum) {
+            currentListNum = listNum;
+
+            binding.clueTabs.setForceSnap(true);
+            selectFirstClue();
+            binding.clueTabs.setForceSnap(false);
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private int getCurrentListNum() {
+        return currentListNum;
+    }
+
+    private void ensureCurrentClueShown() {
+        ClueTabs.PageType pageType
+            = binding.clueTabs.getPageType(getCurrentListNum());
+        if (pageType == ClueTabs.PageType.HISTORY) {
+            // nothing to do
+            return;
+        }
+
+        Playboard board = getBoard();
+        // start with currently selected list showing
+        if (board != null) {
+            ClueID cid = board.getClueID();
+            int listNum = cid == null
+                ? -1
+                : binding.clueTabs.getListNum(cid.getListName());
+            if (listNum >= 0)
+                setCurrentListNum(listNum);
+        }
     }
 }

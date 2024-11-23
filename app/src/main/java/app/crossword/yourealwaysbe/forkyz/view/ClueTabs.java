@@ -294,28 +294,77 @@ public class ClueTabs extends ConstraintLayout
     }
 
     /**
-     * Returns null if oob
+     * Ensure list is shown
+     *
+     * If the listNum-th is not shown, then update the panel showing
+     * replaceListNum with listNum (or the first panel if neither).
+     * replaceListNum can be -1 if no replace.
      */
-    public PageType getCurrentPageType(int viewIdx) {
-        ViewPager2 pager = getPager(viewIdx);
-        int curPage = getCurrentPage(viewIdx);
+    public void ensureListShown(int listNum, int replaceListNum) {
+        int curList0 = getCurrentPage(0);
+        if (listNum == curList0)
+            return;
 
-        if (pager == null || curPage < 0)
-            return null;
+        boolean pager1Visible = isPagerVisible(1);
+        int curList1 = getCurrentPage(1);
 
-        ClueTabsPagerAdapter adapter
-            = (ClueTabsPagerAdapter) pager.getAdapter();
-        return adapter.getPageType(curPage);
+        if (pager1Visible) {
+            if (curList1 == listNum)
+                return;
+
+            if (curList1 == replaceListNum) {
+                setPage(1, listNum);
+                return;
+            }
+        }
+
+        // change if replaceListNum matches or not
+        setPage(0, listNum);
     }
 
     /**
-     * Name of current list or null if oob or history
+     * Get number of clue list, or -1
      */
-    public String getCurrentPageListName(int viewIdx) {
-        int curPage = getCurrentPage(viewIdx);
-        ClueTabsPagerAdapter adapter
-            = (ClueTabsPagerAdapter) binding.clueTabsPager0.getAdapter();
-        return adapter.getPageListName(curPage);
+    public int getListNum(String listName) {
+        return listNames.indexOf(listName);
+    }
+
+    /**
+     * Return the type of the page at listNum (or null if oob)
+     */
+    public PageType getPageType(int listNum) {
+        if (listNum == getHistoryListNum())
+            return PageType.HISTORY;
+        else
+            return PageType.CLUES;
+    }
+
+    /**
+     * Name of list or null if oob or history
+     */
+    public String getPageListName(int listNum) {
+        if (listNum < 0 || listNum >= listNames.size())
+            return null;
+        else
+            return listNames.get(listNum);
+    }
+
+    /**
+     * Get index of the list to the right
+     *
+     * Does not wrap, but stops at ends
+     */
+    public int getNextListNum(int listNum) {
+        return Math.min(listNum + 1, getNumLists() - 1);
+    }
+
+    /**
+     * Get index of the list to the left
+     *
+     * Does not wrap, but stops at ends
+     */
+    public int getPrevListNum(int listNum) {
+        return Math.max(listNum - 1, 0);
     }
 
     /**
@@ -356,13 +405,19 @@ public class ClueTabs extends ConstraintLayout
             if (listIndex < 0)
                 return;
 
-            boolean listShown
-                = getCurrentPage(0) == listIndex || (
-                    binding.clueTabsPager1.getVisibility() == View.VISIBLE
-                    && getCurrentPage(1) == listIndex
+            int historyListNum = getHistoryListNum();
+
+            int curPage0 = getCurrentPage(0);
+            boolean listShown0
+                = curPage0 == listIndex || curPage0 == historyListNum;
+
+            int curPage1 = getCurrentPage(1);
+            boolean listShown1
+                = isPagerVisible(1) && (
+                    curPage1 == listIndex || curPage1 == historyListNum
                 );
 
-            if (!listShown) {
+            if (!listShown0 && !listShown1) {
                 binding.clueTabsPager0.setCurrentItem(listIndex);
             }
         });
@@ -604,36 +659,19 @@ public class ClueTabs extends ConstraintLayout
             onClueTabsPagerBind(pagerIndex);
         }
 
-        public PageType getPageType(int position) {
-            if (position == listNames.size())
-                return PageType.HISTORY;
-            else
-                return PageType.CLUES;
-        }
-
         public String getPageTitle(int position) {
             Context context = getContext();
-            if (position < 0 || position > listNames.size())
+            if (position < 0 || position > getNumLists())
                 return null;
-            else if (position == listNames.size())
+            else if (position == getHistoryListNum())
                 return context.getString(R.string.clue_tab_history);
-            else
-                return listNames.get(position);
-        }
-
-        /**
-         * Name of current list or null if history or oob
-         */
-        public String getPageListName(int position) {
-            if (position < 0 || position >= listNames.size())
-                return null;
             else
                 return listNames.get(position);
         }
 
         @Override
         public int getItemCount() {
-            return listNames.size() + 1;
+            return getNumLists();
         }
     }
 
@@ -1211,6 +1249,24 @@ public class ClueTabs extends ConstraintLayout
             return binding.clueTabsPager1;
         default:
             return null;
+        }
+    }
+
+    private int getNumLists() {
+        // plus one for history
+        return listNames.size() + 1;
+    }
+
+    private int getHistoryListNum() {
+        // always the last
+        return getNumLists() - 1;
+    }
+
+    private boolean isPagerVisible(int viewIdx) {
+        switch (viewIdx) {
+        case 0: return binding.clueTabsPager0.getVisibility() == View.VISIBLE;
+        case 1: return binding.clueTabsPager1.getVisibility() == View.VISIBLE;
+        default: return false;
         }
     }
 

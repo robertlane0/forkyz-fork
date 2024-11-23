@@ -523,7 +523,6 @@ public class PlayActivity extends PuzzleActivity
         binding.clueTabs.setShowWords(isAcrostic());
         settings.getPlayClueTabsPage(0, page0 -> {
         settings.getPlayClueTabsPage(1, page1 -> {
-            // TODO: save/restore both pages
             binding.clueTabs.setPage(0, page0);
             binding.clueTabs.setPage(1, page1);
             binding.clueTabs.addListener(this);
