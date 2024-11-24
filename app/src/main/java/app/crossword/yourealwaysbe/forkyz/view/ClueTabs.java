@@ -722,11 +722,7 @@ public class ClueTabs extends ConstraintLayout
 
         @Override
         public void onPlayboardChange(PlayboardChanges changes) {
-            boolean wordChange = !Objects.equals(
-                changes.getPreviousWord(), changes.getCurrentWord()
-            );
-            if (wordChange)
-                snapToClueIfEnabled();
+            snapToClueIfEnabled();
         }
 
         /**

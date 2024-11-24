@@ -126,7 +126,6 @@ public class ClueListActivity extends PuzzleActivity
         );
 
         binding.clueTabs.setBoard(board);
-        ensureCurrentClueShown();
     }
 
     @Override
@@ -364,14 +363,18 @@ public class ClueListActivity extends PuzzleActivity
             if (firstClue < 0) {
                 return false;
             } else {
+                forceSnapOnKey();
                 board.jumpToClue(new ClueID(listName, firstClue));
+                unforceSnapOnKey();
                 return true;
             }
         case HISTORY:
             for (ClueID cid : puz.getHistory()) {
                 Clue clue = puz.getClue(cid);
                 if (clue.hasZone()) {
+                    forceSnapOnKey();
                     board.jumpToClue(clue);
+                    unforceSnapOnKey();
                     return true;
                 }
             }
@@ -454,11 +457,12 @@ public class ClueListActivity extends PuzzleActivity
         if (board == null)
             return;
 
-
         Position first = getCurrentFirstPosition();
 
         if (!board.getHighlightLetter().equals(first)) {
+            forceSnapOnKey();
             board.moveZoneBack(false);
+            unforceSnapOnKey();
         } else {
             if (prevList())
                 selectFirstSelectableClue(false);
@@ -473,7 +477,9 @@ public class ClueListActivity extends PuzzleActivity
         Position last = getCurrentLastPosition();
 
         if (!board.getHighlightLetter().equals(last)) {
+            forceSnapOnKey();
             board.moveZoneForward(false);
+            unforceSnapOnKey();
         } else {
             if (nextList())
                 selectFirstSelectableClue(true);
@@ -499,9 +505,9 @@ public class ClueListActivity extends PuzzleActivity
         if (curList != null && curClueIndex >= 0) {
             int prev = puz.getClues(curList)
                 .getPreviousZonedIndex(curClueIndex, true);
-            binding.clueTabs.setForceSnap(true);
+            forceSnapOnKey();
             board.jumpToClue(new ClueID(curList, prev));
-            binding.clueTabs.setForceSnap(false);
+            unforceSnapOnKey();
         } else {
             selectFirstSelectableClue(false);
         }
@@ -527,9 +533,9 @@ public class ClueListActivity extends PuzzleActivity
             if (curList != null && curClueIndex >= 0) {
                 int next = puz.getClues(curList)
                     .getNextZonedIndex(curClueIndex, true);
-                binding.clueTabs.setForceSnap(true);
+                forceSnapOnKey();
                 board.jumpToClue(new ClueID(curList, next));
-                binding.clueTabs.setForceSnap(false);
+                unforceSnapOnKey();
             } else {
                 selectFirstSelectableClue(true);
             }
@@ -537,10 +543,10 @@ public class ClueListActivity extends PuzzleActivity
         case HISTORY:
             List<ClueID> history = puz.getHistory();
             if (history.size() > 2) {
-                binding.clueTabs.setForceSnap(true);
+                forceSnapOnKey();
                 // always at top of history
                 board.jumpToClue(history.get(1));
-                binding.clueTabs.setForceSnap(false);
+                unforceSnapOnKey();
             }
            break;
         }
@@ -555,6 +561,7 @@ public class ClueListActivity extends PuzzleActivity
         Position first = getCurrentFirstPosition();
 
         settings.getPlayScratchMode(scratchMode -> {
+            forceSnapOnKey();
             if (scratchMode)
                 board.deleteScratchLetter();
             else
@@ -564,6 +571,7 @@ public class ClueListActivity extends PuzzleActivity
             if (!w.checkInWord(p) && first != null) {
                 board.setHighlightLetter(first);
             }
+            unforceSnapOnKey();
         });
     }
 
@@ -575,7 +583,9 @@ public class ClueListActivity extends PuzzleActivity
         settings.getPlaySpaceChangesDirection(spaceChangesDirection -> {
             if (spaceChangesDirection)
                 return;
+            forceSnapOnKey();
             playLetter(' ');
+            unforceSnapOnKey();
         });
     }
 
@@ -698,6 +708,8 @@ public class ClueListActivity extends PuzzleActivity
      * Move to prev list, return true if change
      */
     private boolean prevList() {
+        System.out.println("FORKYZ: prevList of " + getCurrentListNum()
+            + " is " + binding.clueTabs.getPrevListNum(getCurrentListNum()));
         return setCurrentListNum(
             binding.clueTabs.getPrevListNum(getCurrentListNum())
         );
@@ -712,9 +724,9 @@ public class ClueListActivity extends PuzzleActivity
         if (currentListNum != listNum) {
             currentListNum = listNum;
 
-            binding.clueTabs.setForceSnap(true);
+            forceSnapOnKey();
             selectFirstClue();
-            binding.clueTabs.setForceSnap(false);
+            unforceSnapOnKey();
 
             return true;
         } else {
@@ -726,23 +738,37 @@ public class ClueListActivity extends PuzzleActivity
         return currentListNum;
     }
 
-    private void ensureCurrentClueShown() {
+    /**
+     * After a snap, infer what the current list num should be
+     */
+    private void inferCurrentListNumAfterSnap() {
         ClueTabs.PageType pageType
             = binding.clueTabs.getPageType(getCurrentListNum());
-        if (pageType == ClueTabs.PageType.HISTORY) {
-            // nothing to do
-            return;
-        }
+        switch (pageType) {
+        case CLUES:
+            Playboard board = getBoard();
+            Puzzle puz = getPuzzle();
+            if (board == null || puz == null)
+                return;
 
-        Playboard board = getBoard();
-        // start with currently selected list showing
-        if (board != null) {
             ClueID cid = board.getClueID();
-            int listNum = cid == null
-                ? -1
-                : binding.clueTabs.getListNum(cid.getListName());
-            if (listNum >= 0)
-                setCurrentListNum(listNum);
+            String curList = cid == null ? null : cid.getListName();
+            int newListNum = binding.clueTabs.getListNum(curList);
+            currentListNum = newListNum;
+            break;
+
+        case HISTORY:
+            // current listnum is ok
+            break;
         }
+    }
+
+    private void forceSnapOnKey() {
+        binding.clueTabs.setForceSnap(true);
+    }
+
+    private void unforceSnapOnKey() {
+        binding.clueTabs.setForceSnap(false);
+        inferCurrentListNumAfterSnap();
     }
 }
