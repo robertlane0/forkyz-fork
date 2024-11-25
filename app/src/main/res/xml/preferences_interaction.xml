@@ -35,11 +35,13 @@
         android:key="skipFilled"
     />
 
-    <androidx.preference.CheckBoxPreference
+    <androidx.preference.ListPreference
         android:title="@string/cycle_unfilled"
-        android:defaultValue="false"
         android:summary="@string/cycle_unfilled_desc"
-        android:key="cycleUnfilled"
+        android:defaultValue="NEVER"
+        android:entries="@array/cycle_unfilled_labels"
+        android:entryValues="@array/cycle_unfilled_values"
+        android:key="cycleUnfilledMode"
     />
 
     <androidx.preference.CheckBoxPreference

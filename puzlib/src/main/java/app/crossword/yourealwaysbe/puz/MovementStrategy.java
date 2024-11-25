@@ -508,9 +508,17 @@ public interface MovementStrategy extends Serializable {
 
         private MovementStrategy innerStrategy;
         private long lastBack = -1;
+        private boolean cycleForwards;
+        private boolean cycleBackwards;
 
-        public CycleUnfilled(MovementStrategy innerStrategy) {
+        public CycleUnfilled(
+            MovementStrategy innerStrategy,
+            boolean cycleForwards,
+            boolean cycleBackwards
+        ) {
             this.innerStrategy = innerStrategy;
+            this.cycleForwards = cycleForwards;
+            this.cycleBackwards = cycleBackwards;
         }
 
         public Word move(Playboard board, boolean skipCompletedLetters) {
@@ -527,6 +535,7 @@ public interface MovementStrategy extends Serializable {
                     || puz == null
                     || clue.getZone().isEmpty()
                     || board.isFilledClueID(clue.getClueID())
+                    || !cycleForwards
                 ) {
                     word = innerStrategy.move(board, skipCompletedLetters);
                 } else {
@@ -559,6 +568,7 @@ public interface MovementStrategy extends Serializable {
                     || puz == null
                     || clue.getZone().isEmpty()
                     || board.isFilledClueID(clue.getClueID())
+                    || !cycleBackwards
                 ) {
                     word = innerStrategy.back(board);
                 } else if (!isPauseBackCycle()) {

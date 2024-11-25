@@ -234,6 +234,16 @@
        <item>WIDE</item>
        <item>ALWAYS</item>
      </string-array>
+     <string-array name="cycle_unfilled_labels">
+       <item>@string/cycle_unfilled_never</item>
+       <item>@string/cycle_unfilled_forwards</item>
+       <item>@string/cycle_unfilled_always</item>
+     </string-array>
+     <string-array name="cycle_unfilled_values">
+       <item>NEVER</item>
+       <item>FORWARDS</item>
+       <item>ALWAYS</item>
+     </string-array>
 
      <string-array name="emptyArray"/>
 </resources>

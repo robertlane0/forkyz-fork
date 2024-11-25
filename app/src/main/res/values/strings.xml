@@ -362,6 +362,9 @@
     <!-- preferences interaction -->
     <string name="cycle_unfilled">Cycle on Unfilled Words </string>
     <string name="cycle_unfilled_desc">When the end of a word is reached, return to the beginning if the word is not complete. Else use selected movement strategy.</string>
+    <string name="cycle_unfilled_never">Never</string>
+    <string name="cycle_unfilled_forwards">Forwards</string>
+    <string name="cycle_unfilled_always">Always</string>
     <string name="delete_crossing_delete">Delete all cells</string>
     <string name="delete_crossing_preserve_filled_cells">Don\'t delete crossing partially filled words.</string>
     <string name="delete_crossing_preserve_filled_words">Don\'t delete crossing filled words.</string>

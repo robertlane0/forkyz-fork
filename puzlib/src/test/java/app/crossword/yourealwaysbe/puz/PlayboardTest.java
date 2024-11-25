@@ -465,7 +465,7 @@ public class PlayboardTest {
         board.setSkipCompletedLetters(true);
         board.setMovementStrategy(
             new MovementStrategy.CycleUnfilled(
-                MovementStrategy.MOVE_NEXT_ON_AXIS
+                MovementStrategy.MOVE_NEXT_ON_AXIS, true, true
             )
         );
 
@@ -551,7 +551,7 @@ public class PlayboardTest {
         checkNoMoveFullGrid(
             blockObjects,
             new MovementStrategy.CycleUnfilled(
-                MovementStrategy.MOVE_NEXT_ON_AXIS
+                MovementStrategy.MOVE_NEXT_ON_AXIS, true, true
             )
         );
     }

@@ -37,5 +37,6 @@ public class MigrationHelper {
         settings.migrateThemePreferences();
         downloadersProvider.get(settings::migrateAutoDownloaders);
         settings.migrateDontDeleteCrossing();
+        settings.migrateCycleUnfilled();
     }
 }

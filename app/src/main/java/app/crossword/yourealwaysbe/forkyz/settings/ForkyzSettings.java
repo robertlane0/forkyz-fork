@@ -166,7 +166,10 @@ public class ForkyzSettings {
     private static final String PREF_PLAY_SHOW_ERRORS_GRID = "showErrors";
     private static final String PREF_PLAY_SHOW_TIMER = "showTimer";
     private static final String PREF_PLAY_SKIP_FILLED = "skipFilled";
-    private static final String PREF_PLAY_CYCLE_UNFILLED = "cycleUnfilled";
+    private static final String PREF_PLAY_CYCLE_UNFILLED_LEGACY
+        = "cycleUnfilled";
+    private static final String PREF_PLAY_CYCLE_UNFILLED_MODE
+        = "cycleUnfilledMode";
     private static final String PREF_PLAY_SPACE_CHANGE_DIRECTION
         = "spaceChangesDirection";
     private static final String PREF_PLAY_SUPPRESS_HINT_HIGHLIGHTING
@@ -254,7 +257,6 @@ public class ForkyzSettings {
         BOOL_DEFAULTS.put(PREF_PLAY_SHOW_ERRORS_GRID, false);
         BOOL_DEFAULTS.put(PREF_PLAY_SHOW_TIMER, false);
         BOOL_DEFAULTS.put(PREF_PLAY_SKIP_FILLED, false);
-        BOOL_DEFAULTS.put(PREF_PLAY_CYCLE_UNFILLED, false);
         BOOL_DEFAULTS.put(PREF_PLAY_PLAY_LETTER_UNDO_ENABLED, false);
         BOOL_DEFAULTS.put(PREF_PLAY_SPACE_CHANGE_DIRECTION, true);
         BOOL_DEFAULTS.put(PREF_PLAY_SUPPRESS_HINT_HIGHLIGHTING, false);
@@ -907,17 +909,30 @@ public class ForkyzSettings {
             String strategyString = prefs.getString(
                 PREF_PLAY_MOVEMENT_STRATEGY, "MOVE_NEXT_ON_AXIS"
             );
-            boolean cycleUnfilled = prefs.getBoolean(
-                PREF_PLAY_CYCLE_UNFILLED, false
-            );
+
+            CycleUnfilledMode cycleUnfilledMode
+                = CycleUnfilledMode.getFromSettingsValue(
+                    prefs.getString(
+                        PREF_PLAY_CYCLE_UNFILLED_MODE,
+                        CycleUnfilledMode.NEVER.getSettingsValue()
+                    )
+                );
+
+            boolean cycleForwards
+                = cycleUnfilledMode != CycleUnfilledMode.NEVER;
+            boolean cycleBackwards
+                = cycleUnfilledMode == CycleUnfilledMode.ALWAYS;
 
             handler.post(() -> {
                 MovementStrategy strategy
                     = MovementStrategySetting.getFromSettingsValue(
                             strategyString
                         ).getMovementStrategy();
-                if (cycleUnfilled)
-                    strategy = new MovementStrategy.CycleUnfilled(strategy);
+                if (cycleForwards || cycleBackwards) {
+                    strategy = new MovementStrategy.CycleUnfilled(
+                        strategy, cycleForwards, cycleBackwards
+                    );
+                }
 
                 cb.accept(strategy);
             });
@@ -1273,36 +1288,36 @@ public class ForkyzSettings {
      * Used to be two options, now three
      */
     public void migrateThemePreferences() {
-        executor.execute(() -> {
-            boolean legacyDynamic
-                = prefs.getBoolean(PREF_APP_THEME_LEGACY_USE_DYNAMIC, false);
-            if (legacyDynamic) {
-                prefs.edit()
-                    .remove(PREF_APP_THEME_LEGACY_USE_DYNAMIC)
-                    .putString(PREF_APP_THEME, Theme.DYNAMIC.getSettingsValue())
-                    .apply();
-            }
-        });
+        migratePrefBooleanToString(
+            PREF_APP_THEME_LEGACY_USE_DYNAMIC,
+            PREF_APP_THEME,
+            Theme.DYNAMIC.getSettingsValue(),
+            Theme.STANDARD.getSettingsValue()
+        );
     }
 
     /**
      * Migrate from boolean dontDeleteCrossing to DeleteCrossingMode
      */
     public void migrateDontDeleteCrossing() {
-        executor.execute(() -> {
-            boolean legacyDontDeleteCrossing = prefs.getBoolean(
-                PREF_PLAY_LEGACY_DONT_DELETE_CROSSING, false
-            );
-            if (legacyDontDeleteCrossing) {
-                prefs.edit()
-                    .remove(PREF_PLAY_LEGACY_DONT_DELETE_CROSSING)
-                    .putString(
-                        PREF_PLAY_DELETE_CROSSING_MODE,
-                        DeleteCrossingModeSetting.PRESERVE_FILLED_CELLS
-                            .getSettingsValue()
-                    ).apply();
-            }
-        });
+        migratePrefBooleanToString(
+            PREF_PLAY_LEGACY_DONT_DELETE_CROSSING,
+            PREF_PLAY_DELETE_CROSSING_MODE,
+            DeleteCrossingModeSetting.PRESERVE_FILLED_CELLS.getSettingsValue(),
+            DeleteCrossingModeSetting.DELETE.getSettingsValue()
+        );
+    }
+
+    /**
+     * Migrate from boolean cycleUnfilled to cycleUnfilledMode
+     */
+    public void migrateCycleUnfilled() {
+        migratePrefBooleanToString(
+            PREF_PLAY_CYCLE_UNFILLED_LEGACY,
+            PREF_PLAY_CYCLE_UNFILLED_MODE,
+            CycleUnfilledMode.ALWAYS.getSettingsValue(),
+            CycleUnfilledMode.NEVER.getSettingsValue()
+        );
     }
 
     /**
@@ -1555,5 +1570,25 @@ public class ForkyzSettings {
         } catch (NumberFormatException e) {
             return fallbackValue;
         }
+    }
+
+    private void migratePrefBooleanToString(
+        String legacyName,
+        String newName,
+        String newTrueValue,
+        String newFalseValue
+    ) {
+        executor.execute(() -> {
+            if (!prefs.contains(legacyName))
+                return;
+
+            boolean legacyValue = prefs.getBoolean(legacyName, false);
+            prefs.edit()
+                .remove(legacyName)
+                .putString(
+                    newName,
+                    legacyValue ? newTrueValue : newFalseValue
+                ).apply();
+        });
     }
 }
