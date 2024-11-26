@@ -37,42 +37,42 @@ public class PlayboardTest {
 
          Playboard board = new Playboard(puz);
          moveToPosition(board, 5, 5);
-         board.moveUp(false);
+         board.moveUp();
 
          assertAtRow(board, 4);
-         board.moveUp(false);
+         board.moveUp();
 
          assertAtRow(board, 3);
-         board.moveUp(false);
+         board.moveUp();
 
          assertAtRow(board, 2);
-         board.moveUp(false);
+         board.moveUp();
 
          assertAtRow(board, 2);
-         board.moveUp(false);
+         board.moveUp();
 
          assertAtRow(board, 2);
-         board.moveUp(false);
+         board.moveUp();
 
          moveToPosition(board, 4, 4);
 
          assertAtRow(board, 4);
-         board.moveUp(false);
+         board.moveUp();
 
          assertAtRow(board, 2);
-         board.moveUp(false);
+         board.moveUp();
 
          assertAtRow(board, 1);
-         board.moveUp(false);
+         board.moveUp();
 
          assertAtRow(board, 0);
-         board.moveUp(false);
+         board.moveUp();
 
          assertAtRow(board, 0);
-         board.moveUp(false);
+         board.moveUp();
 
          assertAtRow(board, 0);
-         board.moveUp(false);
+         board.moveUp();
     }
 
     @TestWithAndWithoutBlockObjects
@@ -785,6 +785,50 @@ public class PlayboardTest {
         assertBoxBlank(puz, 0, 1);
     }
 
+    @TestWithAndWithoutBlockObjects
+    public void testToggleBeforeMove() throws Exception {
+        Puzzle puz = loadTestPuz(false);
+        Playboard board = new Playboard(puz);
+
+        // test without toggle first
+        board.moveDown();
+        assertPosition(board, 1, 0);
+        board.moveRight();
+        assertPosition(board, 1, 1);
+        board.moveUp();
+        assertPosition(board, 0, 1);
+        board.moveLeft();
+        assertPosition(board, 0, 0);
+
+        board.setToggleBeforeMove(true);
+
+        assertClue(board, "Across", "1");
+        board.moveDown();
+        assertPosition(board, 0, 0);
+        assertClue(board, "Down", "1");
+        board.moveDown();
+        assertPosition(board, 1, 0);
+        assertClue(board, "Down", "1");
+        board.moveRight();
+        assertPosition(board, 1, 0);
+        assertClue(board, "Across", "14");
+        board.moveRight();
+        assertPosition(board, 1, 1);
+        assertClue(board, "Across", "14");
+        board.moveUp();
+        assertPosition(board, 1, 1);
+        assertClue(board, "Down", "2");
+        board.moveUp();
+        assertPosition(board, 0, 1);
+        assertClue(board, "Down", "2");
+        board.moveLeft();
+        assertPosition(board, 0, 1);
+        assertClue(board, "Across", "1");
+        board.moveLeft();
+        assertPosition(board, 0, 0);
+        assertClue(board, "Across", "1");
+    }
+
     private void checkNoMoveFullGrid(
         boolean blockObjects, MovementStrategy moveStrat
     ) throws Exception {
@@ -841,6 +885,12 @@ public class PlayboardTest {
         Playboard board, int row, int col
     ) throws Exception {
         assertEquals(board.getHighlightLetter(), new Position(row, col));
+    }
+
+    private void assertClue(Playboard board, String listName, String number) {
+        Clue clue = board.getClue();
+        assertEquals(clue.getClueID().getListName(), listName);
+        assertEquals(clue.getClueNumber(), number);
     }
 
     private void assertAtRow(Playboard board, int row) throws Exception {

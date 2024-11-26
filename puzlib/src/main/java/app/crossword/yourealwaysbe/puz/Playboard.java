@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.NavigableSet;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.Stack;
 import java.util.logging.Logger;
@@ -42,6 +43,7 @@ public class Playboard implements Serializable {
     private boolean showErrorsClue;
     private boolean skipCompletedLetters;
     private boolean preserveCorrectLettersInShowErrors;
+    private boolean toggleBeforeMove;
     private DeleteCrossingMode deleteCrossingMode = DeleteCrossingMode.DELETE;
     private Word previousWord = null;
     private Position previousPosition = null;
@@ -115,6 +117,10 @@ public class Playboard implements Serializable {
 
     public void setPreserveCorrectLettersInShowErrors(boolean value){
         this.preserveCorrectLettersInShowErrors = value;
+    }
+
+    public void setToggleBeforeMove(boolean value) {
+        this.toggleBeforeMove = value;
     }
 
     /**
@@ -787,84 +793,28 @@ public class Playboard implements Serializable {
      * Move in direction, or not if no position found
      */
     public Word moveDown() {
-        return this.moveDown(false);
-    }
-
-    /**
-     * Move in direction, or not if no position found
-     */
-    public Word moveDown(boolean skipCompleted) {
-        return moveDelta(skipCompleted, 1, 0);
-    }
-
-    /**
-     * Move in direction, or not if no position found
-     */
-    public Position findNextDown(Position original, boolean skipCompleted) {
-        return findNextDelta(original, skipCompleted, 1, 0);
+        return moveDelta(1, 0);
     }
 
     /**
      * Move in direction, or not if no position found
      */
     public Word moveLeft() {
-        return moveLeft(false);
-    }
-
-    /**
-     * Move in direction, or not if no position found
-     */
-    public Position findNextLeft(Position original, boolean skipCompleted) {
-        return findNextDelta(original, skipCompleted, 0, -1);
-    }
-
-    /**
-     * Move in direction, or not if no position found
-     */
-    public Word moveLeft(boolean skipCompleted) {
-        return moveDelta(skipCompleted, 0, -1);
+        return moveDelta(0, -1);
     }
 
     /**
      * Move in direction, or not if no position found
      */
     public Word moveRight() {
-        return moveRight(false);
-    }
-
-    /**
-     * Move in direction, or not if no position found
-     */
-    public Position findNextRight(Position original, boolean skipCompleted) {
-        return findNextDelta(original, skipCompleted, 0, 1);
-    }
-
-    /**
-     * Move in direction, or not if no position found
-     */
-    public Word moveRight(boolean skipCompleted) {
-        return moveDelta(skipCompleted, 0, 1);
-    }
-
-    /**
-     * Move in direction, or not if no position found
-     */
-    public Position findNextUp(Position original, boolean skipCompleted) {
-        return findNextDelta(original, skipCompleted, -1, 0);
+        return moveDelta(0, 1);
     }
 
     /**
      * Move in direction, or not if no position found
      */
     public Word moveUp() {
-        return moveUp(false);
-    }
-
-    /**
-     * Move in direction, or not if no position found
-     */
-    public Word moveUp(boolean skipCompleted) {
-        return moveDelta(skipCompleted, -1, 0);
+        return moveDelta(-1, 0);
     }
 
     /**
@@ -899,13 +849,50 @@ public class Playboard implements Serializable {
 
     /**
      * Move in direction, or not if no position found
+     *
+     * If toggleBeforeMove is enabled it will toggle the current
+     * position rather than change clue to a clue shared with the new
+     * cell. If no overlap, just move.
+     *
+     * TODO: write tests
      */
-    public Word moveDelta(boolean skipCompleted, int drow, int dcol) {
+    public Word moveDelta(int drow, int dcol) {
         Word w = getCurrentWord();
         Position oldPos = getHighlightLetter();
-        Position newPos = findNextDelta(oldPos, skipCompleted, drow, dcol);
-        if (newPos != null)
+        Position newPos = findNextDelta(oldPos, false, drow, dcol);
+        Box newBox = puzzle.checkedGetBox(newPos);
+
+        if (newPos == null || Box.isBlock(newBox))
+            return w;
+
+        Box oldBox = puzzle.checkedGetBox(oldPos);
+        Collection<ClueID> newBoxClues = newBox.getIsPartOfClues();
+        ClueID curClue = w.getClueID();
+
+        if (
+            toggleBeforeMove
+            && !Box.isBlock(oldBox)
+            && curClue != null
+            && !newBoxClues.contains(curClue)
+        ) {
+            // moving out of clue, need to toggle if possible
+            Collection<ClueID> oldBoxClues = oldBox.getIsPartOfClues();
+
+            Optional<ClueID> nextClue
+                = newBoxClues.stream()
+                    .filter(oldBoxClues::contains)
+                    .findFirst();
+
+            if (nextClue.isPresent()) {
+                puzzle.setCurrentClueID(nextClue.get());
+                notifyChange();
+            } else {
+                setHighlightLetter(newPos);
+            }
+        } else {
             setHighlightLetter(newPos);
+        }
+
         return w;
     }
 
