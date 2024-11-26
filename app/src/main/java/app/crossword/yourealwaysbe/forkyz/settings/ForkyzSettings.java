@@ -527,7 +527,10 @@ public class ForkyzSettings {
      */
     public void getBrowseSwipeAction(Consumer<BrowseSwipeAction> cb) {
         executor.execute(() -> {
-            String value = prefs.getString(PREF_BROWSE_SWIPE_ACTION, "DELETE");
+            String value = prefs.getString(
+                PREF_BROWSE_SWIPE_ACTION,
+                BrowseSwipeAction.DELETE.getSettingsValue()
+            );
             handler.post(() -> {
                 cb.accept(BrowseSwipeAction.getFromSettingsValue(value));
             });
@@ -592,7 +595,9 @@ public class ForkyzSettings {
     public void getClueListClueTabsDouble(Consumer<ClueTabsDouble> cb) {
         executor.execute(() -> {
             String value = prefs.getString(
-                PREF_CLUE_LIST_CLUE_TABS_DOUBLE, "NEVER");
+                PREF_CLUE_LIST_CLUE_TABS_DOUBLE,
+                ClueTabsDouble.NEVER.getSettingsValue()
+            );
             handler.post(() -> {
                 cb.accept(ClueTabsDouble.getFromSettingsValue(value));
             });
@@ -794,7 +799,8 @@ public class ForkyzSettings {
     public void getPlayDeleteCrossingMode(Consumer<DeleteCrossingMode> cb) {
         executor.execute(() -> {
             String modeString = prefs.getString(
-                PREF_PLAY_DELETE_CROSSING_MODE, "DELETE"
+                PREF_PLAY_DELETE_CROSSING_MODE,
+                DeleteCrossingModeSetting.DELETE.getSettingsValue()
             );
             handler.post(() -> {
                 DeleteCrossingMode mode
