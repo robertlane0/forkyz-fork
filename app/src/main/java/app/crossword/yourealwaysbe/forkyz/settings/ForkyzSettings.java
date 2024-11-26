@@ -166,6 +166,8 @@ public class ForkyzSettings {
     private static final String PREF_PLAY_SHOW_ERRORS_GRID = "showErrors";
     private static final String PREF_PLAY_SHOW_TIMER = "showTimer";
     private static final String PREF_PLAY_SKIP_FILLED = "skipFilled";
+    private static final String PREF_PLAY_TOGGLE_BEFORE_MOVE
+        = "toggleBeforeMove";
     private static final String PREF_PLAY_CYCLE_UNFILLED_LEGACY
         = "cycleUnfilled";
     private static final String PREF_PLAY_CYCLE_UNFILLED_MODE
@@ -257,6 +259,7 @@ public class ForkyzSettings {
         BOOL_DEFAULTS.put(PREF_PLAY_SHOW_ERRORS_GRID, false);
         BOOL_DEFAULTS.put(PREF_PLAY_SHOW_TIMER, false);
         BOOL_DEFAULTS.put(PREF_PLAY_SKIP_FILLED, false);
+        BOOL_DEFAULTS.put(PREF_PLAY_TOGGLE_BEFORE_MOVE, false);
         BOOL_DEFAULTS.put(PREF_PLAY_PLAY_LETTER_UNDO_ENABLED, false);
         BOOL_DEFAULTS.put(PREF_PLAY_SPACE_CHANGE_DIRECTION, true);
         BOOL_DEFAULTS.put(PREF_PLAY_SUPPRESS_HINT_HIGHLIGHTING, false);
@@ -1120,6 +1123,21 @@ public class ForkyzSettings {
     public void getPlaySuppressHintHighlighting(Consumer<Boolean> cb) {
         getBooleanPreference(PREF_PLAY_SUPPRESS_HINT_HIGHLIGHTING, cb);
     }
+
+    /**
+     * D-pad/arrow-key behaviour on clue change
+     *
+     * True means change clue on first press, do movement on second. False
+     * means do both in one.
+     */
+    public void getPlayToggleBeforeMove(Consumer<Boolean> cb) {
+        getBooleanPreference(PREF_PLAY_TOGGLE_BEFORE_MOVE, cb);
+    }
+
+    public LiveData<Boolean> livePlayToggleBeforeMove() {
+        return liveBooleanPreference(PREF_PLAY_TOGGLE_BEFORE_MOVE);
+    }
+
 
     /**
      * Whether to indicate show errors status (i.e. whether turned on)

@@ -1299,6 +1299,15 @@ public abstract class PuzzleActivity
                 invalidateOptionsMenu();
             }
         );
+
+        settings.livePlayToggleBeforeMove().observe(
+            this,
+            toggleBeforeMove -> {
+                Playboard board = getBoard();
+                if (board != null)
+                    board.setToggleBeforeMove(toggleBeforeMove);
+            }
+        );
     }
 
     private void toggleScratchMode() {

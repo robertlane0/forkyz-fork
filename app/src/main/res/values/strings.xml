@@ -394,6 +394,8 @@
     <string name="snap_current_desc">Toggles auto-scrolling of the playboard to the current play position.</string>
     <string name="space_change_dir">Space Changes Direction</string>
     <string name="space_change_dir_desc">Spacebar changed direction rather than blanking the box.</string>
+    <string name="toggle_before_move">Change Direction Before Move</string>
+    <string name="toggle_before_move_desc">If a D-pad/arrow-key movement would change the current clue, change clue before moving.</string>
 
     <!-- preferences voice -->
     <string name="about_voice_commands">About Voice Commands</string>
