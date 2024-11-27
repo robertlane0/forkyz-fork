@@ -69,6 +69,13 @@
         app:fragment="app.crossword.yourealwaysbe.forkyz.PreferencesSubPages$ExternalToolsFragment"
     />
 
+    <androidx.preference.Preference
+        android:title="@string/preferences_export_import"
+        android:summary="@string/preferences_export_import_desc"
+        android:key="preferencesExportImport"
+        app:fragment="app.crossword.yourealwaysbe.forkyz.PreferencesSubPages$ExportImportFragment"
+    />
+
     <androidx.preference.PreferenceCategory
         android:title="@string/about_forkyz"
     >

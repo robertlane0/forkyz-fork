@@ -7,6 +7,10 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.ListPreference;
 import androidx.preference.MultiSelectListPreference;
 import androidx.preference.Preference.OnPreferenceClickListener;
@@ -220,6 +224,60 @@ public class PreferencesSubPages {
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.preferences_external, rootKey);
+        }
+    }
+
+    @AndroidEntryPoint
+    public static class ExportImportFragment extends PreferencesBaseFragment {
+        private static final String MIME_TYPE = "application/json";
+        private static final String DEFAULT_FILENAME = "forkyz_settings.json";
+
+        private PreferencesActivityViewModel model;
+
+        // set in onCreate
+        ActivityResultLauncher<String> getImportURI = registerForActivityResult(
+            new ActivityResultContracts.GetContent(),
+            new ActivityResultCallback<Uri>() {
+                @Override
+                public void onActivityResult(Uri uri) {
+                    model.importSettings(uri);
+                }
+            }
+        );
+
+        ActivityResultLauncher<String> getExportURI = registerForActivityResult(
+            new ActivityResultContracts.CreateDocument(MIME_TYPE),
+            new ActivityResultCallback<Uri>() {
+                @Override
+                public void onActivityResult(Uri uri) {
+                    model.exportSettings(uri);
+                }
+            }
+        );
+
+        @Override
+        public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+            setPreferencesFromResource(
+                R.xml.preferences_export_import, rootKey
+            );
+
+            model = new ViewModelProvider(requireActivity()).get(
+                PreferencesActivityViewModel.class
+            );
+
+            findPreference("preferencesImport").setOnPreferenceClickListener(
+                pref -> {
+                    getImportURI.launch(MIME_TYPE);
+                    return true;
+                }
+            );
+
+            findPreference("preferencesExport").setOnPreferenceClickListener(
+                pref -> {
+                    getExportURI.launch(DEFAULT_FILENAME);
+                    return true;
+                }
+            );
         }
     }
 }

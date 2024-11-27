@@ -332,6 +332,14 @@
     <string name="sixty_seconds">1 minute</string>
     <string name="thirty_seconds">30 seconds</string>
 
+    <!-- preferences export/import -->
+    <string name="preferences_export_import">Export/Import Settings</string>
+    <string name="preferences_export_import_desc">Save/restore settings with an external file.</string>
+    <string name="preferences_export">Export Settings</string>
+    <string name="preferences_export_desc">Save settings to an external file.</string>
+    <string name="preferences_import">Import Settings</string>
+    <string name="preferences_import_desc">Restore settings from an external file. Note, settings may change over time. Out-of-date or unknown setting values in a file will be ignored.</string>
+
     <!-- preferences external -->
     <string name="external_dictionary">External Dictionary</string>
     <string name="external_dictionary_desc">External dictionary for looking up entries.</string>
