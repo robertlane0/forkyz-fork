@@ -335,13 +335,6 @@ public class PlayActivity extends PuzzleActivity
                     onDeleteKey();
                     break;
 
-                case KeyEvent.KEYCODE_TAB:
-                    if (event.hasModifiers(KeyEvent.META_SHIFT_ON))
-                        board.previousWord();
-                    else
-                        board.nextWord();
-                    break;
-
                 default:
                     char c = Character.toUpperCase(event.getDisplayLabel());
                     if (Character.isLetterOrDigit(c))
@@ -925,7 +918,6 @@ public class PlayActivity extends PuzzleActivity
         case KeyEvent.KEYCODE_SPACE:
         case KeyEvent.KEYCODE_ENTER:
         case KeyEvent.KEYCODE_DEL:
-        case KeyEvent.KEYCODE_TAB:
             return true;
         }
 
