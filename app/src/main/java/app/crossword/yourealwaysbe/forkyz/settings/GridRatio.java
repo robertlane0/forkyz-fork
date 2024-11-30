@@ -1,9 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.settings;
 
-import java.util.Objects;
-
-public enum GridRatio {
+public enum GridRatio implements EnumSetting {
     ONE_TO_ONE("0"),
     THIRTY_PCNT("1"),
     FORTY_PCNT("2"),
@@ -17,13 +15,6 @@ public enum GridRatio {
         this.settingsValue = settingsValue;
     }
 
+    @Override
     public String getSettingsValue() { return settingsValue; }
-
-    public static GridRatio getFromSettingsValue(String value) {
-        for (GridRatio l : GridRatio.values()) {
-            if (Objects.equals(value, l.getSettingsValue()))
-                return l;
-        }
-        return GridRatio.PUZZLE_SHAPE;
-    }
 }

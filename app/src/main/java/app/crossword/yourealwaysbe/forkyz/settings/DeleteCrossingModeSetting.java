@@ -1,11 +1,9 @@
 
 package app.crossword.yourealwaysbe.forkyz.settings;
 
-import java.util.Objects;
-
 import app.crossword.yourealwaysbe.puz.Playboard.DeleteCrossingMode;
 
-public enum DeleteCrossingModeSetting {
+public enum DeleteCrossingModeSetting implements EnumSetting {
     DELETE("DELETE", DeleteCrossingMode.DELETE),
     PRESERVE_FILLED_WORDS(
         "PRESERVE_FILLED_WORDS",
@@ -26,16 +24,10 @@ public enum DeleteCrossingModeSetting {
         this.deleteCrossingMode = deleteCrossingMode;
     }
 
+    @Override
     public String getSettingsValue() { return settingsValue; }
+
     public DeleteCrossingMode getDeleteCrossingMode() {
         return deleteCrossingMode;
-    }
-
-    public static DeleteCrossingModeSetting getFromSettingsValue(String value) {
-        for (DeleteCrossingModeSetting s : DeleteCrossingModeSetting.values()) {
-            if (Objects.equals(value, s.getSettingsValue()))
-                return s;
-        }
-        return DeleteCrossingModeSetting.DELETE;
     }
 }

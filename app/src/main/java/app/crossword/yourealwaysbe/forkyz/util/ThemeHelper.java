@@ -17,14 +17,14 @@ public class ThemeHelper {
 
     public void themeApplication(Application app) {
         // has to be blocking: a late theme change won't get picked up
-        if (settings.getAppThemeBlocking() == Theme.DYNAMIC)
+        if (settings.getAppThemeSync() == Theme.DYNAMIC)
             DynamicColors.applyToActivitiesIfAvailable(app);
     }
 
     public void themeActivity(Activity activity) {
         // needs to be blocking so can be done before end of onCreate in
         // ForkyzActivity (else toolbar not themed)
-        Theme theme = settings.getAppThemeBlocking();
+        Theme theme = settings.getAppThemeSync();
         switch (theme) {
         case STANDARD:
             activity.setTheme(R.style.Theme_Forkyz_Standard);

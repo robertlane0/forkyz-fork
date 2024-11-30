@@ -1,9 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.settings;
 
-import java.util.Objects;
-
-public enum BrowseSwipeAction {
+public enum BrowseSwipeAction implements EnumSetting {
     ARCHIVE("ARCHIVE"),
     DELETE("DELETE");
 
@@ -13,13 +11,6 @@ public enum BrowseSwipeAction {
         this.settingsValue = settingsValue;
     }
 
+    @Override
     public String getSettingsValue() { return settingsValue; }
-
-    public static BrowseSwipeAction getFromSettingsValue(String value) {
-        for (BrowseSwipeAction a : BrowseSwipeAction.values()) {
-            if (Objects.equals(value, a.getSettingsValue()))
-                return a;
-        }
-        return BrowseSwipeAction.DELETE;
-    }
 }

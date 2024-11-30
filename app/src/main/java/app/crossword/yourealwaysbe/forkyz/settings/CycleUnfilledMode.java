@@ -1,9 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.settings;
 
-import java.util.Objects;
-
-public enum CycleUnfilledMode {
+public enum CycleUnfilledMode implements EnumSetting {
     NEVER("NEVER"),
     FORWARDS("FORWARDS"),
     ALWAYS("ALWAYS");
@@ -15,12 +13,4 @@ public enum CycleUnfilledMode {
     }
 
     public String getSettingsValue() { return settingsValue; }
-
-    public static CycleUnfilledMode getFromSettingsValue(String value) {
-        for (CycleUnfilledMode m : CycleUnfilledMode.values()) {
-            if (Objects.equals(value, m.getSettingsValue()))
-                return m;
-        }
-        return CycleUnfilledMode.NEVER;
-    }
 }

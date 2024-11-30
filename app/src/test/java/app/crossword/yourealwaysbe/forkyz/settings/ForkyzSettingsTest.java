@@ -39,7 +39,7 @@ public class ForkyzSettingsTest {
     }
 
     @Test
-    public void testDefaults() {
+    public void testDefaults() throws Exception {
         ForkyzSettings settings = new ForkyzSettings(prefs, handler);
         for (Method method : ForkyzSettings.class.getDeclaredMethods()) {
             boolean isGet = method.getName().startsWith("get");
@@ -50,15 +50,16 @@ public class ForkyzSettingsTest {
                 try {
                     if (method.getParameterCount() == 0) {
                         method.invoke(settings);
-                    } else {
-                        Consumer<Object> cb = value -> {};
+                    } else if (method.getParameterCount() == 1) {
+                        Consumer<Object> cb = value -> { };
                         method.invoke(settings, cb);
                     }
                 } catch (IllegalAccessException | InvocationTargetException e) {
-                    fail("Failed to call " + method.getName());
+                    fail("Failed to call " + method.getName() + " with " + e);
                 }
             }
         }
+        settings.shutdownWaitAll();
     }
 }
 

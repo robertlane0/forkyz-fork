@@ -41,18 +41,22 @@ public class PreferencesActivityViewModel extends AndroidViewModel {
      * Import settings in background thread
      */
     public void importSettings(Uri importURI) {
-        executorService.execute(() -> {
-            doImportSettings(importURI);
-        });
+        if (importURI != null) {
+            executorService.execute(() -> {
+                doImportSettings(importURI);
+            });
+        }
     }
 
     /**
      * Export settings in background thread
      */
     public void exportSettings(Uri exportURI) {
-        executorService.execute(() -> {
-            doExportSettings(exportURI);
-        });
+        if (exportURI != null) {
+            executorService.execute(() -> {
+                doExportSettings(exportURI);
+            });
+        }
     }
 
     /**

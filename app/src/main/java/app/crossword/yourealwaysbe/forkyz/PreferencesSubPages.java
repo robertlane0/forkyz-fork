@@ -240,7 +240,8 @@ public class PreferencesSubPages {
             new ActivityResultCallback<Uri>() {
                 @Override
                 public void onActivityResult(Uri uri) {
-                    model.importSettings(uri);
+                    if (uri != null)
+                        model.importSettings(uri);
                 }
             }
         );
@@ -250,7 +251,8 @@ public class PreferencesSubPages {
             new ActivityResultCallback<Uri>() {
                 @Override
                 public void onActivityResult(Uri uri) {
-                    model.exportSettings(uri);
+                    if (uri != null)
+                        model.exportSettings(uri);
                 }
             }
         );

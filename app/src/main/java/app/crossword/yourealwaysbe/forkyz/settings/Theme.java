@@ -1,9 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.settings;
 
-import java.util.Objects;
-
-public enum Theme {
+public enum Theme implements EnumSetting {
     STANDARD("S"),
     DYNAMIC("D"),
     LEGACY_LIKE("L");
@@ -14,17 +12,8 @@ public enum Theme {
         this.settingsValue = settingsValue;
     }
 
-    public String getSettingsValue() {
-        return settingsValue;
-    }
-
-    public static Theme getFromSettingsValue(String value) {
-        for (Theme t : Theme.values()) {
-            if (Objects.equals(value, t.getSettingsValue()))
-                return t;
-        }
-        return Theme.STANDARD;
-    }
+    @Override
+    public String getSettingsValue() { return settingsValue; }
 }
 
 

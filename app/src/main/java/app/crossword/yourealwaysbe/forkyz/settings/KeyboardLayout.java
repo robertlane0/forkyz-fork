@@ -1,9 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.settings;
 
-import java.util.Objects;
-
-public enum KeyboardLayout {
+public enum KeyboardLayout implements EnumSetting {
     QWERTY("0"),
     QWERTZ("1"),
     DVORAK("2"),
@@ -15,13 +13,6 @@ public enum KeyboardLayout {
         this.settingsValue = settingsValue;
     }
 
+    @Override
     public String getSettingsValue() { return settingsValue; }
-
-    public static KeyboardLayout getFromSettingsValue(String value) {
-        for (KeyboardLayout l : KeyboardLayout.values()) {
-            if (Objects.equals(value, l.getSettingsValue()))
-                return l;
-        }
-        return KeyboardLayout.QWERTY;
-    }
 }

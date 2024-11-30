@@ -1,9 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.settings;
 
-import java.util.Objects;
-
-public enum ClueTabsDouble {
+public enum ClueTabsDouble implements EnumSetting {
     NEVER("NEVER"),
     LANDSCAPE("LANDSCAPE"),
     WIDE("WIDE"),
@@ -15,13 +13,6 @@ public enum ClueTabsDouble {
         this.settingsValue = settingsValue;
     }
 
+    @Override
     public String getSettingsValue() { return settingsValue; }
-
-    public static ClueTabsDouble getFromSettingsValue(String value) {
-        for (ClueTabsDouble ctd : values()) {
-            if (Objects.equals(value, ctd.getSettingsValue()))
-                return ctd;
-        }
-        return ClueTabsDouble.NEVER;
-    }
 }

@@ -1,7 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.settings;
 
-public enum StorageLocation {
+public enum StorageLocation implements EnumSetting {
     INTERNAL("App Internal Storage"),
     EXTERNAL_SAF("External directory"),
     EXTERNAL_LEGACY("External SD crosswords directory");
@@ -12,19 +12,13 @@ public enum StorageLocation {
         this.settingsValue = settingsValue;
     }
 
+    @Override
     public String getSettingsValue() { return settingsValue; }
 
     public static StorageLocation fromSettingsValue(String value) {
-        if (INTERNAL.getSettingsValue().equals(value))
-            return INTERNAL;
-        else if (EXTERNAL_SAF.getSettingsValue().equals(value))
-            return EXTERNAL_SAF;
-        else if (EXTERNAL_LEGACY.getSettingsValue().equals(value))
-            return EXTERNAL_LEGACY;
-        else
-            throw new IllegalArgumentException(
-                "Unrecognised StorageLocation: " + value
-            );
+        return EnumSetting.getFromSettingsValueNonNull(
+            value, StorageLocation.class, StorageLocation.INTERNAL
+        );
     }
 }
 

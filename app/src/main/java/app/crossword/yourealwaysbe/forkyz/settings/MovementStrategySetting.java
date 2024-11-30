@@ -1,11 +1,9 @@
 
 package app.crossword.yourealwaysbe.forkyz.settings;
 
-import java.util.Objects;
-
 import app.crossword.yourealwaysbe.puz.MovementStrategy;
 
-public enum MovementStrategySetting {
+public enum MovementStrategySetting implements EnumSetting {
     MOVE_NEXT_ON_AXIS("MOVE_NEXT_ON_AXIS", MovementStrategy.MOVE_NEXT_ON_AXIS),
     STOP_ON_END("STOP_ON_END", MovementStrategy.STOP_ON_END),
     MOVE_NEXT_CLUE("MOVE_NEXT_CLUE", MovementStrategy.MOVE_NEXT_CLUE),
@@ -23,14 +21,8 @@ public enum MovementStrategySetting {
         this.movementStrategy = movementStrategy;
     }
 
+    @Override
     public String getSettingsValue() { return settingsValue; }
-    public MovementStrategy getMovementStrategy() { return movementStrategy; }
 
-    public static MovementStrategySetting getFromSettingsValue(String value) {
-        for (MovementStrategySetting s : MovementStrategySetting.values()) {
-            if (Objects.equals(value, s.getSettingsValue()))
-                return s;
-        }
-        return MovementStrategySetting.MOVE_NEXT_ON_AXIS;
-    }
+    public MovementStrategy getMovementStrategy() { return movementStrategy; }
 }

@@ -1,9 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.settings;
 
-import java.util.Objects;
-
-public enum Orientation {
+public enum Orientation implements EnumSetting {
     PORTRAIT("PORT"),
     LANDSCAPE("LAND"),
     UNLOCKED("UNLOCKED");
@@ -14,13 +12,6 @@ public enum Orientation {
         this.settingsValue = settingsValue;
     }
 
+    @Override
     public String getSettingsValue() { return settingsValue; }
-
-    public static Orientation getFromSettingsValue(String value) {
-        for (Orientation o : Orientation.values()) {
-            if (Objects.equals(value, o.getSettingsValue()))
-                return o;
-        }
-        return Orientation.UNLOCKED;
-    }
 }
