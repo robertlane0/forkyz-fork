@@ -9,6 +9,13 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.preference.PreferenceManager;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,10 +32,14 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import dagger.hilt.android.qualifiers.ApplicationContext;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import app.crossword.yourealwaysbe.forkyz.net.Downloader;
 import app.crossword.yourealwaysbe.forkyz.net.Downloaders;
 import app.crossword.yourealwaysbe.forkyz.tools.ExternalDictionary;
+import app.crossword.yourealwaysbe.forkyz.util.JSONUtils;
 import app.crossword.yourealwaysbe.forkyz.util.files.Accessor;
 import app.crossword.yourealwaysbe.puz.MovementStrategy;
 import app.crossword.yourealwaysbe.puz.Playboard.DeleteCrossingMode;
@@ -215,13 +226,15 @@ public class ForkyzSettings {
             )
         );
 
+    private static final Charset WRITE_CHARSET = Charset.forName("UTF-8");
+
     public static class BooleanSetting extends Setting<Boolean> {
         public BooleanSetting(String key, boolean defaultValue) {
             super(key, defaultValue);
         }
 
         @Override
-        public Boolean getValueBackUnchecked(SharedPreferences prefs) {
+        protected Boolean getValueBackUnchecked(SharedPreferences prefs) {
             return prefs.getBoolean(getKey(), getDefaultValue());
         }
 
@@ -230,6 +243,13 @@ public class ForkyzSettings {
             SharedPreferences prefs, Boolean value
         ) {
             prefs.edit().putBoolean(getKey(), value).apply();
+        }
+
+        @Override
+        protected void getFromJSONUnchecked(
+            SharedPreferences prefs, JSONObject json
+        ) throws JSONException {
+            setValue(prefs, json.getBoolean(getKey()));
         }
     }
 
@@ -247,7 +267,7 @@ public class ForkyzSettings {
         }
 
         @Override
-        public Float getValueBackUnchecked(SharedPreferences prefs) {
+        protected Float getValueBackUnchecked(SharedPreferences prefs) {
             return prefs.getFloat(getKey(), getDefaultValue());
         }
 
@@ -256,6 +276,13 @@ public class ForkyzSettings {
             SharedPreferences prefs, Float value
         ) {
             prefs.edit().putFloat(getKey(), value).apply();
+        }
+
+        @Override
+        protected void getFromJSONUnchecked(
+            SharedPreferences prefs, JSONObject json
+        ) throws JSONException {
+            setValue(prefs, (float) json.getDouble(getKey()));
         }
     }
 
@@ -273,7 +300,7 @@ public class ForkyzSettings {
         }
 
         @Override
-        public Integer getValueBackUnchecked(SharedPreferences prefs) {
+        protected Integer getValueBackUnchecked(SharedPreferences prefs) {
             return prefs.getInt(getKey(), getDefaultValue());
         }
 
@@ -282,6 +309,13 @@ public class ForkyzSettings {
             SharedPreferences prefs, Integer value
         ) {
             prefs.edit().putInt(getKey(), value).apply();
+        }
+
+        @Override
+        protected void getFromJSONUnchecked(
+            SharedPreferences prefs, JSONObject json
+        ) throws JSONException {
+            setValue(prefs, json.getInt(getKey()));
         }
     }
 
@@ -299,7 +333,7 @@ public class ForkyzSettings {
         }
 
         @Override
-        public Long getValueBackUnchecked(SharedPreferences prefs) {
+        protected Long getValueBackUnchecked(SharedPreferences prefs) {
             return prefs.getLong(getKey(), getDefaultValue());
         }
 
@@ -308,6 +342,13 @@ public class ForkyzSettings {
             SharedPreferences prefs, Long value
         ) {
             prefs.edit().putLong(getKey(), value).apply();
+        }
+
+        @Override
+        protected void getFromJSONUnchecked(
+            SharedPreferences prefs, JSONObject json
+        ) throws JSONException {
+            setValue(prefs, json.getLong(getKey()));
         }
     }
 
@@ -325,7 +366,7 @@ public class ForkyzSettings {
         }
 
         @Override
-        public String getValueBackUnchecked(SharedPreferences prefs) {
+        protected String getValueBackUnchecked(SharedPreferences prefs) {
             return prefs.getString(getKey(), getDefaultValue());
         }
 
@@ -335,6 +376,13 @@ public class ForkyzSettings {
         ) {
             prefs.edit().putString(getKey(), value).apply();
         }
+
+        @Override
+        protected void getFromJSONUnchecked(
+            SharedPreferences prefs, JSONObject json
+        ) throws JSONException {
+            setValue(prefs, json.getString(getKey()));
+        }
     }
 
     public static class StringSetSetting extends Setting<Set<String>> {
@@ -343,7 +391,7 @@ public class ForkyzSettings {
         }
 
         @Override
-        public Set<String> getValueBackUnchecked(SharedPreferences prefs) {
+        protected Set<String> getValueBackUnchecked(SharedPreferences prefs) {
             return prefs.getStringSet(getKey(), getDefaultValue());
         }
 
@@ -353,7 +401,34 @@ public class ForkyzSettings {
         ) {
             prefs.edit().putStringSet(getKey(), value).apply();
         }
-    }
+
+        /**
+         * Add to JSON if not a null value
+         */
+        public void addToJSON(
+            SharedPreferences prefs, JSONObject json
+        ) throws JSONException {
+            JSONArray array = new JSONArray();
+            Set<String> strings = getValue(prefs);
+            if (strings != null) {
+                for (String v : getValue(prefs))
+                    array.put(v);
+                json.put(getKey(), array);
+            }
+        }
+
+        @Override
+        protected void getFromJSONUnchecked(
+            SharedPreferences prefs, JSONObject json
+        ) throws JSONException {
+            JSONArray array = json.getJSONArray(getKey());
+            Set<String> strings = new HashSet<>();
+            for (int i = 0; i < array.length(); i++)
+                strings.add(array.getString(i));
+
+            setValue(prefs, strings);
+        }
+   }
 
     public static class FSEnumSetting<T extends Enum<T> & EnumSetting>
             extends BaseSetting<T, String> {
@@ -377,7 +452,7 @@ public class ForkyzSettings {
         }
 
         @Override
-        public String getValueBackUnchecked(SharedPreferences prefs) {
+        protected String getValueBackUnchecked(SharedPreferences prefs) {
             return prefs.getString(
                 getKey(),
                 getDefaultValue().getSettingsValue()
@@ -402,6 +477,13 @@ public class ForkyzSettings {
             SharedPreferences prefs, String value
         ) {
             prefs.edit().putString(getKey(), value).apply();
+        }
+
+        @Override
+        protected void getFromJSONUnchecked(
+            SharedPreferences prefs, JSONObject json
+        ) throws JSONException {
+            setValueBack(prefs, json.getString(getKey()));
         }
     }
 
@@ -1649,6 +1731,44 @@ public class ForkyzSettings {
         });
     }
 
+    public void importSettings(InputStream is) throws IOException {
+        try {
+            JSONObject json = JSONUtils.streamToJSON(is);
+
+            var i = iterateSettings();
+            while (i.hasNext()) {
+                i.next().getFromJSON(prefs, json);
+            }
+        } catch (JSONException e) {
+            throw new IOException("JSON Error importing settings", e);
+        }
+    }
+
+    public void exportSettings(OutputStream os) throws IOException {
+        PrintWriter writer = null;
+        try {
+            writer = new PrintWriter(
+                new BufferedWriter(
+                    new OutputStreamWriter(os, WRITE_CHARSET)
+                )
+            );
+
+            JSONObject json = new JSONObject();
+            var i = iterateSettings();
+            while (i.hasNext()) {
+                i.next().addToJSON(prefs, json);
+            }
+
+            writer.print(json.toString());
+        } catch (JSONException e) {
+            throw new IOException("JSON Error exporting settings", e);
+        } finally {
+            // don't close original output stream, it's the caller's job
+            if (writer != null)
+                writer.flush();
+        };
+    }
+
     /**
      * Wait for get/set executor to finish
      *
@@ -1977,19 +2097,7 @@ public class ForkyzSettings {
             }
         }
 
-        /**
-         * Get value from settings, don't check for cast errors
-         */
-        public abstract TBack getValueBackUnchecked(
-            SharedPreferences prefs
-        );
-
         public abstract void setValue(SharedPreferences prefs, TFront value);
-
-        public void setValueBack(SharedPreferences prefs, TBack value) {
-            if (validator == null || validator.apply(value))
-                setValueBackUnchecked(prefs, value);
-        }
 
         public MutableLiveData<TFront> getCreateLiveData(
             SharedPreferences prefs
@@ -2008,9 +2116,49 @@ public class ForkyzSettings {
         }
 
         /**
+         * Add to JSON if not a null value
+         */
+        public void addToJSON(
+            SharedPreferences prefs, JSONObject json
+        ) throws JSONException {
+            TBack value = getValueBackUnchecked(prefs);
+            if (value != null)
+                json.put(getKey(), value);
+        }
+
+        /**
+         * Get value from JSON object
+         *
+         * Do nothing if not there, wrong type, fails validation, or
+         * other error
+         */
+        public void getFromJSON(
+            SharedPreferences prefs, JSONObject json
+        ) {
+            try {
+                if (json.has(getKey()))
+                    getFromJSONUnchecked(prefs, json);
+            } catch (JSONException e) {
+                // pass
+            }
+        }
+
+        /**
          * Get value from settings, don't check for cast errors
          */
         protected abstract TFront getValueUnchecked(SharedPreferences prefs);
+
+        /**
+         * Get value from settings, don't check for cast errors
+         */
+        protected abstract TBack getValueBackUnchecked(
+            SharedPreferences prefs
+        );
+
+        protected void setValueBack(SharedPreferences prefs, TBack value) {
+            if (validator == null || validator.apply(value))
+                setValueBackUnchecked(prefs, value);
+        }
 
         /**
          * Set backend value without checking validation
@@ -2018,6 +2166,13 @@ public class ForkyzSettings {
         protected abstract void setValueBackUnchecked(
             SharedPreferences prefs, TBack value
         );
+
+        /**
+         * Get value from JSON object don't check errors
+         */
+        protected abstract void getFromJSONUnchecked(
+            SharedPreferences prefs, JSONObject json
+        ) throws JSONException;
     }
 
     /**

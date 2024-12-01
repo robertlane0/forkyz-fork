@@ -2,10 +2,8 @@
 package app.crossword.yourealwaysbe.forkyz.tools;
 
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.concurrent.ExecutorService;
@@ -19,6 +17,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import app.crossword.yourealwaysbe.forkyz.R;
+import app.crossword.yourealwaysbe.forkyz.util.JSONUtils;
 import app.crossword.yourealwaysbe.puz.Box;
 import app.crossword.yourealwaysbe.puz.Clue;
 import app.crossword.yourealwaysbe.puz.Playboard;
@@ -115,14 +114,14 @@ public class ChatGPTHelp {
             throws IOException, JSONException {
         if (conn.getResponseCode() != HTTP_OK_RESPONSE) {
             try (InputStream is = conn.getErrorStream()) {
-                JSONObject json = streamToJSON(is);
+                JSONObject json = JSONUtils.streamToJSON(is);
                 return json.getJSONObject(CHAT_GPT_RESPONSE_ERROR)
                         .getString(CHAT_GPT_RESPONSE_MESSAGE);
             }
         }
 
         try (InputStream is = conn.getInputStream()) {
-            JSONObject response = streamToJSON(is);
+            JSONObject response = JSONUtils.streamToJSON(is);
             JSONArray choices
                 = response.getJSONArray(CHAT_GPT_RESPONSE_CHOICES);
             JSONObject first = choices.getJSONObject(0);
@@ -192,22 +191,6 @@ public class ChatGPTHelp {
             );
         } else {
             return context.getString(R.string.help_query_just_clue, clue);
-        }
-    }
-
-    private JSONObject streamToJSON(
-        InputStream is
-    ) throws IOException, JSONException {
-        try (
-            BufferedReader bis = new BufferedReader(
-                new InputStreamReader(is)
-            )
-        ) {
-            StringBuilder sb = new StringBuilder();
-            String line;
-            while ((line = bis.readLine()) != null)
-                sb.append(line);
-            return new JSONObject(sb.toString());
         }
     }
 }

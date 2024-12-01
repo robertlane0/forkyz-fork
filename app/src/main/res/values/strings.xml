@@ -339,6 +339,10 @@
     <string name="preferences_export_desc">Save settings to an external file.</string>
     <string name="preferences_import">Import Settings</string>
     <string name="preferences_import_desc">Restore settings from an external file. Note, settings may change over time. Out-of-date or unknown setting values in a file will be ignored.</string>
+    <string name="preferences_imported">Settings imported.</string>
+    <string name="preferences_import_failed">Settings import failed.</string>
+    <string name="preferences_exported">Settings exported.</string>
+    <string name="preferences_export_failed">Settings export failed.</string>
 
     <!-- preferences external -->
     <string name="external_dictionary">External Dictionary</string>
