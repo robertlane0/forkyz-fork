@@ -82,6 +82,14 @@ public class StreamScrapersTest {
         );
     }
 
+    @Test
+    public void testMyCrossword() throws Exception {
+        testScraper(
+            "https://mycrossword.co.uk/cryptic/2136",
+            new MyCrosswordStreamScraper()
+        );
+    }
+
     /**
      * Test scraper gets a puzzle from the URL
      */

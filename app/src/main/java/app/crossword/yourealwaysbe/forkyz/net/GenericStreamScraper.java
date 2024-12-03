@@ -27,7 +27,8 @@ public class GenericStreamScraper extends AbstractStreamScraper {
             new PzzlNetStreamScraper(),
             new RaetselZentraleSchwedenStreamScraper(),
             new WSJStreamScraper(utils),
-            new PzzlComStreamScraper()
+            new PzzlComStreamScraper(),
+            new MyCrosswordStreamScraper()
         };
     }
 
