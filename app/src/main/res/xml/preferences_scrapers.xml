@@ -17,6 +17,12 @@
         android:key="scrapeEveryman"
     />
     <androidx.preference.CheckBoxPreference
+        android:title="@string/guardian_quick"
+        android:defaultValue="false"
+        android:summary="@string/guardian_quick_desc"
+        android:key="scrapeGuardianQuick"
+    />
+    <androidx.preference.CheckBoxPreference
         android:title="@string/keglars_cryptics"
         android:defaultValue="false"
         android:summary="@string/keglars_cryptics_desc"

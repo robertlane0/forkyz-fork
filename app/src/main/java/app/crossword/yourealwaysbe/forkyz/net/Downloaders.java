@@ -685,6 +685,19 @@ public class Downloaders {
             ));
         }
 
+        if (settings.scrapeGuardianQuick()) {
+            downloaders.add(new PageScraper(
+                "https://www.theguardian.com/crosswords/quick/\\d*",
+                new GuardianJSONIO(),
+                "https://www.theguardian.com/crosswords/series/quick",
+                "guardianQuick",
+                context.getString(R.string.guardian_quick),
+                "https://support.theguardian.com",
+                true, // share file url
+                false // read top down
+            ));
+        }
+
         for (Downloader downloader : downloaders)
             downloader.setTimeout(settings.downloadTimeout());
 

@@ -448,6 +448,8 @@
     <string name="about_scrapes">About These Sources</string>
     <string name="everyman">Guardian Everyman</string>
     <string name="everyman_desc">Weekly Sunday cryptic.</string>
+    <string name="guardian_quick">Guardian Quick Crossword</string>
+    <string name="guardian_quick_desc">Daily quick crossword.</string>
 
     <!-- preferences sources -->
     <string name="daily_crosswords">Daily Crosswords</string>
