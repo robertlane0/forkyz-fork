@@ -87,6 +87,7 @@
     <string name="filter_hint">Filter Text</string>
     <string name="close_filter_desc">Close Filter</string>
     <string name="filter_puzzles">Filter Puzzles</string>
+    <string name="has_solution_desc">Puzzle has solution</string>
 
     <!-- play page -->
     <string name="open_clue_list">Open clue list</string>

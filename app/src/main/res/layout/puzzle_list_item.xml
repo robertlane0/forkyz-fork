@@ -96,6 +96,7 @@
             android:layout_alignParentEnd="true"
             app:srcCompat="@drawable/ic_solution"
             android:visibility="gone"
+            android:contentDescription="@string/has_solution_desc"
         />
     </RelativeLayout>
 </layout>
