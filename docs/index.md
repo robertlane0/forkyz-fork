@@ -6,6 +6,22 @@ downloaded. Below is a list of sources known to Forkyz. Please [raise an
 issue on the GitLab page][issues] if you would like to add a source or
 make a correction.
 
+There are two ways to get crosswords from the web: sharing a web page or downloading supported files.
+
+## Websites Supported by Sharing
+
+For the websites below, open a puzzle page in your browser, then use the "share" function to share the page with Forkyz.
+
+* [Crossword Nexus][jonesin] -- any site embedding [Crossword Nexus][crosswordnexus] puzzles, for example the Jonesin crossword.
+* [Hamburger Abendblatt][hamburgerabendblatt] -- daily crossword from the Hamburger Abendblatt.
+* [Metro Crosswords][metro] -- daily quick and cryptic crosswords (sudoku not supported).
+* [Seattle Times][seattletimes] -- Seattle Times NY Times crossword.
+* [Telegraaf Kruiswoordpuzzels][telegraaf] -- daily crossword from De Telegraaf.
+* [The Guardian][guardian] -- a selection of daily/weekly crosswords from The Guardian.
+* [mycrossword.co.uk][mycrosswordcouk] -- crowd-sources crossword community.
+
+## Websites with File Downloads
+
 Forkyz will attempt to open any file you give it, but look out for
 Across Lite (.puz) or JPZ in particular. IPuz support is partial and
 aims to cover block and bar puzzles.
@@ -72,8 +88,8 @@ The majority of the links on this page come from [Michael F. Gill
 [beneath-the-surface]: https://beneaththesurfacepuzzles.blogspot.com/
 [beq]: https://www.brendanemmettquigley.com/
 [big-dave-monthly]: http://crypticcrosswords.net/puzzles/prize-puzzles
-[big-dave-special]: http://crypticcrosswords.net/puzzles/special-puzzles/
 [big-dave-rookie]: http://crypticcrosswords.net/puzzles/rookie-corner/
+[big-dave-special]: http://crypticcrosswords.net/puzzles/special-puzzles/
 [big-dave-weekly]: http://crypticcrosswords.net/puzzles/ntspp-puzzles/
 [communicrossings]: https://communicrossings.com/crosswords-weyer
 [crosshare]: https://crosshare.org/
@@ -88,30 +104,37 @@ The majority of the links on this page come from [Michael F. Gill
 [glentopher]: https://glentopher.blogspot.com/
 [grids-these-days]: http://gridsthesedays.blogspot.com/
 [gridtherapy]: https://gridtherapy.com/
+[guardian]: https://www.theguardian.com/crosswords
 [half-baked]: https://halfbakedpuzzles.blogspot.com/
+[hamburgerabendblatt]: https://www.abendblatt.de/ratgeber/wissen/article106560367/Spielen-Sie-hier-taeglich-das-kostenlose-Kreuzwortraetsel.html
 [happylittlepuzzles]: https://www.happylittlepuzzles.com/
 [hubcrosswords]: https://www.patreon.com/hubcrosswords
 [inkubator]: https://inkubatorcrosswords.com/
 [jeff-davidson]: https://puzzles.jeffpdavidson.com/
 [jimjar]: https://twitter.com/Jimjar
+[jonesin]: https://www.crosswordnexus.com/jonesin/
 [keglar]: https://kegler.gitlab.io/
 [knotty-grids]: https://knottygrids.blogspot.com/
 [lexicon-devil]: http://www.lexicondevil.live/
 [luckystreak]: https://luckyxwords.blogspot.com/
 [luckyxwords]: https://www.patreon.com/luckyxwords
 [mad-dog-cryptics]: https://maddogcryptics.com/
+[metro]: https://metro.co.uk/puzzles/
 [mokelfish-puzzles]: https://bbtp.net/puzzle/
+[mycrosswordscouk]: https://mycrosswords.co.uk
 [nathan-curtis]: https://www.patreon.com/nathancurtis
-[nyt-crosswords]: https://github.com/doshea/nyt_crosswords
 [neville-fogarty]: https://nevillefogarty.wordpress.com/
+[nyt-crosswords]: https://github.com/doshea/nyt_crosswords
 [outofleftfield]: http://www.leftfieldcryptics.com/
 [outside-the-box]: https://www.joonpahk.com
 [private-eye]: https://www.private-eye.co.uk/crossword
 [puzzles-that-need-a-home]: https://puzzlesthatneedahome.blogspot.com/
 [rackenfracker]: https://www.therackenfracker.com/
+[seattletimes]: https://www.seattletimes.com/games-nytimes-crossword/
 [sids-grids]: https://www.sidsgrids.com
 [something-different]: https://dandoesnotblog.blogspot.com/2020/04/something-different.html
 [square-pursuit]: https://squarepursuit.com/
 [squarechase]: https://www.patreon.com/squarechase
+[telegraaf]: https://www.telegraaf.nl/puzzels/kruiswoord/
 [tough-as-nails]: https://toughasnails.net/
 [xwords-by-aladee]: https://xwordsbyaladee.blogspot.com/
