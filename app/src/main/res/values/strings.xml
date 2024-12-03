@@ -446,6 +446,8 @@
     <string name="przekroj">(PO) Przekrój</string>
     <string name="przekroj_desc">Puzzles from Przekrój magazine, in Polish.</string>
     <string name="about_scrapes">About These Sources</string>
+    <string name="everyman">Guardian Everyman</string>
+    <string name="everyman_desc">Weekly Sunday cryptic.</string>
 
     <!-- preferences sources -->
     <string name="daily_crosswords">Daily Crosswords</string>

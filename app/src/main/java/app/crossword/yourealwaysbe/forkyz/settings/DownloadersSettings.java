@@ -26,6 +26,7 @@ public record DownloadersSettings(
     boolean downloadWaPoSunday,
     boolean downloadWsj,
     boolean scrapeCru,
+    boolean scrapeEveryman,
     boolean scrapeKegler,
     boolean scrapePrivateEye,
     boolean scrapePrzekroj,

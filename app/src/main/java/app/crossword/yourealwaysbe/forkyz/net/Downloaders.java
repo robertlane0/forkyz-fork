@@ -11,14 +11,15 @@ import androidx.core.app.NotificationManagerCompat;
 import app.crossword.yourealwaysbe.forkyz.BrowseActivity;
 import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
 import app.crossword.yourealwaysbe.forkyz.R;
+import app.crossword.yourealwaysbe.forkyz.settings.DownloadersSettings;
+import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler;
+import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 import app.crossword.yourealwaysbe.puz.io.BrainsOnlyIO;
+import app.crossword.yourealwaysbe.puz.io.GuardianJSONIO;
 import app.crossword.yourealwaysbe.puz.io.IO;
 import app.crossword.yourealwaysbe.puz.io.JPZIO;
 import app.crossword.yourealwaysbe.puz.io.PrzekrojIO;
 import app.crossword.yourealwaysbe.puz.io.RCIJeuxMFJIO;
-import app.crossword.yourealwaysbe.forkyz.settings.DownloadersSettings;
-import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler;
-import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -666,6 +667,19 @@ public class Downloaders {
                 "przekroj",
                 context.getString(R.string.przekroj),
                 "https://przekroj.pl/sklep",
+                true, // share file url
+                false // read top down
+            ));
+        }
+
+        if (settings.scrapeEveryman()) {
+            downloaders.add(new PageScraper(
+                "https://www.theguardian.com/crosswords/everyman/\\d*",
+                new GuardianJSONIO(),
+                "https://www.theguardian.com/crosswords/series/everyman",
+                "everyman",
+                context.getString(R.string.everyman),
+                "https://support.theguardian.com",
                 true, // share file url
                 false // read top down
             ));

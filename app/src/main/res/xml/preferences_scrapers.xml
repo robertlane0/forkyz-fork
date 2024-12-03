@@ -11,6 +11,12 @@
         android:key="scrapeCru"
     />
     <androidx.preference.CheckBoxPreference
+        android:title="@string/everyman"
+        android:defaultValue="false"
+        android:summary="@string/everyman_desc"
+        android:key="scrapeEveryman"
+    />
+    <androidx.preference.CheckBoxPreference
         android:title="@string/keglars_cryptics"
         android:defaultValue="false"
         android:summary="@string/keglars_cryptics_desc"

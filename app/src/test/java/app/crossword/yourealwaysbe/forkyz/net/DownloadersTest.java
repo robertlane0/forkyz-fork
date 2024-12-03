@@ -94,6 +94,7 @@ public class DownloadersTest {
             true, // downloadWaPoSunday
             true, // downloadWsj
             true, // scrapeCru
+            true, // scrapeEveryman
             true, // scrapeKegler
             true, // scrapePrivateEye
             true, // scrapePrzekroj
