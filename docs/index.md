@@ -18,7 +18,7 @@ For the websites below, open a puzzle page in your browser, then use the "share"
 * [Seattle Times][seattletimes] -- Seattle Times NY Times crossword.
 * [Telegraaf Kruiswoordpuzzels][telegraaf] -- daily crossword from De Telegraaf.
 * [The Guardian][guardian] -- a selection of daily/weekly crosswords from The Guardian.
-* [mycrossword.co.uk][mycrosswordcouk] -- crowd-sources crossword community.
+* [mycrossword.co.uk][mycrosswordcouk] -- crowd-sourced crossword community.
 
 ## Websites with File Downloads
 
@@ -121,7 +121,7 @@ The majority of the links on this page come from [Michael F. Gill
 [mad-dog-cryptics]: https://maddogcryptics.com/
 [metro]: https://metro.co.uk/puzzles/
 [mokelfish-puzzles]: https://bbtp.net/puzzle/
-[mycrosswordscouk]: https://mycrosswords.co.uk
+[mycrosswordcouk]: https://mycrossword.co.uk
 [nathan-curtis]: https://www.patreon.com/nathancurtis
 [neville-fogarty]: https://nevillefogarty.wordpress.com/
 [nyt-crosswords]: https://github.com/doshea/nyt_crosswords
