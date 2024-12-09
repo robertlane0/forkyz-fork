@@ -1,0 +1,8 @@
+- New puzzles: share from mycrossword.co.uk, scrape Guardian Everyman and Quick.
+- Add puzzle shape as default grid size in play screen (display settings).
+- Add same grid size options for landscape as portrait (display settings).
+- Add options for displaying two clue lists side by side (display settings).
+- Add option to cycle unfilled only when moving forwards (interaction settings).
+- Add option to change direction before move with arrow keys (interaction settings).
+- Add settings import/export.
+- Remove focus indicator from board on play screen when using hardware keys.
