@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="primary">#ad5620</color>
-    <color name="onPrimary">#bbb</color>
-    <color name="primaryContainer">#783200</color>
-    <color name="onPrimaryContainer">#ffdbca</color>
+    <color name="onPrimary">#ddd</color>
+    <color name="primaryContainer">#4d3020</color>
+    <color name="onPrimaryContainer">#ddd</color>
     <color name="secondary">@color/primary</color>
     <color name="onSecondary">@color/onPrimary</color>
     <color name="secondaryContainer">@color/primaryContainer</color>
     <color name="onSecondaryContainer">@color/onPrimaryContainer</color>
-    <color name="tertiary">@color/primary</color>
-    <color name="onTertiary">@color/onPrimary</color>
-    <color name="tertiaryContainer">@color/primaryContainer</color>
-    <color name="onTertiaryContainer">@color/onPrimaryContainer</color>
+    <color name="tertiary">@color/secondary</color>
+    <color name="onTertiary">@color/onSecondary</color>
+    <color name="tertiaryContainer">@color/secondaryContainer</color>
+    <color name="onTertiaryContainer">@color/onSecondaryContainer</color>
     <color name="error">#FFB4AB</color>
     <color name="errorContainer">#93000A</color>
     <color name="onError">#690005</color>

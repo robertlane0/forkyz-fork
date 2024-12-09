@@ -12,6 +12,9 @@
     <!-- thanks https://stackoverflow.com/a/30490191 -->
     <attr name="clueLineOnlyStyle"/>
     <attr name="speedDialStyle"/>
-    <!-- this one to define clue tabs background in styles -->
+    <!-- this one to define clue tabs background and font color in styles -->
     <attr name="clueTabsBackground"/>
+    <attr name="clueTabsForeground"/>
+    <attr name="clueTabsBackgroundSelected"/>
+    <attr name="clueTabsForegroundSelected"/>
 </resources>

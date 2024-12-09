@@ -50,6 +50,9 @@
         <item name="actionBarPopupTheme">@style/submenuHeaderStyle</item>
         <item name="checkboxStyle">@style/checkboxStyle</item>
         <item name="clueTabsBackground">?attr/colorSurface</item>
+        <item name="clueTabsForeground">?attr/colorOnSurface</item>
+        <item name="clueTabsBackgroundSelected">?attr/colorSecondaryContainer</item>
+        <item name="clueTabsForegroundSelected">?attr/colorOnSecondaryContainer</item>
         <item name="toolbarStyle">@style/toolbarStyle</item>
         <item name="actionBarTheme">@style/actionBarStyle</item>
     </style>

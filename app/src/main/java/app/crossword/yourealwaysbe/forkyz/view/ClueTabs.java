@@ -1092,6 +1092,7 @@ public class ClueTabs extends ConstraintLayout
 
             ClueID cid = board.getClueID();
             boolean selected = Objects.equals(clue.getClueID(), cid);
+            clueBinding.getRoot().setSelected(selected);
             clueBinding.clueTextView.setChecked(selected);
 
             Puzzle puz = board.getPuzzle();

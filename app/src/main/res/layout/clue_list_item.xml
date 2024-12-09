@@ -8,6 +8,7 @@
         android:orientation="vertical"
         android:focusable="true"
         android:clickable="true"
+        android:background="@drawable/clue_list_item_background"
     >
         <FrameLayout
             android:layout_width="match_parent"

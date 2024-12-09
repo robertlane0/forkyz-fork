@@ -36,6 +36,8 @@
         <item name="rippleColor">#555555</item>
     </style>
     <style name="speedDialStyle">
+        <!-- experimentally derived -->
+        <item name="colorSecondary">?attr/colorPrimary</item>
         <item name="colorOnPrimaryContainer">?attr/colorOnPrimary</item>
     </style>
     <style name="speedDialOverlayStyle" parent="Theme.Forkyz">
@@ -56,6 +58,7 @@
     </style>
     <style name="clueListItemStyle" parent="Widget.Material3.CheckedTextView">
         <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@drawable/clue_list_item_text_color</item>
     </style>
     <style name="toolbarStyle" parent="Widget.Material3.Toolbar" />
     <style
