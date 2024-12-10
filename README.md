@@ -115,7 +115,7 @@ Supported import file formats (can be zipped or unzipped):
 * .xd,
 * XWord JSON.
 
-Current downloaders are De Standaard, De Telegraaf, Guardian Daily Cryptic, Hamburger Abendblatt, Independent Daily Cryptic, Thomas Joseph Crossword, Le Parisien, Metro (UK), Newsday, Sheffer Crossword, Universal Crosssword, USA Today, Jonesin' Crosswords, Premier Crossword, the Wall Street Journal (Sat/Sun), Keglar's Cryptics, Cryptic Cru Archives, Private Eye, and Przekroj Magazine.
+Current downloaders are De Standaard, De Telegraaf, Guardian Daily Cryptic/Everyman/Quick, Hamburger Abendblatt, Independent Daily Cryptic, Thomas Joseph Crossword, Le Parisien, Metro (UK), Newsday, Sheffer Crossword, Universal Crosssword, USA Today, Jonesin' Crosswords, Premier Crossword, the Wall Street Journal (Sat/Sun), Keglar's Cryptics, Cryptic Cru Archives, Private Eye, and Przekroj Magazine.
 
 ### Sharing From a Browser
 
