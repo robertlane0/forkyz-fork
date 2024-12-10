@@ -141,8 +141,8 @@ public class ForkyzSettings {
     private static final String PREF_KEYBOARD_REPEAT_INTERVAL
         = "keyboardRepeatInterval";
 
-    private static final String PREF_PLAY_CLUE_BELOW_GRID
-        = "clueBelowGrid";
+    private static final String PREF_PLAY_CLUE_BELOW_GRID = "clueBelowGrid";
+    private static final String PREF_PLAY_CLUE_HIGHLIGHT = "clueHighlight";
     private static final String[] PREF_PLAY_CLUE_TABS_PAGES
         = { "playActivityClueTabsPage", "playActivityClueTabsPage1" };
     private static final String PREF_PLAY_DELETE_CROSSING_MODE
@@ -511,6 +511,12 @@ public class ForkyzSettings {
             BrowseSwipeAction.class,
             BrowseSwipeAction.DELETE
         );
+    FSEnumSetting<ClueHighlight> clueHighlight
+        = new FSEnumSetting<ClueHighlight>(
+            PREF_PLAY_CLUE_HIGHLIGHT,
+            ClueHighlight.class,
+            ClueHighlight.RADIO_BUTTON
+        );
     FSEnumSetting<ClueTabsDouble> clueTabsDoubleSetting
         = new FSEnumSetting<ClueTabsDouble>(
             PREF_CLUE_LIST_CLUE_TABS_DOUBLE,
@@ -740,6 +746,7 @@ public class ForkyzSettings {
             appThemeSetting,
             appDayNightModeSetting,
             browseSwipeActionSetting,
+            clueHighlight,
             clueTabsDoubleSetting,
             storageLocationSetting,
             keyboardLayoutSetting,
@@ -1210,6 +1217,17 @@ public class ForkyzSettings {
      */
     public LiveData<Boolean> livePlayClueBelowGrid() {
         return liveBooleanSetting(PREF_PLAY_CLUE_BELOW_GRID);
+    }
+
+    /**
+     * How to highlight the selected clue in clue tabs
+     */
+    public void getPlayClueHighlight(Consumer<ClueHighlight> cb) {
+        getFSEnumSetting(clueHighlight, cb);
+    }
+
+    public LiveData<ClueHighlight> livePlayClueHighlight() {
+        return liveFSEnumSetting(clueHighlight);
     }
 
     /**

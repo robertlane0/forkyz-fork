@@ -105,4 +105,13 @@
         android:entries="@array/clue_tabs_double_labels"
         android:entryValues="@array/clue_tabs_double_values"
     />
+
+    <androidx.preference.ListPreference
+        android:title="@string/clue_highlight"
+        android:summary="@string/clue_highlight_desc"
+        android:key="clueHighlight"
+        android:defaultValue="RADIO_BUTTON"
+        android:entries="@array/clue_highlight_labels"
+        android:entryValues="@array/clue_highlight_values"
+    />
 </androidx.preference.PreferenceScreen>

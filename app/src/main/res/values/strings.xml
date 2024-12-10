@@ -266,6 +266,12 @@
     <string name="clue_tabs_double_landscape">Landscape Orientation</string>
     <string name="clue_tabs_double_wide">More than 3in width</string>
     <string name="clue_tabs_double_always">Always</string>
+    <string name="clue_highlight_none">None</string>
+    <string name="clue_highlight_radio_button">Radio Button</string>
+    <string name="clue_highlight_background">Background</string>
+    <string name="clue_highlight_both">Both</string>
+    <string name="clue_highlight">Clue Highlight</string>
+    <string name="clue_highlight_desc">The style used to highlight the current clue in the clue lists.</string>
 
     <!-- preferences download -->
     <string name="auto_downloaders">Automatic Download Sources</string>

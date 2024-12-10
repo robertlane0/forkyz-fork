@@ -244,6 +244,18 @@
        <item>FORWARDS</item>
        <item>ALWAYS</item>
      </string-array>
+     <string-array name="clue_highlight_labels">
+       <item>@string/clue_highlight_none</item>
+       <item>@string/clue_highlight_radio_button</item>
+       <item>@string/clue_highlight_background</item>
+       <item>@string/clue_highlight_both</item>
+     </string-array>
+     <string-array name="clue_highlight_values">
+       <item>NONE</item>
+       <item>RADIO_BUTTON</item>
+       <item>BACKGROUND</item>
+       <item>BOTH</item>
+     </string-array>
 
      <string-array name="emptyArray"/>
 </resources>

@@ -22,6 +22,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.GestureDetector.OnGestureListener;
@@ -915,6 +916,7 @@ public class ClueTabs extends ConstraintLayout
         private ClueListItemBinding clueBinding;
         private Clue clue;
         private boolean showDirection;
+        private Drawable checkMarkDrawable;
 
         public ClueViewHolder(
             ClueListItemBinding clueBinding, boolean showDirection
@@ -922,6 +924,8 @@ public class ClueTabs extends ConstraintLayout
             super(clueBinding.getRoot());
             this.clueBinding = clueBinding;
             this.showDirection = showDirection;
+            this.checkMarkDrawable
+                = clueBinding.clueTextView.getCheckMarkDrawable();
 
             clueBinding.getRoot().setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -997,6 +1001,11 @@ public class ClueTabs extends ConstraintLayout
             settings.livePlayShowCount().observe(
                 ViewTreeLifecycleOwner.get(binding.getRoot()),
                 showCount -> { setClueText(); }
+            );
+
+            settings.livePlayClueHighlight().observe(
+                ViewTreeLifecycleOwner.get(binding.getRoot()),
+                highlight -> { setHighlight(); }
             );
         }
 
@@ -1090,10 +1099,7 @@ public class ClueTabs extends ConstraintLayout
                 );
             clueBinding.clueTextView.setTextColor(colors.withAlpha(alpha));
 
-            ClueID cid = board.getClueID();
-            boolean selected = Objects.equals(clue.getClueID(), cid);
-            clueBinding.getRoot().setSelected(selected);
-            clueBinding.clueTextView.setChecked(selected);
+            setHighlight();
 
             Puzzle puz = board.getPuzzle();
             if (puz != null && clue.isFlagged()) {
@@ -1112,6 +1118,33 @@ public class ClueTabs extends ConstraintLayout
             } else {
                 clueBinding.clueFlagView.setVisibility(View.INVISIBLE);
             }
+        }
+
+        private void setHighlight() {
+            if (clue == null)
+                return;
+
+            settings.getPlayClueHighlight(highlight -> {
+                if (clue == null)
+                    return;
+
+                ClueID cid = board.getClueID();
+                boolean selected = Objects.equals(clue.getClueID(), cid);
+
+                clueBinding.getRoot().setSelected(
+                    selected && highlight.hasBackground()
+                );
+
+                if (highlight.hasRadio()) {
+                    clueBinding.clueTextView.setCheckMarkDrawable(
+                        checkMarkDrawable
+                    );
+                    clueBinding.clueTextView.setChecked(selected);
+                } else {
+                    clueBinding.clueTextView.setCheckMarkDrawable(null);
+                    clueBinding.clueTextView.setChecked(false);
+                }
+            });
         }
 
         private void getClueText(Clue clue, Consumer<String> cb) {
