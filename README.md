@@ -129,6 +129,7 @@ This only works for a limited number of sites, but may work for sites using simi
 * Hamburger Abendblatt (embedded from Raetsel Zentrale),
 * De Standaard (embedded crosswords from Keesing),
 * Metro (embedded from PA Puzzles),
+* MyCrossword.co.uk,
 * De Telegraaf (embedded from Pzzl.net),
 * Przekroj,
 * Wall Street Journal.
