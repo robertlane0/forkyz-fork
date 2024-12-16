@@ -107,6 +107,13 @@ public class ForkyzSettings {
         = "backgroundDownloadAllowRoaming";
     private static final String PREF_DOWNLOAD_CHARGING
         = "backgroundDownloadRequireCharging";
+    private static final String PREF_DOWNLOAD_CUSTOM_DAILY
+        = "downloadCustomDaily";
+    private static final String PREF_DOWNLOAD_CUSTOM_DAILY_TITLE
+        = "customDailyTitle";
+    // for PreferenceSubPages to add error messages
+    public static final String PREF_DOWNLOAD_CUSTOM_DAILY_URL
+        = "customDailyUrl";
     private static final String PREF_DOWNLOAD_HOURLY
         = "backgroundDownloadHourly";
     private static final String PREF_DOWNLOAD_DAYS
@@ -661,7 +668,7 @@ public class ForkyzSettings {
             new BooleanSetting("scrapeKegler", false),
             new BooleanSetting("scrapePrivateEye", false),
             new BooleanSetting("scrapePrzekroj", false),
-            new BooleanSetting("downloadCustomDaily", false),
+            new BooleanSetting(PREF_DOWNLOAD_CUSTOM_DAILY, false),
             new BooleanSetting("dlOnStartup", false)
         };
         for (BooleanSetting s : booleans)
@@ -728,8 +735,8 @@ public class ForkyzSettings {
             new StringSetting(PREF_KEYBOARD_REPEAT_DELAY, "300"),
             new StringSetting(PREF_KEYBOARD_REPEAT_INTERVAL, "75"),
             // DOWNLOADERS
-            new StringSetting("customDailyTitle", ""),
-            new StringSetting("customDailyUrl", ""),
+            new StringSetting(PREF_DOWNLOAD_CUSTOM_DAILY_TITLE, ""),
+            new StringSetting(PREF_DOWNLOAD_CUSTOM_DAILY_URL, ""),
         };
         for (StringSetting s : strings)
             stringSettings.put(s.getKey(), s);
@@ -1642,9 +1649,9 @@ public class ForkyzSettings {
                 getBooleanSettingSync("scrapeKegler"),
                 getBooleanSettingSync("scrapePrivateEye"),
                 getBooleanSettingSync("scrapePrzekroj"),
-                getBooleanSettingSync("downloadCustomDaily"),
-                getStringSettingSync("customDailyTitle"),
-                getStringSettingSync("customDailyUrl"),
+                getBooleanSettingSync(PREF_DOWNLOAD_CUSTOM_DAILY),
+                getStringSettingSync(PREF_DOWNLOAD_CUSTOM_DAILY_TITLE),
+                getStringSettingSync(PREF_DOWNLOAD_CUSTOM_DAILY_URL),
                 getBooleanSettingSync(PREF_SUPPRESS_SUMMARY_NOTIFICATIONS),
                 getBooleanSettingSync(PREF_SUPPRESS_INDIVIDUAL_NOTIFICATIONS),
                 getStringSetSettingSync(PREF_AUTO_DOWNLOADERS),
@@ -1653,6 +1660,25 @@ public class ForkyzSettings {
             );
             handler.post(() -> { cb.accept(settings); });
         });
+    }
+
+    public void getDownloadCustomDaily(Consumer<Boolean> cb) {
+        getBooleanSetting(PREF_DOWNLOAD_CUSTOM_DAILY, cb);
+    }
+
+    public void getDownloadCustomDailyURL(Consumer<String> cb) {
+        getStringSetting(PREF_DOWNLOAD_CUSTOM_DAILY_URL, cb);
+    }
+
+    /**
+     * If the preference key is a custom daily pref
+     *
+     * For preference activity to detect if config changes
+     */
+    public boolean isDownloadCustomDaily(String pref) {
+        return PREF_DOWNLOAD_CUSTOM_DAILY.equals(pref)
+            || PREF_DOWNLOAD_CUSTOM_DAILY_TITLE.equals(pref)
+            || PREF_DOWNLOAD_CUSTOM_DAILY_URL.equals(pref);
     }
 
     public void getDownloadTimeout(Consumer<Integer> cb) {

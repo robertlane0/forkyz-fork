@@ -26,6 +26,7 @@ import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.util.BackgroundDownloadManager;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 
+import java.time.format.DateTimeFormatter;
 import javax.inject.Inject;
 
 public class PreferencesSubPages {
@@ -37,11 +38,72 @@ public class PreferencesSubPages {
         }
     }
 
+    @AndroidEntryPoint
     public static class DailyFragment
-            extends PreferencesBaseFragment {
+            extends PreferencesBaseFragment
+            implements SharedPreferences.OnSharedPreferenceChangeListener {
+
+        @Inject
+        protected ForkyzSettings settings;
+
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.preferences_daily, rootKey);
+        }
+
+        @Override
+        public void onResume() {
+            PreferenceManager
+                .getDefaultSharedPreferences(getActivity().getApplicationContext())
+                .registerOnSharedPreferenceChangeListener(this);
+            setCustomError();
+            super.onResume();
+        }
+
+        @Override
+        public void onPause() {
+            PreferenceManager
+                .getDefaultSharedPreferences(getActivity().getApplicationContext())
+                .unregisterOnSharedPreferenceChangeListener(this);
+            super.onPause();
+        }
+
+        @Override
+        public void onSharedPreferenceChanged(
+            SharedPreferences sharedPreferences, String pref
+        ) {
+            if (settings.isDownloadCustomDaily(pref))
+                setCustomError();
+        }
+
+        private void setCustomError() {
+            Preference errorMsg = findPreference(
+                ForkyzSettings.PREF_DOWNLOAD_CUSTOM_DAILY_URL
+            );
+            if (errorMsg == null)
+                return;
+
+            errorMsg.setSummary(
+                getResources().getString(R.string.custom_url_desc)
+            );
+
+            settings.getDownloadCustomDaily(downloadCustom -> {
+                if (downloadCustom) {
+                    settings.getDownloadCustomDailyURL(url -> {
+                        try {
+                            DateTimeFormatter.ofPattern(url);
+                        } catch (IllegalArgumentException e) {
+                            errorMsg.setSummary(
+                                getResources().getString(
+                                    R.string.custom_url_desc_with_error,
+                                    e.getMessage()
+                                )
+                            );
+                            errorMsg.setVisible(true);
+                        }
+                    });
+                }
+            });
         }
     }
 

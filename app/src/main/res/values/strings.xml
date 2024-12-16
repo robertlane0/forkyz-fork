@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE resources [
+    <!ENTITY customurldesc "Enter URL formatted according to Java\'s DateTimeFormatter. The puzzle can be in any supported format.">
+]>
 <resources
     xmlns:tools="http://schemas.android.com/tools"
 >
@@ -198,7 +201,8 @@
     <string name="custom_title">Puzzle Name</string>
     <string name="custom_title_desc">Enter title for puzzle list.</string>
     <string name="custom_url">Source URL</string>
-    <string name="custom_url_desc">Enter URL formatted according to Java\'s DateTimeFormatter. The puzzle can be in any supported format.</string>
+    <string name="custom_url_desc">&customurldesc;</string>
+    <string name="custom_url_desc_with_error">URL Error: %s\n\n&customurldesc;</string>
 
     <!-- preferences daily -->
     <string name="updates_mon_fri">Updates Monday-Friday.</string>

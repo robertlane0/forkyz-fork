@@ -98,14 +98,8 @@ public class AbstractDateDownloader extends AbstractDownloader {
         this.days = days;
         this.supportUrl = supportUrl;
         this.puzzleParser = puzzleParser;
-        if (sourceUrlFormatPattern != null) {
-            this.sourceUrlFormat
-                = DateTimeFormatter.ofPattern(sourceUrlFormatPattern);
-        }
-        if (shareUrlFormatPattern != null) {
-            this.shareUrlFormat
-                = DateTimeFormatter.ofPattern(shareUrlFormatPattern);
-        }
+        this.sourceUrlFormat = convertUrlFormatPattern(sourceUrlFormatPattern);
+        this.shareUrlFormat = convertUrlFormatPattern(shareUrlFormatPattern);
         if (goodFrom != null)
             this.goodFrom = goodFrom;
         if (utcAvailabilityOffset != null)
@@ -336,5 +330,18 @@ public class AbstractDateDownloader extends AbstractDownloader {
      */
     protected Duration getUTCAvailabilityOffset() {
         return utcAvailabilityOffset;
+    }
+
+    /**
+     * Returns null if it is not a good pattern
+     */
+    private static DateTimeFormatter convertUrlFormatPattern(String pattern) {
+        try {
+            if (pattern != null)
+                return DateTimeFormatter.ofPattern(pattern);
+        } catch (IllegalArgumentException e) {
+            // fall through
+        }
+        return null;
     }
 }
