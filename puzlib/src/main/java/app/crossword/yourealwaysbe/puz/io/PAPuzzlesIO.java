@@ -193,8 +193,8 @@ public class PAPuzzlesIO implements PuzzleParser {
     }
 
     private static void getClues(Element doc, PuzzleBuilder builder) {
-        getClues(doc, "my-content-desktop-across", builder);
-        getClues(doc, "my-content-desktop-down", builder);
+        getClues(doc, "clues-across", builder);
+        getClues(doc, "clues-down", builder);
     }
 
     /**
