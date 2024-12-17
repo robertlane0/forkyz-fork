@@ -65,6 +65,12 @@
         name="actionBarStyle"
         parent="@style/ThemeOverlay.Material3.ActionBar"
     />
+    <style
+        name="actionModeStyle"
+        parent="@style/Widget.Material3.ActionMode"
+    >
+    <item name="backgroundSplit">?attr/colorError</item>
+    </style>
     <style name="datePickerStyle">
         <item name="android:textColor">@color/primary</item>
     </style>
