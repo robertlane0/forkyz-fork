@@ -44,8 +44,10 @@ public class GuardianJSONIO extends AbstractJSONIO {
     public static Puzzle readPuzzle(InputStream is) throws IOException {
         ByteArrayInputStream copy = StreamUtils.copyInputStream(is);
         Puzzle puz = readFromJSON(copy);
-        if (puz == null)
+        if (puz == null) {
+            copy.reset();
             puz = readFromHTML(copy);
+        }
         return puz;
     }
 
