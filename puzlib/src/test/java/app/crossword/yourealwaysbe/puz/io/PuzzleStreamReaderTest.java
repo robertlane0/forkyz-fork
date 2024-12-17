@@ -94,5 +94,14 @@ public class PuzzleStreamReaderTest {
             )
         );
     }
+
+    @Test
+    public void testPML() throws Exception {
+        PMLIOTest.assertIsTestPuzzle1(
+            PuzzleStreamReader.parseInputStatic(
+                PMLIOTest.getTestPuzzle1InputStream()
+            )
+        );
+    }
 }
 

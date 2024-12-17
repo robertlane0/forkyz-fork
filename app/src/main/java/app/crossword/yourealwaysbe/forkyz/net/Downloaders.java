@@ -18,13 +18,12 @@ import app.crossword.yourealwaysbe.puz.io.BrainsOnlyIO;
 import app.crossword.yourealwaysbe.puz.io.GuardianJSONIO;
 import app.crossword.yourealwaysbe.puz.io.IO;
 import app.crossword.yourealwaysbe.puz.io.JPZIO;
+import app.crossword.yourealwaysbe.puz.io.PMLIO;
 import app.crossword.yourealwaysbe.puz.io.PrzekrojIO;
 import app.crossword.yourealwaysbe.puz.io.RCIJeuxMFJIO;
 
 import java.time.Duration;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -504,15 +503,15 @@ public class Downloaders {
             downloaders.add(new AbstractDateDownloader(
                 "metrocryptic",
                 context.getString(R.string.metro_cryptic),
-                Downloader.DATE_WEEKDAY,
+                Downloader.DATE_NO_SUNDAY,
                 Duration.ZERO,
                 "https://metro.co.uk/",
-                new PAPuzzlesStreamScraper(),
+                new PMLIO(),
+                "'https://d3untqd069jdot.cloudfront.net/puzzles/"
+                    + "cryptic-crossword/'yyyyMMdd'.html'",
                 "'https://metro.co.uk/puzzles/"
                     + "cryptic-crosswords-online-free-daily-word-puzzle/'",
-                "'https://metro.co.uk/puzzles/"
-                    + "cryptic-crosswords-online-free-daily-word-puzzle/'",
-                ZonedDateTime.now(ZoneId.of("Europe/London")).toLocalDate()
+                LocalDate.of(2024, 12, 2)
             ));
         }
 

@@ -1,0 +1,250 @@
+{
+  "pml_id": "111",
+  "abbr": "XC",
+  "name": "Test Crossword",
+  "category": "core",
+  "status": "live",
+  "game_data": {
+    "subject": "Test",
+    "rows": 13,
+    "cols": 13,
+    "items": [
+      {
+        "start": 2,
+        "dir": 0,
+        "num": 1,
+        "answer": "ABCDEF",
+        "answer_formatted": "xxxxxx",
+        "clue": "Test clue 1 (6)"
+      },
+      {
+        "start": 9,
+        "dir": 0,
+        "num": 5,
+        "answer": "XXXX",
+        "answer_formatted": "xxxx",
+        "clue": "Test clue (4)"
+      },
+      {
+        "start": 27,
+        "dir": 0,
+        "num": 9,
+        "answer": "XXXXX",
+        "answer_formatted": "xxxxx",
+        "clue": "Test clue (5)"
+      },
+      {
+        "start": 33,
+        "dir": 0,
+        "num": 10,
+        "answer": "XXXXXXX",
+        "answer_formatted": "xxxxxxx",
+        "clue": "Test clue 10 (7)"
+      },
+      {
+        "start": 53,
+        "dir": 0,
+        "num": 11,
+        "answer": "XXXXXXX",
+        "answer_formatted": "xxxxxxx",
+        "clue": "Test clue (7)"
+      },
+      {
+        "start": 61,
+        "dir": 0,
+        "num": 12,
+        "answer": "GHIJK",
+        "answer_formatted": "xxxxx",
+        "clue": "Test clue (5)"
+      },
+      {
+        "start": 80,
+        "dir": 0,
+        "num": 13,
+        "answer": "XXXXX",
+        "answer_formatted": "xxxxx",
+        "clue": "Test clue (5)"
+      },
+      {
+        "start": 86,
+        "dir": 0,
+        "num": 15,
+        "answer": "XXXXX",
+        "answer_formatted": "xxxxx",
+        "clue": "Test clue (5)"
+      },
+      {
+        "start": 105,
+        "dir": 0,
+        "num": 20,
+        "answer": "XXXXX",
+        "answer_formatted": "xxxxx",
+        "clue": "Test clue (5)"
+      },
+      {
+        "start": 111,
+        "dir": 0,
+        "num": 22,
+        "answer": "XXXXXXX",
+        "answer_formatted": "xxxxxxx",
+        "clue": "Test clue (7)"
+      },
+      {
+        "start": 131,
+        "dir": 0,
+        "num": 24,
+        "answer": "XXXXXXX",
+        "answer_formatted": "xxxxxxx",
+        "clue": "Test clue (7)"
+      },
+      {
+        "start": 139,
+        "dir": 0,
+        "num": 25,
+        "answer": "XXXXX",
+        "answer_formatted": "xxxxx",
+        "clue": "Test clue (5)"
+      },
+      {
+        "start": 158,
+        "dir": 0,
+        "num": 26,
+        "answer": "XXXX",
+        "answer_formatted": "xxxx",
+        "clue": "Test clue (4)"
+      },
+      {
+        "start": 163,
+        "dir": 0,
+        "num": 27,
+        "answer": "XXXXXX",
+        "answer_formatted": "xxxxxx",
+        "clue": "Test clue (6)"
+      },
+      {
+        "start": 3,
+        "dir": 1,
+        "num": 2,
+        "answer": "BXXXXXX",
+        "answer_formatted": "xxxxxxx",
+        "clue": "Test clue 2 (7)"
+      },
+      {
+        "start": 5,
+        "dir": 1,
+        "num": 3,
+        "answer": "DXXXX",
+        "answer_formatted": "xxxxx",
+        "clue": "Test clue 3 (5)"
+      },
+      {
+        "start": 7,
+        "dir": 1,
+        "num": 4,
+        "answer": "FXXXXX",
+        "answer_formatted": "xxxxxx",
+        "clue": "Test clue (6)"
+      },
+      {
+        "start": 9,
+        "dir": 1,
+        "num": 5,
+        "answer": "XXXXGXX",
+        "answer_formatted": "xxxxxxx",
+        "clue": "Test clue (7)"
+      },
+      {
+        "start": 11,
+        "dir": 1,
+        "num": 6,
+        "answer": "XXXXI",
+        "answer_formatted": "xxxxx",
+        "clue": "Test clue (5)"
+      },
+      {
+        "start": 14,
+        "dir": 1,
+        "num": 7,
+        "answer": "XXXXX",
+        "answer_formatted": "xxxxx",
+        "clue": "Test clue (5)"
+      },
+      {
+        "start": 26,
+        "dir": 1,
+        "num": 8,
+        "answer": "XXXKX",
+        "answer_formatted": "xxxxx",
+        "clue": "Test clue (5)"
+      },
+      {
+        "start": 83,
+        "dir": 1,
+        "num": 14,
+        "answer": "XXXXXXX",
+        "answer_formatted": "xxxxxxx",
+        "clue": "Test clue (7)"
+      },
+      {
+        "start": 89,
+        "dir": 1,
+        "num": 16,
+        "answer": "XXXXXXX",
+        "answer_formatted": "xxxxxxx",
+        "clue": "Test clue (7)"
+      },
+      {
+        "start": 92,
+        "dir": 1,
+        "num": 17,
+        "answer": "XXXXX",
+        "answer_formatted": "xxxxx",
+        "clue": "Test clue (5)"
+      },
+      {
+        "start": 98,
+        "dir": 1,
+        "num": 18,
+        "answer": "XXXXXX",
+        "answer_formatted": "xxxxxx",
+        "clue": "Test clue (6)"
+      },
+      {
+        "start": 104,
+        "dir": 1,
+        "num": 19,
+        "answer": "XXXXX",
+        "answer_formatted": "X-xxxx",
+        "clue": "Test clue (1-4)"
+      },
+      {
+        "start": 107,
+        "dir": 1,
+        "num": 21,
+        "answer": "XXXXX",
+        "answer_formatted": "xxx xx",
+        "clue": "Test clue (3,2)"
+      },
+      {
+        "start": 113,
+        "dir": 1,
+        "num": 23,
+        "answer": "XXXXX",
+        "answer_formatted": "xxxxx",
+        "clue": "Test clue (5)"
+      }
+    ],
+    "thumbnails": {
+      "default_gfs_id": "111",
+      "default_filename": "1.png",
+      "finished_gfs_id": "222",
+      "finished_filename": "2.png"
+    }
+  },
+  "puzzle_id": "333",
+  "seqnum": "",
+  "rdate": "16 Dec 2024",
+  "edate": "16 Dec 2024",
+  "duration": 1,
+  "source": "legacy"
+}
