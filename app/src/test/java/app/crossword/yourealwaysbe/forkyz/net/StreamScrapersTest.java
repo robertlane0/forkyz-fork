@@ -35,7 +35,7 @@ public class StreamScrapersTest {
     @Test
     public void testPAPuzzles() throws Exception {
         testScraper(
-            "https://metro.co.uk/puzzles/quick-crosswords-online-free-daily-word-puzzle/",
+            "https://www.irishnews.com/puzzles/cryptic-crossword/",
             new PAPuzzlesStreamScraper()
         );
     }
