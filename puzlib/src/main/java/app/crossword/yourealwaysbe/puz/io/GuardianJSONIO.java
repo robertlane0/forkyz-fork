@@ -42,7 +42,7 @@ public class GuardianJSONIO extends AbstractJSONIO {
     }
 
     public static Puzzle readPuzzle(InputStream is) throws IOException {
-        ByteArrayInputStream copy = StreamUtils.copyInputStream(is);
+        ByteArrayInputStream copy = StreamUtils.makeByteArrayInputStream(is);
         Puzzle puz = readFromJSON(copy);
         if (puz == null) {
             copy.reset();
