@@ -66,6 +66,7 @@
     <androidx.preference.CheckBoxPreference
         android:defaultValue="true"
         android:key="downloadMetroCryptic"
+        android:summary="@string/updates_mon_sat"
         android:title="@string/metro_cryptic"
     />
     <androidx.preference.CheckBoxPreference
