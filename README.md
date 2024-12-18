@@ -106,6 +106,7 @@ Supported import file formats (can be zipped or unzipped):
 * Keesing XML,
 * King Features TXT,
 * PAPuzzles HTML,
+* PML JSON and HTML,
 * Przekroj Magazine JSON and HTML,
 * RCI Jeux Mots-Fleches HJSON,
 * Raetsel Zentrale Schwedenratsel JSON,
@@ -115,7 +116,7 @@ Supported import file formats (can be zipped or unzipped):
 * .xd,
 * XWord JSON.
 
-Current downloaders are De Standaard, De Telegraaf, Guardian Daily Cryptic/Everyman/Quick, Hamburger Abendblatt, Independent Daily Cryptic, Thomas Joseph Crossword, Le Parisien, Metro (UK), Newsday, Sheffer Crossword, Universal Crosssword, USA Today, Jonesin' Crosswords, Premier Crossword, the Wall Street Journal (Sat/Sun), Keglar's Cryptics, Cryptic Cru Archives, Private Eye, and Przekroj Magazine.
+Current downloaders are De Standaard, De Telegraaf, Guardian Daily Cryptic/Everyman/Quick, Hamburger Abendblatt, Independent Daily Cryptic, Irish News Cryptic, Thomas Joseph Crossword, Le Parisien, Metro (UK), Newsday, Sheffer Crossword, Universal Crosssword, USA Today, Jonesin' Crosswords, Premier Crossword, the Wall Street Journal (Sat/Sun), Keglar's Cryptics, Cryptic Cru Archives, Private Eye, and Przekroj Magazine.
 
 ### Sharing From a Browser
 
@@ -127,9 +128,10 @@ This only works for a limited number of sites, but may work for sites using simi
 * Exolve,
 * Guardian,
 * Hamburger Abendblatt (embedded from Raetsel Zentrale),
-* De Standaard (embedded crosswords from Keesing),
+* Irish News,
 * Metro (embedded from PA Puzzles),
 * MyCrossword.co.uk,
+* De Standaard (embedded crosswords from Keesing),
 * De Telegraaf (embedded from Pzzl.net),
 * Przekroj,
 * Wall Street Journal.

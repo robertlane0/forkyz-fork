@@ -14,6 +14,7 @@ For the websites below, open a puzzle page in your browser, then use the "share"
 
 * [Crossword Nexus][jonesin] -- any site embedding [Crossword Nexus][crosswordnexus] puzzles, for example the Jonesin crossword.
 * [Hamburger Abendblatt][hamburgerabendblatt] -- daily crossword from the Hamburger Abendblatt.
+* [Irish News Crosswords][irishnews] -- daily quick and cryptic crosswords (sudoku not supported).
 * [Metro Crosswords][metro] -- daily quick and cryptic crosswords (sudoku not supported).
 * [Seattle Times][seattletimes] -- Seattle Times NY Times crossword.
 * [Telegraaf Kruiswoordpuzzels][telegraaf] -- daily crossword from De Telegraaf.
@@ -110,6 +111,7 @@ The majority of the links on this page come from [Michael F. Gill
 [happylittlepuzzles]: https://www.happylittlepuzzles.com/
 [hubcrosswords]: https://www.patreon.com/hubcrosswords
 [inkubator]: https://inkubatorcrosswords.com/
+[irishnews]: https://www.irishnews.com/puzzles/
 [jeff-davidson]: https://puzzles.jeffpdavidson.com/
 [jimjar]: https://twitter.com/Jimjar
 [jonesin]: https://www.crosswordnexus.com/jonesin/
