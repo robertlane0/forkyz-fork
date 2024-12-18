@@ -77,6 +77,7 @@ public class DownloadersTest {
             true, // downloadGuardianDailyCryptic
             true, // downloadHamAbend
             true, // downloadIndependentDailyCryptic
+            true, // downloadIrishNewsCryptic
             true, // downloadJonesin
             true, // downloadJoseph
             true, // download20Minutes

@@ -9,6 +9,7 @@ public record DownloadersSettings(
     boolean downloadGuardianDailyCryptic,
     boolean downloadHamAbend,
     boolean downloadIndependentDailyCryptic,
+    boolean downloadIrishNewsCryptic,
     boolean downloadJonesin,
     boolean downloadJoseph,
     boolean download20Minutes,

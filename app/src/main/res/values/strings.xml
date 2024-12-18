@@ -232,6 +232,7 @@
     <string name="de_standaard">(FL) De Standaard</string>
     <string name="de_standaard_desc">Daily crossword in Flemish.</string>
     <string name="metro_cryptic">Metro Cryptic</string>
+    <string name="irish_news_cryptic">Irish News Cryptic</string>
 
     <!-- preferences display -->
     <string name="clue_below_grid">Clue Below Grid</string>

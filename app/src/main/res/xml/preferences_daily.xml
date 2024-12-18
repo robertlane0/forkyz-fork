@@ -28,6 +28,11 @@
         android:key="downloadIndependentDailyCryptic"
     />
     <androidx.preference.CheckBoxPreference
+        android:title="@string/irish_news_cryptic"
+        android:defaultValue="true"
+        android:key="downloadIrishNewsCryptic"
+    />
+    <androidx.preference.CheckBoxPreference
         android:title="@string/joseph_crossword"
         android:summary="@string/updates_mon_sat"
         android:defaultValue="true"

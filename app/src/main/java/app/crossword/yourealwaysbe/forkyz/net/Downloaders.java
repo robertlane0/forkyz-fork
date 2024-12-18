@@ -24,6 +24,8 @@ import app.crossword.yourealwaysbe.puz.io.RCIJeuxMFJIO;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -393,6 +395,20 @@ public class Downloaders {
                 "'https://puzzles.independent.co.uk/games/"
                     + "cryptic-crossword-independent'"
             ));
+        }
+
+        if (settings.downloadIrishNewsCryptic()) {
+            downloaders.add(new AbstractDateDownloader(
+                "irishnewscryptic",
+                context.getString(R.string.irish_news_cryptic),
+                Downloader.DATE_DAILY, // availability unknown
+                Duration.ZERO,
+                "https://www.irishnews.com/",
+                new PAPuzzlesStreamScraper(),
+                "'https://www.irishnews.com/puzzles/cryptic-crossword/'",
+                "'https://www.irishnews.com/puzzles/cryptic-crossword/'",
+                ZonedDateTime.now(ZoneId.of("Europe/Belfast")).toLocalDate()
+             ));
         }
 
         if (settings.downloadJonesin()) {
