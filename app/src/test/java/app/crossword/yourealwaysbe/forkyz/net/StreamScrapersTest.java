@@ -90,6 +90,14 @@ public class StreamScrapersTest {
         );
     }
 
+    @Test
+    public void testPML() throws Exception {
+        testScraper(
+            "https://metro.co.uk/puzzles/quick-crosswords-online-free-daily-word-puzzle/",
+            new PMLStreamScraper()
+        );
+    }
+
     /**
      * Test scraper gets a puzzle from the URL
      */
