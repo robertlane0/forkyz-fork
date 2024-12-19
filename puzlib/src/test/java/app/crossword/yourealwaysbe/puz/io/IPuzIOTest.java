@@ -221,6 +221,23 @@ public class IPuzIOTest {
 
         assertEquals(oddClues.getClueByIndex(5).getHint(), "Odd sixth");
         assertEquals(oddClues.getClueByIndex(0).getHint(), "Odd first");
+
+        ClueList acrossClues = puz.getClues("Across");
+        Clue oneAcross = acrossClues.getClueByNumber("1");
+        assertEquals(oneAcross.getHint(), "Clue 1 ('1 2,1-;4)");
+        assertTrue(oneAcross.hasSeparators());
+        assertEquals(oneAcross.getSeparator(0), '\'');
+        assertEquals(oneAcross.getSeparator(1), ' ');
+        assertEquals(oneAcross.getSeparator(2), '\0');
+        assertEquals(oneAcross.getSeparator(3), ',');
+        assertEquals(oneAcross.getSeparator(4), '-');
+        assertEquals(oneAcross.getSeparator(5), '\0');
+
+        Clue sixAcross = acrossClues.getClueByNumber("6");
+        assertEquals(sixAcross.getHint(), "Clue 6 (1 3)");
+        assertTrue(sixAcross.hasSeparators());
+        assertEquals(sixAcross.getSeparator(1), ' ');
+        assertEquals(sixAcross.getSeparator(2), '\0');
     }
 
     public static void assertIsTestPuzzleZones(Puzzle puz) throws Exception {

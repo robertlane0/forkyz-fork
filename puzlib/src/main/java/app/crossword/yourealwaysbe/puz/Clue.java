@@ -2,7 +2,11 @@
 package app.crossword.yourealwaysbe.puz;
 
 import java.io.Serializable;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 /**
  * A clue on the board
@@ -25,12 +29,15 @@ public class Clue implements Serializable {
     private boolean flagged = false;
     // 0x00rrggbb or DEFAULT_FLAG_COLOR
     private int flagColor = DEFAULT_FLAG_COLOR;
+    // separating characters between the n-1 and n cell in answer
+    private SortedMap<Integer, Character> separators;
 
     public Clue(
         String listName,
         int index, String number, String label,
         String hint,
-        Zone zone
+        Zone zone,
+        Map<Integer, Character> separators
     ) {
         this.clueID = new ClueID(listName, index);
         this.number = number;
@@ -42,6 +49,18 @@ public class Clue implements Serializable {
         }
         this.hint = hint;
         this.zone = (zone == null) ? new Zone() : zone;
+        this.separators = (separators == null)
+            ? new TreeMap<>()
+            : new TreeMap<>(separators);
+    }
+
+    public Clue(
+        String listName,
+        int index, String number, String label,
+        String hint,
+        Zone zone
+    ) {
+        this(listName, index, number, label, hint, zone, null);
     }
 
     public Clue(
@@ -116,6 +135,31 @@ public class Clue implements Serializable {
             return null;
     }
 
+    /**
+     * Get the separating character between the pos-1th and pos-th cell
+     *
+     * 0 means start of word. 1 means between 0th and 1st character.
+     *
+     * @return the separating char or null char if no separator
+     */
+    public char getSeparator(int pos) {
+        Character c = separators.get(pos);
+        return (c == null) ? '\0' : c;
+    }
+
+    public boolean hasSeparators() {
+        return separators.size() > 0;
+    }
+
+    /**
+     * Set of positions with separators
+     *
+     * Will iterate in ascending order
+     */
+    public Set<Integer> getSeparatorPositions() {
+        return separators.keySet();
+    }
+
     @Override
     public String toString() {
         return getClueID() + " / " + getClueNumber() + " / "  + getHint();
@@ -136,7 +180,8 @@ public class Clue implements Serializable {
             && Objects.equals(getLabel(), other.getLabel())
             && Objects.equals(getHint(), other.getHint())
             && Objects.equals(getZone(), other.getZone())
-            && isFlagged() == other.isFlagged();
+            && isFlagged() == other.isFlagged()
+            && Objects.equals(separators, other.separators);
     }
 
     @Override

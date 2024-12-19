@@ -1006,34 +1006,14 @@ public class IPuzIO extends AbstractJSONIO {
             for (int i = 0; i < jsonClues.length(); i++) {
                 Object clueObj = jsonClues.get(i);
                 // all clues not across until proven otherwise by list name
-                IPuzClue ipc = getClue(clueObj, showEnumerations, coordBase);
-                // TODO: support zoning of more than just across/down
-                if (ipc != null) {
-                    if (FIELD_CLUES_ACROSS.equals(dirName)) {
-                        builder.addAcrossClue(
-                            displayName,
-                            ipc.getClueNumber(),
-                            ipc.getLabel(),
-                            ipc.getHint()
-                        );
-                    } else if (FIELD_CLUES_DOWN.equals(dirName)) {
-                        builder.addDownClue(
-                            displayName,
-                            ipc.getClueNumber(),
-                            ipc.getLabel(),
-                            ipc.getHint()
-                        );
-                    } else {
-                        builder.addClue(new Clue(
-                            displayName,
-                            i,
-                            ipc.getClueNumber(),
-                            ipc.getLabel(),
-                            ipc.getHint(),
-                            ipc.getZone()
-                        ));
-                    }
-                }
+                addClue(
+                    dirName,
+                    displayName,
+                    clueObj,
+                    showEnumerations,
+                    coordBase,
+                    builder
+                );
             }
         } catch (IllegalArgumentException e) {
             throw new IPuzFormatException(e.getMessage());
@@ -1041,17 +1021,25 @@ public class IPuzIO extends AbstractJSONIO {
     }
 
     /**
-     * Convert a JSON object clue into a Clue
+     * Convert a JSON object clue into a Clue and add to builder
      *
      * Adds enumeration to hint if showEnumerations is true
      *
      * @param coordBase 0 if 0-based indexing, 1 if 1-based
+     * @param dirName the name of the direction of the clue (see ipuz
+     * directions)
      */
-    private static IPuzClue getClue(
-        Object clueObj, boolean showEnumerations, int coordBase
+    private static void addClue(
+        String dirName,
+        String listName,
+        Object clueObj,
+        boolean showEnumerations,
+        int coordBase,
+        PuzzleBuilder builder
     ) throws IPuzFormatException {
         if (clueObj instanceof String) {
-            return new IPuzClue((String) clueObj);
+            String hint = (String) clueObj;
+            buildClue(listName, null, null, hint, null, null, builder);
         } else if (clueObj instanceof JSONArray) {
             JSONArray clueArray = (JSONArray) clueObj;
             if (clueArray.length() != 2) {
@@ -1061,8 +1049,11 @@ public class IPuzIO extends AbstractJSONIO {
             }
             Object clueNumObj = clueArray.get(0);
             String hint = clueArray.getString(1);
+            Zone zone = getDirZone(getClueNumber(clueNumObj), dirName, builder);
 
-            return buildClue(clueNumObj, null, hint, null, null);
+            buildClue(
+                listName, clueNumObj, null, hint, null, zone, builder
+            );
         } else if (clueObj instanceof JSONObject) {
             JSONObject clueJson = (JSONObject) clueObj;
 
@@ -1093,9 +1084,17 @@ public class IPuzIO extends AbstractJSONIO {
                 : null;
 
             Zone zone = getClueZone(clueJson, coordBase);
+            if (zone == null)
+                zone = getDirZone(getClueNumber(clueNumObj), dirName, builder);
 
-            return buildClue(
-                clueNumObj, label, hint.toString(), enumeration, zone
+            buildClue(
+                listName,
+                clueNumObj,
+                label,
+                hint.toString(),
+                enumeration,
+                zone,
+                builder
             );
         } else {
             throw new IPuzFormatException(
@@ -1131,6 +1130,23 @@ public class IPuzIO extends AbstractJSONIO {
     }
 
     /**
+     * Get zone for direction/number
+     *
+     * Returns null if not found
+     */
+    private static Zone getDirZone(
+        String number, String dirName, PuzzleBuilder builder
+    ) {
+        // TODO: support zoning of more than just across/down
+        if (FIELD_CLUES_ACROSS.equals(dirName))
+            return builder.getAcrossZone(number);
+        else if (FIELD_CLUES_DOWN.equals(dirName))
+            return builder.getDownZone(number);
+        else
+            return null;
+    }
+
+    /**
      * Add cross references to hint
      *
      * @param hint hint being built
@@ -1158,19 +1174,27 @@ public class IPuzIO extends AbstractJSONIO {
     }
 
     /**
-     * Build a Clue object from info
+     * Build a Clue object from info and add to builder
      *
      * In particular handles the different clue number formats
      *
      * @param clueNumObj the ClueNum object in JSON
+     * @param listName the name of the list the clue is in
      * @param label a label to display instead of clue number (null if
      * not used)
      * @param hint the clue hint
      * @param enumeration null or empty if no enumeration to be shown in clue
      * @param zone the zone of the clue or null
+     * @param builder the builder to add the clue to
      */
-    private static IPuzClue buildClue(
-        Object clueNumObj, String label, String hint, String enumeration, Zone zone
+    private static void buildClue(
+        String listName,
+        Object clueNumObj,
+        String label,
+        String hint,
+        String enumeration,
+        Zone zone,
+        PuzzleBuilder builder
     ) throws IPuzFormatException {
         String number = getClueNumber(clueNumObj);
 
@@ -1184,7 +1208,65 @@ public class IPuzIO extends AbstractJSONIO {
             hint += " (" + enumeration + ")";
         }
 
-        return new IPuzClue(number, label, hint, zone);
+        int index = builder.getNextClueIndex(listName);
+        Map<Integer, Character> separators = getSeparators(enumeration);
+        Clue clue = new Clue(
+            listName, index, number, label, hint, zone, separators
+        );
+
+
+        builder.addClue(clue);
+    }
+
+    /**
+     * Get map of separating characters from enumeration to clue
+     *
+     * @return map or null if enumeration is null
+     */
+    private static Map<Integer, Character> getSeparators(String enumeration) {
+        if (enumeration == null)
+            return null;
+
+        Map<Integer, Character> separators = new HashMap<>();
+
+        // remove surrounding ( and ) that enumerations should not
+        // "normally" start with
+        int start = enumeration.startsWith("(") ? 1 : 0;
+        int end = enumeration.length() - (enumeration.endsWith(")") ? 1 : 0);
+
+        // look for word length endings (e.g ;4)
+        int wordLenPos = enumeration.lastIndexOf(";");
+        if (wordLenPos > -1) {
+            int i = wordLenPos + 1;
+            while (i < end && Character.isDigit(enumeration.charAt(i))) {
+                i += 1;
+            }
+            if (i == end)
+                end = wordLenPos;
+        }
+
+        int len = 0;
+        int sepPos = 0;
+        for (int i = start; i < end; i++) {
+            char c = enumeration.charAt(i);
+            if (Character.isDigit(c)) {
+                int digit = Character.digit(c, 10);
+                // abandon after first word of unspecified length
+                if (digit == 0)
+                    return separators;
+                len = 10 * len + digit;
+            } else {
+                // Only take first character if a sequence of
+                // non-numeric chars. I.e. only 0 len allowed at start.
+                if (len > 0 || sepPos == 0) {
+                    sepPos += len;
+                    separators.put(sepPos, c);
+                }
+                len = 0;
+            }
+        }
+
+        return separators;
     }
 
     /**
@@ -1801,7 +1883,13 @@ public class IPuzIO extends AbstractJSONIO {
             .keyValueNonNull(
                 FIELD_EXPLANATION, htmlUnicode(puz.getCompletionMessage())
             ).keyValueNonNull(FIELD_URL, puz.getSourceUrl())
-            .keyValueNonNull(FIELD_PUBLISHER, puz.getSource());
+            .keyValueNonNull(FIELD_PUBLISHER, puz.getSource())
+            // enumerations used to store separator info
+            // TODO: separators are not the same as enumerations
+            // enumerations don't necessarily match the grid
+            // move separators to forkyz data section
+            // do as before with enumerations
+            .keyValueNonNull(FIELD_SHOW_ENUMERATIONS, true);
 
         LocalDate date = puz.getDate();
         if (date != null)
@@ -2138,7 +2226,7 @@ public class IPuzIO extends AbstractJSONIO {
 
             writer.indent(2);
 
-            if (withZones || clue.hasLabel()) {
+            if (withZones || clue.hasLabel() || clue.hasSeparators()) {
                 writer.object();
                 writer.newLine();
 
@@ -2159,6 +2247,9 @@ public class IPuzIO extends AbstractJSONIO {
                 writer.indent(3)
                     .key(FIELD_CLUE_HINT)
                     .value(htmlUnicode(clue.getHint()));
+                writer.newLine();
+
+                writeSeparators(3, clue, writer);
                 writer.newLine();
 
                 if (clue.hasZone()) {
@@ -2193,6 +2284,38 @@ public class IPuzIO extends AbstractJSONIO {
         writer.indent(1)
             .endArray();
         writer.newLine();
+    }
+
+    /**
+     * Write enumeration field to represent separators
+     */
+    private static void writeSeparators(
+        int indent, Clue clue, FormatableJSONWriter writer
+    ) throws IOException {
+        if (!clue.hasSeparators())
+            return;
+        if (!clue.hasZone())
+            return;
+
+        int length = clue.getZone().size();
+
+        StringBuilder enumeration = new StringBuilder();
+
+        int lastPos = 0;
+        for (int pos : clue.getSeparatorPositions()) {
+            if (pos > 0)
+                enumeration.append(pos - lastPos);
+            enumeration.append(clue.getSeparator(pos));
+            lastPos = pos;
+        }
+        if (lastPos < length)
+            enumeration.append(length - lastPos);
+
+        if (enumeration.length() > 0) {
+            writer.indent(indent)
+                .key(FIELD_ENUMERATION)
+                .value(enumeration.toString());
+        }
     }
 
     /**
@@ -2686,32 +2809,5 @@ public class IPuzIO extends AbstractJSONIO {
                 writer.append("\t");
             return this;
         }
-    }
-
-    private static class IPuzClue {
-        private String number;
-        private String label;
-        private String hint;
-        private Zone zone;
-
-        public IPuzClue(String number, String label, String hint, Zone zone) {
-            this.number = number;
-            this.label = label;
-            this.hint = hint;
-            this.zone = zone;
-        }
-
-        public IPuzClue(String number, String hint) {
-            this(number, null, hint, null);
-        }
-
-        public IPuzClue(String hint) {
-            this(null, null, hint, null);
-        }
-
-        public String getClueNumber() { return number; }
-        public String getLabel() { return label; }
-        public String getHint() { return hint; }
-        public Zone getZone() { return zone; }
     }
 }
