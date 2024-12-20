@@ -956,9 +956,71 @@ public class Puzzle implements Serializable{
                     + " zone has a block box at position " + pos
                 );
             }
+
             // prefer earlier positions if multiple
             if (!box.hasCluePosition(clue.getClueID()))
                 box.setCluePosition(clue.getClueID(), offset);
+
+            setSeparator(clue, offset, box);
         }
+
+        Position pos = zone.getPosition(zone.size() - 1);
+        Box box = checkedGetBox(pos);
+        // test won't fail cos of loop above
+        if (!Box.isBlock(box))
+            setSeparator(clue, zone.size(), box);
+    }
+
+    private void setSeparator(Clue clue, int offset, Box box) {
+        if (box == null)
+            return;
+
+        char separator = clue.getSeparator(offset);
+        if (separator != '\0') {
+            ClueID cid = clue.getClueID();
+
+            switch (getZoneDirection(clue.getZone(), offset)) {
+            // opposites because from previous offset
+            case UP: box.setBottomSeparator(cid, separator); break;
+            case DOWN: box.setTopSeparator(cid, separator); break;
+            case LEFT: box.setRightSeparator(cid, separator); break;
+            case RIGHT: box.setLeftSeparator(cid, separator); break;
+            }
+        }
+    }
+
+    /**
+     * Get the direction of travel for zone from offset-1 to offset
+     */
+    private Direction getZoneDirection(Zone zone, int offset) {
+        // just a default
+        if (zone.size() <= 1)
+            return offset <= 0 ? Direction.LEFT : Direction.RIGHT;
+
+        // use first two cells rather than -1th and 0th
+        if (offset < 1)
+            offset = 1;
+
+        // use last two if at the end
+        if (offset >= zone.size())
+            offset = zone.size() - 1;
+
+        Position posStart = zone.getPosition(offset - 1);
+        Position posEnd = zone.getPosition(offset);
+
+        if (posStart.getCol() < posEnd.getCol())
+            return Direction.RIGHT;
+        else if (posStart.getCol() > posEnd.getCol())
+            return Direction.LEFT;
+        else if (posStart.getRow() < posEnd.getRow())
+            return Direction.DOWN;
+        else if (posStart.getRow() > posEnd.getRow())
+            return Direction.UP;
+        else // same position, who knows!
+            return Direction.LEFT;
+    }
+
+    private enum Direction {
+        UP, DOWN, LEFT, RIGHT;
     }
 }
