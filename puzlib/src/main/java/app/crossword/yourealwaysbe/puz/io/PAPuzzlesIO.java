@@ -207,7 +207,11 @@ public class PAPuzzlesIO implements PuzzleParser {
     private static void getClues(
         Element doc, String listClass, PuzzleBuilder builder
     ) {
-        for (Element clue : doc.select(".clues ." + listClass + " li")) {
+        Element clueList = doc.selectFirst(".clues ." + listClass);
+        if (clueList == null)
+            return;
+
+        for (Element clue : clueList.select("li")) {
             String number = clue.attr("data-cluenum");
             String[] numbers = number.split("/");
             if (numbers.length == 0)
