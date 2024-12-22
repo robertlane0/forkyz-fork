@@ -256,6 +256,16 @@
        <item>BACKGROUND</item>
        <item>BOTH</item>
      </string-array>
+     <string-array name="display_separators_labels">
+       <item>@string/display_separators_never</item>
+       <item>@string/display_separators_selected</item>
+       <item>@string/display_separators_always</item>
+     </string-array>
+     <string-array name="display_separators_values">
+       <item>NEVER</item>
+       <item>SELECTED</item>
+       <item>ALWAYS</item>
+     </string-array>
 
      <string-array name="emptyArray"/>
 </resources>

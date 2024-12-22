@@ -664,7 +664,8 @@ public class BoardEditText
                     renderChanges,
                     selection,
                     null,
-                    getContentWidth()
+                    getContentWidth(),
+                    false
                 );
                 handler.post(() -> {
                     try { setBitmap(bitmap); }

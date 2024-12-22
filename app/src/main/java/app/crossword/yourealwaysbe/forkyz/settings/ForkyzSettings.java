@@ -154,6 +154,8 @@ public class ForkyzSettings {
         = { "playActivityClueTabsPage", "playActivityClueTabsPage1" };
     private static final String PREF_PLAY_DELETE_CROSSING_MODE
         = "deleteCrossingMode";
+    private static final String PREF_PLAY_DISPLAY_SEPARATORS
+        = "displaySeparators";
     private static final String PREF_PLAY_DOUBLE_TAP_FIT_BOARD
         = "doubleTap";
     private static final String PREF_PLAY_ENSURE_VISIBLE = "ensureVisible";
@@ -554,6 +556,12 @@ public class ForkyzSettings {
             DeleteCrossingModeSetting.class,
             DeleteCrossingModeSetting.DELETE
         );
+    FSEnumSetting<DisplaySeparators> displaySeparatorsSetting
+        = new FSEnumSetting<DisplaySeparators>(
+            PREF_PLAY_DISPLAY_SEPARATORS,
+            DisplaySeparators.class,
+            DisplaySeparators.ALWAYS
+        );
     FSEnumSetting<GridRatio> landscapeGridRatioSetting
         = new FSEnumSetting<GridRatio>(
             PREF_PLAY_GRID_RATIO_LANDSCAPE,
@@ -760,6 +768,7 @@ public class ForkyzSettings {
             keyboardLayoutSetting,
             keyboardModeSetting,
             deleteCrossingModeSetting,
+            displaySeparatorsSetting,
             landscapeGridRatioSetting,
             portraitGridRatioSetting,
             movementStrategySetting,
@@ -1271,6 +1280,17 @@ public class ForkyzSettings {
             updateLivePlayDeleteCrossingMode();
         }
         return livePlayDeleteCrossingMode;
+    }
+
+    /**
+     * Whether to show separators between cells on grid
+     */
+    public void getPlayDisplaySeparators(Consumer<DisplaySeparators> cb) {
+        getFSEnumSetting(displaySeparatorsSetting, cb);
+    }
+
+    public LiveData<DisplaySeparators> livePlayDisplaySeparators() {
+        return liveFSEnumSetting(displaySeparatorsSetting);
     }
 
     /**

@@ -42,6 +42,15 @@
         android:key="supressHints"
     />
 
+    <androidx.preference.ListPreference
+        android:title="@string/display_separators"
+        android:summary="@string/display_separators_desc"
+        android:key="displaySeparators"
+        android:defaultValue="ALWAYS"
+        android:entries="@array/display_separators_labels"
+        android:entryValues="@array/display_separators_values"
+    />
+
     <androidx.preference.CheckBoxPreference
         android:title="@string/indicate_show_errors"
         android:defaultValue="true"

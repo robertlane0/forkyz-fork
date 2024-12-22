@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
+import app.crossword.yourealwaysbe.forkyz.settings.DisplaySeparators;
 import app.crossword.yourealwaysbe.forkyz.view.PlayboardRenderer.RenderChanges;
 import app.crossword.yourealwaysbe.puz.ClueID;
 import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges;
@@ -184,16 +185,22 @@ public class BoardWordEditView extends BoardEditView {
         RenderChanges renderChanges = getRenderChanges(changes);
 
         getSettings().getPlaySuppressHintHighlighting(suppressHints -> {
+        getSettings().getPlayDisplaySeparators(displaySeparatorsMode -> {
         getSuppressNotesList(localSuppressNotesList -> {
             renderer.setHintHighlight(!suppressHints);
             executorService.execute(() -> {
+
+                boolean displaySeparators
+                    = displaySeparatorsMode != DisplaySeparators.NEVER;
+
                 try {
                     lockRenderer();
                     BitmapGrid bitmap = renderer.drawWord(
                         renderWord,
                         renderChanges,
                         localSuppressNotesList,
-                        getContentWidth()
+                        getContentWidth(),
+                        displaySeparators
                     );
                     handler.post(() -> {
                         try {
@@ -208,7 +215,7 @@ public class BoardWordEditView extends BoardEditView {
                     throw e;
                 }
             });
-        });});
+        });});});
     }
 
     @Override

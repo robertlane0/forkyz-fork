@@ -277,6 +277,11 @@
     <string name="clue_highlight_both">Both</string>
     <string name="clue_highlight">Clue Highlight</string>
     <string name="clue_highlight_desc">The style used to highlight the current clue in the clue lists.</string>
+    <string name="display_separators">Display Separators</string>
+    <string name="display_separators_desc">Indicate spaces/punctuation between puzzle cells when known.</string>
+    <string name="display_separators_never">Never</string>
+    <string name="display_separators_selected">Selected Clue</string>
+    <string name="display_separators_always">Always</string>
 
     <!-- preferences download -->
     <string name="auto_downloaders">Automatic Download Sources</string>

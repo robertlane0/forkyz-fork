@@ -21,6 +21,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.text.HtmlCompat;
 
 import app.crossword.yourealwaysbe.forkyz.R;
+import app.crossword.yourealwaysbe.forkyz.settings.DisplaySeparators;
 import app.crossword.yourealwaysbe.forkyz.util.ColorUtils;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 import app.crossword.yourealwaysbe.forkyz.view.ScrollingImageView.Point;
@@ -169,12 +170,14 @@ public class PlayboardRenderer {
      *
      * @param changes the changes or null for redraw all
      * @param suppressNotesLists as in drawBox
+     * @param displaySeparators the mode for showing cell separators
      * @param visibleRect area that will be visible (can be used to
      * avoid drawing outside of it). Null means draw all.
      */
     synchronized public BitmapGrid draw(
         RenderChanges changes,
         Set<String> suppressNotesLists,
+        DisplaySeparators displaySeparators,
         Rect visibleRect
     ) {
         try {
@@ -190,8 +193,12 @@ public class PlayboardRenderer {
             if (canvases == null)
                 return bitmapGrid;
 
-            drawBoardBoxes(canvases, changes, suppressNotesLists);
-            drawPinnedClue(canvases, changes, suppressNotesLists);
+            drawBoardBoxes(
+                canvases, changes, suppressNotesLists, displaySeparators
+            );
+            drawPinnedClue(
+                canvases, changes, suppressNotesLists, displaySeparators
+            );
 
             drawImages(canvases, changes == null);
             return bitmapGrid;
@@ -220,13 +227,19 @@ public class PlayboardRenderer {
      * @param suppressNotesLists as in drawBox
      * @param wrapWidth if non-zero, wrap word after width (in pixels)
      * exceeded
+     * @param displaySeparators whether to show the word separators
      */
     synchronized public BitmapGrid drawWord(
         Word word,
         RenderChanges changes,
         Set<String> suppressNotesLists,
-        int wrapWidth
+        int wrapWidth,
+        boolean displaySeparators
     ) {
+        DisplaySeparators displaySeparatorsMode = displaySeparators
+            ? DisplaySeparators.ALWAYS
+            : DisplaySeparators.NEVER;
+
         Box[] boxes = board.getWordBoxes(word);
         Zone zone = word.getZone();
         int boxSize = getBoxSize();
@@ -262,7 +275,8 @@ public class PlayboardRenderer {
                     null,
                     null, highlight,
                     suppressNotesLists,
-                    false
+                    false,
+                    displaySeparatorsMode
                 );
             }
         }
@@ -294,6 +308,7 @@ public class PlayboardRenderer {
      * @param highlight the position in the box list to highlight
      * @param suppressNotesLists as in drawBox
      * @param wrapWidth if non-zero, wrap after this number of pixels
+     * @param displaySeparators whether to show separators
      */
     synchronized public BitmapGrid drawBoxes(
         Box[] boxes,
@@ -301,11 +316,16 @@ public class PlayboardRenderer {
         boolean[] changes,
         Position highlight,
         Set<String> suppressNotesLists,
-        int wrapWidth
+        int wrapWidth,
+        boolean displaySeparators
     ) {
         if (boxes == null || boxes.length == 0) {
             return null;
         }
+
+        DisplaySeparators displaySeparatorsMode = displaySeparators
+            ? DisplaySeparators.ALWAYS
+            : DisplaySeparators.NEVER;
 
         int boxSize = getBoxSize();
 
@@ -345,7 +365,8 @@ public class PlayboardRenderer {
                     null,
                     highlight,
                     suppressNotesLists,
-                    false
+                    false,
+                    displaySeparatorsMode
                 );
             }
         }
@@ -565,16 +586,21 @@ public class PlayboardRenderer {
      * @param suppressNotesLists set of lists to not draw notes from.
      * Empty set means draw notes from all lists, null means don't draw
      * any notes.
+     * @param displaySeparators whether to display the separators. Null means
+     * yes.
      */
-    private void drawBox(TileCanvas[][] canvases,
-                         int x, int y,
-                         int row, int col,
-                         Box box,
-                         String shadow,
-                         Word currentWord,
-                         Position highlight,
-                         Set<String> suppressNotesLists,
-                         boolean fullBoard) {
+    private void drawBox(
+        TileCanvas[][] canvases,
+        int x, int y,
+        int row, int col,
+        Box box,
+        String shadow,
+        Word currentWord,
+        Position highlight,
+        Set<String> suppressNotesLists,
+        boolean fullBoard,
+        DisplaySeparators displaySeparators
+    ) {
         PaintProfile profile = getProfile();
         int boxSize = profile.getBoxSize();
 
@@ -1545,7 +1571,8 @@ public class PlayboardRenderer {
     private void drawPinnedClue(
         TileCanvas[][] canvases,
         RenderChanges changes,
-        Set<String> suppressNotesLists
+        Set<String> suppressNotesLists,
+        DisplaySeparators displaySeparators
     ) {
         Puzzle puz = this.board.getPuzzle();
         Box[][] boxes = this.board.getBoxes();
@@ -1586,7 +1613,8 @@ public class PlayboardRenderer {
                 boxes[row][col],
                 null, currentWord, highlight,
                 suppressNotesLists,
-                true
+                true,
+                displaySeparators
             );
         }
 
@@ -1733,7 +1761,8 @@ public class PlayboardRenderer {
     private void drawBoardBoxes(
         TileCanvas[][] canvases,
         RenderChanges changes,
-        Set<String> suppressNotesLists
+        Set<String> suppressNotesLists,
+        DisplaySeparators displaySeparators
     ) {
         Puzzle puz = board.getPuzzle();
         Box[][] boxes = board.getBoxes();
@@ -1768,7 +1797,8 @@ public class PlayboardRenderer {
                     boxes[row][col],
                     null, currentWord, highlight,
                     suppressNotesLists,
-                    true
+                    true,
+                    displaySeparators
                 );
             }
         }
