@@ -29,6 +29,7 @@
     />
     <androidx.preference.CheckBoxPreference
         android:title="@string/irish_news_cryptic"
+        android:summary="@string/updates_mon_fri"
         android:defaultValue="true"
         android:key="downloadIrishNewsCryptic"
     />

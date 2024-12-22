@@ -401,7 +401,7 @@ public class Downloaders {
             downloaders.add(new AbstractDateDownloader(
                 "irishnewscryptic",
                 context.getString(R.string.irish_news_cryptic),
-                Downloader.DATE_DAILY, // availability unknown
+                Downloader.DATE_WEEKDAY,
                 Duration.ZERO,
                 "https://www.irishnews.com/",
                 new PAPuzzlesStreamScraper(),
