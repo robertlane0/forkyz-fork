@@ -18,11 +18,14 @@ import android.view.View;
 import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
+import androidx.lifecycle.ViewTreeLifecycleOwner;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
+import app.crossword.yourealwaysbe.forkyz.settings.DisplaySeparators;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.util.BoxInputConnection;
+import app.crossword.yourealwaysbe.forkyz.util.ChangeOnlyObserver;
 import app.crossword.yourealwaysbe.forkyz.util.KeyboardManager;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 import app.crossword.yourealwaysbe.forkyz.view.PlayboardRenderer.RenderChanges;
@@ -80,6 +83,22 @@ public abstract class BoardEditView
     public BoardEditView(Context context, AttributeSet attrs) {
         super(context, attrs);
         handler = new Handler(context.getMainLooper());
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        // no lifecycle owner until attached
+        // only rerender on change
+        settings.livePlayDisplaySeparators().observe(
+            ViewTreeLifecycleOwner.get(this),
+             new ChangeOnlyObserver<DisplaySeparators>() {
+                @Override
+                public void onTrueChange(DisplaySeparators value) {
+                    render();
+                }
+            }
+        );
     }
 
     public void setBoard(Playboard board) {

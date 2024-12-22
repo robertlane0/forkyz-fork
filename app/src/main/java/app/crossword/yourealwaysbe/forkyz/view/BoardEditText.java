@@ -8,7 +8,6 @@ import java.util.concurrent.Semaphore;
 import java.util.logging.Logger;
 import javax.inject.Inject;
 
-
 import android.content.Context;
 import android.graphics.Rect;
 import android.os.Handler;
@@ -22,11 +21,14 @@ import android.view.accessibility.AccessibilityNodeInfo;
 import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
+import androidx.lifecycle.ViewTreeLifecycleOwner;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
+import app.crossword.yourealwaysbe.forkyz.settings.DisplaySeparators;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.util.BoxInputConnection;
+import app.crossword.yourealwaysbe.forkyz.util.ChangeOnlyObserver;
 import app.crossword.yourealwaysbe.forkyz.util.KeyboardManager;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 import app.crossword.yourealwaysbe.puz.Box;
@@ -53,7 +55,6 @@ public class BoardEditText
     private final Handler handler;
     // so we don't render while we're posting a bitmap
     private final Semaphore renderLock = new Semaphore(1);
-
     private BoxInputConnection currentInputConnection = null;
     private boolean nativeInput = false;
 
@@ -118,6 +119,22 @@ public class BoardEditText
 
         setAllowOverScroll(false);
         setAllowZoom(false);
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        // no lifecycle owner until attached
+        // only rerender on change
+        settings.livePlayDisplaySeparators().observe(
+            ViewTreeLifecycleOwner.get(this),
+            new ChangeOnlyObserver<DisplaySeparators>() {
+                @Override
+                public void onTrueChange(DisplaySeparators value) {
+                    render();
+                }
+            }
+        );
     }
 
     /**

@@ -643,6 +643,13 @@ public class PlayboardRenderer {
 
             drawBoxMarks(canvas, x, y, box, inCurrentWord);
             drawBoxFlags(canvas, x, y, box);
+            drawBoxSeparators(
+                canvas,
+                x, y, box,
+                inCurrentWord,
+                currentWord,
+                displaySeparators
+            );
 
             if (box.isBlank()) {
                 if (suppressNotesLists != null || shadow != null) {
@@ -907,6 +914,150 @@ public class PlayboardRenderer {
             canvas.drawRect(bar, profile.getFlag(box));
         }
 
+    }
+
+    private void drawBoxSeparators(
+        Canvas canvas,
+        int x,
+        int y,
+        Box box,
+        boolean inCurrentWord,
+        Word currentWord,
+        DisplaySeparators displaySeparators
+    ) {
+        // decide if to carry on
+        if (displaySeparators == DisplaySeparators.NEVER)
+            return;
+
+        ClueID currentClueID = currentWord == null
+            ? null
+            : currentWord.getClueID();
+        boolean forAny = displaySeparators == DisplaySeparators.ALWAYS;
+
+        PaintProfile profile = getProfile();
+        int boxSize = profile.getBoxSize();
+        int barSize = profile.getBarSize();
+        int barOffset = barSize / 2;
+        TextPaint text = profile.getSeparatorText();
+        int numberOffset = profile.getNumberOffset();
+        int height = getTotalHeight(text);
+        int dashSize = profile.getDashSeparatorSize();
+
+        char top = box.getTopSeparator(currentClueID, forAny);
+        if (top == ' ') {
+            int bary = y + barOffset;
+            drawBar(
+                canvas,
+                x, bary, x + boxSize, bary,
+                box, Box.Bar.DOTTED
+            );
+        } else if (top == '-') {
+            int barx = x + boxSize / 2;
+            drawBar(
+                canvas,
+                barx, y, barx, y + dashSize,
+                box, Box.Bar.SOLID
+            );
+        } else if (top != '\0') {
+            // draw like marks
+            drawHtmlText(
+                canvas,
+                String.valueOf(top),
+                x,
+                y,
+                boxSize,
+                Layout.Alignment.ALIGN_CENTER,
+                text
+            );
+        }
+
+        char bottom = box.getBottomSeparator(currentClueID, forAny);
+        if (bottom == ' ') {
+            // dashed bar
+            int bary = y + boxSize - barOffset;
+            drawBar(
+                canvas,
+                x, bary, x + boxSize, bary,
+                box, Box.Bar.DOTTED
+            );
+        } else if (bottom == '-') {
+            int barx = x + boxSize / 2;
+            int bary = y + boxSize;
+            drawBar(
+                canvas,
+                barx, bary - dashSize, barx, bary,
+                box, Box.Bar.SOLID
+            );
+        } else if (bottom != '\0') {
+            drawHtmlText(
+                canvas,
+                String.valueOf(bottom),
+                x,
+                y + boxSize - height,
+                boxSize,
+                Layout.Alignment.ALIGN_CENTER,
+                text
+            );
+        }
+
+        char left = box.getLeftSeparator(currentClueID, forAny);
+        if (left == ' ') {
+            // dashed bar
+            int barx = x + barOffset;
+            drawBar(
+                canvas,
+                barx, y, barx, y + boxSize,
+                box, Box.Bar.DOTTED
+            );
+        } else if (left == '-') {
+            int bary = y + boxSize / 2;
+            drawBar(
+                canvas,
+                x, bary, x + dashSize, bary,
+                box, Box.Bar.SOLID
+            );
+        } else if (left != '\0') {
+            // draw like marks
+            drawHtmlText(
+                canvas,
+                String.valueOf(left),
+                x,
+                y + boxSize / 2 - height / 2,
+                boxSize,
+                Layout.Alignment.ALIGN_NORMAL,
+                text
+            );
+        }
+
+        char right = box.getRightSeparator(currentClueID, forAny);
+        if (right == ' ') {
+            // dashed bar
+            int barx = x + boxSize - barOffset;
+            drawBar(
+                canvas,
+                barx, y, barx, y + boxSize,
+                box, Box.Bar.DOTTED
+            );
+        } else if (right == '-') {
+            int barx = x + boxSize;
+            int bary = y + boxSize / 2;
+            drawBar(
+                canvas,
+                barx - dashSize, bary, barx, bary,
+                box, Box.Bar.SOLID
+            );
+        } else if (right != '\0') {
+            // draw like marks
+            drawHtmlText(
+                canvas,
+                String.valueOf(right),
+                x,
+                y + boxSize / 2 - height / 2,
+                boxSize,
+                Layout.Alignment.ALIGN_OPPOSITE,
+                text
+            );
+        }
     }
 
     private void drawBoxShape(
@@ -1964,6 +2115,7 @@ public class PlayboardRenderer {
         private final TextPaint blockLetterText = new TextPaint();
         private final TextPaint numberText = new TextPaint();
         private final TextPaint blockNumberText = new TextPaint();
+        private final TextPaint separatorText = new TextPaint();
         private final TextPaint noteText = new TextPaint();
         private final TextPaint blockNoteText = new TextPaint();
         private final TextPaint miniNoteText = new TextPaint();
@@ -1975,6 +2127,7 @@ public class PlayboardRenderer {
 
         private int boxSize;
         private int numberTextSize = boxSize / 4;
+        private int separatorTextSize = boxSize / 3;
         private int miniNoteTextSize = boxSize / 2;
         private int noteTextSize = Math.round(boxSize * 0.6F);
         private int letterTextSize = Math.round(boxSize * 0.7F);
@@ -2031,6 +2184,12 @@ public class PlayboardRenderer {
             blockNumberText.setColor(onBlockColor);
             blockNumberText.setAntiAlias(true);
             blockNumberText.setTypeface(Typeface.MONOSPACE);
+
+            separatorText.setTextAlign(Align.LEFT);
+            separatorText.setColor(blockColor);
+            separatorText.setAntiAlias(true);
+            separatorText.setTypeface(Typeface.MONOSPACE);
+            separatorText.setFakeBoldText(true);
 
             noteText.setTextAlign(Align.CENTER);
             noteText.setColor(boardNoteColor);
@@ -2179,6 +2338,10 @@ public class PlayboardRenderer {
             );
         }
 
+        public TextPaint getSeparatorText() {
+            return separatorText;
+        }
+
         public TextPaint getNoteText(Box box, boolean inCurrentWord) {
             return mixTextPaint(box, noteText, blockNoteText, inCurrentWord);
         }
@@ -2221,6 +2384,7 @@ public class PlayboardRenderer {
 
         public int getBoxSize() { return boxSize; }
         public int getNumberTextSize() { return numberTextSize; }
+        public int getSeparatorTextSize() { return separatorTextSize; }
         public int getMiniNoteTextSize() { return miniNoteTextSize; }
         public int getNoteTextSize() { return noteTextSize; }
         public int getLetterTextSize() { return letterTextSize; }
@@ -2228,10 +2392,12 @@ public class PlayboardRenderer {
         public int getNumberOffset() { return numberOffset; }
         public int getTextOffset() { return textOffset; }
         public int getShapeStrokeWidth() { return shapeStrokeWidth; }
+        public int getDashSeparatorSize() { return boxSize / 5; }
 
         public void setScale(float scale) {
             boxSize = calcBoxSize(scale);
             numberTextSize = boxSize / 4;
+            separatorTextSize = boxSize / 4;
             miniNoteTextSize = boxSize / 2;
             noteTextSize = Math.round(boxSize * 0.6F);
             letterTextSize = Math.round(boxSize * 0.7F);
@@ -2242,6 +2408,7 @@ public class PlayboardRenderer {
 
             numberText.setTextSize(numberTextSize);
             blockNumberText.setTextSize(numberTextSize);
+            separatorText.setTextSize(separatorTextSize);
             letterText.setTextSize(letterTextSize);
             blockLetterText.setTextSize(letterTextSize);
             cellBox.setTextSize(letterTextSize);
