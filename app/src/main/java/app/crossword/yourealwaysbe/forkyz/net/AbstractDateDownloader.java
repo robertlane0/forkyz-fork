@@ -318,7 +318,7 @@ public class AbstractDateDownloader extends AbstractDownloader {
     }
 
     protected LocalDate getGoodFrom(){
-        return LocalDate.ofEpochDay(0L);
+        return goodFrom;
     }
 
     /**

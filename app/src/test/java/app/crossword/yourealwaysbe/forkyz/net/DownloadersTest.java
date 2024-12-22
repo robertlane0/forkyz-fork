@@ -60,9 +60,11 @@ public class DownloadersTest {
     @Test
     public void testDownloaders() {
         LocalDate latest = downloader.getLatestDate();
-        Downloader.DownloadResult res =
-            downloader.download(latest, Collections.emptySet());
-        assertTrue(res.isSuccess());
+        if (latest != null) {
+            Downloader.DownloadResult res =
+                downloader.download(latest, Collections.emptySet());
+            assertTrue(res.isSuccess());
+        }
     }
 
     private static void initialiseMocks(Context context) {
