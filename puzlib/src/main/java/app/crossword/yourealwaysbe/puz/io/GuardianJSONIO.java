@@ -169,18 +169,18 @@ public class GuardianJSONIO extends AbstractJSONIO {
 
     private static void addClues(JSONObject json, PuzzleBuilder builder)
             throws JSONException {
-        Map<String, Zone> zones = getPuzzleZones(json, builder);
+        Map<String, ClueInfo> info = getCluesInfo(json, builder);
 
         JSONArray entries = json.getJSONArray("entries");
         for (int i = 0; i < entries.length(); i++) {
             JSONObject entry = entries.getJSONObject(i);
-            addClue(entry, zones, builder);
+            addClue(entry, info, builder);
         }
     }
 
     private static void addClue(
         JSONObject entry,
-        Map<String, Zone> zones,
+        Map<String, ClueInfo> info,
         PuzzleBuilder builder
     ) {
         String id = entry.getString("id");
@@ -191,24 +191,43 @@ public class GuardianJSONIO extends AbstractJSONIO {
         JSONArray group = entry.getJSONArray("group");
         Zone zone = new Zone();
 
+        Map<Integer, Character> separators = new HashMap<>();
+
         if (group.length() > 0 && id.equals(group.getString(0))) {
-            for (int i = 0; i < group.length(); i++)
-                zone.appendZone(zones.get(group.getString(i)));
+            for (int i = 0; i < group.length(); i++) {
+                String otherId = group.getString(i);
+                ClueInfo otherInfo = info.get(otherId);
+                if (otherInfo != null) {
+                    int sepOffset = zone.size();
+                    Map<Integer, Character> otherSeps = otherInfo.separators();
+                    if (otherSeps != null) {
+                        for (int pos : otherSeps.keySet()) {
+                            separators.put(sepOffset + pos, otherSeps.get(pos));
+                        }
+                    }
+
+                    zone.appendZone(otherInfo.zone());
+                }
+            }
         }
 
         String listName = across ? ACROSS_LIST : DOWN_LIST;
         int index = builder.getNextClueIndex(listName);
 
-        builder.addClue(new Clue(listName, index, num, hint, zone));
+        builder.addClue(
+            new Clue(listName, index, num, null, hint, zone, separators)
+        );
     }
 
     /**
-     * Gets map from clue id to zone on board
+     * Gets map from clue id to info
+     *
+     * Info is: zone on board, separators for zone
      */
-    private static Map<String, Zone> getPuzzleZones(
+    private static Map<String, ClueInfo> getCluesInfo(
         JSONObject json, PuzzleBuilder builder
     ) {
-        Map<String, Zone> zones = new HashMap<>();
+        Map<String, ClueInfo> info = new HashMap<>();
 
         JSONArray entries = json.getJSONArray("entries");
         for (int i = 0; i < entries.length(); i++) {
@@ -228,9 +247,45 @@ public class GuardianJSONIO extends AbstractJSONIO {
                 ? PuzzleUtils.getAcrossZone(puz, start)
                 : PuzzleUtils.getDownZone(puz, start);
 
-            zones.put(id, zone);
+            Map<Integer, Character> separators = getSeparators(entry);
+
+            info.put(id, new ClueInfo(zone, separators));
         }
 
-        return zones;
+        return info;
     }
+
+    private static Map<Integer, Character> getSeparators(JSONObject entry) {
+        JSONObject sepObj = entry.optJSONObject("separatorLocations");
+        if (sepObj == null)
+            return null;
+
+        Map<Integer, Character> separators = new HashMap<>();
+
+        sepObj.keys().forEachRemaining(sepString -> {
+            if (sepString.isEmpty())
+                return;
+
+            char sepChar = sepString.charAt(0);
+            if (sepChar == ',')
+                sepChar = ' ';
+
+            JSONArray positions = sepObj.optJSONArray(sepString);
+            if (positions == null)
+                return;
+
+            for (int i = 0; i < positions.length(); i++) {
+                Integer pos = positions.optInt(i);
+                if (pos != null)
+                    separators.put(pos, sepChar);
+            }
+        });
+
+        return separators;
+    }
+
+    private static record ClueInfo(
+        Zone zone,
+        Map<Integer, Character> separators
+    ) { }
 }
