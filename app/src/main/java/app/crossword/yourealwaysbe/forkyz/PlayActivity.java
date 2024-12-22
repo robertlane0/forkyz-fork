@@ -1016,10 +1016,10 @@ public class PlayActivity extends PuzzleActivity
 
     private void setActivityTitle() {
         String title = getPuzzleTitle();
-        setTitle(title);
+        setTitle(smartHtml(title));
         settings.getPlayClueBelowGrid(belowGrid -> {
             if (belowGrid) {
-                binding.clueHolder.clueLine.setText(title);
+                binding.clueHolder.clueLine.setText(smartHtml(title));
                 TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
                     binding.clueHolder.clueLine,
                     getResources().getInteger(R.integer.min_clue_text_size),
