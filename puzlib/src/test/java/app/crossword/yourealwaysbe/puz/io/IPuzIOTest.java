@@ -58,6 +58,10 @@ public class IPuzIOTest {
         return IPuzIOTest.class.getResourceAsStream("/shapes.ipuz");
     }
 
+    public static InputStream getTestPuzzleExtensionsInputStream() {
+        return IPuzIOTest.class.getResourceAsStream("/extensions.ipuz");
+    }
+
     public static void assertIsTestPuzzle1(Puzzle puz) throws Exception {
         assertEquals(puz.getKind(), Puzzle.Kind.CROSSWORD);
 
@@ -221,23 +225,6 @@ public class IPuzIOTest {
 
         assertEquals(oddClues.getClueByIndex(5).getHint(), "Odd sixth");
         assertEquals(oddClues.getClueByIndex(0).getHint(), "Odd first");
-
-        ClueList acrossClues = puz.getClues("Across");
-        Clue oneAcross = acrossClues.getClueByNumber("1");
-        assertEquals(oneAcross.getHint(), "Clue 1 ('1 2,1-;4)");
-        assertTrue(oneAcross.hasSeparators());
-        assertEquals(oneAcross.getSeparator(0), '\'');
-        assertEquals(oneAcross.getSeparator(1), ' ');
-        assertEquals(oneAcross.getSeparator(2), '\0');
-        assertEquals(oneAcross.getSeparator(3), ',');
-        assertEquals(oneAcross.getSeparator(4), '-');
-        assertEquals(oneAcross.getSeparator(5), '\0');
-
-        Clue sixAcross = acrossClues.getClueByNumber("6");
-        assertEquals(sixAcross.getHint(), "Clue 6 (1 3)");
-        assertTrue(sixAcross.hasSeparators());
-        assertEquals(sixAcross.getSeparator(1), ' ');
-        assertEquals(sixAcross.getSeparator(2), '\0');
     }
 
     public static void assertIsTestPuzzleZones(Puzzle puz) throws Exception {
@@ -323,6 +310,32 @@ public class IPuzIOTest {
         assertEquals(boxes[1][5].getShape(), Box.Shape.RHOMBUS);
         assertEquals(boxes[1][6].getShape(), Box.Shape.FORWARD_SLASH);
         assertEquals(boxes[1][7].getShape(), Box.Shape.BACK_SLASH);
+    }
+
+    public static void assertIsTestPuzzleExtensions(
+        Puzzle puz
+    ) throws Exception {
+        ClueList acrossClues = puz.getClues("Across");
+        ClueList downClues = puz.getClues("Vertical");
+
+        Clue oneAcross = acrossClues.getClueByNumber("1");
+        assertEquals(oneAcross.getSeparator(-1), '\0');
+        assertEquals(oneAcross.getSeparator(0), '\'');
+        assertEquals(oneAcross.getSeparator(1), ' ');
+        assertEquals(oneAcross.getSeparator(2), '\0');
+
+        Clue threeAcross = acrossClues.getClueByNumber("3");
+        assertEquals(threeAcross.getSeparator(-1), '\0');
+        assertEquals(threeAcross.getSeparator(0), '\0');
+        assertEquals(threeAcross.getSeparator(1), '\0');
+        assertEquals(threeAcross.getSeparator(2), ' ');
+        assertEquals(threeAcross.getSeparator(3), '\0');
+
+        Clue oneDown = downClues.getClueByNumber("1");
+        assertEquals(oneDown.getSeparator(-1), '\0');
+        assertEquals(oneDown.getSeparator(0), '\0');
+        assertEquals(oneDown.getSeparator(1), ' ');
+        assertEquals(oneDown.getSeparator(2), '\0');
     }
 
     /**
@@ -721,6 +734,24 @@ public class IPuzIOTest {
         }
     }
 
+    @Test
+    public void testIPuzExtensionsWriteRead() throws Exception {
+        try (InputStream is = getTestPuzzleExtensionsInputStream()) {
+            Puzzle puz = IPuzIO.readPuzzle(is);
 
+            assertIsTestPuzzleExtensions(puz);
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            IPuzIO.writePuzzle(puz, baos);
+            baos.close();
+
+            ByteArrayInputStream bais
+                = new ByteArrayInputStream(baos.toByteArray());
+
+            Puzzle puz2 = IPuzIO.readPuzzle(bais);
+
+            assertEquals(puz, puz2);
+        }
+    }
 }
 

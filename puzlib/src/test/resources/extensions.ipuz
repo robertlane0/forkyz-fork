@@ -1,0 +1,66 @@
+{
+    "version": "http://ipuz.org/v2",
+    "kind": [ "http://ipuz.org/crossword#1" ],
+    "title": "Test Extensions",
+    "author": "Test author",
+    "date": "02/01/2003",
+    "dimensions": { "width": 3, "height": 2 },
+    "puzzle": [
+        [ 1, 2, "#" ],
+        [ { "cell": 3, 
+            "value": "A", 
+            "style": { "shapebg": "circle", "mark": { "R": "t" } } 
+          }, 0, 0 ]
+    ],
+    "saved": [
+        [ null, "B", "#" ],
+        [ null, { "value": "C" }, 0 ]
+    ],
+    "solution": [
+        [ "A", "B", "#" ],
+        [ "A", { "value": "C" }, { "value": "D" } ]
+    ],
+    "showenumerations": true,
+    "clues": {
+        "Across": [
+            [ 1, "Test clue 1" ],
+            [ "3", "Test clue 2" ]
+        ],
+        "Down:Vertical": [
+            { "number": 1, "clue": "Test clue 3", "label": "One" },
+            {
+                "numbers": [ 2, 1, 3 ],
+                "clue": "Test clue 4",
+                "continued": [
+                    { "number": 1, "direction": "Across" },
+                    { "number": 1, "direction": "Down" }
+                ],
+                "references": [
+                    { "number": "1&2", "direction": "Across" }
+                ],
+                "enumeration": "3-2-1"
+            }
+        ]
+    },
+    "app.crossword.yourealwaysbe:separators": [
+        {
+            "clueid": { "listname": "Across", "index": 0 },
+            "separators": {
+                "0": "'",
+                "1": " "
+            }
+        },
+        {
+            "clueid": { "listname": "Across", "index": 1 },
+            "separators": {
+                "2": " "
+            }
+        },
+        {
+            "clueid": { "listname": "Vertical", "index": 0 },
+            "separators": {
+                "1": " "
+            }
+        },
+    ]
+}

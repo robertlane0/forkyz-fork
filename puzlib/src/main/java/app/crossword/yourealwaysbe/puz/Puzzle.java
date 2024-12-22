@@ -668,6 +668,19 @@ public class Puzzle implements Serializable{
     }
 
     /**
+     * Returns true if some clue has separators defined
+     */
+    public boolean hasClueSeparators() {
+        for (String listName : getClueListNames()) {
+            for (Clue clue : getClues(listName)) {
+                if (clue.hasSeparators())
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Returns true if some box has a shape
      */
     public boolean hasShaped() {

@@ -235,6 +235,8 @@ public class IPuzIO extends AbstractJSONIO {
         = getQualifiedExtensionName("height");
     private static final String FIELD_EXT_PINNED_CLUE_ID
         = getQualifiedExtensionName("pinnedClueID");
+    private static final String FIELD_EXT_SEPARATORS =
+        getQualifiedExtensionName("separators");
 
     private static final String FIELD_VOLATILE = "volatile";
     private static final String FIELD_IS_VOLATILE = "*";
@@ -248,7 +250,8 @@ public class IPuzIO extends AbstractJSONIO {
         FIELD_EXT_SUPPORT_URL,
         FIELD_EXT_SHARE_URL,
         FIELD_EXT_IO_VERSION,
-        FIELD_EXT_IMAGES
+        FIELD_EXT_IMAGES,
+        FIELD_EXT_SEPARATORS
     };
 
     private static final String FIELD_BOX_EXTRAS = "boxextras";
@@ -263,7 +266,7 @@ public class IPuzIO extends AbstractJSONIO {
     private static final String FIELD_POSITION_ROW = "row";
     private static final String FIELD_POSITION_COL = "col";
     private static final String FIELD_POSITION_ACROSS = "across";
-    private static final String FIELD_POSITION_CLUEID = "clueid";
+    private static final String FIELD_CLUEID = "clueid";
     private static final String FIELD_CLUE_HISTORY = "cluehistory";
     private static final String FIELD_CLUE_ACROSS = "across";
     private static final String FIELD_CLUE_LISTNAME = "listname";
@@ -277,6 +280,7 @@ public class IPuzIO extends AbstractJSONIO {
         = "anagramsolution";
     private static final String FIELD_FLAGGED_CLUES = "flaggedclues";
     private static final String FIELD_RATING = "rating";
+    private static final String FIELD_CLUE_SEPARATORS = "separators";
 
     private static final DateTimeFormatter DATE_FORMATTER_V1
         = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.US);
@@ -912,6 +916,9 @@ public class IPuzIO extends AbstractJSONIO {
 
         int coordBase = getCoordBase(puzJson);
 
+        Map<ClueID, Map<Integer, Character>> separators
+            = readSeparators(puzJson);
+
         JSONObject clues = puzJson.optJSONObject(FIELD_CLUES);
         if (isJSONNull(clues))
             return;
@@ -927,9 +934,61 @@ public class IPuzIO extends AbstractJSONIO {
                 names.getString(i),
                 showEnumerations,
                 coordBase,
+                separators,
                 builder
             );
         }
+    }
+
+    /**
+     * Reads separators for clues from extensions
+     *
+     * @return null if no separators, else a map from clue id to separators map
+     */
+    private static Map<ClueID, Map<Integer, Character>> readSeparators(
+        JSONObject puzJson
+    ) throws JSONException {
+        JSONArray separators = puzJson.optJSONArray(FIELD_EXT_SEPARATORS);
+        if (separators == null)
+            return null;
+
+        Map<ClueID, Map<Integer, Character>> sepMap = new HashMap<>();
+
+        for (int i = 0; i < separators.length(); i++) {
+            try {
+                JSONObject clueSeparators = separators.getJSONObject(i);
+
+                // passing null for the builder as decode should not need it
+                // and it is not ready for decoding yet anyway
+                ClueID cid = decodeClueID(
+                    clueSeparators.getJSONObject(FIELD_CLUEID), null
+                );
+
+                Map<Integer, Character> clueSepMap = new HashMap<>();
+
+                JSONObject sepList
+                    = clueSeparators.getJSONObject(FIELD_CLUE_SEPARATORS);
+                sepList.keys().forEachRemaining(pos -> {
+                    try {
+                        String sep = sepList.getString(pos);
+                        if (!sep.isEmpty()) {
+                            clueSepMap.put(
+                                Integer.parseInt(pos), sep.charAt(0)
+                            );
+                        }
+                    } catch (NumberFormatException e) {
+                        // ignore key
+                    }
+                });
+
+                if (cid != null)
+                    sepMap.put(cid, clueSepMap);
+            } catch (IPuzFormatException | JSONException e) {
+                // just ignore separator if can't be read
+            }
+        }
+
+        return sepMap;
     }
 
     /**
@@ -992,10 +1051,13 @@ public class IPuzIO extends AbstractJSONIO {
      * Adds enumeration text to hint if showEnumerations is true
      *
      * @param coordBase 0 if 0-based, 1 if 1-based
+     * @param separators map from clue id to separators at positions read from
+     * ipuz extensions, or null if no separators
      */
     private static void addClues(
         JSONArray jsonClues, String listName,
         boolean showEnumerations, int coordBase,
+        Map<ClueID, Map<Integer, Character>> separators,
         PuzzleBuilder builder
     ) throws IPuzFormatException {
         String[] splitName = listName.split(":");
@@ -1004,6 +1066,10 @@ public class IPuzIO extends AbstractJSONIO {
 
         try {
             for (int i = 0; i < jsonClues.length(); i++) {
+                Map<Integer, Character> clueSeparators = (separators == null)
+                    ? null
+                    : separators.get(new ClueID(displayName, i));
+
                 Object clueObj = jsonClues.get(i);
                 // all clues not across until proven otherwise by list name
                 addClue(
@@ -1012,6 +1078,7 @@ public class IPuzIO extends AbstractJSONIO {
                     clueObj,
                     showEnumerations,
                     coordBase,
+                    clueSeparators,
                     builder
                 );
             }
@@ -1028,6 +1095,7 @@ public class IPuzIO extends AbstractJSONIO {
      * @param coordBase 0 if 0-based indexing, 1 if 1-based
      * @param dirName the name of the direction of the clue (see ipuz
      * directions)
+     * @param separators that apply to this clue or null if none
      */
     private static void addClue(
         String dirName,
@@ -1035,11 +1103,14 @@ public class IPuzIO extends AbstractJSONIO {
         Object clueObj,
         boolean showEnumerations,
         int coordBase,
+        Map<Integer, Character> separators,
         PuzzleBuilder builder
     ) throws IPuzFormatException {
         if (clueObj instanceof String) {
             String hint = (String) clueObj;
-            buildClue(listName, null, null, hint, null, null, builder);
+            buildClue(
+                listName, null, null, hint, null, null, separators, builder
+            );
         } else if (clueObj instanceof JSONArray) {
             JSONArray clueArray = (JSONArray) clueObj;
             if (clueArray.length() != 2) {
@@ -1052,7 +1123,8 @@ public class IPuzIO extends AbstractJSONIO {
             Zone zone = getDirZone(getClueNumber(clueNumObj), dirName, builder);
 
             buildClue(
-                listName, clueNumObj, null, hint, null, zone, builder
+                listName, clueNumObj, null, hint, null, zone, separators,
+                builder
             );
         } else if (clueObj instanceof JSONObject) {
             JSONObject clueJson = (JSONObject) clueObj;
@@ -1094,6 +1166,7 @@ public class IPuzIO extends AbstractJSONIO {
                 hint.toString(),
                 enumeration,
                 zone,
+                separators,
                 builder
             );
         } else {
@@ -1185,6 +1258,7 @@ public class IPuzIO extends AbstractJSONIO {
      * @param hint the clue hint
      * @param enumeration null or empty if no enumeration to be shown in clue
      * @param zone the zone of the clue or null
+     * @param separators separators to add to clue or null if none
      * @param builder the builder to add the clue to
      */
     private static void buildClue(
@@ -1194,6 +1268,7 @@ public class IPuzIO extends AbstractJSONIO {
         String hint,
         String enumeration,
         Zone zone,
+        Map<Integer, Character> separators,
         PuzzleBuilder builder
     ) throws IPuzFormatException {
         String number = getClueNumber(clueNumObj);
@@ -1209,64 +1284,11 @@ public class IPuzIO extends AbstractJSONIO {
         }
 
         int index = builder.getNextClueIndex(listName);
-        Map<Integer, Character> separators = getSeparators(enumeration);
         Clue clue = new Clue(
             listName, index, number, label, hint, zone, separators
         );
 
-
         builder.addClue(clue);
-    }
-
-    /**
-     * Get map of separating characters from enumeration to clue
-     *
-     * @return map or null if enumeration is null
-     */
-    private static Map<Integer, Character> getSeparators(String enumeration) {
-        if (enumeration == null)
-            return null;
-
-        Map<Integer, Character> separators = new HashMap<>();
-
-        // remove surrounding ( and ) that enumerations should not
-        // "normally" start with
-        int start = enumeration.startsWith("(") ? 1 : 0;
-        int end = enumeration.length() - (enumeration.endsWith(")") ? 1 : 0);
-
-        // look for word length endings (e.g ;4)
-        int wordLenPos = enumeration.lastIndexOf(";");
-        if (wordLenPos > -1) {
-            int i = wordLenPos + 1;
-            while (i < end && Character.isDigit(enumeration.charAt(i))) {
-                i += 1;
-            }
-            if (i == end)
-                end = wordLenPos;
-        }
-
-        int len = 0;
-        int sepPos = 0;
-        for (int i = start; i < end; i++) {
-            char c = enumeration.charAt(i);
-            if (Character.isDigit(c)) {
-                int digit = Character.digit(c, 10);
-                // abandon after first word of unspecified length
-                if (digit == 0)
-                    return separators;
-                len = 10 * len + digit;
-            } else {
-                // Only take first character if a sequence of
-                // non-numeric chars. I.e. only 0 len allowed at start.
-                if (len > 0 || sepPos == 0) {
-                    sepPos += len;
-                    separators.put(sepPos, c);
-                }
-                len = 0;
-            }
-        }
-
-        return separators;
     }
 
     /**
@@ -1356,6 +1378,9 @@ public class IPuzIO extends AbstractJSONIO {
 
     /**
      * Read non-standard IPuz fields into puzzle
+     *
+     * Does not read clue separators as these need to be read during clue
+     * reading
      */
     private static void readExtensions(
         JSONObject puzJson, PuzzleBuilder builder
@@ -1506,9 +1531,9 @@ public class IPuzIO extends AbstractJSONIO {
                 ClueID cid
                     = Box.isBlock(box) ? null : box.getIsPartOfClue(list);
                 builder.setCurrentClueID(cid);
-            } else if (positionJson.has(FIELD_POSITION_CLUEID)) {
+            } else if (positionJson.has(FIELD_CLUEID)) {
                 JSONObject cidJson
-                    = positionJson.getJSONObject(FIELD_POSITION_CLUEID);
+                    = positionJson.getJSONObject(FIELD_CLUEID);
                 builder.setCurrentClueID(decodeClueID(cidJson, builder));
             }
         }
@@ -1650,7 +1675,9 @@ public class IPuzIO extends AbstractJSONIO {
      * Version 2 was created to handle clue lists apart from
      * across/down. Extended to Version 3 to better handle unnumbered clues.
      *
-     * @return null if not right
+     * @param builder the builder object, can be null if version 3 or above is
+     * guaranteed
+     * @return null if builder needed but no builder given
      */
     private static ClueID decodeClueID(JSONObject cid, PuzzleBuilder builder)
             throws IPuzFormatException {
@@ -1668,6 +1695,8 @@ public class IPuzIO extends AbstractJSONIO {
             if (number == null)
                 number = String.valueOf(cid.getInt(FIELD_CLUE_NUMBER));
             String listName = cid.getString(FIELD_CLUE_LISTNAME);
+            if (builder == null)
+                return null;
             return getClueIDFromListNum(listName, number, builder);
         // Version 1
         } else if (cid.has(FIELD_CLUE_NUMBER) && cid.has(FIELD_CLUE_ACROSS)) {
@@ -1678,6 +1707,8 @@ public class IPuzIO extends AbstractJSONIO {
             String number = cid.optString(FIELD_CLUE_NUMBER);
             if (number == null)
                 number = String.valueOf(cid.getInt(FIELD_CLUE_NUMBER));
+            if (builder == null)
+                return null;
             return getClueIDFromListNum(listName, number, builder);
         } else {
             throw new IPuzFormatException(
@@ -1883,13 +1914,7 @@ public class IPuzIO extends AbstractJSONIO {
             .keyValueNonNull(
                 FIELD_EXPLANATION, htmlUnicode(puz.getCompletionMessage())
             ).keyValueNonNull(FIELD_URL, puz.getSourceUrl())
-            .keyValueNonNull(FIELD_PUBLISHER, puz.getSource())
-            // enumerations used to store separator info
-            // TODO: separators are not the same as enumerations
-            // enumerations don't necessarily match the grid
-            // move separators to forkyz data section
-            // do as before with enumerations
-            .keyValueNonNull(FIELD_SHOW_ENUMERATIONS, true);
+            .keyValueNonNull(FIELD_PUBLISHER, puz.getSource());
 
         LocalDate date = puz.getDate();
         if (date != null)
@@ -2226,7 +2251,7 @@ public class IPuzIO extends AbstractJSONIO {
 
             writer.indent(2);
 
-            if (withZones || clue.hasLabel() || clue.hasSeparators()) {
+            if (withZones || clue.hasLabel()) {
                 writer.object();
                 writer.newLine();
 
@@ -2249,7 +2274,6 @@ public class IPuzIO extends AbstractJSONIO {
                     .value(htmlUnicode(clue.getHint()));
                 writer.newLine();
 
-                writeSeparators(3, clue, writer);
                 writer.newLine();
 
                 if (clue.hasZone()) {
@@ -2287,44 +2311,14 @@ public class IPuzIO extends AbstractJSONIO {
     }
 
     /**
-     * Write enumeration field to represent separators
-     */
-    private static void writeSeparators(
-        int indent, Clue clue, FormatableJSONWriter writer
-    ) throws IOException {
-        if (!clue.hasSeparators())
-            return;
-        if (!clue.hasZone())
-            return;
-
-        int length = clue.getZone().size();
-
-        StringBuilder enumeration = new StringBuilder();
-
-        int lastPos = 0;
-        for (int pos : clue.getSeparatorPositions()) {
-            if (pos > 0)
-                enumeration.append(pos - lastPos);
-            enumeration.append(clue.getSeparator(pos));
-            lastPos = pos;
-        }
-        if (lastPos < length)
-            enumeration.append(length - lastPos);
-
-        if (enumeration.length() > 0) {
-            writer.indent(indent)
-                .key(FIELD_ENUMERATION)
-                .value(enumeration.toString());
-        }
-    }
-
-    /**
      * Write Puzzle features not natively supported by IPuz
      */
     private static void writeExtensions(
         Puzzle puz, FormatableJSONWriter writer, boolean omitPlayState
     ) throws IOException {
         writeExtensionVolatility(writer);
+
+        writeClueSeparators(puz, writer);
 
         writer.keyValueNonNull(FIELD_EXT_SUPPORT_URL, puz.getSupportUrl());
         writer.keyValueNonNull(FIELD_EXT_SHARE_URL, puz.getShareUrl());
@@ -2541,6 +2535,68 @@ public class IPuzIO extends AbstractJSONIO {
     }
 
     /**
+     * Write separators field to extra data
+     */
+    private static void writeClueSeparators(
+        Puzzle puz, FormatableJSONWriter writer
+    ) throws IOException {
+        if (!puz.hasClueSeparators())
+            return;
+
+        writer.key(FIELD_EXT_SEPARATORS)
+            .array();
+        writer.newLine();
+
+        for (String listName : puz.getClueListNames()) {
+            for (Clue clue : puz.getClues(listName)) {
+                writeClueSeparators(1, clue, writer);
+            }
+        }
+
+        writer.endArray();
+        writer.newLine();
+    }
+
+    /**
+     * Write clue separators to writer if has separators
+     */
+    private static void writeClueSeparators(
+        int indent, Clue clue, FormatableJSONWriter writer
+    ) throws IOException {
+        if (!clue.hasSeparators())
+            return;
+
+        writer.indent(indent)
+            .object();
+        writer.newLine();
+
+        writer.indent(indent + 1)
+            .key(FIELD_CLUEID);
+        writeClueID(clue.getClueID(), writer);
+        writer.newLine();
+
+        writer.indent(indent + 1)
+            .key(FIELD_CLUE_SEPARATORS)
+            .object();
+        writer.newLine();
+
+        for (int pos : clue.getSeparatorPositions()) {
+            writer.indent(indent + 2)
+                .key(String.valueOf(pos))
+                .value(String.valueOf(clue.getSeparator(pos)));
+            writer.newLine();
+        }
+
+        writer.indent(indent + 1)
+            .endObject();
+        writer.newLine();
+
+        writer.indent(indent)
+            .endObject();
+        writer.newLine();
+    }
+
+    /**
      * Write clue history list
      */
     private static void writeClueHistory(Puzzle puz, FormatableJSONWriter writer)
@@ -2581,7 +2637,7 @@ public class IPuzIO extends AbstractJSONIO {
             .key(FIELD_POSITION_COL).value(pos.getCol());
         ClueID cid = puz.getCurrentClueID();
         if (cid != null) {
-            writer.key(FIELD_POSITION_CLUEID);
+            writer.key(FIELD_CLUEID);
             writeClueID(cid, writer);
         }
         writer.endObject();
