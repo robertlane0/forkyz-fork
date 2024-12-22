@@ -154,8 +154,7 @@ public class NotesActivity extends PuzzleActivity {
 
             @Override
             public void onLongClick(Position position) {
-                View focused = getWindow().getCurrentFocus();
-                int id = focused.getId();
+                int id = getCurrentFocus(R.id.scratch_miniboard);
                 if (id == R.id.scratch_miniboard) {
                     NotesActivity.this.executeTransferResponseRequest(
                         TransferResponseRequest.BOARD_TO_SCRATCH, true
@@ -222,8 +221,7 @@ public class NotesActivity extends PuzzleActivity {
 
                 @Override
                 public void onContextMenu(Point point) {
-                    View focused = getWindow().getCurrentFocus();
-                    int id = focused == null ? R.id.miniboard : focused.getId();
+                    int id = getCurrentFocus(R.id.miniboard);
                     if (id == R.id.notes_box) {
                         moveBoardEditTextToNotes(binding.scratchMiniboard);
                     } else if (id == R.id.anagram_source) {
@@ -313,8 +311,7 @@ public class NotesActivity extends PuzzleActivity {
 
                 @Override
                 public void onContextMenu(Point point) {
-                    View focused = getWindow().getCurrentFocus();
-                    int id = focused.getId();
+                    int id = getCurrentFocus(R.id.miniboard);
                     if (id == R.id.scratch_miniboard) {
                         executeTransferResponseRequest(
                             TransferResponseRequest.ANAGRAM_SOL_TO_SCRATCH, true
@@ -700,7 +697,8 @@ public class NotesActivity extends PuzzleActivity {
 
         MenuItem specialEntry = menu.findItem(R.id.puzzle_menu_special_entry);
 
-        boolean specialEntryEnabled = getCurrentFocus() == binding.miniboard;
+        boolean specialEntryEnabled
+            = getCurrentFocus(R.id.miniboard) == R.id.miniboard;
 
         specialEntry.setVisible(specialEntryEnabled);
         specialEntry.setEnabled(specialEntryEnabled);
@@ -1214,8 +1212,7 @@ public class NotesActivity extends PuzzleActivity {
      * Override to use scratch for puzzle notes page or if scratch focussed
      */
     protected void callCrosswordSolver() {
-        View focused = getWindow().getCurrentFocus();
-        int id = (focused == null) ? -1 : focused.getId();
+        int id = getCurrentFocus(-1);
         if (id == R.id.scratch_miniboard || isPuzzleNotes()) {
             StringBuilder request = new StringBuilder();
             getLetters(binding.scratchMiniboard, true, request);
@@ -1254,8 +1251,7 @@ public class NotesActivity extends PuzzleActivity {
      * Override to use scratch for puzzle notes page or if scratch focussed
      */
     protected void callExternalDictionary() {
-        View focused = getWindow().getCurrentFocus();
-        int id = (focused == null) ? -1 : focused.getId();
+        int id = getCurrentFocus(-1);
         if (id == R.id.scratch_miniboard || isPuzzleNotes()) {
             settings.getExtDictionary(dictionary -> {
                 StringBuilder request = new StringBuilder();
@@ -1366,5 +1362,13 @@ public class NotesActivity extends PuzzleActivity {
 
     private boolean isAcceptableCharacterResponse(char c) {
         return !Character.isISOControl(c) && !Character.isSurrogate(c);
+    }
+
+    /**
+     * Get the currently focussed view, falling back to default
+     */
+    private int getCurrentFocus(int defaultId) {
+        View focused = getWindow().getCurrentFocus();
+        return focused == null ? defaultId : focused.getId();
     }
 }
