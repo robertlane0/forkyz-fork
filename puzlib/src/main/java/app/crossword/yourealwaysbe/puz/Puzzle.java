@@ -958,6 +958,9 @@ public class Puzzle implements Serializable{
         if (zone == null)
             return;
 
+        if (zone.isEmpty())
+            return;
+
         String number = clue.getClueNumber();
 
         for (int offset = 0; offset < zone.size(); offset++) {
@@ -977,49 +980,60 @@ public class Puzzle implements Serializable{
             setSeparator(clue, offset, box);
         }
 
-        Position pos = zone.getPosition(zone.size() - 1);
+        // add in start separator
+        Position pos = zone.getPosition(0);
         Box box = checkedGetBox(pos);
         // test won't fail cos of loop above
         if (!Box.isBlock(box))
-            setSeparator(clue, zone.size(), box);
+            setSeparator(clue, -1, box);
     }
 
+    /**
+     * Set separator for box
+     *
+     * Takes from offset+1. It looks cleaner on the board to have the
+     * separator on e.g. the right instead of left, as it doesn't clash
+     * with numbers so much.
+     */
     private void setSeparator(Clue clue, int offset, Box box) {
         if (box == null)
             return;
 
-        char separator = clue.getSeparator(offset);
+        char separator = clue.getSeparator(offset + 1);
         if (separator != '\0') {
             ClueID cid = clue.getClueID();
 
-            switch (getZoneDirection(clue.getZone(), offset)) {
-            // opposites because from previous offset
-            case UP: box.setBottomSeparator(cid, separator); break;
-            case DOWN: box.setTopSeparator(cid, separator); break;
-            case LEFT: box.setRightSeparator(cid, separator); break;
-            case RIGHT: box.setLeftSeparator(cid, separator); break;
+            Direction dir = getZoneDirection(clue.getZone(), offset);
+            // on opposite site if coming from start (-1)
+            if (offset < 0)
+                dir = dir.reverse();
+
+            switch (dir) {
+            case UP: box.setTopSeparator(cid, separator); break;
+            case DOWN: box.setBottomSeparator(cid, separator); break;
+            case LEFT: box.setLeftSeparator(cid, separator); break;
+            case RIGHT: box.setRightSeparator(cid, separator); break;
             }
         }
     }
 
     /**
-     * Get the direction of travel for zone from offset-1 to offset
+     * Get the direction of travel for zone from offset to offset + 1
      */
     private Direction getZoneDirection(Zone zone, int offset) {
         // just a default
         if (zone.size() <= 1)
             return offset <= 0 ? Direction.LEFT : Direction.RIGHT;
 
-        // use first two cells rather than -1th and 0th
-        if (offset < 1)
-            offset = 1;
+        if (offset < 0)
+            offset = 0;
 
         // use last two if at the end
-        if (offset >= zone.size())
-            offset = zone.size() - 1;
+        if (offset >= zone.size() - 1)
+            offset = zone.size() - 2;
 
-        Position posStart = zone.getPosition(offset - 1);
-        Position posEnd = zone.getPosition(offset);
+        Position posStart = zone.getPosition(offset);
+        Position posEnd = zone.getPosition(offset + 1);
 
         if (posStart.getCol() < posEnd.getCol())
             return Direction.RIGHT;
@@ -1035,5 +1049,16 @@ public class Puzzle implements Serializable{
 
     private enum Direction {
         UP, DOWN, LEFT, RIGHT;
+
+        public Direction reverse() {
+            switch (this) {
+            case UP: return DOWN;
+            case DOWN: return UP;
+            case LEFT: return RIGHT;
+            case RIGHT: return LEFT;
+            }
+            // never here, but don't return null
+            return LEFT;
+        }
     }
 }
