@@ -191,7 +191,7 @@ public class GuardianJSONIO extends AbstractJSONIO {
         JSONArray group = entry.getJSONArray("group");
         Zone zone = new Zone();
 
-        Map<Integer, Character> separators = new HashMap<>();
+        Map<Integer, String> separators = new HashMap<>();
 
         if (group.length() > 0 && id.equals(group.getString(0))) {
             for (int i = 0; i < group.length(); i++) {
@@ -199,7 +199,7 @@ public class GuardianJSONIO extends AbstractJSONIO {
                 ClueInfo otherInfo = info.get(otherId);
                 if (otherInfo != null) {
                     int sepOffset = zone.size();
-                    Map<Integer, Character> otherSeps = otherInfo.separators();
+                    Map<Integer, String> otherSeps = otherInfo.separators();
                     if (otherSeps != null) {
                         for (int pos : otherSeps.keySet()) {
                             separators.put(sepOffset + pos, otherSeps.get(pos));
@@ -247,7 +247,7 @@ public class GuardianJSONIO extends AbstractJSONIO {
                 ? PuzzleUtils.getAcrossZone(puz, start)
                 : PuzzleUtils.getDownZone(puz, start);
 
-            Map<Integer, Character> separators = getSeparators(entry);
+            Map<Integer, String> separators = getSeparators(entry);
 
             info.put(id, new ClueInfo(zone, separators));
         }
@@ -255,29 +255,28 @@ public class GuardianJSONIO extends AbstractJSONIO {
         return info;
     }
 
-    private static Map<Integer, Character> getSeparators(JSONObject entry) {
+    private static Map<Integer, String> getSeparators(JSONObject entry) {
         JSONObject sepObj = entry.optJSONObject("separatorLocations");
         if (sepObj == null)
             return null;
 
-        Map<Integer, Character> separators = new HashMap<>();
+        Map<Integer, String> separators = new HashMap<>();
 
-        sepObj.keys().forEachRemaining(sepString -> {
-            if (sepString.isEmpty())
+        sepObj.keys().forEachRemaining(sep -> {
+            if (sep == null || sep.isEmpty())
                 return;
 
-            char sepChar = sepString.charAt(0);
-            if (sepChar == ',')
-                sepChar = ' ';
+            if (",".equals(sep))
+                sep = " ";
 
-            JSONArray positions = sepObj.optJSONArray(sepString);
+            JSONArray positions = sepObj.optJSONArray(sep);
             if (positions == null)
                 return;
 
             for (int i = 0; i < positions.length(); i++) {
                 Integer pos = positions.optInt(i);
                 if (pos != null)
-                    separators.put(pos, sepChar);
+                    separators.put(pos, sep);
             }
         });
 
@@ -286,6 +285,6 @@ public class GuardianJSONIO extends AbstractJSONIO {
 
     private static record ClueInfo(
         Zone zone,
-        Map<Integer, Character> separators
+        Map<Integer, String> separators
     ) { }
 }

@@ -916,7 +916,7 @@ public class IPuzIO extends AbstractJSONIO {
 
         int coordBase = getCoordBase(puzJson);
 
-        Map<ClueID, Map<Integer, Character>> separators
+        Map<ClueID, Map<Integer, String>> separators
             = readSeparators(puzJson);
 
         JSONObject clues = puzJson.optJSONObject(FIELD_CLUES);
@@ -945,14 +945,14 @@ public class IPuzIO extends AbstractJSONIO {
      *
      * @return null if no separators, else a map from clue id to separators map
      */
-    private static Map<ClueID, Map<Integer, Character>> readSeparators(
+    private static Map<ClueID, Map<Integer, String>> readSeparators(
         JSONObject puzJson
     ) throws JSONException {
         JSONArray separators = puzJson.optJSONArray(FIELD_EXT_SEPARATORS);
         if (separators == null)
             return null;
 
-        Map<ClueID, Map<Integer, Character>> sepMap = new HashMap<>();
+        Map<ClueID, Map<Integer, String>> sepMap = new HashMap<>();
 
         for (int i = 0; i < separators.length(); i++) {
             try {
@@ -964,7 +964,7 @@ public class IPuzIO extends AbstractJSONIO {
                     clueSeparators.getJSONObject(FIELD_CLUEID), null
                 );
 
-                Map<Integer, Character> clueSepMap = new HashMap<>();
+                Map<Integer, String> clueSepMap = new HashMap<>();
 
                 JSONObject sepList
                     = clueSeparators.getJSONObject(FIELD_CLUE_SEPARATORS);
@@ -972,9 +972,7 @@ public class IPuzIO extends AbstractJSONIO {
                     try {
                         String sep = sepList.getString(pos);
                         if (!sep.isEmpty()) {
-                            clueSepMap.put(
-                                Integer.parseInt(pos), sep.charAt(0)
-                            );
+                            clueSepMap.put(Integer.parseInt(pos), sep);
                         }
                     } catch (NumberFormatException e) {
                         // ignore key
@@ -1057,7 +1055,7 @@ public class IPuzIO extends AbstractJSONIO {
     private static void addClues(
         JSONArray jsonClues, String listName,
         boolean showEnumerations, int coordBase,
-        Map<ClueID, Map<Integer, Character>> separators,
+        Map<ClueID, Map<Integer, String>> separators,
         PuzzleBuilder builder
     ) throws IPuzFormatException {
         String[] splitName = listName.split(":");
@@ -1066,7 +1064,7 @@ public class IPuzIO extends AbstractJSONIO {
 
         try {
             for (int i = 0; i < jsonClues.length(); i++) {
-                Map<Integer, Character> clueSeparators = (separators == null)
+                Map<Integer, String> clueSeparators = (separators == null)
                     ? null
                     : separators.get(new ClueID(displayName, i));
 
@@ -1103,7 +1101,7 @@ public class IPuzIO extends AbstractJSONIO {
         Object clueObj,
         boolean showEnumerations,
         int coordBase,
-        Map<Integer, Character> separators,
+        Map<Integer, String> separators,
         PuzzleBuilder builder
     ) throws IPuzFormatException {
         if (clueObj instanceof String) {
@@ -1268,7 +1266,7 @@ public class IPuzIO extends AbstractJSONIO {
         String hint,
         String enumeration,
         Zone zone,
-        Map<Integer, Character> separators,
+        Map<Integer, String> separators,
         PuzzleBuilder builder
     ) throws IPuzFormatException {
         String number = getClueNumber(clueNumObj);

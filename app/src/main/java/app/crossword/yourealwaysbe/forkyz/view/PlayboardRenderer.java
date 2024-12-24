@@ -36,6 +36,7 @@ import app.crossword.yourealwaysbe.puz.PuzImage;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.Zone;
 
+import java.util.regex.Pattern;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Set;
@@ -67,6 +68,8 @@ public class PlayboardRenderer {
     private static final float MAX_BOX_SIZE_INCHES = 1;
     private static final int MIN_PIXELS_PER_BOX = 4;
 
+    private static final Pattern WHITESPACE_RE = Pattern.compile("\\s+");
+
     // set in constructor
     private final Typeface TYPEFACE_SEMI_BOLD_SANS;
 
@@ -87,12 +90,14 @@ public class PlayboardRenderer {
     ) { }
 
     public static class BoxSeparators {
-        private char top;
-        private char bottom;
-        private char left;
-        private char right;
+        private String top;
+        private String bottom;
+        private String left;
+        private String right;
 
-        public BoxSeparators(char top, char bottom, char left, char right) {
+        public BoxSeparators(
+            String top, String bottom, String left, String right
+        ) {
             this.top = top;
             this.bottom = bottom;
             this.left = left;
@@ -100,18 +105,18 @@ public class PlayboardRenderer {
         }
 
         public BoxSeparators() {
-            this('\0', '\0', '\0', '\0');
+            this(null, null, null, null);
         }
 
-        public char getTop() { return top; }
-        public char getBottom() { return bottom; }
-        public char getLeft() { return left; }
-        public char getRight() { return right; }
+        public String getTop() { return top; }
+        public String getBottom() { return bottom; }
+        public String getLeft() { return left; }
+        public String getRight() { return right; }
 
-        public void setTop(char top) { this.top = top; }
-        public void setBottom(char bottom) { this.bottom = bottom; }
-        public void setLeft(char left) { this.left = left; }
-        public void setRight(char right) { this.right = right; }
+        public void setTop(String top) { this.top = top; }
+        public void setBottom(String bottom) { this.bottom = bottom; }
+        public void setLeft(String left) { this.left = left; }
+        public void setRight(String right) { this.right = right; }
     }
 
     // colors are gotten from context
@@ -580,11 +585,11 @@ public class PlayboardRenderer {
             return null;
 
         // draw separator from offset + 1 on the right
-        char right = clue.getSeparator(offset + 1);
+        String right = clue.getSeparator(offset + 1);
         // and first one if needed
-        char left = offset == 0 ? clue.getSeparator(0) : '\0';
+        String left = offset == 0 ? clue.getSeparator(0) : null;
 
-        return new BoxSeparators('\0', '\0', left, right);
+        return new BoxSeparators(null, null, left, right);
     }
 
     /**
@@ -656,8 +661,8 @@ public class PlayboardRenderer {
         if (clue == null)
             return;
 
-        char separator = clue.getSeparator(offset + 1);
-        if (separator != '\0') {
+        String separator = clue.getSeparator(offset + 1);
+        if (separator != null) {
             ClueID cid = clue.getClueID();
             Zone zone = clue.getZone();
             if (zone != null && !zone.isEmpty()) {
@@ -1084,26 +1089,26 @@ public class PlayboardRenderer {
         int height = getTotalHeight(text);
         int dashSize = profile.getDashSeparatorSize();
 
-        char top = separators.getTop();
-        if (top == ' ') {
+        String top = separators.getTop();
+        if (isWhitespace(top)) {
             int bary = y + barOffset;
             drawBar(
                 canvas,
                 x, bary, x + boxSize, bary,
                 box, Box.Bar.DOTTED
             );
-        } else if (top == '-') {
+        } else if ("-".equals(top)) {
             int barx = x + boxSize / 2;
             drawBar(
                 canvas,
                 barx, y, barx, y + dashSize,
                 box, Box.Bar.SOLID
             );
-        } else if (top != '\0') {
+        } else if (top != null) {
             // draw like marks
             drawHtmlText(
                 canvas,
-                String.valueOf(top),
+                top,
                 x,
                 y,
                 boxSize,
@@ -1112,8 +1117,8 @@ public class PlayboardRenderer {
             );
         }
 
-        char bottom = separators.getBottom();
-        if (bottom == ' ') {
+        String bottom = separators.getBottom();
+        if (isWhitespace(bottom)) {
             // dashed bar
             int bary = y + boxSize - barOffset;
             drawBar(
@@ -1121,7 +1126,7 @@ public class PlayboardRenderer {
                 x, bary, x + boxSize, bary,
                 box, Box.Bar.DOTTED
             );
-        } else if (bottom == '-') {
+        } else if ("-".equals(bottom)) {
             int barx = x + boxSize / 2;
             int bary = y + boxSize;
             drawBar(
@@ -1129,10 +1134,10 @@ public class PlayboardRenderer {
                 barx, bary - dashSize, barx, bary,
                 box, Box.Bar.SOLID
             );
-        } else if (bottom != '\0') {
+        } else if (bottom != null) {
             drawHtmlText(
                 canvas,
-                String.valueOf(bottom),
+                bottom,
                 x,
                 y + boxSize - height,
                 boxSize,
@@ -1141,8 +1146,8 @@ public class PlayboardRenderer {
             );
         }
 
-        char left = separators.getLeft();
-        if (left == ' ') {
+        String left = separators.getLeft();
+        if (isWhitespace(left)) {
             // dashed bar
             int barx = x + barOffset;
             drawBar(
@@ -1150,14 +1155,14 @@ public class PlayboardRenderer {
                 barx, y, barx, y + boxSize,
                 box, Box.Bar.DOTTED
             );
-        } else if (left == '-') {
+        } else if ("-".equals(left)) {
             int bary = y + boxSize / 2;
             drawBar(
                 canvas,
                 x, bary, x + dashSize, bary,
                 box, Box.Bar.SOLID
             );
-        } else if (left != '\0') {
+        } else if (left != null) {
             // draw like marks
             drawHtmlText(
                 canvas,
@@ -1170,8 +1175,8 @@ public class PlayboardRenderer {
             );
         }
 
-        char right = separators.getRight();
-        if (right == ' ') {
+        String right = separators.getRight();
+        if (isWhitespace(right)) {
             // dashed bar
             int barx = x + boxSize - barOffset;
             drawBar(
@@ -1179,7 +1184,7 @@ public class PlayboardRenderer {
                 barx, y, barx, y + boxSize,
                 box, Box.Bar.DOTTED
             );
-        } else if (right == '-') {
+        } else if ("-".equals(right)) {
             int barx = x + boxSize;
             int bary = y + boxSize / 2;
             drawBar(
@@ -1187,11 +1192,11 @@ public class PlayboardRenderer {
                 barx - dashSize, bary, barx, bary,
                 box, Box.Bar.SOLID
             );
-        } else if (right != '\0') {
+        } else if (right != null) {
             // draw like marks
             drawHtmlText(
                 canvas,
-                String.valueOf(right),
+                right,
                 x,
                 y + boxSize / 2 - height / 2,
                 boxSize,
@@ -2243,6 +2248,13 @@ public class PlayboardRenderer {
             boxSize = (int) (BASE_BOX_SIZE_INCHES * dpi * 0.25F);
         }
         return boxSize;
+    }
+
+    /**
+     * Is not null and not whitespace
+     */
+    private boolean isWhitespace(String s) {
+        return (s == null) ? false : WHITESPACE_RE.matcher(s).matches();
     }
 
     private class PaintProfile {

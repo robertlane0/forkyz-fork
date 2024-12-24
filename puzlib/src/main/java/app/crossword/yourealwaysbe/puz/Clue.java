@@ -30,14 +30,14 @@ public class Clue implements Serializable {
     // 0x00rrggbb or DEFAULT_FLAG_COLOR
     private int flagColor = DEFAULT_FLAG_COLOR;
     // separating characters between the n-1 and n cell in answer
-    private SortedMap<Integer, Character> separators;
+    private SortedMap<Integer, String> separators;
 
     public Clue(
         String listName,
         int index, String number, String label,
         String hint,
         Zone zone,
-        Map<Integer, Character> separators
+        Map<Integer, String> separators
     ) {
         this.clueID = new ClueID(listName, index);
         this.number = number;
@@ -142,9 +142,8 @@ public class Clue implements Serializable {
      *
      * @return the separating char or null char if no separator
      */
-    public char getSeparator(int pos) {
-        Character c = separators.get(pos);
-        return (c == null) ? '\0' : c;
+    public String getSeparator(int pos) {
+        return separators.get(pos);
     }
 
     public boolean hasSeparators() {
