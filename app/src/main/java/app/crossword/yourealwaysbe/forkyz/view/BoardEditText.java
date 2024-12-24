@@ -682,7 +682,7 @@ public class BoardEditText
                     selection,
                     null,
                     getContentWidth(),
-                    false
+                    null
                 );
                 handler.post(() -> {
                     try { setBitmap(bitmap); }

@@ -86,6 +86,34 @@ public class PlayboardRenderer {
         Collection<ClueID> changedClueIDs
     ) { }
 
+    public static class BoxSeparators {
+        private char top;
+        private char bottom;
+        private char left;
+        private char right;
+
+        public BoxSeparators(char top, char bottom, char left, char right) {
+            this.top = top;
+            this.bottom = bottom;
+            this.left = left;
+            this.right = right;
+        }
+
+        public BoxSeparators() {
+            this('\0', '\0', '\0', '\0');
+        }
+
+        public char getTop() { return top; }
+        public char getBottom() { return bottom; }
+        public char getLeft() { return left; }
+        public char getRight() { return right; }
+
+        public void setTop(char top) { this.top = top; }
+        public void setBottom(char bottom) { this.bottom = bottom; }
+        public void setLeft(char left) { this.left = left; }
+        public void setRight(char right) { this.right = right; }
+    }
+
     // colors are gotten from context
     public PlayboardRenderer(
         Playboard board,
@@ -236,10 +264,6 @@ public class PlayboardRenderer {
         int wrapWidth,
         boolean displaySeparators
     ) {
-        DisplaySeparators displaySeparatorsMode = displaySeparators
-            ? DisplaySeparators.ALWAYS
-            : DisplaySeparators.NEVER;
-
         Box[] boxes = board.getWordBoxes(word);
         Zone zone = word.getZone();
         int boxSize = getBoxSize();
@@ -267,6 +291,10 @@ public class PlayboardRenderer {
 
             TileCanvas tileCanvas = getCanvasByPixel(canvases, x, y);
             if (tileCanvas != null) {
+                BoxSeparators separators = displaySeparators
+                    ? getBoxSeparators(word.getClueID(), i)
+                    : null;
+
                 this.drawBox(
                     canvases,
                     x, y,
@@ -276,7 +304,7 @@ public class PlayboardRenderer {
                     null, highlight,
                     suppressNotesLists,
                     false,
-                    displaySeparatorsMode
+                    separators
                 );
             }
         }
@@ -308,7 +336,7 @@ public class PlayboardRenderer {
      * @param highlight the position in the box list to highlight
      * @param suppressNotesLists as in drawBox
      * @param wrapWidth if non-zero, wrap after this number of pixels
-     * @param displaySeparators whether to show separators
+     * @param separators the separators to draw on the boxes (or null)
      */
     synchronized public BitmapGrid drawBoxes(
         Box[] boxes,
@@ -317,15 +345,11 @@ public class PlayboardRenderer {
         Position highlight,
         Set<String> suppressNotesLists,
         int wrapWidth,
-        boolean displaySeparators
+        BoxSeparators[] separators
     ) {
         if (boxes == null || boxes.length == 0) {
             return null;
         }
-
-        DisplaySeparators displaySeparatorsMode = displaySeparators
-            ? DisplaySeparators.ALWAYS
-            : DisplaySeparators.NEVER;
 
         int boxSize = getBoxSize();
 
@@ -354,6 +378,10 @@ public class PlayboardRenderer {
             int x = (i % width) * boxSize;
             int y = (i / width) * boxSize;
 
+            BoxSeparators boxSeparators = null;
+            if (separators != null && i < separators.length)
+                boxSeparators = separators[i];
+
             TileCanvas tileCanvas = getCanvasByPixel(canvases, x, y);
             if (tileCanvas != null) {
                 this.drawBox(
@@ -366,7 +394,7 @@ public class PlayboardRenderer {
                     highlight,
                     suppressNotesLists,
                     false,
-                    displaySeparatorsMode
+                    boxSeparators
                 );
             }
         }
@@ -536,6 +564,119 @@ public class PlayboardRenderer {
     }
 
     /**
+     * Get the separators for the box displaying word at offset
+     *
+     * For when cid is being show in a horizontal row
+     *
+     * May return null if no separators
+     */
+    private BoxSeparators getBoxSeparators(ClueID cid, int offset) {
+        Puzzle puz = board == null ? null : board.getPuzzle();
+        if (puz == null)
+            return null;
+
+        Clue clue = puz.getClue(cid);
+        if (clue == null)
+            return null;
+
+        // draw separator from offset + 1 on the right
+        char right = clue.getSeparator(offset + 1);
+        // and first one if needed
+        char left = offset == 0 ? clue.getSeparator(0) : '\0';
+
+        return new BoxSeparators('\0', '\0', left, right);
+    }
+
+    /**
+     * Get the separators for the box on the full board
+     *
+     * May return null if no separators
+     */
+    private BoxSeparators getBoxSeparators(
+        DisplaySeparators displaySeparators,
+        Position position,
+        Word currentWord
+    ) {
+        if (displaySeparators == DisplaySeparators.NEVER)
+            return null;
+
+        Puzzle puz = board == null ? null : board.getPuzzle();
+        if (puz == null)
+            return null;
+
+        Box box = puz.checkedGetBox(position);
+        if (box == null)
+            return null;
+
+        BoxSeparators separators = new BoxSeparators();
+
+        // do other clues first if they should be there
+        if (displaySeparators == DisplaySeparators.ALWAYS) {
+            for (ClueID cid : box.getIsPartOfClues()) {
+                addBoxSeparators(puz.getClue(cid), position, separators);
+            }
+        }
+
+        // current clue takes precedence
+        ClueID currentCID = (currentWord == null)
+            ? null
+            : currentWord.getClueID();
+        if (box.isPartOf(currentCID)) {
+            addBoxSeparators(puz.getClue(currentCID), position, separators);
+        }
+
+        return separators;
+    }
+
+    /**
+     * Add all separators for clue for box
+     */
+    private void addBoxSeparators(
+        Clue clue, Position position, BoxSeparators separators
+    ) {
+        if (clue != null && clue.hasSeparators()) {
+            int offset = clue.getZone().indexOf(position);
+            addBoxSeparator(clue, offset, separators);
+            // add start sep if needed
+            if (offset == 0)
+                addBoxSeparator(clue, -1, separators);
+        }
+    }
+
+    /**
+     * Set separator for box and clue at particular offset
+     *
+     * Takes from offset+1. It looks cleaner on the board to have the
+     * separator on e.g. the right instead of left, as it doesn't clash
+     * with numbers so much.
+     */
+    private void addBoxSeparator(
+        Clue clue, int offset, BoxSeparators separators
+    ) {
+        if (clue == null)
+            return;
+
+        char separator = clue.getSeparator(offset + 1);
+        if (separator != '\0') {
+            ClueID cid = clue.getClueID();
+            Zone zone = clue.getZone();
+            if (zone != null && !zone.isEmpty()) {
+                Zone.Direction dir = zone.getDirection(offset);
+                // on opposite site if coming from start (-1)
+                if (offset < 0)
+                    dir = dir.reverse();
+
+                switch (dir) {
+                case UP: separators.setTop(separator); break;
+                case DOWN: separators.setBottom(separator); break;
+                case LEFT: separators.setLeft(separator); break;
+                case RIGHT: separators.setRight(separator); break;
+                }
+            }
+        }
+    }
+
+    /**
      * Bound scale to set min/max
      */
     private float boundScale(float scale) {
@@ -586,8 +727,9 @@ public class PlayboardRenderer {
      * @param suppressNotesLists set of lists to not draw notes from.
      * Empty set means draw notes from all lists, null means don't draw
      * any notes.
-     * @param displaySeparators whether to display the separators. Null means
-     * yes.
+     * @param displaySeparators true if separators are to be shown
+     * @param separatorCID if not null, show separators for this clue
+     * only
      */
     private void drawBox(
         TileCanvas[][] canvases,
@@ -599,7 +741,7 @@ public class PlayboardRenderer {
         Position highlight,
         Set<String> suppressNotesLists,
         boolean fullBoard,
-        DisplaySeparators displaySeparators
+        BoxSeparators separators
     ) {
         PaintProfile profile = getProfile();
         int boxSize = profile.getBoxSize();
@@ -647,8 +789,7 @@ public class PlayboardRenderer {
                 canvas,
                 x, y, box,
                 inCurrentWord,
-                currentWord,
-                displaySeparators
+                separators
             );
 
             if (box.isBlank()) {
@@ -916,23 +1057,23 @@ public class PlayboardRenderer {
 
     }
 
+    /**
+     * Draw separators for box
+     *
+     * Draw separators for separatorCID if not null, else draws for all
+     * clues, preferring the clue of the current word if there are
+     * multiple clues with separators on the same side of the box.
+     */
     private void drawBoxSeparators(
         Canvas canvas,
         int x,
         int y,
         Box box,
         boolean inCurrentWord,
-        Word currentWord,
-        DisplaySeparators displaySeparators
+        BoxSeparators separators
     ) {
-        // decide if to carry on
-        if (displaySeparators == DisplaySeparators.NEVER)
+        if (separators == null)
             return;
-
-        ClueID currentClueID = currentWord == null
-            ? null
-            : currentWord.getClueID();
-        boolean forAny = displaySeparators == DisplaySeparators.ALWAYS;
 
         PaintProfile profile = getProfile();
         int boxSize = profile.getBoxSize();
@@ -943,7 +1084,7 @@ public class PlayboardRenderer {
         int height = getTotalHeight(text);
         int dashSize = profile.getDashSeparatorSize();
 
-        char top = box.getTopSeparator(currentClueID, forAny);
+        char top = separators.getTop();
         if (top == ' ') {
             int bary = y + barOffset;
             drawBar(
@@ -971,7 +1112,7 @@ public class PlayboardRenderer {
             );
         }
 
-        char bottom = box.getBottomSeparator(currentClueID, forAny);
+        char bottom = separators.getBottom();
         if (bottom == ' ') {
             // dashed bar
             int bary = y + boxSize - barOffset;
@@ -1000,7 +1141,7 @@ public class PlayboardRenderer {
             );
         }
 
-        char left = box.getLeftSeparator(currentClueID, forAny);
+        char left = separators.getLeft();
         if (left == ' ') {
             // dashed bar
             int barx = x + barOffset;
@@ -1029,7 +1170,7 @@ public class PlayboardRenderer {
             );
         }
 
-        char right = box.getRightSeparator(currentClueID, forAny);
+        char right = separators.getRight();
         if (right == ' ') {
             // dashed bar
             int barx = x + boxSize - barOffset;
@@ -1755,6 +1896,10 @@ public class PlayboardRenderer {
             if (!tileCanvas.isNew() && !isRenderPos(pos, changes))
                 continue;
 
+            BoxSeparators separators = getBoxSeparators(
+                puz.getPinnedClueID(), i
+            );
+
             int row = pos.getRow();
             int col = pos.getCol();
 
@@ -1765,7 +1910,7 @@ public class PlayboardRenderer {
                 null, currentWord, highlight,
                 suppressNotesLists,
                 true,
-                displaySeparators
+                separators
             );
         }
 
@@ -1942,6 +2087,10 @@ public class PlayboardRenderer {
                 if (!tileCanvas.isNew() && !isRenderPos(pos, changes))
                     continue;
 
+                BoxSeparators separators = getBoxSeparators(
+                    displaySeparators, pos, currentWord
+                );
+
                 this.drawBox(
                     canvases,
                     x, y, row, col,
@@ -1949,7 +2098,7 @@ public class PlayboardRenderer {
                     null, currentWord, highlight,
                     suppressNotesLists,
                     true,
-                    displaySeparators
+                    separators
                 );
             }
         }

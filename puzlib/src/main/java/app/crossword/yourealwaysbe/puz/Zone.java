@@ -14,6 +14,21 @@ import java.util.Iterator;
 public class Zone implements Iterable<Position>, Serializable {
     private static final long serialVersionUID = 1883316891012999786L;
 
+    public static enum Direction {
+        UP, DOWN, LEFT, RIGHT;
+
+        public Direction reverse() {
+            switch (this) {
+            case UP: return DOWN;
+            case DOWN: return UP;
+            case LEFT: return RIGHT;
+            case RIGHT: return LEFT;
+            }
+            // never here, but don't return null
+            return LEFT;
+        }
+    }
+
     private final ArrayList<Position> positions = new ArrayList<>();
 
     public boolean hasPosition(Position pos) {
@@ -84,5 +99,35 @@ public class Zone implements Iterable<Position>, Serializable {
     @Override
     public String toString() {
         return positions.toString();
+    }
+
+    /**
+     * Get the direction of travel for zone from position to position + 1
+     */
+    public Direction getDirection(int position) {
+        // just a default
+        if (size() <= 1)
+            return position <= 0 ? Direction.LEFT : Direction.RIGHT;
+
+        if (position < 0)
+            position = 0;
+
+        // use last two if at the end
+        if (position >= size() - 1)
+            position = size() - 2;
+
+        Position posStart = getPosition(position);
+        Position posEnd = getPosition(position + 1);
+
+        if (posStart.getCol() < posEnd.getCol())
+            return Direction.RIGHT;
+        else if (posStart.getCol() > posEnd.getCol())
+            return Direction.LEFT;
+        else if (posStart.getRow() < posEnd.getRow())
+            return Direction.DOWN;
+        else if (posStart.getRow() > posEnd.getRow())
+            return Direction.UP;
+        else // same position, who knows!
+            return Direction.LEFT;
     }
 }

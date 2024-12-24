@@ -25,12 +25,6 @@ public class Box implements Serializable {
     // for each clue this box is a part of, the index of the cell it is
     // the clue word, sorted for consistency of cycling through clues
     private TreeMap<ClueID, Integer> cluePositions = new TreeMap<>();
-    // which clues imply separators at top/bottom/left/right of box
-    // only allocate if needed, sorted for consistency of "first"
-    private TreeMap<ClueID, Character> topSeparators = null;
-    private TreeMap<ClueID, Character> bottomSeparators = null;
-    private TreeMap<ClueID, Character> leftSeparators = null;
-    private TreeMap<ClueID, Character> rightSeparators = null;
 
     public enum Bar { NONE, SOLID, DASHED, DOTTED };
     private Bar barTop = Bar.NONE;
@@ -123,18 +117,6 @@ public class Box implements Serializable {
             return false;
 
         if (!Objects.equals(getBarRight(), other.getBarRight()))
-            return false;
-
-        if (!Objects.equals(topSeparators, other.topSeparators))
-            return false;
-
-        if (!Objects.equals(bottomSeparators, other.bottomSeparators))
-            return false;
-
-        if (!Objects.equals(leftSeparators, other.leftSeparators))
-            return false;
-
-        if (!Objects.equals(rightSeparators, other.rightSeparators))
             return false;
 
         if (getColor() != other.getColor())
@@ -458,71 +440,6 @@ public class Box implements Serializable {
     public boolean isSolidBarredBottom() { return barBottom == Bar.SOLID; }
     public boolean isSolidBarredLeft() { return barLeft == Bar.SOLID; }
     public boolean isSolidBarredRight() { return barRight == Bar.SOLID; }
-
-    /**
-     * Set separating char to be displayed at top of box for cid
-     */
-    public void setTopSeparator(ClueID cid, char separator) {
-        if (topSeparators == null)
-            topSeparators = new TreeMap<>();
-        topSeparators.put(cid, separator);
-    }
-
-    public void setBottomSeparator(ClueID cid, char separator) {
-        if (bottomSeparators == null)
-            bottomSeparators = new TreeMap<>();
-        bottomSeparators.put(cid, separator);
-    }
-
-    public void setLeftSeparator(ClueID cid, char separator) {
-        if (leftSeparators == null)
-            leftSeparators = new TreeMap<>();
-        leftSeparators.put(cid, separator);
-    }
-
-    public void setRightSeparator(ClueID cid, char separator) {
-        if (rightSeparators == null)
-            rightSeparators = new TreeMap<>();
-        rightSeparators.put(cid, separator);
-    }
-
-    /**
-     * Get separator at top of box for given clue
-     *
-     * @param forAny prefer separator for cid but use lowest cid
-     * otherwise (if false, only return if cid has a separator)
-     * @return the separator or \0 if none
-     */
-    public char getTopSeparator(ClueID cid, boolean forAny) {
-        return getSeparator(topSeparators, cid, forAny);
-    }
-
-    public char getBottomSeparator(ClueID cid, boolean forAny) {
-        return getSeparator(bottomSeparators, cid, forAny);
-    }
-
-    public char getLeftSeparator(ClueID cid, boolean forAny) {
-        return getSeparator(leftSeparators, cid, forAny);
-    }
-
-    public char getRightSeparator(ClueID cid, boolean forAny) {
-        return getSeparator(rightSeparators, cid, forAny);
-    }
-
-    private char getSeparator(
-        TreeMap<ClueID, Character> separators,
-        ClueID cid,
-        boolean forAny
-    ) {
-        if (separators == null || separators.isEmpty())
-            return '\0';
-        else if (cid != null && separators.containsKey(cid))
-            return separators.get(cid);
-        else if (forAny)
-            return separators.firstEntry().getValue();
-        else
-            return '\0';
-    }
 
     /**
      * 3x3 array of text marks to put in box, can have null entries
