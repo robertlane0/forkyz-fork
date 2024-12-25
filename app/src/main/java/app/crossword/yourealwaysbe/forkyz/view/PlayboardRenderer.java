@@ -117,6 +117,10 @@ public class PlayboardRenderer {
         public void setBottom(String bottom) { this.bottom = bottom; }
         public void setLeft(String left) { this.left = left; }
         public void setRight(String right) { this.right = right; }
+
+        public String toString() {
+            return top + " / " + bottom + " / " + left + " / " + right;
+        }
     }
 
     // colors are gotten from context
@@ -575,7 +579,16 @@ public class PlayboardRenderer {
      *
      * May return null if no separators
      */
-    private BoxSeparators getBoxSeparators(ClueID cid, int offset) {
+    public BoxSeparators getBoxSeparators(Clue clue, int offset) {
+        // draw separator from offset + 1 on the right
+        String right = clue.getSeparator(offset + 1);
+        // and first one if needed
+        String left = offset == 0 ? clue.getSeparator(0) : null;
+
+        return new BoxSeparators(null, null, left, right);
+    }
+
+    public BoxSeparators getBoxSeparators(ClueID cid, int offset) {
         Puzzle puz = board == null ? null : board.getPuzzle();
         if (puz == null)
             return null;
@@ -584,12 +597,7 @@ public class PlayboardRenderer {
         if (clue == null)
             return null;
 
-        // draw separator from offset + 1 on the right
-        String right = clue.getSeparator(offset + 1);
-        // and first one if needed
-        String left = offset == 0 ? clue.getSeparator(0) : null;
-
-        return new BoxSeparators(null, null, left, right);
+        return getBoxSeparators(clue, offset);
     }
 
     /**

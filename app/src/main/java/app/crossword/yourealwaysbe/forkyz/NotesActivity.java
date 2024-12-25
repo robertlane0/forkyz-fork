@@ -681,9 +681,11 @@ public class NotesActivity extends PuzzleActivity {
             }
         }
 
-        binding.anagramSolution.setLength(curWordLen);
         binding.scratchMiniboard.setLength(curWordLen);
+        binding.scratchMiniboard.setSeparatorsFromClue(clue);
         binding.anagramSource.setLength(curWordLen);
+        binding.anagramSolution.setLength(curWordLen);
+        binding.anagramSolution.setSeparatorsFromClue(clue);
 
         keyboardManager.onResume();
 

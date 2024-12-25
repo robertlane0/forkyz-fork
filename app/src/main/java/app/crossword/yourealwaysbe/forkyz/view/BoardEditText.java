@@ -31,7 +31,9 @@ import app.crossword.yourealwaysbe.forkyz.util.BoxInputConnection;
 import app.crossword.yourealwaysbe.forkyz.util.ChangeOnlyObserver;
 import app.crossword.yourealwaysbe.forkyz.util.KeyboardManager;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
+import app.crossword.yourealwaysbe.forkyz.view.PlayboardRenderer.BoxSeparators;
 import app.crossword.yourealwaysbe.puz.Box;
+import app.crossword.yourealwaysbe.puz.Clue;
 import app.crossword.yourealwaysbe.puz.Position;
 
 @AndroidEntryPoint
@@ -91,6 +93,7 @@ public class BoardEditText
 
     private Position selection = new Position(0, -1);
     private Box[] boxes;
+    private BoxSeparators[] separators;
     private boolean[] changes;
     private PlayboardRenderer renderer;
     private String shadow;
@@ -245,6 +248,19 @@ public class BoardEditText
 
             render();
         }
+    }
+
+    /**
+     * Sets separators for existing boxes using clue as a basis
+     */
+    public void setSeparatorsFromClue(Clue clue) {
+        if (boxes == null || clue == null)
+            return;
+
+        separators = new BoxSeparators[boxes.length];
+
+        for (int i = 0; i < separators.length; i++)
+            separators[i] = renderer.getBoxSeparators(clue, i);
     }
 
     public int getLength() {
@@ -672,26 +688,33 @@ public class BoardEditText
             ? null
             : Arrays.copyOf(changes, changes.length);
 
-        executorService.execute(() -> {
-            try {
-                lockRenderer();
-                BitmapGrid bitmap = renderer.drawBoxes(
-                    boxes,
-                    shadow,
-                    renderChanges,
-                    selection,
-                    null,
-                    getContentWidth(),
-                    null
-                );
-                handler.post(() -> {
-                    try { setBitmap(bitmap); }
-                    finally { unlockRenderer(); }
-                });
-            } catch (Exception e) {
-                unlockRenderer();
-                throw e;
-            }
+        settings.getPlayDisplaySeparators(displaySeparatorsMode -> {
+            BoxSeparators[] displaySeps
+                = displaySeparatorsMode == DisplaySeparators.NEVER
+                ? null
+                : separators;
+
+            executorService.execute(() -> {
+                try {
+                    lockRenderer();
+                    BitmapGrid bitmap = renderer.drawBoxes(
+                        boxes,
+                        shadow,
+                        renderChanges,
+                        selection,
+                        null,
+                        getContentWidth(),
+                        displaySeps
+                    );
+                    handler.post(() -> {
+                        try { setBitmap(bitmap); }
+                        finally { unlockRenderer(); }
+                    });
+                } catch (Exception e) {
+                    unlockRenderer();
+                    throw e;
+                }
+            });
         });
 
         clearChanges();
