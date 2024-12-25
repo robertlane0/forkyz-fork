@@ -184,14 +184,17 @@ public class BoardWordEditView extends BoardEditView {
 
         RenderChanges renderChanges = getRenderChanges(changes);
 
-        getSettings().getPlaySuppressHintHighlighting(suppressHints -> {
-        getSettings().getPlayDisplaySeparators(displaySeparatorsMode -> {
-        getSuppressNotesList(localSuppressNotesList -> {
-            renderer.setHintHighlight(!suppressHints);
+        getSettings().getPlayRenderSettings(renderSettings -> {
+            Set<String> localSuppressNotesList
+                = getSuppressNotesList(renderSettings.displayScratch());
+            renderer.setHintHighlight(
+                !renderSettings.suppressHintHighlighting()
+            );
             executorService.execute(() -> {
 
                 boolean displaySeparators
-                    = displaySeparatorsMode != DisplaySeparators.NEVER;
+                    = renderSettings.displaySeparators()
+                        != DisplaySeparators.NEVER;
 
                 try {
                     lockRenderer();
@@ -215,7 +218,7 @@ public class BoardWordEditView extends BoardEditView {
                     throw e;
                 }
             });
-        });});});
+        });
     }
 
     @Override
@@ -270,17 +273,11 @@ public class BoardWordEditView extends BoardEditView {
             renderToView();
     }
 
-    private void getSuppressNotesList(Consumer<Set<String>> cb) {
-        if (customSuppressNotesList) {
-            cb.accept(suppressNotesList);
-        } else {
-            getSettings().getPlayScratchDisplay(displayScratch -> {
-                cb.accept(displayScratch
-                    ? Collections.emptySet()
-                    : null
-                );
-            });
-        }
+    private Set<String> getSuppressNotesList(boolean displayScratch) {
+        if (customSuppressNotesList)
+            return suppressNotesList;
+        else
+            return displayScratch ? Collections.emptySet() : null;
     }
 
     private boolean isRenderingCurrentWord() {

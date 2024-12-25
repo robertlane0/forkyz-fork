@@ -282,6 +282,8 @@
     <string name="display_separators_never">Never</string>
     <string name="display_separators_selected">Selected Clue</string>
     <string name="display_separators_always">Always</string>
+    <string name="infer_separators">Infer Separators</string>
+    <string name="infer_separators_desc">Estimate separators to display from enumeration at the end of the clues.</string>
 
     <!-- preferences download -->
     <string name="auto_downloaders">Automatic Download Sources</string>

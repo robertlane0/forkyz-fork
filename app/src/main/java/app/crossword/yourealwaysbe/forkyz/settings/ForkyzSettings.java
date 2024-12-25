@@ -166,6 +166,8 @@ public class ForkyzSettings {
     private static final String PREF_PLAY_GRID_RATIO_LANDSCAPE
         = "gridRatioLand";
     private static final String PREF_PLAY_GRID_RATIO_PORTRAIT = "gridRatio";
+    private static final String PREF_PLAY_INFER_SEPARATORS
+        = "inferSeparators";
     private static final String PREF_PLAY_LEGACY_DONT_DELETE_CROSSING
         = "dontDeleteCrossing";
     private static final String PREF_PLAY_MOVEMENT_STRATEGY
@@ -620,6 +622,7 @@ public class ForkyzSettings {
             new BooleanSetting(PREF_PLAY_ENTER_CHANGES_DIRECTION, true),
             new BooleanSetting(PREF_PLAY_FIT_TO_SCREEN, false),
             new BooleanSetting(PREF_PLAY_FULL_SCREEN, false),
+            new BooleanSetting(PREF_PLAY_INFER_SEPARATORS, false),
             new BooleanSetting(PREF_PLAY_PLAY_LETTER_UNDO_ENABLED, false),
             new BooleanSetting(PREF_PLAY_PREDICT_ANAGRAM_CHARS, true),
             new BooleanSetting(
@@ -1289,6 +1292,10 @@ public class ForkyzSettings {
         getFSEnumSetting(displaySeparatorsSetting, cb);
     }
 
+    public DisplaySeparators getPlayDisplaySeparatorsSync() {
+        return getFSEnumSettingSync(displaySeparatorsSetting);
+    }
+
     public LiveData<DisplaySeparators> livePlayDisplaySeparators() {
         return liveFSEnumSetting(displaySeparatorsSetting);
     }
@@ -1354,6 +1361,21 @@ public class ForkyzSettings {
     }
 
     /**
+     * Whether to guess separators between cells on grid from clue
+     */
+    public void getPlayInferSeparators(Consumer<Boolean> cb) {
+        getBooleanSetting(PREF_PLAY_INFER_SEPARATORS, cb);
+    }
+
+    public boolean getPlayInferSeparatorsSync() {
+        return getBooleanSettingSync(PREF_PLAY_INFER_SEPARATORS);
+    }
+
+    public LiveData<Boolean> livePlayInferSeparators(Consumer<Boolean> cb) {
+        return liveBooleanSetting(PREF_PLAY_INFER_SEPARATORS);
+    }
+
+    /**
      * Get the style of movement around the board
      */
     public void getPlayMovementStrategy(Consumer<MovementStrategy> cb) {
@@ -1387,6 +1409,21 @@ public class ForkyzSettings {
      */
     public void getPlayRandomClueOnShake(Consumer<Boolean> cb) {
         getBooleanSetting(PREF_PLAY_RANDOM_CLUE_ON_SHAKE, cb);
+    }
+
+    /**
+     * Convenience for getting a bunch of render settings
+     */
+    public void getPlayRenderSettings(Consumer<RenderSettings> cb) {
+        executor.execute(() -> {
+            RenderSettings settings = new RenderSettings(
+                getPlayScratchDisplaySync(),
+                getPlaySuppressHintHighlightingSync(),
+                getPlayDisplaySeparatorsSync(),
+                getPlayInferSeparatorsSync()
+            );
+            handler.post(() -> { cb.accept(settings); });
+        });
     }
 
     /**
@@ -1438,6 +1475,13 @@ public class ForkyzSettings {
      */
     public void getPlayScratchDisplay(Consumer<Boolean> cb) {
         getBooleanSetting(PREF_PLAY_SCRATCH_DISPLAY, cb);
+    }
+
+    /**
+     * Whether to show scratch notes on the play board in grey letters
+     */
+    public boolean getPlayScratchDisplaySync() {
+        return getBooleanSettingSync(PREF_PLAY_SCRATCH_DISPLAY);
     }
 
     /**
@@ -1556,6 +1600,10 @@ public class ForkyzSettings {
      */
     public void getPlaySuppressHintHighlighting(Consumer<Boolean> cb) {
         getBooleanSetting(PREF_PLAY_SUPPRESS_HINT_HIGHLIGHTING, cb);
+    }
+
+    public boolean getPlaySuppressHintHighlightingSync() {
+        return getBooleanSettingSync(PREF_PLAY_SUPPRESS_HINT_HIGHLIGHTING);
     }
 
     /**

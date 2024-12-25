@@ -688,9 +688,9 @@ public class BoardEditText
             ? null
             : Arrays.copyOf(changes, changes.length);
 
-        settings.getPlayDisplaySeparators(displaySeparatorsMode -> {
+        settings.getPlayRenderSettings(renderSettings -> {
             BoxSeparators[] displaySeps
-                = displaySeparatorsMode == DisplaySeparators.NEVER
+                = renderSettings.displaySeparators() == DisplaySeparators.NEVER
                 ? null
                 : separators;
 

@@ -81,12 +81,12 @@ public class BoardFullEditView extends BoardEditView {
 
         RenderChanges renderChanges = getRenderChanges(changes);
 
-        getSettings().getPlayScratchDisplay(displayScratch -> {
-        getSettings().getPlayDisplaySeparators(displaySeparators -> {
-        getSettings().getPlaySuppressHintHighlighting(suppressHints -> {
-            renderer.setHintHighlight(!suppressHints);
+        getSettings().getPlayRenderSettings(renderSettings -> {
+            renderer.setHintHighlight(
+                !renderSettings.suppressHintHighlighting()
+            );
 
-            Set<String> suppressNotesList = displayScratch
+            Set<String> suppressNotesList = renderSettings.displayScratch()
                 ? Collections.emptySet()
                 : null;
 
@@ -96,7 +96,7 @@ public class BoardFullEditView extends BoardEditView {
                     BitmapGrid bitmap = renderer.draw(
                         renderChanges,
                         suppressNotesList,
-                        displaySeparators,
+                        renderSettings.displaySeparators(),
                         getRenderRect()
                     );
                     handler.post(() -> {
@@ -108,7 +108,7 @@ public class BoardFullEditView extends BoardEditView {
                     throw e;
                 }
             });
-        });});});
+        });
     }
 
     @Override

@@ -52,6 +52,13 @@
     />
 
     <androidx.preference.CheckBoxPreference
+        android:title="@string/infer_separators"
+        android:defaultValue="false"
+        android:summary="@string/infer_separators_desc"
+        android:key="inferSeparators"
+    />
+
+    <androidx.preference.CheckBoxPreference
         android:title="@string/indicate_show_errors"
         android:defaultValue="true"
         android:summary="@string/indicate_show_errors_desc"
