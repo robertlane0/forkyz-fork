@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Consumer;
 import javax.inject.Inject;
 
 import android.content.Context;
