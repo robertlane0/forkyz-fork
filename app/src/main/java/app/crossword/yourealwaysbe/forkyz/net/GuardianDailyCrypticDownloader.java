@@ -29,7 +29,7 @@ public class GuardianDailyCrypticDownloader extends AbstractDateDownloader {
         super(
             internalName,
             name,
-            DATE_WEEKDAY,
+            DAYS_WEEKDAY,
             Duration.ZERO, // TODO: availability time
             SUPPORT_URL,
             null

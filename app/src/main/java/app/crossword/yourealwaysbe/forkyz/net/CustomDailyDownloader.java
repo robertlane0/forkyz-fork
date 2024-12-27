@@ -22,7 +22,7 @@ public class CustomDailyDownloader extends AbstractDateDownloader {
         super(
             internalName,
             title,
-            DATE_DAILY,
+            DAYS_DAILY,
             // Currently no option to configure availability time
             Duration.ZERO,
             null,

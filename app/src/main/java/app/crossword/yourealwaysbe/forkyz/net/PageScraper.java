@@ -3,7 +3,6 @@ package app.crossword.yourealwaysbe.forkyz.net;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.Deque;
@@ -90,11 +89,6 @@ public class PageScraper extends AbstractDownloader {
         this.supportUrl = supportUrl;
         this.shareFileUrl = shareFileUrl;
         this.readReverse = readReverse;
-    }
-
-    @Override
-    public DayOfWeek[] getDownloadDates() {
-        return DATE_DAILY;
     }
 
     @Override

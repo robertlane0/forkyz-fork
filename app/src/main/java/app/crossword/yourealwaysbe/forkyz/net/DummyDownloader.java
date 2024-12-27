@@ -1,6 +1,5 @@
 package app.crossword.yourealwaysbe.forkyz.net;
 
-import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.Set;
@@ -9,11 +8,6 @@ import java.util.Set;
  * Does not actually download any puzzles; just adds an "All Available" option to the dropdown.
  */
 public class DummyDownloader implements Downloader {
-    @Override
-    public DayOfWeek[] getDownloadDates() {
-        return null;
-    }
-
     @Override
     public String getInternalName() {
         return null;

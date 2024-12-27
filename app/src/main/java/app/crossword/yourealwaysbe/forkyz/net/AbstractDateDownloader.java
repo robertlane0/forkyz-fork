@@ -38,6 +38,46 @@ public class AbstractDateDownloader extends AbstractDownloader {
     private LocalDate goodFrom = LocalDate.ofEpochDay(0L);
     private Duration utcAvailabilityOffset = Duration.ZERO;
 
+    // These lists must be sorted for binary search.
+    public static DayOfWeek[] DAYS_SUNDAY
+        = new DayOfWeek[] { DayOfWeek.SUNDAY };
+    public static DayOfWeek[] DAYS_MONDAY
+        = new DayOfWeek[] { DayOfWeek.MONDAY };
+    public static DayOfWeek[] DAYS_TUESDAY
+        = new DayOfWeek[] { DayOfWeek.TUESDAY };
+    public static DayOfWeek[] DAYS_WEDNESDAY
+        = new DayOfWeek[] { DayOfWeek.WEDNESDAY };
+    public static DayOfWeek[] DAYS_THURSDAY
+        = new DayOfWeek[] { DayOfWeek.THURSDAY };
+    public static DayOfWeek[] DAYS_FRIDAY
+        = new DayOfWeek[] { DayOfWeek.FRIDAY };
+    public static DayOfWeek[] DAYS_SATURDAY
+        = new DayOfWeek[] { DayOfWeek.SATURDAY };
+    public static DayOfWeek[] DAYS_DAILY = new DayOfWeek[] {
+        DayOfWeek.MONDAY,
+        DayOfWeek.TUESDAY,
+        DayOfWeek.WEDNESDAY,
+        DayOfWeek.THURSDAY,
+        DayOfWeek.FRIDAY,
+        DayOfWeek.SATURDAY,
+        DayOfWeek.SUNDAY
+    };
+    public static DayOfWeek[] DAYS_NO_SUNDAY = new DayOfWeek[] {
+        DayOfWeek.MONDAY,
+        DayOfWeek.TUESDAY,
+        DayOfWeek.WEDNESDAY,
+        DayOfWeek.THURSDAY,
+        DayOfWeek.FRIDAY,
+        DayOfWeek.SATURDAY
+    };
+    public static DayOfWeek[] DAYS_WEEKDAY = new DayOfWeek[] {
+        DayOfWeek.MONDAY,
+        DayOfWeek.TUESDAY,
+        DayOfWeek.WEDNESDAY,
+        DayOfWeek.THURSDAY,
+        DayOfWeek.FRIDAY,
+    };
+
     protected AbstractDateDownloader(
         String internalName,
         String downloaderName,
@@ -82,6 +122,32 @@ public class AbstractDateDownloader extends AbstractDownloader {
         );
     }
 
+    /**
+     * Construct a downloader
+     *
+     * @param internalName the name used to identify the downloader in
+     * backend settings (should be constant).
+     * @param downloaderName the human-readable name (can change based
+     * on e.g. language settings).
+     * @param days the days of the week where the puzzle is available
+     * (should be sorted, recommended to use one of DAYS_DAILY,
+     * DAYS_WEEKDAY, &c.). Override isPublishedOnDay if complex logic is
+     * needed to determine if a puzzle is published on a given day of
+     * the week. Null is interpreted as all days otherwise.
+     * @param utcAvailabilityOffset the hour of the day a puzzle is
+     * published as offset from UTC.
+     * @param supportUrl URL for support of the puzzle source (e.g.
+     * newspaper subscription page).
+     * @param puzzleParser the PuzzleParser for parsing the downloaded
+     * puzzle.
+     * @param sourceUrlFormatPattern Java DateTimeFormatter pattern for
+     * the source URL on a given date. If null, override getSourceUrl.
+     * @param shareUrlFormatPattern Java DateTimeFormatter pattern for
+     * the share URL (i.e. the website where the puzzle is).
+     * getShareUrl can be overridden if more complex logic is needed.
+     * @param goodFrom the first date the source is available. Can also
+     * override getGoodFrom. Epoch 0 by default.
+     */
     protected AbstractDateDownloader(
         String internalName,
         String downloaderName,
@@ -131,11 +197,6 @@ public class AbstractDateDownloader extends AbstractDownloader {
     @Override
     public String toString() {
         return getName();
-    }
-
-    @Override
-    public DayOfWeek[] getDownloadDates() {
-        return days;
     }
 
     @Override
@@ -243,13 +304,7 @@ public class AbstractDateDownloader extends AbstractDownloader {
         if (goodThrough != null && goodThrough.isBefore(date))
             return null;
 
-        // check right day of week
-        DayOfWeek dayOfWeek = date.getDayOfWeek();
-        boolean isDay = Arrays.binarySearch(
-            getDownloadDates(), dayOfWeek
-        ) >= 0;
-
-        if (!isDay)
+        if (!isPublishedOnDay(date))
             return null;
 
         // check current time is before required date plus offset
@@ -306,6 +361,26 @@ public class AbstractDateDownloader extends AbstractDownloader {
      */
     protected int getLatestDateWindow() {
         return 8;
+    }
+
+    /**
+     * The date is a day of the week where the puzzle is published
+     *
+     * Does not necessarily take goodfrom/until into account. Will just
+     * say e.g.. "date is Monday, puzzle is usually published on
+     * Mondays".
+     *
+     * Can be override if more complex logic is needed. E.g. Sundays
+     * until 1/1/2001, then Monday after.
+     */
+    protected boolean isPublishedOnDay(LocalDate date) {
+        if (date == null)
+            return false;
+        if (days == null)
+            return true;
+
+        DayOfWeek dayOfWeek = date.getDayOfWeek();
+        return Arrays.binarySearch(days, dayOfWeek) >= 0;
     }
 
     /**

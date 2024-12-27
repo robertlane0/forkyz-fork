@@ -339,7 +339,7 @@ public class Downloaders {
             downloaders.add(new KeesingDownloader(
                 "destandaard",
                 context.getString(R.string.de_standaard),
-                Downloader.DATE_DAILY,
+                AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofHours(-1), // midnight, tested
                 "https://aboshop.standaard.be/",
                 "'https://www.standaard.be/kruiswoordraadsel'",
@@ -352,7 +352,7 @@ public class Downloaders {
             downloaders.add(new AbstractDateDownloader(
                 "detelegraaf",
                 context.getString(R.string.de_telegraaf),
-                Downloader.DATE_SATURDAY,
+                AbstractDateDownloader.DAYS_SATURDAY,
                 Duration.ofHours(-1), // midnight, tested
                 "https://www.telegraaf.nl/abonnement/telegraaf/abonnement-bestellen/",
                 new BrainsOnlyIO(),
@@ -373,7 +373,7 @@ public class Downloaders {
                 "hamabend",
                 context.getString(R.string.hamburger_abendblatt_daily),
                 "hhab",
-                Downloader.DATE_DAILY,
+                AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofHours(1), // midnight Germany (verified)
                 "https://www.abendblatt.de/plus",
                 "'https://www.abendblatt.de/ratgeber/wissen/"
@@ -386,7 +386,7 @@ public class Downloaders {
             downloaders.add(new AbstractDateDownloader(
                 "independent",
                 context.getString(R.string.independent_daily),
-                Downloader.DATE_DAILY,
+                AbstractDateDownloader.DAYS_DAILY,
                 Duration.ZERO, // midnight UK (actually further in advance)
                 "https://www.independent.co.uk/donations",
                 new JPZIO(),
@@ -401,7 +401,7 @@ public class Downloaders {
             downloaders.add(new AbstractDateDownloader(
                 "irishnewscryptic",
                 context.getString(R.string.irish_news_cryptic),
-                Downloader.DATE_WEEKDAY,
+                AbstractDateDownloader.DAYS_WEEKDAY,
                 Duration.ZERO,
                 "https://www.irishnews.com/",
                 new PAPuzzlesStreamScraper(),
@@ -415,7 +415,7 @@ public class Downloaders {
             downloaders.add(new AbstractDateDownloader(
                 "jonesin",
                 context.getString(R.string.jonesin_crosswords),
-                Downloader.DATE_THURSDAY,
+                AbstractDateDownloader.DAYS_THURSDAY,
                 Duration.ofDays(-2), // by experiment
                 "https://crosswordnexus.com/jonesin/",
                 new IO(),
@@ -430,7 +430,7 @@ public class Downloaders {
                 "Joseph",
                 "Joseph",
                 context.getString(R.string.joseph_crossword),
-                Downloader.DATE_NO_SUNDAY,
+                AbstractDateDownloader.DAYS_NO_SUNDAY,
                 Duration.ofDays(-7), // more than a week by experiment
                 "https://puzzles.kingdigital.com",
                 "'https://www.arkadium.com/games/"
@@ -442,7 +442,7 @@ public class Downloaders {
             downloaders.add(new AbstractDateDownloader(
                 "20minutes",
                 context.getString(R.string.vingminutes),
-                Downloader.DATE_DAILY,
+                AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofHours(1), // by experiment
                 "https://www.20minutes.fr",
                 new RCIJeuxMFJIO(),
@@ -455,7 +455,7 @@ public class Downloaders {
             downloaders.add(new AbstractRCIJeuxMFJDateDownloader(
                 "leparisienf1",
                 context.getString((R.string.le_parisien_daily_f1)),
-                Downloader.DATE_DAILY,
+                AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofHours(1),
                 "https://abonnement.leparisien.fr",
                 "https://www.rcijeux.fr/drupal_game/leparisien/mfleches1/grids/"
@@ -471,7 +471,7 @@ public class Downloaders {
             downloaders.add(new AbstractRCIJeuxMFJDateDownloader(
                 "leparisienf2",
                 context.getString((R.string.le_parisien_daily_f2)),
-                Downloader.DATE_DAILY,
+                AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofHours(1),
                 "https://abonnement.leparisien.fr",
                 "https://www.rcijeux.fr/drupal_game/leparisien/mfleches1/grids/"
@@ -487,7 +487,7 @@ public class Downloaders {
             downloaders.add(new AbstractRCIJeuxMFJDateDownloader(
                 "leparisienf3",
                 context.getString((R.string.le_parisien_daily_f3)),
-                Downloader.DATE_DAILY,
+                AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofHours(1),
                 "https://abonnement.leparisien.fr",
                 "https://www.rcijeux.fr/drupal_game/leparisien/mfleches1/grids/"
@@ -503,7 +503,7 @@ public class Downloaders {
             downloaders.add(new AbstractRCIJeuxMFJDateDownloader(
                 "leparisienf4",
                 context.getString((R.string.le_parisien_daily_f4)),
-                Downloader.DATE_DAILY,
+                AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofHours(1),
                 "https://abonnement.leparisien.fr",
                 "https://www.rcijeux.fr/drupal_game/leparisien/mfleches1/grids/"
@@ -519,7 +519,7 @@ public class Downloaders {
             downloaders.add(new AbstractDateDownloader(
                 "metrocryptic",
                 context.getString(R.string.metro_cryptic),
-                Downloader.DATE_NO_SUNDAY,
+                AbstractDateDownloader.DAYS_NO_SUNDAY,
                 Duration.ZERO,
                 "https://metro.co.uk/",
                 new PMLIO(),
@@ -535,7 +535,7 @@ public class Downloaders {
             downloaders.add(new AbstractDateDownloader(
                 "newsday",
                 context.getString(R.string.newsday),
-                Downloader.DATE_DAILY,
+                AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofHours(5), // midnight US? (by experiment)
                 // i can't browse this site for a more specific URL
                 // (GDPR)
@@ -551,7 +551,7 @@ public class Downloaders {
             downloaders.add(new AbstractDateDownloader(
                 "nytsyndicated",
                 context.getString(R.string.new_york_times_syndicated),
-                Downloader.DATE_DAILY,
+                AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofHours(5), // guess midnight NY
                 "https://www.seattletimes.com/games-nytimes-crossword/",
                 new BrainsOnlyIO(),
@@ -569,7 +569,7 @@ public class Downloaders {
                 "Premier",
                 "Premier",
                 context.getString(R.string.premier_crossword),
-                Downloader.DATE_SUNDAY,
+                AbstractDateDownloader.DAYS_SUNDAY,
                 Duration.ofDays(-7), // more than a week by experiment
                 "https://puzzles.kingdigital.com",
                 "'https://www.arkadium.com/games/"
@@ -582,7 +582,7 @@ public class Downloaders {
                 "Sheffer",
                 "Sheffer",
                 context.getString(R.string.sheffer_crossword),
-                Downloader.DATE_NO_SUNDAY,
+                AbstractDateDownloader.DAYS_NO_SUNDAY,
                 Duration.ofDays(-7), // more than a week by experiment
                 "https://puzzles.kingdigital.com",
                 "'https://www.arkadium.com/games/"
@@ -597,7 +597,7 @@ public class Downloaders {
                 context.getString(R.string.universal_crossword),
                 context.getString(R.string.uclick_copyright),
                 "http://www.uclick.com/client/spi/fcx/",
-                Downloader.DATE_DAILY,
+                AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofMinutes(6 * 60 + 30), // 06:30 by experiment
                 null
             ));
@@ -610,7 +610,7 @@ public class Downloaders {
                 context.getString(R.string.usa_today),
                 context.getString(R.string.usa_today),
                 "https://subscribe.usatoday.com",
-                Downloader.DATE_DAILY,
+                AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofMinutes(6 * 60 + 30), // 06:30 by experiment
                 "'https://games.usatoday.com/en/games/uclick-crossword'"
             ));
@@ -620,7 +620,7 @@ public class Downloaders {
             downloaders.add(new AbstractDateDownloader(
                 "waposunday",
                 context.getString(R.string.washington_post_sunday),
-                Downloader.DATE_SUNDAY,
+                AbstractDateDownloader.DAYS_SUNDAY,
                 Duration.ofHours(-1), // by experiment
                 "https://subscribe.wsj.com",
                 new IO(),
@@ -633,7 +633,7 @@ public class Downloaders {
             downloaders.add(new AbstractDateDownloader(
                 "wsj",
                 context.getString(R.string.wall_street_journal),
-                Downloader.DATE_NO_SUNDAY,
+                AbstractDateDownloader.DAYS_NO_SUNDAY,
                 Duration.ofHours(-3), // by experiment
                 "https://subscribe.wsj.com",
                 new IO(),
