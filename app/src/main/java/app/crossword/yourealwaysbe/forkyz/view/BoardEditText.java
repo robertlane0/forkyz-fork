@@ -253,14 +253,23 @@ public class BoardEditText
     /**
      * Sets separators for existing boxes using clue as a basis
      */
-    public void setSeparatorsFromClue(Clue clue) {
+    public void setSeparatorsFromClue(Clue clue, boolean inferSeparators) {
         if (boxes == null || clue == null)
             return;
 
+        BoxSeparators[] oldSeparators = separators;
         separators = new BoxSeparators[boxes.length];
 
-        for (int i = 0; i < separators.length; i++)
-            separators[i] = renderer.getBoxSeparators(clue, i);
+        for (int i = 0; i < separators.length; i++) {
+            separators[i] = renderer.getBoxSeparators(clue, inferSeparators, i);
+        }
+
+        if (
+            boxes != null
+            && boxes.length > 0
+            && !Objects.equals(separators, oldSeparators)
+        )
+            render();
     }
 
     public int getLength() {

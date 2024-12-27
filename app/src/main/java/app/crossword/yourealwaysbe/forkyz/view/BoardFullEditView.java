@@ -97,6 +97,7 @@ public class BoardFullEditView extends BoardEditView {
                         renderChanges,
                         suppressNotesList,
                         renderSettings.displaySeparators(),
+                        renderSettings.inferSeparators(),
                         getRenderRect()
                     );
                     handler.post(() -> {

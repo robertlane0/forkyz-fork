@@ -1371,7 +1371,7 @@ public class ForkyzSettings {
         return getBooleanSettingSync(PREF_PLAY_INFER_SEPARATORS);
     }
 
-    public LiveData<Boolean> livePlayInferSeparators(Consumer<Boolean> cb) {
+    public LiveData<Boolean> livePlayInferSeparators() {
         return liveBooleanSetting(PREF_PLAY_INFER_SEPARATORS);
     }
 

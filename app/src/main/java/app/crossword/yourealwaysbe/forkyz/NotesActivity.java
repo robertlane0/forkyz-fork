@@ -365,6 +365,8 @@ public class NotesActivity extends PuzzleActivity {
         setupVoiceCommands();
 
         addAccessibilityActions(binding.miniboard);
+
+        setupObservers();
     }
 
     @Override
@@ -682,10 +684,9 @@ public class NotesActivity extends PuzzleActivity {
         }
 
         binding.scratchMiniboard.setLength(curWordLen);
-        binding.scratchMiniboard.setSeparatorsFromClue(clue);
         binding.anagramSource.setLength(curWordLen);
         binding.anagramSolution.setLength(curWordLen);
-        binding.anagramSolution.setSeparatorsFromClue(clue);
+        inferSeparators();
 
         keyboardManager.onResume();
 
@@ -1372,5 +1373,25 @@ public class NotesActivity extends PuzzleActivity {
     private int getCurrentFocus(int defaultId) {
         View focused = getWindow().getCurrentFocus();
         return focused == null ? defaultId : focused.getId();
+    }
+
+    private void setupObservers() {
+        settings.livePlayInferSeparators().observe(
+            this,
+            inferSeparators -> { inferSeparators(); }
+        );
+    }
+
+    private void inferSeparators() {
+        Clue clue = getNotesClue();
+        Boolean inferSeparators = settings.livePlayInferSeparators().getValue();
+        if (clue != null && inferSeparators != null) {
+            binding.scratchMiniboard.setSeparatorsFromClue(
+                clue, inferSeparators
+            );
+            binding.anagramSolution.setSeparatorsFromClue(
+                clue, inferSeparators
+            );
+        }
     }
 }

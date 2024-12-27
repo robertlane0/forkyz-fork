@@ -202,7 +202,8 @@ public class BoardWordEditView extends BoardEditView {
                         renderChanges,
                         localSuppressNotesList,
                         getContentWidth(),
-                        displaySeparators
+                        displaySeparators,
+                        renderSettings.inferSeparators()
                     );
                     handler.post(() -> {
                         try {

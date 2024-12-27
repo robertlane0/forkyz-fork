@@ -2,11 +2,14 @@
 package app.crossword.yourealwaysbe.puz;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * A clue on the board
@@ -17,6 +20,24 @@ public class Clue implements Serializable {
     private static final long serialVersionUID = 2973710091235898521L;
 
     public static final int DEFAULT_FLAG_COLOR = -1;
+
+    // enumeration is e.g. (4, 5) at end of clue. Ignores IPuz word
+    // length endings e.g. ;4, except `;4 where `; should be literal ;
+    // also ignore cue words e.g. long= at start of clue. Only allows
+    // digits and recognised enumeration characters to avoid
+    // over-inferring.
+    private static final Pattern ENUMERATION_HINT_RE
+        = Pattern.compile(
+            "^.*\\((?:\\w+=)?"
+            + "([\\d\\s\\p{Punct}]*?)"
+            + "(?:(?<!`);\\d+)?\\)\s*$"
+        );
+    private static int ENUMERATION_HINT_GRP = 1;
+    private static final Pattern ENUMERATION_WHITESPACE_RE
+        = Pattern.compile("^[\\s,]+$");
+    // character that mean special things in IPuz enumerations
+    private static final Set<Character> ENUMERATION_SPECIAL
+        = Set.of('*', '^', '+');
 
     private ClueID clueID;
     // because sometimes numbers are alphabetic
@@ -31,6 +52,7 @@ public class Clue implements Serializable {
     private int flagColor = DEFAULT_FLAG_COLOR;
     // separating characters between the n-1 and n cell in answer
     private SortedMap<Integer, String> separators;
+    private SortedMap<Integer, String> inferredSeparators;
 
     public Clue(
         String listName,
@@ -140,18 +162,55 @@ public class Clue implements Serializable {
      *
      * 0 means start of word. 1 means between 0th and 1st character.
      *
+     * @param pos the position to get separator for
+     * @param inferSeparators whether to infer separators from hint
      * @return the separating char or null char if no separator
      */
-    public String getSeparator(int pos) {
-        return separators.get(pos);
-    }
-
-    public boolean hasSeparators() {
-        return separators.size() > 0;
+    public String getSeparator(int pos, boolean inferSeparators) {
+        String separator = separators.get(pos);
+        if (separator == null && inferSeparators) {
+            if (inferredSeparators == null)
+                inferSeparators();
+            separator = inferredSeparators.get(pos);
+        }
+        return separator;
     }
 
     /**
-     * Set of positions with separators
+     * Get separator at pos (not inferred)
+     */
+    public String getSeparator(int pos) {
+        return getSeparator(pos, false);
+    }
+
+    /**
+     * Whether clue has any separators
+     *
+     * @param inferSeparators whether to include inferred separators
+     * when answering
+     */
+    public boolean hasSeparators(boolean inferSeparators) {
+        if (separators.size() > 0)
+            return true;
+
+        if (inferSeparators) {
+            if (inferredSeparators == null)
+                inferSeparators();
+            return inferredSeparators.size() > 0;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Whether has separators (not inferred)
+     */
+    public boolean hasSeparators() {
+        return hasSeparators(false);
+    }
+
+    /**
+     * Set of positions with separators (not inferred)
      *
      * Will iterate in ascending order
      */
@@ -196,6 +255,68 @@ public class Clue implements Serializable {
 
     void setHint(String hint) {
         this.hint = (hint == null) ? "" : hint;
+        // erase previously inferred separators
+        inferredSeparators = null;
+    }
+
+    /**
+     * Estimate separators from hint
+     *
+     * Looks for (enumeration) at end of clue. Estimation algorithm
+     * based on IPuz enumeration specification, with modifications. E.g.
+     * comma is interpreted as whitespace (common in most crosswords).
+     */
+    private void inferSeparators() {
+        inferredSeparators = new TreeMap<>();
+
+        Matcher m = ENUMERATION_HINT_RE.matcher(getHint());
+        if (!m.matches())
+            return;
+
+        String enumeration = m.group(ENUMERATION_HINT_GRP);
+
+        int len = 0;
+        int sepPos = 0;
+        String separator = "";
+
+        for (int i = 0; i < enumeration.length(); i++) {
+            char c = enumeration.charAt(i);
+            if (Character.isDigit(c)) {
+                int digit = Character.digit(c, 10);
+                // abandon after first word of unspecified length
+                if (len == 0 && digit == 0)
+                    return;
+                len = 10 * len + digit;
+            } else if (ENUMERATION_SPECIAL.contains(c)) {
+                // ignore
+            } else {
+                // backticks mean take next char literally
+                if (c == '`' && i < enumeration.length() - 1) {
+                    c = enumeration.charAt(i + 1);
+                    i += 1;
+                }
+
+                sepPos = sepPos + len;
+
+                String nextSep = String.valueOf(c);
+                String curSep = inferredSeparators.get(sepPos);
+                if (curSep == null)
+                    inferredSeparators.put(sepPos, nextSep);
+                else
+                    inferredSeparators.put(sepPos, curSep + nextSep);
+
+                len = 0;
+            }
+        }
+
+        // replace whitespace with " "
+        Set<Integer> spaces = new HashSet<>();
+        for (Map.Entry<Integer, String> entry : inferredSeparators.entrySet()) {
+            if (ENUMERATION_WHITESPACE_RE.matcher(entry.getValue()).matches())
+                spaces.add(entry.getKey());
+        }
+        for (int pos : spaces)
+            inferredSeparators.put(pos, " ");
     }
 }
 

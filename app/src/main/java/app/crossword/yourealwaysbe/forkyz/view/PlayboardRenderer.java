@@ -208,6 +208,7 @@ public class PlayboardRenderer {
      * @param changes the changes or null for redraw all
      * @param suppressNotesLists as in drawBox
      * @param displaySeparators the mode for showing cell separators
+     * @param inferSeparators whether to draw inferred separators
      * @param visibleRect area that will be visible (can be used to
      * avoid drawing outside of it). Null means draw all.
      */
@@ -215,6 +216,7 @@ public class PlayboardRenderer {
         RenderChanges changes,
         Set<String> suppressNotesLists,
         DisplaySeparators displaySeparators,
+        boolean inferSeparators,
         Rect visibleRect
     ) {
         try {
@@ -231,10 +233,18 @@ public class PlayboardRenderer {
                 return bitmapGrid;
 
             drawBoardBoxes(
-                canvases, changes, suppressNotesLists, displaySeparators
+                canvases,
+                changes,
+                suppressNotesLists,
+                displaySeparators,
+                inferSeparators
             );
             drawPinnedClue(
-                canvases, changes, suppressNotesLists, displaySeparators
+                canvases,
+                changes,
+                suppressNotesLists,
+                displaySeparators,
+                inferSeparators
             );
 
             drawImages(canvases, changes == null);
@@ -265,13 +275,15 @@ public class PlayboardRenderer {
      * @param wrapWidth if non-zero, wrap word after width (in pixels)
      * exceeded
      * @param displaySeparators whether to show the word separators
+     * @param inferSeparators whether to draw inferred separators
      */
     synchronized public BitmapGrid drawWord(
         Word word,
         RenderChanges changes,
         Set<String> suppressNotesLists,
         int wrapWidth,
-        boolean displaySeparators
+        boolean displaySeparators,
+        boolean inferSeparators
     ) {
         Box[] boxes = board.getWordBoxes(word);
         Zone zone = word.getZone();
@@ -301,7 +313,7 @@ public class PlayboardRenderer {
             TileCanvas tileCanvas = getCanvasByPixel(canvases, x, y);
             if (tileCanvas != null) {
                 BoxSeparators separators = displaySeparators
-                    ? getBoxSeparators(word.getClueID(), i)
+                    ? getBoxSeparators(word.getClueID(), inferSeparators, i)
                     : null;
 
                 this.drawBox(
@@ -577,18 +589,27 @@ public class PlayboardRenderer {
      *
      * For when cid is being show in a horizontal row
      *
-     * May return null if no separators
+     * @param clue the clue to get separators from
+     * @param inferSeparators whether to infer separators
+     * @param offset the position in the clue zone of the box
+     * @return may return null if no separators
      */
-    public BoxSeparators getBoxSeparators(Clue clue, int offset) {
+    public BoxSeparators getBoxSeparators(
+        Clue clue, boolean inferSeparators, int offset
+    ) {
         // draw separator from offset + 1 on the right
-        String right = clue.getSeparator(offset + 1);
+        String right = clue.getSeparator(offset + 1, inferSeparators);
         // and first one if needed
-        String left = offset == 0 ? clue.getSeparator(0) : null;
+        String left = offset == 0
+            ? clue.getSeparator(0, inferSeparators)
+            : null;
 
         return new BoxSeparators(null, null, left, right);
     }
 
-    public BoxSeparators getBoxSeparators(ClueID cid, int offset) {
+    public BoxSeparators getBoxSeparators(
+        ClueID cid, boolean inferSeparators, int offset
+    ) {
         Puzzle puz = board == null ? null : board.getPuzzle();
         if (puz == null)
             return null;
@@ -597,7 +618,7 @@ public class PlayboardRenderer {
         if (clue == null)
             return null;
 
-        return getBoxSeparators(clue, offset);
+        return getBoxSeparators(clue, inferSeparators, offset);
     }
 
     /**
@@ -607,6 +628,7 @@ public class PlayboardRenderer {
      */
     private BoxSeparators getBoxSeparators(
         DisplaySeparators displaySeparators,
+        boolean inferSeparators,
         Position position,
         Word currentWord
     ) {
@@ -626,7 +648,9 @@ public class PlayboardRenderer {
         // do other clues first if they should be there
         if (displaySeparators == DisplaySeparators.ALWAYS) {
             for (ClueID cid : box.getIsPartOfClues()) {
-                addBoxSeparators(puz.getClue(cid), position, separators);
+                addBoxSeparators(
+                    puz.getClue(cid), inferSeparators, position, separators
+                );
             }
         }
 
@@ -635,7 +659,9 @@ public class PlayboardRenderer {
             ? null
             : currentWord.getClueID();
         if (box.isPartOf(currentCID)) {
-            addBoxSeparators(puz.getClue(currentCID), position, separators);
+            addBoxSeparators(
+                puz.getClue(currentCID), inferSeparators, position, separators
+            );
         }
 
         return separators;
@@ -645,14 +671,17 @@ public class PlayboardRenderer {
      * Add all separators for clue for box
      */
     private void addBoxSeparators(
-        Clue clue, Position position, BoxSeparators separators
+        Clue clue,
+        boolean inferSeparators,
+        Position position,
+        BoxSeparators separators
     ) {
-        if (clue != null && clue.hasSeparators()) {
+        if (clue != null && clue.hasSeparators(inferSeparators)) {
             int offset = clue.getZone().indexOf(position);
-            addBoxSeparator(clue, offset, separators);
+            addBoxSeparator(clue, inferSeparators, offset, separators);
             // add start sep if needed
             if (offset == 0)
-                addBoxSeparator(clue, -1, separators);
+                addBoxSeparator(clue, inferSeparators, -1, separators);
         }
     }
 
@@ -664,12 +693,12 @@ public class PlayboardRenderer {
      * with numbers so much.
      */
     private void addBoxSeparator(
-        Clue clue, int offset, BoxSeparators separators
+        Clue clue, boolean inferSeparators, int offset, BoxSeparators separators
     ) {
         if (clue == null)
             return;
 
-        String separator = clue.getSeparator(offset + 1);
+        String separator = clue.getSeparator(offset + 1, inferSeparators);
         if (separator != null) {
             ClueID cid = clue.getClueID();
             Zone zone = clue.getZone();
@@ -1877,7 +1906,8 @@ public class PlayboardRenderer {
         TileCanvas[][] canvases,
         RenderChanges changes,
         Set<String> suppressNotesLists,
-        DisplaySeparators displaySeparators
+        DisplaySeparators displaySeparators,
+        boolean inferSeparators
     ) {
         Puzzle puz = this.board.getPuzzle();
         Box[][] boxes = this.board.getBoxes();
@@ -1910,7 +1940,7 @@ public class PlayboardRenderer {
                 continue;
 
             BoxSeparators separators = getBoxSeparators(
-                puz.getPinnedClueID(), i
+                puz.getPinnedClueID(), inferSeparators, i
             );
 
             int row = pos.getRow();
@@ -2056,22 +2086,23 @@ public class PlayboardRenderer {
     }
 
     /**
-     * Refresh board (current word) on canvas or draw all
+     * Refresh board on canvas or draw all
      *
      * @param canvases canvas matrix matching bitmapGrid tiles with a
      * non-null TileCanvas if the tile should be drawn. New canvases
      * drawn in full, else just changes.
-     * @param boxSize the size of a box
      * @param changes the changes or null for redraw all
-     * @param renderAll whether to just draw the whole board anyway
      * @param suppressNotesLists the notes lists not to draw (null means
      * draw none, empty means draw all)
+     * @param displaySeparators whether to draw the separators
+     * @param inferSeparators whether to infer separators
      */
     private void drawBoardBoxes(
         TileCanvas[][] canvases,
         RenderChanges changes,
         Set<String> suppressNotesLists,
-        DisplaySeparators displaySeparators
+        DisplaySeparators displaySeparators,
+        boolean inferSeparators
     ) {
         Puzzle puz = board.getPuzzle();
         Box[][] boxes = board.getBoxes();
@@ -2101,7 +2132,7 @@ public class PlayboardRenderer {
                     continue;
 
                 BoxSeparators separators = getBoxSeparators(
-                    displaySeparators, pos, currentWord
+                    displaySeparators, inferSeparators, pos, currentWord
                 );
 
                 this.drawBox(
