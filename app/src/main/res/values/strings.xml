@@ -221,6 +221,7 @@
     <string name="le_parisien_daily_f4">(FR) Le Parisien Force 4</string>
     <string name="le_parisien_daily_f4_desc">Daily crossword in French, level 4.</string>
     <string name="guardian_daily">Guardian Daily Cryptic</string>
+    <string name="guardian_quiptic">Guardian Weekly Quiptic</string>
     <string name="independent_daily">Independent Daily Cryptic</string>
     <string name="newsday">Newsday</string>
     <string name="new_york_times_syndicated">New York Times Syndicated</string>

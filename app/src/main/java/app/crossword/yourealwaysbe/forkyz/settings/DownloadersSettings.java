@@ -7,6 +7,7 @@ public record DownloadersSettings(
     boolean downloadDeStandaard,
     boolean downloadDeTelegraaf,
     boolean downloadGuardianDailyCryptic,
+    boolean downloadGuardianWeeklyQuiptic,
     boolean downloadHamAbend,
     boolean downloadIndependentDailyCryptic,
     boolean downloadIrishNewsCryptic,

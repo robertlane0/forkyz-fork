@@ -19,6 +19,12 @@
             android:summary="@string/updates_thursdays"
             android:key="downloadJonesin"
         />
+        <androidx.preference.CheckBoxPreference
+            android:title="@string/guardian_quiptic"
+            android:defaultValue="true"
+            android:summary="@string/updates_sundays"
+            android:key="downloadGuardianWeeklyQuiptic"
+        />
     </androidx.preference.PreferenceCategory>
     <androidx.preference.PreferenceCategory
         android:title="@string/large_sized"
