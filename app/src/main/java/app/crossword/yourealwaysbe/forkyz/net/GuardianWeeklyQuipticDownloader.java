@@ -28,7 +28,7 @@ public class GuardianWeeklyQuipticDownloader extends AbstractDateDownloader {
         super(
             internalName,
             name,
-            DAYS_DAILY, // limited with isPublishedOnDay below
+            DAYS_SUNDAY, // see isPublishedOnDay for logic over time
             Duration.ZERO, // TODO: availability time
             SUPPORT_URL,
             null
@@ -82,12 +82,14 @@ public class GuardianWeeklyQuipticDownloader extends AbstractDateDownloader {
         Duration diff = Duration.between(lower.atStartOfDay(),
                                          upper.atStartOfDay());
 
-
         long daysDiff = diff.toDays();
 
+        // change between tue/mon/sun release smoothed over by rounding
         long cwNumOffset = (daysDiff / 7);
 
         // 25 Dec 2023 was skipped, so adjust up until BASE_CW_DATE
+        // Revisit in 2033 to see if that Christmas is skipped or not
+        // (other Christmases weren't missed)
         if (date.isBefore(BASE_CW_DATE)
                 && date.isAfter(LocalDate.of(2023, 12, 25)))
             cwNumOffset = cwNumOffset + 1;
@@ -100,7 +102,6 @@ public class GuardianWeeklyQuipticDownloader extends AbstractDateDownloader {
     // override default isPublishedOnDay behaviour to follow changing release date
     protected boolean isPublishedOnDay(LocalDate date) {
         DayOfWeek dayOfWeek = date.getDayOfWeek();
-
 
         if (date.isAfter(BASE_CW_DATE) || date.isEqual(BASE_CW_DATE))
             // #1272 onwards on Sundays
@@ -115,6 +116,4 @@ public class GuardianWeeklyQuipticDownloader extends AbstractDateDownloader {
             // #2 to #1271 on Mondays
             return (dayOfWeek == DayOfWeek.MONDAY);
     }
-
-
 }

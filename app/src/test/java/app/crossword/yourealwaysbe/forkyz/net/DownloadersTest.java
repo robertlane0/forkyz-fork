@@ -77,6 +77,7 @@ public class DownloadersTest {
             true, // downloadDeStandaard
             true, // downloadDeTelegraaf
             true, // downloadGuardianDailyCryptic
+            true, // downloadGuardianWeeklyQuiptic
             true, // downloadHamAbend
             true, // downloadIndependentDailyCryptic
             true, // downloadIrishNewsCryptic

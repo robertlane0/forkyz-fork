@@ -368,11 +368,11 @@ public class Downloaders {
             ));
         }
 
-	if (settings.downloadGuardianWeeklyQuiptic()) {
-	    downloaders.add(new GuardianWeeklyQuipticDownloader(
-		"guardianQuiptic", context.getString(R.string.guardian_quiptic)
-	    ));
-	}
+        if (settings.downloadGuardianWeeklyQuiptic()) {
+            downloaders.add(new GuardianWeeklyQuipticDownloader(
+                "guardianQuiptic", context.getString(R.string.guardian_quiptic)
+            ));
+        }
 
         if (settings.downloadHamAbend()) {
             downloaders.add(new RaetselZentraleSchwedenDownloader(
