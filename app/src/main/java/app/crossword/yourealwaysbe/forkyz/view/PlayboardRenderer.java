@@ -55,6 +55,7 @@ public class PlayboardRenderer {
     private static final float BASE_BOX_SIZE_INCHES = 0.25F;
     private static final Logger LOG = Logger.getLogger(PlayboardRenderer.class.getCanonicalName());
     private static final float DESCENT_FUDGE_FACTOR = 1.3F;
+    private static final float SEPARATOR_FILL_PCNT = 0.85F;
 
     // RecordingCanvas will not draw bitmaps bigger than its own
     // constant MAX_BITMAP_SIZE, which at as of 2024/05/28 was at least
@@ -1122,7 +1123,6 @@ public class PlayboardRenderer {
         int barSize = profile.getBarSize();
         int barOffset = barSize / 2;
         TextPaint text = profile.getSeparatorText();
-        int numberOffset = profile.getNumberOffset();
         int height = getTotalHeight(text);
         int dashSize = profile.getDashSeparatorSize();
 
@@ -1143,11 +1143,11 @@ public class PlayboardRenderer {
             );
         } else if (top != null) {
             // draw like marks
-            drawHtmlText(
+            drawSeparator(
                 canvas,
                 top,
                 x,
-                y,
+                y + height / 2,
                 boxSize,
                 Layout.Alignment.ALIGN_CENTER,
                 text
@@ -1172,11 +1172,11 @@ public class PlayboardRenderer {
                 box, Box.Bar.SOLID
             );
         } else if (bottom != null) {
-            drawHtmlText(
+            drawSeparator(
                 canvas,
                 bottom,
                 x,
-                y + boxSize - height,
+                y + boxSize - height / 2,
                 boxSize,
                 Layout.Alignment.ALIGN_CENTER,
                 text
@@ -1200,12 +1200,11 @@ public class PlayboardRenderer {
                 box, Box.Bar.SOLID
             );
         } else if (left != null) {
-            // draw like marks
-            drawHtmlText(
+            drawSeparator(
                 canvas,
                 String.valueOf(left),
                 x,
-                y + boxSize / 2 - height / 2,
+                y + boxSize / 2,
                 boxSize,
                 Layout.Alignment.ALIGN_NORMAL,
                 text
@@ -1230,12 +1229,11 @@ public class PlayboardRenderer {
                 box, Box.Bar.SOLID
             );
         } else if (right != null) {
-            // draw like marks
-            drawHtmlText(
+            drawSeparator(
                 canvas,
                 right,
                 x,
-                y + boxSize / 2 - height / 2,
+                y + boxSize / 2,
                 boxSize,
                 Layout.Alignment.ALIGN_OPPOSITE,
                 text
@@ -1744,6 +1742,47 @@ public class PlayboardRenderer {
             = versionUtils.getStaticLayout(text, style, width, align);
         canvas.save();
         canvas.translate(x, y);
+        staticLayout.draw(canvas);
+        canvas.restore();
+    }
+
+    /**
+     * Draw a separator at x, y
+     *
+     * Scales to fill full height of separator text style and tries to
+     * center glyph vertically
+     */
+    private void drawSeparator(
+        Canvas canvas,
+        String text,
+        int x, int y, int width, Layout.Alignment align,
+        TextPaint style
+    ) {
+        float targetHeight = -style.ascent();
+
+        // work out bounds to scale
+        Rect rect = new Rect();
+        style.getTextBounds(text, 0, text.length(), rect);
+        int baseHeight = rect.height();
+        // from baseline
+        int centerOffset = (rect.top + rect.bottom) / 2;
+
+        float scale = SEPARATOR_FILL_PCNT * targetHeight / baseHeight;
+
+        int fullSize = (int) (scale * style.getTextSize());
+        TextPaint fullStyle = new TextPaint(style);
+        fullStyle.setTextSize(fullSize);
+        int fullCenterOffset = (int) (scale * centerOffset);
+
+        StaticLayout staticLayout
+            = versionUtils.getStaticLayout(text, fullStyle, width, align);
+
+        canvas.save();
+        canvas.translate(
+            x,
+            // this is a fudge :/
+            y - fullCenterOffset + fullStyle.ascent() - fullStyle.descent() / 2
+        );
         staticLayout.draw(canvas);
         canvas.restore();
     }
@@ -2327,7 +2366,7 @@ public class PlayboardRenderer {
 
         private int boxSize;
         private int numberTextSize = boxSize / 4;
-        private int separatorTextSize = boxSize / 3;
+        private int separatorTextSize = boxSize / 4;
         private int miniNoteTextSize = boxSize / 2;
         private int noteTextSize = Math.round(boxSize * 0.6F);
         private int letterTextSize = Math.round(boxSize * 0.7F);
