@@ -17,6 +17,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import app.crossword.yourealwaysbe.forkyz.R;
+import app.crossword.yourealwaysbe.forkyz.settings.ExternalToolSettings;
+import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.util.JSONUtils;
 import app.crossword.yourealwaysbe.puz.Box;
 import app.crossword.yourealwaysbe.puz.Clue;
@@ -24,7 +26,6 @@ import app.crossword.yourealwaysbe.puz.Playboard;
 import app.crossword.yourealwaysbe.puz.Position;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.Zone;
-import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 
 public class ChatGPTHelp {
     private static final String CHAT_GPT_API_URL
@@ -50,8 +51,12 @@ public class ChatGPTHelp {
         ForkyzSettings settings, Consumer<Boolean> cb
     ) {
         settings.getExtChatGPTAPIKey(apiKey -> {
-            cb.accept(apiKey != null && !apiKey.trim().isEmpty());
+            cb.accept(isEnabled(apiKey));
         });
+    }
+
+    public static boolean isEnabled(ExternalToolSettings extSettings) {
+        return isEnabled(extSettings.chatGPTAPIKey());
     }
 
     public void requestHelpForCurrentClue(
@@ -192,5 +197,9 @@ public class ChatGPTHelp {
         } else {
             return context.getString(R.string.help_query_just_clue, clue);
         }
+    }
+
+    private static boolean isEnabled(String apiKey) {
+        return apiKey != null && !apiKey.trim().isEmpty();
     }
 }

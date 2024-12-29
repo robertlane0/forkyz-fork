@@ -1105,23 +1105,41 @@ public class ForkyzSettings {
         getStringSetting(PREF_EXT_CHAT_GPT_API_KEY, cb);
     }
 
-    public void getExtCrosswordSolverEnabled(Consumer<Boolean> cb) {
-        getBooleanSetting(PREF_EXT_CROSSWORD_SOLVER_ENABLED, cb);
+    public String getExtChatGPTAPIKeySync() {
+        return getStringSettingSync(PREF_EXT_CHAT_GPT_API_KEY);
+    }
+
+    public boolean getExtCrosswordSolverEnabledSync() {
+        return getBooleanSettingSync(PREF_EXT_CROSSWORD_SOLVER_ENABLED);
     }
 
     public void getExtDictionary(Consumer<ExternalDictionary> cb) {
         executor.execute(() -> {
-            String value = getStringSettingSync(PREF_EXT_DICTIONARY);
-            handler.post(() -> {
-                if ("NONE".equals(value))
-                    cb.accept(null);
-                else if ("QUICK".equals(value))
-                    cb.accept(ExternalDictionary.QUICK_DIC);
-                else if ("AARD2".equals(value))
-                    cb.accept(ExternalDictionary.AARD2);
-                else
-                    cb.accept(ExternalDictionary.FREE_DICTIONARY);
-            });
+            ExternalDictionary dict = getExtDictionarySync();
+            handler.post(() -> { cb.accept(dict); });
+        });
+    }
+
+    public ExternalDictionary getExtDictionarySync() {
+        String value = getStringSettingSync(PREF_EXT_DICTIONARY);
+        if ("NONE".equals(value))
+            return null;
+        else if ("QUICK".equals(value))
+            return ExternalDictionary.QUICK_DIC;
+        else if ("AARD2".equals(value))
+            return ExternalDictionary.AARD2;
+        else
+            return ExternalDictionary.FREE_DICTIONARY;
+    }
+
+    public void getExternalToolSettings(Consumer<ExternalToolSettings> cb) {
+        executor.execute(() -> {
+            ExternalToolSettings settings = new ExternalToolSettings(
+                getExtDictionarySync(),
+                getExtChatGPTAPIKeySync(),
+                getExtCrosswordSolverEnabledSync()
+            );
+            handler.post(() -> { cb.accept(settings); });
         });
     }
 

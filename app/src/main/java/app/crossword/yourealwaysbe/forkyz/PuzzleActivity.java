@@ -130,40 +130,33 @@ public abstract class PuzzleActivity
             open.setEnabled(false);
         }
 
-        canRequestHelpForCurrentClue(canRequest -> {
-        settings.getExtCrosswordSolverEnabled(solverEnabled -> {
-        settings.getExtDictionary(dictionary -> {
-            boolean extEnabled =
-                canRequest
-                || solverEnabled
-                || dictionary != null;
-
-            if (!extEnabled) {
+        settings.getExternalToolSettings(extSettings -> {
+            if (!extSettings.hasExternal()) {
                 MenuItem ext = menu.findItem(R.id.puzzle_menu_external_tools);
                 ext.setVisible(false);
                 ext.setEnabled(false);
             }
 
-            if (!canRequest) {
+            if (!ChatGPTHelp.isEnabled(extSettings)) {
                 MenuItem help = menu.findItem(R.id.puzzle_menu_ask_chat_gpt);
                 help.setVisible(false);
                 help.setEnabled(false);
             }
 
-            if (!solverEnabled) {
+            if (!extSettings.crosswordSolverEnabled()) {
                 MenuItem solver
                     = menu.findItem(R.id.puzzle_menu_crossword_solver);
                 solver.setVisible(false);
                 solver.setEnabled(false);
             }
 
-            if (dictionary == null) {
+            if (extSettings.externalDictionary() == null) {
                 MenuItem help
                     = menu.findItem(R.id.puzzle_menu_external_dictionary);
                 help.setVisible(false);
                 help.setEnabled(false);
             }
-        });});});
+        });
 
         settings.getPlayScratchMode(scratchMode -> {
             MenuItem item = menu.findItem(R.id.puzzle_menu_scratch_mode);
