@@ -6,7 +6,7 @@ plugins {
 }
 
 java {
-    group 'app.crossword.yourealwaysbe'
+    group = 'app.crossword.yourealwaysbe'
 
     test { useJUnitPlatform() }
 
@@ -28,8 +28,8 @@ java {
     }
 
     compileJava {
-        sourceCompatibility JavaVersion.VERSION_17.toString()
-        targetCompatibility JavaVersion.VERSION_17.toString()
+        sourceCompatibility = JavaVersion.VERSION_17.toString()
+        targetCompatibility = JavaVersion.VERSION_17.toString()
 
         // -processing as adding room annotation processor library
         // causes warnings about unprocessed annotations for an

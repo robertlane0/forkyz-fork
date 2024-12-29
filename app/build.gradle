@@ -8,7 +8,7 @@ plugins {
 check.dependsOn 'checkstyle'
 
 task checkstyle(type: Checkstyle) {
-    configFile file("${project.rootDir}/config/checkstyle/checkstyle.xml")
+    configFile = file("${project.rootDir}/config/checkstyle/checkstyle.xml")
     source 'src'
     include '**/*.java'
     exclude '**/build/**'
@@ -44,7 +44,7 @@ android {
     }
 
     compileOptions.with {
-        coreLibraryDesugaringEnabled true
+        coreLibraryDesugaringEnabled = true
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
