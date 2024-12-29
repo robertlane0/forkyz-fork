@@ -375,6 +375,10 @@
     <string name="fifteen_squared_desc">Search fifteensquared.net for the current puzzle. Mainly UK cryptics.</string>
     <!-- takes source as first string arg, puzzle title as second -->
     <string name="search_fifteen_squared_url">https://www.fifteensquared.net/?s=%1$s %2$s</string>
+    <string name="duckduckgo">DuckDuckGo</string>
+    <string name="duckduckgo_desc">Search for clue on DuckDuckGo.</string>
+    <!-- takes clue formatted without punctuation and - instead of spaces -->
+    <string name="duckduckgo_search_url">https://duckduckgo.com/?q=%1$s</string>
 
     <!-- preferences keyboard -->
     <string name="keyboard_showhide">Show/Hide In-App Keyboard</string>
@@ -529,6 +533,7 @@
     <string name="menu_notes">Notes</string>
     <string name="external_tools">External Tools</string>
     <string name="help_external_dictionary">Dictionary</string>
+    <string name="help_duckduckgo">DuckDuckGo Clue</string>
     <string name="help_crossword_solver">Crossword Solver</string>
     <string name="help_crossword_solver_anagram">Anagram Solver</string>
     <string name="help_fifteen_squared">Search Fifteen Squared</string>

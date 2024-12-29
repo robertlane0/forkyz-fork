@@ -19,7 +19,7 @@
         android:summary="@string/crossword_solver_enabled_desc"
         android:key="crosswordSolverEnabled"
     />
-     <androidx.preference.EditTextPreference
+    <androidx.preference.EditTextPreference
         android:title="@string/chat_gpt_api_key"
         android:summary="@string/chat_gpt_api_key_desc"
         android:dialogTitle="@string/chat_gpt_api_key"
@@ -28,6 +28,12 @@
         android:singleLine="true"
         android:selectAllOnFocus="true"
         android:key="chatGPTAPIKey"
+    />
+    <androidx.preference.CheckBoxPreference
+        android:title="@string/duckduckgo"
+        android:defaultValue="true"
+        android:summary="@string/duckduckgo_desc"
+        android:key="duckDuckGoEnabled"
     />
     <androidx.preference.CheckBoxPreference
         android:title="@string/fifteen_squared"

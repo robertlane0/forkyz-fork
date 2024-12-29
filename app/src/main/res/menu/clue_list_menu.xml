@@ -108,6 +108,10 @@
                 android:title="@string/help_query_chat_gpt"
             />
             <item
+                android:id="@+id/puzzle_menu_duckduckgo"
+                android:title="@string/help_duckduckgo"
+            />
+            <item
                 android:id="@+id/puzzle_menu_fifteen_squared"
                 android:title="@string/help_fifteen_squared"
             />

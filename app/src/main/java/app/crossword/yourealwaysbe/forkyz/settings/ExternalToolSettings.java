@@ -5,16 +5,18 @@ import app.crossword.yourealwaysbe.forkyz.tools.ChatGPTHelp;
 import app.crossword.yourealwaysbe.forkyz.tools.ExternalDictionary;
 
 public record ExternalToolSettings(
-    ExternalDictionary externalDictionary,
     String chatGPTAPIKey,
     boolean crosswordSolverEnabled,
+    boolean duckDuckGoEnabled,
+    ExternalDictionary externalDictionary,
     boolean fifteenSquaredEnabled
 ) {
 
     public boolean hasExternal() {
-        return externalDictionary != null
-            || ChatGPTHelp.isEnabled(this)
+        return ChatGPTHelp.isEnabled(this)
             || crosswordSolverEnabled
+            || duckDuckGoEnabled
+            || externalDictionary != null
             || fifteenSquaredEnabled;
     }
 }

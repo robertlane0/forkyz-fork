@@ -90,6 +90,8 @@ public class ForkyzSettings {
     private static final String PREF_EXT_CROSSWORD_SOLVER_ENABLED
         = "crosswordSolverEnabled";
     private static final String PREF_EXT_DICTIONARY = "externalDictionary";
+    private static final String PREF_EXT_DUCKDUCKGO_ENABLED
+        = "duckDuckGoEnabled";
     private static final String PREF_EXT_FIFTEEN_SQUARED_ENABLED
         = "fifteenSquaredEnabled";
 
@@ -608,6 +610,7 @@ public class ForkyzSettings {
             new BooleanSetting(PREF_BROWSE_NEW_PUZZLE, false),
             new BooleanSetting(PREF_BROWSE_SHOW_PERCENTAGE_CORRECT, false),
             new BooleanSetting(PREF_EXT_CROSSWORD_SOLVER_ENABLED, true),
+            new BooleanSetting(PREF_EXT_DUCKDUCKGO_ENABLED, true),
             new BooleanSetting(PREF_EXT_FIFTEEN_SQUARED_ENABLED, true),
             new BooleanSetting(PREF_CLUE_LIST_SHOW_WORDS, false),
             new BooleanSetting(PREF_CLUE_LIST_SNAP_TO_CLUE, false),
@@ -1138,9 +1141,10 @@ public class ForkyzSettings {
     public void getExternalToolSettings(Consumer<ExternalToolSettings> cb) {
         executor.execute(() -> {
             ExternalToolSettings settings = new ExternalToolSettings(
-                getExtDictionarySync(),
                 getExtChatGPTAPIKeySync(),
                 getExtCrosswordSolverEnabledSync(),
+                getBooleanSettingSync(PREF_EXT_DUCKDUCKGO_ENABLED),
+                getExtDictionarySync(),
                 getBooleanSettingSync(PREF_EXT_FIFTEEN_SQUARED_ENABLED)
             );
             handler.post(() -> { cb.accept(settings); });

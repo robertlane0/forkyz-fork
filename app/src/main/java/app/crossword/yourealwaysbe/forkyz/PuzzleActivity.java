@@ -45,6 +45,7 @@ import org.jg.wordstonumbers.WordsToNumbersUtil;
 import app.crossword.yourealwaysbe.forkyz.databinding.VoiceButtonsBinding;
 import app.crossword.yourealwaysbe.forkyz.tools.ChatGPTHelp;
 import app.crossword.yourealwaysbe.forkyz.tools.CrosswordSolver;
+import app.crossword.yourealwaysbe.forkyz.tools.DuckDuckGo;
 import app.crossword.yourealwaysbe.forkyz.tools.FifteenSquared;
 import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer;
 import app.crossword.yourealwaysbe.forkyz.util.SpeechContract;
@@ -151,11 +152,17 @@ public abstract class PuzzleActivity
                 solver.setEnabled(false);
             }
 
+            if (!extSettings.duckDuckGoEnabled()) {
+                MenuItem item
+                    = menu.findItem(R.id.puzzle_menu_duckduckgo);
+                item.setVisible(false);
+                item.setEnabled(false);
+            }
+
             if (!extSettings.fifteenSquaredEnabled()) {
-                MenuItem solver
-                    = menu.findItem(R.id.puzzle_menu_fifteen_squared);
-                solver.setVisible(false);
-                solver.setEnabled(false);
+                MenuItem item = menu.findItem(R.id.puzzle_menu_fifteen_squared);
+                item.setVisible(false);
+                item.setEnabled(false);
             }
 
             if (extSettings.externalDictionary() == null) {
@@ -274,6 +281,9 @@ public abstract class PuzzleActivity
             return true;
         } else if (id == R.id.puzzle_menu_crossword_solver) {
             callCrosswordSolver();
+            return true;
+        } else if (id == R.id.puzzle_menu_duckduckgo) {
+            searchDuckDuckGo();
             return true;
         } else if (id == R.id.puzzle_menu_external_dictionary) {
             callExternalDictionary();
@@ -1410,6 +1420,12 @@ public abstract class PuzzleActivity
             dialog.setArguments(args);
             dialog.show(getSupportFragmentManager(), "ChooseFlagColorDialog");
         }
+    }
+
+    private void searchDuckDuckGo() {
+        Playboard board = getBoard();
+        Clue clue = (board == null) ? null : board.getClue();
+        DuckDuckGo.launchSearch(this, clue);
     }
 
     public static class RevealPuzzleDialog extends DialogFragment {
