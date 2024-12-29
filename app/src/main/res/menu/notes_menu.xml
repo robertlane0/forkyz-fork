@@ -93,6 +93,10 @@
                 android:id="@+id/puzzle_menu_ask_chat_gpt"
                 android:title="@string/help_query_chat_gpt"
             />
+            <item
+                android:id="@+id/puzzle_menu_fifteen_squared"
+                android:title="@string/help_fifteen_squared"
+            />
         </menu>
     </item>
     <item

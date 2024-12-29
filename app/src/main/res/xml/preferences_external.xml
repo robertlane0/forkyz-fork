@@ -29,4 +29,10 @@
         android:selectAllOnFocus="true"
         android:key="chatGPTAPIKey"
     />
+    <androidx.preference.CheckBoxPreference
+        android:title="@string/fifteen_squared"
+        android:defaultValue="true"
+        android:summary="@string/fifteen_squared_desc"
+        android:key="fifteenSquaredEnabled"
+    />
 </androidx.preference.PreferenceScreen>

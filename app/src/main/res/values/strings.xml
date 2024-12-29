@@ -371,6 +371,10 @@
     <string name="external_tools_settings_desc">Options for integration with external apps.</string>
     <string name="crossword_solver_enabled">Enable Crossword Solver</string>
     <string name="crossword_solver_enabled_desc">Enable calls to billthefarmer\'s Crossword solver app.</string>
+    <string name="fifteen_squared">Fifteen Squared</string>
+    <string name="fifteen_squared_desc">Search fifteensquared.net for the current puzzle. Mainly UK cryptics.</string>
+    <!-- takes source as first string arg, puzzle title as second -->
+    <string name="search_fifteen_squared_url">https://www.fifteensquared.net/?s=%1$s %2$s</string>
 
     <!-- preferences keyboard -->
     <string name="keyboard_showhide">Show/Hide In-App Keyboard</string>
@@ -527,6 +531,7 @@
     <string name="help_external_dictionary">Dictionary</string>
     <string name="help_crossword_solver">Crossword Solver</string>
     <string name="help_crossword_solver_anagram">Anagram Solver</string>
+    <string name="help_fifteen_squared">Search Fifteen Squared</string>
 
     <!-- Clue Tabs -->
     <string name="clue_tab_history">History</string>

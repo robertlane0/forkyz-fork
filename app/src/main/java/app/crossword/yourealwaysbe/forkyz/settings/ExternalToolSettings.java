@@ -7,12 +7,14 @@ import app.crossword.yourealwaysbe.forkyz.tools.ExternalDictionary;
 public record ExternalToolSettings(
     ExternalDictionary externalDictionary,
     String chatGPTAPIKey,
-    boolean crosswordSolverEnabled
+    boolean crosswordSolverEnabled,
+    boolean fifteenSquaredEnabled
 ) {
 
     public boolean hasExternal() {
         return externalDictionary != null
             || ChatGPTHelp.isEnabled(this)
-            || crosswordSolverEnabled;
+            || crosswordSolverEnabled
+            || fifteenSquaredEnabled;
     }
 }

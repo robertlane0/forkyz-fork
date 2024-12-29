@@ -45,6 +45,7 @@ import org.jg.wordstonumbers.WordsToNumbersUtil;
 import app.crossword.yourealwaysbe.forkyz.databinding.VoiceButtonsBinding;
 import app.crossword.yourealwaysbe.forkyz.tools.ChatGPTHelp;
 import app.crossword.yourealwaysbe.forkyz.tools.CrosswordSolver;
+import app.crossword.yourealwaysbe.forkyz.tools.FifteenSquared;
 import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer;
 import app.crossword.yourealwaysbe.forkyz.util.SpeechContract;
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand;
@@ -146,6 +147,13 @@ public abstract class PuzzleActivity
             if (!extSettings.crosswordSolverEnabled()) {
                 MenuItem solver
                     = menu.findItem(R.id.puzzle_menu_crossword_solver);
+                solver.setVisible(false);
+                solver.setEnabled(false);
+            }
+
+            if (!extSettings.fifteenSquaredEnabled()) {
+                MenuItem solver
+                    = menu.findItem(R.id.puzzle_menu_fifteen_squared);
                 solver.setVisible(false);
                 solver.setEnabled(false);
             }
@@ -269,6 +277,9 @@ public abstract class PuzzleActivity
             return true;
         } else if (id == R.id.puzzle_menu_external_dictionary) {
             callExternalDictionary();
+            return true;
+        } else if (id == R.id.puzzle_menu_fifteen_squared) {
+            searchFifteenSquared();
             return true;
         } else if (id == R.id.puzzle_menu_clue_notes) {
             launchClueNotes(getBoard().getClueID());
@@ -1207,6 +1218,10 @@ public abstract class PuzzleActivity
 
             dictionary.query(this, request.toString());
         });
+    }
+
+    protected void searchFifteenSquared() {
+        FifteenSquared.launchSearch(this, getPuzzle());
     }
 
     /**
