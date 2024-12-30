@@ -351,6 +351,8 @@ public class Box implements Serializable {
      * @returns true if box is part of the clue
      */
     public boolean isPartOf(ClueID clueID) {
+        if (clueID == null)
+            return false;
         return cluePositions.containsKey(clueID);
     }
 
