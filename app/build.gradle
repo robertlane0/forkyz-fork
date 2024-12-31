@@ -22,17 +22,17 @@ android {
     compileSdkVersion 34
 
     lintOptions {
-        abortOnError false
+        abortOnError = false
     }
 
     defaultConfig {
         applicationId "app.crossword.yourealwaysbe.forkyz"
-        namespace "app.crossword.yourealwaysbe.forkyz"
+        namespace = "app.crossword.yourealwaysbe.forkyz"
         minSdkVersion 21
         targetSdkVersion 34
-        multiDexEnabled true
+        multiDexEnabled = true
         vectorDrawables {
-            useSupportLibrary true
+            useSupportLibrary = true
         }
         javaCompileOptions {
             annotationProcessorOptions {
@@ -66,7 +66,7 @@ android {
 
     buildTypes {
         release {
-            signingConfig signingConfigs.release
+            signingConfig = signingConfigs.release
         }
     }
 
