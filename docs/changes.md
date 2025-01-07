@@ -1,5 +1,14 @@
 # Forkyz Changelog
 
+## Version 60
+
+- Add PML as supported puzzle/share format and fix Metro download.
+- Add Irish Times and Guardian Quiptic (thanks winkelnp) downloaders.
+- Show selected clue in list by highlight or radio button (display settings).
+- Display word separators on grid (display settings).
+- Add fifteensquared.net (puzzle) and DuckDuckGo (clue) searches to external tools.
+
+
 ## Version 59
 
 - New puzzles: share from mycrossword.co.uk, scrape Guardian Everyman and Quick.
