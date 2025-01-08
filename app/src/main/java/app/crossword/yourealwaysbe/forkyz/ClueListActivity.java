@@ -229,9 +229,8 @@ public class ClueListActivity extends PuzzleActivity
             return true;
 
         switch (keyCode) {
-        case KeyEvent.KEYCODE_BACK:
         case KeyEvent.KEYCODE_ESCAPE:
-            onBackKey();
+            doBackAction();
             return true;
 
         case KeyEvent.KEYCODE_DPAD_LEFT:
@@ -419,7 +418,7 @@ public class ClueListActivity extends PuzzleActivity
         ));
         registerVoiceCommand(new VoiceCommand(
             getString(R.string.command_back),
-            args -> { onBackKey(); }
+            args -> { doBackAction(); }
         ));
         registerVoiceCommand(new VoiceCommand(
             getString(R.string.command_next),
@@ -607,11 +606,9 @@ public class ClueListActivity extends PuzzleActivity
         });
     }
 
-    private void onBackKey() {
-        keyboardManager.handleBackKey(keyHandled -> {
-            if (!keyHandled)
-                this.finish();
-        });
+    private void doBackAction() {
+        if (!keyboardManager.doBackAction())
+            this.finish();
     }
 
     /**
@@ -669,7 +666,6 @@ public class ClueListActivity extends PuzzleActivity
      */
     private boolean isHandledKey(int keyCode, KeyEvent event) {
         switch (keyCode) {
-        case KeyEvent.KEYCODE_BACK:
         case KeyEvent.KEYCODE_ESCAPE:
         case KeyEvent.KEYCODE_DPAD_UP:
         case KeyEvent.KEYCODE_DPAD_DOWN:

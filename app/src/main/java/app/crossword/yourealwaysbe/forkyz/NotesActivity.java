@@ -394,9 +394,8 @@ public class NotesActivity extends PuzzleActivity {
             return true;
 
         switch (keyCode) {
-        case KeyEvent.KEYCODE_BACK:
         case KeyEvent.KEYCODE_ESCAPE:
-            onBackKey();
+            doBackAction();
             return true;
         }
 
@@ -960,7 +959,7 @@ public class NotesActivity extends PuzzleActivity {
         ));
         registerVoiceCommand(new VoiceCommand(
             getString(R.string.command_back),
-            args -> { onBackKey(); }
+            args -> { doBackAction(); }
         ));
         registerVoiceCommand(new VoiceCommand(
             getString(R.string.command_scratch),
@@ -1043,11 +1042,9 @@ public class NotesActivity extends PuzzleActivity {
         }
     }
 
-    private void onBackKey() {
-        keyboardManager.handleBackKey(keyHandled -> {
-            if (!keyHandled)
-                this.finish();
-        });
+    private void doBackAction() {
+        if (!keyboardManager.doBackAction())
+            this.finish();
     }
 
     @AndroidEntryPoint
@@ -1185,7 +1182,6 @@ public class NotesActivity extends PuzzleActivity {
      */
     private boolean isHandledKey(int keyCode, KeyEvent event) {
         switch (keyCode) {
-        case KeyEvent.KEYCODE_BACK:
         case KeyEvent.KEYCODE_ESCAPE:
             return true;
         }

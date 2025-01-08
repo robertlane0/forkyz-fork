@@ -126,6 +126,10 @@ public class PlayActivity extends PuzzleActivity
 
         setFullScreenMode();
 
+        keyboardManager = new KeyboardManager(
+            this, settings, binding.keyboardView, binding.boardView
+        );
+
         binding.clueTabs.setOnClueLongClickDescription(
             getString(R.string.open_clue_notes)
         );
@@ -161,10 +165,6 @@ public class PlayActivity extends PuzzleActivity
                     }
                 }
             }
-        );
-
-        keyboardManager = new KeyboardManager(
-            this, settings, binding.keyboardView, binding.boardView
         );
 
         settings.getPlaySkipFilled(board::setSkipCompletedLetters);
@@ -273,16 +273,6 @@ public class PlayActivity extends PuzzleActivity
             & (KeyEvent.FLAG_CANCELED | KeyEvent.FLAG_CANCELED_LONG_PRESS);
         if (cancelled > 0)
             return true;
-
-        // handle back separately as it we shouldn't block a keyboard
-        // hide because of it
-        if (keyCode == KeyEvent.KEYCODE_BACK
-                || keyCode == KeyEvent.KEYCODE_ESCAPE) {
-            keyboardManager.handleBackKey(keyHandled -> {
-                if (!keyHandled)
-                    this.finish();
-            });
-        }
 
         keyboardManager.pushBlockHide();
 
@@ -746,7 +736,7 @@ public class PlayActivity extends PuzzleActivity
         ));
         registerVoiceCommand(new VoiceCommand(
             getString(R.string.command_back),
-            args -> { onBackKey(); }
+            args -> { doBackAction(); }
         ));
         registerVoiceCommand(new VoiceCommand(
             getString(R.string.command_clues),
@@ -790,11 +780,9 @@ public class PlayActivity extends PuzzleActivity
             board.moveUp();
     }
 
-    private void onBackKey() {
-        keyboardManager.handleBackKey(keyHandled -> {
-            if (!keyHandled)
-                this.finish();
-        });
+    private void doBackAction() {
+        if (!keyboardManager.doBackAction())
+            this.finish();
     }
 
     private void onDeleteKey() {
@@ -907,7 +895,6 @@ public class PlayActivity extends PuzzleActivity
      */
     private boolean isHandledKey(int keyCode, KeyEvent event) {
         switch (keyCode) {
-        case KeyEvent.KEYCODE_BACK:
         case KeyEvent.KEYCODE_ESCAPE:
         case KeyEvent.KEYCODE_SEARCH:
         case KeyEvent.KEYCODE_DPAD_UP:
