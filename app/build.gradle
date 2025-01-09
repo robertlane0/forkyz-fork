@@ -137,7 +137,7 @@ dependencies {
     // thanks https://stackoverflow.com/a/30759769
     testImplementation 'org.json:json:20080701'
     testImplementation 'org.mockito:mockito-core:5.10.0'
-    testImplementation 'org.robolectric:robolectric:4.11.1'
+    testImplementation 'org.robolectric:robolectric:4.14'
 
     // To avoid duplicate classes pulled in by libraries
     // https://stackoverflow.com/a/75298544/6882587
