@@ -76,6 +76,12 @@
         android:title="@string/metro_cryptic"
     />
     <androidx.preference.CheckBoxPreference
+        android:defaultValue="true"
+        android:key="downloadMetroQuick"
+        android:summary="@string/updates_mon_sat"
+        android:title="@string/metro_quick"
+    />
+    <androidx.preference.CheckBoxPreference
         android:title="@string/newsday"
         android:defaultValue="true"
         android:key="downloadNewsday"

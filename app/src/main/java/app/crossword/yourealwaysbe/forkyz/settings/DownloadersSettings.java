@@ -19,6 +19,7 @@ public record DownloadersSettings(
     boolean downloadLeParisienF3,
     boolean downloadLeParisienF4,
     boolean downloadMetroCryptic,
+    boolean downloadMetroQuick,
     boolean downloadNewsday,
     boolean downloadNewYorkTimesSyndicated,
     boolean downloadPremier,
