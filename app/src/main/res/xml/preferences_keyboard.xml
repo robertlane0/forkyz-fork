@@ -45,6 +45,13 @@
     />
 
     <androidx.preference.CheckBoxPreference
+        android:title="@string/keyboard_force_caps"
+        android:defaultValue="true"
+        android:summary="@string/keyboard_force_caps_desc"
+        android:key="keyboardForceCaps"
+    />
+
+    <androidx.preference.CheckBoxPreference
         android:title="@string/keyboard_haptic"
         android:defaultValue="true"
         android:summary="@string/keyboard_haptic_desc"

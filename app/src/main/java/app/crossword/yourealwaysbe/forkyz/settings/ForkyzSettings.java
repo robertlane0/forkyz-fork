@@ -141,6 +141,7 @@ public class ForkyzSettings {
         = "storageLocation";
 
     private static final String PREF_KEYBOARD_COMPACT = "keyboardCompact";
+    private static final String PREF_KEYBOARD_FORCE_CAPS = "keyboardForceCaps";
     private static final String PREF_KEYBOARD_HAPTIC = "keyboardHaptic";
     private static final String PREF_KEYBOARD_HIDE_BUTTON
         = "keyboardHideButton";
@@ -619,6 +620,7 @@ public class ForkyzSettings {
             new BooleanSetting(PREF_DOWNLOAD_CHARGING, false),
             new BooleanSetting(PREF_DOWNLOAD_HOURLY, false),
             new BooleanSetting(PREF_KEYBOARD_COMPACT, false),
+            new BooleanSetting(PREF_KEYBOARD_FORCE_CAPS, true),
             new BooleanSetting(PREF_KEYBOARD_HAPTIC, true),
             new BooleanSetting(PREF_KEYBOARD_HIDE_BUTTON, false),
             new BooleanSetting(PREF_KEYBOARD_NATIVE, false),
@@ -810,6 +812,7 @@ public class ForkyzSettings {
         = (prefs, key) -> {
             if (
                 PREF_KEYBOARD_COMPACT.equals(key)
+                || PREF_KEYBOARD_FORCE_CAPS.equals(key)
                 || PREF_KEYBOARD_HAPTIC.equals(key)
                 || PREF_KEYBOARD_HIDE_BUTTON.equals(key)
                 || PREF_KEYBOARD_LAYOUT.equals(key)
@@ -2094,6 +2097,7 @@ public class ForkyzSettings {
 
             KeyboardSettings settings = new KeyboardSettings(
                 getBooleanSettingSync(PREF_KEYBOARD_COMPACT),
+                getBooleanSettingSync(PREF_KEYBOARD_FORCE_CAPS),
                 getBooleanSettingSync(PREF_KEYBOARD_HAPTIC),
                 getBooleanSettingSync(PREF_KEYBOARD_HIDE_BUTTON),
                 getFSEnumSettingSync(keyboardLayoutSetting),

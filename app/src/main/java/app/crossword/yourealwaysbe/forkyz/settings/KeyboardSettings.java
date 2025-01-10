@@ -3,6 +3,7 @@ package app.crossword.yourealwaysbe.forkyz.settings;
 
 public record KeyboardSettings(
     boolean compact,
+    boolean forceCaps,
     boolean haptic,
     boolean hideButton,
     KeyboardLayout layout,

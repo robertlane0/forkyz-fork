@@ -64,6 +64,7 @@ public abstract class BoardEditView
     private long lastTap = 0;
     private BoxInputConnection currentInputConnection = null;
     private boolean nativeInput = false;
+    private boolean forceCaps = true;
     private boolean ignoreScratchMode = false;
 
     // For use by implementers of render to avoid on-main-thread
@@ -271,9 +272,13 @@ public abstract class BoardEditView
     }
 
     @Override
-    public boolean setNativeInput(boolean nativeInput) {
-        boolean changed = this.nativeInput != nativeInput;
+    public boolean setNativeInput(boolean nativeInput, boolean forceCaps) {
+        boolean changed = (
+            this.nativeInput != nativeInput
+            || this.forceCaps != forceCaps
+        );
         this.nativeInput = nativeInput;
+        this.forceCaps = forceCaps;
         return changed;
     }
 
@@ -315,7 +320,7 @@ public abstract class BoardEditView
 
     @Override
     public boolean onCheckIsTextEditor() {
-        return nativeInput;
+        return isNativeInput();
     }
 
     // Set input type to be raw keys if a keyboard is used
@@ -326,7 +331,8 @@ public abstract class BoardEditView
                 this,
                 utils,
                 getCurrentResponse(),
-                this
+                this,
+                isForceCaps()
             );
             currentInputConnection.setOutAttrs(outAttrs);
             return currentInputConnection;
@@ -456,5 +462,13 @@ public abstract class BoardEditView
         return (box == null)
             ? Box.BLANK
             : box.getResponse();
+    }
+
+    private boolean isForceCaps() {
+        return forceCaps;
+    }
+
+    private boolean isNativeInput() {
+        return nativeInput;
     }
 }

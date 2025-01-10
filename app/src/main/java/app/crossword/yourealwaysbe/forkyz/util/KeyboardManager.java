@@ -48,9 +48,11 @@ public class KeyboardManager {
         /**
          * Indicates view should be in native input mode
          *
+         * @param nativeInput if native input
+         * @param forceCaps whether to convert all native input into uppercase
          * @return true if this is a change from previous mode
          */
-        boolean setNativeInput(boolean nativeInput);
+        boolean setNativeInput(boolean nativeInput, boolean forceCaps);
 
         /**
          * The view that is manageable (usually this)
@@ -286,7 +288,7 @@ public class KeyboardManager {
                 if (focus != null) {
                     // turn off native input if can
                     if (focus instanceof ManageableView)
-                        ((ManageableView) focus).setNativeInput(false);
+                        ((ManageableView) focus).setNativeInput(false, false);
                     InputMethodManager imm = getInputMethodManager();
                     imm.hideSoftInputFromWindow(focus.getWindowToken(), 0);
                 }
@@ -310,7 +312,7 @@ public class KeyboardManager {
             return;
 
        boolean nativeChanged
-            = manageableView.setNativeInput(ks.useNative());
+            = manageableView.setNativeInput(ks.useNative(), ks.forceCaps());
 
         if (
             ks.mode() != KeyboardMode.NEVER_SHOW
