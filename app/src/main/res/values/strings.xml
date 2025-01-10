@@ -401,6 +401,8 @@
     <string name="enter_a_number">Enter a number</string>
     <string name="keyboard_force_caps">Capitalise Native Keyboard</string>
     <string name="keyboard_force_caps_desc">Most crossword solutions use capital letters. If checked, convert all native keyboard input to upper case.</string>
+    <string name="keyboard_built_in">Built-in Forkyz Keyboard</string>
+    <string name="keyboard_native">Native Android Keyboard</string>
 
     <!-- preferences interaction -->
     <string name="cycle_unfilled">Cycle on Unfilled Words </string>
