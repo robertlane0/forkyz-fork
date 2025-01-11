@@ -12,5 +12,6 @@ public enum CycleUnfilledMode implements EnumSetting {
         this.settingsValue = settingsValue;
     }
 
+    @Override
     public String getSettingsValue() { return settingsValue; }
 }
