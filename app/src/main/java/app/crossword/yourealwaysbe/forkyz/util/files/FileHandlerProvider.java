@@ -10,10 +10,14 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.widget.Toast;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.Transformations;
 
 import dagger.hilt.android.qualifiers.ApplicationContext;
 
 import app.crossword.yourealwaysbe.forkyz.R;
+import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
@@ -24,7 +28,7 @@ public class FileHandlerProvider {
     private ForkyzSettings settings;
 
     private AndroidVersionUtils utils;
-    private FileHandler fileHandler;
+    private LiveData<FileHandler> liveFileHandler;
 
     @Inject
     public FileHandlerProvider(
@@ -35,21 +39,24 @@ public class FileHandlerProvider {
         this.applicationContext = applicationContext;
         this.utils = utils;
         this.settings = settings;
+        this.liveFileHandler = Transformations.map(
+            settings.liveFileHandlerSettings(),
+            this::createFileHandler
+        );
     }
 
     public void get(Consumer<FileHandler> cb) {
-        if (fileHandler != null) {
-            cb.accept(fileHandler);
-        } else {
-            createFileHandler(fh -> {
-                fileHandler = fh;
+        liveFileHandler.observeForever(new Observer<FileHandler>() {
+            @Override
+            public void onChanged(FileHandler fh) {
+                liveFileHandler.removeObserver(this);
                 cb.accept(fh);
-            });
-        }
+            }
+        });
     }
 
-    public void reloadFileHandler() {
-        fileHandler = null;
+    public LiveData<FileHandler> liveFileHandler() {
+        return liveFileHandler;
     }
 
     /**
@@ -69,52 +76,46 @@ public class FileHandlerProvider {
         });
     }
 
-    private void createFileHandler(Consumer<FileHandler> cb) {
-        settings.getFileHandlerSettings(fileHandlerSettings -> {
-            // check hasn't been made in the meantime
-            if (fileHandler != null) {
-                cb.accept(fileHandler);
-                return;
-            }
+    private FileHandler createFileHandler(
+        FileHandlerSettings fileHandlerSettings
+    ) {
+        FileHandler fh;
 
-            FileHandler fh;
+        StorageLocation loc = fileHandlerSettings.storageLocation();
 
-            StorageLocation loc = fileHandlerSettings.storageLocation();
+        switch (loc) {
+        case EXTERNAL_LEGACY:
+            fh = new FileHandlerLegacy(applicationContext);
+            break;
+        case EXTERNAL_SAF:
+            fh = FileHandlerSAF.readHandlerFromSettings(
+                applicationContext, fileHandlerSettings, settings
+            );
+            break;
+        default:
+            fh = new FileHandlerInternal(applicationContext);
+            break;
+        }
 
-            switch (loc) {
-            case EXTERNAL_LEGACY:
-                fh = new FileHandlerLegacy(applicationContext);
-                break;
-            case EXTERNAL_SAF:
-                fh = FileHandlerSAF.readHandlerFromSettings(
-                    applicationContext, fileHandlerSettings, settings
-                );
-                break;
-            default:
-                fh = new FileHandlerInternal(applicationContext);
-                break;
-            }
+        if (fh == null || !fh.isStorageMounted()) {
+            fh = new FileHandlerInternal(applicationContext);
+            Toast t = Toast.makeText(
+                applicationContext,
+                R.string.storage_problem_falling_back_internal,
+                Toast.LENGTH_LONG
+            );
+            t.show();
+        }
 
-            if (fh == null || !fh.isStorageMounted()) {
-                fh = new FileHandlerInternal(applicationContext);
-                Toast t = Toast.makeText(
-                    applicationContext,
-                    R.string.storage_problem_falling_back_internal,
-                    Toast.LENGTH_LONG
-                );
-                t.show();
-            }
+        if (fh.isStorageFull(utils)) {
+            Toast t = Toast.makeText(
+                applicationContext,
+                R.string.storage_full_warning,
+                Toast.LENGTH_LONG
+            );
+            t.show();
+        }
 
-            if (fh.isStorageFull(utils)) {
-                Toast t = Toast.makeText(
-                    applicationContext,
-                    R.string.storage_full_warning,
-                    Toast.LENGTH_LONG
-                );
-                t.show();
-            }
-
-            cb.accept(fh);
-        });
+        return fh;
     }
 }

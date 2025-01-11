@@ -1,8 +1,14 @@
 
 plugins {
-    id 'com.android.application'
+    id 'androidx.room'
     id 'checkstyle'
+    id 'com.android.application'
     id 'com.google.dagger.hilt.android'
+    id 'kotlin-android'
+    id 'org.jetbrains.kotlin.plugin.compose'
+    id 'com.google.devtools.ksp'
+    // still needed for databinding even though ksp (phase out databinding)
+    id 'kotlin-kapt'
 }
 
 check.dependsOn 'checkstyle'
@@ -34,19 +40,20 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments += [
-                    "room.schemaLocation": "$projectDir/schemas".toString()
-                ]
-            }
-        }
+    }
+
+    room {
+        schemaDirectory "$projectDir/schemas"
     }
 
     compileOptions.with {
         coreLibraryDesugaringEnabled = true
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_17.toString()
     }
 
     testOptions {
@@ -102,24 +109,26 @@ File getReleaseKeyStoreFile() {
 
 dependencies {
     def lifecycle_version = "2.8.7"
-    def room_version = "2.6.1"
     def work_version = "2.10.0"
-    def hilt_version = "2.51"
 
-    implementation "androidx.concurrent:concurrent-futures:1.2.0"
-    implementation "androidx.lifecycle:lifecycle-livedata:$lifecycle_version"
-    implementation "androidx.lifecycle:lifecycle-viewmodel:$lifecycle_version"
-    implementation "androidx.room:room-runtime:$room_version"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-runtime-compose:2.8.7"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
+    implementation "androidx.room:room-runtime:$roomVersion"
     implementation "androidx.work:work-runtime:$work_version"
-    implementation "com.google.dagger:hilt-android:$hilt_version"
-    implementation 'androidx.activity:activity:1.9.3'
+    implementation "com.google.dagger:hilt-android:$hiltVersion"
+    implementation 'androidx.activity:activity-compose:1.10.0'
+    implementation 'androidx.activity:activity-ktx:1.10.0'
     implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.compose.material3:material3:1.3.1'
+    implementation 'androidx.compose.runtime:runtime-livedata:1.7.6'
+    implementation 'androidx.concurrent:concurrent-futures:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.2.0'
-    implementation 'androidx.core:core:1.15.0'
-    implementation 'androidx.fragment:fragment:1.8.5'
+    implementation 'androidx.core:core-ktx:1.15.0'
+    implementation 'androidx.fragment:fragment-ktx:1.8.5'
     implementation 'androidx.hilt:hilt-work:1.2.0'
-    implementation 'androidx.preference:preference:1.2.1'
-    implementation 'androidx.recyclerview:recyclerview:1.3.2'
+    implementation 'androidx.preference:preference-ktx:1.2.1'
+    implementation 'androidx.recyclerview:recyclerview:1.4.0'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
     implementation 'androidx.viewpager2:viewpager2:1.1.0'
     implementation 'com.github.jgraham0325:words-to-numbers:8a97d258fd'
@@ -127,13 +136,17 @@ dependencies {
     implementation 'com.leinardi.android:speed-dial:3.3.0'
     implementation 'com.squareup:seismic:1.0.3'
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.3'
+    implementation(platform('androidx.compose:compose-bom:2025.01.00'))
+
+    implementation 'androidx.core:core-ktx:1.15.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
 
     implementation project(path: ":puzlib", configuration: 'shadow')
 
-    annotationProcessor "androidx.room:room-compiler:$room_version"
+    ksp "androidx.room:room-compiler:$roomVersion"
     // thanks: https://stackoverflow.com/a/72105049
-    annotationProcessor "com.google.dagger:hilt-compiler:$hilt_version"
-    annotationProcessor "androidx.hilt:hilt-compiler:1.2.0"
+    ksp "com.google.dagger:hilt-compiler:$hiltVersion"
+    ksp "androidx.hilt:hilt-compiler:1.2.0"
 
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
 

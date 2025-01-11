@@ -31,9 +31,9 @@ import com.google.android.material.shape.MaterialShapeDrawable;
 import dagger.hilt.android.AndroidEntryPoint;
 
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
+import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper;
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder;
 import app.crossword.yourealwaysbe.forkyz.util.NightModeHelper;
-import app.crossword.yourealwaysbe.forkyz.util.ThemeHelper;
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 import app.crossword.yourealwaysbe.puz.Playboard;
@@ -52,13 +52,16 @@ public class ForkyzActivity extends AppCompatActivity {
     @Inject
     protected AndroidVersionUtils utils;
 
+    @Inject
+    protected ThemeHelper themeHelper;
+
     protected NightModeHelper nightMode;
     private Drawable originalStatusBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        (new ThemeHelper(settings)).themeActivity(this);
+        themeHelper.themeActivity(this);
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         doOrientation();
     }

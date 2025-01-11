@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.Handler;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
 import androidx.preference.PreferenceManager;
 
 import java.io.BufferedWriter;
@@ -65,7 +66,8 @@ public class ForkyzSettings {
     private static final String PREF_APP_DAY_NIGHT_MODE = "uiTheme";
 
     // public for settings page
-    public static final String PREF_AUTO_DOWNLOADERS = "autoDownloaders";
+    public static final String PREF_DOWNLOAD_AUTO_DOWNLOADERS
+        = "autoDownloaders";
 
     private static final String PREF_BROWSE_ALWAYS_SHOW_RATING
         = "browseAlwaysShowRating";
@@ -124,6 +126,69 @@ public class ForkyzSettings {
         = "backgroundDownloadDays";
     private static final String PREF_DOWNLOAD_DAYS_TIME
         = "backgroundDownloadDaysTime";
+    private static final String PREF_DOWNLOAD_ON_STARTUP
+        = "dlOnStartup";
+
+    private static final String PREF_DOWNLOAD_DE_STANDAARD
+        = "downloadDeStandaard";
+    private static final String PREF_DOWNLOAD_DE_TELEGRAAF
+        = "downloadDeTelegraaf";
+    private static final String PREF_DOWNLOAD_GUARDIAN_DAILY_CRYPTIC
+        = "downloadGuardianDailyCryptic";
+    private static final String PREF_DOWNLOAD_GUARDIAN_WEEKLY_QUIPTIC
+        = "downloadGuardianWeeklyQuiptic";
+    private static final String PREF_DOWNLOAD_HAM_ABEND
+        = "downloadHamAbend";
+    private static final String PREF_DOWNLOAD_INDEPENDENT_DAILY_CRYPTIC
+        = "downloadIndependentDailyCryptic";
+    private static final String PREF_DOWNLOAD_IRISH_NEWS_CRYPTIC
+        = "downloadIrishNewsCryptic";
+    private static final String PREF_DOWNLOAD_JONESIN
+        = "downloadJonesin";
+    private static final String PREF_DOWNLOAD_JOSEPH
+        = "downloadJoseph";
+    private static final String PREF_DOWNLOAD_20_MINUTES
+        = "download20Minutes";
+    private static final String PREF_DOWNLOAD_LE_PARISIEN_F1
+        = "downloadLeParisienF1";
+    private static final String PREF_DOWNLOAD_LE_PARISIEN_F2
+        = "downloadLeParisienF2";
+    private static final String PREF_DOWNLOAD_LE_PARISIEN_F3
+        = "downloadLeParisienF3";
+    private static final String PREF_DOWNLOAD_LE_PARISIEN_F4
+        = "downloadLeParisienF4";
+    private static final String PREF_DOWNLOAD_METRO_CRYPTIC
+        = "downloadMetroCryptic";
+    private static final String PREF_DOWNLOAD_METRO_QUICK
+        = "downloadMetroQuick";
+    private static final String PREF_DOWNLOAD_NEWSDAY
+        = "downloadNewsday";
+    private static final String PREF_DOWNLOAD_NEW_YORK_TIMES_SYNDICATED
+        = "downloadNewYorkTimesSyndicated";
+    private static final String PREF_DOWNLOAD_PREMIER
+        = "downloadPremier";
+    private static final String PREF_DOWNLOAD_SHEFFER
+        = "downloadSheffer";
+    private static final String PREF_DOWNLOAD_UNIVERSAL
+        = "downloadUniversal";
+    private static final String PREF_DOWNLOAD_USA_TODAY
+        = "downloadUSAToday";
+    private static final String PREF_DOWNLOAD_WA_PO_SUNDAY
+        = "downloadWaPoSunday";
+    private static final String PREF_DOWNLOAD_WSJ
+        = "downloadWsj";
+    private static final String PREF_SCRAPE_CRU
+        = "scrapeCru";
+    private static final String PREF_SCRAPE_EVERYMAN
+        = "scrapeEveryman";
+    private static final String PREF_SCRAPE_GUARDIAN_QUICK
+        = "scrapeGuardianQuick";
+    private static final String PREF_SCRAPE_KEGLER
+        = "scrapeKegler";
+    private static final String PREF_SCRAPE_PRIVATE_EYE
+        = "scrapePrivateEye";
+    private static final String PREF_SCRAPE_PRZEKROJ
+        = "scrapePrzekroj";
 
     private static final String PREF_FILE_HANDLER_SAF_ARCHIVE
         = "safArchiveFolderUri";
@@ -150,8 +215,10 @@ public class ForkyzSettings {
     private static final String PREF_KEYBOARD_NATIVE = "useNativeKeyboard";
     private static final String PREF_KEYBOARD_REPEAT_DELAY
         = "keyboardRepeatDelay";
+    private static final int PREF_KEYBOARD_REPEAT_DELAY_DEFAULT = 300;
     private static final String PREF_KEYBOARD_REPEAT_INTERVAL
         = "keyboardRepeatInterval";
+    private static final int PREF_KEYBOARD_REPEAT_INTERVAL_DEFAULT = 75;
 
     private static final String PREF_PLAY_CLUE_BELOW_GRID = "clueBelowGrid";
     private static final String PREF_PLAY_CLUE_HIGHLIGHT = "clueHighlight";
@@ -227,9 +294,9 @@ public class ForkyzSettings {
     private static final String PREF_VOICE_VOLUME_ACTIVATES_VOICE
         = "volumeActivatesVoice";
 
-    private static final String PREF_SUPPRESS_SUMMARY_NOTIFICATIONS
+    private static final String PREF_DOWNLOAD_SUPPRESS_SUMMARY_NOTIFICATIONS
         = "supressSummaryMessages";
-    private static final String PREF_SUPPRESS_INDIVIDUAL_NOTIFICATIONS
+    private static final String PREF_DOWNLOAD_SUPPRESS_INDIVIDUAL_NOTIFICATIONS
         = "supressMessages";
 
     private static final Set<String> BACKGROUND_DOWNLOAD_PREFERENCES
@@ -664,41 +731,47 @@ public class ForkyzSettings {
             new BooleanSetting(PREF_VOICE_BUTTON_ANNOUNCE_CLUE, false),
             new BooleanSetting(PREF_VOICE_EQUALS_ANNOUNCE_CLUE, true),
             new BooleanSetting(PREF_VOICE_VOLUME_ACTIVATES_VOICE, false),
-            new BooleanSetting(PREF_SUPPRESS_SUMMARY_NOTIFICATIONS, false),
-            new BooleanSetting(PREF_SUPPRESS_INDIVIDUAL_NOTIFICATIONS, false),
+            new BooleanSetting(
+                PREF_DOWNLOAD_SUPPRESS_SUMMARY_NOTIFICATIONS,
+                false
+            ),
+            new BooleanSetting(
+                PREF_DOWNLOAD_SUPPRESS_INDIVIDUAL_NOTIFICATIONS,
+                false
+            ),
             // DOWNLOADERS
-            new BooleanSetting("downloadDeStandaard", true),
-            new BooleanSetting("downloadDeTelegraaf", true),
-            new BooleanSetting("downloadGuardianDailyCryptic", true),
-            new BooleanSetting("downloadGuardianWeeklyQuiptic", true),
-            new BooleanSetting("downloadHamAbend", true),
-            new BooleanSetting("downloadIndependentDailyCryptic", true),
-            new BooleanSetting("downloadIrishNewsCryptic", true),
-            new BooleanSetting("downloadJonesin", true),
-            new BooleanSetting("downloadJoseph", true),
-            new BooleanSetting("download20Minutes", true),
-            new BooleanSetting("downloadLeParisienF1", true),
-            new BooleanSetting("downloadLeParisienF2", true),
-            new BooleanSetting("downloadLeParisienF3", true),
-            new BooleanSetting("downloadLeParisienF4", true),
-            new BooleanSetting("downloadMetroCryptic", true),
-            new BooleanSetting("downloadMetroQuick", true),
-            new BooleanSetting("downloadNewsday", true),
-            new BooleanSetting("downloadNewYorkTimesSyndicated", true),
-            new BooleanSetting("downloadPremier", true),
-            new BooleanSetting("downloadSheffer", true),
-            new BooleanSetting("downloadUniversal", true),
-            new BooleanSetting("downloadUSAToday", true),
-            new BooleanSetting("downloadWaPoSunday", true),
-            new BooleanSetting("downloadWsj", true),
-            new BooleanSetting("scrapeCru", false),
-            new BooleanSetting("scrapeEveryman", false),
-            new BooleanSetting("scrapeGuardianQuick", false),
-            new BooleanSetting("scrapeKegler", false),
-            new BooleanSetting("scrapePrivateEye", false),
-            new BooleanSetting("scrapePrzekroj", false),
+            new BooleanSetting(PREF_DOWNLOAD_DE_STANDAARD, true),
+            new BooleanSetting(PREF_DOWNLOAD_DE_TELEGRAAF, true),
+            new BooleanSetting(PREF_DOWNLOAD_GUARDIAN_DAILY_CRYPTIC, true),
+            new BooleanSetting(PREF_DOWNLOAD_GUARDIAN_WEEKLY_QUIPTIC, true),
+            new BooleanSetting(PREF_DOWNLOAD_HAM_ABEND, true),
+            new BooleanSetting(PREF_DOWNLOAD_INDEPENDENT_DAILY_CRYPTIC, true),
+            new BooleanSetting(PREF_DOWNLOAD_IRISH_NEWS_CRYPTIC, true),
+            new BooleanSetting(PREF_DOWNLOAD_JONESIN, true),
+            new BooleanSetting(PREF_DOWNLOAD_JOSEPH, true),
+            new BooleanSetting(PREF_DOWNLOAD_20_MINUTES, true),
+            new BooleanSetting(PREF_DOWNLOAD_LE_PARISIEN_F1, true),
+            new BooleanSetting(PREF_DOWNLOAD_LE_PARISIEN_F2, true),
+            new BooleanSetting(PREF_DOWNLOAD_LE_PARISIEN_F3, true),
+            new BooleanSetting(PREF_DOWNLOAD_LE_PARISIEN_F4, true),
+            new BooleanSetting(PREF_DOWNLOAD_METRO_CRYPTIC, true),
+            new BooleanSetting(PREF_DOWNLOAD_METRO_QUICK, true),
+            new BooleanSetting(PREF_DOWNLOAD_NEWSDAY, true),
+            new BooleanSetting(PREF_DOWNLOAD_NEW_YORK_TIMES_SYNDICATED, true),
+            new BooleanSetting(PREF_DOWNLOAD_PREMIER, true),
+            new BooleanSetting(PREF_DOWNLOAD_SHEFFER, true),
+            new BooleanSetting(PREF_DOWNLOAD_UNIVERSAL, true),
+            new BooleanSetting(PREF_DOWNLOAD_USA_TODAY, true),
+            new BooleanSetting(PREF_DOWNLOAD_WA_PO_SUNDAY, true),
+            new BooleanSetting(PREF_DOWNLOAD_WSJ, true),
+            new BooleanSetting(PREF_SCRAPE_CRU, true),
+            new BooleanSetting(PREF_SCRAPE_EVERYMAN, true),
+            new BooleanSetting(PREF_SCRAPE_GUARDIAN_QUICK, true),
+            new BooleanSetting(PREF_SCRAPE_KEGLER, true),
+            new BooleanSetting(PREF_SCRAPE_PRIVATE_EYE, true),
+            new BooleanSetting(PREF_SCRAPE_PRZEKROJ, true),
             new BooleanSetting(PREF_DOWNLOAD_CUSTOM_DAILY, false),
-            new BooleanSetting("dlOnStartup", false)
+            new BooleanSetting(PREF_DOWNLOAD_ON_STARTUP, false)
         };
         for (BooleanSetting s : booleans)
             booleanSettings.put(s.getKey(), s);
@@ -761,8 +834,14 @@ public class ForkyzSettings {
             new StringSetting(PREF_FILE_HANDLER_SAF_TO_IMPORT, null),
             new StringSetting(PREF_FILE_HANDLER_SAF_TO_IMPORT_DONE, null),
             new StringSetting(PREF_FILE_HANDLER_SAF_TO_IMPORT_FAILED, null),
-            new StringSetting(PREF_KEYBOARD_REPEAT_DELAY, "300"),
-            new StringSetting(PREF_KEYBOARD_REPEAT_INTERVAL, "75"),
+            new StringSetting(
+                PREF_KEYBOARD_REPEAT_DELAY,
+                String.valueOf(PREF_KEYBOARD_REPEAT_DELAY_DEFAULT)
+            ),
+            new StringSetting(
+                PREF_KEYBOARD_REPEAT_INTERVAL,
+                String.valueOf(PREF_KEYBOARD_REPEAT_INTERVAL_DEFAULT)
+            ),
             // DOWNLOADERS
             new StringSetting(PREF_DOWNLOAD_CUSTOM_DAILY_TITLE, ""),
             new StringSetting(PREF_DOWNLOAD_CUSTOM_DAILY_URL, ""),
@@ -771,7 +850,10 @@ public class ForkyzSettings {
             stringSettings.put(s.getKey(), s);
 
         StringSetSetting[] stringSets = {
-            new StringSetSetting(PREF_AUTO_DOWNLOADERS, Collections.emptySet()),
+            new StringSetSetting(
+                PREF_DOWNLOAD_AUTO_DOWNLOADERS,
+                Collections.emptySet()
+            ),
             new StringSetSetting(PREF_DOWNLOAD_DAYS, Collections.emptySet()),
         };
         for (StringSetSetting s : stringSets)
@@ -815,6 +897,8 @@ public class ForkyzSettings {
     private MutableLiveData<DeleteCrossingMode> livePlayDeleteCrossingMode;
     private MutableLiveData<KeyboardSettings> liveKeyboardSettings;
     private MutableLiveData<RatingsSettings> liveRatingsSettings;
+    private MutableLiveData<FileHandlerSettings> liveFileHandlerSettings;
+    private MutableLiveData<DownloadersSettings> liveDownloadersSettings;
 
     private OnSharedPreferenceChangeListener prefChangeListener
         = (prefs, key) -> {
@@ -839,11 +923,64 @@ public class ForkyzSettings {
                 updateLiveBrowseSort();
             } else if (PREF_PLAY_DELETE_CROSSING_MODE.equals(key)) {
                 updateLivePlayDeleteCrossingMode();
-            } else {
-                BaseSetting<?, ?> setting = getSetting(key);
-                if (setting != null)
-                    setting.updateLiveData(prefs);
+            } else if (
+                PREF_FILE_HANDLER_STORAGE_LOC.equals(key)
+                || PREF_FILE_HANDLER_SAF_ROOT.equals(key)
+                || PREF_FILE_HANDLER_SAF_CROSSWORDS.equals(key)
+                || PREF_FILE_HANDLER_SAF_ARCHIVE.equals(key)
+                || PREF_FILE_HANDLER_SAF_TO_IMPORT.equals(key)
+                || PREF_FILE_HANDLER_SAF_TO_IMPORT_DONE.equals(key)
+                || PREF_FILE_HANDLER_SAF_TO_IMPORT_FAILED.equals(key)
+            ) {
+                updateLiveFileHandlerSettings();
+            } else if (
+                // oof
+                PREF_DOWNLOAD_DE_STANDAARD.equals(key)
+                || PREF_DOWNLOAD_DE_TELEGRAAF.equals(key)
+                || PREF_DOWNLOAD_GUARDIAN_DAILY_CRYPTIC.equals(key)
+                || PREF_DOWNLOAD_GUARDIAN_WEEKLY_QUIPTIC.equals(key)
+                || PREF_DOWNLOAD_HAM_ABEND.equals(key)
+                || PREF_DOWNLOAD_INDEPENDENT_DAILY_CRYPTIC.equals(key)
+                || PREF_DOWNLOAD_IRISH_NEWS_CRYPTIC.equals(key)
+                || PREF_DOWNLOAD_JONESIN.equals(key)
+                || PREF_DOWNLOAD_JOSEPH.equals(key)
+                || PREF_DOWNLOAD_20_MINUTES.equals(key)
+                || PREF_DOWNLOAD_LE_PARISIEN_F1.equals(key)
+                || PREF_DOWNLOAD_LE_PARISIEN_F2.equals(key)
+                || PREF_DOWNLOAD_LE_PARISIEN_F3.equals(key)
+                || PREF_DOWNLOAD_LE_PARISIEN_F4.equals(key)
+                || PREF_DOWNLOAD_METRO_CRYPTIC.equals(key)
+                || PREF_DOWNLOAD_METRO_QUICK.equals(key)
+                || PREF_DOWNLOAD_NEWSDAY.equals(key)
+                || PREF_DOWNLOAD_NEW_YORK_TIMES_SYNDICATED.equals(key)
+                || PREF_DOWNLOAD_PREMIER.equals(key)
+                || PREF_DOWNLOAD_SHEFFER.equals(key)
+                || PREF_DOWNLOAD_UNIVERSAL.equals(key)
+                || PREF_DOWNLOAD_USA_TODAY.equals(key)
+                || PREF_DOWNLOAD_WA_PO_SUNDAY.equals(key)
+                || PREF_DOWNLOAD_WSJ.equals(key)
+                || PREF_SCRAPE_CRU.equals(key)
+                || PREF_SCRAPE_EVERYMAN.equals(key)
+                || PREF_SCRAPE_GUARDIAN_QUICK.equals(key)
+                || PREF_SCRAPE_KEGLER.equals(key)
+                || PREF_SCRAPE_PRIVATE_EYE.equals(key)
+                || PREF_SCRAPE_PRZEKROJ.equals(key)
+                || PREF_DOWNLOAD_CUSTOM_DAILY.equals(key)
+                || PREF_DOWNLOAD_CUSTOM_DAILY_TITLE.equals(key)
+                || PREF_DOWNLOAD_CUSTOM_DAILY_URL.equals(key)
+                || PREF_DOWNLOAD_SUPPRESS_SUMMARY_NOTIFICATIONS.equals(key)
+                || PREF_DOWNLOAD_SUPPRESS_INDIVIDUAL_NOTIFICATIONS.equals(key)
+                || PREF_DOWNLOAD_AUTO_DOWNLOADERS.equals(key)
+                || PREF_DOWNLOAD_TIMEOUT.equals(key)
+                || PREF_DOWNLOAD_ON_STARTUP.equals(key)
+            ) {
+                updateLiveDownloadersSettings();
             }
+
+            // also update direct live ones if exist
+            BaseSetting<?, ?> setting = getSetting(key);
+            if (setting != null)
+                setting.updateLiveData(prefs);
         };
 
     @Inject
@@ -867,11 +1004,27 @@ public class ForkyzSettings {
         getFSEnumSetting(orientationSetting, cb);
     }
 
+    public LiveData<Orientation> liveAppOrientationLock() {
+        return liveFSEnumSetting(orientationSetting);
+    }
+
+    public void setAppOrientationLock(Orientation value) {
+        setFSEnumSetting(orientationSetting, value);
+    }
+
     /**
      * Whether to use day theme, night theme, or follow system
      */
     public void getAppDayNightMode(Consumer<DayNightMode> cb) {
         getFSEnumSetting(appDayNightModeSetting, cb);
+    }
+
+    public DayNightMode getAppDayNightModeSync() {
+        return getFSEnumSettingSync(appDayNightModeSetting);
+    }
+
+    public LiveData<DayNightMode> liveAppDayNightMode() {
+        return liveFSEnumSetting(appDayNightModeSetting);
     }
 
     public void setAppDayNightMode(DayNightMode mode, Runnable cb) {
@@ -894,11 +1047,38 @@ public class ForkyzSettings {
         return getFSEnumSettingSync(appThemeSetting);
     }
 
+    public LiveData<Theme> liveAppTheme() {
+        return liveFSEnumSetting(appThemeSetting);
+    }
+
+    public void setAppTheme(Theme value) {
+        setFSEnumSetting(appThemeSetting, value);
+    }
+
+    /**
+     * Whether to show rating on all browse pages
+     */
+    public LiveData<Boolean> liveBrowseAlwaysShowRating() {
+        return liveBooleanSetting(PREF_BROWSE_ALWAYS_SHOW_RATING);
+    }
+
+    public void setBrowseAlwaysShowRating(boolean value) {
+        setBooleanSetting(PREF_BROWSE_ALWAYS_SHOW_RATING, value);
+    }
+
     /**
      * Age of a puzzle in the crosswords list to be removed in cleanup
      */
     public void getBrowseCleanupAge(Consumer<String> cb) {
         getStringSetting(PREF_BROWSE_CLEANUP_AGE, cb);
+    }
+
+    public LiveData<String> liveBrowseCleanupAge() {
+        return liveStringSetting(PREF_BROWSE_CLEANUP_AGE);
+    }
+
+    public void setBrowseCleanupAge(String value) {
+        setStringSetting(PREF_BROWSE_CLEANUP_AGE, value);
     }
 
     /**
@@ -915,6 +1095,14 @@ public class ForkyzSettings {
         getBooleanSetting(PREF_BROWSE_DELETE_ON_CLEANUP, cb);
     }
 
+    public LiveData<Boolean> liveBrowseDeleteOnCleanup() {
+        return liveBooleanSetting(PREF_BROWSE_DELETE_ON_CLEANUP);
+    }
+
+    public void setBrowseDeleteOnCleanup(Boolean value) {
+        setBooleanSetting(PREF_BROWSE_DELETE_ON_CLEANUP, value);
+    }
+
     /**
      * Disable the swipe action in the browse list
      */
@@ -926,6 +1114,10 @@ public class ForkyzSettings {
         return liveBooleanSetting(PREF_BROWSE_DISABLE_SWIPE);
     }
 
+    public void setBrowseDisableSwipe(boolean value) {
+        setBooleanSetting(PREF_BROWSE_DISABLE_SWIPE, value);
+    }
+
     /**
      * Whether to indicate in browse if puzzle has answers in data
      */
@@ -935,6 +1127,10 @@ public class ForkyzSettings {
 
     public LiveData<Boolean> liveBrowseIndicateIfSolution() {
         return liveBooleanSetting(PREF_BROWSE_INDICATE_IF_SOLUTION);
+    }
+
+    public void setBrowseIndicateIfSolution(boolean value) {
+        setBooleanSetting(PREF_BROWSE_INDICATE_IF_SOLUTION, value);
     }
 
     /**
@@ -988,6 +1184,10 @@ public class ForkyzSettings {
         return liveBooleanSetting(PREF_BROWSE_SHOW_PERCENTAGE_CORRECT);
     }
 
+    public void setBrowseShowPercentageCorrect(boolean value) {
+        setBooleanSetting(PREF_BROWSE_SHOW_PERCENTAGE_CORRECT, value);
+    }
+
     /**
      * How to order the puzzles in the browse list
      */
@@ -1028,6 +1228,14 @@ public class ForkyzSettings {
         getFSEnumSetting(browseSwipeActionSetting, cb);
     }
 
+    public LiveData<BrowseSwipeAction> liveBrowseSwipeAction() {
+        return liveFSEnumSetting(browseSwipeActionSetting);
+    }
+
+    public void setBrowseSwipeAction(BrowseSwipeAction value) {
+        setFSEnumSetting(browseSwipeActionSetting, value);
+    }
+
     /**
      * The settings for background downloads
      *
@@ -1063,12 +1271,75 @@ public class ForkyzSettings {
     }
 
     /**
-     * Set whether to background download every hour
+     * whether to background download every hour
      */
+    public LiveData<Boolean> liveBackgroundDownloadHourly() {
+        return liveBooleanSetting(PREF_DOWNLOAD_HOURLY);
+    }
+
+    public void setBackgroundDownloadHourly(boolean hourly) {
+        setBooleanSetting(PREF_DOWNLOAD_HOURLY, hourly);
+    }
+
     public void setBackgroundDownloadHourly(
         boolean hourly, Runnable cb
     ) {
         setBooleanSetting(PREF_DOWNLOAD_HOURLY, hourly, cb);
+    }
+
+    /**
+     * Which days of the week to background download
+     */
+    public LiveData<Set<String>> liveBackgroundDownloadDays() {
+        return liveStringSetSetting(PREF_DOWNLOAD_DAYS);
+    }
+
+    public void setBackgroundDownloadDays(Set<String> value) {
+        setStringSetSetting(PREF_DOWNLOAD_DAYS, value);
+    }
+
+    /**
+     * What time of day to background download
+     */
+    public LiveData<String> liveBackgroundDownloadDaysTime() {
+        return liveStringSetting(PREF_DOWNLOAD_DAYS_TIME);
+    }
+
+    public void setBackgroundDownloadDaysTime(String value) {
+        setStringSetting(PREF_DOWNLOAD_DAYS_TIME, value);
+    }
+
+    /**
+     * Whether to auto download on data
+     */
+    public LiveData<Boolean> liveBackgroundDownloadRequireUnmetered() {
+        return liveBooleanSetting(PREF_DOWNLOAD_UNMETERED);
+    }
+
+    public void setBackgroundDownloadRequireUnmetered(boolean value) {
+        setBooleanSetting(PREF_DOWNLOAD_UNMETERED, value);
+    }
+
+    /**
+     * Whether to auto download on roaming
+     */
+    public LiveData<Boolean> liveBackgroundDownloadAllowRoaming() {
+        return liveBooleanSetting(PREF_DOWNLOAD_ROAMING);
+    }
+
+    public void setBackgroundDownloadAllowRoaming(boolean value) {
+        setBooleanSetting(PREF_DOWNLOAD_ROAMING, value);
+    }
+
+    /**
+     * Whether to auto download when not charging
+     */
+    public LiveData<Boolean> liveBackgroundDownloadRequireCharging() {
+        return liveBooleanSetting(PREF_DOWNLOAD_CHARGING);
+    }
+
+    public void setBackgroundDownloadRequireCharging(boolean value) {
+        setBooleanSetting(PREF_DOWNLOAD_CHARGING, value);
     }
 
     /**
@@ -1091,6 +1362,10 @@ public class ForkyzSettings {
         return liveFSEnumSetting(clueTabsDoubleSetting);
     }
 
+    public void setClueListClueTabsDouble(ClueTabsDouble value) {
+        setFSEnumSetting(clueTabsDoubleSetting, value);
+    }
+
     /**
      * Whether to show the board for each clue in the clue list
      *
@@ -1107,6 +1382,13 @@ public class ForkyzSettings {
         getBooleanSetting(PREF_CLUE_LIST_SNAP_TO_CLUE, cb);
     }
 
+    public LiveData<Boolean> liveClueListSnapToClue() {
+        return liveBooleanSetting(PREF_CLUE_LIST_SNAP_TO_CLUE);
+    }
+
+    public void setClueListSnapToClue(boolean value) {
+        setBooleanSetting(PREF_CLUE_LIST_SNAP_TO_CLUE, value);
+    }
 
     public LiveData<Boolean> liveClueListShowWords() {
         return liveBooleanSetting(PREF_CLUE_LIST_SHOW_WORDS);
@@ -1123,12 +1405,28 @@ public class ForkyzSettings {
         getStringSetting(PREF_EXT_CHAT_GPT_API_KEY, cb);
     }
 
+    public LiveData<String> liveExtChatGPTAPIKey() {
+        return liveStringSetting(PREF_EXT_CHAT_GPT_API_KEY);
+    }
+
+    public void setExtChatGPTAPIKey(String value) {
+        setStringSetting(PREF_EXT_CHAT_GPT_API_KEY, value);
+    }
+
     public String getExtChatGPTAPIKeySync() {
         return getStringSettingSync(PREF_EXT_CHAT_GPT_API_KEY);
     }
 
     public boolean getExtCrosswordSolverEnabledSync() {
         return getBooleanSettingSync(PREF_EXT_CROSSWORD_SOLVER_ENABLED);
+    }
+
+    public LiveData<Boolean> liveExtCrosswordSolverEnabled() {
+        return liveBooleanSetting(PREF_EXT_CROSSWORD_SOLVER_ENABLED);
+    }
+
+    public void setExtCrosswordSolverEnabled(boolean value) {
+        setBooleanSettingSync(PREF_EXT_CROSSWORD_SOLVER_ENABLED, value);
     }
 
     public void getExtDictionary(Consumer<ExternalDictionary> cb) {
@@ -1148,6 +1446,30 @@ public class ForkyzSettings {
             return ExternalDictionary.AARD2;
         else
             return ExternalDictionary.FREE_DICTIONARY;
+    }
+
+    public LiveData<String> liveExtDictionaryString() {
+        return liveStringSetting(PREF_EXT_DICTIONARY);
+    }
+
+    public void setExtDictionaryString(String value) {
+        setStringSetting(PREF_EXT_DICTIONARY, value);
+    }
+
+    public LiveData<Boolean> liveExtDuckDuckGoEnabled() {
+        return liveBooleanSetting(PREF_EXT_DUCKDUCKGO_ENABLED);
+    }
+
+    public void setExtDuckDuckGoEnabled(boolean value) {
+        setBooleanSetting(PREF_EXT_DUCKDUCKGO_ENABLED, value);
+    }
+
+    public LiveData<Boolean> liveExtFifteenSquaredEnabled() {
+        return liveBooleanSetting(PREF_EXT_FIFTEEN_SQUARED_ENABLED);
+    }
+
+    public void setExtFifteenSquaredEnabled(boolean value) {
+        setBooleanSetting(PREF_EXT_FIFTEEN_SQUARED_ENABLED, value);
     }
 
     public void getExternalToolSettings(Consumer<ExternalToolSettings> cb) {
@@ -1171,38 +1493,51 @@ public class ForkyzSettings {
      */
     public void getFileHandlerSettings(Consumer<FileHandlerSettings> cb) {
         executor.execute(() -> {
-            StorageLocation storageLocation = getFSEnumSettingSync(
-                storageLocationSetting
-            );
-            String safRoot = getStringSettingSync(PREF_FILE_HANDLER_SAF_ROOT);
-            String safCrosswords = getStringSettingSync(
-                PREF_FILE_HANDLER_SAF_CROSSWORDS
-            );
-            String safArchive = getStringSettingSync(
-                PREF_FILE_HANDLER_SAF_ARCHIVE
-            );
-            String safToImport = getStringSettingSync(
-                PREF_FILE_HANDLER_SAF_TO_IMPORT
-            );
-            String safToImportDone = getStringSettingSync(
-                PREF_FILE_HANDLER_SAF_TO_IMPORT_DONE
-            );
-            String safToImportFailed = getStringSettingSync(
-                PREF_FILE_HANDLER_SAF_TO_IMPORT_FAILED
-            );
-
+            FileHandlerSettings fhSettings = getFileHandlerSettingsSync();
             handler.post(() -> {
-                cb.accept(new FileHandlerSettings(
-                    storageLocation,
-                    safRoot,
-                    safCrosswords,
-                    safArchive,
-                    safToImport,
-                    safToImportDone,
-                    safToImportFailed
-                ));
+                cb.accept(fhSettings);
             });
         });
+    }
+
+    public FileHandlerSettings getFileHandlerSettingsSync() {
+        StorageLocation storageLocation = getFSEnumSettingSync(
+            storageLocationSetting
+        );
+        String safRoot = getStringSettingSync(PREF_FILE_HANDLER_SAF_ROOT);
+        String safCrosswords = getStringSettingSync(
+            PREF_FILE_HANDLER_SAF_CROSSWORDS
+        );
+        String safArchive = getStringSettingSync(
+            PREF_FILE_HANDLER_SAF_ARCHIVE
+        );
+        String safToImport = getStringSettingSync(
+            PREF_FILE_HANDLER_SAF_TO_IMPORT
+        );
+        String safToImportDone = getStringSettingSync(
+            PREF_FILE_HANDLER_SAF_TO_IMPORT_DONE
+        );
+        String safToImportFailed = getStringSettingSync(
+            PREF_FILE_HANDLER_SAF_TO_IMPORT_FAILED
+        );
+
+        return new FileHandlerSettings(
+            storageLocation,
+            safRoot,
+            safCrosswords,
+            safArchive,
+            safToImport,
+            safToImportDone,
+            safToImportFailed
+        );
+    }
+
+    public LiveData<FileHandlerSettings> liveFileHandlerSettings() {
+        if (liveFileHandlerSettings == null) {
+            liveFileHandlerSettings = new MutableLiveData<FileHandlerSettings>();
+            updateLiveFileHandlerSettings();
+        }
+        return liveFileHandlerSettings;
     }
 
     /**
@@ -1245,6 +1580,10 @@ public class ForkyzSettings {
         });
     }
 
+    public LiveData<StorageLocation> liveFileStorageLocation() {
+        return liveFSEnumSetting(storageLocationSetting);
+    }
+
     public void getKeyboardSettings(Consumer<KeyboardSettings> cb) {
         // use value cached in liveKeyboardSettings or create cache
         if (
@@ -1273,6 +1612,109 @@ public class ForkyzSettings {
     }
 
     /**
+     * Bunch up space on built in keyboard
+     */
+    public LiveData<Boolean> liveKeyboardCompact() {
+        return liveBooleanSetting(PREF_KEYBOARD_COMPACT);
+    }
+
+    public void setKeyboardCompact(boolean value) {
+        setBooleanSetting(PREF_KEYBOARD_COMPACT, value);
+    }
+
+    /**
+     * Force caps on native ime
+     */
+    public LiveData<Boolean> liveKeyboardForceCaps() {
+        return liveBooleanSetting(PREF_KEYBOARD_FORCE_CAPS);
+    }
+
+    public void setKeyboardForceCaps(boolean value) {
+        setBooleanSetting(PREF_KEYBOARD_FORCE_CAPS, value);
+    }
+
+    /**
+     * Use native IME or built in keyboard
+     */
+    public LiveData<Boolean> liveKeyboardHideButton() {
+        return liveBooleanSetting(PREF_KEYBOARD_HIDE_BUTTON);
+    }
+
+    public void setKeyboardHideButton(boolean value) {
+        setBooleanSetting(PREF_KEYBOARD_HIDE_BUTTON, value);
+    }
+
+    /**
+     * Haptic feedback on built in keyboard
+     */
+    public LiveData<Boolean> liveKeyboardHaptic() {
+        return liveBooleanSetting(PREF_KEYBOARD_HAPTIC);
+    }
+
+    public void setKeyboardHaptic(boolean value) {
+        setBooleanSetting(PREF_KEYBOARD_HAPTIC, value);
+    }
+
+    /**
+     * The show/hide mode of the keyboard
+     */
+    public LiveData<KeyboardLayout> liveKeyboardLayout() {
+        return liveFSEnumSetting(keyboardLayoutSetting);
+    }
+
+    public void setKeyboardLayout(KeyboardLayout value) {
+        setFSEnumSetting(keyboardLayoutSetting, value);
+    }
+
+    /**
+     * The show/hide mode of the keyboard
+     */
+    public LiveData<KeyboardMode> liveKeyboardMode() {
+        return liveFSEnumSetting(keyboardModeSetting);
+    }
+
+    public void setKeyboardMode(KeyboardMode value) {
+        setFSEnumSetting(keyboardModeSetting, value);
+    }
+
+    /**
+     * How long in ms before built in keyboard repeats key presses
+     */
+    public LiveData<Integer> liveKeyboardRepeatDelay() {
+        return liveIntegerFromStringSetting(
+            PREF_KEYBOARD_REPEAT_DELAY, PREF_KEYBOARD_REPEAT_DELAY_DEFAULT
+        );
+    }
+
+    public void setKeyboardRepeatDelay(int value) {
+        setIntegerToStringSetting(PREF_KEYBOARD_REPEAT_DELAY, value);
+    }
+
+    /**
+     * How long in ms between built in keyboard repeats
+     */
+    public LiveData<Integer> liveKeyboardRepeatInterval() {
+        return liveIntegerFromStringSetting(
+            PREF_KEYBOARD_REPEAT_INTERVAL, PREF_KEYBOARD_REPEAT_INTERVAL_DEFAULT
+        );
+    }
+
+    public void setKeyboardRepeatInterval(int value) {
+        setIntegerToStringSetting(PREF_KEYBOARD_REPEAT_INTERVAL, value);
+    }
+
+    /**
+     * Use native IME or built in keyboard
+     */
+    public LiveData<Boolean> liveKeyboardUseNative() {
+        return liveBooleanSetting(PREF_KEYBOARD_NATIVE);
+    }
+
+    public void setKeyboardUseNative(boolean value) {
+        setBooleanSetting(PREF_KEYBOARD_NATIVE, value);
+    }
+
+    /**
      * Whether to display the currently selected clue below the grid
      *
      * Default is in the title bar
@@ -1281,13 +1723,12 @@ public class ForkyzSettings {
         getBooleanSetting(PREF_PLAY_CLUE_BELOW_GRID, cb);
     }
 
-    /**
-     * Whether to display the currently selected clue below the grid
-     *
-     * Default is in the title bar
-     */
     public LiveData<Boolean> livePlayClueBelowGrid() {
         return liveBooleanSetting(PREF_PLAY_CLUE_BELOW_GRID);
+    }
+
+    public void setPlayClueBelowGrid(boolean value) {
+        setBooleanSetting(PREF_PLAY_CLUE_BELOW_GRID, value);
     }
 
     /**
@@ -1301,6 +1742,10 @@ public class ForkyzSettings {
         return liveFSEnumSetting(clueHighlight);
     }
 
+    public void setPlayClueHighlight(ClueHighlight value) {
+        setFSEnumSetting(clueHighlight, value);
+    }
+
     /**
      * To remember which page of the clue list is selected in PlayActivity
      */
@@ -1312,6 +1757,14 @@ public class ForkyzSettings {
     public void setPlayClueTabsPage(int pageNum, int value) {
         if (0 <= pageNum && pageNum < PREF_PLAY_CLUE_TABS_PAGES.length)
             setIntegerSetting(PREF_PLAY_CLUE_TABS_PAGES[pageNum], value);
+    }
+
+    public LiveData<CycleUnfilledMode> livePlayCycleUnfilledMode() {
+        return liveFSEnumSetting(cycleUnfilledSetting);
+    }
+
+    public void setPlayCycleUnfilledMode(CycleUnfilledMode value) {
+        setFSEnumSetting(cycleUnfilledSetting, value);
     }
 
     /**
@@ -1337,6 +1790,20 @@ public class ForkyzSettings {
     }
 
     /**
+     * Access to the settings value of delete crossing mode
+     */
+    public LiveData<DeleteCrossingModeSetting>
+    livePlayDeleteCrossingModeSetting() {
+        return liveFSEnumSetting(deleteCrossingModeSetting);
+    }
+
+    public void setPlayDeleteCrossingModeSetting(
+        DeleteCrossingModeSetting value
+    ) {
+        setFSEnumSetting(deleteCrossingModeSetting, value);
+    }
+
+    /**
      * Whether to show separators between cells on grid
      */
     public void getPlayDisplaySeparators(Consumer<DisplaySeparators> cb) {
@@ -1351,11 +1818,23 @@ public class ForkyzSettings {
         return liveFSEnumSetting(displaySeparatorsSetting);
     }
 
+    public void setPlayDisplaySeparators(DisplaySeparators value) {
+        setFSEnumSettingSync(displaySeparatorsSetting, value);
+    }
+
     /**
      * Whether double tapping the screen fits the board to screen
      */
     public void getPlayDoubleTapFitBoard(Consumer<Boolean> cb) {
         getBooleanSetting(PREF_PLAY_DOUBLE_TAP_FIT_BOARD, cb);
+    }
+
+    public LiveData<Boolean> livePlayDoubleTapFitBoard() {
+        return liveBooleanSetting(PREF_PLAY_DOUBLE_TAP_FIT_BOARD);
+    }
+
+    public void setPlayDoubleTapFitBoard(boolean value) {
+        setBooleanSetting(PREF_PLAY_DOUBLE_TAP_FIT_BOARD, value);
     }
 
     /**
@@ -1365,11 +1844,27 @@ public class ForkyzSettings {
         getBooleanSetting(PREF_PLAY_ENSURE_VISIBLE, cb);
     }
 
+    public LiveData<Boolean> livePlayEnsureVisible() {
+        return liveBooleanSetting(PREF_PLAY_ENSURE_VISIBLE);
+    }
+
+    public void setPlayEnsureVisible(boolean value) {
+        setBooleanSetting(PREF_PLAY_ENSURE_VISIBLE, value);
+    }
+
     /**
      * Whether to change selection direction when enter pressed
      */
     public void getPlayEnterChangesDirection(Consumer<Boolean> cb) {
         getBooleanSetting(PREF_PLAY_ENTER_CHANGES_DIRECTION, cb);
+    }
+
+    public LiveData<Boolean> livePlayEnterChangesDirection() {
+        return liveBooleanSetting(PREF_PLAY_ENTER_CHANGES_DIRECTION);
+    }
+
+    public void setPlayEnterChangesDirection(boolean value) {
+        setBooleanSetting(PREF_PLAY_ENTER_CHANGES_DIRECTION, value);
     }
 
     /**
@@ -1383,6 +1878,10 @@ public class ForkyzSettings {
         return liveFSEnumSetting(fitToScreenModeSetting);
     }
 
+    public void setPlayFitToScreenMode(FitToScreenMode value) {
+        setFSEnumSetting(fitToScreenModeSetting, value);
+    }
+
     /**
      * Whether to display the app in full screen mode
      *
@@ -1391,6 +1890,14 @@ public class ForkyzSettings {
      */
     public void getPlayFullScreen(Consumer<Boolean> cb) {
         getBooleanSetting(PREF_PLAY_FULL_SCREEN, cb);
+    }
+
+    public LiveData<Boolean> livePlayFullScreen() {
+        return liveBooleanSetting(PREF_PLAY_FULL_SCREEN);
+    }
+
+    public void setPlayFullScreen(boolean value) {
+        setBooleanSetting(PREF_PLAY_FULL_SCREEN, value);
     }
 
     /**
@@ -1404,6 +1911,10 @@ public class ForkyzSettings {
         return liveFSEnumSetting(landscapeGridRatioSetting);
     }
 
+    public void setPlayGridRatioLandscape(GridRatio value) {
+        setFSEnumSetting(landscapeGridRatioSetting, value);
+    }
+
     /**
      * Get grid ratio when clue tabs showing on play screen
      */
@@ -1413,6 +1924,10 @@ public class ForkyzSettings {
 
     public LiveData<GridRatio> livePlayGridRatioPortrait() {
         return liveFSEnumSetting(portraitGridRatioSetting);
+    }
+
+    public void setPlayGridRatioPortrait(GridRatio value) {
+        setFSEnumSetting(portraitGridRatioSetting, value);
     }
 
     /**
@@ -1428,6 +1943,10 @@ public class ForkyzSettings {
 
     public LiveData<Boolean> livePlayInferSeparators() {
         return liveBooleanSetting(PREF_PLAY_INFER_SEPARATORS);
+    }
+
+    public void setPlayInferSeparators(boolean value) {
+        setBooleanSetting(PREF_PLAY_INFER_SEPARATORS, value);
     }
 
     /**
@@ -1459,11 +1978,27 @@ public class ForkyzSettings {
         });
     }
 
+    public LiveData<MovementStrategySetting> livePlayMovementStrategySetting() {
+        return liveFSEnumSetting(movementStrategySetting);
+    }
+
+    public void setPlayMovementStrategySetting(MovementStrategySetting value) {
+        setFSEnumSetting(movementStrategySetting, value);
+    }
+
     /**
      * Whether to jump to a random clue when device shaken
      */
     public void getPlayRandomClueOnShake(Consumer<Boolean> cb) {
         getBooleanSetting(PREF_PLAY_RANDOM_CLUE_ON_SHAKE, cb);
+    }
+
+    public LiveData<Boolean> livePlayRandomClueOnShake() {
+        return liveBooleanSetting(PREF_PLAY_RANDOM_CLUE_ON_SHAKE);
+    }
+
+    public void setPlayRandomClueOnShake(boolean value) {
+        setBooleanSetting(PREF_PLAY_RANDOM_CLUE_ON_SHAKE, value);
     }
 
     /**
@@ -1488,6 +2023,14 @@ public class ForkyzSettings {
         getBooleanSetting(PREF_PLAY_PLAY_LETTER_UNDO_ENABLED, cb);
     }
 
+    public LiveData<Boolean> livePlayPlayLetterUndoEnabled() {
+        return liveBooleanSetting(PREF_PLAY_PLAY_LETTER_UNDO_ENABLED);
+    }
+
+    public void setPlayPlayLetterUndoEnabled(boolean value) {
+        setBooleanSetting(PREF_PLAY_PLAY_LETTER_UNDO_ENABLED, value);
+    }
+
     /**
      * Whether to try to guess the source chars of an anagram
      *
@@ -1495,6 +2038,14 @@ public class ForkyzSettings {
      */
     public void getPlayPredictAnagramChars(Consumer<Boolean> cb) {
         getBooleanSetting(PREF_PLAY_PREDICT_ANAGRAM_CHARS, cb);
+    }
+
+    public LiveData<Boolean> livePlayPredictAnagramChars() {
+        return liveBooleanSetting(PREF_PLAY_PREDICT_ANAGRAM_CHARS);
+    }
+
+    public void setPlayPredictAnagramChars(boolean value) {
+        setBooleanSetting(PREF_PLAY_PREDICT_ANAGRAM_CHARS, value);
     }
 
     /**
@@ -1511,6 +2062,12 @@ public class ForkyzSettings {
     public LiveData<Boolean> livePlayPreserveCorrectLettersInShowErrors() {
         return liveBooleanSetting(
             PREF_PLAY_PRESERVE_CORRECT_LETTERS_IN_SHOW_ERRORS
+        );
+    }
+
+    public void setPlayPreserveCorrectLettersInShowErrors(boolean value) {
+        setBooleanSetting(
+            PREF_PLAY_PRESERVE_CORRECT_LETTERS_IN_SHOW_ERRORS, value
         );
     }
 
@@ -1532,11 +2089,16 @@ public class ForkyzSettings {
         getBooleanSetting(PREF_PLAY_SCRATCH_DISPLAY, cb);
     }
 
-    /**
-     * Whether to show scratch notes on the play board in grey letters
-     */
     public boolean getPlayScratchDisplaySync() {
         return getBooleanSettingSync(PREF_PLAY_SCRATCH_DISPLAY);
+    }
+
+    public LiveData<Boolean> livePlayScratchDisplay() {
+        return liveBooleanSetting(PREF_PLAY_SCRATCH_DISPLAY);
+    }
+
+    public void setPlayScratchDisplay(boolean value) {
+        setBooleanSetting(PREF_PLAY_SCRATCH_DISPLAY, value);
     }
 
     /**
@@ -1625,11 +2187,23 @@ public class ForkyzSettings {
         return liveBooleanSetting(PREF_PLAY_SHOW_TIMER);
     }
 
+    public void setPlayShowTimer(boolean value) {
+        setBooleanSetting(PREF_PLAY_SHOW_TIMER, value);
+    }
+
     /**
      * Whether to skip filled cells when moving to the next
      */
     public void getPlaySkipFilled(Consumer<Boolean> cb) {
         getBooleanSetting(PREF_PLAY_SKIP_FILLED, cb);
+    }
+
+    public LiveData<Boolean> livePlaySkipFilled() {
+        return liveBooleanSetting(PREF_PLAY_SKIP_FILLED);
+    }
+
+    public void setPlaySkipFilled(boolean value) {
+        setBooleanSetting(PREF_PLAY_SKIP_FILLED, value);
     }
 
     /**
@@ -1650,6 +2224,14 @@ public class ForkyzSettings {
         getBooleanSetting(PREF_PLAY_SPACE_CHANGE_DIRECTION, cb);
     }
 
+    public LiveData<Boolean> livePlaySpaceChangesDirection() {
+        return liveBooleanSetting(PREF_PLAY_SPACE_CHANGE_DIRECTION);
+    }
+
+    public void setPlaySpaceChangesDirection(boolean value) {
+        setBooleanSetting(PREF_PLAY_SPACE_CHANGE_DIRECTION, value);
+    }
+
     /**
      * Whether hinted squares should not be highlighted on board view
      */
@@ -1659,6 +2241,14 @@ public class ForkyzSettings {
 
     public boolean getPlaySuppressHintHighlightingSync() {
         return getBooleanSettingSync(PREF_PLAY_SUPPRESS_HINT_HIGHLIGHTING);
+    }
+
+    public LiveData<Boolean> livePlaySuppressHintHighlighting() {
+        return liveBooleanSetting(PREF_PLAY_SUPPRESS_HINT_HIGHLIGHTING);
+    }
+
+    public void setPlaySuppressHintHighlighting(boolean value) {
+        setBooleanSetting(PREF_PLAY_SUPPRESS_HINT_HIGHLIGHTING, value);
     }
 
     /**
@@ -1675,6 +2265,10 @@ public class ForkyzSettings {
         return liveBooleanSetting(PREF_PLAY_TOGGLE_BEFORE_MOVE);
     }
 
+    public void setPlayToggleBeforeMove(boolean value) {
+        setBooleanSetting(PREF_PLAY_TOGGLE_BEFORE_MOVE, value);
+    }
+
     /**
      * Whether to indicate show errors status (i.e. whether turned on)
      */
@@ -1686,13 +2280,24 @@ public class ForkyzSettings {
         return liveBooleanSetting(PREF_PLAY_INDICATE_SHOW_ERRORS);
     }
 
+    public void setPlayIndicateShowErrors(boolean value) {
+        setBooleanSetting(PREF_PLAY_INDICATE_SHOW_ERRORS, value);
+    }
+
+    public LiveData<Boolean> liveRatingsDisableRatings() {
+        return liveBooleanSetting(PREF_RATINGS_DISABLE_RATINGS);
+    }
+
+    public void setRatingsDisableRatings(boolean value) {
+        setBooleanSetting(PREF_RATINGS_DISABLE_RATINGS, value);
+    }
+
     public LiveData<RatingsSettings> liveRatingsSettings() {
         if (liveRatingsSettings == null) {
             liveRatingsSettings = new MutableLiveData<RatingsSettings>();
             updateLiveRatingsSettings();
         }
         return liveRatingsSettings;
-
     }
 
     /**
@@ -1702,11 +2307,27 @@ public class ForkyzSettings {
         getBooleanSetting(PREF_VOICE_ALWAYS_ANNOUNCE_BOX, cb);
     }
 
+    public LiveData<Boolean> liveVoiceAlwaysAnnounceBox() {
+        return liveBooleanSetting(PREF_VOICE_ALWAYS_ANNOUNCE_BOX);
+    }
+
+    public void setVoiceAlwaysAnnounceBox(boolean value) {
+        setBooleanSetting(PREF_VOICE_ALWAYS_ANNOUNCE_BOX, value);
+    }
+
     /**
      * Whether to always announce the current clue
      */
     public void getVoiceAlwaysAnnounceClue(Consumer<Boolean> cb) {
         getBooleanSetting(PREF_VOICE_ALWAYS_ANNOUNCE_CLUE, cb);
+    }
+
+    public LiveData<Boolean> liveVoiceAlwaysAnnounceClue() {
+        return liveBooleanSetting(PREF_VOICE_ALWAYS_ANNOUNCE_CLUE);
+    }
+
+    public void setVoiceAlwaysAnnounceClue(boolean value) {
+        setBooleanSetting(PREF_VOICE_ALWAYS_ANNOUNCE_CLUE, value);
     }
 
     /**
@@ -1716,11 +2337,23 @@ public class ForkyzSettings {
         getBooleanSetting(PREF_VOICE_BUTTON_ACTIVATES_VOICE, cb);
     }
 
+    public LiveData<Boolean> liveVoiceButtonActivatesVoice() {
+        return liveBooleanSetting(PREF_VOICE_BUTTON_ACTIVATES_VOICE);
+    }
+
+    public void setVoiceButtonActivatesVoice(boolean value) {
+        setBooleanSetting(PREF_VOICE_BUTTON_ACTIVATES_VOICE, value);
+    }
+
     /**
      * Whether pressing volume down activates voice input
      */
     public LiveData<Boolean> liveVoiceVolumeActivatesVoice() {
         return liveBooleanSetting(PREF_VOICE_VOLUME_ACTIVATES_VOICE);
+    }
+
+    public void setVoiceVolumeActivatesVoice(boolean value) {
+        setBooleanSetting(PREF_VOICE_VOLUME_ACTIVATES_VOICE, value);
     }
 
     /**
@@ -1730,11 +2363,23 @@ public class ForkyzSettings {
         return liveBooleanSetting(PREF_VOICE_EQUALS_ANNOUNCE_CLUE);
     }
 
+    public void setVoiceEqualsAnnounceClue(boolean value) {
+        setBooleanSetting(PREF_VOICE_EQUALS_ANNOUNCE_CLUE, value);
+    }
+
     /**
      * Whether to show a button for reading out clue
      */
     public void getVoiceButtonAnnounceClue(Consumer<Boolean> cb) {
         getBooleanSetting(PREF_VOICE_BUTTON_ANNOUNCE_CLUE, cb);
+    }
+
+    public LiveData<Boolean> liveVoiceButtonAnnounceClue() {
+        return liveBooleanSetting(PREF_VOICE_BUTTON_ANNOUNCE_CLUE);
+    }
+
+    public void setVoiceButtonAnnounceClue(boolean value) {
+        setBooleanSetting(PREF_VOICE_BUTTON_ANNOUNCE_CLUE, value);
     }
 
     /**
@@ -1745,56 +2390,336 @@ public class ForkyzSettings {
      */
     public void getDownloadersSettings(Consumer<DownloadersSettings> cb) {
         executor.execute(() -> {
-            DownloadersSettings settings = new DownloadersSettings(
-                getBooleanSettingSync("downloadDeStandaard"),
-                getBooleanSettingSync("downloadDeTelegraaf"),
-                getBooleanSettingSync("downloadGuardianDailyCryptic"),
-                getBooleanSettingSync("downloadGuardianWeeklyQuiptic"),
-                getBooleanSettingSync("downloadHamAbend"),
-                getBooleanSettingSync("downloadIndependentDailyCryptic"),
-                getBooleanSettingSync("downloadIrishNewsCryptic"),
-                getBooleanSettingSync("downloadJonesin"),
-                getBooleanSettingSync("downloadJoseph"),
-                getBooleanSettingSync("download20Minutes"),
-                getBooleanSettingSync("downloadLeParisienF1"),
-                getBooleanSettingSync("downloadLeParisienF2"),
-                getBooleanSettingSync("downloadLeParisienF3"),
-                getBooleanSettingSync("downloadLeParisienF4"),
-                getBooleanSettingSync("downloadMetroCryptic"),
-                getBooleanSettingSync("downloadMetroQuick"),
-                getBooleanSettingSync("downloadNewsday"),
-                getBooleanSettingSync("downloadNewYorkTimesSyndicated"),
-                getBooleanSettingSync("downloadPremier"),
-                getBooleanSettingSync("downloadSheffer"),
-                getBooleanSettingSync("downloadUniversal"),
-                getBooleanSettingSync("downloadUSAToday"),
-                getBooleanSettingSync("downloadWaPoSunday"),
-                getBooleanSettingSync("downloadWsj"),
-                getBooleanSettingSync("scrapeCru"),
-                getBooleanSettingSync("scrapeEveryman"),
-                getBooleanSettingSync("scrapeGuardianQuick"),
-                getBooleanSettingSync("scrapeKegler"),
-                getBooleanSettingSync("scrapePrivateEye"),
-                getBooleanSettingSync("scrapePrzekroj"),
-                getBooleanSettingSync(PREF_DOWNLOAD_CUSTOM_DAILY),
-                getStringSettingSync(PREF_DOWNLOAD_CUSTOM_DAILY_TITLE),
-                getStringSettingSync(PREF_DOWNLOAD_CUSTOM_DAILY_URL),
-                getBooleanSettingSync(PREF_SUPPRESS_SUMMARY_NOTIFICATIONS),
-                getBooleanSettingSync(PREF_SUPPRESS_INDIVIDUAL_NOTIFICATIONS),
-                getStringSetSettingSync(PREF_AUTO_DOWNLOADERS),
-                Integer.valueOf(getStringSettingSync(PREF_DOWNLOAD_TIMEOUT)),
-                getBooleanSettingSync("dlOnStartup")
-            );
+            DownloadersSettings settings = getDownloadersSettingsSync();
             handler.post(() -> { cb.accept(settings); });
         });
+    }
+
+    public DownloadersSettings getDownloadersSettingsSync() {
+        return new DownloadersSettings(
+            getBooleanSettingSync(PREF_DOWNLOAD_DE_STANDAARD),
+            getBooleanSettingSync(PREF_DOWNLOAD_DE_TELEGRAAF),
+            getBooleanSettingSync(PREF_DOWNLOAD_GUARDIAN_DAILY_CRYPTIC),
+            getBooleanSettingSync(PREF_DOWNLOAD_GUARDIAN_WEEKLY_QUIPTIC),
+            getBooleanSettingSync(PREF_DOWNLOAD_HAM_ABEND),
+            getBooleanSettingSync(PREF_DOWNLOAD_INDEPENDENT_DAILY_CRYPTIC),
+            getBooleanSettingSync(PREF_DOWNLOAD_IRISH_NEWS_CRYPTIC),
+            getBooleanSettingSync(PREF_DOWNLOAD_JONESIN),
+            getBooleanSettingSync(PREF_DOWNLOAD_JOSEPH),
+            getBooleanSettingSync(PREF_DOWNLOAD_20_MINUTES),
+            getBooleanSettingSync(PREF_DOWNLOAD_LE_PARISIEN_F1),
+            getBooleanSettingSync(PREF_DOWNLOAD_LE_PARISIEN_F2),
+            getBooleanSettingSync(PREF_DOWNLOAD_LE_PARISIEN_F3),
+            getBooleanSettingSync(PREF_DOWNLOAD_LE_PARISIEN_F4),
+            getBooleanSettingSync(PREF_DOWNLOAD_METRO_CRYPTIC),
+            getBooleanSettingSync(PREF_DOWNLOAD_METRO_QUICK),
+            getBooleanSettingSync(PREF_DOWNLOAD_NEWSDAY),
+            getBooleanSettingSync(PREF_DOWNLOAD_NEW_YORK_TIMES_SYNDICATED),
+            getBooleanSettingSync(PREF_DOWNLOAD_PREMIER),
+            getBooleanSettingSync(PREF_DOWNLOAD_SHEFFER),
+            getBooleanSettingSync(PREF_DOWNLOAD_UNIVERSAL),
+            getBooleanSettingSync(PREF_DOWNLOAD_USA_TODAY),
+            getBooleanSettingSync(PREF_DOWNLOAD_WA_PO_SUNDAY),
+            getBooleanSettingSync(PREF_DOWNLOAD_WSJ),
+            getBooleanSettingSync(PREF_SCRAPE_CRU),
+            getBooleanSettingSync(PREF_SCRAPE_EVERYMAN),
+            getBooleanSettingSync(PREF_SCRAPE_GUARDIAN_QUICK),
+            getBooleanSettingSync(PREF_SCRAPE_KEGLER),
+            getBooleanSettingSync(PREF_SCRAPE_PRIVATE_EYE),
+            getBooleanSettingSync(PREF_SCRAPE_PRZEKROJ),
+            getBooleanSettingSync(PREF_DOWNLOAD_CUSTOM_DAILY),
+            getStringSettingSync(PREF_DOWNLOAD_CUSTOM_DAILY_TITLE),
+            getStringSettingSync(PREF_DOWNLOAD_CUSTOM_DAILY_URL),
+            getBooleanSettingSync(
+                PREF_DOWNLOAD_SUPPRESS_SUMMARY_NOTIFICATIONS
+            ),
+            getBooleanSettingSync(
+                PREF_DOWNLOAD_SUPPRESS_INDIVIDUAL_NOTIFICATIONS
+            ),
+            getStringSetSettingSync(PREF_DOWNLOAD_AUTO_DOWNLOADERS),
+            Integer.valueOf(getStringSettingSync(PREF_DOWNLOAD_TIMEOUT)),
+            getBooleanSettingSync(PREF_DOWNLOAD_ON_STARTUP)
+        );
+    }
+
+    public LiveData<DownloadersSettings> liveDownloadersSettings() {
+        if (liveDownloadersSettings == null) {
+            liveDownloadersSettings = new MutableLiveData<DownloadersSettings>();
+            updateLiveDownloadersSettings();
+        }
+        return liveDownloadersSettings;
+    }
+
+    public LiveData<Boolean> liveDownloadDeStandaard() {
+        return liveBooleanSetting(PREF_DOWNLOAD_DE_STANDAARD);
+    }
+
+    public void setDownloadDeStandaard(boolean download) {
+        setBooleanSetting(PREF_DOWNLOAD_DE_STANDAARD, download);
+    }
+
+    public LiveData<Boolean> liveDownloadDeTelegraaf() {
+        return liveBooleanSetting(PREF_DOWNLOAD_DE_TELEGRAAF);
+    }
+
+    public void setDownloadDeTelegraaf(boolean download) {
+        setBooleanSetting(PREF_DOWNLOAD_DE_TELEGRAAF, download);
+    }
+
+    public LiveData<Boolean> liveDownloadGuardianDailyCryptic() {
+        return liveBooleanSetting(PREF_DOWNLOAD_GUARDIAN_DAILY_CRYPTIC);
+    }
+
+    public void setDownloadGuardianDailyCryptic(boolean download) {
+        setBooleanSetting(PREF_DOWNLOAD_GUARDIAN_DAILY_CRYPTIC, download);
+    }
+
+    public LiveData<Boolean> liveDownloadGuardianWeeklyQuiptic() {
+        return liveBooleanSetting(PREF_DOWNLOAD_GUARDIAN_WEEKLY_QUIPTIC);
+    }
+
+    public void setDownloadGuardianWeeklyQuiptic(boolean download) {
+        setBooleanSetting(PREF_DOWNLOAD_GUARDIAN_WEEKLY_QUIPTIC, download);
+    }
+
+    public LiveData<Boolean> liveDownloadHamAbend() {
+        return liveBooleanSetting(PREF_DOWNLOAD_HAM_ABEND);
+    }
+
+    public void setDownloadHamAbend(boolean download) {
+        setBooleanSetting(PREF_DOWNLOAD_HAM_ABEND, download);
+    }
+
+    public LiveData<Boolean> liveDownloadIndependentDailyCryptic() {
+        return liveBooleanSetting(PREF_DOWNLOAD_INDEPENDENT_DAILY_CRYPTIC);
+    }
+
+    public void setDownloadIndependentDailyCryptic(boolean download) {
+        setBooleanSetting(PREF_DOWNLOAD_INDEPENDENT_DAILY_CRYPTIC, download);
+    }
+
+    public LiveData<Boolean> liveDownloadIrishNewsCryptic() {
+        return liveBooleanSetting(PREF_DOWNLOAD_IRISH_NEWS_CRYPTIC);
+    }
+
+    public void setDownloadIrishNewsCryptic(boolean download) {
+        setBooleanSetting(PREF_DOWNLOAD_IRISH_NEWS_CRYPTIC, download);
+    }
+
+    public LiveData<Boolean> liveDownloadJonesin() {
+        return liveBooleanSetting(PREF_DOWNLOAD_JONESIN);
+    }
+
+    public void setDownloadJonesin(boolean download) {
+        setBooleanSetting(PREF_DOWNLOAD_JONESIN, download);
+    }
+
+    public LiveData<Boolean> liveDownloadJoseph() {
+        return liveBooleanSetting(PREF_DOWNLOAD_JOSEPH);
+    }
+
+    public void setDownloadJoseph(boolean download) {
+        setBooleanSetting(PREF_DOWNLOAD_JOSEPH, download);
+    }
+
+    public LiveData<Boolean> liveDownload20Minutes() {
+        return liveBooleanSetting(PREF_DOWNLOAD_20_MINUTES);
+    }
+
+    public void setDownload20Minutes(boolean download) {
+        setBooleanSetting(PREF_DOWNLOAD_20_MINUTES, download);
+    }
+
+    public LiveData<Boolean> liveDownloadLeParisienF1() {
+        return liveBooleanSetting(PREF_DOWNLOAD_LE_PARISIEN_F1);
+    }
+
+    public void setDownloadLeParisienF1(boolean download) {
+        setBooleanSetting(PREF_DOWNLOAD_LE_PARISIEN_F1, download);
+    }
+
+    public LiveData<Boolean> liveDownloadLeParisienF2() {
+        return liveBooleanSetting(PREF_DOWNLOAD_LE_PARISIEN_F2);
+    }
+
+    public void setDownloadLeParisienF2(boolean download) {
+        setBooleanSetting(PREF_DOWNLOAD_LE_PARISIEN_F2, download);
+    }
+
+    public LiveData<Boolean> liveDownloadLeParisienF3() {
+        return liveBooleanSetting(PREF_DOWNLOAD_LE_PARISIEN_F3);
+    }
+
+    public void setDownloadLeParisienF3(boolean download) {
+        setBooleanSetting(PREF_DOWNLOAD_LE_PARISIEN_F3, download);
+    }
+
+    public LiveData<Boolean> liveDownloadLeParisienF4() {
+        return liveBooleanSetting(PREF_DOWNLOAD_LE_PARISIEN_F4);
+    }
+
+    public void setDownloadLeParisienF4(boolean download) {
+        setBooleanSetting(PREF_DOWNLOAD_LE_PARISIEN_F4, download);
+    }
+
+    public LiveData<Boolean> liveDownloadMetroCryptic() {
+        return liveBooleanSetting(PREF_DOWNLOAD_METRO_CRYPTIC);
+    }
+
+    public void setDownloadMetroCryptic(boolean download) {
+        setBooleanSetting(PREF_DOWNLOAD_METRO_CRYPTIC, download);
+    }
+
+    public LiveData<Boolean> liveDownloadMetroQuick() {
+        return liveBooleanSetting(PREF_DOWNLOAD_METRO_QUICK);
+    }
+
+    public void setDownloadMetroQuick(boolean download) {
+        setBooleanSetting(PREF_DOWNLOAD_METRO_QUICK, download);
+    }
+
+    public LiveData<Boolean> liveDownloadNewsday() {
+        return liveBooleanSetting(PREF_DOWNLOAD_NEWSDAY);
+    }
+
+    public void setDownloadNewsday(boolean download) {
+        setBooleanSetting(PREF_DOWNLOAD_NEWSDAY, download);
+    }
+
+    public LiveData<Boolean> liveDownloadNewYorkTimesSyndicated() {
+        return liveBooleanSetting(PREF_DOWNLOAD_NEW_YORK_TIMES_SYNDICATED);
+    }
+
+    public void setDownloadNewYorkTimesSyndicated(boolean download) {
+        setBooleanSetting(PREF_DOWNLOAD_NEW_YORK_TIMES_SYNDICATED, download);
+    }
+
+    public LiveData<Boolean> liveDownloadPremier() {
+        return liveBooleanSetting(PREF_DOWNLOAD_PREMIER);
+    }
+
+    public void setDownloadPremier(boolean download) {
+        setBooleanSetting(PREF_DOWNLOAD_PREMIER, download);
+    }
+
+    public LiveData<Boolean> liveDownloadSheffer() {
+        return liveBooleanSetting(PREF_DOWNLOAD_SHEFFER);
+    }
+
+    public void setDownloadSheffer(boolean download) {
+        setBooleanSetting(PREF_DOWNLOAD_SHEFFER, download);
+    }
+
+    public LiveData<Boolean> liveDownloadUniversal() {
+        return liveBooleanSetting(PREF_DOWNLOAD_UNIVERSAL);
+    }
+
+    public void setDownloadUniversal(boolean download) {
+        setBooleanSetting(PREF_DOWNLOAD_UNIVERSAL, download);
+    }
+
+    public LiveData<Boolean> liveDownloadUSAToday() {
+        return liveBooleanSetting(PREF_DOWNLOAD_USA_TODAY);
+    }
+
+    public void setDownloadUSAToday(boolean download) {
+        setBooleanSetting(PREF_DOWNLOAD_USA_TODAY, download);
+    }
+
+    public LiveData<Boolean> liveDownloadWaPoSunday() {
+        return liveBooleanSetting(PREF_DOWNLOAD_WA_PO_SUNDAY);
+    }
+
+    public void setDownloadWaPoSunday(boolean download) {
+        setBooleanSetting(PREF_DOWNLOAD_WA_PO_SUNDAY, download);
+    }
+
+    public LiveData<Boolean> liveDownloadWsj() {
+        return liveBooleanSetting(PREF_DOWNLOAD_WSJ);
+    }
+
+    public void setDownloadWsj(boolean download) {
+        setBooleanSetting(PREF_DOWNLOAD_WSJ, download);
+    }
+
+    public LiveData<Boolean> liveScrapeCru() {
+        return liveBooleanSetting(PREF_SCRAPE_CRU);
+    }
+
+    public void setScrapeCru(boolean download) {
+        setBooleanSetting(PREF_SCRAPE_CRU, download);
+    }
+
+    public LiveData<Boolean> liveScrapeEveryman() {
+        return liveBooleanSetting(PREF_SCRAPE_EVERYMAN);
+    }
+
+    public void setScrapeEveryman(boolean download) {
+        setBooleanSetting(PREF_SCRAPE_EVERYMAN, download);
+    }
+
+    public LiveData<Boolean> liveScrapeGuardianQuick() {
+        return liveBooleanSetting(PREF_SCRAPE_GUARDIAN_QUICK);
+    }
+
+    public void setScrapeGuardianQuick(boolean download) {
+        setBooleanSetting(PREF_SCRAPE_GUARDIAN_QUICK, download);
+    }
+
+    public LiveData<Boolean> liveScrapeKegler() {
+        return liveBooleanSetting(PREF_SCRAPE_KEGLER);
+    }
+
+    public void setScrapeKegler(boolean download) {
+        setBooleanSetting(PREF_SCRAPE_KEGLER, download);
+    }
+
+    public LiveData<Boolean> liveScrapePrivateEye() {
+        return liveBooleanSetting(PREF_SCRAPE_PRIVATE_EYE);
+    }
+
+    public void setScrapePrivateEye(boolean download) {
+        setBooleanSetting(PREF_SCRAPE_PRIVATE_EYE, download);
+    }
+
+    public LiveData<Boolean> liveScrapePrzekroj() {
+        return liveBooleanSetting(PREF_SCRAPE_PRZEKROJ);
+    }
+
+    public void setScrapePrzekroj(boolean download) {
+        setBooleanSetting(PREF_SCRAPE_PRZEKROJ, download);
     }
 
     public void getDownloadCustomDaily(Consumer<Boolean> cb) {
         getBooleanSetting(PREF_DOWNLOAD_CUSTOM_DAILY, cb);
     }
 
+    public LiveData<Boolean> liveDownloadCustomDaily() {
+        return liveBooleanSetting(PREF_DOWNLOAD_CUSTOM_DAILY);
+    }
+
+    public void setDownloadCustomDaily(Boolean download) {
+        setBooleanSetting(PREF_DOWNLOAD_CUSTOM_DAILY, download);
+    }
+
+    public LiveData<String> liveDownloadCustomDailyTitle() {
+        return liveStringSetting(PREF_DOWNLOAD_CUSTOM_DAILY_TITLE);
+    }
+
+    public void setDownloadCustomDailyTitle(String title) {
+        setStringSetting(PREF_DOWNLOAD_CUSTOM_DAILY_TITLE, title);
+    }
+
     public void getDownloadCustomDailyURL(Consumer<String> cb) {
         getStringSetting(PREF_DOWNLOAD_CUSTOM_DAILY_URL, cb);
+    }
+
+    public LiveData<String> liveDownloadCustomDailyURL() {
+        return liveStringSetting(PREF_DOWNLOAD_CUSTOM_DAILY_URL);
+    }
+
+    public void setDownloadCustomDailyURL(String url) {
+        setStringSetting(PREF_DOWNLOAD_CUSTOM_DAILY_URL, url);
     }
 
     /**
@@ -1808,10 +2733,75 @@ public class ForkyzSettings {
             || PREF_DOWNLOAD_CUSTOM_DAILY_URL.equals(pref);
     }
 
+    /**
+     * Set of ids of downloaders to download using autodownload
+     */
+    public LiveData<Set<String>> liveDownloadAutoDownloaders() {
+        return liveStringSetSetting(PREF_DOWNLOAD_AUTO_DOWNLOADERS);
+    }
+
+    public void setDownloadAutoDownloaders(Set<String> value) {
+        setStringSetSetting(PREF_DOWNLOAD_AUTO_DOWNLOADERS, value);
+    }
+
+    public LiveData<Boolean> liveDownloadOnStartup() {
+        return liveBooleanSetting(PREF_DOWNLOAD_ON_STARTUP);
+    }
+
+    public void setDownloadOnStartUp(boolean download) {
+        setBooleanSetting(PREF_DOWNLOAD_ON_STARTUP, download);
+    }
+
+    /**
+     * Whether to not show summary notification when download finished
+     */
+    public LiveData<Boolean> liveDownloadSuppressSummaryMessages() {
+        return liveBooleanSetting(PREF_DOWNLOAD_SUPPRESS_SUMMARY_NOTIFICATIONS);
+    }
+
+    public void setDownloadSuppressSummaryMessages(boolean value) {
+        setBooleanSetting(PREF_DOWNLOAD_SUPPRESS_SUMMARY_NOTIFICATIONS, value);
+    }
+
+    /**
+     * Whether to give notification for each download tried
+     */
+    public LiveData<Boolean> liveDownloadSuppressMessages() {
+        return liveBooleanSetting(
+            PREF_DOWNLOAD_SUPPRESS_INDIVIDUAL_NOTIFICATIONS
+        );
+    }
+
+    public void setDownloadSuppressMessages(boolean value) {
+        setBooleanSetting(
+            PREF_DOWNLOAD_SUPPRESS_INDIVIDUAL_NOTIFICATIONS,
+            value
+        );
+    }
+
+    /**
+     * How long to wait before download times out
+     *
+     * Is a string but converts to integer before returning
+     */
     public void getDownloadTimeout(Consumer<Integer> cb) {
         getStringSetting(PREF_DOWNLOAD_TIMEOUT, value -> {
             cb.accept(Integer.valueOf(value));
         });
+    }
+
+    /**
+     * Live version returns backend value of string
+     */
+    public LiveData<String> liveDownloadTimeout() {
+        return liveStringSetting(PREF_DOWNLOAD_TIMEOUT);
+    }
+
+    /**
+     * Set backend string value
+     */
+    public void setDownloadTimeout(String value) {
+        setStringSetting(PREF_DOWNLOAD_TIMEOUT, value);
     }
 
     /**
@@ -1820,7 +2810,7 @@ public class ForkyzSettings {
     public void migrateAutoDownloaders(Downloaders downloaders) {
         executor.execute(() -> {
             Set<String> autoDownloaders
-                = prefs.getStringSet(PREF_AUTO_DOWNLOADERS, null);
+                = prefs.getStringSet(PREF_DOWNLOAD_AUTO_DOWNLOADERS, null);
 
             if (autoDownloaders == null) {
                 autoDownloaders = new HashSet<>();
@@ -1830,8 +2820,10 @@ public class ForkyzSettings {
                 }
 
                 prefs.edit()
-                    .putStringSet(PREF_AUTO_DOWNLOADERS, autoDownloaders)
-                    .apply();
+                    .putStringSet(
+                        PREF_DOWNLOAD_AUTO_DOWNLOADERS,
+                        autoDownloaders
+                    ).apply();
             }
         });
     }
@@ -1913,8 +2905,14 @@ public class ForkyzSettings {
      */
     public void disableNotifications() {
         executor.execute(() -> {
-            setBooleanSettingSync(PREF_SUPPRESS_SUMMARY_NOTIFICATIONS, true);
-            setBooleanSettingSync(PREF_SUPPRESS_INDIVIDUAL_NOTIFICATIONS, true);
+            setBooleanSettingSync(
+                PREF_DOWNLOAD_SUPPRESS_SUMMARY_NOTIFICATIONS,
+                true
+            );
+            setBooleanSettingSync(
+                PREF_DOWNLOAD_SUPPRESS_INDIVIDUAL_NOTIFICATIONS,
+                true
+            );
         });
     }
 
@@ -2078,6 +3076,12 @@ public class ForkyzSettings {
         return stringSetSettings.get(key).getValue(prefs);
     }
 
+    private void setStringSetSetting(String key, Set<String> value) {
+        executor.execute(() -> {
+            setStringSetSettingSync(key, value);
+        });
+    }
+
     private void setStringSetSettingSync(String key, Set<String> value) {
         stringSetSettings.get(key).setValue(prefs, value);
     }
@@ -2113,8 +3117,34 @@ public class ForkyzSettings {
         }
     }
 
+    private void updateLiveFileHandlerSettings() {
+        if (liveFileHandlerSettings != null) {
+            executor.execute(() -> {
+                FileHandlerSettings fhSettings = getFileHandlerSettingsSync();
+                liveFileHandlerSettings.postValue(fhSettings);
+            });
+        }
+    }
+
+    private void updateLiveDownloadersSettings() {
+        if (liveDownloadersSettings != null) {
+            executor.execute(() -> {
+                DownloadersSettings settings = getDownloadersSettingsSync();
+                liveDownloadersSettings.postValue(settings);
+            });
+        }
+    }
+
     private LiveData<Boolean> liveBooleanSetting(String key) {
         return booleanSettings.get(key).getCreateLiveData(prefs);
+    }
+
+    private LiveData<String> liveStringSetting(String key) {
+        return stringSettings.get(key).getCreateLiveData(prefs);
+    }
+
+    private LiveData<Set<String>> liveStringSetSetting(String key) {
+        return stringSetSettings.get(key).getCreateLiveData(prefs);
     }
 
     /**
@@ -2160,6 +3190,28 @@ public class ForkyzSettings {
             return fallbackValue;
         }
     }
+
+    private LiveData<Integer> liveIntegerFromStringSetting(
+        String key, int fallbackValue
+    ) {
+        return Transformations.map(
+            liveStringSetting(key),
+            value -> {
+                try {
+                    return Integer.parseInt(getStringSettingSync(key));
+                } catch (NumberFormatException e) {
+                    return fallbackValue;
+                }
+            }
+        );
+    }
+
+    private void setIntegerToStringSetting(String key, int value) {
+        executor.execute(() -> {
+            stringSettings.get(key).setValue(prefs, String.valueOf(value));
+        });
+    }
+
 
     private void migratePrefBooleanToString(
         String legacyName,

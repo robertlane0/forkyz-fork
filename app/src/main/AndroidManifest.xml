@@ -85,7 +85,7 @@
         >
         </activity>
         <activity
-            android:name="app.crossword.yourealwaysbe.forkyz.PreferencesActivity"
+            android:name="app.crossword.yourealwaysbe.forkyz.SettingsActivity"
             android:label="@string/settings_label"
             android:theme="@style/Theme.Forkyz"
             android:exported="false"

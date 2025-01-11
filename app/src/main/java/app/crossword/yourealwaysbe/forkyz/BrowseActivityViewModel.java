@@ -145,7 +145,7 @@ public class BrowseActivityViewModel extends AndroidViewModel {
                     : fileHandler.getCrosswordsDirectory();
 
                 FilteredList<MutableLiveData<PuzMetaFile>> puzFiles
-                    = new FilteredList<>(this::metaMatches);
+                    = new FilteredList<>();
 
                 for (PuzMetaFile pm : fileHandler.getPuzMetas(directory)) {
                     puzFiles.add(new MutableLiveData<>(pm));
@@ -534,8 +534,12 @@ public class BrowseActivityViewModel extends AndroidViewModel {
     private void setNewPuzzleListAndFilter(
         FilteredList<MutableLiveData<PuzMetaFile>> newList, String newFilter
     ) {
-        if (newList != null)
-            newList.applyFilter(newFilter);
+        if (newList != null) {
+            if (newFilter == null || newFilter.length() == 0)
+                newList.clearFilter();
+            else
+                newList.applyFilter(meta -> metaMatches(meta, newFilter));
+        }
         puzzleFiles.setValue(newList);
     }
 
@@ -576,7 +580,7 @@ public class BrowseActivityViewModel extends AndroidViewModel {
             return false;
 
         if (filterText == null)
-            return false;
+            return true;
 
         Locale locale = Locale.getDefault();
 

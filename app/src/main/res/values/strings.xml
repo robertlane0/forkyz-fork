@@ -1,7 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE resources [
-    <!ENTITY customurldesc "Enter URL formatted according to Java\'s DateTimeFormatter. The puzzle can be in any supported format.">
-]>
 <resources
     xmlns:tools="http://schemas.android.com/tools"
 >
@@ -20,6 +17,7 @@
     <string name="general_puzzle_notes">Free-form notes about puzzle</string>
     <string name="unknown_hint">(No explicit clue)</string>
     <string name="no_orientation_lock">Sorry, orientation lock is not supported without fullscreen mode anymore because of an Android change."</string>
+    <string name="back">Back</string>
 
     <!-- downloading -->
     <string name="download">Download</string>
@@ -91,6 +89,10 @@
     <string name="close_filter_desc">Close Filter</string>
     <string name="filter_puzzles">Filter Puzzles</string>
     <string name="has_solution_desc">Puzzle has solution</string>
+    <string name="cleanup_age_two_days">Two Days</string>
+    <string name="cleanup_age_one_week">One Week</string>
+    <string name="cleanup_age_thirty_days">Thirty Days</string>
+    <string name="cleanup_age_never">Never</string>
 
     <!-- play page -->
     <string name="open_clue_list">Open clue list</string>
@@ -151,7 +153,7 @@
     <string name="external_storage_saf_current_uri">(Current: %1$s)</string>
     <string name="external_storage_saf_none_selected">no directory selected</string>
     <string name="external_storage_legacy">External SD crosswords directory</string>
-    <string name="storage_changed_title">Storage location changed.</string>
+    <string name="storage_changed_title">Storage Changed</string>
     <string name="storage_changed_please_restart">Please restart Forkyz for the change to take effect.</string>
     <string name="failed_to_initialise_saf">Could not initialise external directory.</string>
     <string name="storage_problem_falling_back_internal">Error accessing configured storage, falling back to internal.</string>
@@ -174,6 +176,9 @@
     <string name="about_forkyz">About Forkyz</string>
     <string name="release_notes">Release Notes</string>
     <string name="license">License</string>
+    <string name="filter_settings_title">Search Settings</string>
+    <string name="filter_settings_hint">Search Settings</string>
+    <string name="filter_settings_close">Cancel Search</string>
 
     <!-- preferences browse -->
     <string name="browse_always_show_rating">Always Show Rating</string>
@@ -198,11 +203,12 @@
     <string name="custom_daily_title">Custom daily</string>
     <string name="custom">Use Custom Source</string>
     <string name="custom_desc">Specify source URL below.</string>
-    <string name="custom_title">Puzzle Name</string>
+    <string name="custom_title">Custom Puzzle Name</string>
     <string name="custom_title_desc">Enter title for puzzle list.</string>
-    <string name="custom_url">Source URL</string>
-    <string name="custom_url_desc">&customurldesc;</string>
-    <string name="custom_url_desc_with_error">URL Error: %s\n\n&customurldesc;</string>
+    <string name="custom_title_hint">Puzzle Name</string>
+    <string name="custom_url">Custom Source URL</string>
+    <string name="custom_url_desc">Enter URL formatted according to Java\'s DateTimeFormatter. The puzzle can be in any supported format.</string>
+    <string name="custom_url_hint">Source URL</string>
 
     <!-- preferences daily -->
     <string name="updates_mon_fri">Updates Monday-Friday.</string>
@@ -289,6 +295,9 @@
     <string name="display_separators_always">Always</string>
     <string name="infer_separators">Infer Separators</string>
     <string name="infer_separators_desc">Estimate separators to display from enumeration at the end of the clues.</string>
+    <string name="orientation_lock_portrait">Portrait</string>
+    <string name="orientation_lock_landscape">Landscape</string>
+    <string name="orientation_lock_unlocked">Unlocked</string>
 
     <!-- preferences download -->
     <string name="auto_downloaders">Automatic Download Sources</string>
@@ -337,16 +346,13 @@
     <string name="background_download_tue">Tuesday</string>
     <string name="background_download_wed">Wednesday</string>
     <string name="download_charging">Download while charging only</string>
-    <string name="download_charging_desc_off">Schedule background downloads when on battery</string>
-    <string name="download_charging_desc_on">Only schedule background downloads when charging</string>
+    <string name="download_charging_desc">Only schedule background downloads when charging</string>
     <string name="download_roaming">Download when roaming</string>
-    <string name="download_roaming_desc_off">Do not schedule background downloads when roaming (will download when roaming on Android 6 (Marshmallow) or earlier)</string>
-    <string name="download_roaming_desc_on">Schedule background downloads even when roaming</string>
+    <string name="download_roaming_desc">Schedule background downloads even when roaming</string>
     <string name="download_timeout">Download Timeout</string>
     <string name="download_timeout_desc">How long to try downloading a puzzle before giving up.</string>
     <string name="download_wifi_only">Download over Wifi only</string>
-    <string name="download_wifi_only_desc_off">Schedule background downloads even when not on Wifi</string>
-    <string name="download_wifi_only_desc_on">Only schedule background downloads when Wifi is available.</string>
+    <string name="download_wifi_only_desc">Only schedule background downloads when Wifi is available.</string>
     <string name="fifteen_seconds">15 seconds</string>
     <string name="forty_five_seconds">45 seconds</string>
     <string name="no_puzzle_download_notifs">No Individual Download Notifications</string>
@@ -399,9 +405,10 @@
     <string name="keyboard_compact_desc">Reduce the vertical space usage of the built-in Forkyz keyboard.</string>
     <string name="keyboard_repeat_delay">Key Repeat Delay</string>
     <string name="keyboard_repeat_delay_desc">Delay in milliseconds before a held key starts repeating. Zero means no repeat.</string>
+    <string name="keyboard_repeat_delay_hint">Key Repeat Delay (ms)</string>
     <string name="keyboard_repeat_interval">Key Repeat Interval</string>
     <string name="keyboard_repeat_interval_desc">Delay in milliseconds between held key repeats. Zero means no repeat.</string>
-    <string name="enter_a_number">Enter a number</string>
+    <string name="keyboard_repeat_interval_hint">Key Repeat Interval (ms)</string>
     <string name="keyboard_force_caps">Capitalise Native Keyboard</string>
     <string name="keyboard_force_caps_desc">Most crossword solutions use capital letters. If checked, convert all native keyboard input to upper case.</string>
     <string name="keyboard_built_in">Built-in Forkyz Keyboard</string>
@@ -444,6 +451,10 @@
     <string name="space_change_dir_desc">Spacebar changed direction rather than blanking the box.</string>
     <string name="toggle_before_move">Change Direction Before Move</string>
     <string name="toggle_before_move_desc">If a D-pad/arrow-key movement would change the current clue, change clue before moving.</string>
+    <string name="movement_strategy_next_word">Next word in line</string>
+    <string name="movement_strategy_stop_end">Stop at the end</string>
+    <string name="movement_strategy_next_clue">Next clue</string>
+    <string name="movement_strategy_next_parallel_clue">Next parallel clue</string>
 
     <!-- preferences voice -->
     <string name="about_voice_commands">About Voice Commands</string>
@@ -729,6 +740,8 @@
     <string name="crossword_solver">Crossword Solver</string>
     <string name="quick_dic">QuickDic</string>
     <string name="aard2">Aard2</string>
+    <string name="dictionary_none">None</string>
+    <string name="free_dictionary">The Free Dictionary (Web)</string>
     <string name="external_app_not_installed">%1$s Not Installed</string>
     <string name="external_app_install_msg">Please install %1$s or disable this tool in the external tool settings.</string>
     <string name="website">Website</string>

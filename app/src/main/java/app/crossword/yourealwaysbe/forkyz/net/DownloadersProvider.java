@@ -1,6 +1,9 @@
 
 package app.crossword.yourealwaysbe.forkyz.net;
 
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
+import androidx.lifecycle.Observer;
 import java.util.function.Consumer;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -10,7 +13,9 @@ import androidx.core.app.NotificationManagerCompat;
 
 import dagger.hilt.android.qualifiers.ApplicationContext;
 
+import app.crossword.yourealwaysbe.forkyz.settings.DownloadersSettings;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
+import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler;
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 
@@ -25,7 +30,8 @@ public class DownloadersProvider {
     private Context applicationContext;
     private AndroidVersionUtils utils;
     private FileHandlerProvider fileHandlerProvider;
-    ForkyzSettings settings;
+    private ForkyzSettings settings;
+    private MediatorLiveData<Downloaders> liveDownloadersMediator;
 
     @Inject
     public DownloadersProvider(
@@ -41,15 +47,69 @@ public class DownloadersProvider {
     }
 
     public void get(Consumer<Downloaders> cb) {
-        fileHandlerProvider.get(fileHandler -> {
-        settings.getDownloadersSettings(downloadersSettings -> {
-            cb.accept(new Downloaders(
-                applicationContext,
-                utils,
-                fileHandler,
-                downloadersSettings,
-                NotificationManagerCompat.from(applicationContext)
-            ));
-        });});
+        liveDownloaders().observeForever(new Observer<Downloaders>() {
+            @Override
+            public void onChanged(Downloaders downloaders) {
+                liveDownloadersMediator.removeObserver(this);
+                cb.accept(downloaders);
+            }
+        });
+    }
+
+    public LiveData<Downloaders> liveDownloaders() {
+        if (liveDownloadersMediator != null)
+            return liveDownloadersMediator;
+
+        liveDownloadersMediator = new MediatorLiveData<>();
+
+        LiveData<FileHandler> liveFileHandler
+            = fileHandlerProvider.liveFileHandler();
+        LiveData<DownloadersSettings> liveDownloadersSettings
+            = settings.liveDownloadersSettings();
+
+        liveDownloadersMediator.addSource(
+            liveFileHandler,
+            fileHandler -> {
+                DownloadersSettings downloadersSettings
+                    = liveDownloadersSettings.getValue();
+                if (downloadersSettings != null && fileHandler != null) {
+                    liveDownloadersMediator.setValue(
+                        constructFromSettings(
+                            downloadersSettings,
+                            fileHandler
+                        )
+                    );
+                }
+            }
+        );
+
+        liveDownloadersMediator.addSource(
+            liveDownloadersSettings,
+            downloadersSettings -> {
+                FileHandler fileHandler = liveFileHandler.getValue();
+                if (downloadersSettings != null && fileHandler != null) {
+                    liveDownloadersMediator.setValue(
+                        constructFromSettings(
+                            downloadersSettings,
+                            fileHandler
+                        )
+                    );
+                }
+            }
+        );
+
+        return liveDownloadersMediator;
+    }
+
+    private Downloaders constructFromSettings(
+        DownloadersSettings downloadersSettings, FileHandler fileHandler
+    ) {
+        return new Downloaders(
+            applicationContext,
+            utils,
+            fileHandler,
+            downloadersSettings,
+            NotificationManagerCompat.from(applicationContext)
+        );
     }
 }

@@ -368,7 +368,7 @@ public class BrowseActivity extends ForkyzActivity {
             });
             return true;
         } else if (id == R.id.browse_menu_settings) {
-            Intent settingsIntent = new Intent(this, PreferencesActivity.class);
+            Intent settingsIntent = new Intent(this, SettingsActivity.class);
             this.startActivity(settingsIntent);
             return true;
         } else if (id == R.id.browse_menu_archives) {

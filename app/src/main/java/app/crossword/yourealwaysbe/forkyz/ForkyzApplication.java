@@ -7,7 +7,7 @@ import androidx.work.Configuration;
 import dagger.hilt.android.HiltAndroidApp;
 
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
-import app.crossword.yourealwaysbe.forkyz.util.ThemeHelper;
+import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 
 import java.util.logging.Logger;
@@ -28,6 +28,9 @@ public class ForkyzApplication
     @Inject
     protected ForkyzSettings settings;
 
+    @Inject
+    protected ThemeHelper themeHelper;
+
     // for background downloads
     // https://developer.android.com/reference/androidx/hilt/work/HiltWorker
     @Inject
@@ -36,10 +39,8 @@ public class ForkyzApplication
     @Override
     public void onCreate() {
         super.onCreate();
-
         utils.createNotificationChannel(this);
-
-        (new ThemeHelper(settings)).themeApplication(this);
+        themeHelper.themeApplication(this);
     }
 
     @Override

@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.function.Function;
 
 import static org.junit.Assert.assertEquals;
 
@@ -18,7 +19,7 @@ public class FilteredListTest {
     @Before
     public void setUp() {
         // Create a new FilteredList with a simple matching function
-        filteredList = new FilteredList<>(String::contains);
+        filteredList = new FilteredList<>();
 
         // Add some initial data to the list
         filteredList.addAll(Arrays.asList(new String[] {
@@ -33,7 +34,7 @@ public class FilteredListTest {
         assertEquals(10, filteredList.size());
 
         // Apply a filter and check the size
-        filteredList.applyFilter("a");
+        filteredList.applyFilter(filter("a"));
 
         assertEquals(5, filteredList.size());
 
@@ -49,7 +50,7 @@ public class FilteredListTest {
         assertEquals("kiwi", filteredList.get(6));
 
         // Apply a filter and get elements
-        filteredList.applyFilter("p");
+        filteredList.applyFilter(filter("p"));
         assertEquals("apple", filteredList.get(0));
         assertEquals("grape", filteredList.get(1));
     }
@@ -61,7 +62,7 @@ public class FilteredListTest {
         assertEquals("blueberry", filteredList.get(2));
 
         // Apply a filter and set an element
-        filteredList.applyFilter("a");
+        filteredList.applyFilter(filter("a"));
         filteredList.set(1, "apricot");
         assertEquals("apricot", filteredList.get(1));
     }
@@ -75,7 +76,7 @@ public class FilteredListTest {
         assertEquals(11, filteredList.size());
 
         // Apply a filter and add an element
-        filteredList.applyFilter("a");
+        filteredList.applyFilter(filter("a"));
         assertEquals(5, filteredList.size());
 
         filteredList.add(2, "avocado");
@@ -88,7 +89,7 @@ public class FilteredListTest {
         assertEquals("avocado", filteredList.get(2));
         assertEquals("date", filteredList.get(3));
 
-        filteredList.applyFilter("g");
+        filteredList.applyFilter(filter("g"));
         assertEquals(4, filteredList.size());
         assertEquals("gooseberry", filteredList.get(0));
         assertEquals("grape", filteredList.get(2));
@@ -105,7 +106,7 @@ public class FilteredListTest {
         assertEquals(9, filteredList.size());
 
         // Apply a filter and remove an element
-        filteredList.applyFilter("a");
+        filteredList.applyFilter(filter("a"));
         filteredList.remove(1);
         assertEquals("grape", filteredList.get(1));
         assertEquals(3, filteredList.size());
@@ -114,6 +115,10 @@ public class FilteredListTest {
         assertEquals(8, filteredList.size());
         assertEquals("cherry", filteredList.get(1));
         assertEquals("kiwi", filteredList.get(4));
+    }
+
+    private Function<String, Boolean> filter(String filter) {
+        return s -> s.contains(filter);
     }
 }
 

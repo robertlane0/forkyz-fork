@@ -22,9 +22,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts.OpenDocumentTree;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
@@ -111,21 +109,6 @@ public class LollipopUtil implements AndroidVersionUtils {
     @Override
     public boolean isSAFSupported() {
         return true;
-    }
-
-    @Override
-    public ActivityResultLauncher<Uri> registerForSAFUriResult(
-        Fragment fragment, Consumer<Uri> uriConsumer
-    ) {
-        return fragment.registerForActivityResult(
-            new OpenDocumentTree(),
-            new ActivityResultCallback<Uri>() {
-                @Override
-                public void onActivityResult(Uri uri) {
-                    uriConsumer.accept(uri);
-                }
-            }
-        );
     }
 
     @SuppressWarnings("deprecation")

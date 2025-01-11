@@ -2,7 +2,6 @@ package app.crossword.yourealwaysbe.forkyz.versions;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.function.Consumer;
 
 import android.app.Activity;
 import android.content.Context;
@@ -18,7 +17,6 @@ import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.fragment.app.Fragment;
 
 import dagger.Module;
 import dagger.Provides;
@@ -84,11 +82,8 @@ public interface AndroidVersionUtils {
         Context context, long minimumBytesFree
     ) throws IOException;
 
+    // TODO: remove always true now
     boolean isSAFSupported();
-
-    ActivityResultLauncher<Uri> registerForSAFUriResult(
-        Fragment fragment, Consumer<Uri> uriConsumer
-    );
 
     boolean hasNetworkConnection(Context context);
 
