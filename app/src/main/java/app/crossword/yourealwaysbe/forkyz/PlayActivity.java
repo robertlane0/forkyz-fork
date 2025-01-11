@@ -28,6 +28,7 @@ import androidx.fragment.app.DialogFragment;
 import com.squareup.seismic.ShakeDetector;
 
 import app.crossword.yourealwaysbe.forkyz.databinding.PlayBinding;
+import app.crossword.yourealwaysbe.forkyz.settings.FitToScreenMode;
 import app.crossword.yourealwaysbe.forkyz.settings.GridRatio;
 import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer;
 import app.crossword.yourealwaysbe.forkyz.util.KeyboardManager;
@@ -68,27 +69,13 @@ public class PlayActivity extends PuzzleActivity
     private KeyboardManager keyboardManager;
     private ShakeDetector shakeDetector = null;
 
+    // needed to know when to immediately fit to screen or whether to wait for
+    // layout to finish
+    private boolean firstLayoutFinished = false;
+    private boolean pendingFitToScreen = false;
+
     // Proper value is loaded before this is used anyway
     private GridRatio currentGridRatio = GridRatio.PUZZLE_SHAPE;
-
-    private Runnable fitToScreenTask = new Runnable() {
-        @Override
-        public void run() {
-            PlayActivity.this.fitBoardToScreen();
-        }
-    };
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-
-        DisplayMetrics metrics = getResources().getDisplayMetrics();
-        int screenWidthInInches = (metrics.widthPixels > metrics.heightPixels ? metrics.widthPixels : metrics.heightPixels) / Math.round(160 * metrics.density);
-        LOG.info("Configuration Changed "+screenWidthInInches+" ");
-        if(screenWidthInInches >= 7){
-            this.handler.post(this.fitToScreenTask);
-        }
-    }
 
     /**
      * Create the activity
@@ -219,16 +206,6 @@ public class PlayActivity extends PuzzleActivity
             }
         );
 
-        DisplayMetrics metrics = getResources().getDisplayMetrics();
-        settings.getPlayFitToScreen(fitToScreen -> {
-            if (fitToScreen || (
-                    isLandscape(metrics) && isTabletish(metrics)
-                )
-            ) {
-                this.handler.postDelayed(fitToScreenTask, 100);
-            }
-        });
-
         setupVoiceButtons(binding.voiceButtonsInclude);
         setupVoiceCommands();
 
@@ -341,6 +318,27 @@ public class PlayActivity extends PuzzleActivity
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         return onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        if (!super.onPrepareOptionsMenu(menu))
+            return false;
+
+        settings.getPlayFitToScreenMode(fitToScreen -> {
+            switch (fitToScreen) {
+            case LOCKED:
+                MenuItem zoom = menu.findItem(R.id.play_menu_zoom);
+                zoom.setVisible(false);
+                zoom.setEnabled(false);
+                break;
+            default:
+                // do nothing
+                break;
+            }
+        });
+
+        return true;
     }
 
     @Override
@@ -602,6 +600,29 @@ public class PlayActivity extends PuzzleActivity
                 setActivityTitle();
             }
         );
+
+        settings.livePlayFitToScreenMode().observe(
+            this,
+            fitToScreen -> {
+                switch (fitToScreen) {
+                case START:
+                case LOCKED:
+                    if (isFirstLayoutFinished())
+                        fitBoardToScreen();
+                    else
+                        setPendingFitToScreen();
+                    break;
+                default:
+                    // do nothing
+                    break;
+                }
+
+                boolean locked = fitToScreen == FitToScreenMode.LOCKED;
+                binding.boardView.setAllowOverScroll(!locked);
+                binding.boardView.setAllowZoom(!locked);
+
+                invalidateOptionsMenu();
+            });
     }
 
     private void setClueText() {
@@ -915,21 +936,6 @@ public class PlayActivity extends PuzzleActivity
         return false;
     }
 
-    private static boolean isLandscape(DisplayMetrics metrics){
-        return metrics.widthPixels > metrics.heightPixels;
-    }
-
-    private static boolean isTabletish(DisplayMetrics metrics) {
-        double x = Math.pow(metrics.widthPixels / metrics.xdpi, 2);
-        double y = Math.pow(metrics.heightPixels / metrics.ydpi, 2);
-        double screenInches = Math.sqrt(x + y);
-        if (screenInches > 9) { // look for a 9" or larger screen.
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     /**
      * Setup the clue line click listeners &c.
      *
@@ -1073,11 +1079,44 @@ public class PlayActivity extends PuzzleActivity
                             binding.boardView.relayout();
                             binding.boardView.getViewTreeObserver()
                                 .removeOnPreDrawListener(this);
+                            setFirstLayoutFinished();
+                            handleResizeFitToScreen();
                             return false;
                         }
                     }
                 );
         }
+    }
+
+    private void setFirstLayoutFinished() {
+        firstLayoutFinished = true;
+    }
+
+    private boolean isFirstLayoutFinished() {
+        return firstLayoutFinished;
+    }
+
+    private void setPendingFitToScreen() {
+        pendingFitToScreen = true;
+    }
+
+    private void clearPendingFitToScreen() {
+        pendingFitToScreen = false;
+    }
+
+    private boolean isPendingFitToScreen() {
+        return pendingFitToScreen;
+    }
+
+    private void handleResizeFitToScreen() {
+        settings.getPlayFitToScreenMode(fitToScreen -> {
+            boolean needsFit = isPendingFitToScreen()
+                || fitToScreen == FitToScreenMode.LOCKED;
+            clearPendingFitToScreen();
+            if (needsFit)
+                fitBoardToScreen();
+
+        });
     }
 
     /**

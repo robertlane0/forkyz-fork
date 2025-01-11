@@ -166,7 +166,9 @@ public class ForkyzSettings {
     private static final String PREF_PLAY_ENSURE_VISIBLE = "ensureVisible";
     private static final String PREF_PLAY_ENTER_CHANGES_DIRECTION
         = "enterChangesDirection";
-    private static final String PREF_PLAY_FIT_TO_SCREEN = "fitToScreen";
+    private static final String PREF_PLAY_FIT_TO_SCREEN_LEGACY = "fitToScreen";
+    private static final String PREF_PLAY_FIT_TO_SCREEN_MODE
+        = "fitToScreenMode";
     private static final String PREF_PLAY_FULL_SCREEN = "fullScreen";
     private static final String PREF_PLAY_GRID_RATIO_LANDSCAPE
         = "gridRatioLand";
@@ -593,6 +595,12 @@ public class ForkyzSettings {
             CycleUnfilledMode.class,
             CycleUnfilledMode.NEVER
         );
+    FSEnumSetting<FitToScreenMode> fitToScreenModeSetting
+        = new FSEnumSetting<FitToScreenMode>(
+            PREF_PLAY_FIT_TO_SCREEN_MODE,
+            FitToScreenMode.class,
+            FitToScreenMode.NEVER
+        );
 
     private HashMap<String, BooleanSetting> booleanSettings = new HashMap<>();
     private HashMap<String, FloatSetting> floatSettings = new HashMap<>();
@@ -628,7 +636,6 @@ public class ForkyzSettings {
             new BooleanSetting(PREF_PLAY_DOUBLE_TAP_FIT_BOARD, false),
             new BooleanSetting(PREF_PLAY_ENSURE_VISIBLE, true),
             new BooleanSetting(PREF_PLAY_ENTER_CHANGES_DIRECTION, true),
-            new BooleanSetting(PREF_PLAY_FIT_TO_SCREEN, false),
             new BooleanSetting(PREF_PLAY_FULL_SCREEN, false),
             new BooleanSetting(PREF_PLAY_INFER_SEPARATORS, false),
             new BooleanSetting(PREF_PLAY_PLAY_LETTER_UNDO_ENABLED, false),
@@ -785,7 +792,8 @@ public class ForkyzSettings {
             landscapeGridRatioSetting,
             portraitGridRatioSetting,
             movementStrategySetting,
-            cycleUnfilledSetting
+            cycleUnfilledSetting,
+            fitToScreenModeSetting
         };
         for (FSEnumSetting<?> s : enums)
             enumSettings.put(s.getKey(), s);
@@ -1353,10 +1361,14 @@ public class ForkyzSettings {
     }
 
     /**
-     * Whether to fit puzzle to screen on starting PlayActivity
+     * How/if to fit to screen
      */
-    public void getPlayFitToScreen(Consumer<Boolean> cb) {
-        getBooleanSetting(PREF_PLAY_FIT_TO_SCREEN, cb);
+    public void getPlayFitToScreenMode(Consumer<FitToScreenMode> cb) {
+        getFSEnumSetting(fitToScreenModeSetting, cb);
+    }
+
+    public LiveData<FitToScreenMode> livePlayFitToScreenMode() {
+        return liveFSEnumSetting(fitToScreenModeSetting);
     }
 
     /**
@@ -1869,6 +1881,18 @@ public class ForkyzSettings {
             PREF_PLAY_CYCLE_UNFILLED_MODE,
             CycleUnfilledMode.ALWAYS.getSettingsValue(),
             CycleUnfilledMode.NEVER.getSettingsValue()
+        );
+    }
+
+    /**
+     * Migrate from boolean fitToScreen to fitToScreenMode
+     */
+    public void migrateFitToScreen() {
+        migratePrefBooleanToString(
+            PREF_PLAY_FIT_TO_SCREEN_LEGACY,
+            PREF_PLAY_FIT_TO_SCREEN_MODE,
+            FitToScreenMode.START.getSettingsValue(),
+            FitToScreenMode.NEVER.getSettingsValue()
         );
     }
 

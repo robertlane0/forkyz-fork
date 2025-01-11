@@ -266,6 +266,16 @@
        <item>SELECTED</item>
        <item>ALWAYS</item>
      </string-array>
+     <string-array name="fit_to_screen_mode_labels">
+       <item>@string/fit_to_screen_mode_never</item>
+       <item>@string/fit_to_screen_mode_start</item>
+       <item>@string/fit_to_screen_mode_locked</item>
+     </string-array>
+     <string-array name="fit_to_screen_mode_values">
+       <item>NEVER</item>
+       <item>START</item>
+       <item>LOCKED</item>
+     </string-array>
 
      <string-array name="emptyArray"/>
 </resources>

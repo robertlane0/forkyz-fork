@@ -21,11 +21,13 @@
         android:key="clueBelowGrid"
     />
 
-    <androidx.preference.CheckBoxPreference
-        android:title="@string/fit_screen_start"
-        android:defaultValue="false"
-        android:summary="@string/fit_screen_start_desc"
-        android:key="fitToScreen"
+    <androidx.preference.ListPreference
+        android:title="@string/fit_to_screen_mode"
+        android:defaultValue="NEVER"
+        android:summary="@string/fit_to_screen_mode_desc"
+        android:entries="@array/fit_to_screen_mode_labels"
+        android:entryValues="@array/fit_to_screen_mode_values"
+        android:key="fitToScreenMode"
     />
 
     <androidx.preference.CheckBoxPreference

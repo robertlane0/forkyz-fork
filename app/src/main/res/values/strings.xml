@@ -241,8 +241,11 @@
     <string name="clue_below_grid_desc">Display the selected clue below the grid instead of in the app title bar.</string>
     <string name="display_scratch">Display Scratch</string>
     <string name="display_scratch_desc">Display scratch notes on play board.</string>
-    <string name="fit_screen_start">Fit to Screen When Starting</string>
-    <string name="fit_screen_start_desc">Best-fits the puzzle when you start.</string>
+    <string name="fit_to_screen_mode">Fit to Screen Behaviour</string>
+    <string name="fit_to_screen_mode_desc">If/how the puzzle is automatically resized to fit the screen.</string>
+    <string name="fit_to_screen_mode_never">Never</string>
+    <string name="fit_to_screen_mode_start">Puzzle Start</string>
+    <string name="fit_to_screen_mode_locked">Locked</string>
     <string name="full_screen">Full Screen</string>
     <string name="full_screen_desc">Hides the notification bar.\nYou must leave and re-enter a puzzle to apply.</string>
     <string name="grid_ratio_portrait">Portrait Grid Size</string>
