@@ -1,0 +1,3 @@
+-dontwarn org.brotli.dec.BrotliInputStream
+-dontwarn org.slf4j.impl.StaticLoggerBinder
+-keep class app.crossword.yourealwaysbe.forkyz.**
