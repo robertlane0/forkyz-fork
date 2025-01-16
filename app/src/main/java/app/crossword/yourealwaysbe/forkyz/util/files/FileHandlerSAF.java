@@ -18,6 +18,7 @@ import android.provider.DocumentsContract.Document;
 import android.provider.DocumentsContract;
 
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings;
+import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 import app.crossword.yourealwaysbe.puz.io.StreamUtils;
@@ -441,9 +442,14 @@ public class FileHandlerSAF extends FileHandler {
      * null if the handler could not be created. (E.g. if there are no
      * configured directories.) Will reinitialise if the rootUri is
      * still available.
+     *
+     * If reinit is needed, the settings are updated with the refreshed
+     * values
      */
     public static FileHandlerSAF readHandlerFromSettings(
-        Context applicationContext, FileHandlerSettings fileHandlerSettings
+        Context applicationContext,
+        FileHandlerSettings fileHandlerSettings,
+        ForkyzSettings settings
     ) {
         FileHandlerSAF fileHandler = null;
 
@@ -502,6 +508,13 @@ public class FileHandlerSAF extends FileHandler {
             fileHandler = initialiseSAFForRoot(
                 applicationContext, Uri.parse(rootFolder)
             );
+            // update settings to good values
+            if (fileHandler != null && settings != null) {
+                settings.setFileHandlerSettings(
+                    fileHandler.getSettings(),
+                    () -> { }
+                );
+            }
         }
 
         return fileHandler;

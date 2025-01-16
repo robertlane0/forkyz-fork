@@ -87,7 +87,7 @@ public class FileHandlerProvider {
                 break;
             case EXTERNAL_SAF:
                 fh = FileHandlerSAF.readHandlerFromSettings(
-                    applicationContext, fileHandlerSettings
+                    applicationContext, fileHandlerSettings, settings
                 );
                 break;
             default:

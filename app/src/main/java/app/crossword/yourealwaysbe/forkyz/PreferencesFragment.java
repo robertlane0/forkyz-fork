@@ -158,7 +158,9 @@ public class PreferencesFragment extends PreferencesBaseFragment {
             if (isSAF) {
                 FileHandlerSAF fileHandler
                     = FileHandlerSAF.readHandlerFromSettings(
-                        activity.getApplicationContext(), fileHandlerSettings
+                        activity.getApplicationContext(),
+                        fileHandlerSettings,
+                        settings
                     );
 
                 if (fileHandler == null) {

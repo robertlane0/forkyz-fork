@@ -1228,6 +1228,18 @@ public class ForkyzSettings {
                 PREF_FILE_HANDLER_SAF_ARCHIVE,
                 settings.safArchiveURI()
             );
+            setStringSettingSync(
+                PREF_FILE_HANDLER_SAF_TO_IMPORT,
+                settings.safToImportURI()
+            );
+            setStringSettingSync(
+                PREF_FILE_HANDLER_SAF_TO_IMPORT_DONE,
+                settings.safToImportDoneURI()
+            );
+            setStringSettingSync(
+                PREF_FILE_HANDLER_SAF_TO_IMPORT_FAILED,
+                settings.safToImportFailedURI()
+            );
             if (cb != null)
                 handler.post(() -> { cb.run(); });
         });
