@@ -100,10 +100,19 @@ public class Playboard {
         if (puzzle.getPosition() == null)
             selectFirstPosition();
 
-        updateHistory();
-        // there will be no listeners at this point, but the call also
-        // does a bit of bookkeeping / setup for the next use
-        notifyChange();
+        // setup bookkeeping
+        ClueID curID = puzzle.getCurrentClueID();
+
+        updateHistory(curID);
+
+        previousPosition = puzzle.getPosition();
+
+        Clue clue = puzzle.getClue(curID);
+        if (clue == null || !clue.hasZone()) {
+            previousWord  = new Word(getDetachedCellsZone(puzzle));
+        } else {
+            previousWord = new Word(clue.getZone(), clue.getClueID());
+        }
     }
 
     /**
@@ -1611,7 +1620,13 @@ public class Playboard {
      * there is no current clue. Detect latter case with getClueID() == null.
      */
     private int updateHistory() {
-        ClueID cid = getClueID();
+        return updateHistory(getClueID());
+    }
+
+    /**
+     * Version without this escape for constructor
+     */
+    private int updateHistory(ClueID cid) {
         if (cid == null)
             return -1;
         return puzzle.updateHistory(cid);
@@ -1785,6 +1800,13 @@ public class Playboard {
      * have been added before. Then move on with the scan.
      */
     private Zone getDetachedCellsZone() {
+        return getDetachedCellsZone(getPuzzle());
+    }
+
+    /**
+     * Version without this escape for constructor
+     */
+    private Zone getDetachedCellsZone(Puzzle puz) {
         if (detachedCellsZone != null)
             return detachedCellsZone;
 
@@ -1792,7 +1814,6 @@ public class Playboard {
         // because Zone.hasPosition is O(n)
         Set<Position> oldPositions = new HashSet<>();
 
-        Puzzle puz = getPuzzle();
         for (int row = 0; row < puz.getHeight(); row++) {
             for (int col = 0; col < puz.getWidth(); col++) {
                 Box box = puz.checkedGetBox(row, col);
