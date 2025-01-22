@@ -1,6 +1,5 @@
 package app.crossword.yourealwaysbe.puz;
 
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,9 +22,7 @@ import java.util.logging.Logger;
  * String should use HTML for formatting (including new lines), except
  * Note objects which do not support it.
  */
-public class Puzzle implements Serializable{
-    private static final long serialVersionUID = 4424966800816624115L;
-
+public class Puzzle {
     private static final Logger LOG = Logger.getLogger("app.crossword.yourealwaysbe");
 
     private String author;

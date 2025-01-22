@@ -1,15 +1,12 @@
 
 package app.crossword.yourealwaysbe.puz;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 
-class MutableClueList implements ClueList, Serializable {
-    private static final long serialVersionUID = 5559785136857192666L;
-
+class MutableClueList implements ClueList {
     ArrayList<Clue> clues = new ArrayList<>();
     HashMap<String, Clue> numberedClueMap = new HashMap<>();
 

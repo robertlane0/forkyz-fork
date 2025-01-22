@@ -1,6 +1,5 @@
 package app.crossword.yourealwaysbe.puz;
 
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -11,9 +10,7 @@ import java.util.Objects;
  *
  * TODO: rename!
  */
-public class PuzzleMeta implements Serializable {
-    private static final long serialVersionUID = 8186225059888351752L;
-
+public class PuzzleMeta {
     public static class ListNum {
         private String listName;
         private int number;

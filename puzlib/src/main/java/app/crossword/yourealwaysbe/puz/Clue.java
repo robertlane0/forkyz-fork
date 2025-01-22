@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.puz;
 
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
@@ -16,9 +15,7 @@ import java.util.regex.Pattern;
  *
  * Must have a listName and index, number is optional.
  */
-public class Clue implements Serializable {
-    private static final long serialVersionUID = 2973710091235898521L;
-
+public class Clue {
     public static final int DEFAULT_FLAG_COLOR = -1;
 
     // enumeration is e.g. (4, 5) at end of clue. Ignores IPuz word

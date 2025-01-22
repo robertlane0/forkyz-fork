@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.puz;
 
-import java.io.Serializable;
 import java.util.Objects;
 
 /**
@@ -10,7 +9,7 @@ import java.util.Objects;
  * Specified by grid start position and width/height in cells. The URL can
  * either be a url to a file, or a data url in base64.
  */
-public class PuzImage implements Serializable {
+public class PuzImage {
     private static final long serialVersionUID = 1296894387919009041L;
 
     private String url;

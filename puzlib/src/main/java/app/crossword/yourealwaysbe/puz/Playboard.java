@@ -1,6 +1,5 @@
 package app.crossword.yourealwaysbe.puz;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -16,8 +15,7 @@ import java.util.logging.Logger;
 import app.crossword.yourealwaysbe.puz.util.PuzzleUtils;
 import app.crossword.yourealwaysbe.puz.util.WeakSet;
 
-public class Playboard implements Serializable {
-    private static final long serialVersionUID = 4593768901101043503L;
+public class Playboard {
     private static final Logger LOG = Logger.getLogger(Playboard.class.getCanonicalName());
 
     private static final long PAUSE_DELETE_DELAY = 150; // ms
@@ -1878,9 +1876,7 @@ public class Playboard implements Serializable {
      *
      * A Zone and possibly the clue it goes with (null if no clue).
      */
-    public static class Word implements Serializable {
-        private static final long serialVersionUID = 7726718778003961317L;
-
+    public static class Word {
         private final Zone zone;
         private final ClueID clueID;
 
