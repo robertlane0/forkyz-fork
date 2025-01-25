@@ -33,6 +33,7 @@ import app.crossword.yourealwaysbe.forkyz.settings.ClueTabsDouble
 import app.crossword.yourealwaysbe.forkyz.settings.CycleUnfilledMode
 import app.crossword.yourealwaysbe.forkyz.settings.DeleteCrossingModeSetting
 import app.crossword.yourealwaysbe.forkyz.settings.DisplaySeparators
+import app.crossword.yourealwaysbe.forkyz.settings.ExternalDictionarySetting
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings
 import app.crossword.yourealwaysbe.forkyz.settings.FitToScreenMode
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
@@ -1481,18 +1482,30 @@ class SettingsActivityViewModel @Inject constructor(
         ),
 
         // External Tools
-        SettingsList<String>(
+        SettingsList<ExternalDictionarySetting>(
             SettingsPage.EXTERNAL_TOOLS,
             R.string.external_dictionary,
             R.string.external_dictionary_desc,
             listOf(
-                SettingsListEntry(R.string.dictionary_none, "NONE"),
-                SettingsListEntry(R.string.free_dictionary, "FREE"),
-                SettingsListEntry(R.string.quick_dic, "QUICK"),
-                SettingsListEntry(R.string.aard2, "AARD2"),
+                SettingsListEntry(
+                    R.string.dictionary_none,
+                    ExternalDictionarySetting.NONE,
+                ),
+                SettingsListEntry(
+                    R.string.free_dictionary,
+                    ExternalDictionarySetting.FREE,
+                ),
+                SettingsListEntry(
+                    R.string.quick_dic,
+                    ExternalDictionarySetting.QUICK,
+                ),
+                SettingsListEntry(
+                    R.string.aard2,
+                    ExternalDictionarySetting.AARD2,
+                ),
             ),
-            settings.liveExtDictionaryString(),
-            settings::setExtDictionaryString,
+            settings.liveExtDictionarySetting(),
+            settings::setExtDictionarySetting,
         ),
         SettingsBoolean(
             SettingsPage.EXTERNAL_TOOLS,

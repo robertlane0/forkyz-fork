@@ -614,6 +614,12 @@ public class ForkyzSettings {
             StorageLocation.class,
             StorageLocation.INTERNAL
         );
+    FSEnumSetting<ExternalDictionarySetting> externalDictionarySetting
+        = new FSEnumSetting<>(
+            PREF_EXT_DICTIONARY,
+            ExternalDictionarySetting.class,
+            ExternalDictionarySetting.FREE
+        );
     FSEnumSetting<KeyboardLayout> keyboardLayoutSetting
         = new FSEnumSetting<KeyboardLayout>(
             PREF_KEYBOARD_LAYOUT,
@@ -823,7 +829,6 @@ public class ForkyzSettings {
             new StringSetting(PREF_BROWSE_CLEANUP_AGE_ARCHIVE, "-1"),
             new StringSetting(PREF_BROWSE_LAST_SEEN_VERSION, ""),
             new StringSetting(PREF_EXT_CHAT_GPT_API_KEY, ""),
-            new StringSetting(PREF_EXT_DICTIONARY, "FREE"),
             new StringSetting(
                 PREF_DOWNLOAD_TIMEOUT, PREF_DOWNLOAD_TIMEOUT_DEFAULT
             ),
@@ -867,6 +872,7 @@ public class ForkyzSettings {
             clueHighlight,
             clueTabsDoubleSetting,
             storageLocationSetting,
+            externalDictionarySetting,
             keyboardLayoutSetting,
             keyboardModeSetting,
             deleteCrossingModeSetting,
@@ -1437,23 +1443,24 @@ public class ForkyzSettings {
     }
 
     public ExternalDictionary getExtDictionarySync() {
-        String value = getStringSettingSync(PREF_EXT_DICTIONARY);
-        if ("NONE".equals(value))
+        switch (getFSEnumSettingSync(externalDictionarySetting)) {
+        case NONE:
             return null;
-        else if ("QUICK".equals(value))
+        case QUICK:
             return ExternalDictionary.QUICK_DIC;
-        else if ("AARD2".equals(value))
+        case AARD2:
             return ExternalDictionary.AARD2;
-        else
+        default:
             return ExternalDictionary.FREE_DICTIONARY;
+        }
     }
 
-    public LiveData<String> liveExtDictionaryString() {
-        return liveStringSetting(PREF_EXT_DICTIONARY);
+    public LiveData<ExternalDictionarySetting> liveExtDictionarySetting() {
+        return liveFSEnumSetting(externalDictionarySetting);
     }
 
-    public void setExtDictionaryString(String value) {
-        setStringSetting(PREF_EXT_DICTIONARY, value);
+    public void setExtDictionarySetting(ExternalDictionarySetting value) {
+        setFSEnumSetting(externalDictionarySetting, value);
     }
 
     public LiveData<Boolean> liveExtDuckDuckGoEnabled() {
