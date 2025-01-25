@@ -3,8 +3,7 @@ package app.crossword.yourealwaysbe.forkyz.settings;
 
 public enum StorageLocation implements EnumSetting {
     INTERNAL("App Internal Storage"),
-    EXTERNAL_SAF("External directory"),
-    EXTERNAL_LEGACY("External SD crosswords directory");
+    EXTERNAL_SAF("External directory");
 
     private String settingsValue;
 

@@ -100,17 +100,6 @@ public class LollipopUtil implements AndroidVersionUtils {
         return files.getFreeSpace() < minimumBytesFree;
     }
 
-    /**
-     * SAF support for Forkyz rather than Android
-     *
-     * Android had it in KitKat, but didn't have the document tree access we
-     * need until now.
-     */
-    @Override
-    public boolean isSAFSupported() {
-        return true;
-    }
-
     @SuppressWarnings("deprecation")
     @Override
     public boolean hasNetworkConnection(Context activity) {

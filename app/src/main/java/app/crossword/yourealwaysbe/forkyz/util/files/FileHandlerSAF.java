@@ -56,10 +56,6 @@ public class FileHandlerSAF extends FileHandler {
         public String getMimeType() { return mimeType; }
     }
 
-    public static boolean isSAFSupported(AndroidVersionUtils utils) {
-        return utils.isSAFSupported();
-    }
-
     /**
      * Construct FileHandler from context and folder URIs
      *

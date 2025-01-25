@@ -317,40 +317,29 @@ class SettingsActivityViewModel @Inject constructor(
     private val storageLocationsLiveData
         : LiveData<List<SettingsListEntry<StorageLocation>>>
             = settings.liveFileHandlerSettings().map { fhSettings ->
-                // annoying to have to get resources in view model!
                 val app : Application = getApplication()
 
-                val externalList = if (FileHandlerSAF.isSAFSupported(utils)) {
-                    val storageLocationSAFURI
-                        = fhSettings.safRootURI() ?: app.getString(
-                            R.string.external_storage_saf_none_selected,
-                        )
-
-                    val label = (
-                        app.getString(R.string.external_storage_saf)
-                        + " "
-                        + app.getString(
-                            R.string.external_storage_saf_current_uri,
-                            storageLocationSAFURI
-                        )
+                val storageLocationSAFURI
+                    = fhSettings.safRootURI() ?: app.getString(
+                        R.string.external_storage_saf_none_selected,
                     )
 
-                    listOf(
-                        SettingsListEntry(label, StorageLocation.EXTERNAL_SAF),
+                val label = (
+                    app.getString(R.string.external_storage_saf)
+                    + " "
+                    + app.getString(
+                        R.string.external_storage_saf_current_uri,
+                        storageLocationSAFURI
                     )
-                } else {
-                    listOf(SettingsListEntry(
-                        R.string.external_storage_legacy,
-                        StorageLocation.EXTERNAL_LEGACY,
-                    ))
-                }
+                )
 
                 listOf(
                     SettingsListEntry(
                         R.string.internal_storage,
                         StorageLocation.INTERNAL,
                     ),
-                ) + externalList
+                    SettingsListEntry(label, StorageLocation.EXTERNAL_SAF),
+                )
            }
 
     private val downloadAutoDownloadersLiveData

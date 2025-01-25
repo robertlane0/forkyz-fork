@@ -82,9 +82,6 @@ public interface AndroidVersionUtils {
         Context context, long minimumBytesFree
     ) throws IOException;
 
-    // TODO: remove always true now
-    boolean isSAFSupported();
-
     boolean hasNetworkConnection(Context context);
 
     /**

@@ -84,9 +84,6 @@ public class FileHandlerProvider {
         StorageLocation loc = fileHandlerSettings.storageLocation();
 
         switch (loc) {
-        case EXTERNAL_LEGACY:
-            fh = new FileHandlerLegacy(applicationContext);
-            break;
         case EXTERNAL_SAF:
             fh = FileHandlerSAF.readHandlerFromSettings(
                 applicationContext, fileHandlerSettings, settings
