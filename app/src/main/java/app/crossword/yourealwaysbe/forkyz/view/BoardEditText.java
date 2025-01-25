@@ -305,6 +305,17 @@ public class BoardEditText
         setResponse(pos, c, true);
     }
 
+    public void deleteResponse(int pos) {
+        if (canDelete(pos)) {
+            char oldChar = getResponse(pos);
+            boxes[pos].setBlank();
+            flagChanged(pos);
+            notifyPostChange(pos, oldChar, true);
+            this.render();
+            if (pos == getSelectedCol())
+                updateInputConnection();
+        }
+    }
 
     /**
      * Set response at pos and choose if render
@@ -736,16 +747,20 @@ public class BoardEditText
     }
 
     private boolean canDelete(Position pos) {
+        return canDelete(pos.getCol());
+    }
+
+    private boolean canDelete(int col) {
         if (filters == null)
             return true;
 
-        if (boxes == null || pos.getCol() < 0 || pos.getCol() >= boxes.length)
+        if (boxes == null || col < 0 || col >= boxes.length)
             return false;
 
-        char oldChar = getResponse(pos.getCol());
+        char oldChar = getResponse(col);
 
         for (BoardEditFilter filter : filters) {
-            if (filter != null && !filter.delete(oldChar, pos.getCol())) {
+            if (filter != null && !filter.delete(oldChar, col)) {
                 return false;
             }
         }

@@ -318,6 +318,8 @@ public class NotesActivity extends PuzzleActivity {
                         );
                     } else if (id == R.id.notes_box) {
                         moveBoardEditTextToNotes(binding.anagramSolution);
+                    } else if (id == R.id.anagram_source) {
+                        resetAnagramSolution();
                     } else {
                         if (isClueOnBoard()) {
                             executeTransferResponseRequest(
@@ -1388,6 +1390,26 @@ public class NotesActivity extends PuzzleActivity {
             binding.anagramSolution.setSeparatorsFromClue(
                 clue, inferSeparators
             );
+        }
+    }
+
+    /**
+     * Move anagram source back to anagram sol
+     */
+    private void resetAnagramSolution() {
+        // not the cleanest as it bypasses filters
+        int curWordLen = binding.anagramSolution.getLength();
+        for (int i = 0; i < curWordLen; i++) {
+            binding.anagramSolution.deleteResponse(i);
+            //if (!binding.anagramSolution.isBlank(i)) {
+            //    for (int i = 0; i < curWordLen; i++) {
+            //        if (binding.anagramSource.isBlank(i)) {
+            //            binding.anagramSolution.deleteResponse(i);
+            //            binding.anagramSource.setResponse(i, oldChar);
+            //            break;
+            //        }
+            //    }
+            //}
         }
     }
 }
