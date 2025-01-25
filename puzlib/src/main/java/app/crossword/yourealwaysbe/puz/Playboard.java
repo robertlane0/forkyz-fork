@@ -1229,7 +1229,8 @@ public class Playboard {
 
             ClueID newCID = getClueID();
             Position start = getClueStart(newCID);
-            setHighlightLetter(start);
+            if (!Objects.equals(start, getHighlightLetter()))
+                setHighlightLetter(start);
 
             Box box = puzzle.checkedGetBox(start);
             if (box != null && skipBox(box, skipCompletedLetters)) {
