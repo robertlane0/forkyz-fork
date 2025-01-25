@@ -92,7 +92,7 @@ public class FileHandlerShared extends FileProvider {
             return null;
         }
 
-        return getUriForFile(context, SHARE_AUTHORITY, shareFile);
+        return getUriForFile(context, getShareAuthority(context), shareFile);
     }
 
     synchronized static private void cleanCache(Context context) {
@@ -102,5 +102,10 @@ public class FileHandlerShared extends FileProvider {
             if (ageMillis > CACHE_CLEAR_AGE_MILLIS)
                 file.delete();
         }
+    }
+
+    synchronized static private String getShareAuthority(Context context) {
+        System.out.println("FORKYZ: auth " + context.getPackageName() + ".files");
+        return context.getPackageName() + ".files";
     }
 }
