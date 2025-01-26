@@ -15,6 +15,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext;
 
 import app.crossword.yourealwaysbe.forkyz.settings.DownloadersSettings;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
+import app.crossword.yourealwaysbe.forkyz.util.LiveDataUtilsKt;
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler;
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
@@ -47,13 +48,7 @@ public class DownloadersProvider {
     }
 
     public void get(Consumer<Downloaders> cb) {
-        liveDownloaders().observeForever(new Observer<Downloaders>() {
-            @Override
-            public void onChanged(Downloaders downloaders) {
-                liveDownloadersMediator.removeObserver(this);
-                cb.accept(downloaders);
-            }
-        });
+        LiveDataUtilsKt.observeOnce(liveDownloaders(), cb);
     }
 
     public LiveData<Downloaders> liveDownloaders() {

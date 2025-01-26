@@ -20,6 +20,7 @@ import app.crossword.yourealwaysbe.forkyz.R;
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation;
+import app.crossword.yourealwaysbe.forkyz.util.LiveDataUtilsKt;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 
 @Singleton
@@ -46,13 +47,7 @@ public class FileHandlerProvider {
     }
 
     public void get(Consumer<FileHandler> cb) {
-        liveFileHandler.observeForever(new Observer<FileHandler>() {
-            @Override
-            public void onChanged(FileHandler fh) {
-                liveFileHandler.removeObserver(this);
-                cb.accept(fh);
-            }
-        });
+        LiveDataUtilsKt.observeOnce(liveFileHandler, cb);
     }
 
     public LiveData<FileHandler> liveFileHandler() {
