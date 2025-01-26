@@ -281,9 +281,9 @@ public class BrowseActivityViewModel extends AndroidViewModel {
         if (!utils.hasNetworkConnection(getApplication()))
             return;
 
-        downloadExecutorService.execute(() -> {
-            settings.getDownloadersSettings(downloaderSettings -> {
-            downloadersProvider.get(dls -> {
+        settings.getDownloadersSettings(downloaderSettings -> {
+        downloadersProvider.get(dls -> {
+            downloadExecutorService.execute(() -> {
                 // Should not run in parallel with other auto downloads.
                 // If multiple calls are made rapidly, the first will
                 // lock the block below and update lastDL so future
@@ -306,8 +306,8 @@ public class BrowseActivityViewModel extends AndroidViewModel {
                         download(LocalDate.now(), dls.getAutoDownloaders());
                     }
                 }
-            ;});});
-        });
+            ;})
+        ;});});
     }
 
     public void loadPuzzle(PuzMetaFile puzMeta) {

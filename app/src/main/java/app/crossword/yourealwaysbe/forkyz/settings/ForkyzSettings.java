@@ -933,7 +933,7 @@ public class ForkyzSettings {
     }
 
     public void getAppOrientationLock(Consumer<Orientation> cb) {
-        getFSEnumSetting(orientationSetting, cb);
+        LiveDataUtilsKt.observeOnce(liveAppOrientationLock(), cb);
     }
 
     public LiveData<Orientation> liveAppOrientationLock() {
@@ -948,7 +948,7 @@ public class ForkyzSettings {
      * Whether to use day theme, night theme, or follow system
      */
     public void getAppDayNightMode(Consumer<DayNightMode> cb) {
-        getFSEnumSetting(appDayNightModeSetting, cb);
+        LiveDataUtilsKt.observeOnce(liveAppDayNightMode(), cb);
     }
 
     public DayNightMode getAppDayNightModeSync() {
@@ -967,7 +967,7 @@ public class ForkyzSettings {
      * The theme selected by user
      */
     public void getAppTheme(Consumer<Theme> cb) {
-        getFSEnumSetting(appThemeSetting, cb);
+        LiveDataUtilsKt.observeOnce(liveAppTheme(), cb);
     }
 
     /**
@@ -1002,7 +1002,7 @@ public class ForkyzSettings {
      * Age of a puzzle in the crosswords list to be removed in cleanup
      */
     public void getBrowseCleanupAge(Consumer<String> cb) {
-        getStringSetting(PREF_BROWSE_CLEANUP_AGE, cb);
+        LiveDataUtilsKt.observeOnce(liveBrowseCleanupAge(), cb);
     }
 
     public LiveData<String> liveBrowseCleanupAge() {
@@ -1017,14 +1017,18 @@ public class ForkyzSettings {
      * Age of a puzzle in the archive list to be removed in cleanup
      */
     public void getBrowseCleanupAgeArchive(Consumer<String> cb) {
-        getStringSetting(PREF_BROWSE_CLEANUP_AGE_ARCHIVE, cb);
+        LiveDataUtilsKt.observeOnce(liveBrowseCleanupAgeArchive(), cb);
+    }
+
+    public LiveData<String> liveBrowseCleanupAgeArchive() {
+        return liveStringSetting(PREF_BROWSE_CLEANUP_AGE_ARCHIVE);
     }
 
     /**
      * Delete on clean up crosswords list, rather than send to archive
      */
     public void getBrowseDeleteOnCleanup(Consumer<Boolean> cb) {
-        getBooleanSetting(PREF_BROWSE_DELETE_ON_CLEANUP, cb);
+        LiveDataUtilsKt.observeOnce(liveBrowseDeleteOnCleanup(), cb);
     }
 
     public LiveData<Boolean> liveBrowseDeleteOnCleanup() {
@@ -1039,7 +1043,7 @@ public class ForkyzSettings {
      * Disable the swipe action in the browse list
      */
     public void getBrowseDisableSwipe(Consumer<Boolean> cb) {
-        getBooleanSetting(PREF_BROWSE_DISABLE_SWIPE, cb);
+        LiveDataUtilsKt.observeOnce(liveBrowseDisableSwipe(), cb);
     }
 
     public LiveData<Boolean> liveBrowseDisableSwipe() {
@@ -1054,7 +1058,7 @@ public class ForkyzSettings {
      * Whether to indicate in browse if puzzle has answers in data
      */
     public void getBrowseIndicateIfSolution(Consumer<Boolean> cb) {
-        getBooleanSetting(PREF_BROWSE_INDICATE_IF_SOLUTION, cb);
+        LiveDataUtilsKt.observeOnce(liveBrowseIndicateIfSolution(), cb);
     }
 
     public LiveData<Boolean> liveBrowseIndicateIfSolution() {
@@ -1156,7 +1160,7 @@ public class ForkyzSettings {
      * Whether to delete or archve on swipe
      */
     public void getBrowseSwipeAction(Consumer<BrowseSwipeAction> cb) {
-        getFSEnumSetting(browseSwipeActionSetting, cb);
+        LiveDataUtilsKt.observeOnce(liveBrowseSwipeAction(), cb);
     }
 
     public LiveData<BrowseSwipeAction> liveBrowseSwipeAction() {
@@ -1286,7 +1290,7 @@ public class ForkyzSettings {
      * When to double up the clue tabs display
      */
     public void getClueListClueTabsDouble(Consumer<ClueTabsDouble> cb) {
-        getFSEnumSetting(clueTabsDoubleSetting, cb);
+        LiveDataUtilsKt.observeOnce(liveClueListClueTabsDouble(), cb);
     }
 
     public LiveData<ClueTabsDouble> liveClueListClueTabsDouble() {
@@ -1303,14 +1307,14 @@ public class ForkyzSettings {
      * Or just the currently selected clue.
      */
     public void getClueListShowWords(Consumer<Boolean> cb) {
-        getBooleanSetting(PREF_CLUE_LIST_SHOW_WORDS, cb);
+        LiveDataUtilsKt.observeOnce(liveClueListShowWords(), cb);
     }
 
     /**
      * Whether to make sure current clue always visible in clue tabs
      */
     public void getClueListSnapToClue(Consumer<Boolean> cb) {
-        getBooleanSetting(PREF_CLUE_LIST_SNAP_TO_CLUE, cb);
+        LiveDataUtilsKt.observeOnce(liveClueListSnapToClue(), cb);
     }
 
     public LiveData<Boolean> liveClueListSnapToClue() {
@@ -1333,7 +1337,7 @@ public class ForkyzSettings {
      * The API key for ask chat gpt for help if set
      */
     public void getExtChatGPTAPIKey(Consumer<String> cb) {
-        getStringSetting(PREF_EXT_CHAT_GPT_API_KEY, cb);
+        LiveDataUtilsKt.observeOnce(liveExtChatGPTAPIKey(), cb);
     }
 
     public LiveData<String> liveExtChatGPTAPIKey() {
@@ -1656,7 +1660,7 @@ public class ForkyzSettings {
      * Default is in the title bar
      */
     public void getPlayClueBelowGrid(Consumer<Boolean> cb) {
-        getBooleanSetting(PREF_PLAY_CLUE_BELOW_GRID, cb);
+        LiveDataUtilsKt.observeOnce(livePlayClueBelowGrid(), cb);
     }
 
     public LiveData<Boolean> livePlayClueBelowGrid() {
@@ -1671,7 +1675,7 @@ public class ForkyzSettings {
      * How to highlight the selected clue in clue tabs
      */
     public void getPlayClueHighlight(Consumer<ClueHighlight> cb) {
-        getFSEnumSetting(clueHighlight, cb);
+        LiveDataUtilsKt.observeOnce(livePlayClueHighlight(), cb);
     }
 
     public LiveData<ClueHighlight> livePlayClueHighlight() {
@@ -1757,7 +1761,7 @@ public class ForkyzSettings {
      * Whether double tapping the screen fits the board to screen
      */
     public void getPlayDoubleTapFitBoard(Consumer<Boolean> cb) {
-        getBooleanSetting(PREF_PLAY_DOUBLE_TAP_FIT_BOARD, cb);
+        LiveDataUtilsKt.observeOnce(livePlayDoubleTapFitBoard(), cb);
     }
 
     public LiveData<Boolean> livePlayDoubleTapFitBoard() {
@@ -1772,7 +1776,7 @@ public class ForkyzSettings {
      * Ensure the currently selected word/cell is visible on play board
      */
     public void getPlayEnsureVisible(Consumer<Boolean> cb) {
-        getBooleanSetting(PREF_PLAY_ENSURE_VISIBLE, cb);
+        LiveDataUtilsKt.observeOnce(livePlayEnsureVisible(), cb);
     }
 
     public LiveData<Boolean> livePlayEnsureVisible() {
@@ -1787,7 +1791,7 @@ public class ForkyzSettings {
      * Whether to change selection direction when enter pressed
      */
     public void getPlayEnterChangesDirection(Consumer<Boolean> cb) {
-        getBooleanSetting(PREF_PLAY_ENTER_CHANGES_DIRECTION, cb);
+        LiveDataUtilsKt.observeOnce(livePlayEnterChangesDirection(), cb);
     }
 
     public LiveData<Boolean> livePlayEnterChangesDirection() {
@@ -1802,7 +1806,7 @@ public class ForkyzSettings {
      * How/if to fit to screen
      */
     public void getPlayFitToScreenMode(Consumer<FitToScreenMode> cb) {
-        getFSEnumSetting(fitToScreenModeSetting, cb);
+        LiveDataUtilsKt.observeOnce(livePlayFitToScreenMode(), cb);
     }
 
     public LiveData<FitToScreenMode> livePlayFitToScreenMode() {
@@ -1820,7 +1824,7 @@ public class ForkyzSettings {
      * hide the status bar at the top.
      */
     public void getPlayFullScreen(Consumer<Boolean> cb) {
-        getBooleanSetting(PREF_PLAY_FULL_SCREEN, cb);
+        LiveDataUtilsKt.observeOnce(livePlayFullScreen(), cb);
     }
 
     public LiveData<Boolean> livePlayFullScreen() {
@@ -1835,7 +1839,7 @@ public class ForkyzSettings {
      * Get grid ratio when clue tabs showing on play screen landscape mode
      */
     public void getPlayGridRatioLandscape(Consumer<GridRatio> cb) {
-        getFSEnumSetting(landscapeGridRatioSetting, cb);
+        LiveDataUtilsKt.observeOnce(livePlayGridRatioLandscape(), cb);
     }
 
     public LiveData<GridRatio> livePlayGridRatioLandscape() {
@@ -1850,7 +1854,7 @@ public class ForkyzSettings {
      * Get grid ratio when clue tabs showing on play screen
      */
     public void getPlayGridRatioPortrait(Consumer<GridRatio> cb) {
-        getFSEnumSetting(portraitGridRatioSetting, cb);
+        LiveDataUtilsKt.observeOnce(livePlayGridRatioPortrait(), cb);
     }
 
     public LiveData<GridRatio> livePlayGridRatioPortrait() {
@@ -1865,7 +1869,7 @@ public class ForkyzSettings {
      * Whether to guess separators between cells on grid from clue
      */
     public void getPlayInferSeparators(Consumer<Boolean> cb) {
-        getBooleanSetting(PREF_PLAY_INFER_SEPARATORS, cb);
+        LiveDataUtilsKt.observeOnce(livePlayInferSeparators(), cb);
     }
 
     public boolean getPlayInferSeparatorsSync() {
@@ -1921,7 +1925,7 @@ public class ForkyzSettings {
      * Whether to jump to a random clue when device shaken
      */
     public void getPlayRandomClueOnShake(Consumer<Boolean> cb) {
-        getBooleanSetting(PREF_PLAY_RANDOM_CLUE_ON_SHAKE, cb);
+        LiveDataUtilsKt.observeOnce(livePlayRandomClueOnShake(), cb);
     }
 
     public LiveData<Boolean> livePlayRandomClueOnShake() {
@@ -1951,7 +1955,7 @@ public class ForkyzSettings {
      * Whether to use play letter undo stack on Playboard
      */
     public void getPlayPlayLetterUndoEnabled(Consumer<Boolean> cb) {
-        getBooleanSetting(PREF_PLAY_PLAY_LETTER_UNDO_ENABLED, cb);
+        LiveDataUtilsKt.observeOnce(livePlayPlayLetterUndoEnabled(), cb);
     }
 
     public LiveData<Boolean> livePlayPlayLetterUndoEnabled() {
@@ -1968,7 +1972,7 @@ public class ForkyzSettings {
      * On notes page, predict by matching against clue
      */
     public void getPlayPredictAnagramChars(Consumer<Boolean> cb) {
-        getBooleanSetting(PREF_PLAY_PREDICT_ANAGRAM_CHARS, cb);
+        LiveDataUtilsKt.observeOnce(livePlayPredictAnagramChars(), cb);
     }
 
     public LiveData<Boolean> livePlayPredictAnagramChars() {
@@ -1985,8 +1989,8 @@ public class ForkyzSettings {
     public void getPlayPreserveCorrectLettersInShowErrors(
         Consumer<Boolean> cb
     ) {
-        getBooleanSetting(
-            PREF_PLAY_PRESERVE_CORRECT_LETTERS_IN_SHOW_ERRORS, cb
+        LiveDataUtilsKt.observeOnce(
+            livePlayPreserveCorrectLettersInShowErrors(), cb
         );
     }
 
@@ -2017,7 +2021,7 @@ public class ForkyzSettings {
      * Whether to show scratch notes on the play board in grey letters
      */
     public void getPlayScratchDisplay(Consumer<Boolean> cb) {
-        getBooleanSetting(PREF_PLAY_SCRATCH_DISPLAY, cb);
+        LiveDataUtilsKt.observeOnce(livePlayScratchDisplay(), cb);
     }
 
     public boolean getPlayScratchDisplaySync() {
@@ -2039,7 +2043,7 @@ public class ForkyzSettings {
      * chars as scratch notes for the current clue.
      */
     public void getPlayScratchMode(Consumer<Boolean> cb) {
-        getBooleanSetting(PREF_PLAY_SCRATCH_MODE, cb);
+        LiveDataUtilsKt.observeOnce(livePlayScratchMode(), cb);
     }
 
     public LiveData<Boolean> livePlayScratchMode() {
@@ -2054,7 +2058,7 @@ public class ForkyzSettings {
      * Wether to show the clue solution length after the clue hint
      */
     public void getPlayShowCount(Consumer<Boolean> cb) {
-        getBooleanSetting(PREF_PLAY_SHOW_COUNT, cb);
+        LiveDataUtilsKt.observeOnce(livePlayShowCount(), cb);
     }
 
     public LiveData<Boolean> livePlayShowCount() {
@@ -2069,7 +2073,7 @@ public class ForkyzSettings {
      * Whether to highlight errors on completely filled clue entries
      */
     public void getPlayShowErrorsClue(Consumer<Boolean> cb) {
-        getBooleanSetting(PREF_PLAY_SHOW_ERRORS_CLUE, cb);
+        LiveDataUtilsKt.observeOnce(livePlayShowErrorsClue(), cb);
     }
 
     public LiveData<Boolean> livePlayShowErrorsClue() {
@@ -2084,7 +2088,7 @@ public class ForkyzSettings {
      * Whether to highlight errors in the currently selected cell
      */
     public void getPlayShowErrorsCursor(Consumer<Boolean> cb) {
-        getBooleanSetting(PREF_PLAY_SHOW_ERRORS_CURSOR, cb);
+        LiveDataUtilsKt.observeOnce(livePlayShowErrorsCursor(), cb);
     }
 
     public LiveData<Boolean> livePlayShowErrorsCursor() {
@@ -2099,7 +2103,7 @@ public class ForkyzSettings {
      * Whether to highlight errors anywhere on the grid
      */
     public void getPlayShowErrorsGrid(Consumer<Boolean> cb) {
-        getBooleanSetting(PREF_PLAY_SHOW_ERRORS_GRID, cb);
+        LiveDataUtilsKt.observeOnce(livePlayShowErrorsGrid(), cb);
     }
 
     public LiveData<Boolean> livePlayShowErrorsGrid() {
@@ -2111,7 +2115,7 @@ public class ForkyzSettings {
     }
 
     public void getPlayShowTimer(Consumer<Boolean> cb) {
-        getBooleanSetting(PREF_PLAY_SHOW_TIMER, cb);
+        LiveDataUtilsKt.observeOnce(livePlayShowTimer(), cb);
     }
 
     public LiveData<Boolean> livePlayShowTimer() {
@@ -2126,7 +2130,7 @@ public class ForkyzSettings {
      * Whether to skip filled cells when moving to the next
      */
     public void getPlaySkipFilled(Consumer<Boolean> cb) {
-        getBooleanSetting(PREF_PLAY_SKIP_FILLED, cb);
+        LiveDataUtilsKt.observeOnce(livePlaySkipFilled(), cb);
     }
 
     public LiveData<Boolean> livePlaySkipFilled() {
@@ -2141,7 +2145,11 @@ public class ForkyzSettings {
      * Whether to show the clue list on the PlayActivity
      */
     public void getPlayShowCluesTab(Consumer<Boolean> cb) {
-        getBooleanSetting(PREF_PLAY_SHOW_CLUES_TAB, cb);
+        LiveDataUtilsKt.observeOnce(livePlayShowCluesTab(), cb);
+    }
+
+    public LiveData<Boolean> livePlayShowCluesTab() {
+        return liveBooleanSetting(PREF_PLAY_SHOW_CLUES_TAB);
     }
 
     public void setPlayShowCluesTab(boolean value) {
@@ -2152,7 +2160,7 @@ public class ForkyzSettings {
      * Whether pressing space changes the selection direction
      */
     public void getPlaySpaceChangesDirection(Consumer<Boolean> cb) {
-        getBooleanSetting(PREF_PLAY_SPACE_CHANGE_DIRECTION, cb);
+        LiveDataUtilsKt.observeOnce(livePlaySpaceChangesDirection(), cb);
     }
 
     public LiveData<Boolean> livePlaySpaceChangesDirection() {
@@ -2167,7 +2175,7 @@ public class ForkyzSettings {
      * Whether hinted squares should not be highlighted on board view
      */
     public void getPlaySuppressHintHighlighting(Consumer<Boolean> cb) {
-        getBooleanSetting(PREF_PLAY_SUPPRESS_HINT_HIGHLIGHTING, cb);
+        LiveDataUtilsKt.observeOnce(livePlaySuppressHintHighlighting(), cb);
     }
 
     public boolean getPlaySuppressHintHighlightingSync() {
@@ -2189,7 +2197,7 @@ public class ForkyzSettings {
      * means do both in one.
      */
     public void getPlayToggleBeforeMove(Consumer<Boolean> cb) {
-        getBooleanSetting(PREF_PLAY_TOGGLE_BEFORE_MOVE, cb);
+        LiveDataUtilsKt.observeOnce(livePlayToggleBeforeMove(), cb);
     }
 
     public LiveData<Boolean> livePlayToggleBeforeMove() {
@@ -2204,7 +2212,7 @@ public class ForkyzSettings {
      * Whether to indicate show errors status (i.e. whether turned on)
      */
     public void getPlayIndicateShowErrors(Consumer<Boolean> cb) {
-        getBooleanSetting(PREF_PLAY_INDICATE_SHOW_ERRORS, cb);
+        LiveDataUtilsKt.observeOnce(livePlayIndicateShowErrors(), cb);
     }
 
     public LiveData<Boolean> livePlayIndicateShowErrors() {
@@ -2243,7 +2251,7 @@ public class ForkyzSettings {
      * Whether to always announce the current box
      */
     public void getVoiceAlwaysAnnounceBox(Consumer<Boolean> cb) {
-        getBooleanSetting(PREF_VOICE_ALWAYS_ANNOUNCE_BOX, cb);
+        LiveDataUtilsKt.observeOnce(liveVoiceAlwaysAnnounceBox(), cb);
     }
 
     public LiveData<Boolean> liveVoiceAlwaysAnnounceBox() {
@@ -2258,7 +2266,7 @@ public class ForkyzSettings {
      * Whether to always announce the current clue
      */
     public void getVoiceAlwaysAnnounceClue(Consumer<Boolean> cb) {
-        getBooleanSetting(PREF_VOICE_ALWAYS_ANNOUNCE_CLUE, cb);
+        LiveDataUtilsKt.observeOnce(liveVoiceAlwaysAnnounceClue(), cb);
     }
 
     public LiveData<Boolean> liveVoiceAlwaysAnnounceClue() {
@@ -2273,7 +2281,7 @@ public class ForkyzSettings {
      * Whether to show a button for activating voice commands
      */
     public void getVoiceButtonActivatesVoice(Consumer<Boolean> cb) {
-        getBooleanSetting(PREF_VOICE_BUTTON_ACTIVATES_VOICE, cb);
+        LiveDataUtilsKt.observeOnce(liveVoiceButtonActivatesVoice(), cb);
     }
 
     public LiveData<Boolean> liveVoiceButtonActivatesVoice() {
@@ -2310,7 +2318,7 @@ public class ForkyzSettings {
      * Whether to show a button for reading out clue
      */
     public void getVoiceButtonAnnounceClue(Consumer<Boolean> cb) {
-        getBooleanSetting(PREF_VOICE_BUTTON_ANNOUNCE_CLUE, cb);
+        LiveDataUtilsKt.observeOnce(liveVoiceButtonAnnounceClue(), cb);
     }
 
     public LiveData<Boolean> liveVoiceButtonAnnounceClue() {
@@ -2328,57 +2336,7 @@ public class ForkyzSettings {
      * timeout, notifications.
      */
     public void getDownloadersSettings(Consumer<DownloadersSettings> cb) {
-        executor.execute(() -> {
-            DownloadersSettings settings = getDownloadersSettingsSync();
-            handler.post(() -> { cb.accept(settings); });
-        });
-    }
-
-    public DownloadersSettings getDownloadersSettingsSync() {
-        return new DownloadersSettings(
-            getBooleanSettingSync(PREF_DOWNLOAD_DE_STANDAARD),
-            getBooleanSettingSync(PREF_DOWNLOAD_DE_TELEGRAAF),
-            getBooleanSettingSync(PREF_DOWNLOAD_GUARDIAN_DAILY_CRYPTIC),
-            getBooleanSettingSync(PREF_DOWNLOAD_GUARDIAN_WEEKLY_QUIPTIC),
-            getBooleanSettingSync(PREF_DOWNLOAD_HAM_ABEND),
-            getBooleanSettingSync(PREF_DOWNLOAD_INDEPENDENT_DAILY_CRYPTIC),
-            getBooleanSettingSync(PREF_DOWNLOAD_IRISH_NEWS_CRYPTIC),
-            getBooleanSettingSync(PREF_DOWNLOAD_JONESIN),
-            getBooleanSettingSync(PREF_DOWNLOAD_JOSEPH),
-            getBooleanSettingSync(PREF_DOWNLOAD_20_MINUTES),
-            getBooleanSettingSync(PREF_DOWNLOAD_LE_PARISIEN_F1),
-            getBooleanSettingSync(PREF_DOWNLOAD_LE_PARISIEN_F2),
-            getBooleanSettingSync(PREF_DOWNLOAD_LE_PARISIEN_F3),
-            getBooleanSettingSync(PREF_DOWNLOAD_LE_PARISIEN_F4),
-            getBooleanSettingSync(PREF_DOWNLOAD_METRO_CRYPTIC),
-            getBooleanSettingSync(PREF_DOWNLOAD_METRO_QUICK),
-            getBooleanSettingSync(PREF_DOWNLOAD_NEWSDAY),
-            getBooleanSettingSync(PREF_DOWNLOAD_NEW_YORK_TIMES_SYNDICATED),
-            getBooleanSettingSync(PREF_DOWNLOAD_PREMIER),
-            getBooleanSettingSync(PREF_DOWNLOAD_SHEFFER),
-            getBooleanSettingSync(PREF_DOWNLOAD_UNIVERSAL),
-            getBooleanSettingSync(PREF_DOWNLOAD_USA_TODAY),
-            getBooleanSettingSync(PREF_DOWNLOAD_WA_PO_SUNDAY),
-            getBooleanSettingSync(PREF_DOWNLOAD_WSJ),
-            getBooleanSettingSync(PREF_SCRAPE_CRU),
-            getBooleanSettingSync(PREF_SCRAPE_EVERYMAN),
-            getBooleanSettingSync(PREF_SCRAPE_GUARDIAN_QUICK),
-            getBooleanSettingSync(PREF_SCRAPE_KEGLER),
-            getBooleanSettingSync(PREF_SCRAPE_PRIVATE_EYE),
-            getBooleanSettingSync(PREF_SCRAPE_PRZEKROJ),
-            getBooleanSettingSync(PREF_DOWNLOAD_CUSTOM_DAILY),
-            getStringSettingSync(PREF_DOWNLOAD_CUSTOM_DAILY_TITLE),
-            getStringSettingSync(PREF_DOWNLOAD_CUSTOM_DAILY_URL),
-            getBooleanSettingSync(
-                PREF_DOWNLOAD_SUPPRESS_SUMMARY_NOTIFICATIONS
-            ),
-            getBooleanSettingSync(
-                PREF_DOWNLOAD_SUPPRESS_INDIVIDUAL_NOTIFICATIONS
-            ),
-            getStringSetSettingSync(PREF_DOWNLOAD_AUTO_DOWNLOADERS),
-            Integer.valueOf(getStringSettingSync(PREF_DOWNLOAD_TIMEOUT)),
-            getBooleanSettingSync(PREF_DOWNLOAD_ON_STARTUP)
-        );
+        LiveDataUtilsKt.observeOnce(liveDownloadersSettings(), cb);
     }
 
     public LiveData<DownloadersSettings> liveDownloadersSettings() {
@@ -2710,7 +2668,7 @@ public class ForkyzSettings {
     }
 
     public void getDownloadCustomDaily(Consumer<Boolean> cb) {
-        getBooleanSetting(PREF_DOWNLOAD_CUSTOM_DAILY, cb);
+        LiveDataUtilsKt.observeOnce(liveDownloadCustomDaily(), cb);
     }
 
     public LiveData<Boolean> liveDownloadCustomDaily() {
@@ -2730,7 +2688,7 @@ public class ForkyzSettings {
     }
 
     public void getDownloadCustomDailyURL(Consumer<String> cb) {
-        getStringSetting(PREF_DOWNLOAD_CUSTOM_DAILY_URL, cb);
+        LiveDataUtilsKt.observeOnce(liveDownloadCustomDailyURL(), cb);
     }
 
     public LiveData<String> liveDownloadCustomDailyURL() {
@@ -3046,13 +3004,6 @@ public class ForkyzSettings {
     private void setIntegerSetting(String key, int value) {
         executor.execute(() -> {
             integerSettings.get(key).setValue(prefs, value);
-        });
-    }
-
-    private void getLongSetting(String key, Consumer<Long> cb) {
-        executor.execute(() -> {
-            long value = getLongSettingSync(key);
-            handler.post(() -> { cb.accept(value); });
         });
     }
 
