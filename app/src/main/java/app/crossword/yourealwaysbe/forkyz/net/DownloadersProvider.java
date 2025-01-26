@@ -2,7 +2,6 @@
 package app.crossword.yourealwaysbe.forkyz.net;
 
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.Observer;
 import java.util.function.Consumer;
 import javax.inject.Inject;
@@ -32,7 +31,7 @@ public class DownloadersProvider {
     private AndroidVersionUtils utils;
     private FileHandlerProvider fileHandlerProvider;
     private ForkyzSettings settings;
-    private MediatorLiveData<Downloaders> liveDownloadersMediator;
+    private LiveData<Downloaders> liveDownloaders;
 
     @Inject
     public DownloadersProvider(
@@ -52,48 +51,26 @@ public class DownloadersProvider {
     }
 
     public LiveData<Downloaders> liveDownloaders() {
-        if (liveDownloadersMediator != null)
-            return liveDownloadersMediator;
-
-        liveDownloadersMediator = new MediatorLiveData<>();
+        if (liveDownloaders != null)
+            return liveDownloaders;
 
         LiveData<FileHandler> liveFileHandler
             = fileHandlerProvider.liveFileHandler();
         LiveData<DownloadersSettings> liveDownloadersSettings
             = settings.liveDownloadersSettings();
 
-        liveDownloadersMediator.addSource(
+        liveDownloaders = LiveDataUtilsKt.liveDataFanIn(
+            () -> {
+                return constructFromSettings(
+                    liveDownloadersSettings.getValue(),
+                    liveFileHandler.getValue()
+                );
+            },
             liveFileHandler,
-            fileHandler -> {
-                DownloadersSettings downloadersSettings
-                    = liveDownloadersSettings.getValue();
-                if (downloadersSettings != null && fileHandler != null) {
-                    liveDownloadersMediator.setValue(
-                        constructFromSettings(
-                            downloadersSettings,
-                            fileHandler
-                        )
-                    );
-                }
-            }
+            liveDownloadersSettings
         );
 
-        liveDownloadersMediator.addSource(
-            liveDownloadersSettings,
-            downloadersSettings -> {
-                FileHandler fileHandler = liveFileHandler.getValue();
-                if (downloadersSettings != null && fileHandler != null) {
-                    liveDownloadersMediator.setValue(
-                        constructFromSettings(
-                            downloadersSettings,
-                            fileHandler
-                        )
-                    );
-                }
-            }
-        );
-
-        return liveDownloadersMediator;
+        return liveDownloaders;
     }
 
     private Downloaders constructFromSettings(
