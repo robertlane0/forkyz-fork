@@ -8,6 +8,7 @@ import android.os.Handler;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
+import androidx.lifecycle.Transformations;
 import androidx.preference.PreferenceManager;
 
 import java.io.BufferedWriter;
@@ -41,6 +42,7 @@ import app.crossword.yourealwaysbe.forkyz.net.Downloader;
 import app.crossword.yourealwaysbe.forkyz.net.Downloaders;
 import app.crossword.yourealwaysbe.forkyz.tools.ExternalDictionary;
 import app.crossword.yourealwaysbe.forkyz.util.JSONUtils;
+import app.crossword.yourealwaysbe.forkyz.util.LiveDataUtilsKt;
 import app.crossword.yourealwaysbe.forkyz.util.files.Accessor;
 import app.crossword.yourealwaysbe.puz.MovementStrategy;
 import app.crossword.yourealwaysbe.puz.Playboard.DeleteCrossingMode;
@@ -890,6 +892,7 @@ public class ForkyzSettings {
         booleanSettings,
         enumSettings,
         floatSettings,
+        integerSettings,
         longSettings,
         stringSettings,
         stringSetSettings
@@ -899,91 +902,14 @@ public class ForkyzSettings {
     private Handler handler;
     private ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    private MutableLiveData<Accessor> liveBrowseSort;
-    private MutableLiveData<DeleteCrossingMode> livePlayDeleteCrossingMode;
-    private MutableLiveData<KeyboardSettings> liveKeyboardSettings;
-    private MutableLiveData<RatingsSettings> liveRatingsSettings;
-    private MutableLiveData<FileHandlerSettings> liveFileHandlerSettings;
-    private MutableLiveData<DownloadersSettings> liveDownloadersSettings;
+    private LiveData<Accessor> liveBrowseSort;
+    private LiveData<KeyboardSettings> liveKeyboardSettings;
+    private LiveData<RatingsSettings> liveRatingsSettings;
+    private LiveData<FileHandlerSettings> liveFileHandlerSettings;
+    private LiveData<DownloadersSettings> liveDownloadersSettings;
 
     private OnSharedPreferenceChangeListener prefChangeListener
         = (prefs, key) -> {
-            if (
-                PREF_KEYBOARD_COMPACT.equals(key)
-                || PREF_KEYBOARD_FORCE_CAPS.equals(key)
-                || PREF_KEYBOARD_HAPTIC.equals(key)
-                || PREF_KEYBOARD_HIDE_BUTTON.equals(key)
-                || PREF_KEYBOARD_LAYOUT.equals(key)
-                || PREF_KEYBOARD_MODE.equals(key)
-                || PREF_KEYBOARD_NATIVE.equals(key)
-                || PREF_KEYBOARD_REPEAT_DELAY.equals(key)
-                || PREF_KEYBOARD_REPEAT_INTERVAL.equals(key)
-            ) {
-                updateLiveKeyboardSettings();
-            } else if (
-                PREF_BROWSE_ALWAYS_SHOW_RATING.equals(key)
-                || PREF_RATINGS_DISABLE_RATINGS.equals(key)
-            ) {
-                updateLiveRatingsSettings();
-            } else if (PREF_BROWSE_SORT.equals(key)) {
-                updateLiveBrowseSort();
-            } else if (PREF_PLAY_DELETE_CROSSING_MODE.equals(key)) {
-                updateLivePlayDeleteCrossingMode();
-            } else if (
-                PREF_FILE_HANDLER_STORAGE_LOC.equals(key)
-                || PREF_FILE_HANDLER_SAF_ROOT.equals(key)
-                || PREF_FILE_HANDLER_SAF_CROSSWORDS.equals(key)
-                || PREF_FILE_HANDLER_SAF_ARCHIVE.equals(key)
-                || PREF_FILE_HANDLER_SAF_TO_IMPORT.equals(key)
-                || PREF_FILE_HANDLER_SAF_TO_IMPORT_DONE.equals(key)
-                || PREF_FILE_HANDLER_SAF_TO_IMPORT_FAILED.equals(key)
-            ) {
-                updateLiveFileHandlerSettings();
-            } else if (
-                // oof
-                PREF_DOWNLOAD_DE_STANDAARD.equals(key)
-                || PREF_DOWNLOAD_DE_TELEGRAAF.equals(key)
-                || PREF_DOWNLOAD_GUARDIAN_DAILY_CRYPTIC.equals(key)
-                || PREF_DOWNLOAD_GUARDIAN_WEEKLY_QUIPTIC.equals(key)
-                || PREF_DOWNLOAD_HAM_ABEND.equals(key)
-                || PREF_DOWNLOAD_INDEPENDENT_DAILY_CRYPTIC.equals(key)
-                || PREF_DOWNLOAD_IRISH_NEWS_CRYPTIC.equals(key)
-                || PREF_DOWNLOAD_JONESIN.equals(key)
-                || PREF_DOWNLOAD_JOSEPH.equals(key)
-                || PREF_DOWNLOAD_20_MINUTES.equals(key)
-                || PREF_DOWNLOAD_LE_PARISIEN_F1.equals(key)
-                || PREF_DOWNLOAD_LE_PARISIEN_F2.equals(key)
-                || PREF_DOWNLOAD_LE_PARISIEN_F3.equals(key)
-                || PREF_DOWNLOAD_LE_PARISIEN_F4.equals(key)
-                || PREF_DOWNLOAD_METRO_CRYPTIC.equals(key)
-                || PREF_DOWNLOAD_METRO_QUICK.equals(key)
-                || PREF_DOWNLOAD_NEWSDAY.equals(key)
-                || PREF_DOWNLOAD_NEW_YORK_TIMES_SYNDICATED.equals(key)
-                || PREF_DOWNLOAD_PREMIER.equals(key)
-                || PREF_DOWNLOAD_SHEFFER.equals(key)
-                || PREF_DOWNLOAD_UNIVERSAL.equals(key)
-                || PREF_DOWNLOAD_USA_TODAY.equals(key)
-                || PREF_DOWNLOAD_WA_PO_SUNDAY.equals(key)
-                || PREF_DOWNLOAD_WSJ.equals(key)
-                || PREF_SCRAPE_CRU.equals(key)
-                || PREF_SCRAPE_EVERYMAN.equals(key)
-                || PREF_SCRAPE_GUARDIAN_QUICK.equals(key)
-                || PREF_SCRAPE_KEGLER.equals(key)
-                || PREF_SCRAPE_PRIVATE_EYE.equals(key)
-                || PREF_SCRAPE_PRZEKROJ.equals(key)
-                || PREF_DOWNLOAD_CUSTOM_DAILY.equals(key)
-                || PREF_DOWNLOAD_CUSTOM_DAILY_TITLE.equals(key)
-                || PREF_DOWNLOAD_CUSTOM_DAILY_URL.equals(key)
-                || PREF_DOWNLOAD_SUPPRESS_SUMMARY_NOTIFICATIONS.equals(key)
-                || PREF_DOWNLOAD_SUPPRESS_INDIVIDUAL_NOTIFICATIONS.equals(key)
-                || PREF_DOWNLOAD_AUTO_DOWNLOADERS.equals(key)
-                || PREF_DOWNLOAD_TIMEOUT.equals(key)
-                || PREF_DOWNLOAD_ON_STARTUP.equals(key)
-            ) {
-                updateLiveDownloadersSettings();
-            }
-
-            // also update direct live ones if exist
             BaseSetting<?, ?> setting = getSetting(key);
             if (setting != null)
                 setting.updateLiveData(prefs);
@@ -1198,21 +1124,20 @@ public class ForkyzSettings {
      * How to order the puzzles in the browse list
      */
     public void getBrowseSort(Consumer<Accessor> cb) {
-        getIntegerSetting(PREF_BROWSE_SORT, value -> {
-            switch (value) {
-            case 2: cb.accept(Accessor.SOURCE); break;
-            case 1: cb.accept(Accessor.DATE_ASC); break;
-            default: cb.accept(Accessor.DATE_DESC); break;
-            }
-        });
+        LiveDataUtilsKt.observeOnce(liveBrowseSort(), cb);
     }
 
     public LiveData<Accessor> liveBrowseSort() {
-        if (liveBrowseSort == null) {
-            liveBrowseSort = new MutableLiveData<Accessor>();
-            updateLiveBrowseSort();
-        }
-        return liveBrowseSort;
+        return Transformations.map(
+            liveIntegerSetting(PREF_BROWSE_SORT),
+            value -> {
+                switch (value) {
+                case 2: return Accessor.SOURCE;
+                case 1: return Accessor.DATE_ASC;
+                default: return Accessor.DATE_DESC;
+                }
+            }
+        );
     }
 
     public void setBrowseSort(Accessor value) {
@@ -1499,50 +1424,44 @@ public class ForkyzSettings {
      * custom storage is.
      */
     public void getFileHandlerSettings(Consumer<FileHandlerSettings> cb) {
-        executor.execute(() -> {
-            FileHandlerSettings fhSettings = getFileHandlerSettingsSync();
-            handler.post(() -> {
-                cb.accept(fhSettings);
-            });
-        });
-    }
-
-    public FileHandlerSettings getFileHandlerSettingsSync() {
-        StorageLocation storageLocation = getFSEnumSettingSync(
-            storageLocationSetting
-        );
-        String safRoot = getStringSettingSync(PREF_FILE_HANDLER_SAF_ROOT);
-        String safCrosswords = getStringSettingSync(
-            PREF_FILE_HANDLER_SAF_CROSSWORDS
-        );
-        String safArchive = getStringSettingSync(
-            PREF_FILE_HANDLER_SAF_ARCHIVE
-        );
-        String safToImport = getStringSettingSync(
-            PREF_FILE_HANDLER_SAF_TO_IMPORT
-        );
-        String safToImportDone = getStringSettingSync(
-            PREF_FILE_HANDLER_SAF_TO_IMPORT_DONE
-        );
-        String safToImportFailed = getStringSettingSync(
-            PREF_FILE_HANDLER_SAF_TO_IMPORT_FAILED
-        );
-
-        return new FileHandlerSettings(
-            storageLocation,
-            safRoot,
-            safCrosswords,
-            safArchive,
-            safToImport,
-            safToImportDone,
-            safToImportFailed
-        );
+        LiveDataUtilsKt.observeOnce(liveFileHandlerSettings(), cb);
     }
 
     public LiveData<FileHandlerSettings> liveFileHandlerSettings() {
         if (liveFileHandlerSettings == null) {
-            liveFileHandlerSettings = new MutableLiveData<FileHandlerSettings>();
-            updateLiveFileHandlerSettings();
+            LiveData<String> liveSAFRoot
+                = liveStringSetting(PREF_FILE_HANDLER_SAF_ROOT);
+            LiveData<String> liveSAFCrosswords
+                = liveStringSetting(PREF_FILE_HANDLER_SAF_CROSSWORDS);
+            LiveData<String> liveSAFArchive
+                = liveStringSetting(PREF_FILE_HANDLER_SAF_ARCHIVE);
+            LiveData<String> liveSAFToImport
+                = liveStringSetting(PREF_FILE_HANDLER_SAF_TO_IMPORT);
+            LiveData<String> liveSAFToImportDone
+                = liveStringSetting(PREF_FILE_HANDLER_SAF_TO_IMPORT_DONE);
+            LiveData<String> liveSAFToImportFailed
+                = liveStringSetting(PREF_FILE_HANDLER_SAF_TO_IMPORT_FAILED);
+
+            liveFileHandlerSettings = LiveDataUtilsKt.liveDataFanIn(
+                () -> {
+                    return new FileHandlerSettings(
+                        liveFileStorageLocation().getValue(),
+                        liveSAFRoot.getValue(),
+                        liveSAFCrosswords.getValue(),
+                        liveSAFArchive.getValue(),
+                        liveSAFToImport.getValue(),
+                        liveSAFToImportDone.getValue(),
+                        liveSAFToImportFailed.getValue()
+                    );
+                },
+                liveFileStorageLocation(),
+                liveSAFRoot,
+                liveSAFCrosswords,
+                liveSAFArchive,
+                liveSAFToImport,
+                liveSAFToImportDone,
+                liveSAFToImportFailed
+            );
         }
         return liveFileHandlerSettings;
     }
@@ -1592,19 +1511,7 @@ public class ForkyzSettings {
     }
 
     public void getKeyboardSettings(Consumer<KeyboardSettings> cb) {
-        // use value cached in liveKeyboardSettings or create cache
-        if (
-            liveKeyboardSettings == null
-            || !liveKeyboardSettings.isInitialized()
-        ) {
-            getFreshKeyboardSettings(ks -> {
-                handler.post(() -> { cb.accept(ks); });
-            });
-            // create a cache for future if needed
-            liveKeyboardSettings();
-        } else {
-            cb.accept(liveKeyboardSettings.getValue());
-        }
+        LiveDataUtilsKt.observeOnce(liveKeyboardSettings(), cb);
     }
 
     /**
@@ -1612,8 +1519,30 @@ public class ForkyzSettings {
      */
     public LiveData<KeyboardSettings> liveKeyboardSettings() {
         if (liveKeyboardSettings == null) {
-            liveKeyboardSettings = new MutableLiveData<KeyboardSettings>();
-            updateLiveKeyboardSettings();
+            liveKeyboardSettings = LiveDataUtilsKt.liveDataFanIn(
+                () -> {
+                    return new KeyboardSettings(
+                        liveKeyboardCompact().getValue(),
+                        liveKeyboardForceCaps().getValue(),
+                        liveKeyboardHaptic().getValue(),
+                        liveKeyboardHideButton().getValue(),
+                        liveKeyboardLayout().getValue(),
+                        liveKeyboardMode().getValue(),
+                        liveKeyboardRepeatDelay().getValue(),
+                        liveKeyboardRepeatInterval().getValue(),
+                        liveKeyboardUseNative().getValue()
+                    );
+                },
+                liveKeyboardCompact(),
+                liveKeyboardForceCaps(),
+                liveKeyboardHaptic(),
+                liveKeyboardHideButton(),
+                liveKeyboardLayout(),
+                liveKeyboardMode(),
+                liveKeyboardRepeatDelay(),
+                liveKeyboardRepeatInterval(),
+                liveKeyboardUseNative()
+            );
         }
         return liveKeyboardSettings;
     }
@@ -1778,22 +1707,17 @@ public class ForkyzSettings {
      * Whether to delete characters that may belong to a crossing word
      */
     public void getPlayDeleteCrossingMode(Consumer<DeleteCrossingMode> cb) {
-        getFSEnumSetting(
-            deleteCrossingModeSetting,
-            value -> { cb.accept(value.getDeleteCrossingMode()); }
-        );
+        LiveDataUtilsKt.observeOnce(livePlayDeleteCrossingMode(), cb);
     }
 
     /**
      * Whether to delete characters that may belong to a crossing word
      */
     public LiveData<DeleteCrossingMode> livePlayDeleteCrossingMode() {
-        if (livePlayDeleteCrossingMode == null) {
-            livePlayDeleteCrossingMode
-                = new MutableLiveData<DeleteCrossingMode>();
-            updateLivePlayDeleteCrossingMode();
-        }
-        return livePlayDeleteCrossingMode;
+        return Transformations.map(
+            livePlayDeleteCrossingModeSetting(),
+            value -> { return value.getDeleteCrossingMode(); }
+        );
     }
 
     /**
@@ -2301,8 +2225,16 @@ public class ForkyzSettings {
 
     public LiveData<RatingsSettings> liveRatingsSettings() {
         if (liveRatingsSettings == null) {
-            liveRatingsSettings = new MutableLiveData<RatingsSettings>();
-            updateLiveRatingsSettings();
+            liveRatingsSettings = LiveDataUtilsKt.liveDataFanIn(
+                () -> {
+                    return new RatingsSettings(
+                        liveRatingsDisableRatings().getValue(),
+                        liveBrowseAlwaysShowRating().getValue()
+                    );
+                },
+                liveRatingsDisableRatings(),
+                liveBrowseAlwaysShowRating()
+            );
         }
         return liveRatingsSettings;
     }
@@ -2451,8 +2383,88 @@ public class ForkyzSettings {
 
     public LiveData<DownloadersSettings> liveDownloadersSettings() {
         if (liveDownloadersSettings == null) {
-            liveDownloadersSettings = new MutableLiveData<DownloadersSettings>();
-            updateLiveDownloadersSettings();
+            liveDownloadersSettings = LiveDataUtilsKt.liveDataFanIn(
+                () -> {
+                    return new DownloadersSettings(
+                        liveDownloadDeStandaard().getValue(),
+                        liveDownloadDeTelegraaf().getValue(),
+                        liveDownloadGuardianDailyCryptic().getValue(),
+                        liveDownloadGuardianWeeklyQuiptic().getValue(),
+                        liveDownloadHamAbend().getValue(),
+                        liveDownloadIndependentDailyCryptic().getValue(),
+                        liveDownloadIrishNewsCryptic().getValue(),
+                        liveDownloadJonesin().getValue(),
+                        liveDownloadJoseph().getValue(),
+                        liveDownload20Minutes().getValue(),
+                        liveDownloadLeParisienF1().getValue(),
+                        liveDownloadLeParisienF2().getValue(),
+                        liveDownloadLeParisienF3().getValue(),
+                        liveDownloadLeParisienF4().getValue(),
+                        liveDownloadMetroCryptic().getValue(),
+                        liveDownloadMetroQuick().getValue(),
+                        liveDownloadNewsday().getValue(),
+                        liveDownloadNewYorkTimesSyndicated().getValue(),
+                        liveDownloadPremier().getValue(),
+                        liveDownloadSheffer().getValue(),
+                        liveDownloadUniversal().getValue(),
+                        liveDownloadUSAToday().getValue(),
+                        liveDownloadWaPoSunday().getValue(),
+                        liveDownloadWsj().getValue(),
+                        liveScrapeCru().getValue(),
+                        liveScrapeEveryman().getValue(),
+                        liveScrapeGuardianQuick().getValue(),
+                        liveScrapeKegler().getValue(),
+                        liveScrapePrivateEye().getValue(),
+                        liveScrapePrzekroj().getValue(),
+                        liveDownloadCustomDaily().getValue(),
+                        liveDownloadCustomDailyTitle().getValue(),
+                        liveDownloadCustomDailyURL().getValue(),
+                        liveDownloadSuppressSummaryMessages().getValue(),
+                        liveDownloadSuppressMessages().getValue(),
+                        liveDownloadAutoDownloaders().getValue(),
+                        liveDownloadTimeoutInteger().getValue(),
+                        liveDownloadOnStartup().getValue()
+                    );
+                },
+                liveDownloadDeStandaard(),
+                liveDownloadDeTelegraaf(),
+                liveDownloadGuardianDailyCryptic(),
+                liveDownloadGuardianWeeklyQuiptic(),
+                liveDownloadHamAbend(),
+                liveDownloadIndependentDailyCryptic(),
+                liveDownloadIrishNewsCryptic(),
+                liveDownloadJonesin(),
+                liveDownloadJoseph(),
+                liveDownload20Minutes(),
+                liveDownloadLeParisienF1(),
+                liveDownloadLeParisienF2(),
+                liveDownloadLeParisienF3(),
+                liveDownloadLeParisienF4(),
+                liveDownloadMetroCryptic(),
+                liveDownloadMetroQuick(),
+                liveDownloadNewsday(),
+                liveDownloadNewYorkTimesSyndicated(),
+                liveDownloadPremier(),
+                liveDownloadSheffer(),
+                liveDownloadUniversal(),
+                liveDownloadUSAToday(),
+                liveDownloadWaPoSunday(),
+                liveDownloadWsj(),
+                liveScrapeCru(),
+                liveScrapeEveryman(),
+                liveScrapeGuardianQuick(),
+                liveScrapeKegler(),
+                liveScrapePrivateEye(),
+                liveScrapePrzekroj(),
+                liveDownloadCustomDaily(),
+                liveDownloadCustomDailyTitle(),
+                liveDownloadCustomDailyURL(),
+                liveDownloadSuppressSummaryMessages(),
+                liveDownloadSuppressMessages(),
+                liveDownloadAutoDownloaders(),
+                liveDownloadTimeoutInteger(),
+                liveDownloadOnStartup()
+            );
         }
         return liveDownloadersSettings;
     }
@@ -2792,9 +2804,14 @@ public class ForkyzSettings {
      * Is a string but converts to integer before returning
      */
     public void getDownloadTimeout(Consumer<Integer> cb) {
-        getStringSetting(PREF_DOWNLOAD_TIMEOUT, value -> {
-            cb.accept(Integer.valueOf(value));
-        });
+        LiveDataUtilsKt.observeOnce(liveDownloadTimeoutInteger(), cb);
+    }
+
+    public LiveData<Integer> liveDownloadTimeoutInteger() {
+        return liveIntegerFromStringSetting(
+            PREF_DOWNLOAD_TIMEOUT,
+            Integer.valueOf(PREF_DOWNLOAD_TIMEOUT_DEFAULT)
+        );
     }
 
     /**
@@ -3093,57 +3110,12 @@ public class ForkyzSettings {
         stringSetSettings.get(key).setValue(prefs, value);
     }
 
-    private void updateLiveBrowseSort() {
-        if (liveBrowseSort != null)
-            getBrowseSort(value -> { liveBrowseSort.setValue(value); });
-    }
-
-    private void updateLiveKeyboardSettings() {
-        if (liveKeyboardSettings != null) {
-            getFreshKeyboardSettings(liveKeyboardSettings::setValue);
-        }
-    }
-
-    private void updateLivePlayDeleteCrossingMode() {
-        if (livePlayDeleteCrossingMode != null) {
-            getPlayDeleteCrossingMode(value -> {
-                livePlayDeleteCrossingMode.setValue(value);
-            });
-        }
-    }
-
-    private void updateLiveRatingsSettings() {
-        if (liveRatingsSettings != null) {
-            executor.execute(() -> {
-                RatingsSettings settings = new RatingsSettings(
-                    prefs.getBoolean(PREF_RATINGS_DISABLE_RATINGS, false),
-                    prefs.getBoolean(PREF_BROWSE_ALWAYS_SHOW_RATING, false)
-                );
-                liveRatingsSettings.postValue(settings);
-            });
-        }
-    }
-
-    private void updateLiveFileHandlerSettings() {
-        if (liveFileHandlerSettings != null) {
-            executor.execute(() -> {
-                FileHandlerSettings fhSettings = getFileHandlerSettingsSync();
-                liveFileHandlerSettings.postValue(fhSettings);
-            });
-        }
-    }
-
-    private void updateLiveDownloadersSettings() {
-        if (liveDownloadersSettings != null) {
-            executor.execute(() -> {
-                DownloadersSettings settings = getDownloadersSettingsSync();
-                liveDownloadersSettings.postValue(settings);
-            });
-        }
-    }
-
     private LiveData<Boolean> liveBooleanSetting(String key) {
         return booleanSettings.get(key).getCreateLiveData(prefs);
+    }
+
+    private LiveData<Integer> liveIntegerSetting(String key) {
+        return integerSettings.get(key).getCreateLiveData(prefs);
     }
 
     private LiveData<String> liveStringSetting(String key) {
@@ -3152,40 +3124,6 @@ public class ForkyzSettings {
 
     private LiveData<Set<String>> liveStringSetSetting(String key) {
         return stringSetSettings.get(key).getCreateLiveData(prefs);
-    }
-
-    /**
-     * Get a fresh copy of keyboard settings without using cached live
-     * settings
-     */
-    private void getFreshKeyboardSettings(Consumer<KeyboardSettings> cb) {
-        executor.execute(() -> {
-            String value = prefs.getString(
-                PREF_KEYBOARD_LAYOUT,
-                KeyboardLayout.QWERTY.getSettingsValue()
-            );
-            String modePref = prefs.getString(
-                PREF_KEYBOARD_MODE, KeyboardMode.HIDE_MANUAL.getSettingsValue()
-            );
-
-            KeyboardSettings settings = new KeyboardSettings(
-                getBooleanSettingSync(PREF_KEYBOARD_COMPACT),
-                getBooleanSettingSync(PREF_KEYBOARD_FORCE_CAPS),
-                getBooleanSettingSync(PREF_KEYBOARD_HAPTIC),
-                getBooleanSettingSync(PREF_KEYBOARD_HIDE_BUTTON),
-                getFSEnumSettingSync(keyboardLayoutSetting),
-                getFSEnumSettingSync(keyboardModeSetting),
-                getIntegerFromStringSettingSync(
-                    PREF_KEYBOARD_REPEAT_DELAY, 300
-                ),
-                getIntegerFromStringSettingSync(
-                    PREF_KEYBOARD_REPEAT_INTERVAL, 75
-                ),
-                getBooleanSettingSync(PREF_KEYBOARD_NATIVE)
-            );
-
-            handler.post(() -> { cb.accept(settings); });
-        });
     }
 
     private int getIntegerFromStringSettingSync(
