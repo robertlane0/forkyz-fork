@@ -156,7 +156,10 @@ fun ForkyzTopAppBar(
     val colors = if (appTheme == Theme.LEGACY_LIKE && !darkMode) {
         TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primary,
+            scrolledContainerColor = MaterialTheme.colorScheme.primary,
             titleContentColor = MaterialTheme.colorScheme.onPrimary,
+            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+            actionIconContentColor = MaterialTheme.colorScheme.onPrimary,
         )
     } else {
         TopAppBarDefaults.topAppBarColors()
