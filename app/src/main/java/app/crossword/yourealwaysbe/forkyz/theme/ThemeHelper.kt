@@ -6,13 +6,17 @@ import javax.inject.Singleton
 
 import android.app.Activity
 import android.app.Application
+import android.content.res.Configuration
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.core.content.ContextCompat
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.color.DynamicColors
 
+import app.crossword.yourealwaysbe.forkyz.ForkyzActivity
 import app.crossword.yourealwaysbe.forkyz.R
 import app.crossword.yourealwaysbe.forkyz.settings.DayNightMode
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
@@ -81,6 +85,27 @@ class ThemeHelper @Inject constructor(val settings : ForkyzSettings) {
                 activity.setTheme(R.style.Theme_Forkyz_LegacyLike)
             }
             else -> { /* keep main theme */ }
+        }
+    }
+
+    fun setupStatusBar(
+        activity : ForkyzActivity,
+        appBarLayout : AppBarLayout,
+    ) {
+        val nightModeFlags = activity
+            .getResources()
+            .getConfiguration().uiMode and Configuration.UI_MODE_NIGHT_MASK
+
+        if (
+            appTheme == Theme.LEGACY_LIKE
+            && nightModeFlags != Configuration.UI_MODE_NIGHT_YES
+        ) {
+            activity.setStatusBarColor(
+                appBarLayout,
+                ContextCompat.getColor(activity, R.color.primary),
+            )
+        } else {
+            activity.setStatusBarElevation(appBarLayout)
         }
     }
 }

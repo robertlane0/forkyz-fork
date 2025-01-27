@@ -205,8 +205,10 @@ public class ForkyzActivity extends AppCompatActivity {
      * Set the elevation to match the app bar
      *
      * As per Material3 docs
+     *
+     * Public for theme helper
      */
-    protected void setStatusBarElevation(AppBarLayout appBarLayout) {
+    public void setStatusBarElevation(AppBarLayout appBarLayout) {
         appBarLayout.setStatusBarForeground(
             MaterialShapeDrawable.createWithElevationOverlay(this)
         );
@@ -218,8 +220,10 @@ public class ForkyzActivity extends AppCompatActivity {
      * Calling reset will reset the status bar to what it was the first
      * time this method was used. I would call setStatusBarElevation
      * first if you want to be able to reset to that.
+     *
+     * Make public for theme helper
      */
-    protected void setStatusBarColor(AppBarLayout appBarLayout, int color) {
+    public void setStatusBarColor(AppBarLayout appBarLayout, int color) {
         if (originalStatusBar == null)
             originalStatusBar = appBarLayout.getStatusBarForeground();
         appBarLayout.setStatusBarForeground(
@@ -276,5 +280,14 @@ public class ForkyzActivity extends AppCompatActivity {
                 return windowInsets;
             }
         );
+    }
+
+    /**
+     * Setup status bar stuff
+     *
+     * Elevation and colour to match show errors
+     */
+    protected void setupStatusBar(AppBarLayout appBarLayout) {
+        themeHelper.setupStatusBar(this, appBarLayout);
     }
 }

@@ -1240,7 +1240,7 @@ public abstract class PuzzleActivity
      * Elevation and colour to match show errors
      */
     protected void setupStatusBar(AppBarLayout appBarLayout) {
-        setStatusBarElevation(appBarLayout);
+        super.setupStatusBar(appBarLayout);
 
         Observer<Boolean> showErrorsObserver = v -> {
             setStatusBarColor(appBarLayout);

@@ -446,7 +446,7 @@ public class BrowseActivity extends ForkyzActivity {
         setupSideInsets(binding.toolbar);
         setupBottomInsets(binding.content);
         setupBottomInsets(binding.speedDialAdd);
-        setStatusBarElevation(binding.appBarLayout);
+        setupStatusBar(binding.appBarLayout);
 
         setDefaultKeyMode(DEFAULT_KEYS_SHORTCUT);
         binding.puzzleList.setLayoutManager(new LinearLayoutManager(this));
