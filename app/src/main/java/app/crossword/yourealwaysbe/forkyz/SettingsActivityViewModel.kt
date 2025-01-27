@@ -44,6 +44,7 @@ import app.crossword.yourealwaysbe.forkyz.settings.MovementStrategySetting
 import app.crossword.yourealwaysbe.forkyz.settings.Orientation
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation
 import app.crossword.yourealwaysbe.forkyz.settings.Theme
+import app.crossword.yourealwaysbe.forkyz.util.BackgroundDownloadManager
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerSAF
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
@@ -291,6 +292,7 @@ class SettingsActivityViewModel @Inject constructor(
     private val utils : AndroidVersionUtils,
     private val fileHandlerProvider : FileHandlerProvider,
     private val downloadersProvider : DownloadersProvider,
+    private val backgroundDownloadManager : BackgroundDownloadManager,
 ) : AndroidViewModel(application) {
 
     private val fileActionMutex = Mutex()
@@ -770,7 +772,11 @@ class SettingsActivityViewModel @Inject constructor(
             R.string.background_download_hourly,
             R.string.background_download_hourly_desc,
             settings.liveBackgroundDownloadHourly(),
-            settings::setBackgroundDownloadHourly,
+            { value ->
+                settings.setBackgroundDownloadHourly(value) {
+                    backgroundDownloadManager.updateBackgroundDownloads()
+                }
+            }
         ),
         SettingsMultiList(
             SettingsPage.DOWNLOAD_BACKGROUND,
@@ -787,7 +793,11 @@ class SettingsActivityViewModel @Inject constructor(
                 SettingsListEntry(R.string.background_download_sun, "7"),
             ),
             settings.liveBackgroundDownloadDays(),
-            settings::setBackgroundDownloadDays,
+            { value ->
+                settings.setBackgroundDownloadDays(value) {
+                    backgroundDownloadManager.updateBackgroundDownloads()
+                }
+            }
         ),
         SettingsList<String>(
             SettingsPage.DOWNLOAD_BACKGROUND,
@@ -820,7 +830,11 @@ class SettingsActivityViewModel @Inject constructor(
                 SettingsListEntry(R.string.background_download_23, "23"),
             ),
             settings.liveBackgroundDownloadDaysTime(),
-            settings::setBackgroundDownloadDaysTime,
+            { value ->
+                settings.setBackgroundDownloadDaysTime(value) {
+                    backgroundDownloadManager.updateBackgroundDownloads()
+                }
+            }
         ),
         SettingsHeading(
             SettingsPage.DOWNLOAD_BACKGROUND,
@@ -831,21 +845,33 @@ class SettingsActivityViewModel @Inject constructor(
             R.string.download_wifi_only,
             R.string.download_wifi_only_desc,
             settings.liveBackgroundDownloadRequireUnmetered(),
-            settings::setBackgroundDownloadRequireUnmetered,
+            { value ->
+                settings.setBackgroundDownloadRequireUnmetered(value) {
+                    backgroundDownloadManager.updateBackgroundDownloads()
+                }
+            }
         ),
         SettingsBoolean(
             SettingsPage.DOWNLOAD_BACKGROUND,
             R.string.download_roaming,
             R.string.download_roaming_desc,
             settings.liveBackgroundDownloadAllowRoaming(),
-            settings::setBackgroundDownloadAllowRoaming,
+            { value ->
+                settings.setBackgroundDownloadAllowRoaming(value) {
+                    backgroundDownloadManager.updateBackgroundDownloads()
+                }
+            }
         ),
         SettingsBoolean(
             SettingsPage.DOWNLOAD_BACKGROUND,
             R.string.download_charging,
             R.string.download_charging_desc,
             settings.liveBackgroundDownloadRequireCharging(),
-            settings::setBackgroundDownloadRequireCharging,
+            { value ->
+                settings.setBackgroundDownloadRequireCharging(value) {
+                    backgroundDownloadManager.updateBackgroundDownloads()
+                }
+            }
         ),
 
         // Browser

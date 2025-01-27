@@ -9,6 +9,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.widget.Toast;
+import androidx.annotation.MainThread;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
@@ -46,6 +47,7 @@ public class FileHandlerProvider {
         );
     }
 
+    @MainThread
     public void get(Consumer<FileHandler> cb) {
         LiveDataUtilsKt.observeOnce(liveFileHandler, cb);
     }
@@ -57,6 +59,7 @@ public class FileHandlerProvider {
     /**
      * Returns true if WRITE_EXTERNAL_STORAGE permission is needed/missing
      */
+    @MainThread
     public void isMissingWritePermission(Consumer<Boolean> cb) {
         get(fileHandler -> {
             boolean needsPerm

@@ -104,8 +104,6 @@ public class BackgroundDownloadManager {
     private void scheduleHourlyDownloads(
         BackgroundDownloadSettings bgSettings
     ) {
-        LOGGER.info("Scheduling hourly downloads");
-
         PeriodicWorkRequest request
             = new PeriodicWorkRequest.Builder(
                 HourlyDownloadWorker.class, 1, TimeUnit.HOURS
@@ -126,8 +124,6 @@ public class BackgroundDownloadManager {
         long nextDelay = getNextDailyDownloadDelay(bgSettings);
         if (nextDelay < 0)
             return;
-
-        LOGGER.info("Scheduling next daily download in " + nextDelay + "ms");
 
         OneTimeWorkRequest request
             = new OneTimeWorkRequest.Builder(DailyDownloadWorker.class)
@@ -253,6 +249,7 @@ public class BackgroundDownloadManager {
         protected void doDownload(
             CallbackToFutureAdapter.Completer<ListenableWorker.Result> completer
         ) {
+            System.out.println("FORKYZ: do download");
             fileHandlerProvider.isMissingWritePermission(missing -> {
                 if (missing) {
                     LOGGER.info("Skipping download, no write permission");
@@ -261,8 +258,10 @@ public class BackgroundDownloadManager {
 
                 LOGGER.info("Downloading most recent puzzles");
 
+                System.out.println("FORKYZ: get dls");
                 downloadersProvider.get(dls -> {
                 downloadExecutorService.execute(() -> {
+                    System.out.println("FORKYZ: um ok");
                     try {
                         LocalDate now = LocalDate.now();
                         dls.downloadLatestInRange(

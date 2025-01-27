@@ -8,6 +8,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import android.content.Context;
+import androidx.annotation.MainThread;
+import androidx.annotation.WorkerThread;
 import androidx.core.app.NotificationManagerCompat;
 
 import dagger.hilt.android.qualifiers.ApplicationContext;
@@ -46,10 +48,12 @@ public class DownloadersProvider {
         this.fileHandlerProvider = fileHandlerProvider;
     }
 
+    @MainThread
     public void get(Consumer<Downloaders> cb) {
         LiveDataUtilsKt.observeOnce(liveDownloaders(), cb);
     }
 
+    @MainThread
     public LiveData<Downloaders> liveDownloaders() {
         if (liveDownloaders != null)
             return liveDownloaders;

@@ -261,12 +261,15 @@ public class BrowseActivityViewModel extends AndroidViewModel {
     }
 
     public void download(LocalDate date, List<Downloader> downloaders) {
-        downloadersProvider.get(dls -> {
-            downloadExecutorService.execute(() -> {
-                dls.download(date, downloaders);
-                if (!getIsViewArchive()) {
-                    handler.post(() -> { startLoadFiles(); });
-                }
+        // post to ensure on UI thread
+        handler.post(() -> {
+            downloadersProvider.get(dls -> {
+                downloadExecutorService.execute(() -> {
+                    dls.download(date, downloaders);
+                    if (!getIsViewArchive()) {
+                        handler.post(() -> { startLoadFiles(); });
+                    }
+                });
             });
         });
     }

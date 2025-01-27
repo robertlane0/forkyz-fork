@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.SharedPreferences;
 import android.os.Handler;
+import androidx.annotation.MainThread;
+import androidx.annotation.WorkerThread;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
@@ -300,18 +302,6 @@ public class ForkyzSettings {
         = "supressSummaryMessages";
     private static final String PREF_DOWNLOAD_SUPPRESS_INDIVIDUAL_NOTIFICATIONS
         = "supressMessages";
-
-    private static final Set<String> BACKGROUND_DOWNLOAD_PREFERENCES
-        = new HashSet<>(
-            List.of(
-                PREF_DOWNLOAD_UNMETERED,
-                PREF_DOWNLOAD_ROAMING,
-                PREF_DOWNLOAD_CHARGING,
-                PREF_DOWNLOAD_HOURLY,
-                PREF_DOWNLOAD_DAYS,
-                PREF_DOWNLOAD_DAYS_TIME
-            )
-        );
 
     private static final Charset WRITE_CHARSET = Charset.forName("UTF-8");
 
@@ -932,6 +922,7 @@ public class ForkyzSettings {
         this.prefs.registerOnSharedPreferenceChangeListener(prefChangeListener);
     }
 
+    @MainThread
     public void getAppOrientationLock(Consumer<Orientation> cb) {
         LiveDataUtilsKt.observeOnce(liveAppOrientationLock(), cb);
     }
@@ -947,10 +938,12 @@ public class ForkyzSettings {
     /**
      * Whether to use day theme, night theme, or follow system
      */
+    @MainThread
     public void getAppDayNightMode(Consumer<DayNightMode> cb) {
         LiveDataUtilsKt.observeOnce(liveAppDayNightMode(), cb);
     }
 
+    @WorkerThread
     public DayNightMode getAppDayNightModeSync() {
         return getFSEnumSettingSync(appDayNightModeSetting);
     }
@@ -966,6 +959,7 @@ public class ForkyzSettings {
     /**
      * The theme selected by user
      */
+    @MainThread
     public void getAppTheme(Consumer<Theme> cb) {
         LiveDataUtilsKt.observeOnce(liveAppTheme(), cb);
     }
@@ -975,6 +969,7 @@ public class ForkyzSettings {
      *
      * Needed to apply dynamic colors to application
      */
+    @WorkerThread
     public Theme getAppThemeSync() {
         return getFSEnumSettingSync(appThemeSetting);
     }
@@ -1001,6 +996,7 @@ public class ForkyzSettings {
     /**
      * Age of a puzzle in the crosswords list to be removed in cleanup
      */
+    @MainThread
     public void getBrowseCleanupAge(Consumer<String> cb) {
         LiveDataUtilsKt.observeOnce(liveBrowseCleanupAge(), cb);
     }
@@ -1016,6 +1012,7 @@ public class ForkyzSettings {
     /**
      * Age of a puzzle in the archive list to be removed in cleanup
      */
+    @MainThread
     public void getBrowseCleanupAgeArchive(Consumer<String> cb) {
         LiveDataUtilsKt.observeOnce(liveBrowseCleanupAgeArchive(), cb);
     }
@@ -1027,6 +1024,7 @@ public class ForkyzSettings {
     /**
      * Delete on clean up crosswords list, rather than send to archive
      */
+    @MainThread
     public void getBrowseDeleteOnCleanup(Consumer<Boolean> cb) {
         LiveDataUtilsKt.observeOnce(liveBrowseDeleteOnCleanup(), cb);
     }
@@ -1042,6 +1040,7 @@ public class ForkyzSettings {
     /**
      * Disable the swipe action in the browse list
      */
+    @MainThread
     public void getBrowseDisableSwipe(Consumer<Boolean> cb) {
         LiveDataUtilsKt.observeOnce(liveBrowseDisableSwipe(), cb);
     }
@@ -1057,6 +1056,7 @@ public class ForkyzSettings {
     /**
      * Whether to indicate in browse if puzzle has answers in data
      */
+    @MainThread
     public void getBrowseIndicateIfSolution(Consumer<Boolean> cb) {
         LiveDataUtilsKt.observeOnce(liveBrowseIndicateIfSolution(), cb);
     }
@@ -1077,6 +1077,7 @@ public class ForkyzSettings {
      *
      * Runs sychronously, avoid usage on main thread.
      */
+    @WorkerThread
     public long getBrowseLastDownloadSync() {
         return getLongSettingSync(PREF_BROWSE_LAST_DOWNLOAD);
     }
@@ -1086,6 +1087,7 @@ public class ForkyzSettings {
      *
      * Runs synchronously, avoid on main thread
      */
+    @WorkerThread
     public void setBrowseLastDownloadSync(long value) {
         setLongSettingSync(PREF_BROWSE_LAST_DOWNLOAD, value);
     }
@@ -1127,6 +1129,7 @@ public class ForkyzSettings {
     /**
      * How to order the puzzles in the browse list
      */
+    @MainThread
     public void getBrowseSort(Consumer<Accessor> cb) {
         LiveDataUtilsKt.observeOnce(liveBrowseSort(), cb);
     }
@@ -1159,6 +1162,7 @@ public class ForkyzSettings {
     /**
      * Whether to delete or archve on swipe
      */
+    @MainThread
     public void getBrowseSwipeAction(Consumer<BrowseSwipeAction> cb) {
         LiveDataUtilsKt.observeOnce(liveBrowseSwipeAction(), cb);
     }
@@ -1177,6 +1181,7 @@ public class ForkyzSettings {
      * Things like whether to download every hour, or what day/time to
      * download. Plus conditions under which download should fire.
      */
+    @MainThread
     public void getBackgroundDownloadSettings(
         Consumer<BackgroundDownloadSettings> cb
     ) {
@@ -1229,8 +1234,8 @@ public class ForkyzSettings {
         return liveStringSetSetting(PREF_DOWNLOAD_DAYS);
     }
 
-    public void setBackgroundDownloadDays(Set<String> value) {
-        setStringSetSetting(PREF_DOWNLOAD_DAYS, value);
+    public void setBackgroundDownloadDays(Set<String> value, Runnable cb) {
+        setStringSetSetting(PREF_DOWNLOAD_DAYS, value, cb);
     }
 
     /**
@@ -1240,8 +1245,8 @@ public class ForkyzSettings {
         return liveStringSetting(PREF_DOWNLOAD_DAYS_TIME);
     }
 
-    public void setBackgroundDownloadDaysTime(String value) {
-        setStringSetting(PREF_DOWNLOAD_DAYS_TIME, value);
+    public void setBackgroundDownloadDaysTime(String value, Runnable cb) {
+        setStringSetting(PREF_DOWNLOAD_DAYS_TIME, value, cb);
     }
 
     /**
@@ -1251,8 +1256,10 @@ public class ForkyzSettings {
         return liveBooleanSetting(PREF_DOWNLOAD_UNMETERED);
     }
 
-    public void setBackgroundDownloadRequireUnmetered(boolean value) {
-        setBooleanSetting(PREF_DOWNLOAD_UNMETERED, value);
+    public void setBackgroundDownloadRequireUnmetered(
+        boolean value, Runnable cb
+    ) {
+        setBooleanSetting(PREF_DOWNLOAD_UNMETERED, value, cb);
     }
 
     /**
@@ -1262,8 +1269,10 @@ public class ForkyzSettings {
         return liveBooleanSetting(PREF_DOWNLOAD_ROAMING);
     }
 
-    public void setBackgroundDownloadAllowRoaming(boolean value) {
-        setBooleanSetting(PREF_DOWNLOAD_ROAMING, value);
+    public void setBackgroundDownloadAllowRoaming(
+        boolean value, Runnable cb
+    ) {
+        setBooleanSetting(PREF_DOWNLOAD_ROAMING, value, cb);
     }
 
     /**
@@ -1273,22 +1282,16 @@ public class ForkyzSettings {
         return liveBooleanSetting(PREF_DOWNLOAD_CHARGING);
     }
 
-    public void setBackgroundDownloadRequireCharging(boolean value) {
-        setBooleanSetting(PREF_DOWNLOAD_CHARGING, value);
-    }
-
-    /**
-     * If the preference key is a background download key
-     *
-     * For preference activity to detect if config changes
-     */
-    public boolean isBackgroundDownloadConfigPref(String pref) {
-        return BACKGROUND_DOWNLOAD_PREFERENCES.contains(pref);
+    public void setBackgroundDownloadRequireCharging(
+        boolean value, Runnable cb
+    ) {
+        setBooleanSetting(PREF_DOWNLOAD_CHARGING, value, cb);
     }
 
     /**
      * When to double up the clue tabs display
      */
+    @MainThread
     public void getClueListClueTabsDouble(Consumer<ClueTabsDouble> cb) {
         LiveDataUtilsKt.observeOnce(liveClueListClueTabsDouble(), cb);
     }
@@ -1306,6 +1309,7 @@ public class ForkyzSettings {
      *
      * Or just the currently selected clue.
      */
+    @MainThread
     public void getClueListShowWords(Consumer<Boolean> cb) {
         LiveDataUtilsKt.observeOnce(liveClueListShowWords(), cb);
     }
@@ -1313,6 +1317,7 @@ public class ForkyzSettings {
     /**
      * Whether to make sure current clue always visible in clue tabs
      */
+    @MainThread
     public void getClueListSnapToClue(Consumer<Boolean> cb) {
         LiveDataUtilsKt.observeOnce(liveClueListSnapToClue(), cb);
     }
@@ -1336,6 +1341,7 @@ public class ForkyzSettings {
     /**
      * The API key for ask chat gpt for help if set
      */
+    @MainThread
     public void getExtChatGPTAPIKey(Consumer<String> cb) {
         LiveDataUtilsKt.observeOnce(liveExtChatGPTAPIKey(), cb);
     }
@@ -1348,10 +1354,12 @@ public class ForkyzSettings {
         setStringSetting(PREF_EXT_CHAT_GPT_API_KEY, value);
     }
 
+    @WorkerThread
     public String getExtChatGPTAPIKeySync() {
         return getStringSettingSync(PREF_EXT_CHAT_GPT_API_KEY);
     }
 
+    @WorkerThread
     public boolean getExtCrosswordSolverEnabledSync() {
         return getBooleanSettingSync(PREF_EXT_CROSSWORD_SOLVER_ENABLED);
     }
@@ -1361,7 +1369,7 @@ public class ForkyzSettings {
     }
 
     public void setExtCrosswordSolverEnabled(boolean value) {
-        setBooleanSettingSync(PREF_EXT_CROSSWORD_SOLVER_ENABLED, value);
+        setBooleanSetting(PREF_EXT_CROSSWORD_SOLVER_ENABLED, value);
     }
 
     public void getExtDictionary(Consumer<ExternalDictionary> cb) {
@@ -1371,6 +1379,7 @@ public class ForkyzSettings {
         });
     }
 
+    @WorkerThread
     public ExternalDictionary getExtDictionarySync() {
         switch (getFSEnumSettingSync(externalDictionarySetting)) {
         case NONE:
@@ -1427,10 +1436,12 @@ public class ForkyzSettings {
      * E.g. whether to use internal or custom storage, and where the
      * custom storage is.
      */
+    @MainThread
     public void getFileHandlerSettings(Consumer<FileHandlerSettings> cb) {
         LiveDataUtilsKt.observeOnce(liveFileHandlerSettings(), cb);
     }
 
+    @MainThread
     public LiveData<FileHandlerSettings> liveFileHandlerSettings() {
         if (liveFileHandlerSettings == null) {
             LiveData<String> liveSAFRoot
@@ -1514,6 +1525,7 @@ public class ForkyzSettings {
         return liveFSEnumSetting(storageLocationSetting);
     }
 
+    @MainThread
     public void getKeyboardSettings(Consumer<KeyboardSettings> cb) {
         LiveDataUtilsKt.observeOnce(liveKeyboardSettings(), cb);
     }
@@ -1659,6 +1671,7 @@ public class ForkyzSettings {
      *
      * Default is in the title bar
      */
+    @MainThread
     public void getPlayClueBelowGrid(Consumer<Boolean> cb) {
         LiveDataUtilsKt.observeOnce(livePlayClueBelowGrid(), cb);
     }
@@ -1674,6 +1687,7 @@ public class ForkyzSettings {
     /**
      * How to highlight the selected clue in clue tabs
      */
+    @MainThread
     public void getPlayClueHighlight(Consumer<ClueHighlight> cb) {
         LiveDataUtilsKt.observeOnce(livePlayClueHighlight(), cb);
     }
@@ -1710,6 +1724,7 @@ public class ForkyzSettings {
     /**
      * Whether to delete characters that may belong to a crossing word
      */
+    @MainThread
     public void getPlayDeleteCrossingMode(Consumer<DeleteCrossingMode> cb) {
         LiveDataUtilsKt.observeOnce(livePlayDeleteCrossingMode(), cb);
     }
@@ -1745,6 +1760,7 @@ public class ForkyzSettings {
         getFSEnumSetting(displaySeparatorsSetting, cb);
     }
 
+    @WorkerThread
     public DisplaySeparators getPlayDisplaySeparatorsSync() {
         return getFSEnumSettingSync(displaySeparatorsSetting);
     }
@@ -1754,12 +1770,13 @@ public class ForkyzSettings {
     }
 
     public void setPlayDisplaySeparators(DisplaySeparators value) {
-        setFSEnumSettingSync(displaySeparatorsSetting, value);
+        setFSEnumSetting(displaySeparatorsSetting, value);
     }
 
     /**
      * Whether double tapping the screen fits the board to screen
      */
+    @MainThread
     public void getPlayDoubleTapFitBoard(Consumer<Boolean> cb) {
         LiveDataUtilsKt.observeOnce(livePlayDoubleTapFitBoard(), cb);
     }
@@ -1775,6 +1792,7 @@ public class ForkyzSettings {
     /**
      * Ensure the currently selected word/cell is visible on play board
      */
+    @MainThread
     public void getPlayEnsureVisible(Consumer<Boolean> cb) {
         LiveDataUtilsKt.observeOnce(livePlayEnsureVisible(), cb);
     }
@@ -1790,6 +1808,7 @@ public class ForkyzSettings {
     /**
      * Whether to change selection direction when enter pressed
      */
+    @MainThread
     public void getPlayEnterChangesDirection(Consumer<Boolean> cb) {
         LiveDataUtilsKt.observeOnce(livePlayEnterChangesDirection(), cb);
     }
@@ -1805,6 +1824,7 @@ public class ForkyzSettings {
     /**
      * How/if to fit to screen
      */
+    @MainThread
     public void getPlayFitToScreenMode(Consumer<FitToScreenMode> cb) {
         LiveDataUtilsKt.observeOnce(livePlayFitToScreenMode(), cb);
     }
@@ -1823,6 +1843,7 @@ public class ForkyzSettings {
      * I think this doesn't do much on modern phones, but it used to
      * hide the status bar at the top.
      */
+    @MainThread
     public void getPlayFullScreen(Consumer<Boolean> cb) {
         LiveDataUtilsKt.observeOnce(livePlayFullScreen(), cb);
     }
@@ -1838,6 +1859,7 @@ public class ForkyzSettings {
     /**
      * Get grid ratio when clue tabs showing on play screen landscape mode
      */
+    @MainThread
     public void getPlayGridRatioLandscape(Consumer<GridRatio> cb) {
         LiveDataUtilsKt.observeOnce(livePlayGridRatioLandscape(), cb);
     }
@@ -1853,6 +1875,7 @@ public class ForkyzSettings {
     /**
      * Get grid ratio when clue tabs showing on play screen
      */
+    @MainThread
     public void getPlayGridRatioPortrait(Consumer<GridRatio> cb) {
         LiveDataUtilsKt.observeOnce(livePlayGridRatioPortrait(), cb);
     }
@@ -1868,10 +1891,12 @@ public class ForkyzSettings {
     /**
      * Whether to guess separators between cells on grid from clue
      */
+    @MainThread
     public void getPlayInferSeparators(Consumer<Boolean> cb) {
         LiveDataUtilsKt.observeOnce(livePlayInferSeparators(), cb);
     }
 
+    @WorkerThread
     public boolean getPlayInferSeparatorsSync() {
         return getBooleanSettingSync(PREF_PLAY_INFER_SEPARATORS);
     }
@@ -1924,6 +1949,7 @@ public class ForkyzSettings {
     /**
      * Whether to jump to a random clue when device shaken
      */
+    @MainThread
     public void getPlayRandomClueOnShake(Consumer<Boolean> cb) {
         LiveDataUtilsKt.observeOnce(livePlayRandomClueOnShake(), cb);
     }
@@ -1954,6 +1980,7 @@ public class ForkyzSettings {
     /**
      * Whether to use play letter undo stack on Playboard
      */
+    @MainThread
     public void getPlayPlayLetterUndoEnabled(Consumer<Boolean> cb) {
         LiveDataUtilsKt.observeOnce(livePlayPlayLetterUndoEnabled(), cb);
     }
@@ -1971,6 +1998,7 @@ public class ForkyzSettings {
      *
      * On notes page, predict by matching against clue
      */
+    @MainThread
     public void getPlayPredictAnagramChars(Consumer<Boolean> cb) {
         LiveDataUtilsKt.observeOnce(livePlayPredictAnagramChars(), cb);
     }
@@ -2020,10 +2048,12 @@ public class ForkyzSettings {
     /**
      * Whether to show scratch notes on the play board in grey letters
      */
+    @MainThread
     public void getPlayScratchDisplay(Consumer<Boolean> cb) {
         LiveDataUtilsKt.observeOnce(livePlayScratchDisplay(), cb);
     }
 
+    @WorkerThread
     public boolean getPlayScratchDisplaySync() {
         return getBooleanSettingSync(PREF_PLAY_SCRATCH_DISPLAY);
     }
@@ -2042,6 +2072,7 @@ public class ForkyzSettings {
      * Instead of going to the main response for the cell, enter new
      * chars as scratch notes for the current clue.
      */
+    @MainThread
     public void getPlayScratchMode(Consumer<Boolean> cb) {
         LiveDataUtilsKt.observeOnce(livePlayScratchMode(), cb);
     }
@@ -2057,6 +2088,7 @@ public class ForkyzSettings {
     /**
      * Wether to show the clue solution length after the clue hint
      */
+    @MainThread
     public void getPlayShowCount(Consumer<Boolean> cb) {
         LiveDataUtilsKt.observeOnce(livePlayShowCount(), cb);
     }
@@ -2072,6 +2104,7 @@ public class ForkyzSettings {
     /**
      * Whether to highlight errors on completely filled clue entries
      */
+    @MainThread
     public void getPlayShowErrorsClue(Consumer<Boolean> cb) {
         LiveDataUtilsKt.observeOnce(livePlayShowErrorsClue(), cb);
     }
@@ -2087,6 +2120,7 @@ public class ForkyzSettings {
     /**
      * Whether to highlight errors in the currently selected cell
      */
+    @MainThread
     public void getPlayShowErrorsCursor(Consumer<Boolean> cb) {
         LiveDataUtilsKt.observeOnce(livePlayShowErrorsCursor(), cb);
     }
@@ -2102,6 +2136,7 @@ public class ForkyzSettings {
     /**
      * Whether to highlight errors anywhere on the grid
      */
+    @MainThread
     public void getPlayShowErrorsGrid(Consumer<Boolean> cb) {
         LiveDataUtilsKt.observeOnce(livePlayShowErrorsGrid(), cb);
     }
@@ -2114,6 +2149,7 @@ public class ForkyzSettings {
         setBooleanSetting(PREF_PLAY_SHOW_ERRORS_GRID, value);
     }
 
+    @MainThread
     public void getPlayShowTimer(Consumer<Boolean> cb) {
         LiveDataUtilsKt.observeOnce(livePlayShowTimer(), cb);
     }
@@ -2129,6 +2165,7 @@ public class ForkyzSettings {
     /**
      * Whether to skip filled cells when moving to the next
      */
+    @MainThread
     public void getPlaySkipFilled(Consumer<Boolean> cb) {
         LiveDataUtilsKt.observeOnce(livePlaySkipFilled(), cb);
     }
@@ -2144,6 +2181,7 @@ public class ForkyzSettings {
     /**
      * Whether to show the clue list on the PlayActivity
      */
+    @MainThread
     public void getPlayShowCluesTab(Consumer<Boolean> cb) {
         LiveDataUtilsKt.observeOnce(livePlayShowCluesTab(), cb);
     }
@@ -2159,6 +2197,7 @@ public class ForkyzSettings {
     /**
      * Whether pressing space changes the selection direction
      */
+    @MainThread
     public void getPlaySpaceChangesDirection(Consumer<Boolean> cb) {
         LiveDataUtilsKt.observeOnce(livePlaySpaceChangesDirection(), cb);
     }
@@ -2174,10 +2213,12 @@ public class ForkyzSettings {
     /**
      * Whether hinted squares should not be highlighted on board view
      */
+    @MainThread
     public void getPlaySuppressHintHighlighting(Consumer<Boolean> cb) {
         LiveDataUtilsKt.observeOnce(livePlaySuppressHintHighlighting(), cb);
     }
 
+    @WorkerThread
     public boolean getPlaySuppressHintHighlightingSync() {
         return getBooleanSettingSync(PREF_PLAY_SUPPRESS_HINT_HIGHLIGHTING);
     }
@@ -2196,6 +2237,7 @@ public class ForkyzSettings {
      * True means change clue on first press, do movement on second. False
      * means do both in one.
      */
+    @MainThread
     public void getPlayToggleBeforeMove(Consumer<Boolean> cb) {
         LiveDataUtilsKt.observeOnce(livePlayToggleBeforeMove(), cb);
     }
@@ -2211,6 +2253,7 @@ public class ForkyzSettings {
     /**
      * Whether to indicate show errors status (i.e. whether turned on)
      */
+    @MainThread
     public void getPlayIndicateShowErrors(Consumer<Boolean> cb) {
         LiveDataUtilsKt.observeOnce(livePlayIndicateShowErrors(), cb);
     }
@@ -2250,6 +2293,7 @@ public class ForkyzSettings {
     /**
      * Whether to always announce the current box
      */
+    @MainThread
     public void getVoiceAlwaysAnnounceBox(Consumer<Boolean> cb) {
         LiveDataUtilsKt.observeOnce(liveVoiceAlwaysAnnounceBox(), cb);
     }
@@ -2265,6 +2309,7 @@ public class ForkyzSettings {
     /**
      * Whether to always announce the current clue
      */
+    @MainThread
     public void getVoiceAlwaysAnnounceClue(Consumer<Boolean> cb) {
         LiveDataUtilsKt.observeOnce(liveVoiceAlwaysAnnounceClue(), cb);
     }
@@ -2280,6 +2325,7 @@ public class ForkyzSettings {
     /**
      * Whether to show a button for activating voice commands
      */
+    @MainThread
     public void getVoiceButtonActivatesVoice(Consumer<Boolean> cb) {
         LiveDataUtilsKt.observeOnce(liveVoiceButtonActivatesVoice(), cb);
     }
@@ -2317,6 +2363,7 @@ public class ForkyzSettings {
     /**
      * Whether to show a button for reading out clue
      */
+    @MainThread
     public void getVoiceButtonAnnounceClue(Consumer<Boolean> cb) {
         LiveDataUtilsKt.observeOnce(liveVoiceButtonAnnounceClue(), cb);
     }
@@ -2335,6 +2382,7 @@ public class ForkyzSettings {
      * I.e. which ones to use, which ones are automatic, how long before
      * timeout, notifications.
      */
+    @MainThread
     public void getDownloadersSettings(Consumer<DownloadersSettings> cb) {
         LiveDataUtilsKt.observeOnce(liveDownloadersSettings(), cb);
     }
@@ -2667,10 +2715,6 @@ public class ForkyzSettings {
         setBooleanSetting(PREF_SCRAPE_PRZEKROJ, download);
     }
 
-    public void getDownloadCustomDaily(Consumer<Boolean> cb) {
-        LiveDataUtilsKt.observeOnce(liveDownloadCustomDaily(), cb);
-    }
-
     public LiveData<Boolean> liveDownloadCustomDaily() {
         return liveBooleanSetting(PREF_DOWNLOAD_CUSTOM_DAILY);
     }
@@ -2685,10 +2729,6 @@ public class ForkyzSettings {
 
     public void setDownloadCustomDailyTitle(String title) {
         setStringSetting(PREF_DOWNLOAD_CUSTOM_DAILY_TITLE, title);
-    }
-
-    public void getDownloadCustomDailyURL(Consumer<String> cb) {
-        LiveDataUtilsKt.observeOnce(liveDownloadCustomDailyURL(), cb);
     }
 
     public LiveData<String> liveDownloadCustomDailyURL() {
@@ -2761,6 +2801,7 @@ public class ForkyzSettings {
      *
      * Is a string but converts to integer before returning
      */
+    @MainThread
     public void getDownloadTimeout(Consumer<Integer> cb) {
         LiveDataUtilsKt.observeOnce(liveDownloadTimeoutInteger(), cb);
     }
@@ -2959,6 +3000,7 @@ public class ForkyzSettings {
         });
     }
 
+    @WorkerThread
     private boolean getBooleanSettingSync(String key) {
         return booleanSettings.get(key).getValue(prefs);
     }
@@ -2977,6 +3019,7 @@ public class ForkyzSettings {
         });
     }
 
+    @WorkerThread
     private void setBooleanSettingSync(String key, boolean value) {
         booleanSettings.get(key).setValue(prefs, value);
     }
@@ -3016,6 +3059,7 @@ public class ForkyzSettings {
     /**
      * Get pref synchronously, avoid on main thread
      */
+    @WorkerThread
     private long getLongSettingSync(String key) {
         return longSettings.get(key).getValue(prefs);
     }
@@ -3023,6 +3067,7 @@ public class ForkyzSettings {
     /**
      * Set pref synchronously, avoid on main thread
      */
+    @WorkerThread
     private void setLongSettingSync(String key, long value) {
         longSettings.get(key).setValue(prefs, value);
     }
@@ -3034,29 +3079,48 @@ public class ForkyzSettings {
         });
     }
 
+    @WorkerThread
     private String getStringSettingSync(String key) {
         return stringSettings.get(key).getValue(prefs);
     }
 
     private void setStringSetting(String key, String value) {
+        setStringSetting(key, value, null);
+    }
+
+    private void setStringSetting(String key, String value, Runnable cb) {
         executor.execute(() -> {
             setStringSettingSync(key, value);
+            if (cb != null)
+                cb.run();
         });
     }
 
+    @WorkerThread
     private void setStringSettingSync(String key, String value) {
         stringSettings.get(key).setValue(prefs, value);
     }
+
+    @WorkerThread
     private Set<String> getStringSetSettingSync(String key) {
         return stringSetSettings.get(key).getValue(prefs);
     }
 
     private void setStringSetSetting(String key, Set<String> value) {
+        setStringSetSetting(key, value, null);
+    }
+
+    private void setStringSetSetting(
+        String key, Set<String> value, Runnable cb
+    ) {
         executor.execute(() -> {
             setStringSetSettingSync(key, value);
+            if (cb != null)
+                cb.run();
         });
     }
 
+    @WorkerThread
     private void setStringSetSettingSync(String key, Set<String> value) {
         stringSetSettings.get(key).setValue(prefs, value);
     }
@@ -3077,6 +3141,7 @@ public class ForkyzSettings {
         return stringSetSettings.get(key).getCreateLiveData(prefs);
     }
 
+    @WorkerThread
     private int getIntegerFromStringSettingSync(
         String name, int fallbackValue
     ) {
@@ -3094,7 +3159,7 @@ public class ForkyzSettings {
             liveStringSetting(key),
             value -> {
                 try {
-                    return Integer.parseInt(getStringSettingSync(key));
+                    return Integer.parseInt(value);
                 } catch (NumberFormatException e) {
                     return fallbackValue;
                 }
@@ -3138,6 +3203,7 @@ public class ForkyzSettings {
         });
     }
 
+    @WorkerThread
     private <T extends Enum<T> & EnumSetting>
     T getFSEnumSettingSync(FSEnumSetting<T> setting) {
         return setting.getValue(prefs);
@@ -3162,6 +3228,7 @@ public class ForkyzSettings {
         });
     }
 
+    @WorkerThread
     private <T extends Enum<T> & EnumSetting>
     void setFSEnumSettingSync(FSEnumSetting<T> setting, T value) {
         setting.setValue(prefs, value);
