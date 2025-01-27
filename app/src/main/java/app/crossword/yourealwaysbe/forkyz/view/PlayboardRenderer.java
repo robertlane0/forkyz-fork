@@ -704,7 +704,14 @@ public class PlayboardRenderer {
             ClueID cid = clue.getClueID();
             Zone zone = clue.getZone();
             if (zone != null && !zone.isEmpty()) {
+                // try to figure out where to put the separator, default
+                // to right
                 Zone.Direction dir = zone.getDirection(offset);
+                if (dir == Zone.Direction.INCONCLUSIVE)
+                    dir = zone.getDirection(offset - 1);
+                if (dir == Zone.Direction.INCONCLUSIVE)
+                    dir = Zone.Direction.RIGHT;
+
                 // on opposite site if coming from start (-1)
                 if (offset < 0)
                     dir = dir.reverse();
