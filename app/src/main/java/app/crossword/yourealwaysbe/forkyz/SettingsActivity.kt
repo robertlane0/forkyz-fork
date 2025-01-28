@@ -75,7 +75,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import app.crossword.yourealwaysbe.forkyz.theme.AppTheme
 import app.crossword.yourealwaysbe.forkyz.theme.ForkyzTopAppBar
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
-import app.crossword.yourealwaysbe.forkyz.util.ExitActivity;
+import app.crossword.yourealwaysbe.forkyz.util.ExitActivity
+import app.crossword.yourealwaysbe.forkyz.util.OrientationHelper
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 
 @AndroidEntryPoint
@@ -93,6 +94,9 @@ class SettingsActivity : ComponentActivity() {
 
     @Inject
     lateinit var utils : AndroidVersionUtils
+
+    @Inject
+    lateinit var orientationHelper : OrientationHelper
 
     private val viewModel by viewModels<SettingsActivityViewModel>()
 
@@ -123,6 +127,7 @@ class SettingsActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState : Bundle?) {
         super.onCreate(savedInstanceState)
+        orientationHelper.applyOrientation(this)
 
         setContent {
             val state by viewModel.state.collectAsStateWithLifecycle()

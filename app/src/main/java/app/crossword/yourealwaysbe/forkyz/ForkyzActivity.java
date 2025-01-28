@@ -3,7 +3,6 @@ package app.crossword.yourealwaysbe.forkyz;
 import java.util.logging.Logger;
 import javax.inject.Inject;
 
-import android.content.pm.ActivityInfo;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -17,7 +16,6 @@ import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup.MarginLayoutParams;
-import android.widget.Toast;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -34,6 +32,7 @@ import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper;
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder;
 import app.crossword.yourealwaysbe.forkyz.util.NightModeHelper;
+import app.crossword.yourealwaysbe.forkyz.util.OrientationHelper;
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 import app.crossword.yourealwaysbe.puz.Playboard;
@@ -55,6 +54,9 @@ public class ForkyzActivity extends AppCompatActivity {
     @Inject
     protected ThemeHelper themeHelper;
 
+    @Inject
+    protected OrientationHelper orientationHelper;
+
     protected NightModeHelper nightMode;
     private Drawable originalStatusBar;
 
@@ -63,7 +65,7 @@ public class ForkyzActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         themeHelper.themeActivity(this);
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
-        doOrientation();
+        orientationHelper.applyOrientation(this);
     }
 
     @Override
@@ -75,43 +77,10 @@ public class ForkyzActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
         if(nightMode == null) {
             nightMode = NightModeHelper.bind(this, settings);
             nightMode.restoreNightMode();
         }
-
-        doOrientation();
-    }
-
-    @SuppressWarnings("SourceLockedOrientationActivity")
-    private void doOrientation() {
-        settings.getAppOrientationLock(orientation -> {
-            try {
-                switch (orientation) {
-                case PORTRAIT:
-                    setRequestedOrientation(
-                        ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                    );
-                    break;
-                case LANDSCAPE:
-                    setRequestedOrientation(
-                        ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-                    );
-                    break;
-                default:
-                    setRequestedOrientation(
-                        ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-                    );
-                }
-            } catch(RuntimeException e) {
-                Toast.makeText(
-                    this,
-                    R.string.no_orientation_lock,
-                    Toast.LENGTH_LONG
-                ).show();
-            }
-        });
     }
 
     protected Bitmap createBitmap(String fontFile, String character){
