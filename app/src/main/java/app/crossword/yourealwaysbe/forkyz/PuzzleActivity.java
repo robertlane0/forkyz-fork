@@ -404,8 +404,15 @@ public abstract class PuzzleActivity
     protected void onResume() {
         super.onResume();
 
+        Playboard board = getBoard();
         Puzzle puz = getPuzzle();
-        if (puz != null && puz.getPercentComplete() != 100) {
+        if (board == null || puz == null) {
+            LOG.info("No puzzle board, puzzle activity finishing.");
+            finish();
+            return;
+        }
+
+        if (puz.getPercentComplete() != 100) {
             long time = puz.getTime();
             firstPlay = (time == 0);
             ImaginaryTimer timer = new ImaginaryTimer(time);
@@ -413,11 +420,9 @@ public abstract class PuzzleActivity
             timer.start();
         }
 
-        Playboard board = getBoard();
-        if (board != null)
-            board.addListener(this);
+        board.addListener(this);
 
-        hasInitialValues = puz != null && puz.hasInitialValueCells();
+        hasInitialValues = puz.hasInitialValueCells();
 
         // anything in puzzle could have changed
         invalidateOptionsMenu();
