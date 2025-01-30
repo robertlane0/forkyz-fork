@@ -512,7 +512,7 @@ public class NotesActivity extends PuzzleActivity {
 
                 if (!board.getCurrentWord().equals(w)
                         || Box.isBlock(board.getBoxes()[row][col])) {
-                    getBoard().setHighlightLetter(last);
+                    board.setHighlightLetter(last);
                 }
             }
             return true;
@@ -726,7 +726,11 @@ public class NotesActivity extends PuzzleActivity {
         if (!displayScratch)
             return null;
 
-        ClueID cid = getBoard().getClueID();
+        Playboard board = getBoard();
+        if (board == null)
+            return Collections.emptySet();
+
+        ClueID cid = board.getClueID();
         if (cid == null)
             return Collections.emptySet();
 

@@ -248,112 +248,116 @@ public abstract class PuzzleActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == android.R.id.home) {
-            finish();
-            return true;
-        } else if (id == R.id.puzzle_menu_special_entry) {
-            specialEntry();
-            return true;
-        } else if (id == R.id.puzzle_menu_share_clue) {
-            shareClue(false);
-            return true;
-        } else if (id == R.id.puzzle_menu_share_clue_response) {
-            shareClue(true);
-            return true;
-        } else if (id == R.id.puzzle_menu_share_puzzle_full) {
-            sharePuzzle(false, false);
-            return true;
-        } else if (id == R.id.puzzle_menu_share_puzzle_without_extensions) {
-            sharePuzzle(false, true);
-            return true;
-        } else if (id == R.id.puzzle_menu_share_puzzle_orig) {
-            sharePuzzle(true, true);
-            return true;
-        } else if (id == R.id.puzzle_menu_open_share_url) {
-            openShareUrl();
-            return true;
-        } else if (id == R.id.puzzle_menu_ask_chat_gpt) {
-            requestHelpForCurrentClue();
-            return true;
-        } else if (id == R.id.clue_list_menu_edit_clue) {
-            editClue();
-            return true;
-        } else if (id == R.id.puzzle_menu_crossword_solver) {
-            callCrosswordSolver();
-            return true;
-        } else if (id == R.id.puzzle_menu_duckduckgo) {
-            searchDuckDuckGo();
-            return true;
-        } else if (id == R.id.puzzle_menu_external_dictionary) {
-            callExternalDictionary();
-            return true;
-        } else if (id == R.id.puzzle_menu_fifteen_squared) {
-            searchFifteenSquared();
-            return true;
-        } else if (id == R.id.puzzle_menu_clue_notes) {
-            launchClueNotes(getBoard().getClueID());
-            return true;
-        } else if (id == R.id.puzzle_menu_puzzle_notes) {
-            launchPuzzleNotes();
-            return true;
-        } else if (id == R.id.puzzle_menu_flag_clue_toggle) {
-            toggleClueFlag();
-            return true;
-        } else if (id == R.id.puzzle_menu_flag_cell_toggle) {
-            toggleCellFlag();
-            return true;
-        } else if (id == R.id.puzzle_menu_scratch_mode) {
-            toggleScratchMode();
-            return true;
-        } else if (id == R.id.puzzle_menu_show_errors_grid) {
-            settings.setPlayShowErrorsGrid(!getBoard().isShowErrorsGrid());
-            return true;
-        } else if (id == R.id.puzzle_menu_show_errors_clue) {
-            settings.setPlayShowErrorsClue(!getBoard().isShowErrorsClue());
-            return true;
-        } else if (id == R.id.puzzle_menu_show_errors_cursor) {
-            settings.setPlayShowErrorsCursor(
-                !getBoard().isShowErrorsCursor()
-            );
-            return true;
-        } else if (id == R.id.puzzle_menu_reveal_initial_letter) {
-            getBoard().revealInitialLetter();
-            return true;
-        } else if (id == R.id.puzzle_menu_reveal_letter) {
-            getBoard().revealLetter();
-            return true;
-        } else if (id == R.id.puzzle_menu_reveal_word) {
-            getBoard().revealWord();
-            return true;
-        } if (id == R.id.puzzle_menu_reveal_initial_letters) {
-            getBoard().revealInitialLetters();
-            return true;
-        } else if (id == R.id.puzzle_menu_reveal_errors) {
-            getBoard().revealErrors();
-            return true;
-        } else if (id == R.id.puzzle_menu_reveal_puzzle) {
-            showRevealPuzzleDialog();
-            return true;
-        } else if (id == R.id.puzzle_menu_info) {
-            showInfoDialog();
-            return true;
-        } else if (id == R.id.puzzle_menu_support_source) {
-            actionSupportSource();
-            return true;
-        } else if (id == R.id.puzzle_menu_help) {
-            Intent helpIntent = new Intent(
-                Intent.ACTION_VIEW,
-                Uri.parse("play.html"),
-                this,
-                HTMLActivity.class
-            );
-            this.startActivity(helpIntent);
-            return true;
-        } else if (id == R.id.puzzle_menu_settings) {
-            Intent i = new Intent(this, SettingsActivity.class);
-            this.startActivity(i);
-            return true;
+        Playboard board = getBoard();
+
+        if (board != null) {
+            int id = item.getItemId();
+            if (id == android.R.id.home) {
+                finish();
+                return true;
+            } else if (id == R.id.puzzle_menu_special_entry) {
+                specialEntry();
+                return true;
+            } else if (id == R.id.puzzle_menu_share_clue) {
+                shareClue(false);
+                return true;
+            } else if (id == R.id.puzzle_menu_share_clue_response) {
+                shareClue(true);
+                return true;
+            } else if (id == R.id.puzzle_menu_share_puzzle_full) {
+                sharePuzzle(false, false);
+                return true;
+            } else if (id == R.id.puzzle_menu_share_puzzle_without_extensions) {
+                sharePuzzle(false, true);
+                return true;
+            } else if (id == R.id.puzzle_menu_share_puzzle_orig) {
+                sharePuzzle(true, true);
+                return true;
+            } else if (id == R.id.puzzle_menu_open_share_url) {
+                openShareUrl();
+                return true;
+            } else if (id == R.id.puzzle_menu_ask_chat_gpt) {
+                requestHelpForCurrentClue();
+                return true;
+            } else if (id == R.id.clue_list_menu_edit_clue) {
+                editClue();
+                return true;
+            } else if (id == R.id.puzzle_menu_crossword_solver) {
+                callCrosswordSolver();
+                return true;
+            } else if (id == R.id.puzzle_menu_duckduckgo) {
+                searchDuckDuckGo();
+                return true;
+            } else if (id == R.id.puzzle_menu_external_dictionary) {
+                callExternalDictionary();
+                return true;
+            } else if (id == R.id.puzzle_menu_fifteen_squared) {
+                searchFifteenSquared();
+                return true;
+            } else if (id == R.id.puzzle_menu_clue_notes) {
+                launchClueNotes(board.getClueID());
+                return true;
+            } else if (id == R.id.puzzle_menu_puzzle_notes) {
+                launchPuzzleNotes();
+                return true;
+            } else if (id == R.id.puzzle_menu_flag_clue_toggle) {
+                toggleClueFlag();
+                return true;
+            } else if (id == R.id.puzzle_menu_flag_cell_toggle) {
+                toggleCellFlag();
+                return true;
+            } else if (id == R.id.puzzle_menu_scratch_mode) {
+                toggleScratchMode();
+                return true;
+            } else if (id == R.id.puzzle_menu_show_errors_grid) {
+                settings.setPlayShowErrorsGrid(!board.isShowErrorsGrid());
+                return true;
+            } else if (id == R.id.puzzle_menu_show_errors_clue) {
+                settings.setPlayShowErrorsClue(!board.isShowErrorsClue());
+                return true;
+            } else if (id == R.id.puzzle_menu_show_errors_cursor) {
+                settings.setPlayShowErrorsCursor(
+                    !board.isShowErrorsCursor()
+                );
+                return true;
+            } else if (id == R.id.puzzle_menu_reveal_initial_letter) {
+                board.revealInitialLetter();
+                return true;
+            } else if (id == R.id.puzzle_menu_reveal_letter) {
+                board.revealLetter();
+                return true;
+            } else if (id == R.id.puzzle_menu_reveal_word) {
+                board.revealWord();
+                return true;
+            } if (id == R.id.puzzle_menu_reveal_initial_letters) {
+                board.revealInitialLetters();
+                return true;
+            } else if (id == R.id.puzzle_menu_reveal_errors) {
+                board.revealErrors();
+                return true;
+            } else if (id == R.id.puzzle_menu_reveal_puzzle) {
+                showRevealPuzzleDialog();
+                return true;
+            } else if (id == R.id.puzzle_menu_info) {
+                showInfoDialog();
+                return true;
+            } else if (id == R.id.puzzle_menu_support_source) {
+                actionSupportSource();
+                return true;
+            } else if (id == R.id.puzzle_menu_help) {
+                Intent helpIntent = new Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse("play.html"),
+                    this,
+                    HTMLActivity.class
+                );
+                this.startActivity(helpIntent);
+                return true;
+            } else if (id == R.id.puzzle_menu_settings) {
+                Intent i = new Intent(this, SettingsActivity.class);
+                this.startActivity(i);
+                return true;
+            }
         }
 
         return super.onOptionsItemSelected(item);
@@ -488,7 +492,7 @@ public abstract class PuzzleActivity
 
     protected Puzzle getPuzzle() {
         Playboard board = getBoard();
-        return (board == null) ? null : getBoard().getPuzzle();
+        return (board == null) ? null : board.getPuzzle();
     }
 
     protected void saveBoard() {
@@ -804,7 +808,11 @@ public abstract class PuzzleActivity
     protected void registerVoiceCommandClear() {
         registerVoiceCommand(new VoiceCommand(
             getString(R.string.command_clear),
-            args -> { getBoard().clearWord(); }
+            args -> {
+                Playboard board = getBoard();
+                if (board != null)
+                    board.clearWord();
+            }
         ));
     }
 

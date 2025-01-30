@@ -136,16 +136,20 @@ public class PlayActivity extends PuzzleActivity
 
                 @Override
                 public void onKeyUp(@ForkyzKeyboard.SpecialKey int key) {
+                    Playboard board = getBoard();
+                    if (board == null)
+                        return;
+
                     // ignore
                     switch (key) {
                     case ForkyzKeyboard.KEY_CHANGE_CLUE_DIRECTION:
-                        getBoard().toggleSelection();
+                        board.toggleSelection();
                         return;
                     case ForkyzKeyboard.KEY_NEXT_CLUE:
-                        getBoard().nextWord();
+                        board.nextWord();
                         return;
                     case ForkyzKeyboard.KEY_PREVIOUS_CLUE:
-                        getBoard().previousWord();
+                        board.previousWord();
                         return;
                     default:
                         // ignore
@@ -416,9 +420,13 @@ public class PlayActivity extends PuzzleActivity
     public void onPlayboardChange(PlayboardChanges changes) {
         super.onPlayboardChange(changes);
 
+        Playboard board = getBoard();
+        if (board == null)
+            return;
+
         Word previousWord = changes.getPreviousWord();
 
-        Position newPos = getBoard().getHighlightLetter();
+        Position newPos = board.getHighlightLetter();
 
         boolean isNewWord = (previousWord == null) ||
             !previousWord.checkInWord(newPos);
@@ -820,11 +828,15 @@ public class PlayActivity extends PuzzleActivity
     }
 
     private void playLetter(char c) {
+        Playboard board = getBoard();
+        if (board == null)
+            return;
+
         settings.getPlayScratchMode(scratchMode -> {
             if (scratchMode)
-                getBoard().playScratchLetter(c);
+                board.playScratchLetter(c);
             else
-                getBoard().playLetter(c);
+                board.playLetter(c);
         });
     }
 

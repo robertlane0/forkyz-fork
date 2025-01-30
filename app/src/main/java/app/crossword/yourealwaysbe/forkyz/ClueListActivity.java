@@ -91,7 +91,9 @@ public class ClueListActivity extends PuzzleActivity
 
             @Override
             public void onLongClick(Position position) {
-                launchClueNotes(getBoard().getClueID());
+                Playboard board = getBoard();
+                if (board != null)
+                    launchClueNotes(board.getClueID());
             }
         });
         ViewCompat.replaceAccessibilityAction(
