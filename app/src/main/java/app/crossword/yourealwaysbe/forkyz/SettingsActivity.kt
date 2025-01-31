@@ -211,10 +211,14 @@ class SettingsActivity : ComponentActivity() {
                 }
             }
             RequestedURI.SETTINGS_EXPORT -> {
-                getExportSettingsURI.launch(SETTINGS_DEFAULT_FILENAME)
+                LaunchedEffect(needsURI) {
+                    getExportSettingsURI.launch(SETTINGS_DEFAULT_FILENAME)
+                }
             }
             RequestedURI.SETTINGS_IMPORT -> {
-                getImportSettingsURI.launch(SETTINGS_MIME_TYPE)
+                LaunchedEffect(needsURI) {
+                    getImportSettingsURI.launch(SETTINGS_MIME_TYPE)
+                }
             }
             RequestedURI.NONE -> {
                 // nothing to do

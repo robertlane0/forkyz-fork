@@ -8,7 +8,10 @@ import kotlin.collections.ArrayDeque
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.WhileSubscribed
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -19,7 +22,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.google.android.material.color.DynamicColors
@@ -295,6 +297,10 @@ class SettingsActivityViewModel @Inject constructor(
     private val backgroundDownloadManager : BackgroundDownloadManager,
 ) : AndroidViewModel(application) {
 
+    // 5000ms is apparently LiveData default for timing out on
+    // subscriptions, someone said, on the internet
+    private val SUBSCRIBED_TIMEOUT = 5000L
+
     private val fileActionMutex = Mutex()
 
     private val availableThemeSettings =
@@ -355,23 +361,21 @@ class SettingsActivityViewModel @Inject constructor(
                 }
             }
 
-    private val downloadCustomDailyURLErrorMsg = MutableStateFlow<String?>(null)
-    init {
-        viewModelScope.launch {
-            settings.liveDownloadCustomDailyURL().asFlow().collect { url ->
-                if (url == null) {
-                    downloadCustomDailyURLErrorMsg.value = null
-                } else {
-                    try {
-                        DateTimeFormatter.ofPattern(url)
-                        downloadCustomDailyURLErrorMsg.value = null
-                    } catch (e : IllegalArgumentException) {
-                        downloadCustomDailyURLErrorMsg.value = e.message
-                    }
+    private val downloadCustomDailyURLErrorMsg : StateFlow<String?>
+        = settings.liveDownloadCustomDailyURL().map { url ->
+            url?.let { url ->
+                try {
+                    DateTimeFormatter.ofPattern(url)
+                    null
+                } catch (e : IllegalArgumentException) {
+                    e.message
                 }
             }
-        }
-    }
+        }.asFlow().stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(SUBSCRIBED_TIMEOUT),
+            null,
+        )
 
     private val settingsItemsList : List<SettingsItem> = listOf(
         SettingsDynamicList<StorageLocation>(
