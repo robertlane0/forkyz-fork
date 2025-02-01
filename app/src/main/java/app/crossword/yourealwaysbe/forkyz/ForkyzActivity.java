@@ -119,11 +119,6 @@ public class ForkyzActivity extends AppCompatActivity {
         return currentPuzzleHolder.getPuzHandle();
     }
 
-    protected void clearCurrentBoard() {
-        System.out.println("FORKYZ: base activity clear board");
-        currentPuzzleHolder.clearBoard();
-    }
-
     protected void finishOnHomeButton() {
         ActionBar bar = getSupportActionBar();
         if(bar == null){

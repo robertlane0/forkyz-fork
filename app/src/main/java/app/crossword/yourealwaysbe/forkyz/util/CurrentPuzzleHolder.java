@@ -34,11 +34,6 @@ public class CurrentPuzzleHolder {
         this.puzHandle = puzHandle;
     }
 
-    public void clearBoard() {
-        this.board = null;
-        this.puzHandle = null;
-    }
-
     public Playboard getBoard() {
         System.out.println("FORKYZ: get board " + board);
         return board;

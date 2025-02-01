@@ -650,9 +650,16 @@ public class BrowseActivity extends ForkyzActivity {
             } else {
                 refreshLastAccessedPuzzle();
             }
-            // previous game ended for now
-            System.out.println("FORKYZ: browse clearing board");
-            clearCurrentBoard();
+
+            // A resume used to clear the current board with the
+            // reasoning that the player has returned and will not be
+            // able to play the current puzzle. However, predictive back
+            // may cause an on resume -- i think if the browse activity
+            // has been destroyed and it needs to recreate to display
+            // the preview. So onResume no longer means play has
+            // finished, so don't clear the puzzle. It gets overwritten
+            // when a new puzzle is selected and just uses unneeded
+            // memory in the meantime.
         });
 
         autoDownloadIfEnabled();
