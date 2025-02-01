@@ -14,6 +14,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import android.content.Context;
+import androidx.annotation.MainThread;
 import androidx.concurrent.futures.CallbackToFutureAdapter;
 import androidx.hilt.work.HiltWorker;
 import androidx.work.Constraints;
@@ -81,6 +82,7 @@ public class BackgroundDownloadManager {
         this.settings = settings;
     }
 
+    @MainThread
     public void isBackgroundDownloadEnabled(Consumer<Boolean> cb) {
         settings.getBackgroundDownloadSettings(bgSettings -> {
             cb.accept(
@@ -90,6 +92,7 @@ public class BackgroundDownloadManager {
         });
     }
 
+    @MainThread
     public void updateBackgroundDownloads() {
         cancelBackgroundDownloads();
 

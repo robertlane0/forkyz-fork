@@ -21,6 +21,7 @@ import android.view.accessibility.AccessibilityNodeInfo;
 import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
+import androidx.annotation.MainThread;
 import androidx.lifecycle.ViewTreeLifecycleOwner;
 
 import dagger.hilt.android.AndroidEntryPoint;
@@ -658,6 +659,7 @@ public class BoardEditText
         return true;
     }
 
+    @MainThread
     private void onNewResponse(char character) {
         if (!isAcceptableCharacterResponse(character))
             return;
@@ -702,10 +704,12 @@ public class BoardEditText
         }
     }
 
+    @MainThread
     public void render() {
         render(false);
     }
 
+    @MainThread
     private void render(boolean renderAll) {
         if (getWidth() == 0)
             return;

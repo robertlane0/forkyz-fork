@@ -651,6 +651,7 @@ public class BrowseActivity extends ForkyzActivity {
                 refreshLastAccessedPuzzle();
             }
             // previous game ended for now
+            System.out.println("FORKYZ: browse clearing board");
             clearCurrentBoard();
         });
 

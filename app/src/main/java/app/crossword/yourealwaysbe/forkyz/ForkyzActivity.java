@@ -120,6 +120,7 @@ public class ForkyzActivity extends AppCompatActivity {
     }
 
     protected void clearCurrentBoard() {
+        System.out.println("FORKYZ: base activity clear board");
         currentPuzzleHolder.clearBoard();
     }
 
