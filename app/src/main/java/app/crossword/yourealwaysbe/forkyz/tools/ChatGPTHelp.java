@@ -11,6 +11,7 @@ import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 import android.content.Context;
+import androidx.annotation.MainThread;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -47,6 +48,7 @@ public class ChatGPTHelp {
         this.settings = settings;
     }
 
+    @MainThread
     public static void isEnabled(
         ForkyzSettings settings, Consumer<Boolean> cb
     ) {
@@ -59,6 +61,7 @@ public class ChatGPTHelp {
         return isEnabled(extSettings.chatGPTAPIKey());
     }
 
+    @MainThread
     public void requestHelpForCurrentClue(
         Context context, Playboard board, Consumer<String> callback
     ) {

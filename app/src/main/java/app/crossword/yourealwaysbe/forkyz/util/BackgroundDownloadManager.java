@@ -14,6 +14,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import android.content.Context;
+import androidx.annotation.MainThread;
 import androidx.concurrent.futures.CallbackToFutureAdapter;
 import androidx.hilt.work.HiltWorker;
 import androidx.work.Constraints;
@@ -81,6 +82,7 @@ public class BackgroundDownloadManager {
         this.settings = settings;
     }
 
+    @MainThread
     public void isBackgroundDownloadEnabled(Consumer<Boolean> cb) {
         settings.getBackgroundDownloadSettings(bgSettings -> {
             cb.accept(
@@ -90,6 +92,7 @@ public class BackgroundDownloadManager {
         });
     }
 
+    @MainThread
     public void updateBackgroundDownloads() {
         cancelBackgroundDownloads();
 
@@ -104,8 +107,6 @@ public class BackgroundDownloadManager {
     private void scheduleHourlyDownloads(
         BackgroundDownloadSettings bgSettings
     ) {
-        LOGGER.info("Scheduling hourly downloads");
-
         PeriodicWorkRequest request
             = new PeriodicWorkRequest.Builder(
                 HourlyDownloadWorker.class, 1, TimeUnit.HOURS
@@ -126,8 +127,6 @@ public class BackgroundDownloadManager {
         long nextDelay = getNextDailyDownloadDelay(bgSettings);
         if (nextDelay < 0)
             return;
-
-        LOGGER.info("Scheduling next daily download in " + nextDelay + "ms");
 
         OneTimeWorkRequest request
             = new OneTimeWorkRequest.Builder(DailyDownloadWorker.class)

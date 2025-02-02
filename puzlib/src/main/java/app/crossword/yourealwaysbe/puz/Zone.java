@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.puz;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -11,11 +10,11 @@ import java.util.Iterator;
  * Normally where an answer to a clue goes, a sequence of boxes, usually
  * in a line across or down, but can be any sequence.
  */
-public class Zone implements Iterable<Position>, Serializable {
+public class Zone implements Iterable<Position> {
     private static final long serialVersionUID = 1883316891012999786L;
 
     public static enum Direction {
-        UP, DOWN, LEFT, RIGHT;
+        UP, DOWN, LEFT, RIGHT, INCONCLUSIVE;
 
         public Direction reverse() {
             switch (this) {
@@ -23,6 +22,7 @@ public class Zone implements Iterable<Position>, Serializable {
             case DOWN: return UP;
             case LEFT: return RIGHT;
             case RIGHT: return LEFT;
+            case INCONCLUSIVE: return INCONCLUSIVE;
             }
             // never here, but don't return null
             return LEFT;
@@ -103,6 +103,9 @@ public class Zone implements Iterable<Position>, Serializable {
 
     /**
      * Get the direction of travel for zone from position to position + 1
+     *
+     * Insists directions are only for contiguous cells, else return
+     * inconclusive.
      */
     public Direction getDirection(int position) {
         // just a default
@@ -119,15 +122,18 @@ public class Zone implements Iterable<Position>, Serializable {
         Position posStart = getPosition(position);
         Position posEnd = getPosition(position + 1);
 
-        if (posStart.getCol() < posEnd.getCol())
-            return Direction.RIGHT;
-        else if (posStart.getCol() > posEnd.getCol())
-            return Direction.LEFT;
-        else if (posStart.getRow() < posEnd.getRow())
-            return Direction.DOWN;
-        else if (posStart.getRow() > posEnd.getRow())
-            return Direction.UP;
-        else // same position, who knows!
-            return Direction.LEFT;
+        if (posStart.getRow() == posEnd.getRow()) {
+            if (posStart.getCol() + 1 == posEnd.getCol())
+                return Direction.RIGHT;
+            else if (posStart.getCol() == posEnd.getCol() + 1)
+                return Direction.LEFT;
+        } else if (posStart.getCol() == posEnd.getCol()) {
+            if (posStart.getRow() + 1 == posEnd.getRow())
+                return Direction.DOWN;
+            else if (posStart.getRow() == posEnd.getRow() + 1)
+                return Direction.UP;
+        }
+
+        return Direction.INCONCLUSIVE;
     }
 }

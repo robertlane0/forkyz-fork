@@ -3,7 +3,6 @@ package app.crossword.yourealwaysbe.forkyz.versions;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.function.Consumer;
 
 import android.app.Activity;
 import android.app.job.JobScheduler;
@@ -12,7 +11,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Typeface;
 import android.net.ConnectivityManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.text.Layout;
@@ -22,11 +20,8 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts.OpenDocumentTree;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
 
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.util.BackgroundDownloadManager;
@@ -100,32 +95,6 @@ public class LollipopUtil implements AndroidVersionUtils {
     ) throws IOException {
         File files = context.getFilesDir();
         return files.getFreeSpace() < minimumBytesFree;
-    }
-
-    /**
-     * SAF support for Forkyz rather than Android
-     *
-     * Android had it in KitKat, but didn't have the document tree access we
-     * need until now.
-     */
-    @Override
-    public boolean isSAFSupported() {
-        return true;
-    }
-
-    @Override
-    public ActivityResultLauncher<Uri> registerForSAFUriResult(
-        Fragment fragment, Consumer<Uri> uriConsumer
-    ) {
-        return fragment.registerForActivityResult(
-            new OpenDocumentTree(),
-            new ActivityResultCallback<Uri>() {
-                @Override
-                public void onActivityResult(Uri uri) {
-                    uriConsumer.accept(uri);
-                }
-            }
-        );
     }
 
     @SuppressWarnings("deprecation")

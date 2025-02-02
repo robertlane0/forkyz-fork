@@ -105,7 +105,6 @@ public class FileHandlerShared extends FileProvider {
     }
 
     synchronized static private String getShareAuthority(Context context) {
-        System.out.println("FORKYZ: auth " + context.getPackageName() + ".files");
         return context.getPackageName() + ".files";
     }
 }

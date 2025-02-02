@@ -21,6 +21,7 @@ import android.view.accessibility.AccessibilityNodeInfo;
 import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
+import androidx.annotation.MainThread;
 import androidx.lifecycle.ViewTreeLifecycleOwner;
 
 import dagger.hilt.android.AndroidEntryPoint;
@@ -59,6 +60,7 @@ public class BoardEditText
     private final Semaphore renderLock = new Semaphore(1);
     private BoxInputConnection currentInputConnection = null;
     private boolean nativeInput = false;
+    private boolean forceCaps = true;
 
     public interface BoardEditFilter {
         /**
@@ -311,7 +313,9 @@ public class BoardEditText
             flagChanged(pos);
             notifyPostChange(pos, oldChar, true);
             this.render();
-            updateInputConnection();
+
+            if (pos == getSelectedCol())
+                updateInputConnection();
         }
     }
 
@@ -488,9 +492,13 @@ public class BoardEditText
     }
 
     @Override
-    public boolean setNativeInput(boolean nativeInput) {
-        boolean changed = this.nativeInput != nativeInput;
+    public boolean setNativeInput(boolean nativeInput, boolean forceCaps) {
+        boolean changed = (
+            this.nativeInput != nativeInput
+            || this.forceCaps != forceCaps
+        );
         this.nativeInput = nativeInput;
+        this.forceCaps = forceCaps;
         return changed;
     }
 
@@ -501,7 +509,7 @@ public class BoardEditText
 
     @Override
     public boolean onCheckIsTextEditor() {
-        return nativeInput;
+        return isNativeInput();
     }
 
     // Set input type to be raw keys if a keyboard is used
@@ -512,7 +520,8 @@ public class BoardEditText
                 this,
                 utils,
                 getSelectedResponse(),
-                this
+                this,
+                isForceCaps()
             );
             currentInputConnection.setOutAttrs(outAttrs);
             return currentInputConnection;
@@ -651,6 +660,7 @@ public class BoardEditText
         return true;
     }
 
+    @MainThread
     private void onNewResponse(char character) {
         if (!isAcceptableCharacterResponse(character))
             return;
@@ -695,10 +705,12 @@ public class BoardEditText
         }
     }
 
+    @MainThread
     public void render() {
         render(false);
     }
 
+    @MainThread
     private void render(boolean renderAll) {
         if (getWidth() == 0)
             return;
@@ -875,6 +887,10 @@ public class BoardEditText
                 filter.postChange(pos, oldChar, isDelete);
         }
     }
+
+    private boolean isNativeInput() { return nativeInput; }
+
+    private boolean isForceCaps() { return forceCaps; }
 
     /**
      * Use these to ensure only one thread working on render bitmap

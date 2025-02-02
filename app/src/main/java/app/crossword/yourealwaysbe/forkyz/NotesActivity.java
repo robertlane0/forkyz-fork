@@ -396,9 +396,8 @@ public class NotesActivity extends PuzzleActivity {
             return true;
 
         switch (keyCode) {
-        case KeyEvent.KEYCODE_BACK:
         case KeyEvent.KEYCODE_ESCAPE:
-            onBackKey();
+            doBackAction();
             return true;
         }
 
@@ -513,7 +512,7 @@ public class NotesActivity extends PuzzleActivity {
 
                 if (!board.getCurrentWord().equals(w)
                         || Box.isBlock(board.getBoxes()[row][col])) {
-                    getBoard().setHighlightLetter(last);
+                    board.setHighlightLetter(last);
                 }
             }
             return true;
@@ -727,7 +726,11 @@ public class NotesActivity extends PuzzleActivity {
         if (!displayScratch)
             return null;
 
-        ClueID cid = getBoard().getClueID();
+        Playboard board = getBoard();
+        if (board == null)
+            return Collections.emptySet();
+
+        ClueID cid = board.getClueID();
         if (cid == null)
             return Collections.emptySet();
 
@@ -962,7 +965,7 @@ public class NotesActivity extends PuzzleActivity {
         ));
         registerVoiceCommand(new VoiceCommand(
             getString(R.string.command_back),
-            args -> { onBackKey(); }
+            args -> { doBackAction(); }
         ));
         registerVoiceCommand(new VoiceCommand(
             getString(R.string.command_scratch),
@@ -1045,11 +1048,9 @@ public class NotesActivity extends PuzzleActivity {
         }
     }
 
-    private void onBackKey() {
-        keyboardManager.handleBackKey(keyHandled -> {
-            if (!keyHandled)
-                this.finish();
-        });
+    private void doBackAction() {
+        if (!keyboardManager.doBackAction())
+            this.finish();
     }
 
     @AndroidEntryPoint
@@ -1187,7 +1188,6 @@ public class NotesActivity extends PuzzleActivity {
      */
     private boolean isHandledKey(int keyCode, KeyEvent event) {
         switch (keyCode) {
-        case KeyEvent.KEYCODE_BACK:
         case KeyEvent.KEYCODE_ESCAPE:
             return true;
         }
@@ -1405,15 +1405,6 @@ public class NotesActivity extends PuzzleActivity {
         int curWordLen = binding.anagramSolution.getLength();
         for (int i = 0; i < curWordLen; i++) {
             binding.anagramSolution.deleteResponse(i);
-            //if (!binding.anagramSolution.isBlank(i)) {
-            //    for (int i = 0; i < curWordLen; i++) {
-            //        if (binding.anagramSource.isBlank(i)) {
-            //            binding.anagramSolution.deleteResponse(i);
-            //            binding.anagramSource.setResponse(i, oldChar);
-            //            break;
-            //        }
-            //    }
-            //}
         }
     }
 }

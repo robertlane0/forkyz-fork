@@ -21,6 +21,7 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.widget.Toast;
+import androidx.annotation.MainThread;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
@@ -132,10 +133,12 @@ public class BrowseActivityViewModel extends AndroidViewModel {
         return isViewArchive;
     }
 
+    @MainThread
     public void startLoadFiles() {
         startLoadFiles(getIsViewArchive());
     }
 
+    @MainThread
     public void startLoadFiles(boolean archive) {
         fileHandlerProvider.get(fileHandler -> {
             threadWithUILock(() -> {
@@ -145,7 +148,7 @@ public class BrowseActivityViewModel extends AndroidViewModel {
                     : fileHandler.getCrosswordsDirectory();
 
                 FilteredList<MutableLiveData<PuzMetaFile>> puzFiles
-                    = new FilteredList<>(this::metaMatches);
+                    = new FilteredList<>();
 
                 for (PuzMetaFile pm : fileHandler.getPuzMetas(directory)) {
                     puzFiles.add(new MutableLiveData<>(pm));
@@ -161,10 +164,12 @@ public class BrowseActivityViewModel extends AndroidViewModel {
         });
     }
 
+    @MainThread
     public void deletePuzzle(PuzMetaFile puzMeta) {
         deletePuzzles(Collections.singleton(puzMeta));
     }
 
+    @MainThread
     public void deletePuzzles(Collection<PuzMetaFile> puzMetas) {
         fileHandlerProvider.get(fileHandler -> {
             threadWithUILock(() -> {
@@ -180,10 +185,12 @@ public class BrowseActivityViewModel extends AndroidViewModel {
         });
     }
 
+    @MainThread
     public void movePuzzle(PuzMetaFile puzMeta, DirHandle destDir) {
         movePuzzles(Collections.singleton(puzMeta), destDir);
     }
 
+    @MainThread
     public void movePuzzles(
         Collection<PuzMetaFile> puzMetas, DirHandle destDir
     ) {
@@ -206,6 +213,7 @@ public class BrowseActivityViewModel extends AndroidViewModel {
         });
     }
 
+    @MainThread
     public void cleanUpPuzzles() {
         settings.getBrowseDeleteOnCleanup(deleteOnCleanup -> {
         settings.getBrowseCleanupAge(maxAgeString -> {
@@ -255,17 +263,18 @@ public class BrowseActivityViewModel extends AndroidViewModel {
                 for (PuzMetaFile puzMeta : toArchive)
                     fileHandler.moveTo(puzMeta, archive);
 
-                startLoadFiles();
+                handler.post(() -> startLoadFiles());
             });
         });});});});
     }
 
+    @MainThread
     public void download(LocalDate date, List<Downloader> downloaders) {
         downloadersProvider.get(dls -> {
             downloadExecutorService.execute(() -> {
                 dls.download(date, downloaders);
                 if (!getIsViewArchive()) {
-                    handler.post(() -> { startLoadFiles(); });
+                    handler.post(this::startLoadFiles);
                 }
             });
         });
@@ -281,9 +290,9 @@ public class BrowseActivityViewModel extends AndroidViewModel {
         if (!utils.hasNetworkConnection(getApplication()))
             return;
 
-        downloadExecutorService.execute(() -> {
-            settings.getDownloadersSettings(downloaderSettings -> {
-            downloadersProvider.get(dls -> {
+        settings.getDownloadersSettings(downloaderSettings -> {
+        downloadersProvider.get(dls -> {
+            downloadExecutorService.execute(() -> {
                 // Should not run in parallel with other auto downloads.
                 // If multiple calls are made rapidly, the first will
                 // lock the block below and update lastDL so future
@@ -303,13 +312,16 @@ public class BrowseActivityViewModel extends AndroidViewModel {
                         settings.setBrowseLastDownloadSync(
                             System.currentTimeMillis()
                         );
-                        download(LocalDate.now(), dls.getAutoDownloaders());
+                        handler.post(() -> {
+                            download(LocalDate.now(), dls.getAutoDownloaders());
+                        });
                     }
                 }
-            ;});});
-        });
+            ;})
+        ;});});
     }
 
+    @MainThread
     public void loadPuzzle(PuzMetaFile puzMeta) {
         settings.getPlayPreserveCorrectLettersInShowErrors(preserveCorrect -> {
         settings.getPlayDeleteCrossingMode(deleteCrossingMode -> {
@@ -362,6 +374,7 @@ public class BrowseActivityViewModel extends AndroidViewModel {
         });});});});
     }
 
+    @MainThread
     public void refreshPuzzleMeta(PuzHandle refreshHandle) {
         fileHandlerProvider.get(fileHandler -> {
             threadWithUILock(() -> {
@@ -396,6 +409,7 @@ public class BrowseActivityViewModel extends AndroidViewModel {
      *
      * callback when finished, arguments are someFailed and someSucceeded
      */
+    @MainThread
     public void importURIs(
         Collection<Uri> uris,
         boolean forceReload,
@@ -431,7 +445,7 @@ public class BrowseActivityViewModel extends AndroidViewModel {
                 }
 
                 if (needsReload)
-                    startLoadFiles();
+                    handler.post(this::startLoadFiles);
 
                 final boolean finalSomeFailed = someFailed;
                 final boolean finalSomeSucceeded = someSucceeded;
@@ -447,6 +461,7 @@ public class BrowseActivityViewModel extends AndroidViewModel {
      *
      * Import puzzles in there, move successful files to to-import-done
      */
+    @MainThread
     public void processToImportDirectory() {
         fileHandlerProvider.get(fileHandler -> {
             threadWithUILock(() -> {
@@ -534,8 +549,12 @@ public class BrowseActivityViewModel extends AndroidViewModel {
     private void setNewPuzzleListAndFilter(
         FilteredList<MutableLiveData<PuzMetaFile>> newList, String newFilter
     ) {
-        if (newList != null)
-            newList.applyFilter(newFilter);
+        if (newList != null) {
+            if (newFilter == null || newFilter.length() == 0)
+                newList.clearFilter();
+            else
+                newList.applyFilter(meta -> metaMatches(meta, newFilter));
+        }
         puzzleFiles.setValue(newList);
     }
 
@@ -576,7 +595,7 @@ public class BrowseActivityViewModel extends AndroidViewModel {
             return false;
 
         if (filterText == null)
-            return false;
+            return true;
 
         Locale locale = Locale.getDefault();
 

@@ -1,12 +1,9 @@
 
 package app.crossword.yourealwaysbe.puz;
 
-import java.io.Serializable;
 import java.util.Objects;
 
-public class ClueID implements Comparable<ClueID>, Serializable {
-    private static final long serialVersionUID = 4021247069653611249L;
-
+public class ClueID implements Comparable<ClueID> {
     private String listName;
     private int index;
 

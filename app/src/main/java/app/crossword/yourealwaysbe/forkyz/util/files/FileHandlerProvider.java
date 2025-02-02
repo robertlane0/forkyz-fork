@@ -9,13 +9,18 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.widget.Toast;
+import androidx.annotation.MainThread;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Transformations;
 
 import dagger.hilt.android.qualifiers.ApplicationContext;
 
 import app.crossword.yourealwaysbe.forkyz.R;
+import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation;
+import app.crossword.yourealwaysbe.forkyz.util.LiveDataUtilsKt;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 
 @Singleton
@@ -24,7 +29,7 @@ public class FileHandlerProvider {
     private ForkyzSettings settings;
 
     private AndroidVersionUtils utils;
-    private FileHandler fileHandler;
+    private LiveData<FileHandler> liveFileHandler;
 
     @Inject
     public FileHandlerProvider(
@@ -35,26 +40,25 @@ public class FileHandlerProvider {
         this.applicationContext = applicationContext;
         this.utils = utils;
         this.settings = settings;
+        this.liveFileHandler = Transformations.map(
+            settings.liveFileHandlerSettings(),
+            this::createFileHandler
+        );
     }
 
+    @MainThread
     public void get(Consumer<FileHandler> cb) {
-        if (fileHandler != null) {
-            cb.accept(fileHandler);
-        } else {
-            createFileHandler(fh -> {
-                fileHandler = fh;
-                cb.accept(fh);
-            });
-        }
+        LiveDataUtilsKt.observeOnce(liveFileHandler, cb);
     }
 
-    public void reloadFileHandler() {
-        fileHandler = null;
+    public LiveData<FileHandler> liveFileHandler() {
+        return liveFileHandler;
     }
 
     /**
      * Returns true if WRITE_EXTERNAL_STORAGE permission is needed/missing
      */
+    @MainThread
     public void isMissingWritePermission(Consumer<Boolean> cb) {
         get(fileHandler -> {
             boolean needsPerm
@@ -69,52 +73,43 @@ public class FileHandlerProvider {
         });
     }
 
-    private void createFileHandler(Consumer<FileHandler> cb) {
-        settings.getFileHandlerSettings(fileHandlerSettings -> {
-            // check hasn't been made in the meantime
-            if (fileHandler != null) {
-                cb.accept(fileHandler);
-                return;
-            }
+    private FileHandler createFileHandler(
+        FileHandlerSettings fileHandlerSettings
+    ) {
+        FileHandler fh;
 
-            FileHandler fh;
+        StorageLocation loc = fileHandlerSettings.storageLocation();
 
-            StorageLocation loc = fileHandlerSettings.storageLocation();
+        switch (loc) {
+        case EXTERNAL_SAF:
+            fh = FileHandlerSAF.readHandlerFromSettings(
+                applicationContext, fileHandlerSettings, settings
+            );
+            break;
+        default:
+            fh = new FileHandlerInternal(applicationContext);
+            break;
+        }
 
-            switch (loc) {
-            case EXTERNAL_LEGACY:
-                fh = new FileHandlerLegacy(applicationContext);
-                break;
-            case EXTERNAL_SAF:
-                fh = FileHandlerSAF.readHandlerFromSettings(
-                    applicationContext, fileHandlerSettings
-                );
-                break;
-            default:
-                fh = new FileHandlerInternal(applicationContext);
-                break;
-            }
+        if (fh == null || !fh.isStorageMounted()) {
+            fh = new FileHandlerInternal(applicationContext);
+            Toast t = Toast.makeText(
+                applicationContext,
+                R.string.storage_problem_falling_back_internal,
+                Toast.LENGTH_LONG
+            );
+            t.show();
+        }
 
-            if (fh == null || !fh.isStorageMounted()) {
-                fh = new FileHandlerInternal(applicationContext);
-                Toast t = Toast.makeText(
-                    applicationContext,
-                    R.string.storage_problem_falling_back_internal,
-                    Toast.LENGTH_LONG
-                );
-                t.show();
-            }
+        if (fh.isStorageFull(utils)) {
+            Toast t = Toast.makeText(
+                applicationContext,
+                R.string.storage_full_warning,
+                Toast.LENGTH_LONG
+            );
+            t.show();
+        }
 
-            if (fh.isStorageFull(utils)) {
-                Toast t = Toast.makeText(
-                    applicationContext,
-                    R.string.storage_full_warning,
-                    Toast.LENGTH_LONG
-                );
-                t.show();
-            }
-
-            cb.accept(fh);
-        });
+        return fh;
     }
 }

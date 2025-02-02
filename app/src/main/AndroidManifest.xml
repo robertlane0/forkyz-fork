@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:installLocation="auto"
-    android:versionCode="6000000"
-    android:versionName="60">
+    android:versionCode="6100000"
+    android:versionName="61">
 
     <supports-screens
         android:anyDensity="true"
@@ -73,6 +73,7 @@
         tools:ignore="UnusedAttribute"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:supportsRtl="true"
+        android:enableOnBackInvokedCallback="true"
     >
         <activity
             tools:ignore="UnusedAttribute"
@@ -84,7 +85,7 @@
         >
         </activity>
         <activity
-            android:name="app.crossword.yourealwaysbe.forkyz.PreferencesActivity"
+            android:name="app.crossword.yourealwaysbe.forkyz.SettingsActivity"
             android:label="@string/settings_label"
             android:theme="@style/Theme.Forkyz"
             android:exported="false"

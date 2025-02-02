@@ -1,6 +1,8 @@
 
 package app.crossword.yourealwaysbe.forkyz.util;
 
+import java.util.Locale;
+
 import android.content.Context;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -30,6 +32,7 @@ public class BoxInputConnection extends BaseInputConnection {
     private BoardEditable boardEditable;
     private View targetView;
     private BoxInputListener listener;
+    private boolean forceCaps;
     private int updateExtractedTextToken = -1;
     private int batchEditNestingDepth = 0;
     private String pendingResponse = null;
@@ -39,17 +42,26 @@ public class BoxInputConnection extends BaseInputConnection {
         default void onDeleteResponse() { }
     }
 
+    /**
+     * Create BoxInputConnection
+     *
+     * @param forceCaps whether to convert all input into uppercase (input is
+     * always requested in uppercase, but not always enforced by input method,
+     * this setting converts it)
+     */
     public BoxInputConnection(
         View targetView,
         AndroidVersionUtils utils,
         String initialResponse,
-        BoxInputListener listener
+        BoxInputListener listener,
+        boolean forceCaps
     ) {
         super(targetView, true);
         this.targetView = targetView;
         this.utils = utils;
         this.boardEditable = new BoardEditable(initialResponse);
         this.listener = listener;
+        this.forceCaps = forceCaps;
     }
 
     public void setOutAttrs(EditorInfo outAttrs) {
@@ -149,6 +161,8 @@ public class BoxInputConnection extends BaseInputConnection {
                 if (response.isEmpty()) {
                     listener.onDeleteResponse();
                 } else {
+                    if (isForceCaps())
+                        response = response.toUpperCase(Locale.getDefault());
                     // give whole response so emojis work
                     listener.onNewResponse(response);
                 }
@@ -161,6 +175,8 @@ public class BoxInputConnection extends BaseInputConnection {
             .getContext()
             .getSystemService(Context.INPUT_METHOD_SERVICE);
     }
+
+    private boolean isForceCaps() { return forceCaps; }
 
     private class BoardEditable implements Editable {
         SpannableStringBuilder spannable;

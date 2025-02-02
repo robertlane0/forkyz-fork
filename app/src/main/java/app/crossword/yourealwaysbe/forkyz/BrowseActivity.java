@@ -368,7 +368,7 @@ public class BrowseActivity extends ForkyzActivity {
             });
             return true;
         } else if (id == R.id.browse_menu_settings) {
-            Intent settingsIntent = new Intent(this, PreferencesActivity.class);
+            Intent settingsIntent = new Intent(this, SettingsActivity.class);
             this.startActivity(settingsIntent);
             return true;
         } else if (id == R.id.browse_menu_archives) {
@@ -446,7 +446,7 @@ public class BrowseActivity extends ForkyzActivity {
         setupSideInsets(binding.toolbar);
         setupBottomInsets(binding.content);
         setupBottomInsets(binding.speedDialAdd);
-        setStatusBarElevation(binding.appBarLayout);
+        setupStatusBar(binding.appBarLayout);
 
         setDefaultKeyMode(DEFAULT_KEYS_SHORTCUT);
         binding.puzzleList.setLayoutManager(new LinearLayoutManager(this));
@@ -650,8 +650,16 @@ public class BrowseActivity extends ForkyzActivity {
             } else {
                 refreshLastAccessedPuzzle();
             }
-            // previous game ended for now
-            clearCurrentBoard();
+
+            // A resume used to clear the current board with the
+            // reasoning that the player has returned and will not be
+            // able to play the current puzzle. However, predictive back
+            // may cause an on resume -- i think if the browse activity
+            // has been destroyed and it needs to recreate to display
+            // the preview. So onResume no longer means play has
+            // finished, so don't clear the puzzle. It gets overwritten
+            // when a new puzzle is selected and just uses unneeded
+            // memory in the meantime.
         });
 
         autoDownloadIfEnabled();

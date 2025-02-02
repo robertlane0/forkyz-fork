@@ -38,5 +38,6 @@ public class MigrationHelper {
         downloadersProvider.get(settings::migrateAutoDownloaders);
         settings.migrateDontDeleteCrossing();
         settings.migrateCycleUnfilled();
+        settings.migrateFitToScreen();
     }
 }

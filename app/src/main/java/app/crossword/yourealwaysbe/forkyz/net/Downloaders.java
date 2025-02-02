@@ -537,6 +537,22 @@ public class Downloaders {
             ));
         }
 
+        if (settings.downloadMetroQuick()) {
+            downloaders.add(new AbstractDateDownloader(
+                "metroquick",
+                context.getString(R.string.metro_quick),
+                AbstractDateDownloader.DAYS_NO_SUNDAY,
+                Duration.ZERO,
+                "https://metro.co.uk/",
+                new PMLIO(),
+                "'https://d3untqd069jdot.cloudfront.net/puzzles/"
+                    + "crossword/'yyyyMMdd'.html'",
+                "'https://metro.co.uk/puzzles/"
+                    + "quick-crosswords-online-free-daily-word-puzzle/'",
+                LocalDate.of(2024, 12, 2)
+            ));
+        }
+
         if (settings.downloadNewsday()) {
             downloaders.add(new AbstractDateDownloader(
                 "newsday",

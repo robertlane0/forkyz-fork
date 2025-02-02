@@ -28,6 +28,7 @@ import androidx.fragment.app.DialogFragment;
 import com.squareup.seismic.ShakeDetector;
 
 import app.crossword.yourealwaysbe.forkyz.databinding.PlayBinding;
+import app.crossword.yourealwaysbe.forkyz.settings.FitToScreenMode;
 import app.crossword.yourealwaysbe.forkyz.settings.GridRatio;
 import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer;
 import app.crossword.yourealwaysbe.forkyz.util.KeyboardManager;
@@ -68,27 +69,13 @@ public class PlayActivity extends PuzzleActivity
     private KeyboardManager keyboardManager;
     private ShakeDetector shakeDetector = null;
 
+    // needed to know when to immediately fit to screen or whether to wait for
+    // layout to finish
+    private boolean firstLayoutFinished = false;
+    private boolean pendingFitToScreen = false;
+
     // Proper value is loaded before this is used anyway
     private GridRatio currentGridRatio = GridRatio.PUZZLE_SHAPE;
-
-    private Runnable fitToScreenTask = new Runnable() {
-        @Override
-        public void run() {
-            PlayActivity.this.fitBoardToScreen();
-        }
-    };
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-
-        DisplayMetrics metrics = getResources().getDisplayMetrics();
-        int screenWidthInInches = (metrics.widthPixels > metrics.heightPixels ? metrics.widthPixels : metrics.heightPixels) / Math.round(160 * metrics.density);
-        LOG.info("Configuration Changed "+screenWidthInInches+" ");
-        if(screenWidthInInches >= 7){
-            this.handler.post(this.fitToScreenTask);
-        }
-    }
 
     /**
      * Create the activity
@@ -126,6 +113,10 @@ public class PlayActivity extends PuzzleActivity
 
         setFullScreenMode();
 
+        keyboardManager = new KeyboardManager(
+            this, settings, binding.keyboardView, binding.boardView
+        );
+
         binding.clueTabs.setOnClueLongClickDescription(
             getString(R.string.open_clue_notes)
         );
@@ -145,26 +136,26 @@ public class PlayActivity extends PuzzleActivity
 
                 @Override
                 public void onKeyUp(@ForkyzKeyboard.SpecialKey int key) {
+                    Playboard board = getBoard();
+                    if (board == null)
+                        return;
+
                     // ignore
                     switch (key) {
                     case ForkyzKeyboard.KEY_CHANGE_CLUE_DIRECTION:
-                        getBoard().toggleSelection();
+                        board.toggleSelection();
                         return;
                     case ForkyzKeyboard.KEY_NEXT_CLUE:
-                        getBoard().nextWord();
+                        board.nextWord();
                         return;
                     case ForkyzKeyboard.KEY_PREVIOUS_CLUE:
-                        getBoard().previousWord();
+                        board.previousWord();
                         return;
                     default:
                         // ignore
                     }
                 }
             }
-        );
-
-        keyboardManager = new KeyboardManager(
-            this, settings, binding.keyboardView, binding.boardView
         );
 
         settings.getPlaySkipFilled(board::setSkipCompletedLetters);
@@ -219,16 +210,6 @@ public class PlayActivity extends PuzzleActivity
             }
         );
 
-        DisplayMetrics metrics = getResources().getDisplayMetrics();
-        settings.getPlayFitToScreen(fitToScreen -> {
-            if (fitToScreen || (
-                    isLandscape(metrics) && isTabletish(metrics)
-                )
-            ) {
-                this.handler.postDelayed(fitToScreenTask, 100);
-            }
-        });
-
         setupVoiceButtons(binding.voiceButtonsInclude);
         setupVoiceCommands();
 
@@ -273,16 +254,6 @@ public class PlayActivity extends PuzzleActivity
             & (KeyEvent.FLAG_CANCELED | KeyEvent.FLAG_CANCELED_LONG_PRESS);
         if (cancelled > 0)
             return true;
-
-        // handle back separately as it we shouldn't block a keyboard
-        // hide because of it
-        if (keyCode == KeyEvent.KEYCODE_BACK
-                || keyCode == KeyEvent.KEYCODE_ESCAPE) {
-            keyboardManager.handleBackKey(keyHandled -> {
-                if (!keyHandled)
-                    this.finish();
-            });
-        }
 
         keyboardManager.pushBlockHide();
 
@@ -351,6 +322,27 @@ public class PlayActivity extends PuzzleActivity
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         return onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        if (!super.onPrepareOptionsMenu(menu))
+            return false;
+
+        settings.getPlayFitToScreenMode(fitToScreen -> {
+            switch (fitToScreen) {
+            case LOCKED:
+                MenuItem zoom = menu.findItem(R.id.play_menu_zoom);
+                zoom.setVisible(false);
+                zoom.setEnabled(false);
+                break;
+            default:
+                // do nothing
+                break;
+            }
+        });
+
+        return true;
     }
 
     @Override
@@ -428,9 +420,13 @@ public class PlayActivity extends PuzzleActivity
     public void onPlayboardChange(PlayboardChanges changes) {
         super.onPlayboardChange(changes);
 
+        Playboard board = getBoard();
+        if (board == null)
+            return;
+
         Word previousWord = changes.getPreviousWord();
 
-        Position newPos = getBoard().getHighlightLetter();
+        Position newPos = board.getHighlightLetter();
 
         boolean isNewWord = (previousWord == null) ||
             !previousWord.checkInWord(newPos);
@@ -480,8 +476,9 @@ public class PlayActivity extends PuzzleActivity
     protected void onResume() {
         super.onResume();
 
-        this.onConfigurationChanged(getBaseContext().getResources()
-                                                    .getConfiguration());
+        this.onConfigurationChanged(getBaseContext()
+            .getResources()
+            .getConfiguration());
 
         setVoiceButtonVisibility();
         registerBoard();
@@ -612,6 +609,29 @@ public class PlayActivity extends PuzzleActivity
                 setActivityTitle();
             }
         );
+
+        settings.livePlayFitToScreenMode().observe(
+            this,
+            fitToScreen -> {
+                switch (fitToScreen) {
+                case START:
+                case LOCKED:
+                    if (isFirstLayoutFinished())
+                        fitBoardToScreen();
+                    else
+                        setPendingFitToScreen();
+                    break;
+                default:
+                    // do nothing
+                    break;
+                }
+
+                boolean locked = fitToScreen == FitToScreenMode.LOCKED;
+                binding.boardView.setAllowOverScroll(!locked);
+                binding.boardView.setAllowZoom(!locked);
+
+                invalidateOptionsMenu();
+            });
     }
 
     private void setClueText() {
@@ -746,7 +766,7 @@ public class PlayActivity extends PuzzleActivity
         ));
         registerVoiceCommand(new VoiceCommand(
             getString(R.string.command_back),
-            args -> { onBackKey(); }
+            args -> { doBackAction(); }
         ));
         registerVoiceCommand(new VoiceCommand(
             getString(R.string.command_clues),
@@ -790,11 +810,9 @@ public class PlayActivity extends PuzzleActivity
             board.moveUp();
     }
 
-    private void onBackKey() {
-        keyboardManager.handleBackKey(keyHandled -> {
-            if (!keyHandled)
-                this.finish();
-        });
+    private void doBackAction() {
+        if (!keyboardManager.doBackAction())
+            this.finish();
     }
 
     private void onDeleteKey() {
@@ -811,11 +829,15 @@ public class PlayActivity extends PuzzleActivity
     }
 
     private void playLetter(char c) {
+        Playboard board = getBoard();
+        if (board == null)
+            return;
+
         settings.getPlayScratchMode(scratchMode -> {
             if (scratchMode)
-                getBoard().playScratchLetter(c);
+                board.playScratchLetter(c);
             else
-                getBoard().playLetter(c);
+                board.playLetter(c);
         });
     }
 
@@ -907,7 +929,6 @@ public class PlayActivity extends PuzzleActivity
      */
     private boolean isHandledKey(int keyCode, KeyEvent event) {
         switch (keyCode) {
-        case KeyEvent.KEYCODE_BACK:
         case KeyEvent.KEYCODE_ESCAPE:
         case KeyEvent.KEYCODE_SEARCH:
         case KeyEvent.KEYCODE_DPAD_UP:
@@ -926,21 +947,6 @@ public class PlayActivity extends PuzzleActivity
             return true;
 
         return false;
-    }
-
-    private static boolean isLandscape(DisplayMetrics metrics){
-        return metrics.widthPixels > metrics.heightPixels;
-    }
-
-    private static boolean isTabletish(DisplayMetrics metrics) {
-        double x = Math.pow(metrics.widthPixels / metrics.xdpi, 2);
-        double y = Math.pow(metrics.heightPixels / metrics.ydpi, 2);
-        double screenInches = Math.sqrt(x + y);
-        if (screenInches > 9) { // look for a 9" or larger screen.
-            return true;
-        } else {
-            return false;
-        }
     }
 
     /**
@@ -1086,11 +1092,44 @@ public class PlayActivity extends PuzzleActivity
                             binding.boardView.relayout();
                             binding.boardView.getViewTreeObserver()
                                 .removeOnPreDrawListener(this);
+                            setFirstLayoutFinished();
+                            handleResizeFitToScreen();
                             return false;
                         }
                     }
                 );
         }
+    }
+
+    private void setFirstLayoutFinished() {
+        firstLayoutFinished = true;
+    }
+
+    private boolean isFirstLayoutFinished() {
+        return firstLayoutFinished;
+    }
+
+    private void setPendingFitToScreen() {
+        pendingFitToScreen = true;
+    }
+
+    private void clearPendingFitToScreen() {
+        pendingFitToScreen = false;
+    }
+
+    private boolean isPendingFitToScreen() {
+        return pendingFitToScreen;
+    }
+
+    private void handleResizeFitToScreen() {
+        settings.getPlayFitToScreenMode(fitToScreen -> {
+            boolean needsFit = isPendingFitToScreen()
+                || fitToScreen == FitToScreenMode.LOCKED;
+            clearPendingFitToScreen();
+            if (needsFit)
+                fitBoardToScreen();
+
+        });
     }
 
     /**

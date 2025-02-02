@@ -12,6 +12,7 @@ import java.util.Set;
 import android.content.Context;
 import android.net.Uri;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Dao;
 import androidx.room.Database;
@@ -34,23 +35,30 @@ import app.crossword.yourealwaysbe.puz.Puzzle;
 public class MetaCache {
 
     public static class Converters {
+        // need nullable not just non-null now
+        // https://stackoverflow.com/a/77888612
+
         @TypeConverter
-        public static LocalDate fromEpochDay(Long value) {
+        @Nullable
+        public static LocalDate fromEpochDay(@Nullable Long value) {
             return value == null ? null : LocalDate.ofEpochDay(value);
         }
 
         @TypeConverter
-        public static Long dateToEpochDay(LocalDate date) {
+        @Nullable
+        public static Long dateToEpochDay(@Nullable LocalDate date) {
             return date == null ? null : date.toEpochDay();
         }
 
         @TypeConverter
-        public static Uri fromUriString(String value) {
+        @Nullable
+        public static Uri fromUriString(@Nullable String value) {
             return value == null ? null : Uri.parse(value);
         }
 
         @TypeConverter
-        public static String uriToString(Uri uri) {
+        @Nullable
+        public static String uriToString(@Nullable Uri uri) {
             return uri == null ? null : uri.toString();
         }
     }
@@ -76,6 +84,7 @@ public class MetaCache {
         public boolean isUpdatable;
 
         @ColumnInfo
+        @Nullable
         public LocalDate date;
 
         @ColumnInfo
@@ -85,18 +94,20 @@ public class MetaCache {
         public int percentFilled;
 
         @ColumnInfo
+        @Nullable
         public String source;
 
         @ColumnInfo
+        @Nullable
         public String title;
 
         // from db version 2
         @ColumnInfo
+        @Nullable
         public String author;
 
         // from db version 3
         @ColumnInfo
-        @NonNull
         public char rating;
 
         // from db version 4

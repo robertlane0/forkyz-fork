@@ -1,6 +1,5 @@
 package app.crossword.yourealwaysbe.puz;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -16,8 +15,7 @@ import java.util.logging.Logger;
 import app.crossword.yourealwaysbe.puz.util.PuzzleUtils;
 import app.crossword.yourealwaysbe.puz.util.WeakSet;
 
-public class Playboard implements Serializable {
-    private static final long serialVersionUID = 4593768901101043503L;
+public class Playboard {
     private static final Logger LOG = Logger.getLogger(Playboard.class.getCanonicalName());
 
     private static final long PAUSE_DELETE_DELAY = 150; // ms
@@ -102,10 +100,19 @@ public class Playboard implements Serializable {
         if (puzzle.getPosition() == null)
             selectFirstPosition();
 
-        updateHistory();
-        // there will be no listeners at this point, but the call also
-        // does a bit of bookkeeping / setup for the next use
-        notifyChange();
+        // setup bookkeeping
+        ClueID curID = puzzle.getCurrentClueID();
+
+        updateHistory(curID);
+
+        previousPosition = puzzle.getPosition();
+
+        Clue clue = puzzle.getClue(curID);
+        if (clue == null || !clue.hasZone()) {
+            previousWord  = new Word(getDetachedCellsZone(puzzle));
+        } else {
+            previousWord = new Word(clue.getZone(), clue.getClueID());
+        }
     }
 
     /**
@@ -1222,7 +1229,8 @@ public class Playboard implements Serializable {
 
             ClueID newCID = getClueID();
             Position start = getClueStart(newCID);
-            setHighlightLetter(start);
+            if (!Objects.equals(start, getHighlightLetter()))
+                setHighlightLetter(start);
 
             Box box = puzzle.checkedGetBox(start);
             if (box != null && skipBox(box, skipCompletedLetters)) {
@@ -1613,7 +1621,13 @@ public class Playboard implements Serializable {
      * there is no current clue. Detect latter case with getClueID() == null.
      */
     private int updateHistory() {
-        ClueID cid = getClueID();
+        return updateHistory(getClueID());
+    }
+
+    /**
+     * Version without this escape for constructor
+     */
+    private int updateHistory(ClueID cid) {
         if (cid == null)
             return -1;
         return puzzle.updateHistory(cid);
@@ -1787,6 +1801,13 @@ public class Playboard implements Serializable {
      * have been added before. Then move on with the scan.
      */
     private Zone getDetachedCellsZone() {
+        return getDetachedCellsZone(getPuzzle());
+    }
+
+    /**
+     * Version without this escape for constructor
+     */
+    private Zone getDetachedCellsZone(Puzzle puz) {
         if (detachedCellsZone != null)
             return detachedCellsZone;
 
@@ -1794,7 +1815,6 @@ public class Playboard implements Serializable {
         // because Zone.hasPosition is O(n)
         Set<Position> oldPositions = new HashSet<>();
 
-        Puzzle puz = getPuzzle();
         for (int row = 0; row < puz.getHeight(); row++) {
             for (int col = 0; col < puz.getWidth(); col++) {
                 Box box = puz.checkedGetBox(row, col);
@@ -1878,9 +1898,7 @@ public class Playboard implements Serializable {
      *
      * A Zone and possibly the clue it goes with (null if no clue).
      */
-    public static class Word implements Serializable {
-        private static final long serialVersionUID = 7726718778003961317L;
-
+    public static class Word {
         private final Zone zone;
         private final ClueID clueID;
 

@@ -1,14 +1,11 @@
 package app.crossword.yourealwaysbe.puz;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.TreeMap;
 
-public class Box implements Serializable {
-    private static final long serialVersionUID = 5432015770689391374L;
-
+public class Box {
     public static final int DEFAULT_FLAG_COLOR = -1;
 
     public static final String BLANK = " ";

@@ -267,6 +267,8 @@ public class ClueTabs extends ConstraintLayout
         if (pager == null || state == null)
             return;
 
+        state.setPageCalled = true;
+
         if (state.pagerInitialised)
             pager.setCurrentItem(pageNumber, false);
         else
@@ -455,8 +457,9 @@ public class ClueTabs extends ConstraintLayout
                 post(() -> {
                     int page = state.savedCurrentPage;
                     // might have been overwritten by setPage
-                    if (page >= 0)
+                    if (page >= 0) {
                         setPage(viewIdx, state.savedCurrentPage);
+                    }
                     state.savedCurrentPage = -1;
                 });
             }
@@ -554,7 +557,12 @@ public class ClueTabs extends ConstraintLayout
             }
         }
 
-        pager.setCurrentItem(viewIdx % adapter.getItemCount(), false);
+        // only initialise the page number if something else hasn't be
+        // requested externally
+        PagerState state = getPagerState(viewIdx);
+        if (state != null && !state.setPageCalled) {
+            setPage(viewIdx, viewIdx % adapter.getItemCount());
+        }
     }
 
     /**
@@ -622,9 +630,9 @@ public class ClueTabs extends ConstraintLayout
     private void onClueTabsPagerBind(int viewIdx) {
         PagerState state = getPagerState(viewIdx);
         if (state != null && !state.pagerInitialised) {
-            state.pagerInitialised = true;
             if (state.pendingSetPage >= 0) {
                 post(() -> {
+                    state.pagerInitialised = true;
                     setPage(viewIdx, state.pendingSetPage);
                     state.pendingSetPage = -1;
                 });
@@ -1316,6 +1324,9 @@ public class ClueTabs extends ConstraintLayout
         // because onLayoutChange doesn't get called until page has been
         // reset...
         public int pageOnLastSizeChange = -1;
+        // record if set page has called so we don't set the initial
+        // page over a request that has been made
+        public boolean setPageCalled = false;
 
         public String toString() {
             return "PagerState("

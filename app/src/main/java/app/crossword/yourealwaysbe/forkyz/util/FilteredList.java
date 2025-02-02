@@ -4,45 +4,37 @@ package app.crossword.yourealwaysbe.forkyz.util;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
-
-import androidx.annotation.NonNull;
+import java.util.function.Function;
 
 public class FilteredList<T> extends AbstractList<T> {
 
-    @FunctionalInterface
-    public interface MatchingFunction<T> {
-        public boolean matches(T item, String filter);
-    }
-
     private List<T> unfilteredList = new ArrayList<T>();
-    private String filter = null;
+    private Function<T, Boolean> filter = null;
+
     /**
      * Maps position i of the filtered list (if filtered) to position j
      * of the unfiltered one
      */
     private List<Integer> filterMap = null;
-    private MatchingFunction<T> matcher;
 
-    public FilteredList(@NonNull MatchingFunction<T> matcher) {
-        this.matcher = matcher;
+    public FilteredList(T... elements) {
+        for (T e : elements)
+            unfilteredList.add(e);
     }
 
     public boolean hasFilter() {
-        return filter != null && !filter.isEmpty();
+        return filter != null;
     }
 
     public void clearFilter() {
         applyFilter(null);
     }
 
-    public void applyFilter(String filter) {
+    public void applyFilter(Function<T, Boolean> filter) {
         this.filter = filter;
         this.filterMap = new ArrayList<>();
         for (int i = 0; i < unfilteredList.size(); i++) {
-            if (
-                filter == null
-                || matcher.matches(unfilteredList.get(i), filter)
-            ) {
+            if (filter == null || filter.apply(unfilteredList.get(i))) {
                 filterMap.add(i);
             }
         }
@@ -78,7 +70,7 @@ public class FilteredList<T> extends AbstractList<T> {
             }
 
             // add new index to filter map if needed
-            if (matcher.matches(element, filter))
+            if (filter == null || filter.apply(element))
                 filterMap.add(index, trueIndex);
         } else {
             unfilteredList.add(index, element);

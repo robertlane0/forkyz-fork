@@ -3,6 +3,7 @@ package app.crossword.yourealwaysbe.forkyz.settings;
 
 import android.content.SharedPreferences;
 import android.os.Handler;
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -10,6 +11,7 @@ import java.lang.reflect.Modifier;
 import java.util.function.Consumer;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 
@@ -28,6 +30,11 @@ public class ForkyzSettingsTest {
 
     @Mock
     SharedPreferences prefs = mock(SharedPreferences.class);
+
+    // to handle livedata
+    @Rule
+    public InstantTaskExecutorRule instantTaskExecutorRule =
+    new InstantTaskExecutorRule();
 
     @Before
     public void setupMocks() {

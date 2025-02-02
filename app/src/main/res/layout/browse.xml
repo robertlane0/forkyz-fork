@@ -69,7 +69,7 @@
                     android:contentDescription="@string/close_filter_desc"
                     app:iconPadding="0dp"
                     app:iconGravity="textStart"
-                    style="@style/Widget.Material3.Button.ElevatedButton"
+                    style="@style/Widget.Material3.Button.IconButton"
                 />
             </LinearLayout>
             <TextView

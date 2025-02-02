@@ -57,7 +57,6 @@
     <color name="progressError">#ff4a4d</color>
 
     <!-- for legacy-like theme -->
-    <color name="primaryDark">#334465</color>
     <color name="speedDialTint">#ff669900</color>
     <color name="speedDialIconTint">#fff</color>
     <color name="legacySurfaceContainerLowest">#eaeaea</color>

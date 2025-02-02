@@ -89,6 +89,7 @@ public class DownloadersTest {
             true, // downloadLeParisienF3
             true, // downloadLeParisienF4
             true, // downloadMetroCryptic
+            true, // downloadMetroQuick
             true, // downloadNewsday
             true, // downloadNewYorkTimesSyndicated
             true, // downloadPremier

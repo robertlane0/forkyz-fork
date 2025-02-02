@@ -3,7 +3,6 @@ package app.crossword.yourealwaysbe.forkyz;
 import java.util.logging.Logger;
 import javax.inject.Inject;
 
-import android.content.pm.ActivityInfo;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -17,7 +16,6 @@ import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup.MarginLayoutParams;
-import android.widget.Toast;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -31,9 +29,10 @@ import com.google.android.material.shape.MaterialShapeDrawable;
 import dagger.hilt.android.AndroidEntryPoint;
 
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
+import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper;
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder;
 import app.crossword.yourealwaysbe.forkyz.util.NightModeHelper;
-import app.crossword.yourealwaysbe.forkyz.util.ThemeHelper;
+import app.crossword.yourealwaysbe.forkyz.util.OrientationHelper;
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 import app.crossword.yourealwaysbe.puz.Playboard;
@@ -52,15 +51,21 @@ public class ForkyzActivity extends AppCompatActivity {
     @Inject
     protected AndroidVersionUtils utils;
 
+    @Inject
+    protected ThemeHelper themeHelper;
+
+    @Inject
+    protected OrientationHelper orientationHelper;
+
     protected NightModeHelper nightMode;
     private Drawable originalStatusBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        (new ThemeHelper(settings)).themeActivity(this);
+        themeHelper.themeActivity(this);
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
-        doOrientation();
+        orientationHelper.applyOrientation(this);
     }
 
     @Override
@@ -72,43 +77,10 @@ public class ForkyzActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
         if(nightMode == null) {
             nightMode = NightModeHelper.bind(this, settings);
             nightMode.restoreNightMode();
         }
-
-        doOrientation();
-    }
-
-    @SuppressWarnings("SourceLockedOrientationActivity")
-    private void doOrientation() {
-        settings.getAppOrientationLock(orientation -> {
-            try {
-                switch (orientation) {
-                case PORTRAIT:
-                    setRequestedOrientation(
-                        ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                    );
-                    break;
-                case LANDSCAPE:
-                    setRequestedOrientation(
-                        ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-                    );
-                    break;
-                default:
-                    setRequestedOrientation(
-                        ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-                    );
-                }
-            } catch(RuntimeException e) {
-                Toast.makeText(
-                    this,
-                    R.string.no_orientation_lock,
-                    Toast.LENGTH_LONG
-                ).show();
-            }
-        });
     }
 
     protected Bitmap createBitmap(String fontFile, String character){
@@ -145,10 +117,6 @@ public class ForkyzActivity extends AppCompatActivity {
 
     protected PuzHandle getCurrentPuzHandle() {
         return currentPuzzleHolder.getPuzHandle();
-    }
-
-    protected void clearCurrentBoard() {
-        currentPuzzleHolder.clearBoard();
     }
 
     protected void finishOnHomeButton() {
@@ -202,8 +170,10 @@ public class ForkyzActivity extends AppCompatActivity {
      * Set the elevation to match the app bar
      *
      * As per Material3 docs
+     *
+     * Public for theme helper
      */
-    protected void setStatusBarElevation(AppBarLayout appBarLayout) {
+    public void setStatusBarElevation(AppBarLayout appBarLayout) {
         appBarLayout.setStatusBarForeground(
             MaterialShapeDrawable.createWithElevationOverlay(this)
         );
@@ -215,8 +185,10 @@ public class ForkyzActivity extends AppCompatActivity {
      * Calling reset will reset the status bar to what it was the first
      * time this method was used. I would call setStatusBarElevation
      * first if you want to be able to reset to that.
+     *
+     * Make public for theme helper
      */
-    protected void setStatusBarColor(AppBarLayout appBarLayout, int color) {
+    public void setStatusBarColor(AppBarLayout appBarLayout, int color) {
         if (originalStatusBar == null)
             originalStatusBar = appBarLayout.getStatusBarForeground();
         appBarLayout.setStatusBarForeground(
@@ -273,5 +245,14 @@ public class ForkyzActivity extends AppCompatActivity {
                 return windowInsets;
             }
         );
+    }
+
+    /**
+     * Setup status bar stuff
+     *
+     * Elevation and colour to match show errors
+     */
+    protected void setupStatusBar(AppBarLayout appBarLayout) {
+        themeHelper.setupStatusBar(this, appBarLayout);
     }
 }

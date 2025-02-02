@@ -31,13 +31,8 @@ public class CurrentPuzzleHolder {
         this.puzHandle = puzHandle;
     }
 
-    public void clearBoard() {
-        this.board = null;
-        this.puzHandle = null;
-    }
-
     public Playboard getBoard() {
-         return board;
+        return board;
     }
 
     public PuzHandle getPuzHandle() {

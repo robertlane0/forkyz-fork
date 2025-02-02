@@ -54,25 +54,25 @@ public class GuardianJSONIOTest {
         Zone fiveAcrossZone = fiveAcross.getZone();
         assertEquals(fiveAcrossZone.getPosition(6), new Position(0, 14));
         assertEquals(fiveAcrossZone.getPosition(7), new Position(2, 6));
-        assertEquals(fiveAcross.getSeparator(0), '\0');
-        assertEquals(fiveAcross.getSeparator(2), '\0');
-        assertEquals(fiveAcross.getSeparator(6), '\0');
-        assertEquals(fiveAcross.getSeparator(7), ' ');
-        assertEquals(fiveAcross.getSeparator(8), '\0');
-        assertEquals(fiveAcross.getSeparator(9), '\0');
-        assertEquals(fiveAcross.getSeparator(10), ' ');
-        assertEquals(fiveAcross.getSeparator(11), '\0');
+        assertEquals(fiveAcross.getSeparator(0), null);
+        assertEquals(fiveAcross.getSeparator(2), null);
+        assertEquals(fiveAcross.getSeparator(6), null);
+        assertEquals(fiveAcross.getSeparator(7), " ");
+        assertEquals(fiveAcross.getSeparator(8), null);
+        assertEquals(fiveAcross.getSeparator(9), null);
+        assertEquals(fiveAcross.getSeparator(10), " ");
+        assertEquals(fiveAcross.getSeparator(11), null);
 
         Clue tenAcross = acrossClues.getClueByNumber("10");
         Zone tenAcrossZone = tenAcross.getZone();
         assertTrue(tenAcrossZone == null || tenAcrossZone.isEmpty());
 
         Clue oneAcross = acrossClues.getClueByNumber("1");
-        assertEquals(oneAcross.getSeparator(0), '-');
-        assertEquals(oneAcross.getSeparator(1), '\0');
-        assertEquals(oneAcross.getSeparator(4), ' ');
-        assertEquals(oneAcross.getSeparator(5), ' ');
-        assertEquals(oneAcross.getSeparator(6), '\0');
+        assertEquals(oneAcross.getSeparator(0), "-");
+        assertEquals(oneAcross.getSeparator(1), null);
+        assertEquals(oneAcross.getSeparator(4), " ");
+        assertEquals(oneAcross.getSeparator(5), " ");
+        assertEquals(oneAcross.getSeparator(6), null);
     }
 
     @Test
