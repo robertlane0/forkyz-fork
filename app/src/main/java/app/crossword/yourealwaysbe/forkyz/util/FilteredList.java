@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-import androidx.annotation.NonNull;
-
 public class FilteredList<T> extends AbstractList<T> {
 
     private List<T> unfilteredList = new ArrayList<T>();

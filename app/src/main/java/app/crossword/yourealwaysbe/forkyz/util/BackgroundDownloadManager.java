@@ -252,7 +252,6 @@ public class BackgroundDownloadManager {
         protected void doDownload(
             CallbackToFutureAdapter.Completer<ListenableWorker.Result> completer
         ) {
-            System.out.println("FORKYZ: do download");
             fileHandlerProvider.isMissingWritePermission(missing -> {
                 if (missing) {
                     LOGGER.info("Skipping download, no write permission");
@@ -261,10 +260,8 @@ public class BackgroundDownloadManager {
 
                 LOGGER.info("Downloading most recent puzzles");
 
-                System.out.println("FORKYZ: get dls");
                 downloadersProvider.get(dls -> {
                 downloadExecutorService.execute(() -> {
-                    System.out.println("FORKYZ: um ok");
                     try {
                         LocalDate now = LocalDate.now();
                         dls.downloadLatestInRange(

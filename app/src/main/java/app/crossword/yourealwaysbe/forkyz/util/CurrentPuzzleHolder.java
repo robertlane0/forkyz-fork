@@ -21,26 +21,21 @@ public class CurrentPuzzleHolder {
     private PuzHandle puzHandle;
 
     @Inject
-    public CurrentPuzzleHolder() {
-        System.out.println("FORKYZ: build holder");
-    }
+    public CurrentPuzzleHolder() { }
 
     /**
      * Set the board and base file of the puzzle loaded on it
      */
     public void setBoard(Playboard board, PuzHandle puzHandle){
-        System.out.println("FORKYZ: set puzzle " + puzHandle);
         this.board = board;
         this.puzHandle = puzHandle;
     }
 
     public Playboard getBoard() {
-        System.out.println("FORKYZ: get board " + board);
         return board;
     }
 
     public PuzHandle getPuzHandle() {
-        System.out.println("FORKYZ: get handle " + puzHandle);
         return puzHandle;
     }
 }

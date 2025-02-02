@@ -33,9 +33,6 @@ public class DuckDuckGo {
         hint = hint.replaceAll("&[A-Za-z\\d#]+;", "");
         hint = hint.replaceAll("[^-A-Za-z\\s\\d]", "");
 
-        System.out.println("FORKYZ: url " + Uri.parse(
-            activity.getString(R.string.duckduckgo_search_url, hint)
-        ));
         Intent i = new Intent(Intent.ACTION_VIEW);
         i.setData(Uri.parse(
             activity.getString(R.string.duckduckgo_search_url, hint)

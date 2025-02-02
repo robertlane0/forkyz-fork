@@ -421,10 +421,8 @@ public class PlayActivity extends PuzzleActivity
         super.onPlayboardChange(changes);
 
         Playboard board = getBoard();
-        if (board == null) {
-            System.out.println("FORKYZ: play play change board is null");
+        if (board == null)
             return;
-        }
 
         Word previousWord = changes.getPreviousWord();
 
@@ -478,10 +476,9 @@ public class PlayActivity extends PuzzleActivity
     protected void onResume() {
         super.onResume();
 
-        System.out.println("FORKYZ: play resume board " + getBoard());
-
-        this.onConfigurationChanged(getBaseContext().getResources()
-                                                    .getConfiguration());
+        this.onConfigurationChanged(getBaseContext()
+            .getResources()
+            .getConfiguration());
 
         setVoiceButtonVisibility();
         registerBoard();

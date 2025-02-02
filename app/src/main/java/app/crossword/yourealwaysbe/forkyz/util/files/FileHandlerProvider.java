@@ -12,7 +12,6 @@ import android.widget.Toast;
 import androidx.annotation.MainThread;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.Transformations;
 
 import dagger.hilt.android.qualifiers.ApplicationContext;

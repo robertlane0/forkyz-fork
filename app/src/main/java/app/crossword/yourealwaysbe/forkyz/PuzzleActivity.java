@@ -404,8 +404,6 @@ public abstract class PuzzleActivity
     protected void onResume() {
         super.onResume();
 
-        System.out.println("FORKYZ: puzzle activity on resume board " + getBoard());
-
         Playboard board = getBoard();
         Puzzle puz = getPuzzle();
         if (board == null || puz == null) {

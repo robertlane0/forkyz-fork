@@ -698,8 +698,6 @@ public class ClueListActivity extends PuzzleActivity
      * Move to prev list, return true if change
      */
     private boolean prevList() {
-        System.out.println("FORKYZ: prevList of " + getCurrentListNum()
-            + " is " + binding.clueTabs.getPrevListNum(getCurrentListNum()));
         return setCurrentListNum(
             binding.clueTabs.getPrevListNum(getCurrentListNum())
         );

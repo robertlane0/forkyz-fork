@@ -6,7 +6,6 @@ import java.io.Serializable;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Typeface;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;

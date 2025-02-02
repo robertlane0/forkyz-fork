@@ -2,14 +2,12 @@
 package app.crossword.yourealwaysbe.forkyz.net;
 
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
 import java.util.function.Consumer;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import android.content.Context;
 import androidx.annotation.MainThread;
-import androidx.annotation.WorkerThread;
 import androidx.core.app.NotificationManagerCompat;
 
 import dagger.hilt.android.qualifiers.ApplicationContext;
