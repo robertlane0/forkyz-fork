@@ -1,5 +1,16 @@
 # Forkyz Changelog
 
+## Version 61
+
+- Target Android 15.
+- Add Metro Quick downloader.
+- Rewrite of settings screen.
+- Add option to force native input to upper case (keyboard settings).
+- Add "locked" fit to screen (interaction settings).
+- Long-press to move anagram solution back to source on Notes page (focus source first).
+- Tweaks to separators display on board.
+- Minor bug fixes and new bugs.
+
 ## Version 60
 
 - Add PML as supported puzzle/share format and fix Metro download.
