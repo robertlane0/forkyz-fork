@@ -319,23 +319,23 @@ public class IPuzIOTest {
         ClueList downClues = puz.getClues("Vertical");
 
         Clue oneAcross = acrossClues.getClueByNumber("1");
-        assertEquals(oneAcross.getSeparator(-1), '\0');
-        assertEquals(oneAcross.getSeparator(0), '\'');
-        assertEquals(oneAcross.getSeparator(1), ' ');
-        assertEquals(oneAcross.getSeparator(2), '\0');
+        assertEquals(oneAcross.getSeparator(-1), null);
+        assertEquals(oneAcross.getSeparator(0), "\'");
+        assertEquals(oneAcross.getSeparator(1), " ");
+        assertEquals(oneAcross.getSeparator(2), null);
 
         Clue threeAcross = acrossClues.getClueByNumber("3");
-        assertEquals(threeAcross.getSeparator(-1), '\0');
-        assertEquals(threeAcross.getSeparator(0), '\0');
-        assertEquals(threeAcross.getSeparator(1), '\0');
-        assertEquals(threeAcross.getSeparator(2), ' ');
-        assertEquals(threeAcross.getSeparator(3), '\0');
+        assertEquals(threeAcross.getSeparator(-1), null);
+        assertEquals(threeAcross.getSeparator(0), null);
+        assertEquals(threeAcross.getSeparator(1), null);
+        assertEquals(threeAcross.getSeparator(2), " ");
+        assertEquals(threeAcross.getSeparator(3), null);
 
         Clue oneDown = downClues.getClueByNumber("1");
-        assertEquals(oneDown.getSeparator(-1), '\0');
-        assertEquals(oneDown.getSeparator(0), '\0');
-        assertEquals(oneDown.getSeparator(1), ' ');
-        assertEquals(oneDown.getSeparator(2), '\0');
+        assertEquals(oneDown.getSeparator(-1), null);
+        assertEquals(oneDown.getSeparator(0), null);
+        assertEquals(oneDown.getSeparator(1), " ");
+        assertEquals(oneDown.getSeparator(2), null);
     }
 
     /**
