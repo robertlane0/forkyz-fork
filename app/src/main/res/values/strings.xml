@@ -152,7 +152,6 @@
     <string name="external_storage_saf">External directory</string>
     <string name="external_storage_saf_current_uri">(Current: %1$s)</string>
     <string name="external_storage_saf_none_selected">no directory selected</string>
-    <string name="external_storage_legacy">External SD crosswords directory</string>
     <string name="storage_changed_title">Storage Changed</string>
     <string name="storage_changed_please_restart">Please restart Forkyz for the change to take effect.</string>
     <string name="failed_to_initialise_saf">Could not initialise external directory.</string>
