@@ -266,12 +266,12 @@ public class GuardianJSONIO extends AbstractJSONIO {
             if (sep == null || sep.isEmpty())
                 return;
 
-            if (",".equals(sep))
-                sep = " ";
-
             JSONArray positions = sepObj.optJSONArray(sep);
             if (positions == null)
                 return;
+
+            if (",".equals(sep))
+                sep = " ";
 
             for (int i = 0; i < positions.length(); i++) {
                 Integer pos = positions.optInt(i);
