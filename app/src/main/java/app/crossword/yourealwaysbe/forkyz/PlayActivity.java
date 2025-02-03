@@ -219,6 +219,7 @@ public class PlayActivity extends PuzzleActivity
     }
 
     private void fitBoardToScreen() {
+        System.out.println("FORKYZ: do fit");
         float newScale = binding.boardView.fitToView();
         settings.setPlayScale(newScale);
     }
@@ -613,6 +614,7 @@ public class PlayActivity extends PuzzleActivity
         settings.livePlayFitToScreenMode().observe(
             this,
             fitToScreen -> {
+                System.out.println("FORKYZ: live fit " + fitToScreen + " layed out " + isFirstLayoutFinished());
                 switch (fitToScreen) {
                 case START:
                 case LOCKED:
@@ -1092,12 +1094,13 @@ public class PlayActivity extends PuzzleActivity
                             binding.boardView.relayout();
                             binding.boardView.getViewTreeObserver()
                                 .removeOnPreDrawListener(this);
-                            setFirstLayoutFinished();
-                            handleResizeFitToScreen();
                             return false;
                         }
                     }
                 );
+        } else {
+            setFirstLayoutFinished();
+            handleResizeFitToScreen();
         }
     }
 
@@ -1110,6 +1113,7 @@ public class PlayActivity extends PuzzleActivity
     }
 
     private void setPendingFitToScreen() {
+        System.out.println("FORKYZ: set pending fit");
         pendingFitToScreen = true;
     }
 
@@ -1122,9 +1126,11 @@ public class PlayActivity extends PuzzleActivity
     }
 
     private void handleResizeFitToScreen() {
+        System.out.println("FORKYZ: handle resize");
         settings.getPlayFitToScreenMode(fitToScreen -> {
             boolean needsFit = isPendingFitToScreen()
                 || fitToScreen == FitToScreenMode.LOCKED;
+            System.out.println("FORKYZ: needs fit " + needsFit);
             clearPendingFitToScreen();
             if (needsFit)
                 fitBoardToScreen();
