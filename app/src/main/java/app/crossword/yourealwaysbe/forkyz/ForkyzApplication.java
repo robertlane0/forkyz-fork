@@ -8,6 +8,7 @@ import dagger.hilt.android.HiltAndroidApp;
 
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper;
+import app.crossword.yourealwaysbe.forkyz.util.MigrationHelper;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 
 import java.util.logging.Logger;
@@ -36,9 +37,13 @@ public class ForkyzApplication
     @Inject
     HiltWorkerFactory workerFactory;
 
+    @Inject
+    protected MigrationHelper migrationHelper;
+
     @Override
     public void onCreate() {
         super.onCreate();
+        migrationHelper.applyMigrations(this);
         utils.createNotificationChannel(this);
         themeHelper.themeApplication(this);
     }

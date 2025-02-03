@@ -131,7 +131,7 @@ public class BoardEditText
         super.onAttachedToWindow();
         // no lifecycle owner until attached
         // only rerender on change
-        settings.livePlayDisplaySeparators().observe(
+        settings.getLivePlayDisplaySeparators().observe(
             ViewTreeLifecycleOwner.get(this),
             new ChangeOnlyObserver<DisplaySeparators>() {
                 @Override
@@ -721,7 +721,8 @@ public class BoardEditText
 
         settings.getPlayRenderSettings(renderSettings -> {
             BoxSeparators[] displaySeps
-                = renderSettings.displaySeparators() == DisplaySeparators.NEVER
+                = renderSettings.getDisplaySeparators()
+                    == DisplaySeparators.DS_NEVER
                 ? null
                 : separators;
 

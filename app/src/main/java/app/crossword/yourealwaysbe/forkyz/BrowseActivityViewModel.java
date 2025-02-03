@@ -305,11 +305,11 @@ public class BrowseActivityViewModel extends AndroidViewModel {
                         - (long) (12 * 60 * 60 * 1000);
 
                     boolean isDownload
-                        = downloaderSettings.downloadOnStartup()
+                        = downloaderSettings.getDownloadOnStartUp()
                         && downloadCutoff > lastDL;
 
                     if (isDownload) {
-                        settings.setBrowseLastDownloadSync(
+                        settings.setBrowseLastDownload(
                             System.currentTimeMillis()
                         );
                         handler.post(() -> {
@@ -482,8 +482,8 @@ public class BrowseActivityViewModel extends AndroidViewModel {
         });
     }
 
-    private LocalDate getMaxAge(String preferenceValue) {
-        int cleanupValue = Integer.parseInt(preferenceValue) + 1;
+    private LocalDate getMaxAge(int preferenceValue) {
+        int cleanupValue = preferenceValue + 1;
         if (cleanupValue > 0)
             return LocalDate.now().minus(Period.ofDays(cleanupValue));
         else

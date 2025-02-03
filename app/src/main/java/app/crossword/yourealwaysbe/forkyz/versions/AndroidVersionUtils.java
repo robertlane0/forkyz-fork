@@ -22,9 +22,6 @@ import dagger.Provides;
 import dagger.hilt.InstallIn;
 import dagger.hilt.components.SingletonComponent;
 
-import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
-import app.crossword.yourealwaysbe.forkyz.util.BackgroundDownloadManager;
-
 public interface AndroidVersionUtils {
 
     @Module
@@ -64,12 +61,6 @@ public interface AndroidVersionUtils {
             text, style, width, Layout.Alignment.ALIGN_NORMAL
         );
     }
-
-    void migrateLegacyBackgroundDownloads(
-        Context context,
-        ForkyzSettings settings,
-        BackgroundDownloadManager downloadManager
-    );
 
     void setFullScreen(Window window);
 

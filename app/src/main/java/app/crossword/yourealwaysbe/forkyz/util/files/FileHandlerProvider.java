@@ -41,7 +41,7 @@ public class FileHandlerProvider {
         this.utils = utils;
         this.settings = settings;
         this.liveFileHandler = Transformations.map(
-            settings.liveFileHandlerSettings(),
+            settings.getLiveFileHandlerSettings(),
             this::createFileHandler
         );
     }
@@ -78,10 +78,10 @@ public class FileHandlerProvider {
     ) {
         FileHandler fh;
 
-        StorageLocation loc = fileHandlerSettings.storageLocation();
+        StorageLocation loc = fileHandlerSettings.getStorageLocation();
 
         switch (loc) {
-        case EXTERNAL_SAF:
+        case SL_EXTERNAL_SAF:
             fh = FileHandlerSAF.readHandlerFromSettings(
                 applicationContext, fileHandlerSettings, settings
             );

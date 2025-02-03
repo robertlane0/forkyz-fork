@@ -4,6 +4,7 @@ import app.crossword.yourealwaysbe.forkyz.R;
 import app.crossword.yourealwaysbe.forkyz.databinding.ClueListItemBinding;
 import app.crossword.yourealwaysbe.forkyz.databinding.ClueTabsBinding;
 import app.crossword.yourealwaysbe.forkyz.databinding.ClueTabsPageBinding;
+import app.crossword.yourealwaysbe.forkyz.settings.ClueHighlight;
 import app.crossword.yourealwaysbe.forkyz.settings.ClueTabsDouble;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.util.ColorUtils;
@@ -177,7 +178,7 @@ public class ClueTabs extends ConstraintLayout
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         // no lifecycle owner until attached
-        settings.liveClueListClueTabsDouble().observe(
+        settings.getLiveClueListClueTabsDouble().observe(
             ViewTreeLifecycleOwner.get(this),
             value -> { setDouble(); }
         );
@@ -488,21 +489,22 @@ public class ClueTabs extends ConstraintLayout
      * If double clue tabs
      */
     private boolean isDouble() {
-        ClueTabsDouble dbl = settings.liveClueListClueTabsDouble().getValue();
+        ClueTabsDouble dbl
+            = settings.getLiveClueListClueTabsDouble().getValue();
         if (dbl == null)
             return false;
 
         switch(dbl) {
-        case ALWAYS:
+        case CTD_ALWAYS:
             return true;
-        case LANDSCAPE:
+        case CTD_LANDSCAPE:
             int orientation = getResources().getConfiguration().orientation;
             return orientation == Configuration.ORIENTATION_LANDSCAPE;
-        case WIDE:
+        case CTD_WIDE:
             DisplayMetrics metrics
                 = getContext().getResources().getDisplayMetrics();
             return metrics.densityDpi * DOUBLE_UP_WIDTH_INCH < getMeasuredWidth();
-        case NEVER:
+        case CTD_NEVER:
         default:
             return false;
         }
@@ -1006,12 +1008,12 @@ public class ClueTabs extends ConstraintLayout
             }
 
             // so we can refresh if changes
-            settings.livePlayShowCount().observe(
+            settings.getLivePlayShowCount().observe(
                 ViewTreeLifecycleOwner.get(binding.getRoot()),
                 showCount -> { setClueText(); }
             );
 
-            settings.livePlayClueHighlight().observe(
+            settings.getLivePlayClueHighlight().observe(
                 ViewTreeLifecycleOwner.get(binding.getRoot()),
                 highlight -> { setHighlight(); }
             );
@@ -1139,11 +1141,14 @@ public class ClueTabs extends ConstraintLayout
                 ClueID cid = board.getClueID();
                 boolean selected = Objects.equals(clue.getClueID(), cid);
 
-                clueBinding.getRoot().setSelected(
-                    selected && highlight.hasBackground()
-                );
+                boolean hasBackground = highlight == ClueHighlight.CH_BACKGROUND
+                    || highlight == ClueHighlight.CH_BOTH;
+                boolean hasRadio = highlight == ClueHighlight.CH_RADIO_BUTTON
+                    || highlight == ClueHighlight.CH_BOTH;
 
-                if (highlight.hasRadio()) {
+                clueBinding.getRoot().setSelected(selected && hasBackground);
+
+                if (hasRadio) {
                     clueBinding.clueTextView.setCheckMarkDrawable(
                         checkMarkDrawable
                     );

@@ -57,7 +57,6 @@ import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation;
 import app.crossword.yourealwaysbe.forkyz.util.BackgroundDownloadManager;
 import app.crossword.yourealwaysbe.forkyz.util.DownloadPickerDialogBuilder;
 import app.crossword.yourealwaysbe.forkyz.util.ImportedNowFinishDialogActivity;
-import app.crossword.yourealwaysbe.forkyz.util.MigrationHelper;
 import app.crossword.yourealwaysbe.forkyz.util.files.Accessor;
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider;
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle;
@@ -136,9 +135,6 @@ public class BrowseActivity extends ForkyzActivity {
 
     private static final DateTimeFormatter DATE_FORMAT
         = DateTimeFormatter.ofPattern("EEEE\ndd MMM\nyyyy");
-
-    @Inject
-    protected MigrationHelper migrationHelper;
 
     @Inject
     protected BackgroundDownloadManager backgroundDownloadManager;
@@ -344,9 +340,9 @@ public class BrowseActivity extends ForkyzActivity {
 
     private int getNightModeIcon(DayNightMode mode) {
         switch (mode) {
-        case DAY: return R.drawable.day_mode;
-        case NIGHT: return R.drawable.night_mode;
-        case SYSTEM: return R.drawable.system_daynight_mode;
+        case DNM_DAY: return R.drawable.day_mode;
+        case DNM_NIGHT: return R.drawable.night_mode;
+        case DNM_SYSTEM: return R.drawable.system_daynight_mode;
         }
         return R.drawable.day_mode;
     }
@@ -425,9 +421,6 @@ public class BrowseActivity extends ForkyzActivity {
             ContextCompat.RECEIVER_NOT_EXPORTED
         );
 
-        // Bring up to date
-        migrationHelper.applyMigrations(this);
-
         // Now create!
 
         getImportURI = registerForActivityResult(
@@ -456,7 +449,7 @@ public class BrowseActivity extends ForkyzActivity {
                 ItemTouchHelper.START | ItemTouchHelper.END
             ) {
                 private LiveData<Boolean> liveDisableSwipe
-                    = settings.liveBrowseDisableSwipe();
+                    = settings.getLiveBrowseDisableSwipe();
 
                 @Override
                 public int getSwipeDirs(
@@ -499,7 +492,7 @@ public class BrowseActivity extends ForkyzActivity {
                     fileHandlerProvider.get(fileHandler -> {
                     settings.getBrowseSwipeAction(action -> {
                         switch (action) {
-                        case DELETE:
+                        case BSA_DELETE:
                             model.deletePuzzle(puzMeta);
                             break;
                         default:
@@ -523,7 +516,7 @@ public class BrowseActivity extends ForkyzActivity {
 
         this.nm = NotificationManagerCompat.from(this);
 
-        settings.liveBrowseSort().observe(this, accessor -> {
+        settings.getLiveBrowseSort().observe(this, accessor -> {
             loadPuzzleAdapter();
         });
 
@@ -780,7 +773,7 @@ public class BrowseActivity extends ForkyzActivity {
         settings.getDownloadersSettings(settings -> {
         backgroundDownloadManager.isBackgroundDownloadEnabled(bgDownload -> {
             boolean downloading = bgDownload
-                || settings.downloadOnStartup();
+                || settings.getDownloadOnStartUp();
 
             if (settings.isNotificationPermissionNeeded() && downloading)
                 checkRequestNotificationPermissions();
@@ -898,7 +891,10 @@ public class BrowseActivity extends ForkyzActivity {
             binding.emptyListingMsg.setVisibility(View.VISIBLE);
 
             settings.getFileHandlerSettings(fhSettings -> {
-                if (fhSettings.storageLocation() == StorageLocation.INTERNAL)
+                if (
+                    fhSettings.getStorageLocation()
+                    == StorageLocation.SL_INTERNAL
+                )
                     binding.internalStorageMsg.setVisibility(View.VISIBLE);
                 else
                     binding.internalStorageMsg.setVisibility(View.GONE);
@@ -1209,7 +1205,7 @@ public class BrowseActivity extends ForkyzActivity {
             super(itemBinding.getRoot());
             this.itemBinding = itemBinding;
 
-            settings.liveBrowseSort().observe(
+            settings.getLiveBrowseSort().observe(
                 BrowseActivity.this,
                 accessor -> {
                     if (accessor == Accessor.SOURCE) {
@@ -1220,7 +1216,7 @@ public class BrowseActivity extends ForkyzActivity {
                 }
             );
 
-            settings.liveBrowseShowPercentageCorrect().observe(
+            settings.getLiveBrowseShowPercentageCorrect().observe(
                 BrowseActivity.this,
                 showPercentageCorrect -> {
                     this.showPercentageCorrect = showPercentageCorrect;
@@ -1228,11 +1224,11 @@ public class BrowseActivity extends ForkyzActivity {
                 }
             );
 
-            settings.liveRatingsSettings().observe(
+            settings.getLiveRatingsSettings().observe(
                 BrowseActivity.this,
                 settings -> {
-                    boolean visible = !settings.disableRatings() && (
-                        settings.browseAlwaysShowRating()
+                    boolean visible = !settings.getDisableRatings() && (
+                        settings.getBrowseAlwaysShowRating()
                         || model.getIsViewArchive()
                     );
                     itemBinding.puzzleRating.setVisibility(
@@ -1241,7 +1237,7 @@ public class BrowseActivity extends ForkyzActivity {
                 }
             );
 
-            settings.liveBrowseIndicateIfSolution().observe(
+            settings.getLiveBrowseIndicateIfSolution().observe(
                 BrowseActivity.this,
                 indicate -> { setIndicateSolutionVisibility(); }
             );

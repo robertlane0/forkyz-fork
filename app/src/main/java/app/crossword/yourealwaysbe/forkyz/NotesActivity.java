@@ -1378,7 +1378,7 @@ public class NotesActivity extends PuzzleActivity {
     }
 
     private void setupObservers() {
-        settings.livePlayInferSeparators().observe(
+        settings.getLivePlayInferSeparators().observe(
             this,
             inferSeparators -> { inferSeparators(); }
         );
@@ -1386,7 +1386,7 @@ public class NotesActivity extends PuzzleActivity {
 
     private void inferSeparators() {
         Clue clue = getNotesClue();
-        Boolean inferSeparators = settings.livePlayInferSeparators().getValue();
+        Boolean inferSeparators = settings.getLivePlayInferSeparators().getValue();
         if (clue != null && inferSeparators != null) {
             binding.scratchMiniboard.setSeparatorsFromClue(
                 clue, inferSeparators

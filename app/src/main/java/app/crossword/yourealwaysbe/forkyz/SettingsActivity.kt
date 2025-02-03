@@ -621,6 +621,9 @@ class SettingsActivity : ComponentActivity() {
         onDismissRequest : () -> Unit,
     ) {
         var selectedState by remember { mutableIntStateOf(selected) }
+        // set again in case this is a relayout
+        selectedState = selected
+
         OKCancelDialog(
             title = title,
             summary = summary,
@@ -667,6 +670,9 @@ class SettingsActivity : ComponentActivity() {
         onDismissRequest : () -> Unit,
     ) {
         var selectedState by remember { mutableStateOf(selected) }
+        // set again in case relayout
+        selectedState = selected
+
         OKCancelDialog(
             title = title,
             summary = summary,
@@ -733,6 +739,9 @@ class SettingsActivity : ComponentActivity() {
         keyboardType : KeyboardType = KeyboardType.Text,
     ) {
         var currentValue by remember { mutableStateOf(value ?: "") }
+        // set again in case relayout
+        currentValue = value ?: ""
+
         OKCancelDialog(
             title = title,
             summary = summary,

@@ -91,7 +91,7 @@ public abstract class BoardEditView
         super.onAttachedToWindow();
         // no lifecycle owner until attached
         // only rerender on change
-        settings.livePlayDisplaySeparators().observe(
+        settings.getLivePlayDisplaySeparators().observe(
             ViewTreeLifecycleOwner.get(this),
              new ChangeOnlyObserver<DisplaySeparators>() {
                 @Override

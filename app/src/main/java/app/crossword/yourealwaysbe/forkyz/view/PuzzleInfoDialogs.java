@@ -153,11 +153,11 @@ public class PuzzleInfoDialogs {
                 }
             );
 
-            settings.liveRatingsSettings().observe(
+            settings.getLiveRatingsSettings().observe(
                 this,
                 ratingsSettings -> {
                     ratingBar.setVisibility(
-                        ratingsSettings.disableRatings()
+                        ratingsSettings.getDisableRatings()
                         ? View.GONE
                         : View.VISIBLE
                     );

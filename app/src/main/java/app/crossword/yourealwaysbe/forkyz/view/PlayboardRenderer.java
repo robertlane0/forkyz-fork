@@ -633,7 +633,7 @@ public class PlayboardRenderer {
         Position position,
         Word currentWord
     ) {
-        if (displaySeparators == DisplaySeparators.NEVER)
+        if (displaySeparators == DisplaySeparators.DS_NEVER)
             return null;
 
         Puzzle puz = board == null ? null : board.getPuzzle();
@@ -647,7 +647,7 @@ public class PlayboardRenderer {
         BoxSeparators separators = new BoxSeparators();
 
         // do other clues first if they should be there
-        if (displaySeparators == DisplaySeparators.ALWAYS) {
+        if (displaySeparators == DisplaySeparators.DS_ALWAYS) {
             for (ClueID cid : box.getIsPartOfClues()) {
                 addBoxSeparators(
                     puz.getClue(cid), inferSeparators, position, separators

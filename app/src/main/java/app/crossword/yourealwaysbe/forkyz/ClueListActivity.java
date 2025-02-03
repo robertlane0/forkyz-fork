@@ -119,7 +119,7 @@ public class ClueListActivity extends PuzzleActivity
 
         addAccessibilityActions(binding.miniboard);
 
-        settings.liveClueListShowWords().observe(
+        settings.getLiveClueListShowWords().observe(
             this,
             showWords -> {
                 setupShowWordsMode(showWords);

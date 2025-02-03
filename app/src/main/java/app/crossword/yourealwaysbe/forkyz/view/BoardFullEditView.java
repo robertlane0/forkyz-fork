@@ -83,10 +83,10 @@ public class BoardFullEditView extends BoardEditView {
 
         getSettings().getPlayRenderSettings(renderSettings -> {
             renderer.setHintHighlight(
-                !renderSettings.suppressHintHighlighting()
+                !renderSettings.getSuppressHintHighlighting()
             );
 
-            Set<String> suppressNotesList = renderSettings.displayScratch()
+            Set<String> suppressNotesList = renderSettings.getDisplayScratch()
                 ? Collections.emptySet()
                 : null;
 
@@ -96,8 +96,8 @@ public class BoardFullEditView extends BoardEditView {
                     BitmapGrid bitmap = renderer.draw(
                         renderChanges,
                         suppressNotesList,
-                        renderSettings.displaySeparators(),
-                        renderSettings.inferSeparators(),
+                        renderSettings.getDisplaySeparators(),
+                        renderSettings.getInferSeparators(),
                         getRenderRect()
                     );
                     handler.post(() -> {

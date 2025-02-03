@@ -6,6 +6,7 @@ plugins {
     id 'com.google.dagger.hilt.android'
     id 'kotlin-android'
     id 'org.jetbrains.kotlin.plugin.compose'
+    id 'com.google.protobuf'
     id 'com.google.devtools.ksp'
     // still needed for databinding even though ksp (phase out databinding)
     id 'kotlin-kapt'
@@ -128,6 +129,7 @@ dependencies {
     implementation 'androidx.concurrent:concurrent-futures:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.2.0'
     implementation 'androidx.core:core-ktx:1.15.0'
+    implementation 'androidx.datastore:datastore:1.1.2'
     implementation 'androidx.fragment:fragment-ktx:1.8.5'
     implementation 'androidx.hilt:hilt-work:1.2.0'
     implementation 'androidx.preference:preference-ktx:1.2.1'
@@ -136,6 +138,7 @@ dependencies {
     implementation 'androidx.viewpager2:viewpager2:1.1.0'
     implementation 'com.github.jgraham0325:words-to-numbers:8a97d258fd'
     implementation 'com.google.android.material:material:1.12.0'
+    implementation 'com.google.protobuf:protobuf-javalite:4.29.3'
     implementation 'com.leinardi.android:speed-dial:3.3.0'
     implementation 'com.squareup:seismic:1.0.3'
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.3'
@@ -172,3 +175,34 @@ dependencies {
     }
 }
 
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:4.29.3"
+    }
+
+    // Generates the java Protobuf-lite code for the Protobufs in this project. See
+    // https://github.com/google/protobuf-gradle-plugin#customizing-protobuf-compilation
+    // for more information.
+    generateProtoTasks {
+        all().each { task ->
+            task.builtins {
+                java {
+                    option 'lite'
+                }
+            }
+        }
+    }
+}
+
+// copied shamelessly from
+// https://github.com/google/ksp/issues/1590#issuecomment-1851504979
+androidComponents {
+    onVariants(selector().all(), { variant ->
+        afterEvaluate {
+            def capName = variant.name.capitalize()
+            tasks.getByName("ksp${capName}Kotlin") {
+                setSource(tasks.getByName("generate${capName}Proto").outputs)
+            }
+        }
+    })
+}

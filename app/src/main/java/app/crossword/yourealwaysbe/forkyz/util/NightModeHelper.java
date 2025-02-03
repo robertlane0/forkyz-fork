@@ -55,20 +55,20 @@ public class NightModeHelper {
     public void next(Consumer<DayNightMode> cb) {
         settings.getAppDayNightMode(currentMode -> {
             switch (currentMode) {
-            case DAY:
-                setMode(DayNightMode.NIGHT);
+            case DNM_DAY:
+                setMode(DayNightMode.DNM_NIGHT);
                 if (cb != null)
-                    cb.accept(DayNightMode.NIGHT);
+                    cb.accept(DayNightMode.DNM_NIGHT);
                 break;
-            case NIGHT:
-                setMode(DayNightMode.SYSTEM);
+            case DNM_NIGHT:
+                setMode(DayNightMode.DNM_SYSTEM);
                 if (cb != null)
-                    cb.accept(DayNightMode.SYSTEM);
+                    cb.accept(DayNightMode.DNM_SYSTEM);
                 break;
-            case SYSTEM:
-                setMode(DayNightMode.DAY);
+            case DNM_SYSTEM:
+                setMode(DayNightMode.DNM_DAY);
                 if (cb != null)
-                    cb.accept(DayNightMode.DAY);
+                    cb.accept(DayNightMode.DNM_DAY);
                 break;
             }
         });
@@ -83,17 +83,17 @@ public class NightModeHelper {
         if (activity != null) {
             getCurrentMode(currentMode -> {
                 switch (currentMode) {
-                case DAY:
+                case DNM_DAY:
                     AppCompatDelegate.setDefaultNightMode(
                         AppCompatDelegate.MODE_NIGHT_NO
                     );
                     break;
-                case NIGHT:
+                case DNM_NIGHT:
                     AppCompatDelegate.setDefaultNightMode(
                         AppCompatDelegate.MODE_NIGHT_YES
                     );
                     break;
-                case SYSTEM:
+                case DNM_SYSTEM:
                     AppCompatDelegate.setDefaultNightMode(
                         AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
                     );

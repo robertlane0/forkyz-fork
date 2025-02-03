@@ -421,7 +421,7 @@ public class FileHandlerSAF extends FileHandler {
      */
     public FileHandlerSettings getSettings() {
         return new FileHandlerSettings(
-            StorageLocation.EXTERNAL_SAF,
+            StorageLocation.SL_EXTERNAL_SAF,
             rootUri.toString(),
             crosswordsFolderUri.toString(),
             archiveFolderUri.toString(),
@@ -449,21 +449,22 @@ public class FileHandlerSAF extends FileHandler {
     ) {
         FileHandlerSAF fileHandler = null;
 
-        String rootFolder = fileHandlerSettings.safRootURI();
-        String crosswordsFolder = fileHandlerSettings.safCrosswordsURI();
-        String archiveFolder = fileHandlerSettings.safArchiveURI();
-        String toImportFolder = fileHandlerSettings.safToImportURI();
-        String toImportDoneFolder = fileHandlerSettings.safToImportDoneURI();
+        String rootFolder = fileHandlerSettings.getSafRootURI();
+        String crosswordsFolder = fileHandlerSettings.getSafCrosswordsURI();
+        String archiveFolder = fileHandlerSettings.getSafArchiveURI();
+        String toImportFolder = fileHandlerSettings.getSafToImportURI();
+        String toImportDoneFolder = fileHandlerSettings.getSafToImportDoneURI();
         String toImportFailedFolder
-            = fileHandlerSettings.safToImportFailedURI();
+            = fileHandlerSettings.getSafToImportFailedURI();
 
+        // actually never null since Kotlin, but hey
         if (
-            rootFolder != null
-            && crosswordsFolder != null
-            && archiveFolder != null
-            && toImportFolder != null
-            && toImportDoneFolder != null
-            && toImportFailedFolder != null
+            rootFolder != null && !rootFolder.isEmpty()
+            && crosswordsFolder != null && !crosswordsFolder.isEmpty()
+            && archiveFolder != null && !archiveFolder.isEmpty()
+            && toImportFolder != null && !toImportFolder.isEmpty()
+            && toImportDoneFolder != null && !toImportDoneFolder.isEmpty()
+            && toImportFailedFolder != null && toImportFailedFolder.isEmpty()
         ) {
             Uri rootFolderUri = Uri.parse(rootFolder);
             Uri crosswordsFolderUri = Uri.parse(crosswordsFolder);
@@ -493,14 +494,20 @@ public class FileHandlerSAF extends FileHandler {
                     );
                 }
             } catch (SecurityException e) {
-                LOGGER.severe("Permission not granted to configured SAF directories.");
+                LOGGER.severe(
+                    "Permission not granted to configured SAF directories."
+                );
             } catch (UnsupportedOperationException e) {
                 LOGGER.severe("Unsupported operation with SAF");
                 e.printStackTrace();
             }
         }
 
-        if (fileHandler == null && rootFolder != null) {
+        if (
+            fileHandler == null
+            && rootFolder != null
+            && !rootFolder.isEmpty()
+        ) {
             fileHandler = initialiseSAFForRoot(
                 applicationContext, Uri.parse(rootFolder)
             );

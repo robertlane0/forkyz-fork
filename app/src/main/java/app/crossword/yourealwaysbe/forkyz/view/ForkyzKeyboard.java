@@ -57,16 +57,16 @@ public class ForkyzKeyboard
     static {
         KEYBOARD_LAYOUTS = new EnumMap<>(KeyboardLayout.class);
         KEYBOARD_LAYOUTS.put(
-            KeyboardLayout.QWERTY, R.layout.forkyz_keyboard_qwerty
+            KeyboardLayout.KL_QWERTY, R.layout.forkyz_keyboard_qwerty
         );
         KEYBOARD_LAYOUTS.put(
-            KeyboardLayout.QWERTZ, R.layout.forkyz_keyboard_qwertz
+            KeyboardLayout.KL_QWERTZ, R.layout.forkyz_keyboard_qwertz
         );
         KEYBOARD_LAYOUTS.put(
-            KeyboardLayout.DVORAK, R.layout.forkyz_keyboard_dvorak
+            KeyboardLayout.KL_DVORAK, R.layout.forkyz_keyboard_dvorak
         );
         KEYBOARD_LAYOUTS.put(
-            KeyboardLayout.COLEMAK, R.layout.forkyz_keyboard_colemak
+            KeyboardLayout.KL_COLEMAK, R.layout.forkyz_keyboard_colemak
         );
     };
 
@@ -129,7 +129,7 @@ public class ForkyzKeyboard
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         // need to do this here: there's no life cycle owner until attached
-        settings.liveKeyboardSettings().observe(
+        settings.getLiveKeyboardSettings().observe(
             ViewTreeLifecycleOwner.get(this),
             ks -> { createView(getContext(), ks); }
         );
@@ -149,7 +149,7 @@ public class ForkyzKeyboard
             onKeyDown(view.getId());
             view.setPressed(true);
             settings.getKeyboardSettings(ks -> {
-                if (ks.haptic()) {
+                if (ks.getHaptic()) {
                     view.performHapticFeedback(
                         HapticFeedbackConstants.KEYBOARD_TAP
                     );
@@ -266,7 +266,7 @@ public class ForkyzKeyboard
         );
 
         inflater.inflate(
-            KEYBOARD_LAYOUTS.get(keyboardSettings.layout()),
+            KEYBOARD_LAYOUTS.get(keyboardSettings.getLayout()),
             this,
             true
         );
@@ -348,8 +348,8 @@ public class ForkyzKeyboard
         sendKeyDown(keyId);
 
         settings.getKeyboardSettings(ks -> {
-            int delay = ks.repeatDelay();
-            int interval = ks.repeatInterval();
+            int delay = ks.getRepeatDelay();
+            int interval = ks.getRepeatInterval();
 
             if (delay == 0 || interval == 0)
                 return;
@@ -499,7 +499,7 @@ public class ForkyzKeyboard
                     = context
                         .getResources()
                         .getInteger(
-                            keyboardSettings.compact()
+                            keyboardSettings.getCompact()
                                 ? R.integer.keyboardButtonPaddingPcntCompact
                                 : R.integer.keyboardButtonPaddingPcnt
                         );

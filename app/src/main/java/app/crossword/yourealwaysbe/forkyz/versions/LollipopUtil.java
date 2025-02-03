@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.Serializable;
 
 import android.app.Activity;
-import android.app.job.JobScheduler;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -22,9 +21,6 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.core.content.ContextCompat;
-
-import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
-import app.crossword.yourealwaysbe.forkyz.util.BackgroundDownloadManager;
 
 public class LollipopUtil implements AndroidVersionUtils {
 
@@ -49,24 +45,6 @@ public class LollipopUtil implements AndroidVersionUtils {
             text,
             style, width, align, 1.0f, 0, false
         );
-    }
-
-    @Override
-    public void migrateLegacyBackgroundDownloads(
-        Context context,
-        ForkyzSettings settings,
-        BackgroundDownloadManager downloadManager
-    ) {
-        settings.migrateLegacyBackgroundDownloads(legacyEnabled -> {
-            if (legacyEnabled) {
-                JobScheduler scheduler = (JobScheduler) context
-                    .getSystemService(Context.JOB_SCHEDULER_SERVICE);
-                scheduler.cancelAll();
-
-                // start new
-                downloadManager.setHourlyBackgroundDownloadPeriod();
-            }
-        });
     }
 
     @SuppressWarnings("deprecation")

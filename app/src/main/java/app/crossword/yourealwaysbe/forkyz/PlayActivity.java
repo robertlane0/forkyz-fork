@@ -75,7 +75,7 @@ public class PlayActivity extends PuzzleActivity
     private boolean pendingFitToScreen = false;
 
     // Proper value is loaded before this is used anyway
-    private GridRatio currentGridRatio = GridRatio.PUZZLE_SHAPE;
+    private GridRatio currentGridRatio = GridRatio.GR_PUZZLE_SHAPE;
 
     /**
      * Create the activity
@@ -331,7 +331,7 @@ public class PlayActivity extends PuzzleActivity
 
         settings.getPlayFitToScreenMode(fitToScreen -> {
             switch (fitToScreen) {
-            case LOCKED:
+            case FTSM_LOCKED:
                 MenuItem zoom = menu.findItem(R.id.play_menu_zoom);
                 zoom.setVisible(false);
                 zoom.setEnabled(false);
@@ -577,7 +577,7 @@ public class PlayActivity extends PuzzleActivity
     }
 
     private void setupObservers() {
-        settings.livePlayGridRatioPortrait().observe(
+        settings.getLivePlayGridRatioPortrait().observe(
             this,
             gridRatio -> {
                 if (!isPortrait())
@@ -586,7 +586,7 @@ public class PlayActivity extends PuzzleActivity
             }
         );
 
-        settings.livePlayGridRatioLandscape().observe(
+        settings.getLivePlayGridRatioLandscape().observe(
             this,
             gridRatio -> {
                 if (isPortrait())
@@ -595,7 +595,7 @@ public class PlayActivity extends PuzzleActivity
             }
         );
 
-        settings.livePlayClueBelowGrid().observe(
+        settings.getLivePlayClueBelowGrid().observe(
             this,
             belowGrid -> {
                 binding.clueLineBelowGrid.layout.setVisibility(
@@ -610,12 +610,12 @@ public class PlayActivity extends PuzzleActivity
             }
         );
 
-        settings.livePlayFitToScreenMode().observe(
+        settings.getLivePlayFitToScreenMode().observe(
             this,
             fitToScreen -> {
                 switch (fitToScreen) {
-                case START:
-                case LOCKED:
+                case FTSM_START:
+                case FTSM_LOCKED:
                     if (isFirstLayoutFinished())
                         fitBoardToScreen();
                     else
@@ -626,7 +626,7 @@ public class PlayActivity extends PuzzleActivity
                     break;
                 }
 
-                boolean locked = fitToScreen == FitToScreenMode.LOCKED;
+                boolean locked = fitToScreen == FitToScreenMode.FTSM_LOCKED;
                 binding.boardView.setAllowOverScroll(!locked);
                 binding.boardView.setAllowZoom(!locked);
 
@@ -1125,7 +1125,7 @@ public class PlayActivity extends PuzzleActivity
     private void handleResizeFitToScreen() {
         settings.getPlayFitToScreenMode(fitToScreen -> {
             boolean needsFit = isPendingFitToScreen()
-                || fitToScreen == FitToScreenMode.LOCKED;
+                || fitToScreen == FitToScreenMode.FTSM_LOCKED;
             clearPendingFitToScreen();
             if (needsFit)
                 fitBoardToScreen();
@@ -1159,23 +1159,23 @@ public class PlayActivity extends PuzzleActivity
             }
         } else {
             switch (currentGridRatio) {
-            case PUZZLE_SHAPE:
+            case GR_PUZZLE_SHAPE:
                 float ratio = getPuzzleHeightRatio();
                 maxHeight = (int)(ratio * width);
                 break;
-            case ONE_TO_ONE:
+            case GR_ONE_TO_ONE:
                 maxHeight = width;
                 break;
-            case THIRTY_PCNT:
+            case GR_THIRTY_PCNT:
                 maxHeight = (int)(0.3 * metrics.heightPixels);
                 break;
-            case FORTY_PCNT:
+            case GR_FORTY_PCNT:
                 maxHeight = (int)(0.4 * metrics.heightPixels);
                 break;
-            case FIFTY_PCNT:
+            case GR_FIFTY_PCNT:
                 maxHeight = (int)(0.5 * metrics.heightPixels);
                 break;
-            case SIXTY_PCNT:
+            case GR_SIXTY_PCNT:
                 maxHeight = (int)(0.6 * metrics.heightPixels);
                 break;
             }
@@ -1218,23 +1218,23 @@ public class PlayActivity extends PuzzleActivity
             }
         } else {
             switch (currentGridRatio) {
-            case PUZZLE_SHAPE:
+            case GR_PUZZLE_SHAPE:
                 float ratio = 1 / getPuzzleHeightRatio();
                 maxWidth = (int)(ratio * height);
                 break;
-            case ONE_TO_ONE:
+            case GR_ONE_TO_ONE:
                 maxWidth = height;
                 break;
-            case THIRTY_PCNT:
+            case GR_THIRTY_PCNT:
                 maxWidth = (int)(0.3 * metrics.widthPixels);
                 break;
-            case FORTY_PCNT:
+            case GR_FORTY_PCNT:
                 maxWidth = (int)(0.4 * metrics.widthPixels);
                 break;
-            case FIFTY_PCNT:
+            case GR_FIFTY_PCNT:
                 maxWidth = (int)(0.5 * metrics.widthPixels);
                 break;
-            case SIXTY_PCNT:
+            case GR_SIXTY_PCNT:
                 maxWidth = (int)(0.6 * metrics.widthPixels);
                 break;
             }

@@ -1,0 +1,240 @@
+syntax = "proto3";
+
+option java_package = "app.crossword.yourealwaysbe.forkyz.settings";
+option java_multiple_files = true;
+
+enum AccessorSetting {
+    AS_DATE_DESC = 0;
+    AS_DATE_ASC = 1;
+    AS_SOURCE = 2;
+}
+
+enum BrowseSwipeAction {
+    BSA_DELETE = 0;
+    BSA_ARCHIVE = 1;
+}
+
+enum ClueHighlight {
+    CH_RADIO_BUTTON = 0;
+    CH_NONE = 1;
+    CH_BACKGROUND = 2;
+    CH_BOTH = 3;
+}
+
+enum ClueTabsDouble {
+    CTD_NEVER = 0;
+    CTD_LANDSCAPE = 1;
+    CTD_WIDE = 2;
+    CTD_ALWAYS = 3;
+}
+
+enum CycleUnfilledMode {
+    CU_NEVER = 0;
+    CU_FORWARDS = 1;
+    CU_ALWAYS = 2;
+}
+
+enum DayNightMode {
+    DNM_DAY = 0;
+    DNM_NIGHT = 1;
+    DNM_SYSTEM = 2;
+}
+
+enum DeleteCrossingModeSetting {
+    DCMS_DELETE = 0;
+    DCMS_PRESERVE_FILLED_WORDS = 1;
+    DCMS_PRESERVE_FILLED_CELLS = 2;
+}
+
+enum DisplaySeparators {
+    DS_ALWAYS = 0;
+    DS_NEVER = 1;
+    DS_SELECTED = 2;
+}
+
+enum ExternalDictionarySetting {
+    EDS_FREE = 0;
+    EDS_NONE = 1;
+    EDS_QUICK = 2;
+    EDS_AARD2 = 3;
+}
+
+enum FitToScreenMode {
+    FTSM_NEVER = 0;
+    FTSM_START = 1;
+    FTSM_LOCKED = 2;
+}
+
+enum GridRatio {
+    GR_PUZZLE_SHAPE = 0;
+    GR_ONE_TO_ONE = 1;
+    GR_THIRTY_PCNT = 2;
+    GR_FORTY_PCNT = 3;
+    GR_FIFTY_PCNT = 4;
+    GR_SIXTY_PCNT = 5;
+}
+
+enum KeyboardLayout {
+    KL_QWERTY = 0;
+    KL_QWERTZ = 1;
+    KL_DVORAK = 2;
+    KL_COLEMAK = 3;
+}
+
+enum KeyboardMode {
+    KM_HIDE_MANUAL = 0;
+    KM_ALWAYS_SHOW = 1;
+    KM_SHOW_SPARINGLY = 2;
+    KM_NEVER_SHOW = 3;
+}
+
+enum MovementStrategySetting {
+    MSS_MOVE_NEXT_ON_AXIS = 0;
+    MSS_STOP_ON_END = 1;
+    MSS_MOVE_NEXT_CLUE = 2;
+    MSS_MOVE_PARALLEL_WORD = 3;
+}
+
+enum Orientation {
+    O_UNLOCKED = 0;
+    O_PORTRAIT = 1;
+    O_LANDSCAPE = 2;
+}
+
+enum StorageLocation {
+    SL_INTERNAL = 0;
+    SL_EXTERNAL_SAF = 1;
+}
+
+enum Theme {
+    T_STANDARD = 0;
+    T_DYNAMIC = 1;
+    T_LEGACY_LIKE = 2;
+}
+
+message Settings {
+    bool alwaysAnnounceBox = 1;
+    bool alwaysAnnounceClue = 2;
+    Theme applicationTheme = 3;
+    int32 archiveCleanupAge = 4;
+    repeated string autoDownloaders = 5;
+    bool backgroundDownloadAllowRoaming = 6;
+    repeated string backgroundDownloadDays = 7;
+    int32 backgroundDownloadDaysTime = 8;
+    bool backgroundDownloadHourly = 9;
+    bool backgroundDownloadRequireCharging = 10;
+    bool backgroundDownloadRequireUnmetered = 11;
+    bool browseAlwaysShowRating = 12;
+    bool browseIndicateIfSolution = 13;
+    bool browseNewPuzzle = 14;
+    bool browseShowPercentageCorrect = 15;
+    bool buttonActivatesVoice = 16;
+    bool buttonAnnounceClue = 17;
+    string chatGPTAPIKey = 18;
+    int32 cleanupAge = 19;
+    bool clueBelowGrid = 20;
+    ClueHighlight clueHighlight = 21;
+    ClueTabsDouble clueTabsDouble = 22;
+    bool crosswordSolverEnabled = 23;
+    string customDailyTitle = 24;
+    string customDailyUrl = 25;
+    CycleUnfilledMode cycleUnfilledMode = 26;
+    DeleteCrossingModeSetting deleteCrossingMode = 27;
+    bool deleteOnCleanup = 28;
+    bool disableRatings = 29;
+    bool disableSwipe = 30;
+    bool displayScratch = 31;
+    DisplaySeparators displaySeparators = 32;
+    int64 dlLast = 33;
+    bool dlOnStartup = 34;
+    bool doubleTap = 35;
+    bool download20Minutes = 36;
+    bool downloadCustomDaily = 37;
+    bool downloadDeStandaard = 38;
+    bool downloadDeTelegraaf = 39;
+    bool downloadGuardianDailyCryptic = 40;
+    bool downloadGuardianWeeklyQuiptic = 41;
+    bool downloadHamAbend = 42;
+    bool downloadIndependentDailyCryptic = 43;
+    bool downloadIrishNewsCryptic = 44;
+    bool downloadJonesin = 45;
+    bool downloadJoseph = 46;
+    bool downloadLeParisienF1 = 47;
+    bool downloadLeParisienF2 = 48;
+    bool downloadLeParisienF3 = 49;
+    bool downloadLeParisienF4 = 50;
+    bool downloadMetroCryptic = 51;
+    bool downloadMetroQuick = 52;
+    bool downloadNewYorkTimesSyndicated = 53;
+    bool downloadNewsday = 54;
+    bool downloadPremier = 55;
+    bool downloadSheffer = 56;
+    int32 downloadTimeout = 57;
+    bool downloadUSAToday = 58;
+    bool downloadUniversal = 59;
+    bool downloadWaPoSunday = 60;
+    bool downloadWsj = 61;
+    bool duckDuckGoEnabled = 62;
+    bool ensureVisible = 63;
+    bool enterChangesDirection = 64;
+    bool equalsAnnounceClue = 65;
+    ExternalDictionarySetting externalDictionary = 66;
+    bool fifteenSquaredEnabled = 67;
+    FitToScreenMode fitToScreenMode = 68;
+    bool fullScreen = 69;
+    GridRatio gridRatio = 70;
+    GridRatio gridRatioLand = 71;
+    bool indicateShowErrors = 72;
+    bool inferSeparators = 73;
+    bool keyboardCompact = 74;
+    bool keyboardForceCaps = 75;
+    bool keyboardHaptic = 76;
+    bool keyboardHideButton = 77;
+    KeyboardLayout keyboardLayout = 78;
+    int32 keyboardRepeatDelay = 79;
+    int32 keyboardRepeatInterval = 80;
+    KeyboardMode keyboardShowHide = 81;
+    string lastSeenVersion = 82;
+    MovementStrategySetting movementStrategy = 83;
+    Orientation orientationLock = 84;
+    int32 playActivityClueTabsPage = 85;
+    int32 playActivityClueTabsPage1 = 86;
+    bool playLetterUndoEnabled = 87;
+    bool predictAnagramChars = 88;
+    bool preserveCorrectLettersInShowErrors = 89;
+    bool randomClueOnShake = 90;
+    string safArchiveFolderUri = 91;
+    string safCrosswordsFolderUri = 92;
+    string safRootUri = 93;
+    string safToImportDoneFolderUri = 94;
+    string safToImportFailedFolderUri = 95;
+    string safToImportFolderUri = 96;
+    float scale = 97;
+    bool scrapeCru = 98;
+    bool scrapeEveryman = 99;
+    bool scrapeGuardianQuick = 100;
+    bool scrapeKegler = 101;
+    bool scrapePrivateEye = 102;
+    bool scrapePrzekroj = 103;
+    bool scratchMode = 104;
+    bool showCluesOnPlayScreen = 105;
+    bool showCount = 106;
+    bool showErrors = 107;
+    bool showErrorsClue = 108;
+    bool showErrorsCursor = 109;
+    bool showTimer = 110;
+    bool showWordsInClueList = 111;
+    bool skipFilled = 112;
+    bool snapClue = 113;
+    AccessorSetting sort = 114;
+    bool spaceChangesDirection = 115;
+    StorageLocation storageLocation = 116;
+    bool suppressHints = 117;
+    bool suppressMessages = 118;
+    bool suppressSummaryMessages = 119;
+    BrowseSwipeAction swipeAction = 120;
+    bool toggleBeforeMove = 121;
+    DayNightMode uiTheme = 122;
+    bool useNativeKeyboard = 123;
+    bool volumeActivatesVoice = 124;
+}

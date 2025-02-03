@@ -110,8 +110,8 @@ public abstract class PuzzleActivity
 
         // get these early to maximise chances of it being ready by the first
         // volume down press
-        volumeActivatesVoice = settings.liveVoiceVolumeActivatesVoice();
-        equalsAnnounceClue = settings.liveVoiceEqualsAnnounceClue();
+        volumeActivatesVoice = settings.getLiveVoiceVolumeActivatesVoice();
+        equalsAnnounceClue = settings.getLiveVoiceEqualsAnnounceClue();
 
         startTimer();
         setupObservers();
@@ -133,7 +133,7 @@ public abstract class PuzzleActivity
         }
 
         settings.getExternalToolSettings(extSettings -> {
-            if (!extSettings.hasExternal()) {
+            if (!extSettings.getHasExternal()) {
                 MenuItem ext = menu.findItem(R.id.puzzle_menu_external_tools);
                 ext.setVisible(false);
                 ext.setEnabled(false);
@@ -145,27 +145,27 @@ public abstract class PuzzleActivity
                 help.setEnabled(false);
             }
 
-            if (!extSettings.crosswordSolverEnabled()) {
+            if (!extSettings.getCrosswordSolverEnabled()) {
                 MenuItem solver
                     = menu.findItem(R.id.puzzle_menu_crossword_solver);
                 solver.setVisible(false);
                 solver.setEnabled(false);
             }
 
-            if (!extSettings.duckDuckGoEnabled()) {
+            if (!extSettings.getDuckDuckGoEnabled()) {
                 MenuItem item
                     = menu.findItem(R.id.puzzle_menu_duckduckgo);
                 item.setVisible(false);
                 item.setEnabled(false);
             }
 
-            if (!extSettings.fifteenSquaredEnabled()) {
+            if (!extSettings.getFifteenSquaredEnabled()) {
                 MenuItem item = menu.findItem(R.id.puzzle_menu_fifteen_squared);
                 item.setVisible(false);
                 item.setEnabled(false);
             }
 
-            if (extSettings.externalDictionary() == null) {
+            if (extSettings.getExternalDictionary() == null) {
                 MenuItem help
                     = menu.findItem(R.id.puzzle_menu_external_dictionary);
                 help.setVisible(false);
@@ -1258,14 +1258,14 @@ public abstract class PuzzleActivity
         Observer<Boolean> showErrorsObserver = v -> {
             setStatusBarColor(appBarLayout);
         };
-        settings.livePlayIndicateShowErrors().observe(this, showErrorsObserver);
-        settings.livePlayShowErrorsClue().observe(this, showErrorsObserver);
-        settings.livePlayShowErrorsCursor().observe(this, showErrorsObserver);
-        settings.livePlayShowErrorsGrid().observe(this, showErrorsObserver);
+        settings.getLivePlayIndicateShowErrors().observe(this, showErrorsObserver);
+        settings.getLivePlayShowErrorsClue().observe(this, showErrorsObserver);
+        settings.getLivePlayShowErrorsCursor().observe(this, showErrorsObserver);
+        settings.getLivePlayShowErrorsGrid().observe(this, showErrorsObserver);
     }
 
     private void setupObservers() {
-        settings.livePlayShowTimer().observe(
+        settings.getLivePlayShowTimer().observe(
             this,
             showTimer -> {
                 if (showTimer)
@@ -1273,7 +1273,7 @@ public abstract class PuzzleActivity
             }
         );
 
-        settings.livePlayPreserveCorrectLettersInShowErrors().observe(
+        settings.getLivePlayPreserveCorrectLettersInShowErrors().observe(
             this,
             preserveCorrect -> {
                 Playboard board = getBoard();
@@ -1282,7 +1282,7 @@ public abstract class PuzzleActivity
             }
         );
 
-        settings.livePlayDeleteCrossingMode().observe(
+        settings.getLivePlayDeleteCrossingMode().observe(
             this,
             deleteCrossingMode -> {
                 Playboard board = getBoard();
@@ -1291,11 +1291,11 @@ public abstract class PuzzleActivity
             }
         );
 
-        settings.livePlayScratchMode().observe(
+        settings.getLivePlayScratchMode().observe(
             this, value -> { invalidateOptionsMenu(); }
         );
 
-        settings.livePlayShowErrorsGrid().observe(
+        settings.getLivePlayShowErrorsGrid().observe(
             this,
             showErrorsGrid -> {
                 Playboard board = getBoard();
@@ -1306,7 +1306,7 @@ public abstract class PuzzleActivity
             }
         );
 
-        settings.livePlayShowErrorsCursor().observe(
+        settings.getLivePlayShowErrorsCursor().observe(
             this,
             showErrorsCursor -> {
                 Playboard board = getBoard();
@@ -1320,7 +1320,7 @@ public abstract class PuzzleActivity
             }
         );
 
-        settings.livePlayShowErrorsClue().observe(
+        settings.getLivePlayShowErrorsClue().observe(
             this,
             showErrorsClue -> {
                 Playboard board = getBoard();
@@ -1331,7 +1331,7 @@ public abstract class PuzzleActivity
             }
         );
 
-        settings.livePlayToggleBeforeMove().observe(
+        settings.getLivePlayToggleBeforeMove().observe(
             this,
             toggleBeforeMove -> {
                 Playboard board = getBoard();
@@ -1354,11 +1354,11 @@ public abstract class PuzzleActivity
      */
     private void setStatusBarColor(AppBarLayout appBarLayout) {
         Boolean indicateShowErrors
-            = settings.livePlayIndicateShowErrors().getValue();
-        Boolean showErrorsClue = settings.livePlayShowErrorsClue().getValue();
+            = settings.getLivePlayIndicateShowErrors().getValue();
+        Boolean showErrorsClue = settings.getLivePlayShowErrorsClue().getValue();
         Boolean showErrorsCursor
-            = settings.livePlayShowErrorsCursor().getValue();
-        Boolean showErrorsGrid = settings.livePlayShowErrorsGrid().getValue();
+            = settings.getLivePlayShowErrorsCursor().getValue();
+        Boolean showErrorsGrid = settings.getLivePlayShowErrorsGrid().getValue();
 
         if (
             indicateShowErrors == null

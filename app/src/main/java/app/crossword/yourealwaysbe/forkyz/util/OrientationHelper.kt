@@ -20,13 +20,13 @@ class OrientationHelper @Inject constructor(val settings : ForkyzSettings) {
     @SuppressWarnings("SourceLockedOrientationActivity")
     fun <T> applyOrientation(activity : T)
     where T : Activity, T : LifecycleOwner {
-        settings.liveAppOrientationLock().observe(activity) { orientation ->
+        settings.liveAppOrientationLock.observe(activity) { orientation ->
             try {
                 when (orientation) {
-                    Orientation.PORTRAIT -> activity.setRequestedOrientation(
+                    Orientation.O_PORTRAIT -> activity.setRequestedOrientation(
                         ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                     )
-                    Orientation.LANDSCAPE -> activity.setRequestedOrientation(
+                    Orientation.O_LANDSCAPE -> activity.setRequestedOrientation(
                         ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
                     )
                     else -> activity.setRequestedOrientation(

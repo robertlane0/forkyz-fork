@@ -59,7 +59,7 @@ public class DownloadersProvider {
         LiveData<FileHandler> liveFileHandler
             = fileHandlerProvider.liveFileHandler();
         LiveData<DownloadersSettings> liveDownloadersSettings
-            = settings.liveDownloadersSettings();
+            = settings.getLiveDownloadersSettings();
 
         liveDownloaders = LiveDataUtilsKt.liveDataFanIn(
             () -> {

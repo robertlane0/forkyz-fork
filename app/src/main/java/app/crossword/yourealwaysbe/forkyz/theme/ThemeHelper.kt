@@ -25,16 +25,19 @@ import app.crossword.yourealwaysbe.forkyz.settings.Theme
 @Singleton
 class ThemeHelper @Inject constructor(val settings : ForkyzSettings) {
     private val appDayNightMode : DayNightMode
-        get() = settings.liveAppDayNightMode().value
+        get() = settings.liveAppDayNightMode.value
             ?: settings.getAppDayNightModeSync()
 
-    val appTheme : Theme = settings.getAppThemeSync()
+    private val appTheme : Theme
+        get() = settings.liveAppTheme.value
+            ?: settings.getAppThemeSync()
 
     @Composable
     fun isDarkMode() : Boolean = when (appDayNightMode) {
-        DayNightMode.DAY -> false
-        DayNightMode.NIGHT -> true
-        DayNightMode.SYSTEM -> isSystemInDarkTheme()
+        DayNightMode.DNM_DAY -> false
+        DayNightMode.DNM_NIGHT -> true
+        DayNightMode.DNM_SYSTEM -> isSystemInDarkTheme()
+        else -> false
     }
 
     @Composable
@@ -69,7 +72,7 @@ class ThemeHelper @Inject constructor(val settings : ForkyzSettings) {
      */
     fun themeApplication(app : Application) {
         // has to be blocking: a late theme change won't get picked up
-        if (appTheme == Theme.DYNAMIC)
+        if (appTheme == Theme.T_DYNAMIC)
             DynamicColors.applyToActivitiesIfAvailable(app);
     }
 
@@ -80,8 +83,8 @@ class ThemeHelper @Inject constructor(val settings : ForkyzSettings) {
         // needs to be blocking so can be done before end of onCreate in
         // ForkyzActivity (else toolbar not themed)
         when (appTheme) {
-            Theme.STANDARD -> activity.setTheme(R.style.Theme_Forkyz_Standard)
-            Theme.LEGACY_LIKE -> {
+            Theme.T_STANDARD -> activity.setTheme(R.style.Theme_Forkyz_Standard)
+            Theme.T_LEGACY_LIKE -> {
                 activity.setTheme(R.style.Theme_Forkyz_LegacyLike)
             }
             else -> { /* keep main theme */ }
@@ -97,7 +100,7 @@ class ThemeHelper @Inject constructor(val settings : ForkyzSettings) {
             .getConfiguration().uiMode and Configuration.UI_MODE_NIGHT_MASK
 
         if (
-            appTheme == Theme.LEGACY_LIKE
+            appTheme == Theme.T_LEGACY_LIKE
             && nightModeFlags != Configuration.UI_MODE_NIGHT_YES
         ) {
             activity.setStatusBarColor(

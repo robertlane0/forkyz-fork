@@ -58,7 +58,7 @@ public class ChatGPTHelp {
     }
 
     public static boolean isEnabled(ExternalToolSettings extSettings) {
-        return isEnabled(extSettings.chatGPTAPIKey());
+        return isEnabled(extSettings.getChatGPTAPIKey());
     }
 
     @MainThread

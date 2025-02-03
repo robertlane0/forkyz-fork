@@ -185,15 +185,15 @@ public class BoardWordEditView extends BoardEditView {
 
         getSettings().getPlayRenderSettings(renderSettings -> {
             Set<String> localSuppressNotesList
-                = getSuppressNotesList(renderSettings.displayScratch());
+                = getSuppressNotesList(renderSettings.getDisplayScratch());
             renderer.setHintHighlight(
-                !renderSettings.suppressHintHighlighting()
+                !renderSettings.getSuppressHintHighlighting()
             );
             executorService.execute(() -> {
 
                 boolean displaySeparators
-                    = renderSettings.displaySeparators()
-                        != DisplaySeparators.NEVER;
+                    = renderSettings.getDisplaySeparators()
+                        != DisplaySeparators.DS_NEVER;
 
                 try {
                     lockRenderer();
@@ -203,7 +203,7 @@ public class BoardWordEditView extends BoardEditView {
                         localSuppressNotesList,
                         getContentWidth(),
                         displaySeparators,
-                        renderSettings.inferSeparators()
+                        renderSettings.getInferSeparators()
                     );
                     handler.post(() -> {
                         try {

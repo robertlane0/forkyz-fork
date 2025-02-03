@@ -144,7 +144,7 @@ public class Downloaders {
         List<Downloader> downloaders = new LinkedList<>();
         for (Downloader downloader : available) {
             boolean isAuto = settings
-                .autoDownloaders()
+                .getAutoDownloaders()
                 .contains(downloader.getInternalName());
             if (isAuto)
                 downloaders.add(downloader);
@@ -335,7 +335,7 @@ public class Downloaders {
     public List<Downloader> getDownloaders() {
         List<Downloader> downloaders = new LinkedList<>();
 
-        if (settings.downloadDeStandaard()) {
+        if (settings.getDownloadDeStandaard()) {
             downloaders.add(new KeesingDownloader(
                 "destandaard",
                 context.getString(R.string.de_standaard),
@@ -348,7 +348,7 @@ public class Downloaders {
             ));
         }
 
-        if (settings.downloadDeTelegraaf()) {
+        if (settings.getDownloadDeTelegraaf()) {
             downloaders.add(new AbstractDateDownloader(
                 "detelegraaf",
                 context.getString(R.string.de_telegraaf),
@@ -362,19 +362,19 @@ public class Downloaders {
             ));
         }
 
-        if (settings.downloadGuardianDailyCryptic()) {
+        if (settings.getDownloadGuardianDailyCryptic()) {
             downloaders.add(new GuardianDailyCrypticDownloader(
                 "guardian", context.getString(R.string.guardian_daily)
             ));
         }
 
-        if (settings.downloadGuardianWeeklyQuiptic()) {
+        if (settings.getDownloadGuardianWeeklyQuiptic()) {
             downloaders.add(new GuardianWeeklyQuipticDownloader(
                 "guardianQuiptic", context.getString(R.string.guardian_quiptic)
             ));
         }
 
-        if (settings.downloadHamAbend()) {
+        if (settings.getDownloadHamAbend()) {
             downloaders.add(new RaetselZentraleSchwedenDownloader(
                 "hamabend",
                 context.getString(R.string.hamburger_abendblatt_daily),
@@ -388,7 +388,7 @@ public class Downloaders {
             ));
         }
 
-        if (settings.downloadIndependentDailyCryptic()) {
+        if (settings.getDownloadIndependentDailyCryptic()) {
             downloaders.add(new AbstractDateDownloader(
                 "independent",
                 context.getString(R.string.independent_daily),
@@ -403,7 +403,7 @@ public class Downloaders {
             ));
         }
 
-        if (settings.downloadIrishNewsCryptic()) {
+        if (settings.getDownloadIrishNewsCryptic()) {
             downloaders.add(new AbstractDateDownloader(
                 "irishnewscryptic",
                 context.getString(R.string.irish_news_cryptic),
@@ -417,7 +417,7 @@ public class Downloaders {
              ));
         }
 
-        if (settings.downloadJonesin()) {
+        if (settings.getDownloadJonesin()) {
             downloaders.add(new AbstractDateDownloader(
                 "jonesin",
                 context.getString(R.string.jonesin_crosswords),
@@ -431,7 +431,7 @@ public class Downloaders {
             ));
         }
 
-        if (settings.downloadJoseph()) {
+        if (settings.getDownloadJoseph()) {
             downloaders.add(new KingDigitalDownloader(
                 "Joseph",
                 "Joseph",
@@ -444,7 +444,7 @@ public class Downloaders {
             ));
         }
 
-        if (settings.download20Minutes()) {
+        if (settings.getDownload20Minutes()) {
             downloaders.add(new AbstractDateDownloader(
                 "20minutes",
                 context.getString(R.string.vingminutes),
@@ -457,7 +457,7 @@ public class Downloaders {
             ));
         }
 
-        if (settings.downloadLeParisienF1()) {
+        if (settings.getDownloadLeParisienF1()) {
             downloaders.add(new AbstractRCIJeuxMFJDateDownloader(
                 "leparisienf1",
                 context.getString((R.string.le_parisien_daily_f1)),
@@ -473,7 +473,7 @@ public class Downloaders {
             ));
         }
 
-        if (settings.downloadLeParisienF2()) {
+        if (settings.getDownloadLeParisienF2()) {
             downloaders.add(new AbstractRCIJeuxMFJDateDownloader(
                 "leparisienf2",
                 context.getString((R.string.le_parisien_daily_f2)),
@@ -489,7 +489,7 @@ public class Downloaders {
             ));
         }
 
-        if (settings.downloadLeParisienF3()) {
+        if (settings.getDownloadLeParisienF3()) {
             downloaders.add(new AbstractRCIJeuxMFJDateDownloader(
                 "leparisienf3",
                 context.getString((R.string.le_parisien_daily_f3)),
@@ -505,7 +505,7 @@ public class Downloaders {
             ));
         }
 
-        if (settings.downloadLeParisienF4()) {
+        if (settings.getDownloadLeParisienF4()) {
             downloaders.add(new AbstractRCIJeuxMFJDateDownloader(
                 "leparisienf4",
                 context.getString((R.string.le_parisien_daily_f4)),
@@ -521,7 +521,7 @@ public class Downloaders {
             ));
         }
 
-        if (settings.downloadMetroCryptic()) {
+        if (settings.getDownloadMetroCryptic()) {
             downloaders.add(new AbstractDateDownloader(
                 "metrocryptic",
                 context.getString(R.string.metro_cryptic),
@@ -537,7 +537,7 @@ public class Downloaders {
             ));
         }
 
-        if (settings.downloadMetroQuick()) {
+        if (settings.getDownloadMetroQuick()) {
             downloaders.add(new AbstractDateDownloader(
                 "metroquick",
                 context.getString(R.string.metro_quick),
@@ -553,7 +553,7 @@ public class Downloaders {
             ));
         }
 
-        if (settings.downloadNewsday()) {
+        if (settings.getDownloadNewsday()) {
             downloaders.add(new AbstractDateDownloader(
                 "newsday",
                 context.getString(R.string.newsday),
@@ -569,7 +569,7 @@ public class Downloaders {
             ));
         }
 
-        if (settings.downloadNewYorkTimesSyndicated()) {
+        if (settings.getDownloadNewYorkTimesSyndicated()) {
             downloaders.add(new AbstractDateDownloader(
                 "nytsyndicated",
                 context.getString(R.string.new_york_times_syndicated),
@@ -586,7 +586,7 @@ public class Downloaders {
             ));
         }
 
-        if (settings.downloadPremier()) {
+        if (settings.getDownloadPremier()) {
             downloaders.add(new KingDigitalDownloader(
                 "Premier",
                 "Premier",
@@ -599,7 +599,7 @@ public class Downloaders {
             ));
         }
 
-        if (settings.downloadSheffer()) {
+        if (settings.getDownloadSheffer()) {
             downloaders.add(new KingDigitalDownloader(
                 "Sheffer",
                 "Sheffer",
@@ -612,7 +612,7 @@ public class Downloaders {
             ));
         }
 
-        if (settings.downloadUniversal()) {
+        if (settings.getDownloadUniversal()) {
             downloaders.add(new UclickDownloader(
                 "universal",
                 "fcx",
@@ -625,7 +625,7 @@ public class Downloaders {
             ));
         }
 
-        if (settings.downloadUSAToday()) {
+        if (settings.getDownloadUSAToday()) {
             downloaders.add(new UclickDownloader(
                 "usatoday",
                 "usaon",
@@ -638,7 +638,7 @@ public class Downloaders {
             ));
         }
 
-        if (settings.downloadWaPoSunday()) {
+        if (settings.getDownloadWaPoSunday()) {
             downloaders.add(new AbstractDateDownloader(
                 "waposunday",
                 context.getString(R.string.washington_post_sunday),
@@ -651,7 +651,7 @@ public class Downloaders {
             ));
         }
 
-        if (settings.downloadWsj()) {
+        if (settings.getDownloadWsj()) {
             downloaders.add(new AbstractDateDownloader(
                 "wsj",
                 context.getString(R.string.wall_street_journal),
@@ -666,7 +666,7 @@ public class Downloaders {
 
         addCustomDownloaders(downloaders);
 
-        if (settings.scrapeCru()) {
+        if (settings.getScrapeCru()) {
             downloaders.add(new PageScraper.Puz(
                 // certificate doesn't seem to work for me
                 // "https://theworld.com/~wij/puzzles/cru/index.html",
@@ -677,7 +677,7 @@ public class Downloaders {
             ));
         }
 
-        if (settings.scrapeKegler()) {
+        if (settings.getScrapeKegler()) {
             downloaders.add(new PageScraper.Puz(
                 "https://kegler.gitlab.io/Block_style/index.html",
                 "keglar",
@@ -686,7 +686,7 @@ public class Downloaders {
             ));
         }
 
-        if (settings.scrapePrivateEye()) {
+        if (settings.getScrapePrivateEye()) {
             downloaders.add(new PageScraper.Puz(
                 "https://www.private-eye.co.uk/pictures/crossword/download/",
                 "privateeye",
@@ -696,7 +696,7 @@ public class Downloaders {
             ));
         }
 
-        if (settings.scrapePrzekroj()) {
+        if (settings.getScrapePrzekroj()) {
             downloaders.add(new PageScraper(
                 "https://przekroj.org/krzyzowki/.*",
                 new PrzekrojIO(),
@@ -709,7 +709,7 @@ public class Downloaders {
             ));
         }
 
-        if (settings.scrapeEveryman()) {
+        if (settings.getScrapeEveryman()) {
             downloaders.add(new PageScraper(
                 "https://www.theguardian.com/crosswords/everyman/\\d*",
                 new GuardianJSONIO(),
@@ -722,7 +722,7 @@ public class Downloaders {
             ));
         }
 
-        if (settings.scrapeGuardianQuick()) {
+        if (settings.getScrapeGuardianQuick()) {
             downloaders.add(new PageScraper(
                 "https://www.theguardian.com/crosswords/quick/\\d*",
                 new GuardianJSONIO(),
@@ -736,18 +736,18 @@ public class Downloaders {
         }
 
         for (Downloader downloader : downloaders)
-            downloader.setTimeout(settings.downloadTimeout());
+            downloader.setTimeout(settings.getDownloadTimeout());
 
         return downloaders;
     }
 
     private void addCustomDownloaders(List<Downloader> downloaders) {
-        if (settings.downloadCustomDaily()) {
-            String title = settings.customDailyTitle();
+        if (settings.getDownloadCustomDaily()) {
+            String title = settings.getCustomDailyTitle();
             if (title == null || title.trim().isEmpty())
                 title = context.getString(R.string.custom_daily_title);
 
-            String urlDateFormatPattern = settings.customDailyUrl();
+            String urlDateFormatPattern = settings.getCustomDailyUrl();
 
             downloaders.add(
                 new CustomDailyDownloader("custom", title, urlDateFormatPattern)
@@ -763,13 +763,13 @@ public class Downloaders {
     private boolean isNotifyingSummary() {
         return canNotify()
             && notificationManager.areNotificationsEnabled()
-            && !settings.suppressSummaryNotifications();
+            && !settings.getSuppressSummaryNotifications();
     }
 
     private boolean isNotifyingIndividual() {
         return canNotify()
             && notificationManager.areNotificationsEnabled()
-            && !settings.suppressIndividualNotifications();
+            && !settings.getSuppressIndividualNotifications();
     }
 
     @SuppressLint("MissingPermission") // canNotify does check

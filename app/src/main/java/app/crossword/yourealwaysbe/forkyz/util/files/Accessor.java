@@ -1,8 +1,8 @@
+
 package app.crossword.yourealwaysbe.forkyz.util.files;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
-
 
 public interface Accessor extends Comparator<PuzMetaFile> {
     Accessor DATE_ASC = new Accessor() {

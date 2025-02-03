@@ -116,22 +116,23 @@ fun AppTheme(
     val view = LocalView.current
 
     val colorScheme = when (appTheme) {
-        Theme.STANDARD -> if (darkMode) darkScheme else lightScheme
         // only diff is app bar, see ForkyzTopAppBar
-        Theme.LEGACY_LIKE -> if (darkMode) darkScheme else lightScheme
-        Theme.DYNAMIC ->
+        Theme.T_LEGACY_LIKE -> if (darkMode) darkScheme else lightScheme
+        Theme.T_DYNAMIC ->
             if (DynamicColors.isDynamicColorAvailable()) {
                 if (darkMode) dynamicDarkColorScheme(context)
                 else dynamicLightColorScheme(context)
             } else {
                 if (darkMode) darkScheme else lightScheme
             }
+        // Theme.T_STANDARD
+        else -> if (darkMode) darkScheme else lightScheme
     }
 
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            val isLight = !darkMode && appTheme != Theme.LEGACY_LIKE
+            val isLight = !darkMode && appTheme != Theme.T_LEGACY_LIKE
             WindowCompat.getInsetsController(window, view)
                 .isAppearanceLightStatusBars = isLight
         }
@@ -153,7 +154,7 @@ fun ForkyzTopAppBar(
     onBack : () -> Unit,
     scrollBehavior : TopAppBarScrollBehavior,
 ) {
-    val colors = if (appTheme == Theme.LEGACY_LIKE && !darkMode) {
+    val colors = if (appTheme == Theme.T_LEGACY_LIKE && !darkMode) {
         TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primary,
             scrolledContainerColor = MaterialTheme.colorScheme.primary,
