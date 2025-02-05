@@ -213,11 +213,13 @@ class SettingsActivity : ComponentActivity() {
             RequestedURI.SETTINGS_EXPORT -> {
                 LaunchedEffect(needsURI) {
                     getExportSettingsURI.launch(SETTINGS_DEFAULT_FILENAME)
+                    viewModel.clearNeedsURI()
                 }
             }
             RequestedURI.SETTINGS_IMPORT -> {
                 LaunchedEffect(needsURI) {
                     getImportSettingsURI.launch(SETTINGS_MIME_TYPE)
+                    viewModel.clearNeedsURI()
                 }
             }
             RequestedURI.NONE -> {
