@@ -8,7 +8,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts.CreateDocument
@@ -72,15 +71,11 @@ import androidx.lifecycle.repeatOnLifecycle
 
 import dagger.hilt.android.AndroidEntryPoint
 
-import app.crossword.yourealwaysbe.forkyz.theme.AppTheme
 import app.crossword.yourealwaysbe.forkyz.theme.ForkyzTopAppBar
-import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 import app.crossword.yourealwaysbe.forkyz.util.ExitActivity
-import app.crossword.yourealwaysbe.forkyz.util.OrientationHelper
-import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 
 @AndroidEntryPoint
-class SettingsActivity : ComponentActivity() {
+class SettingsActivity : ForkyzActivityKt() {
 
     private val SETTINGS_HORIZONTAL_PADDING = 20.dp
     private val SETTINGS_VERTICAL_PADDING = 14.dp
@@ -88,15 +83,6 @@ class SettingsActivity : ComponentActivity() {
     private val DIALOG_BUTTON_PADDING = 4.dp
     private val DIALOG_ROUNDED_CORNERS = RoundedCornerShape(26.dp)
     private val SWITCH_PADDING = 4.dp
-
-    @Inject
-    lateinit var themeHelper : ThemeHelper
-
-    @Inject
-    lateinit var utils : AndroidVersionUtils
-
-    @Inject
-    lateinit var orientationHelper : OrientationHelper
 
     private val viewModel by viewModels<SettingsActivityViewModel>()
 
@@ -127,7 +113,6 @@ class SettingsActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState : Bundle?) {
         super.onCreate(savedInstanceState)
-        orientationHelper.applyOrientation(this)
 
         setContent {
             val state by viewModel.state.collectAsStateWithLifecycle()
@@ -139,7 +124,7 @@ class SettingsActivity : ComponentActivity() {
                 handleBack()
             }
 
-            themeHelper.AppTheme() {
+            AppTheme() {
                 // Reset list state/scroll on new list
                 // https://slack-chats.kotlinlang.org/t/510683/what-would-be-to-best-way-to-reset-the-scroll-of-a-lazylist-
                 val scrollBehavior = key(state.settingsItems) {

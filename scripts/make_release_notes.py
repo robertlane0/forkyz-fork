@@ -18,20 +18,22 @@ def version_number(filename: str) -> int:
 
 with open(release_file, "w") as release_file:
     release_file.write("""
-        <h1>Forkyz</h1>
+        <h1>Forkyz</h1><br>
 
         <p>
             This is an unofficial fork of the Shortyz
             crossword app. It implements a number of new features and
             removes some non-open libraries / trackers.
-        </p>
+        </p><br>
     """)
 
     changelogs = glob.glob("fastlane/metadata/android/en-US/changelogs/*")
     changelogs.sort(key=lambda file: -version_number(file))
 
-    for file in changelogs:
-        release_file.write(f"<h2>Version {version_number(file)}</h2>\n")
+    for num, file in enumerate(changelogs):
+        if num > 0:
+            release_file.write("<br>\n")
+        release_file.write(f"<h2>Version {version_number(file)}</h2><br>\n")
         release_file.write("\n")
         with open(file) as changelog:
             for line in changelog:

@@ -744,4 +744,7 @@
     <string name="external_app_not_installed">%1$s Not Installed</string>
     <string name="external_app_install_msg">Please install %1$s or disable this tool in the external tool settings.</string>
     <string name="website">Website</string>
+
+    <!-- HTML activity -->
+    <string name="asset_not_found">Error: could not find page to display. This is a programming error and can only be fixed by reporting it to the developers.</string>
 </resources>

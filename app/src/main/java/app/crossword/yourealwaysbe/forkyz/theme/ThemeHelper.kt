@@ -53,9 +53,9 @@ class ThemeHelper @Inject constructor(val settings : ForkyzSettings) {
     @OptIn(ExperimentalMaterial3Api::class)
     fun ForkyzTopAppBar(
         title : @Composable () -> Unit,
-        actions : @Composable RowScope.() -> Unit,
-        onBack : () -> Unit,
-        scrollBehavior : TopAppBarScrollBehavior,
+        actions : @Composable RowScope.() -> Unit = { },
+        onBack : () -> Unit = { },
+        scrollBehavior : TopAppBarScrollBehavior? = null,
     ) {
         ForkyzTopAppBar(
             appTheme = appTheme,

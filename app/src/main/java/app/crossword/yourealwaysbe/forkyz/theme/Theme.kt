@@ -150,9 +150,9 @@ fun ForkyzTopAppBar(
     appTheme : Theme,
     darkMode : Boolean,
     title : @Composable () -> Unit,
-    actions : @Composable RowScope.() -> Unit,
-    onBack : () -> Unit,
-    scrollBehavior : TopAppBarScrollBehavior,
+    actions : @Composable RowScope.() -> Unit = { },
+    onBack : () -> Unit = { },
+    scrollBehavior : TopAppBarScrollBehavior? = null,
 ) {
     val colors = if (appTheme == Theme.T_LEGACY_LIKE && !darkMode) {
         TopAppBarDefaults.topAppBarColors(
