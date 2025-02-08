@@ -512,7 +512,13 @@ public class BrowseActivity extends ForkyzActivity {
                     });});
                 }
             });
-        helper.attachToRecyclerView(binding.puzzleList);
+        settings.getLiveBrowseDisableSwipe().observe(
+            this,
+            disableSwipe -> {
+                helper.attachToRecyclerView(null);
+                helper.attachToRecyclerView(binding.puzzleList);
+            }
+        );
 
         this.nm = NotificationManagerCompat.from(this);
 
