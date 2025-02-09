@@ -159,7 +159,7 @@ public abstract class PuzzleActivity
                 item.setEnabled(false);
             }
 
-            if (extSettings.getExternalDictionary() == null) {
+            if (!extSettings.getHasExternalDictionary()) {
                 MenuItem help
                     = menu.findItem(R.id.puzzle_menu_external_dictionary);
                 help.setVisible(false);
@@ -871,29 +871,7 @@ public abstract class PuzzleActivity
     }
 
     protected void callExternalDictionary() {
-        Playboard board = getBoard();
-        Zone zone = (board == null) ? null : board.getCurrentZone();
-        if (zone == null)
-            return;
-
-        Puzzle puz = getPuzzle();
-        if (puz == null)
-            return;
-
-        settings.getExtDictionary(dictionary -> {
-            if (dictionary == null)
-                return;
-
-            StringBuilder request = new StringBuilder();
-
-            for (Position pos : zone) {
-                Box box = puz.checkedGetBox(pos);
-                if (box != null)
-                    request.append(box.getResponse());
-            }
-
-            dictionary.query(this, request.toString());
-        });
+        viewModel.callExternalDictionary();
     }
 
     protected void searchFifteenSquared() {

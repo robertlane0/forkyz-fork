@@ -32,6 +32,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 
 import app.crossword.yourealwaysbe.forkyz.databinding.NotesBinding;
 import app.crossword.yourealwaysbe.forkyz.tools.CrosswordSolverData;
+import app.crossword.yourealwaysbe.forkyz.tools.ExternalDictionaries;
 import app.crossword.yourealwaysbe.forkyz.tools.ExternalToolLauncher;
 import app.crossword.yourealwaysbe.forkyz.util.ColorUtils;
 import app.crossword.yourealwaysbe.forkyz.util.KeyboardManager;
@@ -1263,11 +1264,13 @@ public class NotesActivity extends PuzzleActivity {
     protected void callExternalDictionary() {
         int id = getCurrentFocus(-1);
         if (id == R.id.scratch_miniboard || isPuzzleNotes()) {
-            settings.getExtDictionary(dictionary -> {
-                StringBuilder request = new StringBuilder();
-                getLetters(binding.scratchMiniboard, true, request);
-                dictionary.query(this, request.toString());
-            });
+            StringBuilder request = new StringBuilder();
+            getLetters(binding.scratchMiniboard, true, request);
+            ExternalDictionaries.build(
+                settings,
+                request.toString(),
+                data -> { data.accept(new ExternalToolLauncher(this)); }
+            );
         } else {
             super.callExternalDictionary();
         }

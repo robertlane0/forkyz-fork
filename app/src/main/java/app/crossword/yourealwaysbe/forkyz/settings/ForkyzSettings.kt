@@ -31,7 +31,6 @@ import org.json.JSONException
 import org.json.JSONObject
 
 import app.crossword.yourealwaysbe.forkyz.net.Downloaders
-import app.crossword.yourealwaysbe.forkyz.tools.ExternalDictionary
 import app.crossword.yourealwaysbe.forkyz.util.JSONUtils
 import app.crossword.yourealwaysbe.forkyz.util.files.Accessor
 import app.crossword.yourealwaysbe.forkyz.util.observeOnce
@@ -1280,23 +1279,6 @@ class ForkyzSettings(
         }
     }
 
-    val liveExtDictionary : LiveData<ExternalDictionary?>
-        = settingsFlow.map {
-            convertExternalDictionary(it.externalDictionary)
-        }.distinctUntilChanged().asLiveData()
-
-    fun getExtDictionary(cb : Consumer<ExternalDictionary?>)
-        = liveExtDictionary.observeOnce(cb)
-
-    private fun convertExternalDictionary(
-        setting : ExternalDictionarySetting
-    ) : ExternalDictionary? = when (setting) {
-        ExternalDictionarySetting.EDS_NONE -> null
-        ExternalDictionarySetting.EDS_QUICK -> ExternalDictionary.QUICK_DIC
-        ExternalDictionarySetting.EDS_AARD2 -> ExternalDictionary.AARD2
-        else -> ExternalDictionary.FREE_DICTIONARY
-    }
-
     val liveExtDictionarySetting : LiveData<ExternalDictionarySetting>
         = settingsFlow.map {
             it.externalDictionary
@@ -1319,7 +1301,7 @@ class ForkyzSettings(
                 it.chatGPTAPIKey,
                 it.crosswordSolverEnabled,
                 it.duckDuckGoEnabled,
-                convertExternalDictionary(it.externalDictionary),
+                it.externalDictionary,
                 it.fifteenSquaredEnabled,
             );
         }.distinctUntilChanged().asLiveData()

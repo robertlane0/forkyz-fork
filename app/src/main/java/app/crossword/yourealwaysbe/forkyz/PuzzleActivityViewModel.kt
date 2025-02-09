@@ -24,6 +24,7 @@ import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.tools.ChatGPTHelp
 import app.crossword.yourealwaysbe.forkyz.tools.CrosswordSolverData
 import app.crossword.yourealwaysbe.forkyz.tools.DuckDuckGoData
+import app.crossword.yourealwaysbe.forkyz.tools.ExternalDictionaries
 import app.crossword.yourealwaysbe.forkyz.tools.ExternalToolData
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
 import app.crossword.yourealwaysbe.forkyz.util.SingleLiveEvent
@@ -58,7 +59,7 @@ class PuzzleActivityViewModel @Inject constructor(
     application : Application,
 ) : AndroidViewModel(application) {
     private val LOG = Logger.getLogger(
-        PuzzleActivityViewModel::class.qualifiedName
+        PuzzleActivityViewModel::class.qualifiedName ?: ""
     )
 
     @Inject
@@ -224,6 +225,16 @@ class PuzzleActivityViewModel @Inject constructor(
         getBoard()?.getClue()
             ?.let { DuckDuckGoData.build(getApplication(), it) }
             ?.let { externalToolEvent.postValue(it) }
+    }
+
+    fun callExternalDictionary() {
+        getBoard()?.let { board ->
+            ExternalDictionaries.build(
+                settings,
+                board,
+                externalToolEvent::postValue
+            )
+        }
     }
 
     /**
