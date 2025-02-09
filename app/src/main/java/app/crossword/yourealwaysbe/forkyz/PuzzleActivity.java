@@ -42,8 +42,8 @@ import dagger.hilt.android.AndroidEntryPoint;
 
 import app.crossword.yourealwaysbe.forkyz.databinding.VoiceButtonsBinding;
 import app.crossword.yourealwaysbe.forkyz.tools.ChatGPTHelp;
-import app.crossword.yourealwaysbe.forkyz.tools.CrosswordSolver;
 import app.crossword.yourealwaysbe.forkyz.tools.DuckDuckGo;
+import app.crossword.yourealwaysbe.forkyz.tools.ExternalToolLauncher;
 import app.crossword.yourealwaysbe.forkyz.tools.FifteenSquared;
 import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer;
 import app.crossword.yourealwaysbe.forkyz.util.SpeechContract;
@@ -868,28 +868,7 @@ public abstract class PuzzleActivity
      * Uses org.billthefarmer.crossword
      */
     protected void callCrosswordSolver() {
-        Playboard board = getBoard();
-        Zone zone = (board == null) ? null : board.getCurrentZone();
-        if (zone == null)
-            return;
-
-        Puzzle puz = getPuzzle();
-        if (puz == null)
-            return;
-
-        StringBuilder request = new StringBuilder();
-
-        for (Position pos : zone) {
-            Box box = puz.checkedGetBox(pos);
-            if (!Box.isBlock(box) && !box.isBlank()) {
-                String response = box.getResponse();
-                request.append(response);
-            } else {
-                request.append(".");
-            }
-        }
-
-        CrosswordSolver.launchMain(this, request.toString());
+        viewModel.callCrosswordSolver();
     }
 
     protected void callExternalDictionary() {
@@ -1112,6 +1091,11 @@ public abstract class PuzzleActivity
                 dialog.setArguments(args);
                 dialog.show(getSupportFragmentManager(), "HelpResponseDialog");
             }
+        );
+
+        viewModel.getExternalToolEvent().observe(
+            this,
+            data -> { data.accept(new ExternalToolLauncher(this)); }
         );
     }
 

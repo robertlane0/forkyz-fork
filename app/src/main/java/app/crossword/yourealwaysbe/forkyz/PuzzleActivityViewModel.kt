@@ -22,6 +22,8 @@ import org.jg.wordstonumbers.WordsToNumbersUtil
 
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.tools.ChatGPTHelp
+import app.crossword.yourealwaysbe.forkyz.tools.CrosswordSolverData
+import app.crossword.yourealwaysbe.forkyz.tools.ExternalToolData
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
 import app.crossword.yourealwaysbe.forkyz.util.SingleLiveEvent
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands
@@ -76,6 +78,7 @@ class PuzzleActivityViewModel @Inject constructor(
     val requestHelpForCurrentClueEvent = SingleLiveEvent<Void>()
     val sendToastEvent = SingleLiveEvent<SendToast>()
     val chatGPTResponseEvent = SingleLiveEvent<ChatGPTResponse>()
+    val externalToolEvent = SingleLiveEvent<ExternalToolData>()
 
     private val voiceCommandDispatcher = VoiceCommands()
 
@@ -199,6 +202,20 @@ class PuzzleActivityViewModel @Inject constructor(
                     getBoard()?.playAnswer(prepped)
                 }
             )
+        )
+    }
+
+    fun callCrosswordSolver() {
+        val zone = getBoard()?.getCurrentZone()
+        if (zone == null)
+            return
+
+        val puz = getPuzzle()
+        if (puz == null)
+            return
+
+        externalToolEvent.postValue(
+            CrosswordSolverData.buildMissingLetters(puz, zone)
         )
     }
 

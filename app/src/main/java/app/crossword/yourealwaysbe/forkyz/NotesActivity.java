@@ -31,7 +31,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import dagger.hilt.android.AndroidEntryPoint;
 
 import app.crossword.yourealwaysbe.forkyz.databinding.NotesBinding;
-import app.crossword.yourealwaysbe.forkyz.tools.CrosswordSolver;
+import app.crossword.yourealwaysbe.forkyz.tools.CrosswordSolverData;
+import app.crossword.yourealwaysbe.forkyz.tools.ExternalToolLauncher;
 import app.crossword.yourealwaysbe.forkyz.util.ColorUtils;
 import app.crossword.yourealwaysbe.forkyz.util.KeyboardManager;
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand;
@@ -1221,7 +1222,9 @@ public class NotesActivity extends PuzzleActivity {
         if (id == R.id.scratch_miniboard || isPuzzleNotes()) {
             StringBuilder request = new StringBuilder();
             getLetters(binding.scratchMiniboard, true, request);
-            CrosswordSolver.launchMain(this, request.toString());
+            CrosswordSolverData.buildMissingLetters(request.toString()).accept(
+                new ExternalToolLauncher(this)
+            );
         } else {
             super.callCrosswordSolver();
         }
@@ -1233,7 +1236,9 @@ public class NotesActivity extends PuzzleActivity {
         getLetters(binding.anagramSource, false, request);
         getLetters(binding.anagramSolution, false, request);
 
-        CrosswordSolver.launchAnagram(this, request.toString());
+        CrosswordSolverData.buildAnagram(request.toString()).accept(
+            new ExternalToolLauncher(this)
+        );
     }
 
     /**
