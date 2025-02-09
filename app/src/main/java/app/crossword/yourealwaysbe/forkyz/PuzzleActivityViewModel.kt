@@ -23,6 +23,7 @@ import org.jg.wordstonumbers.WordsToNumbersUtil
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.tools.ChatGPTHelp
 import app.crossword.yourealwaysbe.forkyz.tools.CrosswordSolverData
+import app.crossword.yourealwaysbe.forkyz.tools.DuckDuckGoData
 import app.crossword.yourealwaysbe.forkyz.tools.ExternalToolData
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
 import app.crossword.yourealwaysbe.forkyz.util.SingleLiveEvent
@@ -217,6 +218,12 @@ class PuzzleActivityViewModel @Inject constructor(
         externalToolEvent.postValue(
             CrosswordSolverData.buildMissingLetters(puz, zone)
         )
+    }
+
+    fun searchDuckDuckGo() {
+        getBoard()?.getClue()
+            ?.let { DuckDuckGoData.build(getApplication(), it) }
+            ?.let { externalToolEvent.postValue(it) }
     }
 
     /**

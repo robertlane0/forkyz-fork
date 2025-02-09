@@ -42,7 +42,6 @@ import dagger.hilt.android.AndroidEntryPoint;
 
 import app.crossword.yourealwaysbe.forkyz.databinding.VoiceButtonsBinding;
 import app.crossword.yourealwaysbe.forkyz.tools.ChatGPTHelp;
-import app.crossword.yourealwaysbe.forkyz.tools.DuckDuckGo;
 import app.crossword.yourealwaysbe.forkyz.tools.ExternalToolLauncher;
 import app.crossword.yourealwaysbe.forkyz.tools.FifteenSquared;
 import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer;
@@ -1194,9 +1193,7 @@ public abstract class PuzzleActivity
     }
 
     private void searchDuckDuckGo() {
-        Playboard board = getBoard();
-        Clue clue = (board == null) ? null : board.getClue();
-        DuckDuckGo.launchSearch(this, clue);
+        viewModel.searchDuckDuckGo();
     }
 
     public static class RevealPuzzleDialog extends DialogFragment {
