@@ -1,7 +1,6 @@
 package app.crossword.yourealwaysbe.forkyz;
 
 import java.io.IOException;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
@@ -35,12 +34,11 @@ import androidx.core.view.accessibility.AccessibilityViewCommand;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import dagger.hilt.android.AndroidEntryPoint;
-
-import org.jg.wordstonumbers.WordsToNumbersUtil;
 
 import app.crossword.yourealwaysbe.forkyz.databinding.VoiceButtonsBinding;
 import app.crossword.yourealwaysbe.forkyz.tools.ChatGPTHelp;
@@ -50,10 +48,6 @@ import app.crossword.yourealwaysbe.forkyz.tools.FifteenSquared;
 import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer;
 import app.crossword.yourealwaysbe.forkyz.util.SpeechContract;
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand;
-import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands;
-import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider;
-import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerShared;
-import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle;
 import app.crossword.yourealwaysbe.forkyz.view.ChooseFlagColorDialog;
 import app.crossword.yourealwaysbe.forkyz.view.ClueEditDialog;
 import app.crossword.yourealwaysbe.forkyz.view.PlayboardTextRenderer;
@@ -77,9 +71,6 @@ public abstract class PuzzleActivity
 
     protected static final String HELP_RESPONSE_TEXT = "helpResponse";
 
-    @Inject
-    protected FileHandlerProvider fileHandlerProvider;
-
     private VoiceButtonsBinding voiceBinding = null;
     private boolean firstPlay = false;
     private ImaginaryTimer timer;
@@ -98,15 +89,19 @@ public abstract class PuzzleActivity
         }
     };
 
-    private VoiceCommands voiceCommandDispatcher = new VoiceCommands();
+    private PuzzleActivityViewModel viewModel;
+
     private ActivityResultLauncher<String> voiceInputLauncher
         = registerForActivityResult(new SpeechContract(), text -> {
-            voiceCommandDispatcher.dispatch(text);
+            viewModel.dispatchVoiceCommand(text);
         });
 
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
+
+        viewModel = new ViewModelProvider(this)
+            .get(PuzzleActivityViewModel.class);
 
         // get these early to maximise chances of it being ready by the first
         // volume down press
@@ -259,19 +254,19 @@ public abstract class PuzzleActivity
                 specialEntry();
                 return true;
             } else if (id == R.id.puzzle_menu_share_clue) {
-                shareClue(false);
+                viewModel.shareClue(false);
                 return true;
             } else if (id == R.id.puzzle_menu_share_clue_response) {
-                shareClue(true);
+                viewModel.shareClue(true);
                 return true;
             } else if (id == R.id.puzzle_menu_share_puzzle_full) {
-                sharePuzzle(false, false);
+                viewModel.sharePuzzle(false, false);
                 return true;
             } else if (id == R.id.puzzle_menu_share_puzzle_without_extensions) {
-                sharePuzzle(false, true);
+                viewModel.sharePuzzle(false, true);
                 return true;
             } else if (id == R.id.puzzle_menu_share_puzzle_orig) {
-                sharePuzzle(true, true);
+                viewModel.sharePuzzle(true, true);
                 return true;
             } else if (id == R.id.puzzle_menu_open_share_url) {
                 openShareUrl();
@@ -472,6 +467,10 @@ public abstract class PuzzleActivity
         return super.onKeyUp(keyCode, event);
     }
 
+    protected void registerVoiceCommand(@NonNull VoiceCommand command) {
+        viewModel.registerVoiceCommand(command);
+    }
+
     /**
      * Whether the current puzzle has initial values
      */
@@ -492,44 +491,16 @@ public abstract class PuzzleActivity
     }
 
     protected Playboard getBoard(){
-        return getCurrentBoard();
+        return viewModel.getBoard();
     }
 
     protected Puzzle getPuzzle() {
-        Playboard board = getBoard();
-        return (board == null) ? null : board.getPuzzle();
+        return viewModel.getPuzzle();
     }
 
     protected void saveBoard() {
-        PuzHandle puzHandle = getCurrentPuzHandle();
-        if (puzHandle == null) {
-            LOG.severe("No puz handle to save puzzle to.");
-            return;
-        }
-
-        Playboard board = getCurrentBoard();
-        if (board == null) {
-            LOG.severe("No board to save.");
-            return;
-        }
-
-        Puzzle puz = board.getPuzzle();
-        if (puz == null) {
-            LOG.severe("No puzzle associated to the board to save.");
-            return;
-        }
-
-        fileHandlerProvider.get(fileHandler -> {
-            // TODO: save off main thread?
-            try {
-                fileHandler.save(puz, puzHandle);
-            } catch (IOException e) {
-                LOG.severe("Error saving puzzle.");
-                e.printStackTrace();
-            }
-        });
+        viewModel.saveBoard();
     }
-
 
     protected boolean isFirstPlay() {
         return firstPlay;
@@ -537,10 +508,6 @@ public abstract class PuzzleActivity
 
     protected void setTimer(ImaginaryTimer timer) {
         this.timer = timer;
-    }
-
-    protected PuzHandle getPuzHandle() {
-        return getCurrentPuzHandle();
     }
 
     protected void getLongClueText(Clue clue, Consumer<String> cb) {
@@ -596,136 +563,13 @@ public abstract class PuzzleActivity
         }
     }
 
-    private void canRequestHelpForCurrentClue(Consumer<Boolean> cb) {
-        Playboard board = getBoard();
-        Clue clue = board == null ? null : board.getClue();
-        if (clue == null)
-            cb.accept(false);
-        else
-            ChatGPTHelp.isEnabled(settings, cb);
-    }
-
     private void requestHelpForCurrentClue() {
-        if (!utils.hasNetworkConnection(this)) {
-            Toast t = Toast.makeText(
-                this,
-                R.string.help_query_but_no_active_network,
-                Toast.LENGTH_LONG
-            );
-            t.show();
-        } else {
-            canRequestHelpForCurrentClue(canRequest -> {
-                if (canRequest) {
-                    ChatGPTHelp helper = new ChatGPTHelp(settings);
-                    helper.requestHelpForCurrentClue(
-                        this,
-                        getBoard(),
-                        (String response) -> {
-                            HelpResponseDialog dialog
-                                = new HelpResponseDialog();
-                            Bundle args = new Bundle();
-                            args.putString(HELP_RESPONSE_TEXT, response);
-                            dialog.setArguments(args);
-                            dialog.show(
-                                getSupportFragmentManager(),
-                                "HelpResponseDialog"
-                            );
-                        }
-                    );
-                }
-            });
-        }
+        viewModel.requestHelpForCurrentClue();
     }
 
     private void specialEntry() {
         SpecialEntryDialog dialog = new SpecialEntryDialog();
         dialog.show(getSupportFragmentManager(), "SpecialEntryDialog");
-    }
-
-    private void shareClue(boolean withResponse) {
-        Playboard board = getBoard();
-        Clue clue = (board == null) ? null : board.getClue();
-        if (clue == null)
-            return;
-
-        Puzzle puz = board.getPuzzle();
-        String source = (puz == null) ? null : puz.getSource();
-        String title = (puz == null) ? null : puz.getTitle();
-        String author = (puz == null) ? null : puz.getAuthor();
-        Box[] response = board.getCurrentWordBoxes();
-
-        getShareMessage(puz, clue, response, withResponse, shareMessage -> {
-            // ShareCompat from
-            // https://stackoverflow.com/a/39619468/6882587
-            // assume works better than the out-of-date android docs!
-            Intent shareIntent = new ShareCompat.IntentBuilder(this)
-                .setText(shareMessage)
-                .setType("text/plain")
-                .setChooserTitle(getString(R.string.share_clue_title))
-                .createChooserIntent();
-
-            startActivity(shareIntent);
-        });
-    }
-
-    private void getShareMessage(
-        Puzzle puz, Clue clue, Box[] response, boolean withResponse,
-        Consumer<String> cb
-    ) {
-        getShareClueText(clue, clueText -> {
-            String responseText = withResponse
-                ? getShareResponseText(response)
-                : null;
-
-            String puzzleDetails = getSharePuzzleDetails(puz);
-
-            if (withResponse) {
-                cb.accept(getString(
-                    R.string.share_clue_response_text,
-                    clueText, responseText, puzzleDetails
-                ));
-            } else {
-                cb.accept(getString(
-                    R.string.share_clue_text,
-                    clueText, puzzleDetails
-                ));
-            }
-        });
-    }
-
-    private String getShareResponseText(Box[] boxes) {
-        StringBuilder responseText = new StringBuilder();
-        if (boxes != null) {
-            for (Box box : boxes) {
-                if (box.isBlank()) {
-                    responseText.append(
-                        getString(R.string.share_clue_blank_box)
-                    );
-                } else {
-                    responseText.append(box.getResponse());
-                }
-            }
-        }
-        return responseText.toString();
-    }
-
-    protected void getShareClueText(Clue clue, Consumer<String> cb) {
-        settings.getPlayShowCount(showCount -> {
-            if (clue == null)
-                cb.accept(getString(R.string.unknown_hint));
-
-            int wordLen = clue.hasZone() ? clue.getZone().size() : -1;
-
-            if (showCount && wordLen >= 0) {
-                cb.accept(getString(
-                    R.string.clue_format_short_no_num_no_dir_with_count,
-                    clue.getHint(),
-                    wordLen
-                ));
-            } else {
-                cb.accept(clue.getHint());
-            }
-        });
     }
 
     protected void launchVoiceInput() {
@@ -741,175 +585,6 @@ public abstract class PuzzleActivity
             );
             t.show();
         }
-    }
-
-    protected void registerVoiceCommand(@NonNull VoiceCommand command) {
-        voiceCommandDispatcher.registerVoiceCommand(command);
-    }
-
-    /**
-     * Prepared command for inputting word answers
-     */
-    protected void registerVoiceCommandAnswer() {
-        registerVoiceCommand(new VoiceCommand(
-            getString(R.string.command_answer),
-            getString(R.string.command_answer_alt),
-            answer -> {
-                Playboard board = getBoard();
-                if (board == null)
-                    return;
-
-                // remove non-word as not usually entered into grids
-                String prepped
-                    = answer.replaceAll("\\W+", "")
-                        .toUpperCase(Locale.getDefault());
-                board.playAnswer(prepped);
-            }
-        ));
-    }
-
-    /**
-     * Prepared command for inputting letters
-     */
-    protected void registerVoiceCommandLetter() {
-        registerVoiceCommand(new VoiceCommand(
-            getString(R.string.command_letter),
-            letter -> {
-                if (letter == null || letter.isEmpty())
-                    return;
-                Playboard board = getBoard();
-                if (board != null)
-                    board.playLetter(Character.toUpperCase(letter.charAt(0)));
-            }
-        ));
-    }
-
-    /**
-     * Prepared command for jumping to clue number
-     */
-    protected void registerVoiceCommandNumber() {
-        registerVoiceCommand(new VoiceCommand(
-            getString(R.string.command_number),
-            textNumber -> {
-                Playboard board = getBoard();
-                if (board == null)
-                    return;
-
-                String prepped
-                    = WordsToNumbersUtil.convertTextualNumbersInDocument(textNumber);
-                try {
-                    int number = Integer.parseInt(prepped);
-                    board.jumpToClue(String.valueOf(number));
-                } catch (NumberFormatException e) {
-                    board.jumpToClue(textNumber);
-                }
-            }
-        ));
-    }
-
-    /**
-     * Prepared command for clearing current word
-     */
-    protected void registerVoiceCommandClear() {
-        registerVoiceCommand(new VoiceCommand(
-            getString(R.string.command_clear),
-            args -> {
-                Playboard board = getBoard();
-                if (board != null)
-                    board.clearWord();
-            }
-        ));
-    }
-
-    /**
-     * Prepared command for announcing current clue
-     */
-    protected void registerVoiceCommandAnnounceClue() {
-        registerVoiceCommand(new VoiceCommand(
-            getString(R.string.command_announce_clue),
-            args -> { announceClue(false); }
-        ));
-    }
-
-    /**
-     * Prepared command for announcing current clue
-     */
-    protected void registerVoiceCommandClueHelp() {
-        registerVoiceCommand(new VoiceCommand(
-            getString(R.string.command_current_clue_help),
-            args -> { requestHelpForCurrentClue(); }
-        ));
-    }
-
-    private String getSharePuzzleDetails(Puzzle puz) {
-        if (puz == null)
-            return "";
-
-        String source = puz.getSource();
-        String title = puz.getTitle();
-        String author = puz.getAuthor();
-
-        if (source == null)
-            source = "";
-        if (title == null)
-            title = "";
-        if (author != null) {
-            // add author if not already in title or caption
-            // case insensitive trick:
-            // https://www.baeldung.com/java-case-insensitive-string-matching
-            String quotedAuthor = Pattern.quote(author);
-            boolean removeAuthor
-                = author.isEmpty()
-                    || title.matches("(?i).*" + quotedAuthor + ".*")
-                    || source.matches("(?i).*" + quotedAuthor + ".*");
-
-            if (removeAuthor)
-                author = null;
-        }
-
-        String shareUrl = puz.getShareUrl();
-
-        if (shareUrl == null || shareUrl.isEmpty()) {
-            return (author != null)
-                ? getString(
-                    R.string.share_puzzle_details_author_no_url,
-                    source, title, author
-                ) : getString(
-                    R.string.share_puzzle_details_no_author_no_url,
-                    source, title
-                );
-        } else {
-            return (author != null)
-                ? getString(
-                    R.string.share_puzzle_details_author_url,
-                    source, title, author, shareUrl
-                ) : getString(
-                    R.string.share_puzzle_details_no_author_url,
-                    source, title, shareUrl
-                );
-        }
-    }
-
-    private void sharePuzzle(boolean writeBlank, boolean omitExtensions) {
-        final Puzzle puz = getPuzzle();
-        if (puz == null)
-            return;
-
-        FileHandlerShared.getShareUri(
-            getApplicationContext(), getPuzzle(), writeBlank, omitExtensions,
-            (puzUri) -> {
-                String mimeType = FileHandlerShared.getShareUriMimeType();
-                String puzzleDetails = getSharePuzzleDetails(puz);
-
-                Intent shareIntent = new ShareCompat.IntentBuilder(this)
-                    .setStream(puzUri)
-                    .setType(mimeType)
-                    .setChooserTitle(getString(R.string.share_puzzle_title))
-                    .createChooserIntent();
-
-                startActivity(shareIntent);
-            }
-        );
     }
 
     private void openShareUrl() {
@@ -1036,7 +711,7 @@ public abstract class PuzzleActivity
      * subclasses to edit a different default clue.
      */
     protected void editClue() {
-        Playboard board = currentPuzzleHolder.getBoard();
+        Playboard board = getBoard();
         ClueID cid = (board == null) ? null : board.getClueID();
         editClue(cid);
     }
@@ -1264,6 +939,50 @@ public abstract class PuzzleActivity
         settings.getLivePlayShowErrorsGrid().observe(this, showErrorsObserver);
     }
 
+    // TODO: delete these register commands and register in viewModel
+    // instead
+    /**
+     * Prepared command for inputting word answers
+     */
+    protected void registerVoiceCommandAnswer() {
+        viewModel.registerVoiceCommandAnswer();
+    }
+
+    /**
+     * Prepared command for inputting letters
+     */
+    protected void registerVoiceCommandLetter() {
+        viewModel.registerVoiceCommandLetter();
+    }
+
+    /**
+     * Prepared command for jumping to clue number
+     */
+    protected void registerVoiceCommandNumber() {
+        viewModel.registerVoiceCommandNumber();
+    }
+
+    /**
+     * Prepared command for clearing current word
+     */
+    protected void registerVoiceCommandClear() {
+        viewModel.registerVoiceCommandClear();
+    }
+
+    /**
+     * Prepared command for announcing current clue
+     */
+    protected void registerVoiceCommandAnnounceClue() {
+        viewModel.registerVoiceCommandAnnounceClue();
+    }
+
+    /**
+     * Prepared command for announcing current clue
+     */
+    protected void registerVoiceCommandClueHelp() {
+        viewModel.registerVoiceCommandClueHelp();
+    }
+
     private void setupObservers() {
         settings.getLivePlayShowTimer().observe(
             this,
@@ -1337,6 +1056,61 @@ public abstract class PuzzleActivity
                 Playboard board = getBoard();
                 if (board != null)
                     board.setToggleBeforeMove(toggleBeforeMove);
+            }
+        );
+
+        viewModel.getShareMessageEvent().observe(
+            this,
+            shareMessage -> {
+                // ShareCompat from
+                // https://stackoverflow.com/a/39619468/6882587
+                // assume works better than the out-of-date android docs!
+                Intent shareIntent = new ShareCompat.IntentBuilder(this)
+                    .setText(shareMessage.getMessage())
+                    .setType("text/plain")
+                    .setChooserTitle(shareMessage.getTitle())
+                    .createChooserIntent();
+                startActivity(shareIntent);
+            }
+        );
+
+        viewModel.getShareStreamEvent().observe(
+            this,
+            shareStream -> {
+                Intent shareIntent = new ShareCompat.IntentBuilder(this)
+                    .setChooserTitle(shareStream.getTitle())
+                    .setStream(shareStream.getUri())
+                    .setType(shareStream.getMimeType())
+                    .createChooserIntent();
+                startActivity(shareIntent);
+            }
+        );
+
+        viewModel.getAnnounceClueEvent().observe(
+            this,
+            (v) -> { announceClue(false); }
+        );
+
+        viewModel.getRequestHelpForCurrentClueEvent().observe(
+            this,
+            (v) -> { requestHelpForCurrentClue(); }
+        );
+
+        viewModel.getSendToastEvent().observe(
+            this,
+            toast -> {
+                Toast.makeText(this, toast.getText(), Toast.LENGTH_LONG).show();
+            }
+        );
+
+        viewModel.getChatGPTResponseEvent().observe(
+            this,
+            response -> {
+                HelpResponseDialog dialog = new HelpResponseDialog();
+                Bundle args = new Bundle();
+                args.putString(HELP_RESPONSE_TEXT, response.getResponse());
+                dialog.setArguments(args);
+                dialog.show(getSupportFragmentManager(), "HelpResponseDialog");
             }
         );
     }

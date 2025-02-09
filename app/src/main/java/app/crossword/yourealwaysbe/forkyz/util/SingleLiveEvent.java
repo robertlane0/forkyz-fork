@@ -71,4 +71,11 @@ public class SingleLiveEvent<T> extends MutableLiveData<T> {
     public void call() {
         setValue(null);
     }
+
+    /**
+     * As call but post
+     */
+    public void postCall() {
+        postValue(null);
+    }
 }
