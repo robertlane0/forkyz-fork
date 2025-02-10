@@ -26,6 +26,7 @@ import app.crossword.yourealwaysbe.forkyz.tools.CrosswordSolverData
 import app.crossword.yourealwaysbe.forkyz.tools.DuckDuckGoData
 import app.crossword.yourealwaysbe.forkyz.tools.ExternalDictionaries
 import app.crossword.yourealwaysbe.forkyz.tools.ExternalToolData
+import app.crossword.yourealwaysbe.forkyz.tools.FifteenSquaredData
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
 import app.crossword.yourealwaysbe.forkyz.util.SingleLiveEvent
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands
@@ -217,6 +218,12 @@ class PuzzleActivityViewModel @Inject constructor(
         getBoard()?.getClue()
             ?.let { DuckDuckGoData.build(getApplication(), it) }
             ?.let { externalToolEvent.postValue(it) }
+    }
+
+    fun searchFifteenSquared() {
+        getPuzzle()?.let {
+            FifteenSquaredData.build(getApplication(), it)
+        }?.let { externalToolEvent.postValue(it) }
     }
 
     fun callExternalDictionary() {

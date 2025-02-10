@@ -43,7 +43,6 @@ import dagger.hilt.android.AndroidEntryPoint;
 import app.crossword.yourealwaysbe.forkyz.databinding.VoiceButtonsBinding;
 import app.crossword.yourealwaysbe.forkyz.tools.ChatGPTHelpData;
 import app.crossword.yourealwaysbe.forkyz.tools.ExternalToolLauncher;
-import app.crossword.yourealwaysbe.forkyz.tools.FifteenSquared;
 import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer;
 import app.crossword.yourealwaysbe.forkyz.util.SpeechContract;
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand;
@@ -852,7 +851,7 @@ public abstract class PuzzleActivity
     }
 
     protected void searchFifteenSquared() {
-        FifteenSquared.launchSearch(this, getPuzzle());
+        viewModel.searchFifteenSquared();
     }
 
     /**
