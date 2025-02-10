@@ -268,7 +268,7 @@ public abstract class PuzzleActivity
                 openShareUrl();
                 return true;
             } else if (id == R.id.puzzle_menu_ask_chat_gpt) {
-                requestHelpForCurrentClue();
+                viewModel.requestHelpForCurrentClue();
                 return true;
             } else if (id == R.id.clue_list_menu_edit_clue) {
                 editClue();
@@ -277,13 +277,13 @@ public abstract class PuzzleActivity
                 callCrosswordSolver();
                 return true;
             } else if (id == R.id.puzzle_menu_duckduckgo) {
-                searchDuckDuckGo();
+                viewModel.searchDuckDuckGo();
                 return true;
             } else if (id == R.id.puzzle_menu_external_dictionary) {
                 callExternalDictionary();
                 return true;
             } else if (id == R.id.puzzle_menu_fifteen_squared) {
-                searchFifteenSquared();
+                viewModel.searchFifteenSquared();
                 return true;
             } else if (id == R.id.puzzle_menu_clue_notes) {
                 launchClueNotes(board.getClueID());
@@ -557,10 +557,6 @@ public abstract class PuzzleActivity
                 startActivity(i);
             }
         }
-    }
-
-    private void requestHelpForCurrentClue() {
-        viewModel.requestHelpForCurrentClue();
     }
 
     private void specialEntry() {
@@ -846,12 +842,13 @@ public abstract class PuzzleActivity
         viewModel.callCrosswordSolver();
     }
 
+    /**
+     * Call external dictionary
+     *
+     * Protected to allow activity overriding.
+     */
     protected void callExternalDictionary() {
         viewModel.callExternalDictionary();
-    }
-
-    protected void searchFifteenSquared() {
-        viewModel.searchFifteenSquared();
     }
 
     /**
@@ -1128,10 +1125,6 @@ public abstract class PuzzleActivity
             dialog.setArguments(args);
             dialog.show(getSupportFragmentManager(), "ChooseFlagColorDialog");
         }
-    }
-
-    private void searchDuckDuckGo() {
-        viewModel.searchDuckDuckGo();
     }
 
     public static class RevealPuzzleDialog extends DialogFragment {
