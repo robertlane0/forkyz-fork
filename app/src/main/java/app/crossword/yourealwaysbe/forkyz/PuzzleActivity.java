@@ -41,7 +41,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import dagger.hilt.android.AndroidEntryPoint;
 
 import app.crossword.yourealwaysbe.forkyz.databinding.VoiceButtonsBinding;
-import app.crossword.yourealwaysbe.forkyz.tools.ChatGPTHelp;
+import app.crossword.yourealwaysbe.forkyz.tools.ChatGPTHelpData;
 import app.crossword.yourealwaysbe.forkyz.tools.ExternalToolLauncher;
 import app.crossword.yourealwaysbe.forkyz.tools.FifteenSquared;
 import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer;
@@ -67,8 +67,6 @@ public abstract class PuzzleActivity
         implements Playboard.PlayboardListener {
 
     private static final Logger LOG = Logger.getLogger("app.crossword.yourealwaysbe");
-
-    protected static final String HELP_RESPONSE_TEXT = "helpResponse";
 
     private VoiceButtonsBinding voiceBinding = null;
     private boolean firstPlay = false;
@@ -133,7 +131,7 @@ public abstract class PuzzleActivity
                 ext.setEnabled(false);
             }
 
-            if (!ChatGPTHelp.isEnabled(extSettings)) {
+            if (!ChatGPTHelpData.isEnabled(extSettings)) {
                 MenuItem help = menu.findItem(R.id.puzzle_menu_ask_chat_gpt);
                 help.setVisible(false);
                 help.setEnabled(false);
@@ -825,7 +823,7 @@ public abstract class PuzzleActivity
     }
 
     private void handleChangeChatGPT(PlayboardChanges changes) {
-        ChatGPTHelp.isEnabled(settings, isEnabled -> {
+        ChatGPTHelpData.isEnabled(settings, isEnabled -> {
             if (isEnabled) {
                 boolean newWord = !Objects.equals(
                     changes.getPreviousWord(), changes.getCurrentWord()
@@ -835,27 +833,6 @@ public abstract class PuzzleActivity
                     invalidateOptionsMenu();
             }
         });
-    }
-
-    public static class HelpResponseDialog extends DialogFragment {
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            Activity activity = getActivity();
-
-            String response = getArguments().getString(HELP_RESPONSE_TEXT);
-            if (response == null)
-                response = activity.getString(R.string.help_query_failed);
-
-            MaterialAlertDialogBuilder builder
-                = new MaterialAlertDialogBuilder(activity);
-
-            builder.setTitle(
-                activity.getString(R.string.help_query_response_title)
-            ).setMessage(response)
-                .setPositiveButton(R.string.ok, null);
-
-            return builder.create();
-        }
     }
 
     /**
@@ -1047,26 +1024,10 @@ public abstract class PuzzleActivity
             (v) -> { announceClue(false); }
         );
 
-        viewModel.getRequestHelpForCurrentClueEvent().observe(
-            this,
-            (v) -> { requestHelpForCurrentClue(); }
-        );
-
         viewModel.getSendToastEvent().observe(
             this,
             toast -> {
                 Toast.makeText(this, toast.getText(), Toast.LENGTH_LONG).show();
-            }
-        );
-
-        viewModel.getChatGPTResponseEvent().observe(
-            this,
-            response -> {
-                HelpResponseDialog dialog = new HelpResponseDialog();
-                Bundle args = new Bundle();
-                args.putString(HELP_RESPONSE_TEXT, response.getResponse());
-                dialog.setArguments(args);
-                dialog.show(getSupportFragmentManager(), "HelpResponseDialog");
             }
         );
 

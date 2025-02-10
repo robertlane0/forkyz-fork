@@ -1,7 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.settings
 
-import app.crossword.yourealwaysbe.forkyz.tools.ChatGPTHelp
+import app.crossword.yourealwaysbe.forkyz.tools.ChatGPTHelpData
 
 class ExternalToolSettings(
     val chatGPTAPIKey : String,
@@ -12,7 +12,7 @@ class ExternalToolSettings(
 ) {
     val hasExternal
         get() = (
-            ChatGPTHelp.isEnabled(this)
+            ChatGPTHelpData.isEnabled(this)
             || crosswordSolverEnabled
             || duckDuckGoEnabled
             || hasExternalDictionary

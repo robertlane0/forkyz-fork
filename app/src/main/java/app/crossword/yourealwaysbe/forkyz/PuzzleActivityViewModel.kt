@@ -21,7 +21,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import org.jg.wordstonumbers.WordsToNumbersUtil
 
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
-import app.crossword.yourealwaysbe.forkyz.tools.ChatGPTHelp
+import app.crossword.yourealwaysbe.forkyz.tools.ChatGPTHelpData
 import app.crossword.yourealwaysbe.forkyz.tools.CrosswordSolverData
 import app.crossword.yourealwaysbe.forkyz.tools.DuckDuckGoData
 import app.crossword.yourealwaysbe.forkyz.tools.ExternalDictionaries
@@ -37,8 +37,6 @@ import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Clue
 import app.crossword.yourealwaysbe.puz.Playboard
 import app.crossword.yourealwaysbe.puz.Puzzle
-
-class ChatGPTResponse(val response : String)
 
 class ShareMessage(
     val title : String,
@@ -77,9 +75,7 @@ class PuzzleActivityViewModel @Inject constructor(
     val shareMessageEvent = SingleLiveEvent<ShareMessage>()
     val shareStreamEvent = SingleLiveEvent<ShareStream>()
     val announceClueEvent = SingleLiveEvent<Void>()
-    val requestHelpForCurrentClueEvent = SingleLiveEvent<Void>()
     val sendToastEvent = SingleLiveEvent<SendToast>()
-    val chatGPTResponseEvent = SingleLiveEvent<ChatGPTResponse>()
     val externalToolEvent = SingleLiveEvent<ExternalToolData>()
 
     private val voiceCommandDispatcher = VoiceCommands()
@@ -118,17 +114,13 @@ class PuzzleActivityViewModel @Inject constructor(
         if (!utils.hasNetworkConnection(getApplication())) {
             sendToast(app.getString(R.string.help_query_but_no_active_network))
         } else {
-            canRequestHelpForCurrentClue() { canRequest ->
-                if (canRequest) {
-                    ChatGPTHelp(settings).requestHelpForCurrentClue(
-                        app,
-                        getBoard(),
-                    ) { response ->
-                        chatGPTResponseEvent.postValue(
-                            ChatGPTResponse(response)
-                        )
-                    }
-                }
+            getBoard()?.let { board ->
+                ChatGPTHelpData.buildForCurrentClue(
+                    app,
+                    settings,
+                    board,
+                    externalToolEvent::postValue,
+                )
             }
         }
     }
@@ -312,7 +304,7 @@ class PuzzleActivityViewModel @Inject constructor(
         registerVoiceCommand(
             VoiceCommand(
                 app.getString(R.string.command_current_clue_help),
-                { requestHelpForCurrentClueEvent.postCall() },
+                { requestHelpForCurrentClue() }
             )
         )
     }
@@ -451,14 +443,6 @@ class PuzzleActivityViewModel @Inject constructor(
                 )
             }
         }
-    }
-
-    private fun canRequestHelpForCurrentClue(cb : (Boolean) -> Unit) {
-        val clue = getBoard()?.getClue();
-        if (clue == null)
-            cb(false)
-        else
-            ChatGPTHelp.isEnabled(settings, cb)
     }
 
     private fun sendToast(text : String) {
