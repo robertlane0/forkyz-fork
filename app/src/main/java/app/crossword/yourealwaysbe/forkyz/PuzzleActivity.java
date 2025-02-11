@@ -113,105 +113,97 @@ public abstract class PuzzleActivity
         if (!super.onPrepareOptionsMenu(menu))
             return false;
 
-        Playboard board = getBoard();
-        Puzzle puz = getPuzzle();
+        MenuState state = viewModel.getMenuState().getValue();
+        if (state == null)
+            return true;
 
-        String shareUrl = puz == null ? null : puz.getShareUrl();
-        if (shareUrl == null || shareUrl.isEmpty()) {
+        if (!state.getHasShareURL()) {
             MenuItem open = menu.findItem(R.id.puzzle_menu_open_share_url);
             open.setVisible(false);
             open.setEnabled(false);
         }
 
-        settings.getExternalToolSettings(extSettings -> {
-            if (!extSettings.getHasExternal()) {
-                MenuItem ext = menu.findItem(R.id.puzzle_menu_external_tools);
-                ext.setVisible(false);
-                ext.setEnabled(false);
-            }
-
-            if (!ChatGPTHelpData.isEnabled(extSettings)) {
-                MenuItem help = menu.findItem(R.id.puzzle_menu_ask_chat_gpt);
-                help.setVisible(false);
-                help.setEnabled(false);
-            }
-
-            if (!extSettings.getCrosswordSolverEnabled()) {
-                MenuItem solver
-                    = menu.findItem(R.id.puzzle_menu_crossword_solver);
-                solver.setVisible(false);
-                solver.setEnabled(false);
-            }
-
-            if (!extSettings.getDuckDuckGoEnabled()) {
-                MenuItem item
-                    = menu.findItem(R.id.puzzle_menu_duckduckgo);
-                item.setVisible(false);
-                item.setEnabled(false);
-            }
-
-            if (!extSettings.getFifteenSquaredEnabled()) {
-                MenuItem item = menu.findItem(R.id.puzzle_menu_fifteen_squared);
-                item.setVisible(false);
-                item.setEnabled(false);
-            }
-
-            if (!extSettings.getHasExternalDictionary()) {
-                MenuItem help
-                    = menu.findItem(R.id.puzzle_menu_external_dictionary);
-                help.setVisible(false);
-                help.setEnabled(false);
-            }
-        });
-
-        settings.getPlayScratchMode(scratchMode -> {
-            MenuItem item = menu.findItem(R.id.puzzle_menu_scratch_mode);
-            if (item != null)
-                item.setChecked(scratchMode);
-        });
-
-        boolean canSolve = puz != null && puz.hasSolution();
-
-        MenuItem showErrors = menu.findItem(R.id.puzzle_menu_show_errors);
-        showErrors.setEnabled(canSolve);
-        showErrors.setVisible(canSolve);
-
-        settings.getPlayShowErrorsClue(showErrorsClue -> {
-        settings.getPlayShowErrorsCursor(showErrorsCursor -> {
-        settings.getPlayShowErrorsGrid(showErrorsGrid -> {
-            int showErrorsTitle =
-                (showErrorsGrid || showErrorsCursor || showErrorsClue)
-                ? R.string.showing_errors
-                : R.string.show_errors;
-
-            showErrors.setTitle(showErrorsTitle);
-
-            menu.findItem(R.id.puzzle_menu_show_errors_grid)
-                .setChecked(showErrorsGrid);
-            menu.findItem(R.id.puzzle_menu_show_errors_cursor)
-                .setChecked(showErrorsCursor);
-            menu.findItem(R.id.puzzle_menu_show_errors_clue)
-                .setChecked(showErrorsClue);
-        });});});
-
-
-        MenuItem reveal = menu.findItem(R.id.puzzle_menu_reveal);
-        reveal.setEnabled(canSolve);
-        reveal.setVisible(canSolve);
-
-        Box box = (board == null) ? null : board.getCurrentBox();
-        boolean hasInitial = !Box.isBlock(box) && box.hasInitialValue();
-        menu.findItem(R.id.puzzle_menu_reveal_initial_letter)
-            .setVisible(hasInitial);
-
-        menu.findItem(R.id.puzzle_menu_reveal_initial_letters)
-            .setVisible(getHasInitialValues());
-
-        if (puz == null || puz.getSupportUrl() == null) {
+        if (!state.getHasSupportURL()) {
             MenuItem support = menu.findItem(R.id.puzzle_menu_support_source);
             support.setVisible(false);
             support.setEnabled(false);
         }
+
+        ExternalToolsMenuState ext = state.getExternalToolsState();
+
+        if (!ext.getHasExternal()) {
+            MenuItem extTools = menu.findItem(R.id.puzzle_menu_external_tools);
+            extTools.setVisible(false);
+            extTools.setEnabled(false);
+        }
+
+        if (!ext.getHasChatGPT()) {
+            MenuItem help = menu.findItem(R.id.puzzle_menu_ask_chat_gpt);
+            help.setVisible(false);
+            help.setEnabled(false);
+        }
+
+        if (!ext.getHasCrosswordSolver()) {
+            MenuItem solver = menu.findItem(R.id.puzzle_menu_crossword_solver);
+            solver.setVisible(false);
+            solver.setEnabled(false);
+        }
+
+        if (!ext.getHasDuckDuckGo()) {
+            MenuItem item = menu.findItem(R.id.puzzle_menu_duckduckgo);
+            item.setVisible(false);
+            item.setEnabled(false);
+        }
+
+        if (!ext.getHasFifteenSquared()) {
+            MenuItem item = menu.findItem(R.id.puzzle_menu_fifteen_squared);
+            item.setVisible(false);
+            item.setEnabled(false);
+        }
+
+        if (!ext.getHasExternalDictionary()) {
+            MenuItem help = menu.findItem(R.id.puzzle_menu_external_dictionary);
+            help.setVisible(false);
+            help.setEnabled(false);
+        }
+
+        MenuItem item = menu.findItem(R.id.puzzle_menu_scratch_mode);
+        if (item != null)
+            item.setChecked(state.isScratchMode());
+
+        ShowErrorsMenuState errState = state.getShowErrorsState();
+        boolean showErrorsClue = errState.isShowingErrorsClue();
+        boolean showErrorsCursor = errState.isShowingErrorsCursor();
+        boolean showErrorsGrid = errState.isShowingErrorsGrid();
+
+        MenuItem showErrors = menu.findItem(R.id.puzzle_menu_show_errors);
+        showErrors.setEnabled(errState.getEnabled());
+        showErrors.setVisible(errState.getEnabled());
+
+        int showErrorsTitle =
+            (showErrorsGrid || showErrorsCursor || showErrorsClue)
+            ? R.string.showing_errors
+            : R.string.show_errors;
+
+        showErrors.setTitle(showErrorsTitle);
+
+        menu.findItem(R.id.puzzle_menu_show_errors_grid)
+            .setChecked(showErrorsGrid);
+        menu.findItem(R.id.puzzle_menu_show_errors_cursor)
+            .setChecked(showErrorsCursor);
+        menu.findItem(R.id.puzzle_menu_show_errors_clue)
+            .setChecked(showErrorsClue);
+
+        boolean canReveal = state.getCanReveal();
+        MenuItem reveal = menu.findItem(R.id.puzzle_menu_reveal);
+        reveal.setEnabled(canReveal);
+        reveal.setVisible(canReveal);
+
+        menu.findItem(R.id.puzzle_menu_reveal_initial_letter)
+            .setVisible(state.getCanRevealInitialBoxLetter());
+
+        menu.findItem(R.id.puzzle_menu_reveal_initial_letters)
+            .setVisible(state.getCanRevealInitialLetters());
 
         return true;
     }
@@ -939,10 +931,6 @@ public abstract class PuzzleActivity
             }
         );
 
-        settings.getLivePlayScratchMode().observe(
-            this, value -> { invalidateOptionsMenu(); }
-        );
-
         settings.getLivePlayShowErrorsGrid().observe(
             this,
             showErrorsGrid -> {
@@ -950,7 +938,6 @@ public abstract class PuzzleActivity
                 if (board != null && board.isShowErrorsGrid() != showErrorsGrid) {
                     board.toggleShowErrorsGrid();
                 }
-                invalidateOptionsMenu();
             }
         );
 
@@ -964,7 +951,6 @@ public abstract class PuzzleActivity
                 ) {
                     board.toggleShowErrorsCursor();
                 }
-                invalidateOptionsMenu();
             }
         );
 
@@ -975,7 +961,6 @@ public abstract class PuzzleActivity
                 if (board != null && board.isShowErrorsClue() != showErrorsClue) {
                     board.toggleShowErrorsClue();
                 }
-                invalidateOptionsMenu();
             }
         );
 
@@ -1015,6 +1000,11 @@ public abstract class PuzzleActivity
         viewModel.getExternalToolEvent().observe(
             this,
             data -> { data.accept(new ExternalToolLauncher(this)); }
+        );
+
+        viewModel.getMenuState().observe(
+            this,
+            data -> { invalidateOptionsMenu(); }
         );
     }
 

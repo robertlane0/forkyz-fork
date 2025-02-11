@@ -1,16 +1,18 @@
 
 package app.crossword.yourealwaysbe.forkyz
 
-//import kotlinx.coroutines.flow.MutableStateFlow
 //import kotlinx.coroutines.flow.StateFlow
 import java.io.IOException
 import java.util.Locale
 import java.util.logging.Logger
 import javax.inject.Inject
 import kotlin.text.Regex
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
-//import androidx.lifecycle.asLiveData
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.LiveData
 import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
@@ -34,6 +36,7 @@ import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerShared
+import app.crossword.yourealwaysbe.forkyz.util.liveDataFanIn
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Clue
@@ -48,31 +51,65 @@ class ShareStream(
 
 class SendToast(val text : String)
 
+data class ExternalToolsMenuState(
+    val hasChatGPT : Boolean = true,
+    val hasCrosswordSolver : Boolean = true,
+    val hasDuckDuckGo : Boolean = true,
+    val hasFifteenSquared : Boolean = true,
+    val hasExternalDictionary : Boolean = true,
+) {
+    val hasExternal : Boolean
+        = hasChatGPT
+        || hasCrosswordSolver
+        || hasDuckDuckGo
+        || hasFifteenSquared
+        || hasExternalDictionary
+}
+
+data class ShowErrorsMenuState(
+    val enabled : Boolean = true,
+    val isShowingErrorsClue : Boolean = false,
+    val isShowingErrorsCursor : Boolean = false,
+    val isShowingErrorsGrid : Boolean = false,
+)
+
+data class MenuState(
+    val hasShareURL : Boolean = true,
+    val hasSupportURL : Boolean = true,
+    val externalToolsState : ExternalToolsMenuState = ExternalToolsMenuState(),
+    val isScratchMode : Boolean = false,
+    val showErrorsState : ShowErrorsMenuState = ShowErrorsMenuState(),
+    val canReveal : Boolean = true,
+    val canRevealInitialBoxLetter : Boolean = true,
+    val canRevealInitialLetters : Boolean = true,
+)
+
 // will lose this tag and become an open base class
 @HiltViewModel
 class PuzzleActivityViewModel @Inject constructor(
     application : Application,
+    val settings : ForkyzSettings,
+    val currentPuzzleHolder : CurrentPuzzleHolder,
+    val fileHandlerProvider : FileHandlerProvider,
+    val utils : AndroidVersionUtils,
 ) : AndroidViewModel(application) {
     private val LOG = Logger.getLogger(
         PuzzleActivityViewModel::class.qualifiedName ?: ""
     )
 
-    @Inject
-    lateinit var settings : ForkyzSettings
-
-    @Inject
-    lateinit var currentPuzzleHolder : CurrentPuzzleHolder
-
-    @Inject
-    lateinit var fileHandlerProvider : FileHandlerProvider
-
-    @Inject
-    lateinit var utils : AndroidVersionUtils
-
     val shareStreamEvent = SingleLiveEvent<ShareStream>()
     val announceClueEvent = SingleLiveEvent<Void>()
     val sendToastEvent = SingleLiveEvent<SendToast>()
     val externalToolEvent = SingleLiveEvent<ExternalToolData>()
+
+    val menuState : LiveData<MenuState> = liveDataFanIn(
+        this::getMenuState,
+        settings.liveExternalToolSettings,
+        settings.livePlayScratchMode,
+        settings.livePlayShowErrorsClue,
+        settings.livePlayShowErrorsCursor,
+        settings.livePlayShowErrorsGrid,
+    )
 
     private val voiceCommandDispatcher = VoiceCommands()
 
@@ -308,6 +345,56 @@ class PuzzleActivityViewModel @Inject constructor(
 
     private fun sendToast(text : String) {
         sendToastEvent.postValue(SendToast(text))
+    }
+
+    private fun getMenuState() : MenuState {
+        val board = getBoard()
+        val puz = getPuzzle()
+
+        val hasShareURL = puz?.getShareUrl() != null
+        val hasSupportURL = puz?.getSupportUrl() != null
+        val canReveal = puz?.hasSolution() ?: false
+
+        val box = board?.getCurrentBox();
+
+        val canRevealInitialLetters = puz?.hasInitialValueCells() ?: false
+        val canRevealInitialBoxLetter
+            = !Box.isBlock(box) && box?.hasInitialValue() ?: false
+
+        val extSettings = settings.liveExternalToolSettings.value
+        val externalToolsState = ExternalToolsMenuState(
+            extSettings?.hasChatGPT ?: false,
+            extSettings?.crosswordSolverEnabled ?: false,
+            extSettings?.duckDuckGoEnabled ?: false,
+            extSettings?.fifteenSquaredEnabled ?: false,
+            extSettings?.hasExternalDictionary ?: false,
+        )
+
+        val isScratchMode = settings.livePlayScratchMode.value
+
+        val isShowingErrorsClue
+            = settings.livePlayShowErrorsClue.value ?: false
+        val isShowingErrorsCursor
+            = settings.livePlayShowErrorsCursor.value ?: false
+        val isShowingErrorsGrid
+            = settings.livePlayShowErrorsGrid.value ?: false
+        val showErrorsState = ShowErrorsMenuState(
+            canReveal,
+            isShowingErrorsClue,
+            isShowingErrorsCursor,
+            isShowingErrorsGrid,
+        )
+
+        return MenuState(
+            hasShareURL,
+            hasSupportURL,
+            externalToolsState,
+            isScratchMode!!,
+            showErrorsState,
+            canReveal = canReveal,
+            canRevealInitialBoxLetter = canRevealInitialBoxLetter,
+            canRevealInitialLetters = canRevealInitialLetters,
+        )
     }
 }
 

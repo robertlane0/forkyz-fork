@@ -12,12 +12,15 @@ class ExternalToolSettings(
 ) {
     val hasExternal
         get() = (
-            ChatGPTHelpData.isEnabled(this)
+            hasChatGPT
             || crosswordSolverEnabled
             || duckDuckGoEnabled
             || hasExternalDictionary
             || fifteenSquaredEnabled
         )
+
+    val hasChatGPT
+        get() = ChatGPTHelpData.isEnabled(this)
 
     val hasExternalDictionary
         get() = externalDictionary != ExternalDictionarySetting.EDS_NONE
