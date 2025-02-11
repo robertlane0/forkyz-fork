@@ -27,6 +27,7 @@ import app.crossword.yourealwaysbe.forkyz.tools.DuckDuckGoData
 import app.crossword.yourealwaysbe.forkyz.tools.ExternalDictionaries
 import app.crossword.yourealwaysbe.forkyz.tools.ExternalToolData
 import app.crossword.yourealwaysbe.forkyz.tools.FifteenSquaredData
+import app.crossword.yourealwaysbe.forkyz.tools.ShareClueData
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
 import app.crossword.yourealwaysbe.forkyz.util.SingleLiveEvent
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands
@@ -38,11 +39,6 @@ import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Clue
 import app.crossword.yourealwaysbe.puz.Playboard
 import app.crossword.yourealwaysbe.puz.Puzzle
-
-class ShareMessage(
-    val title : String,
-    val message : String,
-)
 
 class ShareStream(
     val title : String,
@@ -73,7 +69,6 @@ class PuzzleActivityViewModel @Inject constructor(
     @Inject
     lateinit var utils : AndroidVersionUtils
 
-    val shareMessageEvent = SingleLiveEvent<ShareMessage>()
     val shareStreamEvent = SingleLiveEvent<ShareStream>()
     val announceClueEvent = SingleLiveEvent<Void>()
     val sendToastEvent = SingleLiveEvent<SendToast>()
@@ -132,18 +127,14 @@ class PuzzleActivityViewModel @Inject constructor(
         if (clue == null)
             return
 
-        val puz = board.getPuzzle()
-        val response = board.getCurrentWordBoxes()
-        val app : Application = getApplication()
-
-        getShareMessage(puz, clue, response, withResponse) { shareMessage ->
-            shareMessageEvent.postValue(
-                ShareMessage(
-                    app.getString(R.string.share_clue_title),
-                    shareMessage,
-                )
-            )
-        }
+        ShareClueData.build(
+            getApplication(),
+            settings,
+            board,
+            clue,
+            withResponse,
+            externalToolEvent::postValue,
+        )
     }
 
     fun sharePuzzle(writeBlank : Boolean, omitExtensions : Boolean) {
@@ -159,7 +150,6 @@ class PuzzleActivityViewModel @Inject constructor(
             omitExtensions
         ) { puzUri ->
             val mimeType = FileHandlerShared.getShareUriMimeType()
-            val puzzleDetails = getSharePuzzleDetails(puz)
             shareStreamEvent.postValue(
                 ShareStream(
                     app.getString(R.string.share_puzzle_title),
@@ -314,142 +304,6 @@ class PuzzleActivityViewModel @Inject constructor(
                 { requestHelpForCurrentClue() }
             )
         )
-    }
-
-    private fun getShareMessage(
-        puz : Puzzle,
-        clue : Clue,
-        response : Array<Box>,
-        withResponse : Boolean,
-        cb : (String) -> Unit,
-    ) {
-        getShareClueText(clue) { clueText ->
-            val app : Application = getApplication()
-
-            val responseText
-                = if (withResponse) getShareResponseText(response)
-                else null
-
-            val puzzleDetails = getSharePuzzleDetails(puz)
-
-            if (withResponse) {
-                cb(
-                    app.getString(
-                        R.string.share_clue_response_text,
-                        clueText,
-                        responseText,
-                        puzzleDetails,
-                    )
-                )
-            } else {
-                cb(
-                    app.getString(
-                        R.string.share_clue_text,
-                        clueText,
-                        puzzleDetails,
-                    )
-                )
-            }
-        }
-    }
-
-    private fun getShareResponseText(boxes : Array<Box>) : String {
-        val app : Application = getApplication()
-        val responseText = StringBuilder()
-        for (box in boxes) {
-            if (box.isBlank()) {
-                responseText.append(
-                    app.getString(R.string.share_clue_blank_box),
-                )
-            } else {
-                responseText.append(box.getResponse())
-            }
-        }
-        return responseText.toString()
-    }
-
-    private fun getShareClueText(clue : Clue?, cb : (String) -> Unit) {
-        settings.getPlayShowCount() { showCount ->
-            val app : Application = getApplication()
-
-            if (clue == null) {
-                cb(app.getString(R.string.unknown_hint))
-            } else {
-                val wordLen = if (clue.hasZone()) clue.getZone().size() else -1
-
-                if (showCount && wordLen >= 0) {
-                    cb(
-                        app.getString(
-                            R.string.clue_format_short_no_num_no_dir_with_count,
-                            clue.getHint(),
-                            wordLen,
-                        )
-                    )
-                } else {
-                    cb(clue.getHint())
-                }
-            }
-        }
-    }
-
-    private fun getSharePuzzleDetails(puz : Puzzle) : String {
-        var source = puz.getSource()
-        var title = puz.getTitle()
-        var author = puz.getAuthor()
-
-        if (source == null)
-            source = "";
-        if (title == null)
-            title = "";
-        if (author != null) {
-            // add author if not already in title or caption
-            // case insensitive trick:
-            // https://www.baeldung.com/java-case-insensitive-string-matching
-            val regex = ("(?i).*" + Regex.escape(author) + ".*").toRegex()
-            val removeAuthor = author.isEmpty()
-                || title.matches(regex)
-                || source.matches(regex)
-
-            if (removeAuthor)
-                author = null
-        }
-
-        val shareUrl = puz.getShareUrl();
-
-        val app : Application = getApplication()
-        if (shareUrl == null || shareUrl.isEmpty()) {
-            return if (author != null) {
-                app.getString(
-                    R.string.share_puzzle_details_author_no_url,
-                    source,
-                    title,
-                    author,
-                )
-            } else {
-                app.getString(
-                    R.string.share_puzzle_details_no_author_no_url,
-                    source,
-                    title,
-                )
-            }
-        } else {
-            return if (author != null) {
-                app.getString(
-                    R.string.share_puzzle_details_author_url,
-                    source,
-                    title,
-                    author,
-                    shareUrl,
-                )
-            } else {
-                app.getString(
-                    R.string.share_puzzle_details_no_author_url,
-                    source,
-                    title,
-                    shareUrl,
-                )
-            }
-        }
     }
 
     private fun sendToast(text : String) {

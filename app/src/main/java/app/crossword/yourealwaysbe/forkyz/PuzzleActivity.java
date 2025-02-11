@@ -988,21 +988,6 @@ public abstract class PuzzleActivity
             }
         );
 
-        viewModel.getShareMessageEvent().observe(
-            this,
-            shareMessage -> {
-                // ShareCompat from
-                // https://stackoverflow.com/a/39619468/6882587
-                // assume works better than the out-of-date android docs!
-                Intent shareIntent = new ShareCompat.IntentBuilder(this)
-                    .setText(shareMessage.getMessage())
-                    .setType("text/plain")
-                    .setChooserTitle(shareMessage.getTitle())
-                    .createChooserIntent();
-                startActivity(shareIntent);
-            }
-        );
-
         viewModel.getShareStreamEvent().observe(
             this,
             shareStream -> {
