@@ -913,18 +913,6 @@ public abstract class PuzzleActivity
             }
         );
 
-        viewModel.getShareStreamEvent().observe(
-            this,
-            shareStream -> {
-                Intent shareIntent = new ShareCompat.IntentBuilder(this)
-                    .setChooserTitle(shareStream.getTitle())
-                    .setStream(shareStream.getUri())
-                    .setType(shareStream.getMimeType())
-                    .createChooserIntent();
-                startActivity(shareIntent);
-            }
-        );
-
         viewModel.getAnnounceClueEvent().observe(
             this,
             (v) -> { announceClue(false); }

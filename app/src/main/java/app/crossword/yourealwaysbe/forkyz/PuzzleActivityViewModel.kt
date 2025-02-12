@@ -30,6 +30,7 @@ import app.crossword.yourealwaysbe.forkyz.tools.ExternalDictionaries
 import app.crossword.yourealwaysbe.forkyz.tools.ExternalToolData
 import app.crossword.yourealwaysbe.forkyz.tools.FifteenSquaredData
 import app.crossword.yourealwaysbe.forkyz.tools.ShareClueData
+import app.crossword.yourealwaysbe.forkyz.tools.SharePuzzleData
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
 import app.crossword.yourealwaysbe.forkyz.util.SingleLiveEvent
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands
@@ -97,7 +98,6 @@ class PuzzleActivityViewModel @Inject constructor(
         PuzzleActivityViewModel::class.toString()
     )
 
-    val shareStreamEvent = SingleLiveEvent<ShareStream>()
     val announceClueEvent = SingleLiveEvent<Void>()
     val sendToastEvent = SingleLiveEvent<SendToast>()
     val externalToolEvent = SingleLiveEvent<ExternalToolData>()
@@ -158,22 +158,13 @@ class PuzzleActivityViewModel @Inject constructor(
         if (puz == null)
             return
 
-        val app : Application = getApplication()
-        FileHandlerShared.getShareUri(
-            app,
+        SharePuzzleData.build(
+            getApplication(),
             puz,
             writeBlank,
-            omitExtensions
-        ) { puzUri ->
-            val mimeType = FileHandlerShared.getShareUriMimeType()
-            shareStreamEvent.postValue(
-                ShareStream(
-                    app.getString(R.string.share_puzzle_title),
-                    mimeType,
-                    puzUri,
-                )
-            )
-        }
+            omitExtensions,
+            externalToolEvent::postValue,
+        )
     }
 
     fun dispatchVoiceCommand(text : List<String>) {
