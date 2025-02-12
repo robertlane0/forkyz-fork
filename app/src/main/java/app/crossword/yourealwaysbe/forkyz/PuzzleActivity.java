@@ -75,9 +75,7 @@ public abstract class PuzzleActivity
     private TextToSpeech ttsService = null;
     private boolean ttsReady = false;
     private boolean hasInitialValues = false;
-
-    private LiveData<Boolean> volumeActivatesVoice;
-    private LiveData<Boolean> equalsAnnounceClue;
+    private boolean updatingTimer = false;
 
     private Runnable updateTimeTask = new Runnable() {
         public void run() {
@@ -98,11 +96,6 @@ public abstract class PuzzleActivity
 
         viewModel = new ViewModelProvider(this)
             .get(PuzzleActivityViewModel.class);
-
-        // get these early to maximise chances of it being ready by the first
-        // volume down press
-        volumeActivatesVoice = settings.getLiveVoiceVolumeActivatesVoice();
-        equalsAnnounceClue = settings.getLiveVoiceEqualsAnnounceClue();
 
         startTimer();
         setupObservers();
@@ -231,116 +224,112 @@ public abstract class PuzzleActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Playboard board = getBoard();
-
-        if (board != null) {
-            int id = item.getItemId();
-            if (id == android.R.id.home) {
-                finish();
-                return true;
-            } else if (id == R.id.puzzle_menu_special_entry) {
-                specialEntry();
-                return true;
-            } else if (id == R.id.puzzle_menu_share_clue) {
-                viewModel.shareClue(false);
-                return true;
-            } else if (id == R.id.puzzle_menu_share_clue_response) {
-                viewModel.shareClue(true);
-                return true;
-            } else if (id == R.id.puzzle_menu_share_puzzle_full) {
-                viewModel.sharePuzzle(false, false);
-                return true;
-            } else if (id == R.id.puzzle_menu_share_puzzle_without_extensions) {
-                viewModel.sharePuzzle(false, true);
-                return true;
-            } else if (id == R.id.puzzle_menu_share_puzzle_orig) {
-                viewModel.sharePuzzle(true, true);
-                return true;
-            } else if (id == R.id.puzzle_menu_open_share_url) {
-                openShareUrl();
-                return true;
-            } else if (id == R.id.puzzle_menu_ask_chat_gpt) {
-                viewModel.requestHelpForCurrentClue();
-                return true;
-            } else if (id == R.id.clue_list_menu_edit_clue) {
-                editClue();
-                return true;
-            } else if (id == R.id.puzzle_menu_crossword_solver) {
-                callCrosswordSolver();
-                return true;
-            } else if (id == R.id.puzzle_menu_duckduckgo) {
-                viewModel.searchDuckDuckGo();
-                return true;
-            } else if (id == R.id.puzzle_menu_external_dictionary) {
-                callExternalDictionary();
-                return true;
-            } else if (id == R.id.puzzle_menu_fifteen_squared) {
-                viewModel.searchFifteenSquared();
-                return true;
-            } else if (id == R.id.puzzle_menu_clue_notes) {
+        int id = item.getItemId();
+        if (id == android.R.id.home) {
+            finish();
+            return true;
+        } else if (id == R.id.puzzle_menu_special_entry) {
+            specialEntry();
+            return true;
+        } else if (id == R.id.puzzle_menu_share_clue) {
+            viewModel.shareClue(false);
+            return true;
+        } else if (id == R.id.puzzle_menu_share_clue_response) {
+            viewModel.shareClue(true);
+            return true;
+        } else if (id == R.id.puzzle_menu_share_puzzle_full) {
+            viewModel.sharePuzzle(false, false);
+            return true;
+        } else if (id == R.id.puzzle_menu_share_puzzle_without_extensions) {
+            viewModel.sharePuzzle(false, true);
+            return true;
+        } else if (id == R.id.puzzle_menu_share_puzzle_orig) {
+            viewModel.sharePuzzle(true, true);
+            return true;
+        } else if (id == R.id.puzzle_menu_open_share_url) {
+            openShareUrl();
+            return true;
+        } else if (id == R.id.puzzle_menu_ask_chat_gpt) {
+            viewModel.requestHelpForCurrentClue();
+            return true;
+        } else if (id == R.id.clue_list_menu_edit_clue) {
+            editClue();
+            return true;
+        } else if (id == R.id.puzzle_menu_crossword_solver) {
+            callCrosswordSolver();
+            return true;
+        } else if (id == R.id.puzzle_menu_duckduckgo) {
+            viewModel.searchDuckDuckGo();
+            return true;
+        } else if (id == R.id.puzzle_menu_external_dictionary) {
+            callExternalDictionary();
+            return true;
+        } else if (id == R.id.puzzle_menu_fifteen_squared) {
+            viewModel.searchFifteenSquared();
+            return true;
+        } else if (id == R.id.puzzle_menu_clue_notes) {
+            Playboard board = getBoard();
+            if (board != null)
                 launchClueNotes(board.getClueID());
-                return true;
-            } else if (id == R.id.puzzle_menu_puzzle_notes) {
-                launchPuzzleNotes();
-                return true;
-            } else if (id == R.id.puzzle_menu_flag_clue_toggle) {
-                toggleClueFlag();
-                return true;
-            } else if (id == R.id.puzzle_menu_flag_cell_toggle) {
-                toggleCellFlag();
-                return true;
-            } else if (id == R.id.puzzle_menu_scratch_mode) {
-                toggleScratchMode();
-                return true;
-            } else if (id == R.id.puzzle_menu_show_errors_grid) {
-                settings.setPlayShowErrorsGrid(!board.isShowErrorsGrid());
-                return true;
-            } else if (id == R.id.puzzle_menu_show_errors_clue) {
-                settings.setPlayShowErrorsClue(!board.isShowErrorsClue());
-                return true;
-            } else if (id == R.id.puzzle_menu_show_errors_cursor) {
-                settings.setPlayShowErrorsCursor(
-                    !board.isShowErrorsCursor()
-                );
-                return true;
-            } else if (id == R.id.puzzle_menu_reveal_initial_letter) {
-                board.revealInitialLetter();
-                return true;
-            } else if (id == R.id.puzzle_menu_reveal_letter) {
-                board.revealLetter();
-                return true;
-            } else if (id == R.id.puzzle_menu_reveal_word) {
-                board.revealWord();
-                return true;
-            } if (id == R.id.puzzle_menu_reveal_initial_letters) {
-                board.revealInitialLetters();
-                return true;
-            } else if (id == R.id.puzzle_menu_reveal_errors) {
-                board.revealErrors();
-                return true;
-            } else if (id == R.id.puzzle_menu_reveal_puzzle) {
-                showRevealPuzzleDialog();
-                return true;
-            } else if (id == R.id.puzzle_menu_info) {
-                showInfoDialog();
-                return true;
-            } else if (id == R.id.puzzle_menu_support_source) {
-                actionSupportSource();
-                return true;
-            } else if (id == R.id.puzzle_menu_help) {
-                Intent helpIntent = new Intent(
-                    Intent.ACTION_VIEW,
-                    Uri.parse("play.html"),
-                    this,
-                    HTMLActivity.class
-                );
-                this.startActivity(helpIntent);
-                return true;
-            } else if (id == R.id.puzzle_menu_settings) {
-                Intent i = new Intent(this, SettingsActivity.class);
-                this.startActivity(i);
-                return true;
-            }
+            return true;
+        } else if (id == R.id.puzzle_menu_puzzle_notes) {
+            launchPuzzleNotes();
+            return true;
+        } else if (id == R.id.puzzle_menu_flag_clue_toggle) {
+            toggleClueFlag();
+            return true;
+        } else if (id == R.id.puzzle_menu_flag_cell_toggle) {
+            toggleCellFlag();
+            return true;
+        } else if (id == R.id.puzzle_menu_scratch_mode) {
+            viewModel.toggleScratchMode();
+            return true;
+        } else if (id == R.id.puzzle_menu_show_errors_grid) {
+            viewModel.toggleShowErrorsGrid();
+            return true;
+        } else if (id == R.id.puzzle_menu_show_errors_clue) {
+            viewModel.toggleShowErrorsClue();
+            return true;
+        } else if (id == R.id.puzzle_menu_show_errors_cursor) {
+            viewModel.toggleShowErrorsCursor();
+            return true;
+        } else if (id == R.id.puzzle_menu_reveal_initial_letter) {
+            viewModel.revealInitialLetter();
+            return true;
+        } else if (id == R.id.puzzle_menu_reveal_letter) {
+            viewModel.revealLetter();
+            return true;
+        } else if (id == R.id.puzzle_menu_reveal_word) {
+            viewModel.revealWord();
+            return true;
+        } if (id == R.id.puzzle_menu_reveal_initial_letters) {
+            viewModel.revealInitialLetters();
+            return true;
+        } else if (id == R.id.puzzle_menu_reveal_errors) {
+            viewModel.revealErrors();
+            return true;
+        } else if (id == R.id.puzzle_menu_reveal_puzzle) {
+            showRevealPuzzleDialog();
+            return true;
+        } else if (id == R.id.puzzle_menu_info) {
+            showInfoDialog();
+            return true;
+        } else if (id == R.id.puzzle_menu_support_source) {
+            actionSupportSource();
+            return true;
+        } else if (id == R.id.puzzle_menu_help) {
+            Intent helpIntent = new Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("play.html"),
+                this,
+                HTMLActivity.class
+            );
+            this.startActivity(helpIntent);
+            return true;
+        } else if (id == R.id.puzzle_menu_settings) {
+            Intent i = new Intent(this, SettingsActivity.class);
+            this.startActivity(i);
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -472,10 +461,8 @@ public abstract class PuzzleActivity
      * But still call super. Only called if the showTimer pref is true
      */
     protected void onTimerUpdate() {
-        settings.getPlayShowTimer(showTimer -> {
-            if (showTimer)
-                handler.postDelayed(updateTimeTask, 1000);
-        });
+        if (updatingTimer)
+            handler.postDelayed(updateTimeTask, 1000);
     }
 
     protected Playboard getBoard(){
@@ -540,14 +527,11 @@ public abstract class PuzzleActivity
     }
 
     private void actionSupportSource() {
-        Puzzle puz = getPuzzle();
-        if (puz != null) {
-            String supportUrl = puz.getSupportUrl();
-            if (supportUrl != null) {
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse(supportUrl));
-                startActivity(i);
-            }
+        String url = viewModel.getSupportURL();
+        if (url != null) {
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(url));
+            startActivity(i);
         }
     }
 
@@ -591,8 +575,8 @@ public abstract class PuzzleActivity
      * (defaults to false)
      */
     protected boolean isVolumeDownActivatesVoicePref() {
-        Boolean value = volumeActivatesVoice.getValue();
-        return value == null ? false : value;
+        VoiceState state = viewModel.getVoiceState().getValue();
+        return state != null && state.getVolumeActivatesVoice();
     }
 
     protected void setupVoiceButtons(VoiceButtonsBinding binding) {
@@ -606,26 +590,6 @@ public abstract class PuzzleActivity
         voiceBinding.announceClueButton.setOnClickListener(view -> {
             announceClue(false);
         });
-    }
-
-    protected void setVoiceButtonVisibility() {
-        if (voiceBinding == null)
-            return;
-
-        settings.getVoiceButtonActivatesVoice(buttonVoice -> {
-        settings.getVoiceButtonAnnounceClue(buttonAnnounce -> {
-            boolean anyButton = buttonVoice || buttonAnnounce;
-
-            voiceBinding.voiceButtonsContainer.setVisibility(
-                anyButton ? View.VISIBLE : View.GONE
-            );
-            voiceBinding.voiceButton.setVisibility(
-                buttonVoice ? View.VISIBLE : View.GONE
-            );
-            voiceBinding.announceClueButton.setVisibility(
-                buttonAnnounce ? View.VISIBLE : View.GONE
-            );
-        });});
     }
 
     /**
@@ -683,8 +647,8 @@ public abstract class PuzzleActivity
     }
 
     protected boolean isAnnounceClueEquals() {
-        Boolean value = equalsAnnounceClue.getValue();
-        return (value == null) ? false : value;
+        VoiceState state = viewModel.getVoiceState().getValue();
+        return state != null && state.getEqualsAnnounceClue();
     }
 
     /**
@@ -905,14 +869,6 @@ public abstract class PuzzleActivity
     }
 
     private void setupObservers() {
-        settings.getLivePlayShowTimer().observe(
-            this,
-            showTimer -> {
-                if (showTimer)
-                    handler.post(updateTimeTask);
-            }
-        );
-
         viewModel.getAnnounceClueEvent().observe(
             this,
             (v) -> { announceClue(false); }
@@ -934,12 +890,37 @@ public abstract class PuzzleActivity
             this,
             data -> { invalidateOptionsMenu(); }
         );
-    }
 
-    private void toggleScratchMode() {
-        settings.getPlayScratchMode(scratchMode -> {
-            settings.setPlayScratchMode(!scratchMode);
-        });
+        viewModel.getVoiceState().observe(
+            this,
+            state -> {
+                if (voiceBinding != null) {
+                    boolean buttonVoice = state.getShowVoiceButton();
+                    boolean buttonAnnounce = state.getShowAnnounceButton();
+                    boolean anyButton = buttonVoice || buttonAnnounce;
+
+                    voiceBinding.voiceButtonsContainer.setVisibility(
+                        anyButton ? View.VISIBLE : View.GONE
+                    );
+                    voiceBinding.voiceButton.setVisibility(
+                        buttonVoice ? View.VISIBLE : View.GONE
+                    );
+                    voiceBinding.announceClueButton.setVisibility(
+                        buttonAnnounce ? View.VISIBLE : View.GONE
+                    );
+                }
+            }
+        );
+
+        viewModel.getShowTimer().observe(
+            this,
+            showTimer -> {
+                if (showTimer && !updatingTimer) {
+                    handler.postDelayed(updateTimeTask, 1000);
+                }
+                updatingTimer = showTimer;
+            }
+        );
     }
 
     /**
@@ -1042,10 +1023,8 @@ public abstract class PuzzleActivity
                     R.string.ok,
                     new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
-                            Playboard board
-                                = ((PuzzleActivity) getActivity()).getBoard();
-                            if (board != null)
-                                 board.revealPuzzle();
+                            ((PuzzleActivity) getActivity()).viewModel
+                                .revealPuzzle();
                         }
                     }
                 )

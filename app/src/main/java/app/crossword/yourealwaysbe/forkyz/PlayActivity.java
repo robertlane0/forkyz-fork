@@ -478,7 +478,6 @@ public class PlayActivity extends PuzzleActivity
             .getResources()
             .getConfiguration());
 
-        setVoiceButtonVisibility();
         registerBoard();
 
         if (keyboardManager != null)

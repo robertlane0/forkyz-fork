@@ -164,8 +164,6 @@ public class ClueListActivity extends PuzzleActivity
         binding.clueTabs.addListener(this);
 
         keyboardManager.onResume();
-
-        setVoiceButtonVisibility();
     }
 
     @Override

@@ -85,6 +85,15 @@ data class MenuState(
     val canRevealInitialLetters : Boolean = true,
 )
 
+data class VoiceState(
+    val volumeActivatesVoice : Boolean,
+    val equalsAnnounceClue : Boolean,
+    val showVoiceButton : Boolean,
+    val showAnnounceButton : Boolean,
+    val alwaysAnnounceBox : Boolean,
+    val alwaysAnnounceClue : Boolean,
+)
+
 // will lose this tag and become an open base class
 @HiltViewModel
 class PuzzleActivityViewModel @Inject constructor(
@@ -102,6 +111,25 @@ class PuzzleActivityViewModel @Inject constructor(
     val sendToastEvent = SingleLiveEvent<SendToast>()
     val externalToolEvent = SingleLiveEvent<ExternalToolData>()
 
+    val voiceState : LiveData<VoiceState> = liveDataFanIn(
+        {
+            VoiceState(
+                settings.liveVoiceVolumeActivatesVoice.value ?: false,
+                settings.liveVoiceEqualsAnnounceClue.value ?: false,
+                settings.liveVoiceButtonActivatesVoice.value ?: false,
+                settings.liveVoiceButtonAnnounceClue.value ?: false,
+                settings.liveVoiceAlwaysAnnounceBox.value ?: false,
+                settings.liveVoiceAlwaysAnnounceClue.value ?: false,
+            )
+        },
+        settings.liveVoiceVolumeActivatesVoice,
+        settings.liveVoiceEqualsAnnounceClue,
+        settings.liveVoiceButtonActivatesVoice,
+        settings.liveVoiceButtonAnnounceClue,
+        settings.liveVoiceAlwaysAnnounceBox,
+        settings.liveVoiceAlwaysAnnounceClue,
+    )
+
     val menuState : LiveData<MenuState> = liveDataFanIn(
         this::getMenuState,
         settings.liveExternalToolSettings,
@@ -111,6 +139,8 @@ class PuzzleActivityViewModel @Inject constructor(
         settings.livePlayShowErrorsGrid,
     )
 
+    val showTimer : LiveData<Boolean> = settings.livePlayShowTimer
+
     private val voiceCommandDispatcher = VoiceCommands()
 
     protected fun getBoard() : Playboard? = currentPuzzleHolder.board
@@ -118,6 +148,54 @@ class PuzzleActivityViewModel @Inject constructor(
 
     fun saveBoard() {
         currentPuzzleHolder.saveBoard()
+    }
+
+    fun toggleShowErrorsClue() {
+        getBoard()?.let { board ->
+            settings.setPlayShowErrorsClue(!board.isShowErrorsClue())
+        }
+    }
+
+    fun toggleShowErrorsCursor() {
+        getBoard()?.let { board ->
+            settings.setPlayShowErrorsCursor(!board.isShowErrorsCursor())
+        }
+    }
+
+    fun toggleShowErrorsGrid() {
+        getBoard()?.let { board ->
+            settings.setPlayShowErrorsGrid(!board.isShowErrorsGrid())
+        }
+    }
+
+    fun revealInitialLetter() {
+        getBoard()?.revealInitialLetter()
+    }
+
+    fun revealLetter() {
+        getBoard()?.revealLetter()
+    }
+
+    fun revealWord() {
+        getBoard()?.revealWord()
+    }
+
+    fun revealInitialLetters() {
+        getBoard()?.revealInitialLetters()
+    }
+
+    fun revealErrors() {
+        getBoard()?.revealErrors()
+    }
+
+    fun revealPuzzle() {
+        getBoard()?.revealPuzzle()
+    }
+
+    fun getSupportURL() : String? = getPuzzle()?.getSupportUrl()
+
+    fun toggleScratchMode() {
+        settings.getPlayScratchMode() { settings.setPlayScratchMode(!it); }
     }
 
     fun requestHelpForCurrentClue() {

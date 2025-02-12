@@ -692,8 +692,6 @@ public class NotesActivity extends PuzzleActivity {
         inferSeparators();
 
         keyboardManager.onResume();
-
-        setVoiceButtonVisibility();
     }
 
     @Override
