@@ -94,7 +94,7 @@ class PuzzleActivityViewModel @Inject constructor(
     val utils : AndroidVersionUtils,
 ) : AndroidViewModel(application) {
     private val LOG = Logger.getLogger(
-        PuzzleActivityViewModel::class.qualifiedName ?: ""
+        PuzzleActivityViewModel::class.toString()
     )
 
     val shareStreamEvent = SingleLiveEvent<ShareStream>()
@@ -113,32 +113,11 @@ class PuzzleActivityViewModel @Inject constructor(
 
     private val voiceCommandDispatcher = VoiceCommands()
 
-    protected fun getBoard() : Playboard? = currentPuzzleHolder.getBoard()
+    protected fun getBoard() : Playboard? = currentPuzzleHolder.board
     protected fun getPuzzle() : Puzzle? = getBoard()?.getPuzzle()
 
     fun saveBoard() {
-        val puzHandle = currentPuzzleHolder.getPuzHandle()
-        if (puzHandle == null) {
-            LOG.severe("No puz handle to save puzzle to.")
-            return
-        }
-
-        val puz = getPuzzle()
-        if (puz == null) {
-            LOG.severe("No puzzle associated to the board to save.")
-            return
-        }
-
-        fileHandlerProvider.get() { fileHandler ->
-            // TODO: save off main thread? May cause race conditions
-            // with BrowseActivity refresh?
-            try {
-                fileHandler.save(puz, puzHandle)
-            } catch (e : IOException) {
-                LOG.severe("Error saving puzzle.")
-                e.printStackTrace()
-            }
-        }
+        currentPuzzleHolder.saveBoard()
     }
 
     fun requestHelpForCurrentClue() {

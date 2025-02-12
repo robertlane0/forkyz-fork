@@ -142,7 +142,6 @@ public class BrowseActivityViewModel extends AndroidViewModel {
     public void startLoadFiles(boolean archive) {
         fileHandlerProvider.get(fileHandler -> {
             threadWithUILock(() -> {
-
                 DirHandle directory = archive
                     ? fileHandler.getArchiveDirectory()
                     : fileHandler.getCrosswordsDirectory();
@@ -323,84 +322,58 @@ public class BrowseActivityViewModel extends AndroidViewModel {
 
     @MainThread
     public void loadPuzzle(PuzMetaFile puzMeta) {
-        settings.getPlayPreserveCorrectLettersInShowErrors(preserveCorrect -> {
-        settings.getPlayDeleteCrossingMode(deleteCrossingMode -> {
-        settings.getPlayMovementStrategy(movementStrategy -> {
-        fileHandlerProvider.get(fileHandler -> {
-            threadWithUILock(() -> {
-                try {
-                    Puzzle puz = fileHandler.load(puzMeta);
-                    if (puz == null || puz.getBoxes() == null) {
-                        throw new IOException(
-                            "Puzzle is null or contains no boxes."
-                        );
+        currentPuzzleHolder.loadPuzzle(
+            puzMeta,
+            () -> { puzzleLoadEvents.call(); },
+            e -> {
+                LOGGER.severe("Could not load file: " + e);
+
+                fileHandlerProvider.get(fileHandler -> {
+                    String filename = null;
+                    try {
+                        filename
+                            = fileHandler.getName(puzMeta.getPuzHandle());
+                    } catch (Exception ee) {
+                        ee.printStackTrace();
                     }
-                    handler.post(() -> {
-                        currentPuzzleHolder.setBoard(
-                            new Playboard(
-                                puz,
-                                movementStrategy,
-                                preserveCorrect,
-                                deleteCrossingMode
-                            ),
-                            puzMeta.getPuzHandle()
-                        );
-                        puzzleLoadEvents.call();
-                    });
-                } catch (IOException e) {
-                    handler.post(() -> {
-                        String filename = null;
-                        try {
-                            filename
-                                = fileHandler.getName(puzMeta.getPuzHandle());
-                        } catch (Exception ee) {
-                            ee.printStackTrace();
-                        }
 
-
-                        Application application = getApplication();
-                        Toast t = Toast.makeText(
-                            application,
-                            application.getString(
-                                R.string.unable_to_read_file,
-                                (filename != null ?  filename : "")
-                            ),
-                            Toast.LENGTH_SHORT
-                        );
-                        t.show();
-                    });
-                }
-            });
-        });});});});
+                    Application application = getApplication();
+                    Toast.makeText(
+                        application,
+                        application.getString(
+                            R.string.unable_to_read_file,
+                            (filename != null ?  filename : "")
+                        ),
+                        Toast.LENGTH_SHORT
+                    ).show();
+                });
+            }
+        );
     }
 
+    /**
+     * Refresh the meta of the puzzle that is current
+     *
+     * It could have been in use by a play activity.
+     */
     @MainThread
-    public void refreshPuzzleMeta(PuzHandle refreshHandle) {
-        fileHandlerProvider.get(fileHandler -> {
-            threadWithUILock(() -> {
-                try {
-                    PuzMetaFile refreshedMeta
-                        = fileHandler.loadPuzMetaFile(refreshHandle);
+    public void refreshCurrentPuzzleMeta() {
+        isUIBusy.setValue(true);
+        currentPuzzleHolder.getFreshCurrentPuzzleMeta(refreshedMeta -> {
+            isUIBusy.setValue(false);
+            if (refreshedMeta != null) {
+                PuzHandle curHandle = currentPuzzleHolder.getPuzHandle();
+                List<MutableLiveData<PuzMetaFile>> pmList
+                    = puzzleFiles.getValue();
 
-                    if (refreshedMeta == null)
-                        return;
-
-                    if (refreshedMeta != null) {
-                        List<MutableLiveData<PuzMetaFile>> pmList
-                            = puzzleFiles.getValue();
-
-                        int index = -1;
-                        for (MutableLiveData<PuzMetaFile> pm : pmList) {
-                            index += 1;
-                            if (pm.getValue().isSameMainFile(refreshHandle)) {
-                                pm.postValue(refreshedMeta);
-                            }
-                        }
+                int index = -1;
+                for (MutableLiveData<PuzMetaFile> pm : pmList) {
+                    index += 1;
+                    if (pm.getValue().isSameMainFile(curHandle)) {
+                        pm.postValue(refreshedMeta);
                     }
-                } catch (IOException e) {
-                    LOGGER.warning("Could not refresh puz meta " + e);
                 }
-            });
+            }
         });
     }
 

@@ -715,10 +715,7 @@ public class BrowseActivity extends ForkyzActivity {
 
 
     private void refreshLastAccessedPuzzle() {
-        final PuzHandle lastAccessed = getCurrentPuzHandle();
-        if (lastAccessed == null)
-            return;
-        model.refreshPuzzleMeta(lastAccessed);
+        model.refreshCurrentPuzzleMeta();
     }
 
     private SeparatedRecyclerViewAdapter<FileViewHolder, FileAdapter>

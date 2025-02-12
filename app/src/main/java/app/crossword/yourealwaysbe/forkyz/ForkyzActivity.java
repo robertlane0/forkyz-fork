@@ -104,21 +104,6 @@ public class ForkyzActivity extends AppCompatActivity {
         return text == null ? null : HtmlCompat.fromHtml(text, 0);
     }
 
-    /**
-     * Set the board and base file of the puzzle loaded on it
-     */
-    protected void setCurrentBoard(Playboard board, PuzHandle puzHandle) {
-        currentPuzzleHolder.setBoard(board, puzHandle);
-    }
-
-    protected Playboard getCurrentBoard() {
-        return currentPuzzleHolder.getBoard();
-    }
-
-    protected PuzHandle getCurrentPuzHandle() {
-        return currentPuzzleHolder.getPuzHandle();
-    }
-
     protected void finishOnHomeButton() {
         ActionBar bar = getSupportActionBar();
         if(bar == null){
