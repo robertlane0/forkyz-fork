@@ -47,6 +47,8 @@ public class CurrentPuzzleHolder @Inject constructor(
     private val mainScope = CoroutineScope(Dispatchers.Main)
     private val ioLock = Mutex()
 
+    init { setupObservers() }
+
     /**
      * Load puzzle and set as current board
      *
@@ -66,7 +68,13 @@ public class CurrentPuzzleHolder @Inject constructor(
                 settings.getPlayPreserveCorrectLettersInShowErrors() {
                     preserveCorrect ->
                 settings.getPlayDeleteCrossingMode() { deleteCrossingMode ->
+                settings.getPlayShowErrorsGrid() { showErrorsGrid ->
+                settings.getPlayShowErrorsCursor() { showErrorsCursor ->
+                settings.getPlayShowErrorsClue() { showErrorsClue ->
+                settings.getPlayToggleBeforeMove() { toggleBeforeMove ->
                 settings.getPlayMovementStrategy() { movementStrategy ->
+                settings.getPlaySkipFilled() { skipFilled ->
+                settings.getPlayPlayLetterUndoEnabled() { undoEnabled ->
                 fileHandlerProvider.get() { fileHandler ->
                     // on main thread so go back to io
                     ioScope.launch {
@@ -82,7 +90,13 @@ public class CurrentPuzzleHolder @Inject constructor(
                                     puz,
                                     movementStrategy,
                                     preserveCorrect,
-                                    deleteCrossingMode
+                                    deleteCrossingMode,
+                                    showErrorsCursor,
+                                    showErrorsClue,
+                                    showErrorsGrid,
+                                    toggleBeforeMove,
+                                    skipFilled,
+                                    undoEnabled
                                 )
                                 puzHandle = puzMeta.getPuzHandle()
                                 cb.run()
@@ -93,7 +107,7 @@ public class CurrentPuzzleHolder @Inject constructor(
                             ioLock.unlock()
                         }
                     }
-                }}}}
+                }}}}}}}}}}
             }
         }
     }
@@ -162,6 +176,41 @@ public class CurrentPuzzleHolder @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    private fun setupObservers() {
+        // these keep the current board up to date with changes in
+        // settings -- rather than expecting activities to do it on
+        // resume.
+        // Ok to observe forever because this is a singleton that lives
+        // forever.
+        settings.livePlayPreserveCorrectLettersInShowErrors.observeForever() {
+            board?.setPreserveCorrectLettersInShowErrors(it)
+        }
+        settings.livePlayDeleteCrossingMode.observeForever() {
+            board?.setDeleteCrossingMode(it)
+        }
+        settings.livePlayShowErrorsGrid.observeForever() {
+            board?.setShowErrorsGrid(it)
+        }
+        settings.livePlayShowErrorsCursor.observeForever() {
+            board?.setShowErrorsCursor(it)
+        }
+        settings.livePlayShowErrorsClue.observeForever() {
+            board?.setShowErrorsClue(it)
+        }
+        settings.livePlayToggleBeforeMove.observeForever() {
+            board?.setToggleBeforeMove(it)
+        }
+        settings.livePlayMovementStrategy.observeForever() {
+            board?.setMovementStrategy(it)
+        }
+        settings.livePlaySkipFilled.observeForever {
+            board?.setSkipCompletedLetters(it)
+        }
+        settings.livePlayPlayLetterUndoEnabled.observeForever {
+            board?.setPlayLetterUndoStackEnabled(it)
         }
     }
 }

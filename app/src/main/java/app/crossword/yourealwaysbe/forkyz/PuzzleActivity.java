@@ -913,66 +913,6 @@ public abstract class PuzzleActivity
             }
         );
 
-        settings.getLivePlayPreserveCorrectLettersInShowErrors().observe(
-            this,
-            preserveCorrect -> {
-                Playboard board = getBoard();
-                if (board != null)
-                    board.setPreserveCorrectLettersInShowErrors(preserveCorrect);
-            }
-        );
-
-        settings.getLivePlayDeleteCrossingMode().observe(
-            this,
-            deleteCrossingMode -> {
-                Playboard board = getBoard();
-                if (board != null)
-                    board.setDeleteCrossingMode(deleteCrossingMode);
-            }
-        );
-
-        settings.getLivePlayShowErrorsGrid().observe(
-            this,
-            showErrorsGrid -> {
-                Playboard board = getBoard();
-                if (board != null && board.isShowErrorsGrid() != showErrorsGrid) {
-                    board.toggleShowErrorsGrid();
-                }
-            }
-        );
-
-        settings.getLivePlayShowErrorsCursor().observe(
-            this,
-            showErrorsCursor -> {
-                Playboard board = getBoard();
-                if (
-                    board != null &&
-                    board.isShowErrorsCursor() != showErrorsCursor
-                ) {
-                    board.toggleShowErrorsCursor();
-                }
-            }
-        );
-
-        settings.getLivePlayShowErrorsClue().observe(
-            this,
-            showErrorsClue -> {
-                Playboard board = getBoard();
-                if (board != null && board.isShowErrorsClue() != showErrorsClue) {
-                    board.toggleShowErrorsClue();
-                }
-            }
-        );
-
-        settings.getLivePlayToggleBeforeMove().observe(
-            this,
-            toggleBeforeMove -> {
-                Playboard board = getBoard();
-                if (board != null)
-                    board.setToggleBeforeMove(toggleBeforeMove);
-            }
-        );
-
         viewModel.getShareStreamEvent().observe(
             this,
             shareStream -> {

@@ -158,8 +158,6 @@ public class PlayActivity extends PuzzleActivity
             }
         );
 
-        settings.getPlaySkipFilled(board::setSkipCompletedLetters);
-
         createClueLine(binding.clueHolder.clueLine);
         createClueLine(binding.clueLineBelowGrid.clueText);
 
@@ -518,13 +516,6 @@ public class PlayActivity extends PuzzleActivity
             binding.clueTabs.addListener(this);
         });});
 
-        settings.getPlaySkipFilled(board::setSkipCompletedLetters);
-        settings.getPlayMovementStrategy(movementStrategy -> {
-            board.setMovementStrategy(movementStrategy);
-        });
-        settings.getPlayPlayLetterUndoEnabled(
-            board::setPlayLetterUndoStackEnabled
-        );
         board.addListener(this);
 
         keyboardManager.attachKeyboardToView(binding.boardView);

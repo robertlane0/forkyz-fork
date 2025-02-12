@@ -71,6 +71,32 @@ public class Playboard {
     private PlayLetterUndoStack playLetterUndoStack
         = new PlayLetterUndoStack(false);
 
+    public Playboard(
+        Puzzle puzzle,
+        MovementStrategy movementStrategy,
+        boolean preserveCorrectLettersInShowErrors,
+        DeleteCrossingMode deleteCrossingMode,
+        boolean showErrorsClue,
+        boolean showErrorsCursor,
+        boolean showErrorsGrid,
+        boolean toggleBeforeMove,
+        boolean skipCompletedLetters,
+        boolean undoEnabled
+    ) {
+        this(
+            puzzle,
+            movementStrategy,
+            preserveCorrectLettersInShowErrors,
+            deleteCrossingMode
+        );
+        this.showErrorsClue = showErrorsClue;
+        this.showErrorsCursor = showErrorsCursor;
+        this.showErrorsGrid = showErrorsGrid;
+        this.toggleBeforeMove = toggleBeforeMove;
+        this.skipCompletedLetters = skipCompletedLetters;
+        playLetterUndoStack.setEnabled(undoEnabled);
+    }
+
     public Playboard(Puzzle puzzle,
                      MovementStrategy movementStrategy,
                      boolean preserveCorrectLettersInShowErrors,
