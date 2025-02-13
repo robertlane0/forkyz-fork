@@ -200,7 +200,8 @@ public abstract class PuzzleActivity
 
     @Override
     public void onPlayboardChange(PlayboardChanges changes) {
-        handleChangeChatGPT(changes);
+        // for override only
+        // remove when everyone has a view model
     }
 
     @Override
@@ -324,6 +325,7 @@ public abstract class PuzzleActivity
         viewModel.saveBoard();
 
         viewModel.unlistenBoard();
+        // remove when everyone has a view model
         Playboard board = getBoard();
         if (board != null)
             board.removeListener(this);
@@ -357,6 +359,7 @@ public abstract class PuzzleActivity
             handler.postDelayed(updateTimeTask, 1000);
 
         viewModel.listenBoard();
+        // remove when everyone has a view model
         board.addListener(this);
 
         hasInitialValues = puz.hasInitialValueCells();
@@ -634,19 +637,6 @@ public abstract class PuzzleActivity
                 utils.speak(ttsService, text);
             }
         }
-    }
-
-    private void handleChangeChatGPT(PlayboardChanges changes) {
-        ChatGPTHelpData.isEnabled(settings, isEnabled -> {
-            if (isEnabled) {
-                boolean newWord = !Objects.equals(
-                    changes.getPreviousWord(), changes.getCurrentWord()
-                );
-
-                if (newWord)
-                    invalidateOptionsMenu();
-            }
-        });
     }
 
     /**

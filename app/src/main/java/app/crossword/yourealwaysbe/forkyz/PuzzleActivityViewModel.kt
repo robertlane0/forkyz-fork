@@ -17,6 +17,7 @@ import android.net.Uri
 import android.view.accessibility.AccessibilityManager
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 
@@ -139,7 +140,7 @@ class PuzzleActivityViewModel @Inject constructor(
         settings.liveVoiceAlwaysAnnounceClue,
     )
 
-    val menuState : LiveData<MenuState> = liveDataFanIn(
+    val _menuState : MutableLiveData<MenuState> = liveDataFanIn(
         this::getMenuState,
         settings.liveExternalToolSettings,
         settings.livePlayScratchMode,
@@ -147,6 +148,7 @@ class PuzzleActivityViewModel @Inject constructor(
         settings.livePlayShowErrorsCursor,
         settings.livePlayShowErrorsGrid,
     )
+    val menuState : LiveData<MenuState> = _menuState
 
     val showTimer : LiveData<Boolean> = settings.livePlayShowTimer
     var timer : ImaginaryTimer? = null
@@ -572,6 +574,17 @@ class PuzzleActivityViewModel @Inject constructor(
                     announceBox(!announceBoxSetting)
             }
         }}
+    }
+
+    private fun handleChangeChatGPT(changes : PlayboardChanges) {
+        ChatGPTHelpData.isEnabled(settings) { isEnabled ->
+            if (isEnabled) {
+                val newWord
+                    = changes.getPreviousWord() != changes.getCurrentWord()
+                if (newWord)
+                    _menuState.postValue(getMenuState())
+            }
+        }
     }
 }
 

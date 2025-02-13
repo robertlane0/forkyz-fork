@@ -6,6 +6,7 @@ import java.util.function.Supplier
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 
 fun <T> LiveData<T>.observeOnce(cb : Consumer<T>) {
@@ -32,7 +33,7 @@ fun <T> LiveData<T>.observeOnce(cb : Consumer<T>) {
 fun <T> liveDataFanIn(
     supplier : Supplier<T>,
     vararg liveDatas : LiveData<*>,
-) : LiveData<T> {
+) : MutableLiveData<T> {
     val mediator = MediatorLiveData<T>()
     val seen : MutableSet<Int>
         = liveDatas.map(System::identityHashCode).toMutableSet()
