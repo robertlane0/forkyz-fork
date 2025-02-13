@@ -296,8 +296,8 @@ class PuzzleActivityViewModel @Inject constructor(
         )
     }
 
-    fun dispatchVoiceCommand(text : List<String>) {
-        voiceCommandDispatcher.dispatch(text)
+    fun dispatchVoiceCommand(text : List<String>?) {
+        text?.let { voiceCommandDispatcher.dispatch(it) }
     }
 
     // public for now to give a route through puzzle activity to
