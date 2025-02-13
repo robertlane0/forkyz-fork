@@ -1,5 +1,5 @@
 
-package app.crossword.yourealwaysbe.forkyz.tools
+package app.crossword.yourealwaysbe.forkyz.exttools
 
 import android.net.Uri
 import android.content.Context

@@ -31,9 +31,9 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import dagger.hilt.android.AndroidEntryPoint;
 
 import app.crossword.yourealwaysbe.forkyz.databinding.NotesBinding;
-import app.crossword.yourealwaysbe.forkyz.tools.CrosswordSolverData;
-import app.crossword.yourealwaysbe.forkyz.tools.ExternalDictionaries;
-import app.crossword.yourealwaysbe.forkyz.tools.ExternalToolLauncher;
+import app.crossword.yourealwaysbe.forkyz.exttools.CrosswordSolverData;
+import app.crossword.yourealwaysbe.forkyz.exttools.ExternalDictionaries;
+import app.crossword.yourealwaysbe.forkyz.exttools.ExternalToolLauncher;
 import app.crossword.yourealwaysbe.forkyz.util.ColorUtils;
 import app.crossword.yourealwaysbe.forkyz.util.KeyboardManager;
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand;

@@ -1,5 +1,5 @@
 
-package app.crossword.yourealwaysbe.forkyz.tools
+package app.crossword.yourealwaysbe.forkyz.exttools
 
 import java.util.regex.Matcher
 import java.util.regex.Pattern

@@ -1,7 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.settings
 
-import app.crossword.yourealwaysbe.forkyz.tools.ChatGPTHelpData
+import app.crossword.yourealwaysbe.forkyz.exttools.ChatGPTHelpData
 
 class ExternalToolSettings(
     val chatGPTAPIKey : String,

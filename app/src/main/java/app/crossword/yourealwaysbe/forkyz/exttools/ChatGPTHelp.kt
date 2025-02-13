@@ -1,5 +1,5 @@
 
-package app.crossword.yourealwaysbe.forkyz.tools
+package app.crossword.yourealwaysbe.forkyz.exttools
 
 import java.io.BufferedOutputStream
 import java.io.IOException

@@ -1,5 +1,5 @@
 
-package app.crossword.yourealwaysbe.forkyz.tools;
+package app.crossword.yourealwaysbe.forkyz.exttools;
 
 import android.app.Activity;
 import android.app.Dialog;

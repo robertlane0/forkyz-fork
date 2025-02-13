@@ -41,8 +41,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import dagger.hilt.android.AndroidEntryPoint;
 
 import app.crossword.yourealwaysbe.forkyz.databinding.VoiceButtonsBinding;
-import app.crossword.yourealwaysbe.forkyz.tools.ChatGPTHelpData;
-import app.crossword.yourealwaysbe.forkyz.tools.ExternalToolLauncher;
+import app.crossword.yourealwaysbe.forkyz.exttools.ChatGPTHelpData;
+import app.crossword.yourealwaysbe.forkyz.exttools.ExternalToolLauncher;
 import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer;
 import app.crossword.yourealwaysbe.forkyz.util.SpeechContract;
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand;
@@ -361,6 +361,9 @@ public abstract class PuzzleActivity
             ttsService = null;
             ttsReady = false;
         }
+
+        // start again on resume if updating
+        handler.removeCallbacks(updateTimeTask);
     }
 
     @Override
@@ -398,6 +401,10 @@ public abstract class PuzzleActivity
 
         // anything in puzzle could have changed
         invalidateOptionsMenu();
+
+        // start updating again
+        if (updatingTimer)
+            handler.postDelayed(updateTimeTask, 1000);
     }
 
     @Override

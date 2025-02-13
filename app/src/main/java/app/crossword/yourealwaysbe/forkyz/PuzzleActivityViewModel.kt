@@ -23,14 +23,14 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import org.jg.wordstonumbers.WordsToNumbersUtil
 
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
-import app.crossword.yourealwaysbe.forkyz.tools.ChatGPTHelpData
-import app.crossword.yourealwaysbe.forkyz.tools.CrosswordSolverData
-import app.crossword.yourealwaysbe.forkyz.tools.DuckDuckGoData
-import app.crossword.yourealwaysbe.forkyz.tools.ExternalDictionaries
-import app.crossword.yourealwaysbe.forkyz.tools.ExternalToolData
-import app.crossword.yourealwaysbe.forkyz.tools.FifteenSquaredData
-import app.crossword.yourealwaysbe.forkyz.tools.ShareClueData
-import app.crossword.yourealwaysbe.forkyz.tools.SharePuzzleData
+import app.crossword.yourealwaysbe.forkyz.exttools.ChatGPTHelpData
+import app.crossword.yourealwaysbe.forkyz.exttools.CrosswordSolverData
+import app.crossword.yourealwaysbe.forkyz.exttools.DuckDuckGoData
+import app.crossword.yourealwaysbe.forkyz.exttools.ExternalDictionaries
+import app.crossword.yourealwaysbe.forkyz.exttools.ExternalToolData
+import app.crossword.yourealwaysbe.forkyz.exttools.FifteenSquaredData
+import app.crossword.yourealwaysbe.forkyz.exttools.ShareClueData
+import app.crossword.yourealwaysbe.forkyz.exttools.SharePuzzleData
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
 import app.crossword.yourealwaysbe.forkyz.util.SingleLiveEvent
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands
