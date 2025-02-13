@@ -33,6 +33,7 @@ import app.crossword.yourealwaysbe.forkyz.exttools.ExternalToolData
 import app.crossword.yourealwaysbe.forkyz.exttools.FifteenSquaredData
 import app.crossword.yourealwaysbe.forkyz.exttools.ShareClueData
 import app.crossword.yourealwaysbe.forkyz.exttools.SharePuzzleData
+import app.crossword.yourealwaysbe.forkyz.inttools.EditClueData
 import app.crossword.yourealwaysbe.forkyz.inttools.InternalToolData
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
@@ -47,6 +48,7 @@ import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 import app.crossword.yourealwaysbe.forkyz.view.PlayboardTextRenderer
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Clue
+import app.crossword.yourealwaysbe.puz.ClueID
 import app.crossword.yourealwaysbe.puz.Playboard
 import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges
 import app.crossword.yourealwaysbe.puz.Playboard.PlayboardListener
@@ -296,6 +298,19 @@ class PuzzleActivityViewModel @Inject constructor(
             omitExtensions,
             externalToolEvent::postValue,
         )
+    }
+
+    /**
+     * Handles user request to edit currently selected clue
+     */
+    fun editClue() {
+        getBoard()?.getClueID()?.let { editClue(it) }
+    }
+
+    fun editClue(cid : ClueID?) {
+        cid?.let {
+            internalToolEvent.postValue(EditClueData.build(it))
+        }
     }
 
     fun dispatchVoiceCommand(text : List<String>?) {

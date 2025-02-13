@@ -48,7 +48,6 @@ import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer;
 import app.crossword.yourealwaysbe.forkyz.util.SpeechContract;
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand;
 import app.crossword.yourealwaysbe.forkyz.view.ChooseFlagColorDialog;
-import app.crossword.yourealwaysbe.forkyz.view.ClueEditDialog;
 import app.crossword.yourealwaysbe.forkyz.view.PlayboardTextRenderer;
 import app.crossword.yourealwaysbe.forkyz.view.PuzzleInfoDialogs;
 import app.crossword.yourealwaysbe.forkyz.view.SpecialEntryDialog;
@@ -569,32 +568,16 @@ public abstract class PuzzleActivity
         return state != null && state.getEqualsAnnounceClue();
     }
 
-    /**
-     * Handles user request to edit clue
-     *
-     * Calls through to editClue(cid) where cid is the id of the
-     * currently selected clue on the board. May be overridden by
-     * subclasses to edit a different default clue.
-     */
+    // remove when all activities talk to view model
+    // notes activity currently overrides this for its own behaviour
+    // so menu should call this not go to view model directly
     protected void editClue() {
-        Playboard board = getBoard();
-        ClueID cid = (board == null) ? null : board.getClueID();
-        editClue(cid);
+        viewModel.editClue();
     }
 
-    /**
-     * Open dialog to edit given clue
-     */
+    // remove when all activities talk to view model
     protected void editClue(ClueID cid) {
-        if (cid == null)
-            return;
-
-        ClueEditDialog dialog = new ClueEditDialog();
-        Bundle args = new Bundle();
-        args.putString(ClueEditDialog.CLUE_LISTNAME, cid.getListName());
-        args.putInt(ClueEditDialog.CLUE_INDEX, cid.getIndex());
-        dialog.setArguments(args);
-        dialog.show(getSupportFragmentManager(), "ClueEditDialog");
+        viewModel.editClue(cid);
     }
 
     private boolean isAccessibilityServiceRunning() {
