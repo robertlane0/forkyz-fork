@@ -43,6 +43,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 import app.crossword.yourealwaysbe.forkyz.databinding.VoiceButtonsBinding;
 import app.crossword.yourealwaysbe.forkyz.exttools.ChatGPTHelpData;
 import app.crossword.yourealwaysbe.forkyz.exttools.ExternalToolLauncher;
+import app.crossword.yourealwaysbe.forkyz.inttools.InternalToolLauncher;
 import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer;
 import app.crossword.yourealwaysbe.forkyz.util.SpeechContract;
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand;
@@ -734,6 +735,11 @@ public abstract class PuzzleActivity
         viewModel.getExternalToolEvent().observe(
             this,
             data -> { data.accept(new ExternalToolLauncher(this)); }
+        );
+
+        viewModel.getInternalToolEvent().observe(
+            this,
+            data -> { data.accept(new InternalToolLauncher(this)); }
         );
 
         viewModel.getMenuState().observe(

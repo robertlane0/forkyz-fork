@@ -33,6 +33,7 @@ import app.crossword.yourealwaysbe.forkyz.exttools.ExternalToolData
 import app.crossword.yourealwaysbe.forkyz.exttools.FifteenSquaredData
 import app.crossword.yourealwaysbe.forkyz.exttools.ShareClueData
 import app.crossword.yourealwaysbe.forkyz.exttools.SharePuzzleData
+import app.crossword.yourealwaysbe.forkyz.inttools.InternalToolData
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
 import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer
@@ -119,6 +120,7 @@ class PuzzleActivityViewModel @Inject constructor(
     val announceEvent = SingleLiveEvent<AnnounceData>()
     val sendToastEvent = SingleLiveEvent<SendToast>()
     val externalToolEvent = SingleLiveEvent<ExternalToolData>()
+    val internalToolEvent = SingleLiveEvent<InternalToolData>()
     val puzzleFinishedEvent = SingleLiveEvent<Void>()
 
     val voiceState : LiveData<VoiceState> = liveDataFanIn(
