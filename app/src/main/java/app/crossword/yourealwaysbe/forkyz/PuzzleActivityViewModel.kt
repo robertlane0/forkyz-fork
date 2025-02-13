@@ -33,6 +33,8 @@ import app.crossword.yourealwaysbe.forkyz.exttools.ExternalToolData
 import app.crossword.yourealwaysbe.forkyz.exttools.FifteenSquaredData
 import app.crossword.yourealwaysbe.forkyz.exttools.ShareClueData
 import app.crossword.yourealwaysbe.forkyz.exttools.SharePuzzleData
+import app.crossword.yourealwaysbe.forkyz.inttools.CellFlagData
+import app.crossword.yourealwaysbe.forkyz.inttools.ClueFlagData
 import app.crossword.yourealwaysbe.forkyz.inttools.EditClueData
 import app.crossword.yourealwaysbe.forkyz.inttools.InternalToolData
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
@@ -210,6 +212,33 @@ class PuzzleActivityViewModel @Inject constructor(
             settings.setPlayShowErrorsClue(!board.isShowErrorsClue())
         }
     }
+
+    fun toggleClueFlag() {
+        getBoard()?.getClue()?.let { clue ->
+            if (clue.isFlagged())
+                getBoard()?.flagClue(clue, false);
+            else
+                internalToolEvent.postValue(ClueFlagData.build(clue.getClueID()))
+        }
+    }
+
+    fun toggleCellFlag() {
+        getBoard()?.let { board ->
+            getPuzzle()?.let { puz ->
+                board.getHighlightLetter()?.let { pos ->
+                    puz.checkedGetBox(pos)?.let { box ->
+                        if (box.isFlagged())
+                            board.flagPosition(pos, false)
+                        else
+                            internalToolEvent.postValue(
+                                CellFlagData.build(pos)
+                            )
+                    }
+                }
+            }
+        }
+    }
+
 
     fun toggleShowErrorsCursor() {
         getBoard()?.let { board ->

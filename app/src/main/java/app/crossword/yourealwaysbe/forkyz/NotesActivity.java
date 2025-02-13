@@ -444,7 +444,7 @@ public class NotesActivity extends PuzzleActivity {
 
         DialogFragment dialog = new ChooseFlagColorDialog();
         Bundle args = new Bundle();
-        ChooseFlagColorDialog.addClueToBundle(args, clue);
+        ChooseFlagColorDialog.addClueIDToBundle(args, clue.getClueID());
         dialog.setArguments(args);
         dialog.show(getSupportFragmentManager(), "ChooseFlagColorDialog");
     }

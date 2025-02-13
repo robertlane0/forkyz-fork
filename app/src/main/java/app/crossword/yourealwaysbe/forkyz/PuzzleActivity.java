@@ -47,7 +47,6 @@ import app.crossword.yourealwaysbe.forkyz.inttools.InternalToolLauncher;
 import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer;
 import app.crossword.yourealwaysbe.forkyz.util.SpeechContract;
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand;
-import app.crossword.yourealwaysbe.forkyz.view.ChooseFlagColorDialog;
 import app.crossword.yourealwaysbe.forkyz.view.PlayboardTextRenderer;
 import app.crossword.yourealwaysbe.forkyz.view.PuzzleInfoDialogs;
 import app.crossword.yourealwaysbe.forkyz.view.SpecialEntryDialog;
@@ -258,10 +257,10 @@ public abstract class PuzzleActivity
             launchPuzzleNotes();
             return true;
         } else if (id == R.id.puzzle_menu_flag_clue_toggle) {
-            toggleClueFlag();
+            viewModel.toggleClueFlag();
             return true;
         } else if (id == R.id.puzzle_menu_flag_cell_toggle) {
-            toggleCellFlag();
+            viewModel.toggleCellFlag();
             return true;
         } else if (id == R.id.puzzle_menu_scratch_mode) {
             viewModel.toggleScratchMode();
@@ -809,55 +808,6 @@ public abstract class PuzzleActivity
             );
         } else {
             resetStatusBarColor(appBarLayout);
-        }
-    }
-
-    /**
-     * Flag currently selected clue and choose colour
-     */
-    private void toggleClueFlag() {
-        Playboard board = getBoard();
-        if (board == null)
-            return;
-
-        Clue clue = board.getClue();
-        if (clue == null)
-            return;
-
-        if (clue.isFlagged()) {
-            board.flagClue(clue, false);
-        } else {
-            DialogFragment dialog = new ChooseFlagColorDialog();
-            Bundle args = new Bundle();
-            ChooseFlagColorDialog.addClueToBundle(args, clue);
-            dialog.setArguments(args);
-            dialog.show(getSupportFragmentManager(), "ChooseFlagColorDialog");
-        }
-    }
-
-    /**
-     * Flag currently selected cell
-     */
-    private void toggleCellFlag() {
-        Playboard board = getBoard();
-        Puzzle puz = getPuzzle();
-        if (board == null || puz == null)
-            return;
-
-        Position pos = board.getHighlightLetter();
-        Box box = puz.checkedGetBox(pos);
-        if (pos == null || box == null)
-            return;
-
-        if (box.isFlagged()) {
-            board.flagPosition(pos, false);
-        } else {
-            // let diagog set flag
-            DialogFragment dialog = new ChooseFlagColorDialog();
-            Bundle args = new Bundle();
-            ChooseFlagColorDialog.addBoxPositionToBundle(args, pos);
-            dialog.setArguments(args);
-            dialog.show(getSupportFragmentManager(), "ChooseFlagColorDialog");
         }
     }
 

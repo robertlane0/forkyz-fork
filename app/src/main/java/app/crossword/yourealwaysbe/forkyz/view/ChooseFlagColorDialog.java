@@ -52,8 +52,7 @@ public class ChooseFlagColorDialog extends DialogFragment {
     /**
      * Either add a clue or a cell before showing
      */
-    public static void addClueToBundle(Bundle bundle, Clue clue) {
-        ClueID cid = clue.getClueID();
+    public static void addClueIDToBundle(Bundle bundle, ClueID cid) {
         bundle.putString(ARG_CLUE_LIST_NAME, cid.getListName());
         bundle.putInt(ARG_CLUE_INDEX, cid.getIndex());
     }
