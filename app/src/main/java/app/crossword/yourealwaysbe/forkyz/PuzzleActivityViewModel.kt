@@ -11,11 +11,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.LiveData
 import android.app.Application
+import android.content.Context
 import android.net.Uri
+import android.view.accessibility.AccessibilityManager
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -40,6 +42,7 @@ import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerShared
 import app.crossword.yourealwaysbe.forkyz.util.liveDataFanIn
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
+import app.crossword.yourealwaysbe.forkyz.view.PlayboardTextRenderer
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Clue
 import app.crossword.yourealwaysbe.puz.Playboard
@@ -97,6 +100,8 @@ data class VoiceState(
     val alwaysAnnounceClue : Boolean,
 )
 
+data class AnnounceData(val message : CharSequence)
+
 // will lose this tag and become an open base class
 @HiltViewModel
 class PuzzleActivityViewModel @Inject constructor(
@@ -110,7 +115,7 @@ class PuzzleActivityViewModel @Inject constructor(
         PuzzleActivityViewModel::class.toString()
     )
 
-    val announceClueEvent = SingleLiveEvent<Void>()
+    val announceEvent = SingleLiveEvent<AnnounceData>()
     val sendToastEvent = SingleLiveEvent<SendToast>()
     val externalToolEvent = SingleLiveEvent<ExternalToolData>()
     val puzzleFinishedEvent = SingleLiveEvent<Void>()
@@ -355,9 +360,32 @@ class PuzzleActivityViewModel @Inject constructor(
         }
     }
 
-    override fun onPlayboardChange(changed : PlayboardChanges) {
+    fun announceClue(onlyIfAccessibilityService : Boolean) {
+        getBoard()?.let { board ->
+            settings.getPlayShowCount() { showCount ->
+                PlayboardTextRenderer.getAccessibleCurrentClueWord(
+                    getApplication(), board, showCount
+                )?.let {
+                    announce(AnnounceData(it), onlyIfAccessibilityService)
+                }
+            }
+        }
+    }
+
+   fun announceBox(onlyIfAccessibilityService : Boolean) {
+        getBoard()?.let { board ->
+            PlayboardTextRenderer.getAccessibleCurrentBox(
+                getApplication(),
+                board,
+            )?.let {
+                announce(AnnounceData(it), onlyIfAccessibilityService)
+            }
+        }
+    }
+
+    override fun onPlayboardChange(changes : PlayboardChanges) {
         handleChangeTimer()
-        //handleChangeAccessibility(changes);
+        handleChangeAccessibility(changes)
         //handleChangeChatGPT(changes);
     }
 
@@ -427,7 +455,7 @@ class PuzzleActivityViewModel @Inject constructor(
         registerVoiceCommand(
             VoiceCommand(
                 app.getString(R.string.command_announce_clue),
-                { announceClueEvent.postCall() },
+                { announceClue(false) },
             )
         )
     }
@@ -506,6 +534,44 @@ class PuzzleActivityViewModel @Inject constructor(
                 puzzleFinishedEvent.postCall()
             stopTimer()
         }
+    }
+
+    private fun isAccessibilityServiceRunning() : Boolean {
+        val app : Application = getApplication()
+        val manager = app.getSystemService(
+            Context.ACCESSIBILITY_SERVICE
+        ) as AccessibilityManager?;
+        return manager != null && manager.isEnabled();
+    }
+
+    private fun announce(
+        data : AnnounceData,
+        onlyIfAccessibilityService : Boolean,
+    ) {
+        if (!onlyIfAccessibilityService || isAccessibilityServiceRunning())
+            announceEvent.postValue(data)
+    }
+
+    private fun handleChangeAccessibility(changes : PlayboardChanges) {
+        val accessibilityRunning = isAccessibilityServiceRunning()
+        settings.getVoiceAlwaysAnnounceBox() { announceBoxSetting ->
+        settings.getVoiceAlwaysAnnounceClue() { announceClueSetting ->
+            val announceBox = accessibilityRunning || announceBoxSetting
+            val announceClue = accessibilityRunning || announceClueSetting
+            val board = getBoard()
+
+            if (board != null && (announceClue || announceBox)) {
+                val newPos = board.getHighlightLetter()
+                val isNewWord
+                    = changes.getPreviousWord() != changes.getCurrentWord()
+                val isNewPosition = changes.getPreviousPosition() != newPos
+
+                if (isNewWord && announceClue)
+                    announceClue(!announceClueSetting)
+                else if (isNewPosition && announceBox)
+                    announceBox(!announceBoxSetting)
+            }
+        }}
     }
 }
 
