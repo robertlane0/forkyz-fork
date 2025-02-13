@@ -69,7 +69,6 @@ public abstract class PuzzleActivity
 
     private VoiceButtonsBinding voiceBinding = null;
     private boolean firstPlay = false;
-    private ImaginaryTimer timer;
     private Handler handler = new Handler(Looper.getMainLooper());
     private PlayboardTextRenderer textRenderer;
     private TextToSpeech ttsService = null;
@@ -97,7 +96,6 @@ public abstract class PuzzleActivity
         viewModel = new ViewModelProvider(this)
             .get(PuzzleActivityViewModel.class);
 
-        startTimer();
         setupObservers();
     }
 
@@ -201,23 +199,8 @@ public abstract class PuzzleActivity
         return true;
     }
 
-    private void startTimer() {
-        Puzzle puz = getPuzzle();
-
-        if (puz != null && puz.getPercentComplete() != 100) {
-            ImaginaryTimer timer = new ImaginaryTimer(puz.getTime());
-            setTimer(timer);
-            timer.start();
-        }
-    }
-
-    public ImaginaryTimer getTimer() {
-        return timer;
-    }
-
     @Override
     public void onPlayboardChange(PlayboardChanges changes) {
-        handleChangeTimer();
         handleChangeAccessibility(changes);
         handleChangeChatGPT(changes);
     }
@@ -339,19 +322,10 @@ public abstract class PuzzleActivity
     protected void onPause() {
         super.onPause();
 
-        Puzzle puz = getPuzzle();
-        ImaginaryTimer timer = getTimer();
+        viewModel.stopTimer();
+        viewModel.saveBoard();
 
-        if ((puz != null)) {
-            if ((timer != null) && (puz.getPercentComplete() != 100)) {
-                timer.stop();
-                puz.setTime(timer.getElapsed());
-                setTimer(null);
-            }
-
-            saveBoard();
-        }
-
+        viewModel.unlistenBoard()
         Playboard board = getBoard();
         if (board != null)
             board.removeListener(this);
@@ -367,15 +341,6 @@ public abstract class PuzzleActivity
     }
 
     @Override
-    protected void onRestart() {
-        super.onRestart();
-
-        ImaginaryTimer timer = getTimer();
-        if (timer != null)
-            timer.start();
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
 
@@ -387,34 +352,19 @@ public abstract class PuzzleActivity
             return;
         }
 
-        if (puz.getPercentComplete() != 100) {
-            long time = puz.getTime();
-            firstPlay = (time == 0);
-            ImaginaryTimer timer = new ImaginaryTimer(time);
-            setTimer(timer);
-            timer.start();
-        }
+        Long time = viewModel.startTimer();
+        firstPlay = (time != null && time == 0);
+        // start updating again
+        if (updatingTimer)
+            handler.postDelayed(updateTimeTask, 1000);
 
+        viewModel.listenBoard()
         board.addListener(this);
 
         hasInitialValues = puz.hasInitialValueCells();
 
         // anything in puzzle could have changed
         invalidateOptionsMenu();
-
-        // start updating again
-        if (updatingTimer)
-            handler.postDelayed(updateTimeTask, 1000);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        ImaginaryTimer timer = getTimer();
-        if (timer != null) {
-            timer.stop();
-        }
     }
 
     @Override
@@ -451,6 +401,11 @@ public abstract class PuzzleActivity
         return super.onKeyUp(keyCode, event);
     }
 
+    // remove when all activities can talk to their view models
+    public ImaginaryTimer getTimer() {
+        return viewModel.getTimer();
+    }
+
     protected void registerVoiceCommand(@NonNull VoiceCommand command) {
         viewModel.registerVoiceCommand(command);
     }
@@ -480,16 +435,8 @@ public abstract class PuzzleActivity
         return viewModel.getPuzzle();
     }
 
-    protected void saveBoard() {
-        viewModel.saveBoard();
-    }
-
     protected boolean isFirstPlay() {
         return firstPlay;
-    }
-
-    protected void setTimer(ImaginaryTimer timer) {
-        this.timer = timer;
     }
 
     protected void getLongClueText(Clue clue, Consumer<String> cb) {
@@ -684,28 +631,6 @@ public abstract class PuzzleActivity
         args.putInt(ClueEditDialog.CLUE_INDEX, cid.getIndex());
         dialog.setArguments(args);
         dialog.show(getSupportFragmentManager(), "ClueEditDialog");
-    }
-
-    private void handleChangeTimer() {
-        Puzzle puz = getPuzzle();
-        if (puz == null)
-            return;
-
-        ImaginaryTimer timer = getTimer();
-        if (puz != null &&
-            puz.getPercentComplete() == 100 &&
-            timer != null) {
-
-            timer.stop();
-            puz.setTime(timer.getElapsed());
-            setTimer(null);
-
-            DialogFragment dialog = new PuzzleInfoDialogs.Finished();
-            dialog.show(
-                getSupportFragmentManager(),
-                "PuzzleInfoDialogs.Finished"
-            );
-        }
     }
 
     private boolean isAccessibilityServiceRunning() {
@@ -926,6 +851,17 @@ public abstract class PuzzleActivity
                     handler.postDelayed(updateTimeTask, 1000);
                 }
                 updatingTimer = showTimer;
+            }
+        );
+
+        viewModel.getPuzzleFinishedEvent().observe(
+            this,
+            (v) -> {
+                DialogFragment dialog = new PuzzleInfoDialogs.Finished();
+                dialog.show(
+                    PuzzleActivity.this.getSupportFragmentManager(),
+                    "PuzzleInfoDialogs.Finished"
+                );
             }
         );
     }

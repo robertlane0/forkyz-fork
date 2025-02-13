@@ -22,7 +22,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 
 import org.jg.wordstonumbers.WordsToNumbersUtil
 
-import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.exttools.ChatGPTHelpData
 import app.crossword.yourealwaysbe.forkyz.exttools.CrosswordSolverData
 import app.crossword.yourealwaysbe.forkyz.exttools.DuckDuckGoData
@@ -31,7 +30,9 @@ import app.crossword.yourealwaysbe.forkyz.exttools.ExternalToolData
 import app.crossword.yourealwaysbe.forkyz.exttools.FifteenSquaredData
 import app.crossword.yourealwaysbe.forkyz.exttools.ShareClueData
 import app.crossword.yourealwaysbe.forkyz.exttools.SharePuzzleData
+import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
+import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer
 import app.crossword.yourealwaysbe.forkyz.util.SingleLiveEvent
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand
@@ -42,6 +43,8 @@ import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Clue
 import app.crossword.yourealwaysbe.puz.Playboard
+import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges
+import app.crossword.yourealwaysbe.puz.Playboard.PlayboardListener
 import app.crossword.yourealwaysbe.puz.Puzzle
 
 class ShareStream(
@@ -102,7 +105,7 @@ class PuzzleActivityViewModel @Inject constructor(
     val currentPuzzleHolder : CurrentPuzzleHolder,
     val fileHandlerProvider : FileHandlerProvider,
     val utils : AndroidVersionUtils,
-) : AndroidViewModel(application) {
+) : AndroidViewModel(application), PlayboardListener {
     private val LOG = Logger.getLogger(
         PuzzleActivityViewModel::class.toString()
     )
@@ -110,6 +113,7 @@ class PuzzleActivityViewModel @Inject constructor(
     val announceClueEvent = SingleLiveEvent<Void>()
     val sendToastEvent = SingleLiveEvent<SendToast>()
     val externalToolEvent = SingleLiveEvent<ExternalToolData>()
+    val puzzleFinishedEvent = SingleLiveEvent<Void>()
 
     val voiceState : LiveData<VoiceState> = liveDataFanIn(
         {
@@ -140,6 +144,8 @@ class PuzzleActivityViewModel @Inject constructor(
     )
 
     val showTimer : LiveData<Boolean> = settings.livePlayShowTimer
+    var timer : ImaginaryTimer? = null
+        private set
 
     private val voiceCommandDispatcher = VoiceCommands()
 
@@ -148,6 +154,44 @@ class PuzzleActivityViewModel @Inject constructor(
 
     fun saveBoard() {
         currentPuzzleHolder.saveBoard()
+    }
+
+    fun listenBoard() {
+        getBoard()?.addListener(this)
+    }
+
+    fun unlistenBoard() {
+        getBoard()?.removeListener(this)
+    }
+
+    /**
+     * Returns value of timer at start or null if no puzzle
+     */
+    fun startTimer() : Long? {
+        val puz = getPuzzle()
+        if (puz != null && puz.getPercentComplete() != 100) {
+                val time = puz.getTime()
+                timer = ImaginaryTimer(time);
+                timer?.start();
+                return time
+        } else {
+            return null
+        }
+    }
+
+    val isTimerRunning : Boolean
+        get() = timer != null
+
+    fun stopTimer() {
+        getPuzzle()?.let { puz ->
+            timer?.let { timer ->
+                if (puz.getPercentComplete() != 100) {
+                    timer.stop();
+                    puz.setTime(timer.getElapsed());
+                }
+            }
+        }
+        timer = null
     }
 
     fun toggleShowErrorsClue() {
@@ -311,6 +355,16 @@ class PuzzleActivityViewModel @Inject constructor(
         }
     }
 
+    override fun onPlayboardChange(changed : PlayboardChanges) {
+        handleChangeTimer()
+        //handleChangeAccessibility(changes);
+        //handleChangeChatGPT(changes);
+    }
+
+    override protected fun onCleared() {
+        getBoard()?.removeListener(this)
+    }
+
     /**
      * Prepared command for inputting letters
      */
@@ -443,6 +497,15 @@ class PuzzleActivityViewModel @Inject constructor(
             canRevealInitialBoxLetter = canRevealInitialBoxLetter,
             canRevealInitialLetters = canRevealInitialLetters,
         )
+    }
+
+    private fun handleChangeTimer() {
+        val puz = getPuzzle()
+        if (puz != null && puz.getPercentComplete() == 100) {
+            if (isTimerRunning)
+                puzzleFinishedEvent.postCall()
+            stopTimer()
+        }
     }
 }
 
