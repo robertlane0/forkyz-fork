@@ -323,7 +323,7 @@ public abstract class PuzzleActivity
         viewModel.stopTimer();
         viewModel.saveBoard();
 
-        viewModel.unlistenBoard()
+        viewModel.unlistenBoard();
         Playboard board = getBoard();
         if (board != null)
             board.removeListener(this);
@@ -356,7 +356,7 @@ public abstract class PuzzleActivity
         if (updatingTimer)
             handler.postDelayed(updateTimeTask, 1000);
 
-        viewModel.listenBoard()
+        viewModel.listenBoard();
         board.addListener(this);
 
         hasInitialValues = puz.hasInitialValueCells();
