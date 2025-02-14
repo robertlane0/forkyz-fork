@@ -42,6 +42,10 @@ public class BoardWordEditView extends BoardEditView {
     private Set<String> suppressNotesList;
     boolean customSuppressNotesList = false;
 
+    public BoardWordEditView(Context context) {
+        this(context, null);
+    }
+
     @Inject
     public BoardWordEditView(Context context, AttributeSet attrs) {
         super(context, attrs);

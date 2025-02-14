@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.core.content.ContextCompat
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.color.DynamicColors
@@ -39,6 +40,15 @@ class ThemeHelper @Inject constructor(val settings : ForkyzSettings) {
         DayNightMode.DNM_SYSTEM -> isSystemInDarkTheme()
         else -> false
     }
+
+    val cheatedColor : Color
+        @Composable
+        get() {
+            if (isDarkMode())
+                return cheatedColorDark
+            else
+                return cheatedColorLight
+        }
 
     @Composable
     fun AppTheme(content : @Composable() () -> Unit) {

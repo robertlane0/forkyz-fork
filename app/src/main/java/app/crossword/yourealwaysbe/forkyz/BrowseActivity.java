@@ -59,7 +59,6 @@ import app.crossword.yourealwaysbe.forkyz.util.DownloadPickerDialogBuilder;
 import app.crossword.yourealwaysbe.forkyz.util.ImportedNowFinishDialogActivity;
 import app.crossword.yourealwaysbe.forkyz.util.files.Accessor;
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider;
-import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle;
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzMetaFile;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 import app.crossword.yourealwaysbe.forkyz.view.recycler.RemovableRecyclerViewAdapter;

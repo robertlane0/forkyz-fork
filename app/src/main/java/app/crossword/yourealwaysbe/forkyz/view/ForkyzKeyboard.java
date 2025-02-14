@@ -109,6 +109,7 @@ public class ForkyzKeyboard
     private List<Integer> specialKeyViewIds = new ArrayList<>();
     private SpecialKeyListener specialKeyListener = null;
     private boolean showHideButton = true;
+    private Runnable onHideButtonPressed = null;
 
     public ForkyzKeyboard(Context context) {
         this(context, null, 0);
@@ -212,11 +213,18 @@ public class ForkyzKeyboard
         setupSpecialKeys();
     }
 
+    public synchronized void setShowHideButton(boolean show) {
+        setShowHideButton(show, onHideButtonPressed);
+    }
+
     /**
      * Whether to show or hide the keyboard hide button row
      */
-    public synchronized void setShowHideButton(boolean show) {
+    public synchronized void setShowHideButton(
+        boolean show, Runnable onHideButtonPressed
+    ) {
         showHideButton = show;
+        this.onHideButtonPressed = onHideButtonPressed;
         View hideRow = findViewById(R.id.hide_row);
         if (hideRow != null)
             hideRow.setVisibility(show ? View.VISIBLE : View.GONE);
@@ -277,7 +285,8 @@ public class ForkyzKeyboard
         Button hideButton = (Button) findViewById(R.id.key_hide);
         hideButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                ForkyzKeyboard.this.setVisibility(View.GONE);
+                if (onHideButtonPressed != null)
+                    onHideButtonPressed.run();
             }
         });
 

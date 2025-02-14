@@ -2426,7 +2426,7 @@ class ForkyzSettings(
             "alwaysAnnounceBox",
             { s, key -> json.put(key, s.alwaysAnnounceBox) },
             { key ->
-                json.optBoolean(key)?.let {setVoiceAlwaysAnnounceBox(it) }
+                json.optBoolean(key)?.let { setVoiceAlwaysAnnounceBox(it) }
             },
         )
         run(

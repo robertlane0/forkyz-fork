@@ -519,6 +519,7 @@
     <string name="menu_notes_clue">Clue Notes</string>
     <string name="menu_notes_puzzle">Puzzle Notes</string>
     <string name="menu_flag_clue_toggle">Toggle Clue Flag</string>
+    <string name="overflow">More Options</string>
 
     <!-- clue list menu -->
     <string name="show_all_words_clue_list">Show all words</string>

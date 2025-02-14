@@ -416,6 +416,10 @@ public class Playboard {
         this.movementStrategy = movementStrategy;
     }
 
+    public MovementStrategy getMovementStrategy() {
+        return movementStrategy;
+    }
+
     public Puzzle getPuzzle() {
         return puzzle;
     }

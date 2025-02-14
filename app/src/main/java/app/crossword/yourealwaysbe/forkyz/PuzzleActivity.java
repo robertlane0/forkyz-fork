@@ -1,17 +1,10 @@
 package app.crossword.yourealwaysbe.forkyz;
 
-import java.io.IOException;
-import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
-import javax.inject.Inject;
 
-import android.app.Activity;
-import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -27,21 +20,16 @@ import android.view.accessibility.AccessibilityManager;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
-import androidx.core.app.ShareCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.accessibility.AccessibilityViewCommand;
 import androidx.fragment.app.DialogFragment;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.appbar.AppBarLayout;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
 import app.crossword.yourealwaysbe.forkyz.databinding.VoiceButtonsBinding;
-import app.crossword.yourealwaysbe.forkyz.exttools.ChatGPTHelpData;
 import app.crossword.yourealwaysbe.forkyz.exttools.ExternalToolLauncher;
 import app.crossword.yourealwaysbe.forkyz.inttools.InternalToolLauncher;
 import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer;
@@ -49,15 +37,13 @@ import app.crossword.yourealwaysbe.forkyz.util.SpeechContract;
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand;
 import app.crossword.yourealwaysbe.forkyz.view.PlayboardTextRenderer;
 import app.crossword.yourealwaysbe.forkyz.view.PuzzleInfoDialogs;
+import app.crossword.yourealwaysbe.forkyz.view.RevealPuzzleDialog;
 import app.crossword.yourealwaysbe.forkyz.view.SpecialEntryDialog;
-import app.crossword.yourealwaysbe.puz.Box;
 import app.crossword.yourealwaysbe.puz.Clue;
 import app.crossword.yourealwaysbe.puz.ClueID;
 import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges;
 import app.crossword.yourealwaysbe.puz.Playboard;
-import app.crossword.yourealwaysbe.puz.Position;
 import app.crossword.yourealwaysbe.puz.Puzzle;
-import app.crossword.yourealwaysbe.puz.Zone;
 
 @AndroidEntryPoint
 public abstract class PuzzleActivity
@@ -741,12 +727,14 @@ public abstract class PuzzleActivity
 
         viewModel.getPuzzleFinishedEvent().observe(
             this,
-            (v) -> {
-                DialogFragment dialog = new PuzzleInfoDialogs.Finished();
-                dialog.show(
-                    PuzzleActivity.this.getSupportFragmentManager(),
-                    "PuzzleInfoDialogs.Finished"
-                );
+            (finished) -> {
+                if (finished) {
+                    DialogFragment dialog = new PuzzleInfoDialogs.Finished();
+                    dialog.show(
+                        PuzzleActivity.this.getSupportFragmentManager(),
+                        "PuzzleInfoDialogs.Finished"
+                    );
+                }
             }
         );
 
@@ -777,36 +765,6 @@ public abstract class PuzzleActivity
             );
         } else {
             resetStatusBarColor(appBarLayout);
-        }
-    }
-
-    public static class RevealPuzzleDialog extends DialogFragment {
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            MaterialAlertDialogBuilder builder
-                = new MaterialAlertDialogBuilder(getActivity());
-
-            builder.setTitle(getString(R.string.reveal_puzzle))
-                .setMessage(getString(R.string.are_you_sure))
-                .setPositiveButton(
-                    R.string.ok,
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            ((PuzzleActivity) getActivity()).viewModel
-                                .revealPuzzle();
-                        }
-                    }
-                )
-                .setNegativeButton(
-                    R.string.cancel,
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    }
-                );
-
-            return builder.create();
         }
     }
 }

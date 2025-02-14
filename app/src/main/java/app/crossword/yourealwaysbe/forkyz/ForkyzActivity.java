@@ -33,9 +33,7 @@ import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper;
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder;
 import app.crossword.yourealwaysbe.forkyz.util.NightModeHelper;
 import app.crossword.yourealwaysbe.forkyz.util.OrientationHelper;
-import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
-import app.crossword.yourealwaysbe.puz.Playboard;
 
 @AndroidEntryPoint
 public class ForkyzActivity extends AppCompatActivity {

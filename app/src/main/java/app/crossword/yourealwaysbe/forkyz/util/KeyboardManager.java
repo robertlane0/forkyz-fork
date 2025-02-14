@@ -225,6 +225,8 @@ public class KeyboardManager {
                 keyboardView.setShowHideButton(
                     ks.getMode() == KeyboardMode.KM_HIDE_MANUAL
                         || ks.getMode() == KeyboardMode.KM_SHOW_SPARINGLY
+                    ,
+                    () -> { keyboardView.setVisibility(View.GONE); }
                 );
             } else {
                 keyboardView.setShowHideButton(false);

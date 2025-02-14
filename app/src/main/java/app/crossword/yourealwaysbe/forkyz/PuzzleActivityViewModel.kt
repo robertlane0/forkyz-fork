@@ -5,10 +5,12 @@ package app.crossword.yourealwaysbe.forkyz
 import java.io.IOException
 import java.util.Locale
 import java.util.logging.Logger
+import java.util.Deque
 import javax.inject.Inject
 import kotlin.text.Regex
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 import android.app.Application
@@ -37,9 +39,12 @@ import app.crossword.yourealwaysbe.forkyz.inttools.CellFlagData
 import app.crossword.yourealwaysbe.forkyz.inttools.ClueFlagData
 import app.crossword.yourealwaysbe.forkyz.inttools.EditClueData
 import app.crossword.yourealwaysbe.forkyz.inttools.InternalToolData
+import app.crossword.yourealwaysbe.forkyz.inttools.ClueNotesData
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
 import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer
+import app.crossword.yourealwaysbe.forkyz.util.KeyboardInfo
+import app.crossword.yourealwaysbe.forkyz.util.KeyboardManagerKt
 import app.crossword.yourealwaysbe.forkyz.util.SingleLiveEvent
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand
@@ -55,6 +60,16 @@ import app.crossword.yourealwaysbe.puz.Playboard
 import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges
 import app.crossword.yourealwaysbe.puz.Playboard.PlayboardListener
 import app.crossword.yourealwaysbe.puz.Puzzle
+
+enum class SubMenu {
+    NONE,
+    MAIN,
+    NOTES,
+    SHOW_ERRORS,
+    REVEAL,
+    EXTERNAL_TOOLS,
+    SHARE,
+}
 
 class ShareStream(
     val title : String,
@@ -84,7 +99,12 @@ data class ShowErrorsMenuState(
     val isShowingErrorsClue : Boolean = false,
     val isShowingErrorsCursor : Boolean = false,
     val isShowingErrorsGrid : Boolean = false,
-)
+) {
+    val isShowing : Boolean
+        get() = enabled && (
+            isShowingErrorsGrid || isShowingErrorsCursor || isShowingErrorsClue
+        )
+}
 
 data class MenuState(
     val hasShareURL : Boolean = true,
@@ -95,6 +115,7 @@ data class MenuState(
     val canReveal : Boolean = true,
     val canRevealInitialBoxLetter : Boolean = true,
     val canRevealInitialLetters : Boolean = true,
+    val expanded : SubMenu = SubMenu.NONE,
 )
 
 data class VoiceState(
@@ -113,9 +134,36 @@ data class PuzzleActivityUIState(
     val indicateShowErrors : Boolean = false,
 )
 
+enum class KeyboardVisibility {
+    NONE,
+    FORKYZ,
+    NATIVE,
+}
+
+/**
+ * State of keyboard
+ *
+ * @param visibility whether to show Forkyz, Native, or no keyboard
+ * @param needsNativeRefresh indicates if native state has just changed,
+ * so keyboard needs showing or hiding. Call markNativeRefreshed() once
+ * launched.
+ * @param hideOnBack whether the (Forkyz) keyboard should intepret a back gesture
+ * as "close"
+ * @param showHideButton whether the Forkyz keyboard should show a hide
+ * button
+ * @param forceCaps whether the native keyboard should convert to caps
+ */
+data class KeyboardState(
+    val visibility : KeyboardVisibility = KeyboardVisibility.NONE,
+    val needsNativeRefresh : Boolean = false,
+    val hideOnBack : Boolean = false,
+    val showHideButton : Boolean = false,
+    val forceCaps : Boolean = false,
+)
+
 // will lose this tag and become an open base class
 @HiltViewModel
-class PuzzleActivityViewModel @Inject constructor(
+open class PuzzleActivityViewModel @Inject constructor(
     application : Application,
     val settings : ForkyzSettings,
     val currentPuzzleHolder : CurrentPuzzleHolder,
@@ -126,11 +174,12 @@ class PuzzleActivityViewModel @Inject constructor(
         PuzzleActivityViewModel::class.toString()
     )
 
-    val announceEvent = SingleLiveEvent<AnnounceData>()
-    val sendToastEvent = SingleLiveEvent<SendToast>()
-    val externalToolEvent = SingleLiveEvent<ExternalToolData>()
-    val internalToolEvent = SingleLiveEvent<InternalToolData>()
-    val puzzleFinishedEvent = SingleLiveEvent<Void>()
+    val announceEvent = SingleLiveEvent<AnnounceData?>()
+    val sendToastEvent = SingleLiveEvent<SendToast?>()
+    val externalToolEvent = SingleLiveEvent<ExternalToolData?>()
+    val internalToolEvent = SingleLiveEvent<InternalToolData?>()
+    val puzzleFinishedEvent = SingleLiveEvent<Boolean>()
+    val backEvent = SingleLiveEvent<Boolean>()
 
     val voiceState : LiveData<VoiceState> = liveDataFanIn(
         {
@@ -151,7 +200,8 @@ class PuzzleActivityViewModel @Inject constructor(
         settings.liveVoiceAlwaysAnnounceClue,
     )
 
-    val _menuState : MutableLiveData<MenuState> = liveDataFanIn(
+    private val menuExpandStack : MutableList<SubMenu> = mutableListOf()
+    private val _menuState : MutableLiveData<MenuState> = liveDataFanIn(
         this::getMenuState,
         settings.liveExternalToolSettings,
         settings.livePlayScratchMode,
@@ -184,6 +234,15 @@ class PuzzleActivityViewModel @Inject constructor(
         settings.livePlayShowErrorsGrid,
     )
 
+    val _keyboardState = MutableStateFlow<KeyboardState>(KeyboardState())
+    val keyboardState : StateFlow<KeyboardState> = _keyboardState
+
+    private val keyboardManager = KeyboardManagerKt(
+        settings,
+        this::keyboardManagerShow,
+        this::keyboardManagerHide,
+    )
+
     var timer : ImaginaryTimer? = null
         private set
     val puzzleHasInitialValues : Boolean by lazy {
@@ -191,11 +250,20 @@ class PuzzleActivityViewModel @Inject constructor(
     }
     val isFirstPlay : Boolean
         get() = getPuzzle()?.getTime() == 0.toLong()
+    val canResume : Boolean
+        get() = getPuzzle() != null
+    val isTimerRunning : Boolean
+        get() = timer != null
+    val supportURL : String?
+        get() = getPuzzle()?.getSupportUrl()
+    val shareURL : String?
+        get() = getPuzzle()?.getShareUrl()
 
     private val voiceCommandDispatcher = VoiceCommands()
 
-    protected fun getBoard() : Playboard? = currentPuzzleHolder.board
-    protected fun getPuzzle() : Puzzle? = getBoard()?.getPuzzle()
+    // needed public to send to non-compose views
+    fun getBoard() : Playboard? = currentPuzzleHolder.board
+    fun getPuzzle() : Puzzle? = getBoard()?.getPuzzle()
 
     fun saveBoard() {
         currentPuzzleHolder.saveBoard()
@@ -209,6 +277,12 @@ class PuzzleActivityViewModel @Inject constructor(
         getBoard()?.removeListener(this)
     }
 
+    fun markNativeRefreshed() {
+        _keyboardState.value = keyboardState.value.copy(
+            needsNativeRefresh = false,
+        )
+    }
+
     fun startTimer() {
         val puz = getPuzzle()
         if (puz != null && puz.getPercentComplete() != 100) {
@@ -217,9 +291,6 @@ class PuzzleActivityViewModel @Inject constructor(
                 timer?.start();
         }
     }
-
-    val isTimerRunning : Boolean
-        get() = timer != null
 
     fun stopTimer() {
         getPuzzle()?.let { puz ->
@@ -265,7 +336,6 @@ class PuzzleActivityViewModel @Inject constructor(
         }
     }
 
-
     fun toggleShowErrorsCursor() {
         getBoard()?.let { board ->
             settings.setPlayShowErrorsCursor(!board.isShowErrorsCursor())
@@ -297,12 +367,6 @@ class PuzzleActivityViewModel @Inject constructor(
     fun revealErrors() {
         getBoard()?.revealErrors()
     }
-
-    fun revealPuzzle() {
-        getBoard()?.revealPuzzle()
-    }
-
-    fun getSupportURL() : String? = getPuzzle()?.getSupportUrl()
 
     fun toggleScratchMode() {
         settings.getPlayScratchMode() { settings.setPlayScratchMode(!it); }
@@ -366,6 +430,40 @@ class PuzzleActivityViewModel @Inject constructor(
         cid?.let {
             internalToolEvent.postValue(EditClueData.build(it))
         }
+    }
+
+    fun launchCurrentClueNotes() {
+        getBoard()?.let { board ->
+            launchClueNotes(board.getClueID())
+        }
+    }
+
+    fun launchClueNotes(clue : Clue?) {
+        launchClueNotes(clue?.getClueID())
+    }
+
+    fun launchClueNotes(cid : ClueID?) {
+        getBoard()?.let { board ->
+            if (cid == null) {
+                launchPuzzleNotes()
+            } else {
+                internalToolEvent.postValue(
+                    ClueNotesData.buildClueNotes(board.getClueID())
+                )
+            }
+        }
+    }
+
+    fun launchPuzzleNotes() {
+        internalToolEvent.postValue(ClueNotesData.buildPuzzleNotes())
+    }
+
+    fun doBack() {
+        backEvent.postValue(true)
+    }
+
+    fun clearBackEvent() {
+        backEvent.postValue(false)
     }
 
     fun dispatchVoiceCommand(text : List<String>?) {
@@ -434,7 +532,7 @@ class PuzzleActivityViewModel @Inject constructor(
         }
     }
 
-    fun announceClue(onlyIfAccessibilityService : Boolean) {
+    fun announceClue(onlyIfAccessibilityService : Boolean = false) {
         getBoard()?.let { board ->
             settings.getPlayShowCount() { showCount ->
                 PlayboardTextRenderer.getAccessibleCurrentClueWord(
@@ -457,14 +555,82 @@ class PuzzleActivityViewModel @Inject constructor(
         }
     }
 
+    fun expandMenu(menu : SubMenu) {
+        menuExpandStack.add(menu)
+        val state = menuState.value ?: getMenuState()
+        _menuState.postValue(state.copy(expanded = menu))
+    }
+
+    /**
+     * Close most recently opened menu and return to previous
+     */
+    fun closeMenu() {
+         val state = menuState.value ?: getMenuState()
+        if (menuExpandStack.isEmpty()) {
+            _menuState.postValue(state.copy(expanded = SubMenu.NONE))
+        } else {
+            menuExpandStack.removeAt(menuExpandStack.size - 1)
+            _menuState.postValue(state.copy(expanded = menuExpandStack.last()))
+        }
+    }
+
+    /**
+     * Dismiss menu completely
+     */
+    fun dismissMenu() {
+        menuExpandStack.clear()
+         val state = menuState.value ?: getMenuState()
+        _menuState.postValue(state.copy(expanded = SubMenu.NONE))
+    }
+
+    fun clearAnnounceEvent() {
+        announceEvent.postValue(null)
+    }
+
+    fun clearInternalToolEvent() {
+        internalToolEvent.postValue(null)
+    }
+
+    fun clearExternalToolEvent() {
+        externalToolEvent.postValue(null)
+    }
+
+    fun clearSendToast() {
+        sendToastEvent.postValue(null)
+    }
+
+    fun clearPuzzleFinishedEvent() {
+        puzzleFinishedEvent.postValue(false)
+    }
+
+    fun selectClue(clue : Clue?) {
+        getBoard()?.let { board ->
+            clue?.let { clue ->
+                if (clue.getClueID() != board.getClueID())
+                    board.jumpToClue(clue)
+            }
+        }
+    }
+
     override fun onPlayboardChange(changes : PlayboardChanges) {
         handleChangeTimer()
         handleChangeAccessibility(changes)
-        //handleChangeChatGPT(changes);
+        handleChangeChatGPT(changes)
     }
 
     override protected fun onCleared() {
         getBoard()?.removeListener(this)
+    }
+
+    fun showKeyboard() {
+        keyboardManager.showKeyboard(this::keyboardManagerShow)
+    }
+
+    fun hideKeyboard(force : Boolean = false) {
+        keyboardManager.hideKeyboard(
+            this::keyboardManagerHide,
+            force,
+        )
     }
 
     /**
@@ -547,6 +713,31 @@ class PuzzleActivityViewModel @Inject constructor(
         )
     }
 
+    private fun keyboardManagerShow(info : KeyboardInfo) {
+        val visibility = if (info.useNative)
+            KeyboardVisibility.NATIVE
+        else
+            KeyboardVisibility.FORKYZ
+        val needsNativeRefresh = info.useNative
+        _keyboardState.value = KeyboardState(
+            visibility,
+            needsNativeRefresh,
+            info.hideOnBack,
+            info.showHideButton,
+            info.forceCaps,
+        )
+    }
+
+    private fun keyboardManagerHide() {
+        val needsNativeRefresh
+            = keyboardState.value.visibility == KeyboardVisibility.NATIVE
+        _keyboardState.value = KeyboardState(
+            visibility = KeyboardVisibility.NONE,
+            needsNativeRefresh = needsNativeRefresh,
+            hideOnBack = false,
+        )
+    }
+
     private fun sendToast(text : String) {
         sendToastEvent.postValue(SendToast(text))
     }
@@ -589,15 +780,18 @@ class PuzzleActivityViewModel @Inject constructor(
             isShowingErrorsGrid,
         )
 
+        val expanded = menuState.value?.expanded ?: SubMenu.NONE
+
         return MenuState(
             hasShareURL,
             hasSupportURL,
             externalToolsState,
             isScratchMode!!,
             showErrorsState,
-            canReveal = canReveal,
-            canRevealInitialBoxLetter = canRevealInitialBoxLetter,
-            canRevealInitialLetters = canRevealInitialLetters,
+            canReveal,
+            canRevealInitialBoxLetter,
+            canRevealInitialLetters,
+            expanded,
         )
     }
 
@@ -605,7 +799,7 @@ class PuzzleActivityViewModel @Inject constructor(
         val puz = getPuzzle()
         if (puz != null && puz.getPercentComplete() == 100) {
             if (isTimerRunning)
-                puzzleFinishedEvent.postCall()
+                puzzleFinishedEvent.postValue(true)
             stopTimer()
         }
     }
@@ -622,8 +816,9 @@ class PuzzleActivityViewModel @Inject constructor(
         data : AnnounceData,
         onlyIfAccessibilityService : Boolean,
     ) {
-        if (!onlyIfAccessibilityService || isAccessibilityServiceRunning())
+        if (!onlyIfAccessibilityService || isAccessibilityServiceRunning()) {
             announceEvent.postValue(data)
+        }
     }
 
     private fun handleChangeAccessibility(changes : PlayboardChanges) {
@@ -651,8 +846,7 @@ class PuzzleActivityViewModel @Inject constructor(
     private fun handleChangeChatGPT(changes : PlayboardChanges) {
         ChatGPTHelpData.isEnabled(settings) { isEnabled ->
             if (isEnabled) {
-                val newWord
-                    = changes.getPreviousWord() != changes.getCurrentWord()
+                val newWord = changes.previousWord != changes.currentWord
                 if (newWord)
                     _menuState.postValue(getMenuState())
             }

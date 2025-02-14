@@ -85,7 +85,6 @@ public class ClueTabs extends ConstraintLayout
     private Playboard board;
     private boolean listening = false;
     private Set<ClueTabsListener> listeners = WeakSet.buildSet();
-    private boolean forceSnap = false;
     private List<String> listNames = new ArrayList<>();
     private boolean showWords = false;
     private float maxWordScale = 0.9F;
@@ -150,6 +149,10 @@ public class ClueTabs extends ConstraintLayout
          * @param view the view calling
          */
         default void onClueTabsBarLongclick(ClueTabs view) { }
+    }
+
+    public ClueTabs(Context context) {
+        this(context, null);
     }
 
     public ClueTabs(Context context, AttributeSet as) {
@@ -371,19 +374,56 @@ public class ClueTabs extends ConstraintLayout
         return Math.max(listNum - 1, 0);
     }
 
-    /**
-     * Always snap to clue if true, else follow prefs
-     */
-    public void setForceSnap(boolean forceSnap) {
-        this.forceSnap = forceSnap;
-    }
-
     public void addListener(ClueTabsListener listener) {
         listeners.add(listener);
     }
 
     public void removeListener(ClueTabsListener listener) {
         listeners.remove(listener);
+    }
+
+    public void snapToClue() {
+        if (board == null)
+            return;
+
+        ClueID cid = board.getClueID();
+        String listName = (cid == null) ? null : cid.getListName();
+
+        if (listName == null)
+            return;
+
+        int listIndex = listNames.indexOf(listName);
+        if (listIndex < 0)
+            return;
+
+        int historyListNum = getHistoryListNum();
+
+        int curPage0 = getCurrentPage(0);
+        boolean listShown0
+            = curPage0 == listIndex || curPage0 == historyListNum;
+
+        int curPage1 = getCurrentPage(1);
+        boolean listShown1
+            = isPagerVisible(1) && (
+                curPage1 == listIndex || curPage1 == historyListNum
+            );
+
+        if (!listShown0 && !listShown1) {
+            binding.clueTabsPager0.setCurrentItem(listIndex);
+            listShown0 = true;
+        }
+
+        if (listShown0) {
+            ClueTabsPagerAdapter adapter = (ClueTabsPagerAdapter)
+                binding.clueTabsPager0.getAdapter();
+            if (adapter != null)
+                adapter.snapContainingListToCurrentClue();
+        } else if (listShown1) {
+            ClueTabsPagerAdapter adapter = (ClueTabsPagerAdapter)
+                    binding.clueTabsPager1.getAdapter();
+            if (adapter != null)
+                adapter.snapContainingListToCurrentClue();
+        }
     }
 
     public void onResume() {
@@ -398,32 +438,7 @@ public class ClueTabs extends ConstraintLayout
         isSnapToClue(snapToClue -> {
             if (!snapToClue)
                 return;
-
-            ClueID cid = board.getClueID();
-            String listName = (cid == null) ? null : cid.getListName();
-
-            if (listName == null)
-                return;
-
-            int listIndex = listNames.indexOf(listName);
-            if (listIndex < 0)
-                return;
-
-            int historyListNum = getHistoryListNum();
-
-            int curPage0 = getCurrentPage(0);
-            boolean listShown0
-                = curPage0 == listIndex || curPage0 == historyListNum;
-
-            int curPage1 = getCurrentPage(1);
-            boolean listShown1
-                = isPagerVisible(1) && (
-                    curPage1 == listIndex || curPage1 == historyListNum
-                );
-
-            if (!listShown0 && !listShown1) {
-                binding.clueTabsPager0.setCurrentItem(listIndex);
-            }
+            snapToClue();
         });
     }
 
@@ -579,10 +594,7 @@ public class ClueTabs extends ConstraintLayout
     }
 
     private void isSnapToClue(Consumer<Boolean> cb) {
-        if (forceSnap)
-            cb.accept(true);
-        else
-            settings.getClueListSnapToClue(cb::accept);
+        settings.getClueListSnapToClue(cb::accept);
     }
 
     private void notifyListenersClueClick(Clue clue) {
@@ -646,6 +658,7 @@ public class ClueTabs extends ConstraintLayout
             extends RecyclerView.Adapter<ClueListHolder> {
 
         public int pagerIndex;
+        public Set<ClueListHolder> boundHolders = WeakSet.buildSet();
 
         /**
          * Construct adapter for the pager at given index
@@ -668,6 +681,12 @@ public class ClueTabs extends ConstraintLayout
         public void onBindViewHolder(ClueListHolder holder, int position) {
             holder.setContents(getPageType(position), getPageTitle(position));
             onClueTabsPagerBind(pagerIndex);
+            boundHolders.add(holder);
+        }
+
+        @Override
+        public void onViewRecycled(ClueListHolder holder) {
+            boundHolders.remove(holder);
         }
 
         public String getPageTitle(int position) {
@@ -683,6 +702,16 @@ public class ClueTabs extends ConstraintLayout
         @Override
         public int getItemCount() {
             return getNumLists();
+        }
+
+        /**
+         * Show current clue
+         */
+        public void snapContainingListToCurrentClue() {
+            for (ClueListHolder holder : boundHolders) {
+                if (holder != null)
+                    holder.snapToCurrentClueIfContained();
+            }
         }
     }
 
@@ -798,24 +827,27 @@ public class ClueTabs extends ConstraintLayout
             snapToClueIfEnabled();
         }
 
+        public void snapToCurrentClueIfContained() {
+            switch (pageType) {
+            case CLUES:
+                String curList = board.getCurrentClueListName();
+                if (Objects.equals(listName, curList)) {
+                    int position = board.getCurrentClueIndex();
+                    layoutManager.scrollToPosition(position);
+                }
+                break;
+            case HISTORY:
+                layoutManager.scrollToPosition(0);
+                break;
+            }
+        }
+
         private void snapToClueIfEnabled() {
             Playboard board = ClueTabs.this.board;
             if (board != null) {
                 isSnapToClue(snapToClue -> {
-                    if (snapToClue) {
-                        switch (pageType) {
-                        case CLUES:
-                            String curList = board.getCurrentClueListName();
-                            if (Objects.equals(listName, curList)) {
-                                int position = board.getCurrentClueIndex();
-                                layoutManager.scrollToPosition(position);
-                            }
-                            break;
-                        case HISTORY:
-                            layoutManager.scrollToPosition(0);
-                            break;
-                        }
-                    }
+                    if (snapToClue)
+                        snapToCurrentClueIfContained();
                 });
             }
         }
