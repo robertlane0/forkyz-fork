@@ -81,6 +81,7 @@ public abstract class PuzzleActivity
     };
 
     private PuzzleActivityViewModel viewModel;
+    private AppBarLayout appBarLayout = null;
 
     private ActivityResultLauncher<String> voiceInputLauncher
         = registerForActivityResult(new SpeechContract(), text -> {
@@ -650,14 +651,7 @@ public abstract class PuzzleActivity
      */
     protected void setupStatusBar(AppBarLayout appBarLayout) {
         super.setupStatusBar(appBarLayout);
-
-        Observer<Boolean> showErrorsObserver = v -> {
-            setStatusBarColor(appBarLayout);
-        };
-        settings.getLivePlayIndicateShowErrors().observe(this, showErrorsObserver);
-        settings.getLivePlayShowErrorsClue().observe(this, showErrorsObserver);
-        settings.getLivePlayShowErrorsCursor().observe(this, showErrorsObserver);
-        settings.getLivePlayShowErrorsGrid().observe(this, showErrorsObserver);
+        this.appBarLayout = appBarLayout;
     }
 
     // TODO: delete these register commands and register in viewModel
@@ -750,16 +744,6 @@ public abstract class PuzzleActivity
             }
         );
 
-        viewModel.getShowTimer().observe(
-            this,
-            showTimer -> {
-                if (showTimer && !updatingTimer) {
-                    handler.postDelayed(updateTimeTask, 1000);
-                }
-                updatingTimer = showTimer;
-            }
-        );
-
         viewModel.getPuzzleFinishedEvent().observe(
             this,
             (v) -> {
@@ -770,38 +754,28 @@ public abstract class PuzzleActivity
                 );
             }
         );
+
+        viewModel.getUiState().observe(
+            this,
+            state -> {
+                updateShowTimer(state);
+                setStatusBarColor(state);
+            }
+        );
     }
 
-    /**
-     * Set status based on current values of show errors
-     *
-     * Uses LiveData.getValue, does nothing if settings not live yet
-     */
-    private void setStatusBarColor(AppBarLayout appBarLayout) {
-        Boolean indicateShowErrors
-            = settings.getLivePlayIndicateShowErrors().getValue();
-        Boolean showErrorsClue = settings.getLivePlayShowErrorsClue().getValue();
-        Boolean showErrorsCursor
-            = settings.getLivePlayShowErrorsCursor().getValue();
-        Boolean showErrorsGrid = settings.getLivePlayShowErrorsGrid().getValue();
+    private void updateShowTimer(PuzzleActivityUIState state) {
+        if (state.getShowTimer() && !updatingTimer) {
+            handler.postDelayed(updateTimeTask, 1000);
+        }
+        updatingTimer = state.getShowTimer();
+    }
 
-        if (
-            indicateShowErrors == null
-            || showErrorsClue == null
-            || showErrorsCursor == null
-            || showErrorsGrid == null
-        )
+    private void setStatusBarColor(PuzzleActivityUIState state) {
+        if (appBarLayout == null)
             return;
 
-        Puzzle puz = getPuzzle();
-        if (
-            puz != null
-            && puz.hasSolution()
-            && indicateShowErrors
-            && (
-                showErrorsClue || showErrorsCursor || showErrorsGrid
-            )
-        ) {
+        if (state.getIndicateShowErrors()) {
             setStatusBarColor(
                 appBarLayout,
                 ContextCompat.getColor(this, R.color.cheatedColor)

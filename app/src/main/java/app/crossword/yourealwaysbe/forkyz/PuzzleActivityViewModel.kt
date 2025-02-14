@@ -108,6 +108,11 @@ data class VoiceState(
 
 data class AnnounceData(val message : CharSequence)
 
+data class PuzzleActivityUIState(
+    val showTimer : Boolean = false,
+    val indicateShowErrors : Boolean = false,
+)
+
 // will lose this tag and become an open base class
 @HiltViewModel
 class PuzzleActivityViewModel @Inject constructor(
@@ -156,7 +161,29 @@ class PuzzleActivityViewModel @Inject constructor(
     )
     val menuState : LiveData<MenuState> = _menuState
 
-    val showTimer : LiveData<Boolean> = settings.livePlayShowTimer
+    val uiState = liveDataFanIn(
+        {
+            val puzHasSolution = getPuzzle()?.hasSolution() ?: false
+            val indicateShowErrors =
+                puzHasSolution
+                && settings.livePlayIndicateShowErrors.value ?: false
+                && (
+                    settings.livePlayShowErrorsClue.value ?: false
+                    || settings.livePlayShowErrorsCursor.value ?: false
+                    || settings.livePlayShowErrorsGrid.value ?: false
+                )
+            PuzzleActivityUIState(
+                settings.livePlayShowTimer.value ?: false,
+                indicateShowErrors,
+            )
+        },
+        settings.livePlayShowTimer,
+        settings.livePlayIndicateShowErrors,
+        settings.livePlayShowErrorsClue,
+        settings.livePlayShowErrorsCursor,
+        settings.livePlayShowErrorsGrid,
+    )
+
     var timer : ImaginaryTimer? = null
         private set
 
