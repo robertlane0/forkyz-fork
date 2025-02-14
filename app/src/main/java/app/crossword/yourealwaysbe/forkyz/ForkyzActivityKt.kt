@@ -4,7 +4,7 @@ package app.crossword.yourealwaysbe.forkyz
 import javax.inject.Inject
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.Composable
 
 import dagger.hilt.android.AndroidEntryPoint
@@ -15,7 +15,7 @@ import app.crossword.yourealwaysbe.forkyz.util.OrientationHelper
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 
 @AndroidEntryPoint
-open class ForkyzActivityKt : ComponentActivity() {
+open class ForkyzActivityKt : AppCompatActivity() {
 
     @Inject
     lateinit var themeHelper : ThemeHelper
@@ -26,8 +26,8 @@ open class ForkyzActivityKt : ComponentActivity() {
     @Inject
     lateinit var utils : AndroidVersionUtils
 
-    override fun onCreate(bundle : Bundle?) {
-        super.onCreate(bundle)
+    override fun onCreate(savedInstanceState : Bundle?) {
+        super.onCreate(savedInstanceState)
         orientationHelper.applyOrientation(this)
     }
 
