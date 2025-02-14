@@ -186,6 +186,9 @@ class PuzzleActivityViewModel @Inject constructor(
 
     var timer : ImaginaryTimer? = null
         private set
+    val puzzleHasInitialValues : Boolean by lazy {
+        getPuzzle()?.hasInitialValueCells() ?: false
+    }
 
     private val voiceCommandDispatcher = VoiceCommands()
 

@@ -71,7 +71,6 @@ public abstract class PuzzleActivity
     private Handler handler = new Handler(Looper.getMainLooper());
     private TextToSpeech ttsService = null;
     private boolean ttsReady = false;
-    private boolean hasInitialValues = false;
     private boolean updatingTimer = false;
 
     private Runnable updateTimeTask = new Runnable() {
@@ -362,8 +361,6 @@ public abstract class PuzzleActivity
         // remove when everyone has a view model
         board.addListener(this);
 
-        hasInitialValues = puz.hasInitialValueCells();
-
         // anything in puzzle could have changed
         invalidateOptionsMenu();
     }
@@ -415,7 +412,7 @@ public abstract class PuzzleActivity
      * Whether the current puzzle has initial values
      */
     protected boolean getHasInitialValues() {
-        return hasInitialValues;
+        return viewModel.getPuzzleHasInitialValues();
     }
 
     /**
