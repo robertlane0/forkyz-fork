@@ -189,6 +189,8 @@ class PuzzleActivityViewModel @Inject constructor(
     val puzzleHasInitialValues : Boolean by lazy {
         getPuzzle()?.hasInitialValueCells() ?: false
     }
+    val isFirstPlay : Boolean
+        get() = getPuzzle()?.getTime() == 0.toLong()
 
     private val voiceCommandDispatcher = VoiceCommands()
 
@@ -207,18 +209,12 @@ class PuzzleActivityViewModel @Inject constructor(
         getBoard()?.removeListener(this)
     }
 
-    /**
-     * Returns value of timer at start or null if no puzzle
-     */
-    fun startTimer() : Long? {
+    fun startTimer() {
         val puz = getPuzzle()
         if (puz != null && puz.getPercentComplete() != 100) {
                 val time = puz.getTime()
                 timer = ImaginaryTimer(time);
                 timer?.start();
-                return time
-        } else {
-            return null
         }
     }
 

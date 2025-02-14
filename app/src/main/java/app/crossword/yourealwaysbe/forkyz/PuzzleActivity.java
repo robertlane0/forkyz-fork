@@ -67,7 +67,6 @@ public abstract class PuzzleActivity
     private static final Logger LOG = Logger.getLogger("app.crossword.yourealwaysbe");
 
     private VoiceButtonsBinding voiceBinding = null;
-    private boolean firstPlay = false;
     private Handler handler = new Handler(Looper.getMainLooper());
     private TextToSpeech ttsService = null;
     private boolean ttsReady = false;
@@ -351,8 +350,7 @@ public abstract class PuzzleActivity
             return;
         }
 
-        Long time = viewModel.startTimer();
-        firstPlay = (time != null && time == 0);
+        viewModel.startTimer();
         // start updating again
         if (updatingTimer)
             handler.postDelayed(updateTimeTask, 1000);
@@ -434,7 +432,7 @@ public abstract class PuzzleActivity
     }
 
     protected boolean isFirstPlay() {
-        return firstPlay;
+        return viewModel.isFirstPlay();
     }
 
     protected void getLongClueText(Clue clue, Consumer<String> cb) {
