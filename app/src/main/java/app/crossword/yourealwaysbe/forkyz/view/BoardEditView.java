@@ -349,6 +349,13 @@ public abstract class BoardEditView
     }
 
     @Override
+    protected void onSizeChanged(int w, int h, int ow, int oh) {
+        super.onSizeChanged(w, h, ow, oh);
+        // need to rerender in case new parts of grid visible
+        render(PlayboardChanges.getEmptyChanges());
+    }
+
+    @Override
     protected void onScale(float scale, Point center) {
         lastTap = System.currentTimeMillis();
 
