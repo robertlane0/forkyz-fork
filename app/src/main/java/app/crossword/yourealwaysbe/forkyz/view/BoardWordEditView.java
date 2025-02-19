@@ -15,8 +15,10 @@ import android.view.ViewGroup;
 import dagger.hilt.android.AndroidEntryPoint;
 
 import app.crossword.yourealwaysbe.forkyz.settings.DisplaySeparators;
+import app.crossword.yourealwaysbe.forkyz.util.MovementStrategyUtilsKt;
 import app.crossword.yourealwaysbe.forkyz.view.PlayboardRenderer.RenderChanges;
 import app.crossword.yourealwaysbe.puz.ClueID;
+import app.crossword.yourealwaysbe.puz.MovementStrategy;
 import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges;
 import app.crossword.yourealwaysbe.puz.Playboard.Word;
 import app.crossword.yourealwaysbe.puz.Playboard;
@@ -120,6 +122,32 @@ public class BoardWordEditView extends BoardEditView {
             // need to rescale with new word
             renderToView();
         }
+    }
+
+    /**
+     * Overrides to stay on same word
+     *
+     * Changes movement strategy to stop on end before calling to super,
+     * then changes back. Stops this single word view changing words
+     * when typing.
+     */
+    @Override
+    public void onNewResponse(String response) {
+        Playboard board = getBoard();
+        if (board == null)
+            return;
+
+        // fix movement strategy so that we don't fall into the next
+        // clue
+        MovementStrategy oldStrategy = board.getMovementStrategy();
+        MovementStrategyUtilsKt.getStopOnEndStrategy(
+            getSettings(),
+            stopOnEnd -> {
+                board.setMovementStrategy(stopOnEnd);
+                super.onNewResponse(response);
+                board.setMovementStrategy(oldStrategy);
+            }
+        );
     }
 
     @Override
