@@ -136,11 +136,12 @@ public class ForkyzKeyboard
         );
     }
 
-    /**
-     * Call when activity paused to cancel unfinished key repeats
-     */
-    public synchronized void onPause() {
-        cancelKeyTimers();
+    @Override
+    public synchronized void onVisibilityChanged(View view, int visibility) {
+        super.onVisibilityChanged(view, visibility);
+        if (visibility != View.VISIBLE) {
+            cancelKeyTimers();
+        }
     }
 
     @Override
