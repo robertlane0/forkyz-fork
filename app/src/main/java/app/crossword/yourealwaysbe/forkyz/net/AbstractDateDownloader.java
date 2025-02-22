@@ -2,6 +2,8 @@ package app.crossword.yourealwaysbe.forkyz.net;
 
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.DayOfWeek;
 import java.time.Duration;
@@ -250,7 +252,7 @@ public class AbstractDateDownloader extends AbstractDownloader {
             if (sourceUrl == null)
                 return null;
 
-            URL url = new URL(sourceUrl);
+            URL url = (new URI(sourceUrl)).toURL();
             try (InputStream is = getInputStream(url, headers)) {
                 Puzzle puz = puzzleParser.parseInput(is);
 
@@ -266,7 +268,7 @@ public class AbstractDateDownloader extends AbstractDownloader {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } catch (MalformedURLException e) {
+        } catch (URISyntaxException | MalformedURLException e) {
             LOG.severe("Malformed URL in download: " + e);
         }
 

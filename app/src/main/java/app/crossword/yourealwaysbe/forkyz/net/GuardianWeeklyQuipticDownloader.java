@@ -2,7 +2,8 @@ package app.crossword.yourealwaysbe.forkyz.net;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -41,7 +42,11 @@ public class GuardianWeeklyQuipticDownloader extends AbstractDateDownloader {
         Map<String, String> headers
     ) {
         String sourceUrl = getSourceUrl(date);
-        try (InputStream is = getInputStream(new URL(sourceUrl), headers)) {
+        try (
+            InputStream is = getInputStream(
+                (new URI(sourceUrl)).toURL(), headers
+            )
+        ) {
             Puzzle puz = GuardianJSONIO.readFromHTML(is);
             if (puz != null) {
                 puz.setCopyright("Guardian / " + puz.getAuthor());
@@ -51,7 +56,7 @@ public class GuardianWeeklyQuipticDownloader extends AbstractDateDownloader {
                 puz.setShareUrl(sourceUrl);
             }
             return puz;
-        } catch (IOException e) {
+        } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
         }
 

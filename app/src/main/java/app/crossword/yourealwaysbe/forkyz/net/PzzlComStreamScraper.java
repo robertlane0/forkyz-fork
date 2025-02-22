@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -133,7 +134,7 @@ public class PzzlComStreamScraper extends AbstractStreamScraper {
                 return null;
             else
                 return new MainInfo(results[0], results[1]);
-        } catch (IOException e) {
+        } catch (IOException | URISyntaxException e) {
             return null;
         }
     }
@@ -160,7 +161,7 @@ public class PzzlComStreamScraper extends AbstractStreamScraper {
             String first = reader.readLine();
             if (first != null)
                 return first.trim();
-        } catch (IOException e) {
+        } catch (IOException | URISyntaxException e) {
             /* fall through */
         }
 

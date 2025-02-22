@@ -4,6 +4,8 @@ package app.crossword.yourealwaysbe.puz;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.time.LocalDate;
@@ -454,7 +456,9 @@ public class PuzzleBuilder {
                 continue;
 
             try {
-                URL imgFullUrl = new URL(new URL(relativeUrl), imgUrl);
+                URL imgFullUrl = (new URI(relativeUrl))
+                    .resolve(new URI(imgUrl))
+                    .toURL();
                 URLConnection connection = imgFullUrl.openConnection();
                 try (
                     InputStream is
@@ -466,7 +470,7 @@ public class PuzzleBuilder {
                         "data:" + type + "," + Base64.encodeBytes(bytes)
                     );
                 }
-            } catch (IOException e) {
+            } catch (IOException | URISyntaxException e) {
                 // ignore
             }
         }

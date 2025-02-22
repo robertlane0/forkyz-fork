@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URISyntaxException;
 import java.util.Locale;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -117,7 +118,7 @@ public class KeesingStreamScraper extends AbstractStreamScraper {
             return String.format(
                 Locale.US, XML_URL_FORMAT, customerID, puzzleID
             );
-        } catch (JSONException | IOException e) {
+        } catch (JSONException | IOException | URISyntaxException e) {
             LOG.severe("Could not read Keesing JSON: " + e);
             return null;
         }

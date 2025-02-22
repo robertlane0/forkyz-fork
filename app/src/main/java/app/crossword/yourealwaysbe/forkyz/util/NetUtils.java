@@ -5,6 +5,8 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Map.Entry;
 import java.util.Map;
@@ -46,8 +48,8 @@ public class NetUtils {
 
     public static BufferedInputStream getInputStream(
         String url, Map<String, String> headers, int timeout
-    ) throws IOException {
-        return getInputStream(new URL(url), headers, timeout);
+    ) throws IOException, URISyntaxException {
+        return getInputStream((new URI(url)).toURL(), headers, timeout);
     }
 
     public static InputStream apacheGetInputStream(

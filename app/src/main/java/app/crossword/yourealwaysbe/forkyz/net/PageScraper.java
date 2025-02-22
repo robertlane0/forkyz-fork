@@ -2,6 +2,9 @@ package app.crossword.yourealwaysbe.forkyz.net;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -198,13 +201,17 @@ public class PageScraper extends AbstractDownloader {
             return DownloadResult.ALREADY_EXISTS;
     }
 
-    private Puzzle downloadPuzzle(String url) throws IOException {
-        URL u = new URL(url);
+    private Puzzle downloadPuzzle(String url) {
+        try {
+            URL u = (new URI(url)).toURL();
 
-        try (InputStream is = getInputStream(u, null)) {
-            return parser.parseInput(is);
-        } catch (Exception e) {
-            e.printStackTrace();
+            try (InputStream is = getInputStream(u, null)) {
+                return parser.parseInput(is);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } catch (URISyntaxException | MalformedURLException e) {
+            // oh well
         }
 
         return null;

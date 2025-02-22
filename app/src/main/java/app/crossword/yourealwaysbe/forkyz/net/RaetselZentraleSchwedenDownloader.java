@@ -2,7 +2,8 @@ package app.crossword.yourealwaysbe.forkyz.net;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -73,9 +74,9 @@ public class RaetselZentraleSchwedenDownloader
 
     @Override
     protected String getSourceUrl(LocalDate date) {
-        try(InputStream is = getInputStream(new URL(idUrl), null)) {
+        try(InputStream is = getInputStream((new URI(idUrl)).toURL(), null)) {
             return RaetselZentraleSchwedenStreamScraper.getAPIURL(is);
-        } catch (IOException e) {
+        } catch (IOException | URISyntaxException e) {
             // fall through
         }
         return null;

@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -76,7 +77,7 @@ public class PuzzleImporter {
                     getFileName(uri),
                     timeout
                 );
-            } catch (IOException e2) {
+            } catch (IOException | URISyntaxException e2) {
                 // we tried
                 return null;
             }
@@ -208,7 +209,7 @@ public class PuzzleImporter {
 
     private static BufferedInputStream getRemoteInputStream(
         String url, int timeout
-    ) throws IOException {
+    ) throws IOException, URISyntaxException {
         return NetUtils.getInputStream(url, null, timeout);
     }
 
