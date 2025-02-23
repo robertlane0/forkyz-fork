@@ -15,7 +15,6 @@ import androidx.activity.result.contract.ActivityResultContracts.GetContent
 import androidx.activity.result.contract.ActivityResultContracts.OpenDocumentTree
 import androidx.activity.viewModels
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -26,13 +25,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -63,7 +60,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -73,15 +69,13 @@ import dagger.hilt.android.AndroidEntryPoint
 
 import app.crossword.yourealwaysbe.forkyz.theme.ForkyzTopAppBar
 import app.crossword.yourealwaysbe.forkyz.util.ExitActivity
+import app.crossword.yourealwaysbe.forkyz.view.OKCancelDialog
 
 @AndroidEntryPoint
 class SettingsActivity : ForkyzActivityKt() {
 
     private val SETTINGS_HORIZONTAL_PADDING = 20.dp
     private val SETTINGS_VERTICAL_PADDING = 14.dp
-    private val DIALOG_PADDING = 20.dp
-    private val DIALOG_BUTTON_PADDING = 4.dp
-    private val DIALOG_ROUNDED_CORNERS = RoundedCornerShape(26.dp)
     private val SWITCH_PADDING = 4.dp
 
     private val viewModel by viewModels<SettingsActivityViewModel>()
@@ -744,71 +738,6 @@ class SettingsActivity : ForkyzActivityKt() {
                     keyboardType = keyboardType,
                 ),
             )
-        }
-    }
-
-    /**
-     * OK Cancel dialog with customisable body
-     *
-     * @param title the title resource id
-     * @param summary the summary resource id or null
-     * @param onCancel call back for cancel pressed
-     * @param onOK call back for OK pressed
-     * @param body the dialog body
-     */
-    @Composable
-    private fun OKCancelDialog(
-        title : Int,
-        summary : Int?,
-        onCancel : () -> Unit,
-        onOK : () -> Unit,
-        body : @Composable () -> Unit,
-    ) {
-        Dialog(onDismissRequest = onCancel) {
-            Card(shape = DIALOG_ROUNDED_CORNERS) {
-                Column(
-                    modifier = Modifier.padding(DIALOG_PADDING),
-                    verticalArrangement = Arrangement.Center,
-                ) {
-                    Text(
-                        modifier = Modifier.padding(bottom = DIALOG_PADDING),
-                        text = stringResource(title),
-                        style = MaterialTheme.typography.headlineSmall,
-                    )
-                    summary?.let { summary ->
-                        Text(
-                            modifier = Modifier.fillMaxWidth()
-                                .padding(bottom = DIALOG_PADDING),
-                            text = stringResource(summary),
-                            style = MaterialTheme.typography.bodyMedium,
-                        )
-                    }
-
-                    body()
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.End,
-                    ) {
-                        TextButton(
-                            onClick = onCancel,
-                            modifier = Modifier.padding(
-                                horizontal = DIALOG_BUTTON_PADDING,
-                            ),
-                        ) {
-                            Text(stringResource(android.R.string.cancel))
-                        }
-                        TextButton(
-                            onClick = onOK,
-                            modifier = Modifier.padding(
-                                horizontal = DIALOG_BUTTON_PADDING,
-                            ),
-                        ) {
-                            Text(stringResource(android.R.string.ok))
-                        }
-                    }
-                }
-            }
         }
     }
 
