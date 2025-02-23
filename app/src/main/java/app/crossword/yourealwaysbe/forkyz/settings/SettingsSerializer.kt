@@ -134,6 +134,7 @@ object SettingsSerializer : Serializer<Settings> {
         .setUiTheme(DayNightMode.DNM_DAY)
         .setUseNativeKeyboard(false)
         .setVolumeActivatesVoice(false)
+        .setSpecialEntryForceCaps(false)
         .build()
 
     override suspend fun readFrom(input: InputStream) : Settings {

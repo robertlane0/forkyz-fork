@@ -237,4 +237,5 @@ message Settings {
     DayNightMode uiTheme = 122;
     bool useNativeKeyboard = 123;
     bool volumeActivatesVoice = 124;
+    bool specialEntryForceCaps = 125;
 }

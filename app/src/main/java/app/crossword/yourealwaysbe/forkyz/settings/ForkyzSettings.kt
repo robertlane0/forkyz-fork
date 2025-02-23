@@ -1791,6 +1791,19 @@ class ForkyzSettings(
         }
     }
 
+    val livePlaySpecialEntryForceCaps : LiveData<Boolean>
+        = settingsFlow.map {
+            it.specialEntryForceCaps
+        }.distinctUntilChanged().asLiveData()
+
+    fun setPlaySpecialEntryForceCaps(value : Boolean) {
+        launch {
+            settingsStore.updateData { settings ->
+                settings.toBuilder().setSpecialEntryForceCaps(value).build()
+            }
+        }
+    }
+
     val liveFileHandlerSafArchive : LiveData<String>
         = settingsFlow.map {
             it.safArchiveFolderUri
@@ -3259,6 +3272,13 @@ class ForkyzSettings(
             { s, key -> json.put(key, s.volumeActivatesVoice) },
             { key ->
                 json.optBoolean(key)?.let { setVoiceVolumeActivatesVoice(it) }
+            },
+        )
+        run(
+            "specialEntryForceCaps",
+            { s, key -> json.put(key, s.specialEntryForceCaps) },
+            { key ->
+                json.optBoolean(key)?.let { setPlaySpecialEntryForceCaps(it) }
             },
         )
 

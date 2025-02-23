@@ -676,6 +676,7 @@
     <!-- special entry -->
     <string name="special_character">Special Character</string>
     <string name="enter_special_desc">Enter the response in the box below. The character(s) will be entered onto the board as is. E.g. lowercase letters will not be converted to uppercase. Special characters and multiple characters are allowed.</string>
+    <string name="special_entry_force_caps">Capitalise</string>
 
     <!-- share clue -->
     <string name="share_clue_title">Clue</string>
