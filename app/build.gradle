@@ -160,7 +160,7 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     // thanks https://stackoverflow.com/a/30759769
     testImplementation 'org.json:json:20080701'
-    testImplementation 'org.mockito:mockito-core:5.10.0'
+    testImplementation 'org.mockito:mockito-core:5.15.2'
     testImplementation 'org.robolectric:robolectric:4.14'
 
     // To avoid duplicate classes pulled in by libraries

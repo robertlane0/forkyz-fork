@@ -109,7 +109,7 @@ public class DownloadersTest {
             "", // customDailyUrl,
             true, // suppressSummaryNotifications,
             true, // suppressIndividualNotifications,
-            null, // autoDownloaders,
+            Collections.emptySet(), // autoDownloaders,
             30000, // downloadTimeout,
             false // downloadOnStartup
         );
