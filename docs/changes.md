@@ -1,5 +1,13 @@
 # Forkyz Changelog
 
+## Version 62
+
+- Add force caps option to special entry dialog.
+- Fix Irish News Cryptic Downloader.
+- Fix stop-on-end behaviour on clue list and notes page.
+- Move settings to datastore (requires exported settings to be re-exported).
+- Reimplement Clue List in Compose (hopefully invisible except menu positioning).
+
 ## Version 61
 
 - Target Android 15.
