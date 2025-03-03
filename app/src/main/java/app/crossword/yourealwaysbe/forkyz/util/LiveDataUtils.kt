@@ -42,8 +42,9 @@ fun <T> liveDataFanIn(
         val liveData = ld
         mediator.addSource(liveData, {
             seen.remove(System.identityHashCode(liveData))
-            if (seen.isEmpty())
+            if (seen.isEmpty()) {
                 mediator.setValue(supplier.get())
+            }
         })
     }
 

@@ -80,6 +80,10 @@ public class BackgroundDownloadManager {
         this.applicationContext = applicationContext;
         this.workManager = workManager;
         this.settings = settings;
+
+        settings.getLiveBackgroundDownloadSettings().observeForever(value -> {
+            updateBackgroundDownloads();
+        });
     }
 
     @MainThread
@@ -146,9 +150,7 @@ public class BackgroundDownloadManager {
      * Set the download period to 1 hour
      */
     public void setHourlyBackgroundDownloadPeriod() {
-        settings.setDownloadHourly(true, () -> {
-            updateBackgroundDownloads();
-        });
+        settings.setDownloadHourly(true);
     }
 
     /**

@@ -204,14 +204,13 @@ class ForkyzSettings(
     fun getDownloadAllowRoaming(cb : Consumer<Boolean>)
         = liveDownloadAllowRoaming.observeOnce(cb)
 
-    fun setDownloadAllowRoaming(value : Boolean, cb : Runnable? = null) {
+    fun setDownloadAllowRoaming(value : Boolean) {
         launch {
             settingsStore.updateData { settings ->
                 settings.toBuilder()
                     .setBackgroundDownloadAllowRoaming(value)
                     .build()
             }
-            runMain(cb)
         }
     }
 
@@ -242,7 +241,7 @@ class ForkyzSettings(
     fun getDownloadDays(cb : Consumer<Set<String>>)
         = liveDownloadDays.observeOnce(cb)
 
-    fun setDownloadDays(value : Set<String>, cb : Runnable? = null) {
+    fun setDownloadDays(value : Set<String>) {
         launch {
             settingsStore.updateData { settings ->
                 settings.toBuilder()
@@ -250,7 +249,6 @@ class ForkyzSettings(
                     .addAllBackgroundDownloadDays(value)
                     .build()
             }
-            runMain(cb)
         }
     }
 
@@ -262,14 +260,13 @@ class ForkyzSettings(
     fun getDownloadDaysTime(cb : Consumer<Int>)
         = liveDownloadDaysTime.observeOnce(cb)
 
-    fun setDownloadDaysTime(value : Int, cb : Runnable? = null) {
+    fun setDownloadDaysTime(value : Int) {
         launch {
             settingsStore.updateData { settings ->
                 settings.toBuilder()
                     .setBackgroundDownloadDaysTime(value)
                     .build()
             }
-            runMain(cb)
         }
     }
 
@@ -281,12 +278,11 @@ class ForkyzSettings(
     fun getDownloadHourly(cb : Consumer<Boolean>)
         = liveDownloadHourly.observeOnce(cb)
 
-    fun setDownloadHourly(value : Boolean, cb : Runnable? = null) {
+    fun setDownloadHourly(value : Boolean) {
         launch {
             settingsStore.updateData { settings ->
                 settings.toBuilder().setBackgroundDownloadHourly(value).build()
             }
-            runMain(cb)
         }
     }
 
@@ -298,17 +294,13 @@ class ForkyzSettings(
     fun getDownloadRequireCharging(cb : Consumer<Boolean>)
         = liveDownloadRequireCharging.observeOnce(cb)
 
-    fun setDownloadRequireCharging(
-        value : Boolean,
-        cb : Runnable? = null,
-    ) {
+    fun setDownloadRequireCharging(value : Boolean) {
         launch {
             settingsStore.updateData { settings ->
                 settings.toBuilder()
                     .setBackgroundDownloadRequireCharging(value)
                     .build()
             }
-            runMain(cb)
         }
     }
 
@@ -320,17 +312,13 @@ class ForkyzSettings(
     fun getDownloadRequireUnmetered(cb : Consumer<Boolean>)
         = liveDownloadRequireUnmetered.observeOnce(cb)
 
-    fun setDownloadRequireUnmetered(
-        value : Boolean,
-        cb : Runnable? = null,
-    ) {
+    fun setDownloadRequireUnmetered(value : Boolean) {
         launch {
             settingsStore.updateData { settings ->
                 settings.toBuilder()
                     .setBackgroundDownloadRequireUnmetered(value)
                     .build()
             }
-            runMain(cb)
         }
     }
 

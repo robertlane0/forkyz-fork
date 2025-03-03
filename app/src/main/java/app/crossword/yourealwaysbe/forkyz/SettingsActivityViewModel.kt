@@ -46,7 +46,6 @@ import app.crossword.yourealwaysbe.forkyz.settings.MovementStrategySetting
 import app.crossword.yourealwaysbe.forkyz.settings.Orientation
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation
 import app.crossword.yourealwaysbe.forkyz.settings.Theme
-import app.crossword.yourealwaysbe.forkyz.util.BackgroundDownloadManager
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerSAF
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
@@ -294,7 +293,6 @@ class SettingsActivityViewModel @Inject constructor(
     private val utils : AndroidVersionUtils,
     private val fileHandlerProvider : FileHandlerProvider,
     private val downloadersProvider : DownloadersProvider,
-    private val backgroundDownloadManager : BackgroundDownloadManager,
 ) : AndroidViewModel(application) {
 
     // 5000ms is apparently LiveData default for timing out on
@@ -776,11 +774,7 @@ class SettingsActivityViewModel @Inject constructor(
             R.string.background_download_hourly,
             R.string.background_download_hourly_desc,
             settings.liveDownloadHourly,
-            { value ->
-                settings.setDownloadHourly(value) {
-                    backgroundDownloadManager.updateBackgroundDownloads()
-                }
-            }
+            { value -> settings.setDownloadHourly(value) },
         ),
         SettingsMultiList(
             SettingsPage.DOWNLOAD_BACKGROUND,
@@ -797,11 +791,7 @@ class SettingsActivityViewModel @Inject constructor(
                 SettingsListEntry(R.string.background_download_sun, "7"),
             ),
             settings.liveDownloadDays,
-            { value ->
-                settings.setDownloadDays(value) {
-                    backgroundDownloadManager.updateBackgroundDownloads()
-                }
-            }
+            { value -> settings.setDownloadDays(value) },
         ),
         SettingsList<Int>(
             SettingsPage.DOWNLOAD_BACKGROUND,
@@ -834,11 +824,7 @@ class SettingsActivityViewModel @Inject constructor(
                 SettingsListEntry(R.string.background_download_23, 23),
             ),
             settings.liveDownloadDaysTime,
-            { value ->
-                settings.setDownloadDaysTime(value) {
-                    backgroundDownloadManager.updateBackgroundDownloads()
-                }
-            }
+            { value -> settings.setDownloadDaysTime(value) },
         ),
         SettingsHeading(
             SettingsPage.DOWNLOAD_BACKGROUND,
@@ -849,33 +835,21 @@ class SettingsActivityViewModel @Inject constructor(
             R.string.download_wifi_only,
             R.string.download_wifi_only_desc,
             settings.liveDownloadRequireUnmetered,
-            { value ->
-                settings.setDownloadRequireUnmetered(value) {
-                    backgroundDownloadManager.updateBackgroundDownloads()
-                }
-            }
+            { value -> settings.setDownloadRequireUnmetered(value) },
         ),
         SettingsBoolean(
             SettingsPage.DOWNLOAD_BACKGROUND,
             R.string.download_roaming,
             R.string.download_roaming_desc,
             settings.liveDownloadAllowRoaming,
-            { value ->
-                settings.setDownloadAllowRoaming(value) {
-                    backgroundDownloadManager.updateBackgroundDownloads()
-                }
-            }
+            { value -> settings.setDownloadAllowRoaming(value) },
         ),
         SettingsBoolean(
             SettingsPage.DOWNLOAD_BACKGROUND,
             R.string.download_charging,
             R.string.download_charging_desc,
             settings.liveDownloadRequireCharging,
-            { value ->
-                settings.setDownloadRequireCharging(value) {
-                    backgroundDownloadManager.updateBackgroundDownloads()
-                }
-            }
+            { value -> settings.setDownloadRequireCharging(value) },
         ),
 
         // Browser
