@@ -251,13 +251,13 @@ open class PuzzleActivityViewModel @Inject constructor(
     val isFirstPlay : Boolean
         get() = getPuzzle()?.getTime() == 0.toLong()
     val canResume : Boolean
-        get() = getPuzzle() != null
+        get() { return getPuzzle() != null }
     val isTimerRunning : Boolean
-        get() = timer != null
+        get() { return timer != null }
     val supportURL : String?
-        get() = getPuzzle()?.getSupportUrl()
+        get() { return getPuzzle()?.getSupportUrl() }
     val shareURL : String?
-        get() = getPuzzle()?.getShareUrl()
+        get() { return getPuzzle()?.getShareUrl() }
 
     private val voiceCommandDispatcher = VoiceCommands()
 
