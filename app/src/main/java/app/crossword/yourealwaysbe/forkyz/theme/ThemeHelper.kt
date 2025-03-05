@@ -26,12 +26,16 @@ import app.crossword.yourealwaysbe.forkyz.settings.Theme
 @Singleton
 class ThemeHelper @Inject constructor(val settings : ForkyzSettings) {
     private val appDayNightMode : DayNightMode
-        get() = settings.liveAppDayNightMode.value
-            ?: settings.getAppDayNightModeSync()
+        get() {
+            return settings.liveAppDayNightMode.value
+                ?: settings.getAppDayNightModeSync()
+        }
 
     private val appTheme : Theme
-        get() = settings.liveAppTheme.value
-            ?: settings.getAppThemeSync()
+        get() {
+            return settings.liveAppTheme.value
+                ?: settings.getAppThemeSync()
+        }
 
     @Composable
     fun isDarkMode() : Boolean = when (appDayNightMode) {
