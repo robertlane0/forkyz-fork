@@ -60,8 +60,8 @@ class ClueListActivity() : PuzzleActivityKt(), ClueTabs.ClueTabsListener {
             AppTheme() {
                 Scaffold(
                     modifier = Modifier.onKeyEvent(this::onKeyEvent)
-                        .puzzleStatusBarColor()
-                        .imePadding(),
+                        .imePadding()
+                        .puzzleStatusBarColor(),
                     topBar = { TopAppBar() },
                 ) { innerPadding ->
                     ActivityBody(Modifier.padding(innerPadding))

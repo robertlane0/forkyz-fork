@@ -219,11 +219,16 @@ abstract class PuzzleActivityKt() : ForkyzActivityKt() {
     protected fun Modifier.puzzleStatusBarColor() : Modifier {
         val state by viewModel.menuState.observeAsState()
 
+        // always return same padding
+        // not returning status bar padding means the app freezes if
+        // imepadding is added afterwards.
+        // potentially just a material bug that might be fixed in
+        // future
         if (state?.showErrorsState?.isShowing ?: false)
             return this.background(themeHelper.cheatedColor)
                 .statusBarsPadding()
         else
-            return this
+            return this.statusBarsPadding()
     }
 
     protected open fun onKeyEvent(event : KeyEvent) : Boolean {
