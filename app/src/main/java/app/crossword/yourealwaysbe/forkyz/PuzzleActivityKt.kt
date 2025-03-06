@@ -68,6 +68,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.platform.LocalView
 import androidx.core.app.ShareCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
@@ -232,7 +233,6 @@ abstract class PuzzleActivityKt() : ForkyzActivityKt() {
     }
 
     protected open fun onKeyEvent(event : KeyEvent) : Boolean {
-
         return when (event.key) {
             Key.Equals -> {
                 if (isAnnounceClueEquals) {
@@ -314,9 +314,10 @@ abstract class PuzzleActivityKt() : ForkyzActivityKt() {
     @Composable
     protected open fun Launchers() {
         val announcement by viewModel.announceEvent.observeAsState()
+        val view = LocalView.current
         LaunchedEffect(announcement) {
             announcement?.let { data ->
-                announce(data)
+                announce(data, view)
                 viewModel.clearAnnounceEvent()
             }
         }
@@ -970,13 +971,15 @@ abstract class PuzzleActivityKt() : ForkyzActivityKt() {
 
     /**
      * Announce text with accessibility if running or tts
+     *
+     * @param data what to announce
+     * @param view the view to announce from (announceForAccessibility)
+     * if accessibility service is running
      */
-    private fun announce(data : AnnounceData) {
+    private fun announce(data : AnnounceData, view : View) {
         val text = data.message
         if (isAccessibilityServiceRunning) {
-            //val content = findViewById(android.R.id.content)
-            //if (content != null && text != null)
-            //    content.announceForAccessibility(text)
+            view.announceForAccessibility(text)
         } else {
             if (ttsService == null) {
                 ttsService = TextToSpeech(
@@ -984,7 +987,7 @@ abstract class PuzzleActivityKt() : ForkyzActivityKt() {
                     { status ->
                         if (status == TextToSpeech.SUCCESS) {
                             ttsReady = true
-                            announce(data)
+                            announce(data, view)
                         }
                     }
                 )
