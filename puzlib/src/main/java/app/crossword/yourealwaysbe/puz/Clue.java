@@ -125,7 +125,11 @@ public class Clue {
      * If no custom flag color has been set
      */
     public boolean isDefaultFlagColor() {
-        return flagColor == DEFAULT_FLAG_COLOR;
+        return isDefaultFlagColor(getFlagColor());
+    }
+
+    public static boolean isDefaultFlagColor(int color) {
+        return color == DEFAULT_FLAG_COLOR;
     }
 
     /**

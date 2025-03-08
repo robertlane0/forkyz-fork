@@ -279,6 +279,7 @@ class ClueListActivityViewModel @Inject constructor(
         registerVoiceCommandNumber()
         registerVoiceCommandAnnounceClue()
         registerVoiceCommandClueHelp()
+        registerVoiceCommandBack()
 
         val app : Application = getApplication()
 
@@ -297,10 +298,6 @@ class ClueListActivityViewModel @Inject constructor(
         registerVoiceCommand(VoiceCommand(
             app.getString(R.string.command_down),
             { _ -> moveDown() }
-        ))
-        registerVoiceCommand(VoiceCommand(
-            app.getString(R.string.command_back),
-            { _ -> doBack() }
         ))
         registerVoiceCommand(VoiceCommand(
             app.getString(R.string.command_next),

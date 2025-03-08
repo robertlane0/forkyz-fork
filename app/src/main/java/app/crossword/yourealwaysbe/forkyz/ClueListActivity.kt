@@ -32,17 +32,12 @@ import androidx.compose.ui.input.key.type
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.view.ViewCompat
-import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
-import app.crossword.yourealwaysbe.forkyz.view.BoardEditView.BoardClickListener
-import app.crossword.yourealwaysbe.forkyz.view.BoardWordEditView
 import app.crossword.yourealwaysbe.forkyz.view.ClueTabs
 import app.crossword.yourealwaysbe.puz.Clue
 import app.crossword.yourealwaysbe.puz.Playboard.Word
-import app.crossword.yourealwaysbe.puz.Position
 
 class ClueListActivity() : PuzzleActivityKt(), ClueTabs.ClueTabsListener {
 
@@ -152,7 +147,12 @@ class ClueListActivity() : PuzzleActivityKt(), ClueTabs.ClueTabsListener {
             val showAllWordsState by viewModel.showAllWords.observeAsState()
             val showAllWords = showAllWordsState ?: false
 
-            Miniboard(showAllWords)
+            Miniboard(
+                onClick = { _, _ -> viewModel.showKeyboard() },
+                onLongClick = { viewModel.launchCurrentClueNotes() },
+                longClickAccessibilityAction = R.string.open_clue_notes,
+                incognitoMode = showAllWords,
+            )
             ClueLists(
                 Modifier.fillMaxWidth().weight(1.0F),
                 showAllWords,
@@ -198,52 +198,6 @@ class ClueListActivity() : PuzzleActivityKt(), ClueTabs.ClueTabsListener {
                     view.snapToClue()
                 }
             },
-        )
-    }
-
-    @Composable
-    private fun Miniboard(incognitoMode : Boolean) {
-        AndroidView(
-            modifier = Modifier.fillMaxWidth(),
-            factory = { context ->
-                val view = BoardWordEditView(context).apply {
-                    setFocusable(true)
-                    setFocusableInTouchMode(true)
-                    setContentDescription(
-                        context.getString(R.string.current_word),
-                    )
-                    setAllowOverScroll(false)
-                    setBoard(viewModel.getBoard())
-                    addBoardClickListener(object : BoardClickListener {
-                        override fun onClick(
-                            position : Position?,
-                            previousWord : Word?,
-                        ) {
-                            viewModel.showKeyboard()
-                        }
-
-                        override fun onLongClick(position : Position?) {
-                            viewModel.launchCurrentClueNotes()
-                        }
-                    })
-                    requestFocus()
-                }
-
-                ViewCompat.replaceAccessibilityAction(
-                    view,
-                    AccessibilityActionCompat.ACTION_LONG_CLICK,
-                    context.getText(R.string.open_clue_notes),
-                    null
-                )
-
-                // always this view gets input
-                inputConnectionMediator.registerReceiver(view)
-
-                view
-            },
-            update = { view ->
-                view.setIncognitoMode(incognitoMode)
-            }
         )
     }
 

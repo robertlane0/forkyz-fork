@@ -136,6 +136,42 @@ public class Note {
         return true;
     }
 
+    public Note withScratch(String scratch) {
+        return new Note(
+            scratch,
+            getText(),
+            getAnagramSource(),
+            getAnagramSolution()
+        );
+    }
+
+    public Note withText(String text) {
+        return new Note(
+            getScratch(),
+            text,
+            getAnagramSource(),
+            getAnagramSolution()
+        );
+    }
+
+    public Note withAnagramSource(String anagramSource) {
+        return new Note(
+            getScratch(),
+            getText(),
+            anagramSource,
+            getAnagramSolution()
+        );
+    }
+
+    public Note withAnagramSolution(String anagramSolution) {
+        return new Note(
+            getScratch(),
+            getText(),
+            getAnagramSource(),
+            anagramSolution
+        );
+    }
+
     /**
      * Create a copy with updated scratch letter
      *

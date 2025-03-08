@@ -84,6 +84,24 @@ class KeyboardManagerKt(
     }
 
     /**
+     * Call when a native view (e.g. TextEdit) gets focus
+     *
+     * Will hide the inapp keyboard if needed
+     */
+    fun onFocusNativeView(
+        gainFocus : Boolean,
+        hideCB : () -> Unit,
+    ) {
+        if (gainFocus) {
+            settings.getKeyboardSettings() { ks ->
+                if (!ks.useNative) {
+                    hideKeyboard(hideCB, true)
+                }
+            }
+        }
+    }
+
+    /**
      * Add a block hide request
      *
      * hideKeyboard will only have an effect if there are no block hide

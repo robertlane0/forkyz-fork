@@ -129,6 +129,31 @@ public class BoardWordEditView extends BoardEditView {
     }
 
     /**
+     * Set word to draw or null to draw current word
+     */
+    public void setSuppressNotesList(Set<String> suppressNotesList) {
+        boolean changed = !customSuppressNotesList || !Objects.equals(
+            this.suppressNotesList, suppressNotesList
+        );
+        if (changed) {
+            this.suppressNotesList = suppressNotesList;
+            this.customSuppressNotesList = true;
+            renderToView();
+        }
+    }
+
+    /**
+     * Clear a suppress notes list
+     */
+    public void clearSuppressNotesList() {
+        if (customSuppressNotesList) {
+            this.suppressNotesList = null;
+            this.customSuppressNotesList = false;
+            renderToView();
+        }
+    }
+
+    /**
      * Overrides to stay on same word
      *
      * Changes movement strategy to stop on end before calling to super,

@@ -101,10 +101,10 @@ public class BoardEditText
     private String shadow;
     private SelectionListener selectionListener = null;
 
-    private BoardEditFilter[] filters;
+    private BoardEditFilter filter;
 
-    public BoardEditText(Context context, AttributeSet as) {
-        super(context, as);
+    public BoardEditText(Context context) {
+        super(context, null);
 
         handler = new Handler(context.getMainLooper());
 
@@ -224,8 +224,8 @@ public class BoardEditText
         }
     }
 
-    public void setFilters(BoardEditFilter[] filters) {
-        this.filters = filters;
+    public void setFilter(BoardEditFilter filter) {
+        this.filter = filter;
     }
 
     public void setLength(int len) {
@@ -371,13 +371,21 @@ public class BoardEditText
 
         int end = Math.min(text.length(), boxes.length);
 
+        boolean changed = false;
+
         for (int i = 0; i < end; i++) {
-            boxes[i].setResponse(text.charAt(i));
-            flagChanged(i);
+            char c = text.charAt(i);
+            if (!charStringEquals(boxes[i].getResponse(), c)) {
+                boxes[i].setResponse(c);
+                flagChanged(i);
+                changed = true;
+            }
         }
 
-        render();
-        updateInputConnection();
+        if (changed) {
+            render();
+            updateInputConnection();
+        }
     }
 
     /**
@@ -757,7 +765,7 @@ public class BoardEditText
     }
 
     private boolean canDelete(int col) {
-        if (filters == null)
+        if (filter == null)
             return true;
 
         if (boxes == null || col < 0 || col >= boxes.length)
@@ -765,17 +773,15 @@ public class BoardEditText
 
         char oldChar = getResponse(col);
 
-        for (BoardEditFilter filter : filters) {
-            if (filter != null && !filter.delete(oldChar, col)) {
-                return false;
-            }
+        if (!filter.delete(oldChar, col)) {
+            return false;
         }
 
         return true;
     }
 
     private char filterReplacement(char newChar, Position pos) {
-        if (filters == null)
+        if (filter == null)
             return newChar;
 
         if (boxes == null || pos.getCol() < 0 || pos.getCol() >= boxes.length)
@@ -783,13 +789,7 @@ public class BoardEditText
 
         char oldChar = getResponse(pos.getCol());
 
-        for (BoardEditFilter filter : filters) {
-            if (filter != null) {
-                newChar = filter.filter(oldChar, newChar, pos.getCol());
-            }
-        }
-
-        return newChar;
+        return filter.filter(oldChar, newChar, pos.getCol());
     }
 
     private int findPosition(Point point) {
@@ -880,13 +880,8 @@ public class BoardEditText
     }
 
     private void notifyPostChange(int pos, char oldChar, boolean isDelete) {
-        if (filters == null)
-            return;
-
-        for (BoardEditFilter filter : filters) {
-            if (filter != null)
-                filter.postChange(pos, oldChar, isDelete);
-        }
+        if (filter != null)
+            filter.postChange(pos, oldChar, isDelete);
     }
 
     private boolean isNativeInput() { return nativeInput; }
@@ -905,4 +900,8 @@ public class BoardEditText
     }
 
     private void unlockRenderer() { renderLock.release(); }
+
+    private boolean charStringEquals(String s, char c) {
+        return s != null && s.length() == 1 && s.charAt(0) == c;
+    }
 }

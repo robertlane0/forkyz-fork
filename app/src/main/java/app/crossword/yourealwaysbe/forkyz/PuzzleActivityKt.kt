@@ -36,10 +36,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Arrangement.Center
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.Checkbox
@@ -48,6 +51,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -63,15 +67,20 @@ import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.compose.ui.platform.LocalView
 import androidx.core.app.ShareCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat
 import androidx.core.view.accessibility.AccessibilityViewCommand
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Lifecycle
@@ -93,6 +102,8 @@ import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer
 import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
 import app.crossword.yourealwaysbe.forkyz.util.SpeechContract
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand
+import app.crossword.yourealwaysbe.forkyz.view.BoardEditView.BoardClickListener
+import app.crossword.yourealwaysbe.forkyz.view.BoardWordEditView
 import app.crossword.yourealwaysbe.forkyz.view.ForkyzKeyboard
 import app.crossword.yourealwaysbe.forkyz.view.PlayboardTextRenderer
 import app.crossword.yourealwaysbe.forkyz.view.PuzzleInfoDialogs
@@ -102,6 +113,7 @@ import app.crossword.yourealwaysbe.puz.Clue
 import app.crossword.yourealwaysbe.puz.ClueID
 import app.crossword.yourealwaysbe.puz.Playboard
 import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges
+import app.crossword.yourealwaysbe.puz.Playboard.Word
 import app.crossword.yourealwaysbe.puz.Position
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.Zone
@@ -198,6 +210,93 @@ abstract class PuzzleActivityKt() : ForkyzActivityKt() {
     }
 
     /**
+     * Miniboard current word view
+     *
+     * Shows current word on board. Assumes should take immediate focus
+     * and setup as view targeted by keyboard.
+     *
+     * @param onClick onClick method for BoardClickListener
+     * @param onLongClick onLongClick method for BoardClickListener
+     * @param longClickAccessibilityAction string ID of long click
+     * action description
+     * @param incognitoMode whether to make the view invisible and take
+     * no space (ok, 1 pixel)
+     * @param useSuppressNotesList whether to use the given
+     * suppressNotesList or let BoardWordEditView use its default
+     * @param suppressNotesList for PlayboardRenderer.drawBox
+     */
+    @Composable
+    protected fun Miniboard(
+        modifier : Modifier = Modifier,
+        onClick : (Position?, Word?) -> Unit,
+        onLongClick : (Position?) -> Unit,
+        longClickAccessibilityAction : Int,
+        incognitoMode : Boolean = false,
+        ignoreScratchMode : Boolean = false,
+        useSuppressNotesList : Boolean = false,
+        suppressNotesList : Set<String>? = null,
+    ) {
+        AndroidView(
+            modifier = modifier.fillMaxWidth(),
+            factory = { context ->
+                val view = BoardWordEditView(context).apply {
+                    setFocusable(true)
+                    setFocusableInTouchMode(true)
+                    setContentDescription(
+                        context.getString(R.string.current_word),
+                    )
+                    setAllowOverScroll(false)
+
+                    if (useSuppressNotesList)
+                        setBoard(viewModel.getBoard(), suppressNotesList)
+                    else
+                        setBoard(viewModel.getBoard())
+
+                    addBoardClickListener(object : BoardClickListener {
+                        override fun onClick(
+                            position : Position?,
+                            previousWord : Word?,
+                        ) {
+                            onClick(position, previousWord)
+                        }
+
+                        override fun onLongClick(position : Position?) {
+                            onLongClick(position)
+                        }
+                    })
+
+                    requestFocus()
+                }
+
+                // always this view gets input
+                inputConnectionMediator.registerReceiver(view)
+                view.setOnFocusChangeListener({ _, gainFocus ->
+                    if (gainFocus)
+                        inputConnectionMediator.registerReceiver(view)
+                })
+
+                view
+            },
+            update = { view ->
+                view.apply {
+                    setIncognitoMode(incognitoMode)
+                    setIgnoreScratchMode(ignoreScratchMode)
+                    if (useSuppressNotesList)
+                        setSuppressNotesList(suppressNotesList)
+                    else
+                        clearSuppressNotesList()
+                }
+                ViewCompat.replaceAccessibilityAction(
+                    view,
+                    AccessibilityActionCompat.ACTION_LONG_CLICK,
+                    view.context.getText(longClickAccessibilityAction),
+                    null
+                )
+            }
+        )
+    }
+
+    /**
      * Use if you want to update your UI based on the timer
      *
      * Callback is a launched effect.
@@ -230,6 +329,34 @@ abstract class PuzzleActivityKt() : ForkyzActivityKt() {
                 .statusBarsPadding()
         else
             return this.statusBarsPadding()
+    }
+
+    /**
+     * Clue text for top app bar
+     *
+     * If null, then displays a placeholder
+     */
+    @Composable
+    protected fun ClueText(clueText : String?) {
+        if (clueText == null) {
+            Text(stringResource(R.string.unknown_hint))
+        } else {
+            // Text doesn't support autoSize yet, so rebuild BasicText
+            // from (or close enough)
+            // https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/material/material/src/commonMain/kotlin/androidx/compose/material/Text.kt
+            val color = LocalContentColor.current
+            val clueSize = getResources().getInteger(R.integer.clue_text_size)
+            BasicText(
+                modifier = Modifier.fillMaxWidth(),
+                text = AnnotatedString.fromHtml(clueText),
+                autoSize =  TextAutoSize.StepBased(
+                    minFontSize = 5.sp,
+                    maxFontSize = clueSize.sp,
+                    stepSize = 1.sp,
+                ),
+                color = { color },
+            )
+        }
     }
 
     protected open fun onKeyEvent(event : KeyEvent) : Boolean {

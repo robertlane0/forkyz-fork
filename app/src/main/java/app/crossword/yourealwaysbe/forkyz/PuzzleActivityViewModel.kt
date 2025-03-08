@@ -37,9 +37,9 @@ import app.crossword.yourealwaysbe.forkyz.exttools.ShareClueData
 import app.crossword.yourealwaysbe.forkyz.exttools.SharePuzzleData
 import app.crossword.yourealwaysbe.forkyz.inttools.CellFlagData
 import app.crossword.yourealwaysbe.forkyz.inttools.ClueFlagData
+import app.crossword.yourealwaysbe.forkyz.inttools.ClueNotesData
 import app.crossword.yourealwaysbe.forkyz.inttools.EditClueData
 import app.crossword.yourealwaysbe.forkyz.inttools.InternalToolData
-import app.crossword.yourealwaysbe.forkyz.inttools.ClueNotesData
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
 import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer
@@ -327,7 +327,7 @@ open class PuzzleActivityViewModel @Inject constructor(
             if (clue.isFlagged())
                 getBoard()?.flagClue(clue, false);
             else
-                internalToolEvent.postValue(ClueFlagData.build(clue.getClueID()))
+                launchClueFlagDialog(clue.clueID)
         }
     }
 
@@ -488,6 +488,20 @@ open class PuzzleActivityViewModel @Inject constructor(
         voiceCommandDispatcher.registerVoiceCommand(command)
     }
 
+    protected fun launchClueFlagDialog(cid : ClueID) {
+        internalToolEvent.postValue(ClueFlagData.build(cid))
+    }
+
+    protected fun registerVoiceCommandBack() {
+        val app : Application = getApplication()
+        registerVoiceCommand(
+            VoiceCommand(
+                app.getString(R.string.command_back),
+                { _ -> doBack() }
+            )
+        )
+    }
+
     /**
      * Prepared command for inputting word answers
      */
@@ -645,6 +659,13 @@ open class PuzzleActivityViewModel @Inject constructor(
         )
     }
 
+    fun onFocusNativeView(gainFocus : Boolean) {
+        keyboardManager.onFocusNativeView(
+            gainFocus,
+            this::keyboardManagerHide,
+        )
+    }
+
     /**
      * Prepared command for inputting letters
      */
@@ -723,6 +744,17 @@ open class PuzzleActivityViewModel @Inject constructor(
                 { requestHelpForCurrentClue() }
             )
         )
+    }
+
+    protected fun getLongClueText(clue : Clue, cb : (String) -> Unit) {
+        settings.getPlayShowCount() { showCount ->
+            val text = PlayboardTextRenderer.getLongClueText(
+                getApplication(),
+                clue,
+                showCount
+            )
+            cb(text)
+        }
     }
 
     private fun keyboardManagerShow(info : KeyboardInfo) {
