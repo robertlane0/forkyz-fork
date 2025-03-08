@@ -118,7 +118,10 @@ public class BrowseActivityViewModel extends AndroidViewModel {
             }
         );
 
-        this.puzzleFilter.observeForever(this::setNewPuzzleFilter);
+        puzzleFiles.addSource(
+            puzzleFilter,
+            this::setNewPuzzleFilter
+        );
     }
 
     public MutableLiveData<String> getPuzzleFilter() {
