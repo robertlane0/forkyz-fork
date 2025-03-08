@@ -23,7 +23,9 @@ import android.os.Looper;
 import android.widget.Toast;
 import androidx.annotation.MainThread;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
 
 import dagger.hilt.android.lifecycle.HiltViewModel;
 
@@ -66,12 +68,12 @@ public class BrowseActivityViewModel extends AndroidViewModel {
 
     private boolean isViewArchive = false;
 
-    private MutableLiveData<FilteredList<MutableLiveData<PuzMetaFile>>>
-        puzzleFiles = new MutableLiveData<>();
+    private MediatorLiveData<FilteredList<MutableLiveData<PuzMetaFile>>>
+        puzzleFiles;
     private MutableLiveData<String> puzzleFilter = new MutableLiveData<>();
     // busy with something that isn't downloading
     private MutableLiveData<Boolean> isUIBusy
-        = new MutableLiveData<Boolean>();
+        = new MutableLiveData<Boolean>(false);
     private SingleLiveEvent<Void> puzzleLoadEvents
         = new SingleLiveEvent<>();
 
@@ -91,7 +93,31 @@ public class BrowseActivityViewModel extends AndroidViewModel {
         this.currentPuzzleHolder = currentPuzzleHolder;
         this.downloadersProvider = downloadersProvider;
 
-        isUIBusy.postValue(false);
+        puzzleFiles = new MediatorLiveData<>();
+        puzzleFiles.addSource(
+            // don't think i should need this since it's used in
+            // ForkyzSettings, but i get multiple copies of false
+            // without it
+            Transformations.distinctUntilChanged(
+                settings.getLiveBrowseNewPuzzle()
+            ),
+            (newPuzzle) -> {
+                // wait for true value
+                if (newPuzzle == null)
+                    return;
+
+                // first load, or if new puzzles
+                if (
+                    puzzleFiles.getValue() == null
+                    || (newPuzzle && !getIsViewArchive())
+                ) {
+                    startLoadFiles();
+                    if (newPuzzle)
+                        settings.setBrowseNewPuzzle(false);
+                }
+            }
+        );
+
         this.puzzleFilter.observeForever(this::setNewPuzzleFilter);
     }
 
@@ -364,11 +390,13 @@ public class BrowseActivityViewModel extends AndroidViewModel {
                 List<MutableLiveData<PuzMetaFile>> pmList
                     = puzzleFiles.getValue();
 
-                int index = -1;
-                for (MutableLiveData<PuzMetaFile> pm : pmList) {
-                    index += 1;
-                    if (pm.getValue().isSameMainFile(curHandle)) {
-                        pm.postValue(refreshedMeta);
+                if (pmList != null) {
+                    int index = -1;
+                    for (MutableLiveData<PuzMetaFile> pm : pmList) {
+                        index += 1;
+                        if (pm.getValue().isSameMainFile(curHandle)) {
+                            pm.postValue(refreshedMeta);
+                        }
                     }
                 }
             }

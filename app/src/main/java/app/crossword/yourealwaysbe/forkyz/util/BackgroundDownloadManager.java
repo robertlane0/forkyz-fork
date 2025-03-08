@@ -254,6 +254,7 @@ public class BackgroundDownloadManager {
         protected void doDownload(
             CallbackToFutureAdapter.Completer<ListenableWorker.Result> completer
         ) {
+
             fileHandlerProvider.isMissingWritePermission(missing -> {
                 if (missing) {
                     LOGGER.info("Skipping download, no write permission");

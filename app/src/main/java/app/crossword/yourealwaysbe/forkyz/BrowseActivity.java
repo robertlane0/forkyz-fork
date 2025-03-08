@@ -626,39 +626,23 @@ public class BrowseActivity extends ForkyzActivity {
     protected void onResume() {
         super.onResume();
 
-        // A background update will commonly happen when the user turns
-        // on the preference for the first time, so check here to ensure
-        // the UI is re-rendered when they exit the settings dialog.
-        checkNewPuzzle(newPuzzle -> {
-            if (
-                model.getPuzzleFiles().getValue() == null
-                || newPuzzle
-            ) {
-                if (hasPendingImports()) {
-                    Collection<Uri> importUri = getPendingImports();
-                    clearPendingImports();
-                    onImportURIsAndFinish(importUri);
+        if (hasPendingImports()) {
+            Collection<Uri> importUri = getPendingImports();
+            clearPendingImports();
+            onImportURIsAndFinish(importUri);
+        }
 
-                    // won't be triggered by import if archive is shown
-                    if (model.getIsViewArchive())
-                        startLoadPuzzleList();
-                } else {
-                    startLoadPuzzleList();
-                }
-            } else {
-                refreshLastAccessedPuzzle();
-            }
+        refreshLastAccessedPuzzle();
 
-            // A resume used to clear the current board with the
-            // reasoning that the player has returned and will not be
-            // able to play the current puzzle. However, predictive back
-            // may cause an on resume -- i think if the browse activity
-            // has been destroyed and it needs to recreate to display
-            // the preview. So onResume no longer means play has
-            // finished, so don't clear the puzzle. It gets overwritten
-            // when a new puzzle is selected and just uses unneeded
-            // memory in the meantime.
-        });
+        // A resume used to clear the current board with the
+        // reasoning that the player has returned and will not be
+        // able to play the current puzzle. However, predictive back
+        // may cause an on resume -- i think if the browse activity
+        // has been destroyed and it needs to recreate to display
+        // the preview. So onResume no longer means play has
+        // finished, so don't clear the puzzle. It gets overwritten
+        // when a new puzzle is selected and just uses unneeded
+        // memory in the meantime.
 
         autoDownloadIfEnabled();
         model.processToImportDirectory();
@@ -693,25 +677,6 @@ public class BrowseActivity extends ForkyzActivity {
 
         checkAutoDownloadNotificationPermissions();
     }
-
-    public void checkNewPuzzle(Consumer<Boolean> cb) {
-        fileHandlerProvider.isMissingWritePermission(missing -> {
-            if (missing) {
-                cb.accept(false);
-            } else {
-                settings.getBrowseNewPuzzle(newPuzzle -> {
-                    clearNewPuzzleFlag();
-                    cb.accept(newPuzzle);
-                });
-            }
-        });
-    }
-
-    public void clearNewPuzzleFlag() {
-        settings.setBrowseNewPuzzle(false);
-    }
-
-
 
     private void refreshLastAccessedPuzzle() {
         model.refreshCurrentPuzzleMeta();
@@ -796,7 +761,6 @@ public class BrowseActivity extends ForkyzActivity {
     private void startLoadPuzzleList(boolean archive) {
         fileHandlerProvider.isMissingWritePermission(missing -> {
             if (missing) return;
-            clearNewPuzzleFlag();
             model.startLoadFiles(archive);
         });
     }
