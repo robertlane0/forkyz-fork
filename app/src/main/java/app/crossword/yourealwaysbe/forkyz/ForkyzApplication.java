@@ -44,7 +44,7 @@ public class ForkyzApplication
     public void onCreate() {
         super.onCreate();
         migrationHelper.applyMigrations(this);
-        utils.createNotificationChannel(this);
+        utils.createNotificationChannels(this);
         themeHelper.themeApplication(this);
     }
 

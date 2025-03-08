@@ -19,6 +19,13 @@
     <string name="no_orientation_lock">Sorry, orientation lock is not supported without fullscreen mode anymore because of an Android change."</string>
     <string name="back">Back</string>
 
+    <!-- notifications -->
+    <string name="download_notification_channel_name">Downloads</string>
+    <string name="download_notification_channel_desc">Notifications about downloaded puzzles</string>
+    <string name="save_notification_channel_name">Saving Puzzle</string>
+    <string name="save_notification_channel_desc">Notification when puzzle is being saved.</string>
+    <string name="saving_puzzle">Saving puzzle.</string>
+
     <!-- downloading -->
     <string name="download">Download</string>
     <string name="puzzles_downloading">Downloading Puzzles</string>
@@ -47,6 +54,7 @@
     <string name="vibrate_desc">Required for haptic feedback on built-in keyboard.</string>
     <string name="wake_lock_desc">Used only for automatic download on older Android version.</string>
     <string name="notification_permission_desc">Used for puzzle download notifications (when not disabled in settings).</string>
+    <string name="foreground_service_desc">Used to enable reliable saving of puzzles.</string>
 
     <!-- Browse -->
     <string name="delete">Delete</string>
@@ -60,8 +68,6 @@
     <string name="no_puzzles_download_or_configure_storage">No puzzles found. Download puzzles with the button below or configure a storage directory in settings.</string>
     <string name="no_puzzles">No puzzles found.</string>
     <string name="unable_to_read_file">Unable to read file %1$s</string>
-    <string name="download_notification_channel_name">Downloads</string>
-    <string name="download_notification_channel_desc">Notifications about downloaded puzzles</string>
     <string name="please_wait">Please wait&#8230;</string>
     <string name="internal_storage_description">Currently using internal storage. Puzzles will be deleted when Forkyz is uninstalled.</string>
     <string name="allow_permissions">Allow Permissions</string>

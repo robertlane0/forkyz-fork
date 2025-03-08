@@ -29,6 +29,8 @@ public interface AndroidVersionUtils {
     public static class Factory {
         @Provides
         public static AndroidVersionUtils provideAndroidVersionUtils() {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+                return new UpsideDownCakeUtil();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
                 return new TiramisuUtil();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
@@ -46,7 +48,7 @@ public interface AndroidVersionUtils {
         }
     }
 
-    void createNotificationChannel(Context context);
+    void createNotificationChannels(Context context);
 
     int immutablePendingIntentFlag();
 
@@ -120,4 +122,9 @@ public interface AndroidVersionUtils {
      * (Before Android 10 "Alphabetic", since "IsAlphabetic")
      */
     public String getFilterClueToAlphabeticRegex();
+
+    /**
+     * Constant ServiceInfo.FOREGROUND_SERVICE_TYPE_SHORT_SERVICE
+     */
+    public int foregroundServiceTypeShortService();
 }

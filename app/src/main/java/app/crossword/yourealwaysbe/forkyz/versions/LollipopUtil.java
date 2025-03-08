@@ -27,7 +27,7 @@ public class LollipopUtil implements AndroidVersionUtils {
     private int speechReqCount = 0;
 
     @Override
-    public void createNotificationChannel(Context context) {
+    public void createNotificationChannels(Context context) {
 
     }
 
@@ -139,5 +139,10 @@ public class LollipopUtil implements AndroidVersionUtils {
     @Override
     public String getFilterClueToAlphabeticRegex() {
         return "&[^;]*;|<[^>]*>|[^\\p{Alphabetic}]";
+    }
+
+    @Override
+    public int foregroundServiceTypeShortService() {
+        return 0;
     }
 }

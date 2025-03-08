@@ -12,11 +12,23 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.CoroutineScope
 
 import androidx.annotation.MainThread
+import androidx.core.app.ServiceCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
+import android.content.Context
+import android.content.Intent
+import android.app.Service
+import android.os.IBinder
 
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.qualifiers.ApplicationContext
+
+import app.crossword.yourealwaysbe.forkyz.R
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
+import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzMetaFile
-import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
+import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 import app.crossword.yourealwaysbe.puz.Playboard
 
 /**
@@ -28,6 +40,7 @@ import app.crossword.yourealwaysbe.puz.Playboard
  */
 @Singleton
 public class CurrentPuzzleHolder @Inject constructor(
+    @ApplicationContext val appContext : Context,
     val settings : ForkyzSettings,
     val fileHandlerProvider : FileHandlerProvider,
 ) {
@@ -119,29 +132,10 @@ public class CurrentPuzzleHolder @Inject constructor(
      */
     @MainThread
     fun saveBoard() {
-        val puz = board?.getPuzzle()
-        if (puz == null) {
-            LOG.severe("No puzzle associated to the board to save.")
-            return
-        }
-
-        ioScope.launch {
-            ioLock.lock()
-            mainScope.launch {
-                fileHandlerProvider.get() { fileHandler ->
-                    ioScope.launch {
-                        try {
-                            fileHandler.save(puz, puzHandle)
-                        } catch (e : IOException) {
-                            LOG.severe("Error saving puzzle.")
-                            e.printStackTrace()
-                        } finally {
-                            ioLock.unlock()
-                        }
-                    }
-                }
-            }
-        }
+        ContextCompat.startForegroundService(
+            appContext,
+            Intent(appContext, PuzzleSaveService::class.java),
+        )
     }
 
     /**
@@ -172,6 +166,38 @@ public class CurrentPuzzleHolder @Inject constructor(
                             mainScope.launch {
                                 cb.accept(meta)
                             }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Save board from save service
+     *
+     * App should use saveBoard()
+     */
+    fun saveBoardService(cb : () -> Unit) {
+        val puz = board?.getPuzzle()
+        if (puz == null) {
+            LOG.severe("No puzzle associated to the board to save.")
+            cb()
+        }
+
+        ioScope.launch {
+            ioLock.lock()
+            mainScope.launch {
+                fileHandlerProvider.get() { fileHandler ->
+                    ioScope.launch {
+                        try {
+                            fileHandler.save(puz, puzHandle)
+                        } catch (e : IOException) {
+                            LOG.severe("Error saving puzzle.")
+                            e.printStackTrace()
+                        } finally {
+                            ioLock.unlock()
+                            cb()
                         }
                     }
                 }
@@ -214,3 +240,52 @@ public class CurrentPuzzleHolder @Inject constructor(
         }
     }
 }
+
+@AndroidEntryPoint
+class PuzzleSaveService() : Service() {
+    companion object {
+        @JvmField
+        final val NOTIFICATION_CHANNEL_ID = "forkyz.save"
+        private final val NOTIFICATION_ID = 10102
+    }
+
+    @Inject
+    @ApplicationContext
+    lateinit var context : Context
+
+    @Inject
+    lateinit var currentPuzzleHolder : CurrentPuzzleHolder
+
+    @Inject
+    lateinit var utils : AndroidVersionUtils
+
+    override fun onBind(intent : Intent): IBinder? {
+        return null
+    }
+
+    override fun onStartCommand(
+        intent : Intent,
+        flags : Int,
+        startId : Int,
+    ) : Int {
+        val notification = NotificationCompat.Builder(
+            this,
+            NOTIFICATION_CHANNEL_ID,
+        ).setSmallIcon(android.R.drawable.ic_menu_save)
+            .setContentTitle(context.getString(R.string.saving_puzzle))
+            .setWhen(System.currentTimeMillis())
+            .build()
+
+        ServiceCompat.startForeground(
+            this,
+            NOTIFICATION_ID,
+            notification,
+            utils.foregroundServiceTypeShortService(),
+        )
+
+        currentPuzzleHolder.saveBoardService(this::stopSelf)
+
+        return START_STICKY
+    }
+}
+
