@@ -31,7 +31,13 @@ open class SpecialEntryDialogViewModel @Inject constructor(
 
     val forceCaps : LiveData<Boolean> = settings.livePlaySpecialEntryForceCaps
 
-    init {
+    /**
+     * Call on create to make sure up to date
+     *
+     * Doing this during view model init doesn't work -- multiple calls
+     * to the dialog may use the same view model.
+     */
+    fun refreshResponse() {
         getBoard()?.getCurrentBox()?.let { box ->
             if (box.isBlank)
                 _response.value = ""

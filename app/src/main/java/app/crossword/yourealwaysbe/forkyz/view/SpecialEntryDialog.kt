@@ -48,6 +48,8 @@ class SpecialEntryDialog() : DialogFragment() {
     ) : View? {
         val viewModel = ViewModelProvider(requireActivity())
             .get(SpecialEntryDialogViewModel::class.java)
+        viewModel.refreshResponse()
+
         return ComposeView(requireActivity()).apply {
             setContent {
                 themeHelper.AppTheme() {
