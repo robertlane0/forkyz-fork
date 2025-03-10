@@ -1,5 +1,12 @@
 # Forkyz Changelog
 
+## Version 63
+
+- Fix background downloads.
+- Fix clue list freeze when show errors activated.
+- Improve puzzle save reliability.
+- Fix initial value in special entry dialog.
+
 ## Version 62
 
 - Add force caps option to special entry dialog.
@@ -14,7 +21,7 @@
 - Add Metro Quick downloader.
 - Rewrite of settings screen.
 - Add option to force native input to upper case (keyboard settings).
-- Add "locked" fit to screen (interaction settings).
+- Add "locked" fit to screen (display settings).
 - Long-press to move anagram solution back to source on Notes page (focus source first).
 - Tweaks to separators display on board.
 - Minor bug fixes and new bugs.

@@ -1,0 +1,4 @@
+- Fix background downloads.
+- Fix clue list freeze when show errors activated.
+- Improve puzzle save reliability.
+- Fix initial value in special entry dialog.
