@@ -149,88 +149,102 @@ class ClueListActivity() : PuzzleActivityKt(), ClueTabs.ClueTabsListener {
     @Composable
     private fun ActivityBody(modifier : Modifier) {
         Column(modifier = modifier) {
-            val showAllWords by viewModel.showAllWords.observeAsState()
-            val snapToClue
-                by viewModel.snapToClueEvent.collectAsStateWithLifecycle()
+            val showAllWordsState by viewModel.showAllWords.observeAsState()
+            val showAllWords = showAllWordsState ?: false
 
-            AndroidView(
-                modifier = Modifier.fillMaxWidth(),
-                factory = { context ->
-                    val view = BoardWordEditView(context).apply {
-                        setFocusable(true)
-                        setFocusableInTouchMode(true)
-                        setContentDescription(
-                            context.getString(R.string.current_word),
-                        )
-                        setAllowOverScroll(false)
-                        setBoard(viewModel.getBoard())
-                        addBoardClickListener(object : BoardClickListener {
-                            override fun onClick(
-                                position : Position?,
-                                previousWord : Word?,
-                            ) {
-                                viewModel.showKeyboard()
-                            }
-
-                            override fun onLongClick(position : Position?) {
-                                viewModel.launchCurrentClueNotes()
-                            }
-                        })
-                        requestFocus()
-                    }
-
-                    ViewCompat.replaceAccessibilityAction(
-                        view,
-                        AccessibilityActionCompat.ACTION_LONG_CLICK,
-                        context.getText(R.string.open_clue_notes),
-                        null
-                    )
-
-                    // always this view gets input
-                    inputConnectionMediator.registerReceiver(view)
-
-                    view
-                },
-                update = { view ->
-                    view.setIncognitoMode(showAllWords ?: false)
-                }
-            )
-            AndroidView(
-                modifier = Modifier.fillMaxWidth()
-                    .weight(1.0F),
-                factory = { context ->
-                    val view = ClueTabs(context).apply {
-                        setBoard(viewModel.getBoard())
-                        setOnClueLongClickDescription(
-                            context.getString(R.string.open_clue_notes)
-                        )
-                        setOnClueClickDescription(
-                            context.getString(R.string.select_clue)
-                        )
-                        addListener(this@ClueListActivity)
-                    }
-                    addAccessibilityActions(view)
-                    view
-                },
-                update = { view ->
-                    view.setShowWords(showAllWords ?: false)
-                    if (snapToClue != null) {
-                        viewModel.clearSnapToClueEvent()
-                        // this should probably be a launched effect,
-                        // but can't do that from the update method
-                        snapToClue?.pageChangeData?.let { change ->
-                            view.ensureListShown(
-                                change.showPageNum,
-                                change.replacePageNum,
-                            )
-                        }
-                        view.snapToClue()
-                    }
-                },
+            Miniboard(showAllWords)
+            ClueLists(
+                Modifier.fillMaxWidth().weight(1.0F),
+                showAllWords,
             )
             VoiceButtons()
             Keyboard()
         }
+    }
+
+    @Composable
+    private fun ClueLists(modifier : Modifier, showAllWords : Boolean) {
+        val snapToClue
+            by viewModel.snapToClueEvent.collectAsStateWithLifecycle()
+
+        AndroidView(
+            modifier = modifier,
+            factory = { context ->
+                val view = ClueTabs(context).apply {
+                    setBoard(viewModel.getBoard())
+                    setOnClueLongClickDescription(
+                        context.getString(R.string.open_clue_notes)
+                    )
+                    setOnClueClickDescription(
+                        context.getString(R.string.select_clue)
+                    )
+                    addListener(this@ClueListActivity)
+                }
+                addAccessibilityActions(view)
+                view
+            },
+            update = { view ->
+                view.setShowWords(showAllWords)
+                if (snapToClue != null) {
+                    viewModel.clearSnapToClueEvent()
+                    // this should probably be a launched effect,
+                    // but can't do that from the update method
+                    snapToClue?.pageChangeData?.let { change ->
+                        view.ensureListShown(
+                            change.showPageNum,
+                            change.replacePageNum,
+                        )
+                    }
+                    view.snapToClue()
+                }
+            },
+        )
+    }
+
+    @Composable
+    private fun Miniboard(incognitoMode : Boolean) {
+        AndroidView(
+            modifier = Modifier.fillMaxWidth(),
+            factory = { context ->
+                val view = BoardWordEditView(context).apply {
+                    setFocusable(true)
+                    setFocusableInTouchMode(true)
+                    setContentDescription(
+                        context.getString(R.string.current_word),
+                    )
+                    setAllowOverScroll(false)
+                    setBoard(viewModel.getBoard())
+                    addBoardClickListener(object : BoardClickListener {
+                        override fun onClick(
+                            position : Position?,
+                            previousWord : Word?,
+                        ) {
+                            viewModel.showKeyboard()
+                        }
+
+                        override fun onLongClick(position : Position?) {
+                            viewModel.launchCurrentClueNotes()
+                        }
+                    })
+                    requestFocus()
+                }
+
+                ViewCompat.replaceAccessibilityAction(
+                    view,
+                    AccessibilityActionCompat.ACTION_LONG_CLICK,
+                    context.getText(R.string.open_clue_notes),
+                    null
+                )
+
+                // always this view gets input
+                inputConnectionMediator.registerReceiver(view)
+
+                view
+            },
+            update = { view ->
+                view.setIncognitoMode(incognitoMode)
+            }
+        )
     }
 
     @Composable
