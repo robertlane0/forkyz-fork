@@ -648,8 +648,10 @@ public class Playboard {
                 ClueID cid = getClueID();
                 int cluePos = currentBox.getCluePosition(cid);
                 int length = this.getCurrentWordLength();
-                if (cluePos >= 0 && cluePos < length)
-                    note.deleteScratchLetterAt(cluePos);
+                if (cluePos >= 0 && cluePos < length) {
+                    note = note.withDeleteScratchLetterAt(cluePos);
+                    puzzle.setNote(cid, note);
+                }
                 flagChange(getHighlightLetter());
             }
         }
@@ -1205,13 +1207,14 @@ public class Playboard {
         // Create a note for this clue if we don't already have one
         if (note == null) {
             note = new Note(length);
-            this.puzzle.setNote(cid, note);
+            puzzle.setNote(cid, note);
         }
 
         // Update the scratch text
         int pos = box.getCluePosition(cid);
         if (pos >= 0 && pos < length) {
-            note.setScratchLetter(pos, letter);
+            note = note.withScratchLetter(pos, letter);
+            puzzle.setNote(cid, note);
             flagChange(highlightPos);
         }
 

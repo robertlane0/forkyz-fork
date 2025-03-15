@@ -74,22 +74,6 @@ public class Note {
             return anagramSolution;
     }
 
-    public void setText(String text) {
-        this.text = text;
-    }
-
-    public void setScratch(String scratch) {
-        this.scratch = scratch;
-    }
-
-    public void setAnagramSource(String anagramSource) {
-        this.anagramSource = anagramSource;
-    }
-
-    public void setAnagramSolution(String anagramSolution) {
-        this.anagramSolution = anagramSolution;
-    }
-
     public boolean isEmpty() {
         return (text == null || text.length() == 0) &&
                (scratch == null || scratch.trim().length() == 0) &&
@@ -152,13 +136,19 @@ public class Note {
         return true;
     }
 
-    public void setScratchLetter(int pos, char letter) {
+    /**
+     * Create a copy with updated scratch letter
+     *
+     * Returns same object if scratch is currently null or pos is out of
+     * range
+     */
+    public Note withScratchLetter(int pos, char letter) {
         String letterText = Character.toString(letter);
         String newScratchText;
 
-        if (scratch == null) {
+        if (scratch == null || pos < 0 || pos >= scratch.length()) {
             LOG.warning("Can't set scratch letter because scratch text not created");
-            return;
+            return this;
         }
 
         int len = scratch.length();
@@ -169,10 +159,21 @@ public class Note {
         } else {
             newScratchText = scratch.substring(0, pos) + letterText + scratch.substring(pos + 1);
         }
-        scratch = newScratchText;
+
+        return new Note(
+            newScratchText,
+            getText(),
+            getAnagramSource(),
+            getAnagramSolution()
+        );
     }
 
-    public void deleteScratchLetterAt(int pos) {
-        setScratchLetter(pos, BLANK_CHAR);
+    /**
+     * Return new note with scratch letter at pos deleted
+     *
+     * Returns same object if pos out of range
+     */
+    public Note withDeleteScratchLetterAt(int pos) {
+        return withScratchLetter(pos, BLANK_CHAR);
     }
 }
