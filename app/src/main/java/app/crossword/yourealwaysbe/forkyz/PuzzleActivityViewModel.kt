@@ -292,11 +292,23 @@ open class PuzzleActivityViewModel @Inject constructor(
         }
     }
 
+    // need to do default arguments the Java way while
+    // PuzzleActivity.java still used
     fun stopTimer() {
+        stopTimer(false)
+    }
+
+    /**
+     * Stop the timer running
+     *
+     * Updates puzzle time if it wasn't already finished or if
+     * forceOverwriteTime is true (used when 100% hit for first time).
+     */
+    fun stopTimer(forceOverwriteTime : Boolean) {
         getPuzzle()?.let { puz ->
             timer?.let { timer ->
-                if (puz.getPercentComplete() != 100) {
-                    timer.stop();
+                timer.stop();
+                if (forceOverwriteTime || puz.getPercentComplete() != 100) {
                     puz.setTime(timer.getElapsed());
                 }
             }
@@ -798,9 +810,10 @@ open class PuzzleActivityViewModel @Inject constructor(
     private fun handleChangeTimer() {
         val puz = getPuzzle()
         if (puz != null && puz.getPercentComplete() == 100) {
-            if (isTimerRunning)
+            if (isTimerRunning) {
+                stopTimer(true)
                 puzzleFinishedEvent.postValue(true)
-            stopTimer()
+            }
         }
     }
 
