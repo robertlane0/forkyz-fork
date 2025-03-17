@@ -264,8 +264,6 @@ abstract class PuzzleActivityKt() : ForkyzActivityKt() {
                             onLongClick(position)
                         }
                     })
-
-                    requestFocus()
                 }
 
                 // always this view gets input
@@ -274,6 +272,7 @@ abstract class PuzzleActivityKt() : ForkyzActivityKt() {
                     if (gainFocus)
                         inputConnectionMediator.registerReceiver(view)
                 })
+                view.requestFocusOnSized()
 
                 view
             },
@@ -544,14 +543,17 @@ abstract class PuzzleActivityKt() : ForkyzActivityKt() {
     protected fun Keyboard() {
         val state by viewModel.keyboardState.collectAsStateWithLifecycle()
 
-        LaunchedEffect(state.needsNativeRefresh) {
-            if (state.needsNativeRefresh) {
+        LaunchedEffect(state.needsRefresh) {
+            if (state.needsRefresh) {
                 if (state.visibility == KeyboardVisibility.NATIVE) {
                     inputConnectionMediator.showNative(state.forceCaps)
                 } else {
                     inputConnectionMediator.hideNative()
                 }
-                viewModel.markNativeRefreshed()
+                if (state.visibility == KeyboardVisibility.FORKYZ) {
+                    inputConnectionMediator.focusReceiver()
+                }
+                viewModel.markKeyboardRefreshed()
             }
         }
 

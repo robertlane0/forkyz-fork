@@ -45,6 +45,10 @@ class InputConnectionMediator() {
         }
     }
 
+    fun focusReceiver() {
+        receiver?.let { it.view.requestFocus() }
+    }
+
     fun showNative(forceCaps : Boolean) {
         // Would prefer the following, but doesn't seem to work
         // (with Android Views rather than Compose)?

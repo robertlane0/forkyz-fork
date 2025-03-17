@@ -144,8 +144,8 @@ enum class KeyboardVisibility {
  * State of keyboard
  *
  * @param visibility whether to show Forkyz, Native, or no keyboard
- * @param needsNativeRefresh indicates if native state has just changed,
- * so keyboard needs showing or hiding. Call markNativeRefreshed() once
+ * @param needsRefresh indicates if state has just changed,
+ * so keyboard needs showing or hiding. Call markKeyboardRefreshed() once
  * launched.
  * @param hideOnBack whether the (Forkyz) keyboard should intepret a back gesture
  * as "close"
@@ -155,7 +155,7 @@ enum class KeyboardVisibility {
  */
 data class KeyboardState(
     val visibility : KeyboardVisibility = KeyboardVisibility.NONE,
-    val needsNativeRefresh : Boolean = false,
+    val needsRefresh : Boolean = false,
     val hideOnBack : Boolean = false,
     val showHideButton : Boolean = false,
     val forceCaps : Boolean = false,
@@ -277,9 +277,9 @@ open class PuzzleActivityViewModel @Inject constructor(
         getBoard()?.removeListener(this)
     }
 
-    fun markNativeRefreshed() {
+    fun markKeyboardRefreshed() {
         _keyboardState.value = keyboardState.value.copy(
-            needsNativeRefresh = false,
+            needsRefresh = false,
         )
     }
 
@@ -762,10 +762,9 @@ open class PuzzleActivityViewModel @Inject constructor(
             KeyboardVisibility.NATIVE
         else
             KeyboardVisibility.FORKYZ
-        val needsNativeRefresh = info.useNative
         _keyboardState.value = KeyboardState(
             visibility,
-            needsNativeRefresh,
+            true,
             info.hideOnBack,
             info.showHideButton,
             info.forceCaps,
@@ -773,11 +772,9 @@ open class PuzzleActivityViewModel @Inject constructor(
     }
 
     private fun keyboardManagerHide() {
-        val needsNativeRefresh
-            = keyboardState.value.visibility == KeyboardVisibility.NATIVE
         _keyboardState.value = KeyboardState(
             visibility = KeyboardVisibility.NONE,
-            needsNativeRefresh = needsNativeRefresh,
+            needsRefresh = true,
             hideOnBack = false,
         )
     }

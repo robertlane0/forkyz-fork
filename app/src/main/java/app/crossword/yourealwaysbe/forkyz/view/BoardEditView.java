@@ -66,6 +66,7 @@ public abstract class BoardEditView
     private boolean nativeInput = false;
     private boolean forceCaps = true;
     private boolean ignoreScratchMode = false;
+    private boolean requestFocusOnSized = false;
 
     // For use by implementers of render to avoid on-main-thread
     // rendering. Bitmap can be set with postBitmap in
@@ -84,6 +85,18 @@ public abstract class BoardEditView
     public BoardEditView(Context context, AttributeSet attrs) {
         super(context, attrs);
         handler = new Handler(context.getMainLooper());
+    }
+
+    /**
+     * Request focus or delay until has dimension
+     *
+     * Cannot receive focus until all dimensions > 0
+     */
+    public void requestFocusOnSized() {
+        if (getWidth() > 0 && getHeight() > 0)
+            requestFocus();
+        else
+            requestFocusOnSized = true;
     }
 
     @Override
@@ -351,6 +364,10 @@ public abstract class BoardEditView
     @Override
     protected void onSizeChanged(int w, int h, int ow, int oh) {
         super.onSizeChanged(w, h, ow, oh);
+        if (requestFocusOnSized && w > 0 && h > 0) {
+            requestFocus();
+            requestFocusOnSized = false;
+        }
         // need to rerender in case new parts of grid visible
         render(PlayboardChanges.getEmptyChanges());
     }
