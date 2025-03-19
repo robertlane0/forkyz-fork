@@ -269,12 +269,10 @@ open class PuzzleActivityViewModel @Inject constructor(
         currentPuzzleHolder.saveBoard()
     }
 
-    fun listenBoard() {
+    init {
+        // keep listener active so model is up to date with changes that happen
+        // while paused
         getBoard()?.addListener(this)
-    }
-
-    fun unlistenBoard() {
-        getBoard()?.removeListener(this)
     }
 
     fun markKeyboardRefreshed() {

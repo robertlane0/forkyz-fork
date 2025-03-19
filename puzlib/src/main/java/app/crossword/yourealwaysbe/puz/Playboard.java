@@ -292,17 +292,22 @@ public class Playboard {
 
     }
 
-    public void setCurrentWord(Box[] response) {
+    /**
+     * Set current word from string
+     *
+     * One character per box
+     */
+    public void setCurrentWordFromString(String response) {
         Zone zone = getCurrentZone();
         if (zone == null)
             return;
 
-        int length = Math.min(zone.size(), response.length);
+        int length = Math.min(zone.size(), response.length());
         for (int i = 0; i < length; i++) {
             Position pos = zone.getPosition(i);
             Box box = puzzle.checkedGetBox(pos);
             if (!Box.isBlock(box))
-                box.setResponse(response[i].getResponse());
+                box.setResponse(String.valueOf(response.charAt(i)));
             flagChange(pos);
         }
         notifyChange();

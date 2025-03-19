@@ -183,17 +183,16 @@ abstract class PuzzleActivityKt() : ForkyzActivityKt() {
     }
 
     override fun onPause() {
-        super.onPause()
-
         viewModel.stopTimer()
         viewModel.saveBoard()
-        viewModel.unlistenBoard()
 
         ttsService?.let {
             it.shutdown()
             ttsService = null
             ttsReady = false
         }
+
+        super.onPause()
     }
 
     override fun onResume() {
@@ -206,7 +205,6 @@ abstract class PuzzleActivityKt() : ForkyzActivityKt() {
         }
 
         viewModel.startTimer()
-        viewModel.listenBoard()
     }
 
     /**
@@ -235,6 +233,7 @@ abstract class PuzzleActivityKt() : ForkyzActivityKt() {
         ignoreScratchMode : Boolean = false,
         useSuppressNotesList : Boolean = false,
         suppressNotesList : Set<String>? = null,
+        onFocusChanged : (Boolean) -> Unit = { },
     ) {
         AndroidView(
             modifier = modifier.fillMaxWidth(),
@@ -271,6 +270,7 @@ abstract class PuzzleActivityKt() : ForkyzActivityKt() {
                 view.setOnFocusChangeListener({ _, gainFocus ->
                     if (gainFocus)
                         inputConnectionMediator.registerReceiver(view)
+                    onFocusChanged(gainFocus)
                 })
                 view.requestFocusOnSized()
 
@@ -840,8 +840,26 @@ abstract class PuzzleActivityKt() : ForkyzActivityKt() {
         )
     }
 
+    /**
+     * External tools sub menu
+     *
+     * @param onCallExternalDictionary call back for when external dictionary
+     * called
+     * @param onCallCrosswordSolver call back when crossword solver
+     * called
+     * @param showAnagramSolver whether to show the anagram solver if enabled
+     * in settings.
+     * @param onCallAnagramSolver call back when anagram solver called (does
+     * nothing if null)
+     */
     @Composable
-    protected fun MenuExternalToolsSub() {
+    protected fun MenuExternalToolsSub(
+        onCallExternalDictionary : () -> Unit
+            = viewModel::callExternalDictionary,
+        onCallCrosswordSolver : () -> Unit = viewModel::callCrosswordSolver,
+        showAnagramSolver : Boolean = false,
+        onCallAnagramSolver : () -> Unit = { },
+    ) {
         val state by viewModel.menuState.observeAsState()
         if (!(state?.externalToolsState?.hasExternal ?: false))
             return
@@ -863,8 +881,8 @@ abstract class PuzzleActivityKt() : ForkyzActivityKt() {
                         )
                     },
                     onClick = {
-                        viewModel.callExternalDictionary()
                         viewModel.dismissMenu()
+                        onCallExternalDictionary()
                     },
                 )
             }
@@ -874,10 +892,26 @@ abstract class PuzzleActivityKt() : ForkyzActivityKt() {
                         MenuText(stringResource(R.string.help_crossword_solver))
                     },
                     onClick = {
-                        viewModel.callCrosswordSolver()
                         viewModel.dismissMenu()
+                        onCallCrosswordSolver()
                     },
                 )
+                if (showAnagramSolver) {
+                    DropdownMenuItem(
+                        text = {
+                            MenuText(
+                                stringResource(
+                                    R.string.help_crossword_solver_anagram
+                                )
+                            )
+                        },
+                        onClick = {
+                            viewModel.dismissMenu()
+                            onCallAnagramSolver()
+                        },
+                    )
+
+                }
             }
             if (state?.externalToolsState?.hasChatGPT ?: false) {
                 DropdownMenuItem(
@@ -993,13 +1027,20 @@ abstract class PuzzleActivityKt() : ForkyzActivityKt() {
         }
     }
 
+    /**
+     * Edit clue menu entry
+     *
+     * @param onEditClue override for custom on edit behavior
+     */
     @Composable
-    protected fun MenuEditClue() {
+    protected fun MenuEditClue(
+        onEditClue : () -> Unit = viewModel::editClue,
+    ) {
         DropdownMenuItem(
             text = { MenuText(stringResource(R.string.edit_clue)) },
             onClick = {
-                viewModel.editClue()
                 viewModel.dismissMenu()
+                onEditClue()
             }
         )
     }

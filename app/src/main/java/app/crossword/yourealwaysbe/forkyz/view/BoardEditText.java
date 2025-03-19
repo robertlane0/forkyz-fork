@@ -86,20 +86,12 @@ public class BoardEditText
         default void postChange(int pos, char oldChar, boolean isDelete) { }
     }
 
-    public interface SelectionListener {
-        /**
-         * Notify when selected pos change, -1 when lose focus
-         */
-        void onSelect(int pos);
-    }
-
     private Position selection = new Position(0, -1);
     private Box[] boxes;
     private BoxSeparators[] separators;
     private boolean[] changes;
     private PlayboardRenderer renderer;
     private String shadow;
-    private SelectionListener selectionListener = null;
 
     private BoardEditFilter filter;
 
@@ -142,13 +134,6 @@ public class BoardEditText
         );
     }
 
-    /**
-     * Get notified when selected cell changes
-     */
-    public void setSelectionListener(SelectionListener selectionListener) {
-        this.selectionListener = selectionListener;
-    }
-
     @Override
     protected void onSizeChanged(
         int newWidth, int newHeight, int oldWidth, int oldHeight
@@ -187,14 +172,15 @@ public class BoardEditText
     public void onDeleteResponse() {
         if (boxes != null) {
             int col = getSelectedCol();
-            char oldChar = getResponse(col);
-
             if (boxes[col].isBlank() && col > 0) {
                 flagChanged(col);
                 setSelectedCol(col - 1);
             }
+
+            col = getSelectedCol();
+            char oldChar = getResponse(col);
+
             if (canDelete(selection)) {
-                col = getSelectedCol();
                 boxes[col].setBlank();
                 flagChanged(col);
             }
@@ -363,22 +349,28 @@ public class BoardEditText
     /**
      * Fill the existing boxes from the string
      *
-     * Overwrite from start to end or length of text. Does not filter entries.
+     * Does not filter entries.
      */
     public void setFromString(String text) {
         if (text == null)
             return;
 
-        int end = Math.min(text.length(), boxes.length);
-
         boolean changed = false;
 
-        for (int i = 0; i < end; i++) {
-            char c = text.charAt(i);
-            if (!charStringEquals(boxes[i].getResponse(), c)) {
-                boxes[i].setResponse(c);
-                flagChanged(i);
-                changed = true;
+        for (int i = 0; i < boxes.length; i++) {
+            if (i < text.length()) {
+                char c = text.charAt(i);
+                if (!charStringEquals(boxes[i].getResponse(), c)) {
+                    boxes[i].setResponse(c);
+                    flagChanged(i);
+                    changed = true;
+                }
+            } else {
+                if (!boxes[i].isBlank()) {
+                    boxes[i].setBlank();
+                    flagChanged(i);
+                    changed = true;
+                }
             }
         }
 
@@ -450,7 +442,8 @@ public class BoardEditText
      * Set a string to display in the boxes as a note
      *
      * Can be used e.g. for predictive text. Will be displayed as
-     * smaller chars. Does nothing if same shadow passed.
+     * smaller chars. Does nothing if same shadow passed. Null means
+     * clear shadow.
      */
     public void setShadow(String shadow) {
         if (Objects.equals(this.shadow, shadow))
@@ -472,28 +465,14 @@ public class BoardEditText
         render();
     }
 
-    public void clearShadow() {
-        setShadow(null);
-    }
-
     public String toString() {
-        return toString(false);
-    }
-
-    /**
-     * Convert to string
-     *
-     * @param skipBlanks don't include blank boxes
-     */
-    public String toString(boolean skipBlanks) {
         if (boxes == null)
             return "";
 
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < boxes.length; i++) {
-            if (!skipBlanks || !boxes[i].isBlank())
-                sb.append(boxes[i].getResponse());
+            sb.append(boxes[i].getResponse());
         }
 
         return sb.toString();
@@ -655,6 +634,9 @@ public class BoardEditText
     public boolean setSelectedCol(int col) {
         if (col == selection.getCol())
             return false;
+        // allow < 0 (means no selection)
+        if (boxes.length <= col)
+            return false;
 
         flagChanged(selection.getCol(), col);
         selection.setCol(col);
@@ -662,9 +644,6 @@ public class BoardEditText
         sendAccessibilityEvent(
             AccessibilityEvent.TYPE_VIEW_TEXT_SELECTION_CHANGED
         );
-        if (selectionListener != null)
-            selectionListener.onSelect(col);
-
         return true;
     }
 

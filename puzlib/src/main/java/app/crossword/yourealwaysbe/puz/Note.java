@@ -172,6 +172,15 @@ public class Note {
         );
     }
 
+    public Note withAnagram( String anagramSource, String anagramSolution) {
+        return new Note(
+            getScratch(),
+            getText(),
+            anagramSource,
+            anagramSolution
+        );
+    }
+
     /**
      * Create a copy with updated scratch letter
      *

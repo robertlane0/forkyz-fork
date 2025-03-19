@@ -36,7 +36,7 @@ fun OKCancelDialog(
     summary : Int?,
     onCancel : () -> Unit,
     onOK : () -> Unit,
-    body : @Composable () -> Unit,
+    body : @Composable () -> Unit = { },
 ) {
     Dialog(onDismissRequest = onCancel) {
         Card(shape = DIALOG_ROUNDED_CORNERS) {

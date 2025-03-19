@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -13,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -39,22 +39,29 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.compose.ui.graphics.Color
 import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 import app.crossword.yourealwaysbe.forkyz.util.ColorUtils
 import app.crossword.yourealwaysbe.forkyz.view.BoardEditText
 import app.crossword.yourealwaysbe.forkyz.view.BoardEditText.BoardEditFilter
 import app.crossword.yourealwaysbe.forkyz.view.BoardEditView.BoardClickListener
 import app.crossword.yourealwaysbe.forkyz.view.BoardWordEditView
+import app.crossword.yourealwaysbe.forkyz.view.OKCancelDialog
 import app.crossword.yourealwaysbe.forkyz.view.ScrollingImageView
 import app.crossword.yourealwaysbe.forkyz.view.ScrollingImageView.Point
 import app.crossword.yourealwaysbe.puz.Clue
@@ -74,6 +81,15 @@ class NotesActivity() : PuzzleActivityKt() {
     }
 
     override protected lateinit var viewModel : NotesActivityViewModel
+
+    private var focussedEntry : NoteEntry? = null
+    private val defaultEntry : NoteEntry
+        get() {
+            return if (viewModel.isPuzzleNotes)
+                NoteEntry.SCRATCH
+            else
+                NoteEntry.BOARD
+        }
 
     override fun onCreate(savedInstanceState : Bundle?) {
         super.onCreate(savedInstanceState)
@@ -99,16 +115,56 @@ class NotesActivity() : PuzzleActivityKt() {
         }
     }
 
+    override protected fun onKeyEvent(event : KeyEvent) : Boolean {
+        when (event.key) {
+            Key.Escape -> {
+                if (event.type == KeyEventType.KeyUp)
+                    doBackAction()
+                return true
+            }
+        }
+        return super.onKeyEvent(event)
+    }
+
+    private fun onMiniboardKeyEvent(event : KeyEvent) : Boolean {
+        when (event.key) {
+            Key.DirectionLeft -> {
+                if (event.type == KeyEventType.KeyUp)
+                    viewModel.moveLeft()
+                return true
+            }
+            Key.DirectionRight -> {
+                if (event.type == KeyEventType.KeyUp)
+                    viewModel.moveRight()
+                return true
+            }
+            Key.Delete, Key.Backspace -> {
+                if (event.type == KeyEventType.KeyUp)
+                    viewModel.deleteLetterFromBoard()
+                return true
+            }
+        }
+
+        val keyChar = letterOrDigitKeyToChar(event.key)
+        if (keyChar != null) {
+            if (event.type == KeyEventType.KeyUp)
+                viewModel.playLetterToBoard(keyChar)
+            return true
+        } else {
+            return super.onKeyEvent(event)
+        }
+    }
+
     @Composable
     @OptIn(ExperimentalMaterial3Api::class)
     private fun TopAppBar() {
-        val state = viewModel.notesUIState.observeAsState()
+        val state by viewModel.notesUIState.observeAsState()
         themeHelper.ForkyzTopAppBar(
             title = {
-                if (state.value?.isPuzzleNotes ?: false) {
+                if (state?.isPuzzleNotes ?: false) {
                     Text(stringResource(R.string.menu_notes_puzzle))
                 } else {
-                    ClueText(state.value?.clueText)
+                    ClueText(state?.clueText)
                 }
             },
             onBack = { finish() },
@@ -123,8 +179,8 @@ class NotesActivity() : PuzzleActivityKt() {
                 .verticalScroll(rememberScrollState())
                 .height(IntrinsicSize.Max),
         ) {
-            val state = viewModel.notesUIState.observeAsState()
-            val isPuzzleNotes = state.value?.isPuzzleNotes ?: false
+            val state by viewModel.notesUIState.observeAsState()
+            val isPuzzleNotes = state?.isPuzzleNotes ?: false
 
             if (!isPuzzleNotes) {
                 MiniboardRow()
@@ -136,77 +192,69 @@ class NotesActivity() : PuzzleActivityKt() {
             AnagramSolutionRow()
             VoiceButtons()
             Keyboard()
+            TransferConfirmationDialog()
         }
     }
 
     @Composable
     private fun MiniboardRow() {
-        val state = viewModel.notesUIState.observeAsState()
+        val state by viewModel.notesUIState.observeAsState()
 
         BoardLabel(R.string.board_lab)
         // TODO: getsuppressnoteslist
         Miniboard(
-            modifier = Modifier.padding(
-                vertical = VERTICAL_BOARD_PADDING
-            ),
+            modifier = Modifier.onKeyEvent(this::onMiniboardKeyEvent)
+                .padding(
+                    vertical = VERTICAL_BOARD_PADDING
+                ),
             onClick = { _, _ -> viewModel.showKeyboard() },
-            onLongClick = { /* TODO */ },
+            onLongClick = {
+                transferToFocussed(NoteEntry.BOARD)
+            },
             longClickAccessibilityAction
                 = R.string.transfer_board_to_focussed_view,
             ignoreScratchMode = true,
-            useSuppressNotesList = state.value != null,
-            suppressNotesList = state.value?.suppressNotesList,
+            useSuppressNotesList = state != null,
+            suppressNotesList = state?.suppressNotesList,
+            onFocusChanged = { focussed ->
+                setFocussedEntry(NoteEntry.BOARD, focussed)
+            },
         )
     }
 
     @Composable
     private fun ScratchRow() {
-        val state = viewModel.notesUIState.observeAsState()
+        val state by viewModel.notesUIState.observeAsState()
 
         BoardLabel(R.string.scratch_lab)
         BoardEdit(
-            value = state.value?.scratchValue ?: "",
+            value = state?.scratchValue ?: "",
             contentDescription = R.string.scratch_lab,
             onClick = {
                 // TODO: show keyboard for view!
                 viewModel.showKeyboard()
             },
             onLongClick = {
-                // TODO
-                // int id = getCurrentFocus(R.id.miniboard)
-                // if (id == R.id.notes_box) {
-                //     moveBoardEditTextToNotes(binding.scratchMiniboard)
-                // } else if (id == R.id.anagram_source) {
-                //     executeTransferResponseRequest(
-                //         TransferResponseRequest.SCRATCH_TO_ANAGRAM_SOURCE,
-                //         true
-                //     )
-                // } else if (id == R.id.anagram_solution) {
-                //     executeTransferResponseRequest(
-                //         TransferResponseRequest.SCRATCH_TO_ANAGRAM_SOL,
-                //         true
-                //     )
-                // } else {
-                //     if (isClueOnBoard()) {
-                //         executeTransferResponseRequest(
-                //             TransferResponseRequest.SCRATCH_TO_BOARD, true
-                //         )
-                //     }
-                // }
+                transferToFocussed(NoteEntry.SCRATCH, NoteEntry.BOARD)
             },
             postChange = { _, _, _, value ->
                 viewModel.setScratchValue(value)
             },
             longClickAccessibilityAction
                 = R.string.transfer_scratch_to_focussed_view,
+            onFocusChanged = { focussed ->
+                setFocussedEntry(NoteEntry.SCRATCH, focussed)
+            },
+            separatorsClue = state?.notesClue,
+            inferSeparators = state?.inferSeparators ?: false,
         )
     }
 
     @Composable
     private fun TextRow(modifier : Modifier) {
-        val state = viewModel.notesUIState.observeAsState()
-        val textValue = state.value?.textValue ?: ""
-        val hintStringID = if (state.value?.isPuzzleNotes ?: false)
+        val state by viewModel.notesUIState.observeAsState()
+        val textValue = state?.textValue ?: ""
+        val hintStringID = if (state?.isPuzzleNotes ?: false)
             R.string.general_puzzle_notes
         else
             R.string.general_clue_notes
@@ -218,9 +266,10 @@ class NotesActivity() : PuzzleActivityKt() {
         TextField(
             modifier = modifier.fillMaxWidth()
                 .padding(vertical = VERTICAL_BOARD_PADDING)
-                .onFocusChanged({
+                .onFocusChanged {
+                    setFocussedEntry(NoteEntry.TEXT, it.hasFocus)
                     viewModel.onFocusNativeView(it.hasFocus)
-                }),
+                },
             textStyle = textStyle,
             singleLine = false,
             minLines = 2,
@@ -232,8 +281,8 @@ class NotesActivity() : PuzzleActivityKt() {
 
     @Composable
     private fun FlagRow() {
-        val state = viewModel.notesUIState.observeAsState()
-        state.value?.let { stateValue ->
+        val state by viewModel.notesUIState.observeAsState()
+        state?.let { stateValue ->
             if (!stateValue.isPuzzleNotes) {
                 Row(
                     modifier = Modifier.fillMaxWidth()
@@ -276,47 +325,67 @@ class NotesActivity() : PuzzleActivityKt() {
 
     @Composable
     private fun AnagramSourceRow() {
-        //val state = viewModel.notesUIState.observeAsState()
+        val state by viewModel.notesUIState.observeAsState()
+        val acceptedPredictionEvent
+            by viewModel.acceptedPredictionEvent.collectAsStateWithLifecycle()
+
+        var selectionPosition : Int? = null
+        if (acceptedPredictionEvent) {
+            selectionPosition = state?.let { it.boxesLength - 1 }
+            viewModel.clearAcceptedPredictionEvent()
+        }
 
         BoardLabel(R.string.anagram_source_lab)
         BoardEdit(
-            value = "",
+            value = state?.anagramSourceValue ?: "",
+            shadowValue = state?.anagramSourcePredictionValue,
             contentDescription = R.string.anagram_source_lab,
             onClick = {
                 // TODO: show keyboard for view!
                 viewModel.showKeyboard()
             },
-            onLongClick = {
-                // TODO
+            onLongClick = viewModel::shuffleAnagramSource,
+            filter = { oldChar, newChar, _ ->
+                viewModel.filterAnagramSource(oldChar, newChar)
             },
-            postChange = { _, _, _, _ ->
-                // TODO
-            },
+            postChange = viewModel::updateAnagramSource,
             longClickAccessibilityAction
                 = R.string.shuffle_anagram_source,
+            onFocusChanged = { focussed ->
+                setFocussedEntry(NoteEntry.ANAGRAM_SOURCE, focussed)
+            },
+            selectionPosition = selectionPosition,
         )
     }
 
     @Composable
     private fun AnagramSolutionRow() {
-        //val state = viewModel.notesUIState.observeAsState()
+        val state by viewModel.notesUIState.observeAsState()
 
         BoardLabel(R.string.anagram_solution_lab)
         BoardEdit(
-            value = "",
+            value = state?.anagramSolutionValue ?: "",
             contentDescription = R.string.anagram_source_lab,
             onClick = {
                 // TODO: show keyboard for view!
                 viewModel.showKeyboard()
             },
             onLongClick = {
-                // TODO
+                transferToFocussed(NoteEntry.ANAGRAM_SOLUTION, NoteEntry.BOARD)
             },
-            postChange = { _, _, _, _ ->
-                // TODO
+            filter = { _, newChar, _ ->
+                viewModel.filterAnagramSolution(newChar)
+            },
+            postChange = { pos, oldChar, _, newValue ->
+                viewModel.updateAnagramSolution(pos, oldChar, newValue)
             },
             longClickAccessibilityAction
                 = R.string.transfer_anagram_solution_to_focussed_view,
+            onFocusChanged = { focussed ->
+                setFocussedEntry(NoteEntry.ANAGRAM_SOLUTION, focussed)
+            },
+            separatorsClue = state?.notesClue,
+            inferSeparators = state?.inferSeparators ?: false,
         )
     }
 
@@ -326,8 +395,25 @@ class NotesActivity() : PuzzleActivityKt() {
     }
 
     @Composable
+    private fun TransferConfirmationDialog() {
+        val state by viewModel.notesUIState.observeAsState()
+
+        if (state?.confirmTransferRequest != null) {
+            OKCancelDialog(
+                title = R.string.copy_conflict,
+                summary = R.string.transfer_overwrite_warning,
+                onOK = { viewModel.confirmTransferRequest(true) },
+                onCancel = { viewModel.confirmTransferRequest(false) },
+            )
+        }
+    }
+
+    @Composable
     private fun OverflowMenu() {
         val state by viewModel.menuState.observeAsState()
+        val uiState by viewModel.notesUIState.observeAsState()
+
+        val isPuzzleNotes = uiState?.isPuzzleNotes ?: false
 
         IconButton(onClick = { viewModel.expandMenu(SubMenu.MAIN) }) {
             Icon(
@@ -342,11 +428,16 @@ class NotesActivity() : PuzzleActivityKt() {
         ) {
             MenuClueFlagToggle()
             MenuCellFlagToggle()
-            MenuSpecialEntry()
+            if (focussedEntry == NoteEntry.BOARD)
+                MenuSpecialEntry()
             MenuShowErrors()
             MenuReveal()
             MenuExternalTools()
-            MenuEditClue()
+            if (!isPuzzleNotes) {
+                MenuEditClue() {
+                    viewModel.editClue(viewModel.notesClueID)
+                }
+            }
             MenuPuzzleInfo()
             MenuSupportPuzzleSource()
             MenuShare()
@@ -356,7 +447,12 @@ class NotesActivity() : PuzzleActivityKt() {
         MenuNotesSub()
         MenuShowErrorsSub()
         MenuRevealSub()
-        MenuExternalToolsSub()
+        MenuExternalToolsSub(
+            onCallExternalDictionary = this::callExternalDictionary,
+            onCallCrosswordSolver = this::callCrosswordSolver,
+            showAnagramSolver = true,
+            onCallAnagramSolver = viewModel::callAnagramSolver
+        )
         MenuShareSub()
     }
 
@@ -392,6 +488,11 @@ class NotesActivity() : PuzzleActivityKt() {
      * @param delete see BoardEditFilter
      * @param filter see BoardEditFilter
      * @param postChange see BoardEditFilter with extra full value arg
+     * @param onFocusChanged call back for gain/lose focus
+     * @param shadowValue the shadow value to use
+     * @param separatorsClue clue to copy separators from or null
+     * @param inferSeparators whether to infer separators from clue
+     * @param selectionPosition if non-null and in range, select this cel
      */
     @Composable
     protected fun BoardEdit(
@@ -400,13 +501,16 @@ class NotesActivity() : PuzzleActivityKt() {
         onClick : () -> Unit,
         onLongClick : () -> Unit,
         longClickAccessibilityAction : Int,
-        delete : ((Char, Int) -> Boolean)? = null,
-        filter : ((Char, Char, Int) -> Char)? = null,
-        postChange : ((Int, Char, Boolean, String) -> Unit)? = null,
-        //incognitoMode : Boolean = false,
-        //ignoreScratchMode : Boolean = false,
+        delete : (Char, Int) -> Boolean = { _, _ -> true },
+        filter : (Char, Char, Int) -> Char = { _, newChar, _ -> newChar },
+        postChange : (Int, Char, Boolean, String) -> Unit = { _, _, _, _ -> },
+        onFocusChanged : (Boolean) -> Unit = { },
+        shadowValue : String? = "",
+        separatorsClue : Clue? = null,
+        inferSeparators : Boolean = false,
+        selectionPosition : Int? = null,
     ) {
-        val state = viewModel.notesUIState.observeAsState()
+        val state by viewModel.notesUIState.observeAsState()
 
         AndroidView(
             modifier = Modifier.fillMaxWidth()
@@ -433,10 +537,7 @@ class NotesActivity() : PuzzleActivityKt() {
                             oldChar : Char,
                             pos : Int,
                         ) : Boolean {
-                            if (delete == null)
-                                return true
-                            else
-                                return delete(oldChar, pos)
+                            return delete(oldChar, pos)
                         }
 
                         override fun filter(
@@ -444,10 +545,7 @@ class NotesActivity() : PuzzleActivityKt() {
                             newChar : Char,
                             pos : Int,
                         ) : Char {
-                            if (filter == null)
-                                return newChar
-                            else
-                                return filter(oldChar, newChar, pos)
+                            return filter(oldChar, newChar, pos)
                         }
 
                         override fun postChange(
@@ -455,14 +553,12 @@ class NotesActivity() : PuzzleActivityKt() {
                             oldChar : Char,
                             isDelete : Boolean,
                         ) {
-                            if (postChange != null) {
-                                postChange(
-                                    pos,
-                                    oldChar,
-                                    isDelete,
-                                    view.toString(),
-                                )
-                            }
+                            postChange(
+                                pos,
+                                oldChar,
+                                isDelete,
+                                view.toString(),
+                            )
                         }
                     })
                 }
@@ -475,14 +571,20 @@ class NotesActivity() : PuzzleActivityKt() {
                 view.setOnFocusChangeListener({ _, gainFocus ->
                     if (gainFocus)
                         inputConnectionMediator.registerReceiver(view)
+                    onFocusChanged(gainFocus)
                 })
 
                 view
             },
             update = { view ->
                 view.apply {
-                    setLength(state.value?.boxesLength ?: 0)
+                    setLength(state?.boxesLength ?: 0)
                     setFromString(value)
+                    setShadow(shadowValue)
+                    if (separatorsClue != null)
+                        setSeparatorsFromClue(separatorsClue, inferSeparators)
+                    if (selectionPosition != null)
+                        setSelectedCol(selectionPosition)
                 }
             },
         )
@@ -500,5 +602,41 @@ class NotesActivity() : PuzzleActivityKt() {
             return null
 
         return ClueID(listName, index)
+    }
+
+    /**
+     * Call when focus on entry items changes
+     *
+     * Keeps track of which entry if any has focus
+     */
+    private fun setFocussedEntry(entry : NoteEntry, focussed : Boolean) {
+        if (focussed)
+            focussedEntry = entry
+        else if (focussedEntry == entry)
+            focussedEntry = null
+    }
+
+    /**
+     * Transfer source to focussed view
+     *
+     * Use default if focussed entry is null or the same as source
+     */
+    private fun transferToFocussed(
+        source : NoteEntry,
+        default : NoteEntry? = null
+    ) {
+        val target = if (focussedEntry == null || focussedEntry == source)
+            default
+        else
+            focussedEntry
+        target?.let { viewModel.transferEntries(source, it) }
+    }
+
+    private fun callExternalDictionary() {
+        viewModel.callExternalDictionary(focussedEntry ?: defaultEntry)
+    }
+
+    private fun callCrosswordSolver() {
+        viewModel.callCrosswordSolver(focussedEntry ?: defaultEntry)
     }
 }

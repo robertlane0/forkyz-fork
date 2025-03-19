@@ -19,9 +19,9 @@ import app.crossword.yourealwaysbe.forkyz.util.getStopOnEndStrategy
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 import app.crossword.yourealwaysbe.puz.Clue
 import app.crossword.yourealwaysbe.puz.ClueID
-import app.crossword.yourealwaysbe.puz.Position
 import app.crossword.yourealwaysbe.puz.MovementStrategy
 import app.crossword.yourealwaysbe.puz.Playboard.Word
+import app.crossword.yourealwaysbe.puz.Position
 
 /**
  * The state of the clue tabs widget
@@ -167,7 +167,6 @@ class ClueListActivityViewModel @Inject constructor(
             }
         }
     }
-
 
     fun moveLeft() {
         getBoard()?.let { board ->

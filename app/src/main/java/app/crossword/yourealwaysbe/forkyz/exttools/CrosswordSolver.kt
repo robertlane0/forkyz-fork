@@ -8,6 +8,8 @@ import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.Zone
 
+val CROSSWORD_SOLVER_BLANK = '.'
+
 private val CROSSWORD_SOLVER = "org.billthefarmer.crossword"
 private val CROSSWORD_SOLVER_MAIN = "org.billthefarmer.crossword.Main"
 private val CROSSWORD_SOLVER_ANAGRAM = "org.billthefarmer.crossword.Anagram"

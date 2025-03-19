@@ -218,9 +218,6 @@ public abstract class PuzzleActivity
         } else if (id == R.id.puzzle_menu_ask_chat_gpt) {
             viewModel.requestHelpForCurrentClue();
             return true;
-        } else if (id == R.id.clue_list_menu_edit_clue) {
-            editClue();
-            return true;
         } else if (id == R.id.puzzle_menu_crossword_solver) {
             callCrosswordSolver();
             return true;
@@ -308,7 +305,6 @@ public abstract class PuzzleActivity
         viewModel.stopTimer();
         viewModel.saveBoard();
 
-        viewModel.unlistenBoard();
         // remove when everyone has a view model
         Playboard board = getBoard();
         if (board != null)
@@ -341,7 +337,6 @@ public abstract class PuzzleActivity
         if (updatingTimer)
             handler.postDelayed(updateTimeTask, 1000);
 
-        viewModel.listenBoard();
         // remove when everyone has a view model
         board.addListener(this);
 
@@ -547,18 +542,6 @@ public abstract class PuzzleActivity
     protected boolean isAnnounceClueEquals() {
         VoiceState state = viewModel.getVoiceState().getValue();
         return state != null && state.getEqualsAnnounceClue();
-    }
-
-    // remove when all activities talk to view model
-    // notes activity currently overrides this for its own behaviour
-    // so menu should call this not go to view model directly
-    protected void editClue() {
-        viewModel.editClue();
-    }
-
-    // remove when all activities talk to view model
-    protected void editClue(ClueID cid) {
-        viewModel.editClue(cid);
     }
 
     private boolean isAccessibilityServiceRunning() {
