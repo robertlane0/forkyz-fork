@@ -66,10 +66,32 @@ public class GuardianJSONIO extends AbstractJSONIO {
     public static Puzzle readFromHTML(InputStream is) {
         try {
             Document doc = Jsoup.parse(is, null, "");
-            String cwJson = doc.select(".js-crossword")
-                               .attr("data-crossword-data");
-            if (!cwJson.isEmpty())
-                return readPuzzleFromJSON(JSONParser.parse(cwJson));
+            JSONObject cwJson = null;
+            JSONException err = null;
+
+            String cwJsonStr = doc
+                .select("[name=CrosswordComponent]")
+                .attr("props");
+            if (!cwJsonStr.isEmpty()) {
+                try {
+                    cwJson = JSONParser.parse(cwJsonStr).optJSONObject("data");
+                } catch (JSONException e) {
+                    err = e;
+                }
+            }
+
+            // try old format if couldn't find above
+            if (cwJson == null) {
+                cwJsonStr = doc.select(".js-crossword")
+                    .attr("data-crossword-data");
+                if (!cwJsonStr.isEmpty())
+                    cwJson = JSONParser.parse(cwJsonStr);
+            }
+
+            if (cwJson != null)
+                return readPuzzleFromJSON(cwJson);
+            else if (err != null)
+                throw err;
         } catch (IOException | JSONException e) {
             // pass through
         }
