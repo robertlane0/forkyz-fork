@@ -137,6 +137,18 @@ public class LollipopUtil implements AndroidVersionUtils {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
+    public int getApplicationUID(Context context) {
+        try {
+            PackageInfo info = context.getPackageManager()
+                .getPackageInfo(context.getPackageName(), 0);
+            return info.applicationInfo.uid;
+        } catch (NameNotFoundException e) {
+            return -1;
+        }
+    }
+
+    @Override
     public String getFilterClueToAlphabeticRegex() {
         return "&[^;]*;|<[^>]*>|[^\\p{Alphabetic}]";
     }

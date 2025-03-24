@@ -254,6 +254,16 @@ class SettingsAction(
     val onClick : () -> Unit,
 ) : SettingsNamedItem(page, title, summary)
 
+/**
+ * Call Logcat activity
+ *
+ * Should be made into a more general class if more activities come along.
+ */
+class SettingsLogcat(
+    page : SettingsPage,
+    title : Int,
+) : SettingsNamedItem(page, title, null)
+
 enum class RequestedURI {
     NONE, SAF, SETTINGS_EXPORT, SETTINGS_IMPORT
 }
@@ -442,6 +452,10 @@ class SettingsActivityViewModel @Inject constructor(
             SettingsPage.ROOT,
             R.string.license,
             "license.html",
+        ),
+        SettingsLogcat(
+            SettingsPage.ROOT,
+            R.string.logcat,
         ),
 
         // Sources

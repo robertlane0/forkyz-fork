@@ -339,6 +339,19 @@ class SettingsActivity : ForkyzActivityKt() {
                             onClick = item.onClick,
                         )
                     }
+                    is SettingsLogcat -> {
+                        SettingsClickable(
+                            modifier = modifier,
+                            title = title,
+                            summary = summary,
+                            errorMsg = errorMsg?.value,
+                            onClick = {
+                                startActivity(
+                                    Intent(this, LogcatActivity::class.java)
+                                )
+                            },
+                        )
+                    }
                     else -> { } /* ignore */
                 }
             }

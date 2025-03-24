@@ -300,7 +300,7 @@ public abstract class PuzzleActivity
 
     @Override
     protected void onPause() {
-        super.onPause();
+        System.out.println("FORKYZ: onPause " + this);
 
         viewModel.stopTimer();
         viewModel.saveBoard();
@@ -318,10 +318,13 @@ public abstract class PuzzleActivity
 
         // start again on resume if updating
         handler.removeCallbacks(updateTimeTask);
+
+        super.onPause();
     }
 
     @Override
     protected void onResume() {
+        System.out.println("FORKYZ: onResume " + this);
         super.onResume();
 
         Playboard board = getBoard();

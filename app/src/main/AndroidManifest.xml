@@ -148,6 +148,12 @@
             android:theme="@style/Theme.Forkyz.Floating"
             android:exported="false"
         />
+        <activity
+            android:name="app.crossword.yourealwaysbe.forkyz.LogcatActivity"
+            android:label="@string/logcat"
+            android:theme="@style/Theme.Forkyz"
+            android:exported="false"
+        />
         <service
             android:name="app.crossword.yourealwaysbe.forkyz.util.PuzzleSaveService"
             android:foregroundServiceType="shortService"

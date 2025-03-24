@@ -59,10 +59,25 @@ public class TiramisuUtil extends RUtil {
     public String getApplicationVersionName(Context context) {
         try {
             PackageInfo info = context.getPackageManager()
-                .getPackageInfo(context.getPackageName(), PackageInfoFlags.of(0));
+                .getPackageInfo(
+                    context.getPackageName(), PackageInfoFlags.of(0)
+                );
             return info.versionName;
         } catch (NameNotFoundException e) {
             return null;
+        }
+    }
+
+    @Override
+    public int getApplicationUID(Context context) {
+        try {
+            PackageInfo info = context.getPackageManager()
+                .getPackageInfo(
+                    context.getPackageName(), PackageInfoFlags.of(0)
+                );
+            return info.applicationInfo.uid;
+        } catch (NameNotFoundException e) {
+            return -1;
         }
     }
 }

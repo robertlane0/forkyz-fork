@@ -11,14 +11,15 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.CoroutineScope
 
-import androidx.annotation.MainThread
-import androidx.core.app.ServiceCompat
-import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat
+import android.app.ForegroundServiceStartNotAllowedException
+import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.app.Service
 import android.os.IBinder
+import androidx.annotation.MainThread
+import androidx.core.app.NotificationCompat
+import androidx.core.app.ServiceCompat
+import androidx.core.content.ContextCompat
 
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -132,10 +133,18 @@ public class CurrentPuzzleHolder @Inject constructor(
      */
     @MainThread
     fun saveBoard() {
-        ContextCompat.startForegroundService(
-            appContext,
-            Intent(appContext, PuzzleSaveService::class.java),
-        )
+        try {
+            ContextCompat.startForegroundService(
+                appContext,
+                Intent(appContext, PuzzleSaveService::class.java),
+            )
+        } catch (e : ForegroundServiceStartNotAllowedException) {
+            LOG.severe("Cannot start save service because app is in the background. Saving on thread instead:" + e)
+            // try direct save anyway, even though threads may be killed before
+            // they can run
+            // saveBoardService()
+            throw e; // TODO: throw for now to see if onpause changes fixed it
+        }
     }
 
     /**
@@ -178,7 +187,7 @@ public class CurrentPuzzleHolder @Inject constructor(
      *
      * App should use saveBoard()
      */
-    fun saveBoardService(cb : () -> Unit) {
+    fun saveBoardService(cb : () -> Unit = { }) {
         val puz = board?.getPuzzle()
         if (puz == null) {
             LOG.severe("No puzzle associated to the board to save.")

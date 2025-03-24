@@ -755,4 +755,11 @@
 
     <!-- HTML activity -->
     <string name="asset_not_found">Error: could not find page to display. This is a programming error and can only be fixed by reporting it to the developers.</string>
+
+    <!-- Logcat activity -->
+    <string name="loading_logcat">Loading Logcat…</string>
+    <string name="could_not_load_logcat">Could not load logcat: %1$s.</string>
+    <string name="jump_to_end">Jump to End</string>
+    <string name="logcat">Logcat</string>
+    <string name="share_logcat">Share Logcat</string>
 </resources>

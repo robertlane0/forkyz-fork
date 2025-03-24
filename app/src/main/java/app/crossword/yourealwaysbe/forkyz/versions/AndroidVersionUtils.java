@@ -117,6 +117,11 @@ public interface AndroidVersionUtils {
     String getApplicationVersionName(Context context);
 
     /**
+     * Get the current application uid or -1
+     */
+    int getApplicationUID(Context context);
+
+    /**
      * A regex for filtering all non alphabetic chars and tags from clue text
      *
      * (Before Android 10 "Alphabetic", since "IsAlphabetic")
