@@ -4,7 +4,6 @@ package app.crossword.yourealwaysbe.forkyz
 //import kotlinx.coroutines.flow.StateFlow
 import java.io.IOException
 import java.util.Locale
-import java.util.logging.Logger
 import java.util.Deque
 import javax.inject.Inject
 import kotlin.text.Regex
@@ -170,10 +169,6 @@ open class PuzzleActivityViewModel @Inject constructor(
     val fileHandlerProvider : FileHandlerProvider,
     val utils : AndroidVersionUtils,
 ) : AndroidViewModel(application), PlayboardListener {
-    private val LOG = Logger.getLogger(
-        PuzzleActivityViewModel::class.toString()
-    )
-
     val announceEvent = SingleLiveEvent<AnnounceData?>()
     val sendToastEvent = SingleLiveEvent<SendToast?>()
     val externalToolEvent = SingleLiveEvent<ExternalToolData?>()

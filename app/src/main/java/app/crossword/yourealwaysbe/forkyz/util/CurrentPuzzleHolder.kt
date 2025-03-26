@@ -3,7 +3,6 @@ package app.crossword.yourealwaysbe.forkyz.util
 
 import java.io.IOException
 import java.util.function.Consumer
-import java.util.logging.Logger
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
@@ -11,11 +10,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.CoroutineScope
 
-import android.app.ForegroundServiceStartNotAllowedException
 import android.app.Service
+import android.app.ForegroundServiceStartNotAllowedException
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
+import android.util.Log
 import androidx.annotation.MainThread
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
@@ -45,9 +45,7 @@ public class CurrentPuzzleHolder @Inject constructor(
     val settings : ForkyzSettings,
     val fileHandlerProvider : FileHandlerProvider,
 ) {
-    private val LOG = Logger.getLogger(
-        CurrentPuzzleHolder::class.toString()
-    )
+    private val TAG = "ForkyzCurrentPuzzleHolder";
 
     var board : Playboard? = null
         private set
@@ -129,21 +127,28 @@ public class CurrentPuzzleHolder @Inject constructor(
     /**
      * Save current board
      *
-     * Delegates to io thread
+     * Delegates to io thread or uses a foreground service if app in
+     * foreground. Foreground service is less likely to be killed than a
+     * plain thread.
      */
     @MainThread
     fun saveBoard() {
+        // If calling from onPause the app is usually in the foreground,
+        // except if onPause is being called during the wakeup cycle, in
+        // which case you get paused without ever being foregrounded, so you
+        // get an exception.
         try {
+            Log.i(TAG, "Saving board on foreground")
             ContextCompat.startForegroundService(
                 appContext,
                 Intent(appContext, PuzzleSaveService::class.java),
             )
         } catch (e : ForegroundServiceStartNotAllowedException) {
-            LOG.severe("Cannot start save service because app is in the background. Saving on thread instead:" + e)
-            // try direct save anyway, even though threads may be killed before
-            // they can run
-            // saveBoardService()
-            throw e; // TODO: throw for now to see if onpause changes fixed it
+            Log.i(
+                TAG,
+                "Save on foreground not allowed, save in background"
+            )
+            saveBoardService()
         }
     }
 
@@ -167,7 +172,8 @@ public class CurrentPuzzleHolder @Inject constructor(
                         try {
                             meta = fileHandler.loadPuzMetaFile(puzHandle)
                         } catch (e : IOException) {
-                            LOG.severe(
+                            Log.e(
+                                TAG,
                                 "Could not get current puzzle meta: " + e,
                             )
                         } finally {
@@ -190,7 +196,7 @@ public class CurrentPuzzleHolder @Inject constructor(
     fun saveBoardService(cb : () -> Unit = { }) {
         val puz = board?.getPuzzle()
         if (puz == null) {
-            LOG.severe("No puzzle associated to the board to save.")
+            Log.e(TAG, "No puzzle associated to the board to save.")
             cb()
         }
 
@@ -202,7 +208,7 @@ public class CurrentPuzzleHolder @Inject constructor(
                         try {
                             fileHandler.save(puz, puzHandle)
                         } catch (e : IOException) {
-                            LOG.severe("Error saving puzzle.")
+                            Log.e(TAG, "Error saving puzzle.")
                             e.printStackTrace()
                         } finally {
                             ioLock.unlock()

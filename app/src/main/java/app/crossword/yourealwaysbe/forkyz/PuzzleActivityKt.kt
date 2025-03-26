@@ -4,7 +4,6 @@ package app.crossword.yourealwaysbe.forkyz
 import java.io.IOException
 import java.util.Objects
 import java.util.function.Consumer
-import java.util.logging.Logger
 import java.util.regex.Pattern
 import javax.inject.Inject
 import kotlinx.coroutines.launch
@@ -22,6 +21,7 @@ import android.os.Handler
 import android.os.Looper
 import android.speech.RecognizerIntent
 import android.speech.tts.TextToSpeech
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -120,7 +120,7 @@ import app.crossword.yourealwaysbe.puz.Zone
 
 @AndroidEntryPoint
 abstract class PuzzleActivityKt() : ForkyzActivityKt() {
-    private val LOG = Logger.getLogger(PuzzleActivity::class.toString())
+    private val TAG = "ForkyzPuzzleActivity"
 
     protected val BASE_MENU_MODIFIER
         = Modifier.defaultMinSize(minWidth = 200.dp)
@@ -199,7 +199,7 @@ abstract class PuzzleActivityKt() : ForkyzActivityKt() {
         super.onResume()
 
         if (!viewModel.canResume) {
-            LOG.info("No puzzle board, puzzle activity finishing.")
+            Log.i(TAG, "No puzzle board, puzzle activity finishing.")
             finish()
             return
         }

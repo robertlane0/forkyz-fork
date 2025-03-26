@@ -1,7 +1,6 @@
 package app.crossword.yourealwaysbe.forkyz;
 
 import java.util.function.Consumer;
-import java.util.logging.Logger;
 
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -12,6 +11,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -50,7 +50,7 @@ public abstract class PuzzleActivity
         extends ForkyzActivity
         implements Playboard.PlayboardListener {
 
-    private static final Logger LOG = Logger.getLogger("app.crossword.yourealwaysbe");
+    private static final String TAG = "ForkyzPuzzleActivity";
 
     private VoiceButtonsBinding voiceBinding = null;
     private Handler handler = new Handler(Looper.getMainLooper());
@@ -300,8 +300,6 @@ public abstract class PuzzleActivity
 
     @Override
     protected void onPause() {
-        System.out.println("FORKYZ: onPause " + this);
-
         viewModel.stopTimer();
         viewModel.saveBoard();
 
@@ -324,13 +322,12 @@ public abstract class PuzzleActivity
 
     @Override
     protected void onResume() {
-        System.out.println("FORKYZ: onResume " + this);
         super.onResume();
 
         Playboard board = getBoard();
         Puzzle puz = getPuzzle();
         if (board == null || puz == null) {
-            LOG.info("No puzzle board, puzzle activity finishing.");
+            Log.i(TAG, "No puzzle board, puzzle activity finishing.");
             finish();
             return;
         }

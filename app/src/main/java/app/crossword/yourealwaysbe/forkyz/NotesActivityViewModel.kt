@@ -307,7 +307,6 @@ class NotesActivityViewModel @Inject constructor(
     }
 
     fun clearAcceptedPredictionEvent() {
-                println("FORKYZ: clear accepted event")
         _acceptedPredictionEvent.value = false
     }
 
