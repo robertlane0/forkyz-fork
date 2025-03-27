@@ -54,6 +54,10 @@
         android:name="android.permission.FOREGROUND_SERVICE"
         android:description="@string/foreground_service_desc"
     />
+    <uses-permission
+        android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"
+        android:description="@string/foreground_service_data_sync_desc"
+    />
 
     <uses-feature
         android:name="android.hardware.touchscreen"
@@ -157,6 +161,11 @@
         <service
             android:name="app.crossword.yourealwaysbe.forkyz.util.PuzzleSaveService"
             android:foregroundServiceType="shortService"
+            android:exported="false"
+        />
+        <service
+            android:name="app.crossword.yourealwaysbe.forkyz.util.PuzzleExportService"
+            android:foregroundServiceType="dataSync"
             android:exported="false"
         />
         <provider

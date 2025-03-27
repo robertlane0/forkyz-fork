@@ -11,4 +11,9 @@ public class UpsideDownCakeUtil extends TiramisuUtil {
     public int foregroundServiceTypeShortService() {
         return ServiceInfo.FOREGROUND_SERVICE_TYPE_SHORT_SERVICE;
     }
+
+    @Override
+    public int foregroundServiceTypeDataSync() {
+        return ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC;
+    }
 }

@@ -320,10 +320,11 @@ public class FileHandlerSAF extends FileHandler {
     }
 
     @Override
-    protected FileHandle createFileHandle(
+    FileHandle createFileHandle(
         DirHandle dir, String fileName, String mimeType
     ) {
         try {
+            mimeType = (mimeType == null) ? MIME_TYPE_GENERIC : mimeType;
             Uri uri = DocumentsContract.createDocument(
                 getContentResolver(), dir.getUri(), mimeType, fileName
             );
@@ -341,6 +342,16 @@ public class FileHandlerSAF extends FileHandler {
     }
 
     /**
+     * Convenience for same with keeping permission
+     */
+    public static FileHandlerSAF initialiseSAFForRoot(
+        Context applicationContext,
+        Uri rootUri
+    ) {
+        return initialiseSAFForRoot(applicationContext, rootUri, true);
+    }
+
+    /**
      * Initialise a crosswords directory in the give rootUri
      *
      * This will search the contents of rootUri to see if directories
@@ -353,10 +364,14 @@ public class FileHandlerSAF extends FileHandler {
      *
      * @param applicationContext the application context
      * @param rootUri the root permitted folder for storage
+     * @param keepPermission whether to keep access permission to
+     * rootUri
      * @return an initiated file handler if successful, else null
      */
     public static FileHandlerSAF initialiseSAFForRoot(
-        Context applicationContext, Uri rootUri
+        Context applicationContext,
+        Uri rootUri,
+        boolean keepPermission
     ) {
         try {
             ContentResolver resolver = applicationContext.getContentResolver();
@@ -392,12 +407,14 @@ public class FileHandlerSAF extends FileHandler {
                 && toImportDoneFolderUri != null
                 && toImportFailedFolderUri != null
             ) {
-                // persist permissions
-                int takeFlags = (
-                    Intent.FLAG_GRANT_READ_URI_PERMISSION
-                        | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                );
-                resolver.takePersistableUriPermission(rootUri, takeFlags);
+                if (keepPermission) {
+                    // persist permissions
+                    int takeFlags = (
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION
+                            | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                    );
+                    resolver.takePersistableUriPermission(rootUri, takeFlags);
+                }
 
                 return new FileHandlerSAF(
                     applicationContext,

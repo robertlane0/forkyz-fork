@@ -137,7 +137,7 @@ public abstract class FileHandlerJavaFile extends FileHandler {
     }
 
     @Override
-    protected FileHandle createFileHandle(
+    FileHandle createFileHandle(
         DirHandle dir, String fileName, String mimeType
     ) {
         File file = new File(dir.getFile(), fileName);

@@ -121,10 +121,12 @@ public abstract class FileHandler {
      * save(Puzzle, DirHandle, String) that will use the preferred
      * backend file format for puzzles.
      *
+     * Default visibility for StorageExporter to use.
+     *
      * Return null if could not be created. E.g. if the file already
      * exists.
      */
-    protected abstract FileHandle createFileHandle(
+    abstract FileHandle createFileHandle(
         DirHandle dir, String fileName, String mimeType
     );
 

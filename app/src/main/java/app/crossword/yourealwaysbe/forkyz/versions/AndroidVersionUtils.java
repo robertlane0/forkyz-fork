@@ -132,4 +132,9 @@ public interface AndroidVersionUtils {
      * Constant ServiceInfo.FOREGROUND_SERVICE_TYPE_SHORT_SERVICE
      */
     public int foregroundServiceTypeShortService();
+
+    /**
+     * Constant ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+     */
+    public int foregroundServiceTypeDataSync();
 }

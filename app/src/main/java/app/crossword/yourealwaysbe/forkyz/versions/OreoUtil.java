@@ -13,6 +13,7 @@ import android.util.Log;
 
 import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
 import app.crossword.yourealwaysbe.forkyz.R;
+import app.crossword.yourealwaysbe.forkyz.util.PuzzleExportService;
 import app.crossword.yourealwaysbe.forkyz.util.PuzzleSaveService;
 
 @TargetApi(Build.VERSION_CODES.O)
@@ -43,6 +44,17 @@ public class OreoUtil extends NougatUtil {
             = context.getString(R.string.save_notification_channel_desc);
         channel = new NotificationChannel(
             PuzzleSaveService.NOTIFICATION_CHANNEL_ID,
+            name,
+            NotificationManager.IMPORTANCE_LOW
+        );
+        channel.setDescription(description);
+        notificationManager.createNotificationChannel(channel);
+
+        name = context.getString(R.string.export_notification_channel_name);
+        description
+            = context.getString(R.string.export_notification_channel_desc);
+        channel = new NotificationChannel(
+            PuzzleExportService.NOTIFICATION_CHANNEL_ID,
             name,
             NotificationManager.IMPORTANCE_LOW
         );

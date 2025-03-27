@@ -25,6 +25,9 @@
     <string name="save_notification_channel_name">Saving Puzzle</string>
     <string name="save_notification_channel_desc">Notification when puzzle is being saved.</string>
     <string name="saving_puzzle">Saving puzzle.</string>
+    <string name="export_notification_channel_name">Export Puzzles</string>
+    <string name="export_notification_channel_desc">Notification when puzzles are being exported.</string>
+    <string name="exporting_puzzles">Exporting Puzzles</string>
 
     <!-- downloading -->
     <string name="download">Download</string>
@@ -55,6 +58,7 @@
     <string name="wake_lock_desc">Used only for automatic download on older Android version.</string>
     <string name="notification_permission_desc">Used for puzzle download notifications (when not disabled in settings).</string>
     <string name="foreground_service_desc">Used to enable reliable saving of puzzles.</string>
+    <string name="foreground_service_data_sync_desc">Used for exporting puzzles to an external directory.</string>
 
     <!-- Browse -->
     <string name="delete">Delete</string>
@@ -368,8 +372,8 @@
     <string name="thirty_seconds">30 seconds</string>
 
     <!-- preferences export/import -->
-    <string name="preferences_export_import">Export/Import Settings</string>
-    <string name="preferences_export_import_desc">Save/restore settings with an external file.</string>
+    <string name="preferences_export_import">Export/Import</string>
+    <string name="preferences_export_import_desc">Export puzzles or save/restore settings with an external file.</string>
     <string name="preferences_export">Export Settings</string>
     <string name="preferences_export_desc">Save settings to an external file.</string>
     <string name="preferences_import">Import Settings</string>
@@ -378,6 +382,10 @@
     <string name="preferences_import_failed">Settings import failed.</string>
     <string name="preferences_exported">Settings exported.</string>
     <string name="preferences_export_failed">Settings export failed.</string>
+    <string name="puzzles_export">Export Puzzles</string>
+    <string name="puzzles_export_desc">Export puzzles to an external directory.</string>
+    <string name="puzzles_exported">Puzzles exported.</string>
+    <string name="puzzles_export_failed">Puzzles export failed.</string>
 
     <!-- preferences external -->
     <string name="external_dictionary">External Dictionary</string>

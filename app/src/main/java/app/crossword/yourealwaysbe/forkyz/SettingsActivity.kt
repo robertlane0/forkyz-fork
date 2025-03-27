@@ -4,9 +4,11 @@ package app.crossword.yourealwaysbe.forkyz
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 
+import android.app.ForegroundServiceStartNotAllowedException
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
@@ -60,6 +62,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -70,9 +73,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import app.crossword.yourealwaysbe.forkyz.theme.ForkyzTopAppBar
 import app.crossword.yourealwaysbe.forkyz.util.ExitActivity
 import app.crossword.yourealwaysbe.forkyz.view.OKCancelDialog
+import app.crossword.yourealwaysbe.forkyz.util.PuzzleExportService
 
 @AndroidEntryPoint
 class SettingsActivity : ForkyzActivityKt() {
+    private val TAG = "ForkyzSettingsActivity"
 
     private val SETTINGS_HORIZONTAL_PADDING = 20.dp
     private val SETTINGS_VERTICAL_PADDING = 14.dp
@@ -103,6 +108,30 @@ class SettingsActivity : ForkyzActivityKt() {
             viewModel.exportSettings(uri)
         }
     }
+    private val getExportPuzzlesURI
+        = registerForActivityResult(OpenDocumentTree()) {
+            uri : Uri? -> uri?.let {
+                try {
+                    Log.i(TAG, "Starting puzzle export")
+                    val intent = Intent(this, PuzzleExportService::class.java)
+                    intent.putExtra(
+                        PuzzleExportService.PUZZLE_EXPORT_URI,
+                        uri.toString()
+                    )
+                    ContextCompat.startForegroundService(this, intent)
+                } catch (e : ForegroundServiceStartNotAllowedException) {
+                    Log.i(
+                        TAG,
+                        "Could not start puzzle export service on foreground"
+                    )
+                    Toast.makeText(
+                       this,
+                       R.string.puzzles_export_failed,
+                       Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState : Bundle?) {
@@ -198,6 +227,12 @@ class SettingsActivity : ForkyzActivityKt() {
             RequestedURI.SETTINGS_IMPORT -> {
                 LaunchedEffect(needsURI) {
                     getImportSettingsURI.launch(SETTINGS_MIME_TYPE)
+                    viewModel.clearNeedsURI()
+                }
+            }
+            RequestedURI.PUZZLES_EXPORT -> {
+                LaunchedEffect(needsURI) {
+                    getExportPuzzlesURI.launch(null)
                     viewModel.clearNeedsURI()
                 }
             }
@@ -774,3 +809,4 @@ class SettingsActivity : ForkyzActivityKt() {
         ))
     }
 }
+

@@ -265,7 +265,7 @@ class SettingsLogcat(
 ) : SettingsNamedItem(page, title, null)
 
 enum class RequestedURI {
-    NONE, SAF, SETTINGS_EXPORT, SETTINGS_IMPORT
+    NONE, SAF, SETTINGS_EXPORT, SETTINGS_IMPORT, PUZZLES_EXPORT
 }
 
 /**
@@ -1575,6 +1575,12 @@ class SettingsActivityViewModel @Inject constructor(
             R.string.preferences_import_desc,
             this::startSettingsImport,
         ),
+        SettingsAction(
+            SettingsPage.EXPORT_IMPORT,
+            R.string.puzzles_export,
+            R.string.puzzles_export_desc,
+            this::startPuzzlesExport,
+        ),
     )
 
     private val rootState = settingsPageState(SettingsPage.ROOT, false)
@@ -1814,6 +1820,10 @@ class SettingsActivityViewModel @Inject constructor(
 
     private fun startSettingsImport() {
         raiseNeedsURI(RequestedURI.SETTINGS_IMPORT)
+    }
+
+    private fun startPuzzlesExport() {
+        raiseNeedsURI(RequestedURI.PUZZLES_EXPORT)
     }
 }
 

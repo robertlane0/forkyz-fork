@@ -53,4 +53,11 @@ public class FileHandle {
     }
 
     FileHandlerSAF.Meta getSAFMeta() { return safMeta; }
+
+    /**
+     * The mime type of the file if know else null
+     */
+    public String getMimeType() {
+        return (safMeta == null) ? null : safMeta.getMimeType();
+    }
 }

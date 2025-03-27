@@ -157,4 +157,9 @@ public class LollipopUtil implements AndroidVersionUtils {
     public int foregroundServiceTypeShortService() {
         return 0;
     }
+
+    @Override
+    public int foregroundServiceTypeDataSync() {
+        return 0;
+    }
 }
