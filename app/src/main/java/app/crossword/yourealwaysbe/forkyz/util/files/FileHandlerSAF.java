@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.logging.Logger;
 
 import android.annotation.TargetApi;
 import android.content.ContentResolver;
@@ -16,6 +15,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.DocumentsContract.Document;
 import android.provider.DocumentsContract;
+import android.util.Log;
 
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
@@ -25,8 +25,7 @@ import app.crossword.yourealwaysbe.puz.io.StreamUtils;
 
 @TargetApi(24)
 public class FileHandlerSAF extends FileHandler {
-    private static final Logger LOGGER
-        = Logger.getLogger(FileHandlerSAF.class.getCanonicalName());
+    private static final String TAG = "ForkyzFileHandlerSAF";
 
     private static final String ARCHIVE_NAME = "archive";
     private static final String TO_IMPORT_NAME = "to-import";
@@ -229,9 +228,10 @@ public class FileHandlerSAF extends FileHandler {
                 destDirHandle.getUri()
             );
         } catch (FileNotFoundException | IllegalArgumentException e) {
-            LOGGER.severe(
-                "Attempt to move " + fileHandle + " to " +
-                destDirHandle + " failed."
+            Log.e(
+                TAG,
+                "Attempt to move " + fileHandle + " to "
+                    + destDirHandle + " failed."
             );
             e.printStackTrace();
         } catch (IllegalStateException e) {
@@ -260,9 +260,10 @@ public class FileHandlerSAF extends FileHandler {
                 | IllegalStateException
                 | IOException e2
             ) {
-                LOGGER.severe(
-                    "Attempt to move " + fileHandle + " to " +
-                    destDirHandle + " failed."
+                Log.e(
+                    TAG,
+                    "Attempt to move " + fileHandle + " to "
+                       + destDirHandle + " failed."
                 );
                 e.printStackTrace();
             }
@@ -302,7 +303,7 @@ public class FileHandlerSAF extends FileHandler {
             return exists(resolver, crosswordsFolderUri)
                 && exists(resolver, archiveFolderUri);
         } catch (UnsupportedOperationException e) {
-            LOGGER.severe("Unsupported operation accessing SAF");
+            Log.e(TAG, "Unsupported operation accessing SAF");
             e.printStackTrace();
             return false;
         }
@@ -427,7 +428,7 @@ public class FileHandlerSAF extends FileHandler {
                 );
             }
         } catch (Exception e) {
-            LOGGER.severe("Unable to (re-)configure SAF directory.");
+            Log.e(TAG, "Unable to (re-)configure SAF directory.");
         }
 
         return null;
@@ -511,11 +512,12 @@ public class FileHandlerSAF extends FileHandler {
                     );
                 }
             } catch (SecurityException e) {
-                LOGGER.severe(
+                Log.e(
+                    TAG,
                     "Permission not granted to configured SAF directories."
                 );
             } catch (UnsupportedOperationException e) {
-                LOGGER.severe("Unsupported operation with SAF");
+                Log.e(TAG, "Unsupported operation with SAF");
                 e.printStackTrace();
             }
         }

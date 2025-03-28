@@ -5,6 +5,7 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
@@ -35,12 +36,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class Downloaders {
-    private static final Logger LOG
-        = Logger.getLogger("app.crossword.yourealwaysbe");
+    private static final String TAG = "ForkyzDownloaders";
     private static final int NUM_DOWNLOAD_THREADS = 3;
 
     private Context context;
@@ -112,7 +110,8 @@ public class Downloaders {
         for (Downloader d : downloaders) {
             LocalDate latestDate = d.getLatestDate(to);
             if (latestDate != null && !latestDate.isBefore(from)) {
-                LOG.info(
+                Log.i(
+                    TAG,
                     "Will try to download puzzle " + d + " @ " + latestDate
                 );
                 puzzlesToDownload.put(d, latestDate);
@@ -243,7 +242,7 @@ public class Downloaders {
         if (fileHandler == null)
             return result;
 
-        LOG.info("Downloading " + d.toString());
+        Log.i(TAG, "Downloading " + d.toString());
 
         try {
             String contentText = context.getString(
@@ -267,7 +266,7 @@ public class Downloaders {
                 }
             }
         } catch (Exception e) {
-            LOG.log(Level.WARNING, "Failed to download "+d.getName(), e);
+            Log.w(TAG, "Failed to download "+d.getName(), e);
         }
 
         if (isNotifyingIndividual()) {

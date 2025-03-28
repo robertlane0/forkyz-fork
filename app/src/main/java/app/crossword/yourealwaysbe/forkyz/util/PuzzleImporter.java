@@ -9,10 +9,10 @@ import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import android.content.Context;
 import android.net.Uri;
+import android.util.Log;
 
 import app.crossword.yourealwaysbe.forkyz.R;
 import app.crossword.yourealwaysbe.forkyz.net.GenericStreamScraper;
@@ -29,8 +29,7 @@ import app.crossword.yourealwaysbe.puz.io.StreamUtils;
  * Takes an arbitrary URI and tries to convert to a puzzle and import
  */
 public class PuzzleImporter {
-    private static final Logger LOGGER
-        = Logger.getLogger(PuzzleImporter.class.getCanonicalName());
+    private static final String TAG = "ForkyzPuzzleImporter";
 
     /** Import from a URI supported by resolver
      *
@@ -201,7 +200,7 @@ public class PuzzleImporter {
                 puz, AppPuzzleUtils.generateFileName(puz)
             );
         } catch (IOException e) {
-            LOGGER.severe("Failed to save imported puzzle: " + e);
+            Log.e(TAG, "Failed to save imported puzzle: " + e);
             return null;
         }
 

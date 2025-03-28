@@ -5,7 +5,6 @@ import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
-import java.util.logging.Logger;
 import javax.inject.Inject;
 
 import android.content.Context;
@@ -42,9 +41,6 @@ public class BoardEditText
         extends ScrollingImageView
         implements BoxInputConnection.BoxInputListener,
             KeyboardManager.ManageableView {
-
-    private static final Logger LOG
-        = Logger.getLogger(BoardEditText.class.getCanonicalName());
 
     @Inject
     protected ForkyzSettings settings;

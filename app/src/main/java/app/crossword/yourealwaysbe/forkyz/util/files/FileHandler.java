@@ -21,10 +21,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.logging.Logger;
 
 import android.content.Context;
 import android.net.Uri;
+import android.util.Log;
 
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 import app.crossword.yourealwaysbe.puz.Puzzle;
@@ -38,8 +38,7 @@ import app.crossword.yourealwaysbe.puz.io.StreamUtils;
  * Implementations provided for different file backends
  */
 public abstract class FileHandler {
-    private static final Logger LOGGER
-        = Logger.getLogger(FileHandler.class.getCanonicalName());
+    private static final String TAG = "ForkyzFileHandler";
 
     // private for now because downloaders shouldn't be directly
     // creating puzzle files but instead saving Puzzle objects with
@@ -481,10 +480,11 @@ public abstract class FileHandler {
             ) {
                 return IO.load(pis, mis);
             } catch (IOException e) {
-                LOGGER.warning(
+                Log.w(
+                    TAG,
                     "Could not load "
-                    + ph.getMainFileHandle().getUri()
-                    + ". Trying again without metadata."
+                        + ph.getMainFileHandle().getUri()
+                        + ". Trying again without metadata."
                 );
                 // fall through to try without meta
             }
@@ -680,7 +680,7 @@ public abstract class FileHandler {
             try {
                 return loadPuzMetaFile(ph);
             } catch (IOException e) {
-                LOGGER.warning("Could not load puz meta for " + ph +": " + e);
+                Log.w(TAG, "Could not load puz meta for " + ph +": " + e);
                 return new PuzMetaFile(this, ph, null);
             }
         }

@@ -41,15 +41,11 @@ import app.crossword.yourealwaysbe.forkyz.R;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.settings.KeyboardSettings;
 import app.crossword.yourealwaysbe.forkyz.settings.KeyboardLayout;
-import java.util.logging.Logger;
 
 @AndroidEntryPoint
 public class ForkyzKeyboard
     extends LinearLayout
     implements View.OnTouchListener, View.OnClickListener {
-
-    private static final Logger LOG
-        = Logger.getLogger(ForkyzKeyboard.class.getCanonicalName());
 
     private static final String FORKYZ_TEXT_KEY = "ForkyzTextKey";
     private static final String FORKYZ_IMAGE_KEY = "ForkyzImageKey";

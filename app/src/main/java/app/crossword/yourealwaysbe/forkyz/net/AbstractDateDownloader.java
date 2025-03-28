@@ -16,7 +16,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
+
+import android.util.Log;
 
 import app.crossword.yourealwaysbe.puz.io.PuzzleParser;
 import app.crossword.yourealwaysbe.puz.Puzzle;
@@ -28,7 +29,8 @@ import app.crossword.yourealwaysbe.puz.Puzzle;
  * date has one unique puzzle.
  */
 public class AbstractDateDownloader extends AbstractDownloader {
-    protected static final Logger LOG = Logger.getLogger("app.crossword.yourealwaysbe");
+    protected static final String TAG = "ForkyzDateDownloader";
+
     protected static final Map<String, String> EMPTY_MAP = Collections.emptyMap();
     private String internalName;
     private String downloaderName;
@@ -269,7 +271,7 @@ public class AbstractDateDownloader extends AbstractDownloader {
                 e.printStackTrace();
             }
         } catch (URISyntaxException | MalformedURLException e) {
-            LOG.severe("Malformed URL in download: " + e);
+            Log.e(TAG, "Malformed URL in download: " + e);
         }
 
         return null;

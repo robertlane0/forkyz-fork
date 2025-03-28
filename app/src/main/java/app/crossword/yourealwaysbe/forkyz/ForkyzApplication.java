@@ -11,16 +11,12 @@ import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper;
 import app.crossword.yourealwaysbe.forkyz.util.MigrationHelper;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 
-import java.util.logging.Logger;
 import javax.inject.Inject;
 
 @HiltAndroidApp
 public class ForkyzApplication
         extends Application
         implements Configuration.Provider {
-    private static final Logger LOGGER
-        = Logger.getLogger(ForkyzApplication.class.getCanonicalName());
-
     public static final String PUZZLE_DOWNLOAD_CHANNEL_ID = "forkyz.downloads";
 
     @Inject

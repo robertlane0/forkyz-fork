@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Iterator;
-import java.util.logging.Logger;
 
 import android.content.Context;
 import android.net.Uri;
@@ -18,9 +17,6 @@ import android.net.Uri;
  * root directory.
  */
 public abstract class FileHandlerJavaFile extends FileHandler {
-    private static final Logger LOGGER
-        = Logger.getLogger(FileHandlerJavaFile.class.getCanonicalName());
-
     private File rootDirectory;
 
     public FileHandlerJavaFile(

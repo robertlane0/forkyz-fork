@@ -129,9 +129,6 @@ public class BrowseActivity extends ForkyzActivity {
     // puzzle that's recognised)
     private static final String IMPORT_MIME_TYPE =  "*/*";
 
-    private static final Logger LOGGER
-        = Logger.getLogger(BrowseActivity.class.getCanonicalName());
-
     private static final DateTimeFormatter DATE_FORMAT
         = DateTimeFormatter.ofPattern("EEEE\ndd MMM\nyyyy");
 

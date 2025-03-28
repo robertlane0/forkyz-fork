@@ -41,7 +41,6 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.logging.Logger;
 
 /**
  * For rendering part of the board
@@ -53,7 +52,6 @@ public class PlayboardRenderer {
     // for calculating max scale with no puzzle
     private static final int DEFAULT_PUZZLE_WIDTH = 15;
     private static final float BASE_BOX_SIZE_INCHES = 0.25F;
-    private static final Logger LOG = Logger.getLogger(PlayboardRenderer.class.getCanonicalName());
     private static final float DESCENT_FUDGE_FACTOR = 1.3F;
     private static final float SEPARATOR_FILL_PCNT = 0.85F;
 
@@ -479,7 +477,6 @@ public class PlayboardRenderer {
 
     public int findBoxNoScale(Point p) {
         int boxSize =  (int) (BASE_BOX_SIZE_INCHES * dpi);
-        LOG.info("DPI "+dpi+" scale "+ scale +" box size "+boxSize);
         return p.x / boxSize;
     }
 

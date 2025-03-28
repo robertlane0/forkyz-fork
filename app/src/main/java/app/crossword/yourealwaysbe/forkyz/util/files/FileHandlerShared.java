@@ -11,12 +11,12 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
-import java.util.logging.Logger;
 
 import android.content.Context;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import androidx.core.content.FileProvider;
 
 import app.crossword.yourealwaysbe.puz.io.IPuzIO;
@@ -24,8 +24,7 @@ import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.forkyz.util.AppPuzzleUtils;
 
 public class FileHandlerShared extends FileProvider {
-    private static final Logger LOGGER
-        = Logger.getLogger(FileHandlerShared.class.getCanonicalName());
+    private static final String TAG = "ForkyzFileHandlerShared";
 
     private static final String SHARE_AUTHORITY
         = "app.crossword.yourealwaysbe.forkyzfiles";
@@ -115,7 +114,7 @@ public class FileHandlerShared extends FileProvider {
         ) {
             IPuzIO.writePuzzle(puz, os, writeBlank, omitExtensions);
         } catch (IOException e) {
-            LOGGER.severe("Could not create file for sharing: " + e);
+            Log.e(TAG, "Could not create file for sharing: " + e);
             return null;
         }
 
@@ -138,7 +137,7 @@ public class FileHandlerShared extends FileProvider {
             for (String line : logcat)
                 os.println(line);
         } catch (IOException e) {
-            LOGGER.severe("Could not create file for sharing: " + e);
+            Log.e(TAG, "Could not create file for sharing: " + e);
             return null;
         }
 

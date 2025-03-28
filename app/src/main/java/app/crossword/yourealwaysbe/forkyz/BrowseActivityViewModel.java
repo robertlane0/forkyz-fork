@@ -13,13 +13,13 @@ import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.BiConsumer;
-import java.util.logging.Logger;
 import javax.inject.Inject;
 
 import android.app.Application;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.widget.Toast;
 import androidx.annotation.MainThread;
 import androidx.lifecycle.AndroidViewModel;
@@ -45,8 +45,7 @@ import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 
 @HiltViewModel
 public class BrowseActivityViewModel extends AndroidViewModel {
-    private static final Logger LOGGER
-        = Logger.getLogger(BrowseActivityViewModel.class.getCanonicalName());
+    private static final String TAG = "ForkyzBrowseActivity";
 
     private static final DateTimeFormatter MATCHER_DATE_FORMAT
         = DateTimeFormatter.ofPattern("EEEE dd MMM yyyy");
@@ -353,7 +352,7 @@ public class BrowseActivityViewModel extends AndroidViewModel {
             puzMeta,
             () -> { puzzleLoadEvents.call(); },
             e -> {
-                LOGGER.severe("Could not load file: " + e);
+                Log.e(TAG, "Could not load file: " + e);
 
                 fileHandlerProvider.get(fileHandler -> {
                     String filename = null;
@@ -477,7 +476,7 @@ public class BrowseActivityViewModel extends AndroidViewModel {
                         PuzMetaFile pm = fileHandler.loadPuzMetaFile(ph);
                         addPuzzleToList(pm);
                     } catch (IOException e) {
-                        LOGGER.warning("Could not load meta for handle " + ph);
+                        Log.w(TAG, "Could not load meta for handle " + ph);
                     }
                 }
             });

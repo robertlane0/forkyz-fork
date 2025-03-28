@@ -27,6 +27,7 @@ import androidx.fragment.app.DialogFragment;
 
 import com.squareup.seismic.ShakeDetector;
 
+import android.util.Log;
 import app.crossword.yourealwaysbe.forkyz.databinding.PlayBinding;
 import app.crossword.yourealwaysbe.forkyz.settings.FitToScreenMode;
 import app.crossword.yourealwaysbe.forkyz.settings.GridRatio;
@@ -50,13 +51,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
-import java.util.logging.Logger;
 
 public class PlayActivity extends PuzzleActivity
                           implements Playboard.PlayboardListener,
                                      ClueTabs.ClueTabsListener,
                                      ShakeDetector.Listener {
-    private static final Logger LOG = Logger.getLogger("app.crossword.yourealwaysbe");
+    private static final String TAG = "ForkyzPlayActivity";
+
     // min height in portrait
     private static final float ACROSTIC_BOARD_HEIGHT_RATIO_MIN = 0.25F;
     // max width in landscape
@@ -95,7 +96,7 @@ public class PlayActivity extends PuzzleActivity
         Puzzle puz = getPuzzle();
 
         if (board == null || puz == null) {
-            LOG.info("PlayActivity started but no Puzzle selected, finishing.");
+            Log.i(TAG, "PlayActivity started but no Puzzle selected, finishing.");
             finish();
             return;
         }
@@ -492,7 +493,7 @@ public class PlayActivity extends PuzzleActivity
         Puzzle puz = getPuzzle();
 
         if (board == null || puz == null) {
-            LOG.info("PlayActivity resumed but no Puzzle selected, finishing.");
+            Log.i(TAG, "PlayActivity resumed but no Puzzle selected, finishing.");
             finish();
             return;
         }

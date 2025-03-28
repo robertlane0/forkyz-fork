@@ -1,7 +1,5 @@
 package app.crossword.yourealwaysbe.forkyz.view;
 
-import java.util.logging.Logger;
-
 import android.content.Context;
 import android.graphics.Rect;
 import android.util.AttributeSet;
@@ -16,8 +14,6 @@ import android.widget.GridLayout;
 import android.widget.ImageView;
 
 public class ScrollingImageView extends FrameLayout implements OnGestureListener {
-    private static final Logger LOG = Logger.getLogger("app.crossword.yourealwaysbe");
-
     private static final float BOARD_STICKY_BORDER_MM = 1.5F;
 
     private AuxTouchHandler aux = null;

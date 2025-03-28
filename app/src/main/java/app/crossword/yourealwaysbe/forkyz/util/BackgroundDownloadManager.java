@@ -9,11 +9,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import android.content.Context;
+import android.util.Log;
 import androidx.annotation.MainThread;
 import androidx.concurrent.futures.CallbackToFutureAdapter;
 import androidx.hilt.work.HiltWorker;
@@ -47,9 +47,7 @@ import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
  */
 @Singleton
 public class BackgroundDownloadManager {
-    private static final Logger LOGGER = Logger.getLogger(
-        BackgroundDownloadManager.class.getCanonicalName()
-    );
+    private static final String TAG = "ForkyzBackgroundDownload";
 
     @Module
     @InstallIn(SingletonComponent.class)
@@ -257,11 +255,11 @@ public class BackgroundDownloadManager {
 
             fileHandlerProvider.isMissingWritePermission(missing -> {
                 if (missing) {
-                    LOGGER.info("Skipping download, no write permission");
+                    Log.i(TAG, "Skipping download, no write permission");
                     return;
                 }
 
-                LOGGER.info("Downloading most recent puzzles");
+                Log.i(TAG, "Downloading most recent puzzles");
 
                 downloadersProvider.get(dls -> {
                 downloadExecutorService.execute(() -> {

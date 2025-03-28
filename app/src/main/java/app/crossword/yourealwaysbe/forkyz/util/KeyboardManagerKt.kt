@@ -1,8 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.util
 
-import java.util.logging.Logger
-
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.KeyboardMode
 import app.crossword.yourealwaysbe.forkyz.settings.KeyboardSettings
@@ -38,10 +36,6 @@ class KeyboardManagerKt(
     showCB : (KeyboardInfo) -> Unit,
     hideCB : () -> Unit,
 ) {
-    private val LOGGER = Logger.getLogger(
-        KeyboardManagerKt::class.toString()
-    )
-
     private var blockHideDepth : Int = 0
 
     init {

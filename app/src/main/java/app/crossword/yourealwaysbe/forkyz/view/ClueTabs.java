@@ -60,15 +60,11 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.logging.Logger;
 import javax.inject.Inject;
 
 @AndroidEntryPoint
 public class ClueTabs extends ConstraintLayout
                       implements Playboard.PlayboardListener {
-    private static final Logger LOG
-        = Logger.getLogger("app.crossword.yourealwaysbe");
-
     /**
      * How wide before enable multiple clue lists
      */

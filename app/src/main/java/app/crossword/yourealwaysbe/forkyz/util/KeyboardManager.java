@@ -4,8 +4,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.util;
 
-import java.util.logging.Logger;
-
 import android.content.Context;
 import android.view.View;
 import android.view.WindowManager;
@@ -21,8 +19,6 @@ import app.crossword.yourealwaysbe.forkyz.settings.KeyboardSettings;
 import app.crossword.yourealwaysbe.forkyz.view.ForkyzKeyboard;
 
 public class KeyboardManager {
-    private static final Logger LOG = Logger.getLogger(KeyboardManager.class.getCanonicalName());
-
     private AppCompatActivity activity;
     private ForkyzSettings settings;
     private ForkyzKeyboard keyboardView;

@@ -30,16 +30,11 @@ import java.time.format.TextStyle;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.logging.Logger;
 
 /**
  * Custom dialog for choosing puzzles to download.
  */
 public class DownloadPickerDialogBuilder {
-    private static final Logger LOGGER = Logger.getLogger(
-        DownloadPickerDialogBuilder.class.getCanonicalName()
-    );
-
     private Activity activity;
     private DownloadDialogBinding binding;
     private List<Downloader> availableDownloaders;

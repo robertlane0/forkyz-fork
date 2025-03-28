@@ -1,6 +1,5 @@
 package app.crossword.yourealwaysbe.forkyz;
 
-import java.util.logging.Logger;
 import javax.inject.Inject;
 
 import android.content.res.ColorStateList;
@@ -37,8 +36,6 @@ import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 
 @AndroidEntryPoint
 public class ForkyzActivity extends AppCompatActivity {
-    private static final Logger LOG
-        = Logger.getLogger(ForkyzActivity.class.getCanonicalName());
 
     @Inject
     protected ForkyzSettings settings;
