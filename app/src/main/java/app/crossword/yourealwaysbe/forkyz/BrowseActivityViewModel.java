@@ -167,7 +167,7 @@ public class BrowseActivityViewModel extends AndroidViewModel {
     @MainThread
     public void startLoadFiles(boolean archive) {
         fileHandlerProvider.get(fileHandler -> {
-            threadWithUILock(() -> {
+            threadWithUILock("load files", () -> {
                 DirHandle directory = archive
                     ? fileHandler.getArchiveDirectory()
                     : fileHandler.getCrosswordsDirectory();
@@ -197,7 +197,7 @@ public class BrowseActivityViewModel extends AndroidViewModel {
     @MainThread
     public void deletePuzzles(Collection<PuzMetaFile> puzMetas) {
         fileHandlerProvider.get(fileHandler -> {
-            threadWithUILock(() -> {
+            threadWithUILock("delete puzzles", () -> {
                 DirHandle viewedDir = getViewedDirectory(fileHandler);
 
                 for (PuzMetaFile puzMeta : puzMetas) {
@@ -220,7 +220,7 @@ public class BrowseActivityViewModel extends AndroidViewModel {
         Collection<PuzMetaFile> puzMetas, DirHandle destDir
     ) {
         fileHandlerProvider.get(fileHandler -> {
-            threadWithUILock(() -> {
+            threadWithUILock("move puzzles", () -> {
                 DirHandle directory = getViewedDirectory(fileHandler);
 
                 for (PuzMetaFile puzMeta : puzMetas) {
@@ -244,7 +244,7 @@ public class BrowseActivityViewModel extends AndroidViewModel {
         settings.getBrowseCleanupAge(maxAgeString -> {
         settings.getBrowseCleanupAgeArchive(archiveMaxAgeString -> {
         fileHandlerProvider.get(fileHandler -> {
-            threadWithUILock(() -> {
+            threadWithUILock("clean up puzzles", () -> {
                 LocalDate maxAge = getMaxAge(maxAgeString);
                 LocalDate archiveMaxAge = getMaxAge(archiveMaxAgeString);
 
@@ -384,9 +384,11 @@ public class BrowseActivityViewModel extends AndroidViewModel {
      */
     @MainThread
     public void refreshCurrentPuzzleMeta() {
+        Log.i(TAG, "Refreshing current puzzle in list with isUIBusy");
         isUIBusy.setValue(true);
         currentPuzzleHolder.getFreshCurrentPuzzleMeta(refreshedMeta -> {
             isUIBusy.setValue(false);
+            Log.i(TAG, "Done refreshing current puzzle in list with isUIBusy");
             if (refreshedMeta != null) {
                 PuzHandle curHandle = currentPuzzleHolder.getPuzHandle();
                 List<MutableLiveData<PuzMetaFile>> pmList
@@ -418,7 +420,7 @@ public class BrowseActivityViewModel extends AndroidViewModel {
     ) {
         fileHandlerProvider.get(fileHandler -> {
         settings.getDownloadTimeout(timeout -> {
-            threadWithUILock(() -> {
+            threadWithUILock("import URIs", () -> {
                 boolean someFailed = false;
                 boolean someSucceeded = false;
                 boolean needsReload = forceReload;
@@ -465,7 +467,7 @@ public class BrowseActivityViewModel extends AndroidViewModel {
     @MainThread
     public void processToImportDirectory() {
         fileHandlerProvider.get(fileHandler -> {
-            threadWithUILock(() -> {
+            threadWithUILock("process to import dir", () -> {
                 List<PuzHandle> imported
                     = PuzzleImporter.processToImportDirectory(
                         getApplication(), fileHandler, utils
@@ -510,15 +512,17 @@ public class BrowseActivityViewModel extends AndroidViewModel {
         downloadExecutorService.shutdown();
     }
 
-    private void threadWithUILock(Runnable r) {
+    private void threadWithUILock(String taskName, Runnable r) {
         // no lock actually needed because executorService is single
         // threaded guaranteed
+        Log.i(TAG, "Starting task " + taskName + " with isUIBusy");
         executorService.execute(() -> {
             try {
                 isUIBusy.postValue(true);
                 r.run();
             } finally {
                 isUIBusy.postValue(false);
+                Log.i(TAG, "Finished task " + taskName + " with isUIBusy");
             }
         });
     }
