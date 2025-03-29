@@ -11,7 +11,6 @@ import android.content.Context;
 import android.graphics.Rect;
 import android.os.Handler;
 import android.text.InputType;
-import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.KeyEvent;
 import android.view.View;
