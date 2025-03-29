@@ -1,5 +1,15 @@
 # Forkyz Changelog
 
+## Version 64
+
+- Rewrite Notes page in Compose.
+- Add log viewer in settings.
+- Add puzzles export in settings.
+- Fix Guardian downloads.
+- Fix keyboard in Clues List.
+- Fix puzzle time in Info Dialog.
+- Fix crash during save when phone waking up.
+
 ## Version 63
 
 - Fix background downloads.
