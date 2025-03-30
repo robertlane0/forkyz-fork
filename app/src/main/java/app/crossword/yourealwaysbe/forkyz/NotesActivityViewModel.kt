@@ -693,7 +693,10 @@ class NotesActivityViewModel @Inject constructor(
             }
             NoteEntry.ANAGRAM_SOURCE -> {
                 // only add as many characters as will fit
-                val anagSrc = anagramSourceValue.toCharArray()
+                val anagSrc = charArrayWithBlanks(
+                    anagramSourceValue,
+                    boxesLength,
+                )
                 val len = Math.min(value.length, anagSrc.size)
                 var numRemaining = numRemainingAnagramCharacters
 
@@ -710,7 +713,7 @@ class NotesActivityViewModel @Inject constructor(
             NoteEntry.ANAGRAM_SOLUTION -> {
                 // simulate playing each character except blank
                 val targetValue = charArrayWithBlanks(
-                    getNotesValue(target),
+                    anagramSolutionValue,
                     boxesLength
                 )
                 val len = Math.min(value.length, targetValue.size)
@@ -737,7 +740,6 @@ class NotesActivityViewModel @Inject constructor(
             NoteEntry.ANAGRAM_SOLUTION -> anagramSolutionValue
         }
     }
-
 
     /**
      * Update anagram source prediction settings enabled
