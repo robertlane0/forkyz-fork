@@ -329,11 +329,17 @@ class NotesActivity() : PuzzleActivityKt() {
         val acceptedPredictionEvent
             by viewModel.acceptedPredictionEvent.collectAsStateWithLifecycle()
 
-        var selectionPosition : Int? = null
-        if (acceptedPredictionEvent) {
-            selectionPosition = state?.let { it.boxesLength - 1 }
-            viewModel.clearAcceptedPredictionEvent()
+        var selectionPosition : Int? = acceptedPredictionEvent?.let {
+            // to end if filled boxes, else to first free space
+            if (it >= state?.boxesLength ?: 0)
+                it - 1
+            else if (it > 0)
+                it
+            else
+                null
         }
+        if (acceptedPredictionEvent != null)
+            viewModel.clearAcceptedPredictionEvent()
 
         BoardLabel(R.string.anagram_source_lab)
         BoardEdit(

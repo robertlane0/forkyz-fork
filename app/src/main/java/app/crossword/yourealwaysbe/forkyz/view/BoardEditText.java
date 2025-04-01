@@ -147,7 +147,7 @@ public class BoardEditText
 
         int box = findPosition(point);
         if (box >= 0) {
-            if (setSelectedCol(box)) {
+            if (setSelectedColNoRender(box)) {
                 BoardEditText.this.render();
                 updateInputConnection();
             }
@@ -169,7 +169,7 @@ public class BoardEditText
             int col = getSelectedCol();
             if (boxes[col].isBlank() && col > 0) {
                 flagChanged(col);
-                setSelectedCol(col - 1);
+                setSelectedColNoRender(col - 1);
             }
 
             col = getSelectedCol();
@@ -193,12 +193,12 @@ public class BoardEditText
     ) {
         super.onFocusChanged(gainFocus, direction, previouslyFocusedRect);
         if (!gainFocus) {
-            setSelectedCol(-1);
+            setSelectedColNoRender(-1);
             render();
         } else if (boxes != null) {
             if (getSelectedCol() < 0
                     || getSelectedCol() >= boxes.length) {
-                setSelectedCol(0);
+                setSelectedColNoRender(0);
                 updateInputConnection();
                 render();
             }
@@ -542,7 +542,7 @@ public class BoardEditText
         case KeyEvent.KEYCODE_DPAD_LEFT: {
                 int col = getSelectedCol();
                 if (col > 0) {
-                    setSelectedCol(col - 1);
+                    setSelectedColNoRender(col - 1);
                     this.render();
                 }
                 return true;
@@ -551,7 +551,7 @@ public class BoardEditText
         case KeyEvent.KEYCODE_DPAD_RIGHT: {
                 int col = getSelectedCol();
                 if (boxes != null && col < boxes.length - 1) {
-                    setSelectedCol(col + 1);
+                    setSelectedColNoRender(col + 1);
                     this.render();
                 }
 
@@ -624,9 +624,21 @@ public class BoardEditText
     }
 
     /**
-     * Returns true if changed
+     * Set selected column, render if needed
+     *
+     * @return true if changed
      */
     public boolean setSelectedCol(int col) {
+        boolean changed = setSelectedColNoRender(col);
+        if (changed)
+            render();
+        return changed;
+    }
+
+    /**
+     * Returns true if changed, does not rerender
+     */
+    private boolean setSelectedColNoRender(int col) {
         if (col == selection.getCol())
             return false;
         // allow < 0 (means no selection)
@@ -669,9 +681,9 @@ public class BoardEditText
                     }
 
                     if (boxes[col].isBlank())
-                        setSelectedCol(col);
+                        setSelectedColNoRender(col);
                     else
-                        setSelectedCol(nextPos);
+                        setSelectedColNoRender(nextPos);
                 } else {
                     updateInputConnection();
                 }

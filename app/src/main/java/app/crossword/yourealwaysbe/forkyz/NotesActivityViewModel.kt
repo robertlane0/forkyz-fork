@@ -135,8 +135,11 @@ class NotesActivityViewModel @Inject constructor(
         = MediatorLiveData<NotesActivityUIState>(NotesActivityUIState())
     public val notesUIState : LiveData<NotesActivityUIState> = _notesUIState
 
-    private val _acceptedPredictionEvent = MutableStateFlow<Boolean>(false)
-    public val acceptedPredictionEvent : StateFlow<Boolean>
+    private val _acceptedPredictionEvent = MutableStateFlow<Int?>(null)
+    /**
+     * The length of a prediction if just accepted or null
+     */
+    public val acceptedPredictionEvent : StateFlow<Int?>
         = _acceptedPredictionEvent
 
     init {
@@ -299,7 +302,8 @@ class NotesActivityViewModel @Inject constructor(
                 updateNote() {
                     it.withAnagramSource(anagramSourcePredictionValue)
                 }
-                _acceptedPredictionEvent.value = true
+                _acceptedPredictionEvent.value =
+                    anagramSourcePredictionValue?.length
             } else {
                 updateNote() { it.withAnagramSource(newValue) }
             }
@@ -307,7 +311,7 @@ class NotesActivityViewModel @Inject constructor(
     }
 
     fun clearAcceptedPredictionEvent() {
-        _acceptedPredictionEvent.value = false
+        _acceptedPredictionEvent.value = null
     }
 
     fun shuffleAnagramSource() {
