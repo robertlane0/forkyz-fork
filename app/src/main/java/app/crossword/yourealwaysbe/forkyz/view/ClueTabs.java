@@ -54,6 +54,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -80,7 +81,7 @@ public class ClueTabs extends ConstraintLayout
     private ClueTabsBinding binding;
     private Playboard board;
     private boolean listening = false;
-    private Set<ClueTabsListener> listeners = WeakSet.buildSet();
+    private Set<ClueTabsListener> listeners = new HashSet<>();
     private List<String> listNames = new ArrayList<>();
     private boolean showWords = false;
     private float maxWordScale = 0.9F;
@@ -144,7 +145,7 @@ public class ClueTabs extends ConstraintLayout
          *
          * @param view the view calling
          */
-        default void onClueTabsBarLongclick(ClueTabs view) { }
+        default void onClueTabsBarLongClick(ClueTabs view) { }
     }
 
     public ClueTabs(Context context) {

@@ -18,6 +18,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -35,11 +36,9 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
-import app.crossword.yourealwaysbe.forkyz.view.ClueTabs
 import app.crossword.yourealwaysbe.puz.Clue
-import app.crossword.yourealwaysbe.puz.Playboard.Word
 
-class ClueListActivity() : PuzzleActivityKt(), ClueTabs.ClueTabsListener {
+class ClueListActivity() : PuzzleActivity() {
 
     override protected lateinit var viewModel : ClueListActivityViewModel
 
@@ -62,23 +61,6 @@ class ClueListActivity() : PuzzleActivityKt(), ClueTabs.ClueTabsListener {
                     ActivityBody(Modifier.padding(innerPadding))
                 }
             }
-        }
-    }
-
-    override fun onClueTabsClick(clue : Clue?, view : ClueTabs?) {
-        viewModel.clueClick(clue)
-    }
-
-    override fun onClueTabsBoardClick(
-        clue : Clue?, previousWord : Word?, view : ClueTabs?
-    ) {
-        viewModel.clueClick(clue)
-    }
-
-    override fun onClueTabsLongClick(clue : Clue?, view : ClueTabs?) {
-        clue?.let { clue ->
-            viewModel.selectClue(clue)
-            viewModel.launchClueNotes(clue)
         }
     }
 
@@ -167,38 +149,29 @@ class ClueListActivity() : PuzzleActivityKt(), ClueTabs.ClueTabsListener {
         val snapToClue
             by viewModel.snapToClueEvent.collectAsStateWithLifecycle()
 
-        AndroidView(
+        ClueTabsView(
             modifier = modifier,
-            factory = { context ->
-                val view = ClueTabs(context).apply {
-                    setBoard(viewModel.getBoard())
-                    setOnClueLongClickDescription(
-                        context.getString(R.string.open_clue_notes)
-                    )
-                    setOnClueClickDescription(
-                        context.getString(R.string.select_clue)
-                    )
-                    addListener(this@ClueListActivity)
-                }
-                addAccessibilityActions(view)
-                view
-            },
-            update = { view ->
-                view.setShowWords(showAllWords)
-                if (snapToClue != null) {
-                    viewModel.clearSnapToClueEvent()
-                    // this should probably be a launched effect,
-                    // but can't do that from the update method
-                    snapToClue?.pageChangeData?.let { change ->
-                        view.ensureListShown(
-                            change.showPageNum,
-                            change.replacePageNum,
-                        )
-                    }
-                    view.snapToClue()
+            board = viewModel.getBoard(),
+            onClueClick = viewModel::clueClick,
+            onClueClickDescription = stringResource(R.string.select_clue),
+            onClueLongClick = { clue ->
+                clue?.let { clue ->
+                    viewModel.selectClue(clue)
+                    viewModel.launchClueNotes(clue)
                 }
             },
+            onClueLongClickDescription
+                = stringResource(R.string.open_clue_notes),
+            onBoardClick = { clue, _ -> viewModel.clueClick(clue) },
+            snapToClue = snapToClue != null,
+            snapClueShowPageNum = snapToClue?.pageChangeData?.showPageNum,
+            snapClueReplacePageNum = snapToClue?.pageChangeData?.replacePageNum,
+            showAllWords = showAllWords,
         )
+
+        LaunchedEffect(snapToClue) {
+            viewModel.clearSnapToClueEvent()
+        }
     }
 
     @Composable

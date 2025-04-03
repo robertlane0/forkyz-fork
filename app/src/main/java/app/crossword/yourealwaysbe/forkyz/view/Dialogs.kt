@@ -14,6 +14,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 
@@ -38,7 +40,91 @@ fun OKCancelDialog(
     onOK : () -> Unit,
     body : @Composable () -> Unit = { },
 ) {
-    Dialog(onDismissRequest = onCancel) {
+    PlainDialog(
+        title = title,
+        summary = summary?.let { stringResource(it) },
+        onClose = onCancel,
+    ) {
+        body()
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End,
+        ) {
+            TextButton(
+                onClick = onCancel,
+                modifier = Modifier.padding(
+                    horizontal = DIALOG_BUTTON_PADDING,
+                ),
+            ) {
+                Text(stringResource(android.R.string.cancel))
+            }
+            TextButton(
+                onClick = onOK,
+                modifier = Modifier.padding(
+                    horizontal = DIALOG_BUTTON_PADDING,
+                ),
+            ) {
+                Text(stringResource(android.R.string.ok))
+            }
+        }
+    }
+}
+
+/**
+ * OK dialog with customisable body
+ *
+ * @param title the title resource id
+ * @param summary the summary message in HTML
+ * @param onClose call back for closing dialog
+ * @param body the dialog body
+ */
+@Composable
+fun OKDialog(
+    title : Int,
+    summary : String?,
+    onClose : () -> Unit,
+    body : @Composable () -> Unit = { },
+) {
+    PlainDialog(
+        title = title,
+        summary = summary,
+        onClose = onClose
+    ) {
+        body()
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End,
+        ) {
+            TextButton(
+                onClick = onClose,
+                modifier = Modifier.padding(
+                    horizontal = DIALOG_BUTTON_PADDING,
+                ),
+            ) {
+                Text(stringResource(android.R.string.ok))
+            }
+        }
+    }
+}
+
+/**
+ * Dialog with no buttons
+ *
+ * @param title the title resource id
+ * @param summary the summary message in HTML
+ * @param onClose call back for closing dialog by outside click
+ * @param body the dialog body
+ */
+@Composable
+private fun PlainDialog(
+    title : Int,
+    summary : String?,
+    onClose : () -> Unit,
+    body : @Composable () -> Unit = { },
+) {
+    Dialog(onDismissRequest = onClose) {
         Card(shape = DIALOG_ROUNDED_CORNERS) {
             Column(
                 modifier = Modifier.padding(DIALOG_PADDING),
@@ -53,34 +139,12 @@ fun OKCancelDialog(
                     Text(
                         modifier = Modifier.fillMaxWidth()
                             .padding(bottom = DIALOG_PADDING),
-                        text = stringResource(summary),
+                        text = AnnotatedString.fromHtml(summary),
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 }
 
                 body()
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End,
-                ) {
-                    TextButton(
-                        onClick = onCancel,
-                        modifier = Modifier.padding(
-                            horizontal = DIALOG_BUTTON_PADDING,
-                        ),
-                    ) {
-                        Text(stringResource(android.R.string.cancel))
-                    }
-                    TextButton(
-                        onClick = onOK,
-                        modifier = Modifier.padding(
-                            horizontal = DIALOG_BUTTON_PADDING,
-                        ),
-                    ) {
-                        Text(stringResource(android.R.string.ok))
-                    }
-                }
             }
         }
     }

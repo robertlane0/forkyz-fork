@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz
 
-//import kotlinx.coroutines.flow.StateFlow
 import java.io.IOException
 import java.util.Locale
 import java.util.Deque
@@ -36,6 +35,7 @@ import app.crossword.yourealwaysbe.forkyz.exttools.ShareClueData
 import app.crossword.yourealwaysbe.forkyz.exttools.SharePuzzleData
 import app.crossword.yourealwaysbe.forkyz.inttools.CellFlagData
 import app.crossword.yourealwaysbe.forkyz.inttools.ClueFlagData
+import app.crossword.yourealwaysbe.forkyz.inttools.ClueListData
 import app.crossword.yourealwaysbe.forkyz.inttools.ClueNotesData
 import app.crossword.yourealwaysbe.forkyz.inttools.EditClueData
 import app.crossword.yourealwaysbe.forkyz.inttools.InternalToolData
@@ -68,6 +68,7 @@ enum class SubMenu {
     REVEAL,
     EXTERNAL_TOOLS,
     SHARE,
+    ZOOM,
 }
 
 class ShareStream(
@@ -463,6 +464,10 @@ open class PuzzleActivityViewModel @Inject constructor(
         internalToolEvent.postValue(ClueNotesData.buildPuzzleNotes())
     }
 
+    fun launchClueList() {
+        internalToolEvent.postValue(ClueListData.build())
+    }
+
     fun doBack() {
         backEvent.postValue(true)
     }
@@ -493,6 +498,17 @@ open class PuzzleActivityViewModel @Inject constructor(
                 { _ -> doBack() }
             )
         )
+    }
+
+    /**
+     * Voice command launch notes current clue
+     */
+    protected fun registerVoiceCommandNotes() {
+        val app : Application = getApplication()
+        registerVoiceCommand(VoiceCommand(
+            app.getString(R.string.command_notes),
+            { launchCurrentClueNotes() },
+        ))
     }
 
     /**
@@ -639,6 +655,14 @@ open class PuzzleActivityViewModel @Inject constructor(
 
     override protected fun onCleared() {
         getBoard()?.removeListener(this)
+    }
+
+    fun keyboardPushBlockHide() {
+        keyboardManager.pushBlockHide()
+    }
+
+    fun keyboardPopBlockHide() {
+        keyboardManager.popBlockHide()
     }
 
     fun showKeyboard() {

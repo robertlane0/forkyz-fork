@@ -279,6 +279,7 @@ class ClueListActivityViewModel @Inject constructor(
         registerVoiceCommandAnnounceClue()
         registerVoiceCommandClueHelp()
         registerVoiceCommandBack()
+        registerVoiceCommandNotes()
 
         val app : Application = getApplication()
 
@@ -305,10 +306,6 @@ class ClueListActivityViewModel @Inject constructor(
         registerVoiceCommand(VoiceCommand(
             app.getString(R.string.command_previous),
             { _ -> movePrevPage() },
-        ))
-        registerVoiceCommand(VoiceCommand(
-            app.getString(R.string.command_notes),
-            { _ -> launchCurrentClueNotes() },
         ))
     }
 

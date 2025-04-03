@@ -420,28 +420,6 @@ public class PuzzleInfoDialogs {
         }
     }
 
-    @AndroidEntryPoint
-    public static class Intro extends DialogFragment {
-        @Inject
-        protected CurrentPuzzleHolder currentPuzzleHolder;
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            MaterialAlertDialogBuilder builder
-                = new MaterialAlertDialogBuilder(getActivity());
-
-            Puzzle puz = getPuzzle(currentPuzzleHolder);
-            if (puz != null && puz.hasIntroMessage()) {
-                builder.setTitle(getString(R.string.introduction))
-                    .setMessage(smartHtml(puz.getIntroMessage()))
-                    .setPositiveButton(R.string.ok, null);
-            }
-
-            return builder.create();
-        }
-
-    }
-
     private static Spanned smartHtml(String text) {
         return text == null ? null : HtmlCompat.fromHtml(text, 0);
     }

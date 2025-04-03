@@ -527,6 +527,13 @@ class ForkyzSettings(
             livePlayActivityClueTabsPage1.observeOnce(cb)
     }
 
+    fun livePlayClueTabsPage(viewIdx : Int) : LiveData<Int> {
+        if (viewIdx == 0)
+            return livePlayActivityClueTabsPage
+        else
+            return livePlayActivityClueTabsPage1
+    }
+
     fun setPlayClueTabsPage(viewIdx : Int, pageNo : Int) {
         if (pageNo >= 0) {
             if (viewIdx == 0) {

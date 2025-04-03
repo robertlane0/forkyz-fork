@@ -32,6 +32,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.NonNull
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Arrangement.Center
 import androidx.compose.foundation.layout.Row
@@ -109,6 +110,7 @@ import app.crossword.yourealwaysbe.forkyz.view.PlayboardTextRenderer
 import app.crossword.yourealwaysbe.forkyz.view.PuzzleInfoDialogs
 import app.crossword.yourealwaysbe.forkyz.view.RevealPuzzleDialog
 import app.crossword.yourealwaysbe.forkyz.view.SpecialEntryDialog
+import app.crossword.yourealwaysbe.forkyz.view.ClueTabs
 import app.crossword.yourealwaysbe.puz.Clue
 import app.crossword.yourealwaysbe.puz.ClueID
 import app.crossword.yourealwaysbe.puz.Playboard
@@ -118,8 +120,20 @@ import app.crossword.yourealwaysbe.puz.Position
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.Zone
 
+class ClueTabsPageSetter() {
+    var clueTabs : ClueTabs? = null
+
+    fun setPage(idx : Int, page : Int) {
+        clueTabs?.setPage(idx, page)
+    }
+
+    fun getPage(idx : Int) : Int? {
+        return clueTabs?.getCurrentPage(idx)
+    }
+}
+
 @AndroidEntryPoint
-abstract class PuzzleActivityKt() : ForkyzActivityKt() {
+abstract class PuzzleActivity() : ForkyzActivityKt() {
     private val TAG = "ForkyzPuzzleActivity"
 
     protected val BASE_MENU_MODIFIER
@@ -205,6 +219,13 @@ abstract class PuzzleActivityKt() : ForkyzActivityKt() {
         }
 
         viewModel.startTimer()
+    }
+
+
+    // used for the puzzle info dialog (maybe remove when it has a view
+    // model)
+    fun getTimer() : ImaginaryTimer? {
+        return viewModel.timer
     }
 
     /**
@@ -336,26 +357,37 @@ abstract class PuzzleActivityKt() : ForkyzActivityKt() {
      * If null, then displays a placeholder
      */
     @Composable
-    protected fun ClueText(clueText : String?) {
-        if (clueText == null) {
-            Text(stringResource(R.string.unknown_hint))
-        } else {
-            // Text doesn't support autoSize yet, so rebuild BasicText
-            // from (or close enough)
-            // https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/material/material/src/commonMain/kotlin/androidx/compose/material/Text.kt
-            val color = LocalContentColor.current
-            val clueSize = getResources().getInteger(R.integer.clue_text_size)
-            BasicText(
-                modifier = Modifier.fillMaxWidth(),
-                text = AnnotatedString.fromHtml(clueText),
-                autoSize =  TextAutoSize.StepBased(
-                    minFontSize = 5.sp,
-                    maxFontSize = clueSize.sp,
-                    stepSize = 1.sp,
-                ),
-                color = { color },
-            )
-        }
+    protected fun ClueText(
+        modifier : Modifier = Modifier.fillMaxWidth(),
+        clueText : String? = null,
+        onClick : () -> Unit = { },
+        onClickDescription : String = "",
+        onLongClick : () -> Unit = { },
+        onLongClickDescription : String = "",
+    ) {
+        val fullModifier = modifier.combinedClickable(
+            onClick = onClick,
+            onClickLabel = onClickDescription,
+            onLongClick = onLongClick,
+            onLongClickLabel = onLongClickDescription,
+        )
+        val text = clueText ?: stringResource(R.string.unknown_hint)
+
+        // Text doesn't support autoSize yet, so rebuild BasicText
+        // from (or close enough)
+        // https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/material/material/src/commonMain/kotlin/androidx/compose/material/Text.kt
+        val color = LocalContentColor.current
+        val clueSize = getResources().getInteger(R.integer.clue_text_size)
+        BasicText(
+            modifier = fullModifier,
+            text = AnnotatedString.fromHtml(text),
+            autoSize =  TextAutoSize.StepBased(
+                minFontSize = 5.sp,
+                maxFontSize = clueSize.sp,
+                stepSize = 1.sp,
+            ),
+            color = { color },
+        )
     }
 
     protected open fun onKeyEvent(event : KeyEvent) : Boolean {
@@ -450,14 +482,14 @@ abstract class PuzzleActivityKt() : ForkyzActivityKt() {
         val internalTool by viewModel.internalToolEvent.observeAsState()
         LaunchedEffect(internalTool) {
             internalTool?.let { tool ->
-                tool.accept(InternalToolLauncher(this@PuzzleActivityKt))
+                tool.accept(InternalToolLauncher(this@PuzzleActivity))
                 viewModel.clearInternalToolEvent()
             }
         }
         val externalTool by viewModel.externalToolEvent.observeAsState()
         LaunchedEffect(externalTool) {
             externalTool?.let { tool ->
-                tool.accept(ExternalToolLauncher(this@PuzzleActivityKt))
+                tool.accept(ExternalToolLauncher(this@PuzzleActivity))
                 viewModel.clearExternalToolEvent()
             }
         }
@@ -465,7 +497,7 @@ abstract class PuzzleActivityKt() : ForkyzActivityKt() {
         LaunchedEffect(sendToast) {
             sendToast?.let { data ->
                 Toast.makeText(
-                    this@PuzzleActivityKt,
+                    this@PuzzleActivity,
                     data.text,
                     Toast.LENGTH_LONG,
                 ).show()
@@ -503,6 +535,7 @@ abstract class PuzzleActivityKt() : ForkyzActivityKt() {
         if (showVoiceButton || showAnnounceButton) {
             Row(
                 modifier = Modifier.fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.surface)
                     .padding(bottom = 5.dp),
                 horizontalArrangement = Arrangement.Center,
             ) {
@@ -540,7 +573,11 @@ abstract class PuzzleActivityKt() : ForkyzActivityKt() {
     }
 
     @Composable
-    protected fun Keyboard() {
+    protected fun Keyboard(
+        showSpecialKeys : Boolean = false,
+        onSpecialKeyDown : (ForkyzKeyboard.SpecialKey) -> Unit = { },
+        onSpecialKeyUp : (ForkyzKeyboard.SpecialKey) -> Unit = { },
+    ) {
         val state by viewModel.keyboardState.collectAsStateWithLifecycle()
 
         LaunchedEffect(state.needsRefresh) {
@@ -558,9 +595,25 @@ abstract class PuzzleActivityKt() : ForkyzActivityKt() {
         }
 
         AndroidView(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surface),
             factory = { context ->
                 val keyboard = ForkyzKeyboard(context)
+
+                keyboard.setSpecialKeyListener(
+                    object : ForkyzKeyboard.SpecialKeyListener {
+                        override fun onKeyDown(
+                            key : ForkyzKeyboard.SpecialKey,
+                        ) {
+                            onSpecialKeyDown(key)
+                        }
+
+                        override fun onKeyUp(key : ForkyzKeyboard.SpecialKey) {
+                            onSpecialKeyUp(key)
+                        }
+                    }
+                )
+
                 inputConnectionMediator.registerForkyzKeyboard(keyboard)
                 keyboard
             },
@@ -570,11 +623,11 @@ abstract class PuzzleActivityKt() : ForkyzActivityKt() {
                         View.VISIBLE
                     else
                         View.GONE
-                view.setVisibility(visibility)
-                view.setShowHideButton(
-                    state.showHideButton,
-                    { viewModel.hideKeyboard(true) },
-                )
+                view.visibility = visibility
+                view.setShowHideButton(state.showHideButton) {
+                    viewModel.hideKeyboard(true)
+                }
+                view.setShowSpecialKeys(showSpecialKeys)
             },
         )
     }
@@ -822,6 +875,73 @@ abstract class PuzzleActivityKt() : ForkyzActivityKt() {
                 text = { MenuText(stringResource(R.string.puzzle)) },
                 onClick = {
                     showRevealPuzzleDialog()
+                    viewModel.dismissMenu()
+                },
+            )
+        }
+    }
+
+    @Composable
+    protected fun MenuZoom() {
+        MenuSubEntry(
+            text = { MenuText(stringResource(R.string.zoom)) },
+            onClick = { viewModel.expandMenu(SubMenu.ZOOM) },
+        )
+    }
+
+    @Composable
+    protected fun MenuZoomSub(
+        onZoomIn : () -> Unit,
+        onZoomInMax : () -> Unit,
+        onZoomOut : () -> Unit,
+        onZoomFit : () -> Unit,
+        onZoomReset : () -> Unit,
+    ) {
+        val state by viewModel.menuState.observeAsState()
+
+        DropdownMenu(
+            modifier = BASE_MENU_MODIFIER,
+            expanded = state?.expanded == SubMenu.ZOOM,
+            onDismissRequest = viewModel::dismissMenu,
+        ) {
+            MenuDropdownHeading(
+                R.string.zoom,
+                onClick = viewModel::closeMenu,
+            )
+            DropdownMenuItem(
+                text = { MenuText(stringResource(R.string.zoom_in)) },
+                onClick = {
+                    onZoomIn()
+                    viewModel.dismissMenu()
+                },
+            )
+            DropdownMenuItem(
+                text = { MenuText(stringResource(R.string.zoom_in_max)) },
+                onClick = {
+                    onZoomInMax()
+                    viewModel.dismissMenu()
+                },
+            )
+            DropdownMenuItem(
+                text = {
+                    MenuText(stringResource(R.string.zoom_out))
+                },
+                onClick = {
+                    onZoomOut()
+                    viewModel.dismissMenu()
+                },
+            )
+            DropdownMenuItem(
+                text = { MenuText(stringResource(R.string.fit_to_screen)) },
+                onClick = {
+                    onZoomFit()
+                    viewModel.dismissMenu()
+                },
+            )
+            DropdownMenuItem(
+                text = { MenuText(stringResource(R.string.zoom_reset)) },
+                onClick = {
+                    onZoomReset()
                     viewModel.dismissMenu()
                 },
             )
@@ -1085,6 +1205,110 @@ abstract class PuzzleActivityKt() : ForkyzActivityKt() {
                 actionSupportSource()
                 viewModel.dismissMenu()
             }
+        )
+    }
+
+    /**
+     * ClueTabs composable
+     *
+     * @param modifier modifier
+     * @param board the playboard to get clues from
+     * @param showAllWords whether to display miniboards in each item
+     * @param onClueClick callback when clue clicked
+     * @param onClueClickDescription description for clue click
+     * @param onClueLongClick callback for long click on clue
+     * @param onClueLongClickDescription description for long clue click
+     * @param onBoardClick callback when miniboard for clue clicked
+     * @param onBarSwipeUp callback when tabs bar swiped up
+     * @param onBarSwipeDown callback when tabs bar swiped down
+     * @param onBarLongClick callback when tabs bar long clicked
+     * @param onBarLongClickDescription description of bar long click action
+     * @param snapToClue if to snap to clue on this cycle
+     * @param snapClueShowPageNum which page to ensure shown if snapping
+     * @param snapClueReplacePageNum which page to replace if snapping
+     * @param pageSetter for controlling the page of the clue tabs
+     * @param onPageChange callback for page changes
+     * @param maxWordScale the maximum scale for word views
+     */
+    @Composable
+    protected fun ClueTabsView(
+        modifier : Modifier,
+        board : Playboard?,
+        showAllWords : Boolean = false,
+        onClueClick : (Clue?) -> Unit = { },
+        onClueClickDescription : String = "",
+        onClueLongClick : (Clue?) -> Unit = { } ,
+        onClueLongClickDescription : String = "",
+        onBoardClick : (Clue?, Word?) -> Unit = { _, _ -> },
+        onBarSwipeUp : () -> Unit = { },
+        onBarSwipeDown : () -> Unit = { },
+        onBarLongClick : () -> Unit = { },
+        onBarLongClickDescription : String = "",
+        snapToClue : Boolean = false,
+        snapClueShowPageNum : Int? = null,
+        snapClueReplacePageNum : Int? = null,
+        pageSetter : ClueTabsPageSetter? = null,
+        maxWordScale : Float? = null
+    ) {
+        AndroidView(
+            modifier = modifier,
+            factory = { context ->
+                val view = ClueTabs(context).apply {
+                    setBoard(board)
+                    setOnClueLongClickDescription(onClueLongClickDescription)
+                    setOnClueClickDescription(onClueClickDescription)
+                    setOnBarLongClickDescription(onBarLongClickDescription)
+                    addListener(object : ClueTabs.ClueTabsListener {
+                        override fun onClueTabsClick(
+                            clue : Clue, _view : ClueTabs
+                        ) {
+                            onClueClick(clue)
+                        }
+
+                        override fun onClueTabsLongClick(
+                            clue : Clue, _view : ClueTabs
+                        ) {
+                            onClueLongClick(clue)
+                        }
+
+                        override fun onClueTabsBoardClick(
+                            clue : Clue, previousWord : Word, _view : ClueTabs
+                        ) {
+                            onBoardClick(clue, previousWord)
+                        }
+
+                        override fun onClueTabsBarSwipeUp(_view : ClueTabs) {
+                            onBarSwipeUp()
+                        }
+
+                        override fun onClueTabsBarSwipeDown(_view : ClueTabs) {
+                            onBarSwipeDown()
+                        }
+
+                        override fun onClueTabsBarLongClick(_view : ClueTabs) {
+                            onBarLongClick()
+                        }
+                    })
+                }
+                addAccessibilityActions(view)
+                pageSetter?.let { it.clueTabs = view }
+                view
+            },
+            update = { view ->
+                view.setShowWords(showAllWords)
+                if (snapToClue) {
+                    // this should probably be a launched effect,
+                    // but can't do that from the update method
+                    snapClueShowPageNum?.let { showPageNum ->
+                        view.ensureListShown(
+                            snapClueShowPageNum,
+                            snapClueReplacePageNum ?: -1,
+                        )
+                    }
+                    view.snapToClue()
+                }
+                maxWordScale?.let { view.setMaxWordScale(it) }
+            },
         )
     }
 

@@ -136,8 +136,11 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
      *
      * May adjust if necessary, returns final scale
      */
-    public float setCurrentScale(float scale){
+    public float setCurrentScale(float scale) {
+        boolean changed = this.currentScale != scale;
         this.currentScale = scale;
+        if (changed)
+            notifyScaleChange(scale);
         return this.currentScale;
     }
 

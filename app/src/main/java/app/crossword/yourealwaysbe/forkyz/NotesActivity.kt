@@ -71,7 +71,7 @@ import app.crossword.yourealwaysbe.puz.Position
 
 private val VERTICAL_BOARD_PADDING = 6.dp
 
-class NotesActivity() : PuzzleActivityKt() {
+class NotesActivity() : PuzzleActivity() {
     companion object {
         // TODO: JvmField can be removed when PlayActivity is Compose
         @JvmField
@@ -164,7 +164,7 @@ class NotesActivity() : PuzzleActivityKt() {
                 if (state?.isPuzzleNotes ?: false) {
                     Text(stringResource(R.string.menu_notes_puzzle))
                 } else {
-                    ClueText(state?.clueText)
+                    ClueText(clueText = state?.clueText)
                 }
             },
             onBack = { finish() },

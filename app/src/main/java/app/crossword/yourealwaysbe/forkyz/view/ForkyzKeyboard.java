@@ -66,21 +66,31 @@ public class ForkyzKeyboard
         );
     };
 
-    public static final int KEY_CHANGE_CLUE_DIRECTION = 0;
-    public static final int KEY_NEXT_CLUE = 1;
-    public static final int KEY_PREVIOUS_CLUE = 2;
+    public enum SpecialKey {
+        KEY_CHANGE_CLUE_DIRECTION(0),
+        KEY_NEXT_CLUE(1),
+        KEY_PREVIOUS_CLUE(2);
 
-    @IntDef({
-        KEY_CHANGE_CLUE_DIRECTION,
-        KEY_NEXT_CLUE,
-        KEY_PREVIOUS_CLUE
-    })
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface SpecialKey { }
+        private int keyCode;
+
+        private SpecialKey(int keyCode) {
+            this.keyCode = keyCode;
+        }
+
+        public static SpecialKey valueOf(int value) {
+            for (SpecialKey key : SpecialKey.values()) {
+                if (key.keyCode == value)
+                    return key;
+            }
+            throw new IllegalArgumentException(
+                "Unknown special key code " + value
+            );
+        }
+    }
 
     public interface SpecialKeyListener {
-        public void onKeyUp(@SpecialKey int key);
-        public void onKeyDown(@SpecialKey int key);
+        public void onKeyUp(SpecialKey key);
+        public void onKeyDown(SpecialKey key);
     }
 
     /**
@@ -103,6 +113,7 @@ public class ForkyzKeyboard
     private InputConnection inputConnection;
     private int countKeysDown = 0;
     private List<Integer> specialKeyViewIds = new ArrayList<>();
+    private boolean showSpecialKeys = false;
     private SpecialKeyListener specialKeyListener = null;
     private boolean showHideButton = true;
     private Runnable onHideButtonPressed = null;
@@ -197,17 +208,17 @@ public class ForkyzKeyboard
      */
     public synchronized boolean hasKeysDown() { return countKeysDown > 0; }
 
+    public void setShowSpecialKeys(boolean showSpecialKeys) {
+        this.showSpecialKeys = showSpecialKeys;
+    }
+
     /**
      * Set a listener for and display special keys
-     *
-     * Special keys are hidden if they are not listened for. Set to null
-     * to hide keys.
      */
     public synchronized void setSpecialKeyListener(
         SpecialKeyListener specialKeyListener
     ) {
         this.specialKeyListener = specialKeyListener;
-        setupSpecialKeys();
     }
 
     public synchronized void setShowHideButton(boolean show) {
@@ -231,19 +242,19 @@ public class ForkyzKeyboard
      * Make special keys visible, reactive if listener available
      */
     private synchronized void setupSpecialKeys() {
-        if (this.specialKeyListener == null) {
-            setSpecialKeyVisibilty(View.INVISIBLE);
-            for (int viewId : specialKeyViewIds) {
-                View keyView = findViewById(viewId);
-                keyView.setOnTouchListener(null);
-                keyView.setOnClickListener(null);
-            }
-        } else {
+        if (showSpecialKeys) {
             setSpecialKeyVisibilty(View.VISIBLE);
             for (int viewId : specialKeyViewIds) {
                 View keyView = findViewById(viewId);
                 keyView.setOnTouchListener(this);
                 keyView.setOnClickListener(this);
+            }
+        } else {
+            setSpecialKeyVisibilty(View.INVISIBLE);
+            for (int viewId : specialKeyViewIds) {
+                View keyView = findViewById(viewId);
+                keyView.setOnTouchListener(null);
+                keyView.setOnClickListener(null);
             }
         }
     }
@@ -319,7 +330,7 @@ public class ForkyzKeyboard
         });
     }
 
-    private void addSpecialKeyCode(int keyId, @SpecialKey int keyCode) {
+    private void addSpecialKeyCode(int keyId, SpecialKey keyCode) {
         specialKeyViewIds.add(keyId);
         keyActors.put(keyId, new KeyActor() {
             @Override
@@ -476,7 +487,7 @@ public class ForkyzKeyboard
 
                 if (specialKeyCode > -1) {
                     ForkyzKeyboard.this.addSpecialKeyCode(
-                        view.getId(), specialKeyCode
+                        view.getId(), SpecialKey.valueOf(specialKeyCode)
                     );
                 }
 

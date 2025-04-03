@@ -9,6 +9,7 @@ import android.content.Context;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -28,11 +29,17 @@ import app.crossword.yourealwaysbe.puz.Puzzle;
  */
 @AndroidEntryPoint
 public class BoardFullEditView extends BoardEditView {
+    private static final String TAG = "ForkyzBoardFullEditView";
+
     // how far off screen in inches to still draw grid
     private static final int SCREEN_OVERDRAW = 2;
 
     // screen overdraw in pixels
     private int screenOverdrawPx;
+
+    public BoardFullEditView(Context context) {
+        this(context, null);
+    }
 
     @Inject
     public BoardFullEditView(Context context, AttributeSet attrs) {
@@ -57,11 +64,15 @@ public class BoardFullEditView extends BoardEditView {
         if (renderer == null)
             return -1;
 
-        scrollTo(0, 0);
         int w = getMeasuredWidth();
         int h = getMeasuredHeight();
+
+        Log.i(TAG, "Fitting board to view of size " + w + "x" + h);
+
+        scrollTo(0, 0);
         float scale = renderer.fitTo(w, h);
         setCurrentScale(scale);
+
         return scale;
     }
 
