@@ -3,7 +3,7 @@ package app.crossword.yourealwaysbe.forkyz.settings
 
 import app.crossword.yourealwaysbe.forkyz.exttools.ChatGPTHelpData
 
-class ExternalToolSettings(
+data class ExternalToolSettings(
     val chatGPTAPIKey : String,
     val crosswordSolverEnabled : Boolean,
     val duckDuckGoEnabled : Boolean,

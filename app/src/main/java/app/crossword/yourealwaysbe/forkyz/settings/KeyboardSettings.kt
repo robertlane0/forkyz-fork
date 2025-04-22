@@ -2,7 +2,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.settings
 
-class KeyboardSettings(
+data class KeyboardSettings(
     val compact : Boolean,
     val forceCaps : Boolean,
     val haptic : Boolean,

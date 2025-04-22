@@ -1,7 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.settings
 
-class DownloadersSettings(
+data class DownloadersSettings(
     val downloadDeStandaard : Boolean,
     val downloadDeTelegraaf : Boolean,
     val downloadGuardianDailyCryptic : Boolean,

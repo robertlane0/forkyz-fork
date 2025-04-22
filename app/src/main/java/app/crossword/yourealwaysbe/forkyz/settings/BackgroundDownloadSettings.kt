@@ -1,7 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.settings
 
-class BackgroundDownloadSettings(
+data class BackgroundDownloadSettings(
     val requireUnmetered : Boolean,
     val allowRoaming : Boolean,
     val requireCharging : Boolean,

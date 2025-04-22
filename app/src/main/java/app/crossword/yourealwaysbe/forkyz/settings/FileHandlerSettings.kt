@@ -1,7 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.settings
 
-public class FileHandlerSettings(
+data class FileHandlerSettings(
     val storageLocation : StorageLocation,
     val safRootURI : String,
     val safCrosswordsURI : String,
