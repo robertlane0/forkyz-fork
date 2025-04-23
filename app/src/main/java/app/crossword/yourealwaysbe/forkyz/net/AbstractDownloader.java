@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
 
-import app.crossword.yourealwaysbe.forkyz.util.NetUtils;
+import app.crossword.yourealwaysbe.forkyz.util.NetUtilsKt;
 
 /**
  * Base class for downloaders
@@ -28,6 +28,6 @@ public abstract class AbstractDownloader implements Downloader {
     protected BufferedInputStream getInputStream(
         URL url, Map<String, String> headers
     ) throws IOException {
-        return NetUtils.getInputStream(url, headers, getTimeout());
+        return NetUtilsKt.getURLInputStream(url, getTimeout(), headers);
     }
 }

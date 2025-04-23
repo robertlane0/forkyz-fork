@@ -17,7 +17,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import app.crossword.yourealwaysbe.forkyz.util.NetUtils;
+import app.crossword.yourealwaysbe.forkyz.util.NetUtilsKt;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.io.PuzzleParser;
 
@@ -79,7 +79,7 @@ public abstract class AbstractStreamScraper implements StreamScraper {
     protected BufferedInputStream getInputStream(
         URL url, Map<String, String> headers
     ) throws IOException {
-        return NetUtils.getInputStream(url, headers, getTimeout());
+        return NetUtilsKt.getURLInputStream(url, getTimeout(), headers);
     }
 
     protected BufferedInputStream getInputStream(

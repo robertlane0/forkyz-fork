@@ -1,11 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.exttools
 
-import java.io.BufferedOutputStream
 import java.io.IOException
-import java.io.InputStream
-import java.net.HttpURLConnection
-import java.net.URL
 import java.util.function.Consumer
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
@@ -19,14 +15,13 @@ import androidx.annotation.MainThread
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 
 import app.crossword.yourealwaysbe.forkyz.R
 import app.crossword.yourealwaysbe.forkyz.settings.ExternalToolSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
-import app.crossword.yourealwaysbe.forkyz.util.JSONUtils
+import app.crossword.yourealwaysbe.forkyz.util.getURLJSON
 import app.crossword.yourealwaysbe.puz.Playboard
 
 private val CHAT_GPT_API_URL = "https://api.openai.com/v1/completions"
@@ -37,7 +32,6 @@ private val CHAT_GPT_RESPONSE_MESSAGE = "message"
 private val CHAT_GPT_RESPONSE_TEXT = "text"
 private val CHAT_GPT_TEMPERATURE = 1.0
 private val CHAT_GPT_MAX_TOKENS = 500
-private val HTTP_OK_RESPONSE = 200
 private val QUERY_TIMEOUT = 30000
 
 private val HELP_RESPONSE_TEXT = "helpResponse"
@@ -91,24 +85,13 @@ class ChatGPTHelpData(
         ) {
             ioScope.launch {
                 try {
-                    val conn = URL(CHAT_GPT_API_URL).openConnection()
-                        as HttpURLConnection
-                    with (conn) {
-                        setConnectTimeout(QUERY_TIMEOUT)
-                        setReadTimeout(QUERY_TIMEOUT)
-                        setRequestMethod("POST")
-                        setRequestProperty(
-                            "Content-Type", "application/json",
-                        )
-                        setRequestProperty(
-                            "Authorization", "Bearer " + apiKey,
-                        )
-                        setDoOutput(true)
-                    }
-
-                    sendQueryData(conn, query)
-
-                    callback.accept(getQueryResponse(conn))
+                    val json = getURLJSON(
+                        url = CHAT_GPT_API_URL,
+                        timeout = QUERY_TIMEOUT,
+                        headers = mapOf("Authorization" to "Bearer " + apiKey),
+                        data = getQueryData(query),
+                    )
+                    callback.accept(getQueryResponse(json))
                 } catch (e : IOException) {
                     // ignore bad response?
                 } catch (e : JSONException) {
@@ -117,10 +100,7 @@ class ChatGPTHelpData(
             }
         }
 
-        private fun sendQueryData(
-            conn : HttpURLConnection,
-            query : String,
-        ) {
+        private fun getQueryData(query : String) : JSONObject {
             val data = JSONObject()
             with (data) {
                 put("model", CHAT_GPT_MODEL)
@@ -128,27 +108,17 @@ class ChatGPTHelpData(
                 put("max_tokens", CHAT_GPT_MAX_TOKENS)
                 put("temperature", CHAT_GPT_TEMPERATURE)
             }
-
-            BufferedOutputStream(conn.getOutputStream()).use { os ->
-                val bytes = data.toString().toByteArray()
-                os.write(bytes, 0, bytes.size)
-            }
+            return data
         }
 
-        private fun getQueryResponse(conn : HttpURLConnection) : String {
-            if (conn.getResponseCode() != HTTP_OK_RESPONSE) {
-                return conn.getErrorStream().use { inputStream ->
-                    val json = JSONUtils.streamToJSON(inputStream)
-                    json.getJSONObject(CHAT_GPT_RESPONSE_ERROR)
-                        .getString(CHAT_GPT_RESPONSE_MESSAGE)
-                }
-            }
-
-            return conn.getInputStream().use { inputStream ->
-                val response = JSONUtils.streamToJSON(inputStream)
-                val choices = response.getJSONArray(CHAT_GPT_RESPONSE_CHOICES)
+        private fun getQueryResponse(json : JSONObject) : String {
+            if (json.has(CHAT_GPT_RESPONSE_ERROR)) {
+                return json.getJSONObject(CHAT_GPT_RESPONSE_ERROR)
+                    .getString(CHAT_GPT_RESPONSE_MESSAGE)
+            } else {
+                val choices = json.getJSONArray(CHAT_GPT_RESPONSE_CHOICES)
                 val first = choices.getJSONObject(0)
-                first.getString(CHAT_GPT_RESPONSE_TEXT).trim()
+                return first.getString(CHAT_GPT_RESPONSE_TEXT).trim()
             }
         }
 

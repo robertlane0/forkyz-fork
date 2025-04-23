@@ -209,7 +209,7 @@ public class PuzzleImporter {
     private static BufferedInputStream getRemoteInputStream(
         String url, int timeout
     ) throws IOException, URISyntaxException {
-        return NetUtils.getInputStream(url, null, timeout);
+        return NetUtilsKt.getURLInputStream(url, timeout);
     }
 
     /**
