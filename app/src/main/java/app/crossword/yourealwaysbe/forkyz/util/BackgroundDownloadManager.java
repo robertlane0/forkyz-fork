@@ -96,13 +96,15 @@ public class BackgroundDownloadManager {
 
     @MainThread
     public void updateBackgroundDownloads() {
-        cancelBackgroundDownloads();
-
+        Log.i(TAG, "Updating background download work schedule.");
         settings.getBackgroundDownloadSettings(bgSettings -> {
-            if (bgSettings.getHourly())
+            if (bgSettings.getHourly()) {
+                cancelDailyDownloads();
                 scheduleHourlyDownloads(bgSettings);
-            else
+            } else {
+                cancelHourlyDownloads();
                 scheduleNextDailyDownload(bgSettings);
+            }
         });
     }
 
@@ -127,8 +129,10 @@ public class BackgroundDownloadManager {
         BackgroundDownloadSettings bgSettings
     ) {
         long nextDelay = getNextDailyDownloadDelay(bgSettings);
-        if (nextDelay < 0)
+        if (nextDelay < 0) {
+            cancelDailyDownloads();
             return;
+        }
 
         OneTimeWorkRequest request
             = new OneTimeWorkRequest.Builder(DailyDownloadWorker.class)
@@ -175,8 +179,11 @@ public class BackgroundDownloadManager {
         return nextDownloadDelay;
     }
 
-    private void cancelBackgroundDownloads() {
+    private void cancelHourlyDownloads() {
         getWorkManager().cancelUniqueWork(DOWNLOAD_WORK_NAME_HOURLY);
+    }
+
+    private void cancelDailyDownloads() {
         getWorkManager().cancelUniqueWork(DOWNLOAD_WORK_NAME_DAILY);
     }
 
@@ -252,7 +259,6 @@ public class BackgroundDownloadManager {
         protected void doDownload(
             CallbackToFutureAdapter.Completer<ListenableWorker.Result> completer
         ) {
-
             fileHandlerProvider.isMissingWritePermission(missing -> {
                 if (missing) {
                     Log.i(TAG, "Skipping download, no write permission");
@@ -270,11 +276,13 @@ public class BackgroundDownloadManager {
                         );
 
                         completer.set(ListenableWorker.Result.success());
+                        Log.i(TAG, "Download success.");
 
                         // This is used to tell BrowseActivity that
                         // puzzles may have been updated while paused.
                         settings.setBrowseNewPuzzle(true);
                     } catch (Exception e) {
+                        Log.i(TAG, "Download exception: ");
                         completer.setException(e);
                     }
                 });});
@@ -301,6 +309,7 @@ public class BackgroundDownloadManager {
 
         @Override
         public ListenableFuture<ListenableWorker.Result> startWork() {
+            Log.i(TAG, "Starting hourly download.");
             return CallbackToFutureAdapter.getFuture(completer -> {
                 doDownload(completer);
                 return "BaseDownloadWorker.doDownload";
@@ -330,6 +339,7 @@ public class BackgroundDownloadManager {
 
         @Override
         public ListenableFuture<ListenableWorker.Result> startWork() {
+            Log.i(TAG, "Starting daily download.");
             return CallbackToFutureAdapter.getFuture(completer -> {
                 settings.getBackgroundDownloadSettings(bgSettings -> {
                     manager.scheduleNextDailyDownload(bgSettings);
