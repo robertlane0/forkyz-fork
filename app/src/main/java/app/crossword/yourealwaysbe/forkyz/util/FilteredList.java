@@ -17,6 +17,8 @@ public class FilteredList<T> extends AbstractList<T> {
      */
     private List<Integer> filterMap = null;
 
+    public FilteredList() { }
+
     public FilteredList(T... elements) {
         for (T e : elements)
             unfilteredList.add(e);
