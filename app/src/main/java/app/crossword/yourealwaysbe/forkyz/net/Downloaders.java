@@ -586,15 +586,21 @@ public class Downloaders {
         }
 
         if (settings.getDownloadPremier()) {
-            downloaders.add(new KingDigitalDownloader(
+            String arkadiumUrl = "https://www.arkadium.com/games/"
+                + "premier-crossword-kingsfeatures/";
+            downloaders.add(new KingDigitalLoginDownloader(
                 "Premier",
                 "Premier",
                 context.getString(R.string.premier_crossword),
                 AbstractDateDownloader.DAYS_SUNDAY,
-                Duration.ofDays(-7), // more than a week by experiment
+                Duration.ofDays(-21), // from full puzzle list during login
                 "https://puzzles.kingdigital.com",
-                "'https://www.arkadium.com/games/"
-                    + "premier-crossword-kingsfeatures/'"
+                arkadiumUrl,
+                arkadiumUrl,
+                "KFS+Arkadium$",
+                "Puzzles&Games",
+                arkadiumUrl,
+                "PCC01"
             ));
         }
 
