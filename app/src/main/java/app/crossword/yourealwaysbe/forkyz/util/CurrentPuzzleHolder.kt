@@ -198,21 +198,21 @@ public class CurrentPuzzleHolder @Inject constructor(
         if (puz == null) {
             Log.e(TAG, "No puzzle associated to the board to save.")
             cb()
-        }
-
-        ioScope.launch {
-            ioLock.lock()
-            mainScope.launch {
-                fileHandlerProvider.get() { fileHandler ->
-                    ioScope.launch {
-                        try {
-                            fileHandler.save(puz, puzHandle)
-                        } catch (e : IOException) {
-                            Log.e(TAG, "Error saving puzzle.")
-                            e.printStackTrace()
-                        } finally {
-                            ioLock.unlock()
-                            cb()
+        } else {
+            ioScope.launch {
+                ioLock.lock()
+                mainScope.launch {
+                    fileHandlerProvider.get() { fileHandler ->
+                        ioScope.launch {
+                            try {
+                                fileHandler.save(puz, puzHandle)
+                            } catch (e : IOException) {
+                                Log.e(TAG, "Error saving puzzle.")
+                                e.printStackTrace()
+                            } finally {
+                                ioLock.unlock()
+                                cb()
+                            }
                         }
                     }
                 }
