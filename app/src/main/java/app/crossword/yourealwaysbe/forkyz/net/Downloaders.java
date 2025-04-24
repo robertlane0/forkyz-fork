@@ -1,5 +1,20 @@
 package app.crossword.yourealwaysbe.forkyz.net;
 
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -23,23 +38,14 @@ import app.crossword.yourealwaysbe.puz.io.PMLIO;
 import app.crossword.yourealwaysbe.puz.io.PrzekrojIO;
 import app.crossword.yourealwaysbe.puz.io.RCIJeuxMFJIO;
 
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 public class Downloaders {
     private static final String TAG = "ForkyzDownloaders";
     private static final int NUM_DOWNLOAD_THREADS = 3;
+
+    // In the main download method, lock all other downloaders so that
+    // the list of existing files does not change externally. I.e. two
+    // separate downloaders don't cause duplicate downloads.
+    private static final Semaphore puzzleDirLock = new Semaphore(1);
 
     private Context context;
     private NotificationManagerCompat notificationManager;
@@ -163,70 +169,88 @@ public class Downloaders {
             return;
         }
 
-        NotificationCompat.Builder not =
-                new NotificationCompat.Builder(context, ForkyzApplication.PUZZLE_DOWNLOAD_CHANNEL_ID)
-                        .setSmallIcon(android.R.drawable.stat_sys_download)
-                        .setContentTitle(context.getString(
-                            R.string.puzzles_downloading
-                        ))
-                        .setWhen(System.currentTimeMillis());
-
-        int nextNotificationId = 1;
-        Set<String> fileNames = fileHandler.getPuzzleNames();
-
-        ExecutorService downloadExecutor
-            = Executors.newFixedThreadPool(NUM_DOWNLOAD_THREADS);
-        final AtomicBoolean somethingDownloaded = new AtomicBoolean(false);
-        final AtomicBoolean somethingFailed = new AtomicBoolean(false);
-
-        for (
-            Map.Entry<Downloader, LocalDate> puzzle
-                : puzzlesToDownload.entrySet()
-        ) {
-            int notificationId = nextNotificationId++;
-            Downloader downloader = puzzle.getKey();
-            LocalDate date = puzzle.getValue();
-
-            downloadExecutor.submit(() -> {
-                Downloader.DownloadResult result = downloadPuzzle(
-                    downloader,
-                    date,
-                    not,
-                    notificationId,
-                    fileNames
-                );
-                if (result.isSuccess())
-                    somethingDownloaded.set(true);
-                else if (result.isFailed())
-                    somethingFailed.set(true);
-            });
-        }
-
-        downloadExecutor.shutdown();
-
         try {
-            downloadExecutor.awaitTermination(
-                Long.MAX_VALUE, TimeUnit.MILLISECONDS
-            );
+            acquirePuzzleDirLock();
+
+            NotificationCompat.Builder not = new NotificationCompat.Builder(
+                context, ForkyzApplication.PUZZLE_DOWNLOAD_CHANNEL_ID
+            ).setSmallIcon(android.R.drawable.stat_sys_download)
+                .setContentTitle(
+                    context.getString(R.string.puzzles_downloading)
+                ).setWhen(System.currentTimeMillis());
+
+            int nextNotificationId = 1;
+            Set<String> fileNames = fileHandler.getPuzzleNames();
+
+            ExecutorService downloadExecutor
+                = Executors.newFixedThreadPool(NUM_DOWNLOAD_THREADS);
+            final AtomicBoolean somethingDownloaded = new AtomicBoolean(false);
+            final AtomicBoolean somethingFailed = new AtomicBoolean(false);
+
+            for (
+                Map.Entry<Downloader, LocalDate> puzzle
+                    : puzzlesToDownload.entrySet()
+            ) {
+                int notificationId = nextNotificationId++;
+                Downloader downloader = puzzle.getKey();
+                LocalDate date = puzzle.getValue();
+
+                downloadExecutor.submit(() -> {
+                    Downloader.DownloadResult result = downloadPuzzle(
+                        downloader,
+                        date,
+                        not,
+                        notificationId,
+                        fileNames
+                    );
+                    if (result.isSuccess())
+                        somethingDownloaded.set(true);
+                    else if (result.isFailed())
+                        somethingFailed.set(true);
+                });
+            }
+
+            downloadExecutor.shutdown();
+
+            try {
+                downloadExecutor.awaitTermination(
+                    Long.MAX_VALUE, TimeUnit.MILLISECONDS
+                );
+            } catch (InterruptedException e) {
+                // Oh well
+            }
+
+            if (this.notificationManager != null) {
+                this.notificationManager.cancel(0);
+            }
+
+            if (isNotifyingSummary()) {
+                this.postDownloadedGeneral(
+                    somethingDownloaded.get(), somethingFailed.get()
+                );
+            }
+        } finally {
+            releasePuzzleDirLock();
+        }
+    }
+
+    private void acquirePuzzleDirLock() {
+        try {
+            puzzleDirLock.acquire();
         } catch (InterruptedException e) {
-            // Oh well
+            // oh well
         }
+    }
 
-        if (this.notificationManager != null) {
-            this.notificationManager.cancel(0);
-        }
-
-        if (isNotifyingSummary()) {
-            this.postDownloadedGeneral(
-                somethingDownloaded.get(), somethingFailed.get()
-            );
-        }
+    private void releasePuzzleDirLock() {
+        puzzleDirLock.release();
     }
 
     /**
      * Download and save the puzzle from the downloader
      *
-     * Only saves if we don't already have it.
+     * Only saves if we don't already have it. Only call if
+     * puzzleDirLock is acquired (so existingFileNames doesn't expire).
      */
     @SuppressLint("MissingPermission") // canNotify does check
     private Downloader.DownloadResult downloadPuzzle(
