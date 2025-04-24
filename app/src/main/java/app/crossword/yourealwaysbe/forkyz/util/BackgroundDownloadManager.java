@@ -80,6 +80,10 @@ public class BackgroundDownloadManager {
         this.settings = settings;
 
         settings.getLiveBackgroundDownloadSettings().observeForever(value -> {
+            Log.i(
+                TAG,
+                "Triggering update background download work with: " + value
+            );
             updateBackgroundDownloads();
         });
     }
@@ -95,9 +99,13 @@ public class BackgroundDownloadManager {
     }
 
     @MainThread
-    public void updateBackgroundDownloads() {
-        Log.i(TAG, "Updating background download work schedule.");
+    private void updateBackgroundDownloads() {
         settings.getBackgroundDownloadSettings(bgSettings -> {
+            Log.i(
+                TAG,
+                "Updating background download work schedule with: "
+                    + bgSettings
+            );
             if (bgSettings.getHourly()) {
                 cancelDailyDownloads();
                 scheduleHourlyDownloads(bgSettings);
