@@ -36,9 +36,9 @@ public class RaetselZentraleSchwedenStreamScraper
     private static final RegexScrape SECOND_STAGE_URL_MATCH
         = new RegexScrape(
             Pattern.compile(
-                "iframe[^>]*src=\"([^\"]*raetsel\\.raetselzentrale\\.de[^\"]*)\""
+                "https://raetsel.raetselzentrale.de/.*schwede"
             ),
-            1
+            0
         );
 
     private static final RegexScrape PUZZLE_ID_MATCH

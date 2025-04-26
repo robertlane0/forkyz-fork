@@ -53,7 +53,7 @@ public class StreamScrapersTest {
     @Test
     public void testRaetselZentraleSchweden() throws Exception {
         testScraper(
-            "https://www.abendblatt.de/ratgeber/wissen/article106560367/Spielen-Sie-hier-taeglich-das-kostenlose-Kreuzwortraetsel.html",
+            "https://www.abendblatt.de/hamburg/Kreuzwortraetsel-Jeden-Tag-kostenlos-in-Luxusgroesse",
             new RaetselZentraleSchwedenStreamScraper()
         );
     }
