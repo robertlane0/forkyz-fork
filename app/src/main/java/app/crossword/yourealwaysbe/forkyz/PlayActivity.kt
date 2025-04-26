@@ -5,6 +5,7 @@ import android.content.Intent
 import android.hardware.SensorManager
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -284,8 +285,9 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
     private fun ActivityBodyPortrait(modifier : Modifier) {
         Column(modifier = modifier.fillMaxHeight()) {
             Board(
-                Modifier.boardHeightPortrait(Modifier.weight(1.0F))
-                    .fillMaxWidth(),
+                Modifier.boardHeightPortrait(
+                    unrestrictedModifier = Modifier.weight(1.0F),
+                ).fillMaxWidth(),
             )
             ClueBar(Modifier.fillMaxWidth())
             CluesList(Modifier.weight(1.0F).fillMaxWidth())
@@ -393,13 +395,18 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
         )
     }
 
+    /**
+     * Below grid clue bar
+     *
+     * Modifier mainly needed for width, height is set internally
+     */
     @Composable
-    private fun ClueBar(widthModifier : Modifier) {
+    private fun ClueBar(modifier : Modifier) {
         val state by viewModel.playUIState.observeAsState()
 
         if (state?.isClueBelowGrid ?: false) {
             Row(
-                modifier = widthModifier
+                modifier = modifier
                     .height(64.dp)
                     .background(MaterialTheme.colorScheme.surface),
                 verticalAlignment = Alignment.CenterVertically,
@@ -488,8 +495,9 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
                     setFocusable(true)
                     setFocusableInTouchMode(true)
                     setBackground(
-                        context.getDrawable(
-                            R.drawable.miniboard_no_focus_indicator_bg
+                        AppCompatResources.getDrawable(
+                            context,
+                            R.drawable.miniboard_no_focus_indicator_bg,
                         )
                     )
                     addBoardClickListener(object : BoardClickListener {
@@ -533,7 +541,7 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
 
     @Composable
     private fun Modifier.boardHeightPortrait(
-        unrestrictedModifier : Modifier,
+        unrestrictedModifier : Modifier = Modifier,
     ) : Modifier {
         val state by viewModel.playUIState.observeAsState()
         val aspect = state?.puzzleAspectRatio ?: 1.0F
@@ -542,18 +550,18 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
             val minHeight = (
                 ACROSTIC_BOARD_HEIGHT_RATIO_MIN * displayHeight
             ).toInt().dp
-            return Modifier.aspectRatio(aspect).heightIn(min=minHeight)
+            return this.aspectRatio(aspect).heightIn(min=minHeight)
         } else if (state?.showCluesTab ?: false) {
             return when (state?.portraitGridRatio) {
-                GridRatio.GR_ONE_TO_ONE -> Modifier.aspectRatio(1.0F)
-                GridRatio.GR_THIRTY_PCNT -> Modifier.fillMaxHeight(0.3F)
-                GridRatio.GR_FORTY_PCNT -> Modifier.fillMaxHeight(0.4F)
-                GridRatio.GR_FIFTY_PCNT -> Modifier.fillMaxHeight(0.5F)
-                GridRatio.GR_SIXTY_PCNT -> Modifier.fillMaxHeight(0.6F)
-                else -> Modifier.aspectRatio(aspect)
+                GridRatio.GR_ONE_TO_ONE -> this.aspectRatio(1.0F)
+                GridRatio.GR_THIRTY_PCNT -> this.fillMaxHeight(0.3F)
+                GridRatio.GR_FORTY_PCNT -> this.fillMaxHeight(0.4F)
+                GridRatio.GR_FIFTY_PCNT -> this.fillMaxHeight(0.5F)
+                GridRatio.GR_SIXTY_PCNT -> this.fillMaxHeight(0.6F)
+                else -> this.aspectRatio(aspect)
             }
         } else {
-            return unrestrictedModifier
+            return this.then(unrestrictedModifier)
         }
     }
 
@@ -566,18 +574,18 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
             val maxWidth = (
                 ACROSTIC_BOARD_WIDTH_RATIO_MAX * displayWidth
             ).toInt().dp
-            return Modifier.aspectRatio(aspect).widthIn(max=maxWidth)
+            return this.aspectRatio(aspect).widthIn(max=maxWidth)
         } else if (state?.showCluesTab ?: false) {
             return when (state?.landscapeGridRatio) {
-                GridRatio.GR_ONE_TO_ONE -> Modifier.aspectRatio(1.0F)
-                GridRatio.GR_THIRTY_PCNT -> Modifier.fillMaxWidth(0.3F)
-                GridRatio.GR_FORTY_PCNT -> Modifier.fillMaxWidth(0.4F)
-                GridRatio.GR_FIFTY_PCNT -> Modifier.fillMaxWidth(0.5F)
-                GridRatio.GR_SIXTY_PCNT -> Modifier.fillMaxWidth(0.6F)
-                else -> Modifier.aspectRatio(aspect)
+                GridRatio.GR_ONE_TO_ONE -> this.aspectRatio(1.0F)
+                GridRatio.GR_THIRTY_PCNT -> this.fillMaxWidth(0.3F)
+                GridRatio.GR_FORTY_PCNT -> this.fillMaxWidth(0.4F)
+                GridRatio.GR_FIFTY_PCNT -> this.fillMaxWidth(0.5F)
+                GridRatio.GR_SIXTY_PCNT -> this.fillMaxWidth(0.6F)
+                else -> this.aspectRatio(aspect)
             }
         } else {
-            return Modifier.fillMaxWidth()
+            return this.fillMaxWidth()
         }
     }
 

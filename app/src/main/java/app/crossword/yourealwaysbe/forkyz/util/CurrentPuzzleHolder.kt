@@ -11,7 +11,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.CoroutineScope
 
 import android.app.Service
-import android.app.ForegroundServiceStartNotAllowedException
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
@@ -45,7 +44,7 @@ public class CurrentPuzzleHolder @Inject constructor(
     val settings : ForkyzSettings,
     val fileHandlerProvider : FileHandlerProvider,
 ) {
-    private val TAG = "ForkyzCurrentPuzzleHolder";
+    private val TAG = "ForkyzCurrentPzlHldr";
 
     var board : Playboard? = null
         private set
@@ -143,7 +142,9 @@ public class CurrentPuzzleHolder @Inject constructor(
                 appContext,
                 Intent(appContext, PuzzleSaveService::class.java),
             )
-        } catch (e : ForegroundServiceStartNotAllowedException) {
+        // use IllegalState as ForegroundServiceNotAllowedException
+        // requires API 31
+        } catch (e : IllegalStateException) {
             Log.i(
                 TAG,
                 "Save on foreground not allowed, save in background"

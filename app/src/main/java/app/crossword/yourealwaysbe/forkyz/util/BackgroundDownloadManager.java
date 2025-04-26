@@ -47,7 +47,7 @@ import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
  */
 @Singleton
 public class BackgroundDownloadManager {
-    private static final String TAG = "ForkyzBackgroundDownload";
+    private static final String TAG = "ForkyzBackgroundDLMan";
 
     @Module
     @InstallIn(SingletonComponent.class)

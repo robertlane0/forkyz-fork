@@ -4,7 +4,6 @@ package app.crossword.yourealwaysbe.forkyz
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 
-import android.app.ForegroundServiceStartNotAllowedException
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -119,7 +118,9 @@ class SettingsActivity : ForkyzActivityKt() {
                         uri.toString()
                     )
                     ContextCompat.startForegroundService(this, intent)
-                } catch (e : ForegroundServiceStartNotAllowedException) {
+                // use IllegalState as
+                // ForegroundServiceNotAllowedException requires API 31
+                } catch (e : IllegalStateException) {
                     Log.i(
                         TAG,
                         "Could not start puzzle export service on foreground"

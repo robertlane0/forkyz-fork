@@ -67,7 +67,7 @@ class KingDigitalLoginDownloader(
     sourceUrlPattern,
     shareUrlPattern,
 ) {
-    private val TAG = "ForkyzKingDigitalLoginDownloader"
+    private val TAG = "ForkyzKingDigitalLgnDL"
 
     private val LOGIN_URL = "https://kdig.kingfeatures.net/login/"
     private val DOWNLOAD_URL = "https://kdig.kingfeatures.net/"

@@ -164,7 +164,10 @@ class NotesActivity() : PuzzleActivity() {
                 if (state?.isPuzzleNotes ?: false) {
                     Text(stringResource(R.string.menu_notes_puzzle))
                 } else {
-                    ClueText(clueText = state?.clueText)
+                    ClueText(
+                        modifier = Modifier.fillMaxWidth(),
+                        clueText = state?.clueText,
+                    )
                 }
             },
             onBack = { finish() },

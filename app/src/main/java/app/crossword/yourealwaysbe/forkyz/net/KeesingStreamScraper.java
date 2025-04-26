@@ -37,7 +37,7 @@ import app.crossword.yourealwaysbe.puz.io.KeesingXMLIO;
  *
  */
 public class KeesingStreamScraper extends AbstractStreamScraper {
-    private static final String TAG = "ForkyzKeesingStreamScraper";
+    private static final String TAG = "ForkyzKeesingStrmScrp";
 
     private static final RegexScrape CUSTOMER_ID_MATCH
         = new RegexScrape(Pattern.compile("data-customerid=\"([^\"]*)\""), 1);

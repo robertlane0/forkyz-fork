@@ -3,8 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
 >
     <string name="puzzle_select">Select a puzzle:</string>
-    <string name="yes">YES</string>
-    <string name="no">NO</string>
     <string name="reveal_puzzle">Reveal Entire Puzzle</string>
     <string name="are_you_sure">Are you sure?</string>
     <string name="ok">OK</string>
@@ -765,7 +763,6 @@
     <string name="asset_not_found">Error: could not find page to display. This is a programming error and can only be fixed by reporting it to the developers.</string>
 
     <!-- Logcat activity -->
-    <string name="loading_logcat">Loading Logcat…</string>
     <string name="could_not_load_logcat">Could not load logcat: %1$s.</string>
     <string name="jump_to_end">Jump to End</string>
     <string name="logcat">Logcat</string>

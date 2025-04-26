@@ -358,7 +358,7 @@ abstract class PuzzleActivity() : ForkyzActivityKt() {
      */
     @Composable
     protected fun ClueText(
-        modifier : Modifier = Modifier.fillMaxWidth(),
+        modifier : Modifier = Modifier,
         clueText : String? = null,
         onClick : () -> Unit = { },
         onClickDescription : String = "",
