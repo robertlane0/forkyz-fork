@@ -455,15 +455,21 @@ public class Downloaders {
         }
 
         if (settings.getDownloadJoseph()) {
-            downloaders.add(new KingDigitalDownloader(
+            String arkadiumUrl = "https://www.arkadium.com/games/"
+                + "joseph-crossword-kingsfeatures/";
+            downloaders.add(new KingDigitalLoginDownloader(
                 "Joseph",
                 "Joseph",
                 context.getString(R.string.joseph_crossword),
                 AbstractDateDownloader.DAYS_NO_SUNDAY,
-                Duration.ofDays(-7), // more than a week by experiment
+                Duration.ofDays(-20), // by experiment
                 "https://puzzles.kingdigital.com",
-                "'https://www.arkadium.com/games/"
-                    + "joseph-crossword-kingsfeatures/'"
+                arkadiumUrl,
+                arkadiumUrl,
+                "KFS+Arkadium$",
+                "Puzzles&Games",
+                "",
+                "JCC01"
             ));
         }
 
@@ -555,7 +561,7 @@ public class Downloaders {
                 "'https://d3untqd069jdot.cloudfront.net/puzzles/"
                     + "cryptic-crossword/'yyyyMMdd'.html'",
                 "'https://metro.co.uk/puzzles/"
-                    + "cryptic-crosswords-online-free-daily-word-puzzle/'",
+                    + "cryptic-crossword'",
                 LocalDate.of(2024, 12, 2)
             ));
         }
@@ -571,7 +577,7 @@ public class Downloaders {
                 "'https://d3untqd069jdot.cloudfront.net/puzzles/"
                     + "crossword/'yyyyMMdd'.html'",
                 "'https://metro.co.uk/puzzles/"
-                    + "quick-crosswords-online-free-daily-word-puzzle/'",
+                    + "quick-crossword'",
                 LocalDate.of(2024, 12, 2)
             ));
         }
@@ -634,7 +640,7 @@ public class Downloaders {
                 "Sheffer",
                 context.getString(R.string.sheffer_crossword),
                 AbstractDateDownloader.DAYS_NO_SUNDAY,
-                Duration.ofDays(-7), // more than a week by experiment
+                Duration.ofDays(-6), // six days on last test (26 Apr 2025)
                 "https://puzzles.kingdigital.com",
                 "'https://www.arkadium.com/games/"
                     + "sheffer-crossword-kingsfeatures/'"
