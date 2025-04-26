@@ -5,8 +5,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.view;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -30,7 +28,6 @@ import android.view.inputmethod.InputConnection;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import androidx.annotation.IntDef;
 import androidx.core.view.LayoutInflaterCompat;
 import androidx.lifecycle.ViewTreeLifecycleOwner;
 import com.google.android.material.button.MaterialButton;
