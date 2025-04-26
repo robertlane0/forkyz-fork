@@ -25,8 +25,7 @@ import app.crossword.yourealwaysbe.puz.PuzzleBuilder;
 import app.crossword.yourealwaysbe.puz.util.JSONParser;
 
 /**
- * Read a character stream of JSON data in the format used by the
- * Guardian.
+ * Read a character stream of JSON data in the format used by PML.
  */
 public class PMLIO extends AbstractJSONIO {
     private static final Logger LOG
@@ -68,6 +67,14 @@ public class PMLIO extends AbstractJSONIO {
         } catch (IOException | JSONException e) {
             return null;
         }
+    }
+
+    /**
+     * Returns null if failed
+     */
+    public static Puzzle readFromJSON(String jsonString) {
+        JSONObject json = JSONParser.parse(jsonString);
+        return readPuzzleFromJSON(json);
     }
 
     public static Puzzle readFromHTML(InputStream is) {

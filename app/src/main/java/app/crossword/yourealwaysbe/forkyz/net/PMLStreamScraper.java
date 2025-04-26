@@ -32,6 +32,12 @@ public class PMLStreamScraper extends AbstractStreamScraper {
     private static final int IS_LATEST_PRE_URL_GRP = 1;
     private static final int IS_LATEST_POST_URL_GRP = 2;
 
+    private static final RegexScrape EMBED_JSON_MATCH =
+        new RegexScrape(
+            Pattern.compile("\\{\"pml_id\".*\\}"),
+            0
+        );
+
     private static final DateTimeFormatter DATE_FORMATTER
         = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US);
 
@@ -42,6 +48,7 @@ public class PMLStreamScraper extends AbstractStreamScraper {
         ByteArrayInputStream bis = StreamUtils.makeByteArrayInputStream(is);
 
         String embedURL = getPMLURL(bis);
+        System.out.println("FORKYZ: embed URL " + embedURL);
         if (embedURL != null) {
             try (InputStream embedIS = getInputStream(embedURL)) {
                 bis = StreamUtils.makeByteArrayInputStream(embedIS);
@@ -53,7 +60,18 @@ public class PMLStreamScraper extends AbstractStreamScraper {
             bis.reset();
         }
 
-        Puzzle puz = PMLIO.readPuzzle(bis);
+        Puzzle puz = null;
+
+        String embedJSON = getPMLJSON(bis);
+        if (embedJSON != null) {
+            puz = PMLIO.readFromJSON(embedJSON);
+        }
+
+        if (puz == null) {
+            bis.reset();
+            puz = PMLIO.readPuzzle(bis);
+        }
+
         if (puz != null)
             puz.setSource(DEFAULT_SOURCE);
 
@@ -86,5 +104,12 @@ public class PMLStreamScraper extends AbstractStreamScraper {
         } else {
             return url;
         }
+    }
+
+    /**
+     * Find directly embedded JSON
+     */
+    private static String getPMLJSON(InputStream is) {
+        return regexScrape(is, EMBED_JSON_MATCH);
     }
 }
