@@ -538,7 +538,6 @@
 
     <!-- play menu -->
     <string name="special_entry">Insert Special</string>
-    <string name="grid">Grid</string>
     <string name="clues">Clues</string>
     <string name="zoom">Zoom</string>
     <string name="zoom_in">Zoom In</string>
