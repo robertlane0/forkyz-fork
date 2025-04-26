@@ -297,6 +297,9 @@ class NotesActivity() : PuzzleActivity() {
                         modifier = Modifier.combinedClickable(
                             onLongClick = viewModel::longClickNotesClueFlag,
                             onClick = viewModel::toggleNotesClueFlag,
+                            onLongClickLabel = stringResource(
+                                R.string.choose_flag_color
+                            ),
                         ),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
