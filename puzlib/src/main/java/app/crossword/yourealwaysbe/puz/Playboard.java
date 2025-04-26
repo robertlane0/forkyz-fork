@@ -1528,6 +1528,26 @@ public class Playboard {
     }
 
     /**
+     * Call this instead of Puzzle.setNote to update listeners
+     */
+    public void setClueNote(ClueID cid, Note note) {
+        if (cid != null && !Objects.equals(note, puzzle.getNote(cid))) {
+            puzzle.setNote(cid, note);
+            flagClueChange(cid);
+            notifyChange();
+        }
+    }
+
+    /**
+     * Call this instead of Puzzle.setPlayerNote
+     *
+     * For consistency with setClueNote really.
+     */
+    public void setPlayerNote(Note note) {
+        puzzle.setPlayerNote(note);
+    }
+
+    /**
      * Call this instead of puzzle.flagClue to update listeners
      */
     public void flagClue(Clue clue, boolean flag) {
@@ -1774,7 +1794,11 @@ public class Playboard {
     }
 
     private void flagClueChange(Clue clue) {
-        changedClueIDs.add(clue.getClueID());
+        flagClueChange(clue.getClueID());
+    }
+
+    private void flagClueChange(ClueID cid) {
+        changedClueIDs.add(cid);
     }
 
     /**

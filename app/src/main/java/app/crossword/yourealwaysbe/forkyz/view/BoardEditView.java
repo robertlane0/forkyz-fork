@@ -22,7 +22,7 @@ import androidx.lifecycle.ViewTreeLifecycleOwner;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
-import app.crossword.yourealwaysbe.forkyz.settings.DisplaySeparators;
+import app.crossword.yourealwaysbe.forkyz.settings.RenderSettings;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.util.BoxInputConnection;
 import app.crossword.yourealwaysbe.forkyz.util.ChangeOnlyObserver;
@@ -104,11 +104,11 @@ public abstract class BoardEditView
         super.onAttachedToWindow();
         // no lifecycle owner until attached
         // only rerender on change
-        settings.getLivePlayDisplaySeparators().observe(
+        settings.getLivePlayRenderSettings().observe(
             ViewTreeLifecycleOwner.get(this),
-             new ChangeOnlyObserver<DisplaySeparators>() {
+             new ChangeOnlyObserver<RenderSettings>() {
                 @Override
-                public void onTrueChange(DisplaySeparators value) {
+                public void onTrueChange(RenderSettings value) {
                     render();
                 }
             }

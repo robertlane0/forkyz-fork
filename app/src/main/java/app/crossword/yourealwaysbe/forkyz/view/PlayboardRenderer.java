@@ -1712,17 +1712,6 @@ public class PlayboardRenderer {
         return box.getIsPartOfClues().contains(cid);
     }
 
-    private boolean isStartOfClue(Position pos, ClueID cid) {
-        if (pos == null || board == null || cid == null)
-            return false;
-
-        Box box = board.getPuzzle().checkedGetBox(pos);
-        if (box == null)
-            return false;
-
-        return box.isStartOf(cid);
-    }
-
     private void drawText(
         Canvas canvas,
         CharSequence text,
@@ -2247,9 +2236,7 @@ public class PlayboardRenderer {
             return true;
 
         for (ClueID cid : changes.changedClueIDs()) {
-            // only need to rerender first box of changed clues because it's
-            // num or flag changes only
-            if (isStartOfClue(pos, cid))
+            if (isPartOfClue(pos, cid))
                 return true;
         }
 

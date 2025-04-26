@@ -610,15 +610,15 @@ class NotesActivityViewModel @Inject constructor(
     }
 
     private fun updateNote(transformer : (Note) -> Note) {
-        val puz = getPuzzle()
-        if (puz == null)
+        val board = getBoard()
+        if (board == null)
             return
 
         val newNote = transformer(note)
         if (isPuzzleNotes) {
-            puz.setPlayerNote(newNote)
+            board.setPlayerNote(newNote)
         } else {
-            puz.setNote(notesClueID, newNote)
+            board.setClueNote(notesClueID, newNote)
         }
         updateState()
     }
