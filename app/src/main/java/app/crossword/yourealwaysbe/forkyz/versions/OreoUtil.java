@@ -18,10 +18,11 @@ import app.crossword.yourealwaysbe.forkyz.util.PuzzleSaveService;
 
 @TargetApi(Build.VERSION_CODES.O)
 public class OreoUtil extends NougatUtil {
+    private static final String TAG = "ForkyzOreoUtil";
 
     @Override
     public void createNotificationChannels(Context context) {
-        Log.i(OreoUtil.class.getSimpleName(), "Creating notification channels");
+        Log.i(TAG, "Creating notification channels");
 
         NotificationManager notificationManager
             = context.getSystemService(NotificationManager.class);
