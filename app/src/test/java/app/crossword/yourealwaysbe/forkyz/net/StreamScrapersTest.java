@@ -66,13 +66,14 @@ public class StreamScrapersTest {
     //    );
     //}
 
-    @Test
-    public void testSeattle() throws Exception {
-        testScraper(
-            "https://www.seattletimes.com/games-nytimes-crossword/",
-            new PzzlComStreamScraper()
-        );
-    }
+    //403 without user agent
+    //@Test
+    //public void testSeattle() throws Exception {
+    //    testScraper(
+    //        "https://www.seattletimes.com/games-nytimes-crossword/",
+    //        new PzzlComStreamScraper()
+    //    );
+    //}
 
     @Test
     public void testPzzlCom() throws Exception {
