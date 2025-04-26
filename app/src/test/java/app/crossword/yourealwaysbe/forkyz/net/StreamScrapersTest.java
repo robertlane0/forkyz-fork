@@ -27,7 +27,7 @@ public class StreamScrapersTest {
     @Test
     public void testKeesing() throws Exception {
         testScraper(
-            "https://www.standaard.be/kruiswoordraadsel",
+            "https://app.standaard.be/kruiswoord",
             new KeesingStreamScraper()
         );
     }
