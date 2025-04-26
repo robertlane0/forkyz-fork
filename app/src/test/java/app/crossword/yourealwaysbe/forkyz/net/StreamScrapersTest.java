@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
 
-import app.crossword.yourealwaysbe.forkyz.util.NetUtils;
+import app.crossword.yourealwaysbe.forkyz.util.NetUtilsKt;
 //import app.crossword.yourealwaysbe.forkyz.versions.TiramisuUtil;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.io.PuzzleParser;
@@ -93,7 +93,7 @@ public class StreamScrapersTest {
     @Test
     public void testPML() throws Exception {
         testScraper(
-            "https://metro.co.uk/puzzles/quick-crosswords-online-free-daily-word-puzzle/",
+            "https://metro.co.uk/puzzles/quick-crossword",
             new PMLStreamScraper()
         );
     }
@@ -104,7 +104,9 @@ public class StreamScrapersTest {
     private static void testScraper(
         String url, StreamScraper scraper
     ) throws Exception {
-        try (InputStream is = NetUtils.getInputStream(url, null, TIMEOUT)) {
+        try (
+            InputStream is = NetUtilsKt.getURLInputStream(url, TIMEOUT)
+        ) {
             Puzzle puz = scraper.parseInput(is, url);
             assertNotNull(puz);
         }
@@ -119,7 +121,7 @@ public class StreamScrapersTest {
         String url, PuzzleParser scraper
     ) throws Exception {
         try (
-            InputStream is = NetUtils.apacheGetInputStream(url, null, TIMEOUT)
+            InputStream is = NetUtilsKt.apacheGetURLInputStream(url, TIMEOUT)
         ) {
             Puzzle puz = scraper.parseInput(is);
             assertNotNull(puz);

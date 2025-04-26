@@ -12,10 +12,12 @@ import org.junit.runners.Parameterized.Parameters;
 import org.junit.runners.Parameterized;
 
 import android.content.Context;
+import android.util.Log;
 
 import app.crossword.yourealwaysbe.forkyz.settings.DownloadersSettings;
 import app.crossword.yourealwaysbe.forkyz.versions.TiramisuUtil;
 
+import org.mockito.MockedStatic;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
@@ -34,21 +36,26 @@ public class DownloadersTest {
     public static Iterable<Object[]> downloaders() {
         Context context = mock(Context.class);
         initialiseMocks(context);
-        DownloadersSettings settings = getDownloadersSettings();
-        Downloaders dls = new Downloaders(
-            context, new TiramisuUtil(), null, settings
-        );
-        final List<Downloader> downloaders = dls.getDownloaders();
-        return new AbstractList<Object[]>() {
-            @Override
-            public int size() { return downloaders.size(); }
+        try (MockedStatic<Log> mocked = mockStatic(Log.class)) {
+            DownloadersSettings settings = getDownloadersSettings();
+            Downloaders dls = new Downloaders(
+                context, new TiramisuUtil(), null, settings
+            );
+            final List<Downloader> downloaders = dls.getDownloaders();
+            return new AbstractList<Object[]>() {
+                @Override
+                public int size() { return downloaders.size(); }
 
-            @Override
-            public Object[] get(int i) {
-                Downloader d = downloaders.get(i);
-                return new Object[] { d.getInternalName(), d };
-            }
-        };
+                @Override
+                public Object[] get(int i) {
+                    Downloader d = downloaders.get(i);
+                    return new Object[] { d.getInternalName(), d };
+                }
+            };
+        } catch (Exception e) {
+            System.out.println("What do you want: " + e);
+            return null;
+        }
     }
 
     private Downloader downloader;
@@ -59,11 +66,13 @@ public class DownloadersTest {
 
     @Test
     public void testDownloaders() {
-        LocalDate latest = downloader.getLatestDate();
-        if (latest != null) {
-            Downloader.DownloadResult res =
-                downloader.download(latest, Collections.emptySet());
-            assertTrue(res.isSuccess());
+        try (MockedStatic<Log> mocked = mockStatic(Log.class)) {
+            LocalDate latest = downloader.getLatestDate();
+            if (latest != null) {
+                Downloader.DownloadResult res =
+                    downloader.download(latest, Collections.emptySet());
+                assertTrue(res.isSuccess());
+            }
         }
     }
 
