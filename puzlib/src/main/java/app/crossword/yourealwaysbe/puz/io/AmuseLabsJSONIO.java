@@ -4,6 +4,8 @@ package app.crossword.yourealwaysbe.puz.io;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.json.JSONArray;
@@ -11,8 +13,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import app.crossword.yourealwaysbe.puz.Box;
+import app.crossword.yourealwaysbe.puz.Clue;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.PuzzleBuilder;
+import app.crossword.yourealwaysbe.puz.Zone;
 import app.crossword.yourealwaysbe.puz.util.JSONParser;
 
 /**
@@ -159,24 +163,79 @@ public class AmuseLabsJSONIO extends AbstractJSONIO {
         if (entries == null)
             return;
 
+        boolean wordLengthsEnabled
+            = json.optBoolean("wordLengthsEnabled", false);
+
         for (int i = 0; i < entries.length(); i++) {
             JSONObject entry = entries.getJSONObject(i);
 
             int num = entry.getInt("clueNum");
             if (num > 0) {
+                String number = String.valueOf(num);
                 boolean across = entry.getBoolean("acrossNotDown");
                 String clue = entry.getJSONObject("clue").getString("clue");
 
-                if (across) {
-                    builder.addAcrossClue(
-                        ACROSS_LIST, String.valueOf(num), clue
-                    );
-                } else {
-                    builder.addDownClue(
-                        DOWN_LIST, String.valueOf(num), clue
-                    );
+                Map<Integer, String> separators = null;
+
+                if (wordLengthsEnabled) {
+                    separators = getSeparators(entry);
+                    String enumeration = getEnumeration(entry);
+                    if (enumeration != null && !clue.endsWith(enumeration))
+                        clue += " " + enumeration;
                 }
+
+                String listName = across ? ACROSS_LIST : DOWN_LIST;
+                Zone zone = across
+                    ? builder.getAcrossZone(number)
+                    : builder.getDownZone(number);
+                int index = builder.getNextClueIndex(listName);
+                builder.addClue(new Clue(
+                    listName,
+                    index,
+                    number,
+                    null,
+                    clue,
+                    zone,
+                    separators
+                ));
             }
         }
+    }
+
+    private static String getEnumeration(JSONObject clue) {
+        JSONArray wordLens = clue.optJSONArray("wordLens");
+        if (wordLens == null)
+            return null;
+
+        StringBuilder enumeration = new StringBuilder();
+        enumeration.append("(");
+        for (int i = 0; i < wordLens.length(); i++) {
+            if (i > 0)
+                enumeration.append(",");
+            enumeration.append(String.valueOf(wordLens.get(i)));
+        }
+        enumeration.append(")");
+
+        return enumeration.toString();
+    }
+
+    private static Map<Integer, String> getSeparators(JSONObject clue) {
+        JSONArray wordLens = clue.optJSONArray("wordLens");
+        if (wordLens == null)
+            return null;
+
+        Map<Integer, String> separators = new HashMap<>();
+        int totalLen = 0;
+
+        for (int i = 0; i < wordLens.length(); i++) {
+            int len = wordLens.optInt(i, -1);
+            if (len < 0)
+                return null;
+
+            totalLen += len;
+            separators.put(totalLen, " ");
+        }
+
+        return separators;
     }
 }

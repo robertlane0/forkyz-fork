@@ -3,9 +3,16 @@ package app.crossword.yourealwaysbe.forkyz.net;
 
 import java.io.InputStream;
 
+import android.util.Base64;
+import android.util.Log;
+
 import org.junit.Test;
+import org.mockito.MockedStatic;
 
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.mockStatic;
 
 import app.crossword.yourealwaysbe.forkyz.util.NetUtilsKt;
 //import app.crossword.yourealwaysbe.forkyz.versions.TiramisuUtil;
@@ -99,6 +106,14 @@ public class StreamScrapersTest {
         );
     }
 
+    @Test
+    public void testPuzzleMe() throws Exception {
+        testScraper(
+            "https://observer.co.uk/everyman",
+            new PuzzleMeStreamScraper()
+        );
+    }
+
     /**
      * Test scraper gets a puzzle from the URL
      */
@@ -106,8 +121,15 @@ public class StreamScrapersTest {
         String url, StreamScraper scraper
     ) throws Exception {
         try (
+            MockedStatic<Log> mockedLog = mockStatic(Log.class);
+            MockedStatic<Base64> mockedB64 = mockStatic(Base64.class);
             InputStream is = NetUtilsKt.getURLInputStream(url, TIMEOUT)
         ) {
+            mockedB64.when(() -> Base64.decode(anyString(), anyInt()))
+                .thenAnswer(i -> {
+                    String arg = (String) i.getArguments()[0];
+                    return java.util.Base64.getDecoder().decode(arg);
+                });
             Puzzle puz = scraper.parseInput(is, url);
             assertNotNull(puz);
         }
