@@ -103,19 +103,13 @@ public class AmuseLabsJSONIO extends AbstractJSONIO {
             for (int row = 0; row < rows.length(); row++) {
                 String entryString = rows.getString(row);
 
-                if (entryString.length() != 1) {
-                    throw new AmuseLabsFormatException(
-                        "Don't know what to do with box contents "
-                            + "that is not a single character: "
-                            + entryString
-                    );
-                }
+                boolean isBox = entryString.isEmpty()
+                    || entryString.charAt(0) != '\0';
 
-                char entry = entryString.charAt(0);
-
-                if (entry != 0) {
+                if (isBox) {
                     boxes[row][col] = new Box();
-                    boxes[row][col].setSolution(entry);
+                    if (!entryString.isEmpty())
+                        boxes[row][col].setSolution(entryString);
                 }
             }
         }
@@ -125,7 +119,7 @@ public class AmuseLabsJSONIO extends AbstractJSONIO {
             for (int col = 0; col < cols.length(); col++) {
                 JSONArray rows = cols.getJSONArray(col);
                 for (int row = 0; row < rows.length(); row++) {
-                    int clueNum = rows.getInt(row);
+                    int clueNum = rows.optInt(row, 0);
 
                     if (clueNum > 0) {
                         if (boxes[row][col] == null) {
