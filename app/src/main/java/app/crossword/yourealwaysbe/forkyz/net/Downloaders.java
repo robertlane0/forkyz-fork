@@ -640,7 +640,7 @@ public class Downloaders {
                 "Sheffer",
                 context.getString(R.string.sheffer_crossword),
                 AbstractDateDownloader.DAYS_NO_SUNDAY,
-                Duration.ofDays(-6), // six days on last test (26 Apr 2025)
+                Duration.ofDays(-1), // six days on last test (1 May 2025)
                 "https://puzzles.kingdigital.com",
                 "'https://www.arkadium.com/games/"
                     + "sheffer-crossword-kingsfeatures/'"
