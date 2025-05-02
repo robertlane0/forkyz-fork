@@ -1990,15 +1990,15 @@ class ForkyzSettings(
         }
     }
 
-    val livePlayShowCluesTab : LiveData<Boolean>
+    val livePlayShowClueTabs : LiveData<Boolean>
         = settingsFlow.map {
             it.showCluesOnPlayScreen
         }.distinctUntilChanged().asLiveData()
 
-    fun getPlayShowCluesTab(cb : Consumer<Boolean>)
-        = livePlayShowCluesTab.observeOnce(cb)
+    fun getPlayShowClueTabs(cb : Consumer<Boolean>)
+        = livePlayShowClueTabs.observeOnce(cb)
 
-    fun setPlayShowCluesTab(value : Boolean) {
+    fun setPlayShowClueTabs(value : Boolean) {
         launch {
             settingsStore.updateData { settings ->
                 settings.toBuilder().setShowCluesOnPlayScreen(value).build()
@@ -3135,7 +3135,7 @@ class ForkyzSettings(
         run(
             "showCluesOnPlayScreen",
             { s, key -> json.put(key, s.showCluesOnPlayScreen) },
-            { key -> json.optBoolean(key)?.let { setPlayShowCluesTab(it) } },
+            { key -> json.optBoolean(key)?.let { setPlayShowClueTabs(it) } },
         )
         run(
             "showCount",

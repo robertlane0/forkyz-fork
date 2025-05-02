@@ -92,7 +92,7 @@ class PlayActivityViewModel @Inject constructor(
             {
                 val curState = playUIState.value ?: PlayActivityUIState()
                 val showClueTabs = isAcrostic
-                    || (settings.livePlayShowCluesTab.value ?: false)
+                    || (settings.livePlayShowClueTabs.value ?: false)
                 curState.copy(
                     isClueBelowGrid
                         = settings.livePlayClueBelowGrid.value ?: false,
@@ -116,7 +116,7 @@ class PlayActivityViewModel @Inject constructor(
                 )
             },
             settings.livePlayClueBelowGrid,
-            settings.livePlayShowCluesTab,
+            settings.livePlayShowClueTabs,
             settings.livePlayClueTabsPage(0),
             settings.livePlayClueTabsPage(1),
             settings.livePlayGridRatioPortrait,
@@ -176,7 +176,7 @@ class PlayActivityViewModel @Inject constructor(
     }
 
     fun showClueTabs() {
-        settings.setPlayShowCluesTab(true)
+        settings.setPlayShowClueTabs(true)
     }
 
     /**
@@ -187,7 +187,7 @@ class PlayActivityViewModel @Inject constructor(
     fun hideClueTabs(page0 : Int?, page1 : Int?) {
         saveClueTabsPages(page0, page1)
         if (!isAcrostic)
-            settings.setPlayShowCluesTab(false)
+            settings.setPlayShowClueTabs(false)
     }
 
     fun clickClue(clue : Clue?, previousWord : Word? = null) {

@@ -442,7 +442,7 @@ fun migratePreferences(
         settings.setPlayScratchMode(it)
     }
     getBoolean(prefs, "showCluesOnPlayScreen")?.let {
-        settings.setPlayShowCluesTab(it)
+        settings.setPlayShowClueTabs(it)
     }
     getBoolean(prefs, "showCount")?.let {
         settings.setPlayShowCount(it)
