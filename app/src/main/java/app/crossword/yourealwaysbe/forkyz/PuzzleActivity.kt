@@ -1229,6 +1229,8 @@ abstract class PuzzleActivity() : ForkyzActivityKt() {
      * @param pageSetter for controlling the page of the clue tabs
      * @param onPageChange callback for page changes
      * @param maxWordScale the maximum scale for word views
+     * @param initialPage0 the initial page for the first view
+     * @param initialPage1 the initial page for the second view
      */
     @Composable
     protected fun ClueTabsView(
@@ -1248,7 +1250,9 @@ abstract class PuzzleActivity() : ForkyzActivityKt() {
         snapClueShowPageNum : Int? = null,
         snapClueReplacePageNum : Int? = null,
         pageSetter : ClueTabsPageSetter? = null,
-        maxWordScale : Float? = null
+        maxWordScale : Float? = null,
+        initialPage0 : Int? = null,
+        initialPage1 : Int? = null,
     ) {
         AndroidView(
             modifier = modifier,
@@ -1291,6 +1295,8 @@ abstract class PuzzleActivity() : ForkyzActivityKt() {
                     })
                 }
                 addAccessibilityActions(view)
+                initialPage0?.let { view.setPage(0, it) }
+                initialPage1?.let { view.setPage(1, it) }
                 pageSetter?.let { it.clueTabs = view }
                 view
             },

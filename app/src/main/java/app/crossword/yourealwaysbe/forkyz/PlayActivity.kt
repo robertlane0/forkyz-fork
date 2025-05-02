@@ -116,8 +116,10 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
     }
 
     override protected fun onPause() {
-        clueTabsPageSetter.getPage(0)?.let { viewModel.setClueTabsPage(0, it) }
-        clueTabsPageSetter.getPage(1)?.let { viewModel.setClueTabsPage(1, it) }
+        viewModel.saveClueTabsPages(
+            clueTabsPageSetter.getPage(0),
+            clueTabsPageSetter.getPage(1),
+        )
         stopShakeDetector()
         super.onPause()
     }
@@ -203,13 +205,13 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
 
         val state by viewModel.playUIState.observeAsState()
 
-        LaunchedEffect(state?.clueTabsPage) {
-            state?.clueTabsPage?.let { page ->
+        LaunchedEffect(state?.clueTabsPage0) {
+            state?.clueTabsPage0?.let { page ->
                 clueTabsPageSetter.setPage(0, page)
             }
         }
         LaunchedEffect(state?.clueTabsPage1) {
-            state?.clueTabsPage?.let { page ->
+            state?.clueTabsPage1?.let { page ->
                 clueTabsPageSetter.setPage(1, page)
             }
         }
@@ -304,9 +306,9 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
         Column(modifier.fillMaxHeight().fillMaxWidth()) {
             Row(Modifier.weight(1.0F).fillMaxWidth()) {
                 val state by viewModel.playUIState.observeAsState()
-                val showCluesTab = state?.showCluesTab ?: false
+                val showClueTabs = state?.showClueTabs ?: false
 
-                val boardWidthModifier = if (showCluesTab)
+                val boardWidthModifier = if (showClueTabs)
                     Modifier.width(IntrinsicSize.Min)
                 else
                     Modifier.fillMaxWidth()
@@ -319,7 +321,7 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
                     ClueBar(Modifier.fillMaxWidth())
                 }
 
-                if (showCluesTab) {
+                if (showClueTabs) {
                     Column(Modifier.weight(1.0F).fillMaxHeight()) {
                         CluesList(Modifier.weight(1.0F).fillMaxWidth())
                         VoiceButtons()
@@ -437,7 +439,7 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
         ClueText(
             modifier = modifier,
             clueText = state?.clueText,
-            onClick = viewModel::toggleShowClueTabs,
+            onClick = this::toggleShowClueTabs,
             onClickDescription = stringResource(R.string.toggle_clue_tabs),
             onLongClick = viewModel::launchClueList,
             onLongClickDescription = stringResource(R.string.open_clue_list),
@@ -448,19 +450,19 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
     private fun CluesList(modifier : Modifier) {
         val state by viewModel.playUIState.observeAsState()
 
-        if (!(state?.showCluesTab ?: false))
+        if (!(state?.showClueTabs ?: false))
             return
 
         val isAcrostic = state?.isAcrostic ?: false
         val showAllWords = isAcrostic
         val onBarLongClick : () -> Unit
-            = if (isAcrostic) viewModel::toggleShowClueTabs
+            = if (isAcrostic) this::toggleShowClueTabs
             else { { } }
         val onBarLongClickDescription
             = if (isAcrostic) stringResource(R.string.toggle_clue_tabs)
             else ""
         val onBarSwipeDown : () -> Unit
-            = if (isAcrostic) viewModel::hideClueTabs else { { } }
+            = if (isAcrostic) this::hideClueTabs else { { } }
 
         ClueTabsView(
             modifier = modifier,
@@ -477,6 +479,8 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
             showAllWords = showAllWords,
             pageSetter = clueTabsPageSetter,
             maxWordScale = ACROSTIC_CLUE_TABS_WORD_SCALE,
+            initialPage0 = state?.clueTabsPage0,
+            initialPage1 = state?.clueTabsPage1,
         )
     }
 
@@ -551,7 +555,7 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
                 ACROSTIC_BOARD_HEIGHT_RATIO_MIN * displayHeight
             ).toInt().dp
             return this.aspectRatio(aspect).heightIn(min=minHeight)
-        } else if (state?.showCluesTab ?: false) {
+        } else if (state?.showClueTabs ?: false) {
             return when (state?.portraitGridRatio) {
                 GridRatio.GR_ONE_TO_ONE -> this.aspectRatio(1.0F)
                 GridRatio.GR_THIRTY_PCNT -> this.fillMaxHeight(0.3F)
@@ -575,7 +579,7 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
                 ACROSTIC_BOARD_WIDTH_RATIO_MAX * displayWidth
             ).toInt().dp
             return this.aspectRatio(aspect).widthIn(max=maxWidth)
-        } else if (state?.showCluesTab ?: false) {
+        } else if (state?.showClueTabs ?: false) {
             return when (state?.landscapeGridRatio) {
                 GridRatio.GR_ONE_TO_ONE -> this.aspectRatio(1.0F)
                 GridRatio.GR_THIRTY_PCNT -> this.fillMaxWidth(0.3F)
@@ -611,6 +615,20 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
 
     private fun stopShakeDetector() {
         shakeDetector?.stop()
+    }
+
+    private fun toggleShowClueTabs() {
+        val isShowing = viewModel.playUIState.value?.showClueTabs ?: false
+        if (isShowing)
+            hideClueTabs()
+        else
+            viewModel.showClueTabs()
+    }
+
+    private fun hideClueTabs() {
+        val page0 = clueTabsPageSetter.getPage(0)
+        val page1 = clueTabsPageSetter.getPage(1)
+        viewModel.hideClueTabs(page0, page1)
     }
 }
 

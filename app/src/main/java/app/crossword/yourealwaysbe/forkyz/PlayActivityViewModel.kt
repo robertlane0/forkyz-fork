@@ -31,8 +31,8 @@ import kotlin.random.Random
  * @param clueText the clue text to display with the clue
  * @param puzzleTitle the title of the current puzzle
  * @param isClueBelowGrid whether to show clue beneath grid or in title
- * @param showCluesTab whether to show clues below grid
- * @param clueTabsPage which page to show on first clue tabs
+ * @param showClueTabs whether to show clues below grid
+ * @param clueTabsPage0 which page to show on first clue tabs
  * @param clueTabsPage1 which page to show on second clue tabs
  * @param portraitGridRatio grid ratio in portrait
  * @param landscapeGridRatio grid ratio in portrait
@@ -46,8 +46,8 @@ data class PlayActivityUIState(
     val clueText : String? = null,
     val puzzleTitle : String = "",
     val isClueBelowGrid : Boolean = false,
-    val showCluesTab : Boolean = false,
-    val clueTabsPage : Int = 0,
+    val showClueTabs : Boolean = false,
+    val clueTabsPage0 : Int = 0,
     val clueTabsPage1 : Int = 1,
     val portraitGridRatio : GridRatio = GridRatio.GR_PUZZLE_SHAPE,
     val landscapeGridRatio : GridRatio = GridRatio.GR_PUZZLE_SHAPE,
@@ -91,13 +91,13 @@ class PlayActivityViewModel @Inject constructor(
         _playUIState = liveDataFanIn(
             {
                 val curState = playUIState.value ?: PlayActivityUIState()
-                val showCluesTab = isAcrostic
+                val showClueTabs = isAcrostic
                     || (settings.livePlayShowCluesTab.value ?: false)
                 curState.copy(
                     isClueBelowGrid
                         = settings.livePlayClueBelowGrid.value ?: false,
-                    showCluesTab = showCluesTab,
-                    clueTabsPage
+                    showClueTabs = showClueTabs,
+                    clueTabsPage0
                         = settings.livePlayClueTabsPage(0).value ?: 0,
                     clueTabsPage1
                         = settings.livePlayClueTabsPage(1).value ?: 1,
@@ -175,15 +175,17 @@ class PlayActivityViewModel @Inject constructor(
         }
     }
 
-    fun toggleShowClueTabs() {
-        if (!isAcrostic) {
-            settings.getPlayShowCluesTab { show ->
-                settings.setPlayShowCluesTab(!show)
-            }
-        }
+    fun showClueTabs() {
+        settings.setPlayShowCluesTab(true)
     }
 
-    fun hideClueTabs() {
+    /**
+     * Hide the clue tabs
+     *
+     * Needs to know which page they were on to save
+     */
+    fun hideClueTabs(page0 : Int?, page1 : Int?) {
+        saveClueTabsPages(page0, page1)
         if (!isAcrostic)
             settings.setPlayShowCluesTab(false)
     }
@@ -200,8 +202,9 @@ class PlayActivityViewModel @Inject constructor(
         }
     }
 
-    fun setClueTabsPage(index : Int, page : Int) {
-        settings.setPlayClueTabsPage(index, page)
+    fun saveClueTabsPages(page0 : Int?, page1 : Int?) {
+        page0?.let { settings.setPlayClueTabsPage(0, it) }
+        page1?.let { settings.setPlayClueTabsPage(1, it) }
     }
 
     fun deleteLetter() {
