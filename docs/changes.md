@@ -1,5 +1,13 @@
 # Forkyz Changelog
 
+## Version 65
+
+- Update Joseph, Metro, Premier, and Sheffer downloaders.
+- Remove Everyman downloader since move from Guardian. Experimental support by sharing the Observer Everyman URL with Forkyz, likely to break soon.
+- Mark Le Parisien downloader as it does not download the true current puzzles.
+- Repair hourly background downloads and protect against simultaneous downloads.
+- Move main play screen to Compose.
+
 ## Version 64
 
 - Rewrite Notes page in Compose.
