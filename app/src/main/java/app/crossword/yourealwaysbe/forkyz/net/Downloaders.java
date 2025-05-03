@@ -635,15 +635,21 @@ public class Downloaders {
         }
 
         if (settings.getDownloadSheffer()) {
-            downloaders.add(new KingDigitalDownloader(
+            String arkadiumUrl = "'https://www.arkadium.com/games/"
+                + "sheffer-crossword-kingsfeatures/'";
+            downloaders.add(new KingDigitalLoginDownloader(
                 "Sheffer",
                 "Sheffer",
                 context.getString(R.string.sheffer_crossword),
                 AbstractDateDownloader.DAYS_NO_SUNDAY,
-                Duration.ofDays(-1), // six days on last test (1 May 2025)
+                Duration.ofDays(-20), // from full puzzle list during login
                 "https://puzzles.kingdigital.com",
-                "'https://www.arkadium.com/games/"
-                    + "sheffer-crossword-kingsfeatures/'"
+                arkadiumUrl,
+                arkadiumUrl,
+                "KFS+Arkadium$",
+                "Puzzles&Games",
+                "",
+                "SHCC01"
             ));
         }
 
