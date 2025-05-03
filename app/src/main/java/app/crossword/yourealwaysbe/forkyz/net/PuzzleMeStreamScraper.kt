@@ -53,8 +53,7 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
         val is2 = getStage2InputStream(is1)
 
         try {
-            return getRawC(is2)?.let(this::decodeRawC)
-                ?.let(AmuseLabsJSONIO::readPuzzle)
+            return getRawC(is2)?.let(this::getFromRawC)
                 ?.let { puz ->
                     with (puz) {
                         if (getSource() == null)
@@ -105,9 +104,11 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
     /**
      * Try a variety of known rawc decodings
      */
-    private fun decodeRawC(rawc : String) : String? {
-        return base64DecodeRawC(rawc)
-            ?: everymanDeObfuscate(rawc)
+    private fun getFromRawC(rawc : String) : Puzzle? {
+        val read : (String?) -> Puzzle? = AmuseLabsJSONIO::readPuzzle
+        return base64DecodeRawC(rawc)?.let(read)
+            ?: everymanDeObfuscate(rawc)?.let(read)
+            ?: everymanDeObfuscate2(rawc)?.let(read)
     }
 
     /**
@@ -137,6 +138,20 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
         everymanPhase(chars, 0, 49, 4)
         everymanPhase(chars, 4, 36, 17)
         everymanPhase(chars, 25, 51, 2)
+
+        return base64DecodeRawC(String(chars))
+    }
+
+    private fun everymanDeObfuscate2(rawc : String) : String? {
+        val chars = rawc.toCharArray()
+
+        everymanPhase(chars, 56, 56, 3)
+        everymanPhase(chars, 31, 46, 13)
+        everymanPhase(chars, 14, 42, 17)
+        everymanPhase(chars, 7, 52, 7)
+        everymanPhase(chars, 0, 52, 7)
+        everymanPhase(chars, 48, 51, 8)
+        everymanPhase(chars, 44, 55, 4)
 
         return base64DecodeRawC(String(chars))
     }
