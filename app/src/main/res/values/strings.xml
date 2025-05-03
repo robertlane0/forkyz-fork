@@ -504,8 +504,6 @@
     <string name="przekroj">(PO) Przekrój</string>
     <string name="przekroj_desc">Puzzles from Przekrój magazine, in Polish.</string>
     <string name="about_scrapes">About These Sources</string>
-    <string name="everyman">Guardian Everyman</string>
-    <string name="everyman_desc">Weekly Sunday cryptic.</string>
     <string name="guardian_quick">Guardian Quick Crossword</string>
     <string name="guardian_quick_desc">Daily quick crossword.</string>
 

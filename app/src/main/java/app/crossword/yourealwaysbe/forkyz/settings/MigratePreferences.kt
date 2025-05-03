@@ -423,9 +423,6 @@ fun migratePreferences(
     getBoolean(prefs, "scrapeCru")?.let {
         settings.setScrapeCru(it)
     }
-    getBoolean(prefs, "scrapeEveryman")?.let {
-        settings.setScrapeEveryman(it)
-    }
     getBoolean(prefs, "scrapeGuardianQuick")?.let {
         settings.setScrapeGuardianQuick(it)
     }

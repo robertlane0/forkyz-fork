@@ -689,13 +689,6 @@ class SettingsActivityViewModel @Inject constructor(
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_SCRAPERS,
-            R.string.everyman,
-            R.string.everyman_desc,
-            settings.liveScrapeEveryman,
-            settings::setScrapeEveryman,
-        ),
-        SettingsBoolean(
-            SettingsPage.PUZZLE_SOURCES_SCRAPERS,
             R.string.guardian_quick,
             R.string.guardian_quick_desc,
             settings.liveScrapeGuardianQuick,

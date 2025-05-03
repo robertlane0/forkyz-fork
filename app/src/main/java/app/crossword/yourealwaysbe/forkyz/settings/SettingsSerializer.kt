@@ -108,7 +108,6 @@ object SettingsSerializer : Serializer<Settings> {
         .setSafToImportFolderUri("")
         .setScale(1.0F)
         .setScrapeCru(true)
-        .setScrapeEveryman(true)
         .setScrapeGuardianQuick(true)
         .setScrapeKegler(true)
         .setScrapePrivateEye(true)

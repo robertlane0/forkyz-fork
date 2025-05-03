@@ -744,19 +744,6 @@ public class Downloaders {
             ));
         }
 
-        if (settings.getScrapeEveryman()) {
-            downloaders.add(new PageScraper(
-                "https://www.theguardian.com/crosswords/everyman/\\d*",
-                new GuardianJSONIO(),
-                "https://www.theguardian.com/crosswords/series/everyman",
-                "everyman",
-                context.getString(R.string.everyman),
-                "https://support.theguardian.com",
-                true, // share file url
-                false // read top down
-            ));
-        }
-
         if (settings.getScrapeGuardianQuick()) {
             downloaders.add(new PageScraper(
                 "https://www.theguardian.com/crosswords/quick/\\d*",

@@ -211,7 +211,6 @@ message Settings {
     string safToImportFolderUri = 96;
     float scale = 97;
     bool scrapeCru = 98;
-    bool scrapeEveryman = 99;
     bool scrapeGuardianQuick = 100;
     bool scrapeKegler = 101;
     bool scrapePrivateEye = 102;

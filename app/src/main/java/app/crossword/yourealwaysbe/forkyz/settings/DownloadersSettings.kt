@@ -27,7 +27,6 @@ data class DownloadersSettings(
     val downloadWaPoSunday : Boolean,
     val downloadWsj : Boolean,
     val scrapeCru : Boolean,
-    val scrapeEveryman : Boolean,
     val scrapeGuardianQuick : Boolean,
     val scrapeKegler : Boolean,
     val scrapePrivateEye : Boolean,

@@ -177,7 +177,6 @@ class ForkyzSettings(
                 it.downloadWaPoSunday,
                 it.downloadWsj,
                 it.scrapeCru,
-                it.scrapeEveryman,
                 it.scrapeGuardianQuick,
                 it.scrapeKegler,
                 it.scrapePrivateEye,
@@ -1894,22 +1893,6 @@ class ForkyzSettings(
         }
     }
 
-    val liveScrapeEveryman : LiveData<Boolean>
-        = settingsFlow.map {
-            it.scrapeEveryman
-        }.distinctUntilChanged().asLiveData()
-
-    fun getScrapeEveryman(cb : Consumer<Boolean>)
-        = liveScrapeEveryman.observeOnce(cb)
-
-    fun setScrapeEveryman(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setScrapeEveryman(value).build()
-            }
-        }
-    }
-
     val liveScrapeGuardianQuick : LiveData<Boolean>
         = settingsFlow.map {
             it.scrapeGuardianQuick
@@ -3101,11 +3084,6 @@ class ForkyzSettings(
             "scrapeCru",
             { s, key -> json.put(key, s.scrapeCru) },
             { key -> json.optBoolean(key)?.let { setScrapeCru(it) } },
-        )
-        run(
-            "scrapeEveryman",
-            { s, key -> json.put(key, s.scrapeEveryman) },
-            { key -> json.optBoolean(key)?.let { setScrapeEveryman(it) } },
         )
         run(
             "scrapeGuardianQuick",
