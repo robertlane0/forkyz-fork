@@ -171,7 +171,7 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
                     viewModel.playEnter()
                 handled = true
             }
-            Key.Delete -> {
+            Key.Delete, Key.Backspace -> {
                 if (isUp)
                     viewModel.deleteLetter()
                 handled = true
