@@ -227,7 +227,8 @@ public class AmuseLabsJSONIO extends AbstractJSONIO {
         Map<Integer, String> separators = new HashMap<>();
         int totalLen = 0;
 
-        for (int i = 0; i < wordLens.length(); i++) {
+        // length - 1 to remove last marker
+        for (int i = 0; i < wordLens.length() - 1; i++) {
             int len = wordLens.optInt(i, -1);
             if (len < 0)
                 return null;
