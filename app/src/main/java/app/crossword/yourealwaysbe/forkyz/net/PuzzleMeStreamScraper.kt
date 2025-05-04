@@ -40,8 +40,14 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
         private val DEFAULT_SOURCE = "PuzzleMe"
         private val STAGE2_URL_FORMAT
             = "https://cdn2.amuselabs.com/auth0/crossword?id=%s&set=%s"
+        private val JS_URL_FORMAT
+            = "https://cdn2.amuselabs.com/puzzleme/js/c-min.js?v=%s"
         private val RAWC_REGEX = RegexScrape(
             Pattern.compile("\"rawc\":\\s*\"([^\"]*)\""),
+            1,
+        )
+        private val JS_VERSION_REGEX = RegexScrape(
+            Pattern.compile("js/c-min.js\\?v=([a-zA-Z0-9]+)"),
             1,
         )
     }
@@ -53,7 +59,7 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
         val is2 = getStage2InputStream(is1)
 
         try {
-            return getRawC(is2)?.let(this::getFromRawC)
+            return getDataData(is2)?.let(this::getFromDataData)
                 ?.let { puz ->
                     with (puz) {
                         if (getSource() == null)
@@ -97,18 +103,27 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
      *
      * @return field value or null if not found
      */
-    private fun getRawC(inputStream : InputStream) : String? {
-        return regexScrape(inputStream, RAWC_REGEX)
+    private fun getDataData(inputStream : InputStream) : DataData? {
+        val results = regexScrape(
+            inputStream,
+            arrayOf(RAWC_REGEX, JS_VERSION_REGEX),
+        )
+        val rawc = results[0]
+        val jsVersion = results[1]
+        if (rawc == null || jsVersion == null) {
+            return null
+        } else {
+            return DataData(rawc, jsVersion)
+        }
     }
 
     /**
      * Try a variety of known rawc decodings
      */
-    private fun getFromRawC(rawc : String) : Puzzle? {
+    private fun getFromDataData(dataData : DataData) : Puzzle? {
         val read : (String?) -> Puzzle? = AmuseLabsJSONIO::readPuzzle
-        return base64DecodeRawC(rawc)?.let(read)
-            ?: everymanDeObfuscate(rawc)?.let(read)
-            ?: everymanDeObfuscate2(rawc)?.let(read)
+        return base64DecodeRawC(dataData.rawc)?.let(read)
+            ?: everymanDeobfuscate(dataData)?.let(read)
     }
 
     /**
@@ -128,35 +143,20 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
     /**
      * Try to deobfuscate using format used in Everyman crossword
      */
-    private fun everymanDeObfuscate(rawc : String) : String? {
-        val chars = rawc.toCharArray()
+    private fun everymanDeobfuscate(dataData : DataData) : String? {
+        val passes = getDeobfuscatePasses(dataData.jsVersion)
+        if (passes?.isEmpty() ?: true)
+            return null
 
-        everymanPhase(chars, 27, 39, 14)
-        everymanPhase(chars, 41, 41, 12)
-        everymanPhase(chars, 21, 51, 2)
-        everymanPhase(chars, 23, 51, 2)
-        everymanPhase(chars, 0, 49, 4)
-        everymanPhase(chars, 4, 36, 17)
-        everymanPhase(chars, 25, 51, 2)
-
-        return base64DecodeRawC(String(chars))
-    }
-
-    private fun everymanDeObfuscate2(rawc : String) : String? {
-        val chars = rawc.toCharArray()
-
-        everymanPhase(chars, 56, 56, 3)
-        everymanPhase(chars, 31, 46, 13)
-        everymanPhase(chars, 14, 42, 17)
-        everymanPhase(chars, 7, 52, 7)
-        everymanPhase(chars, 0, 52, 7)
-        everymanPhase(chars, 48, 51, 8)
-        everymanPhase(chars, 44, 55, 4)
+        val chars = dataData.rawc.toCharArray()
+        passes.forEach { pass ->
+            deobfuscatePass(chars, pass.start, pass.step, pass.length)
+        }
 
         return base64DecodeRawC(String(chars))
     }
 
-    private fun everymanPhase(
+    private fun deobfuscatePass(
         rawc : CharArray,
         start : Int,
         increment : Int,
@@ -182,4 +182,36 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
             pos += realSwapLen + increment
         }
     }
+
+    private fun getDeobfuscatePasses(jsVersion: String) : List<ObfuscatePass>? {
+        try {
+            val jsURL = String.format(JS_URL_FORMAT.format(jsVersion))
+            val js = getInputStream(jsURL).use { it.reader().readText() }
+
+            // for (r=start;..;r+=step) { .. ?length .. }
+            val passRegex
+                = "r=(\\d+);[^;]{0,10};r\\+=(\\d+)[^?]{0,50}\\?(\\d+)".toRegex()
+
+            return passRegex.findAll(js).map { m ->
+                ObfuscatePass(
+                    m.groups[1]?.value?.toInt() ?: 0,
+                    m.groups[2]?.value?.toInt() ?: Int.MAX_VALUE,
+                    m.groups[3]?.value?.toInt() ?: 0,
+                )
+            }.toList()
+        } catch (e : IOException) {
+            return null
+        }
+    }
 }
+
+private data class DataData(
+    val rawc : String,
+    val jsVersion : String,
+)
+
+private data class ObfuscatePass(
+    val start : Int,
+    val step : Int,
+    val length : Int,
+)
