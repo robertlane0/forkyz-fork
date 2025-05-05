@@ -1,0 +1,2 @@
+- Fix delete key on built-in keyboard.
+- Trial a more robust Everyman import from shared URL.

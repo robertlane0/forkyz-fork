@@ -1,5 +1,10 @@
 # Forkyz Changelog
 
+## Version 66
+
+- Fix delete key on built-in keyboard.
+- Trial a more robust Everyman import from shared URL.
+
 ## Version 65
 
 - Update Joseph, Metro, Premier, and Sheffer downloaders.
