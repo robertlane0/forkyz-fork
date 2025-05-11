@@ -7,6 +7,7 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -47,6 +48,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.fromHtml
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -71,6 +73,8 @@ private val ACROSTIC_BOARD_HEIGHT_RATIO_MIN = 0.25F
 // max width of board in landscape / acrostic
 private val ACROSTIC_BOARD_WIDTH_RATIO_MAX = 0.7F
 
+private val CLUE_BAR_HEIGHT = 64.dp
+
 class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
     override protected lateinit var viewModel : PlayActivityViewModel
 
@@ -79,10 +83,12 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
     private val boardViewZoomer = BoardViewZoomer()
 
     private val displayWidth : Int by lazy {
-        getResources().getDisplayMetrics().widthPixels
+        val metrics = getResources().getDisplayMetrics()
+        (metrics.widthPixels / metrics.density).toInt()
     }
     private val displayHeight : Int by lazy {
-        getResources().getDisplayMetrics().heightPixels
+        val metrics = getResources().getDisplayMetrics()
+        (metrics.heightPixels / metrics.density).toInt()
     }
     private val isPortrait : Boolean by lazy {
         displayWidth <= displayHeight
@@ -286,13 +292,25 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
     @Composable
     private fun ActivityBodyPortrait(modifier : Modifier) {
         Column(modifier = modifier.fillMaxHeight()) {
-            Board(
-                Modifier.boardHeightPortrait(
-                    unrestrictedModifier = Modifier.weight(1.0F),
-                ).fillMaxWidth(),
-            )
-            ClueBar(Modifier.fillMaxWidth())
-            CluesList(Modifier.weight(1.0F).fillMaxWidth())
+            BoxWithConstraints(Modifier.weight(1.0F)) {
+                val state by viewModel.playUIState.observeAsState()
+                val showClueBar = state?.isClueBelowGrid ?: false
+                val clueBarHeight = if (showClueBar) CLUE_BAR_HEIGHT else 0.dp
+                val maxBoardHeight = maxHeight - clueBarHeight
+                val maxBoardWidth = maxWidth
+
+                Column(Modifier.fillMaxHeight().fillMaxWidth()) {
+                    Board(
+                        Modifier.boardHeightPortrait(
+                            width = maxBoardWidth,
+                            maxHeight = maxBoardHeight,
+                        ).fillMaxWidth(),
+                    )
+                    if (showClueBar)
+                        ClueBar(Modifier.fillMaxWidth())
+                    CluesList(Modifier.weight(1.0F).fillMaxWidth())
+                }
+            }
             VoiceButtons()
             Keyboard(
                 showSpecialKeys = true,
@@ -318,7 +336,8 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
                         Modifier.boardWidthLandscape()
                             .weight(1.0F),
                     )
-                    ClueBar(Modifier.fillMaxWidth())
+                    if (state?.isClueBelowGrid ?: false)
+                        ClueBar(Modifier.fillMaxWidth())
                 }
 
                 if (showClueTabs) {
@@ -404,28 +423,24 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
      */
     @Composable
     private fun ClueBar(modifier : Modifier) {
-        val state by viewModel.playUIState.observeAsState()
-
-        if (state?.isClueBelowGrid ?: false) {
-            Row(
-                modifier = modifier
-                    .height(64.dp)
-                    .background(MaterialTheme.colorScheme.surface),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                IconButton(onClick = viewModel::prevClue) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_prev_clue),
-                        contentDescription = stringResource(R.string.prev_clue),
-                    )
-                }
-                ClueText(Modifier.weight(1.0F))
-                IconButton(onClick = viewModel::nextClue) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_next_clue),
-                        contentDescription = stringResource(R.string.next_clue),
-                    )
-                }
+        Row(
+            modifier = modifier
+                .height(CLUE_BAR_HEIGHT)
+                .background(MaterialTheme.colorScheme.surface),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            IconButton(onClick = viewModel::prevClue) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_prev_clue),
+                    contentDescription = stringResource(R.string.prev_clue),
+                )
+            }
+            ClueText(Modifier.weight(1.0F))
+            IconButton(onClick = viewModel::nextClue) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_next_clue),
+                    contentDescription = stringResource(R.string.next_clue),
+                )
             }
         }
     }
@@ -545,28 +560,30 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
 
     @Composable
     private fun Modifier.boardHeightPortrait(
-        unrestrictedModifier : Modifier = Modifier,
+        width : Dp,
+        maxHeight : Dp,
     ) : Modifier {
         val state by viewModel.playUIState.observeAsState()
         val aspect = state?.puzzleAspectRatio ?: 1.0F
 
-        if (state?.isAcrostic ?: false) {
-            val minHeight = (
-                ACROSTIC_BOARD_HEIGHT_RATIO_MIN * displayHeight
-            ).toInt().dp
-            return this.aspectRatio(aspect).heightIn(min=minHeight)
+        val desiredHeight = if (state?.isAcrostic ?: false) {
+            val minHeight = ACROSTIC_BOARD_HEIGHT_RATIO_MIN * displayHeight
+            val aspectHeight = width / aspect
+            max(minHeight.dp, aspectHeight)
         } else if (state?.showClueTabs ?: false) {
-            return when (state?.portraitGridRatio) {
-                GridRatio.GR_ONE_TO_ONE -> this.aspectRatio(1.0F)
-                GridRatio.GR_THIRTY_PCNT -> this.fillMaxHeight(0.3F)
-                GridRatio.GR_FORTY_PCNT -> this.fillMaxHeight(0.4F)
-                GridRatio.GR_FIFTY_PCNT -> this.fillMaxHeight(0.5F)
-                GridRatio.GR_SIXTY_PCNT -> this.fillMaxHeight(0.6F)
-                else -> this.aspectRatio(aspect)
+            when (state?.portraitGridRatio) {
+                GridRatio.GR_ONE_TO_ONE -> width
+                GridRatio.GR_THIRTY_PCNT -> fracDp(0.3, displayHeight)
+                GridRatio.GR_FORTY_PCNT -> fracDp(0.4, displayHeight)
+                GridRatio.GR_FIFTY_PCNT -> fracDp(0.5, displayHeight)
+                GridRatio.GR_SIXTY_PCNT -> fracDp(0.6, displayHeight)
+                else -> width / aspect
             }
         } else {
-            return this.then(unrestrictedModifier)
+            maxHeight
         }
+
+        return this.height(min(maxHeight, desiredHeight))
     }
 
     @Composable
@@ -629,6 +646,18 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
         val page0 = clueTabsPageSetter.getPage(0)
         val page1 = clueTabsPageSetter.getPage(1)
         viewModel.hideClueTabs(page0, page1)
+    }
+
+    private fun min(x : Dp, y : Dp) : Dp {
+        return if (x < y) x else y
+    }
+
+    private fun max(x : Dp, y : Dp) : Dp {
+        return if (x > y) x else y
+    }
+
+    private fun fracDp(frac : Double, fracOf : Int) : Dp {
+        return (frac * fracOf).toInt().dp
     }
 }
 
