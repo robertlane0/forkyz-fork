@@ -544,11 +544,5 @@ public class ForkyzKeyboard
             }
             return hasAttribute;
         }
-
-        private int dpToPx(Context context, int dp) {
-            final float scale
-                = context.getResources().getDisplayMetrics().density;
-            return (int) (dp * scale + 0.5f);
-        }
     }
 }
