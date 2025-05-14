@@ -235,7 +235,7 @@ public class BrowseActivity extends ForkyzActivity {
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.browse_action_bar_menu, menu);
 
-            if (model.getIsViewArchive()) {
+            if (model.isViewArchive()) {
                 menu.findItem(R.id.browse_action_archive)
                     .setVisible(false);
             } else {
@@ -362,7 +362,7 @@ public class BrowseActivity extends ForkyzActivity {
             this.startActivity(settingsIntent);
             return true;
         } else if (id == R.id.browse_menu_archives) {
-            startLoadPuzzleList(!model.getIsViewArchive());
+            startLoadPuzzleList(!model.isViewArchive());
             return true;
         } else if (id == R.id.browse_menu_cleanup) {
             model.cleanUpPuzzles();
@@ -490,7 +490,7 @@ public class BrowseActivity extends ForkyzActivity {
                             model.deletePuzzle(puzMeta);
                             break;
                         default:
-                            if (model.getIsViewArchive()) {
+                            if (model.isViewArchive()) {
                                 model.movePuzzle(
                                     puzMeta,
                                     fileHandler.getCrosswordsDirectory()
@@ -531,7 +531,7 @@ public class BrowseActivity extends ForkyzActivity {
         binding.setViewModel(model);
         binding.setLifecycleOwner(this);
 
-        model.getIsUIBusy().observe(this, (isBusy) -> {
+        model.isUIBusy().observe(this, (isBusy) -> {
             if (isBusy)
                 showPleaseWait();
             else
@@ -599,7 +599,7 @@ public class BrowseActivity extends ForkyzActivity {
     }
 
     private void setViewCrosswordsOrArchiveUI() {
-        boolean viewArchive = model.getIsViewArchive();
+        boolean viewArchive = model.isViewArchive();
         if (viewCrosswordsArchiveMenuItem != null) {
             viewCrosswordsArchiveMenuItem.setTitle(viewArchive
                 ? BrowseActivity.this.getString(R.string.title_view_crosswords)
@@ -687,7 +687,8 @@ public class BrowseActivity extends ForkyzActivity {
 
     private SeparatedRecyclerViewAdapter<FileViewHolder, FileAdapter>
     buildList(
-        List<MutableLiveData<PuzMetaFile>> puzFiles, Accessor accessor
+        List<? extends LiveData<PuzMetaFile>> puzFiles,
+        Accessor accessor
     ) {
         try {
             Collections.sort(
@@ -706,9 +707,10 @@ public class BrowseActivity extends ForkyzActivity {
                 FileViewHolder.class
             );
         String lastHeader = null;
-        ArrayList<MutableLiveData<PuzMetaFile>> current = new ArrayList<>();
+        ArrayList<LiveData<PuzMetaFile>> current
+            = new ArrayList<>();
 
-        for (MutableLiveData<PuzMetaFile> pmData: puzFiles) {
+        for (LiveData<PuzMetaFile> pmData : puzFiles) {
             PuzMetaFile puzMeta = pmData.getValue();
 
             String check = accessor.getLabel(puzMeta);
@@ -750,7 +752,7 @@ public class BrowseActivity extends ForkyzActivity {
     }
 
     private void startLoadPuzzleList() {
-        startLoadPuzzleList(model.getIsViewArchive());
+        startLoadPuzzleList(model.isViewArchive());
     }
 
     private void startLoadPuzzleList(boolean archive) {
@@ -762,7 +764,7 @@ public class BrowseActivity extends ForkyzActivity {
 
     private void loadPuzzleAdapter() {
         cleanUpCurrentAdapter();
-        List<MutableLiveData<PuzMetaFile>> puzList
+        List<? extends LiveData<PuzMetaFile>> puzList
             = model.getPuzzleFiles().getValue();
         if (puzList != null) {
             settings.getBrowseSort(accessor -> {
@@ -842,7 +844,7 @@ public class BrowseActivity extends ForkyzActivity {
         binding.puzzleList.setAdapter(adapter);
 
         if (adapter.isEmpty() && showEmptyMsgs) {
-            if (model.getIsViewArchive()) {
+            if (model.isViewArchive()) {
                 binding.emptyListingMsg.setText(R.string.no_puzzles);
             } else {
                 binding.emptyListingMsg.setText(
@@ -1076,13 +1078,15 @@ public class BrowseActivity extends ForkyzActivity {
 
     private class FileAdapter
             extends RemovableRecyclerViewAdapter<FileViewHolder> {
-        final ArrayList<MutableLiveData<PuzMetaFile>> objects;
-        final Map<MutableLiveData<PuzMetaFile>, Observer<PuzMetaFile>>
+        final ArrayList<? extends LiveData<PuzMetaFile>> objects;
+        final Map<LiveData<PuzMetaFile>, Observer<PuzMetaFile>>
             objectObservers = new HashMap<>();
 
-        public FileAdapter(ArrayList<MutableLiveData<PuzMetaFile>> objects) {
+        public FileAdapter(
+            ArrayList<? extends LiveData<PuzMetaFile>> objects
+        ) {
             this.objects = objects;
-            for (MutableLiveData<PuzMetaFile> pmData : objects) {
+            for (LiveData<PuzMetaFile> pmData : objects) {
                 addObserver(pmData);
             }
         }
@@ -1099,7 +1103,7 @@ public class BrowseActivity extends ForkyzActivity {
 
         @Override
         public void onBindViewHolder(FileViewHolder holder, int position) {
-            MutableLiveData<PuzMetaFile> pmData = objects.get(position);
+            LiveData<PuzMetaFile> pmData = objects.get(position);
             PuzMetaFile pm = pmData.getValue();
             holder.setPuzMetaFile(pm);
         }
@@ -1120,14 +1124,14 @@ public class BrowseActivity extends ForkyzActivity {
          * Removes observers from all live data.
          */
         public void cleanUpForRemoval() {
-            for (MutableLiveData<PuzMetaFile> pmData : objects)
+            for (LiveData<PuzMetaFile> pmData : objects)
                 removeObserver(pmData);
         }
 
         /**
          * Only one observer per pmData, removes old if exists
          */
-        private void addObserver(MutableLiveData<PuzMetaFile> pmData) {
+        private void addObserver(LiveData<PuzMetaFile> pmData) {
             if (objectObservers.containsKey(pmData))
                 removeObserver(pmData);
 
@@ -1148,7 +1152,7 @@ public class BrowseActivity extends ForkyzActivity {
             objectObservers.put(pmData, observer);
         }
 
-        private void removeObserver(MutableLiveData<PuzMetaFile> pmData) {
+        private void removeObserver(LiveData<PuzMetaFile> pmData) {
             Observer<PuzMetaFile> observer = objectObservers.get(pmData);
             if (observer != null) {
                 pmData.removeObserver(observer);
@@ -1190,7 +1194,7 @@ public class BrowseActivity extends ForkyzActivity {
                 settings -> {
                     boolean visible = !settings.getDisableRatings() && (
                         settings.getBrowseAlwaysShowRating()
-                        || model.getIsViewArchive()
+                        || model.isViewArchive()
                     );
                     itemBinding.puzzleRating.setVisibility(
                         visible ? View.VISIBLE : View.GONE
