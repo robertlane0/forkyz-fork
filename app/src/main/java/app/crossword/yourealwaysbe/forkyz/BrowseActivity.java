@@ -377,13 +377,13 @@ public class BrowseActivity extends ForkyzActivity {
             this.startActivity(helpIntent);
             return true;
         } else if (id == R.id.browse_menu_sort_source) {
-            settings.setBrowseSort(Accessor.SOURCE);
+            model.setSortOrder(Accessor.SOURCE);
             return true;
         } else if (id == R.id.browse_menu_sort_date_asc) {
-            settings.setBrowseSort(Accessor.DATE_ASC);
+            model.setSortOrder(Accessor.DATE_ASC);
             return true;
         } else if (id == R.id.browse_menu_sort_date_desc) {
-            settings.setBrowseSort(Accessor.DATE_DESC);
+            model.setSortOrder(Accessor.DATE_DESC);
             return true;
         }
 
@@ -515,10 +515,6 @@ public class BrowseActivity extends ForkyzActivity {
         );
 
         this.nm = NotificationManagerCompat.from(this);
-
-        settings.getLiveBrowseSort().observe(this, accessor -> {
-            loadPuzzleAdapter();
-        });
 
         setupSpeedDial();
 
@@ -686,21 +682,7 @@ public class BrowseActivity extends ForkyzActivity {
     }
 
     private SeparatedRecyclerViewAdapter<FileViewHolder, FileAdapter>
-    buildList(
-        List<? extends LiveData<PuzMetaFile>> puzFiles,
-        Accessor accessor
-    ) {
-        try {
-            Collections.sort(
-                puzFiles,
-                (pm1, pm2) -> {
-                    return accessor.compare(pm1.getValue(), pm2.getValue());
-                }
-            );
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+    buildList(List<? extends LiveData<PuzMetaFile>> puzFiles) {
         SeparatedRecyclerViewAdapter<FileViewHolder, FileAdapter> adapter
             = new SeparatedRecyclerViewAdapter<>(
                 R.layout.puzzle_list_header,
@@ -713,6 +695,9 @@ public class BrowseActivity extends ForkyzActivity {
         for (LiveData<PuzMetaFile> pmData : puzFiles) {
             PuzMetaFile puzMeta = pmData.getValue();
 
+            Accessor accessor = model.getSortOrder().getValue();
+            if (accessor == null)
+                accessor = Accessor.DATE_ASC;
             String check = accessor.getLabel(puzMeta);
 
             if (!((lastHeader == null) || lastHeader.equals(check))) {
@@ -767,9 +752,7 @@ public class BrowseActivity extends ForkyzActivity {
         List<? extends LiveData<PuzMetaFile>> puzList
             = model.getPuzzleFiles().getValue();
         if (puzList != null) {
-            settings.getBrowseSort(accessor -> {
-                setPuzzleListAdapter(buildList(puzList, accessor), true);
-            });
+            setPuzzleListAdapter(buildList(puzList), true);
         } else {
             setPuzzleListAdapter(buildEmptyList(), false);
         }
@@ -1170,7 +1153,7 @@ public class BrowseActivity extends ForkyzActivity {
             super(itemBinding.getRoot());
             this.itemBinding = itemBinding;
 
-            settings.getLiveBrowseSort().observe(
+            model.getSortOrder().observe(
                 BrowseActivity.this,
                 accessor -> {
                     if (accessor == Accessor.SOURCE) {

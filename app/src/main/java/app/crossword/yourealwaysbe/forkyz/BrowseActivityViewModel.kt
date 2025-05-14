@@ -34,6 +34,7 @@ import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
 import app.crossword.yourealwaysbe.forkyz.util.FilteredList
 import app.crossword.yourealwaysbe.forkyz.util.PuzzleImporter
 import app.crossword.yourealwaysbe.forkyz.util.SingleLiveEvent
+import app.crossword.yourealwaysbe.forkyz.util.files.Accessor
 import app.crossword.yourealwaysbe.forkyz.util.files.DirHandle
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
@@ -71,6 +72,7 @@ class BrowseActivityViewModel @Inject constructor(
     private val _isUIBusy = MutableLiveData<Boolean>(false)
     val isUIBusy : LiveData<Boolean> = _isUIBusy
     val puzzleLoadEvents = SingleLiveEvent<Void>()
+    val sortOrder : LiveData<Accessor> = settings.liveBrowseSort
 
     /**
      * Get list of puzzle files in currently viewed directory
@@ -106,6 +108,14 @@ class BrowseActivityViewModel @Inject constructor(
             puzzleFilter,
             this::setNewPuzzleFilter
         )
+        _puzzleFiles.addSource(
+            settings.liveBrowseSort,
+            this::sortPuzzleFiles,
+        )
+    }
+
+    fun setSortOrder(accessor : Accessor) {
+        settings.setBrowseSort(accessor)
     }
 
     fun clearPuzzleFilter() {
@@ -485,6 +495,17 @@ class BrowseActivityViewModel @Inject constructor(
 
     private fun setNewPuzzleFilter(filterValue : String?) {
         setNewPuzzleListAndFilter(_puzzleFiles.value, filterValue)
+    }
+
+    private fun sortPuzzleFiles(accessor : Accessor?) {
+        if (accessor != null) {
+            _puzzleFiles.value?.let { files ->
+                files.sortWith() { pm1, pm2 ->
+                    accessor.compare(pm1.value, pm2.value)
+                }
+                _puzzleFiles.value = files
+            }
+        }
     }
 
     private fun setNewPuzzleListAndFilter(
