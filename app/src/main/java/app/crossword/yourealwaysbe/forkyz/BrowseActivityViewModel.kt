@@ -23,15 +23,14 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.distinctUntilChanged
 
 import dagger.hilt.android.lifecycle.HiltViewModel
 
 import app.crossword.yourealwaysbe.forkyz.net.Downloader
 import app.crossword.yourealwaysbe.forkyz.net.DownloadersProvider
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
+import app.crossword.yourealwaysbe.forkyz.settings.RatingsSettings
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
-import app.crossword.yourealwaysbe.forkyz.util.FilteredList
 import app.crossword.yourealwaysbe.forkyz.util.PuzzleImporter
 import app.crossword.yourealwaysbe.forkyz.util.SingleLiveEvent
 import app.crossword.yourealwaysbe.forkyz.util.files.Accessor
@@ -40,11 +39,40 @@ import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzMetaFile
+import app.crossword.yourealwaysbe.forkyz.util.liveDataFanIn
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 
 private val TAG = "ForkyzBrowseActivity"
 private val MATCHER_DATE_FORMAT
     = DateTimeFormatter.ofPattern("EEEE dd MMM yyyy")
+
+/**
+ * UI state of Browse Activity
+ *
+ * @param isViewArchive true if archive is showing not main list
+ * @param puzzleFilter non-null if list limited to puzzles containing
+ * string
+ * @param isBusy true if busy with something that isn't downloading
+ * @param sortOrder the order the puzzles are sorted
+ * @param puzzleList the list of files, each file is mutable so can be
+ * observed (TODO: remove this when using compose)
+ * @param disableSwipe disable swipe actions
+ * @param showPercentageCorrect show percentage correct cells rather
+ * than filled
+ * @param showRatings if to display ratings
+ * @param indicateIfSolution indicate in list if a puzzle has solutions
+ */
+data class UIState(
+    val isViewArchive : Boolean = false,
+    val puzzleFilter : String = "",
+    val isBusy : Boolean = false,
+    val sortOrder : Accessor = Accessor.DATE_ASC,
+    val puzzleList : List<LiveData<PuzMetaFile>> = listOf(),
+    val disableSwipe : Boolean = true,
+    val showPercentageCorrect : Boolean = false,
+    val showRatings : Boolean = false,
+    val indicateIfSolution : Boolean = false,
+)
 
 @HiltViewModel
 class BrowseActivityViewModel @Inject constructor(
@@ -63,56 +91,55 @@ class BrowseActivityViewModel @Inject constructor(
     private val downloadExecutorService = Executors.newCachedThreadPool()
     private val handler = Handler(Looper.getMainLooper())
 
-    var isViewArchive = false
-        private set
+    // TODO: kept for data-binding in browse.xml, remove when Compose
+    val puzzleFilter = MutableLiveData<String>("")
 
-    val puzzleFilter = MutableLiveData<String>()
+    private val _uiState : MediatorLiveData<UIState> = liveDataFanIn(
+        this::updateState,
+        settings.liveBrowseSort,
+        puzzleFilter,
+        settings.liveBrowseDisableSwipe,
+        settings.liveBrowseShowPercentageCorrect,
+        settings.liveRatingsSettings,
+        settings.liveBrowseIndicateIfSolution,
+    )
+    val uiState : LiveData<UIState> = _uiState
 
-    // busy with something that isn't downloading
-    private val _isUIBusy = MutableLiveData<Boolean>(false)
-    val isUIBusy : LiveData<Boolean> = _isUIBusy
     val puzzleLoadEvents = SingleLiveEvent<Void>()
-    val sortOrder : LiveData<Accessor> = settings.liveBrowseSort
 
-    /**
-     * Get list of puzzle files in currently viewed directory
-     *
-     * List of mutable live data. Each live data is for one puzzle --
-     * the base puzzle may change, but it might get updated with new
-     * meta data (e.g. new % completed). If it gets set to null, it
-     * means the puzzle was removed from the puzzle list.
-     *
-     * The puzzle list might have items added to it, a new value will be
-     * posted, containing the same list with the new item at the end.
-     */
-    private val _puzzleFiles
-        = MediatorLiveData<FilteredList<MutableLiveData<PuzMetaFile>>>()
-    val puzzleFiles : LiveData<out FilteredList<out LiveData<PuzMetaFile>>>
-        = _puzzleFiles
+    // local copy will be filtered and posted to uiState when updated
+    private var puzzleList
+        : MutableList<MutableLiveData<PuzMetaFile>> = mutableListOf()
+
     init {
-        _puzzleFiles.addSource(
-            settings.liveBrowseNewPuzzle.distinctUntilChanged(),
+        _uiState.addSource(
+            settings.liveBrowseNewPuzzle,
             { newPuzzle ->
-                // first load, or if new puzzles
-                if (
-                    puzzleFiles.value == null
-                    || ((newPuzzle ?: false) && !isViewArchive)
-                ) {
-                    startLoadFiles()
-                    if (newPuzzle)
-                        settings.setBrowseNewPuzzle(false)
+                if (newPuzzle) {
+                    if (!isViewArchive)
+                        startLoadFiles()
+                    settings.setBrowseNewPuzzle(false)
                 }
             },
         )
-        _puzzleFiles.addSource(
-            puzzleFilter,
-            this::setNewPuzzleFilter
-        )
-        _puzzleFiles.addSource(
-            settings.liveBrowseSort,
-            this::sortPuzzleFiles,
-        )
     }
+
+    val isViewArchive : Boolean
+        get() {
+            return uiState.value?.isViewArchive ?: false
+        }
+
+    // TODO: not needed once Compose?
+    val sortOrder : Accessor
+        get() {
+            return uiState.value?.sortOrder ?: Accessor.DATE_ASC
+        }
+
+    val puzzleFiles : List<LiveData<PuzMetaFile>>
+        get() {
+            return uiState.value?.puzzleList ?: listOf()
+        }
+
 
     fun setSortOrder(accessor : Accessor) {
         settings.setBrowseSort(accessor)
@@ -136,17 +163,12 @@ class BrowseActivityViewModel @Inject constructor(
                 else
                     fileHandler.getCrosswordsDirectory()
 
-                val puzFiles = FilteredList<MutableLiveData<PuzMetaFile>>()
+                puzzleList = fileHandler.getPuzMetas(directory).map { pm ->
+                    MutableLiveData<PuzMetaFile>(pm)
+                }.toMutableList()
 
-                fileHandler.getPuzMetas(directory).forEach { pm ->
-                    puzFiles.add(MutableLiveData<PuzMetaFile>(pm))
-                }
-
-                // use handler for this so viewArchive changes when
-                // puzzleFiles does
                 handler.post() {
-                    isViewArchive = archive
-                    setNewPuzzleList(puzFiles)
+                    updateState(archive, true)
                 }
             }
         }
@@ -162,7 +184,6 @@ class BrowseActivityViewModel @Inject constructor(
         fileHandlerProvider.get() { fileHandler ->
             threadWithUILock("delete puzzles") {
                 val viewedDir = getViewedDirectory(fileHandler)
-
                 puzMetas.forEach { puzMeta ->
                     fileHandler.delete(puzMeta)
                     if (puzMeta.isInDirectory(viewedDir))
@@ -185,7 +206,6 @@ class BrowseActivityViewModel @Inject constructor(
         fileHandlerProvider.get() { fileHandler ->
             threadWithUILock("move puzzles") {
                 val directory = getViewedDirectory(fileHandler)
-
                 puzMetas.forEach { puzMeta ->
                     val addToList = destDir.equals(directory)
                     val removeFromList = puzMeta.isInDirectory(directory)
@@ -338,19 +358,16 @@ class BrowseActivityViewModel @Inject constructor(
     @MainThread
     fun refreshCurrentPuzzleMeta() {
         Log.i(TAG, "Refreshing current puzzle in list with isUIBusy")
-        _isUIBusy.value = true
+        setUIBusy(true)
         currentPuzzleHolder.getFreshCurrentPuzzleMeta() { refreshedMeta ->
-            _isUIBusy.value = false
+            setUIBusy(false)
             Log.i(TAG, "Done refreshing current puzzle in list with isUIBusy")
             if (refreshedMeta != null) {
                 val curHandle = currentPuzzleHolder.puzHandle
-                _puzzleFiles.value?.let { pmList ->
-                    var index = -1
-                    pmList.forEach { pm ->
-                        index += 1
-                        if (pm.value?.isSameMainFile(curHandle) ?: false) {
-                            pm.postValue(refreshedMeta)
-                        }
+                // TODO: should be a puzzle files update when Compose
+                puzzleList.forEach { pm ->
+                    if (pm.value?.isSameMainFile(curHandle) ?: false) {
+                        pm.postValue(refreshedMeta)
                     }
                 }
             }
@@ -468,10 +485,10 @@ class BrowseActivityViewModel @Inject constructor(
         Log.i(TAG, "Starting task " + taskName + " with isUIBusy")
         executorService.execute() {
             try {
-                _isUIBusy.postValue(true)
+                setUIBusy(true)
                 r.run()
             } finally {
-                _isUIBusy.postValue(false)
+                setUIBusy(false)
                 Log.i(TAG, "Finished task " + taskName + " with isUIBusy")
             }
         }
@@ -481,65 +498,28 @@ class BrowseActivityViewModel @Inject constructor(
      * Don't add the same file twice!
      */
     private fun addPuzzleToList(puzMeta : PuzMetaFile) {
-        _puzzleFiles.value?.let { files ->
-            files.add(MutableLiveData<PuzMetaFile>(puzMeta))
-            _puzzleFiles.postValue(files)
-        }
-    }
-
-    private fun setNewPuzzleList(
-        newList : FilteredList<MutableLiveData<PuzMetaFile>>,
-    ) {
-        setNewPuzzleListAndFilter(newList, puzzleFilter.value)
-    }
-
-    private fun setNewPuzzleFilter(filterValue : String?) {
-        setNewPuzzleListAndFilter(_puzzleFiles.value, filterValue)
-    }
-
-    private fun sortPuzzleFiles(accessor : Accessor?) {
-        if (accessor != null) {
-            _puzzleFiles.value?.let { files ->
-                files.sortWith() { pm1, pm2 ->
-                    accessor.compare(pm1.value, pm2.value)
-                }
-                _puzzleFiles.value = files
-            }
-        }
-    }
-
-    private fun setNewPuzzleListAndFilter(
-        newList : FilteredList<MutableLiveData<PuzMetaFile>>?,
-        newFilter : String?
-    ) {
-        if (newList != null) {
-            if (newFilter == null || newFilter.length == 0)
-                newList.clearFilter()
-            else
-                newList.applyFilter() { meta -> metaMatches(meta, newFilter) }
-        }
-        _puzzleFiles.value = newList
+        puzzleList.add(MutableLiveData<PuzMetaFile>(puzMeta))
+        updateState(isNewPuzzleList = true)
     }
 
     /**
      * Assumes files only appear once in list
      */
     private fun removeFromPuzzleList(delPuzMeta : PuzMetaFile) {
-        _puzzleFiles.value?.let { puzList ->
-            var index = 0
-            var delIndex = -1
+        var index = 0
+        var delIndex = -1
 
-            while (index < puzList.size && delIndex < 0) {
-                puzList.get(index).value?.let { pm ->
-                    if (pm.isSameMainFile(delPuzMeta))
-                        delIndex = index
-                    index += 1
-                }
+        while (index < puzzleList.size && delIndex < 0) {
+            puzzleList.get(index).value?.let { pm ->
+                if (pm.isSameMainFile(delPuzMeta))
+                    delIndex = index
+                index += 1
             }
-
-            if (delIndex >= 0)
-                puzList.removeAt(delIndex).postValue(null)
         }
+
+        // TODO: should be updating state when Compose
+        if (delIndex >= 0)
+            puzzleList.removeAt(delIndex).postValue(null)
     }
 
     private fun metaMatches(
@@ -576,5 +556,54 @@ class BrowseActivityViewModel @Inject constructor(
             return true
 
         return false
+    }
+
+    private fun updateState(
+        isArchive : Boolean = isViewArchive,
+        isNewPuzzleList : Boolean = false,
+    ) : UIState {
+        val state = uiState.value ?: UIState()
+        val puzzleFilter = puzzleFilter.value ?: ""
+        var newPuzzleList : List<LiveData<PuzMetaFile>> = state.puzzleList
+
+        val newFilter = state.puzzleFilter != puzzleFilter
+        if (isNewPuzzleList || newFilter) {
+            newPuzzleList = puzzleList.filter {
+                metaMatches(it, puzzleFilter)
+            }
+        }
+
+        val newSortOrder = settings.liveBrowseSort.value ?: state.sortOrder
+        val isNewSort = state.sortOrder != newSortOrder
+        if (isNewPuzzleList || isNewSort) {
+            newPuzzleList = newPuzzleList.sortedWith() { pm1, pm2 ->
+                newSortOrder.compare(pm1.value, pm2.value)
+            }
+        }
+
+        val showPercentageCorrect
+            = settings.liveBrowseShowPercentageCorrect.value ?: false
+        val showRatings = settings.liveRatingsSettings.value?.let { rs ->
+            !rs.disableRatings
+                && (rs.browseAlwaysShowRating || isViewArchive)
+            } ?: false
+        val indicateIfSolution
+            = settings.liveBrowseIndicateIfSolution.value
+                ?: state.indicateIfSolution
+
+        return state.copy(
+            isViewArchive = isArchive,
+            puzzleFilter = puzzleFilter,
+            sortOrder = newSortOrder,
+            puzzleList = newPuzzleList,
+            disableSwipe = settings.liveBrowseDisableSwipe.value ?: true,
+            showPercentageCorrect = showPercentageCorrect,
+            showRatings = showRatings,
+            indicateIfSolution = indicateIfSolution,
+        )
+    }
+
+    private fun setUIBusy(value : Boolean) {
+        _uiState.postValue(uiState.value?.copy(isBusy = value))
     }
 }

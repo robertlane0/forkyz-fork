@@ -33,7 +33,7 @@ fun <T> LiveData<T>.observeOnce(cb : Consumer<T>) {
 fun <T> liveDataFanIn(
     supplier : Supplier<T>,
     vararg liveDatas : LiveData<*>,
-) : MutableLiveData<T> {
+) : MediatorLiveData<T> {
     val mediator = MediatorLiveData<T>()
     val seen : MutableSet<Int>
         = liveDatas.map(System::identityHashCode).toMutableSet()

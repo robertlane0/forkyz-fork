@@ -437,107 +437,14 @@ public class BrowseActivity extends ForkyzActivity {
 
         setDefaultKeyMode(DEFAULT_KEYS_SHORTCUT);
         binding.puzzleList.setLayoutManager(new LinearLayoutManager(this));
-        ItemTouchHelper helper = new ItemTouchHelper(
-            new ItemTouchHelper.SimpleCallback(
-                0,
-                ItemTouchHelper.START | ItemTouchHelper.END
-            ) {
-                private LiveData<Boolean> liveDisableSwipe
-                    = settings.getLiveBrowseDisableSwipe();
-
-                @Override
-                public int getSwipeDirs(
-                    RecyclerView recyclerView,
-                    RecyclerView.ViewHolder viewHolder
-                ) {
-                    Boolean disableSwipe = liveDisableSwipe.getValue();
-                    if (disableSwipe == null)
-                        disableSwipe = true;
-
-                    if (!(viewHolder instanceof FileViewHolder)
-                            || disableSwipe
-                            || !selected.isEmpty()) {
-                        return 0; // Don't swipe the headers.
-                    }
-                    return super.getSwipeDirs(recyclerView, viewHolder);
-                }
-
-                @Override
-                public boolean onMove(
-                    RecyclerView recyclerView,
-                    RecyclerView.ViewHolder viewHolder,
-                    RecyclerView.ViewHolder viewHolder1
-                ) {
-                    return false;
-                }
-
-                @Override
-                public void onSwiped(
-                    RecyclerView.ViewHolder viewHolder, int direction
-                ) {
-                    if(!selected.isEmpty())
-                        return;
-                    if(!(viewHolder instanceof FileViewHolder))
-                        return;
-
-                    PuzMetaFile puzMeta
-                        = ((FileViewHolder) viewHolder).getPuzMetaFile();
-
-                    fileHandlerProvider.get(fileHandler -> {
-                    settings.getBrowseSwipeAction(action -> {
-                        switch (action) {
-                        case BSA_DELETE:
-                            model.deletePuzzle(puzMeta);
-                            break;
-                        default:
-                            if (model.isViewArchive()) {
-                                model.movePuzzle(
-                                    puzMeta,
-                                    fileHandler.getCrosswordsDirectory()
-                                );
-                            } else {
-                                model.movePuzzle(
-                                    puzMeta,
-                                    fileHandler.getArchiveDirectory()
-                                );
-                            }
-                            break;
-                        }
-                    });});
-                }
-            });
-        settings.getLiveBrowseDisableSwipe().observe(
-            this,
-            disableSwipe -> {
-                helper.attachToRecyclerView(null);
-                helper.attachToRecyclerView(binding.puzzleList);
-            }
-        );
 
         this.nm = NotificationManagerCompat.from(this);
 
         setupSpeedDial();
 
         model = new ViewModelProvider(this).get(BrowseActivityViewModel.class);
-        model.getPuzzleFiles().observe(this, (v) -> {
-            BrowseActivity.this.setViewCrosswordsOrArchiveUI();
-            BrowseActivity.this.loadPuzzleAdapter();
-            binding.swipeContainer.setRefreshing(false);
-        });
         binding.setViewModel(model);
         binding.setLifecycleOwner(this);
-
-        model.isUIBusy().observe(this, (isBusy) -> {
-            if (isBusy)
-                showPleaseWait();
-            else
-                hidePleaseWait();
-        });
-
-        model.getPuzzleLoadEvents().observe(this, (v) -> {
-            Intent i = new Intent(BrowseActivity.this, PlayActivity.class);
-            BrowseActivity.this.startActivity(i);
-        });
 
         binding.swipeContainer.setOnRefreshListener(
              new SwipeRefreshLayout.OnRefreshListener() {
@@ -548,6 +455,7 @@ public class BrowseActivity extends ForkyzActivity {
              }
          );
 
+        setupObservers();
         setupPuzzleFilter();
 
         setViewCrosswordsOrArchiveUI();
@@ -695,7 +603,7 @@ public class BrowseActivity extends ForkyzActivity {
         for (LiveData<PuzMetaFile> pmData : puzFiles) {
             PuzMetaFile puzMeta = pmData.getValue();
 
-            Accessor accessor = model.getSortOrder().getValue();
+            Accessor accessor = model.getSortOrder();
             if (accessor == null)
                 accessor = Accessor.DATE_ASC;
             String check = accessor.getLabel(puzMeta);
@@ -750,7 +658,7 @@ public class BrowseActivity extends ForkyzActivity {
     private void loadPuzzleAdapter() {
         cleanUpCurrentAdapter();
         List<? extends LiveData<PuzMetaFile>> puzList
-            = model.getPuzzleFiles().getValue();
+            = model.getPuzzleFiles();
         if (puzList != null) {
             setPuzzleListAdapter(buildList(puzList), true);
         } else {
@@ -1059,6 +967,102 @@ public class BrowseActivity extends ForkyzActivity {
         binding.filterPanel.setVisibility(View.GONE);
     }
 
+    private void setupObservers() {
+        ItemTouchHelper helper = new ItemTouchHelper(
+            new ItemTouchHelper.SimpleCallback(
+                0,
+                ItemTouchHelper.START | ItemTouchHelper.END
+            ) {
+                private LiveData<Boolean> liveDisableSwipe
+                    = settings.getLiveBrowseDisableSwipe();
+
+                @Override
+                public int getSwipeDirs(
+                    RecyclerView recyclerView,
+                    RecyclerView.ViewHolder viewHolder
+                ) {
+                    Boolean disableSwipe = liveDisableSwipe.getValue();
+                    if (disableSwipe == null)
+                        disableSwipe = true;
+
+                    if (!(viewHolder instanceof FileViewHolder)
+                            || disableSwipe
+                            || !selected.isEmpty()) {
+                        return 0; // Don't swipe the headers.
+                    }
+                    return super.getSwipeDirs(recyclerView, viewHolder);
+                }
+
+                @Override
+                public boolean onMove(
+                    RecyclerView recyclerView,
+                    RecyclerView.ViewHolder viewHolder,
+                    RecyclerView.ViewHolder viewHolder1
+                ) {
+                    return false;
+                }
+
+                @Override
+                public void onSwiped(
+                    RecyclerView.ViewHolder viewHolder, int direction
+                ) {
+                    if(!selected.isEmpty())
+                        return;
+                    if(!(viewHolder instanceof FileViewHolder))
+                        return;
+
+                    PuzMetaFile puzMeta
+                        = ((FileViewHolder) viewHolder).getPuzMetaFile();
+
+                    fileHandlerProvider.get(fileHandler -> {
+                    settings.getBrowseSwipeAction(action -> {
+                        switch (action) {
+                        case BSA_DELETE:
+                            model.deletePuzzle(puzMeta);
+                            break;
+                        default:
+                            if (model.isViewArchive()) {
+                                model.movePuzzle(
+                                    puzMeta,
+                                    fileHandler.getCrosswordsDirectory()
+                                );
+                            } else {
+                                model.movePuzzle(
+                                    puzMeta,
+                                    fileHandler.getArchiveDirectory()
+                                );
+                            }
+                            break;
+                        }
+                    });});
+                }
+            });
+
+        model.getUiState().observe(
+            this,
+            state -> {
+                // refresh swipe state
+                helper.attachToRecyclerView(null);
+                helper.attachToRecyclerView(binding.puzzleList);
+
+                // TODO: if new puzzle list
+                BrowseActivity.this.setViewCrosswordsOrArchiveUI();
+                BrowseActivity.this.loadPuzzleAdapter();
+                binding.swipeContainer.setRefreshing(false);
+
+                if (state.isBusy())
+                    showPleaseWait();
+                else
+                    hidePleaseWait();
+            }
+        );
+
+        model.getPuzzleLoadEvents().observe(this, (v) -> {
+            Intent i = new Intent(BrowseActivity.this, PlayActivity.class);
+            BrowseActivity.this.startActivity(i);
+        });
+    }
+
     private class FileAdapter
             extends RemovableRecyclerViewAdapter<FileViewHolder> {
         final ArrayList<? extends LiveData<PuzMetaFile>> objects;
@@ -1153,41 +1157,25 @@ public class BrowseActivity extends ForkyzActivity {
             super(itemBinding.getRoot());
             this.itemBinding = itemBinding;
 
-            model.getSortOrder().observe(
+            model.getUiState().observe(
                 BrowseActivity.this,
-                accessor -> {
-                    if (accessor == Accessor.SOURCE) {
+                state -> {
+                    if (state.getSortOrder() == Accessor.SOURCE) {
                         itemBinding.puzzleDate.setVisibility(View.VISIBLE);
                     } else {
                         itemBinding.puzzleDate.setVisibility(View.GONE);
                     }
-                }
-            );
 
-            settings.getLiveBrowseShowPercentageCorrect().observe(
-                BrowseActivity.this,
-                showPercentageCorrect -> {
-                    this.showPercentageCorrect = showPercentageCorrect;
+                    this.showPercentageCorrect
+                        = state.getShowPercentageCorrect();
                     setPercentage();
-                }
-            );
 
-            settings.getLiveRatingsSettings().observe(
-                BrowseActivity.this,
-                settings -> {
-                    boolean visible = !settings.getDisableRatings() && (
-                        settings.getBrowseAlwaysShowRating()
-                        || model.isViewArchive()
-                    );
                     itemBinding.puzzleRating.setVisibility(
-                        visible ? View.VISIBLE : View.GONE
+                        state.getShowRatings() ? View.VISIBLE : View.GONE
                     );
-                }
-            );
 
-            settings.getLiveBrowseIndicateIfSolution().observe(
-                BrowseActivity.this,
-                indicate -> { setIndicateSolutionVisibility(); }
+                    setIndicateSolutionVisibility();
+                }
             );
         }
 
