@@ -32,11 +32,5 @@
         <item name="android:tint">@color/onPrimary</item>
         <item name="android:textColor">@color/onPrimary</item>
     </style>
-    <style name="legacySpeedDialStyle" parent="Theme.Forkyz">
-        <item name="colorPrimary">@color/speedDialTint</item>
-        <item name="colorAccent">@color/speedDialTint</item>
-        <item name="colorOnSecondary">@color/speedDialIconTint</item>
-        <item name="colorOnPrimaryContainer">@color/speedDialIconTint</item>
-    </style>
 </resources>
 

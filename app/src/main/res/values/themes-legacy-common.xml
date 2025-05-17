@@ -35,6 +35,5 @@
         </item>
 
         <item name="clueLineOnlyStyle">@style/legacyClueLineOnlyStyle</item>
-        <item name="speedDialStyle">@style/legacySpeedDialStyle</item>
     </style>
 </resources>

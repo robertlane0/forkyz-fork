@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.graphics.Color
 import androidx.core.content.ContextCompat
 import com.google.android.material.appbar.AppBarLayout
@@ -37,18 +39,10 @@ class ThemeHelper @Inject constructor(val settings : ForkyzSettings) {
                 ?: settings.getAppThemeSync()
         }
 
-    @Composable
-    fun isDarkMode() : Boolean = when (appDayNightMode) {
-        DayNightMode.DNM_DAY -> false
-        DayNightMode.DNM_NIGHT -> true
-        DayNightMode.DNM_SYSTEM -> isSystemInDarkTheme()
-        else -> false
-    }
-
     val cheatedColor : Color
         @Composable
         get() {
-            if (isDarkMode())
+            if (isDarkMode(appDayNightMode))
                 return cheatedColorDark
             else
                 return cheatedColorLight
@@ -56,9 +50,10 @@ class ThemeHelper @Inject constructor(val settings : ForkyzSettings) {
 
     @Composable
     fun AppTheme(content : @Composable() () -> Unit) {
+        val dayNightMode by settings.liveAppDayNightMode.observeAsState()
         AppTheme(
             appTheme = appTheme,
-            darkMode = isDarkMode(),
+            darkMode = isDarkMode(dayNightMode),
             content = content,
         )
     }
@@ -68,12 +63,13 @@ class ThemeHelper @Inject constructor(val settings : ForkyzSettings) {
     fun ForkyzTopAppBar(
         title : @Composable () -> Unit,
         actions : @Composable RowScope.() -> Unit = { },
-        onBack : () -> Unit = { },
+        onBack : (() -> Unit)? = null,
         scrollBehavior : TopAppBarScrollBehavior? = null,
     ) {
+        val dayNightMode by settings.liveAppDayNightMode.observeAsState()
         ForkyzTopAppBar(
             appTheme = appTheme,
-            darkMode = isDarkMode(),
+            darkMode = isDarkMode(dayNightMode),
             title = title,
             actions = actions,
             onBack = onBack,
@@ -105,24 +101,13 @@ class ThemeHelper @Inject constructor(val settings : ForkyzSettings) {
         }
     }
 
-    fun setupStatusBar(
-        activity : ForkyzActivity,
-        appBarLayout : AppBarLayout,
-    ) {
-        val nightModeFlags = activity
-            .getResources()
-            .getConfiguration().uiMode and Configuration.UI_MODE_NIGHT_MASK
-
-        if (
-            appTheme == Theme.T_LEGACY_LIKE
-            && nightModeFlags != Configuration.UI_MODE_NIGHT_YES
-        ) {
-            activity.setStatusBarColor(
-                appBarLayout,
-                ContextCompat.getColor(activity, R.color.primary),
-            )
-        } else {
-            activity.setStatusBarElevation(appBarLayout)
+    @Composable
+    private fun isDarkMode(dayNightMode : DayNightMode?) : Boolean {
+        return when (appDayNightMode) {
+            DayNightMode.DNM_DAY -> false
+            DayNightMode.DNM_NIGHT -> true
+            DayNightMode.DNM_SYSTEM -> isSystemInDarkTheme()
+            else -> false
         }
     }
 }

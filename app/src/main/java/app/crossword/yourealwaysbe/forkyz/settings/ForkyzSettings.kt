@@ -32,7 +32,6 @@ import org.json.JSONObject
 
 import app.crossword.yourealwaysbe.forkyz.net.Downloaders
 import app.crossword.yourealwaysbe.forkyz.util.JSONUtils
-import app.crossword.yourealwaysbe.forkyz.util.files.Accessor
 import app.crossword.yourealwaysbe.forkyz.util.observeOnce
 import app.crossword.yourealwaysbe.puz.MovementStrategy
 import app.crossword.yourealwaysbe.puz.Playboard.DeleteCrossingMode
@@ -145,6 +144,22 @@ class ForkyzSettings(
         launch {
             settingsStore.updateData { settings ->
                 settings.toBuilder().setArchiveCleanupAge(value).build()
+            }
+        }
+    }
+
+    val liveBrowseDontConfirmCleanup : LiveData<Boolean>
+        = settingsFlow.map {
+            it.dontConfirmCleanup
+        }.distinctUntilChanged().asLiveData()
+
+    fun getBrowseDontConfirmCleanup(cb : Consumer<Boolean>)
+        = liveBrowseDontConfirmCleanup.observeOnce(cb)
+
+    fun setBrowseDontConfirmCleanup(value : Boolean) {
+        launch {
+            settingsStore.updateData { settings ->
+                settings.toBuilder().setDontConfirmCleanup(value).build()
             }
         }
     }
@@ -2125,36 +2140,21 @@ class ForkyzSettings(
         }
     }
 
-    val liveBrowseSort : LiveData<Accessor>
+    val liveBrowseSort : LiveData<AccessorSetting>
         = settingsFlow.map {
-            when (it.sort) {
-                AccessorSetting.AS_SOURCE -> Accessor.SOURCE
-                AccessorSetting.AS_DATE_ASC -> Accessor.DATE_ASC
-                else -> Accessor.DATE_DESC
-            }
+            it.sort
         }.distinctUntilChanged().asLiveData()
 
-    fun getBrowseSort(cb : Consumer<Accessor>)
+    fun getBrowseSort(cb : Consumer<AccessorSetting>)
         = liveBrowseSort.observeOnce(cb)
 
-    fun setBrowseSort(value : Accessor)
-        = setBrowseSortSetting(convertAccessor(value))
-
-    fun setBrowseSortSetting(value : AccessorSetting) {
+    fun setBrowseSort(value : AccessorSetting) {
         launch {
             settingsStore.updateData { settings ->
                 settings.toBuilder().setSort(value).build()
             }
         }
     }
-
-    private fun convertAccessor(value : Accessor) : AccessorSetting
-        = if (value == Accessor.SOURCE)
-            AccessorSetting.AS_SOURCE
-        else if (value == Accessor.DATE_ASC)
-            AccessorSetting.AS_DATE_ASC
-        else /* DATE_DESC */
-            AccessorSetting.AS_DATE_DESC
 
     val livePlaySpaceChangesDirection : LiveData<Boolean>
         = settingsFlow.map {
@@ -2676,6 +2676,13 @@ class ForkyzSettings(
             { key -> json.optBoolean(key)?.let { setDownloadOnStartUp(it) } },
         )
         run(
+            "dontConfirmCleanup",
+            { s, key -> json.put(key, s.dontConfirmCleanup) },
+            { key ->
+                json.optBoolean(key)?.let { setBrowseDontConfirmCleanup(it) }
+            },
+        )
+        run(
             "doubleTap",
             { s, key -> json.put(key, s.doubleTap) },
             { key ->
@@ -3163,7 +3170,7 @@ class ForkyzSettings(
             { key ->
                json.optString(key)?.let {
                    try {
-                       setBrowseSortSetting(AccessorSetting.valueOf(it))
+                       setBrowseSort(AccessorSetting.valueOf(it))
                    } catch (e : IllegalArgumentException) {
                        // ignore
                    }

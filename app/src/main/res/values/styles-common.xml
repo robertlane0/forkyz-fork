@@ -37,17 +37,6 @@
         <item name="iconGravity">textStart</item>
         <item name="rippleColor">#555555</item>
     </style>
-    <style name="speedDialStyle">
-        <!-- experimentally derived -->
-        <item name="colorSecondary">?attr/colorPrimary</item>
-        <item name="colorOnPrimaryContainer">?attr/colorOnPrimary</item>
-    </style>
-    <style name="speedDialOverlayStyle" parent="Theme.Forkyz">
-        <item name="android:background">@color/screenFade</item>
-    </style>
-    <style name="puzzleListItemStyle" parent="Theme.Forkyz">
-        <item name="android:background">@drawable/puzzle_list_background</item>
-    </style>
     <style name="clueLineOnlyStyle" parent="Theme.Forkyz">
         <item name="titleTextColor">?attr/colorOnSurface</item>
         <item name="android:textColor">?attr/colorOnSurface</item>

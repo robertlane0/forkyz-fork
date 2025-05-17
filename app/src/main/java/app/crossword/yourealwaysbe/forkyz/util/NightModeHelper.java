@@ -47,37 +47,6 @@ public class NightModeHelper {
         this.settings = settings;
     }
 
-    /**
-     * After changing theme, calls back with new mode
-     *
-     * Can pass null if don't care
-     */
-    public void next(Consumer<DayNightMode> cb) {
-        settings.getAppDayNightMode(currentMode -> {
-            switch (currentMode) {
-            case DNM_DAY:
-                setMode(DayNightMode.DNM_NIGHT);
-                if (cb != null)
-                    cb.accept(DayNightMode.DNM_NIGHT);
-                break;
-            case DNM_NIGHT:
-                setMode(DayNightMode.DNM_SYSTEM);
-                if (cb != null)
-                    cb.accept(DayNightMode.DNM_SYSTEM);
-                break;
-            case DNM_SYSTEM:
-                setMode(DayNightMode.DNM_DAY);
-                if (cb != null)
-                    cb.accept(DayNightMode.DNM_DAY);
-                break;
-            }
-        });
-    }
-
-    public void setMode(DayNightMode mode) {
-        settings.setAppDayNightMode(mode, () -> { restoreNightMode(); });
-    }
-
     public void restoreNightMode() {
         AppCompatActivity activity = mActivity.get();
         if (activity != null) {
@@ -108,8 +77,9 @@ public class NightModeHelper {
     }
 
     /**
-     * Helper method to get the theme resource id. Warning, accessing non-public methods is
-     * a no-no and there is no guarantee this will work.
+     * Helper method to get the theme resource id. Warning, accessing
+     * non-public methods is a no-no and there is no guarantee this will
+     * work.
      *
      * @param context the context you want to extract the theme-resource-id from
      * @return The themeId associated w/ the context

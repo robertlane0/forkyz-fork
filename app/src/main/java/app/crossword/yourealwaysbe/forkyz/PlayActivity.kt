@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -58,6 +57,8 @@ import androidx.lifecycle.ViewModelProvider
 
 import com.squareup.seismic.ShakeDetector
 
+import app.crossword.yourealwaysbe.forkyz.menu.BaseMenuModifier
+import app.crossword.yourealwaysbe.forkyz.menu.MenuText
 import app.crossword.yourealwaysbe.forkyz.settings.FitToScreenMode
 import app.crossword.yourealwaysbe.forkyz.settings.GridRatio
 import app.crossword.yourealwaysbe.forkyz.view.BoardEditView.BoardClickListener
@@ -359,15 +360,15 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
         val state by viewModel.menuState.observeAsState()
         val uiState by viewModel.playUIState.observeAsState()
 
-        IconButton(onClick = { viewModel.expandMenu(SubMenu.MAIN) }) {
+        IconButton(onClick = { viewModel.expandMenu(PuzzleSubMenu.MAIN) }) {
             Icon(
                 Icons.Default.MoreVert,
                 contentDescription = stringResource(R.string.overflow),
             )
         }
         DropdownMenu(
-            modifier = BASE_MENU_MODIFIER,
-            expanded = state?.expanded == SubMenu.MAIN,
+            modifier = BaseMenuModifier,
+            expanded = state?.expanded == PuzzleSubMenu.MAIN,
             onDismissRequest = viewModel::dismissMenu,
         ) {
             MenuClues()

@@ -26,8 +26,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import app.crossword.yourealwaysbe.forkyz.R
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
-import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzMetaFile
+import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 import app.crossword.yourealwaysbe.puz.Playboard
 
@@ -67,7 +67,7 @@ public class CurrentPuzzleHolder @Inject constructor(
      */
     @MainThread
     fun loadPuzzle(
-        puzMeta : PuzMetaFile,
+        puzHandle : PuzHandle,
         cb : Runnable,
         onErr : Consumer<IOException>,
     ) {
@@ -90,7 +90,7 @@ public class CurrentPuzzleHolder @Inject constructor(
                     // on main thread so go back to io
                     ioScope.launch {
                         try {
-                            val puz = fileHandler.load(puzMeta);
+                            val puz = fileHandler.load(puzHandle);
                             if (puz == null || puz.getBoxes() == null) {
                                 throw IOException(
                                     "Puzzle is null or contains no boxes."
@@ -109,7 +109,7 @@ public class CurrentPuzzleHolder @Inject constructor(
                                     skipFilled,
                                     undoEnabled
                                 )
-                                puzHandle = puzMeta.getPuzHandle()
+                                this@CurrentPuzzleHolder.puzHandle = puzHandle
                                 cb.run()
                             }
                         } catch (e : IOException) {

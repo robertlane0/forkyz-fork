@@ -37,7 +37,7 @@ import androidx.core.app.ShareCompat
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class LogcatActivity : ForkyzActivityKt() {
+class LogcatActivity : ForkyzActivity() {
     private val PADDING = 20.dp
 
     private val viewModel by viewModels<LogcatActivityViewModel>()

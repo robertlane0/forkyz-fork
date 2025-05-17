@@ -151,7 +151,7 @@ fun ForkyzTopAppBar(
     darkMode : Boolean,
     title : @Composable () -> Unit,
     actions : @Composable RowScope.() -> Unit = { },
-    onBack : () -> Unit = { },
+    onBack : (() -> Unit)? = null,
     scrollBehavior : TopAppBarScrollBehavior? = null,
 ) {
     val colors = if (appTheme == Theme.T_LEGACY_LIKE && !darkMode) {
@@ -170,11 +170,13 @@ fun ForkyzTopAppBar(
         colors = colors,
         title = title,
         navigationIcon = {
-            IconButton(onClick = onBack) {
-                Icon(
-                    Icons.AutoMirrored.Filled.ArrowBack,
-                    stringResource(R.string.back),
-                )
+            onBack?.let { onBack ->
+                IconButton(onClick = onBack) {
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowBack,
+                        stringResource(R.string.back),
+                    )
+                }
             }
         },
         actions = actions,

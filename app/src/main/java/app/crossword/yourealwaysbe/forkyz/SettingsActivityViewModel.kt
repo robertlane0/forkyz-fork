@@ -862,6 +862,13 @@ class SettingsActivityViewModel @Inject constructor(
         // Browser
         SettingsBoolean(
             SettingsPage.BROWSER,
+            R.string.dont_confirm_cleanup,
+            R.string.dont_confirm_cleanup_desc,
+            settings.liveBrowseDontConfirmCleanup,
+            settings::setBrowseDontConfirmCleanup,
+        ),
+        SettingsBoolean(
+            SettingsPage.BROWSER,
             R.string.delete_on_cleanup,
             R.string.delete_on_cleanup_desc,
             settings.liveBrowseDeleteOnCleanup,

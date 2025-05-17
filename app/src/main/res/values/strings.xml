@@ -10,7 +10,6 @@
     <string name="exit">Exit</string>
     <string name="cancel">Cancel</string>
     <string name="elapsed_time">Elapsed Time: %1$s</string>
-    <string name="preview">Preview</string>
     <string name="general_clue_notes">Free-form notes about clue</string>
     <string name="general_puzzle_notes">Free-form notes about puzzle</string>
     <string name="unknown_hint">(No explicit clue)</string>
@@ -47,8 +46,6 @@
     <string name="import_failure_long">Some puzzles were not imported into Forkyz.</string>
 
     <!-- permissions -->
-    <string name="perm_read_desc">Requested on older devices to read saved puzzles.</string>
-    <string name="perm_write_desc">Requested on older devices to store puzzles.</string>
     <string name="perm_internet_desc">Required to download puzzles from the internet.</string>
     <string name="perm_access_network_state_desc">Required to limit background download when on mobile data or wifi.</string>
     <string name="perm_boot_desc">Required to (optionally) allow periodic background download of puzzles.</string>
@@ -59,9 +56,15 @@
     <string name="foreground_service_data_sync_desc">Used for exporting puzzles to an external directory.</string>
 
     <!-- Browse -->
+    <string name="unknown_source">Unknown Source</string>
+    <plurals name="num_selected">
+        <item quantity="other">%d Selected</item>
+    </plurals>
     <string name="delete">Delete</string>
     <string name="archive">Archive</string>
-    <string name="unarchive">Un-Archive</string>
+    <string name="delete_selected">Delete</string>
+    <string name="toggle_archive_selected">Archive or un-archive selected</string>
+    <string name="toggle_archive">Archive or un-archive</string>
     <string name="add_puzzle">Add Puzzle</string>
     <string name="online_sources">Online Sources</string>
     <string name="online_sources_url">https://hague.gitlab.io/forkyz</string>
@@ -72,8 +75,6 @@
     <string name="unable_to_read_file">Unable to read file %1$s</string>
     <string name="please_wait">Please wait&#8230;</string>
     <string name="internal_storage_description">Currently using internal storage. Puzzles will be deleted when Forkyz is uninstalled.</string>
-    <string name="allow_permissions">Allow Permissions</string>
-    <string name="please_allow_storage">Please allow writing to storage when prompted. Forkyz needs this permission to store downloaded crossword files and cannot work without it.</string>
     <string name="title_view_archives">Archives</string>
     <string name="title_view_crosswords">Crosswords</string>
     <string name="puzzle_caption_with_author">%1$s by %2$s</string>
@@ -93,14 +94,19 @@
     <string name="new_version_title">Welcome to Forkyz Version %1$s</string>
     <string name="new_version_message">A list of changes is available in the release notes in settings.</string>
     <string name="view_release_notes">View Changes</string>
-    <string name="filter_hint">Filter Text</string>
-    <string name="close_filter_desc">Close Filter</string>
+    <string name="filter_puzzles_hint">Filter Text</string>
     <string name="filter_puzzles">Filter Puzzles</string>
     <string name="has_solution_desc">Puzzle has solution</string>
     <string name="cleanup_age_two_days">Two Days</string>
     <string name="cleanup_age_one_week">One Week</string>
     <string name="cleanup_age_thirty_days">Thirty Days</string>
     <string name="cleanup_age_never">Never</string>
+    <string name="dont_confirm_cleanup">Don\'t Confirm Cleanup</string>
+    <string name="dont_confirm_cleanup_desc">Don\'t display a confirmation dialog before running cleanup.</string>
+    <string name="confirm_cleanup">Confirm Cleanup</string>
+    <string name="confirm_cleanup_msg">Are you sure you want to cleanup old puzzles?</string>
+    <string name="no_cleanup_action">No Cleanup Action</string>
+    <string name="no_cleanup_action_msg">Cleanup will not perform any action because the cleanup ages in the Browse settings are set to "Never".</string>
 
     <!-- play page -->
     <string name="open_clue_list">Open clue list</string>
@@ -582,18 +588,11 @@
     <string name="announce_only_box_response">Only box of clue %1$s.</string>
 
     <!-- browse menu -->
-    <string name="app_theme">App Theme</string>
     <string name="sort">Sort</string>
     <string name="by_date_desc">By Date (Descending)</string>
     <string name="by_date_asc">By Date (Ascending)</string>
     <string name="by_source">By Source</string>
     <string name="cleanup">Cleanup</string>
-    <string name="archives">Archives</string>
-
-    <!-- puzzle list item -->
-    <string name="puzzle_date">Puzzle Date</string>
-    <string name="puzzle_name">Puzzle Name</string>
-    <string name="caption_text">Caption text</string>
 
     <!-- puzzle info dialog -->
     <string name="puzzle_title">Title of Puzzle</string>

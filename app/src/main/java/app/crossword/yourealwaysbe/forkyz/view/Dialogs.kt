@@ -19,6 +19,8 @@ import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 
+import app.crossword.yourealwaysbe.forkyz.R
+
 private val DIALOG_BUTTON_PADDING = 4.dp
 private val DIALOG_PADDING = 20.dp
 private val DIALOG_ROUNDED_CORNERS = RoundedCornerShape(26.dp)
@@ -40,10 +42,62 @@ fun OKCancelDialog(
     onOK : () -> Unit,
     body : @Composable () -> Unit = { },
 ) {
+    TwoButtonDialog(
+        title = title,
+        summary = summary,
+        positiveText = android.R.string.ok,
+        onPositive = onOK,
+        negativeText = android.R.string.cancel,
+        onNegative = onCancel,
+        body = body,
+    )
+}
+
+/**
+ * A dialog with a positive and negative button
+ *
+ * @param title resource ID of title
+ * @param summary resource ID of summary or null
+ * @param postiveText resource ID of positive text
+ * @param onPositive callback on positive
+ * @param negativeText resource ID of negative text
+ * @param onNegative callback on positive
+ */
+@Composable
+fun TwoButtonDialog(
+    title : Int,
+    summary : Int?,
+    positiveText : Int,
+    onPositive : () -> Unit,
+    negativeText : Int,
+    onNegative: () -> Unit,
+    body : @Composable () -> Unit = { },
+) {
+    TwoButtonDialog(
+        title = stringResource(title),
+        summary = summary?.let { stringResource(it) },
+        positiveText = stringResource(positiveText),
+        onPositive = onPositive,
+        negativeText = stringResource(negativeText),
+        onNegative = onNegative,
+        body = body,
+    )
+}
+
+@Composable
+fun TwoButtonDialog(
+    title : String,
+    summary : String?,
+    positiveText : String,
+    onPositive : () -> Unit,
+    negativeText : String,
+    onNegative: () -> Unit,
+    body : @Composable () -> Unit = { },
+) {
     PlainDialog(
         title = title,
-        summary = summary?.let { stringResource(it) },
-        onClose = onCancel,
+        summary = summary,
+        onClose = onNegative,
     ) {
         body()
 
@@ -52,20 +106,20 @@ fun OKCancelDialog(
             horizontalArrangement = Arrangement.End,
         ) {
             TextButton(
-                onClick = onCancel,
+                onClick = onNegative,
                 modifier = Modifier.padding(
                     horizontal = DIALOG_BUTTON_PADDING,
                 ),
             ) {
-                Text(stringResource(android.R.string.cancel))
+                Text(negativeText)
             }
             TextButton(
-                onClick = onOK,
+                onClick = onPositive,
                 modifier = Modifier.padding(
                     horizontal = DIALOG_BUTTON_PADDING,
                 ),
             ) {
-                Text(stringResource(android.R.string.ok))
+                Text(positiveText)
             }
         }
     }
@@ -124,6 +178,21 @@ private fun PlainDialog(
     onClose : () -> Unit,
     body : @Composable () -> Unit = { },
 ) {
+    PlainDialog(
+        title = stringResource(title),
+        summary = summary,
+        onClose = onClose,
+        body = body,
+    )
+}
+
+@Composable
+private fun PlainDialog(
+    title : String,
+    summary : String?,
+    onClose : () -> Unit,
+    body : @Composable () -> Unit = { },
+) {
     Dialog(onDismissRequest = onClose) {
         Card(shape = DIALOG_ROUNDED_CORNERS) {
             Column(
@@ -132,7 +201,7 @@ private fun PlainDialog(
             ) {
                 Text(
                     modifier = Modifier.padding(bottom = DIALOG_PADDING),
-                    text = stringResource(title),
+                    text = title,
                     style = MaterialTheme.typography.headlineSmall,
                 )
                 summary?.let { summary ->

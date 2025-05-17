@@ -36,6 +36,8 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
+import app.crossword.yourealwaysbe.forkyz.menu.BaseMenuModifier
+import app.crossword.yourealwaysbe.forkyz.menu.MenuText
 import app.crossword.yourealwaysbe.puz.Clue
 
 class ClueListActivity() : PuzzleActivity() {
@@ -178,15 +180,15 @@ class ClueListActivity() : PuzzleActivity() {
     private fun OverflowMenu() {
         val state by viewModel.menuState.observeAsState()
 
-        IconButton(onClick = { viewModel.expandMenu(SubMenu.MAIN) }) {
+        IconButton(onClick = { viewModel.expandMenu(PuzzleSubMenu.MAIN) }) {
             Icon(
                 Icons.Default.MoreVert,
                 contentDescription = stringResource(R.string.overflow),
             )
         }
         DropdownMenu(
-            modifier = BASE_MENU_MODIFIER,
-            expanded = state?.expanded == SubMenu.MAIN,
+            modifier = BaseMenuModifier,
+            expanded = state?.expanded == PuzzleSubMenu.MAIN,
             onDismissRequest = viewModel::dismissMenu,
         ) {
             MenuNotes()

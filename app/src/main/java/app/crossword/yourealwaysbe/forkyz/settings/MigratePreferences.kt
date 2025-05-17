@@ -466,7 +466,7 @@ fun migratePreferences(
         settings.setClueListSnapToClue(it)
     }
     getInt(prefs, "sort")?.let {
-        settings.setBrowseSortSetting(
+        settings.setBrowseSort(
             when (it) {
                 1 -> AccessorSetting.AS_DATE_ASC
                 2 -> AccessorSetting.AS_SOURCE

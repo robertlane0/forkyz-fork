@@ -9,7 +9,7 @@ import androidx.datastore.core.Serializer
 import com.google.protobuf.InvalidProtocolBufferException
 
 object SettingsSerializer : Serializer<Settings> {
-    override val defaultValue: Settings = Settings.newBuilder()
+    override val defaultValue : Settings = Settings.newBuilder()
         .setAlwaysAnnounceBox(false)
         .setAlwaysAnnounceClue(false)
         .setApplicationTheme(Theme.T_STANDARD)
@@ -134,6 +134,7 @@ object SettingsSerializer : Serializer<Settings> {
         .setUseNativeKeyboard(false)
         .setVolumeActivatesVoice(false)
         .setSpecialEntryForceCaps(false)
+        .setDontConfirmCleanup(false)
         .build()
 
     override suspend fun readFrom(input: InputStream) : Settings {

@@ -237,4 +237,5 @@ message Settings {
     bool useNativeKeyboard = 123;
     bool volumeActivatesVoice = 124;
     bool specialEntryForceCaps = 125;
+    bool dontConfirmCleanup = 126;
 }

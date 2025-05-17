@@ -18,13 +18,6 @@ public abstract class PuzHandle {
     public FileHandle getMainFileHandle() { return mainHandle; }
 
     /**
-     * True if the objects refer to the same underlying puzzle file
-     */
-    public boolean isSameMainFile(PuzHandle other) {
-        return getMainFileHandle().equals(other.getMainFileHandle());
-    }
-
-    /**
      * True if the puzzle is in the given directory
      */
     public boolean isInDirectory(DirHandle dirHandle) {

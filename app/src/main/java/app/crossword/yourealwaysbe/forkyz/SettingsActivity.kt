@@ -28,7 +28,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
@@ -71,11 +70,12 @@ import dagger.hilt.android.AndroidEntryPoint
 
 import app.crossword.yourealwaysbe.forkyz.theme.ForkyzTopAppBar
 import app.crossword.yourealwaysbe.forkyz.util.ExitActivity
-import app.crossword.yourealwaysbe.forkyz.view.OKCancelDialog
 import app.crossword.yourealwaysbe.forkyz.util.PuzzleExportService
+import app.crossword.yourealwaysbe.forkyz.view.OKCancelDialog
+import app.crossword.yourealwaysbe.forkyz.view.SearchBar
 
 @AndroidEntryPoint
-class SettingsActivity : ForkyzActivityKt() {
+class SettingsActivity : ForkyzActivity() {
     private val TAG = "ForkyzSettingsActivity"
 
     private val SETTINGS_HORIZONTAL_PADDING = 20.dp
@@ -170,6 +170,8 @@ class SettingsActivity : ForkyzActivityKt() {
                             searchTerm = state.searchTerm,
                             onValueChange = viewModel::setSearchTerm,
                             onClose = viewModel::endSearch,
+                            hint
+                                = stringResource(R.string.filter_settings_hint),
                         )
 
                         LazyColumn(
@@ -274,34 +276,6 @@ class SettingsActivity : ForkyzActivityKt() {
             },
             scrollBehavior = scrollBehavior,
         )
-    }
-
-    @Composable
-    private fun SearchBar(
-        showSearchBar : Boolean,
-        searchTerm : String,
-        onValueChange : (String) -> Unit,
-        onClose : () -> Unit,
-    ) {
-        if (showSearchBar) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                OutlinedTextField(
-                    label = {
-                        Text(stringResource(R.string.filter_settings_hint))
-                    },
-                    value = searchTerm,
-                    onValueChange = onValueChange,
-                    modifier = Modifier.weight(1.0f)
-                        .padding(4.dp),
-                )
-                IconButton(onClick = onClose) {
-                    Icon(
-                        Icons.Filled.Close,
-                        stringResource(R.string.filter_settings_close),
-                    )
-                }
-            }
-        }
     }
 
     @Composable

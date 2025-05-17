@@ -25,7 +25,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class HTMLActivity : ForkyzActivityKt() {
+class HTMLActivity : ForkyzActivity() {
     private val PADDING = 20.dp
 
     private val viewModel by viewModels<HTMLActivityViewModel>()

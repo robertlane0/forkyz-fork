@@ -134,8 +134,11 @@ public class PuzzleImporterTest {
         List<PuzMetaFile> pms = fileHandler.getPuzMetas(
             fileHandler.getCrosswordsDirectory()
         );
-        for (PuzMetaFile pm : pms)
-            gotCrosswordTitles.add(fileHandler.load(pm).getTitle());
+        for (PuzMetaFile pm : pms) {
+            gotCrosswordTitles.add(
+                fileHandler.load(pm.getPuzHandle()).getTitle()
+            );
+        }
 
         return gotCrosswordTitles;
     }
@@ -178,11 +181,6 @@ public class PuzzleImporterTest {
             fileHandler = new FileHandlerJavaFile(
                 context, metaCache, folder.getRoot()
             ) {
-                @Override
-                public boolean needsWriteExternalStoragePermission() {
-                    return false;
-                }
-
                 @Override
                 public boolean isStorageMounted() {
                     return true;

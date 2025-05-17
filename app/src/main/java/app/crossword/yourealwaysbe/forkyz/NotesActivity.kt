@@ -56,6 +56,8 @@ import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.Accessibilit
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
+import app.crossword.yourealwaysbe.forkyz.menu.BaseMenuModifier
+import app.crossword.yourealwaysbe.forkyz.menu.MenuText
 import app.crossword.yourealwaysbe.forkyz.util.ColorUtils
 import app.crossword.yourealwaysbe.forkyz.view.BoardEditText
 import app.crossword.yourealwaysbe.forkyz.view.BoardEditText.BoardEditFilter
@@ -427,15 +429,15 @@ class NotesActivity() : PuzzleActivity() {
 
         val isPuzzleNotes = uiState?.isPuzzleNotes ?: false
 
-        IconButton(onClick = { viewModel.expandMenu(SubMenu.MAIN) }) {
+        IconButton(onClick = { viewModel.expandMenu(PuzzleSubMenu.MAIN) }) {
             Icon(
                 Icons.Default.MoreVert,
                 contentDescription = stringResource(R.string.overflow),
             )
         }
         DropdownMenu(
-            modifier = BASE_MENU_MODIFIER,
-            expanded = state?.expanded == SubMenu.MAIN,
+            modifier = BaseMenuModifier,
+            expanded = state?.expanded == PuzzleSubMenu.MAIN,
             onDismissRequest = viewModel::dismissMenu,
         ) {
             MenuClueFlagToggle()

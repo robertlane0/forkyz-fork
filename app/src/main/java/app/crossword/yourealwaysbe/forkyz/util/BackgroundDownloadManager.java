@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -17,6 +16,8 @@ import android.util.Log;
 import androidx.annotation.MainThread;
 import androidx.concurrent.futures.CallbackToFutureAdapter;
 import androidx.hilt.work.HiltWorker;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Transformations;
 import androidx.work.Constraints;
 import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.ExistingWorkPolicy;
@@ -88,14 +89,14 @@ public class BackgroundDownloadManager {
         });
     }
 
-    @MainThread
-    public void isBackgroundDownloadEnabled(Consumer<Boolean> cb) {
-        settings.getBackgroundDownloadSettings(bgSettings -> {
-            cb.accept(
-                bgSettings.getHourly()
-                || getNextDailyDownloadDelay(bgSettings) >= 0
-            );
-        });
+    public LiveData<Boolean> getLiveIsBackgroundDownloadEnabled() {
+        return Transformations.map(
+            settings.getLiveBackgroundDownloadSettings(),
+            bgSettings -> {
+                return bgSettings.getHourly()
+                    || getNextDailyDownloadDelay(bgSettings) >= 0;
+            }
+        );
     }
 
     @MainThread
@@ -267,34 +268,27 @@ public class BackgroundDownloadManager {
         protected void doDownload(
             CallbackToFutureAdapter.Completer<ListenableWorker.Result> completer
         ) {
-            fileHandlerProvider.isMissingWritePermission(missing -> {
-                if (missing) {
-                    Log.i(TAG, "Skipping download, no write permission");
-                    return;
+            Log.i(TAG, "Downloading most recent puzzles");
+
+            downloadersProvider.get(dls -> {
+            downloadExecutorService.execute(() -> {
+                try {
+                    LocalDate now = LocalDate.now();
+                    dls.downloadLatestInRange(
+                        now, now, dls.getAutoDownloaders()
+                    );
+
+                    completer.set(ListenableWorker.Result.success());
+                    Log.i(TAG, "Download success.");
+
+                    // This is used to tell BrowseActivity that
+                    // puzzles may have been updated while paused.
+                    settings.setBrowseNewPuzzle(true);
+                } catch (Exception e) {
+                    Log.i(TAG, "Download exception: ");
+                    completer.setException(e);
                 }
-
-                Log.i(TAG, "Downloading most recent puzzles");
-
-                downloadersProvider.get(dls -> {
-                downloadExecutorService.execute(() -> {
-                    try {
-                        LocalDate now = LocalDate.now();
-                        dls.downloadLatestInRange(
-                            now, now, dls.getAutoDownloaders()
-                        );
-
-                        completer.set(ListenableWorker.Result.success());
-                        Log.i(TAG, "Download success.");
-
-                        // This is used to tell BrowseActivity that
-                        // puzzles may have been updated while paused.
-                        settings.setBrowseNewPuzzle(true);
-                    } catch (Exception e) {
-                        Log.i(TAG, "Download exception: ");
-                        completer.setException(e);
-                    }
-                });});
-            });
+            });});
         }
     }
 

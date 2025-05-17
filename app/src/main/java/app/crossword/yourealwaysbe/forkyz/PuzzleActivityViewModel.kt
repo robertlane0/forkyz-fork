@@ -60,7 +60,7 @@ import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges
 import app.crossword.yourealwaysbe.puz.Playboard.PlayboardListener
 import app.crossword.yourealwaysbe.puz.Puzzle
 
-enum class SubMenu {
+enum class PuzzleSubMenu {
     NONE,
     MAIN,
     NOTES,
@@ -106,7 +106,7 @@ data class ShowErrorsMenuState(
         )
 }
 
-data class MenuState(
+data class PuzzleMenuState(
     val hasShareURL : Boolean = true,
     val hasSupportURL : Boolean = true,
     val externalToolsState : ExternalToolsMenuState = ExternalToolsMenuState(),
@@ -115,7 +115,7 @@ data class MenuState(
     val canReveal : Boolean = true,
     val canRevealInitialBoxLetter : Boolean = true,
     val canRevealInitialLetters : Boolean = true,
-    val expanded : SubMenu = SubMenu.NONE,
+    val expanded : PuzzleSubMenu = PuzzleSubMenu.NONE,
 )
 
 data class VoiceState(
@@ -196,8 +196,8 @@ open class PuzzleActivityViewModel @Inject constructor(
         settings.liveVoiceAlwaysAnnounceClue,
     )
 
-    private val menuExpandStack : MutableList<SubMenu> = mutableListOf()
-    private val _menuState : MutableLiveData<MenuState> = liveDataFanIn(
+    private val menuExpandStack : MutableList<PuzzleSubMenu> = mutableListOf()
+    private val _menuState : MutableLiveData<PuzzleMenuState> = liveDataFanIn(
         this::getMenuState,
         settings.liveExternalToolSettings,
         settings.livePlayScratchMode,
@@ -205,7 +205,7 @@ open class PuzzleActivityViewModel @Inject constructor(
         settings.livePlayShowErrorsCursor,
         settings.livePlayShowErrorsGrid,
     )
-    val menuState : LiveData<MenuState> = _menuState
+    val menuState : LiveData<PuzzleMenuState> = _menuState
 
     val uiState = liveDataFanIn(
         {
@@ -590,7 +590,7 @@ open class PuzzleActivityViewModel @Inject constructor(
         }
     }
 
-    fun expandMenu(menu : SubMenu) {
+    fun expandMenu(menu : PuzzleSubMenu) {
         menuExpandStack.add(menu)
         val state = menuState.value ?: getMenuState()
         _menuState.postValue(state.copy(expanded = menu))
@@ -602,7 +602,7 @@ open class PuzzleActivityViewModel @Inject constructor(
     fun closeMenu() {
          val state = menuState.value ?: getMenuState()
         if (menuExpandStack.isEmpty()) {
-            _menuState.postValue(state.copy(expanded = SubMenu.NONE))
+            _menuState.postValue(state.copy(expanded = PuzzleSubMenu.NONE))
         } else {
             menuExpandStack.removeAt(menuExpandStack.size - 1)
             _menuState.postValue(state.copy(expanded = menuExpandStack.last()))
@@ -615,7 +615,7 @@ open class PuzzleActivityViewModel @Inject constructor(
     fun dismissMenu() {
         menuExpandStack.clear()
          val state = menuState.value ?: getMenuState()
-        _menuState.postValue(state.copy(expanded = SubMenu.NONE))
+        _menuState.postValue(state.copy(expanded = PuzzleSubMenu.NONE))
     }
 
     fun clearAnnounceEvent() {
@@ -800,7 +800,7 @@ open class PuzzleActivityViewModel @Inject constructor(
         sendToastEvent.postValue(SendToast(text))
     }
 
-    private fun getMenuState() : MenuState {
+    private fun getMenuState() : PuzzleMenuState {
         val board = getBoard()
         val puz = getPuzzle()
 
@@ -838,9 +838,9 @@ open class PuzzleActivityViewModel @Inject constructor(
             isShowingErrorsGrid,
         )
 
-        val expanded = menuState.value?.expanded ?: SubMenu.NONE
+        val expanded = menuState.value?.expanded ?: PuzzleSubMenu.NONE
 
-        return MenuState(
+        return PuzzleMenuState(
             hasShareURL,
             hasSupportURL,
             externalToolsState,

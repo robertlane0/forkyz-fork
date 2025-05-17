@@ -80,6 +80,7 @@ class ForkyzSettingsTest {
         .setDisplaySeparators(DisplaySeparators.DS_ALWAYS)
         .setDlLast(0)
         .setDlOnStartup(false)
+        .setDontConfirmCleanup(true)
         .setDoubleTap(false)
         .setDownload20Minutes(true)
         .setDownloadCustomDaily(false)
@@ -210,6 +211,7 @@ class ForkyzSettingsTest {
         .setDisplaySeparators(DisplaySeparators.DS_NEVER)
         .setDlLast(0)
         .setDlOnStartup(true)
+        .setDontConfirmCleanup(false)
         .setDoubleTap(true)
         .setDownload20Minutes(false)
         .setDownloadCustomDaily(true)
@@ -299,6 +301,11 @@ class ForkyzSettingsTest {
         .setUiTheme(DayNightMode.DNM_NIGHT)
         .setUseNativeKeyboard(true)
         .setVolumeActivatesVoice(true)
+        .build()
+
+    val settingsValue3 = Settings.newBuilder()
+        .mergeFrom(settingsValue2)
+        .setDontConfirmCleanup(true)
         .build()
 
     @Mock
@@ -600,7 +607,7 @@ class ForkyzSettingsTest {
         runBlocking { settings.shutdown() }
 
         val migratedSettings = runBlocking { datastore.data.first() }
-        assertEquals(migratedSettings, settingsValue2)
+        assertEquals(migratedSettings, settingsValue3)
     }
 
     // test import

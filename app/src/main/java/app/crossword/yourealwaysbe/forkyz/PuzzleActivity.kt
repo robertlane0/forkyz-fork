@@ -5,7 +5,6 @@ import java.io.IOException
 import java.util.Objects
 import java.util.function.Consumer
 import java.util.regex.Pattern
-import javax.inject.Inject
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 
@@ -36,7 +35,6 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Arrangement.Center
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -73,7 +71,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -99,18 +96,24 @@ import dagger.hilt.android.AndroidEntryPoint
 import app.crossword.yourealwaysbe.forkyz.exttools.ChatGPTHelpData
 import app.crossword.yourealwaysbe.forkyz.exttools.ExternalToolLauncher
 import app.crossword.yourealwaysbe.forkyz.inttools.InternalToolLauncher
+import app.crossword.yourealwaysbe.forkyz.menu.BaseMenuModifier
+import app.crossword.yourealwaysbe.forkyz.menu.MenuDropdownHeading
+import app.crossword.yourealwaysbe.forkyz.menu.MenuHelp
+import app.crossword.yourealwaysbe.forkyz.menu.MenuSettings
+import app.crossword.yourealwaysbe.forkyz.menu.MenuSubEntry
+import app.crossword.yourealwaysbe.forkyz.menu.MenuText
 import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer
 import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
 import app.crossword.yourealwaysbe.forkyz.util.SpeechContract
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand
 import app.crossword.yourealwaysbe.forkyz.view.BoardEditView.BoardClickListener
 import app.crossword.yourealwaysbe.forkyz.view.BoardWordEditView
+import app.crossword.yourealwaysbe.forkyz.view.ClueTabs
 import app.crossword.yourealwaysbe.forkyz.view.ForkyzKeyboard
 import app.crossword.yourealwaysbe.forkyz.view.PlayboardTextRenderer
 import app.crossword.yourealwaysbe.forkyz.view.PuzzleInfoDialogs
 import app.crossword.yourealwaysbe.forkyz.view.RevealPuzzleDialog
 import app.crossword.yourealwaysbe.forkyz.view.SpecialEntryDialog
-import app.crossword.yourealwaysbe.forkyz.view.ClueTabs
 import app.crossword.yourealwaysbe.puz.Clue
 import app.crossword.yourealwaysbe.puz.ClueID
 import app.crossword.yourealwaysbe.puz.Playboard
@@ -133,11 +136,8 @@ class ClueTabsPageSetter() {
 }
 
 @AndroidEntryPoint
-abstract class PuzzleActivity() : ForkyzActivityKt() {
+abstract class PuzzleActivity() : ForkyzActivity() {
     private val TAG = "ForkyzPuzzleActivity"
-
-    protected val BASE_MENU_MODIFIER
-        = Modifier.defaultMinSize(minWidth = 200.dp)
 
     /**
      * Get currently known value of volume activates voice
@@ -651,15 +651,10 @@ abstract class PuzzleActivity() : ForkyzActivityKt() {
     }
 
     @Composable
-    protected fun MenuText(text : String) {
-        Text(text, style = MaterialTheme.typography.bodyLarge)
-    }
-
-    @Composable
     protected fun MenuNotes() {
         MenuSubEntry(
             text = { MenuText(stringResource(R.string.menu_notes)) },
-            onClick = { viewModel.expandMenu(SubMenu.NOTES) },
+            onClick = { viewModel.expandMenu(PuzzleSubMenu.NOTES) },
         )
     }
 
@@ -668,8 +663,8 @@ abstract class PuzzleActivity() : ForkyzActivityKt() {
         val state by viewModel.menuState.observeAsState()
 
         DropdownMenu(
-            modifier = BASE_MENU_MODIFIER,
-            expanded = state?.expanded == SubMenu.NOTES,
+            modifier = BaseMenuModifier,
+            expanded = state?.expanded == PuzzleSubMenu.NOTES,
             onDismissRequest = viewModel::dismissMenu,
         ) {
             MenuDropdownHeading(
@@ -750,7 +745,7 @@ abstract class PuzzleActivity() : ForkyzActivityKt() {
                 else
                     MenuText(stringResource(R.string.show_errors))
             },
-            onClick = { viewModel.expandMenu(SubMenu.SHOW_ERRORS) },
+            onClick = { viewModel.expandMenu(PuzzleSubMenu.SHOW_ERRORS) },
         )
     }
 
@@ -761,8 +756,8 @@ abstract class PuzzleActivity() : ForkyzActivityKt() {
             return
 
         DropdownMenu(
-            modifier = BASE_MENU_MODIFIER,
-            expanded = state?.expanded == SubMenu.SHOW_ERRORS,
+            modifier = BaseMenuModifier,
+            expanded = state?.expanded == PuzzleSubMenu.SHOW_ERRORS,
             onDismissRequest = viewModel::dismissMenu,
         ) {
             MenuDropdownHeading(
@@ -809,7 +804,7 @@ abstract class PuzzleActivity() : ForkyzActivityKt() {
 
         MenuSubEntry(
             text = { MenuText(stringResource(R.string.reveal)) },
-            onClick = { viewModel.expandMenu(SubMenu.REVEAL) },
+            onClick = { viewModel.expandMenu(PuzzleSubMenu.REVEAL) },
         )
     }
 
@@ -820,8 +815,8 @@ abstract class PuzzleActivity() : ForkyzActivityKt() {
             return
 
         DropdownMenu(
-            modifier = BASE_MENU_MODIFIER,
-            expanded = state?.expanded == SubMenu.REVEAL,
+            modifier = BaseMenuModifier,
+            expanded = state?.expanded == PuzzleSubMenu.REVEAL,
             onDismissRequest = viewModel::dismissMenu,
         ) {
             MenuDropdownHeading(
@@ -885,7 +880,7 @@ abstract class PuzzleActivity() : ForkyzActivityKt() {
     protected fun MenuZoom() {
         MenuSubEntry(
             text = { MenuText(stringResource(R.string.zoom)) },
-            onClick = { viewModel.expandMenu(SubMenu.ZOOM) },
+            onClick = { viewModel.expandMenu(PuzzleSubMenu.ZOOM) },
         )
     }
 
@@ -900,8 +895,8 @@ abstract class PuzzleActivity() : ForkyzActivityKt() {
         val state by viewModel.menuState.observeAsState()
 
         DropdownMenu(
-            modifier = BASE_MENU_MODIFIER,
-            expanded = state?.expanded == SubMenu.ZOOM,
+            modifier = BaseMenuModifier,
+            expanded = state?.expanded == PuzzleSubMenu.ZOOM,
             onDismissRequest = viewModel::dismissMenu,
         ) {
             MenuDropdownHeading(
@@ -956,7 +951,7 @@ abstract class PuzzleActivity() : ForkyzActivityKt() {
 
         MenuSubEntry(
             text = { MenuText(stringResource(R.string.external_tools)) },
-            onClick = { viewModel.expandMenu(SubMenu.EXTERNAL_TOOLS) },
+            onClick = { viewModel.expandMenu(PuzzleSubMenu.EXTERNAL_TOOLS) },
         )
     }
 
@@ -985,8 +980,8 @@ abstract class PuzzleActivity() : ForkyzActivityKt() {
             return
 
         DropdownMenu(
-            modifier = BASE_MENU_MODIFIER,
-            expanded = state?.expanded == SubMenu.EXTERNAL_TOOLS,
+            modifier = BaseMenuModifier,
+            expanded = state?.expanded == PuzzleSubMenu.EXTERNAL_TOOLS,
             onDismissRequest = viewModel::dismissMenu,
         ) {
             MenuDropdownHeading(
@@ -1073,7 +1068,7 @@ abstract class PuzzleActivity() : ForkyzActivityKt() {
     protected fun MenuShare() {
         MenuSubEntry(
             text = { MenuText(stringResource(R.string.share)) },
-            onClick = { viewModel.expandMenu(SubMenu.SHARE) },
+            onClick = { viewModel.expandMenu(PuzzleSubMenu.SHARE) },
         )
     }
 
@@ -1082,8 +1077,8 @@ abstract class PuzzleActivity() : ForkyzActivityKt() {
         val state by viewModel.menuState.observeAsState()
 
         DropdownMenu(
-            modifier = BASE_MENU_MODIFIER,
-            expanded = state?.expanded == SubMenu.SHARE,
+            modifier = BaseMenuModifier,
+            expanded = state?.expanded == PuzzleSubMenu.SHARE,
             onDismissRequest = viewModel::dismissMenu,
         ) {
             MenuDropdownHeading(
@@ -1167,25 +1162,18 @@ abstract class PuzzleActivity() : ForkyzActivityKt() {
 
     @Composable
     protected fun MenuHelp() {
-        DropdownMenuItem(
-            text = { MenuText(stringResource(R.string.help)) },
-            onClick = {
-                actionHelp()
-                viewModel.dismissMenu()
-            }
+        MenuHelp(
+            activity = this,
+            helpHTMLAsset = "play.html",
+            onDismiss = viewModel::dismissMenu,
         )
     }
 
     @Composable
     protected fun MenuSettings() {
-        DropdownMenuItem(
-            text = { MenuText(stringResource(R.string.settings)) },
-            onClick = {
-                actionSettings()
-                viewModel.dismissMenu()
-            }
-        )
+        MenuSettings(this, viewModel::dismissMenu)
     }
+
     @Composable
     protected fun MenuPuzzleInfo() {
         DropdownMenuItem(
@@ -1403,55 +1391,6 @@ abstract class PuzzleActivity() : ForkyzActivityKt() {
                 utils.speak(ttsService, text)
             }
         }
-    }
-
-    private fun actionHelp() {
-        val helpIntent = Intent(
-            Intent.ACTION_VIEW,
-            Uri.parse("play.html"),
-            this,
-            HTMLActivity::class.java,
-        )
-        this.startActivity(helpIntent)
-    }
-
-    private fun actionSettings() {
-        startActivity(Intent(this, SettingsActivity::class.java))
-    }
-
-    @Composable
-    private fun MenuSubEntry(
-        text : @Composable () -> Unit,
-        onClick : () -> Unit,
-    ) {
-        DropdownMenuItem(
-            text = text,
-            onClick = onClick,
-            trailingIcon = {
-                Icon(
-                    painter = painterResource(R.drawable.ic_submenu),
-                    contentDescription = null,
-                )
-            }
-
-        )
-    }
-
-    @Composable
-    private fun MenuDropdownHeading(
-        titleId : Int,
-        onClick : () -> Unit,
-    ) {
-        DropdownMenuItem(
-            text = {
-                Text(
-                    stringResource(titleId),
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Medium,
-                )
-            },
-            onClick = onClick,
-        )
     }
 
     private fun launchVoiceInput() {

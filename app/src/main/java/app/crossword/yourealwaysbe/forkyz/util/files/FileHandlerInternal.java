@@ -16,9 +16,6 @@ public class FileHandlerInternal extends FileHandlerJavaFile {
     }
 
     @Override
-    public boolean needsWriteExternalStoragePermission() { return false; }
-
-    @Override
     public boolean isStorageMounted() {
         return true;
     }

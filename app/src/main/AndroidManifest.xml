@@ -14,18 +14,6 @@
         android:xlargeScreens="true" />
 
     <uses-permission
-        android:name="android.permission.READ_EXTERNAL_STORAGE"
-        android:maxSdkVersion="21"
-        tools:ignore="ScopedStorage"
-        android:description="@string/perm_read_desc"
-    />
-    <uses-permission
-        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="21"
-        tools:ignore="ScopedStorage"
-        android:description="@string/perm_write_desc"
-    />
-    <uses-permission
         android:name="android.permission.INTERNET" 
         android:description="@string/perm_internet_desc"
     />

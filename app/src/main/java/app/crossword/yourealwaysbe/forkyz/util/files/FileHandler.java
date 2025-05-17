@@ -92,7 +92,6 @@ public abstract class FileHandler {
     public abstract DirHandle getToImportFailedDirectory();
     public abstract boolean isStorageMounted();
     public abstract boolean isStorageFull(AndroidVersionUtils utils);
-    public abstract boolean needsWriteExternalStoragePermission();
     public abstract Iterable<FileHandle> listFiles(final DirHandle dir);
     public abstract String getName(FileHandle f);
 
@@ -153,10 +152,6 @@ public abstract class FileHandler {
         return getName(puzHandle.getMainFileHandle());
     }
 
-    public boolean exists(PuzMetaFile pm) {
-        return exists(pm.getPuzHandle());
-    }
-
     public boolean exists(PuzHandle ph) {
 
         if (!exists(ph.getMainFileHandle()))
@@ -183,10 +178,6 @@ public abstract class FileHandler {
         return exists;
     }
 
-    public synchronized void delete(PuzMetaFile pm) {
-        delete(pm.getPuzHandle());
-    }
-
     public synchronized void delete(PuzHandle ph) {
         delete(ph.getMainFileHandle());
 
@@ -205,12 +196,6 @@ public abstract class FileHandler {
         });
 
         metaCache.deleteRecord(this, ph);
-    }
-
-    public synchronized void moveTo(
-        PuzMetaFile pm, DirHandle destDirHandle
-    ) {
-        moveTo(pm.getPuzHandle(), destDirHandle);
     }
 
     public synchronized void moveTo(
@@ -314,14 +299,6 @@ public abstract class FileHandler {
     }
 
     /**
-     * Synchronized to avoid reading/writing from the same file at the same
-     * time.
-     */
-    public synchronized Puzzle load(PuzMetaFile pm) throws IOException {
-        return load(pm.getPuzHandle());
-    }
-
-    /**
      * Loads puzzle with meta
      *
      * If the meta file of puz handle is null, loads without meta
@@ -345,11 +322,6 @@ public abstract class FileHandler {
             metaCache.addRecord(this, ph, puz);
 
         return puz;
-    }
-
-    public synchronized void save(Puzzle puz, PuzMetaFile puzMeta)
-            throws IOException {
-        save(puz, puzMeta.getPuzHandle());
     }
 
     /** Save puzzle and meta data
