@@ -48,7 +48,6 @@ public class PMLStreamScraper extends AbstractStreamScraper {
         ByteArrayInputStream bis = StreamUtils.makeByteArrayInputStream(is);
 
         String embedURL = getPMLURL(bis);
-        System.out.println("FORKYZ: embed URL " + embedURL);
         if (embedURL != null) {
             try (InputStream embedIS = getInputStream(embedURL)) {
                 bis = StreamUtils.makeByteArrayInputStream(embedIS);
