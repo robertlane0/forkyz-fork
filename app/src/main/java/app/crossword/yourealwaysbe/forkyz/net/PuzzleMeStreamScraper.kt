@@ -40,15 +40,14 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
         private val DEFAULT_SOURCE = "PuzzleMe"
         private val STAGE2_URL_FORMAT
             = "https://cdn2.amuselabs.com/auth0/crossword?id=%s&set=%s"
-        private val JS_URL_FORMAT
-            = "https://cdn2.amuselabs.com/puzzleme/js/c-min.js?v=%s"
+        private val JS_URL_FORMAT = "https://cdn2.amuselabs.com/puzzleme/%s"
         private val RAWC_REGEX = RegexScrape(
             Pattern.compile("\"rawc\":\\s*\"([^\"]*)\""),
             1,
         )
-        private val JS_VERSION_REGEX = RegexScrape(
-            Pattern.compile("js/c-min.js\\?v=([a-zA-Z0-9]+)"),
-            1,
+        private val JS_URL_SUFFIX_REGEX = RegexScrape(
+            Pattern.compile("(?<=\")[^\"]*/js/c-min.js[^\"]*"),
+            0,
         )
     }
 
@@ -106,14 +105,14 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
     private fun getDataData(inputStream : InputStream) : DataData? {
         val results = regexScrape(
             inputStream,
-            arrayOf(RAWC_REGEX, JS_VERSION_REGEX),
+            arrayOf(RAWC_REGEX, JS_URL_SUFFIX_REGEX),
         )
         val rawc = results[0]
-        val jsVersion = results[1]
-        if (rawc == null || jsVersion == null) {
+        val jsUrlSuffix = results[1]
+        if (rawc == null || jsUrlSuffix == null) {
             return null
         } else {
-            return DataData(rawc, jsVersion)
+            return DataData(rawc, jsUrlSuffix)
         }
     }
 
@@ -144,7 +143,7 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
      * Try to deobfuscate using format used in Everyman crossword
      */
     private fun everymanDeobfuscate(dataData : DataData) : String? {
-        val passes = getDeobfuscatePasses(dataData.jsVersion)
+        val passes = getDeobfuscatePasses(dataData.jsUrlSuffix)
         if (passes?.isEmpty() ?: true)
             return null
 
@@ -183,9 +182,11 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
         }
     }
 
-    private fun getDeobfuscatePasses(jsVersion: String) : List<ObfuscatePass>? {
+    private fun getDeobfuscatePasses(
+        jsUrlSuffix : String,
+    ) : List<ObfuscatePass>? {
         try {
-            val jsURL = String.format(JS_URL_FORMAT.format(jsVersion))
+            val jsURL = String.format(JS_URL_FORMAT.format(jsUrlSuffix))
             val js = getInputStream(jsURL).use { it.reader().readText() }
 
             // for (r=start;..;r+=step) { .. ?length .. }
@@ -207,7 +208,7 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
 
 private data class DataData(
     val rawc : String,
-    val jsVersion : String,
+    val jsUrlSuffix: String,
 )
 
 private data class ObfuscatePass(
