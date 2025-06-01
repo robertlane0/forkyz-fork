@@ -897,8 +897,8 @@ class SettingsActivityViewModel @Inject constructor(
                 SettingsListEntry(R.string.cleanup_age_thirty_days, 30),
                 SettingsListEntry(R.string.cleanup_age_never, -1),
             ),
-            settings.liveBrowseCleanupAge,
-            settings::setBrowseCleanupAge,
+            settings.liveBrowseCleanupAgeArchive,
+            settings::setBrowseCleanupAgeArchive,
         ),
         SettingsBoolean(
             SettingsPage.BROWSER,
