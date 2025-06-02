@@ -3,14 +3,12 @@ package app.crossword.yourealwaysbe.forkyz.net;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import app.crossword.yourealwaysbe.forkyz.util.JSONUtils;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.io.GuardianJSONIO;
 
@@ -27,10 +25,15 @@ import app.crossword.yourealwaysbe.puz.io.GuardianJSONIO;
  */
 public class MyCrosswordStreamScraper extends AbstractStreamScraper {
     private static final Pattern URL_RE = Pattern.compile(
-        ".*mycrossword.*\\/([^/]+)\\/(\\d+)", Pattern.CASE_INSENSITIVE
+        ".*mycrossword.*\\/[^/]+\\/\\d+", Pattern.CASE_INSENSITIVE
     );
-    private static final int URL_TYPE_GRP = 1;
-    private static final int URL_NUM_GRP = 2;
+    private static final RegexScrape JSON_MATCH = new RegexScrape(
+        Pattern.compile(
+            "window.__remixContext = (\\{.*?\\});",
+            Pattern.CASE_INSENSITIVE
+        ),
+        1
+    );
 
     private static final String DATA_URL_FMT
         = "https://mycrossword.co.uk/api/crossword/getpublishedbytypenum?"
@@ -44,14 +47,25 @@ public class MyCrosswordStreamScraper extends AbstractStreamScraper {
         if (!m.matches())
             return null;
 
-        String type = m.group(URL_TYPE_GRP);
-        String num = m.group(URL_NUM_GRP);
+        try (InputStream puzIS = getInputStream(url)) {
+            String jsonString = regexScrape(puzIS, JSON_MATCH);
+            if (jsonString == null)
+                return null;
 
-        String dataUrl = String.format(Locale.US, DATA_URL_FMT, type, num);
-
-        try (InputStream puzIS = getInputStream(dataUrl)) {
-            JSONObject json = JSONUtils.streamToJSON(puzIS);
-            JSONObject data = json.optJSONObject("data");
+            JSONObject json = new JSONObject(jsonString);
+            JSONObject data = json.optJSONObject("state");
+            if (data == null)
+                return null;
+            data = data.optJSONObject("loaderData");
+            if (data == null)
+                return null;
+            data = data.optJSONObject("routes/cryptic.$crosswordId");
+            if (data == null)
+                return null;
+            data = data.optJSONObject("crossword");
+            if (data == null)
+                return null;
+            data = data.optJSONObject("data");
             if (data == null)
                 return null;
 
@@ -60,10 +74,6 @@ public class MyCrosswordStreamScraper extends AbstractStreamScraper {
             if (puz != null) {
                 if (puz.getSource() == null)
                     puz.setSource(DEFAULT_SOURCE);
-
-                String title = puz.getTitle();
-                puz.setTitle(title.replace("?", num));
-
                 return puz;
             }
         } catch (IOException | JSONException e) {
