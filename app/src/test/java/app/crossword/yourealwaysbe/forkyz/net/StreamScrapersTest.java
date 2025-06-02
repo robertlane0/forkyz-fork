@@ -93,7 +93,7 @@ public class StreamScrapersTest {
     @Test
     public void testMyCrossword() throws Exception {
         testScraper(
-            "https://mycrossword.co.uk/cryptic/2136",
+            "https://mycrossword.co.uk/cryptic/2462",
             new MyCrosswordStreamScraper()
         );
     }

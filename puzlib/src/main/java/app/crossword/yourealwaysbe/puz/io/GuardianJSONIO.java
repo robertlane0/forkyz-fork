@@ -5,6 +5,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -125,10 +127,23 @@ public class GuardianJSONIO extends AbstractJSONIO {
             builder.setAuthor(optStringNull(creator, "name"));
 
         if (json.has("date")) {
-            long epochMillis = json.getLong("date");
-            builder.setDate(
-                LocalDate.ofEpochDay(epochMillis / (1000 * 60 * 60 * 24))
-            );
+            try {
+                long epochMillis = json.getLong("date");
+                builder.setDate(
+                    LocalDate.ofEpochDay(epochMillis / (1000 * 60 * 60 * 24))
+                );
+            } catch (JSONException e) {
+                try {
+                    builder.setDate(
+                        LocalDate.parse(
+                            json.getString("date"),
+                            DateTimeFormatter.ISO_LOCAL_TIME
+                        )
+                    );
+                } catch (DateTimeParseException e2) {
+                    // ignore
+                }
+            }
         }
 
         addClues(json, builder);
