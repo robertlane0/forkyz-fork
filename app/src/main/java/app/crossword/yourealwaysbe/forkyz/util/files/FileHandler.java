@@ -318,8 +318,13 @@ public abstract class FileHandler {
             }
         });
 
-        if (puz != null)
-            metaCache.addRecord(this, ph, puz);
+        if (puz != null) {
+            MetaCache.MetaRecord mr = metaCache.addRecord(this, ph, puz);
+            // if the puzzle doesn't have its own date, use the detected
+            // one
+            if (puz.getDate() == null)
+                puz.setDate(mr.getDate());
+        }
 
         return puz;
     }

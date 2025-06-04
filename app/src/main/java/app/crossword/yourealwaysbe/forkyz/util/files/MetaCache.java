@@ -30,6 +30,7 @@ import androidx.room.TypeConverters;
 import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
+import app.crossword.yourealwaysbe.forkyz.util.AppPuzzleUtils;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 
 public class MetaCache {
@@ -265,15 +266,15 @@ public class MetaCache {
 
     /**
      * Cache meta for a file URI, returns new record
+     *
+     * Uses derived date if puz has no date.
      */
     public MetaRecord addRecord(
         FileHandler fileHandler,
         PuzHandle puzHandle,
         Puzzle puz
     ) {
-        CachedMeta cm = new CachedMeta();
-        cm.mainFileUri = fileHandler.getUri(puzHandle.getMainFileHandle());
-
+        FileHandle mainFileHandle = puzHandle.getMainFileHandle();
         FileHandle metaHandle
             = puzHandle.accept(new PuzHandle.Visitor<FileHandle>() {
                 public FileHandle visit(PuzHandle.Puz puzPH) {
@@ -283,14 +284,19 @@ public class MetaCache {
                     return null;
                 }
             });
+        String mainFileName = fileHandler.getName(mainFileHandle);
+        LocalDate date = AppPuzzleUtils.deriveDate(puz.getDate(), mainFileName);
+        if (date == null)
+            date = fileHandler.getModifiedDate(mainFileHandle);
 
+        CachedMeta cm = new CachedMeta();
+        cm.mainFileUri = fileHandler.getUri(mainFileHandle);
         cm.metaFileUri = (metaHandle == null)
             ? null
             : fileHandler.getUri(metaHandle);
-
         cm.directoryUri = fileHandler.getUri(puzHandle.getDirHandle());
         cm.isUpdatable = true; // used to be a puzzle field
-        cm.date = puz.getDate();
+        cm.date = date;
         cm.percentComplete = puz.getPercentComplete();
         cm.percentFilled = puz.getPercentFilled();
         cm.source = puz.getSource();
