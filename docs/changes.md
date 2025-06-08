@@ -1,5 +1,14 @@
 # Forkyz Changelog
 
+## Version 67
+
+* Move Browse activity to Compose.
+* Add confirmations and change defaults for swipes on Browse.
+* Correct keyboard positioning/rendering with larger fonts.
+* Repair Everyman scraper.
+* Other minor tidies and new bugs.
+
+
 ## Version 66
 
 - Fix delete key on built-in keyboard.

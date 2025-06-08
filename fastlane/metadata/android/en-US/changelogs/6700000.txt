@@ -1,0 +1,6 @@
+* Move Browse activity to Compose.
+* Add confirmations and change defaults for swipes on Browse.
+* Correct keyboard positioning/rendering with larger fonts.
+* Repair Everyman scraper.
+* Other minor tidies and new bugs.
+
