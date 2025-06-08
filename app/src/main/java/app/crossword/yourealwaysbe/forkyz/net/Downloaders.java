@@ -623,7 +623,7 @@ public class Downloaders {
                 "Premier",
                 context.getString(R.string.premier_crossword),
                 AbstractDateDownloader.DAYS_SUNDAY,
-                Duration.ofDays(-21), // from full puzzle list during login
+                Duration.ofDays(-7), // from full puzzle list during login
                 "https://puzzles.kingdigital.com",
                 arkadiumUrl,
                 arkadiumUrl,
