@@ -13,6 +13,7 @@ There are two ways to get crosswords from the web: sharing a web page or downloa
 For the websites below, open a puzzle page in your browser, then use the "share" function to share the page with Forkyz.
 
 * [Crossword Nexus][jonesin] -- any site embedding [Crossword Nexus][crosswordnexus] puzzles, for example the Jonesin crossword.
+* [Everyman Crossword][everyman] -- Sunday Everyman puzzle in the Observer (and possibly other Observer puzzles).
 * [Hamburger Abendblatt][hamburgerabendblatt] -- daily crossword from the Hamburger Abendblatt.
 * [Irish News Crosswords][irishnews] -- daily quick and cryptic crosswords (sudoku not supported).
 * [Metro Crosswords][metro] -- daily quick and cryptic crosswords (sudoku not supported).
@@ -102,6 +103,7 @@ The majority of the links on this page come from [Michael F. Gill
 [cryptivore]: https://cryptivore.com/
 [daily-crossword-links]: https://dailycrosswordlinks.com/
 [diary]: https://crosswordfiend.com/
+[everyman]: https://observer.co.uk/everyman
 [glentopher]: https://glentopher.blogspot.com/
 [grids-these-days]: http://gridsthesedays.blogspot.com/
 [gridtherapy]: https://gridtherapy.com/
