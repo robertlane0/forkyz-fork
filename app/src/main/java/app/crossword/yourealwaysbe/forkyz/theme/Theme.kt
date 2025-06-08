@@ -19,6 +19,7 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
@@ -142,6 +143,14 @@ fun AppTheme(
         colorScheme = colorScheme,
         content = content
     )
+}
+
+@Composable
+fun statusBarColor(appTheme : Theme, darkMode : Boolean) : Color {
+    return if (appTheme == Theme.T_LEGACY_LIKE && !darkMode)
+        return MaterialTheme.colorScheme.primary
+    else
+        Color.Transparent
 }
 
 @Composable

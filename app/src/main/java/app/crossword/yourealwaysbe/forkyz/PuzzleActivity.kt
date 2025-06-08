@@ -348,7 +348,8 @@ abstract class PuzzleActivity() : ForkyzActivity() {
             return this.background(themeHelper.cheatedColor)
                 .statusBarsPadding()
         else
-            return this.statusBarsPadding()
+            return this.background(themeHelper.statusBarColor)
+                .statusBarsPadding()
     }
 
     /**

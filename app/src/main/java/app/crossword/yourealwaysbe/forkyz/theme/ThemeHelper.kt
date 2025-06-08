@@ -48,6 +48,12 @@ class ThemeHelper @Inject constructor(val settings : ForkyzSettings) {
                 return cheatedColorLight
         }
 
+    val statusBarColor : Color
+        @Composable
+        get() {
+            return statusBarColor(appTheme, isDarkMode(appDayNightMode))
+        }
+
     @Composable
     fun AppTheme(content : @Composable() () -> Unit) {
         val dayNightMode by settings.liveAppDayNightMode.observeAsState()
