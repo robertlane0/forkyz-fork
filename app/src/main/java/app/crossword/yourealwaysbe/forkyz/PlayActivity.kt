@@ -47,6 +47,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.fromHtml
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -257,7 +258,12 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
             title = {
                 if (state?.isClueBelowGrid ?: false) {
                     val title = state?.puzzleTitle ?: ""
-                    Text(AnnotatedString.fromHtml(title))
+                    Text(
+                        text = AnnotatedString.fromHtml(title),
+                        minLines = 1,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
                 } else {
                     ClueText(Modifier.fillMaxWidth())
                 }
