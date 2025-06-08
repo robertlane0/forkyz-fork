@@ -131,6 +131,7 @@ This only works for a limited number of sites, but may work for sites using simi
 * Irish News,
 * Metro (embedded from PA Puzzles),
 * MyCrossword.co.uk,
+* Observer (Everyman at least),
 * De Standaard (embedded crosswords from Keesing),
 * De Telegraaf (embedded from Pzzl.net),
 * Przekroj,
