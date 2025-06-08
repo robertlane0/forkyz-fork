@@ -31,8 +31,8 @@ class HTMLActivity : ForkyzActivity() {
     private val viewModel by viewModels<HTMLActivityViewModel>()
 
     @OptIn(ExperimentalMaterial3Api::class)
-    override fun onCreate(bundle : Bundle?) {
-        super.onCreate(bundle)
+    override fun onCreate(savedInstanceState : Bundle?) {
+        super.onCreate(savedInstanceState)
 
         val assetName = getIntent().getData().toString()
         viewModel.loadAsset(assetName)

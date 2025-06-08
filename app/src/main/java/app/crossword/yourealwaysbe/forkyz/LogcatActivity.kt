@@ -43,8 +43,8 @@ class LogcatActivity : ForkyzActivity() {
     private val viewModel by viewModels<LogcatActivityViewModel>()
 
     @OptIn(ExperimentalMaterial3Api::class)
-    override fun onCreate(bundle : Bundle?) {
-        super.onCreate(bundle)
+    override fun onCreate(savedInstanceState : Bundle?) {
+        super.onCreate(savedInstanceState)
 
         viewModel.loadLogcat()
 
