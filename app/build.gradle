@@ -196,15 +196,3 @@ protobuf {
     }
 }
 
-//// copied shamelessly from
-//// https://github.com/google/ksp/issues/1590#issuecomment-1851504979
-//androidComponents {
-//    onVariants(selector().all(), { variant ->
-//        afterEvaluate {
-//            def capName = variant.name.capitalize()
-//            tasks.getByName("ksp${capName}Kotlin") {
-//                setSource(tasks.getByName("generate${capName}Proto").outputs)
-//            }
-//        }
-//    })
-//}
