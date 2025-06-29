@@ -7,12 +7,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 
-import androidx.annotation.RequiresApi;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.DocumentsContract.Document;
 import android.provider.DocumentsContract;
 import android.util.Log;
@@ -23,7 +23,6 @@ import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 import app.crossword.yourealwaysbe.puz.io.StreamUtils;
 
-@RequiresApi(api = 24)
 public class FileHandlerSAF extends FileHandler {
     private static final String TAG = "ForkyzFileHandlerSAF";
 
@@ -217,53 +216,63 @@ public class FileHandlerSAF extends FileHandler {
     protected void moveToUnsync(
         FileHandle fileHandle, DirHandle srcDirHandle, DirHandle destDirHandle
     ) {
-        try {
-            DocumentsContract.moveDocument(
-                getContentResolver(),
-                fileHandle.getUri(),
-                srcDirHandle.getUri(),
-                destDirHandle.getUri()
-            );
-        } catch (FileNotFoundException | IllegalArgumentException e) {
-            Log.e(
-                TAG,
-                "Attempt to move " + fileHandle + " to "
-                    + destDirHandle + " failed."
-            );
-            e.printStackTrace();
-        } catch (IllegalStateException e) {
+        // outside of android version utils but awkward to move
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
+            moveToUnsyncLegacy(fileHandle, srcDirHandle, destDirHandle);
+        } else {
             try {
-                // assume name clash and do a copy
-                // createDocument will choose a new name if needed
-                // but the copy process is manual
-                Uri newUri = DocumentsContract.createDocument(
+                DocumentsContract.moveDocument(
                     getContentResolver(),
-                    destDirHandle.getUri(),
-                    getMimeType(fileHandle),
-                    getName(fileHandle)
+                    fileHandle.getUri(),
+                    srcDirHandle.getUri(),
+                    destDirHandle.getUri()
                 );
-                try (
-                    InputStream is = getBufferedInputStream(fileHandle);
-                    OutputStream os
-                        = getBufferedOutputStream(getFileHandle(newUri))
-                ) {
-                    StreamUtils.copyStream(is, os);
-                    DocumentsContract.deleteDocument(
-                        getContentResolver(), fileHandle.getUri()
-                    );
-                }
-            } catch (
-                IllegalArgumentException
-                | IllegalStateException
-                | IOException e2
-            ) {
+            } catch (FileNotFoundException | IllegalArgumentException e) {
                 Log.e(
                     TAG,
                     "Attempt to move " + fileHandle + " to "
-                       + destDirHandle + " failed."
+                        + destDirHandle + " failed."
                 );
                 e.printStackTrace();
+            } catch (IllegalStateException e) {
+                // assume name clash and fall back to legacy manual copy
+                // its createDocument will choose a new name if needed
+                moveToUnsyncLegacy(fileHandle, srcDirHandle, destDirHandle);
             }
+        }
+    }
+
+    private void moveToUnsyncLegacy(
+        FileHandle fileHandle, DirHandle srcDirHandle, DirHandle destDirHandle
+    ) {
+        try {
+            Uri newUri = DocumentsContract.createDocument(
+                getContentResolver(),
+                destDirHandle.getUri(),
+                getMimeType(fileHandle),
+                getName(fileHandle)
+            );
+            try (
+                InputStream is = getBufferedInputStream(fileHandle);
+                OutputStream os
+                    = getBufferedOutputStream(getFileHandle(newUri))
+            ) {
+                StreamUtils.copyStream(is, os);
+                DocumentsContract.deleteDocument(
+                    getContentResolver(), fileHandle.getUri()
+                );
+            }
+        } catch (
+            IllegalArgumentException
+            | IllegalStateException
+            | IOException e
+        ) {
+            Log.e(
+                TAG,
+                "Attempt to move " + fileHandle + " to "
+                   + destDirHandle + " failed."
+            );
+            e.printStackTrace();
         }
     }
 
