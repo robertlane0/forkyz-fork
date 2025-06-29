@@ -164,6 +164,7 @@ public class LollipopUtil implements AndroidVersionUtils {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public void legacySetStatusBarColor(Activity activity, int color) {
         activity.getWindow().setStatusBarColor(color);
     }
