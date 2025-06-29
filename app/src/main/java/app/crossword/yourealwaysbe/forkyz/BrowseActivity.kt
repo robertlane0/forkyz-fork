@@ -1041,6 +1041,8 @@ class BrowseActivity() : ForkyzActivity() {
                     -> ConfirmCleanupDialog()
                 BrowseDialog.NO_CLEANUP_ACTION
                     -> NoCleanupActionDialog()
+                BrowseDialog.CONFIRM_DELETE_SELECTED
+                    -> ConfirmDeleteSelectedDialog()
                 BrowseDialog.NONE -> { }
             }
         }
@@ -1062,6 +1064,21 @@ class BrowseActivity() : ForkyzActivity() {
             summary = R.string.confirm_cleanup_msg,
             onCancel = viewModel::clearConfirmCleanup,
             onOK = viewModel::cleanupPuzzlesConfirmed,
+        )
+    }
+
+    @Composable
+    private fun ConfirmDeleteSelectedDialog() {
+        val state by viewModel.uiState.observeAsState()
+        val numSelected = state?.selectedPuzzleIDs?.size ?: 0
+        OKCancelDialog(
+            title = stringResource(R.string.confirm_delete),
+            summary = pluralStringResource(
+                id = R.plurals.confirm_delete_msg,
+                count = numSelected,
+            ),
+            onCancel = viewModel::cancelDeleteSelectedPuzzles,
+            onOK = viewModel::confirmDeleteSelectedPuzzles,
         )
     }
 

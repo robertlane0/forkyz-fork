@@ -42,12 +42,29 @@ fun OKCancelDialog(
     onOK : () -> Unit,
     body : @Composable () -> Unit = { },
 ) {
+    OKCancelDialog(
+        title = stringResource(title),
+        summary = summary?.let { stringResource(it) },
+        onCancel = onCancel,
+        onOK = onOK,
+        body = body,
+    )
+}
+
+@Composable
+fun OKCancelDialog(
+    title : String,
+    summary : String?,
+    onCancel : () -> Unit,
+    onOK : () -> Unit,
+    body : @Composable () -> Unit = { },
+) {
     TwoButtonDialog(
         title = title,
         summary = summary,
-        positiveText = android.R.string.ok,
+        positiveText = stringResource(android.R.string.ok),
         onPositive = onOK,
-        negativeText = android.R.string.cancel,
+        negativeText = stringResource(android.R.string.cancel),
         onNegative = onCancel,
         body = body,
     )

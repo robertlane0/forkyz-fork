@@ -60,6 +60,7 @@ private val DEFAULT_DAY_NIGHT_MODE = DayNightMode.forNumber(0)
  * No Cleanup Action -- all cleanup options set to never so nothing will happen
  * Notifications Permission -- dialog to show after notification permission
  * denied
+ * Confirm Delete Selected -- confirm whether to delete the selected files
  */
 enum class BrowseDialog {
     NONE,
@@ -67,6 +68,7 @@ enum class BrowseDialog {
     NEW_VERSION,
     NO_CLEANUP_ACTION,
     NOTIFICATIONS_PERMISSION,
+    CONFIRM_DELETE_SELECTED,
 }
 
 /**
@@ -175,9 +177,6 @@ private data class PuzData(
     val puzHandle : PuzHandle,
 )
 
-// TODO: check file permissions here, flag to ui if request needed, ui tells
-// when gotten, then load puzzle list, ui should not need to prompt
-
 @HiltViewModel
 class BrowseActivityViewModel @Inject constructor(
     application : Application,
@@ -241,7 +240,6 @@ class BrowseActivityViewModel @Inject constructor(
     init {
         // load puzzles when new puzzle flagged, or if puzzles haven't
         // been loaded yet
-        // TODO: check write permissions before loading
         _uiState.addSource(
             settings.liveBrowseNewPuzzle,
             { newPuzzle ->
@@ -263,15 +261,10 @@ class BrowseActivityViewModel @Inject constructor(
 
     fun toggleSelectPuzzle(puzzleID : String) {
         uiState.value?.selectedPuzzleIDs?.let { selectedPuzzleIDs ->
-            val newSelection = if (puzzleID in selectedPuzzleIDs)
-                selectedPuzzleIDs - puzzleID
+            if (puzzleID in selectedPuzzleIDs)
+                setSelectedPuzzles(selectedPuzzleIDs - puzzleID)
             else
-                selectedPuzzleIDs + puzzleID
-
-            _uiState.value = uiState.value?.copy(
-                selectedPuzzleIDs = newSelection,
-                disableSwipe = isDisableSwipeSetting || !newSelection.isEmpty(),
-            )
+                setSelectedPuzzles(selectedPuzzleIDs + puzzleID)
         }
     }
 
@@ -381,37 +374,38 @@ class BrowseActivityViewModel @Inject constructor(
 
     @MainThread
     fun deletePuzzle(puzzleID : String) {
-        deletePuzzles(setOf(puzzleID))
+        setSelectedPuzzles(setOf(puzzleID))
+        deleteSelectedPuzzles()
     }
 
     /**
-     * Delete selected puzzles and clear selection
+     * Start delete of selected puzzles (asks for confirmation)
      */
     @MainThread
     fun deleteSelectedPuzzles() {
+        _uiState.value = uiState.value?.copy(
+            showDialog = BrowseDialog.CONFIRM_DELETE_SELECTED,
+        )
+    }
+
+    /**
+     * Confirm delete selected puzzles and clear selection
+     */
+    @MainThread
+    fun confirmDeleteSelectedPuzzles() {
         uiState.value?.selectedPuzzleIDs?.let { selectedPuzzleIDs ->
+            clearDialog(BrowseDialog.CONFIRM_DELETE_SELECTED)
             clearSelection()
-            deletePuzzles(selectedPuzzleIDs)
+            doDeletePuzzles(selectedPuzzleIDs)
         }
     }
 
+    /**
+     * Cancel delete selected puzzles
+     */
     @MainThread
-    fun deletePuzzles(puzzleIDs : Collection<String>) {
-        fileHandlerProvider.get { fileHandler ->
-            threadWithUILock("delete puzzles") {
-                val viewedDir = getViewedDirectory(fileHandler)
-                puzzleIDs.forEach { puzzleID ->
-                    puzzles[puzzleID]?.let { puzzleData ->
-                        fileHandler.delete(puzzleData.puzHandle)
-                        if (puzzleData.puzHandle.isInDirectory(viewedDir))
-                            puzzles.remove(puzzleID)
-                    }
-                }
-                handler.post() {
-                    updateState(isNewPuzzleList = true)
-                }
-            }
-        }
+    fun cancelDeleteSelectedPuzzles() {
+        clearDialog(BrowseDialog.CONFIRM_DELETE_SELECTED)
     }
 
     @MainThread
@@ -1095,6 +1089,32 @@ class BrowseActivityViewModel @Inject constructor(
     private fun clearDialog(dialog : BrowseDialog) {
         if (uiState.value?.showDialog == dialog)
             showDialog(BrowseDialog.NONE)
+    }
+
+    @MainThread
+    private fun doDeletePuzzles(puzzleIDs : Collection<String>) {
+        fileHandlerProvider.get { fileHandler ->
+            threadWithUILock("delete puzzles") {
+                val viewedDir = getViewedDirectory(fileHandler)
+                puzzleIDs.forEach { puzzleID ->
+                    puzzles[puzzleID]?.let { puzzleData ->
+                        fileHandler.delete(puzzleData.puzHandle)
+                        if (puzzleData.puzHandle.isInDirectory(viewedDir))
+                            puzzles.remove(puzzleID)
+                    }
+                }
+                handler.post() {
+                    updateState(isNewPuzzleList = true)
+                }
+            }
+        }
+    }
+
+    private fun setSelectedPuzzles(newSelection : Set<String>) {
+        _uiState.value = uiState.value?.copy(
+            selectedPuzzleIDs = newSelection,
+            disableSwipe = isDisableSwipeSetting || !newSelection.isEmpty(),
+        )
     }
 
     private val currentVersion : String
