@@ -162,4 +162,9 @@ public class LollipopUtil implements AndroidVersionUtils {
     public int foregroundServiceTypeDataSync() {
         return 0;
     }
+
+    @Override
+    public void legacySetStatusBarColor(Activity activity, int color) {
+        activity.getWindow().setStatusBarColor(color);
+    }
 }

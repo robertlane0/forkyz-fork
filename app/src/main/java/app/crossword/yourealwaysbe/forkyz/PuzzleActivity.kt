@@ -61,6 +61,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType
@@ -300,12 +301,19 @@ abstract class PuzzleActivity() : ForkyzActivity() {
         // imepadding is added afterwards.
         // potentially just a material bug that might be fixed in
         // future
-        if (state?.showErrorsState?.isShowing ?: false)
-            return this.background(themeHelper.cheatedColor)
-                .statusBarsPadding()
+
+        val color = if (state?.showErrorsState?.isShowing ?: false)
+            themeHelper.cheatedColor
         else
-            return this.background(themeHelper.statusBarColor)
-                .statusBarsPadding()
+            themeHelper.statusBarColor
+
+        // for older devices where Compose doesn't draw over status bar
+        // for some reason
+        LaunchedEffect(color) {
+            utils.legacySetStatusBarColor(this@PuzzleActivity, color.toArgb())
+        }
+
+        return this.background(color).statusBarsPadding()
     }
 
     /**

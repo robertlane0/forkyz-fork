@@ -29,6 +29,8 @@ public interface AndroidVersionUtils {
     public static class Factory {
         @Provides
         public static AndroidVersionUtils provideAndroidVersionUtils() {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM)
+                return new VanillaIceCreamUtil();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
                 return new UpsideDownCakeUtil();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
@@ -137,4 +139,9 @@ public interface AndroidVersionUtils {
      * Constant ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
      */
     public int foregroundServiceTypeDataSync();
+
+    /**
+     * Set status bar color using deprecated API methods if available
+     */
+    public void legacySetStatusBarColor(Activity activity, int color);
 }
