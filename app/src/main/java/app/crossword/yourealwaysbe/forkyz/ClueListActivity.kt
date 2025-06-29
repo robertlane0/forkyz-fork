@@ -38,6 +38,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 import app.crossword.yourealwaysbe.forkyz.menu.BaseMenuModifier
 import app.crossword.yourealwaysbe.forkyz.menu.MenuText
+import app.crossword.yourealwaysbe.forkyz.view.ClueTabs
 import app.crossword.yourealwaysbe.puz.Clue
 
 class ClueListActivity() : PuzzleActivity() {
@@ -148,32 +149,22 @@ class ClueListActivity() : PuzzleActivity() {
 
     @Composable
     private fun ClueLists(modifier : Modifier, showAllWords : Boolean) {
-        val snapToClue
-            by viewModel.snapToClueEvent.collectAsStateWithLifecycle()
-
-        ClueTabsView(
+        ClueTabs(
             modifier = modifier,
-            board = viewModel.getBoard(),
+            viewModel = viewModel.clueTabsViewModel,
+            isPortrait = isPortrait,
             onClueClick = viewModel::clueClick,
             onClueClickDescription = stringResource(R.string.select_clue),
-            onClueLongClick = { clue ->
-                clue?.let { clue ->
-                    viewModel.selectClue(clue)
-                    viewModel.launchClueNotes(clue)
-                }
+            onClueLongClick = { cid ->
+                viewModel.selectClue(cid)
+                viewModel.launchClueNotes(cid)
             },
             onClueLongClickDescription
                 = stringResource(R.string.open_clue_notes),
-            onBoardClick = { clue, _ -> viewModel.clueClick(clue) },
-            snapToClue = snapToClue != null,
-            snapClueShowPageNum = snapToClue?.pageChangeData?.showPageNum,
-            snapClueReplacePageNum = snapToClue?.pageChangeData?.replacePageNum,
+            onClueBoardClick = { cid, _ -> viewModel.clueClick(cid) },
+            onClueBoardClickDescription = stringResource(R.string.select_clue),
             showAllWords = showAllWords,
         )
-
-        LaunchedEffect(snapToClue) {
-            viewModel.clearSnapToClueEvent()
-        }
     }
 
     @Composable

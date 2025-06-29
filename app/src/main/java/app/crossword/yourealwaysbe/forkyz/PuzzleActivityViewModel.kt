@@ -639,10 +639,14 @@ open class PuzzleActivityViewModel @Inject constructor(
     }
 
     fun selectClue(clue : Clue?) {
+        selectClue(clue?.clueID)
+    }
+
+    fun selectClue(cid : ClueID?) {
         getBoard()?.let { board ->
-            clue?.let { clue ->
-                if (clue.getClueID() != board.getClueID())
-                    board.jumpToClue(clue)
+            cid?.let { cid ->
+                if (cid != board.getClueID())
+                    board.jumpToClue(cid)
             }
         }
     }

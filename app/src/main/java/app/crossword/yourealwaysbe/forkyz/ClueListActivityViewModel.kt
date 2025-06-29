@@ -17,62 +17,12 @@ import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.util.getStopOnEndStrategy
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
+import app.crossword.yourealwaysbe.forkyz.view.ClueTabsViewModel
 import app.crossword.yourealwaysbe.puz.Clue
 import app.crossword.yourealwaysbe.puz.ClueID
 import app.crossword.yourealwaysbe.puz.MovementStrategy
 import app.crossword.yourealwaysbe.puz.Playboard.Word
 import app.crossword.yourealwaysbe.puz.Position
-
-/**
- * The state of the clue tabs widget
- *
- * We are tracking a "primary" list number. Although the clue tabs may
- * display two lists, only one is the main one that is used as the
- * reference point for left/right actions and other key events.
- *
- * Not ideal at the moment that this has to keep in sync with ClueTabs,
- * but will become ClueTabs ViewModel when ClueTabs is Compose.
- *
- * @param numPages how many pages there are (number of clue lists +
- * history)
- * @param currentPageNum the current primary list number
- */
-data class ClueTabsState(
-    val currentPageNum : Int = 0,
-    val listNames : List<String> = listOf(),
-) {
-    // one for each list plus history
-    val numPages : Int
-        get() { return listNames.size + 1 }
-
-    // last page is always history
-    val isCurrentPageHistory : Boolean
-        get() { return isHistoryPage(currentPageNum) }
-
-    fun isHistoryPage(pageNum : Int) : Boolean {
-        return pageNum == numPages - 1;
-    }
-}
-
-/**
- * Data for changing page during snap to clue events
- *
- * @param showPageNum ensure this page is shown
- * @param replacePageNum replace this page when ensuring if shown
- */
-data class PageChangeData(
-    val showPageNum : Int,
-    val replacePageNum : Int,
-)
-
-/**
- * Data for snap to clue
- *
- * @param pageChange if not null, follow page change data during snap
- */
-data class SnapToClueEvent(
-    val pageChangeData : PageChangeData? = null,
-)
 
 @HiltViewModel
 class ClueListActivityViewModel @Inject constructor(
@@ -92,20 +42,16 @@ class ClueListActivityViewModel @Inject constructor(
         setupVoiceCommands()
     }
 
-    private val _snapToClueEvent = MutableStateFlow<SnapToClueEvent?>(null)
-    private val _clueTabsState
-        = MutableStateFlow<ClueTabsState>(
-            ClueTabsState(
-                listNames = getPuzzle()
-                    ?.getClueListNames()
-                    ?.sorted()
-                    ?: listOf()
-            )
-        )
+    /**
+     * Keep a logical current page even if clue tabs displays two pages
+     *
+     * Maintain this always shown on some panel, use it to decide which
+     * page is next/prev when changing.
+     */
+    private var currentPageNum : Int = 0
 
-    val snapToClueEvent : StateFlow<SnapToClueEvent?> = _snapToClueEvent
     val showAllWords : LiveData<Boolean> = settings.liveClueListShowWords
-    val clueTabsState : StateFlow<ClueTabsState> = _clueTabsState
+    val clueTabsViewModel = ClueTabsViewModel(application, settings, getBoard())
 
     fun toggleShowAllWords() {
         val current = showAllWords.value ?: false
@@ -115,9 +61,9 @@ class ClueListActivityViewModel @Inject constructor(
     /**
      * General method for any part of a clue tab click
      */
-    fun clueClick(clue : Clue?) {
+    fun clueClick(cid : ClueID) {
         getBoard()?.let { board ->
-            clue?.let { clue ->
+            board.puzzle.getClue(cid)?.let { clue ->
                 if (clue.hasZone()) {
                     val oldWord = board.getCurrentWord()
                     if (clue.getClueID() != board.getClueID())
@@ -206,10 +152,7 @@ class ClueListActivityViewModel @Inject constructor(
                         board.jumpToClue(ClueID(curList, prev))
                         snapToClue()
                     } else {
-                        selectFirstSelectableClue(
-                            currentPageNum,
-                            false,
-                        )
+                        selectFirstSelectableClue(currentPageNum, false)
                     }
                 }
             }
@@ -241,18 +184,11 @@ class ClueListActivityViewModel @Inject constructor(
                         board.jumpToClue(ClueID(curList, next))
                         snapToClue()
                     } else {
-                        selectFirstSelectableClue(
-                            currentPageNum,
-                            true,
-                        )
+                        selectFirstSelectableClue(currentPageNum, true)
                     }
                 }
             }
         }
-    }
-
-    fun clearSnapToClueEvent() {
-        _snapToClueEvent.value = null
     }
 
     private fun displayKeyboard(previousWord : Word?) {
@@ -320,11 +256,7 @@ class ClueListActivityViewModel @Inject constructor(
      * Return next page num if don't fall off end
      */
     private fun getNextPageNum(pageNum : Int) : Int? {
-        if (pageNum < clueTabsState.value.numPages - 1) {
-            return pageNum + 1
-        } else {
-            return null
-        }
+        return if (pageNum < clueTabsViewModel.numPages) pageNum + 1 else null
     }
 
     /**
@@ -335,11 +267,7 @@ class ClueListActivityViewModel @Inject constructor(
     }
 
     private fun getPrevPageNum(pageNum : Int) : Int? {
-        if (pageNum > 0) {
-            return pageNum - 1
-        } else {
-            return null
-        }
+        return if (pageNum > 0) pageNum - 1 else null
     }
 
     private fun moveNextPage() {
@@ -354,36 +282,29 @@ class ClueListActivityViewModel @Inject constructor(
         }
     }
 
-    private fun snapToClue(
-        pageChangeData : PageChangeData? = null
-    ) {
-        _snapToClueEvent.value = SnapToClueEvent(pageChangeData)
-
-        if (pageChangeData == null) {
+    private fun snapToClue(showPageNum : Int? = null) {
+        var newPageNum = -1
+        if (showPageNum == null) {
             // change current page state
             if (isCurrentPageHistory) {
-                // no need to change current page
+                newPageNum = clueTabsViewModel.snapToClue(
+                    clueTabsViewModel.historyPageNum,
+                )
             } else {
-                // switch to page of current clue
-                val board = getBoard()
-                val puz = getPuzzle()
-                if (board == null || puz == null)
-                    return
-
-                val cid = board.getClueID()
-                val curList = cid?.getListName()
-                val newPageNum = clueTabsState.value.listNames.indexOf(curList)
-                if (newPageNum >= 0) {
-                    _clueTabsState.value = clueTabsState.value.copy(
-                        currentPageNum = newPageNum
-                    )
+                // switch to page of current view
+                getBoard()?.clueID?.listName?.let { curList ->
+                    newPageNum = clueTabsViewModel.getPageNum(curList)
+                    if (newPageNum >= 0) {
+                        newPageNum = clueTabsViewModel.snapToClue(newPageNum)
+                    }
                 }
             }
         } else {
-            _clueTabsState.value = clueTabsState.value.copy(
-                currentPageNum = pageChangeData.showPageNum
-            )
+            newPageNum = clueTabsViewModel.snapToClue(showPageNum)
         }
+
+        if (newPageNum >= 0)
+            currentPageNum = newPageNum
     }
 
     /**
@@ -442,28 +363,28 @@ class ClueListActivityViewModel @Inject constructor(
         if (board == null || puz == null)
             return false
 
-        val pageChangeData = if (pageNum == currentPageNum)
+        val showPageNum = if (pageNum == currentPageNum)
             null
         else
-            PageChangeData(pageNum, currentPageNum)
+            pageNum
 
-        if (clueTabsState.value.isHistoryPage(pageNum)) {
+        if (clueTabsViewModel.isHistoryPage(pageNum)) {
             for (cid in puz.getHistory()) {
                 val clue = puz.getClue(cid)
                 if (clue?.hasZone() ?: false) {
                     board.jumpToClue(clue)
-                    snapToClue(pageChangeData)
+                    snapToClue(showPageNum)
                     return true
                 }
             }
         } else {
-            val listNames = clueTabsState.value.listNames
-            if (0 <= pageNum && pageNum <= listNames.size - 1) {
-                val listName = listNames[pageNum]
+            val pages = clueTabsViewModel.pages
+            if (0 <= pageNum && pageNum <= pages.size - 1) {
+                val listName = pages[pageNum].listName
                 val firstClue = puz.getClues(listName).getFirstZonedIndex()
                 if (firstClue >= 0) {
                     board.jumpToClue(ClueID(listName, firstClue))
-                    snapToClue(pageChangeData)
+                    snapToClue(showPageNum)
                     return true
                 }
             }
@@ -471,9 +392,9 @@ class ClueListActivityViewModel @Inject constructor(
         return false
     }
 
+    // last page is always history
     private val isCurrentPageHistory : Boolean
-        get() { return clueTabsState.value.isCurrentPageHistory }
-
-    private val currentPageNum : Int
-        get() { return clueTabsState.value.currentPageNum }
+        get() {
+            return clueTabsViewModel.isHistoryPage(currentPageNum)
+        }
 }

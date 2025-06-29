@@ -237,10 +237,7 @@ public abstract class BoardEditView
 
     public abstract Position findPosition(Point point);
 
-    /**
-     * Returns new scale
-     */
-    public abstract float fitToView();
+    public abstract void fitToView();
 
     /**
      * Returns new scale

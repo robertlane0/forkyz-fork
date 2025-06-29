@@ -66,6 +66,7 @@ import app.crossword.yourealwaysbe.forkyz.view.BoardEditView.BoardClickListener
 import app.crossword.yourealwaysbe.forkyz.view.BoardFullEditView
 import app.crossword.yourealwaysbe.forkyz.view.ForkyzKeyboard
 import app.crossword.yourealwaysbe.forkyz.view.OKDialog
+import app.crossword.yourealwaysbe.forkyz.view.ClueTabs
 import app.crossword.yourealwaysbe.puz.Playboard.Word
 import app.crossword.yourealwaysbe.puz.Position
 
@@ -80,21 +81,8 @@ private val CLUE_BAR_HEIGHT = 64.dp
 class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
     override protected lateinit var viewModel : PlayActivityViewModel
 
-    private var clueTabsPageSetter = ClueTabsPageSetter()
     private var shakeDetector : ShakeDetector? = null
     private val boardViewZoomer = BoardViewZoomer()
-
-    private val displayWidth : Int by lazy {
-        val metrics = getResources().getDisplayMetrics()
-        (metrics.widthPixels / metrics.density).toInt()
-    }
-    private val displayHeight : Int by lazy {
-        val metrics = getResources().getDisplayMetrics()
-        (metrics.heightPixels / metrics.density).toInt()
-    }
-    private val isPortrait : Boolean by lazy {
-        displayWidth <= displayHeight
-    }
 
     override fun onCreate(savedInstanceState : Bundle?) {
         super.onCreate(savedInstanceState)
@@ -124,10 +112,6 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
     }
 
     override protected fun onPause() {
-        viewModel.saveClueTabsPages(
-            clueTabsPageSetter.getPage(0),
-            clueTabsPageSetter.getPage(1),
-        )
         stopShakeDetector()
         super.onPause()
     }
@@ -213,16 +197,6 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
 
         val state by viewModel.playUIState.observeAsState()
 
-        LaunchedEffect(state?.clueTabsPage0) {
-            state?.clueTabsPage0?.let { page ->
-                clueTabsPageSetter.setPage(0, page)
-            }
-        }
-        LaunchedEffect(state?.clueTabsPage1) {
-            state?.clueTabsPage1?.let { page ->
-                clueTabsPageSetter.setPage(1, page)
-            }
-        }
         LaunchedEffect(state?.isRandomClueOnShake) {
             if (state?.isRandomClueOnShake ?: false) {
                 if (shakeDetector == null) {
@@ -483,26 +457,23 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
         val onBarLongClickDescription
             = if (isAcrostic) stringResource(R.string.toggle_clue_tabs)
             else ""
-        val onBarSwipeDown : () -> Unit
-            = if (isAcrostic) this::hideClueTabs else { { } }
 
-        ClueTabsView(
+        ClueTabs(
             modifier = modifier,
-            board = viewModel.getBoard(),
+            viewModel = viewModel.clueTabsViewModel,
+            isPortrait = isPortrait,
+            showAllWords = showAllWords,
             onClueClick = viewModel::clickClue,
             onClueClickDescription = stringResource(R.string.select_clue),
             onClueLongClick = { viewModel.launchCurrentClueNotes() },
             onClueLongClickDescription
                 = stringResource(R.string.open_clue_notes),
-            onBoardClick = viewModel::clickClue,
+            onClueBoardClick = viewModel::clickClue,
+            onClueBoardClickDescription = stringResource(R.string.select_clue),
             onBarLongClick = onBarLongClick,
             onBarLongClickDescription = onBarLongClickDescription,
-            onBarSwipeDown = onBarSwipeDown,
-            showAllWords = showAllWords,
-            pageSetter = clueTabsPageSetter,
             maxWordScale = ACROSTIC_CLUE_TABS_WORD_SCALE,
-            initialPage0 = state?.clueTabsPage0,
-            initialPage1 = state?.clueTabsPage1,
+            onPageChange = viewModel::saveClueTabsPage,
         )
     }
 
@@ -644,15 +615,9 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
     private fun toggleShowClueTabs() {
         val isShowing = viewModel.playUIState.value?.showClueTabs ?: false
         if (isShowing)
-            hideClueTabs()
+            viewModel.hideClueTabs()
         else
             viewModel.showClueTabs()
-    }
-
-    private fun hideClueTabs() {
-        val page0 = clueTabsPageSetter.getPage(0)
-        val page1 = clueTabsPageSetter.getPage(1)
-        viewModel.hideClueTabs(page0, page1)
     }
 
     private fun min(x : Dp, y : Dp) : Dp {

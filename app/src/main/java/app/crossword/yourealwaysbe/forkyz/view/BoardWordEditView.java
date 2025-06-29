@@ -40,7 +40,8 @@ public class BoardWordEditView extends BoardEditView {
     private boolean incognitoMode;
     private int originalHeight;
     private Set<String> suppressNotesList;
-    boolean customSuppressNotesList = false;
+    private boolean customSuppressNotesList = false;
+    private int expectedWidth = 0;
 
     public BoardWordEditView(Context context) {
         this(context, null);
@@ -52,6 +53,21 @@ public class BoardWordEditView extends BoardEditView {
         setAllowOverScroll(false);
         setAllowZoom(false);
         setScaleBounds();
+    }
+
+    /**
+     * Set how wide the view is expected to be
+     *
+     * Useful for setting the size of the view immediately rather than
+     * resizing after the actual width is known, which can cause
+     * rendering jumps (the view goes from height 0 to full size after
+     * the first render, which may cause jumps if the view is in e.g. a
+     * scrolling list of views).
+     *
+     * Should have padding removed already.
+     */
+    public void setExpectedWidth(int expectedWidth) {
+        this.expectedWidth = expectedWidth;
     }
 
     /**
@@ -221,8 +237,8 @@ public class BoardWordEditView extends BoardEditView {
     }
 
     @Override
-    public float fitToView() {
-        return fitToView(false);
+    public void fitToView() {
+        fitToView(false);
     }
 
     @Override
@@ -355,29 +371,43 @@ public class BoardWordEditView extends BoardEditView {
         return (renderWord == null) ? null : renderWord.getZone();
     }
 
-    private float fitToView(boolean noRender) {
+    private void fitToView(boolean noRender) {
         PlayboardRenderer renderer = getRenderer();
         if (renderer == null)
-            return -1;
+            return;
 
-        scrollTo(0, 0);
-
-        int width = getContentWidth();
         Zone zone = getRenderWordZone();
+        int width = getContentWidth();
+
         if (zone == null)
-            return -1;
+            return;
 
         int numBoxes = zone.size();
 
-        float scale = renderer.fitWidthTo(width, numBoxes);
-
-        setCurrentScale(scale, noRender);
-
-        return scale;
+        if (width == 0) {
+            // use renderer to set view to expected size to avoid jumps
+            // in clue list, reset renderer after so is clean for real
+            // redraw when size known
+            Word word = getRenderWord();
+            if (!incognitoMode && word != null && expectedWidth > 0) {
+                float oldScale = renderer.getScale();
+                renderer.fitWidthTo(expectedWidth, numBoxes);
+                Position dims
+                    = renderer.getWordPixelsForWidth(word, expectedWidth);
+                setViewParams(this, dims.getCol(), dims.getRow());
+                renderer.setScale(oldScale);
+            }
+        } else {
+            scrollTo(0, 0);
+            float scale = renderer.fitWidthTo(width, numBoxes);
+            setCurrentScale(scale, noRender);
+        }
     }
 
     /**
      * Width of the usable area inside the view (sans padding)
+     *
+     * Uses expectedWidth if no current measured width
      */
     private int getContentWidth() {
         return getContentWidth(getMeasuredWidth());
@@ -398,7 +428,7 @@ public class BoardWordEditView extends BoardEditView {
      */
     private boolean isRendering() {
         return !incognitoMode
-            && getMeasuredWidth() != 0
+            && getContentWidth() > 0
             && getVisibility() == VISIBLE;
     }
 

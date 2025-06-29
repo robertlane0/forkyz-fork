@@ -38,7 +38,7 @@ public class PMLIO extends AbstractJSONIO {
         = DateTimeFormatter.ofPattern("d MMM y", Locale.US);
 
     private static final Pattern CW_JSON_RE = Pattern.compile(
-        "^.*\"starting_puzzle\"\\s*:\\s*(\\{.*\\}).*$"
+        "^.*starting_puzzle\\s*:\\s*(\\{.*pml_id.*\\}).*$"
     );
     private static final int CW_JSON_GRP = 1;
 

@@ -647,7 +647,7 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
     /**
      * Change view params, return if change made
      */
-    private boolean setViewParams(View view, int width, int height) {
+    protected boolean setViewParams(View view, int width, int height) {
         return setViewParams(view, width, height, false);
     }
 

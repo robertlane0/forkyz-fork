@@ -1,6 +1,10 @@
 
 package app.crossword.yourealwaysbe.forkyz
 
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+
+
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.combinedClickable
@@ -206,7 +210,6 @@ class NotesActivity() : PuzzleActivity() {
         val state by viewModel.notesUIState.observeAsState()
 
         BoardLabel(R.string.board_lab)
-        // TODO: getsuppressnoteslist
         Miniboard(
             modifier = Modifier.onKeyEvent(this::onMiniboardKeyEvent)
                 .padding(

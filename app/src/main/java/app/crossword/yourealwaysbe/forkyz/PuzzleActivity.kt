@@ -78,7 +78,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ShareCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
-import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat
 import androidx.core.view.accessibility.AccessibilityViewCommand
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Lifecycle
@@ -106,9 +105,7 @@ import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer
 import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
 import app.crossword.yourealwaysbe.forkyz.util.SpeechContract
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand
-import app.crossword.yourealwaysbe.forkyz.view.BoardEditView.BoardClickListener
-import app.crossword.yourealwaysbe.forkyz.view.BoardWordEditView
-import app.crossword.yourealwaysbe.forkyz.view.ClueTabs
+import app.crossword.yourealwaysbe.forkyz.view.BoardWordEdit
 import app.crossword.yourealwaysbe.forkyz.view.ForkyzKeyboard
 import app.crossword.yourealwaysbe.forkyz.view.PlayboardTextRenderer
 import app.crossword.yourealwaysbe.forkyz.view.PuzzleInfoDialogs
@@ -123,21 +120,21 @@ import app.crossword.yourealwaysbe.puz.Position
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.Zone
 
-class ClueTabsPageSetter() {
-    var clueTabs : ClueTabs? = null
-
-    fun setPage(idx : Int, page : Int) {
-        clueTabs?.setPage(idx, page)
-    }
-
-    fun getPage(idx : Int) : Int? {
-        return clueTabs?.getCurrentPage(idx)
-    }
-}
-
 @AndroidEntryPoint
 abstract class PuzzleActivity() : ForkyzActivity() {
     private val TAG = "ForkyzPuzzleActivity"
+
+    protected val displayWidth : Int by lazy {
+        val metrics = getResources().getDisplayMetrics()
+        (metrics.widthPixels / metrics.density).toInt()
+    }
+    protected val displayHeight : Int by lazy {
+        val metrics = getResources().getDisplayMetrics()
+        (metrics.heightPixels / metrics.density).toInt()
+    }
+    protected val isPortrait : Boolean by lazy {
+        displayWidth <= displayHeight
+    }
 
     /**
      * Get currently known value of volume activates voice
@@ -256,64 +253,23 @@ abstract class PuzzleActivity() : ForkyzActivity() {
         suppressNotesList : Set<String>? = null,
         onFocusChanged : (Boolean) -> Unit = { },
     ) {
-        AndroidView(
-            modifier = modifier.fillMaxWidth(),
-            factory = { context ->
-                val view = BoardWordEditView(context).apply {
-                    setFocusable(true)
-                    setFocusableInTouchMode(true)
-                    setContentDescription(
-                        context.getString(R.string.current_word),
-                    )
-                    setAllowOverScroll(false)
-
-                    if (useSuppressNotesList)
-                        setBoard(viewModel.getBoard(), suppressNotesList)
-                    else
-                        setBoard(viewModel.getBoard())
-
-                    addBoardClickListener(object : BoardClickListener {
-                        override fun onClick(
-                            position : Position?,
-                            previousWord : Word?,
-                        ) {
-                            onClick(position, previousWord)
-                        }
-
-                        override fun onLongClick(position : Position?) {
-                            onLongClick(position)
-                        }
-                    })
-                }
-
-                // always this view gets input
-                inputConnectionMediator.registerReceiver(view)
-                view.setOnFocusChangeListener({ _, gainFocus ->
-                    if (gainFocus)
-                        inputConnectionMediator.registerReceiver(view)
-                    onFocusChanged(gainFocus)
-                })
-                view.requestFocusOnSized()
-
-                view
-            },
-            update = { view ->
-                view.apply {
-                    setIncognitoMode(incognitoMode)
-                    setIgnoreScratchMode(ignoreScratchMode)
-                    if (useSuppressNotesList)
-                        setSuppressNotesList(suppressNotesList)
-                    else
-                        clearSuppressNotesList()
-                }
-                ViewCompat.replaceAccessibilityAction(
-                    view,
-                    AccessibilityActionCompat.ACTION_LONG_CLICK,
-                    view.context.getText(longClickAccessibilityAction),
-                    null
-                )
-            }
-        )
+        viewModel.getBoard()?.let { board ->
+            BoardWordEdit(
+                modifier = modifier,
+                board = board,
+                contentDescription = stringResource(R.string.current_word),
+                onClick = onClick,
+                onLongClick = onLongClick,
+                longClickAccessibilityAction
+                    = stringResource(longClickAccessibilityAction),
+                inputConnectionMediator = inputConnectionMediator,
+                incognitoMode = incognitoMode,
+                ignoreScratchMode = ignoreScratchMode,
+                useSuppressNotesList = useSuppressNotesList,
+                suppressNotesList = suppressNotesList,
+                onFocusChanged = onFocusChanged,
+            )
+        }
     }
 
     /**
@@ -1194,116 +1150,6 @@ abstract class PuzzleActivity() : ForkyzActivity() {
                 actionSupportSource()
                 viewModel.dismissMenu()
             }
-        )
-    }
-
-    /**
-     * ClueTabs composable
-     *
-     * @param modifier modifier
-     * @param board the playboard to get clues from
-     * @param showAllWords whether to display miniboards in each item
-     * @param onClueClick callback when clue clicked
-     * @param onClueClickDescription description for clue click
-     * @param onClueLongClick callback for long click on clue
-     * @param onClueLongClickDescription description for long clue click
-     * @param onBoardClick callback when miniboard for clue clicked
-     * @param onBarSwipeUp callback when tabs bar swiped up
-     * @param onBarSwipeDown callback when tabs bar swiped down
-     * @param onBarLongClick callback when tabs bar long clicked
-     * @param onBarLongClickDescription description of bar long click action
-     * @param snapToClue if to snap to clue on this cycle
-     * @param snapClueShowPageNum which page to ensure shown if snapping
-     * @param snapClueReplacePageNum which page to replace if snapping
-     * @param pageSetter for controlling the page of the clue tabs
-     * @param onPageChange callback for page changes
-     * @param maxWordScale the maximum scale for word views
-     * @param initialPage0 the initial page for the first view
-     * @param initialPage1 the initial page for the second view
-     */
-    @Composable
-    protected fun ClueTabsView(
-        modifier : Modifier,
-        board : Playboard?,
-        showAllWords : Boolean = false,
-        onClueClick : (Clue?) -> Unit = { },
-        onClueClickDescription : String = "",
-        onClueLongClick : (Clue?) -> Unit = { } ,
-        onClueLongClickDescription : String = "",
-        onBoardClick : (Clue?, Word?) -> Unit = { _, _ -> },
-        onBarSwipeUp : () -> Unit = { },
-        onBarSwipeDown : () -> Unit = { },
-        onBarLongClick : () -> Unit = { },
-        onBarLongClickDescription : String = "",
-        snapToClue : Boolean = false,
-        snapClueShowPageNum : Int? = null,
-        snapClueReplacePageNum : Int? = null,
-        pageSetter : ClueTabsPageSetter? = null,
-        maxWordScale : Float? = null,
-        initialPage0 : Int? = null,
-        initialPage1 : Int? = null,
-    ) {
-        AndroidView(
-            modifier = modifier,
-            factory = { context ->
-                val view = ClueTabs(context).apply {
-                    setBoard(board)
-                    setOnClueLongClickDescription(onClueLongClickDescription)
-                    setOnClueClickDescription(onClueClickDescription)
-                    setOnBarLongClickDescription(onBarLongClickDescription)
-                    addListener(object : ClueTabs.ClueTabsListener {
-                        override fun onClueTabsClick(
-                            clue : Clue, _view : ClueTabs
-                        ) {
-                            onClueClick(clue)
-                        }
-
-                        override fun onClueTabsLongClick(
-                            clue : Clue, _view : ClueTabs
-                        ) {
-                            onClueLongClick(clue)
-                        }
-
-                        override fun onClueTabsBoardClick(
-                            clue : Clue, previousWord : Word, _view : ClueTabs
-                        ) {
-                            onBoardClick(clue, previousWord)
-                        }
-
-                        override fun onClueTabsBarSwipeUp(_view : ClueTabs) {
-                            onBarSwipeUp()
-                        }
-
-                        override fun onClueTabsBarSwipeDown(_view : ClueTabs) {
-                            onBarSwipeDown()
-                        }
-
-                        override fun onClueTabsBarLongClick(_view : ClueTabs) {
-                            onBarLongClick()
-                        }
-                    })
-                }
-                addAccessibilityActions(view)
-                initialPage0?.let { view.setPage(0, it) }
-                initialPage1?.let { view.setPage(1, it) }
-                pageSetter?.let { it.clueTabs = view }
-                view
-            },
-            update = { view ->
-                view.setShowWords(showAllWords)
-                if (snapToClue) {
-                    // this should probably be a launched effect,
-                    // but can't do that from the update method
-                    snapClueShowPageNum?.let { showPageNum ->
-                        view.ensureListShown(
-                            snapClueShowPageNum,
-                            snapClueReplacePageNum ?: -1,
-                        )
-                    }
-                    view.snapToClue()
-                }
-                maxWordScale?.let { view.setMaxWordScale(it) }
-            },
         )
     }
 

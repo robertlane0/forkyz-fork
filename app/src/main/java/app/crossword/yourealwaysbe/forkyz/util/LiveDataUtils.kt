@@ -20,6 +20,21 @@ fun <T> LiveData<T>.observeOnce(cb : Consumer<T>) {
 }
 
 /**
+ * As observe once, but only report first non-null value
+ */
+fun <T> LiveData<T>.observeOnceNonNull(cb : Consumer<T>) {
+    val liveData = this
+    liveData.observeForever(object : Observer<T> {
+        override fun onChanged(value : T) {
+            if (value != null) {
+                liveData.removeObserver(this)
+                cb.accept(value)
+            }
+        }
+    })
+}
+
+/**
  * Watch multiple live data instances
  *
  * Get a callback when they all have an initial value, and further

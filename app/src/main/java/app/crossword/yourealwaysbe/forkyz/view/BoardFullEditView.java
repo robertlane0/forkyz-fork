@@ -59,10 +59,10 @@ public class BoardFullEditView extends BoardEditView {
     }
 
     @Override
-    public float fitToView() {
+    public void fitToView() {
         PlayboardRenderer renderer = getRenderer();
         if (renderer == null)
-            return -1;
+            return;
 
         int w = getMeasuredWidth();
         int h = getMeasuredHeight();
@@ -72,8 +72,6 @@ public class BoardFullEditView extends BoardEditView {
         scrollTo(0, 0);
         float scale = renderer.fitTo(w, h);
         setCurrentScale(scale);
-
-        return scale;
     }
 
     @Override

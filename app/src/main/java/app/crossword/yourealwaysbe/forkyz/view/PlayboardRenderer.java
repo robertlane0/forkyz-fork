@@ -266,6 +266,19 @@ public class PlayboardRenderer {
     }
 
     /**
+     * Size of image that would be drawn for word
+     *
+     * @return row in height in pixels, col is width in pixels
+     */
+    public Position getWordPixelsForWidth(Word word, int wrapWidth) {
+        Zone zone = word == null ? null : word.getZone();
+        int len = zone == null ? 0 : zone.size();
+        Position dims = getBoxesDimsForWidth(wrapWidth, len, getScale());
+        int boxSize = getBoxSize();
+        return new Position(dims.getRow() * boxSize, dims.getCol() * boxSize);
+    }
+
+    /**
      * Draw given word
      *
      * @param word word to draw

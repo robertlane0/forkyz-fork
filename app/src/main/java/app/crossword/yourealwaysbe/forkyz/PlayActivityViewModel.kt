@@ -2,6 +2,7 @@
 package app.crossword.yourealwaysbe.forkyz
 
 import javax.inject.Inject
+import kotlin.random.Random
 
 import android.app.Application
 import androidx.lifecycle.LiveData
@@ -10,20 +11,20 @@ import androidx.lifecycle.MutableLiveData
 
 import dagger.hilt.android.lifecycle.HiltViewModel
 
+import app.crossword.yourealwaysbe.forkyz.settings.FitToScreenMode
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.GridRatio
-import app.crossword.yourealwaysbe.forkyz.settings.FitToScreenMode
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.util.liveDataFanIn
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
-import app.crossword.yourealwaysbe.puz.Clue
+import app.crossword.yourealwaysbe.forkyz.view.ClueTabsViewModel
+import app.crossword.yourealwaysbe.puz.ClueID
 import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges
 import app.crossword.yourealwaysbe.puz.Playboard.Word
 import app.crossword.yourealwaysbe.puz.Position
 import app.crossword.yourealwaysbe.puz.Puzzle
-import kotlin.random.Random
 
 /**
  * UI State for play
@@ -74,8 +75,13 @@ class PlayActivityViewModel @Inject constructor(
     utils,
 ) {
     private var _playUIState : MutableLiveData<PlayActivityUIState>
-    public var playUIState : LiveData<PlayActivityUIState>
+    var playUIState : LiveData<PlayActivityUIState>
         private set
+    val clueTabsViewModel = ClueTabsViewModel(application, settings, getBoard())
+    init {
+        settings.getPlayClueTabsPage(0) { clueTabsViewModel.setPage(0, it) }
+        settings.getPlayClueTabsPage(1) { clueTabsViewModel.setPage(1, it) }
+    }
 
     // indicates if first run message was shown and is now cleared
     // will stay false if this is not the first run of the puzzle
@@ -184,27 +190,27 @@ class PlayActivityViewModel @Inject constructor(
      *
      * Needs to know which page they were on to save
      */
-    fun hideClueTabs(page0 : Int?, page1 : Int?) {
-        saveClueTabsPages(page0, page1)
+    fun hideClueTabs() {
         if (!isAcrostic)
             settings.setPlayShowClueTabs(false)
     }
 
-    fun clickClue(clue : Clue?, previousWord : Word? = null) {
-        if (clue == null)
+    fun clickClue(cid : ClueID?, previousWord : Word? = null) {
+        if (cid == null)
             return
 
         getBoard()?.let { board ->
-            val word = previousWord ?: board.currentWord
-            if (clue.hasZone() && clue.clueID != board.clueID)
-                board.jumpToClue(clue)
-            displayKeyboard(word)
+            board.puzzle.getClue(cid)?.let { clue ->
+                val word = previousWord ?: board.currentWord
+                if (clue.hasZone() && clue.clueID != board.clueID)
+                    board.jumpToClue(clue)
+                displayKeyboard(word)
+            }
         }
     }
 
-    fun saveClueTabsPages(page0 : Int?, page1 : Int?) {
-        page0?.let { settings.setPlayClueTabsPage(0, it) }
-        page1?.let { settings.setPlayClueTabsPage(1, it) }
+    fun saveClueTabsPage(index : Int, page : Int) {
+        settings.setPlayClueTabsPage(index, page)
     }
 
     fun deleteLetter() {

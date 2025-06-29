@@ -87,9 +87,10 @@ public class JPZIO implements PuzzleParser {
     private static final String ACROSTIC_QUOTE_LISTNAME = "Quote";
     private static final String ACROSTIC_QUOTE_HINT = "Quote";
 
-    private static class ClueInfo extends ClueID {
+    private static class ClueInfo {
         private static final long serialVersionUID = 7114093029494561830L;
 
+        private ClueID cid;
         private String clueNumber;
         private String hint;
         private String zoneID;
@@ -100,13 +101,15 @@ public class JPZIO implements PuzzleParser {
             String clueNumber, String hint, String zoneID,
             String citation
         ) {
-            super(listName, index);
+            this.cid = new ClueID(listName, index);
             this.clueNumber = clueNumber;
             this.hint = hint;
             this.zoneID = zoneID;
             this.citation = citation;
         }
 
+        public String getListName() { return cid.getListName(); }
+        public int getIndex() { return cid.getIndex(); }
         public String getClueNumber() { return clueNumber; }
         public String getHint() { return hint; }
         public String getZoneID() { return zoneID; }
