@@ -558,11 +558,9 @@ public class Downloaders {
                 Duration.ZERO,
                 "https://metro.co.uk/",
                 new PMLIO(),
-                "'https://d3untqd069jdot.cloudfront.net/puzzles/"
-                    + "cryptic-crossword/'yyyyMMdd'.html'",
-                "'https://metro.co.uk/puzzles/"
-                    + "cryptic-crossword'",
-                LocalDate.of(2024, 12, 2)
+                "'https://metro.co.uk/puzzles/cryptic-crossword'",
+                "'https://metro.co.uk/puzzles/cryptic-crossword'",
+                ZonedDateTime.now(ZoneId.of("Europe/London")).toLocalDate()
             ));
         }
 
@@ -574,11 +572,9 @@ public class Downloaders {
                 Duration.ZERO,
                 "https://metro.co.uk/",
                 new PMLIO(),
-                "'https://d3untqd069jdot.cloudfront.net/puzzles/"
-                    + "crossword/'yyyyMMdd'.html'",
-                "'https://metro.co.uk/puzzles/"
-                    + "quick-crossword'",
-                LocalDate.of(2024, 12, 2)
+                "'https://metro.co.uk/puzzles/quick-crossword'",
+                "'https://metro.co.uk/puzzles/quick-crossword'",
+                ZonedDateTime.now(ZoneId.of("Europe/London")).toLocalDate()
             ));
         }
 
