@@ -6,7 +6,7 @@ import java.util.function.Consumer
 
 import android.app.SearchManager
 import android.content.Intent
-import android.net.Uri
+import androidx.core.net.toUri
 
 import app.crossword.yourealwaysbe.forkyz.R
 import app.crossword.yourealwaysbe.forkyz.settings.ExternalDictionarySetting
@@ -95,13 +95,11 @@ class ExternalDictionaries {
 fun ExternalToolLauncher.visit(data : FreeDictionaryData) {
     val intent = Intent(Intent.ACTION_VIEW)
     intent.setData(
-        Uri.parse(
-            String.format(
-                Locale.getDefault(),
-                FREE_URL_FORMAT,
-                data.word,
-            ),
-        ),
+        String.format(
+            Locale.getDefault(),
+            FREE_URL_FORMAT,
+            data.word,
+        ).toUri()
     )
     this.activity.startActivity(intent)
 }

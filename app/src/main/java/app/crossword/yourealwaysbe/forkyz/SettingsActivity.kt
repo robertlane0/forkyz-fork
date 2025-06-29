@@ -61,6 +61,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -778,7 +779,7 @@ class SettingsActivity : ForkyzActivity() {
     private fun openHTMLPage(url : String) {
         startActivity(Intent(
             Intent.ACTION_VIEW,
-            Uri.parse(url),
+            url.toUri(),
             this,
             HTMLActivity::class.java
         ))

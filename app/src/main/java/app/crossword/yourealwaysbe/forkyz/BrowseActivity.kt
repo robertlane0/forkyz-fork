@@ -83,6 +83,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
+import androidx.core.net.toUri
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -492,7 +493,7 @@ class BrowseActivity() : ForkyzActivity() {
             onClick = {
                 val i = Intent(Intent.ACTION_VIEW);
                 i.setData(
-                    Uri.parse(getString(R.string.online_sources_url))
+                    getString(R.string.online_sources_url).toUri()
                 )
                 startActivity(i);
             },
@@ -1094,7 +1095,7 @@ class BrowseActivity() : ForkyzActivity() {
                 val appPackage = getPackageName()
                 val intent = Intent(
                     Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                    Uri.parse("package:" + appPackage),
+                    ("package:" + appPackage).toUri(),
                 )
                 intent.addCategory(Intent.CATEGORY_DEFAULT)
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -1115,7 +1116,7 @@ class BrowseActivity() : ForkyzActivity() {
             onPositive = {
                 val intent = Intent(
                     Intent.ACTION_VIEW,
-                    Uri.parse("release.html"),
+                    "release.html".toUri(),
                     this,
                     HTMLActivity::class.java
                 )
@@ -1225,7 +1226,7 @@ class BrowseActivity() : ForkyzActivity() {
         } else if (Intent.ACTION_SEND == action) {
             if (intent.hasExtra(Intent.EXTRA_TEXT)) {
                 setPendingImport(
-                    Uri.parse(intent.getStringExtra(Intent.EXTRA_TEXT)),
+                    intent.getStringExtra(Intent.EXTRA_TEXT)?.toUri(),
                 )
             } else {
                 setPendingImport(

@@ -15,6 +15,7 @@ import android.os.IBinder
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
+import androidx.core.net.toUri
 
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -57,10 +58,9 @@ class PuzzleExportService() : Service() {
         flags : Int,
         startId : Int,
     ) : Int {
-        if (intent == null)
+        val uri = intent?.getStringExtra(PUZZLE_EXPORT_URI)?.toUri()
+        if (intent == null || uri == null)
             return START_NOT_STICKY
-
-        val uri = Uri.parse(intent.getStringExtra(PUZZLE_EXPORT_URI))
 
         val notification = NotificationCompat.Builder(
             this,

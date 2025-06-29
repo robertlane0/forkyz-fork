@@ -4,6 +4,7 @@ package app.crossword.yourealwaysbe.forkyz.exttools
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.core.net.toUri
 
 import app.crossword.yourealwaysbe.forkyz.R
 import app.crossword.yourealwaysbe.puz.Puzzle
@@ -30,11 +31,9 @@ class FifteenSquaredData(uri : Uri) : HTMLToolData(uri) {
             source = source.replace("Daily Cryptic", "")
             title = title.replace(".", "")
 
-            val uri = Uri.parse(
-                context.getResources().getString(
-                    R.string.search_fifteen_squared_url, source, title
-                )
-            )
+            val uri = context.getResources().getString(
+                R.string.search_fifteen_squared_url, source, title
+            ).toUri()
 
             return FifteenSquaredData(uri)
         }

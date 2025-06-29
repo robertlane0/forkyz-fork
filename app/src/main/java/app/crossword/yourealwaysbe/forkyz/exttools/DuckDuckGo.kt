@@ -8,6 +8,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.core.net.toUri
 
 import app.crossword.yourealwaysbe.forkyz.R
 import app.crossword.yourealwaysbe.puz.Clue
@@ -39,10 +40,9 @@ class DuckDuckGoData(uri : Uri) : HTMLToolData(uri) {
             hint = hint?.replace("&[A-Za-z\\d#]+;".toRegex(), "")
             hint = hint?.replace("[^-A-Za-z\\s\\d]".toRegex(), "")
 
-            val uri = Uri.parse(
-                context.getResources()
-                    .getString(R.string.duckduckgo_search_url, hint)
-            )
+            val uri = context.getResources()
+                .getString(R.string.duckduckgo_search_url, hint)
+                .toUri()
 
             return DuckDuckGoData(uri)
         }

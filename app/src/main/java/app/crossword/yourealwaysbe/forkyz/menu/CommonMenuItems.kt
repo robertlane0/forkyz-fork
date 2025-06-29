@@ -3,18 +3,18 @@ package app.crossword.yourealwaysbe.forkyz.menu
 
 import android.app.Activity
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 
 import app.crossword.yourealwaysbe.forkyz.HTMLActivity
 import app.crossword.yourealwaysbe.forkyz.R
@@ -94,7 +94,7 @@ fun MenuSettings(
 private fun actionHelp(activity : Activity, helpHTMLAsset : String) {
     val helpIntent = Intent(
         Intent.ACTION_VIEW,
-        Uri.parse(helpHTMLAsset),
+        helpHTMLAsset.toUri(),
         activity,
         HTMLActivity::class.java,
     )

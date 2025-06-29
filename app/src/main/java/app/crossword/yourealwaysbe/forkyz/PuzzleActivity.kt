@@ -14,7 +14,6 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -78,6 +77,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ShareCompat
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityViewCommand
 import androidx.fragment.app.DialogFragment
@@ -1173,7 +1173,7 @@ abstract class PuzzleActivity() : ForkyzActivity() {
     private fun actionSupportSource() {
         viewModel.supportURL?.let { url ->
             val i = Intent(Intent.ACTION_VIEW)
-            i.setData(Uri.parse(url))
+            i.setData(url.toUri())
             startActivity(i)
         }
     }
@@ -1189,7 +1189,7 @@ abstract class PuzzleActivity() : ForkyzActivity() {
         viewModel.shareURL?.let { url ->
             if (!url.isEmpty()) {
                 val i = Intent(Intent.ACTION_VIEW)
-                i.setData(Uri.parse(url))
+                i.setData(url.toUri())
                 startActivity(i)
             }
         }
