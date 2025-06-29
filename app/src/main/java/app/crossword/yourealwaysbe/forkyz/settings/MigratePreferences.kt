@@ -2,6 +2,7 @@
 package app.crossword.yourealwaysbe.forkyz.settings
 
 import android.content.SharedPreferences
+import androidx.core.content.edit
 
 /**
  * Migrate shared preferences to new settings
@@ -538,7 +539,7 @@ fun migratePreferences(
     }}}}}}}
 
     // finally, delete shared prefs
-    prefs.edit()?.clear()?.apply() // !
+    prefs.edit { clear() } // !
 }
 
 private fun getBoolean(prefs : SharedPreferences, key : String) : Boolean? {
