@@ -3,7 +3,7 @@ package app.crossword.yourealwaysbe.forkyz.versions;
 import java.io.IOException;
 import java.util.UUID;
 
-import android.annotation.TargetApi;
+import androidx.annotation.RequiresApi;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -16,7 +16,7 @@ import app.crossword.yourealwaysbe.forkyz.R;
 import app.crossword.yourealwaysbe.forkyz.util.PuzzleExportService;
 import app.crossword.yourealwaysbe.forkyz.util.PuzzleSaveService;
 
-@TargetApi(Build.VERSION_CODES.O)
+@RequiresApi(api = Build.VERSION_CODES.O)
 public class OreoUtil extends NougatUtil {
     private static final String TAG = "ForkyzOreoUtil";
 

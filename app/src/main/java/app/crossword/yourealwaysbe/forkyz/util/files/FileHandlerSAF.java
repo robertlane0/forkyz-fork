@@ -7,7 +7,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 
-import android.annotation.TargetApi;
+import androidx.annotation.RequiresApi;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -23,7 +23,7 @@ import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 import app.crossword.yourealwaysbe.puz.io.StreamUtils;
 
-@TargetApi(24)
+@RequiresApi(api = 24)
 public class FileHandlerSAF extends FileHandler {
     private static final String TAG = "ForkyzFileHandlerSAF";
 

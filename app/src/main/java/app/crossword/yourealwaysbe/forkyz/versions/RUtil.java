@@ -1,12 +1,12 @@
 package app.crossword.yourealwaysbe.forkyz.versions;
 
-import android.annotation.TargetApi;
+import androidx.annotation.RequiresApi;
 import android.os.Build;
 import android.view.Window;
 import android.view.WindowInsets;
 import android.view.WindowInsetsController;
 
-@TargetApi(Build.VERSION_CODES.R)
+@RequiresApi(api = Build.VERSION_CODES.R)
 public class RUtil extends QUtil {
     @Override
     public void setFullScreen(Window window) {

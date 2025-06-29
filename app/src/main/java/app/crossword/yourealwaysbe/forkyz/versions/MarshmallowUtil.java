@@ -1,7 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.versions;
 
-import android.annotation.TargetApi;
+import androidx.annotation.RequiresApi;
 import android.content.Context;
 import android.app.PendingIntent;
 import android.net.ConnectivityManager;
@@ -10,7 +10,7 @@ import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 
-@TargetApi(Build.VERSION_CODES.M)
+@RequiresApi(api = Build.VERSION_CODES.M)
 public class MarshmallowUtil extends LollipopUtil {
     @Override
     public int immutablePendingIntentFlag() {

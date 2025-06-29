@@ -1,10 +1,10 @@
 package app.crossword.yourealwaysbe.forkyz.versions;
 
-import android.annotation.TargetApi;
+import androidx.annotation.RequiresApi;
 import android.graphics.Typeface;
 import android.os.Build;
 
-@TargetApi(Build.VERSION_CODES.P)
+@RequiresApi(api = Build.VERSION_CODES.P)
 public class PieUtil extends OreoUtil {
     @Override
     public Typeface getSemiBoldTypeface() {

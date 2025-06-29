@@ -4,7 +4,7 @@ package app.crossword.yourealwaysbe.forkyz.versions;
 import java.io.Serializable;
 
 import android.Manifest;
-import android.annotation.TargetApi;
+import androidx.annotation.RequiresApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageInfo;
@@ -19,7 +19,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-@TargetApi(Build.VERSION_CODES.TIRAMISU)
+@RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
 public class TiramisuUtil extends RUtil {
     @Override
     public <T extends Serializable>
