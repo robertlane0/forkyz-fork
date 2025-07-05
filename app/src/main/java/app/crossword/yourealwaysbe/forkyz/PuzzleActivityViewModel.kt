@@ -40,6 +40,7 @@ import app.crossword.yourealwaysbe.forkyz.inttools.ClueNotesData
 import app.crossword.yourealwaysbe.forkyz.inttools.EditClueData
 import app.crossword.yourealwaysbe.forkyz.inttools.InternalToolData
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
+import app.crossword.yourealwaysbe.forkyz.settings.KeyboardLayout
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
 import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer
 import app.crossword.yourealwaysbe.forkyz.util.KeyboardInfo
@@ -152,6 +153,12 @@ enum class KeyboardVisibility {
  * @param showHideButton whether the Forkyz keyboard should show a hide
  * button
  * @param forceCaps whether the native keyboard should convert to caps
+ * @param compact whether keyboard should be compact
+ * @param hapticFeedback whether to use haptic feedback on key press
+ * @param layout keyboard layout to use
+ * @param repeatDelay how long to hold before key repeat happens (0
+ * means never)
+ * @param repeatInterval how long between key repeats (0 means never)
  */
 data class KeyboardState(
     val visibility : KeyboardVisibility = KeyboardVisibility.NONE,
@@ -159,6 +166,11 @@ data class KeyboardState(
     val hideOnBack : Boolean = false,
     val showHideButton : Boolean = false,
     val forceCaps : Boolean = false,
+    val compact : Boolean = false,
+    val hapticFeedback : Boolean = false,
+    val layout : KeyboardLayout = KeyboardLayout.KL_QWERTY,
+    val repeatDelay : Long = 300,
+    val repeatInterval : Long = 75,
 )
 
 // will lose this tag and become an open base class
@@ -230,8 +242,11 @@ open class PuzzleActivityViewModel @Inject constructor(
         settings.livePlayShowErrorsGrid,
     )
 
-    val _keyboardState = MutableStateFlow<KeyboardState>(KeyboardState())
-    val keyboardState : StateFlow<KeyboardState> = _keyboardState
+    val _keyboardState = liveDataFanIn(
+        { getUpdatedKeyboardState() },
+        settings.liveKeyboardSettings
+    )
+    val keyboardState : LiveData<KeyboardState> = _keyboardState
 
     private val keyboardManager = KeyboardManagerKt(
         settings,
@@ -272,7 +287,7 @@ open class PuzzleActivityViewModel @Inject constructor(
     }
 
     fun markKeyboardRefreshed() {
-        _keyboardState.value = keyboardState.value.copy(
+        _keyboardState.value = keyboardState.value?.copy(
             needsRefresh = false,
         )
     }
@@ -783,17 +798,18 @@ open class PuzzleActivityViewModel @Inject constructor(
             KeyboardVisibility.NATIVE
         else
             KeyboardVisibility.FORKYZ
-        _keyboardState.value = KeyboardState(
-            visibility,
-            true,
-            info.hideOnBack,
-            info.showHideButton,
-            info.forceCaps,
+        val state = keyboardState.value ?: KeyboardState()
+        _keyboardState.value = state.copy(
+            visibility = visibility,
+            needsRefresh = true,
+            hideOnBack = info.hideOnBack,
+            showHideButton = info.showHideButton,
         )
     }
 
     private fun keyboardManagerHide() {
-        _keyboardState.value = KeyboardState(
+        val state = keyboardState.value ?: KeyboardState()
+        _keyboardState.value = state.copy(
             visibility = KeyboardVisibility.NONE,
             needsRefresh = true,
             hideOnBack = false,
@@ -914,6 +930,19 @@ open class PuzzleActivityViewModel @Inject constructor(
                     _menuState.postValue(getMenuState())
             }
         }
+    }
+
+    private fun getUpdatedKeyboardState() : KeyboardState {
+        val state = keyboardState.value ?: KeyboardState()
+        return settings.liveKeyboardSettings.value?.let { ks ->
+            state.copy(
+                compact = ks.compact,
+                hapticFeedback = ks.haptic,
+                layout = ks.layout,
+                repeatDelay = ks.repeatDelay.toLong(),
+                repeatInterval = ks.repeatInterval.toLong(),
+            )
+        } ?: state
     }
 }
 

@@ -102,6 +102,7 @@ import app.crossword.yourealwaysbe.forkyz.menu.MenuHelp
 import app.crossword.yourealwaysbe.forkyz.menu.MenuSettings
 import app.crossword.yourealwaysbe.forkyz.menu.MenuSubEntry
 import app.crossword.yourealwaysbe.forkyz.menu.MenuText
+import app.crossword.yourealwaysbe.forkyz.settings.KeyboardLayout
 import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer
 import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
 import app.crossword.yourealwaysbe.forkyz.util.SpeechContract
@@ -112,6 +113,7 @@ import app.crossword.yourealwaysbe.forkyz.view.PlayboardTextRenderer
 import app.crossword.yourealwaysbe.forkyz.view.PuzzleInfoDialogs
 import app.crossword.yourealwaysbe.forkyz.view.RevealPuzzleDialog
 import app.crossword.yourealwaysbe.forkyz.view.SpecialEntryDialog
+import app.crossword.yourealwaysbe.forkyz.view.SpecialKey
 import app.crossword.yourealwaysbe.puz.Clue
 import app.crossword.yourealwaysbe.puz.ClueID
 import app.crossword.yourealwaysbe.puz.Playboard
@@ -185,13 +187,6 @@ abstract class PuzzleActivity() : ForkyzActivity() {
     override fun onCreate(savedInstanceState : Bundle?) {
         super.onCreate(savedInstanceState)
         onBackPressedDispatcher.addCallback(this, backCallback)
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.keyboardState.collect { state ->
-                    backCallback.isEnabled = state.hideOnBack
-                }
-            }
-        }
     }
 
     override fun onPause() {
@@ -487,6 +482,9 @@ abstract class PuzzleActivity() : ForkyzActivity() {
                 viewModel.clearBackEvent()
             }
         }
+        viewModel.keyboardState.observe(this) { state ->
+            backCallback.isEnabled = state.hideOnBack
+        }
     }
 
     @Composable
@@ -540,61 +538,45 @@ abstract class PuzzleActivity() : ForkyzActivity() {
     @Composable
     protected fun Keyboard(
         showSpecialKeys : Boolean = false,
-        onSpecialKeyDown : (ForkyzKeyboard.SpecialKey) -> Unit = { },
-        onSpecialKeyUp : (ForkyzKeyboard.SpecialKey) -> Unit = { },
+        onSpecialKeyDown : (SpecialKey) -> Unit = { },
+        onSpecialKeyUp : (SpecialKey) -> Unit = { },
     ) {
-        val state by viewModel.keyboardState.collectAsStateWithLifecycle()
+        val state by viewModel.keyboardState.observeAsState()
 
-        LaunchedEffect(state.needsRefresh) {
-            if (state.needsRefresh) {
-                if (state.visibility == KeyboardVisibility.NATIVE) {
-                    inputConnectionMediator.showNative(state.forceCaps)
+        LaunchedEffect(state?.needsRefresh) {
+            if (state?.needsRefresh ?: false) {
+                if (state?.visibility == KeyboardVisibility.NATIVE) {
+                    inputConnectionMediator.showNative(
+                        state?.forceCaps ?: false
+                    )
                 } else {
                     inputConnectionMediator.hideNative()
                 }
-                if (state.visibility == KeyboardVisibility.FORKYZ) {
+                if (state?.visibility == KeyboardVisibility.FORKYZ) {
                     inputConnectionMediator.focusReceiver()
                 }
                 viewModel.markKeyboardRefreshed()
             }
         }
 
-        AndroidView(
-            modifier = Modifier.fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surface),
-            factory = { context ->
-                val keyboard = ForkyzKeyboard(context)
-
-                keyboard.setSpecialKeyListener(
-                    object : ForkyzKeyboard.SpecialKeyListener {
-                        override fun onKeyDown(
-                            key : ForkyzKeyboard.SpecialKey,
-                        ) {
-                            onSpecialKeyDown(key)
-                        }
-
-                        override fun onKeyUp(key : ForkyzKeyboard.SpecialKey) {
-                            onSpecialKeyUp(key)
-                        }
-                    }
-                )
-
-                inputConnectionMediator.registerForkyzKeyboard(keyboard)
-                keyboard
-            },
-            update = { view ->
-                val visibility
-                    = if (state.visibility == KeyboardVisibility.FORKYZ)
-                        View.VISIBLE
-                    else
-                        View.GONE
-                view.visibility = visibility
-                view.setShowHideButton(state.showHideButton) {
-                    viewModel.hideKeyboard(true)
-                }
-                view.setShowSpecialKeys(showSpecialKeys)
-            },
-        )
+        if (state?.visibility == KeyboardVisibility.FORKYZ) {
+            ForkyzKeyboard(
+                modifier = Modifier.fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.surface),
+                inputConnection
+                    = inputConnectionMediator.forkyzKeyboardInputConnection,
+                onHideClick = { viewModel.hideKeyboard(true) },
+                onSpecialKeyDown = onSpecialKeyDown,
+                onSpecialKeyUp = onSpecialKeyUp,
+                compact = state?.compact ?: false,
+                hapticFeedback = state?.hapticFeedback ?: false,
+                showHideButton = state?.showHideButton ?: false,
+                showSpecialKeys = showSpecialKeys,
+                layout = state?.layout ?: KeyboardLayout.KL_QWERTY,
+                repeatDelay = state?.repeatDelay ?: 300,
+                repeatInterval = state?.repeatInterval ?: 75,
+            )
+        }
     }
 
     @Composable

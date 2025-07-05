@@ -570,11 +570,14 @@ class NotesActivity() : PuzzleActivity() {
                             oldChar : Char,
                             isDelete : Boolean,
                         ) {
+                            // getView() for BoardEditText just returns
+                            // "this", but toString() on its own uses
+                            // the toString() of NotesActivity (i think)
                             postChange(
                                 pos,
                                 oldChar,
                                 isDelete,
-                                view.toString(),
+                                getView().toString(),
                             )
                         }
                     })

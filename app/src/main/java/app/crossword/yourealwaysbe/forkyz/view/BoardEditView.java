@@ -26,7 +26,7 @@ import app.crossword.yourealwaysbe.forkyz.settings.RenderSettings;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.util.BoxInputConnection;
 import app.crossword.yourealwaysbe.forkyz.util.ChangeOnlyObserver;
-import app.crossword.yourealwaysbe.forkyz.util.KeyboardManager;
+import app.crossword.yourealwaysbe.forkyz.util.KeyboardManageableView;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 import app.crossword.yourealwaysbe.forkyz.view.PlayboardRenderer.RenderChanges;
 import app.crossword.yourealwaysbe.puz.Box;
@@ -48,7 +48,7 @@ public abstract class BoardEditView
         extends ScrollingImageView
         implements Playboard.PlayboardListener,
                     BoxInputConnection.BoxInputListener,
-                    KeyboardManager.ManageableView {
+                    KeyboardManageableView {
     private static final int DOUBLE_CLICK_INTERVAL = 300; // ms
 
     @Inject

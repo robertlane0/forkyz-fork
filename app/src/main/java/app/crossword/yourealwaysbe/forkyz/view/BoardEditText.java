@@ -28,7 +28,7 @@ import app.crossword.yourealwaysbe.forkyz.settings.DisplaySeparators;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.util.BoxInputConnection;
 import app.crossword.yourealwaysbe.forkyz.util.ChangeOnlyObserver;
-import app.crossword.yourealwaysbe.forkyz.util.KeyboardManager;
+import app.crossword.yourealwaysbe.forkyz.util.KeyboardManageableView;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 import app.crossword.yourealwaysbe.forkyz.view.PlayboardRenderer.BoxSeparators;
 import app.crossword.yourealwaysbe.puz.Box;
@@ -38,8 +38,7 @@ import app.crossword.yourealwaysbe.puz.Position;
 @AndroidEntryPoint
 public class BoardEditText
         extends ScrollingImageView
-        implements BoxInputConnection.BoxInputListener,
-            KeyboardManager.ManageableView {
+        implements BoxInputConnection.BoxInputListener, KeyboardManageableView {
 
     @Inject
     protected ForkyzSettings settings;

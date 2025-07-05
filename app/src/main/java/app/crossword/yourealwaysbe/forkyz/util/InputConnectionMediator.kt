@@ -6,12 +6,33 @@ import java.util.function.Function
 import java.util.function.Supplier
 
 import android.content.Context
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
 import android.view.inputmethod.InputMethodManager
 
-import app.crossword.yourealwaysbe.forkyz.util.KeyboardManager.ManageableView
-import app.crossword.yourealwaysbe.forkyz.view.ForkyzKeyboard
+import app.crossword.yourealwaysbe.forkyz.view.getForkyzKeyboardEditorInfo
+
+interface KeyboardManageableView {
+    /**
+     * Indicates view should be in native input mode
+     *
+     * @param nativeInput if native input
+     * @param forceCaps whether to convert all native input into uppercase
+     * @return true if this is a change from previous mode
+     */
+    fun setNativeInput(nativeInput : Boolean, forceCaps : Boolean) : Boolean
+
+    /**
+     * The view that is manageable (usually this)
+     */
+    fun getView() : View
+
+    /**
+     * Create an input connection for the built-in Forkyz keyboard
+     */
+    fun onCreateForkyzInputConnection(ei : EditorInfo) : InputConnection
+}
 
 /**
  * For connecting input methods to views in Compose
@@ -19,26 +40,21 @@ import app.crossword.yourealwaysbe.forkyz.view.ForkyzKeyboard
  * Currently use old views setup.
  *
  * Provide the ForkyzKeyboard and the ManageableView that wants to be
- * connected. Once has both, with refresh connection on any change.
+ * connected. Once has both, with refresh connection on any change. Holds the
+ * live input connection between the view and ForkyzKeyboard if appropriate.
+ *
+ * Also provides helper functions for connecting to native keyboard.
  */
 class InputConnectionMediator() {
-    private var forkyzKeyboard : ForkyzKeyboard? = null
-    private var receiver : ManageableView? = null
-
-    /**
-     * Will refresh if keyboard is new and receiver set
-     */
-    fun registerForkyzKeyboard(forkyzKeyboard : ForkyzKeyboard?) {
-        if (this.forkyzKeyboard !== forkyzKeyboard) {
-            this.forkyzKeyboard = forkyzKeyboard
-            refreshInputConnection()
-        }
-    }
+    private var forkyzKeyboardEditorInfo : EditorInfo? = null
+    private var receiver : KeyboardManageableView? = null
+    var forkyzKeyboardInputConnection : InputConnection? = null
+        private set
 
     /**
      * Will refresh if receiver is new and keyboard set
      */
-    fun registerReceiver(receiver : ManageableView?) {
+    fun registerReceiver(receiver : KeyboardManageableView?) {
         if (this.receiver !== receiver) {
             this.receiver = receiver
             refreshInputConnection()
@@ -46,7 +62,7 @@ class InputConnectionMediator() {
     }
 
     fun focusReceiver() {
-        receiver?.let { it.view.requestFocus() }
+        receiver?.let { it.getView().requestFocus() }
     }
 
     fun showNative(forceCaps : Boolean) {
@@ -79,10 +95,13 @@ class InputConnectionMediator() {
     }
 
     private fun refreshInputConnection() {
-        forkyzKeyboard?.getEditorInfo()?.let { editorInfo ->
+        if (forkyzKeyboardEditorInfo == null)
+            forkyzKeyboardEditorInfo = getForkyzKeyboardEditorInfo()
+
+        forkyzKeyboardEditorInfo?.let { editorInfo ->
             receiver?.onCreateForkyzInputConnection(editorInfo)
                 ?.let { inputConnection ->
-                    forkyzKeyboard?.setInputConnection(inputConnection)
+                    forkyzKeyboardInputConnection = inputConnection
                 }
         }
     }

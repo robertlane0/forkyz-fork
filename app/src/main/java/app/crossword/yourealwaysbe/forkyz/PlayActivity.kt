@@ -64,9 +64,9 @@ import app.crossword.yourealwaysbe.forkyz.settings.FitToScreenMode
 import app.crossword.yourealwaysbe.forkyz.settings.GridRatio
 import app.crossword.yourealwaysbe.forkyz.view.BoardEditView.BoardClickListener
 import app.crossword.yourealwaysbe.forkyz.view.BoardFullEditView
-import app.crossword.yourealwaysbe.forkyz.view.ForkyzKeyboard
-import app.crossword.yourealwaysbe.forkyz.view.OKDialog
 import app.crossword.yourealwaysbe.forkyz.view.ClueTabs
+import app.crossword.yourealwaysbe.forkyz.view.OKDialog
+import app.crossword.yourealwaysbe.forkyz.view.SpecialKey
 import app.crossword.yourealwaysbe.puz.Playboard.Word
 import app.crossword.yourealwaysbe.puz.Position
 
@@ -588,14 +588,11 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
         }
     }
 
-    private fun onSpecialKeyUp(key : ForkyzKeyboard.SpecialKey) {
+    private fun onSpecialKeyUp(key : SpecialKey) {
         when (key) {
-            ForkyzKeyboard.SpecialKey.KEY_CHANGE_CLUE_DIRECTION
-                -> viewModel.toggleSelection()
-            ForkyzKeyboard.SpecialKey.KEY_NEXT_CLUE
-                -> viewModel.nextClue()
-            ForkyzKeyboard.SpecialKey.KEY_PREVIOUS_CLUE
-                -> viewModel.prevClue()
+            SpecialKey.KEY_CHANGE_CLUE_DIRECTION -> viewModel.toggleSelection()
+            SpecialKey.KEY_NEXT_CLUE -> viewModel.nextClue()
+            SpecialKey.KEY_PREVIOUS_CLUE -> viewModel.prevClue()
         }
     }
 
