@@ -1,5 +1,12 @@
 # Forkyz Changelog
 
+## Version 68
+
+- Add confirm delete dialog.
+- Fix show errors status-bar indicator on older Android versions.
+- Repair Metro downloads.
+- Move clue list widget to Compose.
+
 ## Version 67
 
 * Move Browse activity to Compose.
