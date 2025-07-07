@@ -105,10 +105,10 @@ import app.crossword.yourealwaysbe.forkyz.net.DownloadersProvider
 import app.crossword.yourealwaysbe.forkyz.settings.AccessorSetting
 import app.crossword.yourealwaysbe.forkyz.settings.BrowseSwipeAction
 import app.crossword.yourealwaysbe.forkyz.settings.DayNightMode
-import app.crossword.yourealwaysbe.forkyz.util.DownloadPickerDialogBuilder
 import app.crossword.yourealwaysbe.forkyz.util.ImportedNowFinishDialogActivity
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.view.CircleProgressBar
+import app.crossword.yourealwaysbe.forkyz.view.DownloadDialog
 import app.crossword.yourealwaysbe.forkyz.view.OKCancelDialog
 import app.crossword.yourealwaysbe.forkyz.view.OKDialog
 import app.crossword.yourealwaysbe.forkyz.view.RatingBar
@@ -1047,6 +1047,16 @@ class BrowseActivity() : ForkyzActivity() {
                 BrowseDialog.NONE -> { }
             }
         }
+
+        val downloadDialog
+            by viewModel.downloadDialog.collectAsStateWithLifecycle()
+        downloadDialog?.let {
+            DownloadDialog(
+                viewModel = it,
+                onCancel = viewModel::clearDownloadDialog,
+                onDownload = viewModel::okDownloadDialog,
+            )
+        }
     }
 
     @Composable
@@ -1139,7 +1149,7 @@ class BrowseActivity() : ForkyzActivity() {
     private fun showDownloadDialog() {
         checkAndWarnNetworkState()
         checkRequestNotificationPermissions()
-        DownloadDialog().show(getSupportFragmentManager(), "DownloadDialog")
+        viewModel.showDownloadDialog()
     }
 
     private fun checkAndWarnNetworkState() {
@@ -1254,37 +1264,6 @@ class BrowseActivity() : ForkyzActivity() {
     private fun onImportURIsAndFinish(uris : Collection<Uri>) {
         // finish happens in launchers when result posted
         viewModel.importURIsAndFinish(uris)
-    }
-}
-
-// TODO: compose
-@AndroidEntryPoint
-class DownloadDialog() : DialogFragment() {
-    @Inject
-    lateinit var downloadersProvider : DownloadersProvider
-
-    @Override
-    override public fun onCreateDialog(savedInstanceState : Bundle?) : Dialog {
-        val activity = requireActivity() as BrowseActivity
-
-        val downloadButtonListener
-            = DownloadPickerDialogBuilder.OnDownloadSelectedListener() {
-                date, downloaders ->
-                    ViewModelProvider(activity)
-                        .get(BrowseActivityViewModel::class.java)
-                        .download(date, downloaders)
-            }
-
-        val d = LocalDate.now()
-
-        return DownloadPickerDialogBuilder(
-            activity,
-            downloadButtonListener,
-            d.getYear(),
-            d.getMonthValue(),
-            d.getDayOfMonth(),
-            downloadersProvider,
-        ).getInstance()
     }
 }
 

@@ -46,6 +46,7 @@ import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzMetaFile
 import app.crossword.yourealwaysbe.forkyz.util.liveDataFanIn
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
+import app.crossword.yourealwaysbe.forkyz.view.DownloadDialogViewModel
 
 private val TAG = "ForkyzBrowseActivity"
 private val HEADER_DATE_FORMAT
@@ -219,6 +220,10 @@ class BrowseActivityViewModel @Inject constructor(
 
     private val _toastMessages = MutableStateFlow<List<String>>(listOf())
     val toastMessages : StateFlow<List<String>> = _toastMessages
+
+    private val _downloadDialog
+        = MutableStateFlow<DownloadDialogViewModel?>(null)
+    val downloadDialog : StateFlow<DownloadDialogViewModel?> = _downloadDialog
 
     private val _importFinishResult
         = MutableStateFlow<ImportFinishResult?>(null)
@@ -698,6 +703,23 @@ class BrowseActivityViewModel @Inject constructor(
 
     fun clearImportFinishResult() {
         _importFinishResult.value = null
+    }
+
+    fun showDownloadDialog() {
+        _downloadDialog.value = DownloadDialogViewModel(downloadersProvider)
+    }
+
+    fun clearDownloadDialog() {
+        _downloadDialog.value = null
+    }
+
+    fun okDownloadDialog() {
+        downloadDialog.value?.let {
+            val date = it.date
+            val downloaders = it.selectedDownloaders
+            download(date, downloaders)
+        }
+        clearDownloadDialog()
     }
 
     /**

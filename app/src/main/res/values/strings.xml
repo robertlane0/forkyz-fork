@@ -79,13 +79,13 @@
     <string name="title_view_crosswords">Crosswords</string>
     <string name="puzzle_caption_with_author">%1$s by %2$s</string>
     <string name="download_but_no_active_network">Please enable a network connection before downloading.</string>
-    <string name="downloader_available_soon">%1$s (in &lt;1hr)</string>
+    <string name="downloader_available_soon">(in &lt;1hr)</string>
     <plurals name="downloader_available_hours">
-        <item quantity="one">%1$s (in ~%2$dhr)</item>
-        <item quantity="other">%1$s (in ~%2$dhrs)</item>
+        <item quantity="one">(In ~%1$dhr)</item>
+        <item quantity="other">(In ~%1$dhrs)</item>
     </plurals>
-    <string name="downloader_available_future">%1$s (not yet available)</string>
-    <string name="downloader_not_available">%1$s (not available)</string>
+    <string name="downloader_available_future">(Not yet available)</string>
+    <string name="downloader_not_available">(Not available)</string>
     <string name="notifications_request_rationale">Download notifications enabled. Allow or disable in download settings.</string>
     <string name="disable_notifications">Disable Notifications?</string>
     <string name="notifications_denied_msg">Download notifications are denied in Android settings. Would you like to disable download notifications in the Forkyz download settings? If you would like to keep notifications, please enable notifications for Forkyz in the Android settings.</string>

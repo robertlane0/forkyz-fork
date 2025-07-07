@@ -16,12 +16,10 @@ import androidx.activity.result.contract.ActivityResultContracts.GetContent
 import androidx.activity.result.contract.ActivityResultContracts.OpenDocumentTree
 import androidx.activity.viewModels
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -30,7 +28,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -38,7 +35,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -50,7 +46,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -72,6 +67,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import app.crossword.yourealwaysbe.forkyz.theme.ForkyzTopAppBar
 import app.crossword.yourealwaysbe.forkyz.util.ExitActivity
 import app.crossword.yourealwaysbe.forkyz.util.PuzzleExportService
+import app.crossword.yourealwaysbe.forkyz.view.ListDialog
+import app.crossword.yourealwaysbe.forkyz.view.MultiListDialog
 import app.crossword.yourealwaysbe.forkyz.view.OKCancelDialog
 import app.crossword.yourealwaysbe.forkyz.view.SearchBar
 
@@ -524,7 +521,7 @@ class SettingsActivity : ForkyzActivity() {
         val selectedIdx = entries?.indexOfFirst { it.value == selected }
 
         if (labels != null && selectedIdx != null) {
-            SettingsListDialog(
+            ListDialog(
                 title = item.title,
                 summary = item.summary,
                 labels = labels,
@@ -543,21 +540,24 @@ class SettingsActivity : ForkyzActivity() {
         val selected by item.value.observeAsState()
         val entries by item.entries.observeAsState()
 
-        val labels = entries?.map {
-                it.labelId?.let {
-                    stringResource(it)
-                } ?: it.labelString ?: ""
-            }
         val selectedIndices = selected?.map { selItem ->
                 entries?.indexOfFirst { it.value == selItem }
             }?.filterNotNull()?.filter { it >= 0 }?.toSet()
             ?: setOf()
 
-        if (labels != null) {
-            SettingsMultiListDialog(
+        if (entries != null) {
+            MultiListDialog(
                 title = item.title,
                 summary = item.summary,
-                labels = labels,
+                numItems = entries?.size ?: 0,
+                getItem = { index ->
+                    entries?.get(index)?.let { entry ->
+                        val label = entry.labelId?.let {
+                            stringResource(it)
+                        } ?: entry.labelString ?: ""
+                        Text(label)
+                    }
+                },
                 selected = selectedIndices,
                 onSelect = { indices ->
                     item.selectItems(indices)
@@ -605,124 +605,6 @@ class SettingsActivity : ForkyzActivity() {
             keyboardType = KeyboardType.Number,
         )
     }
-
-    /**
-     * List selection dialog
-     *
-     * @param labels list of labels to display by android resource id
-     * @param selected index of item to be initially selected
-     * @param onSelect call back when the indexth item is selected and oked
-     * @param onDismissRequest call back when dismissed
-     */
-    @Composable
-    private fun SettingsListDialog(
-        title : Int,
-        summary : Int?,
-        labels : List<String>,
-        selected : Int,
-        onSelect : (Int) -> Unit,
-        onDismissRequest : () -> Unit,
-    ) {
-        var selectedState by remember { mutableIntStateOf(selected) }
-        // set again in case this is a relayout
-        selectedState = selected
-
-        OKCancelDialog(
-            title = title,
-            summary = summary,
-            onCancel = onDismissRequest,
-            onOK = { onSelect(selectedState) }
-        ) {
-            BoxWithConstraints() {
-                LazyColumn(
-                    modifier = Modifier.heightIn(0.dp, maxHeight * 0.7f),
-                ) {
-                    itemsIndexed(labels) { index, label ->
-                        Row(
-                            modifier = Modifier.fillMaxWidth()
-                                .clickable { selectedState = index },
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            RadioButton(
-                                selected = index == selectedState,
-                                onClick = { selectedState = index },
-                            )
-                            Text(label)
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * List multi-selection dialog
-     *
-     * @param labels list of labels to display by android resource id
-     * @param selected set of indices of items to be initially selected
-     * @param onSelect call back when the set of selected is oked
-     * @param onDismissRequest call back when dismissed
-     */
-    @Composable
-    private fun SettingsMultiListDialog(
-        title : Int,
-        summary : Int?,
-        labels : List<String>,
-        selected : Set<Int>,
-        onSelect : (Set<Int>) -> Unit,
-        onDismissRequest : () -> Unit,
-    ) {
-        var selectedState by remember { mutableStateOf(selected) }
-        // set again in case relayout
-        selectedState = selected
-
-        OKCancelDialog(
-            title = title,
-            summary = summary,
-            onCancel = onDismissRequest,
-            onOK = { onSelect(selectedState) }
-        ) {
-            BoxWithConstraints() {
-                LazyColumn(
-                    modifier = Modifier.heightIn(0.dp, maxHeight * 0.7f),
-                ) {
-                    itemsIndexed(labels) { index, label ->
-                        Row(
-                            modifier = Modifier.fillMaxWidth()
-                                .clickable {
-                                    selectedState = setMembership(
-                                        index,
-                                        selectedState,
-                                        !selectedState.contains(index),
-                                    )
-                                },
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Checkbox(
-                                checked = selectedState.contains(index),
-                                onCheckedChange = { checked ->
-                                    selectedState = setMembership(
-                                        index, selectedState, checked
-                                    )
-                                },
-                            )
-                            Text(label)
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * New set with item added/removed to elements by add param
-     */
-    private fun <T> setMembership(
-        item : T, elements : Set<T>, add : Boolean
-    ) : Set<T> = if (add)
-            elements + item
-        else
-            elements - item
 
     /**
      * String input dialog
