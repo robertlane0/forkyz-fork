@@ -149,6 +149,11 @@ class NotesActivity() : PuzzleActivity() {
                     viewModel.deleteLetterFromBoard()
                 return true
             }
+            Key.Spacebar -> {
+                if (event.type == KeyEventType.KeyUp)
+                    viewModel.playLetterToBoard(' ')
+                return true
+            }
         }
 
         val keyChar = letterOrDigitKeyToChar(event.key)
