@@ -600,6 +600,7 @@
     <string name="cleanup">Cleanup</string>
 
     <!-- puzzle info dialog -->
+    <string name="puzzle_info">Puzzle Info</string>
     <string name="puzzle_title">Title of Puzzle</string>
     <string name="by_author">By Author</string>
     <string name="copyright_info">Copyright Info</string>

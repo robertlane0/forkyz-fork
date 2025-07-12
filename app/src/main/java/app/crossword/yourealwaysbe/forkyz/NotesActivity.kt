@@ -208,8 +208,9 @@ class NotesActivity() : PuzzleActivity() {
                 VoiceButtons()
             }
             Keyboard()
-            TransferConfirmationDialog()
         }
+        TransferConfirmationDialog()
+        PuzzleDialogs()
     }
 
     @Composable

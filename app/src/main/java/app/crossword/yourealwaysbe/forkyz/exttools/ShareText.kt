@@ -1,6 +1,9 @@
 
 package app.crossword.yourealwaysbe.forkyz.exttools
 
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import java.util.Locale
 import java.util.function.Consumer
 
 import android.content.Context
@@ -15,23 +18,23 @@ import app.crossword.yourealwaysbe.puz.Clue
 import app.crossword.yourealwaysbe.puz.Playboard
 import app.crossword.yourealwaysbe.puz.Puzzle
 
-open class ShareClueData(
+open class ShareTextData(
     val title : String,
     val message : String
 ) : ExternalToolData() {
     companion object {
-        fun build(
+        fun buildShareClue(
             context : Context,
             settings : ForkyzSettings,
             board : Playboard,
             clue : Clue,
             withResponse : Boolean,
-            cb : Consumer<ShareClueData>,
+            cb : Consumer<ShareTextData>,
         ) {
             val puz = board.getPuzzle()
             if (puz != null) {
                 val response = board.getCurrentWordBoxes()
-                getShareMessage(
+                getShareClueMessage(
                     context,
                     settings,
                     puz,
@@ -40,7 +43,7 @@ open class ShareClueData(
                     withResponse,
                 ) { shareMessage : String ->
                      cb.accept(
-                         ShareClueData(
+                         ShareTextData(
                             context.getString(R.string.share_clue_title),
                             shareMessage,
                         )
@@ -49,7 +52,40 @@ open class ShareClueData(
             }
         }
 
-        private fun getShareMessage(
+        fun buildShareCompletion(
+            context : Context,
+            puz : Puzzle,
+        ) : ShareTextData {
+            val source = puz.source ?: puz.title ?: ""
+            val cheatedBoxes = puz.numberOfCheatedBoxes
+
+            val date = puz.date
+            val message = if (date != null) {
+                val dateFormat
+                    = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
+                context.resources.getQuantityString(
+                    R.plurals.share_message_with_date,
+                    cheatedBoxes,
+                    source,
+                    dateFormat.format(date),
+                    cheatedBoxes
+                )
+            } else {
+                context.resources.getQuantityString(
+                    R.plurals.share_message_no_date,
+                    cheatedBoxes,
+                    source,
+                    cheatedBoxes
+                )
+            }
+
+            return ShareTextData(
+                context.getString(R.string.share_your_time),
+                message,
+            )
+        }
+
+        private fun getShareClueMessage(
             context : Context,
             settings : ForkyzSettings,
             puz : Puzzle,
@@ -198,7 +234,7 @@ open class ShareClueData(
     }
 }
 
-fun ExternalToolLauncher.visit(data : ShareClueData) {
+fun ExternalToolLauncher.visit(data : ShareTextData) {
     // ShareCompat from
     // https://stackoverflow.com/a/39619468/6882587
     // assume works better than the out-of-date android docs!

@@ -218,6 +218,30 @@ public class Puzzle {
     }
 
     /**
+     * Get number of entry boxes in puzzle
+     */
+    public int getNumberOfBoxes() {
+        int totalBoxes = 0;
+        for(Box b : getBoxesList()){
+            if(!Box.isBlock(b))
+                totalBoxes++;
+        }
+        return totalBoxes;
+    }
+
+    /**
+     * Get number of hinted entry boxes in puzzle
+     */
+    public int getNumberOfCheatedBoxes() {
+        int cheatedBoxes = 0;
+        for(Box b : getBoxesList()){
+            if(!Box.isBlock(b) && b.isCheated())
+                cheatedBoxes++;
+        }
+        return cheatedBoxes;
+    }
+
+    /**
      * Iterate over clue starts in board order
      *
      * Left to right, top to bottom, clue list order by name (across

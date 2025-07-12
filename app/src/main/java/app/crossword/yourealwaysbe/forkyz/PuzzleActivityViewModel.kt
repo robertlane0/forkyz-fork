@@ -31,8 +31,8 @@ import app.crossword.yourealwaysbe.forkyz.exttools.DuckDuckGoData
 import app.crossword.yourealwaysbe.forkyz.exttools.ExternalDictionaries
 import app.crossword.yourealwaysbe.forkyz.exttools.ExternalToolData
 import app.crossword.yourealwaysbe.forkyz.exttools.FifteenSquaredData
-import app.crossword.yourealwaysbe.forkyz.exttools.ShareClueData
 import app.crossword.yourealwaysbe.forkyz.exttools.SharePuzzleData
+import app.crossword.yourealwaysbe.forkyz.exttools.ShareTextData
 import app.crossword.yourealwaysbe.forkyz.inttools.CellFlagData
 import app.crossword.yourealwaysbe.forkyz.inttools.ClueFlagData
 import app.crossword.yourealwaysbe.forkyz.inttools.ClueListData
@@ -53,6 +53,8 @@ import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerShared
 import app.crossword.yourealwaysbe.forkyz.util.liveDataFanIn
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 import app.crossword.yourealwaysbe.forkyz.view.PlayboardTextRenderer
+import app.crossword.yourealwaysbe.forkyz.view.PuzzleFinishedDialogViewModel
+import app.crossword.yourealwaysbe.forkyz.view.PuzzleInfoDialogViewModel
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Clue
 import app.crossword.yourealwaysbe.puz.ClueID
@@ -186,7 +188,6 @@ open class PuzzleActivityViewModel @Inject constructor(
     val sendToastEvent = SingleLiveEvent<SendToast?>()
     val externalToolEvent = SingleLiveEvent<ExternalToolData?>()
     val internalToolEvent = SingleLiveEvent<InternalToolData?>()
-    val puzzleFinishedEvent = SingleLiveEvent<Boolean>()
     val backEvent = SingleLiveEvent<Boolean>()
 
     val voiceState : LiveData<VoiceState> = liveDataFanIn(
@@ -219,34 +220,52 @@ open class PuzzleActivityViewModel @Inject constructor(
     )
     val menuState : LiveData<PuzzleMenuState> = _menuState
 
-    val uiState = liveDataFanIn(
-        {
-            val puzHasSolution = getPuzzle()?.hasSolution() ?: false
-            val indicateShowErrors =
-                puzHasSolution
-                && settings.livePlayIndicateShowErrors.value ?: false
-                && (
-                    settings.livePlayShowErrorsClue.value ?: false
-                    || settings.livePlayShowErrorsCursor.value ?: false
-                    || settings.livePlayShowErrorsGrid.value ?: false
+    private val _uiState : MutableLiveData<PuzzleActivityUIState>
+        = liveDataFanIn(
+            {
+                val puzHasSolution = getPuzzle()?.hasSolution() ?: false
+                val indicateShowErrors =
+                    puzHasSolution
+                    && settings.livePlayIndicateShowErrors.value ?: false
+                    && (
+                        settings.livePlayShowErrorsClue.value ?: false
+                        || settings.livePlayShowErrorsCursor.value ?: false
+                        || settings.livePlayShowErrorsGrid.value ?: false
+                    )
+                PuzzleActivityUIState(
+                    settings.livePlayShowTimer.value ?: false,
+                    indicateShowErrors,
                 )
-            PuzzleActivityUIState(
-                settings.livePlayShowTimer.value ?: false,
-                indicateShowErrors,
-            )
-        },
-        settings.livePlayShowTimer,
-        settings.livePlayIndicateShowErrors,
-        settings.livePlayShowErrorsClue,
-        settings.livePlayShowErrorsCursor,
-        settings.livePlayShowErrorsGrid,
-    )
+            },
+            settings.livePlayShowTimer,
+            settings.livePlayIndicateShowErrors,
+            settings.livePlayShowErrorsClue,
+            settings.livePlayShowErrorsCursor,
+            settings.livePlayShowErrorsGrid,
+        )
+    val uiState : LiveData<PuzzleActivityUIState> = _uiState
 
-    val _keyboardState = liveDataFanIn(
+    private val _keyboardState = liveDataFanIn(
         { getUpdatedKeyboardState() },
         settings.liveKeyboardSettings
     )
     val keyboardState : LiveData<KeyboardState> = _keyboardState
+
+    /**
+     * When not null show info dialog with view model
+     */
+    private val _infoDialogViewModel
+        = MutableStateFlow<PuzzleInfoDialogViewModel?>(null)
+    val infoDialogViewModel : StateFlow<PuzzleInfoDialogViewModel?>
+        = _infoDialogViewModel
+
+    /**
+     * When not null show info dialog with view model
+     */
+    private val _finishedDialogViewModel
+        = MutableStateFlow<PuzzleFinishedDialogViewModel?>(null)
+    val finishedDialogViewModel : StateFlow<PuzzleFinishedDialogViewModel?>
+        = _finishedDialogViewModel
 
     private val keyboardManager = KeyboardManagerKt(
         settings,
@@ -411,33 +430,39 @@ open class PuzzleActivityViewModel @Inject constructor(
     }
 
     fun shareClue(withResponse : Boolean) {
-        val board = getBoard()
-        val clue = board?.getClue()
-        if (clue == null)
-            return
-
-        ShareClueData.build(
-            getApplication(),
-            settings,
-            board,
-            clue,
-            withResponse,
-            externalToolEvent::postValue,
-        )
+        getBoard()?.let { board ->
+            board.getClue()?.let { clue ->
+                ShareTextData.buildShareClue(
+                    getApplication(),
+                    settings,
+                    board,
+                    clue,
+                    withResponse,
+                    externalToolEvent::postValue,
+                )
+            }
+        }
     }
 
     fun sharePuzzle(writeBlank : Boolean, omitExtensions : Boolean) {
-        val puz = getPuzzle()
-        if (puz == null)
-            return
+        getPuzzle()?.let { puz ->
+            SharePuzzleData.build(
+                getApplication(),
+                puz,
+                writeBlank,
+                omitExtensions,
+                externalToolEvent::postValue,
+            )
+        }
+    }
 
-        SharePuzzleData.build(
-            getApplication(),
-            puz,
-            writeBlank,
-            omitExtensions,
-            externalToolEvent::postValue,
-        )
+    fun shareCompletion() {
+        getPuzzle()?.let { puz ->
+            externalToolEvent.value = ShareTextData.buildShareCompletion(
+                getApplication(),
+                puz,
+            )
+        }
     }
 
     /**
@@ -649,10 +674,6 @@ open class PuzzleActivityViewModel @Inject constructor(
         sendToastEvent.postValue(null)
     }
 
-    fun clearPuzzleFinishedEvent() {
-        puzzleFinishedEvent.postValue(false)
-    }
-
     fun selectClue(clue : Clue?) {
         selectClue(clue?.clueID)
     }
@@ -700,6 +721,30 @@ open class PuzzleActivityViewModel @Inject constructor(
             gainFocus,
             this::keyboardManagerHide,
         )
+    }
+
+    fun showInfoDialog() {
+        _infoDialogViewModel.value = PuzzleInfoDialogViewModel(
+            settings,
+            currentPuzzleHolder,
+            fileHandlerProvider,
+            timer,
+        )
+    }
+
+    fun closePuzzleInfoDialog() {
+        _infoDialogViewModel.value = null
+    }
+
+    fun showFinishedDialog() {
+        _finishedDialogViewModel.value = PuzzleFinishedDialogViewModel(
+            settings,
+            currentPuzzleHolder,
+        )
+    }
+
+    fun closePuzzleFinishedDialog() {
+        _finishedDialogViewModel.value = null
     }
 
     /**
@@ -878,7 +923,7 @@ open class PuzzleActivityViewModel @Inject constructor(
         if (puz != null && puz.getPercentComplete() == 100) {
             if (isTimerRunning) {
                 stopTimer(true)
-                puzzleFinishedEvent.postValue(true)
+                showFinishedDialog()
             }
         }
     }

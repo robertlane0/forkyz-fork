@@ -255,6 +255,7 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
             ActivityBodyLandscape(modifier)
 
         IntroDialog()
+        PuzzleDialogs()
     }
 
     @Composable

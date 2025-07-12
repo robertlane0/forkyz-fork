@@ -145,6 +145,7 @@ class ClueListActivity() : PuzzleActivity() {
             VoiceButtons()
             Keyboard()
         }
+        PuzzleDialogs()
     }
 
     @Composable

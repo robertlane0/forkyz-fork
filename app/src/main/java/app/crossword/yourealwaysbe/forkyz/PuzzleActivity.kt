@@ -110,7 +110,8 @@ import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand
 import app.crossword.yourealwaysbe.forkyz.view.BoardWordEdit
 import app.crossword.yourealwaysbe.forkyz.view.ForkyzKeyboard
 import app.crossword.yourealwaysbe.forkyz.view.PlayboardTextRenderer
-import app.crossword.yourealwaysbe.forkyz.view.PuzzleInfoDialogs
+import app.crossword.yourealwaysbe.forkyz.view.PuzzleFinishedDialog
+import app.crossword.yourealwaysbe.forkyz.view.PuzzleInfoDialog
 import app.crossword.yourealwaysbe.forkyz.view.RevealPuzzleDialog
 import app.crossword.yourealwaysbe.forkyz.view.SpecialEntryDialog
 import app.crossword.yourealwaysbe.forkyz.view.SpecialKey
@@ -464,17 +465,6 @@ abstract class PuzzleActivity() : ForkyzActivity() {
                 viewModel.clearSendToast()
             }
         }
-        val puzzleFinished by viewModel.puzzleFinishedEvent.observeAsState()
-        LaunchedEffect(puzzleFinished) {
-            if (puzzleFinished ?: false) {
-                val dialog = PuzzleInfoDialogs.Finished()
-                dialog.show(
-                    getSupportFragmentManager(),
-                  "PuzzleInfoDialogs.Finished"
-                )
-                viewModel.clearPuzzleFinishedEvent()
-            }
-        }
         val backEvent by viewModel.backEvent.observeAsState()
         LaunchedEffect(backEvent) {
             if (backEvent ?: false) {
@@ -575,6 +565,31 @@ abstract class PuzzleActivity() : ForkyzActivity() {
                 layout = state?.layout ?: KeyboardLayout.KL_QWERTY,
                 repeatDelay = state?.repeatDelay ?: 300,
                 repeatInterval = state?.repeatInterval ?: 75,
+            )
+        }
+    }
+
+    /**
+     * Always call to display dialogs
+     */
+    @Composable
+    protected fun PuzzleDialogs() {
+        val infoDialogViewModel
+            by viewModel.infoDialogViewModel.collectAsStateWithLifecycle()
+        infoDialogViewModel?.let { infoDialogViewModel ->
+            PuzzleInfoDialog(
+                viewModel = infoDialogViewModel,
+                onClose = viewModel::closePuzzleInfoDialog,
+            )
+        }
+
+        val finishedDialogViewModel
+            by viewModel.finishedDialogViewModel.collectAsStateWithLifecycle()
+        finishedDialogViewModel?.let { finishedDialogViewModel ->
+            PuzzleFinishedDialog(
+                viewModel = finishedDialogViewModel,
+                onDone = viewModel::closePuzzleFinishedDialog,
+                onShare = viewModel::shareCompletion,
             )
         }
     }
@@ -1126,7 +1141,7 @@ abstract class PuzzleActivity() : ForkyzActivity() {
         DropdownMenuItem(
             text = { MenuText(stringResource(R.string.info)) },
             onClick = {
-                showInfoDialog()
+                viewModel.showInfoDialog()
                 viewModel.dismissMenu()
             }
         )
@@ -1145,11 +1160,6 @@ abstract class PuzzleActivity() : ForkyzActivity() {
 
     private fun showRevealPuzzleDialog() {
         RevealPuzzleDialog().show(supportFragmentManager, "RevealPuzzleDialog")
-    }
-
-    private fun showInfoDialog() {
-        PuzzleInfoDialogs.Info()
-            .show(supportFragmentManager, "PuzzleInfoDialogs.Info")
     }
 
     private fun actionSupportSource() {

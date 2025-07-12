@@ -3,12 +3,14 @@ package app.crossword.yourealwaysbe.forkyz.view
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -36,6 +38,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 
 import app.crossword.yourealwaysbe.forkyz.R
 
@@ -104,7 +107,7 @@ fun OKCancelDialog(
 @Composable
 fun TwoButtonDialog(
     title : Int,
-    summary : Int?,
+    summary : Int? = null,
     positiveText : Int,
     onPositive : () -> Unit,
     negativeText : Int,
@@ -125,7 +128,7 @@ fun TwoButtonDialog(
 @Composable
 fun TwoButtonDialog(
     title : String,
-    summary : String?,
+    summary : String? = null,
     positiveText : String,
     onPositive : () -> Unit,
     negativeText : String,
@@ -179,7 +182,7 @@ fun OKDialog(
     body : @Composable () -> Unit = { },
 ) {
     PlainDialog(
-        title = title,
+        title = stringResource(title),
         summary = summary,
         onClose = onClose
     ) {
@@ -367,6 +370,64 @@ fun MultiListDialog(
 }
 
 /**
+ * Dialog with no buttons
+ *
+ * @param title the title in HTML
+ * @param summary the summary message in HTML
+ * @param onClose call back for closing dialog by outside click
+ * @param body the dialog body
+ */
+@Composable
+fun PlainDialog(
+    title : String? = null,
+    summary : String? = null,
+    onClose : () -> Unit,
+    usePlatformDefaultWidth : Boolean = true,
+    body : @Composable () -> Unit = { },
+) {
+    Dialog(
+        onDismissRequest = onClose,
+        properties = DialogProperties(
+            usePlatformDefaultWidth = usePlatformDefaultWidth,
+        ),
+    ) {
+        BoxWithConstraints() {
+            val modifier = if (usePlatformDefaultWidth)
+                Modifier
+            else
+                Modifier.widthIn(max = maxWidth * 0.8F)
+
+            Card(
+                modifier = modifier,
+                shape = DIALOG_ROUNDED_CORNERS,
+            ) {
+                Column(
+                    modifier = Modifier.padding(DIALOG_PADDING),
+                    verticalArrangement = Arrangement.Center,
+                ) {
+                    title?.let { title ->
+                        Text(
+                            modifier = Modifier.padding(bottom = DIALOG_PADDING),
+                            text = AnnotatedString.fromHtml(title),
+                            style = MaterialTheme.typography.headlineSmall,
+                        )
+                    }
+                    summary?.let { summary
+                        Text(
+                            modifier = Modifier.fillMaxWidth()
+                                .padding(bottom = DIALOG_PADDING),
+                            text = AnnotatedString.fromHtml(summary),
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    }
+                    body()
+                }
+            }
+        }
+    }
+}
+
+/**
  * New set with item added/removed to elements by add param
  */
 private fun <T> setMembership(
@@ -375,60 +436,4 @@ private fun <T> setMembership(
         elements + item
     else
         elements - item
-
-/**
- * Dialog with no buttons
- *
- * @param title the title resource id
- * @param summary the summary message in HTML
- * @param onClose call back for closing dialog by outside click
- * @param body the dialog body
- */
-@Composable
-private fun PlainDialog(
-    title : Int,
-    summary : String?,
-    onClose : () -> Unit,
-    body : @Composable () -> Unit = { },
-) {
-    PlainDialog(
-        title = stringResource(title),
-        summary = summary,
-        onClose = onClose,
-        body = body,
-    )
-}
-
-@Composable
-private fun PlainDialog(
-    title : String,
-    summary : String?,
-    onClose : () -> Unit,
-    body : @Composable () -> Unit = { },
-) {
-    Dialog(onDismissRequest = onClose) {
-        Card(shape = DIALOG_ROUNDED_CORNERS) {
-            Column(
-                modifier = Modifier.padding(DIALOG_PADDING),
-                verticalArrangement = Arrangement.Center,
-            ) {
-                Text(
-                    modifier = Modifier.padding(bottom = DIALOG_PADDING),
-                    text = title,
-                    style = MaterialTheme.typography.headlineSmall,
-                )
-                summary?.let { summary ->
-                    Text(
-                        modifier = Modifier.fillMaxWidth()
-                            .padding(bottom = DIALOG_PADDING),
-                        text = AnnotatedString.fromHtml(summary),
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                }
-
-                body()
-            }
-        }
-    }
-}
 
