@@ -183,23 +183,25 @@ class NotesActivity() : PuzzleActivity() {
 
     @Composable
     private fun ActivityBody(modifier : Modifier) {
-        Column(
-            modifier = modifier.fillMaxHeight()
-                .verticalScroll(rememberScrollState())
-                .height(IntrinsicSize.Max),
-        ) {
-            val state by viewModel.notesUIState.observeAsState()
-            val isPuzzleNotes = state?.isPuzzleNotes ?: false
+        Column(modifier.fillMaxHeight()) {
+            Column(
+                modifier = Modifier.weight(1.0F)
+                    .verticalScroll(rememberScrollState())
+                    .height(IntrinsicSize.Max),
+            ) {
+                val state by viewModel.notesUIState.observeAsState()
+                val isPuzzleNotes = state?.isPuzzleNotes ?: false
 
-            if (!isPuzzleNotes) {
-                MiniboardRow()
+                if (!isPuzzleNotes) {
+                    MiniboardRow()
+                }
+                ScratchRow()
+                TextRow(modifier = Modifier.weight(1.0F))
+                FlagRow()
+                AnagramSourceRow()
+                AnagramSolutionRow()
+                VoiceButtons()
             }
-            ScratchRow()
-            TextRow(modifier = Modifier.weight(1.0F))
-            FlagRow()
-            AnagramSourceRow()
-            AnagramSolutionRow()
-            VoiceButtons()
             Keyboard()
             TransferConfirmationDialog()
         }
