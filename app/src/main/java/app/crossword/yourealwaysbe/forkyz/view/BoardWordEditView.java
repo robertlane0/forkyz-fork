@@ -15,7 +15,7 @@ import android.view.ViewGroup;
 import dagger.hilt.android.AndroidEntryPoint;
 
 import app.crossword.yourealwaysbe.forkyz.settings.DisplaySeparators;
-import app.crossword.yourealwaysbe.forkyz.util.MovementStrategyUtilsKt;
+import app.crossword.yourealwaysbe.forkyz.util.StopOnEndStrategyHolder;
 import app.crossword.yourealwaysbe.forkyz.view.PlayboardRenderer.RenderChanges;
 import app.crossword.yourealwaysbe.puz.ClueID;
 import app.crossword.yourealwaysbe.puz.MovementStrategy;
@@ -42,6 +42,8 @@ public class BoardWordEditView extends BoardEditView {
     private Set<String> suppressNotesList;
     private boolean customSuppressNotesList = false;
     private int expectedWidth = 0;
+    private StopOnEndStrategyHolder stopOnEndStrategyHolder
+        = new StopOnEndStrategyHolder();
 
     public BoardWordEditView(Context context) {
         this(context, null);
@@ -185,7 +187,7 @@ public class BoardWordEditView extends BoardEditView {
         // fix movement strategy so that we don't fall into the next
         // clue
         MovementStrategy oldStrategy = board.getMovementStrategy();
-        MovementStrategyUtilsKt.getStopOnEndStrategy(
+        stopOnEndStrategyHolder.getStopOnEndStrategy(
             getSettings(),
             stopOnEnd -> {
                 board.setMovementStrategy(stopOnEnd);

@@ -17,9 +17,9 @@ import app.crossword.yourealwaysbe.forkyz.exttools.CrosswordSolverData
 import app.crossword.yourealwaysbe.forkyz.exttools.ExternalDictionaries
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
+import app.crossword.yourealwaysbe.forkyz.util.StopOnEndStrategyHolder
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
-import app.crossword.yourealwaysbe.forkyz.util.getStopOnEndStrategy
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 import app.crossword.yourealwaysbe.forkyz.view.BoardEditText
 import app.crossword.yourealwaysbe.puz.Box
@@ -142,6 +142,8 @@ class NotesActivityViewModel @Inject constructor(
     public val acceptedPredictionEvent : StateFlow<Int?>
         = _acceptedPredictionEvent
 
+    private val stopOnEndStrategyHolder = StopOnEndStrategyHolder()
+
     init {
         setupVoiceCommands()
 
@@ -241,22 +243,24 @@ class NotesActivityViewModel @Inject constructor(
     fun playLetterToBoard(c : Char) {
         getBoard()?.let { board ->
             val movementStrategy = board.getMovementStrategy()
-            getStopOnEndStrategy(settings) { stopOnEnd ->
-                board.setMovementStrategy(stopOnEnd)
-                board.playLetter(c)
-                board.setMovementStrategy(movementStrategy)
-            }
+            stopOnEndStrategyHolder
+                .getStopOnEndStrategy(settings) { stopOnEnd ->
+                    board.setMovementStrategy(stopOnEnd)
+                    board.playLetter(c)
+                    board.setMovementStrategy(movementStrategy)
+                }
         }
     }
 
     fun deleteLetterFromBoard() {
         getBoard()?.let { board ->
             val movementStrategy = board.getMovementStrategy()
-            getStopOnEndStrategy(settings) { stopOnEnd ->
-                board.setMovementStrategy(stopOnEnd)
-                board.deleteOrUndoLetter()
-                board.setMovementStrategy(movementStrategy)
-            }
+            stopOnEndStrategyHolder
+                .getStopOnEndStrategy(settings) { stopOnEnd ->
+                    board.setMovementStrategy(stopOnEnd)
+                    board.deleteOrUndoLetter()
+                    board.setMovementStrategy(movementStrategy)
+                }
         }
     }
 

@@ -13,9 +13,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import app.crossword.yourealwaysbe.forkyz.settings.CycleUnfilledMode
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
+import app.crossword.yourealwaysbe.forkyz.util.StopOnEndStrategyHolder
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
-import app.crossword.yourealwaysbe.forkyz.util.getStopOnEndStrategy
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 import app.crossword.yourealwaysbe.forkyz.view.ClueTabsViewModel
 import app.crossword.yourealwaysbe.puz.Clue
@@ -50,6 +50,8 @@ class ClueListActivityViewModel @Inject constructor(
      */
     private var currentPageNum : Int = 0
 
+    private val stopOnEndStrategyHolder = StopOnEndStrategyHolder()
+
     val showAllWords : LiveData<Boolean> = settings.liveClueListShowWords
     val clueTabsViewModel = ClueTabsViewModel(application, settings, getBoard())
 
@@ -78,14 +80,15 @@ class ClueListActivityViewModel @Inject constructor(
         getBoard()?.let { board ->
             settings.getPlayScratchMode() { scratchMode ->
                 val movementStrategy = board.getMovementStrategy()
-                getStopOnEndStrategy(settings) { stopOnEnd ->
-                    board.setMovementStrategy(stopOnEnd)
-                    if (scratchMode)
-                        board.deleteScratchLetter()
-                    else
-                        board.deleteOrUndoLetter()
-                    board.setMovementStrategy(movementStrategy)
-                }
+                stopOnEndStrategyHolder
+                    .getStopOnEndStrategy(settings) { stopOnEnd ->
+                        board.setMovementStrategy(stopOnEnd)
+                        if (scratchMode)
+                            board.deleteScratchLetter()
+                        else
+                            board.deleteOrUndoLetter()
+                        board.setMovementStrategy(movementStrategy)
+                    }
             }
         }
     }
@@ -102,14 +105,15 @@ class ClueListActivityViewModel @Inject constructor(
         getBoard()?.let { board ->
             settings.getPlayScratchMode() { scratchMode ->
                 val movementStrategy = board.getMovementStrategy()
-                getStopOnEndStrategy(settings) { stopOnEnd ->
-                    board.setMovementStrategy(stopOnEnd)
-                    if (scratchMode)
-                        board.playScratchLetter(c)
-                    else
-                        board.playLetter(c)
-                    board.setMovementStrategy(movementStrategy)
-                }
+                stopOnEndStrategyHolder
+                    .getStopOnEndStrategy(settings) { stopOnEnd ->
+                        board.setMovementStrategy(stopOnEnd)
+                        if (scratchMode)
+                            board.playScratchLetter(c)
+                        else
+                            board.playLetter(c)
+                        board.setMovementStrategy(movementStrategy)
+                    }
             }
         }
     }

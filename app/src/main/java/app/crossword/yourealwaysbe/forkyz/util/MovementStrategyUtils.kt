@@ -9,28 +9,48 @@ import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.CycleUnfilledMode
 import app.crossword.yourealwaysbe.puz.MovementStrategy
 
-@MainThread
-fun getStopOnEndStrategy(
-    settings : ForkyzSettings?,
-    cb : Consumer<MovementStrategy>?,
-) {
-    settings?.getPlayCycleUnfilledMode() { cycleUnfilled ->
-        val cycleForwards
-            = cycleUnfilled != CycleUnfilledMode.CU_NEVER
-        val cycleBackwards
-            = cycleUnfilled == CycleUnfilledMode.CU_ALWAYS
+/**
+ * Get the stop on on strategy for the current cycle settings
+ *
+ * The get method builds the right strategy and keeps it for future calls, only
+ * refreshes if the settings have changed.
+ */
+class StopOnEndStrategyHolder {
+    private var cycleForwards : Boolean = false
+    private var cycleBackwards : Boolean = false
+    private var movementStrategy : MovementStrategy? = null
 
-        if (cycleForwards || cycleBackwards) {
-            cb?.accept(
-                MovementStrategy.CycleUnfilled(
-                    MovementStrategy.STOP_ON_END,
-                    cycleForwards,
-                    cycleBackwards,
-                )
-            )
-        } else {
-            cb?.accept(MovementStrategy.STOP_ON_END)
+    @MainThread
+    fun getStopOnEndStrategy(
+        settings : ForkyzSettings?,
+        cb : Consumer<MovementStrategy>?,
+    ) {
+        settings?.getPlayCycleUnfilledMode() { cycleUnfilled ->
+            val cycleForwards
+                = cycleUnfilled != CycleUnfilledMode.CU_NEVER
+            val cycleBackwards
+                = cycleUnfilled == CycleUnfilledMode.CU_ALWAYS
+
+            if (
+                movementStrategy == null
+                || this.cycleForwards != cycleForwards
+                || this.cycleBackwards != cycleBackwards
+            ) {
+                if (cycleForwards || cycleBackwards) {
+                    movementStrategy = MovementStrategy.CycleUnfilled(
+                        MovementStrategy.STOP_ON_END,
+                        cycleForwards,
+                        cycleBackwards,
+                    )
+                } else {
+                    movementStrategy = MovementStrategy.STOP_ON_END
+                }
+
+                this.cycleForwards = cycleForwards
+                this.cycleBackwards = cycleBackwards
+            }
+
+            cb?.accept(movementStrategy ?: MovementStrategy.STOP_ON_END)
         }
     }
 }
-
