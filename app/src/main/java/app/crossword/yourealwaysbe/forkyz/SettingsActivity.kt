@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
@@ -34,7 +33,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -71,6 +69,7 @@ import app.crossword.yourealwaysbe.forkyz.view.ListDialog
 import app.crossword.yourealwaysbe.forkyz.view.MultiListDialog
 import app.crossword.yourealwaysbe.forkyz.view.OKCancelDialog
 import app.crossword.yourealwaysbe.forkyz.view.SearchBar
+import app.crossword.yourealwaysbe.forkyz.view.StringDialog
 
 @AndroidEntryPoint
 class SettingsActivity : ForkyzActivity() {
@@ -566,7 +565,7 @@ class SettingsActivity : ForkyzActivity() {
     @Composable
     private fun ActiveStringItemDialog(item : SettingsString) {
         val value by item.value.observeAsState()
-        SettingsStringDialog(
+        StringDialog(
             title = item.title,
             summary = item.dialogMsg ?: item.summary,
             hint = item.hint,
@@ -582,7 +581,7 @@ class SettingsActivity : ForkyzActivity() {
     @Composable
     private fun ActiveIntegerItemDialog(item : SettingsInteger) {
         val value by item.value.observeAsState()
-        SettingsStringDialog(
+        StringDialog(
             title = item.title,
             summary = item.summary,
             hint = item.hint,
@@ -599,47 +598,6 @@ class SettingsActivity : ForkyzActivity() {
             onDismissRequest = viewModel::popState,
             keyboardType = KeyboardType.Number,
         )
-    }
-
-    /**
-     * String input dialog
-     *
-     * @param value the initial value or null if none
-     * @param onValueChange call back when new value oked
-     * @param onDismissRequest call back when dismissed
-     */
-    @Composable
-    private fun SettingsStringDialog(
-        title : Int,
-        summary : Int?,
-        hint : Int?,
-        value : String?,
-        onValueChange : (String) -> Unit,
-        onDismissRequest : () -> Unit,
-        keyboardType : KeyboardType = KeyboardType.Text,
-    ) {
-        var currentValue by remember { mutableStateOf(value ?: "") }
-        // set again in case relayout
-        currentValue = value ?: ""
-
-        OKCancelDialog(
-            title = title,
-            summary = summary,
-            onCancel = onDismissRequest,
-            onOK = { onValueChange(currentValue) },
-        ) {
-            OutlinedTextField(
-                label = {
-                    hint?.let { Text(stringResource(it)) }
-                },
-                value = currentValue,
-                onValueChange = { currentValue = it },
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = keyboardType,
-                ),
-            )
-        }
     }
 
     private fun handleBack() {

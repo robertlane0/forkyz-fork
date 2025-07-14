@@ -15,15 +15,17 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TriStateCheckbox
-import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -33,14 +35,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.fromHtml
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.compose.ui.graphics.Color
 
 import app.crossword.yourealwaysbe.forkyz.R
 
@@ -203,6 +206,47 @@ fun OKDialog(
                 Text(stringResource(android.R.string.ok))
             }
         }
+    }
+}
+
+/**
+ * String input dialog
+ *
+ * @param value the initial value or null if none
+ * @param onValueChange call back when new value oked
+ * @param onDismissRequest call back when dismissed
+ */
+@Composable
+fun StringDialog(
+    title : Int,
+    summary : Int? = null,
+    hint : Int?,
+    value : String?,
+    onValueChange : (String) -> Unit,
+    onDismissRequest : () -> Unit,
+    keyboardType : KeyboardType = KeyboardType.Text,
+) {
+    var currentValue by remember { mutableStateOf(value ?: "") }
+    // set again in case relayout
+    currentValue = value ?: ""
+
+    OKCancelDialog(
+        title = title,
+        summary = summary,
+        onCancel = onDismissRequest,
+        onOK = { onValueChange(currentValue) },
+    ) {
+        OutlinedTextField(
+            label = {
+                hint?.let { Text(stringResource(it)) }
+            },
+            value = currentValue,
+            onValueChange = { currentValue = it },
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions.Default.copy(
+                keyboardType = keyboardType,
+            ),
+        )
     }
 }
 

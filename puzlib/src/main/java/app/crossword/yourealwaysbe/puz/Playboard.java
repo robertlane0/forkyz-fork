@@ -1521,6 +1521,12 @@ public class Playboard {
             listeners.remove(listener);
     }
 
+    public void editClue(ClueID cid, String newHint) {
+        Clue clue = puzzle.getClue(cid);
+        if (clue != null)
+            editClue(clue, newHint);
+    }
+
     public void editClue(Clue clue, String newHint) {
         clue.setHint(newHint);
         flagClueChange(clue);

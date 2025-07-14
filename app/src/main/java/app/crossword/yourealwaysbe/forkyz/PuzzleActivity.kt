@@ -100,6 +100,7 @@ import app.crossword.yourealwaysbe.forkyz.view.PuzzleFinishedDialog
 import app.crossword.yourealwaysbe.forkyz.view.PuzzleInfoDialog
 import app.crossword.yourealwaysbe.forkyz.view.SpecialEntryDialog
 import app.crossword.yourealwaysbe.forkyz.view.SpecialKey
+import app.crossword.yourealwaysbe.forkyz.view.StringDialog
 import app.crossword.yourealwaysbe.puz.Clue
 import app.crossword.yourealwaysbe.puz.ClueID
 import app.crossword.yourealwaysbe.puz.Playboard
@@ -624,6 +625,24 @@ abstract class PuzzleActivity() : ForkyzActivity() {
                         color,
                     )
                 },
+            )
+        }
+
+        val editClueDialogState by viewModel
+            .editClueDialogState
+            .collectAsStateWithLifecycle()
+        editClueDialogState?.let { editClueDialogState ->
+            StringDialog(
+                title = R.string.edit_clue,
+                hint = R.string.clue_hint,
+                value = editClueDialogState.hint,
+                onValueChange = { hint ->
+                    viewModel.confirmEditClue(
+                        editClueDialogState.clueID,
+                        hint,
+                    )
+                },
+                onDismissRequest = viewModel::clearEditClueDialog,
             )
         }
     }

@@ -35,7 +35,6 @@ import app.crossword.yourealwaysbe.forkyz.exttools.SharePuzzleData
 import app.crossword.yourealwaysbe.forkyz.exttools.ShareTextData
 import app.crossword.yourealwaysbe.forkyz.inttools.ClueListData
 import app.crossword.yourealwaysbe.forkyz.inttools.ClueNotesData
-import app.crossword.yourealwaysbe.forkyz.inttools.EditClueData
 import app.crossword.yourealwaysbe.forkyz.inttools.InternalToolData
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.KeyboardLayout
@@ -144,6 +143,11 @@ data class FlagClueDialogState(
 data class FlagCellDialogState(
     val position : Position,
     val flagColor : Int,
+)
+
+data class EditClueDialogState(
+    val clueID : ClueID,
+    val hint : String,
 )
 
 data class PuzzleActivityUIState(
@@ -289,6 +293,14 @@ open class PuzzleActivityViewModel @Inject constructor(
         = MutableStateFlow<FlagClueDialogState?>(null)
     val flagClueDialogState : StateFlow<FlagClueDialogState?>
         = _flagClueDialogState
+
+    /**
+     * When not null show dialog with view model
+     */
+    private val _editClueDialogState
+        = MutableStateFlow<EditClueDialogState?>(null)
+    val editClueDialogState : StateFlow<EditClueDialogState?>
+        = _editClueDialogState
 
     /**
      * When not null show dialog with view model
@@ -539,9 +551,20 @@ open class PuzzleActivityViewModel @Inject constructor(
     }
 
     fun editClue(cid : ClueID?) {
-        cid?.let {
-            internalToolEvent.postValue(EditClueData.build(it))
+        cid?.let { cid ->
+            getPuzzle()?.getClue(cid)?.let { clue ->
+                _editClueDialogState.value = EditClueDialogState(cid, clue.hint)
+            }
         }
+    }
+
+    fun confirmEditClue(cid : ClueID, hint : String) {
+        clearEditClueDialog()
+        getBoard()?.let { it.editClue(cid, hint) }
+    }
+
+    fun clearEditClueDialog() {
+        _editClueDialogState.value = null
     }
 
     fun launchCurrentClueNotes() {
