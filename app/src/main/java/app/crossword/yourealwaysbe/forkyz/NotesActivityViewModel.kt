@@ -412,7 +412,7 @@ class NotesActivityViewModel @Inject constructor(
         notesClueID?.let { cid ->
             // assume want selected
             setNotesClueFlag(true)
-            launchClueFlagDialog(cid)
+            showFlagClueDialog(cid)
         }
     }
 

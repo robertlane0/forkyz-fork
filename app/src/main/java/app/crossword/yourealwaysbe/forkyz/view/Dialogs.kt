@@ -23,6 +23,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TriStateCheckbox
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -39,6 +40,7 @@ import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.graphics.Color
 
 import app.crossword.yourealwaysbe.forkyz.R
 
@@ -208,6 +210,7 @@ fun OKDialog(
  * List selection dialog
  *
  * @param labels list of labels to display by android resource id
+ * @param colorOf optional returns color to use for widget at position
  * @param selected index of item to be initially selected
  * @param onSelect call back when the indexth item is selected and oked
  * @param onDismissRequest call back when dismissed
@@ -215,8 +218,9 @@ fun OKDialog(
 @Composable
 fun ListDialog(
     title : Int,
-    summary : Int?,
+    summary : Int? = null,
     labels : List<String>,
+    colorOf : (@Composable (Int) -> Color)? = null,
     selected : Int,
     onSelect : (Int) -> Unit,
     onDismissRequest : () -> Unit,
@@ -241,7 +245,15 @@ fun ListDialog(
                             .clickable { selectedState = index },
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        val colors = colorOf?.let { colorOf ->
+                            val color = colorOf(index)
+                            RadioButtonDefaults.colors(
+                                selectedColor = color,
+                                unselectedColor = color,
+                            )
+                        } ?: RadioButtonDefaults.colors()
                         RadioButton(
+                            colors = colors,
                             selected = index == selectedState,
                             onClick = { selectedState = index },
                         )

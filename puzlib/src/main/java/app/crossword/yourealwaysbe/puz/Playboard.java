@@ -1547,6 +1547,12 @@ public class Playboard {
         puzzle.setPlayerNote(note);
     }
 
+    public void flagClue(ClueID cid, boolean flag) {
+        Clue clue = puzzle.getClue(cid);
+        if (clue != null)
+            flagClue(clue, flag);
+    }
+
     /**
      * Call this instead of puzzle.flagClue to update listeners
      */
@@ -1556,6 +1562,12 @@ public class Playboard {
             flagClueChange(clue);
             notifyChange();
         }
+    }
+
+    public void setFlagColor(ClueID cid, int color) {
+        Clue clue = puzzle.getClue(cid);
+        if (clue != null)
+            setFlagColor(clue, color);
     }
 
     /**

@@ -33,8 +33,6 @@ import app.crossword.yourealwaysbe.forkyz.exttools.ExternalToolData
 import app.crossword.yourealwaysbe.forkyz.exttools.FifteenSquaredData
 import app.crossword.yourealwaysbe.forkyz.exttools.SharePuzzleData
 import app.crossword.yourealwaysbe.forkyz.exttools.ShareTextData
-import app.crossword.yourealwaysbe.forkyz.inttools.CellFlagData
-import app.crossword.yourealwaysbe.forkyz.inttools.ClueFlagData
 import app.crossword.yourealwaysbe.forkyz.inttools.ClueListData
 import app.crossword.yourealwaysbe.forkyz.inttools.ClueNotesData
 import app.crossword.yourealwaysbe.forkyz.inttools.EditClueData
@@ -62,6 +60,7 @@ import app.crossword.yourealwaysbe.puz.Playboard
 import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges
 import app.crossword.yourealwaysbe.puz.Playboard.PlayboardListener
 import app.crossword.yourealwaysbe.puz.Puzzle
+import app.crossword.yourealwaysbe.puz.Position
 
 enum class PuzzleSubMenu {
     NONE,
@@ -136,6 +135,16 @@ enum class PuzzleDialog {
     NONE,
     REVEAL_ALL,
 }
+
+data class FlagClueDialogState(
+    val clueID : ClueID,
+    val flagColor : Int,
+)
+
+data class FlagCellDialogState(
+    val position : Position,
+    val flagColor : Int,
+)
 
 data class PuzzleActivityUIState(
     val showTimer : Boolean = false,
@@ -266,12 +275,28 @@ open class PuzzleActivityViewModel @Inject constructor(
         = _infoDialogViewModel
 
     /**
-     * When not null show info dialog with view model
+     * When not null show dialog with view model
      */
     private val _finishedDialogViewModel
         = MutableStateFlow<PuzzleFinishedDialogViewModel?>(null)
     val finishedDialogViewModel : StateFlow<PuzzleFinishedDialogViewModel?>
         = _finishedDialogViewModel
+
+    /**
+     * When not null show dialog with view model
+     */
+    private val _flagClueDialogState
+        = MutableStateFlow<FlagClueDialogState?>(null)
+    val flagClueDialogState : StateFlow<FlagClueDialogState?>
+        = _flagClueDialogState
+
+    /**
+     * When not null show dialog with view model
+     */
+    private val _flagCellDialogState
+        = MutableStateFlow<FlagCellDialogState?>(null)
+    val flagCellDialogState : StateFlow<FlagCellDialogState?>
+        = _flagCellDialogState
 
     private val keyboardManager = KeyboardManagerKt(
         settings,
@@ -361,8 +386,20 @@ open class PuzzleActivityViewModel @Inject constructor(
             if (clue.isFlagged())
                 getBoard()?.flagClue(clue, false);
             else
-                launchClueFlagDialog(clue.clueID)
+                showFlagClueDialog(clue.clueID)
         }
+    }
+
+    fun flagClue(clueID : ClueID, color : Int) {
+        getBoard()?.let { board ->
+            board.flagClue(clueID, true)
+            board.setFlagColor(clueID, color)
+        }
+        clearFlagClueDialog()
+    }
+
+    fun clearFlagClueDialog() {
+        _flagClueDialogState.value = null
     }
 
     fun toggleCellFlag() {
@@ -373,13 +410,23 @@ open class PuzzleActivityViewModel @Inject constructor(
                         if (box.isFlagged())
                             board.flagPosition(pos, false)
                         else
-                            internalToolEvent.postValue(
-                                CellFlagData.build(pos)
-                            )
+                            showFlagCellDialog(pos)
                     }
                 }
             }
         }
+    }
+
+    fun flagCell(position : Position, color : Int) {
+        getBoard()?.let { board ->
+            board.flagPosition(position, true)
+            board.setFlagColor(position, color)
+        }
+        clearFlagCellDialog()
+    }
+
+    fun clearFlagCellDialog() {
+        _flagCellDialogState.value = null
     }
 
     fun toggleShowErrorsCursor() {
@@ -415,9 +462,7 @@ open class PuzzleActivityViewModel @Inject constructor(
     }
 
     fun revealPuzzle() {
-        _uiState.value = uiState.value?.copy(
-            showDialog = PuzzleDialog.REVEAL_ALL,
-        )
+        showDialog(PuzzleDialog.REVEAL_ALL)
     }
 
     fun confirmRevealPuzzle() {
@@ -544,10 +589,6 @@ open class PuzzleActivityViewModel @Inject constructor(
     // register voice commands
     fun registerVoiceCommand(command : VoiceCommand) {
         voiceCommandDispatcher.registerVoiceCommand(command)
-    }
-
-    protected fun launchClueFlagDialog(cid : ClueID) {
-        internalToolEvent.postValue(ClueFlagData.build(cid))
     }
 
     protected fun registerVoiceCommandBack() {
@@ -858,6 +899,26 @@ open class PuzzleActivityViewModel @Inject constructor(
         }
     }
 
+    protected fun showFlagClueDialog(clueID : ClueID) {
+        getBoard()?.let { board ->
+            board.puzzle.getClue(clueID)?.let { clue ->
+                _flagClueDialogState.value = FlagClueDialogState(
+                    clueID,
+                    clue.flagColor,
+                )
+            }
+        }
+    }
+
+    protected fun showFlagCellDialog(position : Position) {
+        getPuzzle()?.checkedGetBox(position)?.let { box ->
+            _flagCellDialogState.value = FlagCellDialogState(
+                position,
+                box.flagColor,
+            )
+        }
+    }
+
     private fun keyboardManagerShow(info : KeyboardInfo) {
         val visibility = if (info.useNative)
             KeyboardVisibility.NATIVE
@@ -1008,6 +1069,12 @@ open class PuzzleActivityViewModel @Inject constructor(
                 repeatInterval = ks.repeatInterval.toLong(),
             )
         } ?: state
+    }
+
+    private fun showDialog(dialog : PuzzleDialog) {
+        _uiState.value = uiState.value?.copy(
+            showDialog = dialog,
+        )
     }
 
     private fun clearDialog(dialog : PuzzleDialog) {

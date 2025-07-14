@@ -92,6 +92,7 @@ import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
 import app.crossword.yourealwaysbe.forkyz.util.SpeechContract
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand
 import app.crossword.yourealwaysbe.forkyz.view.BoardWordEdit
+import app.crossword.yourealwaysbe.forkyz.view.ChooseFlagColorDialog
 import app.crossword.yourealwaysbe.forkyz.view.ForkyzKeyboard
 import app.crossword.yourealwaysbe.forkyz.view.OKCancelDialog
 import app.crossword.yourealwaysbe.forkyz.view.PlayboardTextRenderer
@@ -580,12 +581,49 @@ abstract class PuzzleActivity() : ForkyzActivity() {
         }
 
         val state by viewModel.uiState.observeAsState()
-        if (state?.showDialog == PuzzleDialog.REVEAL_ALL) {
-            OKCancelDialog(
-                title = R.string.reveal_puzzle,
-                summary = R.string.are_you_sure,
-                onCancel = viewModel::clearRevealDialog,
-                onOK = viewModel::confirmRevealPuzzle,
+        state?.showDialog?.let {
+            when (it) {
+                PuzzleDialog.REVEAL_ALL -> {
+                    OKCancelDialog(
+                        title = R.string.reveal_puzzle,
+                        summary = R.string.are_you_sure,
+                        onCancel = viewModel::clearRevealDialog,
+                        onOK = viewModel::confirmRevealPuzzle,
+                    )
+                }
+                else -> { /* show nothing */ }
+            }
+        }
+
+        val flagClueDialogState by viewModel
+            .flagClueDialogState
+            .collectAsStateWithLifecycle()
+        flagClueDialogState?.let { flagClueDialogState ->
+            ChooseFlagColorDialog(
+                selectedColor = flagClueDialogState.flagColor,
+                onCancel = viewModel::clearFlagClueDialog,
+                onChoose = { color ->
+                    viewModel.flagClue(
+                        flagClueDialogState.clueID,
+                        color,
+                    )
+                },
+            )
+        }
+
+        val flagCellDialogState by viewModel
+            .flagCellDialogState
+            .collectAsStateWithLifecycle()
+        flagCellDialogState?.let { flagCellDialogState ->
+            ChooseFlagColorDialog(
+                selectedColor = flagCellDialogState.flagColor,
+                onCancel = viewModel::clearFlagCellDialog,
+                onChoose = { color ->
+                    viewModel.flagCell(
+                        flagCellDialogState.position,
+                        color,
+                    )
+                },
             )
         }
     }

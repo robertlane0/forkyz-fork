@@ -138,7 +138,7 @@
     <string name="transfer_scratch_to_focussed_view">Transfer scratch contents to the currently focussed view</string>
     <string name="shuffle_anagram_source">Shuffle anagram source letters</string>
     <string name="transfer_anagram_solution_to_focussed_view">Transfer anagram solution to focussed view</string>
-    <string name="flag_color_title">Set Clue Flag Color</string>
+    <string name="flag_color_title">Set Flag Color</string>
     <string name="choose_flag_color">Choose flag color.</string>
 
     <!-- clue formats -->
