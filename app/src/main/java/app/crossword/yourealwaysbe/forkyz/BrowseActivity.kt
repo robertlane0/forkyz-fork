@@ -898,7 +898,8 @@ class BrowseActivity() : ForkyzActivity() {
                             viewModel.loadPuzzle(pe.id)
                     },
                     onLongClick = { viewModel.toggleSelectPuzzle(pe.id) },
-                ).padding(vertical=8.dp, horizontal=HORIZONTAL_PADDING)
+                ).padding(vertical=8.dp, horizontal=HORIZONTAL_PADDING),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             if (state?.sortOrder == AccessorSetting.AS_SOURCE) {
                 // wide enough for a wednesday
