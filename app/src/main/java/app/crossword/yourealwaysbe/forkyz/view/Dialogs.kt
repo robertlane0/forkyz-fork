@@ -417,7 +417,6 @@ fun PlainDialog(
                             modifier = Modifier.fillMaxWidth()
                                 .padding(bottom = DIALOG_PADDING),
                             text = AnnotatedString.fromHtml(summary),
-                            style = MaterialTheme.typography.bodyMedium,
                         )
                     }
                     body()

@@ -89,7 +89,6 @@ class SpecialEntryDialog() : DialogFragment() {
                                 stringResource(
                                     R.string.special_entry_force_caps
                                 ),
-                                style = MaterialTheme.typography.bodyMedium,
                             )
                         }
                     }

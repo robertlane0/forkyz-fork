@@ -426,15 +426,11 @@ class SettingsActivity : ForkyzActivity() {
                 style = MaterialTheme.typography.titleMedium
             )
             summary?.let {
-                Text(
-                    summary,
-                    style = MaterialTheme.typography.bodyMedium
-                )
+                Text(summary)
             }
             errorMsg?.let {
                 Text(
                     errorMsg,
-                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.error,
                 )
             }
@@ -463,12 +459,11 @@ class SettingsActivity : ForkyzActivity() {
                 color = MaterialTheme.colorScheme.primary,
             )
             summary?.let {
-                Text(it, style = MaterialTheme.typography.bodyMedium)
+                Text(it)
             }
             errorMsg?.let {
                 Text(
                     it,
-                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.error,
                 )
             }

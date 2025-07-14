@@ -789,7 +789,6 @@ class BrowseActivity() : ForkyzActivity() {
                 .padding(horizontal=HORIZONTAL_PADDING)
                 .padding(top=16.dp, bottom=8.dp),
             text = AnnotatedString.fromHtml(header),
-            style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onBackground,
         )
     }
@@ -958,7 +957,6 @@ class BrowseActivity() : ForkyzActivity() {
                             .padding(horizontal=10.dp),
                         maxLines = 3,
                         text = AnnotatedString.fromHtml(pe.caption),
-                        style = MaterialTheme.typography.bodyMedium,
                         color = textColor,
                     )
                     if (state?.showRatings ?: false) {

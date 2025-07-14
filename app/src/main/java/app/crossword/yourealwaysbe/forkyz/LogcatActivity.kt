@@ -107,10 +107,7 @@ class LogcatActivity : ForkyzActivity() {
                         state = listState,
                     ) {
                         items(logcatText) { line ->
-                            Text(
-                                text = line,
-                                style = MaterialTheme.typography.bodyMedium,
-                            )
+                            Text(line)
                         }
                     }
                 }

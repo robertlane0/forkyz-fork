@@ -63,7 +63,6 @@ class HTMLActivity : ForkyzActivity() {
                         Text(
                             modifier = Modifier.padding(PADDING),
                             text = assetText,
-                            style = MaterialTheme.typography.bodyMedium,
                         )
                     }
                 }
