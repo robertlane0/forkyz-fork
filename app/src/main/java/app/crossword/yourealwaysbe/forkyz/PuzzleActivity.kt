@@ -8,27 +8,19 @@ import java.util.regex.Pattern
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 
-import android.app.Activity
-import android.app.Dialog
 import android.content.ActivityNotFoundException
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
 import android.os.Looper
 import android.speech.RecognizerIntent
 import android.speech.tts.TextToSpeech
 import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import android.view.accessibility.AccessibilityManager
 import android.widget.Toast
-import androidx.activity.OnBackPressedCallback;
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
-import androidx.annotation.NonNull
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -74,13 +66,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.app.ShareCompat
-import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
-import androidx.core.view.ViewCompat
-import androidx.core.view.accessibility.AccessibilityViewCommand
-import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -88,8 +74,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -162,7 +146,6 @@ abstract class PuzzleActivity() : ForkyzActivity() {
     private var ttsReady : Boolean = false
 
     abstract protected val viewModel : PuzzleActivityViewModel
-    private var appBarLayout : AppBarLayout? = null
 
     private val voiceInputLauncher : ActivityResultLauncher<String> =
         registerForActivityResult(SpeechContract()) { text ->
@@ -1185,23 +1168,6 @@ abstract class PuzzleActivity() : ForkyzActivity() {
                 startActivity(i)
             }
         }
-    }
-
-    /**
-     * Add available accessibility actions to view
-     *
-     * Just announce clue for now. Only used by views not yet converted
-     * to Compose. Will be replaced by Compose way in future.
-     */
-    protected fun addAccessibilityActions(view : View) {
-        ViewCompat.addAccessibilityAction(
-            view,
-            getString(R.string.announce_clue_label),
-            { _, _ ->
-                viewModel.announceClue(true)
-                true
-            },
-        )
     }
 
     /**
