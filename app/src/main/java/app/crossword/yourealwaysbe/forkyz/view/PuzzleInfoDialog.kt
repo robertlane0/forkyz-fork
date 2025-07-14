@@ -154,7 +154,7 @@ private fun InfoHeadingData(
                 R.string.elapsed_time,
                 getElapsedString(state?.elapsed ?: 0L)
             ),
-            style = MaterialTheme.typography.titleLarge,
+            style = MaterialTheme.typography.titleMedium,
         )
         LinearProgressIndicator(
             modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
