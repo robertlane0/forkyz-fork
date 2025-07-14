@@ -8,8 +8,6 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.compose'
     id 'com.google.protobuf'
     id 'com.google.devtools.ksp'
-    // still needed for databinding even though ksp (phase out databinding)
-    id 'kotlin-kapt'
 }
 
 check.dependsOn 'checkstyle'
@@ -24,8 +22,6 @@ task checkstyle(type: Checkstyle) {
 }
 
 android {
-    dataBinding.enabled = true
-
     compileSdkVersion 35
 
     lintOptions {
