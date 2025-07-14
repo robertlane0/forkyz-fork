@@ -27,6 +27,7 @@ import app.crossword.yourealwaysbe.puz.Clue
 import app.crossword.yourealwaysbe.puz.ClueID
 import app.crossword.yourealwaysbe.puz.Note
 import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges
+import app.crossword.yourealwaysbe.puz.Playboard.Word
 
 private val BLANK = Box.BLANK
 private val BLANK_CHAR = Box.BLANK[0]
@@ -91,6 +92,7 @@ data class TransferRequest(
 data class NotesActivityUIState(
     val notesClueID : ClueID? = null,
     val notesClue : Clue? = null,
+    val word : Word? = null,
     val clueText : String? = null,
     val boxesLength : Int = 0,
     val suppressNotesList : Set<String>? = null,
@@ -526,6 +528,7 @@ class NotesActivityViewModel @Inject constructor(
             _notesUIState.value = notesUIState.value?.copy(
                 notesClueID = null,
                 notesClue = null,
+                word = null,
                 clueText = null,
                 boxesLength = maxPuzzleDimension,
                 suppressNotesList = suppressNotesList,
@@ -544,6 +547,7 @@ class NotesActivityViewModel @Inject constructor(
                 _notesUIState.value = notesUIState.value?.copy(
                     notesClueID = cid,
                     notesClue = clue,
+                    word = null,
                     clueText = null,
                     boxesLength = maxPuzzleDimension,
                     suppressNotesList = suppressNotesList,
@@ -569,6 +573,7 @@ class NotesActivityViewModel @Inject constructor(
                     _notesUIState.value = notesUIState.value?.copy(
                         notesClueID = cid,
                         notesClue = clue,
+                        word = getBoard()?.getClueWord(cid),
                         clueText = text,
                         boxesLength = boxesLength,
                         suppressNotesList = suppressNotesList,

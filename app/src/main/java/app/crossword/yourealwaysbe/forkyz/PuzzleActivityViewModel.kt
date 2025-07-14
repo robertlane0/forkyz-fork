@@ -510,14 +510,13 @@ open class PuzzleActivityViewModel @Inject constructor(
     }
 
     fun launchClueNotes(cid : ClueID?) {
-        getBoard()?.let { board ->
-            if (cid == null) {
-                launchPuzzleNotes()
-            } else {
-                internalToolEvent.postValue(
-                    ClueNotesData.buildClueNotes(board.getClueID())
-                )
-            }
+        if (cid == null) {
+            launchPuzzleNotes()
+        } else {
+            getBoard()?.jumpToClue(cid)
+            internalToolEvent.postValue(
+                ClueNotesData.buildClueNotes(cid)
+            )
         }
     }
 

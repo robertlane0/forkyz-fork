@@ -211,6 +211,7 @@ abstract class PuzzleActivity() : ForkyzActivity() {
      * Shows current word on board. Assumes should take immediate focus
      * and setup as view targeted by keyboard.
      *
+     * @param word if not null show this word not the currently selected
      * @param onClick onClick method for BoardClickListener
      * @param onLongClick onLongClick method for BoardClickListener
      * @param longClickAccessibilityAction string ID of long click
@@ -224,6 +225,7 @@ abstract class PuzzleActivity() : ForkyzActivity() {
     @Composable
     protected fun Miniboard(
         modifier : Modifier = Modifier,
+        word : Word? = null,
         onClick : (Position?, Word?) -> Unit,
         onLongClick : (Position?) -> Unit,
         longClickAccessibilityAction : Int,
@@ -237,6 +239,7 @@ abstract class PuzzleActivity() : ForkyzActivity() {
             BoardWordEdit(
                 modifier = modifier,
                 board = board,
+                word = word,
                 contentDescription = stringResource(R.string.current_word),
                 onClick = onClick,
                 onLongClick = onLongClick,

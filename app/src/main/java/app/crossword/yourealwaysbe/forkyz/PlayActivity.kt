@@ -466,7 +466,7 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
             showAllWords = showAllWords,
             onClueClick = viewModel::clickClue,
             onClueClickDescription = stringResource(R.string.select_clue),
-            onClueLongClick = { viewModel.launchCurrentClueNotes() },
+            onClueLongClick = viewModel::launchClueNotes,
             onClueLongClickDescription
                 = stringResource(R.string.open_clue_notes),
             onClueBoardClick = viewModel::clickClue,

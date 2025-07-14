@@ -219,6 +219,7 @@ class NotesActivity() : PuzzleActivity() {
 
         BoardLabel(R.string.board_lab)
         Miniboard(
+            word = state?.word,
             modifier = Modifier.onKeyEvent(this::onMiniboardKeyEvent)
                 .padding(
                     vertical = VERTICAL_BOARD_PADDING
