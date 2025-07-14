@@ -132,9 +132,15 @@ data class VoiceState(
 
 data class AnnounceData(val message : CharSequence)
 
+enum class PuzzleDialog {
+    NONE,
+    REVEAL_ALL,
+}
+
 data class PuzzleActivityUIState(
     val showTimer : Boolean = false,
     val indicateShowErrors : Boolean = false,
+    val showDialog : PuzzleDialog = PuzzleDialog.NONE,
 )
 
 enum class KeyboardVisibility {
@@ -406,6 +412,21 @@ open class PuzzleActivityViewModel @Inject constructor(
 
     fun revealErrors() {
         getBoard()?.revealErrors()
+    }
+
+    fun revealPuzzle() {
+        _uiState.value = uiState.value?.copy(
+            showDialog = PuzzleDialog.REVEAL_ALL,
+        )
+    }
+
+    fun confirmRevealPuzzle() {
+        clearRevealDialog()
+        getBoard()?.revealPuzzle()
+    }
+
+    fun clearRevealDialog() {
+        clearDialog(PuzzleDialog.REVEAL_ALL)
     }
 
     fun toggleScratchMode() {
@@ -988,6 +1009,14 @@ open class PuzzleActivityViewModel @Inject constructor(
                 repeatInterval = ks.repeatInterval.toLong(),
             )
         } ?: state
+    }
+
+    private fun clearDialog(dialog : PuzzleDialog) {
+        if (uiState.value?.showDialog == dialog) {
+            _uiState.value = uiState.value?.copy(
+                showDialog = PuzzleDialog.NONE,
+            )
+        }
     }
 }
 

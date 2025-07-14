@@ -93,10 +93,10 @@ import app.crossword.yourealwaysbe.forkyz.util.SpeechContract
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand
 import app.crossword.yourealwaysbe.forkyz.view.BoardWordEdit
 import app.crossword.yourealwaysbe.forkyz.view.ForkyzKeyboard
+import app.crossword.yourealwaysbe.forkyz.view.OKCancelDialog
 import app.crossword.yourealwaysbe.forkyz.view.PlayboardTextRenderer
 import app.crossword.yourealwaysbe.forkyz.view.PuzzleFinishedDialog
 import app.crossword.yourealwaysbe.forkyz.view.PuzzleInfoDialog
-import app.crossword.yourealwaysbe.forkyz.view.RevealPuzzleDialog
 import app.crossword.yourealwaysbe.forkyz.view.SpecialEntryDialog
 import app.crossword.yourealwaysbe.forkyz.view.SpecialKey
 import app.crossword.yourealwaysbe.puz.Clue
@@ -575,6 +575,16 @@ abstract class PuzzleActivity() : ForkyzActivity() {
                 onShare = viewModel::shareCompletion,
             )
         }
+
+        val state by viewModel.uiState.observeAsState()
+        if (state?.showDialog == PuzzleDialog.REVEAL_ALL) {
+            OKCancelDialog(
+                title = R.string.reveal_puzzle,
+                summary = R.string.are_you_sure,
+                onCancel = viewModel::clearRevealDialog,
+                onOK = viewModel::confirmRevealPuzzle,
+            )
+        }
     }
 
     @Composable
@@ -814,7 +824,7 @@ abstract class PuzzleActivity() : ForkyzActivity() {
             DropdownMenuItem(
                 text = { MenuText(stringResource(R.string.puzzle)) },
                 onClick = {
-                    showRevealPuzzleDialog()
+                    viewModel.revealPuzzle()
                     viewModel.dismissMenu()
                 },
             )
@@ -1139,10 +1149,6 @@ abstract class PuzzleActivity() : ForkyzActivity() {
                 viewModel.dismissMenu()
             }
         )
-    }
-
-    private fun showRevealPuzzleDialog() {
-        RevealPuzzleDialog().show(supportFragmentManager, "RevealPuzzleDialog")
     }
 
     private fun actionSupportSource() {
