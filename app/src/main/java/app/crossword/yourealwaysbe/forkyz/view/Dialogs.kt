@@ -451,7 +451,7 @@ fun PlainDialog(
             val modifier = if (usePlatformDefaultWidth)
                 Modifier
             else
-                Modifier.widthIn(max = maxWidth * 0.8F)
+                Modifier.widthIn(max = maxWidth * 0.85F)
 
             Card(
                 modifier = modifier,
