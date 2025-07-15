@@ -22,7 +22,4 @@
     >
     <item name="backgroundSplit">?attr/colorError</item>
     </style>
-    <style name="datePickerStyle">
-        <item name="android:textColor">@color/primary</item>
-    </style>
 </resources>

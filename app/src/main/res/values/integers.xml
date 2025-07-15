@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <integer name="clue_text_size">17</integer>
-    <integer name="disabled_downloader_alpha">150</integer>
-    <integer name="enabled_downloader_alpha">255</integer>
     <integer name="max_rating">5</integer>
 </resources>
 
