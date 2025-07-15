@@ -43,7 +43,6 @@ fun DownloadDialog(
         state?.selected?.contains(downloaders.get(it).internalName) ?: false
     }.toSet()
 
-    // TODO: need on selection change
     MultiListDialog(
         title = R.string.download_puzzles,
         allOrNoneLabel = R.string.select_sources,
@@ -60,6 +59,7 @@ fun DownloadDialog(
                     .toSet()
             )
         },
+        okLabel = R.string.download,
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),

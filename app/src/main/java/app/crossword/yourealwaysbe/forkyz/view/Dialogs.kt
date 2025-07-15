@@ -321,6 +321,7 @@ fun ListDialog(
  * @param onSelect call back when the set of selected is oked
  * @param onDismissRequest call back when dismissed
  * @param onSelectionChange when a new item is (de)selected
+ * @param okLabel override normal OK label if not null
  * @param body additional stuff to display between title/summary and
  * list
  */
@@ -336,6 +337,7 @@ fun MultiListDialog(
     onSelect : (Set<Int>) -> Unit = { },
     onDismissRequest : () -> Unit = { },
     onSelectionChange : (Set<Int>) -> Unit = { },
+    okLabel : Int? = null,
     body : @Composable () -> Unit = { },
 ) {
     var selectedState by remember { mutableStateOf(selected) }
@@ -347,11 +349,13 @@ fun MultiListDialog(
         onSelectionChange(selectedState)
     }
 
-    OKCancelDialog(
+    TwoButtonDialog(
         title = title,
         summary = summary,
-        onCancel = onDismissRequest,
-        onOK = { onSelect(selectedState) }
+        negativeText = android.R.string.cancel,
+        onNegative = onDismissRequest,
+        positiveText = okLabel ?: android.R.string.ok,
+        onPositive = { onSelect(selectedState) }
     ) {
         body()
 
