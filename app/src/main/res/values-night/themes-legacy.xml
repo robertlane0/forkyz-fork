@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <!-- base variant theme used in themes-common.xml in values -->
-    <style name="Theme.Forkyz.LegacyLike" parent="Theme.Forkyz">
-        <!-- Don't color toolbar -->
-        <item name="elevationOverlayColor">@color/surfaceTint</item>
-    </style>
-</resources>

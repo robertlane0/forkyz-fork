@@ -1,7 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.settings
 
-import app.crossword.yourealwaysbe.forkyz.exttools.ChatGPTHelpData
+import app.crossword.yourealwaysbe.forkyz.exttools.isChatGPTEnabled
 
 data class ExternalToolSettings(
     val chatGPTAPIKey : String,
@@ -20,7 +20,7 @@ data class ExternalToolSettings(
         )
 
     val hasChatGPT
-        get() = ChatGPTHelpData.isEnabled(this)
+        get() = isChatGPTEnabled(this)
 
     val hasExternalDictionary
         get() = externalDictionary != ExternalDictionarySetting.EDS_NONE

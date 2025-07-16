@@ -92,6 +92,7 @@ class ExternalDictionaries {
     }
 }
 
+@Throws(AppNotFoundException::class)
 fun ExternalToolLauncher.visit(data : FreeDictionaryData) {
     val intent = Intent(Intent.ACTION_VIEW)
     intent.setData(
@@ -107,6 +108,7 @@ fun ExternalToolLauncher.visit(data : FreeDictionaryData) {
 /**
  * Launch or display warning if app not installed
  */
+@Throws(AppNotFoundException::class)
 fun ExternalToolLauncher.visit(data : QuickDictionaryData) {
     ExternalCaller.launchApp(
         this.activity,
@@ -122,8 +124,9 @@ fun ExternalToolLauncher.visit(data : QuickDictionaryData) {
 /**
  * Launch or display warning if app not installed
  */
+@Throws(AppNotFoundException::class)
 fun ExternalToolLauncher.visit(data : Aard2DictionaryData) {
-        ExternalCaller.launchIntent(
+    ExternalCaller.launchIntent(
         this.activity,
         "aard2.lookup",
         SearchManager.QUERY,

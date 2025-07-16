@@ -231,6 +231,13 @@ class BrowseActivityViewModel @Inject constructor(
         = _importFinishResult
 
     /**
+     * True/false means import succeeded or failed now close activities
+     */
+    private val _importedNowExitResult = MutableStateFlow<Boolean?>(null)
+    val importedNowExitResult : StateFlow<Boolean?>
+        = _importedNowExitResult
+
+    /**
      * True when a puzzle has just been loaded
      *
      * Call clearPuzzleLoaded to set back to false
@@ -720,6 +727,18 @@ class BrowseActivityViewModel @Inject constructor(
             download(date, downloaders)
         }
         clearDownloadDialog()
+    }
+
+    /**
+     * Show dialog saying imports done app now closing
+     *
+     * Don't need to clear this dialog because you should exit!
+     */
+    fun setImportedNowExitResult(success : Boolean) {
+        // True cos even failed imports might have gotten some successes
+        // This should be a view model, but it's only one line
+        settings.setBrowseNewPuzzle(true)
+        _importedNowExitResult.value = success
     }
 
     /**

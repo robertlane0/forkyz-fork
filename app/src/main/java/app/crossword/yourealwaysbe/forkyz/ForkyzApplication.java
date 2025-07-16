@@ -41,7 +41,6 @@ public class ForkyzApplication
         super.onCreate();
         migrationHelper.applyMigrations(this);
         utils.createNotificationChannels(this);
-        themeHelper.themeApplication(this);
     }
 
     @Override

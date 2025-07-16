@@ -67,6 +67,7 @@ import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
+import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -77,7 +78,7 @@ import androidx.lifecycle.repeatOnLifecycle
 
 import dagger.hilt.android.AndroidEntryPoint
 
-import app.crossword.yourealwaysbe.forkyz.exttools.ChatGPTHelpData
+import app.crossword.yourealwaysbe.forkyz.exttools.AppNotFoundException
 import app.crossword.yourealwaysbe.forkyz.exttools.ExternalToolLauncher
 import app.crossword.yourealwaysbe.forkyz.inttools.InternalToolLauncher
 import app.crossword.yourealwaysbe.forkyz.menu.BaseMenuModifier
@@ -95,12 +96,14 @@ import app.crossword.yourealwaysbe.forkyz.view.BoardWordEdit
 import app.crossword.yourealwaysbe.forkyz.view.ChooseFlagColorDialog
 import app.crossword.yourealwaysbe.forkyz.view.ForkyzKeyboard
 import app.crossword.yourealwaysbe.forkyz.view.OKCancelDialog
+import app.crossword.yourealwaysbe.forkyz.view.OKDialog
 import app.crossword.yourealwaysbe.forkyz.view.PlayboardTextRenderer
 import app.crossword.yourealwaysbe.forkyz.view.PuzzleFinishedDialog
 import app.crossword.yourealwaysbe.forkyz.view.PuzzleInfoDialog
 import app.crossword.yourealwaysbe.forkyz.view.SpecialEntryDialog
 import app.crossword.yourealwaysbe.forkyz.view.SpecialKey
 import app.crossword.yourealwaysbe.forkyz.view.StringDialog
+import app.crossword.yourealwaysbe.forkyz.view.TwoButtonDialog
 import app.crossword.yourealwaysbe.puz.Clue
 import app.crossword.yourealwaysbe.puz.ClueID
 import app.crossword.yourealwaysbe.puz.Playboard
@@ -438,8 +441,12 @@ abstract class PuzzleActivity() : ForkyzActivity() {
         val externalTool by viewModel.externalToolEvent.observeAsState()
         LaunchedEffect(externalTool) {
             externalTool?.let { tool ->
-                tool.accept(ExternalToolLauncher(this@PuzzleActivity))
                 viewModel.clearExternalToolEvent()
+                try {
+                    tool.accept(ExternalToolLauncher(this@PuzzleActivity))
+                } catch (e : AppNotFoundException) {
+                    viewModel.handleAppNotFoundException(e)
+                }
             }
         }
         val sendToast by viewModel.sendToastEvent.observeAsState()
@@ -645,6 +652,52 @@ abstract class PuzzleActivity() : ForkyzActivity() {
                 onDismissRequest = viewModel::clearEditClueDialog,
             )
         }
+
+        val dialogMessage by viewModel
+            .dialogMessage
+            .collectAsStateWithLifecycle()
+        dialogMessage?.let { dm ->
+            OKDialog(
+                title = dm.title,
+                summary = dm.message,
+                onClose = viewModel::clearDialogMessage,
+            )
+        }
+
+        val appNotFoundDialogState by viewModel
+            .appNotFoundDialogState
+            .collectAsStateWithLifecycle()
+        appNotFoundDialogState?.let { appNotFoundDialogState ->
+            TwoButtonDialog(
+                title = stringResource(
+                    R.string.external_app_not_installed,
+                    appNotFoundDialogState.appName,
+                ),
+                summary = stringResource(
+                    R.string.external_app_install_msg,
+                    appNotFoundDialogState.appName,
+                ),
+                negativeText= stringResource(R.string.website),
+                onNegative = {
+                    viewModel.clearAppNotFoundDialog()
+                    val intent = Intent(Intent.ACTION_VIEW)
+                    intent.setData(appNotFoundDialogState.appURL.toUri())
+                    startActivity(intent)
+                },
+                positiveText = stringResource(android.R.string.ok),
+                onPositive = viewModel::clearAppNotFoundDialog,
+            )
+        }
+
+        val specialEntryDialogViewModel by viewModel
+            .specialEntryDialogViewModel
+            .collectAsStateWithLifecycle()
+        specialEntryDialogViewModel?.let { specialEntryDialogViewModel ->
+            SpecialEntryDialog(
+                viewModel = specialEntryDialogViewModel,
+                onClose = viewModel::clearSpecialEntry,
+            )
+        }
     }
 
     @Composable
@@ -741,7 +794,7 @@ abstract class PuzzleActivity() : ForkyzActivity() {
         DropdownMenuItem(
             text = { MenuText(stringResource(R.string.special_entry)) },
             onClick = {
-                specialEntry()
+                viewModel.doSpecialEntry()
                 viewModel.dismissMenu()
             }
         )
@@ -1217,13 +1270,6 @@ abstract class PuzzleActivity() : ForkyzActivity() {
             i.setData(url.toUri())
             startActivity(i)
         }
-    }
-
-    private fun specialEntry() {
-        SpecialEntryDialog().show(
-            getSupportFragmentManager(),
-            "SpecialEntryDialog",
-        )
     }
 
     private fun openShareUrl() {

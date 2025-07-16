@@ -8,12 +8,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
 import androidx.annotation.MainThread
-import androidx.fragment.app.DialogFragment
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 import org.json.JSONException
 import org.json.JSONObject
@@ -34,193 +31,154 @@ private val CHAT_GPT_TEMPERATURE = 1.0
 private val CHAT_GPT_MAX_TOKENS = 500
 private val QUERY_TIMEOUT = 30000
 
-private val HELP_RESPONSE_TEXT = "helpResponse"
+/**
+ * Makes request and calls back with response data
+ *
+ * May not call back if Chat GPT not configured or no clue to
+ * ask about.
+ *
+ * @param callback delivers text response for OK dialog
+ */
+fun askChatGPTForCurrentClue(
+    context : Context,
+    settings : ForkyzSettings,
+    board : Playboard,
+    callback : (String) -> Unit,
+) {
+    settings.getExtChatGPTAPIKey() { apiKey ->
+        apiKey?.let { apiKey ->
+            makeQuery(context, board)?.let { query ->
+                makeRequest(apiKey, query) { response ->
+                    callback(response)
+                }
+            }
+        }
+    }
+}
 
-class ChatGPTHelpData(
-    val response : String,
-) : ExternalToolData() {
-    companion object {
-        private val ioScope = CoroutineScope(Dispatchers.IO)
+// method should become redundant when all Kotlin/Compose
+@MainThread
+fun isChatGPTEnabled(settings : ForkyzSettings, cb : Consumer<Boolean>) {
+    settings.getExtChatGPTAPIKey() { apiKey ->
+        cb.accept(isChatGPTEnabled(apiKey))
+    }
+}
 
-        /**
-         * Makes request and calls back with response data
-         *
-         * May not call back if Chat GPT not configured or no clue to
-         * ask about.
-         */
-        fun buildForCurrentClue(
-            context : Context,
-            settings : ForkyzSettings,
-            board : Playboard,
-            callback : Consumer<ChatGPTHelpData>,
-        ) {
-            settings.getExtChatGPTAPIKey() { apiKey ->
-                apiKey?.let { apiKey ->
-                    makeQuery(context, board)?.let { query ->
-                        makeRequest(apiKey, query) { response ->
-                            callback.accept(ChatGPTHelpData(response))
-                        }
-                    }
+fun isChatGPTEnabled(extSettings : ExternalToolSettings) : Boolean
+    = isChatGPTEnabled(extSettings.chatGPTAPIKey)
+
+private fun makeRequest(
+    apiKey : String,
+    query : String,
+    callback : Consumer<String>,
+) {
+    val ioScope = CoroutineScope(Dispatchers.IO)
+    ioScope.launch {
+        try {
+            val json = getURLJSON(
+                url = CHAT_GPT_API_URL,
+                timeout = QUERY_TIMEOUT,
+                headers = mapOf("Authorization" to "Bearer " + apiKey),
+                data = getQueryData(query),
+            )
+            callback.accept(getQueryResponse(json))
+        } catch (e : IOException) {
+            // ignore bad response?
+        } catch (e : JSONException) {
+            // ignore bad response?
+        }
+    }
+}
+
+private fun getQueryData(query : String) : JSONObject {
+    val data = JSONObject()
+    with (data) {
+        put("model", CHAT_GPT_MODEL)
+        put("prompt", query)
+        put("max_tokens", CHAT_GPT_MAX_TOKENS)
+        put("temperature", CHAT_GPT_TEMPERATURE)
+    }
+    return data
+}
+
+private fun getQueryResponse(json : JSONObject) : String {
+    if (json.has(CHAT_GPT_RESPONSE_ERROR)) {
+        return json.getJSONObject(CHAT_GPT_RESPONSE_ERROR)
+            .getString(CHAT_GPT_RESPONSE_MESSAGE)
+    } else {
+        val choices = json.getJSONArray(CHAT_GPT_RESPONSE_CHOICES)
+        val first = choices.getJSONObject(0)
+        return first.getString(CHAT_GPT_RESPONSE_TEXT).trim()
+    }
+}
+
+private fun makeQuery(context : Context, board : Playboard) : String? {
+    val blank = context.getString(R.string.share_clue_blank_box)
+
+    val puz = board.getPuzzle()
+    if (puz == null)
+        return null
+
+    val clue = board?.getClue()
+    if (clue == null)
+        return null
+
+    val hint = clue.getHint()
+    var response : String? = null
+    var solution : String? = null
+
+    val zone = clue.getZone()
+    if (zone != null) {
+        var hasResponse = false
+        val responseBuilder = StringBuilder()
+        var hasSolution = false
+        val solutionBuilder = StringBuilder()
+
+        for (pos in zone) {
+            val box = puz.checkedGetBox(pos)
+            if (box != null) {
+                if (!box.isBlank()) {
+                    hasResponse = true
+                    responseBuilder.append(box.getResponse())
+                } else {
+                    responseBuilder.append(blank)
+                }
+
+                if (box.hasSolution()) {
+                    hasSolution = true
+                    solutionBuilder.append(box.getSolution())
+                } else {
+                    solutionBuilder.append(blank)
                 }
             }
         }
 
-        // method should become redundant when all Kotlin/Compose
-        @MainThread
-        @JvmStatic
-        fun isEnabled(settings : ForkyzSettings, cb : Consumer<Boolean>) {
-            settings.getExtChatGPTAPIKey() { apiKey ->
-                cb.accept(isEnabled(apiKey))
-            }
-        }
-
-        @JvmStatic // remove when all Kotlin
-        fun isEnabled(extSettings : ExternalToolSettings) : Boolean
-            = isEnabled(extSettings.chatGPTAPIKey)
-
-        private fun makeRequest(
-            apiKey : String,
-            query : String,
-            callback : Consumer<String>,
-        ) {
-            ioScope.launch {
-                try {
-                    val json = getURLJSON(
-                        url = CHAT_GPT_API_URL,
-                        timeout = QUERY_TIMEOUT,
-                        headers = mapOf("Authorization" to "Bearer " + apiKey),
-                        data = getQueryData(query),
-                    )
-                    callback.accept(getQueryResponse(json))
-                } catch (e : IOException) {
-                    // ignore bad response?
-                } catch (e : JSONException) {
-                    // ignore bad response?
-                }
-            }
-        }
-
-        private fun getQueryData(query : String) : JSONObject {
-            val data = JSONObject()
-            with (data) {
-                put("model", CHAT_GPT_MODEL)
-                put("prompt", query)
-                put("max_tokens", CHAT_GPT_MAX_TOKENS)
-                put("temperature", CHAT_GPT_TEMPERATURE)
-            }
-            return data
-        }
-
-        private fun getQueryResponse(json : JSONObject) : String {
-            if (json.has(CHAT_GPT_RESPONSE_ERROR)) {
-                return json.getJSONObject(CHAT_GPT_RESPONSE_ERROR)
-                    .getString(CHAT_GPT_RESPONSE_MESSAGE)
-            } else {
-                val choices = json.getJSONArray(CHAT_GPT_RESPONSE_CHOICES)
-                val first = choices.getJSONObject(0)
-                return first.getString(CHAT_GPT_RESPONSE_TEXT).trim()
-            }
-        }
-
-        private fun makeQuery(context : Context, board : Playboard) : String? {
-            val blank = context.getString(R.string.share_clue_blank_box)
-
-            val puz = board.getPuzzle()
-            if (puz == null)
-                return null
-
-            val clue = board?.getClue()
-            if (clue == null)
-                return null
-
-            val hint = clue.getHint()
-            var response : String? = null
-            var solution : String? = null
-
-            val zone = clue.getZone()
-            if (zone != null) {
-                var hasResponse = false
-                val responseBuilder = StringBuilder()
-                var hasSolution = false
-                val solutionBuilder = StringBuilder()
-
-                for (pos in zone) {
-                    val box = puz.checkedGetBox(pos)
-                    if (box != null) {
-                        if (!box.isBlank()) {
-                            hasResponse = true
-                            responseBuilder.append(box.getResponse())
-                        } else {
-                            responseBuilder.append(blank)
-                        }
-
-                        if (box.hasSolution()) {
-                            hasSolution = true
-                            solutionBuilder.append(box.getSolution())
-                        } else {
-                            solutionBuilder.append(blank)
-                        }
-                    }
-                }
-
-                if (hasSolution)
-                    solution = solutionBuilder.toString()
-                if (hasResponse)
-                    response = responseBuilder.toString()
-            }
-
-            if (response != null && solution != null) {
-                return context.getString(
-                    R.string.help_query_solution_and_response,
-                    hint, response, solution
-                )
-            } else if (response != null) {
-                return context.getString(
-                    R.string.help_query_just_response,
-                    hint, response
-                )
-            } else if (solution != null) {
-                return context.getString(
-                    R.string.help_query_just_solution,
-                    hint, solution
-                )
-            } else {
-                return context.getString(R.string.help_query_just_clue, clue)
-            }
-        }
-
-        private fun isEnabled(apiKey : String?) : Boolean
-            = apiKey != null && !apiKey.trim().isEmpty()
+        if (hasSolution)
+            solution = solutionBuilder.toString()
+        if (hasResponse)
+            response = responseBuilder.toString()
     }
 
-    override fun accept(launcher : ExternalToolLauncher) {
-        launcher.visit(this)
+    if (response != null && solution != null) {
+        return context.getString(
+            R.string.help_query_solution_and_response,
+            hint, response, solution
+        )
+    } else if (response != null) {
+        return context.getString(
+            R.string.help_query_just_response,
+            hint, response
+        )
+    } else if (solution != null) {
+        return context.getString(
+            R.string.help_query_just_solution,
+            hint, solution
+        )
+    } else {
+        return context.getString(R.string.help_query_just_clue, clue)
     }
 }
 
-fun ExternalToolLauncher.visit(data : ChatGPTHelpData) {
-    val dialog = HelpResponseDialog()
-    val args = Bundle()
-    args.putString(HELP_RESPONSE_TEXT, data.response)
-    dialog.setArguments(args)
-    dialog.show(this.activity.getSupportFragmentManager(), "HelpResponseDialog")
-}
-
-class HelpResponseDialog() : DialogFragment() {
-    override fun onCreateDialog(savedInstanceState : Bundle?) : Dialog {
-        val activity = getActivity()
-
-        var response = getArguments()?.getString(HELP_RESPONSE_TEXT)
-        if (response == null)
-            response = activity?.getString(R.string.help_query_failed)
-
-        val builder = MaterialAlertDialogBuilder(activity!!)
-            .setTitle(
-                activity.getString(R.string.help_query_response_title)
-            ).setMessage(response)
-            .setPositiveButton(R.string.ok, null)
-
-        return builder.create()
-    }
-}
+private fun isChatGPTEnabled(apiKey : String?) : Boolean
+    = apiKey != null && !apiKey.trim().isEmpty()
 

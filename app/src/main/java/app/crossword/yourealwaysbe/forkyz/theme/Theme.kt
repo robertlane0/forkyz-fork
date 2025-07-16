@@ -11,6 +11,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.darkColorScheme
@@ -146,11 +147,14 @@ fun AppTheme(
 }
 
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 fun statusBarColor(appTheme : Theme, darkMode : Boolean) : Color {
     return if (appTheme == Theme.T_LEGACY_LIKE && !darkMode)
         return MaterialTheme.colorScheme.primary
     else
-        Color.Transparent
+        // not ideal and relies on top bar not changing on scroll
+        // on puzzle activity where this is used
+        return getTopAppBarColors(appTheme, darkMode).containerColor
 }
 
 @Composable
@@ -163,20 +167,8 @@ fun ForkyzTopAppBar(
     onBack : (() -> Unit)? = null,
     scrollBehavior : TopAppBarScrollBehavior? = null,
 ) {
-    val colors = if (appTheme == Theme.T_LEGACY_LIKE && !darkMode) {
-        TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            scrolledContainerColor = MaterialTheme.colorScheme.primary,
-            titleContentColor = MaterialTheme.colorScheme.onPrimary,
-            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-            actionIconContentColor = MaterialTheme.colorScheme.onPrimary,
-        )
-    } else {
-        TopAppBarDefaults.topAppBarColors()
-    }
-
     TopAppBar(
-        colors = colors,
+        colors = getTopAppBarColors(appTheme, darkMode),
         title = title,
         navigationIcon = {
             onBack?.let { onBack ->
@@ -191,4 +183,23 @@ fun ForkyzTopAppBar(
         actions = actions,
         scrollBehavior = scrollBehavior,
     )
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun getTopAppBarColors(
+    appTheme : Theme,
+    darkMode : Boolean,
+) : TopAppBarColors {
+    return if (appTheme == Theme.T_LEGACY_LIKE && !darkMode) {
+        TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primary,
+            scrolledContainerColor = MaterialTheme.colorScheme.primary,
+            titleContentColor = MaterialTheme.colorScheme.onPrimary,
+            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+            actionIconContentColor = MaterialTheme.colorScheme.onPrimary,
+        )
+    } else {
+        TopAppBarDefaults.topAppBarColors()
+    }
 }

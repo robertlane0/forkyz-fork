@@ -1,18 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- base variant theme used in themes-common.xml in values -->
-    <style
-        name="Theme.Forkyz.DayNightBaseVersioned"
-        parent="Theme.Forkyz.DayNightBase"
-    >
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
-    </style>
-
-    <!-- base for all versioned alternatives -->
-    <style
-        name="Theme.Forkyz.DayNightBase"
-        parent="Theme.Material3.DynamicColors.Light"
-    >
+    <style name="Theme.Forkyz" parent="Theme.Material3.DynamicColors.Light">
+        <!--
+            Needed for AppCompatActivity which is only needed so that things
+            like PlayboardRenderer can load from the right colors.xml.
+            Remove once all Compose.
+        -->
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionModeOverlay">true</item>
     </style>
 </resources>

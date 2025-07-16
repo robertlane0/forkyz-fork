@@ -105,7 +105,6 @@ import app.crossword.yourealwaysbe.forkyz.net.DownloadersProvider
 import app.crossword.yourealwaysbe.forkyz.settings.AccessorSetting
 import app.crossword.yourealwaysbe.forkyz.settings.BrowseSwipeAction
 import app.crossword.yourealwaysbe.forkyz.settings.DayNightMode
-import app.crossword.yourealwaysbe.forkyz.util.ImportedNowFinishDialogActivity
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.view.CircleProgressBar
 import app.crossword.yourealwaysbe.forkyz.view.DownloadDialog
@@ -217,19 +216,9 @@ class BrowseActivity() : ForkyzActivity() {
                     = intent.getIntExtra(INTENT_IMPORT_TASK_ID, myTaskId)
 
                 if (myTaskId == otherTaskId) {
-                    val i = Intent(
-                        this@BrowseActivity,
-                        ImportedNowFinishDialogActivity::class.java,
-                    ).apply {
-                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        putExtra(
-                            INTENT_IMPORT_SUCCESS,
-                            intent.getBooleanExtra(
-                                INTENT_IMPORT_SUCCESS, false
-                            ),
-                        )
-                    }
-                    startActivity(i)
+                    viewModel.setImportedNowExitResult(
+                        intent.getBooleanExtra(INTENT_IMPORT_SUCCESS, false),
+                    )
                 }
             }
         }
@@ -1056,6 +1045,22 @@ class BrowseActivity() : ForkyzActivity() {
                 onDownload = viewModel::okDownloadDialog,
             )
         }
+
+        val exitDialogSuccess by viewModel
+            .importedNowExitResult
+            .collectAsStateWithLifecycle()
+        exitDialogSuccess?.let { success ->
+            OKDialog(
+                title = stringResource(R.string.imports_title),
+                summary = stringResource(
+                    if (success)
+                        R.string.import_success_long
+                    else
+                        R.string.import_failure_long
+                ),
+                onClose = { doExit() }
+            )
+        }
     }
 
     @Composable
@@ -1263,6 +1268,16 @@ class BrowseActivity() : ForkyzActivity() {
     private fun onImportURIsAndFinish(uris : Collection<Uri>) {
         // finish happens in launchers when result posted
         viewModel.importURIsAndFinish(uris)
+    }
+
+    private fun doExit() {
+        // ask browse activities to close
+        val close = Intent(BROWSER_CLOSE_ACTION)
+        // -1 so all browse activities close
+        close.putExtra(BROWSER_CLOSE_TASK_ID, -1)
+        close.setPackage(getPackageName())
+        sendBroadcast(close)
+        finish()
     }
 }
 

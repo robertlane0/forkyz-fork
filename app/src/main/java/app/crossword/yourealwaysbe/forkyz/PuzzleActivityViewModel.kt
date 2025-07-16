@@ -25,7 +25,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 
 import org.jg.wordstonumbers.WordsToNumbersUtil
 
-import app.crossword.yourealwaysbe.forkyz.exttools.ChatGPTHelpData
+import app.crossword.yourealwaysbe.forkyz.exttools.AppNotFoundException
 import app.crossword.yourealwaysbe.forkyz.exttools.CrosswordSolverData
 import app.crossword.yourealwaysbe.forkyz.exttools.DuckDuckGoData
 import app.crossword.yourealwaysbe.forkyz.exttools.ExternalDictionaries
@@ -33,6 +33,8 @@ import app.crossword.yourealwaysbe.forkyz.exttools.ExternalToolData
 import app.crossword.yourealwaysbe.forkyz.exttools.FifteenSquaredData
 import app.crossword.yourealwaysbe.forkyz.exttools.SharePuzzleData
 import app.crossword.yourealwaysbe.forkyz.exttools.ShareTextData
+import app.crossword.yourealwaysbe.forkyz.exttools.askChatGPTForCurrentClue
+import app.crossword.yourealwaysbe.forkyz.exttools.isChatGPTEnabled
 import app.crossword.yourealwaysbe.forkyz.inttools.ClueListData
 import app.crossword.yourealwaysbe.forkyz.inttools.ClueNotesData
 import app.crossword.yourealwaysbe.forkyz.inttools.InternalToolData
@@ -52,14 +54,15 @@ import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 import app.crossword.yourealwaysbe.forkyz.view.PlayboardTextRenderer
 import app.crossword.yourealwaysbe.forkyz.view.PuzzleFinishedDialogViewModel
 import app.crossword.yourealwaysbe.forkyz.view.PuzzleInfoDialogViewModel
+import app.crossword.yourealwaysbe.forkyz.view.SpecialEntryDialogViewModel
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Clue
 import app.crossword.yourealwaysbe.puz.ClueID
 import app.crossword.yourealwaysbe.puz.Playboard
 import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges
 import app.crossword.yourealwaysbe.puz.Playboard.PlayboardListener
-import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.Position
+import app.crossword.yourealwaysbe.puz.Puzzle
 
 enum class PuzzleSubMenu {
     NONE,
@@ -148,6 +151,16 @@ data class FlagCellDialogState(
 data class EditClueDialogState(
     val clueID : ClueID,
     val hint : String,
+)
+
+data class DialogMessage(
+    val title : String,
+    val message : String,
+)
+
+data class AppNotFoundDialogState(
+    val appName : String,
+    val appURL : String,
 )
 
 data class PuzzleActivityUIState(
@@ -278,37 +291,40 @@ open class PuzzleActivityViewModel @Inject constructor(
     val infoDialogViewModel : StateFlow<PuzzleInfoDialogViewModel?>
         = _infoDialogViewModel
 
-    /**
-     * When not null show dialog with view model
-     */
     private val _finishedDialogViewModel
         = MutableStateFlow<PuzzleFinishedDialogViewModel?>(null)
     val finishedDialogViewModel : StateFlow<PuzzleFinishedDialogViewModel?>
         = _finishedDialogViewModel
 
-    /**
-     * When not null show dialog with view model
-     */
     private val _flagClueDialogState
         = MutableStateFlow<FlagClueDialogState?>(null)
     val flagClueDialogState : StateFlow<FlagClueDialogState?>
         = _flagClueDialogState
 
-    /**
-     * When not null show dialog with view model
-     */
     private val _editClueDialogState
         = MutableStateFlow<EditClueDialogState?>(null)
     val editClueDialogState : StateFlow<EditClueDialogState?>
         = _editClueDialogState
 
-    /**
-     * When not null show dialog with view model
-     */
     private val _flagCellDialogState
         = MutableStateFlow<FlagCellDialogState?>(null)
     val flagCellDialogState : StateFlow<FlagCellDialogState?>
         = _flagCellDialogState
+
+    private val _dialogMessage
+        = MutableStateFlow<DialogMessage?>(null)
+    val dialogMessage : StateFlow<DialogMessage?>
+        = _dialogMessage
+
+    private val _appNotFoundDialogState
+        = MutableStateFlow<AppNotFoundDialogState?>(null)
+    val appNotFoundDialogState : StateFlow<AppNotFoundDialogState?>
+        = _appNotFoundDialogState
+
+    private val _specialEntryDialogViewModel
+        = MutableStateFlow<SpecialEntryDialogViewModel?>(null)
+    val specialEntryDialogViewModel : StateFlow<SpecialEntryDialogViewModel?>
+        = _specialEntryDialogViewModel
 
     private val keyboardManager = KeyboardManagerKt(
         settings,
@@ -497,14 +513,34 @@ open class PuzzleActivityViewModel @Inject constructor(
             sendToast(app.getString(R.string.help_query_but_no_active_network))
         } else {
             getBoard()?.let { board ->
-                ChatGPTHelpData.buildForCurrentClue(
+                askChatGPTForCurrentClue(
                     app,
                     settings,
                     board,
-                    externalToolEvent::postValue,
-                )
+                ) { response ->
+                    val app : Application = getApplication()
+                    sendDialogMessage(
+                        app.getString(R.string.help_query_response_title),
+                        response,
+                    )
+                }
             }
         }
+    }
+
+    fun clearDialogMessage() {
+        _dialogMessage.value = null
+    }
+
+    fun handleAppNotFoundException(e : AppNotFoundException) {
+        _appNotFoundDialogState.value = AppNotFoundDialogState(
+            e.appName,
+            e.appURL,
+        )
+    }
+
+    fun clearAppNotFoundDialog() {
+        _appNotFoundDialogState.value = null
     }
 
     fun shareClue(withResponse : Boolean) {
@@ -831,6 +867,17 @@ open class PuzzleActivityViewModel @Inject constructor(
         _finishedDialogViewModel.value = null
     }
 
+    fun doSpecialEntry() {
+        _specialEntryDialogViewModel.value = SpecialEntryDialogViewModel(
+            settings,
+            currentPuzzleHolder,
+        )
+    }
+
+    fun clearSpecialEntry() {
+        _specialEntryDialogViewModel.value = null
+    }
+
     /**
      * Prepared command for inputting letters
      */
@@ -1072,7 +1119,7 @@ open class PuzzleActivityViewModel @Inject constructor(
     }
 
     private fun handleChangeChatGPT(changes : PlayboardChanges) {
-        ChatGPTHelpData.isEnabled(settings) { isEnabled ->
+        isChatGPTEnabled(settings) { isEnabled ->
             if (isEnabled) {
                 val newWord = changes.previousWord != changes.currentWord
                 if (newWord)
@@ -1106,6 +1153,13 @@ open class PuzzleActivityViewModel @Inject constructor(
                 showDialog = PuzzleDialog.NONE,
             )
         }
+    }
+
+    private fun sendDialogMessage(
+        title : String,
+        message : String,
+    ) {
+        _dialogMessage.value = DialogMessage(title, message)
     }
 }
 

@@ -83,32 +83,8 @@ class ThemeHelper @Inject constructor(val settings : ForkyzSettings) {
         )
     }
 
-    /**
-     * To theme non-compose parts of the app
-     */
-    fun themeApplication(app : Application) {
-        // has to be blocking: a late theme change won't get picked up
-        if (appTheme == Theme.T_DYNAMIC)
-            DynamicColors.applyToActivitiesIfAvailable(app);
-    }
-
-    /**
-     * To theme non-compose parts of the app
-     */
-    fun themeActivity(activity : Activity) {
-        // needs to be blocking so can be done before end of onCreate in
-        // ForkyzActivity (else toolbar not themed)
-        when (appTheme) {
-            Theme.T_STANDARD -> activity.setTheme(R.style.Theme_Forkyz_Standard)
-            Theme.T_LEGACY_LIKE -> {
-                activity.setTheme(R.style.Theme_Forkyz_LegacyLike)
-            }
-            else -> { /* keep main theme */ }
-        }
-    }
-
     @Composable
-    private fun isDarkMode(dayNightMode : DayNightMode?) : Boolean {
+    private fun isDarkMode(appDayNightMode : DayNightMode?) : Boolean {
         return when (appDayNightMode) {
             DayNightMode.DNM_DAY -> false
             DayNightMode.DNM_NIGHT -> true

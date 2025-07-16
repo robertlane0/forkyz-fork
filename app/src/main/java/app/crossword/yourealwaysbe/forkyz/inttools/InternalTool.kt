@@ -1,7 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.inttools
 
-import androidx.appcompat.app.AppCompatActivity
+import android.app.Activity
 
 /**
  * Frame work for passing interal tool tasks from view model to ui
@@ -36,5 +36,5 @@ abstract class InternalToolData {
  * Should be all main thread and just use data, not access backend
  * puzzle/settings/&c.
  */
-class InternalToolLauncher(val activity : AppCompatActivity) { }
+class InternalToolLauncher(val activity : Activity) { }
 

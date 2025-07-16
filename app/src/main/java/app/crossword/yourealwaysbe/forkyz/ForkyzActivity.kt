@@ -31,7 +31,7 @@ open class ForkyzActivity : AppCompatActivity() {
     // Only used for setting nightmode for non-compose views
     // breaking mvvm here -- rather than introduce a
     // ForkyzActivityViewModel for this legacy band-aid.
-    // TODO: remove with NightModeHelper once all Compose
+    // TODO: remove with NightModeHelper once all colors from Compose
     @Inject
     lateinit var settings : ForkyzSettings
 

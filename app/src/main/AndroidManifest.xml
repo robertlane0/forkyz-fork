@@ -136,11 +136,6 @@
             android:exported="false"
         />
         <activity
-            android:name="app.crossword.yourealwaysbe.forkyz.util.ImportedNowFinishDialogActivity"
-            android:theme="@style/Theme.Forkyz.Floating"
-            android:exported="false"
-        />
-        <activity
             android:name="app.crossword.yourealwaysbe.forkyz.LogcatActivity"
             android:label="@string/logcat"
             android:theme="@style/Theme.Forkyz"

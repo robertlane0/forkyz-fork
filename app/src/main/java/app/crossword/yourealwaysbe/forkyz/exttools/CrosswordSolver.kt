@@ -1,7 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.exttools
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.ActivityNotFoundException
 
 import app.crossword.yourealwaysbe.forkyz.R
 import app.crossword.yourealwaysbe.puz.Box
@@ -82,8 +82,9 @@ class CrosswordSolverData(
     }
 }
 
-fun ExternalToolLauncher.visit(data : CrosswordSolverData)
-    = ExternalCaller.launchApp(
+@Throws(AppNotFoundException::class)
+fun ExternalToolLauncher.visit(data : CrosswordSolverData) {
+    ExternalCaller.launchApp(
         this.activity,
         CROSSWORD_SOLVER,
         data.requestType.uri,
@@ -92,4 +93,5 @@ fun ExternalToolLauncher.visit(data : CrosswordSolverData)
         this.activity.getString(R.string.crossword_solver),
         CROSSWORD_SOLVER_WEBSITE_URL,
     )
+}
 

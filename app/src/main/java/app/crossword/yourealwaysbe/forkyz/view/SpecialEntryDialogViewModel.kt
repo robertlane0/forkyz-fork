@@ -1,39 +1,25 @@
 
 package app.crossword.yourealwaysbe.forkyz.view
 
-import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-
-import dagger.hilt.android.lifecycle.HiltViewModel
 
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
 import app.crossword.yourealwaysbe.puz.Playboard
 
-@HiltViewModel
-open class SpecialEntryDialogViewModel @Inject constructor(
-    application : Application,
+class SpecialEntryDialogViewModel(
     val settings : ForkyzSettings,
     val currentPuzzleHolder : CurrentPuzzleHolder,
-) : AndroidViewModel(application) {
-
+) {
     private val _response = MutableStateFlow<String>("")
     val response : StateFlow<String> = _response
 
     val forceCaps : LiveData<Boolean> = settings.livePlaySpecialEntryForceCaps
 
-    /**
-     * Call on create to make sure up to date
-     *
-     * Doing this during view model init doesn't work -- multiple calls
-     * to the dialog may use the same view model.
-     */
-    fun refreshResponse() {
+    init {
         getBoard()?.getCurrentBox()?.let { box ->
             if (box.isBlank)
                 _response.value = ""

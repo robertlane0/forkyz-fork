@@ -1,7 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.exttools
 
-import androidx.appcompat.app.AppCompatActivity
+import android.app.Activity
 
 /**
  * Frame work for passing external tool tasks from view model to ui
@@ -17,6 +17,14 @@ import androidx.appcompat.app.AppCompatActivity
  *
  * See tools in this dir for examples.
  */
+
+/**
+ * Thrown when app can't be launched
+ */
+class AppNotFoundException(
+    val appName : String,
+    val appURL : String,
+) : Exception()
 
 /**
  * Data for external tool call
@@ -35,6 +43,11 @@ abstract class ExternalToolData {
  *
  * Should be all main thread and just use data, not access backend
  * puzzle/settings/&c.
+ *
+ * Response passed by callback should be displayed in an OK dialog to
+ * the user.
  */
-class ExternalToolLauncher(val activity : AppCompatActivity) { }
+class ExternalToolLauncher(
+    val activity : Activity,
+) { }
 

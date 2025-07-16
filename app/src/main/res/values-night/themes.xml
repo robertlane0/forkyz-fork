@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <!-- base night theme for versioned alternatives -->
-    <style
-        name="Theme.Forkyz.DayNightBase"
-        parent="Theme.Material3.DynamicColors.Dark"
-    >
-    </style>
-</resources>

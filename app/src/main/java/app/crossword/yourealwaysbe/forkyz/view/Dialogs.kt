@@ -186,8 +186,23 @@ fun OKDialog(
     onClose : () -> Unit,
     body : @Composable () -> Unit = { },
 ) {
-    PlainDialog(
+    OKDialog(
         title = stringResource(title),
+        summary = summary,
+        onClose = onClose,
+        body = body,
+    )
+}
+
+@Composable
+fun OKDialog(
+    title : String,
+    summary : String?,
+    onClose : () -> Unit,
+    body : @Composable () -> Unit = { },
+) {
+    PlainDialog(
+        title = title,
         summary = summary,
         onClose = onClose
     ) {
