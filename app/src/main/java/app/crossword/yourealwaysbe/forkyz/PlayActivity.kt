@@ -231,7 +231,9 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
         themeHelper.ForkyzTopAppBar(
             title = {
                 if (state?.isClueBelowGrid ?: false) {
-                    val title = state?.puzzleTitle ?: ""
+                    val title = state?.puzzleTitle ?: stringResource(
+                        R.string.app_name
+                    )
                     Text(
                         text = AnnotatedString.fromHtml(title),
                         minLines = 1,

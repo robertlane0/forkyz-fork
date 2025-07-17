@@ -45,7 +45,7 @@ import app.crossword.yourealwaysbe.puz.Puzzle
  */
 data class PlayActivityUIState(
     val clueText : String? = null,
-    val puzzleTitle : String = "",
+    val puzzleTitle : String? = null,
     val isClueBelowGrid : Boolean = false,
     val showClueTabs : Boolean = false,
     val clueTabsPage0 : Int = 0,
