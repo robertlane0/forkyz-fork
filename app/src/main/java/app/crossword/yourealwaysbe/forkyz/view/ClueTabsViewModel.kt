@@ -25,6 +25,7 @@ import app.crossword.yourealwaysbe.puz.Playboard.Word
  */
 data class SnapToClueEvent(
     val paneIndex : Int,
+    val pageNum : Int,
     val clueIndex : Int,
 )
 
@@ -224,8 +225,9 @@ class ClueTabsViewModel(
 
         _uiState.value = uiState.value?.copy(
             snapToClueEvent = SnapToClueEvent(
-                if (listShown0) 0 else 1,
-                if (isHistory) historyIndex else cid.index,
+                paneIndex = if (listShown0) 0 else 1,
+                pageNum = pageNum,
+                clueIndex = if (isHistory) historyIndex else cid.index,
             ),
         )
 

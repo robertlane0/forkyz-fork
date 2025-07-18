@@ -239,7 +239,7 @@ fun ClueTabs(
 
         LaunchedEffect(state?.snapToClueEvent) {
             state?.snapToClueEvent?.let { event ->
-                if (event.paneIndex == paneIndex) {
+                if (event.paneIndex == paneIndex && event.pageNum == page) {
                     coroutineScope.launch {
                         listState.scrollToItem(event.clueIndex)
                     }
