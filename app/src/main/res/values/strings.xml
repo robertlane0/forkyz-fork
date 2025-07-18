@@ -726,6 +726,7 @@
     <string name="help_query_just_response">Give me a hint for the crossword clue \"%1$s\". So far my answer is \"%2$s\".</string>
     <string name="help_query_just_solution">Give me a hint for the crossword clue \"%1$s\". The solution is \"%2$s\", but don\'t tell me that.</string>
     <string name="help_query_just_clue">Give me a hint for the crossword clue \"%1$s\".</string>
+    <string name="help_no_clue_to_query">Please select a clue to ask for help with.</string>
     <string name="help_query_failed">Help query failed. Please check your network connection and API key in settings.</string>
     <string name="help_query_response_title">ChatGPT Help Response</string>
     <string name="help_query_chat_gpt">Ask ChatGPT for Help"</string>

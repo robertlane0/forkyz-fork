@@ -104,8 +104,6 @@ fun apacheGetURLInputStream(
 
 /**
  * Makes a JSON post request and reads JSON response
- *
- * Returns null if error (not JSON err response)
  */
 @Throws(IOException::class, JSONException::class)
 @JvmOverloads

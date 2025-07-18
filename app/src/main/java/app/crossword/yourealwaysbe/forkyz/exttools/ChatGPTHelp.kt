@@ -2,7 +2,6 @@
 package app.crossword.yourealwaysbe.forkyz.exttools
 
 import java.io.IOException
-import java.util.function.Consumer
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -47,9 +46,15 @@ fun askChatGPTForCurrentClue(
 ) {
     settings.getExtChatGPTAPIKey() { apiKey ->
         apiKey?.let { apiKey ->
-            makeQuery(context, board)?.let { query ->
+            val query = makeQuery(context, board)
+            if (query == null) {
+                callback(context.getString(R.string.help_no_clue_to_query))
+            } else {
                 makeRequest(apiKey, query) { response ->
-                    callback(response)
+                    if (response == null)
+                        callback(context.getString(R.string.help_query_failed))
+                    else
+                        callback(response)
                 }
             }
         }
@@ -58,9 +63,9 @@ fun askChatGPTForCurrentClue(
 
 // method should become redundant when all Kotlin/Compose
 @MainThread
-fun isChatGPTEnabled(settings : ForkyzSettings, cb : Consumer<Boolean>) {
+fun isChatGPTEnabled(settings : ForkyzSettings, cb : (Boolean) -> Unit) {
     settings.getExtChatGPTAPIKey() { apiKey ->
-        cb.accept(isChatGPTEnabled(apiKey))
+        cb(isChatGPTEnabled(apiKey))
     }
 }
 
@@ -70,7 +75,7 @@ fun isChatGPTEnabled(extSettings : ExternalToolSettings) : Boolean
 private fun makeRequest(
     apiKey : String,
     query : String,
-    callback : Consumer<String>,
+    callback : (String?) -> Unit,
 ) {
     val ioScope = CoroutineScope(Dispatchers.IO)
     ioScope.launch {
@@ -81,11 +86,11 @@ private fun makeRequest(
                 headers = mapOf("Authorization" to "Bearer " + apiKey),
                 data = getQueryData(query),
             )
-            callback.accept(getQueryResponse(json))
+            callback(getQueryResponse(json))
         } catch (e : IOException) {
-            // ignore bad response?
+            callback(null)
         } catch (e : JSONException) {
-            // ignore bad response?
+            callback(null)
         }
     }
 }
