@@ -488,7 +488,10 @@ class NotesActivity() : PuzzleActivity() {
             text = {
                 MenuText(stringResource(R.string.menu_flag_clue_toggle))
             },
-            onClick = viewModel::toggleClueFlag,
+            onClick = {
+                viewModel.toggleClueFlag()
+                viewModel.dismissMenu()
+            },
         )
     }
 
@@ -498,7 +501,10 @@ class NotesActivity() : PuzzleActivity() {
             text = {
                 MenuText(stringResource(R.string.menu_flag_cell_toggle))
             },
-            onClick = viewModel::toggleCellFlag,
+            onClick = {
+                viewModel.toggleCellFlag()
+                viewModel.dismissMenu()
+            },
         )
     }
 
