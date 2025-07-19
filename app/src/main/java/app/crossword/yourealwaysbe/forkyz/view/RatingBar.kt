@@ -9,6 +9,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.viewinterop.AndroidView
 
+private val UNSELECTED_ALPHA = 0.3F
+
 @Composable
 fun RatingBar(
     modifier : Modifier = Modifier,
@@ -19,15 +21,18 @@ fun RatingBar(
     isIndicator : Boolean = false,
     style : Int = 0,
 ) {
-    val primary = MaterialTheme.colorScheme.primary.toArgb()
-    val background = MaterialTheme.colorScheme.background.toArgb()
+    val selected = MaterialTheme.colorScheme.primary.toArgb()
+    val unselected = MaterialTheme.colorScheme
+        .primary
+        .copy(alpha=UNSELECTED_ALPHA)
+        .toArgb()
     val selectedStateList = ColorStateList(
         arrayOf(intArrayOf()),
-        intArrayOf(primary),
+        intArrayOf(selected),
     )
     val unSelectedStateList = ColorStateList(
         arrayOf(intArrayOf()),
-        intArrayOf(background),
+        intArrayOf(unselected),
     )
     AndroidView(
         modifier = modifier,
