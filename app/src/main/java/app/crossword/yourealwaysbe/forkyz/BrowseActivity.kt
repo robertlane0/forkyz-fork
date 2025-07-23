@@ -777,7 +777,7 @@ class BrowseActivity() : ForkyzActivity() {
             modifier = Modifier.fillMaxWidth()
                 .background(MaterialTheme.colorScheme.background)
                 .padding(horizontal=HORIZONTAL_PADDING)
-                .padding(top=16.dp, bottom=8.dp),
+                .padding(top=4.dp, bottom=4.dp),
             text = AnnotatedString.fromHtml(header),
             color = MaterialTheme.colorScheme.onBackground,
         )
