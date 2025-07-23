@@ -35,6 +35,7 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
@@ -310,6 +311,17 @@ class SettingsActivity : ForkyzActivity() {
                             onValueChange = item.setValue,
                         )
                     }
+                    is SettingsTriState -> {
+                        val state by item.value.observeAsState()
+                        SettingsTriState(
+                            modifier = modifier,
+                            title = title,
+                            summary = summary,
+                            value = state ?: TriState.OFF,
+                            onValueChange = item.setValue,
+                            errorMsg = errorMsg?.value,
+                        )
+                    }
                     is SettingsInputItem -> {
                         SettingsClickable(
                             modifier = modifier,
@@ -408,6 +420,52 @@ class SettingsActivity : ForkyzActivity() {
                 modifier = Modifier.padding(start = SWITCH_PADDING),
                 checked = value,
                 onCheckedChange = onValueChange,
+            )
+        }
+    }
+
+    @Composable
+    fun SettingsTriState(
+        modifier : Modifier,
+        title : String,
+        summary : String?,
+        errorMsg : String?,
+        value : TriState,
+        onValueChange : (TriState) -> Unit,
+    ) {
+        fun onBooleanChange(newBoolean : Boolean) {
+            onValueChange(if (newBoolean) TriState.ON else TriState.OFF)
+        }
+
+        val booleanValue = value != TriState.OFF
+        val colors = if (value == TriState.INDETERMINATE) {
+            val defaults = SwitchDefaults.colors()
+            SwitchDefaults.colors(
+                checkedThumbColor = defaults.uncheckedThumbColor,
+                checkedTrackColor = defaults.uncheckedTrackColor,
+                checkedBorderColor = defaults.uncheckedBorderColor,
+            )
+        } else {
+            SwitchDefaults.colors()
+        }
+
+        Row(
+            modifier = Modifier
+                .clickable { onBooleanChange(!booleanValue) }
+                .then(modifier),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            SettingsDescription(
+                modifier = Modifier.weight(1.0f),
+                title = title,
+                summary = summary,
+                errorMsg = errorMsg,
+            )
+            Switch(
+                modifier = Modifier.padding(start = SWITCH_PADDING),
+                checked = booleanValue,
+                onCheckedChange = { onBooleanChange(it) },
+                colors = colors,
             )
         }
     }

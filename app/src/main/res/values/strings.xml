@@ -255,6 +255,12 @@
     <string name="metro_cryptic">Metro Cryptic</string>
     <string name="metro_quick">Metro Quick</string>
     <string name="irish_news_cryptic">Irish News Cryptic</string>
+    <string name="toggle_all_daily_sources">All Daily Sources</string>
+    <string name="toggle_all_daily_sources_desc">Toggle all daily sources.</string>
+    <string name="toggle_all_weekly_sources">All Weekly Sources</string>
+    <string name="toggle_all_weekly_sources_desc">Toggle all weekly sources.</string>
+    <string name="toggle_all_scrapers">All Scrapers</string>
+    <string name="toggle_all_scrapers_desc">Toggle all scrapers.</string>
 
     <!-- preferences display -->
     <string name="clue_below_grid">Clue Below Grid</string>

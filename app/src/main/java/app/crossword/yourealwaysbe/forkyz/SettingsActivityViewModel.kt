@@ -48,6 +48,7 @@ import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation
 import app.crossword.yourealwaysbe.forkyz.settings.Theme
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerSAF
+import app.crossword.yourealwaysbe.forkyz.util.liveDataFanIn
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 
 enum class SettingsPage(val title : Int) {
@@ -117,6 +118,48 @@ class SettingsBoolean(
     val value : LiveData<Boolean>,
     val setValue : (Boolean) -> Unit,
 ) : SettingsNamedItem(page, title, summary)
+
+enum class TriState {
+    OFF, INDETERMINATE, ON
+}
+
+class SettingsTriState(
+    page : SettingsPage,
+    title : Int,
+    summary : Int?,
+    val value : LiveData<TriState>,
+    val setValue : (TriState) -> Unit,
+) : SettingsNamedItem(page, title, summary) {
+    companion object {
+        fun build(
+            page : SettingsPage,
+            title : Int,
+            summary : Int?,
+            booleans : List<SettingsBoolean>,
+        ) : SettingsTriState {
+            return SettingsTriState(
+                page,
+                title,
+                summary,
+                liveDataFanIn(
+                    { booleans.triState { it.value.value ?: false } },
+                    *(booleans.map { it.value }.toTypedArray())
+                ),
+                {
+                    when (it) {
+                        TriState.ON -> {
+                            booleans.forEach { it.setValue(true) }
+                        }
+                        TriState.OFF -> {
+                            booleans.forEach { it.setValue(false) }
+                        }
+                        else -> { /* do nothing */ }
+                    }
+                },
+            )
+        }
+    }
+}
 
 /**
  * Label can be id or string
@@ -387,95 +430,7 @@ class SettingsActivityViewModel @Inject constructor(
             null,
         )
 
-    private val settingsItemsList : List<SettingsItem> = listOf(
-        SettingsDynamicList<StorageLocation>(
-            SettingsPage.ROOT,
-            R.string.storage_location,
-            R.string.storage_location_desc,
-            storageLocationsLiveData,
-            settings.liveFileHandlerStorageLocation,
-            this::onStorageLocationChange,
-        ),
-        SettingsSubPage(
-            SettingsPage.ROOT,
-            R.string.select_sources_desc,
-            SettingsPage.PUZZLE_SOURCES,
-        ),
-        SettingsSubPage(
-            SettingsPage.ROOT,
-            R.string.download_settings_desc,
-            SettingsPage.DOWNLOAD,
-        ),
-        SettingsSubPage(
-            SettingsPage.ROOT,
-            R.string.browser_settings_desc,
-            SettingsPage.BROWSER,
-        ),
-        SettingsSubPage(
-            SettingsPage.ROOT,
-            R.string.display_settings_desc,
-            SettingsPage.DISPLAY,
-        ),
-        SettingsSubPage(
-            SettingsPage.ROOT,
-            R.string.interaction_settings_desc,
-            SettingsPage.INTERACTION,
-        ),
-        SettingsSubPage(
-            SettingsPage.ROOT,
-            R.string.keyboard_settings_desc,
-            SettingsPage.KEYBOARD,
-        ),
-        SettingsSubPage(
-            SettingsPage.ROOT,
-            R.string.voice_settings_desc,
-            SettingsPage.VOICE_ACCESSIBILITY,
-        ),
-        SettingsSubPage(
-            SettingsPage.ROOT,
-            R.string.external_tools_settings_desc,
-            SettingsPage.EXTERNAL_TOOLS,
-        ),
-        SettingsSubPage(
-            SettingsPage.ROOT,
-            R.string.preferences_export_import_desc,
-            SettingsPage.EXPORT_IMPORT,
-        ),
-        SettingsHeading(
-            SettingsPage.ROOT,
-            R.string.about_forkyz,
-        ),
-        SettingsHTMLPage(
-            SettingsPage.ROOT,
-            R.string.release_notes,
-            "release.html",
-        ),
-        SettingsHTMLPage(
-            SettingsPage.ROOT,
-            R.string.license,
-            "license.html",
-        ),
-        SettingsLogcat(
-            SettingsPage.ROOT,
-            R.string.logcat,
-        ),
-
-        // Sources
-        SettingsSubPage(
-            SettingsPage.PUZZLE_SOURCES,
-            R.string.daily_crosswords_desc,
-            SettingsPage.PUZZLE_SOURCES_DAILY,
-        ),
-        SettingsSubPage(
-            SettingsPage.PUZZLE_SOURCES,
-            R.string.weekly_crosswords_desc,
-            SettingsPage.PUZZLE_SOURCES_WEEKLY,
-        ),
-        SettingsSubPage(
-            SettingsPage.PUZZLE_SOURCES,
-            R.string.scraper_sources_desc,
-            SettingsPage.PUZZLE_SOURCES_SCRAPERS,
-        ),
+    private val downloadersTogglesDaily = listOf(
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
             R.string.de_standaard,
@@ -609,39 +564,19 @@ class SettingsActivityViewModel @Inject constructor(
             settings.liveDownloadWsj,
             settings::setDownloadWsj,
         ),
-        SettingsHeading(
-            SettingsPage.PUZZLE_SOURCES_DAILY,
-            R.string.custom_daily,
-        ),
+    )
+
+    val downloadersTogglesCustomDaily = listOf(
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
             R.string.custom,
             R.string.custom_desc,
             settings.liveDownloadCustomDaily,
             settings::setDownloadCustomDaily,
-        ),
-        SettingsString(
-            SettingsPage.PUZZLE_SOURCES_DAILY,
-            R.string.custom_title,
-            R.string.custom_title_desc,
-            R.string.custom_title_hint,
-            settings.liveDownloadCustomDailyTitle,
-            settings::setDownloadCustomDailyTitle,
-        ),
-        SettingsString(
-            SettingsPage.PUZZLE_SOURCES_DAILY,
-            R.string.custom_url,
-            R.string.custom_url_desc,
-            R.string.custom_url_hint,
-            settings.liveDownloadCustomDailyURL,
-            settings::setDownloadCustomDailyURL,
-            downloadCustomDailyURLErrorMsg,
-        ),
-        SettingsHeading(
-            SettingsPage.PUZZLE_SOURCES_WEEKLY,
-            R.string.regular_sized,
-            null,
-        ),
+        )
+    )
+
+    val downloadersTogglesWeeklyRegular = listOf(
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_WEEKLY,
             R.string.de_telegraaf,
@@ -663,11 +598,9 @@ class SettingsActivityViewModel @Inject constructor(
             settings.liveDownloadGuardianWeeklyQuiptic,
             settings::setDownloadGuardianWeeklyQuiptic,
         ),
-        SettingsHeading(
-            SettingsPage.PUZZLE_SOURCES_WEEKLY,
-            R.string.large_sized,
-            null,
-        ),
+    )
+
+    val downloadersTogglesWeeklyLarge = listOf(
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_WEEKLY,
             R.string.premier_crossword,
@@ -682,6 +615,9 @@ class SettingsActivityViewModel @Inject constructor(
             settings.liveDownloadWaPoSunday,
             settings::setDownloadWaPoSunday,
         ),
+    )
+
+    val downloadersTogglesScrapers = listOf(
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_SCRAPERS,
             R.string.cru_puzzle_workshop,
@@ -717,6 +653,151 @@ class SettingsActivityViewModel @Inject constructor(
             settings.liveScrapePrzekroj,
             settings::setScrapePrzekroj,
         ),
+    )
+
+    private val settingsItemsList : List<SettingsItem> = listOf(
+        SettingsDynamicList<StorageLocation>(
+            SettingsPage.ROOT,
+            R.string.storage_location,
+            R.string.storage_location_desc,
+            storageLocationsLiveData,
+            settings.liveFileHandlerStorageLocation,
+            this::onStorageLocationChange,
+        ),
+        SettingsSubPage(
+            SettingsPage.ROOT,
+            R.string.select_sources_desc,
+            SettingsPage.PUZZLE_SOURCES,
+        ),
+        SettingsSubPage(
+            SettingsPage.ROOT,
+            R.string.download_settings_desc,
+            SettingsPage.DOWNLOAD,
+        ),
+        SettingsSubPage(
+            SettingsPage.ROOT,
+            R.string.browser_settings_desc,
+            SettingsPage.BROWSER,
+        ),
+        SettingsSubPage(
+            SettingsPage.ROOT,
+            R.string.display_settings_desc,
+            SettingsPage.DISPLAY,
+        ),
+        SettingsSubPage(
+            SettingsPage.ROOT,
+            R.string.interaction_settings_desc,
+            SettingsPage.INTERACTION,
+        ),
+        SettingsSubPage(
+            SettingsPage.ROOT,
+            R.string.keyboard_settings_desc,
+            SettingsPage.KEYBOARD,
+        ),
+        SettingsSubPage(
+            SettingsPage.ROOT,
+            R.string.voice_settings_desc,
+            SettingsPage.VOICE_ACCESSIBILITY,
+        ),
+        SettingsSubPage(
+            SettingsPage.ROOT,
+            R.string.external_tools_settings_desc,
+            SettingsPage.EXTERNAL_TOOLS,
+        ),
+        SettingsSubPage(
+            SettingsPage.ROOT,
+            R.string.preferences_export_import_desc,
+            SettingsPage.EXPORT_IMPORT,
+        ),
+        SettingsHeading(
+            SettingsPage.ROOT,
+            R.string.about_forkyz,
+        ),
+        SettingsHTMLPage(
+            SettingsPage.ROOT,
+            R.string.release_notes,
+            "release.html",
+        ),
+        SettingsHTMLPage(
+            SettingsPage.ROOT,
+            R.string.license,
+            "license.html",
+        ),
+        SettingsLogcat(
+            SettingsPage.ROOT,
+            R.string.logcat,
+        ),
+
+        // Sources
+        SettingsSubPage(
+            SettingsPage.PUZZLE_SOURCES,
+            R.string.daily_crosswords_desc,
+            SettingsPage.PUZZLE_SOURCES_DAILY,
+        ),
+        SettingsSubPage(
+            SettingsPage.PUZZLE_SOURCES,
+            R.string.weekly_crosswords_desc,
+            SettingsPage.PUZZLE_SOURCES_WEEKLY,
+        ),
+        SettingsSubPage(
+            SettingsPage.PUZZLE_SOURCES,
+            R.string.scraper_sources_desc,
+            SettingsPage.PUZZLE_SOURCES_SCRAPERS,
+        ),
+        SettingsTriState.build(
+            SettingsPage.PUZZLE_SOURCES_DAILY,
+            R.string.toggle_all_daily_sources,
+            R.string.toggle_all_daily_sources_desc,
+            downloadersTogglesDaily + downloadersTogglesCustomDaily,
+        ),
+    ) + downloadersTogglesDaily + listOf(
+        SettingsHeading(
+            SettingsPage.PUZZLE_SOURCES_DAILY,
+            R.string.custom_daily,
+        ),
+    ) + downloadersTogglesCustomDaily + listOf(
+        SettingsString(
+            SettingsPage.PUZZLE_SOURCES_DAILY,
+            R.string.custom_title,
+            R.string.custom_title_desc,
+            R.string.custom_title_hint,
+            settings.liveDownloadCustomDailyTitle,
+            settings::setDownloadCustomDailyTitle,
+        ),
+        SettingsString(
+            SettingsPage.PUZZLE_SOURCES_DAILY,
+            R.string.custom_url,
+            R.string.custom_url_desc,
+            R.string.custom_url_hint,
+            settings.liveDownloadCustomDailyURL,
+            settings::setDownloadCustomDailyURL,
+            downloadCustomDailyURLErrorMsg,
+        ),
+        SettingsTriState.build(
+            SettingsPage.PUZZLE_SOURCES_WEEKLY,
+            R.string.toggle_all_weekly_sources,
+            R.string.toggle_all_weekly_sources_desc,
+            downloadersTogglesWeeklyRegular + downloadersTogglesWeeklyLarge,
+        ),
+        SettingsHeading(
+            SettingsPage.PUZZLE_SOURCES_WEEKLY,
+            R.string.regular_sized,
+            null,
+        ),
+    ) + downloadersTogglesWeeklyRegular + listOf(
+        SettingsHeading(
+            SettingsPage.PUZZLE_SOURCES_WEEKLY,
+            R.string.large_sized,
+            null,
+        ),
+    ) + downloadersTogglesWeeklyLarge + listOf(
+        SettingsTriState.build(
+            SettingsPage.PUZZLE_SOURCES_SCRAPERS,
+            R.string.toggle_all_scrapers,
+            R.string.toggle_all_scrapers_desc,
+            downloadersTogglesScrapers,
+        ),
+    ) + downloadersTogglesScrapers + listOf(
         SettingsDivider(SettingsPage.PUZZLE_SOURCES_SCRAPERS),
         SettingsHTMLPage(
             SettingsPage.PUZZLE_SOURCES_SCRAPERS,
@@ -1828,4 +1909,25 @@ class SettingsActivityViewModel @Inject constructor(
         raiseNeedsURI(RequestedURI.PUZZLES_EXPORT)
     }
 }
+
+private fun <T> List<T>.triState(predicate : (T) -> Boolean) : TriState {
+    var hasFalse = false
+    var hasTrue = false
+    this.forEach {
+        if (predicate(it)) {
+            if (hasFalse)
+                return TriState.INDETERMINATE
+            hasTrue = true
+        } else {
+            if (hasTrue)
+                return TriState.INDETERMINATE
+            hasFalse = true
+        }
+    }
+    if (hasTrue)
+        return TriState.ON
+    else
+        return TriState.OFF
+}
+
 
