@@ -773,9 +773,16 @@ public class Downloaders {
 
             String urlDateFormatPattern = settings.getCustomDailyUrl();
 
-            downloaders.add(
-                new CustomDailyDownloader("custom", title, urlDateFormatPattern)
-            );
+            if (
+                urlDateFormatPattern != null
+                && !urlDateFormatPattern.trim().isEmpty()
+            ) {
+                downloaders.add(
+                    new CustomDailyDownloader(
+                        "custom", title, urlDateFormatPattern
+                    )
+                );
+            }
         }
     }
 
