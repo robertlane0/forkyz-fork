@@ -95,6 +95,7 @@ import com.leinardi.android.speeddial.compose.SpeedDial
 import com.leinardi.android.speeddial.compose.SpeedDialOverlay
 import com.leinardi.android.speeddial.compose.SpeedDialState
 
+import app.crossword.yourealwaysbe.forkyz.SettingsActivity
 import app.crossword.yourealwaysbe.forkyz.menu.BaseMenuModifier
 import app.crossword.yourealwaysbe.forkyz.menu.MenuDropdownHeading
 import app.crossword.yourealwaysbe.forkyz.menu.MenuHelp
@@ -1043,6 +1044,15 @@ class BrowseActivity() : ForkyzActivity() {
                 viewModel = it,
                 onCancel = viewModel::clearDownloadDialog,
                 onDownload = viewModel::okDownloadDialog,
+                onOpenSettings = {
+                    viewModel.clearDownloadDialog()
+                    startActivity(
+                        Intent(
+                            this@BrowseActivity,
+                            SettingsActivity::class.java
+                        )
+                    )
+                },
             )
         }
 

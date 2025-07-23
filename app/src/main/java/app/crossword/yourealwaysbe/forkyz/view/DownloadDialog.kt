@@ -35,6 +35,7 @@ fun DownloadDialog(
     viewModel : DownloadDialogViewModel,
     onCancel : () -> Unit,
     onDownload : () -> Unit,
+    onOpenSettings : () -> Unit,
 ) {
     val state by viewModel.uiState.observeAsState()
 
@@ -43,45 +44,56 @@ fun DownloadDialog(
         state?.selected?.contains(downloaders.get(it).internalName) ?: false
     }.toSet()
 
-    MultiListDialog(
-        title = R.string.download_puzzles,
-        allOrNoneLabel = R.string.select_sources,
-        numItems = downloaders.size,
-        getItem = { index -> DownloaderLabel(downloaders, index) },
-        getEnabled = { index -> getDownloaderEnabled(downloaders, index) },
-        selected = selected,
-        onSelect = { onDownload() },
-        onDismissRequest = onCancel,
-        onSelectionChange = { newSelection ->
-            viewModel.setSelection(
-                newSelection.filter { 0 <= it && it < downloaders.size }
-                    .map { downloaders[it].internalName }
-                    .toSet()
-            )
-        },
-        okLabel = R.string.download,
-    ) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
+    if (downloaders.size > 0) {
+        MultiListDialog(
+            title = R.string.download_puzzles,
+            allOrNoneLabel = R.string.select_sources,
+            numItems = downloaders.size,
+            getItem = { index -> DownloaderLabel(downloaders, index) },
+            getEnabled = { index -> getDownloaderEnabled(downloaders, index) },
+            selected = selected,
+            onSelect = { onDownload() },
+            onDismissRequest = onCancel,
+            onSelectionChange = { newSelection ->
+                viewModel.setSelection(
+                    newSelection.filter { 0 <= it && it < downloaders.size }
+                        .map { downloaders[it].internalName }
+                        .toSet()
+                )
+            },
+            okLabel = R.string.download,
         ) {
-            val date = state?.date ?: java.time.LocalDate.now()
-            val day = date.getDayOfWeek()
-                .getDisplayName(TextStyle.FULL, java.util.Locale.getDefault())
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                val date = state?.date ?: java.time.LocalDate.now()
+                val day = date.getDayOfWeek()
+                    .getDisplayName(TextStyle.FULL, java.util.Locale.getDefault())
 
-            Text(text = day)
-            WheelDatePicker(
-                modifier = Modifier.padding(vertical = 8.dp),
-                startDate = date.toKotlinLocalDate(),
-                dateFormatter = dateFormatter(
-                    Locale.current,
-                    MonthDisplayStyle.SHORT,
-                ),
-                onSnappedDate = { newDate ->
-                    viewModel.date = newDate.toJavaLocalDate()
-                },
-            )
+                Text(text = day)
+                WheelDatePicker(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                    startDate = date.toKotlinLocalDate(),
+                    dateFormatter = dateFormatter(
+                        Locale.current,
+                        MonthDisplayStyle.SHORT,
+                    ),
+                    onSnappedDate = { newDate ->
+                        viewModel.date = newDate.toJavaLocalDate()
+                    },
+                )
+            }
         }
+    } else {
+        TwoButtonDialog(
+            title = R.string.no_downloaders_enabled,
+            summary = R.string.no_downloaders_enabled_msg,
+            positiveText = R.string.settings,
+            onPositive = onOpenSettings,
+            negativeText = R.string.close,
+            onNegative = onCancel,
+        )
     }
 }
 
