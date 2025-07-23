@@ -371,7 +371,9 @@ class SettingsActivityViewModel @Inject constructor(
 
     private val downloadCustomDailyURLErrorMsg : StateFlow<String?>
         = settings.liveDownloadCustomDailyURL.map { url ->
-            url?.let { url ->
+            if (url == null || url.trim().isEmpty()) {
+                application.getString(R.string.custom_url_missing)
+            } else {
                 try {
                     DateTimeFormatter.ofPattern(url)
                     null
