@@ -91,7 +91,7 @@ fun DownloadDialog(
             summary = R.string.no_downloaders_enabled_msg,
             positiveText = R.string.settings,
             onPositive = onOpenSettings,
-            negativeText = R.string.close,
+            negativeText = android.R.string.cancel,
             onNegative = onCancel,
         )
     }
