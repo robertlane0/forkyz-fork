@@ -332,11 +332,10 @@ public class AbstractDateDownloader extends AbstractDownloader {
     public LocalDate getLatestDate(LocalDate until) {
         LocalDate now = LocalDate.now();
 
-        // look a day ahead (plus offset) and in previous week for an
-        // available date this relies on puzzles being weekly according
-        // to our model include this day last week in case current day
-        // not yet available
-        long lookAhead = -1;
+        // look ahead offset and in previous week for an available date this
+        // relies on puzzles being weekly according to our model include this
+        // day last week in case current day not yet available
+        long lookAhead = 0;
         Duration availabilityOffset = getUTCAvailabilityOffset();
         if (availabilityOffset != null)
             lookAhead += availabilityOffset.toDays();
@@ -346,6 +345,7 @@ public class AbstractDateDownloader extends AbstractDownloader {
             ? startDate
             : until;
 
+        System.out.println("FORKYZ: start " + startDate);
         int lenWindow = getLatestDateWindow();
         for (int i = 0; i <= lenWindow; i++) {
             LocalDate tryDate = startDate.plusDays(-i);

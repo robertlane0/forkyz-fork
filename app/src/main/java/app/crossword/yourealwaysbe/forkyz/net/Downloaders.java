@@ -619,7 +619,7 @@ public class Downloaders {
                 "Premier",
                 context.getString(R.string.premier_crossword),
                 AbstractDateDownloader.DAYS_SUNDAY,
-                Duration.ofDays(-7), // from full puzzle list during login
+                Duration.ofHours(0), // guess midnight NY
                 "https://puzzles.kingdigital.com",
                 arkadiumUrl,
                 arkadiumUrl,
