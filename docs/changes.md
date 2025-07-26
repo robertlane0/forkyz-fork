@@ -1,5 +1,13 @@
 # Forkyz Changelog
 
+## Version 69
+
+- New downloader dialog.
+- Toggle all puzzles in settings.
+- Complete transition of final app widgets to Compose.
+- Fix Everyman sharing.
+- Minor bug fixes and new bugs.
+
 ## Version 68
 
 - Add confirm delete dialog.
