@@ -414,7 +414,7 @@ class SettingsActivityViewModel @Inject constructor(
 
     private val downloadCustomDailyURLErrorMsg : StateFlow<String?>
         = settings.liveDownloadCustomDailyURL.map { url ->
-            if (url == null || url.trim().isEmpty()) {
+            if (url.trim().isEmpty()) {
                 application.getString(R.string.custom_url_missing)
             } else {
                 try {
