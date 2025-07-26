@@ -1,8 +1,6 @@
 
 package app.crossword.yourealwaysbe.puz;
 
-import java.util.Objects;
-
 public record ClueID(String listName, int index) implements Comparable<ClueID> {
     public String getListName() { return listName; }
     public int getIndex() { return index; }

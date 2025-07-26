@@ -2,17 +2,9 @@
 package app.crossword.yourealwaysbe.forkyz.exttools;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
-import android.os.Bundle;
-import androidx.fragment.app.DialogFragment;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-
-import app.crossword.yourealwaysbe.forkyz.R;
 
 /**
  * Helper method for calling out to an external app
