@@ -31,13 +31,14 @@ public class StreamScrapersTest {
         );
     }
 
-    @Test
-    public void testKeesing() throws Exception {
-        testScraper(
-            "https://app.standaard.be/kruiswoord",
-            new KeesingStreamScraper()
-        );
-    }
+    // Fails because of too many redirects, drop support for now
+    // @Test
+    // public void testKeesing() throws Exception {
+    //     testScraper(
+    //         "https://app.standaard.be/kruiswoord",
+    //         new KeesingStreamScraper()
+    //     );
+    // }
 
     @Test
     public void testPAPuzzles() throws Exception {
