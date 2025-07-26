@@ -310,6 +310,7 @@ class ForkyzSettingsTest {
 
     @Mock
     val prefs = mock(SharedPreferences::class.java)
+    val prefsEdit = mock(SharedPreferences.Editor::class.java)
 
     @Before
     fun setupSharedPrefs() {
@@ -567,10 +568,13 @@ class ForkyzSettingsTest {
             .thenReturn(true)
         `when`(prefs.getString(eq("uiTheme"), eq(null)))
             .thenReturn("NIGHT")
+        `when`(prefs.getBoolean(eq("useDynamicColors"), anyBoolean()))
+            .thenReturn(true)
         `when`(prefs.getBoolean(eq("useNativeKeyboard"), anyBoolean()))
             .thenReturn(true)
         `when`(prefs.getBoolean(eq("volumeActivatesVoice"), anyBoolean()))
             .thenReturn(true)
+        `when`(prefs.edit()).thenReturn(prefsEdit)
     }
 
     @Test
