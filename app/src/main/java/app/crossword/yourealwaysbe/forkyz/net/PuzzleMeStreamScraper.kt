@@ -28,7 +28,7 @@ import app.crossword.yourealwaysbe.puz.io.AmuseLabsJSONIO
  * >
  *
  * Stage 2: get embedded puzzle from
- *  https://cdn2.amuselabs.com/auth0/crossword?id=<id>&set=<set>
+ *  https://cdn2.amuselabs.com/puzzleme/crossword?id=<id>&set=<set>
  *
  * Stage 3: get rawc from JSON in above file.
  *
@@ -39,7 +39,7 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
         private val TAG = "ForkyzPuzzleMeStrmSrpr"
         private val DEFAULT_SOURCE = "PuzzleMe"
         private val STAGE2_URL_FORMAT
-            = "https://cdn2.amuselabs.com/auth0/crossword?id=%s&set=%s"
+            = "https://cdn2.amuselabs.com/puzzleme/crossword?id=%s&set=%s"
         private val JS_URL_FORMAT = "https://cdn2.amuselabs.com/puzzleme/%s"
         private val RAWC_REGEX = RegexScrape(
             Pattern.compile("\"rawc\":\\s*\"([^\"]*)\""),
@@ -91,7 +91,6 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
 
         if (cwID == null || cwSet == null)
             return bis
-
         return getInputStream(STAGE2_URL_FORMAT.format(cwID, cwSet))?.use {
             StreamUtils.makeByteArrayInputStream(it)
         } ?: bis
