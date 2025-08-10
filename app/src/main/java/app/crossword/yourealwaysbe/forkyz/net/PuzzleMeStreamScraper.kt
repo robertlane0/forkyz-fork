@@ -88,7 +88,6 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
 
         val cwID = div?.attribute("data-id")?.value
         val cwSet = div?.attribute("data-set")?.value
-
         if (cwID == null || cwSet == null)
             return bis
         return getInputStream(STAGE2_URL_FORMAT.format(cwID, cwSet))?.use {
@@ -121,7 +120,8 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
     private fun getFromDataData(dataData : DataData) : Puzzle? {
         val read : (String?) -> Puzzle? = AmuseLabsJSONIO::readPuzzle
         return base64DecodeRawC(dataData.rawc)?.let(read)
-            ?: everymanDeobfuscate(dataData)?.let(read)
+            ?: everymanDeobfuscateAugust2025(dataData)?.let(read)
+            ?: everymanDeobfuscatePreAugust2025(dataData)?.let(read)
     }
 
     /**
@@ -141,8 +141,35 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
     /**
      * Try to deobfuscate using format used in Everyman crossword
      */
-    private fun everymanDeobfuscate(dataData : DataData) : String? {
-        val passes = getDeobfuscatePasses(dataData.jsUrlSuffix)
+    private fun everymanDeobfuscateAugust2025(dataData : DataData) : String? {
+        // for ([var ]n=start; n < t.length; r+=step) { .. ?length .. }
+        return everymanDeobfuscateSwapPasses(
+            dataData,
+            "n=(\\d+);\\s*n\\s*<\\s*t.length"
+                + "\\s*;n\\+=(\\d+)[^?]{0,50}\\?\\s*(\\d+)",
+        )
+    }
+
+    /**
+     * Try to deobfuscate using format used in Everyman crossword
+     */
+    private fun everymanDeobfuscatePreAugust2025(dataData : DataData) : String? {
+        // for (r=start;..;r+=step) { .. ?length .. }
+        return everymanDeobfuscateSwapPasses(
+            dataData,
+            "r=(\\d+);[^;]{0,10};r\\+=(\\d+)[^?]{0,50}\\?(\\d+)"
+        );
+    }
+
+    /**
+     *  Do deobfuscate swaps
+     *
+     *  Regex used to identify the for loops doing the swapping
+     */
+    private fun everymanDeobfuscateSwapPasses(
+        dataData : DataData, passesRegex : String
+    ) : String? {
+        val passes = getDeobfuscatePasses(dataData.jsUrlSuffix, passesRegex)
         if (passes?.isEmpty() ?: true)
             return null
 
@@ -183,22 +210,20 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
 
     private fun getDeobfuscatePasses(
         jsUrlSuffix : String,
+        passesRegex : String
     ) : List<ObfuscatePass>? {
         try {
             val jsURL = String.format(JS_URL_FORMAT.format(jsUrlSuffix))
             val js = getInputStream(jsURL).use { it.reader().readText() }
 
-            // for (r=start;..;r+=step) { .. ?length .. }
-            val passRegex
-                = "r=(\\d+);[^;]{0,10};r\\+=(\\d+)[^?]{0,50}\\?(\\d+)".toRegex()
-
-            return passRegex.findAll(js).map { m ->
+            val passes = passesRegex.toRegex().findAll(js).map { m ->
                 ObfuscatePass(
                     m.groups[1]?.value?.toInt() ?: 0,
                     m.groups[2]?.value?.toInt() ?: Int.MAX_VALUE,
                     m.groups[3]?.value?.toInt() ?: 0,
                 )
             }.toList()
+            return passes
         } catch (e : IOException) {
             return null
         }
