@@ -30,7 +30,8 @@ public class PuzzleStreamReader implements PuzzleParser {
         new WallStreetJournalJSONIO(),
         new SpoonbillIO(),
         new ExolveIO(),
-        new PMLIO()
+        new PMLIO(),
+        new TCAJSONIO(),
     };
 
     /**
