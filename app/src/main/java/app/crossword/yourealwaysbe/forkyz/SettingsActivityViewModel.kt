@@ -482,6 +482,13 @@ class SettingsActivityViewModel @Inject constructor(
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
+            R.string.la_times,
+            R.string.la_times_desc,
+            settings.liveDownloadLATimes,
+            settings::setDownloadLATimes,
+        ),
+        SettingsBoolean(
+            SettingsPage.PUZZLE_SOURCES_DAILY,
             R.string.le_parisien_daily_f1,
             R.string.le_parisien_daily_f1_desc,
             settings.liveDownloadLeParisienF1,

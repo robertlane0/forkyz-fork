@@ -93,6 +93,7 @@ public class DownloadersTest {
             true, // downloadJonesin
             true, // downloadJoseph
             true, // download20Minutes
+            true, // downloadLATimes
             true, // downloadLeParisienF1
             true, // downloadLeParisienF2
             true, // downloadLeParisienF3

@@ -56,6 +56,7 @@ object SettingsSerializer : Serializer<Settings> {
         .setDownloadIrishNewsCryptic(true)
         .setDownloadJonesin(true)
         .setDownloadJoseph(true)
+        .setDownloadLATimes(true)
         .setDownloadLeParisienF1(true)
         .setDownloadLeParisienF2(true)
         .setDownloadLeParisienF3(true)

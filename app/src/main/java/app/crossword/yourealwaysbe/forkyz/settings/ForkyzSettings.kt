@@ -177,6 +177,7 @@ class ForkyzSettings(
                 it.downloadJonesin,
                 it.downloadJoseph,
                 it.download20Minutes,
+                it.downloadLATimes,
                 it.downloadLeParisienF1,
                 it.downloadLeParisienF2,
                 it.downloadLeParisienF3,
@@ -978,6 +979,19 @@ class ForkyzSettings(
         launch {
             settingsStore.updateData { settings ->
                 settings.toBuilder().setDownloadJoseph(value).build()
+            }
+        }
+    }
+
+    val liveDownloadLATimes : LiveData<Boolean>
+        = settingsFlow.map {
+            it.downloadLATimes
+        }.distinctUntilChanged().asLiveData()
+
+    fun setDownloadLATimes(value : Boolean) {
+        launch {
+            settingsStore.updateData { settings ->
+                settings.toBuilder().setDownloadLATimes(value).build()
             }
         }
     }

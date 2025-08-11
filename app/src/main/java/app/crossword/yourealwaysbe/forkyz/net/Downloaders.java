@@ -486,6 +486,13 @@ public class Downloaders {
             ));
         }
 
+        if (settings.getDownloadLATimes()) {
+            downloaders.add(new LATimesDownloader(
+                "latimes",
+                context.getString(R.string.la_times)
+            ));
+        }
+
         if (settings.getDownloadLeParisienF1()) {
             downloaders.add(new AbstractRCIJeuxMFJDateDownloader(
                 "leparisienf1",

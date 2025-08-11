@@ -345,7 +345,6 @@ public class AbstractDateDownloader extends AbstractDownloader {
             ? startDate
             : until;
 
-        System.out.println("FORKYZ: start " + startDate);
         int lenWindow = getLatestDateWindow();
         for (int i = 0; i <= lenWindow; i++) {
             LocalDate tryDate = startDate.plusDays(-i);

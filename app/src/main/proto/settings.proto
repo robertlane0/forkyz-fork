@@ -238,4 +238,5 @@ message Settings {
     bool volumeActivatesVoice = 124;
     bool specialEntryForceCaps = 125;
     bool dontConfirmCleanup = 126;
+    bool downloadLATimes = 127;
 }
