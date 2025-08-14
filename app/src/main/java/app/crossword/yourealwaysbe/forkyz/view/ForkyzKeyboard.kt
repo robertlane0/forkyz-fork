@@ -520,6 +520,110 @@ fun ForkyzKeyboard(
     }
 
     @Composable
+    fun AzertyKeyboard() {
+        Column(modifier.fillMaxWidth()) {
+            Row() {
+                val m1 = Modifier.weight(1.0F)
+                TextKey(m1, KeyEvent.KEYCODE_A, R.string.key_a)
+                TextKey(m1, KeyEvent.KEYCODE_Z, R.string.key_z)
+                TextKey(m1, KeyEvent.KEYCODE_E, R.string.key_e)
+                TextKey(m1, KeyEvent.KEYCODE_R, R.string.key_r)
+                TextKey(m1, KeyEvent.KEYCODE_T, R.string.key_t)
+                TextKey(m1, KeyEvent.KEYCODE_Y, R.string.key_y)
+                TextKey(m1, KeyEvent.KEYCODE_U, R.string.key_u)
+                TextKey(m1, KeyEvent.KEYCODE_I, R.string.key_i)
+                TextKey(m1, KeyEvent.KEYCODE_O, R.string.key_o)
+                TextKey(m1, KeyEvent.KEYCODE_P, R.string.key_p)
+            }
+            Row() {
+                val m1 = Modifier.weight(1.0F)
+                TextKey(m1, KeyEvent.KEYCODE_Q, R.string.key_q)
+                TextKey(m1, KeyEvent.KEYCODE_S, R.string.key_s)
+                TextKey(m1, KeyEvent.KEYCODE_D, R.string.key_d)
+                TextKey(m1, KeyEvent.KEYCODE_F, R.string.key_f)
+                TextKey(m1, KeyEvent.KEYCODE_G, R.string.key_g)
+                TextKey(m1, KeyEvent.KEYCODE_H, R.string.key_h)
+                TextKey(m1, KeyEvent.KEYCODE_J, R.string.key_j)
+                TextKey(m1, KeyEvent.KEYCODE_K, R.string.key_k)
+                TextKey(m1, KeyEvent.KEYCODE_L, R.string.key_l)
+                TextKey(m1, KeyEvent.KEYCODE_M, R.string.key_m)
+            }
+            Row() {
+                val m1 = Modifier.weight(1.0F)
+                val m2 = Modifier.weight(1.5F)
+                SpecialIconKey(
+                    m2,
+                    SpecialKey.KEY_CHANGE_CLUE_DIRECTION,
+                    R.drawable.ic_change_direction,
+                    R.string.change_direction,
+                )
+                TextKey(m1, KeyEvent.KEYCODE_W, R.string.key_w)
+                TextKey(m1, KeyEvent.KEYCODE_X, R.string.key_x)
+                TextKey(m1, KeyEvent.KEYCODE_C, R.string.key_c)
+                TextKey(m1, KeyEvent.KEYCODE_V, R.string.key_v)
+                TextKey(m1, KeyEvent.KEYCODE_B, R.string.key_b)
+                TextKey(m1, KeyEvent.KEYCODE_N, R.string.key_n)
+                Box(m1)
+                IconKey(
+                    m2,
+                    KeyEvent.KEYCODE_DEL,
+                    R.drawable.delete,
+                    R.string.key_delete,
+                )
+            }
+            Row() {
+                val m1 = Modifier.weight(1.0F)
+                val m2 = Modifier.weight(2.0F)
+                val m6 = Modifier.weight(2.0F)
+                IconKey(
+                    m2,
+                    KeyEvent.KEYCODE_DPAD_UP,
+                    R.drawable.arrow_up,
+                    R.string.key_up,
+                )
+                IconKey(
+                    m2,
+                    KeyEvent.KEYCODE_DPAD_DOWN,
+                    R.drawable.arrow_down,
+                    R.string.key_down,
+                )
+                SpecialIconKey(
+                    m2,
+                    SpecialKey.KEY_PREVIOUS_CLUE,
+                    R.drawable.ic_prev_clue,
+                    R.string.prev_clue,
+                )
+                Box(m1)
+                IconKey(
+                    m6,
+                    KeyEvent.KEYCODE_SPACE,
+                    R.drawable.space,
+                    R.string.key_space,
+                )
+                Box(m1)
+                SpecialIconKey(
+                    m2,
+                    SpecialKey.KEY_NEXT_CLUE,
+                    R.drawable.ic_next_clue,
+                    R.string.next_clue,
+                )
+                IconKey(
+                    m2,
+                    KeyEvent.KEYCODE_DPAD_LEFT,
+                    R.drawable.arrow_left,
+                    R.string.key_left,
+                )
+                IconKey(
+                    m2,
+                    KeyEvent.KEYCODE_DPAD_RIGHT,
+                    R.drawable.arrow_right,
+                    R.string.key_right,
+                )
+            }
+        }
+    }
+
+    @Composable
     fun ColemakKeyboard() {
         Column(modifier.fillMaxWidth()) {
             Row() {
@@ -734,6 +838,7 @@ fun ForkyzKeyboard(
     when (layout) {
         KeyboardLayout.KL_QWERTY -> QwertyKeyboard()
         KeyboardLayout.KL_QWERTZ -> QwertzKeyboard()
+        KeyboardLayout.KL_AZERTY -> AzertyKeyboard()
         KeyboardLayout.KL_COLEMAK -> ColemakKeyboard()
         KeyboardLayout.KL_DVORAK -> DvorakKeyboard()
         else -> { QwertyKeyboard() }

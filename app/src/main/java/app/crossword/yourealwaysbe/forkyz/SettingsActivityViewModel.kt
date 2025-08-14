@@ -1332,6 +1332,10 @@ class SettingsActivityViewModel @Inject constructor(
                     KeyboardLayout.KL_QWERTZ,
                 ),
                 SettingsListEntry(
+                    R.string.keyboard_azerty,
+                    KeyboardLayout.KL_AZERTY,
+                ),
+                SettingsListEntry(
                     R.string.keyboard_dvorak,
                     KeyboardLayout.KL_DVORAK,
                 ),

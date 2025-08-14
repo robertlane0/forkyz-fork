@@ -678,6 +678,7 @@
 
     <string name="keyboard_qwerty">QWERTY</string>
     <string name="keyboard_qwertz">QWERTZ</string>
+    <string name="keyboard_azerty">AZERTY</string>
     <string name="keyboard_dvorak">Dvorak</string>
     <string name="keyboard_colemak">Colemak</string>
 
