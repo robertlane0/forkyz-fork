@@ -1132,6 +1132,7 @@ open class PuzzleActivityViewModel @Inject constructor(
         val state = keyboardState.value ?: KeyboardState()
         return settings.liveKeyboardSettings.value?.let { ks ->
             state.copy(
+                forceCaps = ks.forceCaps,
                 compact = ks.compact,
                 hapticFeedback = ks.haptic,
                 layout = ks.layout,
