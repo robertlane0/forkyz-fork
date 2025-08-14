@@ -79,6 +79,7 @@ enum KeyboardLayout {
     KL_QWERTZ = 1;
     KL_DVORAK = 2;
     KL_COLEMAK = 3;
+    KL_AZERTY = 4;
 }
 
 enum KeyboardMode {

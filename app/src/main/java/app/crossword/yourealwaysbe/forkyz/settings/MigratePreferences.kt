@@ -353,6 +353,7 @@ fun migratePreferences(
             "1" -> KeyboardLayout.KL_QWERTZ
             "2" -> KeyboardLayout.KL_DVORAK
             "3" -> KeyboardLayout.KL_COLEMAK
+            "4" -> KeyboardLayout.KL_AZERTY
             else -> null
         }?.let { settings.setKeyboardLayout(it) }
     }
