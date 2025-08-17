@@ -112,6 +112,7 @@ import app.crossword.yourealwaysbe.puz.Playboard.Word
 import app.crossword.yourealwaysbe.puz.Position
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.Zone
+import app.crossword.yourealwaysbe.puz.MovementStrategy
 
 @AndroidEntryPoint
 abstract class PuzzleActivity() : ForkyzActivity() {
@@ -226,6 +227,7 @@ abstract class PuzzleActivity() : ForkyzActivity() {
      * @param useSuppressNotesList whether to use the given
      * suppressNotesList or let BoardWordEditView use its default
      * @param suppressNotesList for PlayboardRenderer.drawBox
+     * @param movementStrategy the movement strategy to use for the miniboard
      */
     @Composable
     protected fun Miniboard(
@@ -239,6 +241,7 @@ abstract class PuzzleActivity() : ForkyzActivity() {
         useSuppressNotesList : Boolean = false,
         suppressNotesList : Set<String>? = null,
         onFocusChanged : (Boolean) -> Unit = { },
+        movementStrategy : MovementStrategy = MovementStrategy.STOP_ON_END,
     ) {
         viewModel.getBoard()?.let { board ->
             BoardWordEdit(
@@ -256,6 +259,7 @@ abstract class PuzzleActivity() : ForkyzActivity() {
                 useSuppressNotesList = useSuppressNotesList,
                 suppressNotesList = suppressNotesList,
                 onFocusChanged = onFocusChanged,
+                movementStrategy = movementStrategy,
             )
         }
     }

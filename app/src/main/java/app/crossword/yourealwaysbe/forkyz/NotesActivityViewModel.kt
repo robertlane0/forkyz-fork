@@ -17,7 +17,6 @@ import app.crossword.yourealwaysbe.forkyz.exttools.CrosswordSolverData
 import app.crossword.yourealwaysbe.forkyz.exttools.ExternalDictionaries
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
-import app.crossword.yourealwaysbe.forkyz.util.StopOnEndStrategyHolder
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
@@ -28,6 +27,7 @@ import app.crossword.yourealwaysbe.puz.ClueID
 import app.crossword.yourealwaysbe.puz.Note
 import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges
 import app.crossword.yourealwaysbe.puz.Playboard.Word
+import app.crossword.yourealwaysbe.puz.MovementStrategy
 
 private val BLANK = Box.BLANK
 private val BLANK_CHAR = Box.BLANK[0]
@@ -88,6 +88,7 @@ data class TransferRequest(
  * notes)
  * @param clueText the clue text to display with the clue, or null if
  * this is the zone of cells with no clue attached
+ * @param movementStrategy the movement strategy to use on the miniboard
  */
 data class NotesActivityUIState(
     val notesClueID : ClueID? = null,
@@ -106,6 +107,7 @@ data class NotesActivityUIState(
     val clueFlagColor : Int = 0,
     val confirmTransferRequest : TransferRequest? = null,
     val inferSeparators : Boolean = false,
+    val movementStrategy : MovementStrategy = MovementStrategy.STOP_ON_END,
 ) {
     val isPuzzleNotes : Boolean
         get() = notesClueID == null
@@ -144,8 +146,6 @@ class NotesActivityViewModel @Inject constructor(
     public val acceptedPredictionEvent : StateFlow<Int?>
         = _acceptedPredictionEvent
 
-    private val stopOnEndStrategyHolder = StopOnEndStrategyHolder()
-
     init {
         setupVoiceCommands()
 
@@ -154,11 +154,16 @@ class NotesActivityViewModel @Inject constructor(
                 suppressNotesList = getSuppressNotesList(notesClueID)
             )
         }
-
         _notesUIState.addSource(settings.livePlayInferSeparators) {
             _notesUIState.value = notesUIState.value?.copy(
                 inferSeparators
                     = settings.livePlayInferSeparators.value ?: false,
+            )
+        }
+        _notesUIState.addSource(settings.livePlayStopOnEndStrategy) {
+            _notesUIState.value = notesUIState.value?.copy(
+                movementStrategy = settings.livePlayStopOnEndStrategy.value
+                    ?: MovementStrategy.STOP_ON_END,
             )
         }
     }
@@ -244,25 +249,19 @@ class NotesActivityViewModel @Inject constructor(
 
     fun playLetterToBoard(c : Char) {
         getBoard()?.let { board ->
-            val movementStrategy = board.getMovementStrategy()
-            stopOnEndStrategyHolder
-                .getStopOnEndStrategy(settings) { stopOnEnd ->
-                    board.setMovementStrategy(stopOnEnd)
-                    board.playLetter(c)
-                    board.setMovementStrategy(movementStrategy)
-                }
+            val oldMovementStrategy = board.getMovementStrategy()
+            board.setMovementStrategy(getMovementStrategy())
+            board.playLetter(c)
+            board.setMovementStrategy(oldMovementStrategy)
         }
     }
 
     fun deleteLetterFromBoard() {
         getBoard()?.let { board ->
-            val movementStrategy = board.getMovementStrategy()
-            stopOnEndStrategyHolder
-                .getStopOnEndStrategy(settings) { stopOnEnd ->
-                    board.setMovementStrategy(stopOnEnd)
-                    board.deleteOrUndoLetter()
-                    board.setMovementStrategy(movementStrategy)
-                }
+            val oldMovementStrategy = board.getMovementStrategy()
+            board.setMovementStrategy(getMovementStrategy())
+            board.deleteOrUndoLetter()
+            board.setMovementStrategy(oldMovementStrategy)
         }
     }
 
@@ -854,5 +853,10 @@ class NotesActivityViewModel @Inject constructor(
                 sb.append(c.uppercase())
         }
         return sb.toString();
+    }
+
+    private fun getMovementStrategy() : MovementStrategy {
+        return notesUIState.value?.movementStrategy
+            ?: MovementStrategy.STOP_ON_END
     }
 }

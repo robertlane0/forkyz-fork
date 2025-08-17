@@ -587,8 +587,6 @@ public interface MovementStrategy {
          * chance to avoid cycling
          */
         private boolean isPauseBackCycle() {
-            System.out.println("FORKYZ: is pause back cycle"
-                    + (System.currentTimeMillis() - lastBack) + " and " + lastBack);
             return (lastBack < 0)
                 ? false
                 : System.currentTimeMillis() < lastBack + BACK_CYCLE_DELAY;

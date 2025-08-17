@@ -459,6 +459,9 @@
     <string name="enter_changes_direction_desc">Enter changes direction rather than moving to the next clue.</string>
     <string name="movement_style">Movement Style</string>
     <string name="movement_style_desc">Select what happens when you type past the end of a word.</string>
+    <string name="movement_style_clue_list">Clue List Movement Style</string>
+    <string name="movement_style_clue_list_desc">Select what happens when you type past the end of a word on the clue list screen.</string>
+
     <string name="play_letter_undo">Played Letter Undo Stack</string>
     <string name="play_letter_undo_desc">Delete undoes recently played letters or deletes if no recent letters to undo.</string>
     <string name="predict_anagram_chars">Predict Anagram Characters</string>

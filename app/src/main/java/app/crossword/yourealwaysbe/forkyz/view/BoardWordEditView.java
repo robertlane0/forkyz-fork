@@ -15,7 +15,6 @@ import android.view.ViewGroup;
 import dagger.hilt.android.AndroidEntryPoint;
 
 import app.crossword.yourealwaysbe.forkyz.settings.DisplaySeparators;
-import app.crossword.yourealwaysbe.forkyz.util.StopOnEndStrategyHolder;
 import app.crossword.yourealwaysbe.forkyz.view.PlayboardRenderer.RenderChanges;
 import app.crossword.yourealwaysbe.puz.ClueID;
 import app.crossword.yourealwaysbe.puz.MovementStrategy;
@@ -42,8 +41,7 @@ public class BoardWordEditView extends BoardEditView {
     private Set<String> suppressNotesList;
     private boolean customSuppressNotesList = false;
     private int expectedWidth = 0;
-    private StopOnEndStrategyHolder stopOnEndStrategyHolder
-        = new StopOnEndStrategyHolder();
+    private MovementStrategy movementStrategy = MovementStrategy.MOVE_NEXT_CLUE;
 
     public BoardWordEditView(Context context) {
         this(context, null);
@@ -172,6 +170,14 @@ public class BoardWordEditView extends BoardEditView {
     }
 
     /**
+     * Set the movement strategy to use when entering via this view
+     */
+    public void setMovementStrategy(MovementStrategy movementStrategy) {
+        if (movementStrategy != null)
+            this.movementStrategy = movementStrategy;
+    }
+
+    /**
      * Overrides to stay on same word
      *
      * Changes movement strategy to stop on end before calling to super,
@@ -184,17 +190,11 @@ public class BoardWordEditView extends BoardEditView {
         if (board == null)
             return;
 
-        // fix movement strategy so that we don't fall into the next
-        // clue
+        // fix movement strategy while entering
         MovementStrategy oldStrategy = board.getMovementStrategy();
-        stopOnEndStrategyHolder.getStopOnEndStrategy(
-            getSettings(),
-            stopOnEnd -> {
-                board.setMovementStrategy(stopOnEnd);
-                super.onNewResponse(response);
-                board.setMovementStrategy(oldStrategy);
-            }
-        );
+        board.setMovementStrategy(movementStrategy);
+        super.onNewResponse(response);
+        board.setMovementStrategy(oldStrategy);
     }
 
     @Override

@@ -40,6 +40,7 @@ import app.crossword.yourealwaysbe.forkyz.menu.BaseMenuModifier
 import app.crossword.yourealwaysbe.forkyz.menu.MenuText
 import app.crossword.yourealwaysbe.forkyz.view.ClueTabs
 import app.crossword.yourealwaysbe.puz.Clue
+import app.crossword.yourealwaysbe.puz.MovementStrategy
 
 class ClueListActivity() : PuzzleActivity() {
 
@@ -131,12 +132,15 @@ class ClueListActivity() : PuzzleActivity() {
         Column(modifier = modifier) {
             val showAllWordsState by viewModel.showAllWords.observeAsState()
             val showAllWords = showAllWordsState ?: false
+            val movementStrategy by viewModel.movementStrategy.observeAsState()
 
             Miniboard(
                 onClick = { _, _ -> viewModel.showKeyboard() },
                 onLongClick = { viewModel.launchCurrentClueNotes() },
                 longClickAccessibilityAction = R.string.open_clue_notes,
                 incognitoMode = showAllWords,
+                movementStrategy = movementStrategy
+                    ?: MovementStrategy.MOVE_NEXT_CLUE,
             )
             ClueLists(
                 Modifier.fillMaxWidth().weight(1.0F),

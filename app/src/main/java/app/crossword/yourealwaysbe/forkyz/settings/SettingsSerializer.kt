@@ -94,6 +94,7 @@ object SettingsSerializer : Serializer<Settings> {
         .setKeyboardShowHide(KeyboardMode.KM_HIDE_MANUAL)
         .setLastSeenVersion("")
         .setMovementStrategy(MovementStrategySetting.MSS_MOVE_NEXT_ON_AXIS)
+        .setMovementStrategyClueList(MovementStrategySetting.MSS_MOVE_NEXT_CLUE)
         .setOrientationLock(Orientation.O_UNLOCKED)
         .setPlayActivityClueTabsPage(0)
         .setPlayActivityClueTabsPage1(1)

@@ -4,7 +4,6 @@ package app.crossword.yourealwaysbe.forkyz
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 
-
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.combinedClickable
@@ -72,6 +71,7 @@ import app.crossword.yourealwaysbe.forkyz.view.ScrollingImageView
 import app.crossword.yourealwaysbe.forkyz.view.ScrollingImageView.Point
 import app.crossword.yourealwaysbe.puz.Clue
 import app.crossword.yourealwaysbe.puz.ClueID
+import app.crossword.yourealwaysbe.puz.MovementStrategy
 import app.crossword.yourealwaysbe.puz.Playboard.Word
 import app.crossword.yourealwaysbe.puz.Position
 
@@ -236,6 +236,8 @@ class NotesActivity() : PuzzleActivity() {
             onFocusChanged = { focussed ->
                 setFocussedEntry(NoteEntry.BOARD, focussed)
             },
+            movementStrategy = state?.movementStrategy
+                ?: MovementStrategy.STOP_ON_END,
         )
     }
 

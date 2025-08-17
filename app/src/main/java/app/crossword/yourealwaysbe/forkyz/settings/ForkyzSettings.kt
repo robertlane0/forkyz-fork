@@ -1687,30 +1687,10 @@ class ForkyzSettings(
 
     val livePlayMovementStrategy : LiveData<MovementStrategy>
         = settingsFlow.map { settings ->
-            val cycleForwards
-                = settings.cycleUnfilledMode != CycleUnfilledMode.CU_NEVER
-            val cycleBackwards
-                = settings.cycleUnfilledMode == CycleUnfilledMode.CU_ALWAYS
-
-            val strategy = when (settings.movementStrategy) {
-                MovementStrategySetting.MSS_MOVE_NEXT_ON_AXIS
-                    -> MovementStrategy.MOVE_NEXT_ON_AXIS
-                MovementStrategySetting.MSS_STOP_ON_END
-                    -> MovementStrategy.STOP_ON_END
-                MovementStrategySetting.MSS_MOVE_NEXT_CLUE
-                    -> MovementStrategy.MOVE_NEXT_CLUE
-                MovementStrategySetting.MSS_MOVE_PARALLEL_WORD
-                    -> MovementStrategy.MOVE_PARALLEL_WORD
-                else -> MovementStrategy.MOVE_NEXT_ON_AXIS
-            }
-
-            if (cycleForwards || cycleBackwards) {
-                MovementStrategy.CycleUnfilled(
-                    strategy, cycleForwards, cycleBackwards
-                )
-            } else {
-                strategy
-            }
+            getFullMovementStrategy(
+                settings.movementStrategy,
+                settings.cycleUnfilledMode,
+            )
         }.distinctUntilChanged().asLiveData()
 
     fun getPlayMovementStrategy(cb : Consumer<MovementStrategy>)
@@ -1728,6 +1708,48 @@ class ForkyzSettings(
         launch {
             settingsStore.updateData { settings ->
                 settings.toBuilder().setMovementStrategy(value).build()
+            }
+        }
+    }
+
+    val livePlayStopOnEndStrategy : LiveData<MovementStrategy>
+        = settingsFlow.map { settings ->
+            getFullMovementStrategy(
+                MovementStrategySetting.MSS_STOP_ON_END,
+                settings.cycleUnfilledMode,
+            )
+        }.distinctUntilChanged().asLiveData()
+
+    val livePlayMovementStrategyClueList : LiveData<MovementStrategy>
+        = settingsFlow.map { settings ->
+            getFullMovementStrategy(
+                coerceMovementStrategyClueList(
+                    settings.movementStrategyClueList
+                ),
+                settings.cycleUnfilledMode,
+            )
+        }.distinctUntilChanged().asLiveData()
+
+    fun getPlayMovementStrategyClueList(cb : Consumer<MovementStrategy>)
+        = livePlayMovementStrategyClueList.observeOnce(cb)
+
+    val livePlayMovementStrategyClueListSetting
+        : LiveData<MovementStrategySetting> = settingsFlow.map {
+            coerceMovementStrategyClueList(it.movementStrategyClueList)
+        }.distinctUntilChanged().asLiveData()
+
+    fun getPlayMovementStrategyClueListSetting(
+        cb : Consumer<MovementStrategySetting>
+    ) = livePlayMovementStrategyClueListSetting.observeOnce(cb)
+
+    fun setPlayMovementStrategyClueListSetting(
+        value : MovementStrategySetting,
+    ) {
+        launch {
+            settingsStore.updateData { settings ->
+                settings.toBuilder().setMovementStrategyClueList(
+                    coerceMovementStrategyClueList(value)
+                ).build()
             }
         }
     }
@@ -2405,6 +2427,48 @@ class ForkyzSettings(
         }
     }
 
+    private fun getFullMovementStrategy(
+        movementStrategy : MovementStrategySetting,
+        cycleUnfilledMode : CycleUnfilledMode,
+    ) : MovementStrategy {
+        val cycleForwards
+            = cycleUnfilledMode != CycleUnfilledMode.CU_NEVER
+        val cycleBackwards
+            = cycleUnfilledMode == CycleUnfilledMode.CU_ALWAYS
+
+        val strategy = when (movementStrategy) {
+            MovementStrategySetting.MSS_MOVE_NEXT_ON_AXIS
+                -> MovementStrategy.MOVE_NEXT_ON_AXIS
+            MovementStrategySetting.MSS_STOP_ON_END
+                -> MovementStrategy.STOP_ON_END
+            MovementStrategySetting.MSS_MOVE_NEXT_CLUE
+                -> MovementStrategy.MOVE_NEXT_CLUE
+            MovementStrategySetting.MSS_MOVE_PARALLEL_WORD
+                -> MovementStrategy.MOVE_PARALLEL_WORD
+            else -> MovementStrategy.MOVE_NEXT_ON_AXIS
+        }
+
+        return if (cycleForwards || cycleBackwards) {
+            MovementStrategy.CycleUnfilled(
+                strategy, cycleForwards, cycleBackwards
+            )
+        } else {
+            strategy
+        }
+    }
+
+    /**
+     * Coerce movement strategy into a value allowed on clue list
+     */
+    private fun coerceMovementStrategyClueList(
+        settingValue : MovementStrategySetting,
+    ) : MovementStrategySetting {
+        return when (settingValue) {
+            MovementStrategySetting.MSS_STOP_ON_END -> settingValue
+            else -> MovementStrategySetting.MSS_MOVE_NEXT_CLUE
+        }
+    }
+
     /**
      * Export or import settings to/from json
      *
@@ -3037,6 +3101,21 @@ class ForkyzSettings(
                        setPlayMovementStrategySetting(
                            MovementStrategySetting.valueOf(it)
                        )
+                   } catch (e : IllegalArgumentException) {
+                       // ignore
+                   }
+               }
+            },
+        )
+        run(
+            "movementStrategyClueList",
+            { s, key -> json.put(key, s.movementStrategyClueList.toString()) },
+            { key ->
+               json.optString(key)?.let {
+                   try {
+                        setPlayMovementStrategyClueListSetting(
+                            MovementStrategySetting.valueOf(it)
+                        )
                    } catch (e : IllegalArgumentException) {
                        // ignore
                    }

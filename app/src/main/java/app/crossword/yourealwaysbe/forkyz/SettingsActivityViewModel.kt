@@ -1436,6 +1436,23 @@ class SettingsActivityViewModel @Inject constructor(
             settings.livePlayMovementStrategySetting,
             settings::setPlayMovementStrategySetting,
         ),
+        SettingsList<MovementStrategySetting>(
+            SettingsPage.INTERACTION,
+            R.string.movement_style_clue_list,
+            R.string.movement_style_clue_list_desc,
+            listOf(
+                SettingsListEntry(
+                    R.string.movement_strategy_stop_end,
+                    MovementStrategySetting.MSS_STOP_ON_END,
+                ),
+                SettingsListEntry(
+                    R.string.movement_strategy_next_clue,
+                    MovementStrategySetting.MSS_MOVE_NEXT_CLUE,
+                ),
+            ),
+            settings.livePlayMovementStrategyClueListSetting,
+            settings::setPlayMovementStrategyClueListSetting,
+        ),
         SettingsBoolean(
             SettingsPage.INTERACTION,
             R.string.skip_filled,

@@ -240,4 +240,5 @@ message Settings {
     bool specialEntryForceCaps = 125;
     bool dontConfirmCleanup = 126;
     bool downloadLATimes = 127;
+    MovementStrategySetting movementStrategyClueList = 128;
 }

@@ -18,6 +18,7 @@ import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
 import app.crossword.yourealwaysbe.puz.Playboard
 import app.crossword.yourealwaysbe.puz.Playboard.Word
 import app.crossword.yourealwaysbe.puz.Position
+import app.crossword.yourealwaysbe.puz.MovementStrategy
 
 /**
  * Miniboard current word view
@@ -47,6 +48,7 @@ import app.crossword.yourealwaysbe.puz.Position
  * @param totalPadding how much padding will be applied to the view for
  * use when rendering with expected width
  * @param focusable whether view should be focusable including touch mode
+ * @param movementStrategy what movement strategy to use
  */
 @Composable
 fun BoardWordEdit(
@@ -68,6 +70,7 @@ fun BoardWordEdit(
     renderWithExpectedWidth : Boolean = false,
     totalPadding : Dp = 0.dp,
     focusable : Boolean = true,
+    movementStrategy : MovementStrategy = MovementStrategy.MOVE_NEXT_CLUE,
 ) {
     @Composable
     fun View(width : Int? = null) {
@@ -125,6 +128,7 @@ fun BoardWordEdit(
                         setSuppressNotesList(suppressNotesList)
                     else
                         clearSuppressNotesList()
+                    setMovementStrategy(movementStrategy)
                 }
                 clickAccessibilityAction?.let {
                     ViewCompat.replaceAccessibilityAction(

@@ -130,6 +130,7 @@ class ForkyzSettingsTest {
         .setKeyboardShowHide(KeyboardMode.KM_HIDE_MANUAL)
         .setLastSeenVersion("")
         .setMovementStrategy(MovementStrategySetting.MSS_MOVE_NEXT_ON_AXIS)
+        .setMovementStrategyClueList(MovementStrategySetting.MSS_MOVE_NEXT_CLUE)
         .setOrientationLock(Orientation.O_UNLOCKED)
         .setPlayActivityClueTabsPage(0)
         .setPlayActivityClueTabsPage1(1)
@@ -261,6 +262,7 @@ class ForkyzSettingsTest {
         .setKeyboardShowHide(KeyboardMode.KM_NEVER_SHOW)
         .setLastSeenVersion("xx")
         .setMovementStrategy(MovementStrategySetting.MSS_STOP_ON_END)
+        .setMovementStrategyClueList(MovementStrategySetting.MSS_STOP_ON_END)
         .setOrientationLock(Orientation.O_PORTRAIT)
         .setPlayActivityClueTabsPage(1)
         .setPlayActivityClueTabsPage1(0)
@@ -306,6 +308,7 @@ class ForkyzSettingsTest {
     val settingsValue3 = Settings.newBuilder()
         .mergeFrom(settingsValue2)
         .setDontConfirmCleanup(true)
+        .setMovementStrategyClueList(MovementStrategySetting.MSS_MOVE_NEXT_CLUE)
         .build()
 
     @Mock
@@ -489,6 +492,9 @@ class ForkyzSettingsTest {
             .thenReturn("xx")
         `when`(
             prefs.getString(eq("movementStrategy"), eq(null))
+        ).thenReturn("STOP_ON_END")
+        `when`(
+            prefs.getString(eq("movementStrategyClueList"), eq(null))
         ).thenReturn("STOP_ON_END")
         `when`(prefs.getString(eq("orientationLock"), eq(null)))
             .thenReturn("PORT")
