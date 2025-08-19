@@ -164,6 +164,22 @@ class ForkyzSettings(
         }
     }
 
+    val liveBrowseDontConfirmDelete : LiveData<Boolean>
+        = settingsFlow.map {
+            it.dontConfirmBrowseDelete
+        }.distinctUntilChanged().asLiveData()
+
+    fun getBrowseDontConfirmDelete(cb : Consumer<Boolean>)
+        = liveBrowseDontConfirmDelete.observeOnce(cb)
+
+    fun setBrowseDontConfirmDelete(value : Boolean) {
+        launch {
+            settingsStore.updateData { settings ->
+                settings.toBuilder().setDontConfirmBrowseDelete(value).build()
+            }
+        }
+    }
+
     val liveDownloadersSettings : LiveData<DownloadersSettings>
         = settingsFlow.map {
             DownloadersSettings(
@@ -2758,6 +2774,13 @@ class ForkyzSettings(
             { s, key -> json.put(key, s.dontConfirmCleanup) },
             { key ->
                 json.optBoolean(key)?.let { setBrowseDontConfirmCleanup(it) }
+            },
+        )
+        run(
+            "dontConfirmBrowseDelete",
+            { s, key -> json.put(key, s.dontConfirmBrowseDelete) },
+            { key ->
+                json.optBoolean(key)?.let { setBrowseDontConfirmDelete(it) }
             },
         )
         run(

@@ -1016,6 +1016,13 @@ class SettingsActivityViewModel @Inject constructor(
         ),
         SettingsBoolean(
             SettingsPage.BROWSER,
+            R.string.dont_confirm_browse_delete,
+            R.string.dont_confirm_browse_delete_desc,
+            settings.liveBrowseDontConfirmDelete,
+            settings::setBrowseDontConfirmDelete,
+        ),
+        SettingsBoolean(
+            SettingsPage.BROWSER,
             R.string.browse_show_percentage_correct,
             R.string.browse_show_percentage_correct_desc,
             settings.liveBrowseShowPercentageCorrect,

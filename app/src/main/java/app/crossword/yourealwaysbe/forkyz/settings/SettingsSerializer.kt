@@ -137,6 +137,7 @@ object SettingsSerializer : Serializer<Settings> {
         .setVolumeActivatesVoice(false)
         .setSpecialEntryForceCaps(false)
         .setDontConfirmCleanup(false)
+        .setDontConfirmBrowseDelete(false)
         .build()
 
     override suspend fun readFrom(input: InputStream) : Settings {

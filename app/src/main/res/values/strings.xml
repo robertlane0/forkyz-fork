@@ -100,6 +100,8 @@
     <string name="cleanup_age_never">Never</string>
     <string name="dont_confirm_cleanup">Don\'t Confirm Cleanup</string>
     <string name="dont_confirm_cleanup_desc">Don\'t display a confirmation dialog before running cleanup.</string>
+    <string name="dont_confirm_browse_delete">Don\'t Confirm Puzzle Delete</string>
+    <string name="dont_confirm_browse_delete_desc">Don\'t display a confirmation dialog before deleting puzzles.</string>
     <string name="confirm_cleanup">Confirm Cleanup</string>
     <string name="confirm_cleanup_msg">Are you sure you want to cleanup old puzzles?</string>
     <string name="no_cleanup_action">No Cleanup Action</string>

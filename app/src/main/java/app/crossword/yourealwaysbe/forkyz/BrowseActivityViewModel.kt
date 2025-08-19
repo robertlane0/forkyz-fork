@@ -395,9 +395,15 @@ class BrowseActivityViewModel @Inject constructor(
      */
     @MainThread
     fun deleteSelectedPuzzles() {
-        _uiState.value = uiState.value?.copy(
-            showDialog = BrowseDialog.CONFIRM_DELETE_SELECTED,
-        )
+        settings.getBrowseDontConfirmDelete { dontConfirm ->
+            if (dontConfirm) {
+                confirmDeleteSelectedPuzzles()
+            } else {
+                _uiState.value = uiState.value?.copy(
+                    showDialog = BrowseDialog.CONFIRM_DELETE_SELECTED,
+                )
+            }
+        }
     }
 
     /**

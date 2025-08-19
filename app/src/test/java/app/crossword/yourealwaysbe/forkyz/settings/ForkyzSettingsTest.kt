@@ -81,6 +81,7 @@ class ForkyzSettingsTest {
         .setDlLast(0)
         .setDlOnStartup(false)
         .setDontConfirmCleanup(true)
+        .setDontConfirmBrowseDelete(false)
         .setDoubleTap(false)
         .setDownload20Minutes(true)
         .setDownloadCustomDaily(false)
@@ -213,6 +214,7 @@ class ForkyzSettingsTest {
         .setDlLast(0)
         .setDlOnStartup(true)
         .setDontConfirmCleanup(false)
+        .setDontConfirmBrowseDelete(true)
         .setDoubleTap(true)
         .setDownload20Minutes(false)
         .setDownloadCustomDaily(true)
@@ -308,6 +310,7 @@ class ForkyzSettingsTest {
     val settingsValue3 = Settings.newBuilder()
         .mergeFrom(settingsValue2)
         .setDontConfirmCleanup(true)
+        .setDontConfirmBrowseDelete(false)
         .setMovementStrategyClueList(MovementStrategySetting.MSS_MOVE_NEXT_CLUE)
         .build()
 

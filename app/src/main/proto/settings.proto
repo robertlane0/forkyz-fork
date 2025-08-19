@@ -241,4 +241,5 @@ message Settings {
     bool dontConfirmCleanup = 126;
     bool downloadLATimes = 127;
     MovementStrategySetting movementStrategyClueList = 128;
+    bool dontConfirmBrowseDelete = 129;
 }
