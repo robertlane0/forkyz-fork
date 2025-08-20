@@ -1,5 +1,14 @@
 # Forkyz Changelog
 
+## Version 70
+
+- Add AZERTY keyboard layout (thanks Patrik Herbeuval).
+- Add TCA JSON parser and LA Times downloader (via Chicago Tribune).
+- Add option for movement behaviour at end of clue in Clue List.
+- Add option to suppress delete confirmation dialog.
+- Fix Everyman import via share (again).
+- Fix force caps for native keyboard.
+
 ## Version 69
 
 - New downloader dialog.
@@ -17,11 +26,11 @@
 
 ## Version 67
 
-* Move Browse activity to Compose.
-* Add confirmations and change defaults for swipes on Browse.
-* Correct keyboard positioning/rendering with larger fonts.
-* Repair Everyman scraper.
-* Other minor tidies and new bugs.
+- Move Browse activity to Compose.
+- Add confirmations and change defaults for swipes on Browse.
+- Correct keyboard positioning/rendering with larger fonts.
+- Repair Everyman scraper.
+- Other minor tidies and new bugs.
 
 
 ## Version 66

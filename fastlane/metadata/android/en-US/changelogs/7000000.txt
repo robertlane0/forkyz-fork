@@ -1,0 +1,6 @@
+- Add AZERTY keyboard layout (thanks Patrik Herbeuval).
+- Add TCA JSON parser and LA Times downloader (via Chicago Tribune).
+- Add option for movement behaviour at end of clue in Clue List.
+- Add option to suppress delete confirmation dialog.
+- Fix Everyman import via share (again).
+- Fix force caps for native keyboard.
