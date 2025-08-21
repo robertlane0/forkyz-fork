@@ -1743,7 +1743,7 @@
         "id": 4,
         "cellNumber": "4",
         "cellChar": "X",
-        "cellType": "square",
+        "cellType": "circle",
         "xchar": "Y"
       },
       {

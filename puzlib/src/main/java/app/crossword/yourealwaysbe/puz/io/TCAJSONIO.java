@@ -51,7 +51,7 @@ import app.crossword.yourealwaysbe.puz.util.JSONParser;
  *              "id": cell id num,
  *              "cellNumber": string,
  *              "cellChar": char solution,
- *              "cellType": "square/disable"
+ *              "cellType": "square/circle/disable"
  *              "xchar": "Y/N" // not sure what this means, ignore for now
  *          }
  *      ]
@@ -179,6 +179,18 @@ public class TCAJSONIO extends AbstractJSONIO {
             String solution = optStringNull(cell, "cellChar");
             if (solution != null && solution.length() > 0)
                 box.setSolution(solution);
+
+
+            if ("square".equalsIgnoreCase(cellType)) {
+                // normal cell
+            } else if ("circle".equalsIgnoreCase(cellType)) {
+                box.setShape(Box.Shape.CIRCLE);
+            } else {
+                // see if it's an IPuz value why not
+                Box.Shape shape = IPuzIO.getShape(cellType);
+                if (shape != null)
+                    box.setShape(shape);
+            }
 
             rowBoxes[col] = box;
 

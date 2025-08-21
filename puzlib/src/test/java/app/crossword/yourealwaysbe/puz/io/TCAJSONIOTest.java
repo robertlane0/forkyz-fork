@@ -15,6 +15,7 @@ import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.Zone;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TCAJSONIOTest {
@@ -43,6 +44,9 @@ public class TCAJSONIOTest {
         assertEquals(boxes[14][12].getSolution(), "E");
         assertEquals(boxes[14][4].getSolution(), "R");
         assertTrue(Box.isBlock(boxes[1][5]));
+
+        assertNull(boxes[0][2].getShape());
+        assertEquals(Box.Shape.CIRCLE, boxes[0][3].getShape());
 
         ClueList acrossClues = puz.getClues("Across");
         ClueList downClues = puz.getClues("Down");
