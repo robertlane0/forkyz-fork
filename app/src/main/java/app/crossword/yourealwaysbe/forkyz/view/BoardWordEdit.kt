@@ -146,7 +146,8 @@ fun BoardWordEdit(
                         null,
                     )
                 }
-            }
+            },
+            onRelease = { it.detach() },
         )
     }
 
