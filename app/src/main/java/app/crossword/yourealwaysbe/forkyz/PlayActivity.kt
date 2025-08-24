@@ -609,7 +609,11 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
     }
 
     private fun stopShakeDetector() {
-        shakeDetector?.stop()
+        shakeDetector?.let { sd ->
+            sd.stop()
+            val manager = (getSystemService(SENSOR_SERVICE) as SensorManager)
+            manager.unregisterListener(sd)
+        }
     }
 
     private fun toggleShowClueTabs() {
