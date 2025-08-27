@@ -536,6 +536,7 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
                     setAllowZoom(!locked)
                 }
             },
+            onRelease = { it.detach() },
         )
     }
 
