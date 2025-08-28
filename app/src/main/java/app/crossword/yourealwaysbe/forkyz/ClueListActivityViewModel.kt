@@ -90,11 +90,7 @@ class ClueListActivityViewModel @Inject constructor(
     }
 
     fun playSpace() {
-        settings.getPlaySpaceChangesDirection() { spaceChangesDirection ->
-            if (!spaceChangesDirection) {
-                playLetter(' ')
-            }
-        }
+        playLetter(' ')
     }
 
     fun playLetter(c : Char) {
