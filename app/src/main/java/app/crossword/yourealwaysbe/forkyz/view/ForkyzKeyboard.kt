@@ -364,7 +364,7 @@ fun ForkyzKeyboard(
             Row() {
                 val m1 = Modifier.weight(1.0F)
                 val m2 = Modifier.weight(2.0F)
-                val m6 = Modifier.weight(2.0F)
+                val m6 = Modifier.weight(6.0F)
                 IconKey(
                     m2,
                     KeyEvent.KEYCODE_DPAD_UP,
@@ -472,7 +472,7 @@ fun ForkyzKeyboard(
             Row() {
                 val m1 = Modifier.weight(1.0F)
                 val m2 = Modifier.weight(2.0F)
-                val m6 = Modifier.weight(2.0F)
+                val m6 = Modifier.weight(6.0F)
                 IconKey(
                     m2,
                     KeyEvent.KEYCODE_DPAD_UP,
@@ -576,7 +576,7 @@ fun ForkyzKeyboard(
             Row() {
                 val m1 = Modifier.weight(1.0F)
                 val m2 = Modifier.weight(2.0F)
-                val m6 = Modifier.weight(2.0F)
+                val m6 = Modifier.weight(6.0F)
                 IconKey(
                     m2,
                     KeyEvent.KEYCODE_DPAD_UP,
@@ -682,7 +682,7 @@ fun ForkyzKeyboard(
             Row() {
                 val m1 = Modifier.weight(1.0F)
                 val m2 = Modifier.weight(2.0F)
-                val m6 = Modifier.weight(2.0F)
+                val m6 = Modifier.weight(6.0F)
                 IconKey(
                     m2,
                     KeyEvent.KEYCODE_DPAD_UP,
@@ -787,7 +787,7 @@ fun ForkyzKeyboard(
             Row() {
                 val m1 = Modifier.weight(1.0F)
                 val m2 = Modifier.weight(2.0F)
-                val m6 = Modifier.weight(2.0F)
+                val m6 = Modifier.weight(6.0F)
                 IconKey(
                     m2,
                     KeyEvent.KEYCODE_DPAD_UP,
