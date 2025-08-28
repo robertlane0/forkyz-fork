@@ -526,6 +526,9 @@ public class Puzzle {
         this.playedTime = time;
     }
 
+    /**
+     * @return time in milliseconds
+     */
     public long getTime() {
         return this.playedTime;
     }

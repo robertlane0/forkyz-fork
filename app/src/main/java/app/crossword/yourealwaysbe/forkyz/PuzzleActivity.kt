@@ -1157,6 +1157,16 @@ abstract class PuzzleActivity() : ForkyzActivity() {
                 R.string.share,
                 onClick = viewModel::closeMenu,
             )
+
+            if ((viewModel.getPuzzle()?.percentComplete ?: 0) == 100)
+                DropdownMenuItem(
+                    text = { MenuText(stringResource(R.string.completed)) },
+                    onClick = {
+                        viewModel.shareCompletion()
+                        viewModel.dismissMenu()
+                    },
+                )
+
             DropdownMenuItem(
                 text = { MenuText(stringResource(R.string.share_clue)) },
                 onClick = {

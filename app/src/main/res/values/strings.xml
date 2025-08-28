@@ -614,6 +614,7 @@
     <!-- completed -->
     <string name="puzzle_finished_title">Puzzle Finished</string>
     <string name="completed_in">Completed In</string>
+    <string name="completed_in_time">Completed In %d:%02d:%02.2f</string>
     <string name="total_clues">Total Clues</string>
     <string name="total_boxes">Total Boxes</string>
     <string name="hinted_boxes">Hinted Boxes</string>
