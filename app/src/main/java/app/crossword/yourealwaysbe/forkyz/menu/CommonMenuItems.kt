@@ -10,6 +10,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -51,11 +52,18 @@ fun MenuDropdownHeading(
     onClick : () -> Unit,
 ) {
     DropdownMenuItem(
+        leadingIcon = {
+                Icon(
+                    painter = painterResource(R.drawable.ic_submenu),
+                    modifier = Modifier.rotate(180f),
+                    contentDescription = null,
+                )
+        },
         text = {
             Text(
                 stringResource(titleId),
                 style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Medium,
+                fontWeight = FontWeight.ExtraBold,
             )
         },
         onClick = onClick,
