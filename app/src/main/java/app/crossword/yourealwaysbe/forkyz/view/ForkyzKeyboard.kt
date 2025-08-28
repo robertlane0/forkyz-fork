@@ -158,14 +158,16 @@ fun ForkyzKeyboard(
             modifier.pointerInput(true) {
                 awaitEachGesture {
                     val down = awaitFirstDown(requireUnconsumed = false)
-                    val heldButtonJob = scope.launch {
-                        currentOnDown()
-                        if (hapticFeedback) {
-                            haptic.performHapticFeedback(
-                                HapticFeedbackType.VirtualKey,
-                            )
-                        }
+                        .also { it.consume() }
 
+                    currentOnDown()
+                    if (hapticFeedback) {
+                        haptic.performHapticFeedback(
+                            HapticFeedbackType.VirtualKey,
+                        )
+                    }
+
+                    val heldButtonJob = scope.launch {
                         if (repeatDelay > 0 && repeatInterval > 0) {
                             delay(repeatDelay)
                             while (down.pressed) {
@@ -176,7 +178,7 @@ fun ForkyzKeyboard(
                         }
                     }
 
-                    waitForUpOrCancellation()
+                    waitForUpOrCancellation()?.also { it.consume() }
                     heldButtonJob.cancel()
                     currentOnUp()
                 }
