@@ -42,6 +42,8 @@ public class BoardWordEditView extends BoardEditView {
     private boolean customSuppressNotesList = false;
     private int expectedWidth = 0;
     private MovementStrategy movementStrategy = MovementStrategy.MOVE_NEXT_CLUE;
+    // only start rendering after we've set the scale on size change
+    private boolean hadRealSize = false;
 
     public BoardWordEditView(Context context) {
         this(context, null);
@@ -76,6 +78,8 @@ public class BoardWordEditView extends BoardEditView {
      * This is a bit of a hack for having a more or less invisible input
      * view at the top of the clues list if the board is being show in
      * the clues items.
+     *
+     * Must be called after layout params set
      */
     public void setIncognitoMode(boolean incognitoMode) {
         if (this.incognitoMode != incognitoMode) {
@@ -245,17 +249,22 @@ public class BoardWordEditView extends BoardEditView {
 
     @Override
     public void render(PlayboardChanges changes) {
-        // don't draw until we get onSizeChanged
-        if (!isRendering()) {
+        if (incognitoMode) {
+            setBitmap(null);
             return;
         }
+
+        // don't draw until we get onSizeChanged
+        if (!isRendering())
+            return;
 
         PlayboardRenderer renderer = getRenderer();
         if (renderer == null)
             return;
 
+        // get and keep width as /could/change through thread passing
+        int contentWidth = getContentWidth();
         Word renderWord = getRenderWord();
-
         RenderChanges renderChanges = getRenderChanges(changes);
 
         getSettings().getPlayRenderSettings(renderSettings -> {
@@ -265,7 +274,6 @@ public class BoardWordEditView extends BoardEditView {
                 !renderSettings.getSuppressHintHighlighting()
             );
             executorService.execute(() -> {
-
                 boolean displaySeparators
                     = renderSettings.getDisplaySeparators()
                         != DisplaySeparators.DS_NEVER;
@@ -276,14 +284,13 @@ public class BoardWordEditView extends BoardEditView {
                         renderWord,
                         renderChanges,
                         localSuppressNotesList,
-                        getContentWidth(),
+                        contentWidth,
                         displaySeparators,
                         renderSettings.getInferSeparators()
                     );
                     handler.post(() -> {
                         try {
-                            if (isRendering())
-                                setBitmap(bitmap);
+                            setBitmap(bitmap);
                         } finally {
                             unlockRenderer();
                         }
@@ -301,6 +308,8 @@ public class BoardWordEditView extends BoardEditView {
         int newWidth, int newHeight, int oldWidth, int oldHeight
     ) {
         super.onSizeChanged(newWidth, newHeight, oldWidth, oldHeight);
+
+        hadRealSize |= newWidth > 0;
 
         if (!isRendering())
             return;
@@ -429,7 +438,8 @@ public class BoardWordEditView extends BoardEditView {
      * visible
      */
     private boolean isRendering() {
-        return !incognitoMode
+        return hadRealSize
+            && !incognitoMode
             && getContentWidth() > 0
             && getVisibility() == VISIBLE;
     }

@@ -2037,6 +2037,11 @@ public class Playboard {
         public int hashCode() {
             return Objects.hash(zone, clueID);
         }
+
+        @Override
+        public String toString() {
+            return clueID + " | " + zone;
+        }
     }
 
     /**
@@ -2132,6 +2137,17 @@ public class Playboard {
          * List of clues that have had num/hint edited or flagged
          */
         public Collection<ClueID> getChangedClueIDs() { return changedClueIDs; }
+
+        @Override
+        public String toString() {
+            return "currentWord = " + currentWord
+                + ", previousWord = " + previousWord
+                + ", previousPosition = " + previousPosition
+                + ", cellChanges = " + cellChanges
+                + ", historyChange = " + historyChange
+                + ", lastHistoryIndex = " + lastHistoryIndex
+                + ", changedClueIDs = " + changedClueIDs;
+        }
     }
 
     /**
