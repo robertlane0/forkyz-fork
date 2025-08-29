@@ -63,7 +63,7 @@ fun MenuDropdownHeading(
             Text(
                 stringResource(titleId),
                 style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.ExtraBold,
+                fontWeight = FontWeight.Medium,
             )
         },
         onClick = onClick,

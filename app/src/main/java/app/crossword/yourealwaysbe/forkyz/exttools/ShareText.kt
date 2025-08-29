@@ -1,17 +1,23 @@
 
 package app.crossword.yourealwaysbe.forkyz.exttools
 
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import java.util.Locale
+import java.util.function.Consumer
+
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import androidx.core.app.ShareCompat
+
 import app.crossword.yourealwaysbe.forkyz.R
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
+import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Clue
 import app.crossword.yourealwaysbe.puz.Playboard
 import app.crossword.yourealwaysbe.puz.Puzzle
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
-import java.util.function.Consumer
 
 open class ShareTextData(
     val title : String,
@@ -53,8 +59,10 @@ open class ShareTextData(
         ) : ShareTextData {
             val source = puz.source ?: puz.title ?: ""
             val cheatedBoxes = puz.numberOfCheatedBoxes
+
             val date = puz.date
-            var message = if (date != null) {
+            val completionTime = TimeUtils.convertMillisecondsToTime(puz.time)
+            val message = if (date != null) {
                 val dateFormat
                     = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
                 context.resources.getQuantityString(
@@ -62,22 +70,18 @@ open class ShareTextData(
                     cheatedBoxes,
                     source,
                     dateFormat.format(date),
-                    cheatedBoxes
+                    cheatedBoxes,
+                    completionTime,
                 )
             } else {
                 context.resources.getQuantityString(
                     R.plurals.share_message_no_date,
                     cheatedBoxes,
                     source,
-                    cheatedBoxes
+                    cheatedBoxes,
+                    completionTime,
                 )
             }
-
-            val totalSeconds = puz.time / 1000f
-            val hours = (totalSeconds / 3600).toInt()
-            val minutes = ((totalSeconds % 3600) / 60).toInt()
-            val seconds = totalSeconds % 60
-            message += "\r\n" + context.getString(R.string.completed_in_time, hours, minutes, seconds)
 
             return ShareTextData(
                 context.getString(R.string.share_your_time),

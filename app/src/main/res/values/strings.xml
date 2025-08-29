@@ -614,7 +614,6 @@
     <!-- completed -->
     <string name="puzzle_finished_title">Puzzle Finished</string>
     <string name="completed_in">Completed In</string>
-    <string name="completed_in_time">Completed In %d:%02d:%02.2f</string>
     <string name="total_clues">Total Clues</string>
     <string name="total_boxes">Total Boxes</string>
     <string name="hinted_boxes">Hinted Boxes</string>
@@ -624,12 +623,12 @@
     <string name="completed_time_format_no_hours">%1$02d:%2$02d</string>
     <string name="completed_time_format_with_hours">%1$02d:%2$02d:%3$02d</string>
     <plurals name="share_message_with_date">
-        <item quantity="one">I finished the %1$s crossword for %2$s in #Forkyz with %3$d hint!</item>
-        <item quantity="other">I finished the %1$s crossword for %2$s in #Forkyz with %3$d hints!</item>
+        <item quantity="one">I finished the %1$s crossword for %2$s in #Forkyz with %3$d hint!\nI completed the crossword in %4$s.</item>
+        <item quantity="other">I finished the %1$s crossword for %2$s in #Forkyz with %3$d hints!\nI completed the crossword in %4$s.</item>
     </plurals>
     <plurals name="share_message_no_date">
-        <item quantity="one">I finished the %1$s crossword in #Forkyz with %2$d hint!</item>
-        <item quantity="other">I finished the %1$s crossword in #Forkyz with %2$d hints!</item>
+        <item quantity="one">I finished the %1$s crossword in #Forkyz with %2$d hint!\nI completed the crossword in %3$s.</item>
+        <item quantity="other">I finished the %1$s crossword in #Forkyz with %2$d hints!\nI completed the crossword in %3$s.</item>
     </plurals>
 
     <!-- manifest -->
