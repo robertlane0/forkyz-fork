@@ -31,11 +31,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 import app.crossword.yourealwaysbe.forkyz.R
+import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 import app.crossword.yourealwaysbe.forkyz.view.TwoButtonDialog
-
-private val SECONDS = 1000L
-private val MINUTES = SECONDS * 60
-private val HOURS = MINUTES * 60
 
 private val COMPLETION_TABLE_PADDING = 16.dp
 
@@ -151,7 +148,7 @@ private fun InfoHeadingData(
         Text(
             text = stringResource(
                 R.string.elapsed_time,
-                getElapsedString(state.elapsed)
+                TimeUtils.convertMillisecondsToTime(state.elapsed),
             ),
             style = MaterialTheme.typography.titleMedium,
         )
@@ -223,7 +220,9 @@ private fun FinishedInfo(
             ) {
                 CompletionDataRow(
                     R.string.completed_in,
-                    getElapsedString(finishedState.completionTime),
+                    TimeUtils.convertMillisecondsToTime(
+                        finishedState.completionTime
+                    ),
                 )
                 CompletionDataRow(
                     R.string.total_clues,
@@ -270,36 +269,6 @@ private fun CompletionDataRow(
             modifier = Modifier.weight(1.0F)
                 .padding(start=8.dp),
             text = value
-        )
-    }
-}
-
-/**
- * Convert long time duration into readable for humans
- */
-@Composable
-private fun getElapsedString(elapsed : Long) : String {
-    var remainingTime = elapsed
-    val hours = remainingTime / HOURS
-    remainingTime = remainingTime % HOURS
-
-    val minutes = remainingTime / MINUTES
-    remainingTime = remainingTime % MINUTES
-
-    val seconds = remainingTime / SECONDS
-
-    return if (hours > 0) {
-        stringResource(
-            R.string.completed_time_format_with_hours,
-            hours,
-            minutes,
-            seconds,
-        )
-    } else {
-        stringResource(
-            R.string.completed_time_format_no_hours,
-            minutes,
-            seconds,
         )
     }
 }
