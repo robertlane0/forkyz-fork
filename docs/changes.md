@@ -1,5 +1,11 @@
 # Forkyz Changelog
 
+## Version 71
+
+- Support shapes in TCA puz format (LA Times).
+- Fix built-in keyboard keypress bug (thanks @MIC132MIC).
+- Properly stop shake detection if enabled when app in background.
+
 ## Version 70
 
 - Add AZERTY keyboard layout (thanks Patrik Herbeuval).
