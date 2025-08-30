@@ -10,11 +10,11 @@ class TimeUtils {
             val duration: Duration = Duration.of(milliseconds, ChronoUnit.MILLIS)
             val hours = duration.toHours()
             val minutes = duration.toMinutesPart()
-            val seconds = duration.toSecondsPart()
+            val seconds = duration.toSecondsPart() + duration.toMillisPart()/1000f
             if (hours == 0L) {
-                return String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds)
+                return String.format(Locale.getDefault(), "%02d:%02.2f", minutes, seconds)
             }
-            return String.format(Locale.getDefault(), "%02d:%02d:%02d", hours, minutes, seconds)
+            return String.format(Locale.getDefault(), "%02d:%02d:%02.2f", hours, minutes, seconds)
         }
     }
 }
