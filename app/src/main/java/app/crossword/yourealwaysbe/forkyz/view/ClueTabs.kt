@@ -35,7 +35,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -50,6 +49,7 @@ import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 import app.crossword.yourealwaysbe.forkyz.R
 import app.crossword.yourealwaysbe.forkyz.settings.ClueTabsDouble
@@ -111,10 +111,8 @@ fun ClueTabs(
 ) {
     @Composable
     fun Modifier.clueItemBackground(clueSelected : Boolean) : Modifier {
-        val state by viewModel.uiState.observeAsState()
-        val highlightSelectedBackground
-            = state?.highlightSelectedBackground ?: false
-        if (highlightSelectedBackground && clueSelected)
+        val state by viewModel.uiState.collectAsStateWithLifecycle()
+        if (state.highlightSelectedBackground && clueSelected)
             return this.background(MaterialTheme.colorScheme.secondaryContainer)
         else
             return this
@@ -122,10 +120,8 @@ fun ClueTabs(
 
     @Composable
     fun clueItemForeground(clueSelected : Boolean) : Color {
-        val state by viewModel.uiState.observeAsState()
-        val highlightSelectedBackground
-            = state?.highlightSelectedBackground ?: false
-        if (highlightSelectedBackground && clueSelected)
+        val state by viewModel.uiState.collectAsStateWithLifecycle()
+        if (state.highlightSelectedBackground && clueSelected)
             return MaterialTheme.colorScheme.onSecondaryContainer
         else
             return MaterialTheme.colorScheme.onSurface
@@ -175,7 +171,6 @@ fun ClueTabs(
                             ),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        val state by viewModel.uiState.observeAsState()
                         Text(
                             modifier = modifier.weight(1.0F)
                                 .padding(start = CLUE_HORIZONTAL_PADDING)
@@ -189,7 +184,9 @@ fun ClueTabs(
                             color = clueItemForeground(clue.selected),
                         )
 
-                        if (state?.highlightSelectedRadio ?: true) {
+                        val state by viewModel.uiState
+                            .collectAsStateWithLifecycle()
+                        if (state.highlightSelectedRadio) {
                             RadioButton(
                                 selected = clue.selected,
                                 onClick = { onClueClick(clue.cid) },
@@ -201,6 +198,8 @@ fun ClueTabs(
                 if (showAllWords) {
                     viewModel.board?.let { board ->
                         clue.word?.let { word ->
+                            val state by viewModel.uiState
+                                .collectAsStateWithLifecycle()
                             BoardWordEdit(
                                 modifier = Modifier.padding(
                                     vertical = CLUE_VERTICAL_PADDING.toDp(),
@@ -222,6 +221,8 @@ fun ClueTabs(
                                 renderWithExpectedWidth = true,
                                 totalPadding = CLUE_HORIZONTAL_PADDING * 2,
                                 focusable = false,
+                                renderSettings = state.renderSettings,
+                                scratchMode = state.scratchMode,
                             )
                         }
                     }
@@ -233,12 +234,12 @@ fun ClueTabs(
 
     @Composable
     fun Page(paneIndex : Int, page : Int) {
-        val state by viewModel.uiState.observeAsState()
+        val state by viewModel.uiState.collectAsStateWithLifecycle()
         val listState = rememberLazyListState()
         val coroutineScope = rememberCoroutineScope()
 
-        LaunchedEffect(state?.snapToClueEvent) {
-            state?.snapToClueEvent?.let { event ->
+        LaunchedEffect(state.snapToClueEvent) {
+            state.snapToClueEvent?.let { event ->
                 if (event.paneIndex == paneIndex && event.pageNum == page) {
                     coroutineScope.launch {
                         listState.scrollToItem(event.clueIndex)
@@ -252,7 +253,7 @@ fun ClueTabs(
             modifier = Modifier.fillMaxWidth().fillMaxHeight(),
             state = listState,
         ) {
-            items(state?.pages?.get(page)?.clues ?: listOf()) {
+            items(state.pages.get(page).clues) {
                 key(it.cid.toString()) {
                     ClueItem(it)
                 }
@@ -266,13 +267,12 @@ fun ClueTabs(
         modifier : Modifier = Modifier,
         paneIndex : Int = 0,
     ) {
-        val state by viewModel.uiState.observeAsState()
-
-        val numPages = state?.numPages ?: 0
-        val pages = state?.pages ?: listOf()
+        val state by viewModel.uiState.collectAsStateWithLifecycle()
+        val numPages = state.numPages
+        val pages = state.pages
 
         if (numPages > 0) {
-            val uiStatePage = state?.panePages?.get(paneIndex) ?: 0
+            val uiStatePage = state.panePages.get(paneIndex)
             val coroutineScope = rememberCoroutineScope()
             val pagerState = rememberPagerState(
                 pageCount = { numPages },
@@ -310,7 +310,7 @@ fun ClueTabs(
                 SecondaryTabRow(
                     modifier = Modifier.combinedClickable(
                         onClick = { /* handled in Tab */ },
-                        onLongClick = onBarLongClick, // TODO: works?
+                        onLongClick = onBarLongClick,
                         onLongClickLabel = onBarLongClickDescription,
                     ),
                     selectedTabIndex = pagerState.currentPage,
@@ -346,25 +346,24 @@ fun ClueTabs(
     BoxWithConstraints(
         modifier = modifier.background(MaterialTheme.colorScheme.surface),
     ) {
-        val state by viewModel.uiState.observeAsState()
-        state?.doubleMode?.let { doubleMode ->
-            val isDouble = isDouble(doubleMode, maxWidth, isPortrait)
-            LaunchedEffect(isDouble) {
-                viewModel.isDouble = isDouble
-            }
+        val state by viewModel.uiState.collectAsStateWithLifecycle()
+        val isDouble = isDouble(state.doubleMode, maxWidth, isPortrait)
+        LaunchedEffect(isDouble) {
+            viewModel.isDouble = isDouble
+        }
 
-            Row() {
+        Row() {
+            Pane(
+                modifier = Modifier.weight(1.0F),
+                paneIndex = 0,
+            )
+            if (isDouble) {
                 Pane(
                     modifier = Modifier.weight(1.0F),
-                    paneIndex = 0,
+                    paneIndex = 1,
                 )
-                if (isDouble) {
-                    Pane(
-                        modifier = Modifier.weight(1.0F),
-                        paneIndex = 1,
-                    )
-                }
             }
         }
     }
 }
+

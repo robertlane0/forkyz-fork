@@ -11,40 +11,41 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.function.BiConsumer
 import javax.inject.Inject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
 
 import android.app.Application
 import android.net.Uri
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import androidx.annotation.MainThread
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import androidx.lifecycle.viewModelScope
 
 import dagger.hilt.android.lifecycle.HiltViewModel
 
 import app.crossword.yourealwaysbe.forkyz.net.Downloader
 import app.crossword.yourealwaysbe.forkyz.net.DownloadersProvider
 import app.crossword.yourealwaysbe.forkyz.settings.AccessorSetting
+import app.crossword.yourealwaysbe.forkyz.settings.BackgroundDownloadSettings
 import app.crossword.yourealwaysbe.forkyz.settings.BrowseSwipeAction
 import app.crossword.yourealwaysbe.forkyz.settings.DayNightMode
+import app.crossword.yourealwaysbe.forkyz.settings.DownloadersSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.RatingsSettings
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation
 import app.crossword.yourealwaysbe.forkyz.util.AppPuzzleUtils
 import app.crossword.yourealwaysbe.forkyz.util.BackgroundDownloadManager
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
+import app.crossword.yourealwaysbe.forkyz.util.MediatedStateWithFlow
 import app.crossword.yourealwaysbe.forkyz.util.PuzzleImporter
 import app.crossword.yourealwaysbe.forkyz.util.files.DirHandle
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzMetaFile
-import app.crossword.yourealwaysbe.forkyz.util.liveDataFanIn
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 import app.crossword.yourealwaysbe.forkyz.view.DownloadDialogViewModel
 
@@ -112,6 +113,7 @@ data class UIState(
     val swipeAction : BrowseSwipeAction = BrowseSwipeAction.BSA_ARCHIVE,
     val showPercentageCorrect : Boolean = false,
     val showRatings : Boolean = false,
+    val ratingsDisabled : Boolean = false,
     val indicateIfSolution : Boolean = false,
     val dayNightMode : DayNightMode = DEFAULT_DAY_NIGHT_MODE,
     val displayInternalStorageMessage : Boolean = false,
@@ -166,7 +168,6 @@ enum class BrowseSubMenu {
 }
 
 data class BrowseMenuState(
-    val isViewArchive : Boolean = false,
     val expanded : BrowseSubMenu = BrowseSubMenu.NONE,
 )
 
@@ -176,6 +177,38 @@ data class BrowseMenuState(
 private data class PuzData(
     val puzEntry : PuzEntry,
     val puzHandle : PuzHandle,
+)
+
+private data class BrowseActionSettings(
+    val disableSwipe : Boolean = false,
+    val swipeAction : BrowseSwipeAction = BrowseSwipeAction.BSA_ARCHIVE,
+)
+
+private data class BrowseDisplaySettings(
+    val sortOrder : AccessorSetting,
+    val showPercentageCorrect : Boolean,
+    val ratingsSettings : RatingsSettings,
+    val indicateIfSolution : Boolean,
+    val appDayNightMode : DayNightMode,
+)
+
+private data class BrowseExternalSettings(
+    val fileHandlerStorageLocation : StorageLocation,
+    val lastSeenVersion : String,
+    val newPuzzle : Boolean,
+)
+
+private data class BrowseDownloaderSettings(
+    val downloadersSettings : DownloadersSettings,
+    val backgroundDownloadSettings : BackgroundDownloadSettings,
+    val downloadOnStartUp : Boolean,
+)
+
+private data class BrowseSettings(
+    val actionSettings : BrowseActionSettings,
+    val displaySettings : BrowseDisplaySettings,
+    val externalSettings : BrowseExternalSettings,
+    val downloaderSettings : BrowseDownloaderSettings,
 )
 
 @HiltViewModel
@@ -194,24 +227,46 @@ class BrowseActivityViewModel @Inject constructor(
     private val executorService = Executors.newSingleThreadExecutor()
     // not fixed num in case user creates loads of downloads
     private val downloadExecutorService = Executors.newCachedThreadPool()
-    private val handler = Handler(Looper.getMainLooper())
 
-    private val _uiState : MediatorLiveData<UIState> = liveDataFanIn(
-        this::getUpdatedState,
-        settings.liveBrowseSort,
-        settings.liveBrowseDisableSwipe,
-        settings.liveBrowseSwipeAction,
-        settings.liveBrowseShowPercentageCorrect,
-        settings.liveRatingsSettings,
-        settings.liveBrowseIndicateIfSolution,
-        settings.liveAppDayNightMode,
-        settings.liveFileHandlerStorageLocation,
-        settings.liveDownloadersSettings,
-        backgroundDownloadManager.liveIsBackgroundDownloadEnabled,
-        settings.liveDownloadOnStartUp,
-        settings.liveBrowseLastSeenVersion,
+    private val mediatedUIState = MediatedStateWithFlow<UIState, BrowseSettings>(
+        viewModelScope,
+        UIState(),
+        { state, settings ->
+            // currently relying on this being called as soon as uiState
+            // has observers
+            checkNeedPuzzleLoad(settings)
+            getUpdatedState(state, settings)
+        },
+        combine(
+            combine(
+                settings.liveBrowseDisableSwipe,
+                settings.liveBrowseSwipeAction,
+                ::BrowseActionSettings,
+            ),
+            combine(
+                settings.liveBrowseSort,
+                settings.liveBrowseShowPercentageCorrect,
+                settings.liveRatingsSettings,
+                settings.liveBrowseIndicateIfSolution,
+                settings.liveAppDayNightMode,
+                ::BrowseDisplaySettings,
+            ),
+            combine(
+                settings.liveFileHandlerStorageLocation,
+                settings.liveBrowseLastSeenVersion,
+                settings.liveBrowseNewPuzzle,
+                ::BrowseExternalSettings,
+            ),
+            combine(
+                settings.liveDownloadersSettings,
+                settings.liveBackgroundDownloadSettings,
+                settings.liveDownloadOnStartUp,
+                ::BrowseDownloaderSettings,
+            ),
+            ::BrowseSettings,
+        ),
     )
-    val uiState : LiveData<UIState> = _uiState
+    val uiState : StateFlow<UIState> = mediatedUIState.stateFlow
 
     private val menuExpandStack : MutableList<BrowseSubMenu> = mutableListOf()
     private val _menuState
@@ -249,30 +304,11 @@ class BrowseActivityViewModel @Inject constructor(
     private var puzzles : MutableMap<String, PuzData> = mutableMapOf()
     private var initialPuzzleLoadStarted = false
 
-    init {
-        // load puzzles when new puzzle flagged, or if puzzles haven't
-        // been loaded yet
-        _uiState.addSource(
-            settings.liveBrowseNewPuzzle,
-            { newPuzzle ->
-                if (newPuzzle || !initialPuzzleLoadStarted) {
-                    if (!isViewArchive || !initialPuzzleLoadStarted) {
-                        initialPuzzleLoadStarted = true
-                        startLoadPuzzleList()
-                    }
-                    settings.setBrowseNewPuzzle(false)
-                }
-            },
-        )
-    }
-
     val isViewArchive : Boolean
-        get() {
-            return uiState.value?.isViewArchive ?: false
-        }
+        get() { return currentUIState.isViewArchive }
 
     fun toggleSelectPuzzle(puzzleID : String) {
-        uiState.value?.selectedPuzzleIDs?.let { selectedPuzzleIDs ->
+        currentUIState.selectedPuzzleIDs.let { selectedPuzzleIDs ->
             if (puzzleID in selectedPuzzleIDs)
                 setSelectedPuzzles(selectedPuzzleIDs - puzzleID)
             else
@@ -281,10 +317,12 @@ class BrowseActivityViewModel @Inject constructor(
     }
 
     fun clearSelection() {
-        _uiState.value = uiState.value?.copy(
-            selectedPuzzleIDs = setOf(),
-            disableSwipe = isDisableSwipeSetting,
-        )
+        settings.getBrowseDisableSwipe() { disableSwipe ->
+            currentUIState = currentUIState.copy(
+                selectedPuzzleIDs = setOf(),
+                disableSwipe = disableSwipe,
+            )
+        }
     }
 
     fun clearToastMessages() {
@@ -320,8 +358,7 @@ class BrowseActivityViewModel @Inject constructor(
 
     fun expandMenu(menu : BrowseSubMenu) {
         menuExpandStack.add(menu)
-        val state = menuState.value ?: BrowseMenuState()
-        _menuState.value = state.copy(expanded = menu)
+        _menuState.value = menuState.value.copy(expanded = menu)
     }
 
     /**
@@ -355,7 +392,7 @@ class BrowseActivityViewModel @Inject constructor(
 
     @MainThread
     fun swipeRefreshPuzzleList() {
-        _uiState.value = uiState.value?.copy(
+        currentUIState = currentUIState.copy(
             isSwipeRefreshing = true,
         )
         startLoadPuzzleList()
@@ -377,8 +414,11 @@ class BrowseActivityViewModel @Inject constructor(
                         { it },
                     ).toMutableMap()
 
-                handler.post() {
-                    updateState(archive, true)
+                runMain {
+                    updateState(
+                        isArchive = archive,
+                        isNewPuzzleList = true,
+                    )
                 }
             }
         }
@@ -399,7 +439,7 @@ class BrowseActivityViewModel @Inject constructor(
             if (dontConfirm) {
                 confirmDeleteSelectedPuzzles()
             } else {
-                _uiState.value = uiState.value?.copy(
+                currentUIState = currentUIState.copy(
                     showDialog = BrowseDialog.CONFIRM_DELETE_SELECTED,
                 )
             }
@@ -411,11 +451,10 @@ class BrowseActivityViewModel @Inject constructor(
      */
     @MainThread
     fun confirmDeleteSelectedPuzzles() {
-        uiState.value?.selectedPuzzleIDs?.let { selectedPuzzleIDs ->
-            clearDialog(BrowseDialog.CONFIRM_DELETE_SELECTED)
-            clearSelection()
-            doDeletePuzzles(selectedPuzzleIDs)
-        }
+        clearDialog(BrowseDialog.CONFIRM_DELETE_SELECTED)
+        val selectedPuzzleIDs = currentUIState.selectedPuzzleIDs
+        clearSelection()
+        doDeletePuzzles(selectedPuzzleIDs)
     }
 
     /**
@@ -451,15 +490,13 @@ class BrowseActivityViewModel @Inject constructor(
     @MainThread
     fun toggleArchiveSelectedPuzzles() {
         fileHandlerProvider.get { fileHandler ->
-            uiState.value?.selectedPuzzleIDs?.let { selectedPuzzleIDs ->
-                val destDir = if (isViewArchive)
-                    fileHandler.getCrosswordsDirectory()
-                else
-                    fileHandler.getArchiveDirectory()
+            val destDir = if (isViewArchive)
+                fileHandler.getCrosswordsDirectory()
+            else
+                fileHandler.getArchiveDirectory()
 
-                clearSelection()
-                movePuzzles(selectedPuzzleIDs, destDir)
-            }
+            clearSelection()
+            movePuzzles(currentUIState.selectedPuzzleIDs, destDir)
         }
     }
 
@@ -538,7 +575,7 @@ class BrowseActivityViewModel @Inject constructor(
                     toDelete.forEach { fileHandler.delete(it) }
                     toArchive.forEach { fileHandler.moveTo(it, archive) }
 
-                    handler.post { startLoadPuzzleList() }
+                    runMain { startLoadPuzzleList() }
                 }
             }
         }}}}
@@ -571,7 +608,7 @@ class BrowseActivityViewModel @Inject constructor(
             downloadExecutorService.execute {
                 dls.download(date, downloaders)
                 if (!isViewArchive)
-                    handler.post(this::startLoadPuzzleList)
+                    runMain(this::startLoadPuzzleList)
             }
         }
     }
@@ -608,7 +645,7 @@ class BrowseActivityViewModel @Inject constructor(
                         settings.setBrowseLastDownload(
                             System.currentTimeMillis()
                         )
-                        handler.post {
+                        runMain {
                             download(LocalDate.now(), dls.getAutoDownloaders())
                         }
                     }
@@ -719,7 +756,10 @@ class BrowseActivityViewModel @Inject constructor(
     }
 
     fun showDownloadDialog() {
-        _downloadDialog.value = DownloadDialogViewModel(downloadersProvider)
+        _downloadDialog.value = DownloadDialogViewModel(
+            viewModelScope,
+            downloadersProvider,
+        )
     }
 
     fun clearDownloadDialog() {
@@ -729,8 +769,9 @@ class BrowseActivityViewModel @Inject constructor(
     fun okDownloadDialog() {
         downloadDialog.value?.let {
             val date = it.date
-            val downloaders = it.selectedDownloaders
-            download(date, downloaders)
+            it.getSelectedDownloaders() { downloaders ->
+                download(date, downloaders)
+            }
         }
         clearDownloadDialog()
     }
@@ -788,9 +829,9 @@ class BrowseActivityViewModel @Inject constructor(
                 }
 
                 if (needsReload)
-                    handler.post(this::startLoadPuzzleList)
+                    runMain(this::startLoadPuzzleList)
 
-                handler.post { cb(someFailed, someSucceeded) }
+                runMain { cb(someFailed, someSucceeded) }
             }
         }}
     }
@@ -820,7 +861,7 @@ class BrowseActivityViewModel @Inject constructor(
                     }
                 }
 
-                handler.post { updateState(isNewPuzzleList = true) }
+                runMain { updateState(isNewPuzzleList = true) }
             }
         }
     }
@@ -900,10 +941,35 @@ class BrowseActivityViewModel @Inject constructor(
     private fun updateState(
         isArchive : Boolean = isViewArchive,
         isNewPuzzleList : Boolean = false,
-        puzzleFilter : String? = uiState.value?.puzzleFilter,
+        puzzleFilter : String? = currentUIState.puzzleFilter,
     ) {
-        val state = getUpdatedState(isArchive, isNewPuzzleList, puzzleFilter)
-        _uiState.value = state
+        settings.getRatingsDisableRatings() { disableRatings ->
+            val state = currentUIState
+            val sortOrder = state.sortOrder
+            var newPuzzleList : List<PuzGroup> = state.puzzleList
+            if (isNewPuzzleList)
+                newPuzzleList = getPuzzleList(puzzleFilter, state.sortOrder)
+
+            val displayInternalStorageMessage = (
+                currentUIState.displayInternalStorageMessage
+                && puzzles.isEmpty()
+                && !isArchive
+            )
+
+            val showRatings = (!isArchive && state.showRatings)
+                || (isArchive && disableRatings)
+
+            // reset to false when new puzzle list
+            val isSwipeRefreshing = !isNewPuzzleList && state.isSwipeRefreshing
+
+            currentUIState = state.copy(
+                isViewArchive = isArchive,
+                puzzleList = newPuzzleList,
+                displayInternalStorageMessage = displayInternalStorageMessage,
+                showRatings = showRatings,
+                isSwipeRefreshing = isSwipeRefreshing,
+            )
+        }
     }
 
     /**
@@ -915,73 +981,49 @@ class BrowseActivityViewModel @Inject constructor(
      * @param puzzleFilter new puzzle filter value
      */
     private fun getUpdatedState(
-        isArchive : Boolean = isViewArchive,
-        isNewPuzzleList : Boolean = false,
-        puzzleFilter : String? = uiState.value?.puzzleFilter,
+        state : UIState,
+        browseSettings : BrowseSettings,
     ) : UIState {
-        val state = uiState.value ?: UIState()
         var newPuzzleList : List<PuzGroup> = state.puzzleList
 
-        val isNewFilter = state.puzzleFilter != puzzleFilter
-        val newSortOrder = settings.liveBrowseSort.value ?: state.sortOrder
-        val isNewSort = state.sortOrder != newSortOrder
-        if (isNewPuzzleList || isNewFilter || isNewSort) {
-            newPuzzleList = puzzles.values
-                .map { it.puzEntry }
-                .filter { entryMatches(it, puzzleFilter) }
-                .groupBy { pe ->
-                    when (newSortOrder) {
-                        AccessorSetting.AS_SOURCE -> pe.source
-                        else -> HEADER_DATE_FORMAT.format(pe.date)
-                    }
-                }.map { e ->
-                    PuzGroup(
-                        e.key,
-                        e.value.sortedWith { pe1, pe2 ->
-                            pe1.id.compareTo(pe2.id)
-                        }
-                    )
-                }.sortedWith { g1, g2 ->
-                    if (!g1.puzzles.isEmpty() && !g2.puzzles.isEmpty()) {
-                        comparePuzEntries(
-                            newSortOrder,
-                            g1.puzzles[0],
-                            g2.puzzles[0],
-                        )
-                    } else { 0 }
-                }
+        val newSortOrder = browseSettings.displaySettings.sortOrder
+        if (state.sortOrder != newSortOrder) {
+            newPuzzleList = getPuzzleList(
+                currentUIState.puzzleFilter,
+                newSortOrder,
+            )
         }
 
         val showPercentageCorrect
-            = settings.liveBrowseShowPercentageCorrect.value ?: false
-        val showRatings = settings.liveRatingsSettings.value?.let { rs ->
-            !rs.disableRatings
-                && (rs.browseAlwaysShowRating || isArchive)
-            } ?: false
-        val indicateIfSolution
-            = settings.liveBrowseIndicateIfSolution.value
-                ?: state.indicateIfSolution
-        val dayNightMode
-            = settings.liveAppDayNightMode.value ?: DEFAULT_DAY_NIGHT_MODE
+            = browseSettings.displaySettings.showPercentageCorrect
+        val showRatings = browseSettings.displaySettings
+            .ratingsSettings
+            .let { rs ->
+                !rs.disableRatings && (rs.browseAlwaysShowRating || isViewArchive)
+            }
+        val indicateIfSolution = browseSettings.displaySettings
+            .indicateIfSolution
+        val dayNightMode = browseSettings.displaySettings.appDayNightMode
         // note, uses unfiltered puzzle list to detect if empty
         val displayInternalStorageMessage = (
-            settings.liveFileHandlerStorageLocation.value
+            browseSettings.externalSettings.fileHandlerStorageLocation
                 == StorageLocation.SL_INTERNAL
             && puzzles.isEmpty()
-            && !isArchive
+            && !isViewArchive
         )
-        val isNotificationPermissionNeeded = settings.liveDownloadersSettings
-            .value
-            ?.isNotificationPermissionNeeded
-            ?: false
+        val isNotificationPermissionNeeded = browseSettings.downloaderSettings
+            .downloadersSettings
+            .isNotificationPermissionNeeded
         val isBackgroundDownloadEnabled = backgroundDownloadManager
-            .liveIsBackgroundDownloadEnabled.value
-            ?: false
-        val isDownloadOnStartUp = settings.liveDownloadOnStartUp.value ?: false
+            .getIsBackgroundDownloadEnabled(
+                browseSettings.downloaderSettings.backgroundDownloadSettings,
+            )
+        val isDownloadOnStartUp = browseSettings.downloaderSettings
+            .downloadOnStartUp
 
-        val lastSeenVersion = settings.liveBrowseLastSeenVersion.value
-            ?: currentVersion
-        val isNewVersion = currentVersion != lastSeenVersion
+        val lastSeenVersion = browseSettings.externalSettings.lastSeenVersion
+        val isNewVersion
+            = !lastSeenVersion.isEmpty() && currentVersion != lastSeenVersion
         val showDialog = if (
             state.showDialog == BrowseDialog.NONE && isNewVersion
         ) {
@@ -989,18 +1031,14 @@ class BrowseActivityViewModel @Inject constructor(
         } else {
             state.showDialog
         }
-        val disableSwipe = isDisableSwipeSetting || state.isSelecting
-        // reset to false when new puzzle list
-        val isSwipeRefreshing = !isNewPuzzleList && state.isSwipeRefreshing
+        val disableSwipe
+            = browseSettings.actionSettings.disableSwipe || state.isSelecting
 
         return state.copy(
-            isViewArchive = isArchive,
-            puzzleFilter = puzzleFilter,
             sortOrder = newSortOrder,
             puzzleList = newPuzzleList,
             disableSwipe = disableSwipe,
-            swipeAction = settings.liveBrowseSwipeAction.value ?:
-                BrowseSwipeAction.BSA_ARCHIVE,
+            swipeAction = browseSettings.actionSettings.swipeAction,
             showPercentageCorrect = showPercentageCorrect,
             showRatings = showRatings,
             indicateIfSolution = indicateIfSolution,
@@ -1010,14 +1048,43 @@ class BrowseActivityViewModel @Inject constructor(
             isBackgroundDownloadEnabled = isBackgroundDownloadEnabled,
             isDownloadOnStartUp = isDownloadOnStartUp,
             currentVersion = currentVersion,
-            isSwipeRefreshing = isSwipeRefreshing,
             showDialog = showDialog,
         )
     }
 
+    private fun getPuzzleList(
+        puzzleFilter : String?,
+        sortOrder : AccessorSetting,
+    ) : List<PuzGroup> {
+        return puzzles.values
+            .map { it.puzEntry }
+            .filter { entryMatches(it, puzzleFilter) }
+            .groupBy { pe ->
+                when (sortOrder) {
+                    AccessorSetting.AS_SOURCE -> pe.source
+                    else -> HEADER_DATE_FORMAT.format(pe.date)
+                }
+            }.map { e ->
+                PuzGroup(
+                    e.key,
+                    e.value.sortedWith { pe1, pe2 ->
+                        pe1.id.compareTo(pe2.id)
+                    }
+                )
+            }.sortedWith { g1, g2 ->
+                if (!g1.puzzles.isEmpty() && !g2.puzzles.isEmpty()) {
+                    comparePuzEntries(
+                        sortOrder,
+                        g1.puzzles[0],
+                        g2.puzzles[0],
+                    )
+                } else { 0 }
+            }
+    }
+
     private fun setUIBusy(value : Boolean) {
-        handler.post {
-            _uiState.value = uiState.value?.copy(isBusy = value)
+        runMain {
+            currentUIState = currentUIState.copy(isBusy = value)
         }
     }
 
@@ -1082,7 +1149,7 @@ class BrowseActivityViewModel @Inject constructor(
                     }
                 }
 
-                handler.post { updateState(isNewPuzzleList = true) }
+                runMain { updateState(isNewPuzzleList = true) }
             }
         }
     }
@@ -1128,13 +1195,11 @@ class BrowseActivityViewModel @Inject constructor(
     }
 
     private fun showDialog(dialog : BrowseDialog) {
-        _uiState.value = uiState.value?.copy(
-            showDialog = dialog,
-        )
+        currentUIState = currentUIState.copy(showDialog = dialog)
     }
 
     private fun clearDialog(dialog : BrowseDialog) {
-        if (uiState.value?.showDialog == dialog)
+        if (currentUIState.showDialog == dialog)
             showDialog(BrowseDialog.NONE)
     }
 
@@ -1150,25 +1215,39 @@ class BrowseActivityViewModel @Inject constructor(
                             puzzles.remove(puzzleID)
                     }
                 }
-                handler.post() {
-                    updateState(isNewPuzzleList = true)
-                }
+                runMain { updateState(isNewPuzzleList = true) }
             }
         }
     }
 
     private fun setSelectedPuzzles(newSelection : Set<String>) {
-        _uiState.value = uiState.value?.copy(
-            selectedPuzzleIDs = newSelection,
-            disableSwipe = isDisableSwipeSetting || !newSelection.isEmpty(),
-        )
+        settings.getBrowseDisableSwipe() { disableSwipe ->
+            currentUIState = currentUIState.copy(
+                selectedPuzzleIDs = newSelection,
+                disableSwipe = disableSwipe || !newSelection.isEmpty(),
+            )
+        }
+    }
+
+    private fun checkNeedPuzzleLoad(browseSettings : BrowseSettings) {
+        if (
+           !initialPuzzleLoadStarted
+           || (browseSettings.externalSettings.newPuzzle && !isViewArchive)
+        ) {
+            initialPuzzleLoadStarted = true
+            startLoadPuzzleList()
+        }
+        settings.setBrowseNewPuzzle(false)
+    }
+
+    private fun runMain(run : () -> Unit) {
+        viewModelScope.launch(Dispatchers.Main) { run() }
     }
 
     private val currentVersion : String
         = utils.getApplicationVersionName(getApplication())
 
-    private val isDisableSwipeSetting : Boolean
-        get() {
-            return settings.liveBrowseDisableSwipe?.value ?: true
-        }
+    private var currentUIState : UIState
+        get() { return mediatedUIState.current }
+        set(value) { mediatedUIState.current = value }
 }

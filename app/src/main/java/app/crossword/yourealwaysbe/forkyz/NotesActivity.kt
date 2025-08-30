@@ -36,7 +36,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -169,10 +168,10 @@ class NotesActivity() : PuzzleActivity() {
     @Composable
     @OptIn(ExperimentalMaterial3Api::class)
     private fun TopAppBar() {
-        val state by viewModel.notesUIState.observeAsState()
+        val state by viewModel.notesUIState.collectAsStateWithLifecycle()
         themeHelper.ForkyzTopAppBar(
             title = {
-                if (state?.isPuzzleNotes ?: false) {
+                if (state.isPuzzleNotes) {
                     Text(stringResource(R.string.menu_notes_puzzle))
                 } else {
                     ClueText(
@@ -194,10 +193,8 @@ class NotesActivity() : PuzzleActivity() {
                     .verticalScroll(rememberScrollState())
                     .height(IntrinsicSize.Max),
             ) {
-                val state by viewModel.notesUIState.observeAsState()
-                val isPuzzleNotes = state?.isPuzzleNotes ?: false
-
-                if (!isPuzzleNotes) {
+                val state by viewModel.notesUIState.collectAsStateWithLifecycle()
+                if (!state.isPuzzleNotes) {
                     MiniboardRow()
                 }
                 ScratchRow()
@@ -215,11 +212,11 @@ class NotesActivity() : PuzzleActivity() {
 
     @Composable
     private fun MiniboardRow() {
-        val state by viewModel.notesUIState.observeAsState()
+        val state by viewModel.notesUIState.collectAsStateWithLifecycle()
 
         BoardLabel(R.string.board_lab)
         Miniboard(
-            word = state?.word,
+            word = state.word,
             modifier = Modifier.onKeyEvent(this::onMiniboardKeyEvent)
                 .padding(
                     vertical = VERTICAL_BOARD_PADDING
@@ -230,29 +227,26 @@ class NotesActivity() : PuzzleActivity() {
             },
             longClickAccessibilityAction
                 = R.string.transfer_board_to_focussed_view,
-            ignoreScratchMode = true,
-            useSuppressNotesList = state != null,
-            suppressNotesList = state?.suppressNotesList,
+            scratchMode = false,
+            useSuppressNotesList = true,
+            suppressNotesList = state.suppressNotesList,
             onFocusChanged = { focussed ->
                 setFocussedEntry(NoteEntry.BOARD, focussed)
             },
-            movementStrategy = state?.movementStrategy
-                ?: MovementStrategy.STOP_ON_END,
+            movementStrategy = state.movementStrategy,
+            renderSettings = state.renderSettings,
         )
     }
 
     @Composable
     private fun ScratchRow() {
-        val state by viewModel.notesUIState.observeAsState()
+        val state by viewModel.notesUIState.collectAsStateWithLifecycle()
 
         BoardLabel(R.string.scratch_lab)
         BoardEdit(
-            value = state?.scratchValue ?: "",
+            value = state.scratchValue,
             contentDescription = R.string.scratch_lab,
-            onClick = {
-                // TODO: show keyboard for view!
-                viewModel.showKeyboard()
-            },
+            onClick = viewModel::showKeyboard,
             onLongClick = {
                 transferToFocussed(NoteEntry.SCRATCH, NoteEntry.BOARD)
             },
@@ -264,16 +258,15 @@ class NotesActivity() : PuzzleActivity() {
             onFocusChanged = { focussed ->
                 setFocussedEntry(NoteEntry.SCRATCH, focussed)
             },
-            separatorsClue = state?.notesClue,
-            inferSeparators = state?.inferSeparators ?: false,
+            separatorsClue = state.notesClue,
+            inferSeparators = state.inferSeparators,
         )
     }
 
     @Composable
     private fun TextRow(modifier : Modifier) {
-        val state by viewModel.notesUIState.observeAsState()
-        val textValue = state?.textValue ?: ""
-        val hintStringID = if (state?.isPuzzleNotes ?: false)
+        val state by viewModel.notesUIState.collectAsStateWithLifecycle()
+        val hintStringID = if (state.isPuzzleNotes)
             R.string.general_puzzle_notes
         else
             R.string.general_clue_notes
@@ -292,7 +285,7 @@ class NotesActivity() : PuzzleActivity() {
             textStyle = textStyle,
             singleLine = false,
             minLines = 2,
-            value = textValue,
+            value = state.textValue,
             onValueChange = viewModel::setTextValue,
             placeholder = { Text(stringResource(hintStringID)) },
         )
@@ -300,46 +293,44 @@ class NotesActivity() : PuzzleActivity() {
 
     @Composable
     private fun FlagRow() {
-        val state by viewModel.notesUIState.observeAsState()
-        state?.let { stateValue ->
-            if (!stateValue.isPuzzleNotes) {
+        val state by viewModel.notesUIState.collectAsStateWithLifecycle()
+        if (!state.isPuzzleNotes) {
+            Row(
+                modifier = Modifier.fillMaxWidth()
+                    .padding(horizontal = 4.dp),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth()
-                        .padding(horizontal = 4.dp),
-                    horizontalArrangement = Arrangement.End,
+                    modifier = Modifier.combinedClickable(
+                        onLongClick = viewModel::longClickNotesClueFlag,
+                        onClick = viewModel::toggleNotesClueFlag,
+                        onLongClickLabel = stringResource(
+                            R.string.choose_flag_color
+                        ),
+                    ),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(
-                        modifier = Modifier.combinedClickable(
-                            onLongClick = viewModel::longClickNotesClueFlag,
-                            onClick = viewModel::toggleNotesClueFlag,
-                            onLongClickLabel = stringResource(
-                                R.string.choose_flag_color
-                            ),
-                        ),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        val clueFlagColor = stateValue.clueFlagColor
-                        var checkColors = CheckboxDefaults.colors()
-                        if (!Clue.isDefaultFlagColor(clueFlagColor)) {
-                            val color = Color(
-                                ColorUtils.addAlpha(clueFlagColor)
-                            )
-                            checkColors = CheckboxDefaults.colors(
-                                checkedColor = color,
-                                uncheckedColor = color,
-                            )
-                        }
-
-                        Text(stringResource(R.string.flag_clue))
-                        Checkbox(
-                            modifier = Modifier.padding(10.dp),
-                            checked = stateValue.clueFlagged,
-                            // needs to be null so parent gets long click
-                            onCheckedChange = null,
-                            colors = checkColors,
+                    val clueFlagColor = state.clueFlagColor
+                    var checkColors = CheckboxDefaults.colors()
+                    if (!Clue.isDefaultFlagColor(clueFlagColor)) {
+                        val color = Color(
+                            ColorUtils.addAlpha(clueFlagColor)
+                        )
+                        checkColors = CheckboxDefaults.colors(
+                            checkedColor = color,
+                            uncheckedColor = color,
                         )
                     }
+
+                    Text(stringResource(R.string.flag_clue))
+                    Checkbox(
+                        modifier = Modifier.padding(10.dp),
+                        checked = state.clueFlagged,
+                        // needs to be null so parent gets long click
+                        onCheckedChange = null,
+                        colors = checkColors,
+                    )
                 }
             }
         }
@@ -347,13 +338,13 @@ class NotesActivity() : PuzzleActivity() {
 
     @Composable
     private fun AnagramSourceRow() {
-        val state by viewModel.notesUIState.observeAsState()
+        val state by viewModel.notesUIState.collectAsStateWithLifecycle()
         val acceptedPredictionEvent
             by viewModel.acceptedPredictionEvent.collectAsStateWithLifecycle()
 
         var selectionPosition : Int? = acceptedPredictionEvent?.let {
             // to end if filled boxes, else to first free space
-            if (it >= state?.boxesLength ?: 0)
+            if (it >= state.boxesLength)
                 it - 1
             else if (it > 0)
                 it
@@ -365,8 +356,8 @@ class NotesActivity() : PuzzleActivity() {
 
         BoardLabel(R.string.anagram_source_lab)
         BoardEdit(
-            value = state?.anagramSourceValue ?: "",
-            shadowValue = state?.anagramSourcePredictionValue,
+            value = state.anagramSourceValue,
+            shadowValue = state.anagramSourcePredictionValue,
             contentDescription = R.string.anagram_source_lab,
             onClick = {
                 // TODO: show keyboard for view!
@@ -388,16 +379,13 @@ class NotesActivity() : PuzzleActivity() {
 
     @Composable
     private fun AnagramSolutionRow() {
-        val state by viewModel.notesUIState.observeAsState()
+        val state by viewModel.notesUIState.collectAsStateWithLifecycle()
 
         BoardLabel(R.string.anagram_solution_lab)
         BoardEdit(
-            value = state?.anagramSolutionValue ?: "",
+            value = state.anagramSolutionValue,
             contentDescription = R.string.anagram_source_lab,
-            onClick = {
-                // TODO: show keyboard for view!
-                viewModel.showKeyboard()
-            },
+            onClick = { viewModel.showKeyboard() },
             onLongClick = {
                 transferToFocussed(NoteEntry.ANAGRAM_SOLUTION, NoteEntry.BOARD)
             },
@@ -412,8 +400,8 @@ class NotesActivity() : PuzzleActivity() {
             onFocusChanged = { focussed ->
                 setFocussedEntry(NoteEntry.ANAGRAM_SOLUTION, focussed)
             },
-            separatorsClue = state?.notesClue,
-            inferSeparators = state?.inferSeparators ?: false,
+            separatorsClue = state.notesClue,
+            inferSeparators = state.inferSeparators,
         )
     }
 
@@ -424,9 +412,9 @@ class NotesActivity() : PuzzleActivity() {
 
     @Composable
     private fun TransferConfirmationDialog() {
-        val state by viewModel.notesUIState.observeAsState()
+        val state by viewModel.notesUIState.collectAsStateWithLifecycle()
 
-        if (state?.confirmTransferRequest != null) {
+        if (state.confirmTransferRequest != null) {
             OKCancelDialog(
                 title = R.string.copy_conflict,
                 summary = R.string.transfer_overwrite_warning,
@@ -438,10 +426,8 @@ class NotesActivity() : PuzzleActivity() {
 
     @Composable
     private fun OverflowMenu() {
-        val state by viewModel.menuState.observeAsState()
-        val uiState by viewModel.notesUIState.observeAsState()
-
-        val isPuzzleNotes = uiState?.isPuzzleNotes ?: false
+        val state by viewModel.menuState.collectAsStateWithLifecycle()
+        val uiState by viewModel.notesUIState.collectAsStateWithLifecycle()
 
         IconButton(onClick = { viewModel.expandMenu(PuzzleSubMenu.MAIN) }) {
             Icon(
@@ -451,7 +437,7 @@ class NotesActivity() : PuzzleActivity() {
         }
         DropdownMenu(
             modifier = BaseMenuModifier,
-            expanded = state?.expanded == PuzzleSubMenu.MAIN,
+            expanded = state.expanded == PuzzleSubMenu.MAIN,
             onDismissRequest = viewModel::dismissMenu,
         ) {
             MenuClueFlagToggle()
@@ -461,7 +447,7 @@ class NotesActivity() : PuzzleActivity() {
             MenuShowErrors()
             MenuReveal()
             MenuExternalTools()
-            if (!isPuzzleNotes) {
+            if (!uiState.isPuzzleNotes) {
                 MenuEditClue() {
                     viewModel.editClue(viewModel.notesClueID)
                 }
@@ -544,7 +530,7 @@ class NotesActivity() : PuzzleActivity() {
         inferSeparators : Boolean = false,
         selectionPosition : Int? = null,
     ) {
-        val state by viewModel.notesUIState.observeAsState()
+        val state by viewModel.notesUIState.collectAsStateWithLifecycle()
 
         AndroidView(
             modifier = Modifier.fillMaxWidth()
@@ -615,13 +601,15 @@ class NotesActivity() : PuzzleActivity() {
             },
             update = { view ->
                 view.apply {
-                    setLength(state?.boxesLength ?: 0)
+                    setLength(state.boxesLength)
                     setFromString(value)
                     setShadow(shadowValue)
                     if (separatorsClue != null)
                         setSeparatorsFromClue(separatorsClue, inferSeparators)
                     if (selectionPosition != null)
                         setSelectedCol(selectionPosition)
+                    setRenderSettings(state.renderSettings)
+                    setSkipFilled(state.skipFilled)
                 }
             },
         )

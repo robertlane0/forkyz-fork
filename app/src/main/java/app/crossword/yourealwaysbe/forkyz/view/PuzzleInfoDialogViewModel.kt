@@ -1,17 +1,15 @@
 
 package app.crossword.yourealwaysbe.forkyz.view
 
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
-
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import kotlinx.coroutines.flow.combine
 
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
 import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer
+import app.crossword.yourealwaysbe.forkyz.util.MediatedStateWithFlow
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
-import app.crossword.yourealwaysbe.forkyz.util.liveDataFanIn
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Playboard
 import app.crossword.yourealwaysbe.puz.Puzzle
@@ -40,6 +38,11 @@ data class PuzzleFinishedUIState(
     val rating : Int = 0,
 )
 
+private data class PuzzleInfoSettings(
+    val showPercentageCorrect : Boolean,
+    val disableRatings : Boolean,
+)
+
 /**
  * Create a view model for a puzzle info dialog
  *
@@ -47,9 +50,10 @@ data class PuzzleFinishedUIState(
  * puzzle.getTime() is used instead)
  */
 class PuzzleInfoDialogViewModel(
-    protected val settings : ForkyzSettings,
-    protected val currentPuzzleHolder : CurrentPuzzleHolder,
-    protected val fileHandlerProvider : FileHandlerProvider,
+    private val viewModelScope : CoroutineScope,
+    private val settings : ForkyzSettings,
+    private val currentPuzzleHolder : CurrentPuzzleHolder,
+    private val fileHandlerProvider : FileHandlerProvider,
     private val timer : ImaginaryTimer?,
 ) {
     protected val board : Playboard?
@@ -57,18 +61,24 @@ class PuzzleInfoDialogViewModel(
     protected val puzzle : Puzzle?
         get() { return board?.puzzle }
 
-    private val _uiState : MutableLiveData<PuzzleInfoUIState>
-        = liveDataFanIn(
-            { getUpdatedUIState() },
-            settings.liveBrowseShowPercentageCorrect,
-            settings.liveRatingsDisableRatings,
+    private val mediatedUIState
+        = MediatedStateWithFlow<PuzzleInfoUIState, PuzzleInfoSettings>(
+            viewModelScope,
+            PuzzleInfoUIState(),
+            this::getUpdatedUIState,
+            combine(
+                settings.liveBrowseShowPercentageCorrect,
+                settings.liveRatingsDisableRatings,
+                ::PuzzleInfoSettings,
+            )
         )
-    val uiState : LiveData<PuzzleInfoUIState> = _uiState
+    val uiState : StateFlow<PuzzleInfoUIState> = mediatedUIState.stateFlow
 
     /**
      * To show additional completion data when finished
      */
     val finishedViewModel = PuzzleFinishedDialogViewModel(
+        viewModelScope,
         settings,
         currentPuzzleHolder,
     )
@@ -76,7 +86,7 @@ class PuzzleInfoDialogViewModel(
     init {
         fileHandlerProvider.get { fileHandler ->
             currentPuzzleHolder.puzHandle?.let { handle ->
-                _uiState.value = getCurrentUIState().copy(
+                currentUIState = currentUIState.copy(
                     filename = fileHandler.getUri(handle).toString()
                 )
             }
@@ -85,16 +95,17 @@ class PuzzleInfoDialogViewModel(
 
     fun setRating(rating : Int) {
         puzzle?.rating = rating.toChar()
-        _uiState.value = getCurrentUIState().copy(
+        currentUIState = currentUIState.copy(
             rating = rating,
         )
     }
 
-    private fun getUpdatedUIState() : PuzzleInfoUIState {
-        val state = getCurrentUIState()
+    private fun getUpdatedUIState(
+        state : PuzzleInfoUIState,
+        puzzleInfoSettings : PuzzleInfoSettings,
+    ) : PuzzleInfoUIState {
         val puz = puzzle
-        val showPercentageCorrect
-            = settings.liveBrowseShowPercentageCorrect.value ?: false
+        val showPercentageCorrect = puzzleInfoSettings.showPercentageCorrect
         val elapsed = timer?.let { it.elapsed } ?: puz?.time ?: 0L
         val progress = if (showPercentageCorrect)
             puz?.percentComplete ?: 0
@@ -115,48 +126,50 @@ class PuzzleInfoDialogViewModel(
                     puz?.notes ?: ""
                 else
                     "",
-            showRating = !(settings.liveRatingsDisableRatings.value ?: false),
+            showRating = !puzzleInfoSettings.disableRatings,
             rating = puz?.rating?.code ?: 0,
         )
     }
 
-    private fun getCurrentUIState() : PuzzleInfoUIState {
-        return uiState.value ?: PuzzleInfoUIState()
-    }
+    private var currentUIState : PuzzleInfoUIState
+        get() { return mediatedUIState.current }
+        set(value) { mediatedUIState.current = value }
 }
 
 class PuzzleFinishedDialogViewModel(
-    protected val settings : ForkyzSettings,
-    protected val currentPuzzleHolder : CurrentPuzzleHolder,
+    private val viewModelScope : CoroutineScope,
+    private val settings : ForkyzSettings,
+    private val currentPuzzleHolder : CurrentPuzzleHolder,
 ) {
     protected val board : Playboard?
         get() { return currentPuzzleHolder.board }
     protected val puzzle : Puzzle?
         get() { return board?.puzzle }
 
-    private val _uiState : MutableLiveData<PuzzleFinishedUIState>
-        = liveDataFanIn(
-            { getUpdatedUIState() },
+    private val mediatedUIState
+        = MediatedStateWithFlow<PuzzleFinishedUIState?, Boolean>(
+            viewModelScope,
+            null,
+            this::getUpdatedUIState,
             settings.liveRatingsDisableRatings,
         )
     /**
      * UI state is null if puzzle not finished (or no puzzle)
      */
-    val uiState : LiveData<PuzzleFinishedUIState> = _uiState
+    val uiState : StateFlow<PuzzleFinishedUIState?> = mediatedUIState.stateFlow
 
     fun setRating(rating : Int) {
         puzzle?.rating = rating.toChar()
-        _uiState.value = uiState.value?.copy(
-            rating = rating,
-        )
+        currentUIState = currentUIState?.copy(rating = rating)
     }
 
-    private fun getUpdatedUIState() : PuzzleFinishedUIState? {
+    private fun getUpdatedUIState(
+        state : PuzzleFinishedUIState?,
+        disableRatings : Boolean,
+    ) : PuzzleFinishedUIState? {
         val puz = puzzle
         if ((puz?.percentComplete ?: 0) < 100)
             return null
-
-        val state = uiState.value ?: PuzzleFinishedUIState()
 
         val numBoxes = puz?.numberOfBoxes ?: 0
         val numCheated = puz?.numberOfCheatedBoxes ?: 0
@@ -165,16 +178,20 @@ class PuzzleFinishedDialogViewModel(
         else
             (100 * numCheated.toFloat() / numBoxes).toInt()
 
-        return state.copy(
+        return (state ?: PuzzleFinishedUIState()).copy(
             completionTime = puz?.time ?: 0L,
             numberOfClues = puz?.numberOfClues ?: 0,
             numberOfBoxes = numBoxes,
             numberOfCheatedBoxes = numCheated,
             percentCheated = percentCheated,
             completionMessage = puz?.completionMessage,
-            showRating = !(settings.liveRatingsDisableRatings.value ?: false),
+            showRating = !disableRatings,
             rating = puz?.rating?.code ?: 0,
         )
     }
+
+    var currentUIState : PuzzleFinishedUIState?
+        get() { return mediatedUIState.current }
+        set(value) { mediatedUIState.current = value }
 }
 

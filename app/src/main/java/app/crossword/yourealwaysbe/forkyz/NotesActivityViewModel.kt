@@ -5,10 +5,10 @@ import java.util.Locale
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 
 import android.app.Application
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.viewModelScope
 
 import dagger.hilt.android.lifecycle.HiltViewModel
 
@@ -16,7 +16,9 @@ import app.crossword.yourealwaysbe.forkyz.exttools.CROSSWORD_SOLVER_BLANK
 import app.crossword.yourealwaysbe.forkyz.exttools.CrosswordSolverData
 import app.crossword.yourealwaysbe.forkyz.exttools.ExternalDictionaries
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
+import app.crossword.yourealwaysbe.forkyz.settings.RenderSettings
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
+import app.crossword.yourealwaysbe.forkyz.util.MediatedStateWithFlow
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
@@ -24,10 +26,10 @@ import app.crossword.yourealwaysbe.forkyz.view.BoardEditText
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Clue
 import app.crossword.yourealwaysbe.puz.ClueID
+import app.crossword.yourealwaysbe.puz.MovementStrategy
 import app.crossword.yourealwaysbe.puz.Note
 import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges
 import app.crossword.yourealwaysbe.puz.Playboard.Word
-import app.crossword.yourealwaysbe.puz.MovementStrategy
 
 private val BLANK = Box.BLANK
 private val BLANK_CHAR = Box.BLANK[0]
@@ -82,6 +84,14 @@ data class TransferRequest(
 )
 
 /**
+ * Used for doing internal anagram updates
+ */
+private data class AnagramValues(
+    val source : String,
+    val solution : String,
+)
+
+/**
  * UI State for notes
  *
  * @param notesClueID the ID of the clue if clue notes else null (puzzle
@@ -108,6 +118,8 @@ data class NotesActivityUIState(
     val confirmTransferRequest : TransferRequest? = null,
     val inferSeparators : Boolean = false,
     val movementStrategy : MovementStrategy = MovementStrategy.STOP_ON_END,
+    val renderSettings : RenderSettings = RenderSettings(),
+    val skipFilled : Boolean = false,
 ) {
     val isPuzzleNotes : Boolean
         get() = notesClueID == null
@@ -120,6 +132,14 @@ data class NotesActivityUIState(
         )
     }
 }
+
+private data class NotesSettings(
+    val displayScratch : Boolean,
+    val inferSeparators : Boolean,
+    val stopOnEndStrategy : MovementStrategy,
+    val renderSettings : RenderSettings,
+    val skipFilled : Boolean,
+)
 
 @HiltViewModel
 class NotesActivityViewModel @Inject constructor(
@@ -135,9 +155,33 @@ class NotesActivityViewModel @Inject constructor(
     fileHandlerProvider,
     utils,
 ) {
-    private val _notesUIState
-        = MediatorLiveData<NotesActivityUIState>(NotesActivityUIState())
-    public val notesUIState : LiveData<NotesActivityUIState> = _notesUIState
+    private val mediatedNotesUIState
+        = MediatedStateWithFlow<NotesActivityUIState, NotesSettings>(
+            viewModelScope,
+            NotesActivityUIState(),
+            { state, notesSettings ->
+                state.copy(
+                    suppressNotesList = getSuppressNotesList(
+                        notesClueID,
+                        notesSettings.displayScratch,
+                    ),
+                    inferSeparators = notesSettings.inferSeparators,
+                    movementStrategy = notesSettings.stopOnEndStrategy,
+                    renderSettings = notesSettings.renderSettings,
+                    skipFilled = notesSettings.skipFilled,
+                )
+            },
+            combine(
+                settings.livePlayScratchDisplay,
+                settings.livePlayInferSeparators,
+                settings.livePlayStopOnEndStrategy,
+                settings.livePlayRenderSettings,
+                settings.livePlaySkipFilled,
+                ::NotesSettings,
+            ),
+        )
+    val notesUIState : StateFlow<NotesActivityUIState>
+        = mediatedNotesUIState.stateFlow
 
     private val _acceptedPredictionEvent = MutableStateFlow<Int?>(null)
     /**
@@ -148,24 +192,6 @@ class NotesActivityViewModel @Inject constructor(
 
     init {
         setupVoiceCommands()
-
-        _notesUIState.addSource(settings.livePlayScratchDisplay) {
-            _notesUIState.value = notesUIState.value?.copy(
-                suppressNotesList = getSuppressNotesList(notesClueID)
-            )
-        }
-        _notesUIState.addSource(settings.livePlayInferSeparators) {
-            _notesUIState.value = notesUIState.value?.copy(
-                inferSeparators
-                    = settings.livePlayInferSeparators.value ?: false,
-            )
-        }
-        _notesUIState.addSource(settings.livePlayStopOnEndStrategy) {
-            _notesUIState.value = notesUIState.value?.copy(
-                movementStrategy = settings.livePlayStopOnEndStrategy.value
-                    ?: MovementStrategy.STOP_ON_END,
-            )
-        }
     }
 
     /**
@@ -174,22 +200,20 @@ class NotesActivityViewModel @Inject constructor(
      * Null means puzzle notes. Sets notes ui state.
      */
     var notesClueID : ClueID?
-        get() { return notesUIState.value?.notesClueID }
+        get() { return currentNotesUIState.notesClueID }
         set(value) { updateState(value) }
 
     val notesClue : Clue?
-        get() { return notesUIState.value?.notesClue }
+        get() { return currentNotesUIState.notesClue }
 
     val isPuzzleNotes : Boolean
-        get() { return notesUIState.value?.isPuzzleNotes ?: false }
+        get() { return currentNotesUIState.isPuzzleNotes }
 
     val boxesLength : Int
-        get() { return notesUIState.value?.boxesLength ?: 0 }
+        get() { return currentNotesUIState.boxesLength }
 
     val numRemainingAnagramCharacters : Int
-        get() {
-            return notesUIState.value?.numRemainingAnagramCharacters ?: 0
-        }
+        get() { return currentNotesUIState.numRemainingAnagramCharacters }
 
     /**
      * The value of the current word, but as a string not a string array
@@ -212,29 +236,19 @@ class NotesActivityViewModel @Inject constructor(
         }
 
     val scratchValue : String
-        get() {
-            return notesUIState.value?.scratchValue ?: ""
-        }
+        get() { return currentNotesUIState.scratchValue }
 
     val textValue : String
-        get() {
-            return notesUIState.value?.textValue ?: ""
-        }
+        get() { return currentNotesUIState.textValue }
 
     val anagramSourceValue : String
-        get() {
-            return notesUIState.value?.anagramSourceValue ?: ""
-        }
+        get() { return currentNotesUIState.anagramSourceValue }
 
     val anagramSourcePredictionValue : String?
-        get() {
-            return notesUIState.value?.anagramSourcePredictionValue
-        }
+        get() { return currentNotesUIState.anagramSourcePredictionValue }
 
     val anagramSolutionValue : String
-        get() {
-            return notesUIState.value?.anagramSolutionValue ?: ""
-        }
+        get() { return currentNotesUIState.anagramSolutionValue }
 
     val note : Note
         get() {
@@ -250,7 +264,7 @@ class NotesActivityViewModel @Inject constructor(
     fun playLetterToBoard(c : Char) {
         getBoard()?.let { board ->
             val oldMovementStrategy = board.getMovementStrategy()
-            board.setMovementStrategy(getMovementStrategy())
+            board.setMovementStrategy(movementStrategy)
             board.playLetter(c)
             board.setMovementStrategy(oldMovementStrategy)
         }
@@ -259,7 +273,7 @@ class NotesActivityViewModel @Inject constructor(
     fun deleteLetterFromBoard() {
         getBoard()?.let { board ->
             val oldMovementStrategy = board.getMovementStrategy()
-            board.setMovementStrategy(getMovementStrategy())
+            board.setMovementStrategy(movementStrategy)
             board.deleteOrUndoLetter()
             board.setMovementStrategy(oldMovementStrategy)
         }
@@ -333,43 +347,21 @@ class NotesActivityViewModel @Inject constructor(
      * Returns \0 if not and change shouldn't be made. Does not update.
      */
     fun filterAnagramSolution(newChar : Char) : Char {
-        if (
-            anagramSourceValue.contains(newChar)
-            || anagramSolutionValue.contains(newChar)
-        ) {
-            return newChar
-        } else {
-            return 0.toChar()
-        }
+        return filterAnagramSolutionValues(currentAnagramValues, newChar)
     }
 
-    fun updateAnagramSolution(pos : Int, oldChar : Char, newValue : String) {
-        if (pos < 0 || boxesLength <= pos)
-            return
-
-        var source = padBlank(anagramSourceValue, boxesLength)
-        var solution = padBlank(newValue, boxesLength)
-        var swapped = false
-        val newChar = solution[pos]
-
-        val sourcePos = source.indexOf(newChar)
-        if (sourcePos >= 0) {
-            source = setChar(source, sourcePos, oldChar)
-            swapped = true
-        } else {
-            // use old solution value to find a solution char to swap
-            // with (will never be looking for blank here, so don't need
-            // to extend anagramSolutionValue with blanks)
-            val solPos = anagramSolutionValue.indexOf(newChar)
-            if (solPos >= 0) {
-                solution = setChar(solution, solPos, oldChar)
-                swapped = true
-            }
-        }
-
-        if (swapped) {
-            updateNote() { it.withAnagram(source, solution) }
-        }
+    fun updateAnagramSolution(
+        pos : Int,
+        oldChar : Char,
+        newValue : String,
+    ) {
+        val newValues = updateAnagramSolutionValues(
+            currentAnagramValues,
+            pos,
+            oldChar,
+            newValue,
+        )
+        updateAnagramValues(newValues)
     }
 
     fun transferEntries(source : NoteEntry, target : NoteEntry) {
@@ -378,15 +370,15 @@ class NotesActivityViewModel @Inject constructor(
         } else if (!hasCopyConflict(source, target)) {
             executeTransfer(source, target)
         } else {
-            _notesUIState.value = notesUIState.value?.copy(
+            currentNotesUIState = currentNotesUIState.copy(
                 confirmTransferRequest = TransferRequest(source, target),
             )
         }
     }
 
     fun confirmTransferRequest(execute : Boolean) {
-        notesUIState.value?.confirmTransferRequest?.let { request ->
-            _notesUIState.value = notesUIState.value?.copy(
+        currentNotesUIState.confirmTransferRequest?.let { request ->
+            currentNotesUIState = currentNotesUIState.copy(
                 confirmTransferRequest = null,
             )
             if (execute)
@@ -426,10 +418,8 @@ class NotesActivityViewModel @Inject constructor(
     fun callAnagramSolver() {
         val sourceLetters = getUpperLetters(anagramSourceValue)
         val solutionLetters = getUpperLetters(anagramSolutionValue)
-        externalToolEvent.postValue(
-            CrosswordSolverData.buildAnagram(
-                sourceLetters + solutionLetters
-            )
+        _externalToolEvent.value = CrosswordSolverData.buildAnagram(
+            sourceLetters + solutionLetters
         )
     }
 
@@ -437,20 +427,20 @@ class NotesActivityViewModel @Inject constructor(
         ExternalDictionaries.build(
             settings,
             getNotesValue(entry),
-            externalToolEvent::postValue
+            { _externalToolEvent.value = it },
         )
     }
 
     fun callCrosswordSolver(entry : NoteEntry) {
         val request = blanksInCrosswordSolverFormat(getNotesValue(entry))
-        externalToolEvent.postValue(
-            CrosswordSolverData.buildMissingLetters(request)
+        _externalToolEvent.value = CrosswordSolverData.buildMissingLetters(
+            request,
         )
     }
 
     override fun onPlayboardChange(changes : PlayboardChanges) {
         super.onPlayboardChange(changes)
-        updateState(notesUIState.value?.notesClueID)
+        updateState(currentNotesUIState.notesClueID)
     }
 
     private val maxPuzzleDimension : Int
@@ -520,32 +510,14 @@ class NotesActivityViewModel @Inject constructor(
      * Update state for given clue ID
      */
     private fun updateState(cid : ClueID?) {
-        val puz = getPuzzle()
-        val suppressNotesList = getSuppressNotesList(cid)
-        if (cid == null) {
-            val note = puz?.playerNote
-            _notesUIState.value = notesUIState.value?.copy(
-                notesClueID = null,
-                notesClue = null,
-                word = null,
-                clueText = null,
-                boxesLength = maxPuzzleDimension,
-                suppressNotesList = suppressNotesList,
-                scratchValue = note?.scratch ?: "",
-                textValue = note?.text ?: "",
-                anagramSourceValue = note?.anagramSource ?: "",
-                anagramSolutionValue = note?.anagramSolution ?: "",
-                anagramPrediction = null,
-                clueFlagged = false,
-                clueFlagColor = 0,
-            )
-        } else {
-            val note = puz?.getNote(cid)
-            val clue = puz?.let { it.getClue(cid) }
-            if (clue == null) {
-                _notesUIState.value = notesUIState.value?.copy(
-                    notesClueID = cid,
-                    notesClue = clue,
+        settings.getPlayScratchDisplay() { displayScratch ->
+            val puz = getPuzzle()
+            val suppressNotesList = getSuppressNotesList(cid, displayScratch)
+            if (cid == null) {
+                val note = puz?.playerNote
+                currentNotesUIState = currentNotesUIState.copy(
+                    notesClueID = null,
+                    notesClue = null,
                     word = null,
                     clueText = null,
                     boxesLength = maxPuzzleDimension,
@@ -559,36 +531,56 @@ class NotesActivityViewModel @Inject constructor(
                     clueFlagColor = 0,
                 )
             } else {
-                val boxesLength = if (clue.hasZone())
-                    clue.zone.size()
-                else
-                    maxPuzzleDimension
-
-                getLongClueText(clue) { text ->
-                    val oldAnagramSource
-                        = notesUIState.value?.anagramSourceValue ?: ""
-                    val newAnagramSource = note?.anagramSource ?: ""
-
-                    _notesUIState.value = notesUIState.value?.copy(
+                val note = puz?.getNote(cid)
+                val clue = puz?.let { it.getClue(cid) }
+                if (clue == null) {
+                    currentNotesUIState = currentNotesUIState.copy(
                         notesClueID = cid,
                         notesClue = clue,
-                        word = getBoard()?.getClueWord(cid),
-                        clueText = text,
-                        boxesLength = boxesLength,
+                        word = null,
+                        clueText = null,
+                        boxesLength = maxPuzzleDimension,
                         suppressNotesList = suppressNotesList,
                         scratchValue = note?.scratch ?: "",
                         textValue = note?.text ?: "",
-                        anagramSourceValue = newAnagramSource,
+                        anagramSourceValue = note?.anagramSource ?: "",
                         anagramSolutionValue = note?.anagramSolution ?: "",
                         anagramPrediction = null,
-                        clueFlagged = clue.isFlagged(),
-                        clueFlagColor = clue.flagColor,
+                        clueFlagged = false,
+                        clueFlagColor = 0,
                     )
+                } else {
+                    val boxesLength = if (clue.hasZone())
+                        clue.zone.size()
+                    else
+                        maxPuzzleDimension
 
-                    if (oldAnagramSource != newAnagramSource) {
-                        settings.getPlayPredictAnagramChars() { predict ->
-                            if (predict)
-                                predictAnagramChars()
+                    getLongClueText(clue) { text ->
+                        val oldAnagramSource
+                            = currentNotesUIState.anagramSourceValue
+                        val newAnagramSource = note?.anagramSource ?: ""
+
+                        currentNotesUIState = currentNotesUIState.copy(
+                            notesClueID = cid,
+                            notesClue = clue,
+                            word = getBoard()?.getClueWord(cid),
+                            clueText = text,
+                            boxesLength = boxesLength,
+                            suppressNotesList = suppressNotesList,
+                            scratchValue = note?.scratch ?: "",
+                            textValue = note?.text ?: "",
+                            anagramSourceValue = newAnagramSource,
+                            anagramSolutionValue = note?.anagramSolution ?: "",
+                            anagramPrediction = null,
+                            clueFlagged = clue.isFlagged(),
+                            clueFlagColor = clue.flagColor,
+                        )
+
+                        if (oldAnagramSource != newAnagramSource) {
+                            settings.getPlayPredictAnagramChars() { predict ->
+                                if (predict)
+                                    predictAnagramChars()
+                            }
                         }
                     }
                 }
@@ -599,18 +591,20 @@ class NotesActivityViewModel @Inject constructor(
     /**
      * Get suppress notes list for cid and current displayScratch value
      */
-    private fun getSuppressNotesList(cid : ClueID?) : Set<String>? {
+    private fun getSuppressNotesList(
+        cid : ClueID?,
+        displayScratch : Boolean,
+    ) : Set<String>? {
         if (isPuzzleNotes)
             return null
 
-        val displayScratch = settings.livePlayScratchDisplay.value ?: false
         if (!displayScratch)
             return null
 
         if (cid == null)
             return setOf()
 
-        val list = cid.getListName();
+        val list = cid.getListName()
         if (list == null)
             return setOf()
         else
@@ -628,6 +622,7 @@ class NotesActivityViewModel @Inject constructor(
         } else {
             board.setClueNote(notesClueID, newNote)
         }
+
         updateState()
     }
 
@@ -664,12 +659,19 @@ class NotesActivityViewModel @Inject constructor(
             source == NoteEntry.ANAGRAM_SOLUTION
             && target == NoteEntry.ANAGRAM_SOURCE
         ) {
-            val anagSol = anagramSolutionValue.toCharArray()
+            var values = currentAnagramValues
+            val anagSol = values.solution.toCharArray()
             for (i in 0 until anagSol.size) {
                 val oldChar = anagSol[i]
                 anagSol[i] = BLANK_CHAR
-                updateAnagramSolution(i, oldChar, String(anagSol))
+                values = updateAnagramSolutionValues(
+                    values,
+                    i,
+                    oldChar,
+                    String(anagSol),
+                )
             }
+            updateAnagramValues(values)
         } else {
             copyValueToTarget(getNotesValue(source), target)
 
@@ -729,16 +731,24 @@ class NotesActivityViewModel @Inject constructor(
                     boxesLength
                 )
                 val len = Math.min(value.length, targetValue.size)
+                var values = currentAnagramValues
                 for (i in 0 until len) {
                     if (!isBlank(value[i])) {
                         val oldChar = targetValue[i]
-                        val newChar = filterAnagramSolution(value[i])
+                        val newChar
+                            = filterAnagramSolutionValues(values, value[i])
                         if (newChar != 0.toChar()) {
                             targetValue[i] = newChar
-                            updateAnagramSolution(i, oldChar, String(targetValue))
+                            values = updateAnagramSolutionValues(
+                                values,
+                                i,
+                                oldChar,
+                                String(targetValue),
+                            )
                         }
                     }
                 }
+                updateAnagramValues(values)
             }
         }
     }
@@ -826,7 +836,7 @@ class NotesActivityViewModel @Inject constructor(
      * Update state with prediction, null means clear
      */
     private fun setAnagramPrediction(prediction : String?) {
-        _notesUIState.value = notesUIState.value?.copy(
+        currentNotesUIState = currentNotesUIState.copy(
             anagramSourcePredictionValue = prediction,
         )
     }
@@ -855,8 +865,69 @@ class NotesActivityViewModel @Inject constructor(
         return sb.toString();
     }
 
-    private fun getMovementStrategy() : MovementStrategy {
-        return notesUIState.value?.movementStrategy
-            ?: MovementStrategy.STOP_ON_END
+    /**
+     * Set a new character in anagram solution
+     *
+     * Swaps between solution and source, and blocks if not possible.
+     * Returns updated value.
+     */
+    private fun updateAnagramSolutionValues(
+        anagramValues : AnagramValues,
+        pos : Int,
+        oldChar : Char,
+        newValue : String,
+    ) : AnagramValues {
+        if (pos < 0 || boxesLength <= pos)
+            return anagramValues
+
+        var source = padBlank(anagramValues.source, boxesLength)
+        var solution = padBlank(newValue, boxesLength)
+        val newChar = solution[pos]
+
+        val sourcePos = source.indexOf(newChar)
+        if (sourcePos >= 0) {
+            source = setChar(source, sourcePos, oldChar)
+        } else {
+            // use old solution value to find a solution char to swap
+            // with (will never be looking for blank here, so don't need
+            // to extend solution with blanks)
+            val solPos = anagramValues.solution.indexOf(newChar)
+            if (solPos >= 0)
+                solution = setChar(solution, solPos, oldChar)
+        }
+
+        return AnagramValues(source, solution)
     }
+
+    private fun updateAnagramValues(values : AnagramValues) {
+        if (values != currentAnagramValues)
+            updateNote() { it.withAnagram(values.source, values.solution) }
+    }
+
+    /**
+     * As filterAnagramSolution but for given values
+     */
+    private fun filterAnagramSolutionValues(
+        values : AnagramValues,
+        newChar : Char,
+    ) : Char {
+        if (
+            values.source.contains(newChar)
+            || values.solution.contains(newChar)
+        ) {
+            return newChar
+        } else {
+            return 0.toChar()
+        }
+    }
+
+    private val movementStrategy : MovementStrategy
+        get() { return currentNotesUIState.movementStrategy }
+
+    private val currentAnagramValues : AnagramValues
+        get() { return AnagramValues(anagramSourceValue, anagramSolutionValue) }
+
+    private var currentNotesUIState : NotesActivityUIState
+        get() { return mediatedNotesUIState.current }
+        set(value) { mediatedNotesUIState.current = value }
 }

@@ -20,7 +20,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.integerResource
@@ -50,7 +49,7 @@ fun PuzzleInfoDialog(
     viewModel : PuzzleInfoDialogViewModel,
     onClose : () -> Unit = { },
 ) {
-    val state by viewModel.uiState.observeAsState()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     PlainDialog(
         onClose = onClose,
@@ -69,8 +68,8 @@ fun PuzzleInfoDialog(
                 }
             }
             PuzzleRating(
-                state?.showRating ?: true,
-                state?.rating ?: 0,
+                state.showRating,
+                state.rating,
                 onSet = viewModel::setRating,
             )
         }
@@ -83,7 +82,7 @@ fun PuzzleFinishedDialog(
     onDone : () -> Unit = { },
     onShare : () -> Unit = { },
 ) {
-    val state by viewModel.uiState.observeAsState()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     TwoButtonDialog(
         title = R.string.puzzle_finished_title,
@@ -119,7 +118,7 @@ fun PuzzleFinishedDialog(
 private fun InfoHeadingData(
     viewModel : PuzzleInfoDialogViewModel,
 ) {
-    val state by viewModel.uiState.observeAsState()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -127,11 +126,11 @@ private fun InfoHeadingData(
     ) {
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = state?.title ?: stringResource(R.string.puzzle_info),
+            text = state.title ?: stringResource(R.string.puzzle_info),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.headlineSmall,
         )
-        state?.author?.let { author ->
+        state.author?.let { author ->
             if (author.length > 0) {
                 Text(
                     text = AnnotatedString.fromHtml(author),
@@ -140,10 +139,10 @@ private fun InfoHeadingData(
                 )
             }
         }
-        state?.copyright?.let { copyright ->
+        state.copyright?.let { copyright ->
             if (copyright.length > 0) {
                 Text(
-                    text = AnnotatedString.fromHtml(state?.copyright ?: ""),
+                    text = AnnotatedString.fromHtml(state.copyright ?: ""),
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.bodySmall,
                 )
@@ -152,16 +151,16 @@ private fun InfoHeadingData(
         Text(
             text = stringResource(
                 R.string.elapsed_time,
-                getElapsedString(state?.elapsed ?: 0L)
+                getElapsedString(state.elapsed)
             ),
             style = MaterialTheme.typography.titleMedium,
         )
         LinearProgressIndicator(
             modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-            progress = { (state?.progress ?: 0) / 100F },
+            progress = { state.progress / 100F },
         )
         Text(
-            text = state?.filename ?: "",
+            text = state.filename ?: "",
             style = MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.Center,
         )
@@ -172,12 +171,12 @@ private fun InfoHeadingData(
 fun PuzzleInfo(
     viewModel : PuzzleInfoDialogViewModel,
 ) {
-    val state by viewModel.uiState.observeAsState()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
 
-    state?.introduction?.let { introduction ->
+    state.introduction?.let { introduction ->
         InfoSection(R.string.introduction, introduction)
     }
-    state?.notes?.let { notes ->
+    state.notes?.let { notes ->
         InfoSection(R.string.notes, notes)
     }
 }
@@ -210,28 +209,12 @@ private fun InfoSection(
     content()
 }
 
-//        // with apologies to the Material guidelines..
-//        String shareMessage = getShareMessage(puz)
-//        builder.setNegativeButton(
-//            R.string.share,
-//            new DialogInterface.OnClickListener(){
-//                public void onClick(DialogInterface dialog, int which) {
-//                    Intent sendIntent = new Intent(Intent.ACTION_SEND)
-//                    sendIntent.putExtra(Intent.EXTRA_TEXT, shareMessage)
-//                    sendIntent.setType("text/plain")
-//                    activity.startActivity(Intent.createChooser(
-//                        sendIntent, activity.getString(R.string.share_your_time)
-//                    ))
-//                }
-//            }
-//        )
-
 @Composable
 private fun FinishedInfo(
     viewModel : PuzzleFinishedDialogViewModel,
     showTitle : Boolean = true,
 ) {
-    val finishedState by viewModel.uiState.observeAsState()
+    val finishedState by viewModel.uiState.collectAsStateWithLifecycle()
 
     finishedState?.let { finishedState ->
         InfoSection(titleID = if (showTitle) R.string.completed else null) {

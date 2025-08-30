@@ -2,6 +2,6 @@
 package app.crossword.yourealwaysbe.forkyz.settings
 
 data class RatingsSettings(
-    val disableRatings : Boolean,
-    val browseAlwaysShowRating : Boolean,
+    val disableRatings : Boolean = false,
+    val browseAlwaysShowRating : Boolean = false,
 )

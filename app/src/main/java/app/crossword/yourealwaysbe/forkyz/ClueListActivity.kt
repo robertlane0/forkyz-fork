@@ -20,7 +20,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -130,17 +129,17 @@ class ClueListActivity() : PuzzleActivity() {
     @Composable
     private fun ActivityBody(modifier : Modifier) {
         Column(modifier = modifier) {
-            val showAllWordsState by viewModel.showAllWords.observeAsState()
-            val showAllWords = showAllWordsState ?: false
-            val movementStrategy by viewModel.movementStrategy.observeAsState()
+            val showAllWords
+                by viewModel.showAllWords.collectAsStateWithLifecycle()
+            val movementStrategy
+                by viewModel.movementStrategy.collectAsStateWithLifecycle()
 
             Miniboard(
                 onClick = { _, _ -> viewModel.showKeyboard() },
                 onLongClick = { viewModel.launchCurrentClueNotes() },
                 longClickAccessibilityAction = R.string.open_clue_notes,
                 incognitoMode = showAllWords,
-                movementStrategy = movementStrategy
-                    ?: MovementStrategy.MOVE_NEXT_CLUE,
+                movementStrategy = movementStrategy,
             )
             ClueLists(
                 Modifier.fillMaxWidth().weight(1.0F),
@@ -174,7 +173,7 @@ class ClueListActivity() : PuzzleActivity() {
 
     @Composable
     private fun OverflowMenu() {
-        val state by viewModel.menuState.observeAsState()
+        val state by viewModel.menuState.collectAsStateWithLifecycle()
 
         IconButton(onClick = { viewModel.expandMenu(PuzzleSubMenu.MAIN) }) {
             Icon(
@@ -184,7 +183,7 @@ class ClueListActivity() : PuzzleActivity() {
         }
         DropdownMenu(
             modifier = BaseMenuModifier,
-            expanded = state?.expanded == PuzzleSubMenu.MAIN,
+            expanded = state.expanded == PuzzleSubMenu.MAIN,
             onDismissRequest = viewModel::dismissMenu,
         ) {
             MenuNotes()
@@ -210,10 +209,10 @@ class ClueListActivity() : PuzzleActivity() {
 
     @Composable
     private fun MenuShowAllWords() {
-        val showAllWords by viewModel.showAllWords.observeAsState()
+        val showAllWords by viewModel.showAllWords.collectAsStateWithLifecycle()
 
         MenuCheckedItem(
-            checked = showAllWords ?: false,
+            checked = showAllWords,
             text = {
                 MenuText(stringResource(R.string.show_all_words_clue_list))
             },

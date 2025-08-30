@@ -5,12 +5,14 @@ import java.io.IOException
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import kotlin.collections.ArrayDeque
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.WhileSubscribed
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -19,10 +21,6 @@ import kotlinx.coroutines.sync.withLock
 import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asFlow
-import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.google.android.material.color.DynamicColors
 
@@ -46,9 +44,9 @@ import app.crossword.yourealwaysbe.forkyz.settings.MovementStrategySetting
 import app.crossword.yourealwaysbe.forkyz.settings.Orientation
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation
 import app.crossword.yourealwaysbe.forkyz.settings.Theme
-import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerSAF
-import app.crossword.yourealwaysbe.forkyz.util.liveDataFanIn
+import app.crossword.yourealwaysbe.forkyz.util.mediate
+import app.crossword.yourealwaysbe.forkyz.util.stateInSubscribed
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 
 enum class SettingsPage(val title : Int) {
@@ -115,7 +113,7 @@ class SettingsBoolean(
     page : SettingsPage,
     title : Int,
     summary : Int?,
-    val value : LiveData<Boolean>,
+    val value : StateFlow<Boolean>,
     val setValue : (Boolean) -> Unit,
 ) : SettingsNamedItem(page, title, summary)
 
@@ -127,11 +125,12 @@ class SettingsTriState(
     page : SettingsPage,
     title : Int,
     summary : Int?,
-    val value : LiveData<TriState>,
+    val value : StateFlow<TriState>,
     val setValue : (TriState) -> Unit,
 ) : SettingsNamedItem(page, title, summary) {
     companion object {
         fun build(
+            scope : CoroutineScope,
             page : SettingsPage,
             title : Int,
             summary : Int?,
@@ -141,9 +140,12 @@ class SettingsTriState(
                 page,
                 title,
                 summary,
-                liveDataFanIn(
+                combine(
+                    booleans.map { it.value }.toTypedArray().asIterable(),
                     { booleans.triState { it.value.value ?: false } },
-                    *(booleans.map { it.value }.toTypedArray())
+                ).stateInSubscribed(
+                    scope,
+                    booleans.triState { it.value.value },
                 ),
                 {
                     when (it) {
@@ -179,8 +181,8 @@ open class SettingsDynamicList<T>(
     page : SettingsPage,
     title : Int,
     summary : Int?,
-    val entries : LiveData<List<SettingsListEntry<T>>>,
-    val value : LiveData<T>,
+    val entries : StateFlow<List<SettingsListEntry<T>>>,
+    val value : StateFlow<T>,
     private val setValue : (T) -> Unit,
 ) : SettingsInputItem(page, title, summary) {
     fun selectItem(index : Int) {
@@ -196,13 +198,13 @@ class SettingsList<T>(
     title : Int,
     summary : Int?,
     entries : List<SettingsListEntry<T>>,
-    value : LiveData<T>,
+    value : StateFlow<T>,
     setValue : (T) -> Unit,
 ) : SettingsDynamicList<T>(
     page,
     title,
     summary,
-    MutableLiveData<List<SettingsListEntry<T>>>(entries),
+    MutableStateFlow<List<SettingsListEntry<T>>>(entries),
     value,
     setValue
 )
@@ -211,8 +213,8 @@ open class SettingsDynamicMultiList<T>(
     page : SettingsPage,
     title : Int,
     summary : Int?,
-    val entries : LiveData<List<SettingsListEntry<T>>>,
-    val value : LiveData<Set<T>>,
+    val entries : StateFlow<List<SettingsListEntry<T>>>,
+    val value : StateFlow<Set<T>>,
     private val setValue : (Set<T>) -> Unit,
 ) : SettingsInputItem(page, title, summary) {
     fun selectItems(indices : Set<Int>) {
@@ -232,13 +234,13 @@ open class SettingsMultiList<T>(
     title : Int,
     summary : Int?,
     entries : List<SettingsListEntry<T>>,
-    value : LiveData<Set<T>>,
+    value : StateFlow<Set<T>>,
     val setValue : (Set<T>) -> Unit,
 ) : SettingsDynamicMultiList<T>(
     page,
     title,
     summary,
-    MutableLiveData<List<SettingsListEntry<T>>>(entries),
+    MutableStateFlow<List<SettingsListEntry<T>>>(entries),
     value,
     setValue,
 )
@@ -251,7 +253,7 @@ class SettingsString(
     title : Int,
     summary : Int?,
     val hint : Int?,
-    val value : LiveData<String>,
+    val value : StateFlow<String>,
     val setValue : (String) -> Unit,
     errorMsg : StateFlow<String?>? = null,
     val dialogMsg : Int? = null,
@@ -262,7 +264,7 @@ class SettingsInteger(
     title : Int,
     summary : Int?,
     val hint : Int?,
-    val value : LiveData<Int>,
+    val value : StateFlow<Int>,
     val setValue : (Int) -> Unit,
     errorMsg : StateFlow<String?>? = null,
 ) : SettingsInputItem(page, title, summary, errorMsg)
@@ -344,13 +346,8 @@ class SettingsActivityViewModel @Inject constructor(
     application : Application,
     private val settings : ForkyzSettings,
     private val utils : AndroidVersionUtils,
-    private val fileHandlerProvider : FileHandlerProvider,
     private val downloadersProvider : DownloadersProvider,
 ) : AndroidViewModel(application) {
-
-    // 5000ms is apparently LiveData default for timing out on
-    // subscriptions, someone said, on the internet
-    private val SUBSCRIBED_TIMEOUT = 5000L
 
     private val fileActionMutex = Mutex()
 
@@ -374,22 +371,17 @@ class SettingsActivityViewModel @Inject constructor(
             )
         }
 
-    private val storageLocationsLiveData
-        : LiveData<List<SettingsListEntry<StorageLocation>>>
+    private val storageLocationsStateFlow
+        : StateFlow<List<SettingsListEntry<StorageLocation>>>
             = settings.liveFileHandlerSettings.map { fhSettings ->
                 val app : Application = getApplication()
-
-                val storageLocationSAFURI
-                    = fhSettings.safRootURI ?: app.getString(
-                        R.string.external_storage_saf_none_selected,
-                    )
 
                 val label = (
                     app.getString(R.string.external_storage_saf)
                     + " "
                     + app.getString(
                         R.string.external_storage_saf_current_uri,
-                        storageLocationSAFURI
+                        fhSettings.safRootURI
                     )
                 )
 
@@ -400,17 +392,17 @@ class SettingsActivityViewModel @Inject constructor(
                     ),
                     SettingsListEntry(label, StorageLocation.SL_EXTERNAL_SAF),
                 )
-           }
+           }.stateInSubscribed(viewModelScope, listOf())
 
-    private val downloadAutoDownloadersLiveData
-        : LiveData<List<SettingsListEntry<String>>>
-            = downloadersProvider.liveDownloaders().map { dls ->
+    private val downloadAutoDownloadersStateFlow
+        : StateFlow<List<SettingsListEntry<String>>>
+            = downloadersProvider.liveDownloaders.filterNotNull().map { dls ->
                 dls.getDownloaders().map { downloader ->
                     SettingsListEntry(
                         downloader.getName(), downloader.getInternalName()
                     )
                 }
-            }
+            }.stateInSubscribed(viewModelScope, listOf())
 
     private val downloadCustomDailyURLErrorMsg : StateFlow<String?>
         = settings.liveDownloadCustomDailyURL.map { url ->
@@ -424,151 +416,147 @@ class SettingsActivityViewModel @Inject constructor(
                     e.message
                 }
             }
-        }.asFlow().stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(SUBSCRIBED_TIMEOUT),
-            null,
-        )
+        }.stateInSubscribed(viewModelScope, null)
 
     private val downloadersTogglesDaily = listOf(
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
             R.string.de_standaard,
             R.string.de_standaard_desc,
-            settings.liveDownloadDeStandaard,
+            settings.liveDownloadDeStandaard.stateInHere(),
             settings::setDownloadDeStandaard,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
             R.string.guardian_daily,
             R.string.updates_mon_fri,
-            settings.liveDownloadGuardianDailyCryptic,
+            settings.liveDownloadGuardianDailyCryptic.stateInHere(),
             settings::setDownloadGuardianDailyCryptic,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
             R.string.hamburger_abendblatt_daily,
             R.string.hamburger_abendblatt_daily_desc,
-            settings.liveDownloadHamAbend,
+            settings.liveDownloadHamAbend.stateInHere(),
             settings::setDownloadHamAbend,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
             R.string.independent_daily,
             null,
-            settings.liveDownloadIndependentDailyCryptic,
+            settings.liveDownloadIndependentDailyCryptic.stateInHere(),
             settings::setDownloadIndependentDailyCryptic,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
             R.string.irish_news_cryptic,
             R.string.updates_mon_fri,
-            settings.liveDownloadIrishNewsCryptic,
+            settings.liveDownloadIrishNewsCryptic.stateInHere(),
             settings::setDownloadIrishNewsCryptic,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
             R.string.joseph_crossword,
             R.string.updates_mon_sat,
-            settings.liveDownloadJoseph,
+            settings.liveDownloadJoseph.stateInHere(),
             settings::setDownloadJoseph,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
             R.string.vingminutes,
             R.string.vingminutes_desc,
-            settings.liveDownload20Minutes,
+            settings.liveDownload20Minutes.stateInHere(),
             settings::setDownload20Minutes,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
             R.string.la_times,
             R.string.la_times_desc,
-            settings.liveDownloadLATimes,
+            settings.liveDownloadLATimes.stateInHere(),
             settings::setDownloadLATimes,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
             R.string.le_parisien_daily_f1,
             R.string.le_parisien_daily_f1_desc,
-            settings.liveDownloadLeParisienF1,
+            settings.liveDownloadLeParisienF1.stateInHere(),
             settings::setDownloadLeParisienF1,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
             R.string.le_parisien_daily_f2,
             R.string.le_parisien_daily_f2_desc,
-            settings.liveDownloadLeParisienF2,
+            settings.liveDownloadLeParisienF2.stateInHere(),
             settings::setDownloadLeParisienF2,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
             R.string.le_parisien_daily_f3,
             R.string.le_parisien_daily_f3_desc,
-            settings.liveDownloadLeParisienF3,
+            settings.liveDownloadLeParisienF3.stateInHere(),
             settings::setDownloadLeParisienF3,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
             R.string.le_parisien_daily_f4,
             R.string.le_parisien_daily_f4_desc,
-            settings.liveDownloadLeParisienF4,
+            settings.liveDownloadLeParisienF4.stateInHere(),
             settings::setDownloadLeParisienF4,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
             R.string.metro_cryptic,
             R.string.updates_mon_sat,
-            settings.liveDownloadMetroCryptic,
+            settings.liveDownloadMetroCryptic.stateInHere(),
             settings::setDownloadMetroCryptic,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
             R.string.metro_quick,
             R.string.updates_mon_sat,
-            settings.liveDownloadMetroQuick,
+            settings.liveDownloadMetroQuick.stateInHere(),
             settings::setDownloadMetroQuick,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
             R.string.newsday,
             null,
-            settings.liveDownloadNewsday,
+            settings.liveDownloadNewsday.stateInHere(),
             settings::setDownloadNewsday,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
             R.string.new_york_times_syndicated,
             null,
-            settings.liveDownloadNewYorkTimesSyndicated,
+            settings.liveDownloadNewYorkTimesSyndicated.stateInHere(),
             settings::setDownloadNewYorkTimesSyndicated,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
             R.string.sheffer_crossword,
             R.string.updates_mon_sat,
-            settings.liveDownloadSheffer,
+            settings.liveDownloadSheffer.stateInHere(),
             settings::setDownloadSheffer,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
             R.string.universal_crossword,
             R.string.updates_mon_sat,
-            settings.liveDownloadUniversal,
+            settings.liveDownloadUniversal.stateInHere(),
             settings::setDownloadUniversal,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
             R.string.usa_today,
             R.string.updates_daily,
-            settings.liveDownloadUSAToday,
+            settings.liveDownloadUSAToday.stateInHere(),
             settings::setDownloadUSAToday,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
             R.string.wall_street_journal,
             R.string.updates_mon_sat,
-            settings.liveDownloadWsj,
+            settings.liveDownloadWsj.stateInHere(),
             settings::setDownloadWsj,
         ),
     )
@@ -578,7 +566,7 @@ class SettingsActivityViewModel @Inject constructor(
             SettingsPage.PUZZLE_SOURCES_DAILY,
             R.string.custom,
             R.string.custom_desc,
-            settings.liveDownloadCustomDaily,
+            settings.liveDownloadCustomDaily.stateInHere(),
             settings::setDownloadCustomDaily,
         )
     )
@@ -588,21 +576,21 @@ class SettingsActivityViewModel @Inject constructor(
             SettingsPage.PUZZLE_SOURCES_WEEKLY,
             R.string.de_telegraaf,
             R.string.de_telegraaf_desc,
-            settings.liveDownloadDeTelegraaf,
+            settings.liveDownloadDeTelegraaf.stateInHere(),
             settings::setDownloadDeTelegraaf,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_WEEKLY,
             R.string.jonesin_crosswords,
             R.string.updates_thursdays,
-            settings.liveDownloadJonesin,
+            settings.liveDownloadJonesin.stateInHere(),
             settings::setDownloadJonesin,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_WEEKLY,
             R.string.guardian_quiptic,
             R.string.updates_sundays,
-            settings.liveDownloadGuardianWeeklyQuiptic,
+            settings.liveDownloadGuardianWeeklyQuiptic.stateInHere(),
             settings::setDownloadGuardianWeeklyQuiptic,
         ),
     )
@@ -612,14 +600,14 @@ class SettingsActivityViewModel @Inject constructor(
             SettingsPage.PUZZLE_SOURCES_WEEKLY,
             R.string.premier_crossword,
             R.string.updates_sundays,
-            settings.liveDownloadPremier,
+            settings.liveDownloadPremier.stateInHere(),
             settings::setDownloadPremier,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_WEEKLY,
             R.string.washington_post_sunday,
             R.string.updates_sundays,
-            settings.liveDownloadWaPoSunday,
+            settings.liveDownloadWaPoSunday.stateInHere(),
             settings::setDownloadWaPoSunday,
         ),
     )
@@ -629,35 +617,35 @@ class SettingsActivityViewModel @Inject constructor(
             SettingsPage.PUZZLE_SOURCES_SCRAPERS,
             R.string.cru_puzzle_workshop,
             R.string.cru_puzzle_workshop_desc,
-            settings.liveScrapeCru,
+            settings.liveScrapeCru.stateInHere(),
             settings::setScrapeCru,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_SCRAPERS,
             R.string.guardian_quick,
             R.string.guardian_quick_desc,
-            settings.liveScrapeGuardianQuick,
+            settings.liveScrapeGuardianQuick.stateInHere(),
             settings::setScrapeGuardianQuick,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_SCRAPERS,
             R.string.keglars_cryptics,
             R.string.keglars_cryptics_desc,
-            settings.liveScrapeKegler,
+            settings.liveScrapeKegler.stateInHere(),
             settings::setScrapeKegler,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_SCRAPERS,
             R.string.private_eye,
             R.string.private_eye_desc,
-            settings.liveScrapePrivateEye,
+            settings.liveScrapePrivateEye.stateInHere(),
             settings::setScrapePrivateEye,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_SCRAPERS,
             R.string.przekroj,
             R.string.przekroj_desc,
-            settings.liveScrapePrzekroj,
+            settings.liveScrapePrzekroj.stateInHere(),
             settings::setScrapePrzekroj,
         ),
     )
@@ -667,8 +655,10 @@ class SettingsActivityViewModel @Inject constructor(
             SettingsPage.ROOT,
             R.string.storage_location,
             R.string.storage_location_desc,
-            storageLocationsLiveData,
-            settings.liveFileHandlerStorageLocation,
+            storageLocationsStateFlow,
+            settings.liveFileHandlerStorageLocation.stateInHere(
+                StorageLocation.SL_INTERNAL,
+            ),
             this::onStorageLocationChange,
         ),
         SettingsSubPage(
@@ -752,6 +742,7 @@ class SettingsActivityViewModel @Inject constructor(
             SettingsPage.PUZZLE_SOURCES_SCRAPERS,
         ),
         SettingsTriState.build(
+            viewModelScope,
             SettingsPage.PUZZLE_SOURCES_DAILY,
             R.string.toggle_all_daily_sources,
             R.string.toggle_all_daily_sources_desc,
@@ -768,7 +759,7 @@ class SettingsActivityViewModel @Inject constructor(
             R.string.custom_title,
             R.string.custom_title_desc,
             R.string.custom_title_hint,
-            settings.liveDownloadCustomDailyTitle,
+            settings.liveDownloadCustomDailyTitle.stateInHere(),
             settings::setDownloadCustomDailyTitle,
         ),
         SettingsString(
@@ -776,11 +767,12 @@ class SettingsActivityViewModel @Inject constructor(
             R.string.custom_url,
             R.string.custom_url_desc,
             R.string.custom_url_hint,
-            settings.liveDownloadCustomDailyURL,
+            settings.liveDownloadCustomDailyURL.stateInHere(),
             settings::setDownloadCustomDailyURL,
             downloadCustomDailyURLErrorMsg,
         ),
         SettingsTriState.build(
+            viewModelScope,
             SettingsPage.PUZZLE_SOURCES_WEEKLY,
             R.string.toggle_all_weekly_sources,
             R.string.toggle_all_weekly_sources_desc,
@@ -799,6 +791,7 @@ class SettingsActivityViewModel @Inject constructor(
         ),
     ) + downloadersTogglesWeeklyLarge + listOf(
         SettingsTriState.build(
+            viewModelScope,
             SettingsPage.PUZZLE_SOURCES_SCRAPERS,
             R.string.toggle_all_scrapers,
             R.string.toggle_all_scrapers_desc,
@@ -817,7 +810,7 @@ class SettingsActivityViewModel @Inject constructor(
             SettingsPage.DOWNLOAD,
             R.string.automatic_download,
             R.string.automatic_download_desc,
-            settings.liveDownloadOnStartUp,
+            settings.liveDownloadOnStartUp.stateInHere(),
             settings::setDownloadOnStartUp,
         ),
         SettingsSubPage(
@@ -829,22 +822,22 @@ class SettingsActivityViewModel @Inject constructor(
             SettingsPage.DOWNLOAD,
             R.string.auto_downloaders,
             R.string.auto_downloaders_desc,
-            downloadAutoDownloadersLiveData,
-            settings.liveDownloadAutoDownloaders,
+            downloadAutoDownloadersStateFlow,
+            settings.liveDownloadAutoDownloaders.stateInHere(),
             settings::setDownloadAutoDownloaders,
         ),
         SettingsBoolean(
             SettingsPage.DOWNLOAD,
             R.string.no_summary_download_notifs,
             R.string.no_summary_download_notifs_desc,
-            settings.liveDownloadSuppressSummaryMessages,
+            settings.liveDownloadSuppressSummaryMessages.stateInHere(),
             settings::setDownloadSuppressSummaryMessages,
         ),
         SettingsBoolean(
             SettingsPage.DOWNLOAD,
             R.string.no_puzzle_download_notifs,
             R.string.no_puzzle_download_notifs_desc,
-            settings.liveDownloadSuppressMessages,
+            settings.liveDownloadSuppressMessages.stateInHere(),
             settings::setDownloadSuppressMessages,
         ),
         SettingsList<Int>(
@@ -857,7 +850,7 @@ class SettingsActivityViewModel @Inject constructor(
                 SettingsListEntry(R.string.forty_five_seconds, 45000),
                 SettingsListEntry(R.string.sixty_seconds, 60000),
             ),
-            settings.liveDownloadTimeout,
+            settings.liveDownloadTimeout.stateInHere(),
             settings::setDownloadTimeout,
         ),
 
@@ -870,7 +863,7 @@ class SettingsActivityViewModel @Inject constructor(
             SettingsPage.DOWNLOAD_BACKGROUND,
             R.string.background_download_hourly,
             R.string.background_download_hourly_desc,
-            settings.liveDownloadHourly,
+            settings.liveDownloadHourly.stateInHere(),
             { value -> settings.setDownloadHourly(value) },
         ),
         SettingsMultiList(
@@ -887,7 +880,7 @@ class SettingsActivityViewModel @Inject constructor(
                 SettingsListEntry(R.string.background_download_sat, "6"),
                 SettingsListEntry(R.string.background_download_sun, "7"),
             ),
-            settings.liveDownloadDays,
+            settings.liveDownloadDays.stateInHere(),
             { value -> settings.setDownloadDays(value) },
         ),
         SettingsList<Int>(
@@ -920,7 +913,7 @@ class SettingsActivityViewModel @Inject constructor(
                 SettingsListEntry(R.string.background_download_22, 22),
                 SettingsListEntry(R.string.background_download_23, 23),
             ),
-            settings.liveDownloadDaysTime,
+            settings.liveDownloadDaysTime.stateInHere(),
             { value -> settings.setDownloadDaysTime(value) },
         ),
         SettingsHeading(
@@ -931,21 +924,21 @@ class SettingsActivityViewModel @Inject constructor(
             SettingsPage.DOWNLOAD_BACKGROUND,
             R.string.download_wifi_only,
             R.string.download_wifi_only_desc,
-            settings.liveDownloadRequireUnmetered,
+            settings.liveDownloadRequireUnmetered.stateInHere(),
             { value -> settings.setDownloadRequireUnmetered(value) },
         ),
         SettingsBoolean(
             SettingsPage.DOWNLOAD_BACKGROUND,
             R.string.download_roaming,
             R.string.download_roaming_desc,
-            settings.liveDownloadAllowRoaming,
+            settings.liveDownloadAllowRoaming.stateInHere(),
             { value -> settings.setDownloadAllowRoaming(value) },
         ),
         SettingsBoolean(
             SettingsPage.DOWNLOAD_BACKGROUND,
             R.string.download_charging,
             R.string.download_charging_desc,
-            settings.liveDownloadRequireCharging,
+            settings.liveDownloadRequireCharging.stateInHere(),
             { value -> settings.setDownloadRequireCharging(value) },
         ),
 
@@ -954,14 +947,14 @@ class SettingsActivityViewModel @Inject constructor(
             SettingsPage.BROWSER,
             R.string.dont_confirm_cleanup,
             R.string.dont_confirm_cleanup_desc,
-            settings.liveBrowseDontConfirmCleanup,
+            settings.liveBrowseDontConfirmCleanup.stateInHere(),
             settings::setBrowseDontConfirmCleanup,
         ),
         SettingsBoolean(
             SettingsPage.BROWSER,
             R.string.delete_on_cleanup,
             R.string.delete_on_cleanup_desc,
-            settings.liveBrowseDeleteOnCleanup,
+            settings.liveBrowseDeleteOnCleanup.stateInHere(),
             settings::setBrowseDeleteOnCleanup,
         ),
         SettingsList<Int>(
@@ -974,7 +967,7 @@ class SettingsActivityViewModel @Inject constructor(
                 SettingsListEntry(R.string.cleanup_age_thirty_days, 30),
                 SettingsListEntry(R.string.cleanup_age_never, -1),
             ),
-            settings.liveBrowseCleanupAge,
+            settings.liveBrowseCleanupAge.stateInHere(),
             settings::setBrowseCleanupAge,
         ),
         SettingsList<Int>(
@@ -987,14 +980,14 @@ class SettingsActivityViewModel @Inject constructor(
                 SettingsListEntry(R.string.cleanup_age_thirty_days, 30),
                 SettingsListEntry(R.string.cleanup_age_never, -1),
             ),
-            settings.liveBrowseCleanupAgeArchive,
+            settings.liveBrowseCleanupAgeArchive.stateInHere(),
             settings::setBrowseCleanupAgeArchive,
         ),
         SettingsBoolean(
             SettingsPage.BROWSER,
             R.string.disable_swipe,
             R.string.disable_swipe_desc,
-            settings.liveBrowseDisableSwipe,
+            settings.liveBrowseDisableSwipe.stateInHere(),
             settings::setBrowseDisableSwipe,
         ),
         SettingsList<BrowseSwipeAction>(
@@ -1011,35 +1004,37 @@ class SettingsActivityViewModel @Inject constructor(
                     BrowseSwipeAction.BSA_ARCHIVE
                 ),
             ),
-            settings.liveBrowseSwipeAction,
+            settings.liveBrowseSwipeAction.stateInHere(
+                BrowseSwipeAction.BSA_ARCHIVE,
+            ),
             settings::setBrowseSwipeAction,
         ),
         SettingsBoolean(
             SettingsPage.BROWSER,
             R.string.dont_confirm_browse_delete,
             R.string.dont_confirm_browse_delete_desc,
-            settings.liveBrowseDontConfirmDelete,
+            settings.liveBrowseDontConfirmDelete.stateInHere(),
             settings::setBrowseDontConfirmDelete,
         ),
         SettingsBoolean(
             SettingsPage.BROWSER,
             R.string.browse_show_percentage_correct,
             R.string.browse_show_percentage_correct_desc,
-            settings.liveBrowseShowPercentageCorrect,
+            settings.liveBrowseShowPercentageCorrect.stateInHere(),
             settings::setBrowseShowPercentageCorrect,
         ),
         SettingsBoolean(
             SettingsPage.BROWSER,
             R.string.browse_always_show_rating,
             R.string.browse_always_show_rating_desc,
-            settings.liveBrowseAlwaysShowRating,
+            settings.liveBrowseAlwaysShowRating.stateInHere(),
             settings::setBrowseAlwaysShowRating,
         ),
         SettingsBoolean(
             SettingsPage.BROWSER,
             R.string.browse_indicate_if_solution,
             R.string.browse_indicate_if_solution_desc,
-            settings.liveBrowseIndicateIfSolution,
+            settings.liveBrowseIndicateIfSolution.stateInHere(),
             settings::setBrowseIndicateIfSolution,
         ),
 
@@ -1049,14 +1044,14 @@ class SettingsActivityViewModel @Inject constructor(
             R.string.theme_preference,
             R.string.theme_preference_desc,
             availableThemeSettings,
-            settings.liveAppTheme,
+            settings.liveAppTheme.stateInHere(Theme.T_STANDARD),
             settings::setAppTheme,
         ),
         SettingsBoolean(
             SettingsPage.DISPLAY,
             R.string.clue_below_grid,
             R.string.clue_below_grid_desc,
-            settings.livePlayClueBelowGrid,
+            settings.livePlayClueBelowGrid.stateInHere(),
             settings::setPlayClueBelowGrid,
         ),
         SettingsList<FitToScreenMode>(
@@ -1077,21 +1072,23 @@ class SettingsActivityViewModel @Inject constructor(
                     FitToScreenMode.FTSM_LOCKED,
                 ),
             ),
-            settings.livePlayFitToScreenMode,
+            settings.livePlayFitToScreenMode.stateInHere(
+                FitToScreenMode.FTSM_NEVER,
+            ),
             settings::setPlayFitToScreenMode,
         ),
         SettingsBoolean(
             SettingsPage.DISPLAY,
             R.string.display_scratch,
             R.string.display_scratch_desc,
-            settings.livePlayScratchDisplay,
+            settings.livePlayScratchDisplay.stateInHere(),
             settings::setPlayScratchDisplay,
         ),
         SettingsBoolean(
             SettingsPage.DISPLAY,
             R.string.no_hint_highlighting,
             R.string.no_hint_highlighting_desc,
-            settings.livePlaySuppressHintHighlighting,
+            settings.livePlaySuppressHintHighlighting.stateInHere(),
             settings::setPlaySuppressHintHighlighting,
         ),
         SettingsList<DisplaySeparators>(
@@ -1112,42 +1109,44 @@ class SettingsActivityViewModel @Inject constructor(
                     DisplaySeparators.DS_ALWAYS,
                 ),
             ),
-            settings.livePlayDisplaySeparators,
+            settings.livePlayDisplaySeparators.stateInHere(
+                DisplaySeparators.DS_ALWAYS,
+            ),
             settings::setPlayDisplaySeparators,
         ),
         SettingsBoolean(
             SettingsPage.DISPLAY,
             R.string.infer_separators,
             R.string.infer_separators_desc,
-            settings.livePlayInferSeparators,
+            settings.livePlayInferSeparators.stateInHere(),
             settings::setPlayInferSeparators,
         ),
         SettingsBoolean(
             SettingsPage.DISPLAY,
             R.string.indicate_show_errors,
             R.string.indicate_show_errors_desc,
-            settings.livePlayIndicateShowErrors,
+            settings.livePlayIndicateShowErrors.stateInHere(),
             settings::setPlayIndicateShowErrors,
         ),
         SettingsBoolean(
             SettingsPage.DISPLAY,
             R.string.show_length,
             R.string.show_length_desc,
-            settings.livePlayShowCount,
+            settings.livePlayShowCount.stateInHere(),
             settings::setPlayShowCount,
         ),
         SettingsBoolean(
             SettingsPage.DISPLAY,
             R.string.show_timer,
             R.string.show_timer_desc,
-            settings.livePlayShowTimer,
+            settings.livePlayShowTimer.stateInHere(),
             settings::setPlayShowTimer,
         ),
         SettingsBoolean(
             SettingsPage.DISPLAY,
             R.string.full_screen,
             R.string.full_screen_desc,
-            settings.livePlayFullScreen,
+            settings.livePlayFullScreen.stateInHere(),
             settings::setPlayFullScreen,
         ),
         SettingsList<Orientation>(
@@ -1168,7 +1167,9 @@ class SettingsActivityViewModel @Inject constructor(
                     Orientation.O_LANDSCAPE,
                 ),
             ),
-            settings.liveAppOrientationLock,
+            settings.liveAppOrientationLock.stateInHere(
+                Orientation.O_UNLOCKED,
+            ),
             settings::setAppOrientationLock,
         ),
         SettingsList<GridRatio>(
@@ -1201,7 +1202,9 @@ class SettingsActivityViewModel @Inject constructor(
                     GridRatio.GR_SIXTY_PCNT,
                 ),
             ),
-            settings.livePlayGridRatioPortrait,
+            settings.livePlayGridRatioPortrait.stateInHere(
+                GridRatio.GR_PUZZLE_SHAPE,
+            ),
             settings::setPlayGridRatioPortrait,
         ),
         SettingsList<GridRatio>(
@@ -1234,7 +1237,9 @@ class SettingsActivityViewModel @Inject constructor(
                     GridRatio.GR_SIXTY_PCNT,
                 ),
             ),
-            settings.livePlayGridRatioLandscape,
+            settings.livePlayGridRatioLandscape.stateInHere(
+                GridRatio.GR_PUZZLE_SHAPE,
+            ),
             settings::setPlayGridRatioLandscape,
         ),
         SettingsList<ClueTabsDouble>(
@@ -1259,7 +1264,9 @@ class SettingsActivityViewModel @Inject constructor(
                     ClueTabsDouble.CTD_ALWAYS,
                 ),
             ),
-            settings.liveClueListClueTabsDouble,
+            settings.liveClueListClueTabsDouble.stateInHere(
+                ClueTabsDouble.CTD_NEVER,
+            ),
             settings::setClueListClueTabsDouble,
         ),
         SettingsList<ClueHighlight>(
@@ -1284,7 +1291,9 @@ class SettingsActivityViewModel @Inject constructor(
                     ClueHighlight.CH_BOTH,
                 ),
             ),
-            settings.livePlayClueHighlight,
+            settings.livePlayClueHighlight.stateInHere(
+                ClueHighlight.CH_RADIO_BUTTON,
+            ),
             settings::setPlayClueHighlight,
         ),
 
@@ -1311,14 +1320,16 @@ class SettingsActivityViewModel @Inject constructor(
                     KeyboardMode.KM_NEVER_SHOW,
                 ),
             ),
-            settings.liveKeyboardMode,
+            settings.liveKeyboardMode.stateInHere(
+                KeyboardMode.KM_ALWAYS_SHOW,
+            ),
             settings::setKeyboardMode,
         ),
         SettingsBoolean(
             SettingsPage.KEYBOARD,
             R.string.keyboard_use_native,
             R.string.keyboard_use_native_desc,
-            settings.liveKeyboardUseNative,
+            settings.liveKeyboardUseNative.stateInHere(),
             settings::setKeyboardUseNative,
         ),
         SettingsHeading(
@@ -1351,28 +1362,30 @@ class SettingsActivityViewModel @Inject constructor(
                     KeyboardLayout.KL_COLEMAK,
                 ),
             ),
-            settings.liveKeyboardLayout,
+            settings.liveKeyboardLayout.stateInHere(
+                KeyboardLayout.KL_QWERTY,
+            ),
             settings::setKeyboardLayout,
         ),
         SettingsBoolean(
             SettingsPage.KEYBOARD,
             R.string.keyboard_hide_button,
             R.string.keyboard_hide_button_desc,
-            settings.liveKeyboardHideButton,
+            settings.liveKeyboardHideButton.stateInHere(),
             settings::setKeyboardHideButton,
         ),
         SettingsBoolean(
             SettingsPage.KEYBOARD,
             R.string.keyboard_compact,
             R.string.keyboard_compact_desc,
-            settings.liveKeyboardCompact,
+            settings.liveKeyboardCompact.stateInHere(),
             settings::setKeyboardCompact,
         ),
         SettingsBoolean(
             SettingsPage.KEYBOARD,
             R.string.keyboard_haptic,
             R.string.keyboard_haptic_desc,
-            settings.liveKeyboardHaptic,
+            settings.liveKeyboardHaptic.stateInHere(),
             settings::setKeyboardHaptic,
         ),
         SettingsInteger(
@@ -1380,7 +1393,7 @@ class SettingsActivityViewModel @Inject constructor(
             R.string.keyboard_repeat_delay,
             R.string.keyboard_repeat_delay_desc,
             R.string.keyboard_repeat_delay_hint,
-            settings.liveKeyboardRepeatDelay,
+            settings.liveKeyboardRepeatDelay.stateInHere(),
             settings::setKeyboardRepeatDelay,
         ),
         SettingsInteger(
@@ -1388,7 +1401,7 @@ class SettingsActivityViewModel @Inject constructor(
             R.string.keyboard_repeat_interval,
             R.string.keyboard_repeat_interval_desc,
             R.string.keyboard_repeat_interval_hint,
-            settings.liveKeyboardRepeatInterval,
+            settings.liveKeyboardRepeatInterval.stateInHere(),
             settings::setKeyboardRepeatInterval,
         ),
         SettingsHeading(
@@ -1399,7 +1412,7 @@ class SettingsActivityViewModel @Inject constructor(
             SettingsPage.KEYBOARD,
             R.string.keyboard_force_caps,
             R.string.keyboard_force_caps_desc,
-            settings.liveKeyboardForceCaps,
+            settings.liveKeyboardForceCaps.stateInHere(),
             settings::setKeyboardForceCaps,
         ),
 
@@ -1408,14 +1421,14 @@ class SettingsActivityViewModel @Inject constructor(
             SettingsPage.INTERACTION,
             R.string.snap_current,
             R.string.snap_current_desc,
-            settings.livePlayEnsureVisible,
+            settings.livePlayEnsureVisible.stateInHere(),
             settings::setPlayEnsureVisible,
         ),
         SettingsBoolean(
             SettingsPage.INTERACTION,
             R.string.scroll_to_clue,
             R.string.scroll_to_clue_desc,
-            settings.liveClueListSnapToClue,
+            settings.liveClueListSnapToClue.stateInHere(),
             settings::setClueListSnapToClue,
         ),
         SettingsList<MovementStrategySetting>(
@@ -1440,7 +1453,9 @@ class SettingsActivityViewModel @Inject constructor(
                     MovementStrategySetting.MSS_MOVE_PARALLEL_WORD,
                 ),
             ),
-            settings.livePlayMovementStrategySetting,
+            settings.livePlayMovementStrategySetting.stateInHere(
+                MovementStrategySetting.MSS_MOVE_NEXT_ON_AXIS,
+            ),
             settings::setPlayMovementStrategySetting,
         ),
         SettingsList<MovementStrategySetting>(
@@ -1457,14 +1472,16 @@ class SettingsActivityViewModel @Inject constructor(
                     MovementStrategySetting.MSS_MOVE_NEXT_CLUE,
                 ),
             ),
-            settings.livePlayMovementStrategyClueListSetting,
+            settings.livePlayMovementStrategyClueListSetting.stateInHere(
+                MovementStrategySetting.MSS_MOVE_NEXT_CLUE,
+            ),
             settings::setPlayMovementStrategyClueListSetting,
         ),
         SettingsBoolean(
             SettingsPage.INTERACTION,
             R.string.skip_filled,
             R.string.skip_filled_desc,
-            settings.livePlaySkipFilled,
+            settings.livePlaySkipFilled.stateInHere(),
             settings::setPlaySkipFilled,
         ),
         SettingsList<CycleUnfilledMode>(
@@ -1485,14 +1502,16 @@ class SettingsActivityViewModel @Inject constructor(
                     CycleUnfilledMode.CU_ALWAYS,
                 ),
             ),
-            settings.livePlayCycleUnfilledMode,
+            settings.livePlayCycleUnfilledMode.stateInHere(
+                CycleUnfilledMode.CU_NEVER,
+            ),
             settings::setPlayCycleUnfilledMode,
         ),
         SettingsBoolean(
             SettingsPage.INTERACTION,
             R.string.double_tap_zoom,
             R.string.double_tap_zoom_desc,
-            settings.livePlayDoubleTapFitBoard,
+            settings.livePlayDoubleTapFitBoard.stateInHere(),
             settings::setPlayDoubleTapFitBoard,
         ),
         SettingsList<DeleteCrossingModeSetting>(
@@ -1513,63 +1532,65 @@ class SettingsActivityViewModel @Inject constructor(
                     DeleteCrossingModeSetting.DCMS_PRESERVE_FILLED_CELLS,
                 ),
             ),
-            settings.livePlayDeleteCrossingModeSetting,
+            settings.livePlayDeleteCrossingModeSetting.stateInHere(
+                DeleteCrossingModeSetting.DCMS_DELETE,
+            ),
             settings::setPlayDeleteCrossingModeSetting,
         ),
         SettingsBoolean(
             SettingsPage.INTERACTION,
             R.string.preserve_correct,
             R.string.preserve_correct_desc,
-            settings.livePlayPreserveCorrectLettersInShowErrors,
+            settings.livePlayPreserveCorrectLettersInShowErrors.stateInHere(),
             settings::setPlayPreserveCorrectLettersInShowErrors,
         ),
         SettingsBoolean(
             SettingsPage.INTERACTION,
             R.string.play_letter_undo,
             R.string.play_letter_undo_desc,
-            settings.livePlayPlayLetterUndoEnabled,
+            settings.livePlayPlayLetterUndoEnabled.stateInHere(),
             settings::setPlayPlayLetterUndoEnabled,
         ),
         SettingsBoolean(
             SettingsPage.INTERACTION,
             R.string.space_change_dir,
             R.string.space_change_dir_desc,
-            settings.livePlaySpaceChangesDirection,
+            settings.livePlaySpaceChangesDirection.stateInHere(),
             settings::setPlaySpaceChangesDirection,
         ),
         SettingsBoolean(
             SettingsPage.INTERACTION,
             R.string.enter_changes_direction,
             R.string.enter_changes_direction_desc,
-            settings.livePlayEnterChangesDirection,
+            settings.livePlayEnterChangesDirection.stateInHere(),
             settings::setPlayEnterChangesDirection,
         ),
         SettingsBoolean(
             SettingsPage.INTERACTION,
             R.string.toggle_before_move,
             R.string.toggle_before_move_desc,
-            settings.livePlayToggleBeforeMove,
+            settings.livePlayToggleBeforeMove.stateInHere(),
             settings::setPlayToggleBeforeMove,
         ),
         SettingsBoolean(
             SettingsPage.INTERACTION,
             R.string.random_clue_on_shake,
             R.string.random_clue_on_shake_desc,
-            settings.livePlayRandomClueOnShake,
+            settings.livePlayRandomClueOnShake.stateInHere(),
             settings::setPlayRandomClueOnShake,
         ),
         SettingsBoolean(
             SettingsPage.INTERACTION,
             R.string.predict_anagram_chars,
             R.string.predict_anagram_chars_desc,
-            settings.livePlayPredictAnagramChars,
+            settings.livePlayPredictAnagramChars.stateInHere(),
             settings::setPlayPredictAnagramChars,
         ),
         SettingsBoolean(
             SettingsPage.INTERACTION,
             R.string.disable_ratings,
             R.string.disable_ratings_desc,
-            settings.liveRatingsDisableRatings,
+            settings.liveRatingsDisableRatings.stateInHere(),
             settings::setRatingsDisableRatings,
         ),
 
@@ -1578,42 +1599,42 @@ class SettingsActivityViewModel @Inject constructor(
             SettingsPage.VOICE_ACCESSIBILITY,
             R.string.voice_with_volume,
             R.string.voice_with_volume_desc,
-            settings.liveVoiceVolumeActivatesVoice,
+            settings.liveVoiceVolumeActivatesVoice.stateInHere(),
             settings::setVoiceVolumeActivatesVoice,
         ),
         SettingsBoolean(
             SettingsPage.VOICE_ACCESSIBILITY,
             R.string.voice_with_button,
             R.string.voice_with_button_desc,
-            settings.liveVoiceButtonActivatesVoice,
+            settings.liveVoiceButtonActivatesVoice.stateInHere(),
             settings::setVoiceButtonActivatesVoice,
         ),
         SettingsBoolean(
             SettingsPage.VOICE_ACCESSIBILITY,
             R.string.announce_clue_button,
             R.string.announce_clue_button_desc,
-            settings.liveVoiceButtonAnnounceClue,
+            settings.liveVoiceButtonAnnounceClue.stateInHere(),
             settings::setVoiceButtonAnnounceClue,
         ),
         SettingsBoolean(
             SettingsPage.VOICE_ACCESSIBILITY,
             R.string.announce_clue_equals,
             R.string.announce_clue_equals_desc,
-            settings.liveVoiceEqualsAnnounceClue,
+            settings.liveVoiceEqualsAnnounceClue.stateInHere(),
             settings::setVoiceEqualsAnnounceClue,
         ),
         SettingsBoolean(
             SettingsPage.VOICE_ACCESSIBILITY,
             R.string.announce_clue_always,
             R.string.announce_clue_always_desc,
-            settings.liveVoiceAlwaysAnnounceClue,
+            settings.liveVoiceAlwaysAnnounceClue.stateInHere(),
             settings::setVoiceAlwaysAnnounceClue,
         ),
         SettingsBoolean(
             SettingsPage.VOICE_ACCESSIBILITY,
             R.string.announce_box_always,
             R.string.announce_box_always_desc,
-            settings.liveVoiceAlwaysAnnounceBox,
+            settings.liveVoiceAlwaysAnnounceBox.stateInHere(),
             settings::setVoiceAlwaysAnnounceBox,
         ),
         SettingsDivider(SettingsPage.VOICE_ACCESSIBILITY),
@@ -1646,14 +1667,16 @@ class SettingsActivityViewModel @Inject constructor(
                     ExternalDictionarySetting.EDS_AARD2,
                 ),
             ),
-            settings.liveExtDictionarySetting,
+            settings.liveExtDictionarySetting.stateInHere(
+                ExternalDictionarySetting.EDS_NONE,
+            ),
             settings::setExtDictionarySetting,
         ),
         SettingsBoolean(
             SettingsPage.EXTERNAL_TOOLS,
             R.string.crossword_solver_enabled,
             R.string.crossword_solver_enabled_desc,
-            settings.liveExtCrosswordSolverEnabled,
+            settings.liveExtCrosswordSolverEnabled.stateInHere(),
             settings::setExtCrosswordSolverEnabled,
         ),
         SettingsString(
@@ -1661,7 +1684,7 @@ class SettingsActivityViewModel @Inject constructor(
             R.string.chat_gpt_api_key,
             R.string.chat_gpt_api_key_desc,
             R.string.chat_gpt_api_key,
-            settings.liveExtChatGPTAPIKey,
+            settings.liveExtChatGPTAPIKey.stateInHere(),
             settings::setExtChatGPTAPIKey,
             dialogMsg = R.string.chat_gpt_api_key_message,
         ),
@@ -1669,14 +1692,14 @@ class SettingsActivityViewModel @Inject constructor(
             SettingsPage.EXTERNAL_TOOLS,
             R.string.duckduckgo,
             R.string.duckduckgo_desc,
-            settings.liveExtDuckDuckGoEnabled,
+            settings.liveExtDuckDuckGoEnabled.stateInHere(),
             settings::setExtDuckDuckGoEnabled,
         ),
         SettingsBoolean(
             SettingsPage.EXTERNAL_TOOLS,
             R.string.fifteen_squared,
             R.string.fifteen_squared_desc,
-            settings.liveExtFifteenSquaredEnabled,
+            settings.liveExtFifteenSquaredEnabled.stateInHere(),
             settings::setExtFifteenSquaredEnabled,
         ),
 
@@ -1942,6 +1965,30 @@ class SettingsActivityViewModel @Inject constructor(
 
     private fun startPuzzlesExport() {
         raiseNeedsURI(RequestedURI.PUZZLES_EXPORT)
+    }
+
+    private fun <T> Flow<T>.stateInHere(initialValue : T) : StateFlow<T> {
+        return this.stateInSubscribed(viewModelScope, initialValue)
+    }
+
+    @JvmName("stateInHereBoolean")
+    private fun Flow<Boolean>.stateInHere() : StateFlow<Boolean> {
+        return this.stateInHere(false)
+    }
+
+    @JvmName("stateInHereString")
+    private fun Flow<String>.stateInHere() : StateFlow<String> {
+        return this.stateInHere("")
+    }
+
+    @JvmName("stateInHereInt")
+    private fun Flow<Int>.stateInHere() : StateFlow<Int> {
+        return this.stateInHere(0)
+    }
+
+    @JvmName("stateInHereStringSet")
+    private fun <T> Flow<Set<T>>.stateInHere() : StateFlow<Set<T>> {
+        return this.stateInHere(setOf())
     }
 }
 

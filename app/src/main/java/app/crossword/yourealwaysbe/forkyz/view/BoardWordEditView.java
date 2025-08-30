@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import dagger.hilt.android.AndroidEntryPoint;
 
 import app.crossword.yourealwaysbe.forkyz.settings.DisplaySeparators;
+import app.crossword.yourealwaysbe.forkyz.settings.RenderSettings;
 import app.crossword.yourealwaysbe.forkyz.view.PlayboardRenderer.RenderChanges;
 import app.crossword.yourealwaysbe.puz.ClueID;
 import app.crossword.yourealwaysbe.puz.MovementStrategy;
@@ -208,6 +209,8 @@ public class BoardWordEditView extends BoardEditView {
             Word previousWord = changes.getPreviousWord();
             Collection<Position> cellChanges = changes.getCellChanges();
 
+            System.out.println("FORKYZ: onpbc " + changes);
+
             // if rendering current word, which is changing, refit
             // else redraw if data indicates the rendered word is
             // affected
@@ -262,44 +265,48 @@ public class BoardWordEditView extends BoardEditView {
         if (renderer == null)
             return;
 
+        RenderSettings renderSettings = getRenderSettings();
+        if (renderSettings ==  null)
+            return;
+
+        System.out.println("FORKYZ: go render " + word);
+
         // get and keep width as /could/change through thread passing
         int contentWidth = getContentWidth();
         Word renderWord = getRenderWord();
         RenderChanges renderChanges = getRenderChanges(changes);
+        Set<String> localSuppressNotesList
+            = getSuppressNotesList(renderSettings.getDisplayScratch());
 
-        getSettings().getPlayRenderSettings(renderSettings -> {
-            Set<String> localSuppressNotesList
-                = getSuppressNotesList(renderSettings.getDisplayScratch());
-            renderer.setHintHighlight(
-                !renderSettings.getSuppressHintHighlighting()
-            );
-            executorService.execute(() -> {
-                boolean displaySeparators
-                    = renderSettings.getDisplaySeparators()
-                        != DisplaySeparators.DS_NEVER;
+        renderer.setHintHighlight(
+            !renderSettings.getSuppressHintHighlighting()
+        );
+        executorService.execute(() -> {
+            boolean displaySeparators
+                = renderSettings.getDisplaySeparators()
+                    != DisplaySeparators.DS_NEVER;
 
-                try {
-                    lockRenderer();
-                    BitmapGrid bitmap = renderer.drawWord(
-                        renderWord,
-                        renderChanges,
-                        localSuppressNotesList,
-                        contentWidth,
-                        displaySeparators,
-                        renderSettings.getInferSeparators()
-                    );
-                    handler.post(() -> {
-                        try {
-                            setBitmap(bitmap);
-                        } finally {
-                            unlockRenderer();
-                        }
-                    });
-                } catch (Exception e) {
-                    unlockRenderer();
-                    throw e;
-                }
-            });
+            try {
+                lockRenderer();
+                BitmapGrid bitmap = renderer.drawWord(
+                    renderWord,
+                    renderChanges,
+                    localSuppressNotesList,
+                    contentWidth,
+                    displaySeparators,
+                    renderSettings.getInferSeparators()
+                );
+                handler.post(() -> {
+                    try {
+                        setBitmap(bitmap);
+                    } finally {
+                        unlockRenderer();
+                    }
+                });
+            } catch (Exception e) {
+                unlockRenderer();
+                throw e;
+            }
         });
     }
 

@@ -15,13 +15,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 import dev.darkokoa.datetimewheelpicker.WheelDatePicker
 import dev.darkokoa.datetimewheelpicker.core.format.DateFormatter
@@ -37,14 +37,16 @@ fun DownloadDialog(
     onDownload : () -> Unit,
     onOpenSettings : () -> Unit,
 ) {
-    val state by viewModel.uiState.observeAsState()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
 
-    val downloaders : List<DownloaderData> = state?.downloaders ?: listOf()
-    val selected = (0 until downloaders.size).filter {
-        state?.selected?.contains(downloaders.get(it).internalName) ?: false
-    }.toSet()
+    val downloaders : List<DownloaderData>? = state.downloaders
+    if (downloaders == null) {
+        // do nothing yet
+    } else if (downloaders.size > 0) {
+        val selected = (0 until downloaders.size).filter {
+            state.selected.contains(downloaders.get(it).internalName)
+        }.toSet()
 
-    if (downloaders.size > 0) {
         MultiListDialog(
             title = R.string.download_puzzles,
             allOrNoneLabel = R.string.select_sources,
@@ -67,7 +69,7 @@ fun DownloadDialog(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                val date = state?.date ?: java.time.LocalDate.now()
+                val date = state.date
                 val day = date.getDayOfWeek()
                     .getDisplayName(TextStyle.FULL, java.util.Locale.getDefault())
 

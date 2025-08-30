@@ -3,6 +3,8 @@ package app.crossword.yourealwaysbe.forkyz.util
 
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 import android.app.Activity
 import android.content.pm.ActivityInfo
@@ -10,6 +12,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 
 import app.crossword.yourealwaysbe.forkyz.R
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
@@ -20,7 +23,7 @@ class OrientationHelper @Inject constructor(val settings : ForkyzSettings) {
     @SuppressWarnings("SourceLockedOrientationActivity")
     fun <T> applyOrientation(activity : T)
     where T : Activity, T : LifecycleOwner {
-        settings.liveAppOrientationLock.observe(activity) { orientation ->
+        settings.liveAppOrientationLock.onEach { orientation ->
             try {
                 when (orientation) {
                     Orientation.O_PORTRAIT -> activity.setRequestedOrientation(
@@ -40,6 +43,6 @@ class OrientationHelper @Inject constructor(val settings : ForkyzSettings) {
                     Toast.LENGTH_LONG
                 ).show();
             }
-        }
+        }.launchIn(activity.lifecycleScope)
     }
 }

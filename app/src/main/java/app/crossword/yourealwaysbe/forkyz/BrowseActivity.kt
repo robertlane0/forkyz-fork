@@ -59,7 +59,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -279,8 +278,8 @@ class BrowseActivity() : ForkyzActivity() {
                     speedDialState = speedDialState.toggle()
                 }
                 val puzzleListState = rememberLazyListState()
-                val state by viewModel.uiState.observeAsState()
-                val isSelecting = state?.isSelecting ?: false
+                val state by viewModel.uiState.collectAsStateWithLifecycle()
+                val isSelecting = state.isSelecting
 
                 Scaffold(
                     topBar = { TopAppBar() },
@@ -375,16 +374,16 @@ class BrowseActivity() : ForkyzActivity() {
     @Composable
     @OptIn(ExperimentalMaterial3Api::class)
     private fun TopAppBar() {
-        val state by viewModel.uiState.observeAsState()
-        val titleId = if (state?.isViewArchive ?: false)
+        val state by viewModel.uiState.collectAsStateWithLifecycle()
+        val titleId = if (state.isViewArchive)
             R.string.title_view_archives
         else
             R.string.title_view_crosswords
 
-        if (state?.isSelecting ?: false) {
+        if (state.isSelecting) {
             themeHelper.ForkyzTopAppBar(
                 title = {
-                    val numSelected = state?.selectedPuzzleIDs?.size ?: 0
+                    val numSelected = state.selectedPuzzleIDs.size
                     Text(
                         pluralStringResource(
                             id = R.plurals.num_selected,
@@ -423,8 +422,8 @@ class BrowseActivity() : ForkyzActivity() {
 
     @Composable
     private fun ToggleArchiveSelectedButton() {
-        val state by viewModel.uiState.observeAsState()
-        val isArchive = state?.isViewArchive ?: false
+        val state by viewModel.uiState.collectAsStateWithLifecycle()
+        val isArchive = state.isViewArchive
         IconButton(onClick = viewModel::toggleArchiveSelectedPuzzles) {
             Icon(
                 painter = painterResource(toggleArchiveIcon(isArchive)),
@@ -531,9 +530,9 @@ class BrowseActivity() : ForkyzActivity() {
 
     @Composable
     private fun ThemeButton() {
-        val state by viewModel.uiState.observeAsState()
+        val state by viewModel.uiState.collectAsStateWithLifecycle()
 
-        val dnmIcon = when (state?.dayNightMode) {
+        val dnmIcon = when (state.dayNightMode) {
             DayNightMode.DNM_NIGHT -> R.drawable.night_mode
             DayNightMode.DNM_SYSTEM -> R.drawable.system_daynight_mode
             else -> R.drawable.day_mode
@@ -598,8 +597,8 @@ class BrowseActivity() : ForkyzActivity() {
 
     @Composable
     private fun MenuSwitchLists() {
-        val state by viewModel.uiState.observeAsState()
-        val isArchive = state?.isViewArchive ?: false
+        val state by viewModel.uiState.collectAsStateWithLifecycle()
+        val isArchive = state.isViewArchive
 
         val menuText = if (isArchive)
             R.string.title_view_crosswords
@@ -671,8 +670,8 @@ class BrowseActivity() : ForkyzActivity() {
 
     @Composable
     private fun PuzzleSearchBar() {
-        val state by viewModel.uiState.observeAsState()
-        state?.puzzleFilter?.let { puzzleFilter ->
+        val state by viewModel.uiState.collectAsStateWithLifecycle()
+        state.puzzleFilter?.let { puzzleFilter ->
             SearchBar(
                 showSearchBar = true,
                 searchTerm = puzzleFilter,
@@ -685,9 +684,9 @@ class BrowseActivity() : ForkyzActivity() {
 
     @Composable
     private fun IntroMessages() {
-        val state by viewModel.uiState.observeAsState()
-        if (state?.displayNoPuzzlesMessage ?: true) {
-            val noPuzzlesMsg = if (state?.isViewArchive ?: false)
+        val state by viewModel.uiState.collectAsStateWithLifecycle()
+        if (state.displayNoPuzzlesMessage) {
+            val noPuzzlesMsg = if (state.isViewArchive)
                 R.string.no_puzzles
             else
                 R.string.no_puzzles_download_or_configure_storage
@@ -698,7 +697,7 @@ class BrowseActivity() : ForkyzActivity() {
                 style = MaterialTheme.typography.bodyLarge,
             )
         }
-        if (state?.displayInternalStorageMessage ?: false) {
+        if (state.displayInternalStorageMessage) {
             Text(
                 modifier = Modifier.padding(30.dp),
                 text = stringResource(R.string.internal_storage_description),
@@ -713,8 +712,8 @@ class BrowseActivity() : ForkyzActivity() {
         modifier : Modifier,
         listState : LazyListState,
     ) {
-        val state by viewModel.uiState.observeAsState()
-        val puzzles = state?.puzzleList ?: listOf()
+        val state by viewModel.uiState.collectAsStateWithLifecycle()
+        val puzzles = state.puzzleList
         val refreshState = rememberPullToRefreshState()
 
         // move up if items above appear
@@ -753,8 +752,8 @@ class BrowseActivity() : ForkyzActivity() {
 
     @Composable
     private fun UIBusy() {
-        val state by viewModel.uiState.observeAsState()
-        if (state?.isBusy ?: false) {
+        val state by viewModel.uiState.collectAsStateWithLifecycle()
+        if (state.isBusy) {
             Row(
                 modifier = Modifier.fillMaxWidth()
                     .padding(vertical=10.dp),
@@ -785,7 +784,7 @@ class BrowseActivity() : ForkyzActivity() {
 
     @Composable
     private fun Puzzle(pe : PuzEntry) {
-        val state by viewModel.uiState.observeAsState()
+        val state by viewModel.uiState.collectAsStateWithLifecycle()
         val swipeState = rememberSwipeToDismissBoxState()
 
         LaunchedEffect(swipeState.settledValue) {
@@ -800,7 +799,7 @@ class BrowseActivity() : ForkyzActivity() {
 
         SwipeToDismissBox(
             state = swipeState,
-            enabled = !(state?.disableSwipe ?: true),
+            enabled = !state.disableSwipe,
             backgroundContent = {
                 val background = when (swipeState.targetValue) {
                     SwipeToDismissBoxValue.StartToEnd,
@@ -826,7 +825,7 @@ class BrowseActivity() : ForkyzActivity() {
                     when (swipeState.targetValue) {
                         SwipeToDismissBoxValue.Settled -> { }
                         else -> if (
-                            state?.swipeAction == BrowseSwipeAction.BSA_ARCHIVE
+                            state.swipeAction == BrowseSwipeAction.BSA_ARCHIVE
                         ) {
                             SwipeActionIcon(
                                 drawableId = toggleArchiveIcon(isArchive),
@@ -862,12 +861,12 @@ class BrowseActivity() : ForkyzActivity() {
     @Composable
     @OptIn(ExperimentalMaterial3Api::class)
     private fun PuzzleDetails(pe : PuzEntry) {
-        val state by viewModel.uiState.observeAsState()
-        val percentFilled = if (state?.showPercentageCorrect ?: false)
+        val state by viewModel.uiState.collectAsStateWithLifecycle()
+        val percentFilled = if (state.showPercentageCorrect)
             pe.percentComplete
         else
             pe.percentFilled
-        val isSelected = pe.id in (state?.selectedPuzzleIDs ?: setOf())
+        val isSelected = pe.id in state.selectedPuzzleIDs
         val backgroundColor = if (isSelected)
             MaterialTheme.colorScheme.primaryContainer
         else
@@ -882,7 +881,7 @@ class BrowseActivity() : ForkyzActivity() {
                 .background(backgroundColor)
                 .combinedClickable(
                     onClick = {
-                        if (state?.isSelecting ?: false)
+                        if (state.isSelecting)
                             viewModel.toggleSelectPuzzle(pe.id)
                         else
                             viewModel.loadPuzzle(pe.id)
@@ -929,7 +928,7 @@ class BrowseActivity() : ForkyzActivity() {
                         color = textColor,
                     )
 
-                    val showHasSolution = state?.indicateIfSolution ?: false
+                    val showHasSolution = state.indicateIfSolution
                         && pe.hasSolution
 
                     if (showHasSolution) {
@@ -950,7 +949,7 @@ class BrowseActivity() : ForkyzActivity() {
                         text = AnnotatedString.fromHtml(pe.caption),
                         color = textColor,
                     )
-                    if (state?.showRatings ?: false) {
+                    if (state.showRatings) {
                         RatingBar(
                             modifier = Modifier.padding(top=4.dp),
                             numStars = integerResource(R.integer.max_rating),
@@ -967,7 +966,7 @@ class BrowseActivity() : ForkyzActivity() {
 
     @Composable
     private fun Launchers() {
-        val state by viewModel.uiState.observeAsState()
+        val state by viewModel.uiState.collectAsStateWithLifecycle()
         val loadEvent by viewModel.puzzleLoaded.collectAsStateWithLifecycle()
 
         LaunchedEffect(loadEvent) {
@@ -979,9 +978,9 @@ class BrowseActivity() : ForkyzActivity() {
             }
         }
 
-        val isDownloadOnStartUp = state?.isDownloadOnStartUp ?: false
+        val isDownloadOnStartUp = state.isDownloadOnStartUp
         val needsNotificationCheck = (
-            state?.isBackgroundDownloadEnabled ?: false
+            state.isBackgroundDownloadEnabled
             || isDownloadOnStartUp
         )
         LaunchedEffect(needsNotificationCheck) {
@@ -1020,21 +1019,19 @@ class BrowseActivity() : ForkyzActivity() {
 
     @Composable
     private fun DisplayDialogs() {
-        val state by viewModel.uiState.observeAsState()
-        state?.showDialog?.let {
-            when (it) {
-                BrowseDialog.NOTIFICATIONS_PERMISSION
-                    -> NotificationPermissionsDialog()
-                BrowseDialog.NEW_VERSION
-                    -> NewVersionDialog()
-                BrowseDialog.CONFIRM_CLEANUP
-                    -> ConfirmCleanupDialog()
-                BrowseDialog.NO_CLEANUP_ACTION
-                    -> NoCleanupActionDialog()
-                BrowseDialog.CONFIRM_DELETE_SELECTED
-                    -> ConfirmDeleteSelectedDialog()
-                BrowseDialog.NONE -> { }
-            }
+        val state by viewModel.uiState.collectAsStateWithLifecycle()
+        when (state.showDialog) {
+            BrowseDialog.NOTIFICATIONS_PERMISSION
+                -> NotificationPermissionsDialog()
+            BrowseDialog.NEW_VERSION
+                -> NewVersionDialog()
+            BrowseDialog.CONFIRM_CLEANUP
+                -> ConfirmCleanupDialog()
+            BrowseDialog.NO_CLEANUP_ACTION
+                -> NoCleanupActionDialog()
+            BrowseDialog.CONFIRM_DELETE_SELECTED
+                -> ConfirmDeleteSelectedDialog()
+            BrowseDialog.NONE -> { }
         }
 
         val downloadDialog
@@ -1094,8 +1091,8 @@ class BrowseActivity() : ForkyzActivity() {
 
     @Composable
     private fun ConfirmDeleteSelectedDialog() {
-        val state by viewModel.uiState.observeAsState()
-        val numSelected = state?.selectedPuzzleIDs?.size ?: 0
+        val state by viewModel.uiState.collectAsStateWithLifecycle()
+        val numSelected = state.selectedPuzzleIDs.size
         OKCancelDialog(
             title = stringResource(R.string.confirm_delete),
             summary = pluralStringResource(
@@ -1131,8 +1128,8 @@ class BrowseActivity() : ForkyzActivity() {
 
     @Composable
     private fun NewVersionDialog() {
-        val state by viewModel.uiState.observeAsState()
-        val currentVersion = state?.currentVersion ?: ""
+        val state by viewModel.uiState.collectAsStateWithLifecycle()
+        val currentVersion = state.currentVersion
         TwoButtonDialog(
             title = stringResource(R.string.new_version_title, currentVersion),
             summary = stringResource(R.string.new_version_message),

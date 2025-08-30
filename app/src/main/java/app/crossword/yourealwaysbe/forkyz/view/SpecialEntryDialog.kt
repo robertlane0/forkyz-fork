@@ -15,7 +15,6 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,7 +31,7 @@ fun SpecialEntryDialog(
     onClose : () -> Unit,
 ) {
     val response by viewModel.response.collectAsStateWithLifecycle()
-    val forceCaps by viewModel.forceCaps.observeAsState()
+    val forceCaps by viewModel.forceCaps.collectAsStateWithLifecycle()
     OKCancelDialog(
         title = R.string.special_entry,
         summary = R.string.enter_special_desc,
@@ -56,7 +55,7 @@ fun SpecialEntryDialog(
         ) {
             Switch(
                 modifier = Modifier.padding(end = 10.dp),
-                checked = forceCaps ?: false,
+                checked = forceCaps,
                 onCheckedChange = viewModel::setForceCaps,
             )
             Text(

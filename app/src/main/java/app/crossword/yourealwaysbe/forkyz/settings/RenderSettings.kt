@@ -2,8 +2,8 @@
 package app.crossword.yourealwaysbe.forkyz.settings
 
 data class RenderSettings(
-    val displayScratch : Boolean,
-    val suppressHintHighlighting : Boolean,
-    val displaySeparators : DisplaySeparators,
-    val inferSeparators : Boolean,
+    val displayScratch : Boolean = false,
+    val suppressHintHighlighting : Boolean = false,
+    val displaySeparators : DisplaySeparators = DisplaySeparators.DS_NEVER,
+    val inferSeparators : Boolean = false,
 )

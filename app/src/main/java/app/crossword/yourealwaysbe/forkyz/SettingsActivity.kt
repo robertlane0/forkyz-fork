@@ -44,7 +44,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -59,7 +58,6 @@ import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -301,23 +299,23 @@ class SettingsActivity : ForkyzActivity() {
                         )
                     }
                     is SettingsBoolean -> {
-                        val state by item.value.observeAsState()
+                        val state by item.value.collectAsStateWithLifecycle()
                         SettingsBoolean(
                             modifier = modifier,
                             title = title,
                             errorMsg = errorMsg?.value,
                             summary = summary,
-                            value = state ?: false,
+                            value = state,
                             onValueChange = item.setValue,
                         )
                     }
                     is SettingsTriState -> {
-                        val state by item.value.observeAsState()
+                        val state by item.value.collectAsStateWithLifecycle()
                         SettingsTriState(
                             modifier = modifier,
                             title = title,
                             summary = summary,
-                            value = state ?: TriState.OFF,
+                            value = state,
                             onValueChange = item.setValue,
                             errorMsg = errorMsg?.value,
                         )
@@ -562,67 +560,61 @@ class SettingsActivity : ForkyzActivity() {
 
     @Composable
     private fun ActiveListItemDialog(item : SettingsDynamicList<*>) {
-        val selected by item.value.observeAsState()
-        val entries by item.entries.observeAsState()
+        val selected by item.value.collectAsStateWithLifecycle()
+        val entries by item.entries.collectAsStateWithLifecycle()
 
-        val labels = entries?.map {
+        val labels = entries.map {
                 it.labelId?.let {
                     stringResource(it)
                 } ?: it.labelString ?: ""
             }
-        val selectedIdx = entries?.indexOfFirst { it.value == selected }
+        val selectedIdx = entries.indexOfFirst { it.value == selected }
 
-        if (labels != null && selectedIdx != null) {
-            ListDialog(
-                title = item.title,
-                summary = item.summary,
-                labels = labels,
-                selected = selectedIdx,
-                onSelect = { index ->
-                    item.selectItem(index)
-                    viewModel.popState()
-                },
-                onDismissRequest = viewModel::popState,
-            )
-        }
+        ListDialog(
+            title = item.title,
+            summary = item.summary,
+            labels = labels,
+            selected = selectedIdx,
+            onSelect = { index ->
+                item.selectItem(index)
+                viewModel.popState()
+            },
+            onDismissRequest = viewModel::popState,
+        )
     }
 
     @Composable
     private fun ActiveMultiListItemDialog(item : SettingsDynamicMultiList<*>) {
-        val selected by item.value.observeAsState()
-        val entries by item.entries.observeAsState()
+        val selected by item.value.collectAsStateWithLifecycle()
+        val entries by item.entries.collectAsStateWithLifecycle()
 
-        val selectedIndices = selected?.map { selItem ->
-                entries?.indexOfFirst { it.value == selItem }
-            }?.filterNotNull()?.filter { it >= 0 }?.toSet()
-            ?: setOf()
+        val selectedIndices = selected.map { selItem ->
+            entries.indexOfFirst { it.value == selItem }
+        }.filter { it >= 0 }.toSet()
 
-        if (entries != null) {
-            MultiListDialog(
-                title = item.title,
-                summary = item.summary,
-                numItems = entries?.size ?: 0,
-                getItem = { index ->
-                    entries?.get(index)?.let { entry ->
-                        val label = entry.labelId?.let {
-                            stringResource(it)
-                        } ?: entry.labelString ?: ""
-                        Text(label)
-                    }
-                },
-                selected = selectedIndices,
-                onSelect = { indices ->
-                    item.selectItems(indices)
-                    viewModel.popState()
-                },
-                onDismissRequest = viewModel::popState,
-            )
-        }
+        MultiListDialog(
+            title = item.title,
+            summary = item.summary,
+            numItems = entries.size,
+            getItem = { index ->
+                val entry = entries.get(index)
+                val label = entry.labelId?.let {
+                    stringResource(it)
+                } ?: entry.labelString ?: ""
+                Text(label)
+            },
+            selected = selectedIndices,
+            onSelect = { indices ->
+                item.selectItems(indices)
+                viewModel.popState()
+            },
+            onDismissRequest = viewModel::popState,
+        )
     }
 
     @Composable
     private fun ActiveStringItemDialog(item : SettingsString) {
-        val value by item.value.observeAsState()
+        val value by item.value.collectAsStateWithLifecycle()
         StringDialog(
             title = item.title,
             summary = item.dialogMsg ?: item.summary,
@@ -638,7 +630,7 @@ class SettingsActivity : ForkyzActivity() {
 
     @Composable
     private fun ActiveIntegerItemDialog(item : SettingsInteger) {
-        val value by item.value.observeAsState()
+        val value by item.value.collectAsStateWithLifecycle()
         StringDialog(
             title = item.title,
             summary = item.summary,

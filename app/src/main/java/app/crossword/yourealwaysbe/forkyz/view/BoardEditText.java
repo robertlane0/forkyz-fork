@@ -20,14 +20,12 @@ import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import androidx.annotation.MainThread;
-import androidx.lifecycle.ViewTreeLifecycleOwner;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
 import app.crossword.yourealwaysbe.forkyz.settings.DisplaySeparators;
-import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
+import app.crossword.yourealwaysbe.forkyz.settings.RenderSettings;
 import app.crossword.yourealwaysbe.forkyz.util.BoxInputConnection;
-import app.crossword.yourealwaysbe.forkyz.util.ChangeOnlyObserver;
 import app.crossword.yourealwaysbe.forkyz.util.KeyboardManageableView;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 import app.crossword.yourealwaysbe.forkyz.view.PlayboardRenderer.BoxSeparators;
@@ -41,9 +39,6 @@ public class BoardEditText
         implements BoxInputConnection.BoxInputListener, KeyboardManageableView {
 
     @Inject
-    protected ForkyzSettings settings;
-
-    @Inject
     protected AndroidVersionUtils utils;
 
     // for rendering
@@ -55,6 +50,8 @@ public class BoardEditText
     private BoxInputConnection currentInputConnection = null;
     private boolean nativeInput = false;
     private boolean forceCaps = true;
+    private boolean skipFilled = false;
+    private RenderSettings renderSettings = new RenderSettings();
 
     public interface BoardEditFilter {
         /**
@@ -110,22 +107,6 @@ public class BoardEditText
 
         setAllowOverScroll(false);
         setAllowZoom(false);
-    }
-
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-        // no lifecycle owner until attached
-        // only rerender on change
-        settings.getLivePlayDisplaySeparators().observe(
-            ViewTreeLifecycleOwner.get(this),
-            new ChangeOnlyObserver<DisplaySeparators>() {
-                @Override
-                public void onTrueChange(DisplaySeparators value) {
-                    render();
-                }
-            }
-        );
     }
 
     @Override
@@ -202,6 +183,15 @@ public class BoardEditText
                 render();
             }
         }
+    }
+
+    public void setRenderSettings(RenderSettings renderSettings) {
+        this.renderSettings = renderSettings;
+        render();
+    }
+
+    public void setSkipFilled(boolean skipFilled) {
+        this.skipFilled = skipFilled;
     }
 
     public void setFilter(BoardEditFilter filter) {
@@ -661,36 +651,34 @@ public class BoardEditText
         final char c = filterReplacement(character, selection);
 
         if (c != '\0') {
-            settings.getPlaySkipFilled(skipCompleted -> {
-                int enteredCol = getSelectedCol();
-                char oldChar = getResponse(enteredCol);
+            int enteredCol = getSelectedCol();
+            char oldChar = getResponse(enteredCol);
 
-                // we'll update later if the selection doesn't change
-                setResponseNoInputConnectionUpdate(enteredCol, c, false);
+            // we'll update later if the selection doesn't change
+            setResponseNoInputConnectionUpdate(enteredCol, c, false);
 
-                int col = enteredCol;
-                if (col < boxes.length - 1) {
+            int col = enteredCol;
+            if (col < boxes.length - 1) {
+                col += 1;
+                int nextPos = col;
+
+                while (skipFilled &&
+                       !boxes[col].isBlank() &&
+                       col < boxes.length - 1) {
                     col += 1;
-                    int nextPos = col;
-
-                    while (skipCompleted &&
-                           !boxes[col].isBlank() &&
-                           col < boxes.length - 1) {
-                        col += 1;
-                    }
-
-                    if (boxes[col].isBlank())
-                        setSelectedColNoRender(col);
-                    else
-                        setSelectedColNoRender(nextPos);
-                } else {
-                    updateInputConnection();
                 }
 
-                notifyPostChange(enteredCol, oldChar, false);
+                if (boxes[col].isBlank())
+                    setSelectedColNoRender(col);
+                else
+                    setSelectedColNoRender(nextPos);
+            } else {
+                updateInputConnection();
+            }
 
-                this.render();
-            });
+            notifyPostChange(enteredCol, oldChar, false);
+
+            this.render();
         } else {
             // Needs updating else thinks there's a character in the
             // buffer, when it was refused
@@ -705,41 +693,39 @@ public class BoardEditText
 
     @MainThread
     private void render(boolean renderAll) {
-        if (getWidth() == 0)
+        if (getWidth() == 0 || renderSettings == null)
             return;
 
         boolean[] renderChanges = renderAll
             ? null
             : Arrays.copyOf(changes, changes.length);
 
-        settings.getPlayRenderSettings(renderSettings -> {
-            BoxSeparators[] displaySeps
-                = renderSettings.getDisplaySeparators()
-                    == DisplaySeparators.DS_NEVER
-                ? null
-                : separators;
+        BoxSeparators[] displaySeps
+            = renderSettings.getDisplaySeparators()
+                == DisplaySeparators.DS_NEVER
+            ? null
+            : separators;
 
-            executorService.execute(() -> {
-                try {
-                    lockRenderer();
-                    BitmapGrid bitmap = renderer.drawBoxes(
-                        boxes,
-                        shadow,
-                        renderChanges,
-                        selection,
-                        null,
-                        getContentWidth(),
-                        displaySeps
-                    );
-                    handler.post(() -> {
-                        try { setBitmap(bitmap); }
-                        finally { unlockRenderer(); }
-                    });
-                } catch (Exception e) {
-                    unlockRenderer();
-                    throw e;
-                }
-            });
+        executorService.execute(() -> {
+            try {
+                lockRenderer();
+                BitmapGrid bitmap = renderer.drawBoxes(
+                    boxes,
+                    shadow,
+                    renderChanges,
+                    selection,
+                    null,
+                    getContentWidth(),
+                    displaySeps
+                );
+                handler.post(() -> {
+                    try { setBitmap(bitmap); }
+                    finally { unlockRenderer(); }
+                });
+            } catch (Exception e) {
+                unlockRenderer();
+                throw e;
+            }
         });
 
         clearChanges();

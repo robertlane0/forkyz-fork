@@ -538,10 +538,7 @@ public class FileHandlerSAF extends FileHandler {
             );
             // update settings to good values
             if (fileHandler != null && settings != null) {
-                settings.setFileHandlerSettings(
-                    fileHandler.getSettings(),
-                    () -> { }
-                );
+                settings.setFileHandlerSettings(fileHandler.getSettings(), null);
             }
         }
 

@@ -26,8 +26,9 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import app.crossword.yourealwaysbe.forkyz.R
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
-import app.crossword.yourealwaysbe.forkyz.util.files.PuzMetaFile
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle
+import app.crossword.yourealwaysbe.forkyz.util.files.PuzMetaFile
+import app.crossword.yourealwaysbe.forkyz.util.observeForeverWithLifecycle
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 import app.crossword.yourealwaysbe.puz.Playboard
 
@@ -227,31 +228,32 @@ public class CurrentPuzzleHolder @Inject constructor(
         // resume.
         // Ok to observe forever because this is a singleton that lives
         // forever.
-        settings.livePlayPreserveCorrectLettersInShowErrors.observeForever() {
-            board?.setPreserveCorrectLettersInShowErrors(it)
-        }
-        settings.livePlayDeleteCrossingMode.observeForever() {
+        settings.livePlayPreserveCorrectLettersInShowErrors
+            .observeForeverWithLifecycle() {
+                board?.setPreserveCorrectLettersInShowErrors(it)
+            }
+        settings.livePlayDeleteCrossingMode.observeForeverWithLifecycle() {
             board?.setDeleteCrossingMode(it)
         }
-        settings.livePlayShowErrorsGrid.observeForever() {
+        settings.livePlayShowErrorsGrid.observeForeverWithLifecycle() {
             board?.setShowErrorsGrid(it)
         }
-        settings.livePlayShowErrorsCursor.observeForever() {
+        settings.livePlayShowErrorsCursor.observeForeverWithLifecycle() {
             board?.setShowErrorsCursor(it)
         }
-        settings.livePlayShowErrorsClue.observeForever() {
+        settings.livePlayShowErrorsClue.observeForeverWithLifecycle() {
             board?.setShowErrorsClue(it)
         }
-        settings.livePlayToggleBeforeMove.observeForever() {
+        settings.livePlayToggleBeforeMove.observeForeverWithLifecycle() {
             board?.setToggleBeforeMove(it)
         }
-        settings.livePlayMovementStrategy.observeForever() {
+        settings.livePlayMovementStrategy.observeForeverWithLifecycle() {
             board?.setMovementStrategy(it)
         }
-        settings.livePlaySkipFilled.observeForever {
+        settings.livePlaySkipFilled.observeForeverWithLifecycle {
             board?.setSkipCompletedLetters(it)
         }
-        settings.livePlayPlayLetterUndoEnabled.observeForever {
+        settings.livePlayPlayLetterUndoEnabled.observeForeverWithLifecycle {
             board?.setPlayLetterUndoStackEnabled(it)
         }
     }

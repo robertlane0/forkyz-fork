@@ -16,8 +16,6 @@ import android.util.Log;
 import androidx.annotation.MainThread;
 import androidx.concurrent.futures.CallbackToFutureAdapter;
 import androidx.hilt.work.HiltWorker;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Transformations;
 import androidx.work.Constraints;
 import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.ExistingWorkPolicy;
@@ -80,23 +78,26 @@ public class BackgroundDownloadManager {
         this.workManager = workManager;
         this.settings = settings;
 
-        settings.getLiveBackgroundDownloadSettings().observeForever(value -> {
-            Log.i(
-                TAG,
-                "Triggering update background download work with: " + value
-            );
-            updateBackgroundDownloads();
-        });
-    }
-
-    public LiveData<Boolean> getLiveIsBackgroundDownloadEnabled() {
-        return Transformations.map(
+        FlowUtilsKt.observeForeverWithLifecycle(
             settings.getLiveBackgroundDownloadSettings(),
-            bgSettings -> {
-                return bgSettings.getHourly()
-                    || getNextDailyDownloadDelay(bgSettings) >= 0;
+            value -> {
+                Log.i(
+                    TAG,
+                    "Triggering update background download work with: " + value
+                );
+                updateBackgroundDownloads();
             }
         );
+    }
+
+    /**
+     * Get if download is enabled according to given settings values
+     */
+    public boolean getIsBackgroundDownloadEnabled(
+        BackgroundDownloadSettings bgSettings
+    ) {
+        return bgSettings.getHourly()
+            || getNextDailyDownloadDelay(bgSettings) >= 0;
     }
 
     @MainThread

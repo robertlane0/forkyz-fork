@@ -9,7 +9,6 @@ import java.io.OutputStreamWriter
 import java.io.PrintWriter
 import java.nio.charset.Charset
 import java.util.function.Consumer
-import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -23,8 +22,6 @@ import kotlinx.coroutines.runBlocking
 
 import androidx.annotation.WorkerThread
 import androidx.datastore.core.DataStore
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.asLiveData
 
 import org.json.JSONArray
 import org.json.JSONException
@@ -32,7 +29,7 @@ import org.json.JSONObject
 
 import app.crossword.yourealwaysbe.forkyz.net.Downloaders
 import app.crossword.yourealwaysbe.forkyz.util.JSONUtils
-import app.crossword.yourealwaysbe.forkyz.util.observeOnce
+import app.crossword.yourealwaysbe.forkyz.util.mainScope
 import app.crossword.yourealwaysbe.puz.MovementStrategy
 import app.crossword.yourealwaysbe.puz.Playboard.DeleteCrossingMode
 
@@ -49,22 +46,21 @@ class ForkyzSettings(
 
     private val mainScope = CoroutineScope(Dispatchers.Main)
 
-    val settingsFlow: Flow<Settings> = settingsStore.data
-        .catch { exception ->
-            if (exception is IOException) {
-                emit(Settings.getDefaultInstance())
-            } else {
-                throw exception
+    val settingsFlow : Flow<Settings>
+        = settingsStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(Settings.getDefaultInstance())
+                } else {
+                    throw exception
+                }
             }
-        }
 
-    val liveVoiceAlwaysAnnounceBox : LiveData<Boolean>
-        = settingsFlow.map {
-            it.alwaysAnnounceBox
-        }.distinctUntilChanged().asLiveData()
+    val liveVoiceAlwaysAnnounceBox : Flow<Boolean>
+        = settingsMap { it.alwaysAnnounceBox }
 
-    fun getVoiceAlwaysAnnounceBox(cb : Consumer<Boolean>)
-        = liveVoiceAlwaysAnnounceBox.observeOnce(cb)
+    fun getVoiceAlwaysAnnounceBox(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.alwaysAnnounceBox }
 
     fun setVoiceAlwaysAnnounceBox(value : Boolean) {
         launch {
@@ -74,13 +70,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveVoiceAlwaysAnnounceClue : LiveData<Boolean>
-        = settingsFlow.map {
-            it.alwaysAnnounceClue
-        }.distinctUntilChanged().asLiveData()
+    val liveVoiceAlwaysAnnounceClue : Flow<Boolean>
+        = settingsMap { it.alwaysAnnounceClue }
 
-    fun getVoiceAlwaysAnnounceClue(cb : Consumer<Boolean>)
-        = liveVoiceAlwaysAnnounceClue.observeOnce(cb)
+    fun getVoiceAlwaysAnnounceClue(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.alwaysAnnounceClue }
 
     fun setVoiceAlwaysAnnounceClue(value : Boolean) {
         launch {
@@ -90,16 +84,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveAppTheme : LiveData<Theme>
-        = settingsFlow.map {
-            it.applicationTheme
-        }.distinctUntilChanged().asLiveData()
+    val liveAppTheme : Flow<Theme>
+        = settingsMap { it.applicationTheme }
 
-    fun getAppTheme(cb : Consumer<Theme>)
-        = liveAppTheme.observeOnce(cb)
-
-    fun getAppThemeSync() : Theme
-        = runBlocking { settingsFlow.first().applicationTheme }
+    fun getAppTheme(cb : (Theme) -> Unit)
+        = settingsOnce(cb) { it.applicationTheme }
 
     fun setAppTheme(value : Theme) {
         launch {
@@ -117,28 +106,22 @@ class ForkyzSettings(
         }
     }
 
-    val liveBackgroundDownloadSettings : LiveData<BackgroundDownloadSettings>
-        = settingsFlow.map {
-            BackgroundDownloadSettings(
-                it.backgroundDownloadRequireUnmetered,
-                it.backgroundDownloadAllowRoaming,
-                it.backgroundDownloadRequireCharging,
-                it.backgroundDownloadHourly,
-                it.backgroundDownloadDaysList.toSet(),
-                it.backgroundDownloadDaysTime
-            )
-        }.distinctUntilChanged().asLiveData()
+    val liveBackgroundDownloadSettings : Flow<BackgroundDownloadSettings>
+        = settingsMap(this::makeBackgroundDownloadSettings)
 
-    fun getBackgroundDownloadSettings(cb : Consumer<BackgroundDownloadSettings>)
-        = liveBackgroundDownloadSettings.observeOnce(cb)
+    // Consumer for BackgroundDownloadManager.java
+    fun getBackgroundDownloadSettings(
+        cb : Consumer<BackgroundDownloadSettings>,
+    ) = settingsOnce(
+        cb::accept,
+        this::makeBackgroundDownloadSettings,
+    )
 
-    val liveBrowseCleanupAgeArchive : LiveData<Int>
-        = settingsFlow.map {
-            it.archiveCleanupAge
-        }.distinctUntilChanged().asLiveData()
+    val liveBrowseCleanupAgeArchive : Flow<Int>
+        = settingsMap { it.archiveCleanupAge }
 
-    fun getBrowseCleanupAgeArchive(cb : Consumer<Int>)
-        = liveBrowseCleanupAgeArchive.observeOnce(cb)
+    fun getBrowseCleanupAgeArchive(cb : (Int) -> Unit)
+        = settingsOnce(cb) { it.archiveCleanupAge }
 
     fun setBrowseCleanupAgeArchive(value : Int) {
         launch {
@@ -148,13 +131,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveBrowseDontConfirmCleanup : LiveData<Boolean>
-        = settingsFlow.map {
-            it.dontConfirmCleanup
-        }.distinctUntilChanged().asLiveData()
+    val liveBrowseDontConfirmCleanup : Flow<Boolean>
+        = settingsMap { it.dontConfirmCleanup }
 
-    fun getBrowseDontConfirmCleanup(cb : Consumer<Boolean>)
-        = liveBrowseDontConfirmCleanup.observeOnce(cb)
+    fun getBrowseDontConfirmCleanup(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.dontConfirmCleanup }
 
     fun setBrowseDontConfirmCleanup(value : Boolean) {
         launch {
@@ -164,13 +145,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveBrowseDontConfirmDelete : LiveData<Boolean>
-        = settingsFlow.map {
-            it.dontConfirmBrowseDelete
-        }.distinctUntilChanged().asLiveData()
+    val liveBrowseDontConfirmDelete : Flow<Boolean>
+        = settingsMap { it.dontConfirmBrowseDelete }
 
-    fun getBrowseDontConfirmDelete(cb : Consumer<Boolean>)
-        = liveBrowseDontConfirmDelete.observeOnce(cb)
+    fun getBrowseDontConfirmDelete(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.dontConfirmBrowseDelete }
 
     fun setBrowseDontConfirmDelete(value : Boolean) {
         launch {
@@ -180,60 +159,17 @@ class ForkyzSettings(
         }
     }
 
-    val liveDownloadersSettings : LiveData<DownloadersSettings>
-        = settingsFlow.map {
-            DownloadersSettings(
-                it.downloadDeStandaard,
-                it.downloadDeTelegraaf,
-                it.downloadGuardianDailyCryptic,
-                it.downloadGuardianWeeklyQuiptic,
-                it.downloadHamAbend,
-                it.downloadIndependentDailyCryptic,
-                it.downloadIrishNewsCryptic,
-                it.downloadJonesin,
-                it.downloadJoseph,
-                it.download20Minutes,
-                it.downloadLATimes,
-                it.downloadLeParisienF1,
-                it.downloadLeParisienF2,
-                it.downloadLeParisienF3,
-                it.downloadLeParisienF4,
-                it.downloadMetroCryptic,
-                it.downloadMetroQuick,
-                it.downloadNewsday,
-                it.downloadNewYorkTimesSyndicated,
-                it.downloadPremier,
-                it.downloadSheffer,
-                it.downloadUniversal,
-                it.downloadUSAToday,
-                it.downloadWaPoSunday,
-                it.downloadWsj,
-                it.scrapeCru,
-                it.scrapeGuardianQuick,
-                it.scrapeKegler,
-                it.scrapePrivateEye,
-                it.scrapePrzekroj,
-                it.downloadCustomDaily,
-                it.customDailyTitle,
-                it.customDailyUrl,
-                it.suppressSummaryMessages,
-                it.suppressMessages,
-                it.autoDownloadersList.toSet(),
-                it.downloadTimeout,
-                it.dlOnStartup,
-            )
-        }.distinctUntilChanged().asLiveData()
+    val liveDownloadersSettings : Flow<DownloadersSettings>
+        = settingsMap(this::makeDownloadersSettings)
 
-    fun getDownloadersSettings(cb : Consumer<DownloadersSettings>)
-        = liveDownloadersSettings.observeOnce(cb)
+    fun getDownloadersSettings(cb : (DownloadersSettings) -> Unit)
+        = settingsOnce(cb, this::makeDownloadersSettings)
 
-    val liveDownloadAllowRoaming : LiveData<Boolean>
-        = settingsFlow.map {
-            it.backgroundDownloadAllowRoaming
-        }.distinctUntilChanged().asLiveData()
+    val liveDownloadAllowRoaming : Flow<Boolean>
+        = settingsMap { it.backgroundDownloadAllowRoaming }
 
-    fun getDownloadAllowRoaming(cb : Consumer<Boolean>)
-        = liveDownloadAllowRoaming.observeOnce(cb)
+    fun getDownloadAllowRoaming(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.backgroundDownloadAllowRoaming }
 
     fun setDownloadAllowRoaming(value : Boolean) {
         launch {
@@ -245,13 +181,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveDownloadAutoDownloaders : LiveData<Set<String>>
-        = settingsFlow.map {
-            it.autoDownloadersList.toSet()
-        }.distinctUntilChanged().asLiveData()
+    val liveDownloadAutoDownloaders : Flow<Set<String>>
+        = settingsMap { it.autoDownloadersList.toSet() }
 
-    fun getDownloadAutoDownloaders(cb : Consumer<Set<String>>)
-        = liveDownloadAutoDownloaders.observeOnce(cb)
+    fun getDownloadAutoDownloaders(cb : (Set<String>) -> Unit)
+        = settingsOnce(cb) { it.autoDownloadersList.toSet() }
 
     fun setDownloadAutoDownloaders(value : Set<String>) {
         launch {
@@ -264,13 +198,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveDownloadDays : LiveData<Set<String>>
-        = settingsFlow.map {
-            it.backgroundDownloadDaysList.toSet()
-        }.distinctUntilChanged().asLiveData()
+    val liveDownloadDays : Flow<Set<String>>
+        = settingsMap { it.backgroundDownloadDaysList.toSet() }
 
-    fun getDownloadDays(cb : Consumer<Set<String>>)
-        = liveDownloadDays.observeOnce(cb)
+    fun getDownloadDays(cb : (Set<String>) -> Unit)
+        = settingsOnce(cb) { it.backgroundDownloadDaysList.toSet() }
 
     fun setDownloadDays(value : Set<String>) {
         launch {
@@ -283,13 +215,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveDownloadDaysTime : LiveData<Int>
-        = settingsFlow.map {
-            it.backgroundDownloadDaysTime
-        }.distinctUntilChanged().asLiveData()
+    val liveDownloadDaysTime : Flow<Int>
+        = settingsMap { it.backgroundDownloadDaysTime }
 
-    fun getDownloadDaysTime(cb : Consumer<Int>)
-        = liveDownloadDaysTime.observeOnce(cb)
+    fun getDownloadDaysTime(cb : (Int) -> Unit)
+        = settingsOnce(cb) { it.backgroundDownloadDaysTime }
 
     fun setDownloadDaysTime(value : Int) {
         launch {
@@ -301,13 +231,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveDownloadHourly : LiveData<Boolean>
-        = settingsFlow.map {
-            it.backgroundDownloadHourly
-        }.distinctUntilChanged().asLiveData()
+    val liveDownloadHourly : Flow<Boolean>
+        = settingsMap { it.backgroundDownloadHourly }
 
-    fun getDownloadHourly(cb : Consumer<Boolean>)
-        = liveDownloadHourly.observeOnce(cb)
+    fun getDownloadHourly(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.backgroundDownloadHourly }
 
     fun setDownloadHourly(value : Boolean) {
         launch {
@@ -317,13 +245,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveDownloadRequireCharging : LiveData<Boolean>
-        = settingsFlow.map {
-            it.backgroundDownloadRequireCharging
-        }.distinctUntilChanged().asLiveData()
+    val liveDownloadRequireCharging : Flow<Boolean>
+        = settingsMap { it.backgroundDownloadRequireCharging }
 
-    fun getDownloadRequireCharging(cb : Consumer<Boolean>)
-        = liveDownloadRequireCharging.observeOnce(cb)
+    fun getDownloadRequireCharging(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.backgroundDownloadRequireCharging }
 
     fun setDownloadRequireCharging(value : Boolean) {
         launch {
@@ -335,13 +261,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveDownloadRequireUnmetered : LiveData<Boolean>
-        = settingsFlow.map {
-            it.backgroundDownloadRequireUnmetered
-        }.distinctUntilChanged().asLiveData()
+    val liveDownloadRequireUnmetered : Flow<Boolean>
+        = settingsMap { it.backgroundDownloadRequireUnmetered }
 
-    fun getDownloadRequireUnmetered(cb : Consumer<Boolean>)
-        = liveDownloadRequireUnmetered.observeOnce(cb)
+    fun getDownloadRequireUnmetered(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.backgroundDownloadRequireUnmetered }
 
     fun setDownloadRequireUnmetered(value : Boolean) {
         launch {
@@ -353,13 +277,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveBrowseAlwaysShowRating : LiveData<Boolean>
-        = settingsFlow.map {
-            it.browseAlwaysShowRating
-        }.distinctUntilChanged().asLiveData()
+    val liveBrowseAlwaysShowRating : Flow<Boolean>
+        = settingsMap { it.browseAlwaysShowRating }
 
-    fun getBrowseAlwaysShowRating(cb : Consumer<Boolean>)
-        = liveBrowseAlwaysShowRating.observeOnce(cb)
+    fun getBrowseAlwaysShowRating(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.browseAlwaysShowRating }
 
     fun setBrowseAlwaysShowRating(value : Boolean) {
         launch {
@@ -369,13 +291,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveBrowseIndicateIfSolution : LiveData<Boolean>
-        = settingsFlow.map {
-            it.browseIndicateIfSolution
-        }.distinctUntilChanged().asLiveData()
+    val liveBrowseIndicateIfSolution : Flow<Boolean>
+        = settingsMap { it.browseIndicateIfSolution }
 
-    fun getBrowseIndicateIfSolution(cb : Consumer<Boolean>)
-        = liveBrowseIndicateIfSolution.observeOnce(cb)
+    fun getBrowseIndicateIfSolution(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.browseIndicateIfSolution }
 
     fun setBrowseIndicateIfSolution(value : Boolean) {
         launch {
@@ -385,13 +305,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveBrowseNewPuzzle : LiveData<Boolean>
-        = settingsFlow.map {
-            it.browseNewPuzzle
-        }.distinctUntilChanged().asLiveData()
+    val liveBrowseNewPuzzle : Flow<Boolean>
+        = settingsMap { it.browseNewPuzzle }
 
-    fun getBrowseNewPuzzle(cb : Consumer<Boolean>)
-        = liveBrowseNewPuzzle.observeOnce(cb)
+    fun getBrowseNewPuzzle(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.browseNewPuzzle }
 
     fun setBrowseNewPuzzle(value : Boolean) {
         launch {
@@ -401,13 +319,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveBrowseShowPercentageCorrect : LiveData<Boolean>
-        = settingsFlow.map {
-            it.browseShowPercentageCorrect
-        }.distinctUntilChanged().asLiveData()
+    val liveBrowseShowPercentageCorrect : Flow<Boolean>
+        = settingsMap { it.browseShowPercentageCorrect }
 
-    fun getBrowseShowPercentageCorrect(cb : Consumer<Boolean>)
-        = liveBrowseShowPercentageCorrect.observeOnce(cb)
+    fun getBrowseShowPercentageCorrect(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.browseShowPercentageCorrect }
 
     fun setBrowseShowPercentageCorrect(value : Boolean) {
         launch {
@@ -419,13 +335,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveVoiceButtonActivatesVoice : LiveData<Boolean>
-        = settingsFlow.map {
-            it.buttonActivatesVoice
-        }.distinctUntilChanged().asLiveData()
+    val liveVoiceButtonActivatesVoice : Flow<Boolean>
+        = settingsMap { it.buttonActivatesVoice }
 
-    fun getVoiceButtonActivatesVoice(cb : Consumer<Boolean>)
-        = liveVoiceButtonActivatesVoice.observeOnce(cb)
+    fun getVoiceButtonActivatesVoice(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.buttonActivatesVoice }
 
     fun setVoiceButtonActivatesVoice(value : Boolean) {
         launch {
@@ -435,13 +349,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveVoiceButtonAnnounceClue : LiveData<Boolean>
-        = settingsFlow.map {
-            it.buttonAnnounceClue
-        }.distinctUntilChanged().asLiveData()
+    val liveVoiceButtonAnnounceClue : Flow<Boolean>
+        = settingsMap { it.buttonAnnounceClue }
 
-    fun getVoiceButtonAnnounceClue(cb : Consumer<Boolean>)
-        = liveVoiceButtonAnnounceClue.observeOnce(cb)
+    fun getVoiceButtonAnnounceClue(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.buttonAnnounceClue }
 
     fun setVoiceButtonAnnounceClue(value : Boolean) {
         launch {
@@ -451,13 +363,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveExtChatGPTAPIKey : LiveData<String>
-        = settingsFlow.map {
-            it.chatGPTAPIKey
-        }.distinctUntilChanged().asLiveData()
+    val liveExtChatGPTAPIKey : Flow<String>
+        = settingsMap { it.chatGPTAPIKey }
 
-    fun getExtChatGPTAPIKey(cb : Consumer<String>)
-        = liveExtChatGPTAPIKey.observeOnce(cb)
+    fun getExtChatGPTAPIKey(cb : (String) -> Unit)
+        = settingsOnce(cb) { it.chatGPTAPIKey }
 
     fun setExtChatGPTAPIKey(value : String) {
         launch {
@@ -467,13 +377,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveBrowseCleanupAge : LiveData<Int>
-        = settingsFlow.map {
-            it.cleanupAge
-        }.distinctUntilChanged().asLiveData()
+    val liveBrowseCleanupAge : Flow<Int>
+        = settingsMap { it.cleanupAge }
 
-    fun getBrowseCleanupAge(cb : Consumer<Int>)
-        = liveBrowseCleanupAge.observeOnce(cb)
+    fun getBrowseCleanupAge(cb : (Int) -> Unit)
+        = settingsOnce(cb) { it.cleanupAge }
 
     fun setBrowseCleanupAge(value : Int) {
         launch {
@@ -483,13 +391,11 @@ class ForkyzSettings(
         }
     }
 
-    val livePlayClueBelowGrid : LiveData<Boolean>
-        = settingsFlow.map {
-            it.clueBelowGrid
-        }.distinctUntilChanged().asLiveData()
+    val livePlayClueBelowGrid : Flow<Boolean>
+        = settingsMap { it.clueBelowGrid }
 
-    fun getPlayClueBelowGrid(cb : Consumer<Boolean>)
-        = livePlayClueBelowGrid.observeOnce(cb)
+    fun getPlayClueBelowGrid(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.clueBelowGrid }
 
     fun setPlayClueBelowGrid(value : Boolean) {
         launch {
@@ -499,13 +405,11 @@ class ForkyzSettings(
         }
     }
 
-    val livePlayClueHighlight : LiveData<ClueHighlight>
-        = settingsFlow.map {
-            it.clueHighlight
-        }.distinctUntilChanged().asLiveData()
+    val livePlayClueHighlight : Flow<ClueHighlight>
+        = settingsMap { it.clueHighlight }
 
-    fun getPlayClueHighlight(cb : Consumer<ClueHighlight>)
-        = livePlayClueHighlight.observeOnce(cb)
+    fun getPlayClueHighlight(cb : (ClueHighlight) -> Unit)
+        = settingsOnce(cb) { it.clueHighlight }
 
     fun setPlayClueHighlight(value : ClueHighlight) {
         launch {
@@ -515,13 +419,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveClueListClueTabsDouble : LiveData<ClueTabsDouble>
-        = settingsFlow.map {
-            it.clueTabsDouble
-        }.distinctUntilChanged().asLiveData()
+    val liveClueListClueTabsDouble : Flow<ClueTabsDouble>
+        = settingsMap { it.clueTabsDouble }
 
-    fun getClueListClueTabsDouble(cb : Consumer<ClueTabsDouble>)
-        = liveClueListClueTabsDouble.observeOnce(cb)
+    fun getClueListClueTabsDouble(cb : (ClueTabsDouble) -> Unit)
+        = settingsOnce(cb) { it.clueTabsDouble }
 
     fun setClueListClueTabsDouble(value : ClueTabsDouble) {
         launch {
@@ -541,24 +443,211 @@ class ForkyzSettings(
         job.join()
     }
 
-    private val livePlayActivityClueTabsPage : LiveData<Int>
-        = settingsFlow.map {
-            it.playActivityClueTabsPage
-        }.distinctUntilChanged().asLiveData()
-
-    private val livePlayActivityClueTabsPage1 : LiveData<Int>
-        = settingsFlow.map {
-            it.playActivityClueTabsPage1
-        }.distinctUntilChanged().asLiveData()
-
-    fun getPlayClueTabsPage(viewIdx : Int, cb : Consumer<Int>) {
-        if (viewIdx == 0)
-            livePlayActivityClueTabsPage.observeOnce(cb)
-        else
-            livePlayActivityClueTabsPage1.observeOnce(cb)
+    private fun makeBackgroundDownloadSettings(
+        settings : Settings,
+    ) : BackgroundDownloadSettings {
+        return BackgroundDownloadSettings(
+            settings.backgroundDownloadRequireUnmetered,
+            settings.backgroundDownloadAllowRoaming,
+            settings.backgroundDownloadRequireCharging,
+            settings.backgroundDownloadHourly,
+            settings.backgroundDownloadDaysList.toSet(),
+            settings.backgroundDownloadDaysTime
+        )
     }
 
-    fun livePlayClueTabsPage(viewIdx : Int) : LiveData<Int> {
+    private fun makeDownloadersSettings(
+        settings : Settings,
+    ) : DownloadersSettings {
+        return DownloadersSettings(
+            settings.downloadDeStandaard,
+            settings.downloadDeTelegraaf,
+            settings.downloadGuardianDailyCryptic,
+            settings.downloadGuardianWeeklyQuiptic,
+            settings.downloadHamAbend,
+            settings.downloadIndependentDailyCryptic,
+            settings.downloadIrishNewsCryptic,
+            settings.downloadJonesin,
+            settings.downloadJoseph,
+            settings.download20Minutes,
+            settings.downloadLATimes,
+            settings.downloadLeParisienF1,
+            settings.downloadLeParisienF2,
+            settings.downloadLeParisienF3,
+            settings.downloadLeParisienF4,
+            settings.downloadMetroCryptic,
+            settings.downloadMetroQuick,
+            settings.downloadNewsday,
+            settings.downloadNewYorkTimesSyndicated,
+            settings.downloadPremier,
+            settings.downloadSheffer,
+            settings.downloadUniversal,
+            settings.downloadUSAToday,
+            settings.downloadWaPoSunday,
+            settings.downloadWsj,
+            settings.scrapeCru,
+            settings.scrapeGuardianQuick,
+            settings.scrapeKegler,
+            settings.scrapePrivateEye,
+            settings.scrapePrzekroj,
+            settings.downloadCustomDaily,
+            settings.customDailyTitle,
+            settings.customDailyUrl,
+            settings.suppressSummaryMessages,
+            settings.suppressMessages,
+            settings.autoDownloadersList.toSet(),
+            settings.downloadTimeout,
+            settings.dlOnStartup,
+        )
+    }
+
+    private fun makeDeleteCrossingMode(
+        settings : Settings,
+    ) : DeleteCrossingMode {
+        return when (settings.deleteCrossingMode) {
+            DeleteCrossingModeSetting.DCMS_DELETE
+                -> DeleteCrossingMode.DELETE
+            DeleteCrossingModeSetting.DCMS_PRESERVE_FILLED_CELLS
+                -> DeleteCrossingMode.PRESERVE_FILLED_CELLS
+            DeleteCrossingModeSetting.DCMS_PRESERVE_FILLED_WORDS
+                -> DeleteCrossingMode.PRESERVE_FILLED_WORDS
+            else -> DeleteCrossingMode.DELETE
+        }
+    }
+
+    private fun makeExternalToolSettings(
+        settings : Settings,
+    ) : ExternalToolSettings {
+        return ExternalToolSettings(
+            settings.chatGPTAPIKey,
+            settings.crosswordSolverEnabled,
+            settings.duckDuckGoEnabled,
+            settings.externalDictionary,
+            settings.fifteenSquaredEnabled,
+        );
+    }
+
+    private fun makeFileHandlerSettings(
+        settings : Settings,
+    ) : FileHandlerSettings {
+        return FileHandlerSettings(
+            settings.storageLocation,
+            settings.safRootUri,
+            settings.safCrosswordsFolderUri,
+            settings.safArchiveFolderUri,
+            settings.safToImportFolderUri,
+            settings.safToImportDoneFolderUri,
+            settings.safToImportFailedFolderUri,
+        )
+    }
+
+    private fun makeKeyboardSettings(
+        settings : Settings,
+    ) : KeyboardSettings {
+        return KeyboardSettings(
+            settings.keyboardCompact,
+            settings.keyboardForceCaps,
+            settings.keyboardHaptic,
+            settings.keyboardHideButton,
+            settings.keyboardLayout,
+            settings.keyboardShowHide,
+            settings.keyboardRepeatDelay,
+            settings.keyboardRepeatInterval,
+            settings.useNativeKeyboard,
+        )
+    }
+
+    private fun makePlayMovementStrategy(
+        settings : Settings,
+    ) : MovementStrategy {
+        return getFullMovementStrategy(
+            settings.movementStrategy,
+            settings.cycleUnfilledMode,
+        )
+    }
+
+    private fun makeStopOnEndStrategy(
+        settings : Settings,
+    ) : MovementStrategy {
+        return getFullMovementStrategy(
+            MovementStrategySetting.MSS_STOP_ON_END,
+            settings.cycleUnfilledMode,
+        )
+    }
+
+    private fun makeMovementStrategyClueList(
+        settings : Settings,
+    ) : MovementStrategy {
+        return getFullMovementStrategy(
+            coerceMovementStrategyClueList(settings.movementStrategyClueList),
+            settings.cycleUnfilledMode,
+        )
+    }
+
+    private fun makeMovementStrategyClueListSetting(
+        settings : Settings,
+    ) : MovementStrategySetting {
+        return coerceMovementStrategyClueList(settings.movementStrategyClueList)
+    }
+
+    private fun makeRenderSettings(
+        settings : Settings,
+    ) : RenderSettings {
+        return RenderSettings(
+            settings.displayScratch,
+            settings.suppressHints,
+            settings.displaySeparators,
+            settings.inferSeparators,
+        )
+    }
+
+    private fun makeRatingSettings(
+        settings : Settings,
+    ) : RatingsSettings {
+        return RatingsSettings(
+            settings.disableRatings,
+            settings.browseAlwaysShowRating,
+        )
+    }
+
+    /**
+     * Get a value from settings as a shared flow
+     */
+    private fun <T> settingsMap(
+        getValue : (Settings) -> T,
+    ) : Flow<T> {
+        return settingsFlow.map(getValue).distinctUntilChanged()
+    }
+
+    /**
+     * Get a value from settings once and return async on main via callback
+     */
+    private fun <T> settingsOnce(
+        cb : (T) -> Unit,
+        getValue : (Settings) -> T,
+    ) {
+        launch {
+            val value = getValue(settingsFlow.first())
+            runMain { cb(value) }
+        }
+    }
+
+    private val livePlayActivityClueTabsPage : Flow<Int>
+        = settingsMap { it.playActivityClueTabsPage }
+
+    private val livePlayActivityClueTabsPage1 : Flow<Int>
+        = settingsMap { it.playActivityClueTabsPage1 }
+
+    fun getPlayClueTabsPage(viewIdx : Int, cb : (Int) -> Unit) {
+        settingsOnce(cb) {
+            if (viewIdx == 0)
+                it.playActivityClueTabsPage
+            else
+                it.playActivityClueTabsPage1
+        }
+    }
+
+    fun livePlayClueTabsPage(viewIdx : Int) : Flow<Int> {
         if (viewIdx == 0)
             return livePlayActivityClueTabsPage
         else
@@ -587,13 +676,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveExtCrosswordSolverEnabled : LiveData<Boolean>
-        = settingsFlow.map {
-            it.crosswordSolverEnabled
-        }.distinctUntilChanged().asLiveData()
+    val liveExtCrosswordSolverEnabled : Flow<Boolean>
+        = settingsMap { it.crosswordSolverEnabled }
 
-    fun getExtCrosswordSolverEnabled(cb : Consumer<Boolean>)
-        = liveExtCrosswordSolverEnabled.observeOnce(cb)
+    fun getExtCrosswordSolverEnabled(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.crosswordSolverEnabled }
 
     fun setExtCrosswordSolverEnabled(value : Boolean) {
         launch {
@@ -603,13 +690,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveDownloadCustomDailyTitle : LiveData<String>
-        = settingsFlow.map {
-            it.customDailyTitle
-        }.distinctUntilChanged().asLiveData()
+    val liveDownloadCustomDailyTitle : Flow<String>
+        = settingsMap { it.customDailyTitle }
 
-    fun getDownloadCustomDailyTitle(cb : Consumer<String>)
-        = liveDownloadCustomDailyTitle.observeOnce(cb)
+    fun getDownloadCustomDailyTitle(cb : (String) -> Unit)
+        = settingsOnce(cb) { it.customDailyTitle }
 
     fun setDownloadCustomDailyTitle(value : String) {
         launch {
@@ -619,13 +704,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveDownloadCustomDailyURL : LiveData<String>
-        = settingsFlow.map {
-            it.customDailyUrl
-        }.distinctUntilChanged().asLiveData()
+    val liveDownloadCustomDailyURL : Flow<String>
+        = settingsMap { it.customDailyUrl }
 
-    fun getDownloadCustomDailyURL(cb : Consumer<String>)
-        = liveDownloadCustomDailyURL.observeOnce(cb)
+    fun getDownloadCustomDailyURL(cb : (String) -> Unit)
+        = settingsOnce(cb) { it.customDailyUrl }
 
     fun setDownloadCustomDailyURL(value : String) {
         launch {
@@ -635,13 +718,11 @@ class ForkyzSettings(
         }
     }
 
-    val livePlayCycleUnfilledMode : LiveData<CycleUnfilledMode>
-        = settingsFlow.map {
-            it.cycleUnfilledMode
-        }.distinctUntilChanged().asLiveData()
+    val livePlayCycleUnfilledMode : Flow<CycleUnfilledMode>
+        = settingsMap { it.cycleUnfilledMode }
 
-    fun getPlayCycleUnfilledMode(cb : Consumer<CycleUnfilledMode>)
-        = livePlayCycleUnfilledMode.observeOnce(cb)
+    fun getPlayCycleUnfilledMode(cb : (CycleUnfilledMode) -> Unit)
+        = settingsOnce(cb) { it.cycleUnfilledMode }
 
     fun setPlayCycleUnfilledMode(value : CycleUnfilledMode) {
         launch {
@@ -651,30 +732,18 @@ class ForkyzSettings(
         }
     }
 
-    val livePlayDeleteCrossingMode : LiveData<DeleteCrossingMode>
-        = settingsFlow.map {
-            when (it.deleteCrossingMode) {
-                DeleteCrossingModeSetting.DCMS_DELETE
-                    -> DeleteCrossingMode.DELETE
-                DeleteCrossingModeSetting.DCMS_PRESERVE_FILLED_CELLS
-                    -> DeleteCrossingMode.PRESERVE_FILLED_CELLS
-                DeleteCrossingModeSetting.DCMS_PRESERVE_FILLED_WORDS
-                    -> DeleteCrossingMode.PRESERVE_FILLED_WORDS
-                else -> DeleteCrossingMode.DELETE
-            }
-        }.distinctUntilChanged().asLiveData()
+    val livePlayDeleteCrossingMode : Flow<DeleteCrossingMode>
+        = settingsMap(this::makeDeleteCrossingMode)
 
-    fun getPlayDeleteCrossingMode(cb : Consumer<DeleteCrossingMode>)
-        = livePlayDeleteCrossingMode.observeOnce(cb)
+    fun getPlayDeleteCrossingMode(cb : (DeleteCrossingMode) -> Unit)
+        = settingsOnce(cb, this::makeDeleteCrossingMode)
 
-    val livePlayDeleteCrossingModeSetting : LiveData<DeleteCrossingModeSetting>
-        = settingsFlow.map {
-            it.deleteCrossingMode
-        }.distinctUntilChanged().asLiveData()
+    val livePlayDeleteCrossingModeSetting : Flow<DeleteCrossingModeSetting>
+        = settingsMap { it.deleteCrossingMode }
 
     fun getPlayDeleteCrossingModeSetting(
-        cb : Consumer<DeleteCrossingModeSetting>
-    ) = livePlayDeleteCrossingModeSetting.observeOnce(cb)
+        cb : (DeleteCrossingModeSetting) -> Unit
+    ) = settingsOnce(cb) { it.deleteCrossingMode }
 
     fun setPlayDeleteCrossingModeSetting(value : DeleteCrossingModeSetting) {
         launch {
@@ -684,13 +753,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveBrowseDeleteOnCleanup : LiveData<Boolean>
-        = settingsFlow.map {
-            it.deleteOnCleanup
-        }.distinctUntilChanged().asLiveData()
+    val liveBrowseDeleteOnCleanup : Flow<Boolean>
+        = settingsMap { it.deleteOnCleanup }
 
-    fun getBrowseDeleteOnCleanup(cb : Consumer<Boolean>)
-        = liveBrowseDeleteOnCleanup.observeOnce(cb)
+    fun getBrowseDeleteOnCleanup(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.deleteOnCleanup }
 
     fun setBrowseDeleteOnCleanup(value : Boolean) {
         launch {
@@ -700,13 +767,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveRatingsDisableRatings : LiveData<Boolean>
-        = settingsFlow.map {
-            it.disableRatings
-        }.distinctUntilChanged().asLiveData()
+    val liveRatingsDisableRatings : Flow<Boolean>
+        = settingsMap { it.disableRatings }
 
-    fun getRatingsDisableRatings(cb : Consumer<Boolean>)
-        = liveRatingsDisableRatings.observeOnce(cb)
+    fun getRatingsDisableRatings(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.disableRatings }
 
     fun setRatingsDisableRatings(value : Boolean) {
         launch {
@@ -716,13 +781,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveBrowseDisableSwipe : LiveData<Boolean>
-        = settingsFlow.map {
-            it.disableSwipe
-        }.distinctUntilChanged().asLiveData()
+    val liveBrowseDisableSwipe : Flow<Boolean>
+        = settingsMap { it.disableSwipe }
 
-    fun getBrowseDisableSwipe(cb : Consumer<Boolean>)
-        = liveBrowseDisableSwipe.observeOnce(cb)
+    fun getBrowseDisableSwipe(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.disableSwipe }
 
     fun setBrowseDisableSwipe(value : Boolean) {
         launch {
@@ -732,13 +795,11 @@ class ForkyzSettings(
         }
     }
 
-    val livePlayScratchDisplay : LiveData<Boolean>
-        = settingsFlow.map {
-            it.displayScratch
-        }.distinctUntilChanged().asLiveData()
+    val livePlayScratchDisplay : Flow<Boolean>
+        = settingsMap { it.displayScratch }
 
-    fun getPlayScratchDisplay(cb : Consumer<Boolean>)
-        = livePlayScratchDisplay.observeOnce(cb)
+    fun getPlayScratchDisplay(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.displayScratch }
 
     fun setPlayScratchDisplay(value : Boolean) {
         launch {
@@ -748,13 +809,11 @@ class ForkyzSettings(
         }
     }
 
-    val livePlayDisplaySeparators : LiveData<DisplaySeparators>
-        = settingsFlow.map {
-            it.displaySeparators
-        }.distinctUntilChanged().asLiveData()
+    val livePlayDisplaySeparators : Flow<DisplaySeparators>
+        = settingsMap { it.displaySeparators }
 
-    fun getPlayDisplaySeparators(cb : Consumer<DisplaySeparators>)
-        = livePlayDisplaySeparators.observeOnce(cb)
+    fun getPlayDisplaySeparators(cb : (DisplaySeparators) -> Unit)
+        = settingsOnce(cb) { it.displaySeparators }
 
     fun setPlayDisplaySeparators(value : DisplaySeparators) {
         launch {
@@ -764,13 +823,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveBrowseLastDownload : LiveData<Long>
-        = settingsFlow.map {
-            it.dlLast
-        }.distinctUntilChanged().asLiveData()
+    val liveBrowseLastDownload : Flow<Long>
+        = settingsMap { it.dlLast }
 
-    fun getBrowseLastDownload(cb : Consumer<Long>)
-        = liveBrowseLastDownload.observeOnce(cb)
+    fun getBrowseLastDownload(cb : (Long) -> Unit)
+        = settingsOnce(cb) { it.dlLast }
 
     fun getBrowseLastDownloadSync() : Long
         = runBlocking { settingsFlow.first().dlLast }
@@ -785,13 +842,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveDownloadOnStartUp : LiveData<Boolean>
-        = settingsFlow.map {
-            it.dlOnStartup
-        }.distinctUntilChanged().asLiveData()
+    val liveDownloadOnStartUp : Flow<Boolean>
+        = settingsMap { it.dlOnStartup }
 
-    fun getDownloadOnStartUp(cb : Consumer<Boolean>)
-        = liveDownloadOnStartUp.observeOnce(cb)
+    fun getDownloadOnStartUp(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.dlOnStartup }
 
     fun setDownloadOnStartUp(value : Boolean) {
         launch {
@@ -801,13 +856,15 @@ class ForkyzSettings(
         }
     }
 
-    val livePlayDoubleTapFitBoard : LiveData<Boolean>
-        = settingsFlow.map {
-            it.doubleTap
-        }.distinctUntilChanged().asLiveData()
+    val livePlayDoubleTapFitBoard : Flow<Boolean>
+        = settingsMap { it.doubleTap }
 
+    // Consumer for BoardEditViews.java
     fun getPlayDoubleTapFitBoard(cb : Consumer<Boolean>)
-        = livePlayDoubleTapFitBoard.observeOnce(cb)
+        = settingsOnce(
+            cb::accept,
+            { it.doubleTap },
+        )
 
     fun setPlayDoubleTapFitBoard(value : Boolean) {
         launch {
@@ -817,13 +874,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveDownload20Minutes : LiveData<Boolean>
-        = settingsFlow.map {
-            it.download20Minutes
-        }.distinctUntilChanged().asLiveData()
+    val liveDownload20Minutes : Flow<Boolean>
+        = settingsMap { it.download20Minutes }
 
-    fun getDownload20Minutes(cb : Consumer<Boolean>)
-        = liveDownload20Minutes.observeOnce(cb)
+    fun getDownload20Minutes(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.download20Minutes }
 
     fun setDownload20Minutes(value : Boolean) {
         launch {
@@ -833,13 +888,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveDownloadCustomDaily : LiveData<Boolean>
-        = settingsFlow.map {
-            it.downloadCustomDaily
-        }.distinctUntilChanged().asLiveData()
+    val liveDownloadCustomDaily : Flow<Boolean>
+        = settingsMap { it.downloadCustomDaily }
 
-    fun getDownloadCustomDaily(cb : Consumer<Boolean>)
-        = liveDownloadCustomDaily.observeOnce(cb)
+    fun getDownloadCustomDaily(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.downloadCustomDaily }
 
     fun setDownloadCustomDaily(value : Boolean) {
         launch {
@@ -849,13 +902,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveDownloadDeStandaard : LiveData<Boolean>
-        = settingsFlow.map {
-            it.downloadDeStandaard
-        }.distinctUntilChanged().asLiveData()
+    val liveDownloadDeStandaard : Flow<Boolean>
+        = settingsMap { it.downloadDeStandaard }
 
-    fun getDownloadDeStandaard(cb : Consumer<Boolean>)
-        = liveDownloadDeStandaard.observeOnce(cb)
+    fun getDownloadDeStandaard(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.downloadDeStandaard }
 
     fun setDownloadDeStandaard(value : Boolean) {
         launch {
@@ -865,13 +916,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveDownloadDeTelegraaf : LiveData<Boolean>
-        = settingsFlow.map {
-            it.downloadDeTelegraaf
-        }.distinctUntilChanged().asLiveData()
+    val liveDownloadDeTelegraaf : Flow<Boolean>
+        = settingsMap { it.downloadDeTelegraaf }
 
-    fun getDownloadDeTelegraaf(cb : Consumer<Boolean>)
-        = liveDownloadDeTelegraaf.observeOnce(cb)
+    fun getDownloadDeTelegraaf(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.downloadDeTelegraaf }
 
     fun setDownloadDeTelegraaf(value : Boolean) {
         launch {
@@ -881,13 +930,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveDownloadGuardianDailyCryptic : LiveData<Boolean>
-        = settingsFlow.map {
-            it.downloadGuardianDailyCryptic
-        }.distinctUntilChanged().asLiveData()
+    val liveDownloadGuardianDailyCryptic : Flow<Boolean>
+        = settingsMap { it.downloadGuardianDailyCryptic }
 
-    fun getDownloadGuardianDailyCryptic(cb : Consumer<Boolean>)
-        = liveDownloadGuardianDailyCryptic.observeOnce(cb)
+    fun getDownloadGuardianDailyCryptic(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.downloadGuardianDailyCryptic }
 
     fun setDownloadGuardianDailyCryptic(value : Boolean) {
         launch {
@@ -899,13 +946,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveDownloadGuardianWeeklyQuiptic : LiveData<Boolean>
-        = settingsFlow.map {
-            it.downloadGuardianWeeklyQuiptic
-        }.distinctUntilChanged().asLiveData()
+    val liveDownloadGuardianWeeklyQuiptic : Flow<Boolean>
+        = settingsMap { it.downloadGuardianWeeklyQuiptic }
 
-    fun getDownloadGuardianWeeklyQuiptic(cb : Consumer<Boolean>)
-        = liveDownloadGuardianWeeklyQuiptic.observeOnce(cb)
+    fun getDownloadGuardianWeeklyQuiptic(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.downloadGuardianWeeklyQuiptic }
 
     fun setDownloadGuardianWeeklyQuiptic(value : Boolean) {
         launch {
@@ -917,13 +962,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveDownloadHamAbend : LiveData<Boolean>
-        = settingsFlow.map {
-            it.downloadHamAbend
-        }.distinctUntilChanged().asLiveData()
+    val liveDownloadHamAbend : Flow<Boolean>
+        = settingsMap { it.downloadHamAbend }
 
-    fun getDownloadHamAbend(cb : Consumer<Boolean>)
-        = liveDownloadHamAbend.observeOnce(cb)
+    fun getDownloadHamAbend(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.downloadHamAbend }
 
     fun setDownloadHamAbend(value : Boolean) {
         launch {
@@ -933,13 +976,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveDownloadIndependentDailyCryptic : LiveData<Boolean>
-        = settingsFlow.map {
-            it.downloadIndependentDailyCryptic
-        }.distinctUntilChanged().asLiveData()
+    val liveDownloadIndependentDailyCryptic : Flow<Boolean>
+        = settingsMap { it.downloadIndependentDailyCryptic }
 
-    fun getDownloadIndependentDailyCryptic(cb : Consumer<Boolean>)
-        = liveDownloadIndependentDailyCryptic.observeOnce(cb)
+    fun getDownloadIndependentDailyCryptic(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.downloadIndependentDailyCryptic }
 
     fun setDownloadIndependentDailyCryptic(value : Boolean) {
         launch {
@@ -951,13 +992,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveDownloadIrishNewsCryptic : LiveData<Boolean>
-        = settingsFlow.map {
-            it.downloadIrishNewsCryptic
-        }.distinctUntilChanged().asLiveData()
+    val liveDownloadIrishNewsCryptic : Flow<Boolean>
+        = settingsMap { it.downloadIrishNewsCryptic }
 
-    fun getDownloadIrishNewsCryptic(cb : Consumer<Boolean>)
-        = liveDownloadIrishNewsCryptic.observeOnce(cb)
+    fun getDownloadIrishNewsCryptic(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.downloadIrishNewsCryptic }
 
     fun setDownloadIrishNewsCryptic(value : Boolean) {
         launch {
@@ -967,13 +1006,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveDownloadJonesin : LiveData<Boolean>
-        = settingsFlow.map {
-            it.downloadJonesin
-        }.distinctUntilChanged().asLiveData()
+    val liveDownloadJonesin : Flow<Boolean>
+        = settingsMap { it.downloadJonesin }
 
-    fun getDownloadJonesin(cb : Consumer<Boolean>)
-        = liveDownloadJonesin.observeOnce(cb)
+    fun getDownloadJonesin(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.downloadJonesin }
 
     fun setDownloadJonesin(value : Boolean) {
         launch {
@@ -983,13 +1020,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveDownloadJoseph : LiveData<Boolean>
-        = settingsFlow.map {
-            it.downloadJoseph
-        }.distinctUntilChanged().asLiveData()
+    val liveDownloadJoseph : Flow<Boolean>
+        = settingsMap { it.downloadJoseph }
 
-    fun getDownloadJoseph(cb : Consumer<Boolean>)
-        = liveDownloadJoseph.observeOnce(cb)
+    fun getDownloadJoseph(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.downloadJoseph }
 
     fun setDownloadJoseph(value : Boolean) {
         launch {
@@ -999,10 +1034,8 @@ class ForkyzSettings(
         }
     }
 
-    val liveDownloadLATimes : LiveData<Boolean>
-        = settingsFlow.map {
-            it.downloadLATimes
-        }.distinctUntilChanged().asLiveData()
+    val liveDownloadLATimes : Flow<Boolean>
+        = settingsMap { it.downloadLATimes }
 
     fun setDownloadLATimes(value : Boolean) {
         launch {
@@ -1012,13 +1045,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveDownloadLeParisienF1 : LiveData<Boolean>
-        = settingsFlow.map {
-            it.downloadLeParisienF1
-        }.distinctUntilChanged().asLiveData()
+    val liveDownloadLeParisienF1 : Flow<Boolean>
+        = settingsMap { it.downloadLeParisienF1 }
 
-    fun getDownloadLeParisienF1(cb : Consumer<Boolean>)
-        = liveDownloadLeParisienF1.observeOnce(cb)
+    fun getDownloadLeParisienF1(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.downloadLATimes }
 
     fun setDownloadLeParisienF1(value : Boolean) {
         launch {
@@ -1028,13 +1059,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveDownloadLeParisienF2 : LiveData<Boolean>
-        = settingsFlow.map {
-            it.downloadLeParisienF2
-        }.distinctUntilChanged().asLiveData()
+    val liveDownloadLeParisienF2 : Flow<Boolean>
+        = settingsMap { it.downloadLeParisienF2 }
 
-    fun getDownloadLeParisienF2(cb : Consumer<Boolean>)
-        = liveDownloadLeParisienF2.observeOnce(cb)
+    fun getDownloadLeParisienF2(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.downloadLeParisienF2 }
 
     fun setDownloadLeParisienF2(value : Boolean) {
         launch {
@@ -1044,13 +1073,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveDownloadLeParisienF3 : LiveData<Boolean>
-        = settingsFlow.map {
-            it.downloadLeParisienF3
-        }.distinctUntilChanged().asLiveData()
+    val liveDownloadLeParisienF3 : Flow<Boolean>
+        = settingsMap { it.downloadLeParisienF3 }
 
-    fun getDownloadLeParisienF3(cb : Consumer<Boolean>)
-        = liveDownloadLeParisienF3.observeOnce(cb)
+    fun getDownloadLeParisienF3(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.downloadLeParisienF3 }
 
     fun setDownloadLeParisienF3(value : Boolean) {
         launch {
@@ -1060,13 +1087,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveDownloadLeParisienF4 : LiveData<Boolean>
-        = settingsFlow.map {
-            it.downloadLeParisienF4
-        }.distinctUntilChanged().asLiveData()
+    val liveDownloadLeParisienF4 : Flow<Boolean>
+        = settingsMap { it.downloadLeParisienF4 }
 
-    fun getDownloadLeParisienF4(cb : Consumer<Boolean>)
-        = liveDownloadLeParisienF4.observeOnce(cb)
+    fun getDownloadLeParisienF4(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.downloadLeParisienF4 }
 
     fun setDownloadLeParisienF4(value : Boolean) {
         launch {
@@ -1076,13 +1101,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveDownloadMetroCryptic : LiveData<Boolean>
-        = settingsFlow.map {
-            it.downloadMetroCryptic
-        }.distinctUntilChanged().asLiveData()
+    val liveDownloadMetroCryptic : Flow<Boolean>
+        = settingsMap { it.downloadMetroCryptic }
 
-    fun getDownloadMetroCryptic(cb : Consumer<Boolean>)
-        = liveDownloadMetroCryptic.observeOnce(cb)
+    fun getDownloadMetroCryptic(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.downloadMetroCryptic }
 
     fun setDownloadMetroCryptic(value : Boolean) {
         launch {
@@ -1092,13 +1115,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveDownloadMetroQuick : LiveData<Boolean>
-        = settingsFlow.map {
-            it.downloadMetroQuick
-        }.distinctUntilChanged().asLiveData()
+    val liveDownloadMetroQuick : Flow<Boolean>
+        = settingsMap { it.downloadMetroQuick }
 
-    fun getDownloadMetroQuick(cb : Consumer<Boolean>)
-        = liveDownloadMetroQuick.observeOnce(cb)
+    fun getDownloadMetroQuick(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.downloadMetroQuick }
 
     fun setDownloadMetroQuick(value : Boolean) {
         launch {
@@ -1108,13 +1129,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveDownloadNewYorkTimesSyndicated : LiveData<Boolean>
-        = settingsFlow.map {
-            it.downloadNewYorkTimesSyndicated
-        }.distinctUntilChanged().asLiveData()
+    val liveDownloadNewYorkTimesSyndicated : Flow<Boolean>
+        = settingsMap { it.downloadNewYorkTimesSyndicated }
 
-    fun getDownloadNewYorkTimesSyndicated(cb : Consumer<Boolean>)
-        = liveDownloadNewYorkTimesSyndicated.observeOnce(cb)
+    fun getDownloadNewYorkTimesSyndicated(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.downloadNewYorkTimesSyndicated }
 
     fun setDownloadNewYorkTimesSyndicated(value : Boolean) {
         launch {
@@ -1126,13 +1145,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveDownloadNewsday : LiveData<Boolean>
-        = settingsFlow.map {
-            it.downloadNewsday
-        }.distinctUntilChanged().asLiveData()
+    val liveDownloadNewsday : Flow<Boolean>
+        = settingsMap { it.downloadNewsday }
 
-    fun getDownloadNewsday(cb : Consumer<Boolean>)
-        = liveDownloadNewsday.observeOnce(cb)
+    fun getDownloadNewsday(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.downloadNewsday }
 
     fun setDownloadNewsday(value : Boolean) {
         launch {
@@ -1142,13 +1159,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveDownloadPremier : LiveData<Boolean>
-        = settingsFlow.map {
-            it.downloadPremier
-        }.distinctUntilChanged().asLiveData()
+    val liveDownloadPremier : Flow<Boolean>
+        = settingsMap { it.downloadPremier }
 
-    fun getDownloadPremier(cb : Consumer<Boolean>)
-        = liveDownloadPremier.observeOnce(cb)
+    fun getDownloadPremier(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.downloadPremier }
 
     fun setDownloadPremier(value : Boolean) {
         launch {
@@ -1158,13 +1173,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveDownloadSheffer : LiveData<Boolean>
-        = settingsFlow.map {
-            it.downloadSheffer
-        }.distinctUntilChanged().asLiveData()
+    val liveDownloadSheffer : Flow<Boolean>
+        = settingsMap { it.downloadSheffer }
 
-    fun getDownloadSheffer(cb : Consumer<Boolean>)
-        = liveDownloadSheffer.observeOnce(cb)
+    fun getDownloadSheffer(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.downloadSheffer }
 
     fun setDownloadSheffer(value : Boolean) {
         launch {
@@ -1174,13 +1187,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveDownloadTimeout : LiveData<Int>
-        = settingsFlow.map {
-            it.downloadTimeout
-        }.distinctUntilChanged().asLiveData()
+    val liveDownloadTimeout : Flow<Int>
+        = settingsMap { it.downloadTimeout }
 
-    fun getDownloadTimeout(cb : Consumer<Int>)
-        = liveDownloadTimeout.observeOnce(cb)
+    fun getDownloadTimeout(cb : (Int) -> Unit)
+        = settingsOnce(cb) { it.downloadTimeout }
 
     fun setDownloadTimeout(value : Int) {
         launch {
@@ -1190,13 +1201,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveDownloadUSAToday : LiveData<Boolean>
-        = settingsFlow.map {
-            it.downloadUSAToday
-        }.distinctUntilChanged().asLiveData()
+    val liveDownloadUSAToday : Flow<Boolean>
+        = settingsMap { it.downloadUSAToday }
 
-    fun getDownloadUSAToday(cb : Consumer<Boolean>)
-        = liveDownloadUSAToday.observeOnce(cb)
+    fun getDownloadUSAToday(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.downloadUSAToday }
 
     fun setDownloadUSAToday(value : Boolean) {
         launch {
@@ -1206,13 +1215,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveDownloadUniversal : LiveData<Boolean>
-        = settingsFlow.map {
-            it.downloadUniversal
-        }.distinctUntilChanged().asLiveData()
+    val liveDownloadUniversal : Flow<Boolean>
+        = settingsMap { it.downloadUniversal }
 
-    fun getDownloadUniversal(cb : Consumer<Boolean>)
-        = liveDownloadUniversal.observeOnce(cb)
+    fun getDownloadUniversal(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.downloadUniversal }
 
     fun setDownloadUniversal(value : Boolean) {
         launch {
@@ -1222,13 +1229,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveDownloadWaPoSunday : LiveData<Boolean>
-        = settingsFlow.map {
-            it.downloadWaPoSunday
-        }.distinctUntilChanged().asLiveData()
+    val liveDownloadWaPoSunday : Flow<Boolean>
+        = settingsMap { it.downloadWaPoSunday }
 
-    fun getDownloadWaPoSunday(cb : Consumer<Boolean>)
-        = liveDownloadWaPoSunday.observeOnce(cb)
+    fun getDownloadWaPoSunday(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.downloadWaPoSunday }
 
     fun setDownloadWaPoSunday(value : Boolean) {
         launch {
@@ -1238,13 +1243,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveDownloadWsj : LiveData<Boolean>
-        = settingsFlow.map {
-            it.downloadWsj
-        }.distinctUntilChanged().asLiveData()
+    val liveDownloadWsj : Flow<Boolean>
+        = settingsMap { it.downloadWsj }
 
-    fun getDownloadWsj(cb : Consumer<Boolean>)
-        = liveDownloadWsj.observeOnce(cb)
+    fun getDownloadWsj(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.downloadWsj }
 
     fun setDownloadWsj(value : Boolean) {
         launch {
@@ -1254,13 +1257,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveExtDuckDuckGoEnabled : LiveData<Boolean>
-        = settingsFlow.map {
-            it.duckDuckGoEnabled
-        }.distinctUntilChanged().asLiveData()
+    val liveExtDuckDuckGoEnabled : Flow<Boolean>
+        = settingsMap { it.duckDuckGoEnabled }
 
-    fun getExtDuckDuckGoEnabled(cb : Consumer<Boolean>)
-        = liveExtDuckDuckGoEnabled.observeOnce(cb)
+    fun getExtDuckDuckGoEnabled(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.duckDuckGoEnabled }
 
     fun setExtDuckDuckGoEnabled(value : Boolean) {
         launch {
@@ -1270,13 +1271,15 @@ class ForkyzSettings(
         }
     }
 
-    val livePlayEnsureVisible : LiveData<Boolean>
-        = settingsFlow.map {
-            it.ensureVisible
-        }.distinctUntilChanged().asLiveData()
+    val livePlayEnsureVisible : Flow<Boolean>
+        = settingsMap { it.ensureVisible }
 
+    // Consumer for BoardEditViews.java
     fun getPlayEnsureVisible(cb : Consumer<Boolean>)
-        = livePlayEnsureVisible.observeOnce(cb)
+        = settingsOnce(
+            cb::accept,
+            { it.ensureVisible },
+        )
 
     fun setPlayEnsureVisible(value : Boolean) {
         launch {
@@ -1286,13 +1289,11 @@ class ForkyzSettings(
         }
     }
 
-    val livePlayEnterChangesDirection : LiveData<Boolean>
-        = settingsFlow.map {
-            it.enterChangesDirection
-        }.distinctUntilChanged().asLiveData()
+    val livePlayEnterChangesDirection : Flow<Boolean>
+        = settingsMap { it.enterChangesDirection }
 
-    fun getPlayEnterChangesDirection(cb : Consumer<Boolean>)
-        = livePlayEnterChangesDirection.observeOnce(cb)
+    fun getPlayEnterChangesDirection(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.enterChangesDirection }
 
     fun setPlayEnterChangesDirection(value : Boolean) {
         launch {
@@ -1302,13 +1303,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveVoiceEqualsAnnounceClue : LiveData<Boolean>
-        = settingsFlow.map {
-            it.equalsAnnounceClue
-        }.distinctUntilChanged().asLiveData()
+    val liveVoiceEqualsAnnounceClue : Flow<Boolean>
+        = settingsMap { it.equalsAnnounceClue }
 
-    fun getVoiceEqualsAnnounceClue(cb : Consumer<Boolean>)
-        = liveVoiceEqualsAnnounceClue.observeOnce(cb)
+    fun getVoiceEqualsAnnounceClue(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.equalsAnnounceClue }
 
     fun setVoiceEqualsAnnounceClue(value : Boolean) {
         launch {
@@ -1318,13 +1317,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveExtDictionarySetting : LiveData<ExternalDictionarySetting>
-        = settingsFlow.map {
-            it.externalDictionary
-        }.distinctUntilChanged().asLiveData()
+    val liveExtDictionarySetting : Flow<ExternalDictionarySetting>
+        = settingsMap { it.externalDictionary }
 
-    fun getExtDictionarySetting(cb : Consumer<ExternalDictionarySetting>)
-        = liveExtDictionarySetting.observeOnce(cb)
+    fun getExtDictionarySetting(cb : (ExternalDictionarySetting) -> Unit)
+        = settingsOnce(cb) { it.externalDictionary }
 
     fun setExtDictionarySetting(value : ExternalDictionarySetting) {
         launch {
@@ -1334,27 +1331,17 @@ class ForkyzSettings(
         }
     }
 
-    val liveExternalToolSettings : LiveData<ExternalToolSettings>
-        = settingsFlow.map {
-            ExternalToolSettings(
-                it.chatGPTAPIKey,
-                it.crosswordSolverEnabled,
-                it.duckDuckGoEnabled,
-                it.externalDictionary,
-                it.fifteenSquaredEnabled,
-            );
-        }.distinctUntilChanged().asLiveData()
+    val liveExternalToolSettings : Flow<ExternalToolSettings>
+        = settingsMap(this::makeExternalToolSettings)
 
-    fun getExternalToolSettings(cb : Consumer<ExternalToolSettings>)
-        = liveExternalToolSettings.observeOnce(cb)
+    fun getExternalToolSettings(cb : (ExternalToolSettings) -> Unit)
+        = settingsOnce(cb, this::makeExternalToolSettings)
 
-    val liveExtFifteenSquaredEnabled : LiveData<Boolean>
-        = settingsFlow.map {
-            it.fifteenSquaredEnabled
-        }.distinctUntilChanged().asLiveData()
+    val liveExtFifteenSquaredEnabled : Flow<Boolean>
+        = settingsMap { it.fifteenSquaredEnabled }
 
-    fun getExtFifteenSquaredEnabled(cb : Consumer<Boolean>)
-        = liveExtFifteenSquaredEnabled.observeOnce(cb)
+    fun getExtFifteenSquaredEnabled(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.fifteenSquaredEnabled }
 
     fun setExtFifteenSquaredEnabled(value : Boolean) {
         launch {
@@ -1364,25 +1351,15 @@ class ForkyzSettings(
         }
     }
 
-    val liveFileHandlerSettings : LiveData<FileHandlerSettings>
-        = settingsFlow.map {
-            FileHandlerSettings(
-                it.storageLocation,
-                it.safRootUri,
-                it.safCrosswordsFolderUri,
-                it.safArchiveFolderUri,
-                it.safToImportFolderUri,
-                it.safToImportDoneFolderUri,
-                it.safToImportFailedFolderUri,
-            )
-        }.distinctUntilChanged().asLiveData()
+    val liveFileHandlerSettings : Flow<FileHandlerSettings>
+        = settingsMap(this::makeFileHandlerSettings)
 
-    fun getFileHandlerSettings(cb : Consumer<FileHandlerSettings>)
-        = liveFileHandlerSettings.observeOnce(cb)
+    fun getFileHandlerSettings(cb : (FileHandlerSettings) -> Unit)
+        = settingsOnce(cb, this::makeFileHandlerSettings)
 
     fun setFileHandlerSettings(
         settings : FileHandlerSettings,
-        cb : Runnable? = null,
+        cb : (() -> Unit)? = null,
     ) {
         launch {
             settingsStore.updateData {
@@ -1403,7 +1380,7 @@ class ForkyzSettings(
 
     fun setFileHandlerSettingsSync(
         settings : FileHandlerSettings,
-        cb : Runnable? = null,
+        cb : (() -> Unit)? = null,
     ) {
         runBlocking {
             settingsStore.updateData {
@@ -1422,18 +1399,14 @@ class ForkyzSettings(
         }
     }
 
-    val liveFileHandlerStorageLocation : LiveData<StorageLocation>
-        = settingsFlow.map {
-            it.storageLocation
-        }.distinctUntilChanged().asLiveData()
+    val liveFileHandlerStorageLocation : Flow<StorageLocation>
+        = settingsMap { it.storageLocation }
 
-    val livePlayFitToScreenMode : LiveData<FitToScreenMode>
-        = settingsFlow.map {
-            it.fitToScreenMode
-        }.distinctUntilChanged().asLiveData()
+    val livePlayFitToScreenMode : Flow<FitToScreenMode>
+        = settingsMap { it.fitToScreenMode }
 
-    fun getPlayFitToScreenMode(cb : Consumer<FitToScreenMode>)
-        = livePlayFitToScreenMode.observeOnce(cb)
+    fun getPlayFitToScreenMode(cb : (FitToScreenMode) -> Unit)
+        = settingsOnce(cb) { it.fitToScreenMode }
 
     fun setPlayFitToScreenMode(value : FitToScreenMode) {
         launch {
@@ -1443,13 +1416,11 @@ class ForkyzSettings(
         }
     }
 
-    val livePlayFullScreen : LiveData<Boolean>
-        = settingsFlow.map {
-            it.fullScreen
-        }.distinctUntilChanged().asLiveData()
+    val livePlayFullScreen : Flow<Boolean>
+        = settingsMap { it.fullScreen }
 
-    fun getPlayFullScreen(cb : Consumer<Boolean>)
-        = livePlayFullScreen.observeOnce(cb)
+    fun getPlayFullScreen(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.fullScreen }
 
     fun setPlayFullScreen(value : Boolean) {
         launch {
@@ -1459,13 +1430,11 @@ class ForkyzSettings(
         }
     }
 
-    val livePlayGridRatioPortrait : LiveData<GridRatio>
-        = settingsFlow.map {
-            it.gridRatio
-        }.distinctUntilChanged().asLiveData()
+    val livePlayGridRatioPortrait : Flow<GridRatio>
+        = settingsMap { it.gridRatio }
 
-    fun getPlayGridRatioPortrait(cb : Consumer<GridRatio>)
-        = livePlayGridRatioPortrait.observeOnce(cb)
+    fun getPlayGridRatioPortrait(cb : (GridRatio) -> Unit)
+        = settingsOnce(cb) { it.gridRatio }
 
     fun setPlayGridRatioPortrait(value : GridRatio) {
         launch {
@@ -1475,13 +1444,11 @@ class ForkyzSettings(
         }
     }
 
-    val livePlayGridRatioLandscape : LiveData<GridRatio>
-        = settingsFlow.map {
-            it.gridRatioLand
-        }.distinctUntilChanged().asLiveData()
+    val livePlayGridRatioLandscape : Flow<GridRatio>
+        = settingsMap { it.gridRatioLand }
 
-    fun getPlayGridRatioLandscape(cb : Consumer<GridRatio>)
-        = livePlayGridRatioLandscape.observeOnce(cb)
+    fun getPlayGridRatioLandscape(cb : (GridRatio) -> Unit)
+        = settingsOnce(cb) { it.gridRatioLand }
 
     fun setPlayGridRatioLandscape(value : GridRatio) {
         launch {
@@ -1491,13 +1458,11 @@ class ForkyzSettings(
         }
     }
 
-    val livePlayIndicateShowErrors : LiveData<Boolean>
-        = settingsFlow.map {
-            it.indicateShowErrors
-        }.distinctUntilChanged().asLiveData()
+    val livePlayIndicateShowErrors : Flow<Boolean>
+        = settingsMap { it.indicateShowErrors }
 
-    fun getPlayIndicateShowErrors(cb : Consumer<Boolean>)
-        = livePlayIndicateShowErrors.observeOnce(cb)
+    fun getPlayIndicateShowErrors(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.indicateShowErrors }
 
     fun setPlayIndicateShowErrors(value : Boolean) {
         launch {
@@ -1507,13 +1472,11 @@ class ForkyzSettings(
         }
     }
 
-    val livePlayInferSeparators : LiveData<Boolean>
-        = settingsFlow.map {
-            it.inferSeparators
-        }.distinctUntilChanged().asLiveData()
+    val livePlayInferSeparators : Flow<Boolean>
+        = settingsMap { it.inferSeparators }
 
-    fun getPlayInferSeparators(cb : Consumer<Boolean>)
-        = livePlayInferSeparators.observeOnce(cb)
+    fun getPlayInferSeparators(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.inferSeparators }
 
     fun setPlayInferSeparators(value : Boolean) {
         launch {
@@ -1523,13 +1486,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveKeyboardCompact : LiveData<Boolean>
-        = settingsFlow.map {
-            it.keyboardCompact
-        }.distinctUntilChanged().asLiveData()
+    val liveKeyboardCompact : Flow<Boolean>
+        = settingsMap { it.keyboardCompact }
 
-    fun getKeyboardCompact(cb : Consumer<Boolean>)
-        = liveKeyboardCompact.observeOnce(cb)
+    fun getKeyboardCompact(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.keyboardCompact }
 
     fun setKeyboardCompact(value : Boolean) {
         launch {
@@ -1539,13 +1500,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveKeyboardForceCaps : LiveData<Boolean>
-        = settingsFlow.map {
-            it.keyboardForceCaps
-        }.distinctUntilChanged().asLiveData()
+    val liveKeyboardForceCaps : Flow<Boolean>
+        = settingsMap { it.keyboardForceCaps }
 
-    fun getKeyboardForceCaps(cb : Consumer<Boolean>)
-        = liveKeyboardForceCaps.observeOnce(cb)
+    fun getKeyboardForceCaps(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.keyboardForceCaps }
 
     fun setKeyboardForceCaps(value : Boolean) {
         launch {
@@ -1555,13 +1514,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveKeyboardHaptic : LiveData<Boolean>
-        = settingsFlow.map {
-            it.keyboardHaptic
-        }.distinctUntilChanged().asLiveData()
+    val liveKeyboardHaptic : Flow<Boolean>
+        = settingsMap { it.keyboardHaptic }
 
-    fun getKeyboardHaptic(cb : Consumer<Boolean>)
-        = liveKeyboardHaptic.observeOnce(cb)
+    fun getKeyboardHaptic(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.keyboardHaptic }
 
     fun setKeyboardHaptic(value : Boolean) {
         launch {
@@ -1571,13 +1528,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveKeyboardHideButton : LiveData<Boolean>
-        = settingsFlow.map {
-            it.keyboardHideButton
-        }.distinctUntilChanged().asLiveData()
+    val liveKeyboardHideButton : Flow<Boolean>
+        = settingsMap { it.keyboardHideButton }
 
-    fun getKeyboardHideButton(cb : Consumer<Boolean>)
-        = liveKeyboardHideButton.observeOnce(cb)
+    fun getKeyboardHideButton(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.keyboardHideButton }
 
     fun setKeyboardHideButton(value : Boolean) {
         launch {
@@ -1587,13 +1542,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveKeyboardLayout : LiveData<KeyboardLayout>
-        = settingsFlow.map {
-            it.keyboardLayout
-        }.distinctUntilChanged().asLiveData()
+    val liveKeyboardLayout : Flow<KeyboardLayout>
+        = settingsMap { it.keyboardLayout }
 
-    fun getKeyboardLayout(cb : Consumer<KeyboardLayout>)
-        = liveKeyboardLayout.observeOnce(cb)
+    fun getKeyboardLayout(cb : (KeyboardLayout) -> Unit)
+        = settingsOnce(cb) { it.keyboardLayout }
 
     fun setKeyboardLayout(value : KeyboardLayout) {
         launch {
@@ -1603,13 +1556,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveKeyboardMode : LiveData<KeyboardMode>
-        = settingsFlow.map {
-            it.keyboardShowHide
-        }.distinctUntilChanged().asLiveData()
+    val liveKeyboardMode : Flow<KeyboardMode>
+        = settingsMap { it.keyboardShowHide }
 
-    fun getKeyboardMode(cb : Consumer<KeyboardMode>)
-        = liveKeyboardMode.observeOnce(cb)
+    fun getKeyboardMode(cb : (KeyboardMode) -> Unit)
+        = settingsOnce(cb) { it.keyboardShowHide }
 
     fun setKeyboardMode(value : KeyboardMode) {
         launch {
@@ -1619,13 +1570,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveKeyboardRepeatDelay : LiveData<Int>
-        = settingsFlow.map {
-            it.keyboardRepeatDelay
-        }.distinctUntilChanged().asLiveData()
+    val liveKeyboardRepeatDelay : Flow<Int>
+        = settingsMap { it.keyboardRepeatDelay }
 
-    fun getKeyboardRepeatDelay(cb : Consumer<Int>)
-        = liveKeyboardRepeatDelay.observeOnce(cb)
+    fun getKeyboardRepeatDelay(cb : (Int) -> Unit)
+        = settingsOnce(cb) { it.keyboardRepeatDelay }
 
     fun setKeyboardRepeatDelay(value : Int) {
         launch {
@@ -1635,13 +1584,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveKeyboardRepeatInterval : LiveData<Int>
-        = settingsFlow.map {
-            it.keyboardRepeatInterval
-        }.distinctUntilChanged().asLiveData()
+    val liveKeyboardRepeatInterval : Flow<Int>
+        = settingsMap { it.keyboardRepeatInterval }
 
-    fun getKeyboardRepeatInterval(cb : Consumer<Int>)
-        = liveKeyboardRepeatInterval.observeOnce(cb)
+    fun getKeyboardRepeatInterval(cb : (Int) -> Unit)
+        = settingsOnce(cb) { it.keyboardRepeatInterval }
 
     fun setKeyboardRepeatInterval(value : Int) {
         launch {
@@ -1651,31 +1598,17 @@ class ForkyzSettings(
         }
     }
 
-    val liveKeyboardSettings : LiveData<KeyboardSettings>
-        = settingsFlow.map {
-            KeyboardSettings(
-                it.keyboardCompact,
-                it.keyboardForceCaps,
-                it.keyboardHaptic,
-                it.keyboardHideButton,
-                it.keyboardLayout,
-                it.keyboardShowHide,
-                it.keyboardRepeatDelay,
-                it.keyboardRepeatInterval,
-                it.useNativeKeyboard,
-            )
-        }.distinctUntilChanged().asLiveData()
+    val liveKeyboardSettings : Flow<KeyboardSettings>
+        = settingsMap(this::makeKeyboardSettings)
 
-    fun getKeyboardSettings(cb : Consumer<KeyboardSettings>)
-        = liveKeyboardSettings.observeOnce(cb)
+    fun getKeyboardSettings(cb : (KeyboardSettings) -> Unit)
+        = settingsOnce(cb, this::makeKeyboardSettings)
 
-    val liveKeyboardUseNative : LiveData<Boolean>
-        = settingsFlow.map {
-            it.useNativeKeyboard
-        }.distinctUntilChanged().asLiveData()
+    val liveKeyboardUseNative : Flow<Boolean>
+        = settingsMap { it.useNativeKeyboard }
 
-    fun getKeyboardUseNative(cb : Consumer<Boolean>)
-        = liveKeyboardUseNative.observeOnce(cb)
+    fun getKeyboardUseNative(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.useNativeKeyboard }
 
     fun setKeyboardUseNative(value : Boolean) {
         launch {
@@ -1685,13 +1618,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveBrowseLastSeenVersion : LiveData<String>
-        = settingsFlow.map {
-            it.lastSeenVersion
-        }.distinctUntilChanged().asLiveData()
+    val liveBrowseLastSeenVersion : Flow<String>
+        = settingsMap { it.lastSeenVersion }
 
-    fun getBrowseLastSeenVersion(cb : Consumer<String>)
-        = liveBrowseLastSeenVersion.observeOnce(cb)
+    fun getBrowseLastSeenVersion(cb : (String) -> Unit)
+        = settingsOnce(cb) { it.lastSeenVersion }
 
     fun setBrowseLastSeenVersion(value : String) {
         launch {
@@ -1701,24 +1632,17 @@ class ForkyzSettings(
         }
     }
 
-    val livePlayMovementStrategy : LiveData<MovementStrategy>
-        = settingsFlow.map { settings ->
-            getFullMovementStrategy(
-                settings.movementStrategy,
-                settings.cycleUnfilledMode,
-            )
-        }.distinctUntilChanged().asLiveData()
+    val livePlayMovementStrategy : Flow<MovementStrategy>
+        = settingsMap(this::makePlayMovementStrategy)
 
-    fun getPlayMovementStrategy(cb : Consumer<MovementStrategy>)
-        = livePlayMovementStrategy.observeOnce(cb)
+    fun getPlayMovementStrategy(cb : (MovementStrategy) -> Unit)
+        = settingsOnce(cb, this::makePlayMovementStrategy)
 
-    val livePlayMovementStrategySetting : LiveData<MovementStrategySetting>
-        = settingsFlow.map {
-            it.movementStrategy
-        }.distinctUntilChanged().asLiveData()
+    val livePlayMovementStrategySetting : Flow<MovementStrategySetting>
+        = settingsMap { it.movementStrategy }
 
-    fun getPlayMovementStrategySetting(cb : Consumer<MovementStrategySetting>)
-        = livePlayMovementStrategySetting.observeOnce(cb)
+    fun getPlayMovementStrategySetting(cb : (MovementStrategySetting) -> Unit)
+        = settingsOnce(cb) { it.movementStrategy }
 
     fun setPlayMovementStrategySetting(value : MovementStrategySetting) {
         launch {
@@ -1728,35 +1652,23 @@ class ForkyzSettings(
         }
     }
 
-    val livePlayStopOnEndStrategy : LiveData<MovementStrategy>
-        = settingsFlow.map { settings ->
-            getFullMovementStrategy(
-                MovementStrategySetting.MSS_STOP_ON_END,
-                settings.cycleUnfilledMode,
-            )
-        }.distinctUntilChanged().asLiveData()
+    val livePlayStopOnEndStrategy : Flow<MovementStrategy>
+        = settingsMap(this::makeStopOnEndStrategy)
 
-    val livePlayMovementStrategyClueList : LiveData<MovementStrategy>
-        = settingsFlow.map { settings ->
-            getFullMovementStrategy(
-                coerceMovementStrategyClueList(
-                    settings.movementStrategyClueList
-                ),
-                settings.cycleUnfilledMode,
-            )
-        }.distinctUntilChanged().asLiveData()
+    val livePlayMovementStrategyClueList : Flow<MovementStrategy>
+        = settingsMap(this::makeMovementStrategyClueList)
 
-    fun getPlayMovementStrategyClueList(cb : Consumer<MovementStrategy>)
-        = livePlayMovementStrategyClueList.observeOnce(cb)
+    fun getPlayMovementStrategyClueList(cb : (MovementStrategy) -> Unit)
+        = settingsOnce(cb, this::makeMovementStrategyClueList)
 
     val livePlayMovementStrategyClueListSetting
-        : LiveData<MovementStrategySetting> = settingsFlow.map {
-            coerceMovementStrategyClueList(it.movementStrategyClueList)
-        }.distinctUntilChanged().asLiveData()
+        : Flow<MovementStrategySetting> = settingsMap(
+            this::makeMovementStrategyClueListSetting,
+        )
 
     fun getPlayMovementStrategyClueListSetting(
-        cb : Consumer<MovementStrategySetting>
-    ) = livePlayMovementStrategyClueListSetting.observeOnce(cb)
+        cb : (MovementStrategySetting) -> Unit
+    ) = settingsOnce(cb, this::makeMovementStrategyClueListSetting)
 
     fun setPlayMovementStrategyClueListSetting(
         value : MovementStrategySetting,
@@ -1770,13 +1682,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveAppOrientationLock : LiveData<Orientation>
-        = settingsFlow.map {
-            it.orientationLock
-        }.distinctUntilChanged().asLiveData()
+    val liveAppOrientationLock : Flow<Orientation>
+        = settingsMap { it.orientationLock }
 
-    fun getAppOrientationLock(cb : Consumer<Orientation>)
-        = liveAppOrientationLock.observeOnce(cb)
+    fun getAppOrientationLock(cb : (Orientation) -> Unit)
+        = settingsOnce(cb) { it.orientationLock }
 
     fun setAppOrientationLock(value : Orientation) {
         launch {
@@ -1786,13 +1696,11 @@ class ForkyzSettings(
         }
     }
 
-    val livePlayPlayLetterUndoEnabled : LiveData<Boolean>
-        = settingsFlow.map {
-            it.playLetterUndoEnabled
-        }.distinctUntilChanged().asLiveData()
+    val livePlayPlayLetterUndoEnabled : Flow<Boolean>
+        = settingsMap { it.playLetterUndoEnabled }
 
-    fun getPlayPlayLetterUndoEnabled(cb : Consumer<Boolean>)
-        = livePlayPlayLetterUndoEnabled.observeOnce(cb)
+    fun getPlayPlayLetterUndoEnabled(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.playLetterUndoEnabled }
 
     fun setPlayPlayLetterUndoEnabled(value : Boolean) {
         launch {
@@ -1802,13 +1710,11 @@ class ForkyzSettings(
         }
     }
 
-    val livePlayPredictAnagramChars : LiveData<Boolean>
-        = settingsFlow.map {
-            it.predictAnagramChars
-        }.distinctUntilChanged().asLiveData()
+    val livePlayPredictAnagramChars : Flow<Boolean>
+        = settingsMap { it.predictAnagramChars }
 
-    fun getPlayPredictAnagramChars(cb : Consumer<Boolean>)
-        = livePlayPredictAnagramChars.observeOnce(cb)
+    fun getPlayPredictAnagramChars(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.predictAnagramChars }
 
     fun setPlayPredictAnagramChars(value : Boolean) {
         launch {
@@ -1818,13 +1724,11 @@ class ForkyzSettings(
         }
     }
 
-    val livePlayPreserveCorrectLettersInShowErrors : LiveData<Boolean>
-        = settingsFlow.map {
-            it.preserveCorrectLettersInShowErrors
-        }.distinctUntilChanged().asLiveData()
+    val livePlayPreserveCorrectLettersInShowErrors : Flow<Boolean>
+        = settingsMap { it.preserveCorrectLettersInShowErrors }
 
-    fun getPlayPreserveCorrectLettersInShowErrors(cb : Consumer<Boolean>)
-        = livePlayPreserveCorrectLettersInShowErrors.observeOnce(cb)
+    fun getPlayPreserveCorrectLettersInShowErrors(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.preserveCorrectLettersInShowErrors }
 
     fun setPlayPreserveCorrectLettersInShowErrors(value : Boolean) {
         launch {
@@ -1836,13 +1740,11 @@ class ForkyzSettings(
         }
     }
 
-    val livePlayRandomClueOnShake : LiveData<Boolean>
-        = settingsFlow.map {
-            it.randomClueOnShake
-        }.distinctUntilChanged().asLiveData()
+    val livePlayRandomClueOnShake : Flow<Boolean>
+        = settingsMap { it.randomClueOnShake }
 
-    fun getPlayRandomClueOnShake(cb : Consumer<Boolean>)
-        = livePlayRandomClueOnShake.observeOnce(cb)
+    fun getPlayRandomClueOnShake(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.randomClueOnShake }
 
     fun setPlayRandomClueOnShake(value : Boolean) {
         launch {
@@ -1852,10 +1754,11 @@ class ForkyzSettings(
         }
     }
 
-    val livePlaySpecialEntryForceCaps : LiveData<Boolean>
-        = settingsFlow.map {
-            it.specialEntryForceCaps
-        }.distinctUntilChanged().asLiveData()
+    val livePlaySpecialEntryForceCaps : Flow<Boolean>
+        = settingsMap { it.specialEntryForceCaps }
+
+    fun getPlaySpecialEntryForceCaps(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.specialEntryForceCaps }
 
     fun setPlaySpecialEntryForceCaps(value : Boolean) {
         launch {
@@ -1865,74 +1768,57 @@ class ForkyzSettings(
         }
     }
 
-    val liveFileHandlerSafArchive : LiveData<String>
-        = settingsFlow.map {
-            it.safArchiveFolderUri
-        }.distinctUntilChanged().asLiveData()
+    val liveFileHandlerSafArchive : Flow<String>
+        = settingsMap { it.safArchiveFolderUri }
 
-    fun getFileHandlerSafArchive(cb : Consumer<String>)
-        = liveFileHandlerSafArchive.observeOnce(cb)
+    fun getFileHandlerSafArchive(cb : (String) -> Unit)
+        = settingsOnce(cb) { it.safArchiveFolderUri }
 
-    val liveFileHandlerSafCrosswords : LiveData<String>
-        = settingsFlow.map {
-            it.safCrosswordsFolderUri
-        }.distinctUntilChanged().asLiveData()
+    val liveFileHandlerSafCrosswords : Flow<String>
+        = settingsMap { it.safCrosswordsFolderUri }
 
-    fun getFileHandlerSafCrosswords(cb : Consumer<String>)
-        = liveFileHandlerSafCrosswords.observeOnce(cb)
+    fun getFileHandlerSafCrosswords(cb : (String) -> Unit)
+        = settingsOnce(cb) { it.safCrosswordsFolderUri }
 
-    val liveFileHandlerSafRoot : LiveData<String>
-        = settingsFlow.map {
-            it.safRootUri
-        }.distinctUntilChanged().asLiveData()
+    val liveFileHandlerSafRoot : Flow<String>
+        = settingsMap { it.safRootUri }
 
-    fun getFileHandlerSafRoot(cb : Consumer<String>)
-        = liveFileHandlerSafRoot.observeOnce(cb)
+    fun getFileHandlerSafRoot(cb : (String) -> Unit)
+        = settingsOnce(cb) { it.safRootUri }
 
-    val liveFileHandlerSafToImportDone : LiveData<String>
-        = settingsFlow.map {
-            it.safToImportDoneFolderUri
-        }.distinctUntilChanged().asLiveData()
+    val liveFileHandlerSafToImportDone : Flow<String>
+        = settingsMap { it.safToImportDoneFolderUri }
 
-    fun getFileHandlerSafToImportDone(cb : Consumer<String>)
-        = liveFileHandlerSafToImportDone.observeOnce(cb)
+    fun getFileHandlerSafToImportDone(cb : (String) -> Unit)
+        = settingsOnce(cb) { it.safToImportDoneFolderUri }
 
-    val liveFileHandlerSafToImportFailed : LiveData<String>
-        = settingsFlow.map {
-            it.safToImportFailedFolderUri
-        }.distinctUntilChanged().asLiveData()
+    val liveFileHandlerSafToImportFailed : Flow<String>
+        = settingsMap { it.safToImportFailedFolderUri }
 
-    fun getFileHandlerSafToImportFailed(cb : Consumer<String>)
-        = liveFileHandlerSafToImportFailed.observeOnce(cb)
+    fun getFileHandlerSafToImportFailed(cb : (String) -> Unit)
+        = settingsOnce(cb) { it.safToImportFailedFolderUri }
 
-    val liveFileHandlerSafToImport : LiveData<String>
-        = settingsFlow.map {
-            it.safToImportFolderUri
-        }.distinctUntilChanged().asLiveData()
+    val liveFileHandlerSafToImport : Flow<String>
+        = settingsMap { it.safToImportFolderUri }
 
-    fun getFileHandlerSafToImport(cb : Consumer<String>)
-        = liveFileHandlerSafToImport.observeOnce(cb)
+    fun getFileHandlerSafToImport(cb : (String) -> Unit)
+        = settingsOnce(cb) { it.safToImportFolderUri }
 
-    val livePlayRenderSettings : LiveData<RenderSettings>
-        = settingsFlow.map {
-            RenderSettings(
-                it.displayScratch,
-                it.suppressHints,
-                it.displaySeparators,
-                it.inferSeparators,
-            )
-        }.distinctUntilChanged().asLiveData()
+    val livePlayRenderSettings : Flow<RenderSettings>
+        = settingsMap(this::makeRenderSettings)
 
+    // Consumer for BoardEditViews.java
     fun getPlayRenderSettings(cb : Consumer<RenderSettings>)
-        = livePlayRenderSettings.observeOnce(cb)
+        = settingsOnce(
+            cb::accept,
+            this::makeRenderSettings,
+        )
 
-    val livePlayScale : LiveData<Float>
-        = settingsFlow.map {
-            it.scale
-        }.distinctUntilChanged().asLiveData()
+    val livePlayScale : Flow<Float>
+        = settingsMap { it.scale }
 
-    fun getPlayScale(cb : Consumer<Float>)
-        = livePlayScale.observeOnce(cb)
+    fun getPlayScale(cb : (Float) -> Unit)
+        = settingsOnce(cb) { it.scale }
 
     fun setPlayScale(value : Float) {
         if (0 <= value) {
@@ -1944,13 +1830,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveScrapeCru : LiveData<Boolean>
-        = settingsFlow.map {
-            it.scrapeCru
-        }.distinctUntilChanged().asLiveData()
+    val liveScrapeCru : Flow<Boolean>
+        = settingsMap { it.scrapeCru }
 
-    fun getScrapeCru(cb : Consumer<Boolean>)
-        = liveScrapeCru.observeOnce(cb)
+    fun getScrapeCru(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.scrapeCru }
 
     fun setScrapeCru(value : Boolean) {
         launch {
@@ -1960,13 +1844,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveScrapeGuardianQuick : LiveData<Boolean>
-        = settingsFlow.map {
-            it.scrapeGuardianQuick
-        }.distinctUntilChanged().asLiveData()
+    val liveScrapeGuardianQuick : Flow<Boolean>
+        = settingsMap { it.scrapeGuardianQuick }
 
-    fun getScrapeGuardianQuick(cb : Consumer<Boolean>)
-        = liveScrapeGuardianQuick.observeOnce(cb)
+    fun getScrapeGuardianQuick(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.scrapeGuardianQuick }
 
     fun setScrapeGuardianQuick(value : Boolean) {
         launch {
@@ -1976,13 +1858,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveScrapeKegler : LiveData<Boolean>
-        = settingsFlow.map {
-            it.scrapeKegler
-        }.distinctUntilChanged().asLiveData()
+    val liveScrapeKegler : Flow<Boolean>
+        = settingsMap { it.scrapeKegler }
 
-    fun getScrapeKegler(cb : Consumer<Boolean>)
-        = liveScrapeKegler.observeOnce(cb)
+    fun getScrapeKegler(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.scrapeKegler }
 
     fun setScrapeKegler(value : Boolean) {
         launch {
@@ -1992,13 +1872,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveScrapePrivateEye : LiveData<Boolean>
-        = settingsFlow.map {
-            it.scrapePrivateEye
-        }.distinctUntilChanged().asLiveData()
+    val liveScrapePrivateEye : Flow<Boolean>
+        = settingsMap { it.scrapePrivateEye }
 
-    fun getScrapePrivateEye(cb : Consumer<Boolean>)
-        = liveScrapePrivateEye.observeOnce(cb)
+    fun getScrapePrivateEye(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.scrapePrivateEye }
 
     fun setScrapePrivateEye(value : Boolean) {
         launch {
@@ -2008,13 +1886,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveScrapePrzekroj : LiveData<Boolean>
-        = settingsFlow.map {
-            it.scrapePrzekroj
-        }.distinctUntilChanged().asLiveData()
+    val liveScrapePrzekroj : Flow<Boolean>
+        = settingsMap { it.scrapePrzekroj }
 
-    fun getScrapePrzekroj(cb : Consumer<Boolean>)
-        = liveScrapePrzekroj.observeOnce(cb)
+    fun getScrapePrzekroj(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.scrapePrzekroj }
 
     fun setScrapePrzekroj(value : Boolean) {
         launch {
@@ -2024,13 +1900,15 @@ class ForkyzSettings(
         }
     }
 
-    val livePlayScratchMode : LiveData<Boolean>
-        = settingsFlow.map {
-            it.scratchMode
-        }.distinctUntilChanged().asLiveData()
+    val livePlayScratchMode : Flow<Boolean>
+        = settingsMap { it.scratchMode }
 
+    // Consumer for BoardEditView.java
     fun getPlayScratchMode(cb : Consumer<Boolean>)
-        = livePlayScratchMode.observeOnce(cb)
+        = settingsOnce(
+            cb::accept,
+            { it.scratchMode },
+        )
 
     fun setPlayScratchMode(value : Boolean) {
         launch {
@@ -2040,13 +1918,11 @@ class ForkyzSettings(
         }
     }
 
-    val livePlayShowClueTabs : LiveData<Boolean>
-        = settingsFlow.map {
-            it.showCluesOnPlayScreen
-        }.distinctUntilChanged().asLiveData()
+    val livePlayShowClueTabs : Flow<Boolean>
+        = settingsMap { it.showCluesOnPlayScreen }
 
-    fun getPlayShowClueTabs(cb : Consumer<Boolean>)
-        = livePlayShowClueTabs.observeOnce(cb)
+    fun getPlayShowClueTabs(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.showCluesOnPlayScreen }
 
     fun setPlayShowClueTabs(value : Boolean) {
         launch {
@@ -2056,13 +1932,11 @@ class ForkyzSettings(
         }
     }
 
-    val livePlayShowCount : LiveData<Boolean>
-        = settingsFlow.map {
-            it.showCount
-        }.distinctUntilChanged().asLiveData()
+    val livePlayShowCount : Flow<Boolean>
+        = settingsMap { it.showCount }
 
-    fun getPlayShowCount(cb : Consumer<Boolean>)
-        = livePlayShowCount.observeOnce(cb)
+    fun getPlayShowCount(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.showCount }
 
     fun setPlayShowCount(value : Boolean) {
         launch {
@@ -2072,13 +1946,11 @@ class ForkyzSettings(
         }
     }
 
-    val livePlayShowErrorsGrid : LiveData<Boolean>
-        = settingsFlow.map {
-            it.showErrors
-        }.distinctUntilChanged().asLiveData()
+    val livePlayShowErrorsGrid : Flow<Boolean>
+        = settingsMap { it.showErrors }
 
-    fun getPlayShowErrorsGrid(cb : Consumer<Boolean>)
-        = livePlayShowErrorsGrid.observeOnce(cb)
+    fun getPlayShowErrorsGrid(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.showErrors }
 
     fun setPlayShowErrorsGrid(value : Boolean) {
         launch {
@@ -2088,13 +1960,11 @@ class ForkyzSettings(
         }
     }
 
-    val livePlayShowErrorsClue : LiveData<Boolean>
-        = settingsFlow.map {
-            it.showErrorsClue
-        }.distinctUntilChanged().asLiveData()
+    val livePlayShowErrorsClue : Flow<Boolean>
+        = settingsMap { it.showErrorsClue }
 
-    fun getPlayShowErrorsClue(cb : Consumer<Boolean>)
-        = livePlayShowErrorsClue.observeOnce(cb)
+    fun getPlayShowErrorsClue(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.showErrorsClue }
 
     fun setPlayShowErrorsClue(value : Boolean) {
         launch {
@@ -2104,13 +1974,11 @@ class ForkyzSettings(
         }
     }
 
-    val livePlayShowErrorsCursor : LiveData<Boolean>
-        = settingsFlow.map {
-            it.showErrorsCursor
-        }.distinctUntilChanged().asLiveData()
+    val livePlayShowErrorsCursor : Flow<Boolean>
+        = settingsMap { it.showErrorsCursor }
 
-    fun getPlayShowErrorsCursor(cb : Consumer<Boolean>)
-        = livePlayShowErrorsCursor.observeOnce(cb)
+    fun getPlayShowErrorsCursor(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.showErrorsCursor }
 
     fun setPlayShowErrorsCursor(value : Boolean) {
         launch {
@@ -2120,13 +1988,11 @@ class ForkyzSettings(
         }
     }
 
-    val livePlayShowTimer : LiveData<Boolean>
-        = settingsFlow.map {
-            it.showTimer
-        }.distinctUntilChanged().asLiveData()
+    val livePlayShowTimer : Flow<Boolean>
+        = settingsMap { it.showTimer }
 
-    fun getPlayShowTimer(cb : Consumer<Boolean>)
-        = livePlayShowTimer.observeOnce(cb)
+    fun getPlayShowTimer(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.showTimer }
 
     fun setPlayShowTimer(value : Boolean) {
         launch {
@@ -2136,13 +2002,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveClueListShowWords : LiveData<Boolean>
-        = settingsFlow.map {
-            it.showWordsInClueList
-        }.distinctUntilChanged().asLiveData()
+    val liveClueListShowWords : Flow<Boolean>
+        = settingsMap { it.showWordsInClueList }
 
-    fun getClueListShowWords(cb : Consumer<Boolean>)
-        = liveClueListShowWords.observeOnce(cb)
+    fun getClueListShowWords(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.showWordsInClueList }
 
     fun setClueListShowWords(value : Boolean) {
         launch {
@@ -2152,13 +2016,15 @@ class ForkyzSettings(
         }
     }
 
-    val livePlaySkipFilled : LiveData<Boolean>
-        = settingsFlow.map {
-            it.skipFilled
-        }.distinctUntilChanged().asLiveData()
+    val livePlaySkipFilled : Flow<Boolean>
+        = settingsMap { it.skipFilled }
 
+    // Consumer for BoardEditText.java
     fun getPlaySkipFilled(cb : Consumer<Boolean>)
-        = livePlaySkipFilled.observeOnce(cb)
+        = settingsOnce(
+            cb::accept,
+            { it.skipFilled },
+        )
 
     fun setPlaySkipFilled(value : Boolean) {
         launch {
@@ -2168,21 +2034,14 @@ class ForkyzSettings(
         }
     }
 
-    val liveRatingsSettings : LiveData<RatingsSettings>
-        = settingsFlow.map {
-            RatingsSettings(
-                it.disableRatings,
-                it.browseAlwaysShowRating,
-            )
-        }.distinctUntilChanged().asLiveData()
+    val liveRatingsSettings : Flow<RatingsSettings>
+        = settingsMap(this::makeRatingSettings)
 
-    val liveClueListSnapToClue : LiveData<Boolean>
-        = settingsFlow.map {
-            it.snapClue
-        }.distinctUntilChanged().asLiveData()
+    val liveClueListSnapToClue : Flow<Boolean>
+        = settingsMap { it.snapClue }
 
-    fun getClueListSnapToClue(cb : Consumer<Boolean>)
-        = liveClueListSnapToClue.observeOnce(cb)
+    fun getClueListSnapToClue(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.snapClue }
 
     fun setClueListSnapToClue(value : Boolean) {
         launch {
@@ -2192,13 +2051,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveBrowseSort : LiveData<AccessorSetting>
-        = settingsFlow.map {
-            it.sort
-        }.distinctUntilChanged().asLiveData()
+    val liveBrowseSort : Flow<AccessorSetting>
+        = settingsMap { it.sort }
 
-    fun getBrowseSort(cb : Consumer<AccessorSetting>)
-        = liveBrowseSort.observeOnce(cb)
+    fun getBrowseSort(cb : (AccessorSetting) -> Unit)
+        = settingsOnce(cb) { it.sort }
 
     fun setBrowseSort(value : AccessorSetting) {
         launch {
@@ -2208,13 +2065,11 @@ class ForkyzSettings(
         }
     }
 
-    val livePlaySpaceChangesDirection : LiveData<Boolean>
-        = settingsFlow.map {
-            it.spaceChangesDirection
-        }.distinctUntilChanged().asLiveData()
+    val livePlaySpaceChangesDirection : Flow<Boolean>
+        = settingsMap { it.spaceChangesDirection }
 
-    fun getPlaySpaceChangesDirection(cb : Consumer<Boolean>)
-        = livePlaySpaceChangesDirection.observeOnce(cb)
+    fun getPlaySpaceChangesDirection(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.spaceChangesDirection }
 
     fun setPlaySpaceChangesDirection(value : Boolean) {
         launch {
@@ -2224,13 +2079,11 @@ class ForkyzSettings(
         }
     }
 
-    val livePlaySuppressHintHighlighting : LiveData<Boolean>
-        = settingsFlow.map {
-            it.suppressHints
-        }.distinctUntilChanged().asLiveData()
+    val livePlaySuppressHintHighlighting : Flow<Boolean>
+        = settingsMap { it.suppressHints }
 
-    fun getPlaySuppressHintHighlighting(cb : Consumer<Boolean>)
-        = livePlaySuppressHintHighlighting.observeOnce(cb)
+    fun getPlaySuppressHintHighlighting(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.suppressHints }
 
     fun setPlaySuppressHintHighlighting(value : Boolean) {
         launch {
@@ -2240,13 +2093,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveDownloadSuppressMessages : LiveData<Boolean>
-        = settingsFlow.map {
-            it.suppressMessages
-        }.distinctUntilChanged().asLiveData()
+    val liveDownloadSuppressMessages : Flow<Boolean>
+        = settingsMap { it.suppressMessages }
 
-    fun getDownloadSuppressIndividualNotifications(cb : Consumer<Boolean>)
-        = liveDownloadSuppressMessages.observeOnce(cb)
+    fun getDownloadSuppressIndividualNotifications(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.suppressMessages }
 
     fun setDownloadSuppressMessages(value : Boolean) {
         launch {
@@ -2256,13 +2107,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveDownloadSuppressSummaryMessages : LiveData<Boolean>
-        = settingsFlow.map {
-            it.suppressSummaryMessages
-        }.distinctUntilChanged().asLiveData()
+    val liveDownloadSuppressSummaryMessages : Flow<Boolean>
+        = settingsMap { it.suppressSummaryMessages }
 
-    fun getDownloadSuppressSummaryMessages(cb : Consumer<Boolean>)
-        = liveDownloadSuppressSummaryMessages.observeOnce(cb)
+    fun getDownloadSuppressSummaryMessages(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.suppressSummaryMessages }
 
     fun setDownloadSuppressSummaryMessages(value : Boolean) {
         launch {
@@ -2277,13 +2126,11 @@ class ForkyzSettings(
         setDownloadSuppressSummaryMessages(true)
     }
 
-    val liveBrowseSwipeAction : LiveData<BrowseSwipeAction>
-        = settingsFlow.map {
-            it.swipeAction
-        }.distinctUntilChanged().asLiveData()
+    val liveBrowseSwipeAction : Flow<BrowseSwipeAction>
+        = settingsMap { it.swipeAction }
 
-    fun getBrowseSwipeAction(cb : Consumer<BrowseSwipeAction>)
-        = liveBrowseSwipeAction.observeOnce(cb)
+    fun getBrowseSwipeAction(cb : (BrowseSwipeAction) -> Unit)
+        = settingsOnce(cb) { it.swipeAction }
 
     fun setBrowseSwipeAction(value : BrowseSwipeAction) {
         launch {
@@ -2293,13 +2140,11 @@ class ForkyzSettings(
         }
     }
 
-    val livePlayToggleBeforeMove : LiveData<Boolean>
-        = settingsFlow.map {
-            it.toggleBeforeMove
-        }.distinctUntilChanged().asLiveData()
+    val livePlayToggleBeforeMove : Flow<Boolean>
+        = settingsMap { it.toggleBeforeMove }
 
-    fun getPlayToggleBeforeMove(cb : Consumer<Boolean>)
-        = livePlayToggleBeforeMove.observeOnce(cb)
+    fun getPlayToggleBeforeMove(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.toggleBeforeMove }
 
     fun setPlayToggleBeforeMove(value : Boolean) {
         launch {
@@ -2309,18 +2154,17 @@ class ForkyzSettings(
         }
     }
 
-    val liveAppDayNightMode : LiveData<DayNightMode>
-        = settingsFlow.map {
-            it.uiTheme
-        }.distinctUntilChanged().asLiveData()
+    val liveAppDayNightMode : Flow<DayNightMode>
+        = settingsMap { it.uiTheme }
 
+    // consumer for NightModeHelper.java
     fun getAppDayNightMode(cb : Consumer<DayNightMode>)
-        = liveAppDayNightMode.observeOnce(cb)
+        = settingsOnce(
+            cb::accept,
+            { it.uiTheme },
+        )
 
-    fun getAppDayNightModeSync() : DayNightMode
-        = runBlocking { settingsFlow.first().uiTheme }
-
-    fun setAppDayNightMode(value : DayNightMode, cb : Runnable? = null) {
+    fun setAppDayNightMode(value : DayNightMode, cb : (() -> Unit)? = null) {
         launch {
             settingsStore.updateData { settings ->
                 settings.toBuilder().setUiTheme(value).build()
@@ -2338,13 +2182,11 @@ class ForkyzSettings(
         }
     }
 
-    val liveVoiceVolumeActivatesVoice : LiveData<Boolean>
-        = settingsFlow.map {
-            it.volumeActivatesVoice
-        }.distinctUntilChanged().asLiveData()
+    val liveVoiceVolumeActivatesVoice : Flow<Boolean>
+        = settingsMap { it.volumeActivatesVoice }
 
-    fun getVoiceVolumeActivatesVoice(cb : Consumer<Boolean>)
-        = liveVoiceVolumeActivatesVoice.observeOnce(cb)
+    fun getVoiceVolumeActivatesVoice(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.volumeActivatesVoice }
 
     fun setVoiceVolumeActivatesVoice(value : Boolean) {
         launch {
@@ -2394,32 +2236,8 @@ class ForkyzSettings(
         }
     }
 
-    fun migrateAutoDownloaders(downloaders : Downloaders) {
-        // TODO
-    }
-
-    fun migrateThemePreferences() {
-        // TODO
-    }
-
-    fun migrateDontDeleteCrossing() {
-        // TODO
-    }
-
-    fun migrateCycleUnfilled() {
-        // TODO
-    }
-
-    fun migrateFitToScreen() {
-        // TODO
-    }
-
-    fun migrateLegacyBackgroundDownloads(cb : Consumer<Boolean>) {
-        // TODO
-    }
-
-    private fun runMain(runnable : Runnable?) {
-        runnable?.let { mainScope.launch { it.run() } }
+    private fun runMain(run : (() -> Unit)?) {
+        run?.let { mainScope.launch { it() } }
     }
 
     private fun addListToJSON(

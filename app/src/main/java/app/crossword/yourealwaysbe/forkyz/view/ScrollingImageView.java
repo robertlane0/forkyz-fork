@@ -95,6 +95,9 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
                         imageView.setImageBitmap(tile.getBitmap());
                 }
             }
+        } else {
+            // clear bitmap
+            presetImageSize(bitmap);
         }
     }
 

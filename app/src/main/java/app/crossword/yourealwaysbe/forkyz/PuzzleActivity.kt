@@ -47,7 +47,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -69,8 +68,6 @@ import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -88,6 +85,7 @@ import app.crossword.yourealwaysbe.forkyz.menu.MenuSettings
 import app.crossword.yourealwaysbe.forkyz.menu.MenuSubEntry
 import app.crossword.yourealwaysbe.forkyz.menu.MenuText
 import app.crossword.yourealwaysbe.forkyz.settings.KeyboardLayout
+import app.crossword.yourealwaysbe.forkyz.settings.RenderSettings
 import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer
 import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
 import app.crossword.yourealwaysbe.forkyz.util.SpeechContract
@@ -106,13 +104,13 @@ import app.crossword.yourealwaysbe.forkyz.view.StringDialog
 import app.crossword.yourealwaysbe.forkyz.view.TwoButtonDialog
 import app.crossword.yourealwaysbe.puz.Clue
 import app.crossword.yourealwaysbe.puz.ClueID
+import app.crossword.yourealwaysbe.puz.MovementStrategy
 import app.crossword.yourealwaysbe.puz.Playboard
 import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges
 import app.crossword.yourealwaysbe.puz.Playboard.Word
 import app.crossword.yourealwaysbe.puz.Position
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.Zone
-import app.crossword.yourealwaysbe.puz.MovementStrategy
 
 @AndroidEntryPoint
 abstract class PuzzleActivity() : ForkyzActivity() {
@@ -228,6 +226,7 @@ abstract class PuzzleActivity() : ForkyzActivity() {
      * suppressNotesList or let BoardWordEditView use its default
      * @param suppressNotesList for PlayboardRenderer.drawBox
      * @param movementStrategy the movement strategy to use for the miniboard
+     * @param renderSettings settings for renderer
      */
     @Composable
     protected fun Miniboard(
@@ -237,11 +236,12 @@ abstract class PuzzleActivity() : ForkyzActivity() {
         onLongClick : (Position?) -> Unit,
         longClickAccessibilityAction : Int,
         incognitoMode : Boolean = false,
-        ignoreScratchMode : Boolean = false,
+        scratchMode : Boolean = false,
         useSuppressNotesList : Boolean = false,
         suppressNotesList : Set<String>? = null,
         onFocusChanged : (Boolean) -> Unit = { },
         movementStrategy : MovementStrategy = MovementStrategy.STOP_ON_END,
+        renderSettings : RenderSettings = RenderSettings(),
     ) {
         viewModel.getBoard()?.let { board ->
             BoardWordEdit(
@@ -255,11 +255,12 @@ abstract class PuzzleActivity() : ForkyzActivity() {
                     = stringResource(longClickAccessibilityAction),
                 inputConnectionMediator = inputConnectionMediator,
                 incognitoMode = incognitoMode,
-                ignoreScratchMode = ignoreScratchMode,
+                scratchMode = scratchMode,
                 useSuppressNotesList = useSuppressNotesList,
                 suppressNotesList = suppressNotesList,
                 onFocusChanged = onFocusChanged,
                 movementStrategy = movementStrategy,
+                renderSettings = renderSettings,
             )
         }
     }
@@ -271,11 +272,10 @@ abstract class PuzzleActivity() : ForkyzActivity() {
      */
     @Composable
     protected fun OnTimerUpdate(onTimerUpdate : () -> Unit) {
-        val state by viewModel.uiState.observeAsState()
-        val showTimer = state?.showTimer ?: false
-        LaunchedEffect(showTimer) {
+        val state by viewModel.uiState.collectAsStateWithLifecycle()
+        LaunchedEffect(state.showTimer) {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                while (showTimer) {
+                while (state.showTimer) {
                     delay(1000L)
                     onTimerUpdate()
                 }
@@ -285,7 +285,7 @@ abstract class PuzzleActivity() : ForkyzActivity() {
 
     @Composable
     protected fun Modifier.puzzleStatusBarColor() : Modifier {
-        val state by viewModel.menuState.observeAsState()
+        val state by viewModel.menuState.collectAsStateWithLifecycle()
 
         // always return same padding
         // not returning status bar padding means the app freezes if
@@ -293,7 +293,7 @@ abstract class PuzzleActivity() : ForkyzActivity() {
         // potentially just a material bug that might be fixed in
         // future
 
-        val color = if (state?.showErrorsState?.isShowing ?: false)
+        val color = if (state.showErrorsState.isShowing)
             themeHelper.cheatedColor
         else
             themeHelper.statusBarColor
@@ -427,7 +427,8 @@ abstract class PuzzleActivity() : ForkyzActivity() {
      */
     @Composable
     protected open fun Launchers() {
-        val announcement by viewModel.announceEvent.observeAsState()
+        val announcement
+            by viewModel.announceEvent.collectAsStateWithLifecycle()
         val view = LocalView.current
         LaunchedEffect(announcement) {
             announcement?.let { data ->
@@ -435,14 +436,16 @@ abstract class PuzzleActivity() : ForkyzActivity() {
                 viewModel.clearAnnounceEvent()
             }
         }
-        val internalTool by viewModel.internalToolEvent.observeAsState()
+        val internalTool
+            by viewModel.internalToolEvent.collectAsStateWithLifecycle()
         LaunchedEffect(internalTool) {
             internalTool?.let { tool ->
                 tool.accept(InternalToolLauncher(this@PuzzleActivity))
                 viewModel.clearInternalToolEvent()
             }
         }
-        val externalTool by viewModel.externalToolEvent.observeAsState()
+        val externalTool
+            by viewModel.externalToolEvent.collectAsStateWithLifecycle()
         LaunchedEffect(externalTool) {
             externalTool?.let { tool ->
                 viewModel.clearExternalToolEvent()
@@ -453,7 +456,7 @@ abstract class PuzzleActivity() : ForkyzActivity() {
                 }
             }
         }
-        val sendToast by viewModel.sendToastEvent.observeAsState()
+        val sendToast by viewModel.sendToastEvent.collectAsStateWithLifecycle()
         LaunchedEffect(sendToast) {
             sendToast?.let { data ->
                 Toast.makeText(
@@ -464,25 +467,27 @@ abstract class PuzzleActivity() : ForkyzActivity() {
                 viewModel.clearSendToast()
             }
         }
-        val backEvent by viewModel.backEvent.observeAsState()
+        val backEvent by viewModel.backEvent.collectAsStateWithLifecycle()
         LaunchedEffect(backEvent) {
-            if (backEvent ?: false) {
+            if (backEvent) {
                 doBackAction()
                 viewModel.clearBackEvent()
             }
         }
-        viewModel.keyboardState.observe(this) { state ->
-            backCallback.isEnabled = state.hideOnBack
+        val keyboardState
+            by viewModel.keyboardState.collectAsStateWithLifecycle()
+        LaunchedEffect(keyboardState.hideOnBack) {
+            backCallback.isEnabled = keyboardState.hideOnBack
         }
     }
 
     @Composable
     @OptIn(ExperimentalMaterial3Api::class)
     protected fun VoiceButtons() {
-        val state by viewModel.voiceState.observeAsState()
+        val state by viewModel.voiceState.collectAsStateWithLifecycle()
 
-        val showVoiceButton = state?.showVoiceButton ?: false
-        val showAnnounceButton = state?.showAnnounceButton ?: false
+        val showVoiceButton = state.showVoiceButton
+        val showAnnounceButton = state.showAnnounceButton
 
         if (showVoiceButton || showAnnounceButton) {
             Row(
@@ -530,14 +535,12 @@ abstract class PuzzleActivity() : ForkyzActivity() {
         onSpecialKeyDown : (SpecialKey) -> Unit = { },
         onSpecialKeyUp : (SpecialKey) -> Unit = { },
     ) {
-        val state by viewModel.keyboardState.observeAsState()
+        val state by viewModel.keyboardState.collectAsStateWithLifecycle()
 
-        LaunchedEffect(state?.needsRefresh) {
-            if (state?.needsRefresh ?: false) {
-                if (state?.visibility == KeyboardVisibility.NATIVE) {
-                    inputConnectionMediator.showNative(
-                        state?.forceCaps ?: false
-                    )
+        LaunchedEffect(state.needsRefresh) {
+            if (state.needsRefresh) {
+                if (state.visibility == KeyboardVisibility.NATIVE) {
+                    inputConnectionMediator.showNative(state.forceCaps)
                 } else {
                     inputConnectionMediator.hideNative()
                 }
@@ -548,7 +551,7 @@ abstract class PuzzleActivity() : ForkyzActivity() {
             }
         }
 
-        if (state?.visibility == KeyboardVisibility.FORKYZ) {
+        if (state.visibility == KeyboardVisibility.FORKYZ) {
             ForkyzKeyboard(
                 modifier = Modifier.fillMaxWidth()
                     .background(MaterialTheme.colorScheme.surface),
@@ -557,13 +560,13 @@ abstract class PuzzleActivity() : ForkyzActivity() {
                 onHideClick = { viewModel.hideKeyboard(true) },
                 onSpecialKeyDown = onSpecialKeyDown,
                 onSpecialKeyUp = onSpecialKeyUp,
-                compact = state?.compact ?: false,
-                hapticFeedback = state?.hapticFeedback ?: false,
-                showHideButton = state?.showHideButton ?: false,
+                compact = state.compact,
+                hapticFeedback = state.hapticFeedback,
+                showHideButton = state.showHideButton,
                 showSpecialKeys = showSpecialKeys,
-                layout = state?.layout ?: KeyboardLayout.KL_QWERTY,
-                repeatDelay = state?.repeatDelay ?: 300,
-                repeatInterval = state?.repeatInterval ?: 75,
+                layout = state.layout,
+                repeatDelay = state.repeatDelay,
+                repeatInterval = state.repeatInterval,
             )
         }
     }
@@ -592,19 +595,17 @@ abstract class PuzzleActivity() : ForkyzActivity() {
             )
         }
 
-        val state by viewModel.uiState.observeAsState()
-        state?.showDialog?.let {
-            when (it) {
-                PuzzleDialog.REVEAL_ALL -> {
-                    OKCancelDialog(
-                        title = R.string.reveal_puzzle,
-                        summary = R.string.are_you_sure,
-                        onCancel = viewModel::clearRevealDialog,
-                        onOK = viewModel::confirmRevealPuzzle,
-                    )
-                }
-                else -> { /* show nothing */ }
+        val state by viewModel.uiState.collectAsStateWithLifecycle()
+        when (state.showDialog) {
+            PuzzleDialog.REVEAL_ALL -> {
+                OKCancelDialog(
+                    title = R.string.reveal_puzzle,
+                    summary = R.string.are_you_sure,
+                    onCancel = viewModel::clearRevealDialog,
+                    onOK = viewModel::confirmRevealPuzzle,
+                )
             }
+            else -> { /* show nothing */ }
         }
 
         val flagClueDialogState by viewModel
@@ -732,11 +733,11 @@ abstract class PuzzleActivity() : ForkyzActivity() {
 
     @Composable
     protected fun MenuNotesSub() {
-        val state by viewModel.menuState.observeAsState()
+        val state by viewModel.menuState.collectAsStateWithLifecycle()
 
         DropdownMenu(
             modifier = BaseMenuModifier,
-            expanded = state?.expanded == PuzzleSubMenu.NOTES,
+            expanded = state.expanded == PuzzleSubMenu.NOTES,
             onDismissRequest = viewModel::dismissMenu,
         ) {
             MenuDropdownHeading(
@@ -782,9 +783,9 @@ abstract class PuzzleActivity() : ForkyzActivity() {
 
     @Composable
     protected fun MenuScratchMode() {
-        val state by viewModel.menuState.observeAsState()
+        val state by viewModel.menuState.collectAsStateWithLifecycle()
         MenuCheckedItem(
-            checked = state?.isScratchMode ?: false,
+            checked = state.isScratchMode,
             text = { MenuText(stringResource(R.string.scratch_mode)) },
             onClick = {
                 viewModel.toggleScratchMode()
@@ -806,13 +807,13 @@ abstract class PuzzleActivity() : ForkyzActivity() {
 
     @Composable
     protected fun MenuShowErrors() {
-        val state by viewModel.menuState.observeAsState()
-        if (!(state?.showErrorsState?.enabled ?: false))
+        val state by viewModel.menuState.collectAsStateWithLifecycle()
+        if (!state.showErrorsState.enabled)
             return
 
         MenuSubEntry(
             text = {
-                if (state?.showErrorsState?.isShowing ?: false)
+                if (state.showErrorsState.isShowing)
                     MenuText(stringResource(R.string.showing_errors))
                 else
                     MenuText(stringResource(R.string.show_errors))
@@ -823,13 +824,13 @@ abstract class PuzzleActivity() : ForkyzActivity() {
 
     @Composable
     protected fun MenuShowErrorsSub() {
-        val state by viewModel.menuState.observeAsState()
-        if (!(state?.showErrorsState?.enabled ?: false))
+        val state by viewModel.menuState.collectAsStateWithLifecycle()
+        if (!state.showErrorsState.enabled)
             return
 
         DropdownMenu(
             modifier = BaseMenuModifier,
-            expanded = state?.expanded == PuzzleSubMenu.SHOW_ERRORS,
+            expanded = state.expanded == PuzzleSubMenu.SHOW_ERRORS,
             onDismissRequest = viewModel::dismissMenu,
         ) {
             MenuDropdownHeading(
@@ -837,8 +838,7 @@ abstract class PuzzleActivity() : ForkyzActivity() {
                 onClick = viewModel::closeMenu,
             )
             MenuCheckedItem(
-                checked
-                    = state?.showErrorsState?.isShowingErrorsCursor ?: false,
+                checked = state.showErrorsState.isShowingErrorsCursor,
                 text = {
                     MenuText(stringResource(R.string.show_errors_cursor))
                 },
@@ -848,7 +848,7 @@ abstract class PuzzleActivity() : ForkyzActivity() {
                 }
             )
             MenuCheckedItem(
-                checked = state?.showErrorsState?.isShowingErrorsClue ?: false,
+                checked = state.showErrorsState.isShowingErrorsClue,
                 text = { MenuText(stringResource(R.string.show_errors_clue)) },
                 onClick = {
                     viewModel.toggleShowErrorsClue()
@@ -856,7 +856,7 @@ abstract class PuzzleActivity() : ForkyzActivity() {
                 }
             )
             MenuCheckedItem(
-                checked = state?.showErrorsState?.isShowingErrorsGrid ?: false,
+                checked = state.showErrorsState.isShowingErrorsGrid,
                 text = {
                     MenuText(stringResource(R.string.show_errors_full_grid))
                 },
@@ -870,8 +870,8 @@ abstract class PuzzleActivity() : ForkyzActivity() {
 
     @Composable
     protected fun MenuReveal() {
-        val state by viewModel.menuState.observeAsState()
-        if (!(state?.canReveal ?: false))
+        val state by viewModel.menuState.collectAsStateWithLifecycle()
+        if (!state.canReveal)
             return
 
         MenuSubEntry(
@@ -882,20 +882,20 @@ abstract class PuzzleActivity() : ForkyzActivity() {
 
     @Composable
     protected fun MenuRevealSub() {
-        val state by viewModel.menuState.observeAsState()
-        if (!(state?.canReveal ?: false))
+        val state by viewModel.menuState.collectAsStateWithLifecycle()
+        if (!state.canReveal)
             return
 
         DropdownMenu(
             modifier = BaseMenuModifier,
-            expanded = state?.expanded == PuzzleSubMenu.REVEAL,
+            expanded = state.expanded == PuzzleSubMenu.REVEAL,
             onDismissRequest = viewModel::dismissMenu,
         ) {
             MenuDropdownHeading(
                 R.string.reveal,
                 onClick = viewModel::closeMenu,
             )
-            if (state?.canRevealInitialBoxLetter ?: false) {
+            if (state.canRevealInitialBoxLetter) {
                 DropdownMenuItem(
                     text = {
                         MenuText(stringResource(R.string.initial_letter))
@@ -920,7 +920,7 @@ abstract class PuzzleActivity() : ForkyzActivity() {
                     viewModel.dismissMenu()
                 },
             )
-            if (state?.canRevealInitialLetters ?: false) {
+            if (state.canRevealInitialLetters) {
                 DropdownMenuItem(
                     text = {
                         MenuText(stringResource(R.string.initial_letters))
@@ -964,11 +964,11 @@ abstract class PuzzleActivity() : ForkyzActivity() {
         onZoomFit : () -> Unit,
         onZoomReset : () -> Unit,
     ) {
-        val state by viewModel.menuState.observeAsState()
+        val state by viewModel.menuState.collectAsStateWithLifecycle()
 
         DropdownMenu(
             modifier = BaseMenuModifier,
-            expanded = state?.expanded == PuzzleSubMenu.ZOOM,
+            expanded = state.expanded == PuzzleSubMenu.ZOOM,
             onDismissRequest = viewModel::dismissMenu,
         ) {
             MenuDropdownHeading(
@@ -1017,8 +1017,8 @@ abstract class PuzzleActivity() : ForkyzActivity() {
 
     @Composable
     protected fun MenuExternalTools() {
-        val state by viewModel.menuState.observeAsState()
-        if (!(state?.externalToolsState?.hasExternal ?: false))
+        val state by viewModel.menuState.collectAsStateWithLifecycle()
+        if (!state.externalToolsState.hasExternal)
             return
 
         MenuSubEntry(
@@ -1047,20 +1047,20 @@ abstract class PuzzleActivity() : ForkyzActivity() {
         showAnagramSolver : Boolean = false,
         onCallAnagramSolver : () -> Unit = { },
     ) {
-        val state by viewModel.menuState.observeAsState()
-        if (!(state?.externalToolsState?.hasExternal ?: false))
+        val state by viewModel.menuState.collectAsStateWithLifecycle()
+        if (!state.externalToolsState.hasExternal)
             return
 
         DropdownMenu(
             modifier = BaseMenuModifier,
-            expanded = state?.expanded == PuzzleSubMenu.EXTERNAL_TOOLS,
+            expanded = state.expanded == PuzzleSubMenu.EXTERNAL_TOOLS,
             onDismissRequest = viewModel::dismissMenu,
         ) {
             MenuDropdownHeading(
                 R.string.external_tools,
                 onClick = viewModel::closeMenu,
             )
-            if (state?.externalToolsState?.hasExternalDictionary ?: false) {
+            if (state.externalToolsState.hasExternalDictionary) {
                 DropdownMenuItem(
                     text = {
                         MenuText(
@@ -1073,7 +1073,7 @@ abstract class PuzzleActivity() : ForkyzActivity() {
                     },
                 )
             }
-            if (state?.externalToolsState?.hasCrosswordSolver ?: false) {
+            if (state.externalToolsState.hasCrosswordSolver) {
                 DropdownMenuItem(
                     text = {
                         MenuText(stringResource(R.string.help_crossword_solver))
@@ -1100,7 +1100,7 @@ abstract class PuzzleActivity() : ForkyzActivity() {
 
                 }
             }
-            if (state?.externalToolsState?.hasChatGPT ?: false) {
+            if (state.externalToolsState.hasChatGPT) {
                 DropdownMenuItem(
                     text = {
                         MenuText(stringResource(R.string.help_query_chat_gpt))
@@ -1111,7 +1111,7 @@ abstract class PuzzleActivity() : ForkyzActivity() {
                     },
                 )
             }
-            if (state?.externalToolsState?.hasDuckDuckGo ?: false) {
+            if (state.externalToolsState.hasDuckDuckGo) {
                 DropdownMenuItem(
                     text = {
                         MenuText(stringResource(R.string.help_duckduckgo))
@@ -1122,7 +1122,7 @@ abstract class PuzzleActivity() : ForkyzActivity() {
                     },
                 )
             }
-            if (state?.externalToolsState?.hasFifteenSquared ?: false) {
+            if (state.externalToolsState.hasFifteenSquared) {
                 DropdownMenuItem(
                     text = {
                         MenuText(stringResource(R.string.help_fifteen_squared))
@@ -1146,11 +1146,11 @@ abstract class PuzzleActivity() : ForkyzActivity() {
 
     @Composable
     protected fun MenuShareSub() {
-        val state by viewModel.menuState.observeAsState()
+        val state by viewModel.menuState.collectAsStateWithLifecycle()
 
         DropdownMenu(
             modifier = BaseMenuModifier,
-            expanded = state?.expanded == PuzzleSubMenu.SHARE,
+            expanded = state.expanded == PuzzleSubMenu.SHARE,
             onDismissRequest = viewModel::dismissMenu,
         ) {
             MenuDropdownHeading(

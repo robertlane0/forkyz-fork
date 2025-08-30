@@ -1,18 +1,21 @@
 
 package app.crossword.yourealwaysbe.forkyz.view
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+
 import android.app.Application
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 
 import app.crossword.yourealwaysbe.forkyz.R
 import app.crossword.yourealwaysbe.forkyz.settings.ClueHighlight
 import app.crossword.yourealwaysbe.forkyz.settings.ClueTabsDouble
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
+import app.crossword.yourealwaysbe.forkyz.settings.RenderSettings
 import app.crossword.yourealwaysbe.forkyz.util.ColorUtils
-import app.crossword.yourealwaysbe.forkyz.util.liveDataFanIn
-import app.crossword.yourealwaysbe.forkyz.util.observeOnceNonNull
+import app.crossword.yourealwaysbe.forkyz.util.MediatedStateWithFlow
 import app.crossword.yourealwaysbe.puz.Clue
 import app.crossword.yourealwaysbe.puz.ClueID
 import app.crossword.yourealwaysbe.puz.Playboard
@@ -62,6 +65,8 @@ data class ClueList(
  * selected clue
  * @param snapToClueEvent whether needs to snap to a clue
  * clearSnapToClue event once done
+ * @param renderSettings what to use to draw boards
+ * @param scratchMode whether is scratch mode
  */
 data class ClueTabsState(
     val doubleMode : ClueTabsDouble = ClueTabsDouble.CTD_NEVER,
@@ -70,6 +75,8 @@ data class ClueTabsState(
     val highlightSelectedRadio : Boolean = true,
     val highlightSelectedBackground : Boolean = false,
     val snapToClueEvent : SnapToClueEvent? = null,
+    val renderSettings : RenderSettings = RenderSettings(),
+    val scratchMode : Boolean = false,
 ) {
     val numPages : Int
         get() { return pages.size }
@@ -90,30 +97,56 @@ data class ClueTabsState(
     }
 }
 
+private data class ClueTabsDisplaySettings(
+    val clueTabsDouble : ClueTabsDouble,
+    val showWords : Boolean,
+    val clueHighlight : ClueHighlight,
+    val renderSettings : RenderSettings,
+    val showCount : Boolean,
+)
+
+private data class ClueTabsSettings(
+    val displaySettings : ClueTabsDisplaySettings,
+    val scratchMode : Boolean,
+)
+
 class ClueTabsViewModel(
     private val application : Application,
+    private val viewModelScope : CoroutineScope,
     private val settings : ForkyzSettings,
     val board : Playboard?,
 ) : PlayboardListener {
-    private val _uiState : MutableLiveData<ClueTabsState> = liveDataFanIn(
-        { getUpdatedUIState(refreshClueList = false) } ,
-        settings.liveClueListClueTabsDouble,
-        settings.liveClueListShowWords,
-        settings.livePlayClueHighlight,
-        // snap only really here to make the live data value accurate via an
-        // observer
-        settings.liveClueListSnapToClue,
-    )
-    val uiState : LiveData<ClueTabsState> = _uiState
+    private val mediatedUIState
+        = MediatedStateWithFlow<ClueTabsState, ClueTabsSettings>(
+            viewModelScope,
+            getInitialUIState(),
+            this::getUpdatedUIState,
+            combine(
+                combine(
+                    settings.liveClueListClueTabsDouble,
+                    settings.liveClueListShowWords,
+                    settings.livePlayClueHighlight,
+                    settings.livePlayRenderSettings,
+                    settings.livePlayShowCount,
+                    ::ClueTabsDisplaySettings,
+                ),
+                settings.livePlayScratchMode,
+                ::ClueTabsSettings,
+            ),
+        )
+    val uiState : StateFlow<ClueTabsState> = mediatedUIState.stateFlow
+
+    // remembered from latest state update
+    private var isShowCount : Boolean = false
 
     val numPages : Int
-        get() { return uiState.value?.numPages ?: 0 }
+        get() { return currentUIState.numPages }
 
     val pages : List<ClueList>
-        get() { return uiState.value?.pages ?: listOf() }
+        get() { return currentUIState.pages }
 
     val historyPageNum : Int
-        get() { return uiState.value?.historyPageNum ?: 0 }
+        get() { return currentUIState.historyPageNum }
 
     /**
      * View should set this to track if it is showing both panes
@@ -124,11 +157,7 @@ class ClueTabsViewModel(
     var isDouble : Boolean = false
         set(value) {
             field = value
-            // now we know double status, do a snap to clue, but wait until
-            // state first initialised
-            uiState.observeOnceNonNull { state ->
-                snapToClueIfEnabled()
-            }
+            snapToClueIfEnabled()
         }
 
     init {
@@ -136,7 +165,7 @@ class ClueTabsViewModel(
     }
 
     override fun onPlayboardChange(changes : PlayboardChanges) {
-        _uiState.value = getUpdatedUIState(refreshClueList = true)
+        currentUIState = currentUIState.copy(pages = getStatePages())
         if (changes.previousWord != board?.currentWord)
             snapToClueIfEnabled()
     }
@@ -152,7 +181,7 @@ class ClueTabsViewModel(
      * If page num is history page
      */
     fun isHistoryPage(pageNum : Int) : Boolean {
-        return uiState.value?.isHistoryPage(pageNum) ?: false
+        return currentUIState.isHistoryPage(pageNum)
     }
 
     /**
@@ -162,9 +191,9 @@ class ClueTabsViewModel(
      * @param page the page number (0 to num pages)
      */
     fun setPage(index : Int, page : Int) {
-        val state = uiState.value ?: getUpdatedUIState(refreshClueList = true)
+        val state = currentUIState
         if (0 <= page && page < state.numPages) {
-            _uiState.value = state.copy(
+            currentUIState = state.copy(
                 panePages = state.panePages.mapIndexed { i, v ->
                     if (i == index) page else v
                 }
@@ -192,8 +221,8 @@ class ClueTabsViewModel(
         if (listName == null)
             return -1
 
-        val historyPageNum = uiState.value?.historyPageNum
-        val historyIndex = uiState.value?.getHistoryIndex(cid) ?: -1
+        val historyPageNum = currentUIState.historyPageNum
+        val historyIndex = currentUIState.getHistoryIndex(cid) ?: -1
 
         val pageNum = if (showPageNum == historyPageNum  && historyIndex >= 0)
             historyPageNum
@@ -207,8 +236,8 @@ class ClueTabsViewModel(
         else
             return -1
 
-        val curPage0 = uiState.value?.panePages?.get(0)
-        val curPage1 = uiState.value?.panePages?.get(1)
+        val curPage0 = currentUIState.panePages.get(0)
+        val curPage1 = currentUIState.panePages.get(1)
 
         var listShown0
             = curPage0 == pageNum || curPage0 == historyPageNum
@@ -223,7 +252,7 @@ class ClueTabsViewModel(
             isHistory = pageNum == historyPageNum
         }
 
-        _uiState.value = uiState.value?.copy(
+        currentUIState = currentUIState.copy(
             snapToClueEvent = SnapToClueEvent(
                 paneIndex = if (listShown0) 0 else 1,
                 pageNum = pageNum,
@@ -235,22 +264,20 @@ class ClueTabsViewModel(
     }
 
     fun clearSnapToClueEvent() {
-        _uiState.value = uiState.value?.copy(
+        currentUIState = currentUIState.copy(
             snapToClueEvent = null,
         )
     }
 
-    private fun getUpdatedUIState(refreshClueList : Boolean) : ClueTabsState {
-        val state = uiState.value ?: ClueTabsState()
+    private fun getInitialUIState() : ClueTabsState {
+        return ClueTabsState(pages = getStatePages())
+    }
 
-        val pages = if (refreshClueList || state.pages.isEmpty()) {
-            getStatePages()
-        } else {
-            state.pages
-        }
-
-        val highlight = settings.livePlayClueHighlight.value
-            ?: ClueHighlight.CH_RADIO_BUTTON
+    private fun getUpdatedUIState(
+        state : ClueTabsState,
+        clueTabsSettings : ClueTabsSettings,
+    ) : ClueTabsState {
+        val highlight = clueTabsSettings.displaySettings.clueHighlight
         val highlightSelectedRadio
             = highlight == ClueHighlight.CH_RADIO_BUTTON
                 || highlight == ClueHighlight.CH_BOTH
@@ -258,12 +285,20 @@ class ClueTabsViewModel(
             = highlight == ClueHighlight.CH_BACKGROUND
                 || highlight == ClueHighlight.CH_BOTH
 
+        val showCount = clueTabsSettings.displaySettings.showCount
+        val pages = if (isShowCount != showCount)
+            getStatePages()
+        else
+            state.pages
+        isShowCount = showCount
+
         return state.copy(
-            doubleMode = settings.liveClueListClueTabsDouble.value
-                ?: state.doubleMode,
             pages = pages,
+            doubleMode = clueTabsSettings.displaySettings.clueTabsDouble,
             highlightSelectedRadio = highlightSelectedRadio,
             highlightSelectedBackground = highlightSelectedBackground,
+            renderSettings = clueTabsSettings.displaySettings.renderSettings,
+            scratchMode = clueTabsSettings.scratchMode,
         )
     }
 
@@ -336,8 +371,6 @@ class ClueTabsViewModel(
         clue : Clue,
         showDirection : Boolean,
     ) : String {
-        val showCount = settings.livePlayShowCount.value ?: false
-
         val listName = getShortListName(clue)
         val displayNum = clue.displayNumber
         val hint = clue.hint
@@ -345,7 +378,7 @@ class ClueTabsViewModel(
         val count = if (hasCount) clue.getZone().size() else -1
 
         if (showDirection) {
-            if (hasCount && showCount) {
+            if (hasCount && isShowCount) {
                 if (displayNum != null) {
                     return application.getString(
                         R.string.clue_format_short_with_count,
@@ -371,7 +404,7 @@ class ClueTabsViewModel(
                 }
             }
         } else {
-            if (hasCount && showCount) {
+            if (hasCount && isShowCount) {
                 if (displayNum != null) {
                     return application.getString(
                         R.string.clue_format_short_no_dir_with_count,
@@ -418,7 +451,7 @@ class ClueTabsViewModel(
      * only known after first layout
      */
     private fun ensurePageShown(pageNum : Int, replacePageNum : Int) {
-        val state = uiState.value ?: ClueTabsState()
+        val state = currentUIState
         if (pageNum == state.panePages[0])
             return;
 
@@ -445,4 +478,8 @@ class ClueTabsViewModel(
                 snapToClue()
         }
     }
+
+    private var currentUIState : ClueTabsState
+        get() { return mediatedUIState.current }
+        set(value) { mediatedUIState.current = value }
 }

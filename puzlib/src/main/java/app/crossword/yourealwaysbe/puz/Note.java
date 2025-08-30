@@ -221,4 +221,12 @@ public class Note {
     public Note withDeleteScratchLetterAt(int pos) {
         return withScratchLetter(pos, BLANK_CHAR);
     }
+
+    @Override
+    public String toString() {
+        return "Scratch: " + getScratch() + "; "
+            + "Text: " + getText() + "; "
+            + "Anagram source: " + getAnagramSource() + "; "
+            + "Anagram solution: " + getAnagramSolution();
+    }
 }

@@ -299,7 +299,7 @@
     <string name="show_timer">Show Timer</string>
     <string name="show_timer_desc">Shows your puzzle time.\nYou must leave and re-enter a puzzle to apply.</string>
     <string name="theme_preference">Theme</string>
-    <string name="theme_preference_desc">Select application theme (requires restart).</string>
+    <string name="theme_preference_desc">Select application theme.</string>
     <string name="clue_tabs_double">Double Clue Tabs View</string>
     <string name="clue_tabs_double_desc">When to show two clue lists side-by-side.</string>
     <string name="clue_tabs_double_never">Never</string>

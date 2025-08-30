@@ -2,10 +2,10 @@
 package app.crossword.yourealwaysbe.forkyz.settings
 
 data class BackgroundDownloadSettings(
-    val requireUnmetered : Boolean,
-    val allowRoaming : Boolean,
-    val requireCharging : Boolean,
-    val hourly : Boolean,
-    val days : Set<String>,
-    val daysTime : Int,
+    val requireUnmetered : Boolean = false,
+    val allowRoaming : Boolean = false,
+    val requireCharging : Boolean = false,
+    val hourly : Boolean = false,
+    val days : Set<String> = setOf(),
+    val daysTime : Int = 8,
 ) { }

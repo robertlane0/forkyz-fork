@@ -13,6 +13,7 @@ import android.util.Log;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
+import app.crossword.yourealwaysbe.forkyz.settings.RenderSettings;
 import app.crossword.yourealwaysbe.forkyz.view.PlayboardRenderer.RenderChanges;
 import app.crossword.yourealwaysbe.puz.ClueID;
 import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges;
@@ -37,6 +38,9 @@ public class BoardFullEditView extends BoardEditView {
     // screen overdraw in pixels
     private int screenOverdrawPx;
 
+    // ensure current clue is visible
+    private boolean ensureVisible = false;
+
     public BoardFullEditView(Context context) {
         this(context, null);
     }
@@ -48,6 +52,10 @@ public class BoardFullEditView extends BoardEditView {
         DisplayMetrics metrics
             = getContext().getResources().getDisplayMetrics();
         screenOverdrawPx = metrics.densityDpi * SCREEN_OVERDRAW;
+    }
+
+    public void setEnsureVisible(boolean ensureVisible) {
+        this.ensureVisible = ensureVisible;
     }
 
     @Override
@@ -88,36 +96,38 @@ public class BoardFullEditView extends BoardEditView {
         if (renderer == null || board == null)
             return;
 
+        RenderSettings renderSettings = getRenderSettings();
+        if (renderSettings == null)
+            return;
+
         RenderChanges renderChanges = getRenderChanges(changes);
 
-        getSettings().getPlayRenderSettings(renderSettings -> {
-            renderer.setHintHighlight(
-                !renderSettings.getSuppressHintHighlighting()
-            );
+        renderer.setHintHighlight(
+            !renderSettings.getSuppressHintHighlighting()
+        );
 
-            Set<String> suppressNotesList = renderSettings.getDisplayScratch()
-                ? Collections.emptySet()
-                : null;
+        Set<String> suppressNotesList = renderSettings.getDisplayScratch()
+            ? Collections.emptySet()
+            : null;
 
-            executorService.execute(() -> {
-                try {
-                    lockRenderer();
-                    BitmapGrid bitmap = renderer.draw(
-                        renderChanges,
-                        suppressNotesList,
-                        renderSettings.getDisplaySeparators(),
-                        renderSettings.getInferSeparators(),
-                        getRenderRect()
-                    );
-                    handler.post(() -> {
-                        try { setBitmap(bitmap); }
-                        finally { unlockRenderer(); }
-                    });
-                } catch (Exception e) {
-                    unlockRenderer();
-                    throw e;
-                }
-            });
+        executorService.execute(() -> {
+            try {
+                lockRenderer();
+                BitmapGrid bitmap = renderer.draw(
+                    renderChanges,
+                    suppressNotesList,
+                    renderSettings.getDisplaySeparators(),
+                    renderSettings.getInferSeparators(),
+                    getRenderRect()
+                );
+                handler.post(() -> {
+                    try { setBitmap(bitmap); }
+                    finally { unlockRenderer(); }
+                });
+            } catch (Exception e) {
+                unlockRenderer();
+                throw e;
+            }
         });
     }
 
@@ -177,37 +187,35 @@ public class BoardFullEditView extends BoardEditView {
          * Otherwise, insure that the current letter is visible. Only necessary
          * if the cursor is currently off screen.
          */
-        getSettings().getPlayEnsureVisible(ensureVisible -> {
-            if (ensureVisible) {
-                Word currentWord = board.getCurrentWord();
-                Position cursorPos = board.getHighlightLetter();
+        if (ensureVisible) {
+            Word currentWord = board.getCurrentWord();
+            Position cursorPos = board.getHighlightLetter();
 
-                Point topLeft;
-                Point bottomRight;
-                Point cursorTopLeft;
-                Point cursorBottomRight;
+            Point topLeft;
+            Point bottomRight;
+            Point cursorTopLeft;
+            Point cursorBottomRight;
 
-                cursorTopLeft = renderer.findPointTopLeft(cursorPos);
-                cursorBottomRight = renderer.findPointBottomRight(cursorPos);
+            cursorTopLeft = renderer.findPointTopLeft(cursorPos);
+            cursorBottomRight = renderer.findPointBottomRight(cursorPos);
 
-                if (
-                    (previousWord != null)
-                    && previousWord.equals(currentWord)
-                ) {
-                    topLeft = cursorTopLeft;
-                    bottomRight = cursorBottomRight;
-                } else {
-                    topLeft = renderer.findPointTopLeft(currentWord);
-                    bottomRight = renderer.findPointBottomRight(currentWord);
-                }
-
-                ensureVisible(bottomRight);
-                ensureVisible(topLeft);
-
-                // ensure the cursor is always on the screen.
-                ensureVisible(cursorBottomRight);
-                ensureVisible(cursorTopLeft);
+            if (
+                (previousWord != null)
+                && previousWord.equals(currentWord)
+            ) {
+                topLeft = cursorTopLeft;
+                bottomRight = cursorBottomRight;
+            } else {
+                topLeft = renderer.findPointTopLeft(currentWord);
+                bottomRight = renderer.findPointBottomRight(currentWord);
             }
-        });
+
+            ensureVisible(bottomRight);
+            ensureVisible(topLeft);
+
+            // ensure the cursor is always on the screen.
+            ensureVisible(cursorBottomRight);
+            ensureVisible(cursorTopLeft);
+        }
     }
 }

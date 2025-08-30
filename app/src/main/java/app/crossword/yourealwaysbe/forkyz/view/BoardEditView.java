@@ -18,14 +18,11 @@ import android.view.View;
 import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
-import androidx.lifecycle.ViewTreeLifecycleOwner;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
 import app.crossword.yourealwaysbe.forkyz.settings.RenderSettings;
-import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.util.BoxInputConnection;
-import app.crossword.yourealwaysbe.forkyz.util.ChangeOnlyObserver;
 import app.crossword.yourealwaysbe.forkyz.util.KeyboardManageableView;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 import app.crossword.yourealwaysbe.forkyz.view.PlayboardRenderer.RenderChanges;
@@ -52,9 +49,6 @@ public abstract class BoardEditView
     private static final int DOUBLE_CLICK_INTERVAL = 300; // ms
 
     @Inject
-    protected ForkyzSettings settings;
-
-    @Inject
     protected AndroidVersionUtils utils;
 
     private Playboard board;
@@ -65,8 +59,10 @@ public abstract class BoardEditView
     private BoxInputConnection currentInputConnection = null;
     private boolean nativeInput = false;
     private boolean forceCaps = true;
-    private boolean ignoreScratchMode = false;
+    private boolean scratchMode = false;
+    private boolean doubleTapFit = false;
     private boolean requestFocusOnSized = false;
+    private RenderSettings renderSettings = new RenderSettings();
 
     // For use by implementers of render to avoid on-main-thread
     // rendering. Bitmap can be set with postBitmap in
@@ -87,6 +83,15 @@ public abstract class BoardEditView
         handler = new Handler(context.getMainLooper());
     }
 
+    public void setRenderSettings(RenderSettings renderSettings) {
+        this.renderSettings = renderSettings;
+        render();
+    }
+
+    public void setDoubleTapFitBoard(boolean doubleTapFit) {
+        this.doubleTapFit = doubleTapFit;
+    }
+
     /**
      * Request focus or delay until has dimension
      *
@@ -99,28 +104,12 @@ public abstract class BoardEditView
             requestFocusOnSized = true;
     }
 
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-        // no lifecycle owner until attached
-        // only rerender on change
-        settings.getLivePlayRenderSettings().observe(
-            ViewTreeLifecycleOwner.get(this),
-             new ChangeOnlyObserver<RenderSettings>() {
-                @Override
-                public void onTrueChange(RenderSettings value) {
-                    render();
-                }
-            }
-        );
-    }
-
     public void setBoard(Playboard board) {
         setBoard(board, false);
     }
 
-    public void setIgnoreScratchMode(boolean ignoreScratchMode) {
-        this.ignoreScratchMode = ignoreScratchMode;
+    public void setScratchMode(boolean scratchMode) {
+        this.scratchMode = scratchMode;
     }
 
     /**
@@ -298,14 +287,12 @@ public abstract class BoardEditView
         if (board == null)
             return;
 
-        getSettings().getPlayScratchMode(scratchMode -> {
-            if (!ignoreScratchMode && scratchMode) {
-                if (response != null)
-                    board.playScratchLetter(response.charAt(0));
-            } else {
-                board.playLetter(response);
-            }
-        });
+        if (scratchMode) {
+            if (response != null)
+                board.playScratchLetter(response.charAt(0));
+        } else {
+            board.playLetter(response);
+        }
     }
 
     @Override
@@ -314,13 +301,11 @@ public abstract class BoardEditView
         if (board == null)
             return;
 
-        getSettings().getPlayScratchMode(scratchMode -> {
-            if (!ignoreScratchMode && scratchMode) {
-                board.deleteScratchLetter();
-            } else {
-                board.deleteOrUndoLetter();
-            }
-        });
+        if (scratchMode) {
+            board.deleteScratchLetter();
+        } else {
+            board.deleteOrUndoLetter();
+        }
     }
 
     @Override
@@ -401,18 +386,16 @@ public abstract class BoardEditView
 
         long clickInterval = System.currentTimeMillis() - lastTap;
 
-        settings.getPlayDoubleTapFitBoard(doubleTapOn -> {
-            if (doubleTapOn && clickInterval < DOUBLE_CLICK_INTERVAL) {
-                fitToView();
-                notifyScaleChange(getCurrentScale());
-            } else {
-                Position position = findPosition(point);
-                if (position != null)
-                    onClick(position);
-            }
+        if (doubleTapFit && clickInterval < DOUBLE_CLICK_INTERVAL) {
+            fitToView();
+            notifyScaleChange(getCurrentScale());
+        } else {
+            Position position = findPosition(point);
+            if (position != null)
+                onClick(position);
+        }
 
-            lastTap = System.currentTimeMillis();
-        });
+        lastTap = System.currentTimeMillis();
     }
 
     /**
@@ -430,8 +413,8 @@ public abstract class BoardEditView
         }
     }
 
-    protected ForkyzSettings getSettings() {
-        return settings;
+    protected RenderSettings getRenderSettings() {
+        return renderSettings;
     }
 
     protected void render() {

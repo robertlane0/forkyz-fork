@@ -12,13 +12,14 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat
 
+import app.crossword.yourealwaysbe.forkyz.settings.RenderSettings
+import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
 import app.crossword.yourealwaysbe.forkyz.view.BoardEditView.BoardClickListener
 import app.crossword.yourealwaysbe.forkyz.view.BoardWordEditView
-import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
+import app.crossword.yourealwaysbe.puz.MovementStrategy
 import app.crossword.yourealwaysbe.puz.Playboard
 import app.crossword.yourealwaysbe.puz.Playboard.Word
 import app.crossword.yourealwaysbe.puz.Position
-import app.crossword.yourealwaysbe.puz.MovementStrategy
 
 /**
  * Miniboard current word view
@@ -55,6 +56,7 @@ fun BoardWordEdit(
     modifier : Modifier = Modifier,
     board : Playboard,
     contentDescription : String,
+    renderSettings : RenderSettings,
     word : Word? = null,
     onClick : (Position?, Word?) -> Unit = { _, _ -> },
     onLongClick : (Position?) -> Unit = { },
@@ -62,7 +64,7 @@ fun BoardWordEdit(
     longClickAccessibilityAction : String? = null,
     inputConnectionMediator : InputConnectionMediator? = null,
     incognitoMode : Boolean = false,
-    ignoreScratchMode : Boolean = false,
+    scratchMode : Boolean = false,
     useSuppressNotesList : Boolean = false,
     suppressNotesList : Set<String>? = null,
     onFocusChanged : (Boolean) -> Unit = { },
@@ -123,12 +125,13 @@ fun BoardWordEdit(
             update = { view ->
                 view.apply {
                     setIncognitoMode(incognitoMode)
-                    setIgnoreScratchMode(ignoreScratchMode)
+                    setScratchMode(scratchMode)
                     if (useSuppressNotesList)
                         setSuppressNotesList(suppressNotesList)
                     else
                         clearSuppressNotesList()
                     setMovementStrategy(movementStrategy)
+                    setRenderSettings(renderSettings)
                 }
                 clickAccessibilityAction?.let {
                     ViewCompat.replaceAccessibilityAction(

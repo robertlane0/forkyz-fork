@@ -2,19 +2,22 @@
 package app.crossword.yourealwaysbe.forkyz
 
 import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 import android.app.Application
-import androidx.lifecycle.LiveData
+import androidx.lifecycle.viewModelScope
 
 import dagger.hilt.android.lifecycle.HiltViewModel
 
 import app.crossword.yourealwaysbe.forkyz.settings.CycleUnfilledMode
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
+import app.crossword.yourealwaysbe.forkyz.settings.RenderSettings
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
+import app.crossword.yourealwaysbe.forkyz.util.stateInSubscribed
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 import app.crossword.yourealwaysbe.forkyz.view.ClueTabsViewModel
 import app.crossword.yourealwaysbe.puz.Clue
@@ -49,10 +52,26 @@ class ClueListActivityViewModel @Inject constructor(
      */
     private var currentPageNum : Int = 0
 
-    val showAllWords : LiveData<Boolean> = settings.liveClueListShowWords
-    val movementStrategy : LiveData<MovementStrategy>
-        = settings.livePlayMovementStrategyClueList
-    val clueTabsViewModel = ClueTabsViewModel(application, settings, getBoard())
+    // these should become a full state if too numerous!
+    val showAllWords : StateFlow<Boolean> = stateIn(
+        settings.liveClueListShowWords,
+        false,
+    )
+    val movementStrategy : StateFlow<MovementStrategy> = stateIn(
+        settings.livePlayMovementStrategyClueList,
+        MovementStrategy.MOVE_NEXT_CLUE,
+    )
+    val renderSettings : StateFlow<RenderSettings> = stateIn(
+        settings.livePlayRenderSettings,
+        RenderSettings(),
+    )
+
+    val clueTabsViewModel = ClueTabsViewModel(
+        application,
+        viewModelScope,
+        settings,
+        getBoard(),
+    )
 
     fun toggleShowAllWords() {
         val current = showAllWords.value ?: false
@@ -391,10 +410,11 @@ class ClueListActivityViewModel @Inject constructor(
             return clueTabsViewModel.isHistoryPage(currentPageNum)
         }
 
-    /**
-     * Get movement strategy from live or default val
-     */
     private fun getClueListMovementStrategy() : MovementStrategy {
-        return movementStrategy.value ?: MovementStrategy.MOVE_NEXT_CLUE
+        return movementStrategy.value
+    }
+
+    private fun <T> stateIn(flow : Flow<T>, initialValue : T) : StateFlow<T> {
+        return flow.stateInSubscribed(viewModelScope, initialValue)
     }
 }

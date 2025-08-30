@@ -3,21 +3,23 @@ package app.crossword.yourealwaysbe.forkyz
 
 import javax.inject.Inject
 import kotlin.random.Random
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 
 import android.app.Application
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 
 import dagger.hilt.android.lifecycle.HiltViewModel
 
 import app.crossword.yourealwaysbe.forkyz.settings.FitToScreenMode
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.GridRatio
+import app.crossword.yourealwaysbe.forkyz.settings.RenderSettings
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
+import app.crossword.yourealwaysbe.forkyz.util.MediatedStateWithFlow
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
-import app.crossword.yourealwaysbe.forkyz.util.liveDataFanIn
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 import app.crossword.yourealwaysbe.forkyz.view.ClueTabsViewModel
 import app.crossword.yourealwaysbe.puz.ClueID
@@ -42,6 +44,10 @@ import app.crossword.yourealwaysbe.puz.Puzzle
  * @param fitToScreenMode the fit to screen mode
  * @param isAcrostic if the puzzle is an acrostic one
  * @param isFullScreen if the display should be full screen
+ * @param firstPlayMessage message to display on first play
+ * @param renderSettings rendering settings for board view
+ * @param scratchMode whether is scratch mode
+ * @param ensureVisible whether to jump to current clue on play board
  */
 data class PlayActivityUIState(
     val clueText : String? = null,
@@ -58,6 +64,38 @@ data class PlayActivityUIState(
     val isAcrostic : Boolean = false,
     val isFullScreen : Boolean = false,
     val firstPlayMessage : String? = null,
+    val renderSettings : RenderSettings = RenderSettings(),
+    val scratchMode : Boolean = false,
+    val doubleTapFitBoard : Boolean = false,
+    val ensureVisible : Boolean = false,
+)
+
+private data class PlayClueTabsSettings(
+    val showClueTabs : Boolean,
+    val clueTabsPage0 : Int,
+    val clueTabsPage1 : Int,
+    val gridRatioPortrait : GridRatio,
+    val gridRatioLandscape : GridRatio,
+)
+
+private data class PlayDisplaySettings(
+    val clueBelowGrid : Boolean,
+    val fitToScreenMode : FitToScreenMode,
+    val fullScreen : Boolean,
+    val renderSettings : RenderSettings,
+)
+
+private data class PlayInteractionSettings(
+    val randomClueOnShake : Boolean,
+    val scratchMode : Boolean,
+    val doubleTapFitBoard : Boolean,
+    val ensureVisible : Boolean,
+)
+
+private data class PlaySettings(
+    val clueTabsSettings : PlayClueTabsSettings,
+    val displaySettings : PlayDisplaySettings,
+    val interationSettings : PlayInteractionSettings,
 )
 
 @HiltViewModel
@@ -74,10 +112,72 @@ class PlayActivityViewModel @Inject constructor(
     fileHandlerProvider,
     utils,
 ) {
-    private var _playUIState : MutableLiveData<PlayActivityUIState>
-    var playUIState : LiveData<PlayActivityUIState>
-        private set
-    val clueTabsViewModel = ClueTabsViewModel(application, settings, getBoard())
+    private val mediatedPlayUIState
+        = MediatedStateWithFlow<PlayActivityUIState, PlaySettings>(
+            viewModelScope,
+            PlayActivityUIState(),
+            { state, playSettings ->
+                val showClueTabs
+                    = isAcrostic || playSettings.clueTabsSettings.showClueTabs
+                state.copy(
+                    isClueBelowGrid
+                        = playSettings.displaySettings.clueBelowGrid,
+                    showClueTabs = showClueTabs,
+                    clueTabsPage0 = playSettings.clueTabsSettings.clueTabsPage0,
+                    clueTabsPage1 = playSettings.clueTabsSettings.clueTabsPage1,
+                    portraitGridRatio
+                        = playSettings.clueTabsSettings.gridRatioPortrait,
+                    landscapeGridRatio
+                        = playSettings.clueTabsSettings.gridRatioLandscape,
+                    isRandomClueOnShake
+                        = playSettings.interationSettings.randomClueOnShake,
+                    fitToScreenMode
+                        = playSettings.displaySettings.fitToScreenMode,
+                    isFullScreen = playSettings.displaySettings.fullScreen,
+                    renderSettings
+                        = playSettings.displaySettings.renderSettings,
+                    scratchMode = playSettings.interationSettings.scratchMode,
+                    doubleTapFitBoard
+                        = playSettings.interationSettings.doubleTapFitBoard,
+                    ensureVisible
+                        = playSettings.interationSettings.ensureVisible,
+                )
+            },
+            combine(
+                combine(
+                    settings.livePlayShowClueTabs,
+                    settings.livePlayClueTabsPage(0),
+                    settings.livePlayClueTabsPage(1),
+                    settings.livePlayGridRatioPortrait,
+                    settings.livePlayGridRatioLandscape,
+                    ::PlayClueTabsSettings,
+                ),
+                combine(
+                    settings.livePlayClueBelowGrid,
+                    settings.livePlayFitToScreenMode,
+                    settings.livePlayFullScreen,
+                    settings.livePlayRenderSettings,
+                    ::PlayDisplaySettings,
+                ),
+                combine(
+                    settings.livePlayRandomClueOnShake,
+                    settings.livePlayScratchMode,
+                    settings.livePlayDoubleTapFitBoard,
+                    settings.livePlayEnsureVisible,
+                    ::PlayInteractionSettings,
+                ),
+                ::PlaySettings,
+            ),
+        )
+    val playUIState : StateFlow<PlayActivityUIState>
+        = mediatedPlayUIState.stateFlow
+
+    val clueTabsViewModel = ClueTabsViewModel(
+        application,
+        viewModelScope,
+        settings,
+        getBoard()
+    )
     init {
         settings.getPlayClueTabsPage(0) { clueTabsViewModel.setPage(0, it) }
         settings.getPlayClueTabsPage(1) { clueTabsViewModel.setPage(1, it) }
@@ -91,48 +191,9 @@ class PlayActivityViewModel @Inject constructor(
         get() {
             return getPuzzle()?.let { it.kind == Puzzle.Kind.ACROSTIC } ?: false
         }
+
     init {
         setupVoiceCommands()
-
-        _playUIState = liveDataFanIn(
-            {
-                val curState = playUIState.value ?: PlayActivityUIState()
-                val showClueTabs = isAcrostic
-                    || (settings.livePlayShowClueTabs.value ?: false)
-                curState.copy(
-                    isClueBelowGrid
-                        = settings.livePlayClueBelowGrid.value ?: false,
-                    showClueTabs = showClueTabs,
-                    clueTabsPage0
-                        = settings.livePlayClueTabsPage(0).value ?: 0,
-                    clueTabsPage1
-                        = settings.livePlayClueTabsPage(1).value ?: 1,
-                    portraitGridRatio
-                        = settings.livePlayGridRatioPortrait.value
-                            ?: GridRatio.GR_PUZZLE_SHAPE,
-                    landscapeGridRatio
-                        = settings.livePlayGridRatioLandscape.value
-                            ?: GridRatio.GR_PUZZLE_SHAPE,
-                    isRandomClueOnShake
-                        = settings.livePlayRandomClueOnShake.value ?: false,
-                    fitToScreenMode
-                        = settings.livePlayFitToScreenMode.value
-                            ?: FitToScreenMode.FTSM_NEVER,
-                    isFullScreen = settings.livePlayFullScreen.value ?: false,
-                )
-            },
-            settings.livePlayClueBelowGrid,
-            settings.livePlayShowClueTabs,
-            settings.livePlayClueTabsPage(0),
-            settings.livePlayClueTabsPage(1),
-            settings.livePlayGridRatioPortrait,
-            settings.livePlayGridRatioLandscape,
-            settings.livePlayRandomClueOnShake,
-            settings.livePlayFitToScreenMode,
-            settings.livePlayFullScreen,
-        )
-        playUIState = _playUIState
-
         updateState()
     }
 
@@ -295,9 +356,7 @@ class PlayActivityViewModel @Inject constructor(
 
     fun clearFirstPlayMessage() {
         firstPlayCleared = true
-        _playUIState.value = playUIState.value?.copy(
-            firstPlayMessage = null,
-        )
+        currentUIState = currentUIState.copy(firstPlayMessage = null)
     }
 
     override fun onPlayboardChange(changes : PlayboardChanges) {
@@ -371,8 +430,6 @@ class PlayActivityViewModel @Inject constructor(
     private fun updateState() {
         getPuzzle()?.let { puz ->
             getClueText { clueText ->
-                val state = playUIState.value ?: PlayActivityUIState()
-
                 val aspectRatio = if (puz.height == 0)
                     1F
                 else
@@ -386,7 +443,7 @@ class PlayActivityViewModel @Inject constructor(
                     null
                 }
 
-                _playUIState.value = state.copy(
+                currentUIState = currentUIState.copy(
                     puzzleTitle = puz.title,
                     clueText = clueText,
                     puzzleAspectRatio = aspectRatio,
@@ -412,5 +469,9 @@ class PlayActivityViewModel @Inject constructor(
             }
         }
     }
+
+    private var currentUIState : PlayActivityUIState
+        get() { return mediatedPlayUIState.current }
+        set(value) { mediatedPlayUIState.current = value }
 }
 

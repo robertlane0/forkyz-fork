@@ -32,7 +32,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,6 +54,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 import com.squareup.seismic.ShakeDetector
 
@@ -195,10 +195,10 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
     override protected fun Launchers() {
         super.Launchers()
 
-        val state by viewModel.playUIState.observeAsState()
+        val state by viewModel.playUIState.collectAsStateWithLifecycle()
 
-        LaunchedEffect(state?.isRandomClueOnShake) {
-            if (state?.isRandomClueOnShake ?: false) {
+        LaunchedEffect(state.isRandomClueOnShake) {
+            if (state.isRandomClueOnShake) {
                 if (shakeDetector == null) {
                     shakeDetector = ShakeDetector(this@PlayActivity)
                     startShakeDetector()
@@ -208,11 +208,11 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
                 shakeDetector = null
             }
         }
-        LaunchedEffect(state?.fitToScreenMode) {
-            boardViewZoomer.fitToScreenMode = state?.fitToScreenMode
+        LaunchedEffect(state.fitToScreenMode) {
+            boardViewZoomer.fitToScreenMode = state.fitToScreenMode
         }
-        LaunchedEffect(state?.isFullScreen) {
-            if (state?.isFullScreen ?: false)
+        LaunchedEffect(state.isFullScreen) {
+            if (state.isFullScreen)
                 utils.setFullScreen(getWindow())
         }
 
@@ -226,12 +226,12 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
     @Composable
     @OptIn(ExperimentalMaterial3Api::class)
     private fun TopAppBar() {
-        val state by viewModel.playUIState.observeAsState()
+        val state by viewModel.playUIState.collectAsStateWithLifecycle()
 
         themeHelper.ForkyzTopAppBar(
             title = {
-                if (state?.isClueBelowGrid ?: false) {
-                    val title = state?.puzzleTitle ?: stringResource(
+                if (state.isClueBelowGrid) {
+                    val title = state.puzzleTitle ?: stringResource(
                         R.string.app_name
                     )
                     Text(
@@ -262,9 +262,9 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
 
     @Composable
     private fun IntroDialog() {
-        val state by viewModel.playUIState.observeAsState()
+        val state by viewModel.playUIState.collectAsStateWithLifecycle()
 
-        state?.firstPlayMessage?.let { firstPlayMessage ->
+        state.firstPlayMessage?.let { firstPlayMessage ->
             OKDialog(
                 title = R.string.introduction,
                 summary = firstPlayMessage,
@@ -277,8 +277,8 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
     private fun ActivityBodyPortrait(modifier : Modifier) {
         Column(modifier = modifier.fillMaxHeight()) {
             BoxWithConstraints(Modifier.weight(1.0F)) {
-                val state by viewModel.playUIState.observeAsState()
-                val showClueBar = state?.isClueBelowGrid ?: false
+                val state by viewModel.playUIState.collectAsStateWithLifecycle()
+                val showClueBar = state.isClueBelowGrid
                 val clueBarHeight = if (showClueBar) CLUE_BAR_HEIGHT else 0.dp
                 val maxBoardHeight = maxHeight - clueBarHeight
                 val maxBoardWidth = maxWidth
@@ -307,10 +307,9 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
     private fun ActivityBodyLandscape(modifier : Modifier) {
         Column(modifier.fillMaxHeight().fillMaxWidth()) {
             Row(Modifier.weight(1.0F).fillMaxWidth()) {
-                val state by viewModel.playUIState.observeAsState()
-                val showClueTabs = state?.showClueTabs ?: false
+                val state by viewModel.playUIState.collectAsStateWithLifecycle()
 
-                val boardWidthModifier = if (showClueTabs)
+                val boardWidthModifier = if (state.showClueTabs)
                     Modifier.width(IntrinsicSize.Min)
                 else
                     Modifier.fillMaxWidth()
@@ -320,11 +319,11 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
                         Modifier.boardWidthLandscape()
                             .weight(1.0F),
                     )
-                    if (state?.isClueBelowGrid ?: false)
+                    if (state.isClueBelowGrid)
                         ClueBar(Modifier.fillMaxWidth())
                 }
 
-                if (showClueTabs) {
+                if (state.showClueTabs) {
                     Column(Modifier.weight(1.0F).fillMaxHeight()) {
                         CluesList(Modifier.weight(1.0F).fillMaxWidth())
                         VoiceButtons()
@@ -340,8 +339,8 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
 
     @Composable
     private fun OverflowMenu() {
-        val state by viewModel.menuState.observeAsState()
-        val uiState by viewModel.playUIState.observeAsState()
+        val state by viewModel.menuState.collectAsStateWithLifecycle()
+        val uiState by viewModel.playUIState.collectAsStateWithLifecycle()
 
         IconButton(onClick = { viewModel.expandMenu(PuzzleSubMenu.MAIN) }) {
             Icon(
@@ -351,12 +350,12 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
         }
         DropdownMenu(
             modifier = BaseMenuModifier,
-            expanded = state?.expanded == PuzzleSubMenu.MAIN,
+            expanded = state.expanded == PuzzleSubMenu.MAIN,
             onDismissRequest = viewModel::dismissMenu,
         ) {
             MenuClues()
             MenuNotes()
-            if (uiState?.fitToScreenMode != FitToScreenMode.FTSM_LOCKED)
+            if (uiState.fitToScreenMode != FitToScreenMode.FTSM_LOCKED)
                 MenuZoom()
             MenuScratchMode()
             MenuSpecialEntry()
@@ -374,7 +373,7 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
         MenuRevealSub()
         MenuExternalToolsSub()
         MenuShareSub()
-        if (uiState?.fitToScreenMode != FitToScreenMode.FTSM_LOCKED)
+        if (uiState.fitToScreenMode != FitToScreenMode.FTSM_LOCKED)
             MenuZoomSub()
     }
 
@@ -434,10 +433,10 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
      */
     @Composable
     private fun ClueText(modifier : Modifier) {
-        val state by viewModel.playUIState.observeAsState()
+        val state by viewModel.playUIState.collectAsStateWithLifecycle()
         ClueText(
             modifier = modifier,
-            clueText = state?.clueText,
+            clueText = state.clueText,
             onClick = this::toggleShowClueTabs,
             onClickDescription = stringResource(R.string.toggle_clue_tabs),
             onLongClick = viewModel::launchClueList,
@@ -447,18 +446,17 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
 
     @Composable
     private fun CluesList(modifier : Modifier) {
-        val state by viewModel.playUIState.observeAsState()
+        val state by viewModel.playUIState.collectAsStateWithLifecycle()
 
-        if (!(state?.showClueTabs ?: false))
+        if (!state.showClueTabs)
             return
 
-        val isAcrostic = state?.isAcrostic ?: false
-        val showAllWords = isAcrostic
+        val showAllWords = state.isAcrostic
         val onBarLongClick : () -> Unit
-            = if (isAcrostic) this::toggleShowClueTabs
+            = if (state.isAcrostic) this::toggleShowClueTabs
             else { { } }
         val onBarLongClickDescription
-            = if (isAcrostic) stringResource(R.string.toggle_clue_tabs)
+            = if (state.isAcrostic) stringResource(R.string.toggle_clue_tabs)
             else ""
 
         ClueTabs(
@@ -482,8 +480,8 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
 
     @Composable
     private fun Board(modifier : Modifier) {
-        val state by viewModel.playUIState.observeAsState()
-        val locked = state?.fitToScreenMode == FitToScreenMode.FTSM_LOCKED
+        val state by viewModel.playUIState.collectAsStateWithLifecycle()
+        val locked = state.fitToScreenMode == FitToScreenMode.FTSM_LOCKED
 
         AndroidView(
             modifier = modifier.onSizeChanged { size ->
@@ -534,6 +532,9 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
                 view.apply {
                     setAllowOverScroll(!locked)
                     setAllowZoom(!locked)
+                    setRenderSettings(state.renderSettings)
+                    setScratchMode(state.scratchMode)
+                    setDoubleTapFitBoard(state.doubleTapFitBoard)
                 }
             },
             onRelease = { it.detach() },
@@ -545,15 +546,15 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
         width : Dp,
         maxHeight : Dp,
     ) : Modifier {
-        val state by viewModel.playUIState.observeAsState()
-        val aspect = state?.puzzleAspectRatio ?: 1.0F
+        val state by viewModel.playUIState.collectAsStateWithLifecycle()
+        val aspect = state.puzzleAspectRatio
 
-        val desiredHeight = if (state?.isAcrostic ?: false) {
+        val desiredHeight = if (state.isAcrostic) {
             val minHeight = ACROSTIC_BOARD_HEIGHT_RATIO_MIN * displayHeight
             val aspectHeight = width / aspect
             max(minHeight.dp, aspectHeight)
-        } else if (state?.showClueTabs ?: false) {
-            when (state?.portraitGridRatio) {
+        } else if (state.showClueTabs) {
+            when (state.portraitGridRatio) {
                 GridRatio.GR_ONE_TO_ONE -> width
                 GridRatio.GR_THIRTY_PCNT -> fracDp(0.3, displayHeight)
                 GridRatio.GR_FORTY_PCNT -> fracDp(0.4, displayHeight)
@@ -570,16 +571,16 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
 
     @Composable
     private fun Modifier.boardWidthLandscape() : Modifier {
-        val state by viewModel.playUIState.observeAsState()
-        val aspect = state?.puzzleAspectRatio ?: 1.0F
+        val state by viewModel.playUIState.collectAsStateWithLifecycle()
+        val aspect = state.puzzleAspectRatio
 
-        if (state?.isAcrostic ?: false) {
+        if (state.isAcrostic) {
             val maxWidth = (
                 ACROSTIC_BOARD_WIDTH_RATIO_MAX * displayWidth
             ).toInt().dp
             return this.aspectRatio(aspect).widthIn(max=maxWidth)
-        } else if (state?.showClueTabs ?: false) {
-            return when (state?.landscapeGridRatio) {
+        } else if (state.showClueTabs) {
+            return when (state.landscapeGridRatio) {
                 GridRatio.GR_ONE_TO_ONE -> this.aspectRatio(1.0F)
                 GridRatio.GR_THIRTY_PCNT -> this.fillMaxWidth(0.3F)
                 GridRatio.GR_FORTY_PCNT -> this.fillMaxWidth(0.4F)
