@@ -402,13 +402,13 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
             ) {
                 h = subImageSizes[i].height();
                 w = subImageSizes[i].width();
-                h *= runningScale;
-                w *= runningScale;
+                h = (int)(runningScale * h);
+                w = (int)(runningScale * w);
             } else {
                 h = imageView.getMeasuredHeight();
                 w = imageView.getMeasuredWidth();
-                h *= scale;
-                w *= scale;
+                h = (int)(scale * h);
+                w = (int)(scale * w);
             }
             setViewParams(imageView, w, h);
         }
@@ -416,13 +416,13 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
         if (fullImageSize != null) {
             h = fullImageSize.height();
             w = fullImageSize.width();
-            h *= runningScale;
-            w *= runningScale;
+            h = (int)(runningScale * h);
+            w = (int)(runningScale * w);
         } else {
             h = imageGrid.getMeasuredHeight();
             w = imageGrid.getMeasuredWidth();
-            h *= scale;
-            w *= scale;
+            h = (int)(scale * h);
+            w = (int)(scale * h);
         }
         setViewParams(imageGrid, w, h);
 
