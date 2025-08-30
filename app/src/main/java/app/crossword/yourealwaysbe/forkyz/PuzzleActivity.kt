@@ -1290,13 +1290,13 @@ abstract class PuzzleActivity() : ForkyzActivity() {
      * Announce text with accessibility if running or tts
      *
      * @param data what to announce
-     * @param view the view to announce from (announceForAccessibility)
+     * @param view the view to announce from (setStateDescription)
      * if accessibility service is running
      */
     private fun announce(data : AnnounceData, view : View) {
         val text = data.message
         if (isAccessibilityServiceRunning) {
-            view.announceForAccessibility(text)
+            view.setStateDescription(text)
         } else {
             if (ttsService == null) {
                 ttsService = TextToSpeech(
