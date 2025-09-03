@@ -117,6 +117,29 @@ public class PlayboardRenderer {
         public void setLeft(String left) { this.left = left; }
         public void setRight(String right) { this.right = right; }
 
+        @Override
+        public boolean equals(Object other) {
+            if (other == null)
+                return false;
+            if (other.getClass() != this.getClass())
+                return false;
+            BoxSeparators o = (BoxSeparators) other;
+            return getTop() == o.getTop()
+                && getBottom() == o.getBottom()
+                && getLeft() == o.getLeft()
+                && getRight() == o.getRight();
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(
+                getTop(),
+                getBottom(),
+                getLeft(),
+                getRight()
+            );
+        }
+
         public String toString() {
             return top + " / " + bottom + " / " + left + " / " + right;
         }

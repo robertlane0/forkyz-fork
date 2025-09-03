@@ -186,8 +186,11 @@ public class BoardEditText
     }
 
     public void setRenderSettings(RenderSettings renderSettings) {
-        this.renderSettings = renderSettings;
-        render();
+        boolean changed = !Objects.equals(this.renderSettings, renderSettings);
+        if (changed) {
+            this.renderSettings = renderSettings;
+            render();
+        }
     }
 
     public void setSkipFilled(boolean skipFilled) {
@@ -239,7 +242,7 @@ public class BoardEditText
         if (
             boxes != null
             && boxes.length > 0
-            && !Objects.equals(separators, oldSeparators)
+            && !Arrays.equals(separators, oldSeparators)
         )
             render();
     }
