@@ -183,32 +183,6 @@ public class PlayboardRenderer {
         this.minScale = minScale;
     }
 
-    /**
-     * Get max scale for device
-     *
-     * This aims for enough to make boxes MAX_BOX_SIZE_INCHES but allows
-     * larger if needed to fit screen
-     */
-    public float getDeviceMaxScale(){
-        Puzzle puz = (board == null) ? null : board.getPuzzle();
-        int width = (puz == null) ? DEFAULT_PUZZLE_WIDTH : puz.getWidth();
-
-        float puzzleBaseSizeInPixels = width * BASE_BOX_SIZE_INCHES * dpi;
-        float fitToScreen =  displayWidthPixels / puzzleBaseSizeInPixels;
-        float maxBoxSize = MAX_BOX_SIZE_INCHES / BASE_BOX_SIZE_INCHES;
-
-        return Math.max(maxBoxSize, fitToScreen);
-    }
-
-    /**
-     * Get min scale
-     *
-     * To have min pixels per box
-     */
-    public float getDeviceMinScale(){
-        return MIN_PIXELS_PER_BOX / (BASE_BOX_SIZE_INCHES * dpi);
-    }
-
     synchronized public void setScale(float scale) {
         scale = boundScale(scale);
 
@@ -757,6 +731,32 @@ public class PlayboardRenderer {
                 }
             }
         }
+    }
+
+    /**
+     * Get max scale for device
+     *
+     * This aims for enough to make boxes MAX_BOX_SIZE_INCHES but allows
+     * larger if needed to fit screen
+     */
+    private float getDeviceMaxScale(){
+        Puzzle puz = (board == null) ? null : board.getPuzzle();
+        int width = (puz == null) ? DEFAULT_PUZZLE_WIDTH : puz.getWidth();
+
+        float puzzleBaseSizeInPixels = width * BASE_BOX_SIZE_INCHES * dpi;
+        float fitToScreen =  displayWidthPixels / puzzleBaseSizeInPixels;
+        float maxBoxSize = MAX_BOX_SIZE_INCHES / BASE_BOX_SIZE_INCHES;
+
+        return Math.max(maxBoxSize, fitToScreen);
+    }
+
+    /**
+     * Get min scale
+     *
+     * To have min pixels per box
+     */
+    private float getDeviceMinScale(){
+        return MIN_PIXELS_PER_BOX / (BASE_BOX_SIZE_INCHES * dpi);
     }
 
     /**
