@@ -127,23 +127,19 @@ private fun InfoHeadingData(
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.headlineSmall,
         )
-        state.author?.let { author ->
-            if (author.length > 0) {
-                Text(
-                    text = AnnotatedString.fromHtml(author),
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.titleMedium,
-                )
-            }
+        if (state.author.length > 0) {
+            Text(
+                text = AnnotatedString.fromHtml(state.author),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.titleMedium,
+            )
         }
-        state.copyright?.let { copyright ->
-            if (copyright.length > 0) {
-                Text(
-                    text = AnnotatedString.fromHtml(state.copyright ?: ""),
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodySmall,
-                )
-            }
+        if (state.copyright.length > 0) {
+            Text(
+                text = AnnotatedString.fromHtml(state.copyright),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.bodySmall,
+            )
         }
         Text(
             text = stringResource(
@@ -157,7 +153,7 @@ private fun InfoHeadingData(
             progress = { state.progress / 100F },
         )
         Text(
-            text = state.filename ?: "",
+            text = state.filename,
             style = MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.Center,
         )
