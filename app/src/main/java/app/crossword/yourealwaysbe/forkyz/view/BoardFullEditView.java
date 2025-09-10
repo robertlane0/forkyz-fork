@@ -50,7 +50,7 @@ public class BoardFullEditView extends BoardEditView {
         super(context, attrs);
 
         DisplayMetrics metrics
-            = getContext().getResources().getDisplayMetrics();
+            = context.getResources().getDisplayMetrics();
         screenOverdrawPx = metrics.densityDpi * SCREEN_OVERDRAW;
     }
 
