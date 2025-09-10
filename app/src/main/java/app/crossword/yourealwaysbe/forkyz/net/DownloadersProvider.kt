@@ -17,7 +17,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 
 import app.crossword.yourealwaysbe.forkyz.settings.DownloadersSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
-import app.crossword.yourealwaysbe.forkyz.util.mainScope
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.util.getOnce

@@ -4,17 +4,23 @@ package app.crossword.yourealwaysbe.forkyz.settings
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.setMain
 
 import android.content.SharedPreferences
 import android.os.SystemClock
 import androidx.datastore.core.DataStore
 
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
@@ -314,6 +320,18 @@ class ForkyzSettingsTest {
         .setMovementStrategyClueList(MovementStrategySetting.MSS_MOVE_NEXT_CLUE)
         .build()
 
+    private val testDispatcher = UnconfinedTestDispatcher()
+
+    @Before
+    fun setup() {
+        Dispatchers.setMain(testDispatcher)
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
+
     @Mock
     val prefs = mock(SharedPreferences::class.java)
     val prefsEdit = mock(SharedPreferences.Editor::class.java)
@@ -604,8 +622,6 @@ class ForkyzSettingsTest {
         settings1.importSettings(bais)
         bais.close()
 
-        runBlocking { settings1.shutdown() }
-
         val importedSettings = runBlocking { datastore1.data.first() }
         assertEquals(importedSettings, settingsValue2)
     }
@@ -616,8 +632,6 @@ class ForkyzSettingsTest {
         val settings = ForkyzSettings(datastore)
 
         migratePreferences(prefs, settings)
-
-        runBlocking { settings.shutdown() }
 
         val migratedSettings = runBlocking { datastore.data.first() }
         assertEquals(migratedSettings, settingsValue3)

@@ -9,9 +9,9 @@ import java.io.OutputStreamWriter
 import java.io.PrintWriter
 import java.nio.charset.Charset
 import java.util.function.Consumer
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -29,22 +29,12 @@ import org.json.JSONObject
 
 import app.crossword.yourealwaysbe.forkyz.net.Downloaders
 import app.crossword.yourealwaysbe.forkyz.util.JSONUtils
-import app.crossword.yourealwaysbe.forkyz.util.mainScope
+import app.crossword.yourealwaysbe.forkyz.util.getOnce
 import app.crossword.yourealwaysbe.puz.MovementStrategy
 import app.crossword.yourealwaysbe.puz.Playboard.DeleteCrossingMode
 
-class ForkyzSettings(
-    val settingsStore: DataStore<Settings>
-) : CoroutineScope {
+class ForkyzSettings(val settingsStore: DataStore<Settings>) {
     private val WRITE_CHARSET = Charset.forName("UTF-8")
-
-    private val job = Job()
-    // serialise updates in single thread
-    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
-    override val coroutineContext
-        = Dispatchers.IO.limitedParallelism(1) + job
-
-    private val mainScope = CoroutineScope(Dispatchers.Main)
 
     val settingsFlow : Flow<Settings>
         = settingsStore.data
@@ -63,10 +53,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.alwaysAnnounceBox }
 
     fun setVoiceAlwaysAnnounceBox(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setAlwaysAnnounceBox(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setAlwaysAnnounceBox(value).build()
         }
     }
 
@@ -77,10 +65,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.alwaysAnnounceClue }
 
     fun setVoiceAlwaysAnnounceClue(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setAlwaysAnnounceClue(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setAlwaysAnnounceClue(value).build()
         }
     }
 
@@ -91,10 +77,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.applicationTheme }
 
     fun setAppTheme(value : Theme) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setApplicationTheme(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setApplicationTheme(value).build()
         }
     }
 
@@ -124,10 +108,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.archiveCleanupAge }
 
     fun setBrowseCleanupAgeArchive(value : Int) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setArchiveCleanupAge(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setArchiveCleanupAge(value).build()
         }
     }
 
@@ -138,10 +120,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.dontConfirmCleanup }
 
     fun setBrowseDontConfirmCleanup(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setDontConfirmCleanup(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setDontConfirmCleanup(value).build()
         }
     }
 
@@ -152,10 +132,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.dontConfirmBrowseDelete }
 
     fun setBrowseDontConfirmDelete(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setDontConfirmBrowseDelete(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setDontConfirmBrowseDelete(value).build()
         }
     }
 
@@ -172,12 +150,10 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.backgroundDownloadAllowRoaming }
 
     fun setDownloadAllowRoaming(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder()
-                    .setBackgroundDownloadAllowRoaming(value)
-                    .build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder()
+                .setBackgroundDownloadAllowRoaming(value)
+                .build()
         }
     }
 
@@ -188,13 +164,11 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.autoDownloadersList.toSet() }
 
     fun setDownloadAutoDownloaders(value : Set<String>) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder()
-                    .clearAutoDownloaders()
-                    .addAllAutoDownloaders(value)
-                    .build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder()
+                .clearAutoDownloaders()
+                .addAllAutoDownloaders(value)
+                .build()
         }
     }
 
@@ -205,13 +179,11 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.backgroundDownloadDaysList.toSet() }
 
     fun setDownloadDays(value : Set<String>) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder()
-                    .clearBackgroundDownloadDays()
-                    .addAllBackgroundDownloadDays(value)
-                    .build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder()
+                .clearBackgroundDownloadDays()
+                .addAllBackgroundDownloadDays(value)
+                .build()
         }
     }
 
@@ -222,12 +194,10 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.backgroundDownloadDaysTime }
 
     fun setDownloadDaysTime(value : Int) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder()
-                    .setBackgroundDownloadDaysTime(value)
-                    .build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder()
+                .setBackgroundDownloadDaysTime(value)
+                .build()
         }
     }
 
@@ -238,10 +208,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.backgroundDownloadHourly }
 
     fun setDownloadHourly(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setBackgroundDownloadHourly(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setBackgroundDownloadHourly(value).build()
         }
     }
 
@@ -252,12 +220,10 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.backgroundDownloadRequireCharging }
 
     fun setDownloadRequireCharging(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder()
-                    .setBackgroundDownloadRequireCharging(value)
-                    .build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder()
+                .setBackgroundDownloadRequireCharging(value)
+                .build()
         }
     }
 
@@ -268,12 +234,10 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.backgroundDownloadRequireUnmetered }
 
     fun setDownloadRequireUnmetered(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder()
-                    .setBackgroundDownloadRequireUnmetered(value)
-                    .build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder()
+                .setBackgroundDownloadRequireUnmetered(value)
+                .build()
         }
     }
 
@@ -284,10 +248,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.browseAlwaysShowRating }
 
     fun setBrowseAlwaysShowRating(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setBrowseAlwaysShowRating(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setBrowseAlwaysShowRating(value).build()
         }
     }
 
@@ -298,10 +260,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.browseIndicateIfSolution }
 
     fun setBrowseIndicateIfSolution(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setBrowseIndicateIfSolution(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setBrowseIndicateIfSolution(value).build()
         }
     }
 
@@ -312,10 +272,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.browseNewPuzzle }
 
     fun setBrowseNewPuzzle(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setBrowseNewPuzzle(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setBrowseNewPuzzle(value).build()
         }
     }
 
@@ -326,12 +284,10 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.browseShowPercentageCorrect }
 
     fun setBrowseShowPercentageCorrect(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder()
-                    .setBrowseShowPercentageCorrect(value)
-                    .build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder()
+                .setBrowseShowPercentageCorrect(value)
+                .build()
         }
     }
 
@@ -342,10 +298,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.buttonActivatesVoice }
 
     fun setVoiceButtonActivatesVoice(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setButtonActivatesVoice(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setButtonActivatesVoice(value).build()
         }
     }
 
@@ -356,10 +310,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.buttonAnnounceClue }
 
     fun setVoiceButtonAnnounceClue(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setButtonAnnounceClue(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setButtonAnnounceClue(value).build()
         }
     }
 
@@ -370,10 +322,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.chatGPTAPIKey }
 
     fun setExtChatGPTAPIKey(value : String) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setChatGPTAPIKey(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setChatGPTAPIKey(value).build()
         }
     }
 
@@ -384,10 +334,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.cleanupAge }
 
     fun setBrowseCleanupAge(value : Int) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setCleanupAge(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setCleanupAge(value).build()
         }
     }
 
@@ -398,10 +346,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.clueBelowGrid }
 
     fun setPlayClueBelowGrid(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setClueBelowGrid(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setClueBelowGrid(value).build()
         }
     }
 
@@ -412,10 +358,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.clueHighlight }
 
     fun setPlayClueHighlight(value : ClueHighlight) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setClueHighlight(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setClueHighlight(value).build()
         }
     }
 
@@ -426,21 +370,9 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.clueTabsDouble }
 
     fun setClueListClueTabsDouble(value : ClueTabsDouble) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setClueTabsDouble(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setClueTabsDouble(value).build()
         }
-    }
-
-    /**
-     * For testing -- shutdown the settings and wait for jobs to end
-     *
-     * Useful to wait for all updates to have passed.
-     */
-    internal suspend fun shutdown() {
-        job.complete()
-        job.join()
     }
 
     private fun makeBackgroundDownloadSettings(
@@ -626,10 +558,22 @@ class ForkyzSettings(
         cb : (T) -> Unit,
         getValue : (Settings) -> T,
     ) {
-        launch {
-            val value = getValue(settingsFlow.first())
-            runMain { cb(value) }
+        settingsFlow.getOnce { cb(getValue(it)) }
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    private fun settingsUpdate(
+        cb : (() -> Unit)?,
+        transform : (Settings) -> Settings,
+    ) {
+        GlobalScope.launch(Dispatchers.Main) {
+            settingsStore.updateData(transform)
+            cb?.let { it() }
         }
+    }
+
+    private fun settingsUpdate(transform : (Settings) -> Settings) {
+        settingsUpdate(null, transform)
     }
 
     private val livePlayActivityClueTabsPage : Flow<Int>
@@ -657,20 +601,16 @@ class ForkyzSettings(
     fun setPlayClueTabsPage(viewIdx : Int, pageNo : Int) {
         if (pageNo >= 0) {
             if (viewIdx == 0) {
-                launch {
-                    settingsStore.updateData { settings ->
-                        settings.toBuilder()
-                            .setPlayActivityClueTabsPage(pageNo)
-                            .build()
-                    }
+                settingsUpdate { settings ->
+                    settings.toBuilder()
+                        .setPlayActivityClueTabsPage(pageNo)
+                        .build()
                 }
             } else if (viewIdx == 1) {
-                launch {
-                    settingsStore.updateData { settings ->
-                        settings.toBuilder()
-                            .setPlayActivityClueTabsPage1(pageNo)
-                            .build()
-                    }
+                settingsUpdate { settings ->
+                    settings.toBuilder()
+                        .setPlayActivityClueTabsPage1(pageNo)
+                        .build()
                 }
             }
         }
@@ -683,10 +623,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.crosswordSolverEnabled }
 
     fun setExtCrosswordSolverEnabled(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setCrosswordSolverEnabled(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setCrosswordSolverEnabled(value).build()
         }
     }
 
@@ -697,10 +635,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.customDailyTitle }
 
     fun setDownloadCustomDailyTitle(value : String) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setCustomDailyTitle(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setCustomDailyTitle(value).build()
         }
     }
 
@@ -711,10 +647,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.customDailyUrl }
 
     fun setDownloadCustomDailyURL(value : String) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setCustomDailyUrl(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setCustomDailyUrl(value).build()
         }
     }
 
@@ -725,10 +659,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.cycleUnfilledMode }
 
     fun setPlayCycleUnfilledMode(value : CycleUnfilledMode) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setCycleUnfilledMode(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setCycleUnfilledMode(value).build()
         }
     }
 
@@ -746,10 +678,8 @@ class ForkyzSettings(
     ) = settingsOnce(cb) { it.deleteCrossingMode }
 
     fun setPlayDeleteCrossingModeSetting(value : DeleteCrossingModeSetting) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setDeleteCrossingMode(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setDeleteCrossingMode(value).build()
         }
     }
 
@@ -760,10 +690,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.deleteOnCleanup }
 
     fun setBrowseDeleteOnCleanup(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setDeleteOnCleanup(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setDeleteOnCleanup(value).build()
         }
     }
 
@@ -774,10 +702,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.disableRatings }
 
     fun setRatingsDisableRatings(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setDisableRatings(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setDisableRatings(value).build()
         }
     }
 
@@ -788,10 +714,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.disableSwipe }
 
     fun setBrowseDisableSwipe(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setDisableSwipe(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setDisableSwipe(value).build()
         }
     }
 
@@ -802,10 +726,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.displayScratch }
 
     fun setPlayScratchDisplay(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setDisplayScratch(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setDisplayScratch(value).build()
         }
     }
 
@@ -816,10 +738,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.displaySeparators }
 
     fun setPlayDisplaySeparators(value : DisplaySeparators) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setDisplaySeparators(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setDisplaySeparators(value).build()
         }
     }
 
@@ -834,11 +754,9 @@ class ForkyzSettings(
 
     fun setBrowseLastDownload(value : Long) {
         if (0 <= value && value <= System.currentTimeMillis()) {
-            launch {
-                settingsStore.updateData { settings ->
-                    settings.toBuilder().setDlLast(value).build()
-                }
-            }
+            settingsUpdate { settings ->
+                settings.toBuilder().setDlLast(value).build()
+        }
         }
     }
 
@@ -849,10 +767,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.dlOnStartup }
 
     fun setDownloadOnStartUp(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setDlOnStartup(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setDlOnStartup(value).build()
         }
     }
 
@@ -867,10 +783,8 @@ class ForkyzSettings(
         )
 
     fun setPlayDoubleTapFitBoard(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setDoubleTap(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setDoubleTap(value).build()
         }
     }
 
@@ -881,10 +795,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.download20Minutes }
 
     fun setDownload20Minutes(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setDownload20Minutes(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setDownload20Minutes(value).build()
         }
     }
 
@@ -895,10 +807,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.downloadCustomDaily }
 
     fun setDownloadCustomDaily(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setDownloadCustomDaily(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setDownloadCustomDaily(value).build()
         }
     }
 
@@ -909,10 +819,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.downloadDeStandaard }
 
     fun setDownloadDeStandaard(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setDownloadDeStandaard(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setDownloadDeStandaard(value).build()
         }
     }
 
@@ -923,10 +831,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.downloadDeTelegraaf }
 
     fun setDownloadDeTelegraaf(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setDownloadDeTelegraaf(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setDownloadDeTelegraaf(value).build()
         }
     }
 
@@ -937,12 +843,10 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.downloadGuardianDailyCryptic }
 
     fun setDownloadGuardianDailyCryptic(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder()
-                    .setDownloadGuardianDailyCryptic(value)
-                    .build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder()
+                .setDownloadGuardianDailyCryptic(value)
+                .build()
         }
     }
 
@@ -953,12 +857,10 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.downloadGuardianWeeklyQuiptic }
 
     fun setDownloadGuardianWeeklyQuiptic(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder()
-                    .setDownloadGuardianWeeklyQuiptic(value)
-                    .build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder()
+                .setDownloadGuardianWeeklyQuiptic(value)
+                .build()
         }
     }
 
@@ -969,10 +871,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.downloadHamAbend }
 
     fun setDownloadHamAbend(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setDownloadHamAbend(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setDownloadHamAbend(value).build()
         }
     }
 
@@ -983,12 +883,10 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.downloadIndependentDailyCryptic }
 
     fun setDownloadIndependentDailyCryptic(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder()
-                    .setDownloadIndependentDailyCryptic(value)
-                    .build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder()
+                .setDownloadIndependentDailyCryptic(value)
+                .build()
         }
     }
 
@@ -999,10 +897,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.downloadIrishNewsCryptic }
 
     fun setDownloadIrishNewsCryptic(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setDownloadIrishNewsCryptic(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setDownloadIrishNewsCryptic(value).build()
         }
     }
 
@@ -1013,10 +909,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.downloadJonesin }
 
     fun setDownloadJonesin(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setDownloadJonesin(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setDownloadJonesin(value).build()
         }
     }
 
@@ -1027,10 +921,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.downloadJoseph }
 
     fun setDownloadJoseph(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setDownloadJoseph(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setDownloadJoseph(value).build()
         }
     }
 
@@ -1038,10 +930,8 @@ class ForkyzSettings(
         = settingsMap { it.downloadLATimes }
 
     fun setDownloadLATimes(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setDownloadLATimes(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setDownloadLATimes(value).build()
         }
     }
 
@@ -1052,10 +942,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.downloadLATimes }
 
     fun setDownloadLeParisienF1(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setDownloadLeParisienF1(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setDownloadLeParisienF1(value).build()
         }
     }
 
@@ -1066,10 +954,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.downloadLeParisienF2 }
 
     fun setDownloadLeParisienF2(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setDownloadLeParisienF2(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setDownloadLeParisienF2(value).build()
         }
     }
 
@@ -1080,10 +966,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.downloadLeParisienF3 }
 
     fun setDownloadLeParisienF3(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setDownloadLeParisienF3(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setDownloadLeParisienF3(value).build()
         }
     }
 
@@ -1094,10 +978,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.downloadLeParisienF4 }
 
     fun setDownloadLeParisienF4(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setDownloadLeParisienF4(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setDownloadLeParisienF4(value).build()
         }
     }
 
@@ -1108,10 +990,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.downloadMetroCryptic }
 
     fun setDownloadMetroCryptic(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setDownloadMetroCryptic(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setDownloadMetroCryptic(value).build()
         }
     }
 
@@ -1122,10 +1002,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.downloadMetroQuick }
 
     fun setDownloadMetroQuick(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setDownloadMetroQuick(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setDownloadMetroQuick(value).build()
         }
     }
 
@@ -1136,12 +1014,10 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.downloadNewYorkTimesSyndicated }
 
     fun setDownloadNewYorkTimesSyndicated(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder()
-                    .setDownloadNewYorkTimesSyndicated(value)
-                    .build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder()
+                .setDownloadNewYorkTimesSyndicated(value)
+                .build()
         }
     }
 
@@ -1152,10 +1028,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.downloadNewsday }
 
     fun setDownloadNewsday(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setDownloadNewsday(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setDownloadNewsday(value).build()
         }
     }
 
@@ -1166,10 +1040,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.downloadPremier }
 
     fun setDownloadPremier(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setDownloadPremier(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setDownloadPremier(value).build()
         }
     }
 
@@ -1180,10 +1052,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.downloadSheffer }
 
     fun setDownloadSheffer(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setDownloadSheffer(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setDownloadSheffer(value).build()
         }
     }
 
@@ -1194,10 +1064,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.downloadTimeout }
 
     fun setDownloadTimeout(value : Int) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setDownloadTimeout(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setDownloadTimeout(value).build()
         }
     }
 
@@ -1208,10 +1076,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.downloadUSAToday }
 
     fun setDownloadUSAToday(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setDownloadUSAToday(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setDownloadUSAToday(value).build()
         }
     }
 
@@ -1222,10 +1088,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.downloadUniversal }
 
     fun setDownloadUniversal(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setDownloadUniversal(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setDownloadUniversal(value).build()
         }
     }
 
@@ -1236,10 +1100,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.downloadWaPoSunday }
 
     fun setDownloadWaPoSunday(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setDownloadWaPoSunday(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setDownloadWaPoSunday(value).build()
         }
     }
 
@@ -1250,10 +1112,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.downloadWsj }
 
     fun setDownloadWsj(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setDownloadWsj(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setDownloadWsj(value).build()
         }
     }
 
@@ -1264,10 +1124,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.duckDuckGoEnabled }
 
     fun setExtDuckDuckGoEnabled(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setDuckDuckGoEnabled(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setDuckDuckGoEnabled(value).build()
         }
     }
 
@@ -1282,10 +1140,8 @@ class ForkyzSettings(
         )
 
     fun setPlayEnsureVisible(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setEnsureVisible(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setEnsureVisible(value).build()
         }
     }
 
@@ -1296,10 +1152,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.enterChangesDirection }
 
     fun setPlayEnterChangesDirection(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setEnterChangesDirection(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setEnterChangesDirection(value).build()
         }
     }
 
@@ -1310,10 +1164,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.equalsAnnounceClue }
 
     fun setVoiceEqualsAnnounceClue(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setEqualsAnnounceClue(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setEqualsAnnounceClue(value).build()
         }
     }
 
@@ -1324,10 +1176,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.externalDictionary }
 
     fun setExtDictionarySetting(value : ExternalDictionarySetting) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setExternalDictionary(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setExternalDictionary(value).build()
         }
     }
 
@@ -1344,10 +1194,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.fifteenSquaredEnabled }
 
     fun setExtFifteenSquaredEnabled(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setFifteenSquaredEnabled(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setFifteenSquaredEnabled(value).build()
         }
     }
 
@@ -1361,29 +1209,23 @@ class ForkyzSettings(
         settings : FileHandlerSettings,
         cb : (() -> Unit)? = null,
     ) {
-        launch {
-            settingsStore.updateData {
-                it.toBuilder()
-                    .setStorageLocation(settings.storageLocation)
-                    .setSafRootUri(settings.safRootURI)
-                    .setSafCrosswordsFolderUri(settings.safCrosswordsURI)
-                    .setSafArchiveFolderUri(settings.safArchiveURI)
-                    .setSafToImportFolderUri(settings.safToImportURI)
-                    .setSafToImportDoneFolderUri(settings.safToImportDoneURI)
-                    .setSafToImportFailedFolderUri(
-                        settings.safToImportFailedURI
-                    ).build()
-            }
-            runMain(cb)
+        settingsUpdate(cb) {
+            it.toBuilder()
+                .setStorageLocation(settings.storageLocation)
+                .setSafRootUri(settings.safRootURI)
+                .setSafCrosswordsFolderUri(settings.safCrosswordsURI)
+                .setSafArchiveFolderUri(settings.safArchiveURI)
+                .setSafToImportFolderUri(settings.safToImportURI)
+                .setSafToImportDoneFolderUri(settings.safToImportDoneURI)
+                .setSafToImportFailedFolderUri(
+                    settings.safToImportFailedURI
+                ).build()
         }
     }
 
-    fun setFileHandlerSettingsSync(
-        settings : FileHandlerSettings,
-        cb : (() -> Unit)? = null,
-    ) {
+    fun setFileHandlerSettingsSync(settings : FileHandlerSettings) {
         runBlocking {
-            settingsStore.updateData {
+            settingsUpdate {
                 it.toBuilder()
                     .setStorageLocation(settings.storageLocation)
                     .setSafRootUri(settings.safRootURI)
@@ -1395,7 +1237,6 @@ class ForkyzSettings(
                         settings.safToImportFailedURI
                     ).build()
             }
-            runMain(cb)
         }
     }
 
@@ -1409,10 +1250,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.fitToScreenMode }
 
     fun setPlayFitToScreenMode(value : FitToScreenMode) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setFitToScreenMode(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setFitToScreenMode(value).build()
         }
     }
 
@@ -1423,10 +1262,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.fullScreen }
 
     fun setPlayFullScreen(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setFullScreen(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setFullScreen(value).build()
         }
     }
 
@@ -1437,10 +1274,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.gridRatio }
 
     fun setPlayGridRatioPortrait(value : GridRatio) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setGridRatio(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setGridRatio(value).build()
         }
     }
 
@@ -1451,10 +1286,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.gridRatioLand }
 
     fun setPlayGridRatioLandscape(value : GridRatio) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setGridRatioLand(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setGridRatioLand(value).build()
         }
     }
 
@@ -1465,10 +1298,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.indicateShowErrors }
 
     fun setPlayIndicateShowErrors(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setIndicateShowErrors(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setIndicateShowErrors(value).build()
         }
     }
 
@@ -1479,10 +1310,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.inferSeparators }
 
     fun setPlayInferSeparators(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setInferSeparators(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setInferSeparators(value).build()
         }
     }
 
@@ -1493,10 +1322,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.keyboardCompact }
 
     fun setKeyboardCompact(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setKeyboardCompact(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setKeyboardCompact(value).build()
         }
     }
 
@@ -1507,10 +1334,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.keyboardForceCaps }
 
     fun setKeyboardForceCaps(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setKeyboardForceCaps(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setKeyboardForceCaps(value).build()
         }
     }
 
@@ -1521,10 +1346,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.keyboardHaptic }
 
     fun setKeyboardHaptic(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setKeyboardHaptic(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setKeyboardHaptic(value).build()
         }
     }
 
@@ -1535,10 +1358,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.keyboardHideButton }
 
     fun setKeyboardHideButton(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setKeyboardHideButton(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setKeyboardHideButton(value).build()
         }
     }
 
@@ -1549,10 +1370,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.keyboardLayout }
 
     fun setKeyboardLayout(value : KeyboardLayout) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setKeyboardLayout(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setKeyboardLayout(value).build()
         }
     }
 
@@ -1563,10 +1382,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.keyboardShowHide }
 
     fun setKeyboardMode(value : KeyboardMode) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setKeyboardShowHide(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setKeyboardShowHide(value).build()
         }
     }
 
@@ -1577,10 +1394,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.keyboardRepeatDelay }
 
     fun setKeyboardRepeatDelay(value : Int) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setKeyboardRepeatDelay(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setKeyboardRepeatDelay(value).build()
         }
     }
 
@@ -1591,10 +1406,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.keyboardRepeatInterval }
 
     fun setKeyboardRepeatInterval(value : Int) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setKeyboardRepeatInterval(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setKeyboardRepeatInterval(value).build()
         }
     }
 
@@ -1611,10 +1424,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.useNativeKeyboard }
 
     fun setKeyboardUseNative(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setUseNativeKeyboard(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setUseNativeKeyboard(value).build()
         }
     }
 
@@ -1625,10 +1436,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.lastSeenVersion }
 
     fun setBrowseLastSeenVersion(value : String) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setLastSeenVersion(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setLastSeenVersion(value).build()
         }
     }
 
@@ -1645,10 +1454,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.movementStrategy }
 
     fun setPlayMovementStrategySetting(value : MovementStrategySetting) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setMovementStrategy(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setMovementStrategy(value).build()
         }
     }
 
@@ -1673,12 +1480,10 @@ class ForkyzSettings(
     fun setPlayMovementStrategyClueListSetting(
         value : MovementStrategySetting,
     ) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setMovementStrategyClueList(
-                    coerceMovementStrategyClueList(value)
-                ).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setMovementStrategyClueList(
+                coerceMovementStrategyClueList(value)
+            ).build()
         }
     }
 
@@ -1689,10 +1494,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.orientationLock }
 
     fun setAppOrientationLock(value : Orientation) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setOrientationLock(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setOrientationLock(value).build()
         }
     }
 
@@ -1703,10 +1506,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.playLetterUndoEnabled }
 
     fun setPlayPlayLetterUndoEnabled(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setPlayLetterUndoEnabled(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setPlayLetterUndoEnabled(value).build()
         }
     }
 
@@ -1717,10 +1518,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.predictAnagramChars }
 
     fun setPlayPredictAnagramChars(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setPredictAnagramChars(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setPredictAnagramChars(value).build()
         }
     }
 
@@ -1731,12 +1530,10 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.preserveCorrectLettersInShowErrors }
 
     fun setPlayPreserveCorrectLettersInShowErrors(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder()
-                    .setPreserveCorrectLettersInShowErrors(value)
-                    .build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder()
+                .setPreserveCorrectLettersInShowErrors(value)
+                .build()
         }
     }
 
@@ -1747,10 +1544,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.randomClueOnShake }
 
     fun setPlayRandomClueOnShake(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setRandomClueOnShake(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setRandomClueOnShake(value).build()
         }
     }
 
@@ -1761,10 +1556,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.specialEntryForceCaps }
 
     fun setPlaySpecialEntryForceCaps(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setSpecialEntryForceCaps(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setSpecialEntryForceCaps(value).build()
         }
     }
 
@@ -1822,11 +1615,9 @@ class ForkyzSettings(
 
     fun setPlayScale(value : Float) {
         if (0 <= value) {
-            launch {
-                settingsStore.updateData { settings ->
-                    settings.toBuilder().setScale(value).build()
-                }
-            }
+            settingsUpdate { settings ->
+                settings.toBuilder().setScale(value).build()
+        }
         }
     }
 
@@ -1837,10 +1628,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.scrapeCru }
 
     fun setScrapeCru(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setScrapeCru(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setScrapeCru(value).build()
         }
     }
 
@@ -1851,10 +1640,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.scrapeGuardianQuick }
 
     fun setScrapeGuardianQuick(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setScrapeGuardianQuick(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setScrapeGuardianQuick(value).build()
         }
     }
 
@@ -1865,10 +1652,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.scrapeKegler }
 
     fun setScrapeKegler(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setScrapeKegler(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setScrapeKegler(value).build()
         }
     }
 
@@ -1879,10 +1664,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.scrapePrivateEye }
 
     fun setScrapePrivateEye(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setScrapePrivateEye(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setScrapePrivateEye(value).build()
         }
     }
 
@@ -1893,10 +1676,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.scrapePrzekroj }
 
     fun setScrapePrzekroj(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setScrapePrzekroj(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setScrapePrzekroj(value).build()
         }
     }
 
@@ -1911,10 +1692,8 @@ class ForkyzSettings(
         )
 
     fun setPlayScratchMode(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setScratchMode(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setScratchMode(value).build()
         }
     }
 
@@ -1925,10 +1704,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.showCluesOnPlayScreen }
 
     fun setPlayShowClueTabs(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setShowCluesOnPlayScreen(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setShowCluesOnPlayScreen(value).build()
         }
     }
 
@@ -1939,10 +1716,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.showCount }
 
     fun setPlayShowCount(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setShowCount(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setShowCount(value).build()
         }
     }
 
@@ -1953,10 +1728,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.showErrors }
 
     fun setPlayShowErrorsGrid(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setShowErrors(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setShowErrors(value).build()
         }
     }
 
@@ -1967,10 +1740,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.showErrorsClue }
 
     fun setPlayShowErrorsClue(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setShowErrorsClue(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setShowErrorsClue(value).build()
         }
     }
 
@@ -1981,10 +1752,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.showErrorsCursor }
 
     fun setPlayShowErrorsCursor(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setShowErrorsCursor(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setShowErrorsCursor(value).build()
         }
     }
 
@@ -1995,10 +1764,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.showTimer }
 
     fun setPlayShowTimer(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setShowTimer(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setShowTimer(value).build()
         }
     }
 
@@ -2009,10 +1776,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.showWordsInClueList }
 
     fun setClueListShowWords(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setShowWordsInClueList(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setShowWordsInClueList(value).build()
         }
     }
 
@@ -2027,10 +1792,8 @@ class ForkyzSettings(
         )
 
     fun setPlaySkipFilled(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setSkipFilled(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setSkipFilled(value).build()
         }
     }
 
@@ -2044,10 +1807,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.snapClue }
 
     fun setClueListSnapToClue(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setSnapClue(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setSnapClue(value).build()
         }
     }
 
@@ -2058,10 +1819,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.sort }
 
     fun setBrowseSort(value : AccessorSetting) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setSort(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setSort(value).build()
         }
     }
 
@@ -2072,10 +1831,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.spaceChangesDirection }
 
     fun setPlaySpaceChangesDirection(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setSpaceChangesDirection(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setSpaceChangesDirection(value).build()
         }
     }
 
@@ -2086,10 +1843,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.suppressHints }
 
     fun setPlaySuppressHintHighlighting(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setSuppressHints(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setSuppressHints(value).build()
         }
     }
 
@@ -2100,10 +1855,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.suppressMessages }
 
     fun setDownloadSuppressMessages(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setSuppressMessages(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setSuppressMessages(value).build()
         }
     }
 
@@ -2114,10 +1867,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.suppressSummaryMessages }
 
     fun setDownloadSuppressSummaryMessages(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setSuppressSummaryMessages(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setSuppressSummaryMessages(value).build()
         }
     }
 
@@ -2133,10 +1884,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.swipeAction }
 
     fun setBrowseSwipeAction(value : BrowseSwipeAction) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setSwipeAction(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setSwipeAction(value).build()
         }
     }
 
@@ -2147,10 +1896,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.toggleBeforeMove }
 
     fun setPlayToggleBeforeMove(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setToggleBeforeMove(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setToggleBeforeMove(value).build()
         }
     }
 
@@ -2165,20 +1912,16 @@ class ForkyzSettings(
         )
 
     fun setAppDayNightMode(value : DayNightMode, cb : (() -> Unit)? = null) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setUiTheme(value).build()
-            }
-            runMain(cb)
+        settingsUpdate(cb) { settings ->
+            settings.toBuilder().setUiTheme(value).build()
         }
     }
 
-    fun setAppDayNightModeSync(value : DayNightMode, cb : Runnable? = null) {
+    fun setAppDayNightModeSync(value : DayNightMode) {
         runBlocking {
-            settingsStore.updateData { settings ->
+            settingsUpdate { settings ->
                 settings.toBuilder().setUiTheme(value).build()
             }
-            cb?.run()
         }
     }
 
@@ -2189,10 +1932,8 @@ class ForkyzSettings(
         = settingsOnce(cb) { it.volumeActivatesVoice }
 
     fun setVoiceVolumeActivatesVoice(value : Boolean) {
-        launch {
-            settingsStore.updateData { settings ->
-                settings.toBuilder().setVolumeActivatesVoice(value).build()
-            }
+        settingsUpdate { settings ->
+            settings.toBuilder().setVolumeActivatesVoice(value).build()
         }
     }
 
@@ -2234,10 +1975,6 @@ class ForkyzSettings(
         } catch (e : JSONException) {
             throw IOException("JSON error importing settings", e)
         }
-    }
-
-    private fun runMain(run : (() -> Unit)?) {
-        run?.let { mainScope.launch { it() } }
     }
 
     private fun addListToJSON(

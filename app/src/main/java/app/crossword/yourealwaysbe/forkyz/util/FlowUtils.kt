@@ -3,7 +3,9 @@ package app.crossword.yourealwaysbe.forkyz.util
 
 import java.util.function.Consumer
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -27,9 +29,6 @@ import androidx.lifecycle.repeatOnLifecycle
 // 5000ms is apparently LiveData default for timing out on
 // subscriptions, someone said, on the internet
 private val SUBSCRIBED_TIMEOUT = 5000L
-
-val defaultScope = CoroutineScope(Dispatchers.Default)
-val mainScope = CoroutineScope(Dispatchers.Main)
 
 /**
  * A StateFlow MediatorLiveData-alike
@@ -142,17 +141,19 @@ fun <T> Flow<T>.shareInSubscribed(scope : CoroutineScope) : SharedFlow<T> {
 /**
  * Get a value once and return async on main via callback
  *
- * Gets on main scope
+ * Gets on global scope / main
  */
+@OptIn(DelicateCoroutinesApi::class)
 fun <T> Flow<T>.getOnce(cb : (T) -> Unit) {
-    mainScope.launch { cb(first()) }
+    GlobalScope.launch(Dispatchers.Main) { cb(first()) }
 }
 
 /**
  * Get a value once and return async on main via callback
  *
- * Gets on Default returns on Main
+ * Gets on GlobalScope / main
  */
+@OptIn(DelicateCoroutinesApi::class)
 fun <T> Flow<T?>.getOnceNotNull(cb : (T) -> Unit) {
     this.filterNotNull().getOnce(cb)
 }
@@ -160,12 +161,13 @@ fun <T> Flow<T?>.getOnceNotNull(cb : (T) -> Unit) {
 /**
  * Like observeForever on LiveData
  *
- * Uses mainScope. Consumer for BackgroundDownloadManager.java
+ * Uses GlobalScope / main. Consumer for BackgroundDownloadManager.java
  *
  * Uses ProcessLifecycleOwner for lifecycle.
  */
+@OptIn(DelicateCoroutinesApi::class)
 fun <T> Flow<T>.observeForeverWithLifecycle(cb : Consumer<T>) {
-    mainScope.launch {
+    GlobalScope.launch(Dispatchers.Main) {
         ProcessLifecycleOwner.get().repeatOnLifecycle(Lifecycle.State.STARTED) {
             collect(cb::accept)
         }

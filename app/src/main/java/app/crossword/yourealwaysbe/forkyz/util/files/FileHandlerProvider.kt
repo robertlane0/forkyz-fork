@@ -3,6 +3,8 @@ package app.crossword.yourealwaysbe.forkyz.util.files
 
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 
@@ -16,7 +18,6 @@ import app.crossword.yourealwaysbe.forkyz.R
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation
-import app.crossword.yourealwaysbe.forkyz.util.defaultScope
 import app.crossword.yourealwaysbe.forkyz.util.getOnceNotNull
 import app.crossword.yourealwaysbe.forkyz.util.stateInSubscribed
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
@@ -29,10 +30,11 @@ class FileHandlerProvider @Inject constructor(
 ) {
     // state flow to ensure only once file handler unless settings
     // change
+    @OptIn(DelicateCoroutinesApi::class)
     val liveFileHandler : StateFlow<FileHandler?>
         = settings.liveFileHandlerSettings
             .map(this::createFileHandler)
-            .stateInSubscribed(defaultScope, null)
+            .stateInSubscribed(GlobalScope, null)
 
     @MainThread
     fun get(cb : (FileHandler) -> Unit) {
