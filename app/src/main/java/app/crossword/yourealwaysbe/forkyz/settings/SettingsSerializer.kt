@@ -49,6 +49,7 @@ object SettingsSerializer : Serializer<Settings> {
         .setDownloadCustomDaily(false)
         .setDownloadDeStandaard(true)
         .setDownloadDeTelegraaf(true)
+        .setDownloadElPaisExperto(true)
         .setDownloadGuardianDailyCryptic(true)
         .setDownloadGuardianWeeklyQuiptic(true)
         .setDownloadHamAbend(true)

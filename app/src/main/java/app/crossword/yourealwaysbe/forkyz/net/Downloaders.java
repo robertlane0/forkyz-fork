@@ -37,6 +37,7 @@ import app.crossword.yourealwaysbe.puz.io.JPZIO;
 import app.crossword.yourealwaysbe.puz.io.PMLIO;
 import app.crossword.yourealwaysbe.puz.io.PrzekrojIO;
 import app.crossword.yourealwaysbe.puz.io.RCIJeuxMFJIO;
+import app.crossword.yourealwaysbe.puz.io.SmartGamesJSONIO;
 
 public class Downloaders {
     private static final String TAG = "ForkyzDownloaders";
@@ -382,6 +383,13 @@ public class Downloaders {
                 "'https://pzzl.net/servlet/MH_kruis/netcrossword?date='"
                     + "yyMMdd",
                 "'https://www.telegraaf.nl/puzzels/kruiswoord'"
+            ));
+        }
+
+        if (settings.getDownloadElPaisExperto()) {
+            downloaders.add(new ElPaisExpertoDownloader(
+                "elpaisexperto",
+                context.getString(R.string.elpais_experto)
             ));
         }
 

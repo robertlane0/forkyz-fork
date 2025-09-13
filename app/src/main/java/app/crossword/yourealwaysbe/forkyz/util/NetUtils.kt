@@ -47,7 +47,7 @@ fun getURLInputStream(
         setRequestProperty("Connection", "close")
         setRequestProperty("Accept","*/*")
         headers?.forEach { key, value ->
-            conn.setRequestProperty(key, value)
+            setRequestProperty(key, value)
         }
     }
 
@@ -86,7 +86,7 @@ fun getURLInputStream(
 @Throws(IOException::class)
 @JvmOverloads
 fun apacheGetURLInputStream(
-    url : String,
+    url : URI,
     timeout : Int,
     headers : Map<String, String>? = null,
 ) : InputStream {
@@ -100,6 +100,16 @@ fun apacheGetURLInputStream(
             }
         }
     }
+}
+
+@Throws(IOException::class)
+@JvmOverloads
+fun apacheGetURLInputStream(
+    url : String,
+    timeout : Int,
+    headers : Map<String, String>? = null,
+) : InputStream {
+    return apacheGetURLInputStream(URI(url), timeout, headers)
 }
 
 /**

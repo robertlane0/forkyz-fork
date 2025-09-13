@@ -428,6 +428,13 @@ class SettingsActivityViewModel @Inject constructor(
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
+            R.string.elpais_experto,
+            R.string.elpais_experto_desc,
+            settings.liveDownloadElPaisExperto.stateInHere(),
+            settings::setDownloadElPaisExperto,
+        ),
+        SettingsBoolean(
+            SettingsPage.PUZZLE_SOURCES_DAILY,
             R.string.guardian_daily,
             R.string.updates_mon_fri,
             settings.liveDownloadGuardianDailyCryptic.stateInHere(),

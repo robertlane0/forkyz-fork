@@ -3,6 +3,7 @@ package app.crossword.yourealwaysbe.forkyz.net;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Map;
 
@@ -27,7 +28,23 @@ public abstract class AbstractDownloader implements Downloader {
 
     protected BufferedInputStream getInputStream(
         URL url, Map<String, String> headers
-    ) throws IOException {
-        return NetUtilsKt.getURLInputStream(url, getTimeout(), headers);
+    ) throws IOException, URISyntaxException {
+        if (headers != null && headers.containsKey("Origin")) {
+            // use apache as it allows setting origin via headers
+            return new BufferedInputStream(
+                NetUtilsKt.apacheGetURLInputStream(
+                    url.toURI(),
+                    getTimeout(),
+                    headers
+                )
+            );
+        } else {
+            // more efficient implementation
+            return NetUtilsKt.getURLInputStream(
+                url,
+                getTimeout(),
+                headers
+            );
+        }
     }
 }

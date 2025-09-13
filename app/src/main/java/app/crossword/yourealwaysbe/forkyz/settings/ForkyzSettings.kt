@@ -394,6 +394,7 @@ class ForkyzSettings(val settingsStore: DataStore<Settings>) {
         return DownloadersSettings(
             settings.downloadDeStandaard,
             settings.downloadDeTelegraaf,
+            settings.downloadElPaisExperto,
             settings.downloadGuardianDailyCryptic,
             settings.downloadGuardianWeeklyQuiptic,
             settings.downloadHamAbend,
@@ -833,6 +834,18 @@ class ForkyzSettings(val settingsStore: DataStore<Settings>) {
     fun setDownloadDeTelegraaf(value : Boolean) {
         settingsUpdate { settings ->
             settings.toBuilder().setDownloadDeTelegraaf(value).build()
+        }
+    }
+
+    val liveDownloadElPaisExperto : Flow<Boolean>
+        = settingsMap { it.downloadElPaisExperto }
+
+    fun getDownloadElPaisExperto(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.downloadElPaisExperto }
+
+    fun setDownloadElPaisExperto(value : Boolean) {
+        settingsUpdate { settings ->
+            settings.toBuilder().setDownloadElPaisExperto(value).build()
         }
     }
 
@@ -2364,6 +2377,13 @@ class ForkyzSettings(val settingsStore: DataStore<Settings>) {
             "downloadDeTelegraaf",
             { s, key -> json.put(key, s.downloadDeTelegraaf) },
             { key -> json.optBoolean(key)?.let { setDownloadDeTelegraaf(it) } },
+        )
+        run(
+            "downloadElPaisExperto",
+            { s, key -> json.put(key, s.downloadElPaisExperto) },
+            { key ->
+                json.optBoolean(key)?.let { setDownloadElPaisExperto(it) }
+            },
         )
         run(
             "downloadGuardianDailyCryptic",

@@ -85,6 +85,7 @@ public class DownloadersTest {
         return new DownloadersSettings(
             true, // downloadDeStandaard
             true, // downloadDeTelegraaf
+            true, // downloadElPaisExperto
             true, // downloadGuardianDailyCryptic
             true, // downloadGuardianWeeklyQuiptic
             true, // downloadHamAbend

@@ -265,6 +265,8 @@
     <string name="toggle_all_weekly_sources_desc">Toggle all weekly sources.</string>
     <string name="toggle_all_scrapers">All Scrapers</string>
     <string name="toggle_all_scrapers_desc">Toggle all scrapers.</string>
+    <string name="elpais_experto">(ES) El País Experto</string>
+    <string name="elpais_experto_desc">Updates Daily</string>
 
     <!-- preferences display -->
     <string name="clue_below_grid">Clue Below Grid</string>

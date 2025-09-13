@@ -242,4 +242,5 @@ message Settings {
     bool downloadLATimes = 127;
     MovementStrategySetting movementStrategyClueList = 128;
     bool dontConfirmBrowseDelete = 129;
+    bool downloadElPaisExperto = 130;
 }
