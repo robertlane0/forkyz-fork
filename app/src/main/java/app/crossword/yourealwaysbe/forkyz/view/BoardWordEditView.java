@@ -209,8 +209,6 @@ public class BoardWordEditView extends BoardEditView {
             Word previousWord = changes.getPreviousWord();
             Collection<Position> cellChanges = changes.getCellChanges();
 
-            System.out.println("FORKYZ: onpbc " + changes);
-
             // if rendering current word, which is changing, refit
             // else redraw if data indicates the rendered word is
             // affected
@@ -268,8 +266,6 @@ public class BoardWordEditView extends BoardEditView {
         RenderSettings renderSettings = getRenderSettings();
         if (renderSettings ==  null)
             return;
-
-        System.out.println("FORKYZ: go render " + word);
 
         // get and keep width as /could/change through thread passing
         int contentWidth = getContentWidth();

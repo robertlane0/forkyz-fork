@@ -532,7 +532,6 @@ open class PuzzleActivityViewModel @Inject constructor(
 
     fun toggleShowErrorsGrid() {
         getBoard()?.let { board ->
-            println("FORKYZ: set show errors grid " + !board.isShowErrorsGrid())
             settings.setPlayShowErrorsGrid(!board.isShowErrorsGrid())
         }
     }
