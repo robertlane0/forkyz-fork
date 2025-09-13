@@ -47,7 +47,6 @@ class LATimesDownloader(
         val url = date.format(PUZZLES_FEED_FORMAT)
         return getInputStream(URL(url), null)?.use { input ->
             val puzzles = JSONUtils.streamToJSONArray(input)
-            print(puzzles)
             (0 until puzzles.length()).forEach {
                 val puzzle = puzzles.getJSONObject(it)
                 puzzle.optString("date")?.let { dateStr ->
@@ -58,7 +57,6 @@ class LATimesDownloader(
                         )
                         if (puzzleDate == date) {
                             puzzle.optString("feedUrl")?.let { puzURL ->
-                                print(puzURL)
                                 return puzURL
                             }
                         }
