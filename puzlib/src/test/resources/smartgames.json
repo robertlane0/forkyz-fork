@@ -1,0 +1,483 @@
+{
+  "data": {
+    "type": "Crossword",
+    "id": "1111",
+    "attributes": {
+      "userState": {
+        "creationDate": null,
+        "score": null,
+        "time": null,
+        "status": null,
+        "state": null,
+        "deviceInfo": null
+      },
+      "authorObj": null,
+      "userStateStatus": "initial",
+      "stats": {
+        "completedPercentage": 0
+      },
+      "gameType": "crossword",
+      "createdAt": "2025-08-30T07:34:50.536470Z",
+      "updatedAt": "2025-08-30T07:34:50.544984Z",
+      "level": null,
+      "creationDate": null,
+      "category": "expert",
+      "author": "Test Author",
+      "theme": "",
+      "timer": 0,
+      "timerType": "incremental",
+      "publicationDate": "2025-09-10",
+      "unpublishDate": null,
+      "customLogoUrl": {},
+      "customSettings": {
+        "icon": "",
+        "title": "",
+        "colors": {
+          "enabled": false,
+          "primary": "",
+          "secondary": ""
+        }
+      },
+      "config": {
+        "board": "FXXXXXX#XXXXXX#\r\n#XXXXXX#XXXXXX#\r\nX#XXXXXXXXXX#XX\r\nXXXXX#XXXXXXX#X\r\nXXXX#XXXX#XXXXX\r\nXXXXXXXX#XXXXEX\r\n#XXXXXXX#XXXXX#\r\n####XXXXXXX####\r\n#XXXXX#XXXXXXX#\r\nXXXXXX#XXXXXXXX\r\nXXXXX#XXXX#XXXX\r\nX#XXXXXXX#XXXXX\r\nXX#XXXXXXXXXX#X\r\n#XXXXXX#XXXXXX#\r\n#XXXRXX#XXXXEXX",
+        "entries": {
+          "down": {
+            "2": {
+              "col": 1,
+              "row": 0,
+              "clue": "Test clue",
+              "answer": "FX"
+            },
+            "3": {
+              "col": 2,
+              "row": 0,
+              "clue": "Test clue",
+              "answer": "XXXXXXX"
+            },
+            "4": {
+              "col": 3,
+              "row": 0,
+              "clue": "Test clue",
+              "answer": "XXXXXXX"
+            },
+            "5": {
+              "col": 4,
+              "row": 0,
+              "clue": "Test clue",
+              "answer": "XXXX"
+            },
+            "6": {
+              "col": 5,
+              "row": 0,
+              "clue": "Test clue",
+              "answer": "XXX"
+            },
+            "7": {
+              "col": 6,
+              "row": 0,
+              "clue": "Test clue",
+              "answer": "XXXXXXXX"
+            },
+            "8": {
+              "col": 8,
+              "row": 0,
+              "clue": "Test clue",
+              "answer": "XXXXX"
+            },
+            "9": {
+              "col": 9,
+              "row": 0,
+              "clue": "Test clue",
+              "answer": "XXXX"
+            },
+            "10": {
+              "col": 10,
+              "row": 0,
+              "clue": "Test clue",
+              "answer": "XXXXXXXXXX"
+            },
+            "11": {
+              "col": 11,
+              "row": 0,
+              "clue": "Test clue",
+              "answer": "XXXXXXX"
+            },
+            "12": {
+              "col": 12,
+              "row": 0,
+              "clue": "Test clue",
+              "answer": "XX"
+            },
+            "13": {
+              "col": 13,
+              "row": 0,
+              "clue": "Test clue",
+              "answer": "XXX"
+            },
+            "16": {
+              "col": 0,
+              "row": 2,
+              "clue": "Test clue",
+              "answer": "XXXX"
+            },
+            "18": {
+              "col": 7,
+              "row": 2,
+              "clue": "Test clue",
+              "answer": "XXXXXXXXXXX"
+            },
+            "20": {
+              "col": 14,
+              "row": 2,
+              "clue": "Test clue",
+              "answer": "XXXX"
+            },
+            "22": {
+              "col": 1,
+              "row": 3,
+              "clue": "Test clue",
+              "answer": "XXXX"
+            },
+            "24": {
+              "col": 12,
+              "row": 3,
+              "clue": "Test clue",
+              "answer": "XXXX"
+            },
+            "26": {
+              "col": 5,
+              "row": 4,
+              "clue": "Test clue",
+              "answer": "XXXXXX"
+            },
+            "28": {
+              "col": 13,
+              "row": 4,
+              "clue": "Test clue 28",
+              "answer": "XEX"
+            },
+            "30": {
+              "col": 4,
+              "row": 5,
+              "clue": "Test clue",
+              "answer": "XXXXXXXXXR"
+            },
+            "31": {
+              "col": 9,
+              "row": 5,
+              "clue": "Test clue",
+              "answer": "XXXXEX"
+            },
+            "35": {
+              "col": 8,
+              "row": 7,
+              "clue": "Test clue",
+              "answer": "XXXXXXXX"
+            },
+            "36": {
+              "col": 1,
+              "row": 8,
+              "clue": "Test clue",
+              "answer": "XXX"
+            },
+            "37": {
+              "col": 2,
+              "row": 8,
+              "clue": "Test clue",
+              "answer": "XXXX"
+            },
+            "38": {
+              "col": 3,
+              "row": 8,
+              "clue": "Test clue",
+              "answer": "XXXXXXX"
+            },
+            "40": {
+              "col": 11,
+              "row": 8,
+              "clue": "Test clue",
+              "answer": "XXXXXXX"
+            },
+            "41": {
+              "col": 12,
+              "row": 8,
+              "clue": "Test clue",
+              "answer": "XXXXXXE"
+            },
+            "42": {
+              "col": 13,
+              "row": 8,
+              "clue": "Test clue",
+              "answer": "XXXX"
+            },
+            "43": {
+              "col": 0,
+              "row": 9,
+              "clue": "Test clue",
+              "answer": "XXXX"
+            },
+            "45": {
+              "col": 14,
+              "row": 9,
+              "clue": "Test clue",
+              "answer": "XXXX"
+            },
+            "47": {
+              "col": 6,
+              "row": 10,
+              "clue": "Test clue",
+              "answer": "XXXXX"
+            },
+            "50": {
+              "col": 5,
+              "row": 11,
+              "clue": "Test clue",
+              "answer": "XXXX"
+            },
+            "51": {
+              "col": 10,
+              "row": 11,
+              "clue": "Test clue",
+              "answer": "XXXX"
+            },
+            "53": {
+              "col": 1,
+              "row": 12,
+              "clue": "Test clue",
+              "answer": "XXX"
+            },
+            "55": {
+              "col": 9,
+              "row": 12,
+              "clue": "Test clue",
+              "answer": "XXX"
+            },
+            "57": {
+              "col": 2,
+              "row": 13,
+              "clue": "Test clue",
+              "answer": "XX"
+            },
+            "59": {
+              "col": 13,
+              "row": 13,
+              "clue": "Test clue",
+              "answer": "XX"
+            }
+          },
+          "across": {
+            "1": {
+              "col": 0,
+              "row": 0,
+              "clue": "Test clue 1",
+              "answer": "FXXXXXX"
+            },
+            "8": {
+              "col": 8,
+              "row": 0,
+              "clue": "Test clue",
+              "answer": "XXXXXX"
+            },
+            "14": {
+              "col": 1,
+              "row": 1,
+              "clue": "Test clue",
+              "answer": "XXXXXX"
+            },
+            "15": {
+              "col": 8,
+              "row": 1,
+              "clue": "Test clue",
+              "answer": "XXXXXX"
+            },
+            "17": {
+              "col": 2,
+              "row": 2,
+              "clue": "Test clue",
+              "answer": "XXXXXXXXXX"
+            },
+            "19": {
+              "col": 13,
+              "row": 2,
+              "clue": "Test clue 19",
+              "answer": "XX"
+            },
+            "21": {
+              "col": 0,
+              "row": 3,
+              "clue": "Test clue",
+              "answer": "XXXXX"
+            },
+            "23": {
+              "col": 6,
+              "row": 3,
+              "clue": "Test clue",
+              "answer": "XXXXXXX"
+            },
+            "25": {
+              "col": 0,
+              "row": 4,
+              "clue": "Test clue",
+              "answer": "XXXX"
+            },
+            "26": {
+              "col": 5,
+              "row": 4,
+              "clue": "Test clue",
+              "answer": "XXXX"
+            },
+            "27": {
+              "col": 10,
+              "row": 4,
+              "clue": "Test clue 27",
+              "answer": "XXXXX"
+            },
+            "29": {
+              "col": 0,
+              "row": 5,
+              "clue": "Test clue",
+              "answer": "XXXXXXXX"
+            },
+            "31": {
+              "col": 9,
+              "row": 5,
+              "clue": "Test clue",
+              "answer": "XXXXXX"
+            },
+            "32": {
+              "col": 1,
+              "row": 6,
+              "clue": "Test clue",
+              "answer": "XXXXXXX"
+            },
+            "33": {
+              "col": 9,
+              "row": 6,
+              "clue": "Test clue",
+              "answer": "XXXXX"
+            },
+            "34": {
+              "col": 4,
+              "row": 7,
+              "clue": "Test clue",
+              "answer": "XXXXXXX"
+            },
+            "36": {
+              "col": 1,
+              "row": 8,
+              "clue": "Test clue",
+              "answer": "XXXXX"
+            },
+            "39": {
+              "col": 7,
+              "row": 8,
+              "clue": "Test clue",
+              "answer": "XXXXXXX"
+            },
+            "43": {
+              "col": 0,
+              "row": 9,
+              "clue": "Test clue",
+              "answer": "XXXXXX"
+            },
+            "44": {
+              "col": 7,
+              "row": 9,
+              "clue": "Test clue",
+              "answer": "XXXXXXXX"
+            },
+            "46": {
+              "col": 0,
+              "row": 10,
+              "clue": "Test clue",
+              "answer": "XXXXX"
+            },
+            "47": {
+              "col": 6,
+              "row": 10,
+              "clue": "Test clue",
+              "answer": "XXXX"
+            },
+            "48": {
+              "col": 11,
+              "row": 10,
+              "clue": "Test clue",
+              "answer": "XXXX"
+            },
+            "49": {
+              "col": 2,
+              "row": 11,
+              "clue": "Test clue",
+              "answer": "XXXXXXX"
+            },
+            "51": {
+              "col": 10,
+              "row": 11,
+              "clue": "Test clue",
+              "answer": "XXXXX"
+            },
+            "52": {
+              "col": 0,
+              "row": 12,
+              "clue": "Test clue",
+              "answer": "XX"
+            },
+            "54": {
+              "col": 3,
+              "row": 12,
+              "clue": "Test clue",
+              "answer": "XXXXXXXXXX"
+            },
+            "56": {
+              "col": 1,
+              "row": 13,
+              "clue": "Test clue",
+              "answer": "XXXXXX"
+            },
+            "58": {
+              "col": 8,
+              "row": 13,
+              "clue": "Test clue",
+              "answer": "XXXXXX"
+            },
+            "60": {
+              "col": 1,
+              "row": 14,
+              "clue": "Test clue",
+              "answer": "XXXRXX"
+            },
+            "61": {
+              "col": 8,
+              "row": 14,
+              "clue": "Test clue",
+              "answer": "XXXXEXX"
+            }
+          }
+        },
+        "vertical_clues": "2-xxxxxxx xx xxxxxxxx xxxx xxxxxx\r\n3-xxxxx xxxáxxxx xxxx xxxxxxx\r\n4-xxxxxx xxx xxxxxxx xxx xxx xxxxxx xxxx xxx xxíxx\r\n5-xxxx xxx xxxxxx\r\n6-xxxxx xxxxxxx\r\n7-xxxxxxxxxxx xxx xxx xxxxxxxxxxx xx xxx xxáxxxxxx xxxxxxxxxx\r\n8-xx xxxxxé, xx…\r\n9-\"xxx… xxxxxxxx\"\r\n10-xxxxxxáx, xxxxxxxáx\r\n11-xxxxxxxx xx xxxxxñíx\r\n12-xx xx xxxxx xxx xxxóx\r\n13-\"xxxxx xx …\", xxxx xx xx xxxxx xxxáxxxxx xx xxxxxñx, xxxxxxx\r\n16-\"… xxxxáxxxx\" xxxxxxxxxxxx xxxxñxx xxxxxxxxx xxx xxxçx\r\n18-xxxxxxxx x xxxxxxxxxxxx xx xxxxx\r\n20-xxxxx xx xxxxxx xxxxxxx xxxxxxx xxx xxxxx xx xxxxxxx\r\n22-xxxxxxxx xx xxxxéx\r\n24-xxxxx xxxxx xx xxxxx\r\n26-xxxxxx xx xúxxxx xxxxñxx xx xx xxxxxx xx xxxxxx\r\n28-\"xxxx…\" xxxxxx xxxxxóx xxxxx xxxxxxx\r\n30-xxxxxxx x xxxxxxx xáx x xxxxx xxxx xxx x xí xx xxxxó\r\n31-xxx xx xxx xxxxxxx xxxxxxxxxx xx xx xxxxxx\r\n35-xxxxxxxxx xxxxx x xxxxxxxx\r\n36-1440 xxxxxxx\r\n37-xx xxxxxxxx xxxxx xx xxxxx xx xxx xxxxxxxx xíxxxxx\r\n38-xx xxxxxxá, xx xxxxxxxxx xxxx, xx xxxxxxx\r\n40-xxxxxx xxxxxxxx xx xx \"xxxxxx xx xxxxxxxx\"\r\n41-xxxx xxxxxx\r\n42-xxxxó xxx xxx xxx, éx xx xx xxxxxxxxxx…\r\n43-xxxxxxxxxxx xx xx xxxx xxxxxxxx xxxxñxxx (xxxxxx)\r\n45-xxxxxxx xxx xxxxx x xxxxxxxx, xxxxxxx xx xxxxxxx xxxx\r\n47-xxxxx xxx xxxxxx xx xxxxxxxxxx xx xxxxéx x xxxxxxóx\r\n50-xxxxx xx\r\n51-xx xxx, xx xxxxxé\r\n53-xxx xxxxxxxx xx xxxxx xxxxxxx, xxxxxxxx xxx xxxxxxx\r\n55-\"… xx xx\" xxxxxxxx xxx xxxxxxxxx xxñó xxx xx xxxíx xx xxxxx\r\n57-xxxxáxxxx xxxxxxxxóx xxx xxxxxx xxxxxxxxxóx xxxxxxxxxx\r\n59-xxxxxx xxxxxxxxéx\r\n",
+        "horizontal_clues": "1-xxxxxx xxx xx xxxxxx xx xxxxx xx xxxxxxx\r\n8-xxx xxxxx, xxx xxxxx\r\n14-xx xx xxxó, xx xxxxxxó, xx…\r\n15-xxxxxxx xxx xxxóx (xxx)\r\n17-xxx xxxxx\r\n19-xxxxx xxxxxxxxxx (xxxxxxxxx xxxxxxxxxxxxxx, xxxxx xx xxx xñxx 1920)\r\n21-xx xxx xxxxxxxx xxxxxxx, xxxxx xúxxxxx\r\n23-\"… xxxxxx\", xx xíxxxxx xxxxx xx xxxxx\r\n25-xxxxé x xx xxxxx x xxxx xx xxxx xx xxxxxxxxxóx\r\n26-xxxxxxxx, xxxxxxx\r\n27-xxxxxxxx x xx xxxx, xx xxxxx\r\n29-xxx xxxxx xxx xxxúx xxxxxx xxxxxxxxx xx xxxxx xx xxxx xxxxxxx\r\n31-xxxxxxxx, xxxxxxxxx\r\n32-xxx xx xxxúx, xx xx xxxxxxx xxxxx xxxxxxx\r\n33-xxxxxxx, xxxxxxxxx\r\n34-xx xxxó xxxxxx, xxxx xxxxx xx xxxxxxx\r\n36-xúxxxx xxxxxxxxxx\r\n39-xxx xx xxxxx xxxxxxáx\r\n43-xxxxxxxx xx xxxxxxxxxx\r\n44-xx xxxxx xxxxxxxx, xx…\r\n46-xxxxxxxxé x xxxxx\r\n47-xxxíxxxx, xxxxx, xxxxxxxxóx\r\n48-xxxxxxxóx xúxxxxx xx xxx xxxxxxxxxxx xxxíxxxx\r\n49-xx xxxxxxxxx xx xxxx xxxx xxxxxxx\r\n51-xxxxxxxxx xx xx xxxxxxxíx xxxxxx\r\n52-xíxxxxx xx xxxx\r\n54-xxxxxxx xx xxxxxxxxóx xíxxxx\r\n56-xxxá xxx xxxxxx xx xxxxxxxéx\r\n58-xxxxxxíx xx xxxxxxx\r\n60-xxxx xxxxxx xxxíxxxx xx xxx xxxxxxx xxx xíx xxxxxxx\r\n61-xxxxxxx xxx xxxxx xx xxxxxxxxxx xx xxxxxxxxx xxxx\r\n",
+        "highlighted_cells": [],
+        "board_clues_positions": "1,2,3,4,5,6,7,#,8,9,10,11,12,13,#\r\n#,14,#,#,#,#,#,#,15,#,#,#,#,#,#\r\n16,#,17,#,#,#,#,18,#,#,#,#,#,19,20\r\n21,22,#,#,#,#,23,#,#,#,#,#,24,#,#\r\n25,#,#,#,#,26,#,#,#,#,27,#,#,28,#\r\n29,#,#,#,30,#,#,#,#,31,#,#,#,#,#\r\n#,32,#,#,#,#,#,#,#,33,#,#,#,#,#\r\n#,#,#,#,34,#,#,#,35,#,#,#,#,#,#\r\n#,36,37,38,#,#,#,39,#,#,#,40,41,42,#\r\n43,#,#,#,#,#,#,44,#,#,#,#,#,#,45\r\n46,#,#,#,#,#,47,#,#,#,#,48,#,#,#\r\n#,#,49,#,#,50,#,#,#,#,51,#,#,#,#\r\n52,53,#,54,#,#,#,#,#,55,#,#,#,#,#\r\n#,56,57,#,#,#,#,#,58,#,#,#,#,59,#\r\n#,60,#,#,#,#,#,#,61,#,#,#,#,#,#"
+      }
+    },
+    "relationships": {
+      "sites": {
+        "meta": {
+          "count": 1
+        },
+        "data": [
+          {
+            "type": "Site",
+            "id": "7"
+          }
+        ]
+      },
+      "siteGroups": {
+        "meta": {
+          "count": 0
+        },
+        "data": []
+      }
+    }
+  }
+}

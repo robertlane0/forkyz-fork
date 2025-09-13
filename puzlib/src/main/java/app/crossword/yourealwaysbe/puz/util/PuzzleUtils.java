@@ -9,7 +9,6 @@ import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.Zone;
 
 public class PuzzleUtils {
-
     public static boolean joinedTop(Puzzle puzzle, int row, int col) {
         Box boxCur = puzzle.checkedGetBox(row, col);
         Box boxAbove = puzzle.checkedGetBox(row - 1, col);
@@ -241,5 +240,26 @@ public class PuzzleUtils {
         } while (joinedBottom(puz, row + off, col));
 
         return zone;
+    }
+
+    public static int compareStringNumbers(
+        String num1,
+        String num2
+    ) {
+        if (num1 == null && num2 == null) {
+            return 0;
+        } else if (num1 == null) {
+            return -1;
+        } else if (num2 == null) {
+            return 1;
+        } else {
+            try {
+                int n1 = Integer.valueOf(num1);
+                int n2 = Integer.valueOf(num2);
+                return Integer.compare(n1, n2);
+            } catch (NumberFormatException e) {
+                return num1.compareTo(num2);
+            }
+        }
     }
 }
