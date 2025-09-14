@@ -84,8 +84,10 @@ public abstract class BoardEditView
     }
 
     public void setRenderSettings(RenderSettings renderSettings) {
-        this.renderSettings = renderSettings;
-        render();
+        if (!Objects.equals(renderSettings, this.renderSettings)) {
+            this.renderSettings = renderSettings;
+            render();
+        }
     }
 
     public void setDoubleTapFitBoard(boolean doubleTapFit) {
