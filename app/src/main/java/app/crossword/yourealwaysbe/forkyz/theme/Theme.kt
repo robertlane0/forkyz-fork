@@ -32,6 +32,35 @@ import app.crossword.yourealwaysbe.forkyz.settings.DayNightMode
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.Theme
 
+@JvmRecord
+data class BoardColorScheme(
+    val cellColor : Color,
+    val blockColor : Color,
+    val onBlockColor : Color,
+    val errorColor : Color,
+    val errorHighlightColor : Color,
+    val currentWordHighlightColor : Color,
+    val currentLetterHighlightColor : Color,
+    val cheatedColor : Color,
+    val boardLetterColor : Color,
+    val boardNoteColor : Color,
+    val boardShapeColor : Color,
+    val blockShapeColor : Color,
+    val flagColor : Color,
+    val flagColor1 : Color,
+    val flagColor2 : Color,
+    val flagColor3 : Color,
+    val flagColor4 : Color,
+)
+
+@JvmRecord
+data class CircleProgressBarColorScheme(
+    val progressNull : Color,
+    val progressInProgress : Color,
+    val progressDone : Color,
+    val progressError : Color,
+)
+
 private val lightScheme = lightColorScheme(
     primary = primaryLight,
     onPrimary = onPrimaryLight,
@@ -106,6 +135,60 @@ private val darkScheme = darkColorScheme(
     surfaceContainer = surfaceContainerDark,
     surfaceContainerHigh = surfaceContainerHighDark,
     surfaceContainerHighest = surfaceContainerHighestDark,
+)
+
+private val lightBoardColorScheme = BoardColorScheme(
+    currentWordHighlightColor = currentWordHighlightColorLight,
+    currentLetterHighlightColor = currentLetterHighlightColorLight,
+    cheatedColor = cheatedColorLight,
+    boardLetterColor = boardLetterColorLight,
+    boardNoteColor = boardNoteColorLight,
+    boardShapeColor = boardShapeColorLight,
+    blockShapeColor = blockShapeColorLight,
+    blockColor = blockColorLight,
+    onBlockColor = onBlockColorLight,
+    errorColor = errorColorLight,
+    errorHighlightColor = errorHighlightColorLight,
+    cellColor = cellColorLight,
+    flagColor = flagColorLight,
+    flagColor1 = flagColor1,
+    flagColor2 = flagColor2,
+    flagColor3 = flagColor3,
+    flagColor4 = flagColor4,
+)
+
+private val darkBoardColorScheme = BoardColorScheme(
+    currentWordHighlightColor = currentWordHighlightColorDark,
+    currentLetterHighlightColor = currentLetterHighlightColorDark,
+    cheatedColor = cheatedColorDark,
+    boardLetterColor = boardLetterColorDark,
+    boardNoteColor = boardNoteColorDark,
+    boardShapeColor = boardShapeColorDark,
+    blockShapeColor = blockShapeColorDark,
+    blockColor = blockColorDark,
+    onBlockColor = onBlockColorDark,
+    errorColor = errorColorDark,
+    errorHighlightColor = errorHighlightColorDark,
+    cellColor = cellColorDark,
+    flagColor = flagColorDark,
+    flagColor1 = flagColor1,
+    flagColor2 = flagColor2,
+    flagColor3 = flagColor3,
+    flagColor4 = flagColor4,
+)
+
+private val lightCircleProgressBarColorScheme = CircleProgressBarColorScheme(
+    progressNull = progressNullLight,
+    progressInProgress = progressInProgressLight,
+    progressDone = progressDoneLight,
+    progressError = progressErrorLight,
+)
+
+private val darkCircleProgressBarColorScheme = CircleProgressBarColorScheme(
+    progressNull = progressNullDark,
+    progressInProgress = progressInProgressDark,
+    progressDone = progressDoneDark,
+    progressError = progressErrorDark,
 )
 
 @Composable
@@ -183,6 +266,19 @@ fun ForkyzTopAppBar(
         actions = actions,
         scrollBehavior = scrollBehavior,
     )
+}
+
+fun getBoardColorScheme(darkMode : Boolean) : BoardColorScheme {
+    return if (darkMode) darkBoardColorScheme else lightBoardColorScheme
+}
+
+fun getCircleProgressBarColorScheme(
+    darkMode : Boolean,
+) : CircleProgressBarColorScheme {
+    return if (darkMode)
+        darkCircleProgressBarColorScheme
+    else
+        lightCircleProgressBarColorScheme
 }
 
 @Composable

@@ -78,6 +78,18 @@ class ThemeHelper @Inject constructor(val settings : ForkyzSettings) {
     }
 
     @Composable
+    fun getBoardColorScheme() : BoardColorScheme {
+        val dayNightMode by getAppDayNightModeState()
+        return getBoardColorScheme(isDarkMode(dayNightMode))
+    }
+
+    @Composable
+    fun getCircleProgressBarColorScheme() : CircleProgressBarColorScheme {
+        val dayNightMode by getAppDayNightModeState()
+        return getCircleProgressBarColorScheme(isDarkMode(dayNightMode))
+    }
+
+    @Composable
     private fun isDarkMode(appDayNightMode : DayNightMode) : Boolean {
         return when (appDayNightMode) {
             DayNightMode.DNM_DAY -> false

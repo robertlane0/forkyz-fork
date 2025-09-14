@@ -42,7 +42,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.fromHtml
@@ -53,6 +52,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 import app.crossword.yourealwaysbe.forkyz.R
 import app.crossword.yourealwaysbe.forkyz.settings.ClueTabsDouble
+import app.crossword.yourealwaysbe.forkyz.theme.BoardColorScheme
 import app.crossword.yourealwaysbe.forkyz.view.BoardWordEdit
 import app.crossword.yourealwaysbe.puz.ClueID
 import app.crossword.yourealwaysbe.puz.Playboard.Word
@@ -74,6 +74,7 @@ private val UNFILLED_CLUE_ALPHA = 1.0F
  * @param modifier modifier
  * @param viewModel a ClueTabsViewModel to get data from backend
  * @param isPortrait true if the current display is portrait
+ * @param boardColorScheme colors for board rendering
  * @param showAllWords show miniboard beneath each clue
  * @param maxWordScale maximum scale of miniboard (else fits space)
  * @param onClueClick callback when clue clicked, takes clue
@@ -97,6 +98,7 @@ fun ClueTabs(
     modifier : Modifier = Modifier,
     viewModel : ClueTabsViewModel,
     isPortrait : Boolean,
+    boardColorScheme : BoardColorScheme,
     showAllWords : Boolean = false,
     onClueClick : (ClueID) -> Unit = { },
     onClueClickDescription : String? = null, /* TODO */
@@ -146,11 +148,9 @@ fun ClueTabs(
                         .height(IntrinsicSize.Max)
                         .heightIn(min = CLUE_MIN_HEIGHT.toDp()),
                 ) {
-                    // TODO: move flag color to Compose (needs
-                    // PlayboardRender updating too
                     val flagColor = if (clue.isFlagged) {
                         clue.flagColor?.let { Color(it) }
-                            ?: colorResource(R.color.flagColor)
+                            ?: boardColorScheme.flagColor
                     } else {
                         Color.Transparent
                     }
@@ -223,6 +223,7 @@ fun ClueTabs(
                                 focusable = false,
                                 renderSettings = state.renderSettings,
                                 scratchMode = state.scratchMode,
+                                boardColorScheme = boardColorScheme,
                             )
                         }
                     }

@@ -153,6 +153,7 @@ class ClueListActivity() : PuzzleActivity() {
 
     @Composable
     private fun ClueLists(modifier : Modifier, showAllWords : Boolean) {
+        val boardColorScheme = themeHelper.getBoardColorScheme()
         ClueTabs(
             modifier = modifier,
             viewModel = viewModel.clueTabsViewModel,
@@ -168,6 +169,7 @@ class ClueListActivity() : PuzzleActivity() {
             onClueBoardClick = { cid, _ -> viewModel.clueClick(cid) },
             onClueBoardClickDescription = stringResource(R.string.select_clue),
             showAllWords = showAllWords,
+            boardColorScheme = boardColorScheme,
         )
     }
 

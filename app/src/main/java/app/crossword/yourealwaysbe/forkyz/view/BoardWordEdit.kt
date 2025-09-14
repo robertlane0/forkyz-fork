@@ -13,6 +13,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat
 
 import app.crossword.yourealwaysbe.forkyz.settings.RenderSettings
+import app.crossword.yourealwaysbe.forkyz.theme.BoardColorScheme
 import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
 import app.crossword.yourealwaysbe.forkyz.view.BoardEditView.BoardClickListener
 import app.crossword.yourealwaysbe.forkyz.view.BoardWordEditView
@@ -29,7 +30,9 @@ import app.crossword.yourealwaysbe.puz.Position
  *
  * @param board the playboard used by the view
  * @param contentDescription content description of board view
- * @param clueID if non-null show this word not current
+ * @param renderSettings the render settings
+ * @param boardColorScheme the color scheme for rendering
+ * @param word if non-null show this word not current
  * @param onClick onClick method for BoardClickListener
  * @param onLongClick onLongClick method for BoardClickListener
  * @param clickAccessibilityAction click action description
@@ -57,6 +60,7 @@ fun BoardWordEdit(
     board : Playboard,
     contentDescription : String,
     renderSettings : RenderSettings,
+    boardColorScheme : BoardColorScheme,
     word : Word? = null,
     onClick : (Position?, Word?) -> Unit = { _, _ -> },
     onLongClick : (Position?) -> Unit = { },
@@ -132,6 +136,7 @@ fun BoardWordEdit(
                         clearSuppressNotesList()
                     setMovementStrategy(movementStrategy)
                     setRenderSettings(renderSettings)
+                    setBoardColorScheme(boardColorScheme)
                 }
                 clickAccessibilityAction?.let {
                     ViewCompat.replaceAccessibilityAction(

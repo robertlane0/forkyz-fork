@@ -3,6 +3,7 @@ package app.crossword.yourealwaysbe.forkyz.view;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -22,6 +23,7 @@ import android.view.inputmethod.InputConnection;
 import dagger.hilt.android.AndroidEntryPoint;
 
 import app.crossword.yourealwaysbe.forkyz.settings.RenderSettings;
+import app.crossword.yourealwaysbe.forkyz.theme.BoardColorScheme;
 import app.crossword.yourealwaysbe.forkyz.util.BoxInputConnection;
 import app.crossword.yourealwaysbe.forkyz.util.KeyboardManageableView;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
@@ -63,6 +65,7 @@ public abstract class BoardEditView
     private boolean doubleTapFit = false;
     private boolean requestFocusOnSized = false;
     private RenderSettings renderSettings = new RenderSettings();
+    private BoardColorScheme boardColorScheme = null;
 
     // For use by implementers of render to avoid on-main-thread
     // rendering. Bitmap can be set with postBitmap in
@@ -81,6 +84,13 @@ public abstract class BoardEditView
     public BoardEditView(Context context, AttributeSet attrs) {
         super(context, attrs);
         handler = new Handler(context.getMainLooper());
+    }
+
+    public void setBoardColorScheme(BoardColorScheme boardColorScheme) {
+        if (!Objects.equals(boardColorScheme, this.boardColorScheme)) {
+            this.boardColorScheme = boardColorScheme;
+            recreateRenderer(true);
+        }
     }
 
     public void setRenderSettings(RenderSettings renderSettings) {
@@ -132,25 +142,7 @@ public abstract class BoardEditView
             this.renderer = null;
         } else {
             this.board = board;
-
-            DisplayMetrics metrics
-                = getContext().getResources().getDisplayMetrics();
-
-            renderer = new PlayboardRenderer(
-                board,
-                metrics.densityDpi,
-                metrics.widthPixels,
-                getContext(),
-                utils
-            );
-            setMaxScale(renderer.getMaxScale());
-            setMinScale(renderer.getMinScale());
-
-            float scale = getCurrentScale();
-
-            // reset scale in case it violates new board dims
-            setCurrentScale(scale, true);
-
+            recreateRenderer(false);
             if (!noRender)
                 render();
 
@@ -234,36 +226,44 @@ public abstract class BoardEditView
      * Returns new scale
      */
     public float zoomIn() {
-        float newScale = renderer.zoomIn();
-        setCurrentScale(newScale);
-        return newScale;
+        if (renderer != null) {
+            float newScale = renderer.zoomIn();
+            setCurrentScale(newScale);
+        }
+        return getCurrentScale();
     }
 
     /**
      * Returns new scale
      */
     public float zoomInMax() {
-        float newScale = renderer.zoomInMax();
-        setCurrentScale(newScale);
-        return newScale;
+        if (renderer != null) {
+            float newScale = renderer.zoomInMax();
+            setCurrentScale(newScale);
+        }
+        return getCurrentScale();
     }
 
     /**
      * Returns new scale
      */
     public float zoomOut() {
-        float newScale = renderer.zoomOut();
-        setCurrentScale(newScale);
-        return newScale;
+        if (renderer != null) {
+            float newScale = renderer.zoomOut();
+            setCurrentScale(newScale);
+        }
+        return getCurrentScale();
     }
 
     /**
      * Returns new scale
      */
     public float zoomReset() {
-        float newScale = renderer.zoomReset();
-        setCurrentScale(newScale);
-        return newScale;
+        if (renderer != null) {
+            float newScale = renderer.zoomReset();
+            setCurrentScale(newScale);
+        }
+        return getCurrentScale();
     }
 
     @Override
@@ -359,14 +359,13 @@ public abstract class BoardEditView
     @Override
     protected void onScale(float scale, Point center) {
         lastTap = System.currentTimeMillis();
-
-        int w = getImageWidth();
-        int h = getImageHeight();
-        scale = renderer.fitTo(w, h);
-
-        super.onScale(scale, center);
-
-        render();
+        if (renderer != null) {
+            int w = getImageWidth();
+            int h = getImageHeight();
+            scale = renderer.fitTo(w, h);
+            super.onScale(scale, center);
+            render();
+        }
     }
 
     @Override
@@ -476,5 +475,35 @@ public abstract class BoardEditView
 
     private boolean isNativeInput() {
         return nativeInput;
+    }
+
+    /**
+     * BoardWordEditView needs to override to set scale bounds
+     */
+    protected void recreateRenderer(boolean render) {
+        Playboard board = getBoard();
+        if (board == null || boardColorScheme == null)
+            return;
+
+        DisplayMetrics metrics
+            = getContext().getResources().getDisplayMetrics();
+
+        renderer = new PlayboardRenderer(
+            board,
+            metrics.densityDpi,
+            metrics.widthPixels,
+            boardColorScheme,
+            utils
+        );
+        setMaxScale(renderer.getMaxScale());
+        setMinScale(renderer.getMinScale());
+
+        float scale = getCurrentScale();
+
+        // reset scale in case it violates new board dims
+        setCurrentScale(scale, true);
+
+        if (render)
+            render();
     }
 }

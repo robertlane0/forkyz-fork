@@ -1,5 +1,7 @@
 package app.crossword.yourealwaysbe.forkyz.view;
 
+import java.util.Objects;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -13,15 +15,14 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 
 import app.crossword.yourealwaysbe.forkyz.R;
+import app.crossword.yourealwaysbe.forkyz.theme.CircleProgressBarColorScheme;
+import app.crossword.yourealwaysbe.forkyz.util.ColorUtilsKt;
 
 /**
  * Created by rcooper on 10/26/14.
  */
 public class CircleProgressBar extends View {
-    private int nullColor;
-    private int inProgressColor;
-    private int doneColor;
-    private int errorColor;
+    private CircleProgressBarColorScheme colors;
     private int height;
     private int width;
     private int percentFilled;
@@ -32,37 +33,20 @@ public class CircleProgressBar extends View {
     private Paint paint;
     private RectF pcntFilledRect;
 
-    public CircleProgressBar(Context context) {
+    public CircleProgressBar(
+        Context context, CircleProgressBarColorScheme colors
+    ) {
         super(context);
         initMetrics(context);
-        loadColors(context);
-    }
-
-    public CircleProgressBar(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        initMetrics(context);
-        loadColors(context);
-    }
-
-    public CircleProgressBar(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
-        initMetrics(context);
-        loadColors(context);
-    }
-
-    private void loadColors(Context context) {
+        this.colors = colors;
         paint = new Paint();
-        nullColor = ContextCompat.getColor(context, R.color.progressNull);
-        inProgressColor = ContextCompat.getColor(context, R.color.progressInProgress);
-        doneColor = ContextCompat.getColor(context, R.color.progressDone);
-        errorColor = ContextCompat.getColor(context, R.color.progressError);
     }
 
-    private final void initMetrics(Context context){
-        metrics = context.getResources().getDisplayMetrics();
-        circleStroke = metrics.density * 6F;
-        circleFine = metrics.density * 2f;
-        pcntFilledRect = new RectF(0, 0, 0, 0);
+    public void setColors(CircleProgressBarColorScheme colors) {
+        if (!Objects.equals(this.colors, colors)) {
+            this.colors = colors;
+            invalidate();
+        }
     }
 
     public void setPercentFilled(int percentFilled) {
@@ -92,20 +76,23 @@ public class CircleProgressBar extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
+        if (colors == null)
+            return;
+
         float halfWidth = width / 2;
         float halfHeight = height / 2;
         float halfStroke = circleStroke / 2;
         float textSize = halfWidth * 0.75f;
 
         paint.setAntiAlias(true);
-        paint.setColor(nullColor);
+        paint.setColor(colors.progressNull());
         paint.setStyle(Paint.Style.STROKE);
         paint.setTypeface(Typeface.SANS_SERIF);
         paint.setTextAlign(Paint.Align.CENTER);
         paint.setTextSize(textSize);
 
         if (this.complete) {
-            paint.setColor(doneColor);
+            paint.setColor(colors.progressDone());
             paint.setStrokeWidth(circleStroke);
             canvas.drawCircle(
                 halfWidth, halfWidth,
@@ -113,22 +100,40 @@ public class CircleProgressBar extends View {
                 paint
             );
             drawDrawable(
-                R.drawable.ic_done, halfWidth, halfWidth, doneColor, canvas
+                R.drawable.ic_done,
+                halfWidth,
+                halfWidth,
+                ColorUtilsKt.colorToInt(colors.progressDone()),
+                canvas
             );
         } else if (this.percentFilled < 0) {
-            paint.setColor(errorColor);
+            paint.setColor(colors.progressError());
             paint.setStrokeWidth(circleStroke);
-            canvas.drawCircle(halfWidth, halfWidth, halfWidth - halfStroke - metrics.density * 2f, paint);
+            canvas.drawCircle(
+                halfWidth,
+                halfWidth,
+                halfWidth - halfStroke - metrics.density * 2f,
+                paint
+            );
             paint.setStyle(Paint.Style.FILL);
             canvas.drawText("?", halfWidth, halfWidth + textSize / 3f, paint);
         } else if (this.percentFilled == 0) {
             drawDrawable(
-                R.drawable.ic_play, halfWidth, textSize, nullColor, canvas
+                R.drawable.ic_play,
+                halfWidth,
+                textSize,
+                ColorUtilsKt.colorToInt(colors.progressNull()),
+                canvas
             );
         } else {
-            paint.setColor(inProgressColor);
+            paint.setColor(colors.progressInProgress());
             paint.setStrokeWidth(circleFine);
-            canvas.drawCircle(halfWidth, halfWidth, halfWidth - halfStroke - 1f, paint);
+            canvas.drawCircle(
+                halfWidth,
+                halfWidth,
+                halfWidth - halfStroke - 1f,
+                paint
+            );
             paint.setStrokeWidth(circleStroke);
 
             pcntFilledRect.set(
@@ -141,12 +146,21 @@ public class CircleProgressBar extends View {
             paint.setStyle(Paint.Style.FILL);
             textSize = halfWidth * 0.5f;
             paint.setTextSize(textSize);
-            canvas.drawText(percentFilled+"%", halfWidth, halfHeight + textSize / 3f, paint);
+            canvas.drawText(
+                percentFilled+"%",
+                halfWidth,
+                halfHeight + textSize / 3f,
+                paint
+            );
         }
     }
 
     private void drawDrawable(
-        int resId, float halfWidth, float diameter, int color, Canvas canvas
+        int resId,
+        float halfWidth,
+        float diameter,
+        int color,
+        Canvas canvas
     ) {
         Drawable icon = ContextCompat.getDrawable(getContext(), resId);
         Drawable iconWrapped = DrawableCompat.wrap(icon);
@@ -160,4 +174,10 @@ public class CircleProgressBar extends View {
         iconWrapped.draw(canvas);
     }
 
+    private final void initMetrics(Context context){
+        metrics = context.getResources().getDisplayMetrics();
+        circleStroke = metrics.density * 6F;
+        circleFine = metrics.density * 2f;
+        pcntFilledRect = new RectF(0, 0, 0, 0);
+    }
 }

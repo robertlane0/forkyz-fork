@@ -60,7 +60,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 import app.crossword.yourealwaysbe.forkyz.menu.BaseMenuModifier
 import app.crossword.yourealwaysbe.forkyz.menu.MenuText
-import app.crossword.yourealwaysbe.forkyz.util.ColorUtils
+import app.crossword.yourealwaysbe.forkyz.util.addAlpha
 import app.crossword.yourealwaysbe.forkyz.view.BoardEditText
 import app.crossword.yourealwaysbe.forkyz.view.BoardEditText.BoardEditFilter
 import app.crossword.yourealwaysbe.forkyz.view.BoardEditView.BoardClickListener
@@ -314,9 +314,7 @@ class NotesActivity() : PuzzleActivity() {
                     val clueFlagColor = state.clueFlagColor
                     var checkColors = CheckboxDefaults.colors()
                     if (!Clue.isDefaultFlagColor(clueFlagColor)) {
-                        val color = Color(
-                            ColorUtils.addAlpha(clueFlagColor)
-                        )
+                        val color = Color(addAlpha(clueFlagColor))
                         checkColors = CheckboxDefaults.colors(
                             checkedColor = color,
                             uncheckedColor = color,
@@ -531,12 +529,13 @@ class NotesActivity() : PuzzleActivity() {
         selectionPosition : Int? = null,
     ) {
         val state by viewModel.notesUIState.collectAsStateWithLifecycle()
+        val boardColorScheme = themeHelper.getBoardColorScheme()
 
         AndroidView(
             modifier = Modifier.fillMaxWidth()
                 .padding(vertical = VERTICAL_BOARD_PADDING),
             factory = { context ->
-                val view = BoardEditText(context).apply {
+                val view = BoardEditText(context, boardColorScheme).apply {
                     setFocusable(true)
                     setFocusableInTouchMode(true)
                     setContentDescription(
@@ -610,6 +609,7 @@ class NotesActivity() : PuzzleActivity() {
                         setSelectedCol(selectionPosition)
                     setRenderSettings(state.renderSettings)
                     setSkipFilled(state.skipFilled)
+                    setBoardColorScheme(boardColorScheme)
                 }
             },
         )

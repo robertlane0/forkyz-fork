@@ -25,6 +25,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 
 import app.crossword.yourealwaysbe.forkyz.settings.DisplaySeparators;
 import app.crossword.yourealwaysbe.forkyz.settings.RenderSettings;
+import app.crossword.yourealwaysbe.forkyz.theme.BoardColorScheme;
 import app.crossword.yourealwaysbe.forkyz.util.BoxInputConnection;
 import app.crossword.yourealwaysbe.forkyz.util.KeyboardManageableView;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
@@ -52,6 +53,7 @@ public class BoardEditText
     private boolean forceCaps = true;
     private boolean skipFilled = false;
     private RenderSettings renderSettings = new RenderSettings();
+    private BoardColorScheme boardColorScheme = null;
 
     public interface BoardEditFilter {
         /**
@@ -86,10 +88,11 @@ public class BoardEditText
 
     private BoardEditFilter filter;
 
-    public BoardEditText(Context context) {
+    public BoardEditText(
+        Context context,
+        BoardColorScheme boardColorScheme
+    ) {
         super(context, null);
-
-        handler = new Handler(context.getMainLooper());
 
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
 
@@ -99,14 +102,23 @@ public class BoardEditText
             null,
             metrics.densityDpi,
             metrics.widthPixels,
-            context,
+            boardColorScheme,
             utils
         );
         this.renderer.setMaxScale(1.0F);
         this.renderer.setMinScale(0.6F);
 
+        handler = new Handler(context.getMainLooper());
         setAllowOverScroll(false);
         setAllowZoom(false);
+    }
+
+    public void setBoardColorScheme(BoardColorScheme boardColorScheme) {
+        if (!Objects.equals(boardColorScheme, this.boardColorScheme)) {
+            this.boardColorScheme = boardColorScheme;
+            renderer.setBoardColorScheme(boardColorScheme);
+            render();
+        }
     }
 
     @Override

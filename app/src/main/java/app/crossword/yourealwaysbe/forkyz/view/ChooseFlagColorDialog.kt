@@ -8,11 +8,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringArrayResource
 
 import app.crossword.yourealwaysbe.forkyz.R
-import app.crossword.yourealwaysbe.forkyz.util.ColorUtils
+import app.crossword.yourealwaysbe.forkyz.theme.BoardColorScheme
+import app.crossword.yourealwaysbe.forkyz.util.addAlpha
+import app.crossword.yourealwaysbe.forkyz.util.delAlpha
 import app.crossword.yourealwaysbe.puz.Clue
 
 /**
@@ -23,15 +24,16 @@ import app.crossword.yourealwaysbe.puz.Clue
 @Composable
 fun ChooseFlagColorDialog(
     selectedColor : Int,
+    boardColorScheme : BoardColorScheme,
     onCancel : () -> Unit,
     onChoose : (Int) -> Unit,
 ) {
     val colors = listOf(
         Clue.DEFAULT_FLAG_COLOR,
-        getContextColor(R.color.flagColor1),
-        getContextColor(R.color.flagColor2),
-        getContextColor(R.color.flagColor3),
-        getContextColor(R.color.flagColor4),
+        colorToInt(boardColorScheme.flagColor1),
+        colorToInt(boardColorScheme.flagColor2),
+        colorToInt(boardColorScheme.flagColor3),
+        colorToInt(boardColorScheme.flagColor4),
     )
     val labels = stringArrayResource(R.array.flag_color_labels).toList()
     var selected by remember {
@@ -50,8 +52,8 @@ fun ChooseFlagColorDialog(
         colorOf = { index ->
             var color = colors.getOrElse(index) { colors[0] }
             if (color == Clue.DEFAULT_FLAG_COLOR)
-                color = getContextColor(R.color.flagColor)
-            Color(ColorUtils.addAlpha(color))
+                color = colorToInt(boardColorScheme.flagColor)
+            Color(addAlpha(color))
         },
         onDismissRequest = onCancel,
         onSelect = { index ->
@@ -64,8 +66,7 @@ fun ChooseFlagColorDialog(
  * Get color from context and remove alpha channel
  */
 @Composable
-private fun getContextColor(id : Int) : Int {
-    return ColorUtils.delAlpha(colorResource(id).toArgb())
+private fun colorToInt(color : Color) : Int {
+    return delAlpha(color.toArgb())
 }
-
 

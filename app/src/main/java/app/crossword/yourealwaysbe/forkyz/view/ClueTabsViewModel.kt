@@ -14,7 +14,7 @@ import app.crossword.yourealwaysbe.forkyz.settings.ClueHighlight
 import app.crossword.yourealwaysbe.forkyz.settings.ClueTabsDouble
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.RenderSettings
-import app.crossword.yourealwaysbe.forkyz.util.ColorUtils
+import app.crossword.yourealwaysbe.forkyz.util.addAlpha
 import app.crossword.yourealwaysbe.forkyz.util.MediatedStateWithFlow
 import app.crossword.yourealwaysbe.puz.Clue
 import app.crossword.yourealwaysbe.puz.ClueID
@@ -349,7 +349,7 @@ class ClueTabsViewModel(
         val flagColor = if (
             clue.isFlagged && !clue.isDefaultFlagColor()
         ) {
-            ColorUtils.addAlpha(clue.flagColor)
+            addAlpha(clue.flagColor)
         } else {
             null
         }

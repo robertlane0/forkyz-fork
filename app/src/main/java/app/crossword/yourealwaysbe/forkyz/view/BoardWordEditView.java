@@ -55,7 +55,6 @@ public class BoardWordEditView extends BoardEditView {
         super(context, attrs);
         setAllowOverScroll(false);
         setAllowZoom(false);
-        setScaleBounds();
     }
 
     /**
@@ -103,7 +102,6 @@ public class BoardWordEditView extends BoardEditView {
     @Override
     public void setBoard(Playboard board, boolean noRender) {
         super.setBoard(board, noRender);
-        setScaleBounds();
     }
 
     /**
@@ -358,6 +356,12 @@ public class BoardWordEditView extends BoardEditView {
         super.onVisibilityChanged(changedView, visibility);
         if (visibility == View.VISIBLE)
             renderToView();
+    }
+
+    @Override
+    protected void recreateRenderer(boolean render) {
+        super.recreateRenderer(render);
+        setScaleBounds();
     }
 
     private Set<String> getSuppressNotesList(boolean displayScratch) {

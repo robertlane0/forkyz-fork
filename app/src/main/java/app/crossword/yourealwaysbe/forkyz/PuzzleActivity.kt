@@ -86,6 +86,7 @@ import app.crossword.yourealwaysbe.forkyz.menu.MenuSubEntry
 import app.crossword.yourealwaysbe.forkyz.menu.MenuText
 import app.crossword.yourealwaysbe.forkyz.settings.KeyboardLayout
 import app.crossword.yourealwaysbe.forkyz.settings.RenderSettings
+import app.crossword.yourealwaysbe.forkyz.theme.BoardColorScheme
 import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer
 import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
 import app.crossword.yourealwaysbe.forkyz.util.SpeechContract
@@ -242,6 +243,7 @@ abstract class PuzzleActivity() : ForkyzActivity() {
         onFocusChanged : (Boolean) -> Unit = { },
         movementStrategy : MovementStrategy = MovementStrategy.STOP_ON_END,
         renderSettings : RenderSettings = RenderSettings(),
+        boardColorScheme : BoardColorScheme = themeHelper.getBoardColorScheme(),
     ) {
         viewModel.getBoard()?.let { board ->
             BoardWordEdit(
@@ -261,6 +263,7 @@ abstract class PuzzleActivity() : ForkyzActivity() {
                 onFocusChanged = onFocusChanged,
                 movementStrategy = movementStrategy,
                 renderSettings = renderSettings,
+                boardColorScheme = boardColorScheme,
             )
         }
     }
@@ -621,6 +624,7 @@ abstract class PuzzleActivity() : ForkyzActivity() {
                         color,
                     )
                 },
+                boardColorScheme = themeHelper.getBoardColorScheme(),
             )
         }
 
@@ -637,6 +641,7 @@ abstract class PuzzleActivity() : ForkyzActivity() {
                         color,
                     )
                 },
+                boardColorScheme = themeHelper.getBoardColorScheme(),
             )
         }
 

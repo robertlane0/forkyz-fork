@@ -128,3 +128,8 @@ val progressErrorDark = Color(0xffff4a4d)
 // for legacy-like theme
 val primaryDarkDark = Color(0xff000000)
 
+// general flag colors
+val flagColor1 = Color(0xff15c71d)
+val flagColor2 = Color(0xffe100d6)
+val flagColor3 = Color(0xffd5c500)
+val flagColor4 = Color(0xffbbbbbb)

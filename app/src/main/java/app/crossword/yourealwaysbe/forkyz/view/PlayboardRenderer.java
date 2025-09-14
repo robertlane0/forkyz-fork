@@ -1,6 +1,5 @@
 package app.crossword.yourealwaysbe.forkyz.view;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -17,12 +16,12 @@ import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.util.Base64;
 
-import androidx.core.content.ContextCompat;
 import androidx.core.text.HtmlCompat;
 
 import app.crossword.yourealwaysbe.forkyz.R;
 import app.crossword.yourealwaysbe.forkyz.settings.DisplaySeparators;
-import app.crossword.yourealwaysbe.forkyz.util.ColorUtils;
+import app.crossword.yourealwaysbe.forkyz.theme.BoardColorScheme;
+import app.crossword.yourealwaysbe.forkyz.util.ColorUtilsKt;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 import app.crossword.yourealwaysbe.forkyz.view.ScrollingImageView.Point;
 import app.crossword.yourealwaysbe.puz.Box;
@@ -145,11 +144,10 @@ public class PlayboardRenderer {
         }
     }
 
-    // colors are gotten from context
     public PlayboardRenderer(
         Playboard board,
         float dpi, int displayWidthPixels,
-        Context context, AndroidVersionUtils versionUtils
+        BoardColorScheme colors, AndroidVersionUtils versionUtils
     ) {
         TYPEFACE_SEMI_BOLD_SANS = versionUtils.getSemiBoldTypeface();
 
@@ -159,8 +157,12 @@ public class PlayboardRenderer {
         this.hintHighlight = false;
         this.maxScale = getDeviceMaxScale();
         this.minScale = getDeviceMinScale();
-        this.profile = new PaintProfile(context, scale);
+        this.profile = new PaintProfile(colors, scale);
         this.versionUtils = versionUtils;
+    }
+
+    public void setBoardColorScheme(BoardColorScheme colors) {
+        this.profile = new PaintProfile(colors, scale);
     }
 
     public void setHintHighlight(boolean hintHighlight) {
@@ -2402,33 +2404,27 @@ public class PlayboardRenderer {
         private int textOffset = boxSize / 30;
         private int shapeStrokeWidth = Math.max(1, boxSize / 15);
 
-        public PaintProfile(Context context, float scale) {
-            int blockColor
-                = ContextCompat.getColor(context, R.color.blockColor);
-            int cellColor = ContextCompat.getColor(context, R.color.cellColor);
-            int currentWordHighlightColor = ContextCompat.getColor(
-                context, R.color.currentWordHighlightColor
-            );
-            int currentLetterHighlightColor = ContextCompat.getColor(
-                context, R.color.currentLetterHighlightColor
-            );
-            int errorColor
-                = ContextCompat.getColor(context, R.color.errorColor);
+        public PaintProfile(BoardColorScheme colors, float scale) {
+            int blockColor = ColorUtilsKt.colorToInt(colors.blockColor());
+            int cellColor = ColorUtilsKt.colorToInt(colors.cellColor());
+            int currentWordHighlightColor
+                = ColorUtilsKt.colorToInt(colors.currentWordHighlightColor());
+            int currentLetterHighlightColor
+                = ColorUtilsKt.colorToInt(colors.currentLetterHighlightColor());
+            int errorColor = ColorUtilsKt.colorToInt(colors.errorColor());
             int errorHighlightColor
-                = ContextCompat.getColor(context, R.color.errorHighlightColor);
-            int cheatedColor
-                = ContextCompat.getColor(context, R.color.cheatedColor);
+                = ColorUtilsKt.colorToInt(colors.errorHighlightColor());
+            int cheatedColor = ColorUtilsKt.colorToInt(colors.cheatedColor());
             int boardLetterColor
-                = ContextCompat.getColor(context, R.color.boardLetterColor);
+                = ColorUtilsKt.colorToInt(colors.boardLetterColor());
             int boardNoteColor
-                = ContextCompat.getColor(context, R.color.boardNoteColor);
-            int flagColor = ContextCompat.getColor(context, R.color.flagColor);
-            int onBlockColor
-                = ContextCompat.getColor(context, R.color.onBlockColor);
+                = ColorUtilsKt.colorToInt(colors.boardNoteColor());
+            int flagColor = ColorUtilsKt.colorToInt(colors.flagColor());
+            int onBlockColor = ColorUtilsKt.colorToInt(colors.onBlockColor());
             int boardShapeColor
-                = ContextCompat.getColor(context, R.color.boardShapeColor);
+                = ColorUtilsKt.colorToInt(colors.boardShapeColor());
             int blockShapeColor
-                = ContextCompat.getColor(context, R.color.blockShapeColor);
+                = ColorUtilsKt.colorToInt(colors.blockShapeColor());
 
             outline.setColor(blockColor);
             outline.setStrokeWidth(2.0F);
@@ -2632,7 +2628,7 @@ public class PlayboardRenderer {
             } else {
                 Paint customFlag = new Paint();
                 // clue colors have a 0 alpha channel, so fix
-                customFlag.setColor(ColorUtils.addAlpha(clue.getFlagColor()));
+                customFlag.setColor(ColorUtilsKt.addAlpha(clue.getFlagColor()));
                 return customFlag;
             }
         }
@@ -2643,7 +2639,7 @@ public class PlayboardRenderer {
             } else {
                 Paint customFlag = new Paint();
                 // clue colors have a 0 alpha channel, so fix
-                customFlag.setColor(ColorUtils.addAlpha(box.getFlagColor()));
+                customFlag.setColor(ColorUtilsKt.addAlpha(box.getFlagColor()));
                 return customFlag;
             }
         }

@@ -458,6 +458,7 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
         val onBarLongClickDescription
             = if (state.isAcrostic) stringResource(R.string.toggle_clue_tabs)
             else ""
+        val boardColorScheme = themeHelper.getBoardColorScheme()
 
         ClueTabs(
             modifier = modifier,
@@ -475,6 +476,7 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
             onBarLongClickDescription = onBarLongClickDescription,
             maxWordScale = ACROSTIC_CLUE_TABS_WORD_SCALE,
             onPageChange = viewModel::saveClueTabsPage,
+            boardColorScheme = boardColorScheme,
         )
     }
 
@@ -482,6 +484,7 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
     private fun Board(modifier : Modifier) {
         val state by viewModel.playUIState.collectAsStateWithLifecycle()
         val locked = state.fitToScreenMode == FitToScreenMode.FTSM_LOCKED
+        val boardColorScheme = themeHelper.getBoardColorScheme()
 
         AndroidView(
             modifier = modifier.onSizeChanged { size ->
@@ -535,6 +538,7 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
                     setRenderSettings(state.renderSettings)
                     setScratchMode(state.scratchMode)
                     setDoubleTapFitBoard(state.doubleTapFitBoard)
+                    setBoardColorScheme(boardColorScheme)
                 }
             },
             onRelease = { it.detach() },

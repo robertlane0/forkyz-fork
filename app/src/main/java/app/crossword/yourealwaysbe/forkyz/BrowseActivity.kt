@@ -905,12 +905,16 @@ class BrowseActivity() : ForkyzActivity() {
                     color = textColor,
                 )
             }
+            val progressColors = themeHelper.getCircleProgressBarColorScheme()
             AndroidView(
                 modifier = Modifier.size(56.dp),
-                factory = { context -> CircleProgressBar(context) },
+                factory = { context ->
+                    CircleProgressBar(context, progressColors)
+                },
                 update = { view ->
                     view.percentFilled = percentFilled
                     view.complete = pe.percentComplete == 100
+                    view.setColors(progressColors)
                 }
             )
             Column(Modifier.weight(1.0F).fillMaxWidth()) {
