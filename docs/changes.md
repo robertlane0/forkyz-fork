@@ -1,5 +1,12 @@
 # Forkyz Changelog
 
+## Version 72
+
+- Add El Pais Experto downloader.
+- Add completion share and completion time in millis (thanks @develinthedetails).
+- Add back arrow to submenus (thanks @develsinthedetails).
+- Changes to backend settings management (please report bugs).
+
 ## Version 71
 
 - Support shapes in TCA puz format (LA Times).
