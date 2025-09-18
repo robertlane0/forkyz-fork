@@ -18,7 +18,6 @@ import android.util.Base64;
 
 import androidx.core.text.HtmlCompat;
 
-import app.crossword.yourealwaysbe.forkyz.R;
 import app.crossword.yourealwaysbe.forkyz.settings.DisplaySeparators;
 import app.crossword.yourealwaysbe.forkyz.theme.BoardColorScheme;
 import app.crossword.yourealwaysbe.forkyz.util.ColorUtilsKt;

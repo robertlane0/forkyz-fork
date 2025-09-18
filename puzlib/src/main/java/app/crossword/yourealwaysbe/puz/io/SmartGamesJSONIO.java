@@ -10,16 +10,12 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.logging.Logger;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import app.crossword.yourealwaysbe.puz.Box;
-import app.crossword.yourealwaysbe.puz.Clue;
-import app.crossword.yourealwaysbe.puz.Position;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.PuzzleBuilder;
-import app.crossword.yourealwaysbe.puz.Zone;
 import app.crossword.yourealwaysbe.puz.util.JSONParser;
 import app.crossword.yourealwaysbe.puz.util.PuzzleUtils;
 

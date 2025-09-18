@@ -37,7 +37,6 @@ import app.crossword.yourealwaysbe.puz.io.JPZIO;
 import app.crossword.yourealwaysbe.puz.io.PMLIO;
 import app.crossword.yourealwaysbe.puz.io.PrzekrojIO;
 import app.crossword.yourealwaysbe.puz.io.RCIJeuxMFJIO;
-import app.crossword.yourealwaysbe.puz.io.SmartGamesJSONIO;
 
 public class Downloaders {
     private static final String TAG = "ForkyzDownloaders";
