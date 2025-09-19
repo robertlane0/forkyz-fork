@@ -8,7 +8,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts.CreateDocument
@@ -54,7 +53,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -62,7 +60,7 @@ import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 
 import app.crossword.yourealwaysbe.forkyz.theme.ForkyzTopAppBar
-import app.crossword.yourealwaysbe.forkyz.util.ExitActivity
+import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 import app.crossword.yourealwaysbe.forkyz.util.PuzzleExportService
 import app.crossword.yourealwaysbe.forkyz.view.ListDialog
 import app.crossword.yourealwaysbe.forkyz.view.MultiListDialog
@@ -70,40 +68,39 @@ import app.crossword.yourealwaysbe.forkyz.view.OKCancelDialog
 import app.crossword.yourealwaysbe.forkyz.view.SearchBar
 import app.crossword.yourealwaysbe.forkyz.view.StringDialog
 
+private val SETTINGS_HORIZONTAL_PADDING = 20.dp
+private val SETTINGS_VERTICAL_PADDING = 14.dp
+private val SWITCH_PADDING = 4.dp
+
+private val TAG = "ForkyzSettingsActivity"
+
 @AndroidEntryPoint
 class SettingsActivity : ForkyzActivity() {
-    private val TAG = "ForkyzSettingsActivity"
-
-    private val SETTINGS_HORIZONTAL_PADDING = 20.dp
-    private val SETTINGS_VERTICAL_PADDING = 14.dp
-    private val SWITCH_PADDING = 4.dp
 
     private val viewModel by viewModels<SettingsActivityViewModel>()
 
+    // not ideal that these have to finish the job outside of the
+    // Compose function
     private val getSAFURI = registerForActivityResult(OpenDocumentTree()) {
         uri : Uri? -> uri?.let {
             if (!viewModel.setNewExternalStorageSAFURI(it)) {
-                Toast.makeText(
-                    getApplication(),
-                    R.string.failed_to_initialise_saf,
-                    Toast.LENGTH_LONG
-                ).show()
+                toast(getString(R.string.failed_to_initialise_saf))
             }
         }
     }
-    private val getImportSettingsURI = registerForActivityResult(GetContent()) {
+    private val importSettings = registerForActivityResult(GetContent()) {
         uri : Uri? -> uri?.let {
             viewModel.importSettings(uri)
         }
     }
-    private val getExportSettingsURI = registerForActivityResult(
+    private val exportSettings = registerForActivityResult(
         CreateDocument(SETTINGS_MIME_TYPE)
     ) {
         uri : Uri? -> uri?.let {
             viewModel.exportSettings(uri)
         }
     }
-    private val getExportPuzzlesURI
+    private val exportPuzzles
         = registerForActivityResult(OpenDocumentTree()) {
             uri : Uri? -> uri?.let {
                 try {
@@ -121,81 +118,203 @@ class SettingsActivity : ForkyzActivity() {
                         TAG,
                         "Could not start puzzle export service on foreground"
                     )
-                    Toast.makeText(
-                       this,
-                       R.string.puzzles_export_failed,
-                       Toast.LENGTH_SHORT
-                    ).show()
+                    toast(getString(R.string.puzzles_export_failed))
                 }
             }
         }
 
-    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState : Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
-            val state by viewModel.state.collectAsStateWithLifecycle()
-
-            LaunchForActivityResults()
-            ShowMessages()
-
-            BackHandler(enabled = state.hasBackStack) {
-                handleBack()
-            }
-
             AppTheme() {
-                // Reset list state/scroll on new list
-                // https://slack-chats.kotlinlang.org/t/510683/what-would-be-to-best-way-to-reset-the-scroll-of-a-lazylist-
-                val scrollBehavior = key(state.settingsItems) {
-                    TopAppBarDefaults.pinnedScrollBehavior()
-                }
-                val listState = key(state.settingsItems) {
-                    rememberLazyListState()
-                }
-
-                Scaffold(
-                    topBar = { TopAppBar(scrollBehavior) },
-                    modifier = Modifier.nestedScroll(
-                        scrollBehavior.nestedScrollConnection
-                    )
-                ) { innerPadding ->
-                    Column(modifier = Modifier.padding(innerPadding)) {
-                        SearchBar(
-                            showSearchBar = state.inSearchMode,
-                            searchTerm = state.searchTerm,
-                            onValueChange = viewModel::setSearchTerm,
-                            onClose = viewModel::endSearch,
-                            hint
-                                = stringResource(R.string.filter_settings_hint),
-                        )
-
-                        LazyColumn(
-                            modifier = Modifier.fillMaxWidth(),
-                            state = listState,
-                        ) {
-                            itemsIndexed(state.settingsItems) { index, item ->
-                                SettingsItem(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(
-                                            vertical
-                                                = SETTINGS_VERTICAL_PADDING,
-                                            horizontal
-                                                = SETTINGS_HORIZONTAL_PADDING,
-                                        ),
-                                    item = item,
-                                    isFirst = (index == 0),
-                                )
-                            }
-                        }
-                    }
-
-                    DisplayDialogs(state)
-                }
+                SettingsPage(
+                    viewModel = viewModel,
+                    themeHelper = themeHelper,
+                    onFinish = this::finish,
+                    onAppExit = this::appExit,
+                    toast = this::toast,
+                    openHTMLPage = this::openHTMLPage,
+                    openLogcatPage = {
+                        startActivity(Intent(this, LogcatActivity::class.java))
+                    },
+                    onGetSAFURI = { getSAFURI.launch(null) },
+                    onExportSettings
+                        = { exportSettings.launch(SETTINGS_DEFAULT_FILENAME) },
+                    onImportSettings
+                        = { importSettings.launch(SETTINGS_MIME_TYPE) },
+                    onExportPuzzles = { exportPuzzles.launch(null) },
+                )
             }
         }
     }
+}
+
+@Composable
+private fun SettingsClickable(
+    modifier : Modifier,
+    title : String,
+    summary : String?,
+    errorMsg : String?,
+    onClick : () -> Unit,
+) {
+    SettingsDescription(
+        modifier = Modifier.clickable { onClick() }
+            .then(modifier),
+        title = title,
+        summary = summary,
+        errorMsg = errorMsg,
+    )
+}
+
+@Composable
+private fun SettingsBoolean(
+    modifier : Modifier,
+    title : String,
+    summary : String?,
+    errorMsg : String?,
+    value : Boolean,
+    onValueChange : (Boolean) -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .clickable { onValueChange(!value) }
+            .then(modifier),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        SettingsDescription(
+            modifier = Modifier.weight(1.0f),
+            title = title,
+            summary = summary,
+            errorMsg = errorMsg,
+        )
+        Switch(
+            modifier = Modifier.padding(start = SWITCH_PADDING),
+            checked = value,
+            onCheckedChange = onValueChange,
+        )
+    }
+}
+
+@Composable
+private fun SettingsTriState(
+    modifier : Modifier,
+    title : String,
+    summary : String?,
+    errorMsg : String?,
+    value : TriState,
+    onValueChange : (TriState) -> Unit,
+) {
+    fun onBooleanChange(newBoolean : Boolean) {
+        onValueChange(if (newBoolean) TriState.ON else TriState.OFF)
+    }
+
+    val booleanValue = value != TriState.OFF
+    val colors = if (value == TriState.INDETERMINATE) {
+        val defaults = SwitchDefaults.colors()
+        SwitchDefaults.colors(
+            checkedThumbColor = defaults.uncheckedThumbColor,
+            checkedTrackColor = defaults.uncheckedTrackColor,
+            checkedBorderColor = defaults.uncheckedBorderColor,
+        )
+    } else {
+        SwitchDefaults.colors()
+    }
+
+    Row(
+        modifier = Modifier
+            .clickable { onBooleanChange(!booleanValue) }
+            .then(modifier),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        SettingsDescription(
+            modifier = Modifier.weight(1.0f),
+            title = title,
+            summary = summary,
+            errorMsg = errorMsg,
+        )
+        Switch(
+            modifier = Modifier.padding(start = SWITCH_PADDING),
+            checked = booleanValue,
+            onCheckedChange = { onBooleanChange(it) },
+            colors = colors,
+        )
+    }
+}
+
+@Composable
+private fun SettingsDescription(
+    modifier : Modifier,
+    title : String,
+    summary : String?,
+    errorMsg : String?,
+) {
+    Column(modifier = modifier) {
+        Text(
+            title,
+            style = MaterialTheme.typography.titleMedium
+        )
+        summary?.let {
+            Text(summary)
+        }
+        errorMsg?.let {
+            Text(
+                errorMsg,
+                color = MaterialTheme.colorScheme.error,
+            )
+        }
+    }
+}
+
+@Composable
+private fun SettingsHeading(
+    modifier : Modifier,
+    title : String,
+    summary : String?,
+    errorMsg : String?,
+    withRule : Boolean,
+) {
+    Column(modifier = modifier) {
+        if (withRule) {
+            HorizontalDivider(
+                modifier = Modifier.padding(
+                    bottom=SETTINGS_VERTICAL_PADDING
+                )
+            )
+        }
+        Text(
+            title,
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.primary,
+        )
+        summary?.let {
+            Text(it)
+        }
+        errorMsg?.let {
+            Text(
+                it,
+                color = MaterialTheme.colorScheme.error,
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SettingsPage(
+    viewModel : SettingsActivityViewModel,
+    themeHelper : ThemeHelper,
+    onFinish : () -> Unit,
+    onAppExit : () -> Unit,
+    toast : (String) -> Unit,
+    openHTMLPage : (String) -> Unit,
+    openLogcatPage : () -> Unit,
+    onGetSAFURI : () -> Unit,
+    onExportSettings : () -> Unit,
+    onImportSettings : () -> Unit,
+    onExportPuzzles : () -> Unit,
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     /**
      * Launch for activity results if needed
@@ -203,35 +322,32 @@ class SettingsActivity : ForkyzActivity() {
      * E.g. if a SAF URI is needed, launch getSAFURI
      */
     @Composable
-    private fun LaunchForActivityResults() {
+    fun LaunchForActivityResults() {
         val needsURI by viewModel.needsURI.collectAsStateWithLifecycle()
         when (needsURI) {
             RequestedURI.SAF -> {
+                val msg = stringResource(R.string.storage_select_saf_info)
                 LaunchedEffect(needsURI) {
-                    Toast.makeText(
-                        getApplication(),
-                        R.string.storage_select_saf_info,
-                        Toast.LENGTH_LONG
-                    ).show()
-                    getSAFURI.launch(null)
+                    toast(msg)
+                    onGetSAFURI()
                     viewModel.clearNeedsURI()
                 }
             }
             RequestedURI.SETTINGS_EXPORT -> {
                 LaunchedEffect(needsURI) {
-                    getExportSettingsURI.launch(SETTINGS_DEFAULT_FILENAME)
+                    onExportSettings()
                     viewModel.clearNeedsURI()
                 }
             }
             RequestedURI.SETTINGS_IMPORT -> {
                 LaunchedEffect(needsURI) {
-                    getImportSettingsURI.launch(SETTINGS_MIME_TYPE)
+                    onImportSettings()
                     viewModel.clearNeedsURI()
                 }
             }
             RequestedURI.PUZZLES_EXPORT -> {
                 LaunchedEffect(needsURI) {
-                    getExportPuzzlesURI.launch(null)
+                    onExportPuzzles()
                     viewModel.clearNeedsURI()
                 }
             }
@@ -242,26 +358,28 @@ class SettingsActivity : ForkyzActivity() {
     }
 
     @Composable
-    private fun ShowMessages() {
+    fun ShowMessages() {
         val messages by viewModel.messages.collectAsStateWithLifecycle()
-        LaunchedEffect(messages) {
-            val app = getApplication()
-            for (msg in messages) {
-                Toast.makeText(app, msg, Toast.LENGTH_LONG).show()
-            }
+        val msgStrings = messages.map { stringResource(it) }
+        LaunchedEffect(msgStrings) {
+            msgStrings.forEach(toast)
             viewModel.clearMessages()
         }
     }
 
+    fun handleBack() {
+        if (viewModel.state.value.hasBackStack)
+            viewModel.popState()
+        else
+            onFinish()
+    }
+
     @Composable
-    @OptIn(ExperimentalMaterial3Api::class)
-    private fun TopAppBar(scrollBehavior : TopAppBarScrollBehavior) {
-        // using view model in here because it's not intended to be
-        // reused elsewhere
+    fun TopAppBar(scrollBehavior : TopAppBarScrollBehavior) {
         val state by viewModel.state.collectAsStateWithLifecycle()
         themeHelper.ForkyzTopAppBar(
             title = { Text(stringResource(id = state.currentPage.title)) },
-            onBack = this::handleBack,
+            onBack = ::handleBack,
             actions = {
                 IconButton(onClick = viewModel::startSearch) {
                     Icon(
@@ -275,7 +393,7 @@ class SettingsActivity : ForkyzActivity() {
     }
 
     @Composable
-    private fun SettingsItem(
+    fun SettingsItem(
         modifier : Modifier,
         item : SettingsItem,
         isFirst : Boolean,
@@ -362,11 +480,7 @@ class SettingsActivity : ForkyzActivity() {
                             title = title,
                             summary = summary,
                             errorMsg = errorMsg?.value,
-                            onClick = {
-                                startActivity(
-                                    Intent(this, LogcatActivity::class.java)
-                                )
-                            },
+                            onClick = openLogcatPage,
                         )
                     }
                     else -> { } /* ignore */
@@ -377,181 +491,15 @@ class SettingsActivity : ForkyzActivity() {
     }
 
     @Composable
-    private fun SettingsClickable(
-        modifier : Modifier,
-        title : String,
-        summary : String?,
-        errorMsg : String?,
-        onClick : () -> Unit,
-    ) {
-        SettingsDescription(
-            modifier = Modifier.clickable { onClick() }
-                .then(modifier),
-            title = title,
-            summary = summary,
-            errorMsg = errorMsg,
-        )
-    }
-
-    @Composable
-    fun SettingsBoolean(
-        modifier : Modifier,
-        title : String,
-        summary : String?,
-        errorMsg : String?,
-        value : Boolean,
-        onValueChange : (Boolean) -> Unit,
-    ) {
-        Row(
-            modifier = Modifier
-                .clickable { onValueChange(!value) }
-                .then(modifier),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            SettingsDescription(
-                modifier = Modifier.weight(1.0f),
-                title = title,
-                summary = summary,
-                errorMsg = errorMsg,
-            )
-            Switch(
-                modifier = Modifier.padding(start = SWITCH_PADDING),
-                checked = value,
-                onCheckedChange = onValueChange,
-            )
-        }
-    }
-
-    @Composable
-    fun SettingsTriState(
-        modifier : Modifier,
-        title : String,
-        summary : String?,
-        errorMsg : String?,
-        value : TriState,
-        onValueChange : (TriState) -> Unit,
-    ) {
-        fun onBooleanChange(newBoolean : Boolean) {
-            onValueChange(if (newBoolean) TriState.ON else TriState.OFF)
-        }
-
-        val booleanValue = value != TriState.OFF
-        val colors = if (value == TriState.INDETERMINATE) {
-            val defaults = SwitchDefaults.colors()
-            SwitchDefaults.colors(
-                checkedThumbColor = defaults.uncheckedThumbColor,
-                checkedTrackColor = defaults.uncheckedTrackColor,
-                checkedBorderColor = defaults.uncheckedBorderColor,
-            )
-        } else {
-            SwitchDefaults.colors()
-        }
-
-        Row(
-            modifier = Modifier
-                .clickable { onBooleanChange(!booleanValue) }
-                .then(modifier),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            SettingsDescription(
-                modifier = Modifier.weight(1.0f),
-                title = title,
-                summary = summary,
-                errorMsg = errorMsg,
-            )
-            Switch(
-                modifier = Modifier.padding(start = SWITCH_PADDING),
-                checked = booleanValue,
-                onCheckedChange = { onBooleanChange(it) },
-                colors = colors,
-            )
-        }
-    }
-
-    @Composable
-    private fun SettingsDescription(
-        modifier : Modifier,
-        title : String,
-        summary : String?,
-        errorMsg : String?,
-    ) {
-        Column(modifier = modifier) {
-            Text(
-                title,
-                style = MaterialTheme.typography.titleMedium
-            )
-            summary?.let {
-                Text(summary)
-            }
-            errorMsg?.let {
-                Text(
-                    errorMsg,
-                    color = MaterialTheme.colorScheme.error,
-                )
-            }
-        }
-    }
-
-    @Composable
-    private fun SettingsHeading(
-        modifier : Modifier,
-        title : String,
-        summary : String?,
-        errorMsg : String?,
-        withRule : Boolean,
-    ) {
-        Column(modifier = modifier) {
-            if (withRule) {
-                HorizontalDivider(
-                    modifier = Modifier.padding(
-                        bottom=SETTINGS_VERTICAL_PADDING
-                    )
-                )
-            }
-            Text(
-                title,
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.primary,
-            )
-            summary?.let {
-                Text(it)
-            }
-            errorMsg?.let {
-                Text(
-                    it,
-                    color = MaterialTheme.colorScheme.error,
-                )
-            }
-        }
-    }
-
-    @Composable
-    private fun DisplayDialogs(state : SettingsActivityViewState) {
-        if (state.storageChangedAppExit) {
-            StorageChangedAppExitDialog()
-        }
-
-        state.activeInputItem?.let {
-            when (it) {
-                is SettingsDynamicList<*> -> ActiveListItemDialog(it)
-                is SettingsDynamicMultiList<*> -> ActiveMultiListItemDialog(it)
-                is SettingsString -> ActiveStringItemDialog(it)
-                is SettingsInteger -> ActiveIntegerItemDialog(it)
-                else -> { }
-            }
-        }
-    }
-
-    @Composable
-    private fun StorageChangedAppExitDialog() {
+    fun StorageChangedAppExitDialog() {
         AlertDialog(
             title = { Text(stringResource(R.string.storage_changed_title)) },
             text = {
                 Text(stringResource(R.string.storage_changed_please_restart))
             },
-            onDismissRequest = this::appExit,
+            onDismissRequest = onAppExit,
             confirmButton = {
-                TextButton(onClick = this::appExit) {
+                TextButton(onClick = onAppExit) {
                     Text(stringResource(R.string.exit))
                 }
             },
@@ -559,7 +507,7 @@ class SettingsActivity : ForkyzActivity() {
     }
 
     @Composable
-    private fun ActiveListItemDialog(item : SettingsDynamicList<*>) {
+    fun ActiveListItemDialog(item : SettingsDynamicList<*>) {
         val selected by item.value.collectAsStateWithLifecycle()
         val entries by item.entries.collectAsStateWithLifecycle()
 
@@ -584,7 +532,7 @@ class SettingsActivity : ForkyzActivity() {
     }
 
     @Composable
-    private fun ActiveMultiListItemDialog(item : SettingsDynamicMultiList<*>) {
+    fun ActiveMultiListItemDialog(item : SettingsDynamicMultiList<*>) {
         val selected by item.value.collectAsStateWithLifecycle()
         val entries by item.entries.collectAsStateWithLifecycle()
 
@@ -613,7 +561,7 @@ class SettingsActivity : ForkyzActivity() {
     }
 
     @Composable
-    private fun ActiveStringItemDialog(item : SettingsString) {
+    fun ActiveStringItemDialog(item : SettingsString) {
         val value by item.value.collectAsStateWithLifecycle()
         StringDialog(
             title = item.title,
@@ -629,7 +577,7 @@ class SettingsActivity : ForkyzActivity() {
     }
 
     @Composable
-    private fun ActiveIntegerItemDialog(item : SettingsInteger) {
+    fun ActiveIntegerItemDialog(item : SettingsInteger) {
         val value by item.value.collectAsStateWithLifecycle()
         StringDialog(
             title = item.title,
@@ -650,24 +598,73 @@ class SettingsActivity : ForkyzActivity() {
         )
     }
 
-    private fun handleBack() {
-        if (viewModel.state.value.hasBackStack)
-            viewModel.popState()
-        else
-            finish()
+    @Composable
+    fun DisplayDialogs(state : SettingsActivityViewState) {
+        if (state.storageChangedAppExit) {
+            StorageChangedAppExitDialog()
+        }
+
+        state.activeInputItem?.let {
+            when (it) {
+                is SettingsDynamicList<*> -> ActiveListItemDialog(it)
+                is SettingsDynamicMultiList<*> -> ActiveMultiListItemDialog(it)
+                is SettingsString -> ActiveStringItemDialog(it)
+                is SettingsInteger -> ActiveIntegerItemDialog(it)
+                else -> { }
+            }
+        }
     }
 
-    private fun appExit() {
-        ExitActivity.exit(getApplication());
+    LaunchForActivityResults()
+    ShowMessages()
+
+    BackHandler(enabled = state.hasBackStack) {
+        handleBack()
     }
 
-    private fun openHTMLPage(url : String) {
-        startActivity(Intent(
-            Intent.ACTION_VIEW,
-            url.toUri(),
-            this,
-            HTMLActivity::class.java
-        ))
+    // Reset list state/scroll on new list
+    // https://slack-chats.kotlinlang.org/t/510683/what-would-be-to-best-way-to-reset-the-scroll-of-a-lazylist-
+    val scrollBehavior = key(state.settingsItems) {
+        TopAppBarDefaults.pinnedScrollBehavior()
+    }
+    val listState = key(state.settingsItems) {
+        rememberLazyListState()
+    }
+
+    Scaffold(
+        topBar = { TopAppBar(scrollBehavior) },
+        modifier = Modifier.nestedScroll(
+            scrollBehavior.nestedScrollConnection
+        )
+    ) { innerPadding ->
+        Column(modifier = Modifier.padding(innerPadding)) {
+            SearchBar(
+                showSearchBar = state.inSearchMode,
+                searchTerm = state.searchTerm,
+                onValueChange = viewModel::setSearchTerm,
+                onClose = viewModel::endSearch,
+                hint = stringResource(R.string.filter_settings_hint),
+            )
+
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth(),
+                state = listState,
+            ) {
+                itemsIndexed(state.settingsItems) { index, item ->
+                    SettingsItem(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                vertical = SETTINGS_VERTICAL_PADDING,
+                                horizontal = SETTINGS_HORIZONTAL_PADDING,
+                            ),
+                        item = item,
+                        isFirst = (index == 0),
+                    )
+                }
+            }
+        }
+
+        DisplayDialogs(state)
     }
 }
-

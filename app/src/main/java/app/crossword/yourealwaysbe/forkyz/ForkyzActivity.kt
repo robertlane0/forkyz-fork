@@ -3,17 +3,21 @@ package app.crossword.yourealwaysbe.forkyz
 
 import javax.inject.Inject
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.Composable
 import androidx.core.app.ShareCompat
+import androidx.core.net.toUri
 
 import dagger.hilt.android.AndroidEntryPoint
 
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.theme.AppTheme
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
+import app.crossword.yourealwaysbe.forkyz.util.ExitActivity
 import app.crossword.yourealwaysbe.forkyz.util.NightModeHelper
 import app.crossword.yourealwaysbe.forkyz.util.OrientationHelper
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
@@ -75,5 +79,31 @@ open class ForkyzActivity : AppCompatActivity() {
             .setType(data.mimeType)
             .createChooserIntent()
         startActivity(shareIntent)
+    }
+
+    /**
+     * Exit whole app
+     */
+    protected fun appExit() {
+        ExitActivity.exit(getApplication());
+    }
+
+    /**
+     * Display a long toast
+     */
+    protected fun toast(message : String) {
+        Toast.makeText(getApplication(), message, Toast.LENGTH_LONG).show()
+    }
+
+    /**
+     * Open HTML activity with file url
+     */
+    protected fun openHTMLPage(url : String) {
+        startActivity(Intent(
+            Intent.ACTION_VIEW,
+            url.toUri(),
+            this,
+            HTMLActivity::class.java
+        ))
     }
 }
