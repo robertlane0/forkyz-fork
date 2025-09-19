@@ -23,113 +23,127 @@ import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.core.app.ShareCompat
 
 import dagger.hilt.android.AndroidEntryPoint
 
+import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
+
+private val PADDING = 20.dp
+
 @AndroidEntryPoint
 class LogcatActivity : ForkyzActivity() {
-    private val PADDING = 20.dp
-
     private val viewModel by viewModels<LogcatActivityViewModel>()
-
-    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState : Bundle?) {
         super.onCreate(savedInstanceState)
-
-        viewModel.loadLogcat()
-
         setContent() {
-            Launchers()
-
             AppTheme() {
-                val scrollBehavior
-                    = TopAppBarDefaults.enterAlwaysScrollBehavior()
-                val listState = rememberLazyListState()
-                val scope = rememberCoroutineScope()
+                LogcatPage(
+                    viewModel = viewModel,
+                    themeHelper = themeHelper,
+                    onShareFile = this::shareFile,
+                    onFinish = this::finish,
+                )
+            }
+        }
+    }
+}
 
-                Scaffold(
-                    topBar = {
-                        themeHelper.ForkyzTopAppBar(
-                            title = { Text(stringResource(R.string.logcat)) },
-                            onBack = this::finish,
-                            scrollBehavior = scrollBehavior,
-                            actions = {
-                                IconButton(onClick = viewModel::shareLogcat) {
-                                    Icon(
-                                        Icons.Filled.Share,
-                                        stringResource(
-                                            R.string.share_logcat
-                                        ),
-                                    )
-                                }
-                            },
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun LogcatPage(
+    viewModel : LogcatActivityViewModel,
+    themeHelper : ThemeHelper,
+    onShareFile : (ShareFileData) -> Unit,
+    onFinish : () -> Unit,
+) {
+    @Composable
+    fun Launchers() {
+        LaunchedEffect(Unit) {
+            viewModel.loadLogcat()
+        }
 
-                        )
-                    },
-                    modifier = Modifier.nestedScroll(
-                        scrollBehavior.nestedScrollConnection
-                    ),
-                    floatingActionButton = {
-                        if (listState.canScrollForward) {
-                            SmallFloatingActionButton(
-                                onClick = {
-                                    scope.launch {
-                                        listState.scrollToItem(
-                                            viewModel.logcatText.value.size
-                                        )
-                                    }
-                                },
-                            ) {
-                                Icon(
-                                    Icons.Default.KeyboardArrowDown,
-                                    stringResource(R.string.jump_to_end),
-                                )
-                            }
-                        }
-                    }
-                ) { innerPadding ->
-                    val logcatText
-                        by viewModel.logcatText.collectAsStateWithLifecycle()
-
-                    LazyColumn(
-                        modifier = Modifier.padding(innerPadding)
-                            .padding(horizontal=PADDING),
-                        state = listState,
-                    ) {
-                        items(logcatText) { line ->
-                            Text(line)
-                        }
-                    }
-                }
+        val event by viewModel.shareLogcatEvent.collectAsStateWithLifecycle()
+        val title = stringResource(R.string.share_logcat)
+        LaunchedEffect(event) {
+            event?.let { event ->
+                onShareFile(ShareFileData(title, event.uri, event.mimeType))
             }
         }
     }
 
     @Composable
-    private fun Launchers() {
-        val event by viewModel.shareLogcatEvent.collectAsStateWithLifecycle()
-        LaunchedEffect(event) {
-            event?.let { event ->
-                val title = getString(R.string.share_logcat)
-                viewModel.clearShareLogcatEvent()
+    fun PageBody() {
+        val scrollBehavior
+            = TopAppBarDefaults.enterAlwaysScrollBehavior()
+        val listState = rememberLazyListState()
+        val scope = rememberCoroutineScope()
 
-                val shareIntent = ShareCompat.IntentBuilder(this@LogcatActivity)
-                    .setChooserTitle(title)
-                    .setStream(event.uri)
-                    .setType(event.mimeType)
-                    .createChooserIntent()
-                startActivity(shareIntent)
+        Scaffold(
+            topBar = {
+                themeHelper.ForkyzTopAppBar(
+                    title = { Text(stringResource(R.string.logcat)) },
+                    onBack = onFinish,
+                    scrollBehavior = scrollBehavior,
+                    actions = {
+                        IconButton(onClick = viewModel::shareLogcat) {
+                            Icon(
+                                Icons.Filled.Share,
+                                stringResource(
+                                    R.string.share_logcat
+                                ),
+                            )
+                        }
+                    },
+
+                )
+            },
+            modifier = Modifier.nestedScroll(
+                scrollBehavior.nestedScrollConnection
+            ),
+            floatingActionButton = {
+                if (listState.canScrollForward) {
+                    SmallFloatingActionButton(
+                        onClick = {
+                            scope.launch {
+                                listState.scrollToItem(
+                                    viewModel.logcatText.value.size
+                                )
+                            }
+                        },
+                    ) {
+                        Icon(
+                            Icons.Default.KeyboardArrowDown,
+                            stringResource(R.string.jump_to_end),
+                        )
+                    }
+                }
+            }
+        ) { innerPadding ->
+            val logcatText
+                by viewModel.logcatText.collectAsStateWithLifecycle()
+
+            LazyColumn(
+                modifier = Modifier.padding(innerPadding)
+                    .padding(horizontal=PADDING),
+                state = listState,
+            ) {
+                items(logcatText) { line ->
+                    Text(line)
+                }
             }
         }
     }
+
+    Launchers()
+    PageBody()
 }
+
