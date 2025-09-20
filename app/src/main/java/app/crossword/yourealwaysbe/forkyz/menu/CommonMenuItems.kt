@@ -70,6 +70,7 @@ fun MenuDropdownHeading(
     )
 }
 
+// TODO: remove, mixes compose and activity
 @Composable
 fun MenuHelp(
     activity : Activity,
@@ -86,6 +87,21 @@ fun MenuHelp(
 }
 
 @Composable
+fun MenuHelp(
+    openHelp : () -> Unit = { },
+    onDismiss : () -> Unit = { },
+) {
+    DropdownMenuItem(
+        text = { MenuText(stringResource(R.string.help)) },
+        onClick = {
+            openHelp()
+            onDismiss()
+        }
+    )
+}
+
+// TODO: remove, mixes activity and compose
+@Composable
 fun MenuSettings(
     activity : Activity,
     onDismiss : () -> Unit = { },
@@ -99,6 +115,21 @@ fun MenuSettings(
     )
 }
 
+@Composable
+fun MenuSettings(
+    openSettings : () -> Unit = { },
+    onDismiss : () -> Unit = { },
+) {
+    DropdownMenuItem(
+        text = { MenuText(stringResource(R.string.settings)) },
+        onClick = {
+            openSettings()
+            onDismiss()
+        }
+    )
+}
+
+// TOOD: remove, mixes activity and compose
 private fun actionHelp(activity : Activity, helpHTMLAsset : String) {
     val helpIntent = Intent(
         Intent.ACTION_VIEW,
@@ -109,6 +140,7 @@ private fun actionHelp(activity : Activity, helpHTMLAsset : String) {
     activity.startActivity(helpIntent)
 }
 
+// TODO: remove, mixes activity and compose
 private fun actionSettings(activity : Activity) {
     activity.startActivity(Intent(activity, SettingsActivity::class.java))
 }

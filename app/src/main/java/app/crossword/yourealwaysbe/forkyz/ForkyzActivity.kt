@@ -6,6 +6,7 @@ import javax.inject.Inject
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.Composable
@@ -105,5 +106,34 @@ open class ForkyzActivity : AppCompatActivity() {
             this,
             HTMLActivity::class.java
         ))
+    }
+
+    protected fun openOnlineSources() {
+        val i = Intent(Intent.ACTION_VIEW);
+        i.setData(getString(R.string.online_sources_url).toUri())
+        startActivity(i);
+    }
+
+    protected fun openPlayPage() {
+        startActivity(Intent(this, PlayActivity::class.java))
+    }
+
+    protected fun openReleaseNotes() {
+        openHTMLPage("release.html")
+    }
+
+    protected fun openSettingsPage() {
+        startActivity(Intent(this, SettingsActivity::class.java))
+    }
+
+    protected fun openAppSettings() {
+        val appPackage = getPackageName()
+        val intent = Intent(
+            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+            ("package:" + appPackage).toUri(),
+        )
+        intent.addCategory(Intent.CATEGORY_DEFAULT)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(intent)
     }
 }
