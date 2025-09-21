@@ -10,6 +10,8 @@ import android.provider.Settings
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.core.app.ShareCompat
 import androidx.core.net.toUri
 
@@ -109,8 +111,12 @@ open class ForkyzActivity : AppCompatActivity() {
     }
 
     protected fun openOnlineSources() {
+        openURI(getString(R.string.online_sources_url).toUri())
+    }
+
+    protected fun openURI(uri : Uri) {
         val i = Intent(Intent.ACTION_VIEW);
-        i.setData(getString(R.string.online_sources_url).toUri())
+        i.setData(uri)
         startActivity(i);
     }
 
@@ -135,5 +141,9 @@ open class ForkyzActivity : AppCompatActivity() {
         intent.addCategory(Intent.CATEGORY_DEFAULT)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
+    }
+
+    protected fun legacySetStatusBarColor(color : Color) {
+        utils.legacySetStatusBarColor(this, color.toArgb())
     }
 }
