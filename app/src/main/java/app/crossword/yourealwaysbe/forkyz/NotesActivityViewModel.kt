@@ -725,25 +725,20 @@ class NotesActivityViewModel @Inject constructor(
                 updateNote() { it.withAnagramSource(String(anagSrc)) }
             }
             NoteEntry.ANAGRAM_SOLUTION -> {
-                // simulate playing each character except blank
-                val targetValue = charArrayWithBlanks(
-                    anagramSolutionValue,
-                    boxesLength
-                )
-                val len = Math.min(value.length, targetValue.size)
                 var values = currentAnagramValues
+                val len = Math.min(value.length, boxesLength)
                 for (i in 0 until len) {
                     if (!isBlank(value[i])) {
-                        val oldChar = targetValue[i]
+                        val solution = padBlank(values.solution, boxesLength)
+                        val oldChar = solution[i]
                         val newChar
                             = filterAnagramSolutionValues(values, value[i])
                         if (newChar != 0.toChar()) {
-                            targetValue[i] = newChar
                             values = updateAnagramSolutionValues(
                                 values,
                                 i,
                                 oldChar,
-                                String(targetValue),
+                                setChar(solution, i, newChar)
                             )
                         }
                     }
