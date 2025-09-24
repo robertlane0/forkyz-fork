@@ -539,6 +539,7 @@ class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
                     setScratchMode(state.scratchMode)
                     setDoubleTapFitBoard(state.doubleTapFitBoard)
                     setBoardColorScheme(boardColorScheme)
+                    setEnsureVisible(state.ensureVisible)
                 }
             },
             onRelease = { it.detach() },
