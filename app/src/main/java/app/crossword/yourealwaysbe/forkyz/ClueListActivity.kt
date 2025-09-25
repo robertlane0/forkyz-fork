@@ -60,7 +60,7 @@ class ClueListActivity() : PuzzleActivity() {
             .get(ClueListActivityViewModel::class.java)
 
         setContent {
-            AppTheme() {
+            AppTheme {
                 ClueListPage(
                     viewModel = viewModel,
                     themeHelper = themeHelper,
