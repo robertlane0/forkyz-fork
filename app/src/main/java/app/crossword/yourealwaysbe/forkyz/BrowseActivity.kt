@@ -184,7 +184,13 @@ class BrowseActivity() : ForkyzActivity() {
 
     private val viewModel by viewModels<BrowseActivityViewModel>()
     private lateinit var nm : NotificationManagerCompat
-    private var pendingImports : Collection<Uri>? = null
+    private var pendingImports : Collection<Uri> = listOf()
+
+    // callbacks from Compose
+    private var onImportComplete : ((Boolean) -> Unit)? = null
+    private var onImportURIs : ((Collection<Uri>) -> Unit)? = null
+    private var onNotificationPermissionDenied : (() -> Unit)? = null
+    private var onEscapeKey : (() -> Unit)? = null
 
     /**
      * See note for BROWSER_CLOSE_ACTION
@@ -214,9 +220,9 @@ class BrowseActivity() : ForkyzActivity() {
                     = intent.getIntExtra(INTENT_IMPORT_TASK_ID, myTaskId)
 
                 if (myTaskId == otherTaskId) {
-                    viewModel.setImportedNowExitResult(
-                        intent.getBooleanExtra(INTENT_IMPORT_SUCCESS, false),
-                    )
+                    onImportComplete?.let {
+                        it(intent.getBooleanExtra(INTENT_IMPORT_SUCCESS, false))
+                    }
                 }
             }
         }
@@ -225,7 +231,7 @@ class BrowseActivity() : ForkyzActivity() {
     private val getImportURI = registerForActivityResult(
         ActivityResultContracts.GetMultipleContents(),
         ActivityResultCallback<List<Uri>>() { uris ->
-            viewModel.importURIs(uris)
+            onImportURIs?.let { it(uris) }
         },
     )
 
@@ -235,7 +241,7 @@ class BrowseActivity() : ForkyzActivity() {
     private val notificationPermissionLauncher
         = registerForActivityResult(RequestPermission()) { isGranted ->
             if (!isGranted)
-                viewModel.flagNotificationPermissionsDenied()
+                onNotificationPermissionDenied?.let { it() }
         }
 
     override protected fun onCreate(savedInstanceState : Bundle?) {
@@ -276,6 +282,9 @@ class BrowseActivity() : ForkyzActivity() {
                     openPlayPage = this::openPlayPage,
                     openReleaseNotes = this::openReleaseNotes,
                     openSettingsPage = this::openSettingsPage,
+                    getPendingImports = this::getPendingImports,
+                    clearPendingImports = this::clearPendingImports,
+                    onFinish = this::finish,
                     onCheckAndWarnNetworkState
                         = this::checkAndWarnNetworkState,
                     onCheckRequestNotificationPermissions
@@ -283,22 +292,18 @@ class BrowseActivity() : ForkyzActivity() {
                     onImport = { getImportURI.launch(IMPORT_MIME_TYPE) },
                     onImportFinish = this::onImportFinish,
                     onCloseAllBrowseActivities = this::doExit,
+                    setOnImportCompleteCallback = { onImportComplete = it },
+                    setOnImportURIsCallback = { onImportURIs = it },
+                    setOnNotificationPermissionDeniedCallback = {
+                        onNotificationPermissionDenied = it
+                    },
+                    setOnEscapeKeyCallback = { onEscapeKey = it },
+
                 )
             }
         }
 
         handleCreateIntent(savedInstanceState);
-    }
-
-    override protected fun onResume() {
-        super.onResume()
-
-        if (hasPendingImports) {
-            getPendingImports()?.let { importUris ->
-                clearPendingImports()
-                onImportURIsAndFinish(importUris)
-            }
-        }
     }
 
     // don't use Compose because nothing in view requests initial focus
@@ -312,13 +317,9 @@ class BrowseActivity() : ForkyzActivity() {
     }
 
     override fun onKeyUp(keyCode : Int, event : KeyEvent?) : Boolean {
-        val isSelecting = viewModel.uiState.value?.isSelecting ?: false
         return when(keyCode) {
             KeyEvent.KEYCODE_ESCAPE -> {
-                if (isSelecting)
-                    viewModel.clearSelection()
-                else
-                    finish()
+                onEscapeKey?.let { it() }
                 true
             }
             else -> super.onKeyDown(keyCode, event)
@@ -341,42 +342,30 @@ class BrowseActivity() : ForkyzActivity() {
         if (nm.areNotificationsEnabled())
             return
 
-        val needed = viewModel.uiState
-            .value
-            ?.isNotificationPermissionNeeded
-            ?: false
+        val showRationale
+            = utils.shouldShowRequestNotificationPermissionRationale(
+                this
+            )
 
-        if (needed) {
-            val showRationale
-                = utils.shouldShowRequestNotificationPermissionRationale(
-                    this
-                )
+        if (showRationale)
+            toast(getString(R.string.notifications_request_rationale))
 
-            if (showRationale)
-                toast(getString(R.string.notifications_request_rationale))
-
-            utils.requestPostNotifications(notificationPermissionLauncher)
-        }
+        utils.requestPostNotifications(notificationPermissionLauncher)
     }
 
-    private val hasPendingImports : Boolean
-        get() {
-            return pendingImports != null;
-        }
-
     private fun clearPendingImports() {
-        pendingImports = null
+        pendingImports = listOf()
     }
 
     private fun setPendingImport(uri : Uri?) {
         uri?.let { setPendingImports(listOf(it)) }
     }
 
-    private fun setPendingImports(uri : Collection<Uri>?) {
+    private fun setPendingImports(uri : Collection<Uri>) {
         pendingImports = uri
     }
 
-    private fun getPendingImports() : Collection<Uri>? {
+    private fun getPendingImports() : Collection<Uri> {
         return pendingImports
     }
 
@@ -412,22 +401,12 @@ class BrowseActivity() : ForkyzActivity() {
                 )
             }
         } else if (Intent.ACTION_SEND_MULTIPLE == action) {
-            setPendingImports(
-                IntentCompat.getParcelableArrayListExtra(
-                    intent,
-                    Intent.EXTRA_STREAM,
-                    Uri::class.java,
-                ),
-            )
+            IntentCompat.getParcelableArrayListExtra(
+                intent,
+                Intent.EXTRA_STREAM,
+                Uri::class.java,
+            )?.let(this::setPendingImports)
         }
-    }
-
-    /**
-     * Import from URI, force reload of puz list if asked
-     */
-    private fun onImportURIsAndFinish(uris : Collection<Uri>) {
-        // finish happens in launchers when result posted
-        viewModel.importURIsAndFinish(uris)
     }
 
     private fun doExit() {
@@ -472,12 +451,32 @@ fun BrowsePage(
     openPlayPage : () -> Unit,
     openReleaseNotes : () -> Unit,
     openSettingsPage : () -> Unit,
+    getPendingImports : (() -> Collection<Uri>),
+    clearPendingImports : (() -> Unit),
+    onFinish : () -> Unit,
     onCheckAndWarnNetworkState : () -> Unit,
     onCheckRequestNotificationPermissions : () -> Unit,
     onImport : () -> Unit,
     onImportFinish : (ImportFinishResult) -> Unit,
     onCloseAllBrowseActivities : () -> Unit,
+    setOnImportCompleteCallback : ((Boolean) -> Unit) -> Unit,
+    setOnImportURIsCallback : ((Collection<Uri>) -> Unit) -> Unit,
+    setOnNotificationPermissionDeniedCallback : (() -> Unit) -> Unit,
+    setOnEscapeKeyCallback : (() -> Unit) -> Unit,
 ) {
+    setOnImportCompleteCallback(viewModel::setImportedNowExitResult)
+    setOnImportURIsCallback(viewModel::importURIs)
+    setOnNotificationPermissionDeniedCallback(
+        viewModel::flagNotificationPermissionsDenied
+    )
+    setOnEscapeKeyCallback {
+        val isSelecting = viewModel.uiState.value.isSelecting
+        if (isSelecting)
+            viewModel.clearSelection()
+        else
+            onFinish()
+    }
+
     fun startLoadPuzzleList(archive : Boolean) {
         viewModel.startLoadPuzzleList(archive)
     }
@@ -488,7 +487,9 @@ fun BrowsePage(
 
     fun showDownloadDialog() {
         onCheckAndWarnNetworkState()
-        onCheckRequestNotificationPermissions()
+        if (viewModel.uiState.value.isNotificationPermissionNeeded)
+            onCheckRequestNotificationPermissions()
+
         viewModel.showDownloadDialog()
     }
 
@@ -1229,6 +1230,12 @@ fun BrowsePage(
         viewModel.refreshCurrentPuzzleMeta()
         viewModel.autoDownloadIfRequired()
         viewModel.processToImportDirectory()
+
+        val uris = getPendingImports()
+        if (!uris.isEmpty()) {
+            clearPendingImports()
+            viewModel.importURIsAndFinish(uris)
+        }
     }
 
     Launchers()
