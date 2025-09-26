@@ -53,6 +53,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -459,24 +460,11 @@ fun BrowsePage(
     onImport : () -> Unit,
     onImportFinish : (ImportFinishResult) -> Unit,
     onCloseAllBrowseActivities : () -> Unit,
-    setOnImportCompleteCallback : ((Boolean) -> Unit) -> Unit,
-    setOnImportURIsCallback : ((Collection<Uri>) -> Unit) -> Unit,
-    setOnNotificationPermissionDeniedCallback : (() -> Unit) -> Unit,
-    setOnEscapeKeyCallback : (() -> Unit) -> Unit,
+    setOnImportCompleteCallback : (((Boolean) -> Unit)?) -> Unit,
+    setOnImportURIsCallback : (((Collection<Uri>) -> Unit)?) -> Unit,
+    setOnNotificationPermissionDeniedCallback : ((() -> Unit)?) -> Unit,
+    setOnEscapeKeyCallback : ((() -> Unit)?) -> Unit,
 ) {
-    setOnImportCompleteCallback(viewModel::setImportedNowExitResult)
-    setOnImportURIsCallback(viewModel::importURIs)
-    setOnNotificationPermissionDeniedCallback(
-        viewModel::flagNotificationPermissionsDenied
-    )
-    setOnEscapeKeyCallback {
-        val isSelecting = viewModel.uiState.value.isSelecting
-        if (isSelecting)
-            viewModel.clearSelection()
-        else
-            onFinish()
-    }
-
     fun startLoadPuzzleList(archive : Boolean) {
         viewModel.startLoadPuzzleList(archive)
     }
@@ -1235,6 +1223,28 @@ fun BrowsePage(
         if (!uris.isEmpty()) {
             clearPendingImports()
             viewModel.importURIsAndFinish(uris)
+        }
+    }
+
+    DisposableEffect(Unit) {
+        setOnImportCompleteCallback(viewModel::setImportedNowExitResult)
+        setOnImportURIsCallback(viewModel::importURIs)
+        setOnNotificationPermissionDeniedCallback(
+            viewModel::flagNotificationPermissionsDenied
+        )
+        setOnEscapeKeyCallback {
+            val isSelecting = viewModel.uiState.value.isSelecting
+            if (isSelecting)
+                viewModel.clearSelection()
+            else
+                onFinish()
+        }
+
+        onDispose {
+            setOnImportCompleteCallback(null)
+            setOnImportURIsCallback(null)
+            setOnNotificationPermissionDeniedCallback(null)
+            setOnEscapeKeyCallback(null)
         }
     }
 
