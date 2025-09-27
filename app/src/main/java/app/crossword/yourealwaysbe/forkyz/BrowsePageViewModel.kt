@@ -49,7 +49,7 @@ import app.crossword.yourealwaysbe.forkyz.util.files.PuzMetaFile
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 import app.crossword.yourealwaysbe.forkyz.view.DownloadDialogViewModel
 
-private val TAG = "ForkyzBrowseActivity"
+private val TAG = "ForkyzBrowsePage"
 private val HEADER_DATE_FORMAT
     = DateTimeFormatter.ofPattern("EEEE dd MMM yyyy")
 private val DEFAULT_DAY_NIGHT_MODE = DayNightMode.forNumber(0)
@@ -212,7 +212,7 @@ private data class BrowseSettings(
 )
 
 @HiltViewModel
-class BrowseActivityViewModel @Inject constructor(
+class BrowsePageViewModel @Inject constructor(
     application : Application,
     val utils : AndroidVersionUtils,
     val settings : ForkyzSettings,
@@ -632,7 +632,7 @@ class BrowseActivityViewModel @Inject constructor(
                 // blocks don't redownload. Could have used a separate
                 // single-thread autodownload executor instead, but this
                 // avoids an extra thread and field variable.
-                synchronized (this@BrowseActivityViewModel) {
+                synchronized (this@BrowsePageViewModel) {
                     val lastDL = settings.getBrowseLastDownloadSync()
                     val downloadCutoff
                         = System.currentTimeMillis() - (12 * 60 * 60 * 1000)

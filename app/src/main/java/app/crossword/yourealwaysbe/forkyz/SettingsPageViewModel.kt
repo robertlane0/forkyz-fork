@@ -326,7 +326,7 @@ enum class RequestedURI {
  * @param storageChangedAppExit if the storage has changed and the app
  * needs to restart
  */
-data class SettingsActivityViewState(
+data class SettingsPageViewState(
     val currentPage : SettingsPage,
     val searchTerm : String,
     val hasBackStack : Boolean,
@@ -338,11 +338,8 @@ data class SettingsActivityViewState(
         get() = currentPage == SettingsPage.SEARCH
 }
 
-val SETTINGS_MIME_TYPE = "application/json"
-val SETTINGS_DEFAULT_FILENAME = "forkyz_settings.json"
-
 @HiltViewModel
-class SettingsActivityViewModel @Inject constructor(
+class SettingsPageViewModel @Inject constructor(
     application : Application,
     private val settings : ForkyzSettings,
     private val utils : AndroidVersionUtils,
@@ -1732,14 +1729,14 @@ class SettingsActivityViewModel @Inject constructor(
     )
 
     private val rootState = settingsPageState(SettingsPage.ROOT, false)
-    private val _state = MutableStateFlow<SettingsActivityViewState>(rootState)
-    private val stateBackStack = ArrayDeque<SettingsActivityViewState>()
+    private val _state = MutableStateFlow<SettingsPageViewState>(rootState)
+    private val stateBackStack = ArrayDeque<SettingsPageViewState>()
     // separate as should not appear on back stack
     private val _needsURI = MutableStateFlow<RequestedURI>(RequestedURI.NONE)
     // separate from back stack, int is resource id of messages to show
     private val _messages = MutableStateFlow<List<Int>>(listOf())
 
-    val state : StateFlow<SettingsActivityViewState> = _state
+    val state : StateFlow<SettingsPageViewState> = _state
     val needsURI : StateFlow<RequestedURI> = _needsURI
     val messages : StateFlow<List<Int>> = _messages
 
@@ -1860,7 +1857,7 @@ class SettingsActivityViewModel @Inject constructor(
         _needsURI.value = uriType
     }
 
-    private fun pushNewState(newState : SettingsActivityViewState) {
+    private fun pushNewState(newState : SettingsPageViewState) {
         stateBackStack.addLast(state.value)
         _state.value = newState
     }
@@ -1893,7 +1890,7 @@ class SettingsActivityViewModel @Inject constructor(
     private fun settingsPageState(
         page : SettingsPage,
         hasBackStack : Boolean,
-    ) = SettingsActivityViewState(
+    ) = SettingsPageViewState(
             currentPage = page,
             searchTerm = "",
             hasBackStack = hasBackStack,

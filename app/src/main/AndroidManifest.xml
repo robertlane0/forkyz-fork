@@ -72,41 +72,7 @@
         android:enableOnBackInvokedCallback="true"
     >
         <activity
-            tools:ignore="UnusedAttribute"
-            android:name="app.crossword.yourealwaysbe.forkyz.PlayActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation"
-            android:theme="@style/Theme.Forkyz"
-            android:windowSoftInputMode="adjustResize"
-            android:exported="false"
-        >
-        </activity>
-        <activity
-            android:name="app.crossword.yourealwaysbe.forkyz.SettingsActivity"
-            android:label="@string/settings_label"
-            android:theme="@style/Theme.Forkyz"
-            android:exported="false"
-        />
-        <activity
-            android:name="app.crossword.yourealwaysbe.forkyz.ClueListActivity"
-            android:label="@string/clues_list_label"
-            android:theme="@style/Theme.Forkyz"
-            android:configChanges="orientation"
-            android:exported="false"
-        />
-        <activity
-            android:name="app.crossword.yourealwaysbe.forkyz.NotesActivity"
-            android:label="@string/notes_label"
-            android:theme="@style/Theme.Forkyz"
-            android:exported="false"
-        />
-        <activity
-            android:name="app.crossword.yourealwaysbe.forkyz.HTMLActivity"
-            android:label="@string/html_label"
-            android:theme="@style/Theme.Forkyz"
-            android:exported="false"
-        />
-        <activity
-            android:name="app.crossword.yourealwaysbe.forkyz.BrowseActivity"
+            android:name="app.crossword.yourealwaysbe.forkyz.ForkyzActivity"
             android:configChanges="orientation"
             android:theme="@style/Theme.Forkyz"
             tools:ignore="AppLinkUrlError"
@@ -130,17 +96,6 @@
                 <data android:mimeType="application/json" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="app.crossword.yourealwaysbe.forkyz.util.ExitActivity"
-            android:theme="@style/Theme.Forkyz"
-            android:exported="false"
-        />
-        <activity
-            android:name="app.crossword.yourealwaysbe.forkyz.LogcatActivity"
-            android:label="@string/logcat"
-            android:theme="@style/Theme.Forkyz"
-            android:exported="false"
-        />
         <service
             android:name="app.crossword.yourealwaysbe.forkyz.util.PuzzleSaveService"
             android:foregroundServiceType="shortService"

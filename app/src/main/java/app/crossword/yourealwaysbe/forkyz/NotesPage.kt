@@ -2,7 +2,6 @@
 package app.crossword.yourealwaysbe.forkyz
 
 import android.net.Uri
-import android.os.Bundle
 import android.view.View
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.combinedClickable
@@ -56,11 +55,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
+import app.crossword.yourealwaysbe.forkyz.exttools.AppNotFoundException
 import app.crossword.yourealwaysbe.forkyz.exttools.ExternalToolData
-import app.crossword.yourealwaysbe.forkyz.inttools.InternalToolData
 import app.crossword.yourealwaysbe.forkyz.menu.BaseMenuModifier
 import app.crossword.yourealwaysbe.forkyz.menu.MenuText
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
@@ -81,85 +79,27 @@ import app.crossword.yourealwaysbe.puz.Position
 
 private val VERTICAL_BOARD_PADDING = 6.dp
 
-class NotesActivity() : PuzzleActivity() {
-    companion object {
-        // TODO: JvmField can be removed when PlayActivity is Compose
-        @JvmField
-        val CLUE_NOTE_LISTNAME = "clueNoteListName"
-        @JvmField
-        val CLUE_NOTE_INDEX = "clueNoteIndex"
-    }
-
-    override protected lateinit var viewModel : NotesActivityViewModel
-
-    override fun onCreate(savedInstanceState : Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        viewModel = ViewModelProvider(this)
-            .get(NotesActivityViewModel::class.java)
-
-        viewModel.notesClueID = getNotesClueID()
-
-        setContent {
-            AppTheme() {
-                NotesPage(
-                    viewModel = viewModel,
-                    themeHelper = themeHelper,
-                    inputConnectionMediator = inputConnectionMediator,
-                    displayWidth = displayWidth,
-                    displayHeight = displayHeight,
-                    isPortrait = isPortrait,
-                    openHTMLPage = this::openHTMLPage,
-                    openSettingsPage = this::openSettingsPage,
-                    openURI = this::openURI,
-                    onFinish = this::finish,
-                    onBack = this::doBackAction,
-                    setBackEnabled = this::setBackEnabled,
-                    toast = this::toast,
-                    handleInternalToolEvent = this::handleInternalToolEvent,
-                    handleExternalToolEvent = this::handleExternalToolEvent,
-                    setStatusBarColor = this::legacySetStatusBarColor,
-                    launchVoiceInput = this::launchVoiceInput,
-                    announce = { data, view -> announce(data, view) },
-                )
-            }
-        }
-    }
-
-    /**
-     * Get ClueID activity was called for or null if puzzle notes
-     */
-    private fun getNotesClueID() : ClueID? {
-        val intent = getIntent()
-        val listName = intent.getStringExtra(CLUE_NOTE_LISTNAME)
-        val index = intent.getIntExtra(CLUE_NOTE_INDEX, -1)
-
-        if (listName == null || index < 0)
-            return null
-
-        return ClueID(listName, index)
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotesPage(
-    viewModel : NotesActivityViewModel,
+    viewModel : NotesPageViewModel,
     themeHelper : ThemeHelper,
     inputConnectionMediator : InputConnectionMediator,
     displayWidth : Int,
     displayHeight : Int,
     isPortrait : Boolean,
+    openClueListPage : () -> Unit,
+    openNotesPage : (ClueID?) -> Unit,
     openHTMLPage : (String) -> Unit,
     openSettingsPage : () -> Unit,
     openURI : (Uri) -> Unit,
     onFinish : () -> Unit,
     onBack : () -> Unit,
-    setBackEnabled : (Boolean) -> Unit,
     toast : (String) -> Unit,
-    handleInternalToolEvent : (InternalToolData) -> Unit,
     handleExternalToolEvent : (ExternalToolData) -> Unit,
+    setOnAppNotFoundCallback : (((AppNotFoundException) -> Unit)?) -> Unit,
     setStatusBarColor : (Color) -> Unit,
+    setOnVoiceCommandCallback : (((List<String>?) -> Unit)?) -> Unit,
     launchVoiceInput : () -> Unit,
     announce : (AnnounceData, View) -> Unit,
 ) {
@@ -170,16 +110,18 @@ fun NotesPage(
         displayWidth = displayWidth,
         displayHeight = displayHeight,
         isPortrait = isPortrait,
+        openClueListPage = openClueListPage,
+        openNotesPage = openNotesPage,
         openHTMLPage = openHTMLPage,
         openSettingsPage = openSettingsPage,
         openURI = openURI,
         onFinish = onFinish,
         onBack = onBack,
-        setBackEnabled = setBackEnabled,
         toast = toast,
-        handleInternalToolEvent = handleInternalToolEvent,
         handleExternalToolEvent = handleExternalToolEvent,
+        setOnAppNotFoundCallback = setOnAppNotFoundCallback,
         setStatusBarColor = setStatusBarColor,
+        setOnVoiceCommandCallback = setOnVoiceCommandCallback,
         launchVoiceInput = launchVoiceInput,
         announce = announce,
 
@@ -231,13 +173,6 @@ fun NotesPage(
         }
 
         fun onKeyEvent(event : KeyEvent) : Boolean {
-            when (event.key) {
-                Key.Escape -> {
-                    if (event.type == KeyEventType.KeyUp)
-                        onBack()
-                    return true
-                }
-            }
             return onKeyEventPuzzlePage(event)
         }
 
@@ -361,7 +296,7 @@ fun NotesPage(
                         )
                     }
                 },
-                onBack = { onFinish() },
+                onBack = { onBack() },
                 actions = { OverflowMenu() },
             )
         }

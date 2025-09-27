@@ -27,13 +27,13 @@ import app.crossword.yourealwaysbe.puz.Playboard.Word
 import app.crossword.yourealwaysbe.puz.Position
 
 @HiltViewModel
-class ClueListActivityViewModel @Inject constructor(
+class ClueListPageViewModel @Inject constructor(
     application : Application,
     settings : ForkyzSettings,
     currentPuzzleHolder : CurrentPuzzleHolder,
     fileHandlerProvider : FileHandlerProvider,
     utils : AndroidVersionUtils,
-) : PuzzleActivityViewModel(
+) : PuzzlePageViewModel(
     application,
     settings,
     currentPuzzleHolder,

@@ -63,8 +63,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 import com.squareup.seismic.ShakeDetector
 
+import app.crossword.yourealwaysbe.forkyz.exttools.AppNotFoundException
 import app.crossword.yourealwaysbe.forkyz.exttools.ExternalToolData
-import app.crossword.yourealwaysbe.forkyz.inttools.InternalToolData
 import app.crossword.yourealwaysbe.forkyz.menu.BaseMenuModifier
 import app.crossword.yourealwaysbe.forkyz.menu.MenuText
 import app.crossword.yourealwaysbe.forkyz.settings.FitToScreenMode
@@ -76,6 +76,7 @@ import app.crossword.yourealwaysbe.forkyz.view.BoardFullEditView
 import app.crossword.yourealwaysbe.forkyz.view.ClueTabs
 import app.crossword.yourealwaysbe.forkyz.view.OKDialog
 import app.crossword.yourealwaysbe.forkyz.view.SpecialKey
+import app.crossword.yourealwaysbe.puz.ClueID
 import app.crossword.yourealwaysbe.puz.Playboard.Word
 import app.crossword.yourealwaysbe.puz.Position
 
@@ -86,84 +87,6 @@ private val ACROSTIC_BOARD_HEIGHT_RATIO_MIN = 0.25F
 private val ACROSTIC_BOARD_WIDTH_RATIO_MAX = 0.7F
 
 private val CLUE_BAR_HEIGHT = 64.dp
-
-class PlayActivity() : PuzzleActivity(), ShakeDetector.Listener {
-    override protected lateinit var viewModel : PlayActivityViewModel
-
-    private var shakeDetector : ShakeDetector? = null
-    private var onHearShake : (() -> Unit)? = null
-
-    override fun onCreate(savedInstanceState : Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        viewModel = ViewModelProvider(this)
-            .get(PlayActivityViewModel::class.java)
-
-        setContent {
-            AppTheme {
-                PlayPage(
-                    viewModel = viewModel,
-                    themeHelper = themeHelper,
-                    inputConnectionMediator = inputConnectionMediator,
-                    displayWidth = displayWidth,
-                    displayHeight = displayHeight,
-                    isPortrait = isPortrait,
-                    openHTMLPage = this::openHTMLPage,
-                    openSettingsPage = this::openSettingsPage,
-                    openURI = this::openURI,
-                    onFinish = this::finish,
-                    onBack = this::doBackAction,
-                    setBackEnabled = this::setBackEnabled,
-                    toast = this::toast,
-                    handleInternalToolEvent = this::handleInternalToolEvent,
-                    handleExternalToolEvent = this::handleExternalToolEvent,
-                    setStatusBarColor = this::legacySetStatusBarColor,
-                    launchVoiceInput = this::launchVoiceInput,
-                    announce = { data, view -> announce(data, view) },
-                    onSetFullScreen = { utils.setFullScreen(getWindow()) },
-                    startShakeDetector = this::startShakeDetector,
-                    stopShakeDetector = this::stopShakeDetector,
-                    resumeShakeDetector = this::resumeShakeDetector,
-                    pauseShakeDetector = this::pauseShakeDetector,
-                )
-            }
-        }
-    }
-
-    override fun hearShake() {
-        onHearShake?.let { it() }
-    }
-
-    private fun startShakeDetector(onHearShake : () -> Unit) {
-        this.onHearShake = onHearShake
-        if (shakeDetector == null)
-            shakeDetector = ShakeDetector(this)
-        resumeShakeDetector()
-    }
-
-    private fun resumeShakeDetector() {
-        shakeDetector?.let {
-            it.start(
-                getSystemService(SENSOR_SERVICE) as SensorManager,
-                SensorManager.SENSOR_DELAY_GAME
-            )
-        }
-    }
-
-    private fun pauseShakeDetector() {
-        shakeDetector?.let { sd ->
-            sd.stop()
-            val manager = (getSystemService(SENSOR_SERVICE) as SensorManager)
-            manager.unregisterListener(sd)
-        }
-    }
-
-    private fun stopShakeDetector() {
-        pauseShakeDetector()
-        shakeDetector = null
-        onHearShake = null
-    }
-}
 
 // TODO: make more mvvm-y - view shouldn't be driving
 private class BoardViewZoomer {
@@ -240,22 +163,24 @@ private class BoardViewZoomer {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlayPage(
-    viewModel : PlayActivityViewModel,
+    viewModel : PlayPageViewModel,
     themeHelper : ThemeHelper,
     inputConnectionMediator : InputConnectionMediator,
     displayWidth : Int,
     displayHeight : Int,
     isPortrait : Boolean,
+    openNotesPage : (ClueID?) -> Unit,
+    openClueListPage : () -> Unit,
     openHTMLPage : (String) -> Unit,
     openSettingsPage : () -> Unit,
     openURI : (Uri) -> Unit,
     onFinish : () -> Unit,
     onBack : () -> Unit,
-    setBackEnabled : (Boolean) -> Unit,
     toast : (String) -> Unit,
-    handleInternalToolEvent : (InternalToolData) -> Unit,
     handleExternalToolEvent : (ExternalToolData) -> Unit,
+    setOnAppNotFoundCallback : (((AppNotFoundException) -> Unit)?) -> Unit,
     setStatusBarColor : (Color) -> Unit,
+    setOnVoiceCommandCallback : (((List<String>?) -> Unit)?) -> Unit,
     launchVoiceInput : () -> Unit,
     announce : (AnnounceData, View) -> Unit,
     onSetFullScreen : () -> Unit,
@@ -273,16 +198,18 @@ fun PlayPage(
         displayWidth = displayWidth,
         displayHeight = displayHeight,
         isPortrait = isPortrait,
+        openClueListPage = openClueListPage,
+        openNotesPage = openNotesPage,
         openHTMLPage = openHTMLPage,
         openSettingsPage = openSettingsPage,
         openURI = openURI,
         onFinish = onFinish,
         onBack = onBack,
-        setBackEnabled = setBackEnabled,
         toast = toast,
-        handleInternalToolEvent = handleInternalToolEvent,
         handleExternalToolEvent = handleExternalToolEvent,
+        setOnAppNotFoundCallback = setOnAppNotFoundCallback,
         setStatusBarColor = setStatusBarColor,
+        setOnVoiceCommandCallback = setOnVoiceCommandCallback,
         launchVoiceInput = launchVoiceInput,
         announce = announce,
     ) {
@@ -420,7 +347,7 @@ fun PlayPage(
                         ClueText(Modifier.fillMaxWidth())
                     }
                 },
-                onBack = { onFinish() },
+                onBack = { onBack() },
                 actions = { OverflowMenu() },
             )
         }

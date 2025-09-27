@@ -43,10 +43,8 @@ public interface AndroidVersionUtils {
                 return new PieUtil();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                 return new OreoUtil();
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-                return new MarshmallowUtil();
 
-            return new LollipopUtil();
+            return new MarshmallowUtil();
         }
     }
 
@@ -67,8 +65,6 @@ public interface AndroidVersionUtils {
     }
 
     void setFullScreen(Window window);
-
-    void finishAndRemoveTask(Activity activity);
 
     Typeface getSemiBoldTypeface();
 
@@ -107,11 +103,6 @@ public interface AndroidVersionUtils {
      * Call invalidateInput or restartInput as available
      */
     void invalidateInput(InputMethodManager imm, View view);
-
-    /**
-     * Call right version of tts speak
-     */
-    void speak(TextToSpeech tts, CharSequence text);
 
     /**
      * Get the current application version name

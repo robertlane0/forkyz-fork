@@ -31,9 +31,6 @@ import app.crossword.yourealwaysbe.forkyz.exttools.SharePuzzleData
 import app.crossword.yourealwaysbe.forkyz.exttools.ShareTextData
 import app.crossword.yourealwaysbe.forkyz.exttools.askChatGPTForCurrentClue
 import app.crossword.yourealwaysbe.forkyz.exttools.isChatGPTEnabled
-import app.crossword.yourealwaysbe.forkyz.inttools.ClueListData
-import app.crossword.yourealwaysbe.forkyz.inttools.ClueNotesData
-import app.crossword.yourealwaysbe.forkyz.inttools.InternalToolData
 import app.crossword.yourealwaysbe.forkyz.settings.ExternalToolSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.KeyboardLayout
@@ -161,7 +158,7 @@ data class AppNotFoundDialogState(
     val appURL : String,
 )
 
-data class PuzzleActivityUIState(
+data class PuzzlePageUIState(
     val showTimer : Boolean = false,
     val indicateShowErrors : Boolean = false,
     val showDialog : PuzzleDialog = PuzzleDialog.NONE,
@@ -205,6 +202,10 @@ data class KeyboardState(
     val repeatInterval : Long = 75,
 )
 
+data class ClueNotesData(
+    val clueID : ClueID?
+)
+
 private data class VoiceActivateSettings(
     val volumeActivatesVoice : Boolean,
     val equalsAnnounceClue : Boolean,
@@ -240,7 +241,7 @@ private data class UIStateSettings(
 
 // will lose this tag and become an open base class
 @HiltViewModel
-open class PuzzleActivityViewModel @Inject constructor(
+open class PuzzlePageViewModel @Inject constructor(
     application : Application,
     val settings : ForkyzSettings,
     val currentPuzzleHolder : CurrentPuzzleHolder,
@@ -256,8 +257,11 @@ open class PuzzleActivityViewModel @Inject constructor(
     protected val _externalToolEvent = MutableStateFlow<ExternalToolData?>(null)
     val externalToolEvent : StateFlow<ExternalToolData?> = _externalToolEvent
 
-    protected val _internalToolEvent = MutableStateFlow<InternalToolData?>(null)
-    val internalToolEvent : StateFlow<InternalToolData?> = _internalToolEvent
+    protected val _openClueListEvent = MutableStateFlow<Boolean>(false)
+    val openClueListEvent : StateFlow<Boolean> = _openClueListEvent
+
+    protected val _openNotesEvent = MutableStateFlow<ClueNotesData?>(null)
+    val openNotesEvent : StateFlow<ClueNotesData?> = _openNotesEvent
 
     protected val _backEvent = MutableStateFlow<Boolean>(false)
     val backEvent : StateFlow<Boolean> = _backEvent
@@ -311,9 +315,9 @@ open class PuzzleActivityViewModel @Inject constructor(
     val menuState : StateFlow<PuzzleMenuState> = mediatedMenuState.stateFlow
 
     private val mediatedUIState
-        = MediatedStateWithFlow<PuzzleActivityUIState, UIStateSettings>(
+        = MediatedStateWithFlow<PuzzlePageUIState, UIStateSettings>(
             viewModelScope,
-            PuzzleActivityUIState(),
+            PuzzlePageUIState(),
             { state, uiSettings ->
                 val puzHasSolution = getPuzzle()?.hasSolution() ?: false
                 val indicateShowErrors =
@@ -338,7 +342,7 @@ open class PuzzleActivityViewModel @Inject constructor(
                 ::UIStateSettings
             ),
         )
-    val uiState : StateFlow<PuzzleActivityUIState> = mediatedUIState.stateFlow
+    val uiState : StateFlow<PuzzlePageUIState> = mediatedUIState.stateFlow
 
     private val mediatedKeyboardState
         = MediatedStateWithFlow<KeyboardState, KeyboardSettings>(
@@ -447,7 +451,7 @@ open class PuzzleActivityViewModel @Inject constructor(
     }
 
     // need to do default arguments the Java way while
-    // PuzzleActivity.java still used
+    // PuzzlePage.java still used
     fun stopTimer() {
         stopTimer(false)
     }
@@ -670,6 +674,14 @@ open class PuzzleActivityViewModel @Inject constructor(
         _editClueDialogState.value = null
     }
 
+    fun launchClueList() {
+        _openClueListEvent.value = true
+    }
+
+    fun clearOpenClueListEvent() {
+        _openClueListEvent.value = false
+    }
+
     fun launchCurrentClueNotes() {
         getBoard()?.let { board ->
             launchClueNotes(board.getClueID())
@@ -688,16 +700,12 @@ open class PuzzleActivityViewModel @Inject constructor(
                 if (cid != board.getClueID())
                     board.jumpToClue(cid)
             }
-            _internalToolEvent.value = ClueNotesData.buildClueNotes(cid)
+            _openNotesEvent.value = ClueNotesData(cid)
         }
     }
 
     fun launchPuzzleNotes() {
-        _internalToolEvent.value = ClueNotesData.buildPuzzleNotes()
-    }
-
-    fun launchClueList() {
-        _internalToolEvent.value = ClueListData.build()
+        _openNotesEvent.value = ClueNotesData(null)
     }
 
     fun doBack() {
@@ -851,8 +859,8 @@ open class PuzzleActivityViewModel @Inject constructor(
         _announceEvent.value = null
     }
 
-    fun clearInternalToolEvent() {
-        _internalToolEvent.value = null
+    fun clearOpenNotesEvent() {
+        _openNotesEvent.value = null
     }
 
     fun clearExternalToolEvent() {
@@ -1239,7 +1247,7 @@ open class PuzzleActivityViewModel @Inject constructor(
         get() { return mediatedMenuState.current }
         set(value) { mediatedMenuState.current = value }
 
-    private var currentUIState : PuzzleActivityUIState
+    private var currentUIState : PuzzlePageUIState
         get() { return mediatedUIState.current }
         set(value) { mediatedUIState.current = value }
 

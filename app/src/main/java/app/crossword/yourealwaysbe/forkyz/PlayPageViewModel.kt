@@ -49,7 +49,7 @@ import app.crossword.yourealwaysbe.puz.Puzzle
  * @param scratchMode whether is scratch mode
  * @param ensureVisible whether to jump to current clue on play board
  */
-data class PlayActivityUIState(
+data class PlayPageUIState(
     val clueText : String? = null,
     val puzzleTitle : String? = null,
     val isClueBelowGrid : Boolean = false,
@@ -99,13 +99,13 @@ private data class PlaySettings(
 )
 
 @HiltViewModel
-class PlayActivityViewModel @Inject constructor(
+class PlayPageViewModel @Inject constructor(
     application : Application,
     settings : ForkyzSettings,
     currentPuzzleHolder : CurrentPuzzleHolder,
     fileHandlerProvider : FileHandlerProvider,
     utils : AndroidVersionUtils,
-) : PuzzleActivityViewModel(
+) : PuzzlePageViewModel(
     application,
     settings,
     currentPuzzleHolder,
@@ -113,9 +113,9 @@ class PlayActivityViewModel @Inject constructor(
     utils,
 ) {
     private val mediatedPlayUIState
-        = MediatedStateWithFlow<PlayActivityUIState, PlaySettings>(
+        = MediatedStateWithFlow<PlayPageUIState, PlaySettings>(
             viewModelScope,
-            PlayActivityUIState(),
+            PlayPageUIState(),
             { state, playSettings ->
                 val showClueTabs
                     = isAcrostic || playSettings.clueTabsSettings.showClueTabs
@@ -169,7 +169,7 @@ class PlayActivityViewModel @Inject constructor(
                 ::PlaySettings,
             ),
         )
-    val playUIState : StateFlow<PlayActivityUIState>
+    val playUIState : StateFlow<PlayPageUIState>
         = mediatedPlayUIState.stateFlow
 
     val clueTabsViewModel = ClueTabsViewModel(
@@ -470,7 +470,7 @@ class PlayActivityViewModel @Inject constructor(
         }
     }
 
-    private var currentUIState : PlayActivityUIState
+    private var currentUIState : PlayPageUIState
         get() { return mediatedPlayUIState.current }
         set(value) { mediatedPlayUIState.current = value }
 }

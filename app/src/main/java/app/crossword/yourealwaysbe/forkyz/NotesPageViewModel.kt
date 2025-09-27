@@ -100,7 +100,7 @@ private data class AnagramValues(
  * this is the zone of cells with no clue attached
  * @param movementStrategy the movement strategy to use on the miniboard
  */
-data class NotesActivityUIState(
+data class NotesPageUIState(
     val notesClueID : ClueID? = null,
     val notesClue : Clue? = null,
     val word : Word? = null,
@@ -142,13 +142,13 @@ private data class NotesSettings(
 )
 
 @HiltViewModel
-class NotesActivityViewModel @Inject constructor(
+class NotesPageViewModel @Inject constructor(
     application : Application,
     settings : ForkyzSettings,
     currentPuzzleHolder : CurrentPuzzleHolder,
     fileHandlerProvider : FileHandlerProvider,
     utils : AndroidVersionUtils,
-) : PuzzleActivityViewModel(
+) : PuzzlePageViewModel(
     application,
     settings,
     currentPuzzleHolder,
@@ -156,9 +156,9 @@ class NotesActivityViewModel @Inject constructor(
     utils,
 ) {
     private val mediatedNotesUIState
-        = MediatedStateWithFlow<NotesActivityUIState, NotesSettings>(
+        = MediatedStateWithFlow<NotesPageUIState, NotesSettings>(
             viewModelScope,
-            NotesActivityUIState(),
+            NotesPageUIState(),
             { state, notesSettings ->
                 state.copy(
                     suppressNotesList = getSuppressNotesList(
@@ -180,7 +180,7 @@ class NotesActivityViewModel @Inject constructor(
                 ::NotesSettings,
             ),
         )
-    val notesUIState : StateFlow<NotesActivityUIState>
+    val notesUIState : StateFlow<NotesPageUIState>
         = mediatedNotesUIState.stateFlow
 
     private val _acceptedPredictionEvent = MutableStateFlow<Int?>(null)
@@ -922,7 +922,7 @@ class NotesActivityViewModel @Inject constructor(
     private val currentAnagramValues : AnagramValues
         get() { return AnagramValues(anagramSourceValue, anagramSolutionValue) }
 
-    private var currentNotesUIState : NotesActivityUIState
+    private var currentNotesUIState : NotesPageUIState
         get() { return mediatedNotesUIState.current }
         set(value) { mediatedNotesUIState.current = value }
 }

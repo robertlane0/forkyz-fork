@@ -24,7 +24,7 @@ import android.util.Log;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
-import app.crossword.yourealwaysbe.forkyz.BrowseActivity;
+import app.crossword.yourealwaysbe.forkyz.ForkyzActivity;
 import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
 import app.crossword.yourealwaysbe.forkyz.R;
 import app.crossword.yourealwaysbe.forkyz.settings.DownloadersSettings;
@@ -841,7 +841,7 @@ public class Downloaders {
      * Make a content intent for a notification
      */
     private PendingIntent getContentIntent() {
-        Intent notificationIntent = new Intent(context, BrowseActivity.class);
+        Intent notificationIntent = new Intent(context, ForkyzActivity.class);
         return PendingIntent.getActivity(
             context, 0, notificationIntent, utils.immutablePendingIntentFlag()
         );

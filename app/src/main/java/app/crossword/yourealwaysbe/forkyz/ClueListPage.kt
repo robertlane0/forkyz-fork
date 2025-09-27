@@ -2,7 +2,6 @@
 package app.crossword.yourealwaysbe.forkyz
 
 import android.net.Uri
-import android.os.Bundle
 import android.view.View
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
@@ -34,77 +33,41 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
+import app.crossword.yourealwaysbe.forkyz.exttools.AppNotFoundException
 import app.crossword.yourealwaysbe.forkyz.exttools.ExternalToolData
 import app.crossword.yourealwaysbe.forkyz.exttools.ExternalToolLauncher
-import app.crossword.yourealwaysbe.forkyz.inttools.InternalToolData
-import app.crossword.yourealwaysbe.forkyz.inttools.InternalToolLauncher
 import app.crossword.yourealwaysbe.forkyz.menu.BaseMenuModifier
 import app.crossword.yourealwaysbe.forkyz.menu.MenuText
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
 import app.crossword.yourealwaysbe.forkyz.view.ClueTabs
 import app.crossword.yourealwaysbe.puz.Clue
+import app.crossword.yourealwaysbe.puz.ClueID
 import app.crossword.yourealwaysbe.puz.MovementStrategy
-
-class ClueListActivity() : PuzzleActivity() {
-
-    override protected lateinit var viewModel : ClueListActivityViewModel
-
-    override fun onCreate(savedInstanceState : Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        viewModel = ViewModelProvider(this)
-            .get(ClueListActivityViewModel::class.java)
-
-        setContent {
-            AppTheme {
-                ClueListPage(
-                    viewModel = viewModel,
-                    themeHelper = themeHelper,
-                    inputConnectionMediator = inputConnectionMediator,
-                    displayWidth = displayWidth,
-                    displayHeight = displayHeight,
-                    isPortrait = isPortrait,
-                    openHTMLPage = this::openHTMLPage,
-                    openSettingsPage = this::openSettingsPage,
-                    openURI = this::openURI,
-                    onFinish = this::finish,
-                    onBack = this::doBackAction,
-                    setBackEnabled = this::setBackEnabled,
-                    toast = this::toast,
-                    handleInternalToolEvent = this::handleInternalToolEvent,
-                    handleExternalToolEvent = this::handleExternalToolEvent,
-                    setStatusBarColor = this::legacySetStatusBarColor,
-                    launchVoiceInput = this::launchVoiceInput,
-                    announce = { data, view -> announce(data, view) },
-                )
-            }
-        }
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ClueListPage(
-    viewModel : ClueListActivityViewModel,
+    viewModel : ClueListPageViewModel,
     themeHelper : ThemeHelper,
     inputConnectionMediator : InputConnectionMediator,
     displayWidth : Int,
     displayHeight : Int,
     isPortrait : Boolean,
+    openClueListPage : () -> Unit,
+    openNotesPage : (ClueID?) -> Unit,
     openHTMLPage : (String) -> Unit,
     openSettingsPage : () -> Unit,
     openURI : (Uri) -> Unit,
     onFinish : () -> Unit,
     onBack : () -> Unit,
-    setBackEnabled : (Boolean) -> Unit,
     toast : (String) -> Unit,
-    handleInternalToolEvent : (InternalToolData) -> Unit,
     handleExternalToolEvent : (ExternalToolData) -> Unit,
+    setOnAppNotFoundCallback : (((AppNotFoundException) -> Unit)?) -> Unit,
     setStatusBarColor : (Color) -> Unit,
+    setOnVoiceCommandCallback : (((List<String>?) -> Unit)?) -> Unit,
     launchVoiceInput : () -> Unit,
     announce : (AnnounceData, View) -> Unit,
 ) {
@@ -115,26 +78,23 @@ fun ClueListPage(
         displayWidth = displayWidth,
         displayHeight = displayHeight,
         isPortrait = isPortrait,
+        openClueListPage = openClueListPage,
+        openNotesPage = openNotesPage,
         openHTMLPage = openHTMLPage,
         openSettingsPage = openSettingsPage,
         openURI = openURI,
         onFinish = onFinish,
         onBack = onBack,
-        setBackEnabled = setBackEnabled,
         toast = toast,
-        handleInternalToolEvent = handleInternalToolEvent,
         handleExternalToolEvent = handleExternalToolEvent,
+        setOnAppNotFoundCallback = setOnAppNotFoundCallback,
         setStatusBarColor = setStatusBarColor,
+        setOnVoiceCommandCallback = setOnVoiceCommandCallback,
         launchVoiceInput = launchVoiceInput,
         announce = announce,
     ) {
         fun onKeyEvent(event : KeyEvent) : Boolean {
             when (event.key) {
-                Key.Escape -> {
-                    if (event.type == KeyEventType.KeyUp)
-                        onBack()
-                    return true
-                }
                 Key.DirectionLeft -> {
                     if (event.type == KeyEventType.KeyUp)
                         viewModel.moveLeft()
@@ -233,7 +193,7 @@ fun ClueListPage(
         fun TopAppBar() {
             themeHelper.ForkyzTopAppBar(
                 title = { Text(stringResource(R.string.clues_list_label)) },
-                onBack = { onFinish() },
+                onBack = { onBack() },
                 actions = { OverflowMenu() },
             )
         }

@@ -1,27 +1,16 @@
 
 package app.crossword.yourealwaysbe.forkyz
 
-import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import javax.inject.Inject
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.net.Uri
 import android.os.Bundle
-import android.view.KeyEvent
 import androidx.activity.compose.setContent
-import androidx.activity.result.ActivityResultCallback
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
-import androidx.activity.viewModels
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -58,12 +47,21 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.painterResource
@@ -76,23 +74,17 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.app.NotificationManagerCompat;
-import androidx.core.content.ContextCompat
-import androidx.core.content.IntentCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
-import dagger.hilt.android.AndroidEntryPoint
-
 import com.leinardi.android.speeddial.compose.FabWithLabel
 import com.leinardi.android.speeddial.compose.SpeedDial
 import com.leinardi.android.speeddial.compose.SpeedDialOverlay
 import com.leinardi.android.speeddial.compose.SpeedDialState
 
-import app.crossword.yourealwaysbe.forkyz.SettingsActivity
 import app.crossword.yourealwaysbe.forkyz.menu.BaseMenuModifier
 import app.crossword.yourealwaysbe.forkyz.menu.MenuDropdownHeading
 import app.crossword.yourealwaysbe.forkyz.menu.MenuHelp
@@ -117,321 +109,10 @@ import app.crossword.yourealwaysbe.forkyz.view.rememberSwipeToDismissBoxState
 import app.crossword.yourealwaysbe.forkyz.view.SwipeToDismissBox
 import app.crossword.yourealwaysbe.forkyz.view.SwipeToDismissBoxValue
 
-/**
- * Notification that intent imports have finished
- *
- * Esp if URL download, the activity might get restarted due to
- * config changes while the import is happening. To handle this, the
- * compete message is broadcast to the current version of the
- * activity.
- */
-private val INTENT_IMPORT_COMPLETE_ACTION
-    = "app.crossword.yourealwaysbe.INTENT_IMPORT_COMPLETE_ACTION"
-
-/**
- * ID of task that completed intent import
- */
-private val INTENT_IMPORT_TASK_ID
-    = "app.crossword.yourealwaysbe.INTENT_IMPORT_TASK_ID"
-
-// allow import of all docs (parser will take care of detecting if it's a
-// puzzle that's recognised)
-private val IMPORT_MIME_TYPE =  "*/*"
-
 private val DATE_FORMAT = DateTimeFormatter.ofPattern("EEEE\ndd MMM\nyyyy")
 private val HORIZONTAL_PADDING = 16.dp
 private val FAB_OPEN_ANGLE = 45F
 private val MIN_PUZZLE_ITEM_HEIGHT = 72.dp
-
-@AndroidEntryPoint
-class BrowseActivity() : ForkyzActivity() {
-    companion object {
-        // TODO: JvmField can be removed when callers are Kotlin
-
-        /**
-         * Request other browsers close
-         *
-         * An intent to broadcast from BrowseActivity to tell all other
-         * BrowseActivities to close down (avoid multiple instances on same
-         * file system)
-         *
-         * launchMode singleTask is not really what we want here as it
-         * prevents the user from returning to a puzzle from the home screen
-         * (annoying)
-         */
-        @JvmField
-        val BROWSER_CLOSE_ACTION
-            = "app.crossword.yourealwaysbe.BROWSER_CLOSE_ACTION"
-
-        /**
-         * The task ID of the BrowseActivity requesting the close
-         *
-         * To avoid closing self
-         */
-        @JvmField
-        val BROWSER_CLOSE_TASK_ID
-            = "app.crossword.yourealwaysbe.BROWSER_CLOSE_TASK_ID"
-
-        /**
-         * Whether some succeeded (bool)
-         */
-        @JvmField
-        val INTENT_IMPORT_SUCCESS
-            = "app.crossword.yourealwaysbe.INTENT_IMPORT_SUCCESS"
-    }
-
-    @Inject
-    lateinit var fileHandlerProvider : FileHandlerProvider
-
-    private val viewModel by viewModels<BrowseActivityViewModel>()
-    private lateinit var nm : NotificationManagerCompat
-    private var pendingImports : Collection<Uri> = listOf()
-
-    // callbacks from Compose
-    private var onImportComplete : ((Boolean) -> Unit)? = null
-    private var onImportURIs : ((Collection<Uri>) -> Unit)? = null
-    private var onNotificationPermissionDenied : (() -> Unit)? = null
-    private var onEscapeKey : (() -> Unit)? = null
-
-    /**
-     * See note for BROWSER_CLOSE_ACTION
-     */
-    private val closeActionReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context : Context?, intent : Intent?) {
-            if (intent?.action == BROWSER_CLOSE_ACTION) {
-                val myTaskId = (this@BrowseActivity).taskId
-                val otherTaskId
-                    = intent.getIntExtra(BROWSER_CLOSE_TASK_ID, myTaskId)
-
-                if (myTaskId != otherTaskId) {
-                    utils.finishAndRemoveTask(this@BrowseActivity)
-                }
-            }
-        }
-    }
-
-    /**
-     * See note for INTENT_IMPORT_COMPLETE_ACTION
-     */
-    private val intentImportCompleteReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context : Context?, intent : Intent?) {
-            if (intent?.action == INTENT_IMPORT_COMPLETE_ACTION) {
-                val myTaskId = (this@BrowseActivity).taskId
-                val otherTaskId
-                    = intent.getIntExtra(INTENT_IMPORT_TASK_ID, myTaskId)
-
-                if (myTaskId == otherTaskId) {
-                    onImportComplete?.let {
-                        it(intent.getBooleanExtra(INTENT_IMPORT_SUCCESS, false))
-                    }
-                }
-            }
-        }
-    }
-
-    private val getImportURI = registerForActivityResult(
-        ActivityResultContracts.GetMultipleContents(),
-        ActivityResultCallback<List<Uri>>() { uris ->
-            onImportURIs?.let { it(uris) }
-        },
-    )
-
-    /**
-     * When POST_NOTIFICATIONS permission needed
-     */
-    private val notificationPermissionLauncher
-        = registerForActivityResult(RequestPermission()) { isGranted ->
-            if (!isGranted)
-                onNotificationPermissionDenied?.let { it() }
-        }
-
-    override protected fun onCreate(savedInstanceState : Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        nm = NotificationManagerCompat.from(this)
-
-        // ask others to close down
-        sendBroadcast(
-            Intent(BROWSER_CLOSE_ACTION).putExtra(
-                BROWSER_CLOSE_TASK_ID, getTaskId()
-            ).setPackage(getPackageName())
-        )
-
-        // listen for broadcasts
-        ContextCompat.registerReceiver(
-            this,
-            closeActionReceiver,
-            IntentFilter(BROWSER_CLOSE_ACTION),
-            ContextCompat.RECEIVER_NOT_EXPORTED,
-        )
-        ContextCompat.registerReceiver(
-            this,
-            intentImportCompleteReceiver,
-            IntentFilter(INTENT_IMPORT_COMPLETE_ACTION),
-            ContextCompat.RECEIVER_NOT_EXPORTED,
-        )
-
-        setContent() {
-            AppTheme() {
-                BrowsePage(
-                    viewModel = viewModel,
-                    themeHelper = themeHelper,
-                    toast = this::toast,
-                    openAppSettings = this::openAppSettings,
-                    openHTMLPage = this::openHTMLPage,
-                    openOnlineSources = this::openOnlineSources,
-                    openPlayPage = this::openPlayPage,
-                    openReleaseNotes = this::openReleaseNotes,
-                    openSettingsPage = this::openSettingsPage,
-                    getPendingImports = this::getPendingImports,
-                    clearPendingImports = this::clearPendingImports,
-                    onFinish = this::finish,
-                    onCheckAndWarnNetworkState
-                        = this::checkAndWarnNetworkState,
-                    onCheckRequestNotificationPermissions
-                        = this::checkRequestNotificationPermissions,
-                    onImport = { getImportURI.launch(IMPORT_MIME_TYPE) },
-                    onImportFinish = this::onImportFinish,
-                    onCloseAllBrowseActivities = this::doExit,
-                    setOnImportCompleteCallback = { onImportComplete = it },
-                    setOnImportURIsCallback = { onImportURIs = it },
-                    setOnNotificationPermissionDeniedCallback = {
-                        onNotificationPermissionDenied = it
-                    },
-                    setOnEscapeKeyCallback = { onEscapeKey = it },
-
-                )
-            }
-        }
-
-        handleCreateIntent(savedInstanceState);
-    }
-
-    // don't use Compose because nothing in view requests initial focus
-    // and key events in compose need focus set
-    override fun onKeyDown(keyCode : Int, event : KeyEvent?) : Boolean {
-        // for parity with onKeyUp
-        return when(keyCode) {
-            KeyEvent.KEYCODE_ESCAPE -> true
-            else -> super.onKeyDown(keyCode, event)
-        }
-    }
-
-    override fun onKeyUp(keyCode : Int, event : KeyEvent?) : Boolean {
-        return when(keyCode) {
-            KeyEvent.KEYCODE_ESCAPE -> {
-                onEscapeKey?.let { it() }
-                true
-            }
-            else -> super.onKeyDown(keyCode, event)
-        }
-    }
-
-    private fun checkAndWarnNetworkState() {
-        if (!utils.hasNetworkConnection(this)) {
-            toast(getString(R.string.download_but_no_active_network))
-        }
-    }
-
-    /**
-     * Request notification permissions if needed
-     *
-     * E.g. not if settings block them. Doesn't ask twice in an
-     * activities life
-     */
-    private fun checkRequestNotificationPermissions() {
-        if (nm.areNotificationsEnabled())
-            return
-
-        val showRationale
-            = utils.shouldShowRequestNotificationPermissionRationale(
-                this
-            )
-
-        if (showRationale)
-            toast(getString(R.string.notifications_request_rationale))
-
-        utils.requestPostNotifications(notificationPermissionLauncher)
-    }
-
-    private fun clearPendingImports() {
-        pendingImports = listOf()
-    }
-
-    private fun setPendingImport(uri : Uri?) {
-        uri?.let { setPendingImports(listOf(it)) }
-    }
-
-    private fun setPendingImports(uri : Collection<Uri>) {
-        pendingImports = uri
-    }
-
-    private fun getPendingImports() : Collection<Uri> {
-        return pendingImports
-    }
-
-    /**
-     * Handle create intent given saved state
-     *
-     * Includes reading pending imports from saved instance state
-     */
-    private fun handleCreateIntent(savedInstanceState : Bundle?) {
-        // if there's a saved state, then this is not the first time we've seen
-        // the intent, so ignore it
-        if (savedInstanceState != null)
-            return
-
-        // If this was started by a file open or a share
-        val intent = getIntent()
-        val action = intent.action
-        if (Intent.ACTION_VIEW == action) {
-            // loaded by onResume
-            setPendingImport(intent.data)
-        } else if (Intent.ACTION_SEND == action) {
-            if (intent.hasExtra(Intent.EXTRA_TEXT)) {
-                setPendingImport(
-                    intent.getStringExtra(Intent.EXTRA_TEXT)?.toUri(),
-                )
-            } else {
-                setPendingImport(
-                    IntentCompat.getParcelableExtra(
-                        intent,
-                        Intent.EXTRA_STREAM,
-                        Uri::class.java,
-                    ),
-                )
-            }
-        } else if (Intent.ACTION_SEND_MULTIPLE == action) {
-            IntentCompat.getParcelableArrayListExtra(
-                intent,
-                Intent.EXTRA_STREAM,
-                Uri::class.java,
-            )?.let(this::setPendingImports)
-        }
-    }
-
-    private fun doExit() {
-        // ask browse activities to close
-        val close = Intent(BROWSER_CLOSE_ACTION)
-        // -1 so all browse activities close
-        close.putExtra(BROWSER_CLOSE_TASK_ID, -1)
-        close.setPackage(getPackageName())
-        sendBroadcast(close)
-        finish()
-    }
-
-    private fun onImportFinish(ifr : ImportFinishResult) {
-        sendBroadcast(
-            Intent(INTENT_IMPORT_COMPLETE_ACTION).putExtra(
-                INTENT_IMPORT_TASK_ID,
-                taskId,
-            ).putExtra(
-                INTENT_IMPORT_SUCCESS,
-                !ifr.someFailed && ifr.someSucceeded
-            ).setPackage(getPackageName())
-        )
-    }
-}
 
 /**
  * Browse page
@@ -443,7 +124,7 @@ class BrowseActivity() : ForkyzActivity() {
 @OptIn(ExperimentalMaterial3Api::class,ExperimentalAnimationApi::class)
 @Composable
 fun BrowsePage(
-    viewModel : BrowseActivityViewModel,
+    viewModel : BrowsePageViewModel,
     themeHelper : ThemeHelper,
     toast : (String) -> Unit,
     openAppSettings : () -> Unit,
@@ -454,16 +135,15 @@ fun BrowsePage(
     openSettingsPage : () -> Unit,
     getPendingImports : (() -> Collection<Uri>),
     clearPendingImports : (() -> Unit),
-    onFinish : () -> Unit,
+    onBack : () -> Unit,
     onCheckAndWarnNetworkState : () -> Unit,
     onCheckRequestNotificationPermissions : () -> Unit,
     onImport : () -> Unit,
     onImportFinish : (ImportFinishResult) -> Unit,
-    onCloseAllBrowseActivities : () -> Unit,
+    onExit : () -> Unit,
     setOnImportCompleteCallback : (((Boolean) -> Unit)?) -> Unit,
     setOnImportURIsCallback : (((Collection<Uri>) -> Unit)?) -> Unit,
     setOnNotificationPermissionDeniedCallback : ((() -> Unit)?) -> Unit,
-    setOnEscapeKeyCallback : ((() -> Unit)?) -> Unit,
 ) {
     fun startLoadPuzzleList(archive : Boolean) {
         viewModel.startLoadPuzzleList(archive)
@@ -1087,12 +767,18 @@ fun BrowsePage(
         modifier : Modifier,
         puzzleListState : LazyListState,
     ) {
+        val requester = remember { FocusRequester() }
+        LaunchedEffect(Unit) {
+            requester.requestFocus()
+        }
         Box(modifier) {
             Column(Modifier.fillMaxWidth().fillMaxHeight()) {
                 PuzzleSearchBar()
                 IntroMessages()
                 PuzzleList(
-                    modifier = Modifier.weight(1.0F),
+                    modifier = Modifier.weight(1.0F)
+                        .focusable()
+                        .focusRequester(requester),
                     listState = puzzleListState,
                 )
                 UIBusy()
@@ -1209,9 +895,26 @@ fun BrowsePage(
                     else
                         R.string.import_failure_long
                 ),
-                onClose = onCloseAllBrowseActivities,
+                onClose = onExit,
             )
         }
+    }
+
+    fun onKeyEvent(event : KeyEvent) : Boolean {
+        val isUp = event.type == KeyEventType.KeyUp
+        when (event.key) {
+            Key.Escape -> {
+                if (isUp) {
+                    val isSelecting = viewModel.uiState.value.isSelecting
+                    if (isSelecting)
+                        viewModel.clearSelection()
+                    else
+                        onBack()
+                }
+                return true
+            }
+        }
+        return false
     }
 
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
@@ -1232,19 +935,11 @@ fun BrowsePage(
         setOnNotificationPermissionDeniedCallback(
             viewModel::flagNotificationPermissionsDenied
         )
-        setOnEscapeKeyCallback {
-            val isSelecting = viewModel.uiState.value.isSelecting
-            if (isSelecting)
-                viewModel.clearSelection()
-            else
-                onFinish()
-        }
 
         onDispose {
             setOnImportCompleteCallback(null)
             setOnImportURIsCallback(null)
             setOnNotificationPermissionDeniedCallback(null)
-            setOnEscapeKeyCallback(null)
         }
     }
 
@@ -1261,6 +956,7 @@ fun BrowsePage(
     val isSelecting = state.isSelecting
 
     Scaffold(
+        modifier = Modifier.onKeyEvent(::onKeyEvent),
         topBar = { TopAppBar() },
         floatingActionButton = {
             AnimatedVisibility(

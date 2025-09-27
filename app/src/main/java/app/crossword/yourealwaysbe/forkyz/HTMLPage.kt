@@ -2,9 +2,7 @@ package app.crossword.yourealwaysbe.forkyz
 
 import javax.inject.Inject
 
-import android.os.Bundle
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -24,40 +22,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
-import dagger.hilt.android.AndroidEntryPoint
-
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 
 private val PADDING = 20.dp
 
-@AndroidEntryPoint
-class HTMLActivity : ForkyzActivity() {
-    override fun onCreate(savedInstanceState : Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        val viewModel by viewModels<HTMLActivityViewModel>()
-        val assetName = getIntent().getData().toString()
-
-        setContent() {
-            AppTheme() {
-                HTMLPage(
-                    viewModel = viewModel,
-                    themeHelper = themeHelper,
-                    assetName = assetName,
-                    onFinish = this::finish,
-                )
-            }
-        }
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HTMLPage(
-    viewModel : HTMLActivityViewModel,
+    viewModel : HTMLPageViewModel,
     themeHelper : ThemeHelper,
     assetName : String,
-    onFinish : () -> Unit,
+    onBack : () -> Unit,
 ) {
     LaunchedEffect(Unit) {
         viewModel.loadAsset(assetName)
@@ -68,7 +43,7 @@ fun HTMLPage(
         topBar = {
             themeHelper.ForkyzTopAppBar(
                 title = { Text(stringResource(R.string.app_name)) },
-                onBack = onFinish,
+                onBack = onBack,
                 scrollBehavior = scrollBehavior,
             )
         },

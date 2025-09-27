@@ -39,31 +39,13 @@ import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 
 private val PADDING = 20.dp
 
-@AndroidEntryPoint
-class LogcatActivity : ForkyzActivity() {
-    private val viewModel by viewModels<LogcatActivityViewModel>()
-    override fun onCreate(savedInstanceState : Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent() {
-            AppTheme() {
-                LogcatPage(
-                    viewModel = viewModel,
-                    themeHelper = themeHelper,
-                    onShareFile = this::shareFile,
-                    onFinish = this::finish,
-                )
-            }
-        }
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LogcatPage(
-    viewModel : LogcatActivityViewModel,
+    viewModel : LogcatPageViewModel,
     themeHelper : ThemeHelper,
     onShareFile : (ShareFileData) -> Unit,
-    onFinish : () -> Unit,
+    onBack : () -> Unit,
 ) {
     @Composable
     fun Launchers() {
@@ -91,7 +73,7 @@ fun LogcatPage(
             topBar = {
                 themeHelper.ForkyzTopAppBar(
                     title = { Text(stringResource(R.string.logcat)) },
-                    onBack = onFinish,
+                    onBack = onBack,
                     scrollBehavior = scrollBehavior,
                     actions = {
                         IconButton(onClick = viewModel::shareLogcat) {

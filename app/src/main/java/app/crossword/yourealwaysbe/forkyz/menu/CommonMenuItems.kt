@@ -17,9 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 
-import app.crossword.yourealwaysbe.forkyz.HTMLActivity
 import app.crossword.yourealwaysbe.forkyz.R
-import app.crossword.yourealwaysbe.forkyz.SettingsActivity
 
 val BaseMenuModifier = Modifier.defaultMinSize(minWidth = 200.dp)
 
@@ -70,22 +68,6 @@ fun MenuDropdownHeading(
     )
 }
 
-// TODO: remove, mixes compose and activity
-@Composable
-fun MenuHelp(
-    activity : Activity,
-    helpHTMLAsset : String,
-    onDismiss : () -> Unit = { },
-) {
-    DropdownMenuItem(
-        text = { MenuText(stringResource(R.string.help)) },
-        onClick = {
-            actionHelp(activity, helpHTMLAsset)
-            onDismiss()
-        }
-    )
-}
-
 @Composable
 fun MenuHelp(
     openHelp : () -> Unit = { },
@@ -95,21 +77,6 @@ fun MenuHelp(
         text = { MenuText(stringResource(R.string.help)) },
         onClick = {
             openHelp()
-            onDismiss()
-        }
-    )
-}
-
-// TODO: remove, mixes activity and compose
-@Composable
-fun MenuSettings(
-    activity : Activity,
-    onDismiss : () -> Unit = { },
-) {
-    DropdownMenuItem(
-        text = { MenuText(stringResource(R.string.settings)) },
-        onClick = {
-            actionSettings(activity)
             onDismiss()
         }
     )
@@ -128,21 +95,4 @@ fun MenuSettings(
         }
     )
 }
-
-// TOOD: remove, mixes activity and compose
-private fun actionHelp(activity : Activity, helpHTMLAsset : String) {
-    val helpIntent = Intent(
-        Intent.ACTION_VIEW,
-        helpHTMLAsset.toUri(),
-        activity,
-        HTMLActivity::class.java,
-    )
-    activity.startActivity(helpIntent)
-}
-
-// TODO: remove, mixes activity and compose
-private fun actionSettings(activity : Activity) {
-    activity.startActivity(Intent(activity, SettingsActivity::class.java))
-}
-
 

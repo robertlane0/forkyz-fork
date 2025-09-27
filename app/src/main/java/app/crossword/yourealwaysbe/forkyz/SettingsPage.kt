@@ -1,18 +1,11 @@
 
 package app.crossword.yourealwaysbe.forkyz
 
-import javax.inject.Inject
 import kotlinx.coroutines.launch
 
-import android.content.Intent
 import android.net.Uri
-import android.os.Bundle
 import android.util.Log
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts.CreateDocument
-import androidx.activity.result.contract.ActivityResultContracts.GetContent
-import androidx.activity.result.contract.ActivityResultContracts.OpenDocumentTree
 import androidx.activity.viewModels
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -40,6 +33,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -47,7 +41,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -56,8 +52,6 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
-
-import dagger.hilt.android.AndroidEntryPoint
 
 import app.crossword.yourealwaysbe.forkyz.theme.ForkyzTopAppBar
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
@@ -72,83 +66,7 @@ private val SETTINGS_HORIZONTAL_PADDING = 20.dp
 private val SETTINGS_VERTICAL_PADDING = 14.dp
 private val SWITCH_PADDING = 4.dp
 
-private val TAG = "ForkyzSettingsActivity"
-
-@AndroidEntryPoint
-class SettingsActivity : ForkyzActivity() {
-
-    private val viewModel by viewModels<SettingsActivityViewModel>()
-
-    // not ideal that these have to finish the job outside of the
-    // Compose function
-    private val getSAFURI = registerForActivityResult(OpenDocumentTree()) {
-        uri : Uri? -> uri?.let {
-            if (!viewModel.setNewExternalStorageSAFURI(it)) {
-                toast(getString(R.string.failed_to_initialise_saf))
-            }
-        }
-    }
-    private val importSettings = registerForActivityResult(GetContent()) {
-        uri : Uri? -> uri?.let {
-            viewModel.importSettings(uri)
-        }
-    }
-    private val exportSettings = registerForActivityResult(
-        CreateDocument(SETTINGS_MIME_TYPE)
-    ) {
-        uri : Uri? -> uri?.let {
-            viewModel.exportSettings(uri)
-        }
-    }
-    private val exportPuzzles
-        = registerForActivityResult(OpenDocumentTree()) {
-            uri : Uri? -> uri?.let {
-                try {
-                    Log.i(TAG, "Starting puzzle export")
-                    val intent = Intent(this, PuzzleExportService::class.java)
-                    intent.putExtra(
-                        PuzzleExportService.PUZZLE_EXPORT_URI,
-                        uri.toString()
-                    )
-                    ContextCompat.startForegroundService(this, intent)
-                // use IllegalState as
-                // ForegroundServiceNotAllowedException requires API 31
-                } catch (e : IllegalStateException) {
-                    Log.i(
-                        TAG,
-                        "Could not start puzzle export service on foreground"
-                    )
-                    toast(getString(R.string.puzzles_export_failed))
-                }
-            }
-        }
-
-    override fun onCreate(savedInstanceState : Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        setContent {
-            AppTheme() {
-                SettingsPage(
-                    viewModel = viewModel,
-                    themeHelper = themeHelper,
-                    onFinish = this::finish,
-                    onAppExit = this::appExit,
-                    toast = this::toast,
-                    openHTMLPage = this::openHTMLPage,
-                    openLogcatPage = {
-                        startActivity(Intent(this, LogcatActivity::class.java))
-                    },
-                    onGetSAFURI = { getSAFURI.launch(null) },
-                    onExportSettings
-                        = { exportSettings.launch(SETTINGS_DEFAULT_FILENAME) },
-                    onImportSettings
-                        = { importSettings.launch(SETTINGS_MIME_TYPE) },
-                    onExportPuzzles = { exportPuzzles.launch(null) },
-                )
-            }
-        }
-    }
-}
+private val TAG = "ForkyzSettingsPage"
 
 @Composable
 private fun SettingsClickable(
@@ -301,18 +219,21 @@ private fun SettingsHeading(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SettingsPage(
-    viewModel : SettingsActivityViewModel,
+fun SettingsPage(
+    viewModel : SettingsPageViewModel,
     themeHelper : ThemeHelper,
-    onFinish : () -> Unit,
-    onAppExit : () -> Unit,
+    onExit : () -> Unit,
     toast : (String) -> Unit,
     openHTMLPage : (String) -> Unit,
     openLogcatPage : () -> Unit,
+    onBack : () -> Unit,
     onGetSAFURI : () -> Unit,
     onExportSettings : () -> Unit,
     onImportSettings : () -> Unit,
     onExportPuzzles : () -> Unit,
+    setSAFURICallback : (((Uri) -> Unit)?) -> Unit,
+    setExportSettingsURICallback : (((Uri) -> Unit)?) -> Unit,
+    setImportSettingsURICallback : (((Uri) -> Unit)?) -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -322,7 +243,7 @@ private fun SettingsPage(
      * E.g. if a SAF URI is needed, launch getSAFURI
      */
     @Composable
-    fun LaunchForActivityResults() {
+    fun LaunchForExternalResults() {
         val needsURI by viewModel.needsURI.collectAsStateWithLifecycle()
         when (needsURI) {
             RequestedURI.SAF -> {
@@ -371,7 +292,7 @@ private fun SettingsPage(
         if (viewModel.state.value.hasBackStack)
             viewModel.popState()
         else
-            onFinish()
+            onBack()
     }
 
     @Composable
@@ -497,9 +418,9 @@ private fun SettingsPage(
             text = {
                 Text(stringResource(R.string.storage_changed_please_restart))
             },
-            onDismissRequest = onAppExit,
+            onDismissRequest = onExit,
             confirmButton = {
-                TextButton(onClick = onAppExit) {
+                TextButton(onClick = onExit) {
                     Text(stringResource(R.string.exit))
                 }
             },
@@ -599,7 +520,7 @@ private fun SettingsPage(
     }
 
     @Composable
-    fun DisplayDialogs(state : SettingsActivityViewState) {
+    fun DisplayDialogs(state : SettingsPageViewState) {
         if (state.storageChangedAppExit) {
             StorageChangedAppExitDialog()
         }
@@ -615,12 +536,18 @@ private fun SettingsPage(
         }
     }
 
-    LaunchForActivityResults()
+    @OptIn(ExperimentalComposeUiApi::class)
+    @Composable
+    fun HandleBack() {
+        BackHandler(enabled = state.hasBackStack) {
+            handleBack()
+        }
+    }
+
+    LaunchForExternalResults()
     ShowMessages()
 
-    BackHandler(enabled = state.hasBackStack) {
-        handleBack()
-    }
+    HandleBack()
 
     // Reset list state/scroll on new list
     // https://slack-chats.kotlinlang.org/t/510683/what-would-be-to-best-way-to-reset-the-scroll-of-a-lazylist-
@@ -629,6 +556,23 @@ private fun SettingsPage(
     }
     val listState = key(state.settingsItems) {
         rememberLazyListState()
+    }
+
+    val failedToInitialiseSAF
+        = stringResource(R.string.failed_to_initialise_saf)
+    DisposableEffect(Unit) {
+        setSAFURICallback { uri ->
+            if (!viewModel.setNewExternalStorageSAFURI(uri))
+                toast(failedToInitialiseSAF)
+        }
+        setExportSettingsURICallback(viewModel::exportSettings)
+        setImportSettingsURICallback(viewModel::importSettings)
+
+        onDispose {
+            setSAFURICallback(null)
+            setExportSettingsURICallback(null)
+            setImportSettingsURICallback(null)
+        }
     }
 
     Scaffold(

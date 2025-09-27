@@ -26,7 +26,7 @@ data class ShareLogcatData(
 )
 
 @HiltViewModel
-class LogcatActivityViewModel @Inject constructor(
+class LogcatPageViewModel @Inject constructor(
     application : Application,
     val utils : AndroidVersionUtils,
 ) : AndroidViewModel(application) {

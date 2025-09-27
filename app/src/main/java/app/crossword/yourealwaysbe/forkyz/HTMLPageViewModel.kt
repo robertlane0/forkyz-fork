@@ -21,7 +21,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 
 @HiltViewModel
-class HTMLActivityViewModel @Inject constructor(
+class HTMLPageViewModel @Inject constructor(
     application : Application,
 ) : AndroidViewModel(application) {
 
