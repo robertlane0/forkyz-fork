@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 import android.net.Uri
 import android.view.View
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.core.net.toUri
@@ -278,6 +279,8 @@ fun ForkyzApp(
                 )
             }
         }
+
+        themeHelper.LegacyStatusBarColor(setStatusBarColor)
     }
 }
 

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
@@ -45,6 +46,16 @@ class ThemeHelper @Inject constructor(val settings : ForkyzSettings) {
             val appTheme by getAppThemeState()
             return statusBarColor(appTheme, isDarkMode(appDayNightMode))
         }
+
+    @Composable
+    fun LegacyStatusBarColor(setStatusBarColor : (Color) -> Unit) {
+        val appDayNightMode by getAppDayNightModeState()
+        val appTheme by getAppThemeState()
+        val color = statusBarColor(appTheme, isDarkMode(appDayNightMode))
+        LaunchedEffect(color) {
+            setStatusBarColor(color)
+        }
+    }
 
     @Composable
     fun AppTheme(content : @Composable() () -> Unit) {
