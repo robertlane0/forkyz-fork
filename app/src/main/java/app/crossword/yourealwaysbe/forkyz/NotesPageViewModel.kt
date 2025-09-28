@@ -559,11 +559,15 @@ class NotesPageViewModel @Inject constructor(
                         val oldAnagramSource
                             = currentNotesUIState.anagramSourceValue
                         val newAnagramSource = note?.anagramSource ?: ""
+                        val word = if (clue.hasZone())
+                            getBoard()?.getClueWord(cid)
+                        else
+                            null
 
                         currentNotesUIState = currentNotesUIState.copy(
                             notesClueID = cid,
                             notesClue = clue,
-                            word = getBoard()?.getClueWord(cid),
+                            word = word,
                             clueText = text,
                             boxesLength = boxesLength,
                             suppressNotesList = suppressNotesList,
