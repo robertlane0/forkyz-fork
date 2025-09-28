@@ -660,7 +660,7 @@ fun NotesPage(
                 ) {
                     val state by viewModel.notesUIState
                         .collectAsStateWithLifecycle()
-                    if (!state.isPuzzleNotes) {
+                    if (!state.isPuzzleNotes && state.word != null) {
                         MiniboardRow()
                     }
                     ScratchRow()
