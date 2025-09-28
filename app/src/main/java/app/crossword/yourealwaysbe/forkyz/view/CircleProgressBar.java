@@ -91,14 +91,14 @@ public class CircleProgressBar extends View {
         float textSize = halfWidth * 0.75f;
 
         paint.setAntiAlias(true);
-        paint.setColor(colors.progressNull());
+        paint.setColor(ColorUtilsKt.colorToInt(colors.progressNull()));
         paint.setStyle(Paint.Style.STROKE);
         paint.setTypeface(Typeface.SANS_SERIF);
         paint.setTextAlign(Paint.Align.CENTER);
         paint.setTextSize(textSize);
 
         if (this.complete) {
-            paint.setColor(colors.progressDone());
+            paint.setColor(ColorUtilsKt.colorToInt(colors.progressDone()));
             paint.setStrokeWidth(circleStroke);
             canvas.drawCircle(
                 halfWidth, halfWidth,
@@ -113,7 +113,7 @@ public class CircleProgressBar extends View {
                 canvas
             );
         } else if (this.percentFilled < 0) {
-            paint.setColor(colors.progressError());
+            paint.setColor(ColorUtilsKt.colorToInt(colors.progressError()));
             paint.setStrokeWidth(circleStroke);
             canvas.drawCircle(
                 halfWidth,
@@ -132,7 +132,7 @@ public class CircleProgressBar extends View {
                 canvas
             );
         } else {
-            paint.setColor(colors.progressInProgress());
+            paint.setColor(ColorUtilsKt.colorToInt(colors.progressInProgress()));
             paint.setStrokeWidth(circleFine);
             canvas.drawCircle(
                 halfWidth,
