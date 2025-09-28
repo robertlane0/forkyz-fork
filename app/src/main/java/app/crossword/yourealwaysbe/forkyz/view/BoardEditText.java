@@ -88,6 +88,13 @@ public class BoardEditText
 
     private BoardEditFilter filter;
 
+    /**
+     * Will not work without colors set
+     */
+    public BoardEditText(Context context) {
+        this(context, null);
+    }
+
     public BoardEditText(
         Context context,
         BoardColorScheme boardColorScheme

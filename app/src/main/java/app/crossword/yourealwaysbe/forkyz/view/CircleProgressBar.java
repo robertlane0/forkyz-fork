@@ -32,6 +32,13 @@ public class CircleProgressBar extends View {
     private Paint paint;
     private RectF pcntFilledRect;
 
+    /**
+     * Will not work without colors set
+     */
+    public CircleProgressBar(Context context) {
+        this(context, null);
+    }
+
     public CircleProgressBar(
         Context context, CircleProgressBarColorScheme colors
     ) {
