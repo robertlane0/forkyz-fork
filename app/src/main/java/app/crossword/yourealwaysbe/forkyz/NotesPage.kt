@@ -35,6 +35,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -497,6 +498,12 @@ fun NotesPage(
                 fontFamily = FontFamily.Monospace
             )
 
+            // needs immediate updates:
+            // https://medium.com/androiddevelopers/effective-state-management-for-textfield-in-compose-d6e5b070fbe5
+            var localText by remember(state.textValue) {
+                mutableStateOf(state.textValue)
+            }
+
             BoardLabel(R.string.notes_lab)
             TextField(
                 modifier = modifier.fillMaxWidth()
@@ -508,8 +515,11 @@ fun NotesPage(
                 textStyle = textStyle,
                 singleLine = false,
                 minLines = 2,
-                value = state.textValue,
-                onValueChange = viewModel::setTextValue,
+                value = localText,
+                onValueChange = {
+                    localText = it
+                    viewModel.setTextValue(it)
+                },
                 placeholder = { Text(stringResource(hintStringID)) },
             )
         }
