@@ -41,7 +41,7 @@ import app.crossword.yourealwaysbe.puz.Playboard
  */
 @Singleton
 public class CurrentPuzzleHolder @Inject constructor(
-    @ApplicationContext val appContext : Context,
+    @param:ApplicationContext val appContext : Context,
     val settings : ForkyzSettings,
     val fileHandlerProvider : FileHandlerProvider,
 ) {

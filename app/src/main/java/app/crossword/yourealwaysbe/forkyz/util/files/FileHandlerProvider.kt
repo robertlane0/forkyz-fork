@@ -24,7 +24,7 @@ import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 
 @Singleton
 class FileHandlerProvider @Inject constructor(
-     @ApplicationContext private val applicationContext : Context,
+    @param:ApplicationContext private val applicationContext : Context,
     private val utils : AndroidVersionUtils,
     private val settings : ForkyzSettings,
 ) {
