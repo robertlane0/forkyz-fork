@@ -10,6 +10,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -26,13 +30,20 @@ fun SearchBar(
     hint : String,
 ) {
     if (showSearchBar) {
+        // needs immediate updates:
+        // https://medium.com/androiddevelopers/effective-state-management-for-textfield-in-compose-d6e5b070fbe5
+        var localSearchTerm by remember(searchTerm) {
+            mutableStateOf(searchTerm)
+        }
+
         Row(verticalAlignment = Alignment.CenterVertically) {
             OutlinedTextField(
-                label = {
-                    Text(hint)
+                label = { Text(hint) },
+                value = localSearchTerm,
+                onValueChange = {
+                    localSearchTerm = it
+                    onValueChange(it)
                 },
-                value = searchTerm,
-                onValueChange = onValueChange,
                 modifier = Modifier.weight(1.0f)
                     .padding(4.dp),
             )

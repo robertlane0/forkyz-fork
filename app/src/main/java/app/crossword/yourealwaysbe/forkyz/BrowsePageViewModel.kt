@@ -947,7 +947,7 @@ class BrowsePageViewModel @Inject constructor(
             val state = currentUIState
             val sortOrder = state.sortOrder
             var newPuzzleList : List<PuzGroup> = state.puzzleList
-            if (isNewPuzzleList)
+            if (isNewPuzzleList || puzzleFilter != currentUIState.puzzleFilter)
                 newPuzzleList = getPuzzleList(puzzleFilter, state.sortOrder)
 
             val displayInternalStorageMessage = (
@@ -964,6 +964,7 @@ class BrowsePageViewModel @Inject constructor(
 
             currentUIState = state.copy(
                 isViewArchive = isArchive,
+                puzzleFilter = puzzleFilter,
                 puzzleList = newPuzzleList,
                 displayInternalStorageMessage = displayInternalStorageMessage,
                 showRatings = showRatings,
