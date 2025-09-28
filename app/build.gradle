@@ -1,4 +1,4 @@
-
+;
 plugins {
     id 'androidx.room'
     id 'checkstyle'
@@ -109,7 +109,7 @@ File getReleaseKeyStoreFile() {
 }
 
 dependencies {
-    def lifecycle_version = "2.9.3"
+    def lifecycle_version = "2.9.4"
     // 2.10.0 has a bug maybe that prevents background threads in
     // workers from accessing the network
     // https://issuetracker.google.com/issues/387656869
@@ -122,22 +122,23 @@ dependencies {
     implementation "androidx.work:work-runtime:$work_version"
     implementation "com.google.dagger:hilt-android:$hiltVersion"
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
-    implementation 'androidx.activity:activity-compose:1.10.1'
-    implementation 'androidx.activity:activity-ktx:1.10.1'
+    implementation 'androidx.activity:activity-compose:1.11.0'
+    implementation 'androidx.activity:activity-ktx:1.11.0'
     implementation 'androidx.appcompat:appcompat:1.7.1'
     implementation 'androidx.compose.foundation:foundation:1.9.0'
-    implementation 'androidx.compose.material3:material3:1.3.2'
+    implementation 'androidx.compose.material3:material3:1.4.0'
+    implementation 'androidx.compose.material:material-icons-core:1.7.8'
     implementation 'androidx.concurrent:concurrent-futures:1.3.0'
     implementation 'androidx.core:core-ktx:1.17.0'
     implementation 'androidx.datastore:datastore:1.1.7'
     implementation 'androidx.hilt:hilt-navigation-compose:1.3.0'
-    implementation 'androidx.hilt:hilt-work:1.2.0'
+    implementation 'androidx.hilt:hilt-work:1.3.0'
     implementation 'androidx.navigation:navigation-compose:2.9.5'
     implementation 'androidx.preference:preference-ktx:1.2.1'
     implementation 'androidx.recyclerview:recyclerview:1.4.0'
     implementation 'androidx.viewpager2:viewpager2:1.1.0'
     implementation 'com.github.jgraham0325:words-to-numbers:8a97d258fd'
-    implementation 'com.google.android.material:material:1.12.0'
+    implementation 'com.google.android.material:material:1.13.0'
     implementation 'com.google.protobuf:protobuf-javalite:4.29.3'
     implementation 'com.leinardi.android:speed-dial.compose:2.0.0-alpha01'
     implementation 'com.squareup:seismic:1.0.3'
