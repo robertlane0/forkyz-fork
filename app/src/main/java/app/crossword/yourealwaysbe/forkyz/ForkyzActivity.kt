@@ -34,6 +34,7 @@ import androidx.core.app.ShareCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
 import androidx.core.net.toUri
+import androidx.core.view.ViewCompat
 
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -542,7 +543,7 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
     protected fun announce(data : AnnounceData, view : View) {
         val text = data.message
         if (isAccessibilityServiceRunning) {
-            view.setStateDescription(text)
+            ViewCompat.setStateDescription(view, text)
         } else {
             if (ttsService == null) {
                 ttsService = TextToSpeech(
