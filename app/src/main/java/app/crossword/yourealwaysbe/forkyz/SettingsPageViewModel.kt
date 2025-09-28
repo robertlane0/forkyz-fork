@@ -373,12 +373,17 @@ class SettingsPageViewModel @Inject constructor(
             = settings.liveFileHandlerSettings.map { fhSettings ->
                 val app : Application = getApplication()
 
+                val safRootURI = if (fhSettings.safRootURI.length > 0)
+                    fhSettings.safRootURI
+                else
+                    app.getString(R.string.external_storage_saf_none_selected)
+
                 val label = (
                     app.getString(R.string.external_storage_saf)
                     + " "
                     + app.getString(
                         R.string.external_storage_saf_current_uri,
-                        fhSettings.safRootURI
+                        safRootURI
                     )
                 )
 
