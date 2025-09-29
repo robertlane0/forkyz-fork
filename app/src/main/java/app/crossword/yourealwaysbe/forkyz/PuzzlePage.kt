@@ -117,7 +117,7 @@ class PuzzlePageScope(
     private val displayWidth : Int,
     private val displayHeight : Int,
     private val isPortrait : Boolean,
-    private val openHTMLPage : (String) -> Unit,
+    private val openHTMLPage : (Int) -> Unit,
     private val openSettingsPage : () -> Unit,
     private val openURI : (Uri) -> Unit,
     private val onBack : () -> Unit,
@@ -981,7 +981,7 @@ class PuzzlePageScope(
     @Composable
     fun MenuHelp() {
         MenuHelp(
-            openHelp = { openHTMLPage("play.html") },
+            openHelp = { openHTMLPage(R.raw.play) },
             onDismiss = viewModel::dismissMenu,
         )
     }
@@ -1041,7 +1041,7 @@ fun PuzzlePage(
     isPortrait : Boolean,
     openClueListPage : () -> Unit,
     openNotesPage : (ClueID?) -> Unit,
-    openHTMLPage : (String) -> Unit,
+    openHTMLPage : (Int) -> Unit,
     openSettingsPage : () -> Unit,
     openURI : (Uri) -> Unit,
     onFinish : () -> Unit,

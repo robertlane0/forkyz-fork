@@ -224,7 +224,7 @@ fun SettingsPage(
     themeHelper : ThemeHelper,
     onExit : () -> Unit,
     toast : (String) -> Unit,
-    openHTMLPage : (String) -> Unit,
+    openHTMLPage : (Int) -> Unit,
     openLogcatPage : () -> Unit,
     onBack : () -> Unit,
     onGetSAFURI : () -> Unit,
@@ -383,7 +383,7 @@ fun SettingsPage(
                             title = title,
                             summary = summary,
                             errorMsg = errorMsg?.value,
-                            onClick = { openHTMLPage(item.url) },
+                            onClick = { openHTMLPage(item.rawAssetID) },
                         )
                     }
                     is SettingsAction -> {

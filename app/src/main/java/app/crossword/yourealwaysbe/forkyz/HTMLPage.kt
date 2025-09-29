@@ -31,11 +31,11 @@ private val PADDING = 20.dp
 fun HTMLPage(
     viewModel : HTMLPageViewModel,
     themeHelper : ThemeHelper,
-    assetName : String,
+    rawAssetID : Int,
     onBack : () -> Unit,
 ) {
-    LaunchedEffect(Unit) {
-        viewModel.loadAsset(assetName)
+    LaunchedEffect(rawAssetID) {
+        viewModel.loadAsset(rawAssetID)
     }
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()

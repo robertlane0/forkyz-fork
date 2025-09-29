@@ -91,7 +91,7 @@ fun NotesPage(
     isPortrait : Boolean,
     openClueListPage : () -> Unit,
     openNotesPage : (ClueID?) -> Unit,
-    openHTMLPage : (String) -> Unit,
+    openHTMLPage : (Int) -> Unit,
     openSettingsPage : () -> Unit,
     openURI : (Uri) -> Unit,
     onFinish : () -> Unit,

@@ -171,7 +171,7 @@ fun PlayPage(
     isPortrait : Boolean,
     openNotesPage : (ClueID?) -> Unit,
     openClueListPage : () -> Unit,
-    openHTMLPage : (String) -> Unit,
+    openHTMLPage : (Int) -> Unit,
     openSettingsPage : () -> Unit,
     openURI : (Uri) -> Unit,
     onFinish : () -> Unit,

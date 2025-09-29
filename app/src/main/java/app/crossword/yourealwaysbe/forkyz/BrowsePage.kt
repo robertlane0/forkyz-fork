@@ -128,7 +128,7 @@ fun BrowsePage(
     themeHelper : ThemeHelper,
     toast : (String) -> Unit,
     openAppSettings : () -> Unit,
-    openHTMLPage : (String) -> Unit,
+    openHTMLPage : (Int) -> Unit,
     openOnlineSources : () -> Unit,
     openPlayPage : () -> Unit,
     openReleaseNotes : () -> Unit,
@@ -415,7 +415,7 @@ fun BrowsePage(
             MenuCleanup()
             MenuSwitchLists()
             MenuHelp(
-                openHelp = { openHTMLPage("filescreen.html") },
+                openHelp = { openHTMLPage(R.raw.filescreen) },
                 onDismiss = viewModel::dismissMenu,
             )
             MenuSettings(

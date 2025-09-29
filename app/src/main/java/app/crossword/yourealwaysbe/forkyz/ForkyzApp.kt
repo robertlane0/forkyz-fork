@@ -39,7 +39,7 @@ private data class Notes(
 @Serializable
 private object Settings
 @Serializable
-private data class HTML(val asset : String)
+private data class HTML(val rawAssetID : Int)
 @Serializable
 private object Logcat
 
@@ -102,8 +102,8 @@ fun ForkyzApp(
             )
         }
 
-        fun openHTMLPage(asset : String) {
-            navController.navigate(route = HTML(asset))
+        fun openHTMLPage(rawAssetID : Int) {
+            navController.navigate(route = HTML(rawAssetID))
         }
 
         val onlineSourcesURL = stringResource(R.string.online_sources_url)
@@ -116,7 +116,7 @@ fun ForkyzApp(
         }
 
         fun openReleaseNotes() {
-            openHTMLPage("release.html")
+            openHTMLPage(R.raw.release)
         }
 
         fun openSettingsPage() {
@@ -265,7 +265,7 @@ fun ForkyzApp(
                 HTMLPage(
                     viewModel = viewModel,
                     themeHelper = themeHelper,
-                    assetName = html.asset,
+                    rawAssetID = html.rawAssetID,
                     onBack = ::doBackAction,
                 )
             }

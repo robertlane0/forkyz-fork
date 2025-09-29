@@ -30,12 +30,14 @@ class HTMLPageViewModel @Inject constructor(
     )
     val assetText : StateFlow<AnnotatedString> = _assetText
 
-    fun loadAsset(assetName : String) {
+    fun loadAsset(rawAssetID : Int) {
         viewModelScope.launch(Dispatchers.IO) {
             val app : Application = getApplication()
             try {
                 BufferedReader(
-                    InputStreamReader(app.getAssets().open(assetName))
+                    InputStreamReader(
+                        app.getResources().openRawResource(rawAssetID)
+                    )
                 ).use { reader ->
                     val htmlData
                         = reader.lines().collect(Collectors.joining("\n"))

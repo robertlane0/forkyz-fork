@@ -279,13 +279,13 @@ class SettingsHTMLPage(
     page : SettingsPage,
     title : Int,
     summary : Int?,
-    val url : String,
+    val rawAssetID : Int,
 ) : SettingsNamedItem(page, title, summary) {
     constructor(
         page : SettingsPage,
         title : Int,
-        url : String
-    ) : this(page, title, null, url)
+        rawAssetID : Int,
+    ) : this(page, title, null, rawAssetID)
 }
 
 class SettingsDivider(
@@ -722,12 +722,12 @@ class SettingsPageViewModel @Inject constructor(
         SettingsHTMLPage(
             SettingsPage.ROOT,
             R.string.release_notes,
-            "release.html",
+            R.raw.release,
         ),
         SettingsHTMLPage(
             SettingsPage.ROOT,
             R.string.license,
-            "license.html",
+            R.raw.license,
         ),
         SettingsLogcat(
             SettingsPage.ROOT,
@@ -811,7 +811,7 @@ class SettingsPageViewModel @Inject constructor(
         SettingsHTMLPage(
             SettingsPage.PUZZLE_SOURCES_SCRAPERS,
             R.string.about_scrapes,
-            "scrapes.html",
+            R.raw.scrapes,
         ),
 
         // Download
@@ -1650,7 +1650,7 @@ class SettingsPageViewModel @Inject constructor(
         SettingsHTMLPage(
             SettingsPage.VOICE_ACCESSIBILITY,
             R.string.about_voice_commands,
-            "voice_commands.html",
+            R.raw.voice_commands,
         ),
 
         // External Tools
