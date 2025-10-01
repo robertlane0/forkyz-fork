@@ -30,8 +30,8 @@ import java.util.Scanner;
  * src/test/resources/premiere-20100704.txt.
  */
 public class KingFeaturesPlaintextIO implements PuzzleParser {
-    private static final String ACROSS_LIST = "Across";
-    private static final String DOWN_LIST = "Down";
+    private static final String ACROSS_LIST = DefaultListNames.ACROSS_LIST;
+    private static final String DOWN_LIST = DefaultListNames.DOWN_LIST;
 
     @Override
     public Puzzle parseInput(InputStream is) {

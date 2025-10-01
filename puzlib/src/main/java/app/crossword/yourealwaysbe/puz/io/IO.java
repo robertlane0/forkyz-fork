@@ -83,8 +83,8 @@ public class IO implements PuzzleParser {
 
     private static final char BLANK = '-';
 
-    public static final String ACROSS_LIST = "Across";
-    public static final String DOWN_LIST = "Down";
+    public static final String ACROSS_LIST = DefaultListNames.ACROSS_LIST;
+    public static final String DOWN_LIST = DefaultListNames.DOWN_LIST;
 
 
     public static int cksum_region(byte[] data, int offset, int length,

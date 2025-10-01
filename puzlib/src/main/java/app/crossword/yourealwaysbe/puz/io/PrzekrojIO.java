@@ -33,6 +33,7 @@ public class PrzekrojIO implements PuzzleParser {
     private static final Logger LOG
         = Logger.getLogger(PrzekrojIO.class.getCanonicalName());
 
+    // Not internationalised, Polish crosswords
     private static final String ACROSS_LIST = "Poziomo";
     private static final String DOWN_LIST = "Pionowo";
 

@@ -29,8 +29,8 @@ public class SpoonbillIO implements PuzzleParser {
     private static final String MODE_CLUE = "Clue";
     private static final String MODE_SOLVE = "Solve";
 
-    private static final String ACROSS_LIST = "Across";
-    private static final String DOWN_LIST = "Down";
+    private static final String ACROSS_LIST = DefaultListNames.ACROSS_LIST;
+    private static final String DOWN_LIST = DefaultListNames.DOWN_LIST;
 
     public static class SpoonbillFormatException extends Exception {
         private static final long serialVersionUID = 5890275381530098661L;

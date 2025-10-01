@@ -48,8 +48,8 @@ public class XWordJSONIO extends AbstractJSONIO {
     private static final DateTimeFormatter DATE_FORMATTER
         = DateTimeFormatter.ofPattern("M/d/yyyy", Locale.US);
 
-    private static final String ACROSS_LIST = "Across";
-    private static final String DOWN_LIST = "Down";
+    private static final String ACROSS_LIST = DefaultListNames.ACROSS_LIST;
+    private static final String DOWN_LIST = DefaultListNames.DOWN_LIST;
 
     /**
      * An unfancy exception indicating error while parsing

@@ -27,9 +27,6 @@ public class AmuseLabsJSONIO extends AbstractJSONIO {
     private static final Logger LOG
         = Logger.getLogger(AmuseLabsJSONIO.class.getCanonicalName());
 
-    private static final String ACROSS_LIST = "Across";
-    private static final String DOWN_LIST = "Down";
-
     /**
      * An unfancy exception indicating error while parsing
      */
@@ -174,9 +171,13 @@ public class AmuseLabsJSONIO extends AbstractJSONIO {
                 String number = String.valueOf(num);
                 boolean across = entry.getBoolean("acrossNotDown");
                 String clue = entry.getJSONObject("clue").getString("clue");
+                String listName = optStringNull(entry, "clueSection");
+                if (listName == null)
+                    listName = across
+                        ? DefaultListNames.ACROSS_LIST
+                        : DefaultListNames.DOWN_LIST;
 
                 Map<Integer, String> separators = null;
-
                 if (wordLengthsEnabled) {
                     separators = getSeparators(entry);
                     String enumeration = getEnumeration(entry);
@@ -184,7 +185,6 @@ public class AmuseLabsJSONIO extends AbstractJSONIO {
                         clue += " " + enumeration;
                 }
 
-                String listName = across ? ACROSS_LIST : DOWN_LIST;
                 Zone zone = across
                     ? builder.getAcrossZone(number)
                     : builder.getDownZone(number);

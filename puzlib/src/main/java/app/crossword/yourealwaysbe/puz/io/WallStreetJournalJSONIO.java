@@ -61,6 +61,7 @@ public class WallStreetJournalJSONIO extends AbstractJSONIO {
     private static final DateTimeFormatter DATE_FORMATTER
         = DateTimeFormatter.ofPattern("EEEE, d MMMM y");
 
+    // Not internationalised, WSJ English
     private static final String DEFAULT_CLUE_LIST_NAME = "Clues";
 
     /**

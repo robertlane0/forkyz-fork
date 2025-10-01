@@ -66,8 +66,8 @@ public class TCAJSONIO extends AbstractJSONIO {
     private static final DateTimeFormatter DATE_DATA_FORMATTER
         = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    private static final String ACROSS_LIST = "Across";
-    private static final String DOWN_LIST = "Down";
+    private static final String ACROSS_LIST = DefaultListNames.ACROSS_LIST;
+    private static final String DOWN_LIST = DefaultListNames.DOWN_LIST;
 
     /**
      * An unfancy exception indicating error while parsing

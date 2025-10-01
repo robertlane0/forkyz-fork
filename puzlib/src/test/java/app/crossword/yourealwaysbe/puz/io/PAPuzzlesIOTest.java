@@ -35,8 +35,8 @@ public class PAPuzzlesIOTest {
         assertEquals(boxes[5][0].getSolution(), "Y");
         assertEquals(boxes[7][5].getSolution(), "Z");
 
-        ClueList acrossClues = puz.getClues("Across");
-        ClueList downClues = puz.getClues("Down");
+        ClueList acrossClues = puz.getClues("ACROSS");
+        ClueList downClues = puz.getClues("DOWN");
 
         assertEquals(acrossClues.getClueByNumber("8").getHint(), "AClue 8");
         assertEquals(

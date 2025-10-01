@@ -34,6 +34,7 @@ public class RCIJeuxMFJIO implements PuzzleParser {
     private static final Logger LOG
         = Logger.getLogger(RCIJeuxMFJIO.class.getCanonicalName());
 
+    // Not internationalised, assume French
     private static final String ACROSS_LIST = "Horiz.";
     private static final String DOWN_LIST = "Vert.";
     private static final char JOIN_DASH = '–';

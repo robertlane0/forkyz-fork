@@ -35,6 +35,7 @@ public class GuardianJSONIO extends AbstractJSONIO {
     private static final Logger LOG
         = Logger.getLogger(GuardianJSONIO.class.getCanonicalName());
 
+    // Not internationalised, Guardian crosswords are in English
     private static final String ACROSS_LIST = "Across";
     private static final String DOWN_LIST = "Down";
 

@@ -63,6 +63,9 @@ import static app.crossword.yourealwaysbe.puz.util.HtmlUtil.unHtmlString;
  * written in British (dd/mm/yyyy) format, not US (mm/dd/yyyy). The
  * IO_VERSION checks were added to still read old files correctly.
  *
+ * Not using internationalisation for list names as these should be set
+ * in file.
+ *
  * http://www.ipuz.org/
  */
 public class IPuzIO extends AbstractJSONIO {

@@ -46,7 +46,7 @@ public class AmuseLabsJSONIOTest {
         assertFalse(boxes[3][7].hasShape());
         assertFalse(boxes[5][9].hasShape());
 
-        ClueList acrossClues = puz.getClues("Across");
+        ClueList acrossClues = puz.getClues("ACROSS");
         ClueList downClues = puz.getClues("Down");
 
         assertEquals(acrossClues.getClueByNumber("1").getHint(), "Clue 1a");

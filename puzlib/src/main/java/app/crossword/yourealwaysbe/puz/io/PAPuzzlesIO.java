@@ -39,8 +39,9 @@ import app.crossword.yourealwaysbe.puz.Zone;
  *   ...
  * </div>
  * <div class="clues">
+ *   <h2>list name</h2>
  *   ...
- *   <div class="my-content-desktop-{across|down}">
+ *   <div class="clues-{across|down}">
  *       <li id="{clueId}"
  *           data-direction="{across|down}"
  *           data-cluenum="{number}"
@@ -54,7 +55,7 @@ import app.crossword.yourealwaysbe.puz.Zone;
  * {num1}/{num2} as the number. data-islink for the second clue will be
  * 1. Else 0.
  *
- * There are two copies of the clues my-content-desktop-* and
+ * There are sometimes two copies of the clues my-content-desktop-* and
  * my-content-mobile-*.
  */
 public class PAPuzzlesIO implements PuzzleParser {
@@ -211,6 +212,8 @@ public class PAPuzzlesIO implements PuzzleParser {
         if (clueList == null)
             return;
 
+        String listName = findListName(clueList);
+
         for (Element clue : clueList.select("li")) {
             String number = clue.attr("data-cluenum");
             String[] numbers = number.split("/");
@@ -227,18 +230,17 @@ public class PAPuzzlesIO implements PuzzleParser {
 
             int numClues = Math.min(numbers.length, directions.length);
             Zone zone = new Zone();
-            String listName = null;
 
             String islink = clue.attr("data-islink");
             if (!"1".equals(clue.attr("data-islink"))) {
                 for (int i = 0; i < numClues; i++) {
                     if ("across".equalsIgnoreCase(directions[i])) {
-                        if (i == 0)
-                            listName = "Across";
+                        if (i == 0 && listName == null)
+                            listName = DefaultListNames.ACROSS_LIST;
                         zone.appendZone(builder.getAcrossZone(numbers[i]));
                     } else if ("down".equalsIgnoreCase(directions[i])) {
-                        if (i == 0)
-                            listName = "Down";
+                        if (i == 0 && listName == null)
+                            listName = DefaultListNames.DOWN_LIST;
                         zone.appendZone(builder.getDownZone(numbers[i]));
                     }
                 }
@@ -249,6 +251,24 @@ public class PAPuzzlesIO implements PuzzleParser {
                 builder.addClue(new Clue(listName, index, number, hint, zone));
             }
         }
+    }
+
+    /**
+     * Search previous siblings of parent looking for <h2> element with
+     * title.
+     *
+     * Because clue list ul is inside clue div after h2 with title.
+     */
+    private static String findListName(Element clueList) {
+        for (
+            Element cur = clueList.parentElement();
+            cur != null;
+            cur = cur.previousElementSibling()
+        ) {
+            if ("h2".equalsIgnoreCase(cur.tagName()))
+                return cur.text();
+        }
+        return null;
     }
 
     private static String getClueHint(Element clue) {

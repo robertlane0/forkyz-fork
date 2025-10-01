@@ -32,6 +32,7 @@ public class RaetselZentraleSchwedenJSONIO extends AbstractJSONIO {
     private static final Logger LOG
         = Logger.getLogger(RaetselZentraleSchwedenJSONIO.class.getCanonicalName());
 
+    // Not internationalised, assumed German
     private static final String ACROSS_LIST = "Hinüber";
     private static final String DOWN_LIST = "Hinunter";
     private static final String WINWORD_LIST = "Lösungswort";

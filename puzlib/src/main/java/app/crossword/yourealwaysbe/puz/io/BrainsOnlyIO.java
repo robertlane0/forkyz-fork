@@ -28,8 +28,8 @@ import java.util.ArrayList;
 public class BrainsOnlyIO implements PuzzleParser {
 
     private static final Charset CHARSET = Charset.forName("ISO-8859-1");
-    private static final String ACROSS_LIST = "Across";
-    private static final String DOWN_LIST = "Down";
+    private static final String ACROSS_LIST = DefaultListNames.ACROSS_LIST;
+    private static final String DOWN_LIST = DefaultListNames.DOWN_LIST;
     private static final String NOTEPAD_START_TAG = "<NOTEPAD>";
     private static final String NOTEPAD_END_TAG = "</NOTEPAD>";
     private static final DateTimeFormatter DATE_FORMATTER
