@@ -575,16 +575,11 @@ fun BrowsePage(
                 )
             }
             val progressColors = themeHelper.getCircleProgressBarColorScheme()
-            AndroidView(
+            CircleProgressBar(
                 modifier = Modifier.size(56.dp),
-                factory = { context ->
-                    CircleProgressBar(context, progressColors)
-                },
-                update = { view ->
-                    view.percentFilled = percentFilled
-                    view.complete = pe.percentComplete == 100
-                    view.setColors(progressColors)
-                }
+                colors = progressColors,
+                complete = pe.percentComplete == 100,
+                percentFilled = percentFilled,
             )
             Column(Modifier.weight(1.0F).fillMaxWidth()) {
                 Row(Modifier.fillMaxWidth()) {
