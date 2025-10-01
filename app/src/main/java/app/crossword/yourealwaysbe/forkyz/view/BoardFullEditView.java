@@ -42,12 +42,24 @@ public class BoardFullEditView extends BoardEditView {
     private boolean ensureVisible = false;
 
     public BoardFullEditView(Context context) {
-        this(context, null);
+        this(context, null, null);
+    }
+
+    public BoardFullEditView(Context context, ScrollingImageViewState state) {
+        this(context, null, state);
     }
 
     @Inject
     public BoardFullEditView(Context context, AttributeSet attrs) {
-        super(context, attrs);
+        this(context, attrs, null);
+    }
+
+    public BoardFullEditView(
+        Context context,
+        AttributeSet attrs,
+        ScrollingImageViewState state
+    ) {
+        super(context, attrs, state);
 
         DisplayMetrics metrics
             = context.getResources().getDisplayMetrics();

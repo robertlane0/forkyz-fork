@@ -34,7 +34,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -76,6 +78,7 @@ import app.crossword.yourealwaysbe.forkyz.view.BoardFullEditView
 import app.crossword.yourealwaysbe.forkyz.view.ClueTabs
 import app.crossword.yourealwaysbe.forkyz.view.OKDialog
 import app.crossword.yourealwaysbe.forkyz.view.SpecialKey
+import app.crossword.yourealwaysbe.forkyz.view.rememberScrollingImageViewState
 import app.crossword.yourealwaysbe.puz.ClueID
 import app.crossword.yourealwaysbe.puz.Playboard.Word
 import app.crossword.yourealwaysbe.puz.Position
@@ -89,7 +92,15 @@ private val ACROSTIC_BOARD_WIDTH_RATIO_MAX = 0.7F
 private val CLUE_BAR_HEIGHT = 64.dp
 
 // TODO: make more mvvm-y - view shouldn't be driving
-private class BoardViewZoomer {
+/**
+ * For controlling the zoom of the board
+ *
+ * hasDoneInitialFitToScreen controls if fit to screen is fired when fit
+ * to screen mode is first set
+ */
+private class BoardViewZoomer(
+    private val hasDoneInitialFitToScreen : Boolean = false,
+) {
     var boardView : BoardFullEditView? = null
         set(value : BoardFullEditView?) {
             field = value
@@ -137,8 +148,12 @@ private class BoardViewZoomer {
         ) {
             when (fitToScreenMode) {
                 FitToScreenMode.FTSM_START -> {
-                    if (fitToScreenMode != hasSetInitialScaleMode)
+                    if (
+                        fitToScreenMode != hasSetInitialScaleMode
+                        && !hasDoneInitialFitToScreen
+                    ) {
                         zoomFit()
+                    }
                 }
                 FitToScreenMode.FTSM_LOCKED -> {
                     zoomFit()
@@ -189,7 +204,10 @@ fun PlayPage(
     resumeShakeDetector : () -> Unit,
     pauseShakeDetector : () -> Unit,
 ) {
-    val boardViewZoomer = remember { BoardViewZoomer() }
+    var hasDoneInitialFitToScreen by rememberSaveable { mutableStateOf(false) }
+    val boardViewZoomer = remember {
+        BoardViewZoomer(hasDoneInitialFitToScreen)
+    }
 
     PuzzlePage(
         viewModel = viewModel,
@@ -236,6 +254,7 @@ fun PlayPage(
             }
             LaunchedEffect(state.fitToScreenMode) {
                 boardViewZoomer.fitToScreenMode = state.fitToScreenMode
+                hasDoneInitialFitToScreen = true
             }
             LaunchedEffect(state.isFullScreen) {
                 if (state.isFullScreen)
@@ -435,13 +454,14 @@ fun PlayPage(
             val state by viewModel.playUIState.collectAsStateWithLifecycle()
             val locked = state.fitToScreenMode == FitToScreenMode.FTSM_LOCKED
             val boardColorScheme = themeHelper.getBoardColorScheme()
+            val viewState = rememberScrollingImageViewState()
 
             AndroidView(
                 modifier = modifier.onSizeChanged { size ->
                     boardViewZoomer.viewSize = size
                 },
                 factory = { context ->
-                    val view = BoardFullEditView(context).apply {
+                    val view = BoardFullEditView(context, viewState).apply {
                         setBoard(viewModel.getBoard())
                         setFocusable(true)
                         setFocusableInTouchMode(true)

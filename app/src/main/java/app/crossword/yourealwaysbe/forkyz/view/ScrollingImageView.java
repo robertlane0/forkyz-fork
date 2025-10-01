@@ -33,6 +33,7 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
     // count of num requests to block scroll end for internal scroll
     // movements
     private int numBlockScrollEnd = 0;
+    private ScrollingImageViewState state;
 
     private GridLayout imageGrid;
     // the "true" size of each bitmap in the grid in child order of
@@ -41,7 +42,31 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
     private ImageSize fullImageSize;
 
     public ScrollingImageView(Context context, AttributeSet as) {
+        this(context, as, null);
+    }
+
+    /**
+     * Create scrolling image view
+     *
+     * Use given state to keep track of x, y, and scale so can create a
+     * new view in same position. Kept up to date by the image view
+     * itself, so only one view should own a state.
+     *
+     * If null, state is maintained internally.
+     */
+    public ScrollingImageView(
+        Context context,
+        AttributeSet as,
+        ScrollingImageViewState state
+    ) {
         super(context, as);
+
+        if (state == null) {
+            this.state = new ScrollingImageViewState();
+        } else {
+            this.state = state;
+            scrollTo(state.getX(), state.getY());
+        }
 
         gestureDetector = new GestureDetector(context, this);
         gestureDetector.setIsLongpressEnabled(true);
@@ -132,23 +157,21 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
         this.scaleListener = scaleListener;
     }
 
-    private float currentScale = 1.0f;
-
     /**
      * Sets current scale
      *
      * May adjust if necessary, returns final scale
      */
     public float setCurrentScale(float scale) {
-        boolean changed = this.currentScale != scale;
-        this.currentScale = scale;
+        boolean changed = state.getScale() != scale;
+        state.setScale(scale);
         if (changed)
             notifyScaleChange(scale);
-        return this.currentScale;
+        return state.getScale();
     }
 
     public float getCurrentScale() {
-        return currentScale;
+        return state.getScale();
     }
 
     public boolean isVisible(Point p) {
@@ -361,6 +384,9 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
     @Override
     public void scrollTo(int x, int y) {
         if (x != getScrollX() || y != getScrollY()) {
+            state.setX(x);
+            state.setY(y);
+
             super.scrollTo(x, y);
 
             if (!isBlockScrollEnd())
@@ -386,10 +412,10 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
             scale = 1.0F;
         }
 
-        if(scale * this.currentScale > maxScale ){
+        if(scale * state.getScale() > maxScale ){
             return;
         }
-        if(scale * this.currentScale < minScale){
+        if(scale * state.getScale() < minScale){
             return;
         }
 
@@ -432,7 +458,7 @@ public class ScrollingImageView extends FrameLayout implements OnGestureListener
         this.scaleScrollLocation.fixScroll(w, h);
 
         runningScale *= scale;
-        currentScale *= scale;
+        state.setScale(state.getScale() * scale);
     }
 
     public void zoomEnd() {

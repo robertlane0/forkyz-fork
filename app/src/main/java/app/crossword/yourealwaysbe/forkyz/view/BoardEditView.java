@@ -82,7 +82,15 @@ public abstract class BoardEditView
     }
 
     public BoardEditView(Context context, AttributeSet attrs) {
-        super(context, attrs);
+        this(context, null, null);
+    }
+
+    public BoardEditView(
+        Context context,
+        AttributeSet attrs,
+        ScrollingImageViewState state
+    ) {
+        super(context, attrs, state);
         handler = new Handler(context.getMainLooper());
     }
 
