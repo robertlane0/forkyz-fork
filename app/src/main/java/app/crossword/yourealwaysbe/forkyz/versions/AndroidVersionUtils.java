@@ -8,7 +8,6 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
-import android.speech.tts.TextToSpeech;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;

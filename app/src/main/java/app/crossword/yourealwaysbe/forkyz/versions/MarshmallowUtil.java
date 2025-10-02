@@ -13,7 +13,6 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
-import android.speech.tts.TextToSpeech;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
@@ -22,7 +21,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.core.content.ContextCompat;
 
 public class MarshmallowUtil implements AndroidVersionUtils {
     @Override

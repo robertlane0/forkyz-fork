@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
@@ -320,13 +321,16 @@ class ForkyzSettingsTest {
         .setMovementStrategyClueList(MovementStrategySetting.MSS_MOVE_NEXT_CLUE)
         .build()
 
+    @ExperimentalCoroutinesApi
     private val testDispatcher = UnconfinedTestDispatcher()
 
+    @ExperimentalCoroutinesApi
     @Before
     fun setup() {
         Dispatchers.setMain(testDispatcher)
     }
 
+    @ExperimentalCoroutinesApi
     @After
     fun tearDown() {
         Dispatchers.resetMain()
