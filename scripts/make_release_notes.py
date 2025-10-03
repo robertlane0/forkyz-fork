@@ -8,7 +8,7 @@
 import glob
 import os
 
-release_file="app/src/main/assets/release.html"
+release_file="app/src/main/res/raw/release.html"
 changes_md="docs/changes.md"
 
 def version_number(filename: str) -> int:
