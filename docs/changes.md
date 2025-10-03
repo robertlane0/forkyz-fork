@@ -1,5 +1,11 @@
 # Forkyz Changelog
 
+## Version 73
+
+- Use Compose Navigation for moving between pages (please report bugs).
+- Fix crash on Android 10 and below.
+- Bug fixes (anagrams, jump-to-clue, puzzle search, status bar color) and new bugs.
+
 ## Version 72
 
 - Add El Pais Experto downloader.
