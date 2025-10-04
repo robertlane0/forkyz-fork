@@ -3,7 +3,6 @@ package app.crossword.yourealwaysbe.forkyz
 
 import javax.inject.Inject
 import kotlin.random.Random
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 
@@ -21,7 +20,9 @@ import app.crossword.yourealwaysbe.forkyz.util.MediatedStateWithFlow
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
+import app.crossword.yourealwaysbe.forkyz.view.BoardEditViewModel
 import app.crossword.yourealwaysbe.forkyz.view.ClueTabsViewModel
+import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.ClueID
 import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges
 import app.crossword.yourealwaysbe.puz.Playboard.Word
@@ -172,6 +173,12 @@ class PlayPageViewModel @Inject constructor(
     val playUIState : StateFlow<PlayPageUIState>
         = mediatedPlayUIState.stateFlow
 
+    val boardEditViewModel = BoardEditViewModel(
+        viewModelScope,
+        settings,
+        getBoard(),
+    )
+
     val clueTabsViewModel = ClueTabsViewModel(
         application,
         viewModelScope,
@@ -198,14 +205,17 @@ class PlayPageViewModel @Inject constructor(
     }
 
     /**
-     * Get value of scale saved in settings
+     * Get value of fitToScreenMode and scale saved in settings
      *
-     * Not part of playUIState currently as scale is driven by the
-     * BoardFullEditView widget, putting it in the state causes race
-     * conditions with e.g. zoomToFit.
+     * Separate from state as state starts with an initial default value
+     * that causes issues doing the first "true" fit.
      */
-    fun getSavedScale(cb : (Float) -> Unit) {
-        settings.getPlayScale(cb)
+    fun getInitialSizeInfo(cb : (FitToScreenMode, Float) -> Unit) {
+        settings.getPlayFitToScreenMode { fitToScreenMode ->
+            settings.getPlayScale { scale ->
+                cb(fitToScreenMode, scale)
+            }
+        }
     }
 
     fun saveScale(scale : Float) {
@@ -220,11 +230,12 @@ class PlayPageViewModel @Inject constructor(
         getBoard()?.nextWord()
     }
 
-    fun clickBoard(previousWord : Word?) {
+    fun clickBoard(row : Int, col : Int) {
         // only show keyboard if double click a word
         // hide if it's a new word
         getBoard()?.let { board ->
-            val newPos = board.highlightLetter
+            val newPos = Position(row, col)
+            val previousWord = board.setHighlightLetter(newPos)
             if (previousWord?.checkInWord(newPos.row, newPos.col) ?: false) {
                 showKeyboard()
             } else {
@@ -233,12 +244,11 @@ class PlayPageViewModel @Inject constructor(
         }
     }
 
-    fun longClickBoard(position : Position?) {
+    fun longClickBoard(row : Int, col : Int) {
         getBoard()?.let { board ->
-            position?.let { position ->
-                board.setHighlightLetter(position)
-                launchClueNotes(board.getClueID())
-            }
+            val position = Position(row, col)
+            board.setHighlightLetter(position)
+            launchClueNotes(board.getClueID())
         }
     }
 
@@ -286,6 +296,10 @@ class PlayPageViewModel @Inject constructor(
     }
 
     fun playLetter(c : Char) {
+        playLetter(c.toString())
+    }
+
+    fun playLetter(c : String) {
         getBoard()?.let { board ->
             settings.getPlayScratchMode { scratchMode ->
                 if (scratchMode)

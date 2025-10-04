@@ -28,3 +28,10 @@ fun colorToInt(color : Long) : Int {
     return Color(color.toULong()).toArgb()
 }
 
+/**
+ * Adds alpha ff and converts
+ */
+fun colorFromInt(color : Int) : Color {
+    return Color(addAlpha(color))
+}
+

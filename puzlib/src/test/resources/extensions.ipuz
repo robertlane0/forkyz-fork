@@ -9,7 +9,9 @@
         [ 1, 2, "#" ],
         [ { "cell": 3, 
             "value": "A", 
-            "style": { "shapebg": "circle", "mark": { "R": "t" } } 
+            "style": { "shapebg": "circle", "mark": { "TL" : "tl", "TR":
+            "tr", "BL": "bl", "BR": "br", "T": "t", "R": "r", "B": "b",
+            "L": "l", "C": "c"} } 
           }, 0, 0 ]
     ],
     "saved": [

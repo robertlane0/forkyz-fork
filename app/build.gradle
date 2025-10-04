@@ -146,6 +146,7 @@ dependencies {
     implementation 'io.github.darkokoa:datetime-wheel-picker:1.1.0-alpha03-compose1.8'
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.3'
     implementation 'org.jetbrains.compose.ui:ui-backhandler:1.9.0'
+    implementation 'org.jetbrains.kotlinx:kotlinx-collections-immutable:0.4.0'
     implementation 'org.jetbrains.kotlinx:kotlinx-datetime:0.7.1'
     implementation(platform('androidx.compose:compose-bom:2025.09.01'))
 

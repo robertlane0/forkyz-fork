@@ -232,6 +232,14 @@ public class Playboard {
     }
 
     /**
+     * The response in the currently highlighted box or null
+     */
+    public String getCurrentResponse() {
+        Box box = getCurrentBox();
+        return box == null ? null : box.getResponse();
+    }
+
+    /**
      * Get the box at the given offset from current box
      *
      * Null if no box
@@ -1195,6 +1203,11 @@ public class Playboard {
 
             return next;
         }
+    }
+
+    public void playScratchLetter(String letter) {
+        if (!letter.isEmpty())
+            playScratchLetter(letter.charAt(0));
     }
 
     public void playScratchLetter(char letter) {

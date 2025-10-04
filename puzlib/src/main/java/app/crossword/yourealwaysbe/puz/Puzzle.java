@@ -758,6 +758,10 @@ public class Puzzle {
         return pinnedClueID;
     }
 
+    public Clue getPinnedClue() {
+        return getClue(getPinnedClueID());
+    }
+
     public Kind getKind() {
         return kind;
     }

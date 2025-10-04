@@ -7,7 +7,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.activity.compose.setContent
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -56,9 +55,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.view.ViewCompat
-import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -74,14 +70,13 @@ import app.crossword.yourealwaysbe.forkyz.settings.GridRatio
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
 import app.crossword.yourealwaysbe.forkyz.view.BoardEditView.BoardClickListener
-import app.crossword.yourealwaysbe.forkyz.view.BoardFullEditView
+import app.crossword.yourealwaysbe.forkyz.view.BoardFull
 import app.crossword.yourealwaysbe.forkyz.view.ClueTabs
 import app.crossword.yourealwaysbe.forkyz.view.OKDialog
 import app.crossword.yourealwaysbe.forkyz.view.SpecialKey
+import app.crossword.yourealwaysbe.forkyz.view.rememberBoardEditState
 import app.crossword.yourealwaysbe.forkyz.view.rememberScrollingImageViewState
 import app.crossword.yourealwaysbe.puz.ClueID
-import app.crossword.yourealwaysbe.puz.Playboard.Word
-import app.crossword.yourealwaysbe.puz.Position
 
 private val ACROSTIC_CLUE_TABS_WORD_SCALE = 0.7F
 // min height of board in portrait / acrostic
@@ -90,83 +85,6 @@ private val ACROSTIC_BOARD_HEIGHT_RATIO_MIN = 0.25F
 private val ACROSTIC_BOARD_WIDTH_RATIO_MAX = 0.7F
 
 private val CLUE_BAR_HEIGHT = 64.dp
-
-// TODO: make more mvvm-y - view shouldn't be driving
-/**
- * For controlling the zoom of the board
- *
- * hasDoneInitialFitToScreen controls if fit to screen is fired when fit
- * to screen mode is first set
- */
-private class BoardViewZoomer(
-    private val hasDoneInitialFitToScreen : Boolean = false,
-) {
-    var boardView : BoardFullEditView? = null
-        set(value : BoardFullEditView?) {
-            field = value
-            doSetScale()
-        }
-
-    var initialScale : Float? = null
-        set(value : Float?) {
-            field = value
-            doSetScale()
-        }
-
-    var fitToScreenMode : FitToScreenMode? = null
-        set(value : FitToScreenMode?) {
-            field = value
-            doSetScale()
-        }
-
-    var viewSize : IntSize? = null
-        set(value : IntSize?) {
-            field = value
-            doSetScale()
-        }
-
-    private var hasSetInitialScaleMode : FitToScreenMode? = null
-
-    fun zoomIn() { boardView?.zoomIn() }
-    fun zoomInMax() { boardView?.zoomInMax() }
-    fun zoomOut() { boardView?.zoomOut() }
-    fun zoomFit() { boardView?.fitToView() }
-    fun zoomReset() { boardView?.zoomReset() }
-
-    private fun doSetScale() {
-        val boardView = this.boardView
-        val initialScale = this.initialScale
-        val fitToScreenMode = this.fitToScreenMode
-        val viewSize = this.viewSize
-
-        if (
-            boardView != null
-            && initialScale != null
-            && fitToScreenMode != null
-            && viewSize != null
-                && viewSize.width > 0 && viewSize.height > 0
-        ) {
-            when (fitToScreenMode) {
-                FitToScreenMode.FTSM_START -> {
-                    if (
-                        fitToScreenMode != hasSetInitialScaleMode
-                        && !hasDoneInitialFitToScreen
-                    ) {
-                        zoomFit()
-                    }
-                }
-                FitToScreenMode.FTSM_LOCKED -> {
-                    zoomFit()
-                }
-                else -> {
-                    if (fitToScreenMode != hasSetInitialScaleMode)
-                        boardView.setCurrentScale(initialScale)
-                }
-            }
-            hasSetInitialScaleMode = fitToScreenMode
-        }
-    }
-}
 
 /**
  * Main play page
@@ -204,10 +122,7 @@ fun PlayPage(
     resumeShakeDetector : () -> Unit,
     pauseShakeDetector : () -> Unit,
 ) {
-    var hasDoneInitialFitToScreen by rememberSaveable { mutableStateOf(false) }
-    val boardViewZoomer = remember {
-        BoardViewZoomer(hasDoneInitialFitToScreen)
-    }
+    val boardEditState = rememberBoardEditState()
 
     PuzzlePage(
         viewModel = viewModel,
@@ -252,30 +167,28 @@ fun PlayPage(
                     stopShakeDetector()
                 }
             }
+            LaunchedEffect(Unit) {
+                viewModel.getInitialSizeInfo { fitToScreenMode, scale ->
+                    boardEditState.setInitialFitToScreen(fitToScreenMode, scale)
+                }
+            }
             LaunchedEffect(state.fitToScreenMode) {
-                boardViewZoomer.fitToScreenMode = state.fitToScreenMode
-                hasDoneInitialFitToScreen = true
+                boardEditState.updateFitToScreenMode(state.fitToScreenMode)
             }
             LaunchedEffect(state.isFullScreen) {
                 if (state.isFullScreen)
                     onSetFullScreen()
-            }
-
-            // get the initial scale that was saved in settings
-            // zoomer will use it if zoom to fit shouldn't happen
-            LaunchedEffect(Unit) {
-                viewModel.getSavedScale() { boardViewZoomer.initialScale = it }
             }
         }
 
         @Composable
         fun MenuZoomSub() {
             MenuZoomSub(
-                onZoomIn = boardViewZoomer::zoomIn,
-                onZoomInMax = boardViewZoomer::zoomInMax,
-                onZoomOut = boardViewZoomer::zoomOut,
-                onZoomFit = boardViewZoomer::zoomFit,
-                onZoomReset = boardViewZoomer::zoomReset,
+                onZoomIn = boardEditState::zoomIn,
+                onZoomInMax = boardEditState::zoomInMax,
+                onZoomOut = boardEditState::zoomOut,
+                onZoomFit = boardEditState::zoomFit,
+                onZoomReset = boardEditState::zoomReset,
             )
         }
 
@@ -456,64 +369,24 @@ fun PlayPage(
             val boardColorScheme = themeHelper.getBoardColorScheme()
             val viewState = rememberScrollingImageViewState()
 
-            AndroidView(
-                modifier = modifier.onSizeChanged { size ->
-                    boardViewZoomer.viewSize = size
-                },
-                factory = { context ->
-                    val view = BoardFullEditView(context, viewState).apply {
-                        setBoard(viewModel.getBoard())
-                        setFocusable(true)
-                        setFocusableInTouchMode(true)
-                        setBackground(
-                            AppCompatResources.getDrawable(
-                                context,
-                                R.drawable.miniboard_no_focus_indicator_bg,
-                            )
-                        )
-                        addBoardClickListener(object : BoardClickListener {
-                            override fun onClick(
-                                _position : Position,
-                                previousWord : Word,
-                            ) {
-                                viewModel.clickBoard(previousWord)
-                            }
-
-                            override fun onLongClick(position : Position?) {
-                                viewModel.longClickBoard(position)
-                            }
-                        })
-                        setScaleListener(viewModel::saveScale)
-                    }
-
-                    ViewCompat.replaceAccessibilityAction(
-                        view,
-                        AccessibilityActionCompat.ACTION_LONG_CLICK,
-                        context.getString(R.string.open_clue_notes),
-                        null
-                    )
-
-                    // always this view gets input
-                    inputConnectionMediator.registerReceiver(view)
-                    view.requestFocusOnSized()
-
-                    boardViewZoomer.boardView = view
-
-                    view
-                },
-                update = { view ->
-                    view.apply {
-                        setAllowOverScroll(!locked)
-                        setAllowZoom(!locked)
-                        setRenderSettings(state.renderSettings)
-                        setScratchMode(state.scratchMode)
-                        setDoubleTapFitBoard(state.doubleTapFitBoard)
-                        setBoardColorScheme(boardColorScheme)
-                        setEnsureVisible(state.ensureVisible)
-                    }
-                },
-                onRelease = { it.detach() },
+            BoardFull(
+                modifier = modifier,
+                inputConnectionMediator = inputConnectionMediator,
+                state = boardEditState,
+                viewModel = viewModel.boardEditViewModel,
+                colors = boardColorScheme,
+                doubleTapFitBoard = state.doubleTapFitBoard,
+                onTap = viewModel::clickBoard,
+                onLongPress = viewModel::longClickBoard,
             )
+
+            LaunchedEffect(Unit) {
+                // TODO: this is called over and over because the
+                // Board keeps getting recomposed, maybe due to
+                // boardSizePortrait modifier. Harmless, but
+                // suggests an issue elsewhere
+                boardEditState.requestFocus()
+            }
         }
 
         fun min(x : Dp, y : Dp) : Dp {
@@ -737,6 +610,7 @@ fun PlayPage(
             resumeShakeDetector()
             onPauseOrDispose {
                 pauseShakeDetector()
+                viewModel.saveScale(boardEditState.scale)
             }
         }
 
