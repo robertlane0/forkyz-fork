@@ -177,10 +177,10 @@ fun BrowsePage(
         val needsNotificationCheck = (
             state.isBackgroundDownloadEnabled
             || isDownloadOnStartUp
-        )
+        ) &&  state.isNotificationPermissionNeeded
         LaunchedEffect(needsNotificationCheck) {
             if (needsNotificationCheck)
-                onCheckRequestNotificationPermissions();
+                onCheckRequestNotificationPermissions()
         }
 
         val toasts by viewModel.toastMessages.collectAsStateWithLifecycle()
