@@ -703,11 +703,17 @@ fun BrowsePage(
         val puzzles = state.puzzleList
         val refreshState = rememberPullToRefreshState()
 
-        // move up if items above appear
+        // move up if items above appear, but not on return to page
         // thanks: https://stackoverflow.com/a/74326906
-        LaunchedEffect(puzzles.firstOrNull()?.puzzles?.firstOrNull()?.id) {
-            if (!puzzles.isEmpty())
+        var lastScrollToTopID by rememberSaveable {
+            mutableStateOf(puzzles.firstOrNull()?.puzzles?.firstOrNull()?.id)
+        }
+        val firstID = puzzles.firstOrNull()?.puzzles?.firstOrNull()?.id
+        LaunchedEffect(firstID) {
+            if (!puzzles.isEmpty() && firstID != lastScrollToTopID) {
+                lastScrollToTopID = firstID
                 listState.animateScrollToItem(0)
+            }
         }
 
         PullToRefreshBox(
