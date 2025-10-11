@@ -15,6 +15,8 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,12 +43,21 @@ fun SpecialEntryDialog(
             onClose()
         },
     ) {
+        // needs immediate updates:
+        // https://medium.com/androiddevelopers/effective-state-management-for-textfield-in-compose-d6e5b070fbe5
+        var currentResponse by remember(response) {
+            mutableStateOf(response)
+        }
+
         OutlinedTextField(
             label = {
                 Text(stringResource(R.string.special_character))
             },
-            value = response,
-            onValueChange = viewModel::setResponse,
+            value = currentResponse,
+            onValueChange = {
+                currentResponse = it
+                viewModel.setResponse(it)
+            },
             modifier = Modifier.fillMaxWidth(),
         )
         Row(
