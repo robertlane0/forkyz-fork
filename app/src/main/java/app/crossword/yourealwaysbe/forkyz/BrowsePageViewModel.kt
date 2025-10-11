@@ -957,7 +957,7 @@ class BrowsePageViewModel @Inject constructor(
             )
 
             val showRatings = (!isArchive && state.showRatings)
-                || (isArchive && disableRatings)
+                || (isArchive && !disableRatings)
 
             // reset to false when new puzzle list
             val isSwipeRefreshing = !isNewPuzzleList && state.isSwipeRefreshing
