@@ -27,6 +27,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -76,8 +77,6 @@ private val ACROSTIC_CLUE_TABS_WORD_SCALE = 0.7F
 private val ACROSTIC_BOARD_HEIGHT_RATIO_MIN = 0.25F
 // max width of board in landscape / acrostic
 private val ACROSTIC_BOARD_WIDTH_RATIO_MAX = 0.7F
-
-private val CLUE_BAR_HEIGHT = 64.dp
 
 /**
  * Main play page
@@ -257,6 +256,9 @@ fun PlayPage(
             val state by viewModel.playUIState.collectAsStateWithLifecycle()
 
             themeHelper.ForkyzTopAppBar(
+                modifier = Modifier.height(
+                    TopAppBarDefaults.TopAppBarExpandedHeight,
+                ),
                 title = {
                     if (state.isClueBelowGrid) {
                         val title = state.puzzleTitle ?: stringResource(
@@ -269,7 +271,7 @@ fun PlayPage(
                             overflow = TextOverflow.Ellipsis,
                         )
                     } else {
-                        ClueText(Modifier.fillMaxWidth())
+                        ClueText(modifier = Modifier.fillMaxWidth())
                     }
                 },
                 onBack = { onBack() },
@@ -290,6 +292,11 @@ fun PlayPage(
             }
         }
 
+        @Composable
+        fun getClueBarHeight() : Dp {
+            return TopAppBarDefaults.TopAppBarExpandedHeight
+        }
+
         /**
          * Below grid clue bar
          *
@@ -299,7 +306,7 @@ fun PlayPage(
         fun ClueBar(modifier : Modifier) {
             Row(
                 modifier = modifier
-                    .height(CLUE_BAR_HEIGHT)
+                    .height(getClueBarHeight())
                     .background(MaterialTheme.colorScheme.surface),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -529,9 +536,14 @@ fun PlayPage(
         fun ActivityBodyPortrait(modifier : Modifier) {
             Column(modifier = modifier.fillMaxHeight()) {
                 BoxWithConstraints(Modifier.weight(1.0F)) {
-                    val state by viewModel.playUIState.collectAsStateWithLifecycle()
+                    val state by viewModel
+                        .playUIState
+                        .collectAsStateWithLifecycle()
                     val showClueBar = state.isClueBelowGrid
-                    val clueBarHeight = if (showClueBar) CLUE_BAR_HEIGHT else 0.dp
+                    val clueBarHeight = if (showClueBar)
+                        getClueBarHeight()
+                    else
+                        0.dp
                     val maxBoardHeight = maxHeight - clueBarHeight
                     val maxBoardWidth = maxWidth
 

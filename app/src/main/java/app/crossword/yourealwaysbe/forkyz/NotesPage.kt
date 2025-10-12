@@ -32,6 +32,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -287,6 +288,9 @@ fun NotesPage(
         fun TopAppBar() {
             val state by viewModel.notesUIState.collectAsStateWithLifecycle()
             themeHelper.ForkyzTopAppBar(
+                modifier = Modifier.height(
+                    TopAppBarDefaults.TopAppBarExpandedHeight,
+                ),
                 title = {
                     if (state.isPuzzleNotes) {
                         Text(stringResource(R.string.menu_notes_puzzle))

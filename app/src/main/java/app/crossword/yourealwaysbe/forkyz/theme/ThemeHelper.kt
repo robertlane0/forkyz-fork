@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ProcessLifecycleOwner
@@ -71,6 +72,7 @@ class ThemeHelper @Inject constructor(val settings : ForkyzSettings) {
     @Composable
     @OptIn(ExperimentalMaterial3Api::class)
     fun ForkyzTopAppBar(
+        modifier : Modifier = Modifier,
         title : @Composable () -> Unit,
         actions : @Composable RowScope.() -> Unit = { },
         onBack : (() -> Unit)? = null,
@@ -79,6 +81,7 @@ class ThemeHelper @Inject constructor(val settings : ForkyzSettings) {
         val dayNightMode by getAppDayNightModeState()
         val appTheme by getAppThemeState()
         ForkyzTopAppBar(
+            modifier = modifier,
             appTheme = appTheme,
             darkMode = isDarkMode(dayNightMode),
             title = title,

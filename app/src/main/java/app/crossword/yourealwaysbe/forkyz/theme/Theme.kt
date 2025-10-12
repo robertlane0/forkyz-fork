@@ -4,6 +4,7 @@ package app.crossword.yourealwaysbe.forkyz.theme
 import android.app.Activity
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -20,6 +21,7 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
@@ -243,6 +245,7 @@ fun statusBarColor(appTheme : Theme, darkMode : Boolean) : Color {
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun ForkyzTopAppBar(
+    modifier : Modifier = Modifier,
     appTheme : Theme,
     darkMode : Boolean,
     title : @Composable () -> Unit,
@@ -251,6 +254,7 @@ fun ForkyzTopAppBar(
     scrollBehavior : TopAppBarScrollBehavior? = null,
 ) {
     TopAppBar(
+        modifier = modifier,
         colors = getTopAppBarColors(appTheme, darkMode),
         title = title,
         navigationIcon = {
