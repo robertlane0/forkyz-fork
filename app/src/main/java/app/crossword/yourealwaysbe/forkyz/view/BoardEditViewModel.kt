@@ -110,11 +110,13 @@ data class CurrentPositionState(
 /**
  * States of the boxes that need rendering
  *
+ * Null BoxState means uninteresting block (black square)
+ *
  * @param currentPosition only given if may need to snap to clue
  */
 data class BoardState(
-    val boxes : ImmutableList<ImmutableList<BoxState>> = persistentListOf(),
-    val pinnedBoxes : ImmutableList<ImmutableList<BoxState>>? = null,
+    val boxes : ImmutableList<ImmutableList<BoxState?>> = persistentListOf(),
+    val pinnedBoxes : ImmutableList<ImmutableList<BoxState?>>? = null,
     val currentPosition : CurrentPositionState? = null,
 )
 
@@ -244,7 +246,7 @@ class BoardEditViewModel(
     private fun getBoxes(
         boardEditSettings : BoardEditSettings,
         selectedPositions : Set<Position>,
-    ) : ImmutableList<ImmutableList<BoxState>> {
+    ) : ImmutableList<ImmutableList<BoxState?>> {
         val puz = board?.puzzle
         if (puz == null)
             return persistentListOf()
@@ -265,7 +267,7 @@ class BoardEditViewModel(
     private fun getPinnedBoxes(
         boardEditSettings : BoardEditSettings,
         selectedPositions : Set<Position>,
-    ) : ImmutableList<ImmutableList<BoxState>>? {
+    ) : ImmutableList<ImmutableList<BoxState?>>? {
         val puz = board?.puzzle
         if (puz == null)
             return null
@@ -343,10 +345,10 @@ class BoardEditViewModel(
         col : Int,
         box : Box?,
         selectedPositions : Set<Position>,
-    ) : BoxState {
+    ) : BoxState? {
         val puz = board?.puzzle
         if (box == null || puz == null)
-            return BoxState(row, col)
+            return null
 
         val position = Position(row, col)
 

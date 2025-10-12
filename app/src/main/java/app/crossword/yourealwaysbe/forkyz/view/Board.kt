@@ -177,7 +177,7 @@ fun Board(
     modifier : Modifier = Modifier,
     width : Int,
     height : Int,
-    boxes : ImmutableList<ImmutableList<BoxState>>,
+    boxes : ImmutableList<ImmutableList<BoxState?>>,
     profile : BoxProfile,
 ) {
     val textMeasurer = rememberTextMeasurer()
@@ -187,12 +187,12 @@ fun Board(
             .requiredHeight(profile.boxSize * height),
         contentAlignment = Alignment.TopStart,
     ) {
-        boxes.forEachIndexed { row, rowBoxes ->
-            rowBoxes.forEachIndexed { col, box ->
+        boxes.forEach { rowBoxes ->
+            rowBoxes.filterNotNull().forEach { box ->
                 Square(
                     modifier = Modifier.graphicsLayer {
-                        translationX = profile.boxSizePx * col
-                        translationY = profile.boxSizePx * row
+                        translationX = profile.boxSizePx * box.col
+                        translationY = profile.boxSizePx * box.row
                     },
                     textMeasurer = textMeasurer,
                     profile = profile,
