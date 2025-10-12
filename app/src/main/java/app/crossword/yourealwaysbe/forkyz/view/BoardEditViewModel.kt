@@ -441,10 +441,12 @@ class BoardEditViewModel(
             puz.getNote(cid)?.scratch?.let { scratch ->
                 val pos = box.getCluePosition(cid)
                 scratch.getOrNull(pos)?.let { scratchChar ->
-                    if (isClueProbablyAcross(cid))
-                        scratchAcross = scratchChar.toString()
-                    else
-                        scratchDown = scratchChar.toString()
+                    if (!scratchChar.isWhitespace()) {
+                        if (isClueProbablyAcross(cid))
+                            scratchAcross = scratchChar.toString()
+                        else
+                            scratchDown = scratchChar.toString()
+                    }
                 }
             }
             if (scratchAcross != null && scratchDown != null)
