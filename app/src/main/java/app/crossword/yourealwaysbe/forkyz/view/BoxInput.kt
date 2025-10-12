@@ -1,7 +1,6 @@
 
 package app.crossword.yourelawaysbe.forkyz.view
 
-
 import javax.inject.Inject
 
 import android.content.Context

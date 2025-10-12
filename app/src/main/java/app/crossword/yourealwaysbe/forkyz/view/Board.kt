@@ -3,17 +3,10 @@ package app.crossword.yourealwaysbe.forkyz.view
 
 import kotlinx.collections.immutable.ImmutableList
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.text.BasicText
-import androidx.compose.foundation.text.TextAutoSize
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,7 +31,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.LineHeightStyle
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -47,12 +39,12 @@ import androidx.compose.ui.unit.sp
 import app.crossword.yourealwaysbe.forkyz.theme.BoardColorScheme
 
 val BASE_BOX_SIZE_DP : Float = 40f
-private val CELL_BORDER_DP : Dp = 0.5.dp
+private val BOX_BORDER_DP : Dp = 0.5.dp
 // fraction of box size for 1-letter responses
 private val RESPONSE_BOX_FRAC : Float  = 0.7f
 private val SCRATCH_BOX_FRAC : Float  = 0.6f
 private val MINI_SCRATCH_BOX_FRAC : Float  = 0.5f
-private val RESPONSE_TOP_PADDING_BOX_FRAC : Float  = 0.175f
+private val RESPONSE_TOP_PADDING_BOX_FRAC : Float  = 0.1f
 private val SCRATCH_TOP_PADDING_BOX_FRAC : Float  = 0.125f
 private val MARK_BOX_FRAC : Float  = 0.25f
 private val BAR_WIDTH_FRAC : Float = 0.075f
@@ -61,6 +53,7 @@ private val SEPARATOR_DASH_SIZE_FRAC : Float = 0.2f
 private val SEPARATOR_TEXT_BOX_FRAC : Float = 0.25f
 private val WHITESPACE_RE = "\\s+".toRegex()
 private val SEPARATOR_HORIZONTAL_TEXT_OFFSET_FRAC : Float = 0.05f
+private val MULTI_CHAR_RESPONSE_SIZE_FUDGE_FACTOR : Float = 0.8f
 
 /**
  * Rendering data
@@ -72,9 +65,10 @@ data class BoxProfile(
     val colors : BoardColorScheme,
     val boxSize : Dp,
     val boxSizePx : Float,
+    val boxBorderPx : Float,
     val barWidth : Float,
     val responseTextStyle : TextStyle,
-    val responseTopPaddingDp : Dp,
+    val responseTopPaddingPx : Float,
     val markTextStyle : TextStyle,
     val markOffset : Float,
     val markTextSizePx : Float,
@@ -96,6 +90,7 @@ data class BoxProfile(
         ) : BoxProfile {
             val boxSize = BASE_BOX_SIZE_DP.dp * scale
             val boxSizePx = with (density) { boxSize.toPx() }
+            val boxBorderPx = with (density) { BOX_BORDER_DP.toPx() }
             val barWidth = with (density) {
                 (boxSize * BAR_WIDTH_FRAC).toPx()
             }
@@ -131,7 +126,7 @@ data class BoxProfile(
             )
             val responseTextStyle
                 = baseTextStyle.copy(fontSize = responseTextSize)
-            val responseTopPaddingDp = boxSize * RESPONSE_TOP_PADDING_BOX_FRAC
+            val responseTopPaddingPx = boxSizePx * RESPONSE_TOP_PADDING_BOX_FRAC
             val markTextStyle = baseTextStyle.copy(fontSize = markTextSize)
             val scratchTextStyle = baseTextStyle.copy(
                 fontSize = scratchTextSize,
@@ -150,9 +145,10 @@ data class BoxProfile(
                 colors = colors,
                 boxSize = boxSize,
                 boxSizePx = boxSizePx,
+                boxBorderPx = boxBorderPx,
                 barWidth = barWidth,
                 responseTextStyle = responseTextStyle,
-                responseTopPaddingDp = responseTopPaddingDp,
+                responseTopPaddingPx = responseTopPaddingPx,
                 markTextStyle = markTextStyle,
                 markOffset = barWidth,
                 markTextSizePx = markTextSizePx,
@@ -216,10 +212,8 @@ private fun Square(
 ) {
     Box(
         modifier = modifier.size(profile.boxSize, profile.boxSize)
-            .background(profile.colors.blockColor)
-            .padding(CELL_BORDER_DP)
-            .background(getBoxColor(profile, box))
             .drawBehind {
+                drawBackground(profile, box)
                 drawBars(profile, box)
                 drawShape(profile, box)
                 drawFlags(profile, box)
@@ -227,32 +221,62 @@ private fun Square(
                 drawClueNumber(textMeasurer, profile, box)
                 drawMarks(textMeasurer, profile, box)
                 drawScratch(textMeasurer, profile, box)
+                drawResponse(textMeasurer, profile, box)
             },
-    ) {
-        if (!box.isBlank) {
-            val autoSize = if (box.response.length > 1)
-                TextAutoSize.StepBased(
-                    minFontSize = 0.sp,
-                    maxFontSize = 100.sp,
-                    stepSize = 1.sp,
-                )
-            else null
+    )
+}
 
-            BasicText(
-                modifier = Modifier.fillMaxSize()
-                    .padding(top = profile.responseTopPaddingDp)
-                    .wrapContentSize(),
+private fun DrawScope.drawResponse(
+    textMeasurer : TextMeasurer,
+    profile : BoxProfile,
+    box : BoxState,
+) {
+    if (!box.isBlank) {
+        val baseStyle = getResponseTextStyle(profile, box)
+        val style = if (box.response.length <= 1) {
+            baseStyle
+        } else {
+            val textResult = textMeasurer.measure(
                 text = box.response,
-                style = getResponseTextStyle(profile, box),
-                autoSize = autoSize,
-                // currently does not wrap well at large zooms (overlap
-                // in text)
-                maxLines = 1,
-                // shouldn't go over, but sometimes a pixel out
-                overflow = TextOverflow.Visible,
+                style = baseStyle,
             )
+            val size = textResult.size
+            val factor = profile.boxSizePx / size.width
+            val fontSize = (
+                baseStyle.fontSize * Math.min(
+                    1f,
+                    factor * MULTI_CHAR_RESPONSE_SIZE_FUDGE_FACTOR,
+                )
+            )
+            baseStyle.copy(fontSize = fontSize)
         }
+
+        drawOffsetText(
+            textMeasurer,
+            style,
+            box.response,
+            profile.boxSizePx / 2,
+            profile.boxSizePx / 2 + profile.responseTopPaddingPx,
+            -0.5f,
+            -0.5f,
+        )
     }
+}
+
+private fun DrawScope.drawBackground(
+    profile : BoxProfile,
+    box : BoxState,
+) {
+    // box size
+    val bs = profile.boxSizePx
+    // box border
+    val bb = profile.boxBorderPx
+
+    drawRect(
+        color = getBoxColor(profile, box),
+        topLeft = Offset(bb, bb),
+        size = Size(bs - 2 * bb, bs - 2 * bb),
+    )
 }
 
 private fun DrawScope.drawBars(
@@ -351,7 +375,6 @@ private fun DrawScope.drawFlags(
 private fun isWhitespace(s : String?) : Boolean {
     return s?.let(WHITESPACE_RE::matches) ?: false
 }
-
 
 private fun DrawScope.drawSeparators(
     textMeasurer : TextMeasurer,
