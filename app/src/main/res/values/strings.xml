@@ -324,6 +324,8 @@
     <string name="orientation_lock_portrait">Portrait</string>
     <string name="orientation_lock_landscape">Landscape</string>
     <string name="orientation_lock_unlocked">Unlocked</string>
+    <string name="expandable_clue_line">Expandable Clue Line</string>
+    <string name="expandable_clue_line_desc">The clue line display expands for long clues to avoid small text.</string>
 
     <!-- preferences download -->
     <string name="auto_downloaders">Automatic Download Sources</string>

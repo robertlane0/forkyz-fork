@@ -120,6 +120,7 @@ data class NotesPageUIState(
     val movementStrategy : MovementStrategy = MovementStrategy.STOP_ON_END,
     val renderSettings : RenderSettings = RenderSettings(),
     val skipFilled : Boolean = false,
+    val expandableClueLine : Boolean = false,
 ) {
     val isPuzzleNotes : Boolean
         get() = notesClueID == null
@@ -133,12 +134,21 @@ data class NotesPageUIState(
     }
 }
 
-private data class NotesSettings(
+private data class DisplaySettings(
     val displayScratch : Boolean,
     val inferSeparators : Boolean,
-    val stopOnEndStrategy : MovementStrategy,
     val renderSettings : RenderSettings,
+    val expandableClueLine : Boolean,
+)
+
+private data class InteractionSettings(
+    val stopOnEndStrategy : MovementStrategy,
     val skipFilled : Boolean,
+)
+
+private data class NotesSettings(
+    val display : DisplaySettings,
+    val interaction : InteractionSettings,
 )
 
 @HiltViewModel
@@ -163,20 +173,30 @@ class NotesPageViewModel @Inject constructor(
                 state.copy(
                     suppressNotesList = getSuppressNotesList(
                         notesClueID,
-                        notesSettings.displayScratch,
+                        notesSettings.display.displayScratch,
                     ),
-                    inferSeparators = notesSettings.inferSeparators,
-                    movementStrategy = notesSettings.stopOnEndStrategy,
-                    renderSettings = notesSettings.renderSettings,
-                    skipFilled = notesSettings.skipFilled,
+                    inferSeparators = notesSettings.display.inferSeparators,
+                    movementStrategy
+                        = notesSettings.interaction.stopOnEndStrategy,
+                    renderSettings = notesSettings.display.renderSettings,
+                    skipFilled = notesSettings.interaction.skipFilled,
+                    expandableClueLine
+                        = notesSettings.display.expandableClueLine,
                 )
             },
             combine(
-                settings.livePlayScratchDisplay,
-                settings.livePlayInferSeparators,
-                settings.livePlayStopOnEndStrategy,
-                settings.livePlayRenderSettings,
-                settings.livePlaySkipFilled,
+                combine(
+                    settings.livePlayScratchDisplay,
+                    settings.livePlayInferSeparators,
+                    settings.livePlayRenderSettings,
+                    settings.livePlayExpandableClueLine,
+                    ::DisplaySettings,
+                ),
+                combine(
+                    settings.livePlayStopOnEndStrategy,
+                    settings.livePlaySkipFilled,
+                    ::InteractionSettings,
+                ),
                 ::NotesSettings,
             ),
         )

@@ -69,6 +69,7 @@ data class PlayPageUIState(
     val scratchMode : Boolean = false,
     val doubleTapFitBoard : Boolean = false,
     val ensureVisible : Boolean = false,
+    val expandableClueLine : Boolean = false,
 )
 
 private data class PlayClueTabsSettings(
@@ -84,6 +85,7 @@ private data class PlayDisplaySettings(
     val fitToScreenMode : FitToScreenMode,
     val fullScreen : Boolean,
     val renderSettings : RenderSettings,
+    val expandableClueLine : Boolean,
 )
 
 private data class PlayInteractionSettings(
@@ -142,6 +144,8 @@ class PlayPageViewModel @Inject constructor(
                         = playSettings.interationSettings.doubleTapFitBoard,
                     ensureVisible
                         = playSettings.interationSettings.ensureVisible,
+                    expandableClueLine
+                        = playSettings.displaySettings.expandableClueLine,
                 )
             },
             combine(
@@ -158,6 +162,7 @@ class PlayPageViewModel @Inject constructor(
                     settings.livePlayFitToScreenMode,
                     settings.livePlayFullScreen,
                     settings.livePlayRenderSettings,
+                    settings.livePlayExpandableClueLine,
                     ::PlayDisplaySettings,
                 ),
                 combine(

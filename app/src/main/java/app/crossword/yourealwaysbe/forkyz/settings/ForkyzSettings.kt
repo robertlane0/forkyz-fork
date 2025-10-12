@@ -363,6 +363,18 @@ class ForkyzSettings(val settingsStore: DataStore<Settings>) {
         }
     }
 
+    val livePlayExpandableClueLine : Flow<Boolean>
+        = settingsMap { it.expandableClueLine }
+
+    fun getPlayExpandableClueLine(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.expandableClueLine }
+
+    fun setPlayExpandableClueLine(value : Boolean) {
+        settingsUpdate { settings ->
+            settings.toBuilder().setExpandableClueLine(value).build()
+        }
+    }
+
     val liveClueListClueTabsDouble : Flow<ClueTabsDouble>
         = settingsMap { it.clueTabsDouble }
 
@@ -2547,6 +2559,13 @@ class ForkyzSettings(val settingsStore: DataStore<Settings>) {
             { s, key -> json.put(key, s.equalsAnnounceClue) },
             { key ->
                 json.optBoolean(key)?.let { setVoiceEqualsAnnounceClue(it) }
+            },
+        )
+        run(
+            "expandableClueLine",
+            { s, key -> json.put(key, s.expandableClueLine) },
+            { key ->
+                json.optBoolean(key)?.let { setPlayExpandableClueLine(it) }
             },
         )
         run(

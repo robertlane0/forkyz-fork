@@ -1063,6 +1063,13 @@ class SettingsPageViewModel @Inject constructor(
             settings.livePlayClueBelowGrid.stateInHere(),
             settings::setPlayClueBelowGrid,
         ),
+        SettingsBoolean(
+            SettingsPage.DISPLAY,
+            R.string.expandable_clue_line,
+            R.string.expandable_clue_line_desc,
+            settings.livePlayExpandableClueLine.stateInHere(),
+            settings::setPlayExpandableClueLine,
+        ),
         SettingsList<FitToScreenMode>(
             SettingsPage.DISPLAY,
             R.string.fit_to_screen_mode,

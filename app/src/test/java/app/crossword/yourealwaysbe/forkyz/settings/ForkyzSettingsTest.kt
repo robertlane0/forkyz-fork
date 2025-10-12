@@ -120,6 +120,7 @@ class ForkyzSettingsTest {
         .setEnsureVisible(true)
         .setEnterChangesDirection(true)
         .setEqualsAnnounceClue(true)
+        .setExpandableClueLine(false)
         .setExternalDictionary(ExternalDictionarySetting.EDS_FREE)
         .setFifteenSquaredEnabled(true)
         .setFitToScreenMode(FitToScreenMode.FTSM_NEVER)
@@ -253,6 +254,7 @@ class ForkyzSettingsTest {
         .setEnsureVisible(false)
         .setEnterChangesDirection(false)
         .setEqualsAnnounceClue(false)
+        .setExpandableClueLine(true)
         .setExternalDictionary(ExternalDictionarySetting.EDS_NONE)
         .setFifteenSquaredEnabled(false)
         .setFitToScreenMode(FitToScreenMode.FTSM_START)
@@ -318,6 +320,7 @@ class ForkyzSettingsTest {
         .mergeFrom(settingsValue2)
         .setDontConfirmCleanup(true)
         .setDontConfirmBrowseDelete(false)
+        .setExpandableClueLine(false)
         .setMovementStrategyClueList(MovementStrategySetting.MSS_MOVE_NEXT_CLUE)
         .build()
 

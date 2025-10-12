@@ -252,13 +252,20 @@ fun PlayPage(
         }
 
         @Composable
+        fun Modifier.clueBarHeight() : Modifier {
+            val state by viewModel.playUIState.collectAsStateWithLifecycle()
+            if (state.expandableClueLine)
+                return this
+            else
+                return this.height(TopAppBarDefaults.TopAppBarExpandedHeight)
+        }
+
+        @Composable
         fun TopAppBar() {
             val state by viewModel.playUIState.collectAsStateWithLifecycle()
 
             themeHelper.ForkyzTopAppBar(
-                modifier = Modifier.height(
-                    TopAppBarDefaults.TopAppBarExpandedHeight,
-                ),
+                modifier = Modifier.clueBarHeight(),
                 title = {
                     if (state.isClueBelowGrid) {
                         val title = state.puzzleTitle ?: stringResource(
@@ -292,11 +299,6 @@ fun PlayPage(
             }
         }
 
-        @Composable
-        fun getClueBarHeight() : Dp {
-            return TopAppBarDefaults.TopAppBarExpandedHeight
-        }
-
         /**
          * Below grid clue bar
          *
@@ -306,7 +308,7 @@ fun PlayPage(
         fun ClueBar(modifier : Modifier) {
             Row(
                 modifier = modifier
-                    .height(getClueBarHeight())
+                    .clueBarHeight()
                     .background(MaterialTheme.colorScheme.surface),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -541,7 +543,7 @@ fun PlayPage(
                         .collectAsStateWithLifecycle()
                     val showClueBar = state.isClueBelowGrid
                     val clueBarHeight = if (showClueBar)
-                        getClueBarHeight()
+                        TopAppBarDefaults.TopAppBarExpandedHeight
                     else
                         0.dp
                     val maxBoardHeight = maxHeight - clueBarHeight

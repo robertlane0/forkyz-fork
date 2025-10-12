@@ -287,10 +287,13 @@ fun NotesPage(
         @Composable
         fun TopAppBar() {
             val state by viewModel.notesUIState.collectAsStateWithLifecycle()
+            val modifier = if (state.expandableClueLine)
+                Modifier
+            else
+                Modifier.height(TopAppBarDefaults.TopAppBarExpandedHeight)
+
             themeHelper.ForkyzTopAppBar(
-                modifier = Modifier.height(
-                    TopAppBarDefaults.TopAppBarExpandedHeight,
-                ),
+                modifier = modifier,
                 title = {
                     if (state.isPuzzleNotes) {
                         Text(stringResource(R.string.menu_notes_puzzle))

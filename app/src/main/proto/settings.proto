@@ -243,4 +243,5 @@ message Settings {
     MovementStrategySetting movementStrategyClueList = 128;
     bool dontConfirmBrowseDelete = 129;
     bool downloadElPaisExperto = 130;
+    bool expandableClueLine = 131;
 }
