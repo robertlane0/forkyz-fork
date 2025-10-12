@@ -47,7 +47,7 @@ private val MINI_SCRATCH_BOX_FRAC : Float  = 0.5f
 private val RESPONSE_TOP_PADDING_BOX_FRAC : Float  = 0.1f
 private val SCRATCH_TOP_PADDING_BOX_FRAC : Float  = 0.125f
 private val MARK_BOX_FRAC : Float  = 0.25f
-private val BAR_WIDTH_FRAC : Float = 0.075f
+private val BAR_WIDTH_FRAC : Float = 0.0769f
 private val DASH_SIZE_FRAC : Float = 0.11f
 private val SEPARATOR_DASH_SIZE_FRAC : Float = 0.2f
 private val SEPARATOR_TEXT_BOX_FRAC : Float = 0.25f
@@ -158,7 +158,7 @@ data class BoxProfile(
                 ),
                 dottedEffect = PathEffect.dashPathEffect(
                     floatArrayOf(barWidth, barWidth),
-                    0.5f * barWidth,
+                    0f,
                 ),
                 scratchTextStyle = scratchTextStyle,
                 scratchTopPaddingPx = scratchTopPaddingPx,
