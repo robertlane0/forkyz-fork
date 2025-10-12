@@ -10,7 +10,6 @@ import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
@@ -26,11 +25,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.IntOffset
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 import app.crossword.yourealwaysbe.forkyz.settings.FitToScreenMode
@@ -550,34 +548,47 @@ fun BoardFullBody(
                         unbounded = true,
                     ),
                 ) {
-                    var boxProfile = BoxProfile.build(
+                    val localTextStyle = LocalTextStyle.current
+                    var boxProfile = remember(
                         localDensity,
                         colors,
                         state.scale,
-                        LocalTextStyle.current,
-                    )
+                        localTextStyle,
+                    ) {
+                        BoxProfile.build(
+                            localDensity,
+                            colors,
+                            state.scale,
+                            localTextStyle,
+                        )
+                    }
                     val board by viewModel.boardState
                         .collectAsStateWithLifecycle()
 
-                    // bit of a hack to calculate this here but need to
-                    // adjust the fact that scale expands around the center
-                    // of the view, so need to calc view size
-                    val widthPx = with (localDensity) {
-                        boxProfile.boxSize.toPx() * state.boardWidthBoxes
-                    }
-                    val heightPx = with (localDensity) {
-                        boxProfile.boxSize.toPx() * state.boardHeightBoxes
-                    }
-                    val runningOffX = 0.5f * (state.runningScale - 1) * widthPx
-                    val runningOffY = 0.5f * (state.runningScale - 1) * heightPx
-
                     Column(
-                        modifier = Modifier.absoluteOffset {
-                            IntOffset(
-                                (state.x + runningOffX).toInt(),
-                                (state.y + runningOffY).toInt(),
-                            )
-                        }.scale(state.runningScale),
+                        modifier = Modifier.graphicsLayer {
+                            // bit of a hack to calculate this here but
+                            // need to adjust the fact that scale
+                            // expands around the center of the view, so
+                            // need to calc view size
+                            val widthPx = with (localDensity) {
+                                boxProfile.boxSize.toPx() *
+                                    state.boardWidthBoxes
+                            }
+                            val heightPx = with (localDensity) {
+                                boxProfile.boxSize.toPx() *
+                                    state.boardHeightBoxes
+                            }
+                            val runningOffX
+                                = 0.5f * (state.runningScale - 1) * widthPx
+                            val runningOffY
+                                = 0.5f * (state.runningScale - 1) * heightPx
+
+                            scaleX = state.runningScale
+                            scaleY = state.runningScale
+                            translationX = state.x + runningOffX
+                            translationY = state.y + runningOffY
+                        }
                     ) {
                         Board(
                             width = viewModel.width,

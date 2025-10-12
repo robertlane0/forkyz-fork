@@ -5,8 +5,6 @@ import kotlinx.collections.immutable.ImmutableList
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
@@ -17,6 +15,7 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -30,6 +29,7 @@ import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.colorspace.ColorSpaces
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
@@ -184,19 +184,24 @@ fun Board(
     boxes : ImmutableList<ImmutableList<BoxState>>,
     profile : BoxProfile,
 ) {
-    Column(
+    val textMeasurer = rememberTextMeasurer()
+    Box(
         modifier = modifier
             .requiredWidth(profile.boxSize * width)
             .requiredHeight(profile.boxSize * height),
+        contentAlignment = Alignment.TopStart,
     ) {
         boxes.forEachIndexed { row, rowBoxes ->
-            Row() {
-                rowBoxes.forEachIndexed { col, box ->
-                    Square(
-                        profile = profile,
-                        box = box,
-                    )
-                }
+            rowBoxes.forEachIndexed { col, box ->
+                Square(
+                    modifier = Modifier.graphicsLayer {
+                        translationX = profile.boxSizePx * col
+                        translationY = profile.boxSizePx * row
+                    },
+                    textMeasurer = textMeasurer,
+                    profile = profile,
+                    box = box,
+                )
             }
         }
     }
@@ -204,12 +209,13 @@ fun Board(
 
 @Composable
 private fun Square(
+    modifier : Modifier = Modifier,
+    textMeasurer : TextMeasurer,
     profile : BoxProfile,
     box : BoxState,
 ) {
-    val textMeasurer = rememberTextMeasurer()
     Box(
-        modifier = Modifier.size(profile.boxSize, profile.boxSize)
+        modifier = modifier.size(profile.boxSize, profile.boxSize)
             .background(profile.colors.blockColor)
             .padding(CELL_BORDER_DP)
             .background(getBoxColor(profile, box))
