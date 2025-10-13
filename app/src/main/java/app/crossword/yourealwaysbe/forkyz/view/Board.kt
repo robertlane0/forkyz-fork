@@ -4,9 +4,7 @@ package app.crossword.yourealwaysbe.forkyz.view
 import kotlinx.collections.immutable.ImmutableList
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.requiredHeight
-import androidx.compose.foundation.layout.requiredWidth
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,6 +52,9 @@ private val SEPARATOR_TEXT_BOX_FRAC : Float = 0.25f
 private val WHITESPACE_RE = "\\s+".toRegex()
 private val SEPARATOR_HORIZONTAL_TEXT_OFFSET_FRAC : Float = 0.05f
 private val MULTI_CHAR_RESPONSE_SIZE_FUDGE_FACTOR : Float = 0.8f
+// remember 26 characters and 100 numbers and 5 different zooms * 3 for
+// good measure!
+private val TEXT_MEASURE_CACHE_SIZE : Int = (26 + 100) * 5 * 3
 
 /**
  * Rendering data
@@ -180,11 +181,13 @@ fun Board(
     boxes : ImmutableList<ImmutableList<BoxState?>>,
     profile : BoxProfile,
 ) {
-    val textMeasurer = rememberTextMeasurer()
+    val textMeasurer = rememberTextMeasurer(cacheSize = TEXT_MEASURE_CACHE_SIZE)
     Box(
         modifier = modifier
-            .requiredWidth(profile.boxSize * width)
-            .requiredHeight(profile.boxSize * height),
+            .requiredSize(
+                profile.boxSize * width,
+                profile.boxSize * height,
+            ),
         contentAlignment = Alignment.TopStart,
     ) {
         boxes.forEach { rowBoxes ->
@@ -211,7 +214,7 @@ private fun Square(
     box : BoxState,
 ) {
     Box(
-        modifier = modifier.size(profile.boxSize, profile.boxSize)
+        modifier = modifier.requiredSize(profile.boxSize, profile.boxSize)
             .drawBehind {
                 drawBackground(profile, box)
                 drawBars(profile, box)
