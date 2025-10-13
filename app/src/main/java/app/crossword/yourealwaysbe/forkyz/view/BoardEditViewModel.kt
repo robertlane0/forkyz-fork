@@ -323,6 +323,8 @@ class BoardEditViewModel(
             return null
 
         val selectedPositions = board.currentWord.zone
+        if (selectedPositions.isEmpty)
+            return null
 
         val topRow = selectedPositions.map { it.row }.min()
         val bottomRow = selectedPositions.map { it.row }.max()
