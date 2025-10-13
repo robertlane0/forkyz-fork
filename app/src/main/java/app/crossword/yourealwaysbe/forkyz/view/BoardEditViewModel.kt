@@ -120,48 +120,36 @@ data class BoardState(
     val currentPosition : CurrentPositionState? = null,
 )
 
-private data class BoardEditSettings(
+data class BoardEditSettings(
     val renderSettings : RenderSettings = RenderSettings(),
     val ensureVisible : Boolean = false,
 )
 
-class BoardEditViewModel(
-    val viewModelScope : CoroutineScope,
-    val settings : ForkyzSettings,
-    val board : Playboard?,
+abstract class BaseBoardEditViewModel<BaseBoardState>(
+    private val viewModelScope : CoroutineScope,
+    protected val settings : ForkyzSettings,
+    protected val board : Playboard?,
 ) : PlayboardListener {
-    val width : Int = board?.puzzle?.width ?: 0
-    val height : Int = board?.puzzle?.height ?: 0
-    val pinnedHeight : Int = if (board?.puzzle?.hasPinnedClueID() ?: false) {
-        1 + ((board?.puzzle?.pinnedClue?.zone?.size() ?: 0) / width).toInt()
-    } else 0
-
-    private val settingsFlow : Flow<BoardEditSettings>
+    protected val settingsFlow : Flow<BoardEditSettings>
         = combine(
             settings.livePlayRenderSettings,
             settings.livePlayEnsureVisible,
             ::BoardEditSettings,
         )
     private val mediatedBoardState
-        = MediatedStateWithFlow<BoardState, BoardEditSettings>(
+        = MediatedStateWithFlow<BaseBoardState, BoardEditSettings>(
             viewModelScope,
             getBoardState(BoardEditSettings()),
             { state, boardEditSettings -> getBoardState(boardEditSettings) },
             settingsFlow,
         )
-    val boardState : StateFlow<BoardState> = mediatedBoardState.stateFlow
-
-    val _scrollToClueEvent = MutableStateFlow<CurrentPositionState?>(null)
-    val scrollToClueEvent : StateFlow<CurrentPositionState?>
-        = _scrollToClueEvent
+    val boardState : StateFlow<BaseBoardState> = mediatedBoardState.stateFlow
 
     val _newResponseEvent = MutableStateFlow<String?>(null)
     val newResponseEvent : StateFlow<String?> = _newResponseEvent
 
     init {
         board?.addListener(this)
-        scrollToClueIfEnabled()
-        // initialise response
         board?.currentResponse?.let { _newResponseEvent.value = it }
     }
 
@@ -183,40 +171,14 @@ class BoardEditViewModel(
         }
     }
 
-    fun clearScrollToClueEvent() {
-        _scrollToClueEvent.value = null
-    }
-
-    fun clearNewResponseEvent() {
-        _newResponseEvent.value = null
-    }
-
     override fun onPlayboardChange(changes : PlayboardChanges) {
         // TODO: ignore non-board changes
         updateBoardState()
-        updateScrollToClue(changes)
         updateResponse()
     }
 
     private fun updateResponse() {
         board?.currentResponse?.let { _newResponseEvent.value = it }
-    }
-
-    private fun updateScrollToClue(changes : PlayboardChanges) {
-        if (changes.currentWord != changes.previousWord)
-            scrollToClueIfEnabled()
-    }
-
-    private fun scrollToClueIfEnabled() {
-        settings.getPlayEnsureVisible { ensureVisible ->
-            if (ensureVisible) {
-                settingsFlow.getOnce { boardEditSettings ->
-                    _scrollToClueEvent.value = getCurrentPositionState(
-                        boardEditSettings,
-                    )
-                }
-            }
-        }
     }
 
     private fun updateBoardState() {
@@ -228,120 +190,11 @@ class BoardEditViewModel(
     /**
      * Get fresh board state for current board
      */
-    private fun getBoardState(
+    protected abstract fun getBoardState(
         boardEditSettings : BoardEditSettings,
-    ) : BoardState {
-        val puz = board?.puzzle
-        if (board == null || puz == null)
-            return BoardState()
+    ) : BaseBoardState
 
-        val selectedPositions = board.currentWord.zone.toSet()
-
-        return BoardState(
-            boxes = getBoxes(boardEditSettings, selectedPositions),
-            pinnedBoxes = getPinnedBoxes(boardEditSettings, selectedPositions),
-        )
-    }
-
-    private fun getBoxes(
-        boardEditSettings : BoardEditSettings,
-        selectedPositions : Set<Position>,
-    ) : ImmutableList<ImmutableList<BoxState?>> {
-        val puz = board?.puzzle
-        if (puz == null)
-            return persistentListOf()
-
-        return (0 until height).map { row ->
-            (0 until width).map { col ->
-                getBoxState(
-                    boardEditSettings,
-                    row,
-                    col,
-                    puz.boxes[row][col],
-                    selectedPositions,
-                )
-            }.toImmutableList()
-        }.toImmutableList()
-    }
-
-    private fun getPinnedBoxes(
-        boardEditSettings : BoardEditSettings,
-        selectedPositions : Set<Position>,
-    ) : ImmutableList<ImmutableList<BoxState?>>? {
-        val puz = board?.puzzle
-        if (puz == null)
-            return null
-
-        return if (puz.hasPinnedClueID()) {
-            puz.pinnedClue?.zone?.let { zone ->
-                if (zone.size() <= width) {
-                    val padding = List((width - zone.size()) / 2) { col ->
-                        BoxState(height, col)
-                    }
-                    val pinned = zone.map { pos ->
-                        val box = puz.checkedGetBox(pos)
-                        getBoxState(
-                            boardEditSettings,
-                            pos.row,
-                            pos.col,
-                            box,
-                            selectedPositions,
-                        )
-                    }.toImmutableList()
-                    persistentListOf((padding + pinned).toImmutableList())
-                } else {
-                    val rows = zone.size() / width
-                    (0 until rows).map { row ->
-                        (0 until width).map { col ->
-                            val pos = zone.getPosition(row * width + col)
-                            val box = puz.checkedGetBox(pos)
-                            getBoxState(
-                                boardEditSettings,
-                                pos.row,
-                                pos.col,
-                                box,
-                                selectedPositions,
-                            )
-                        }.toImmutableList()
-                    }.toImmutableList()
-                }
-            }
-        } else null
-    }
-
-    /**
-     * Returns null if scroll to clue not enabled
-     */
-    private fun getCurrentPositionState(
-        boardEditSettings : BoardEditSettings,
-    ) : CurrentPositionState? {
-        if (board == null || !boardEditSettings.ensureVisible)
-            return null
-
-        val cursor = board?.highlightLetter
-        if (cursor == null)
-            return null
-
-        val selectedPositions = board.currentWord.zone
-        if (selectedPositions.isEmpty)
-            return null
-
-        val topRow = selectedPositions.map { it.row }.min()
-        val bottomRow = selectedPositions.map { it.row }.max()
-        val leftCol = selectedPositions.map { it.col }.min()
-        val rightCol = selectedPositions.map { it.col }.max()
-
-        return CurrentPositionState(
-            cursorRow = cursor.row,
-            cursorCol = cursor.col,
-            currentWordTopRow = topRow,
-            currentWordBottomRow = bottomRow,
-            currentWordLeftCol = leftCol,
-            currentWordRightCol = rightCol,
-        )
-    }
-
-    private fun getBoxState(
+    protected fun getBoxState(
         boardEditSettings : BoardEditSettings,
         row : Int,
         col : Int,
@@ -673,3 +526,179 @@ class BoardEditViewModel(
     }
 }
 
+class BoardEditViewModel(
+    viewModelScope : CoroutineScope,
+    settings : ForkyzSettings,
+    board : Playboard?,
+) : BaseBoardEditViewModel<BoardState>(
+    viewModelScope,
+    settings,
+    board,
+) {
+    val width : Int
+        get() { return board?.puzzle?.width ?: 0 }
+    val height : Int
+        get() { return board?.puzzle?.height ?: 0 }
+    val pinnedHeight : Int
+        get() {
+            return if (board?.puzzle?.hasPinnedClueID() ?: false) {
+                1 + (
+                    (board?.puzzle?.pinnedClue?.zone?.size() ?: 0) / width
+                ).toInt()
+            } else 0
+        }
+
+    val _scrollToClueEvent = MutableStateFlow<CurrentPositionState?>(null)
+    val scrollToClueEvent : StateFlow<CurrentPositionState?>
+        = _scrollToClueEvent
+
+    init {
+        scrollToClueIfEnabled()
+    }
+
+    fun clearScrollToClueEvent() {
+        _scrollToClueEvent.value = null
+    }
+
+    fun clearNewResponseEvent() {
+        _newResponseEvent.value = null
+    }
+
+    override fun onPlayboardChange(changes : PlayboardChanges) {
+        super.onPlayboardChange(changes)
+        updateScrollToClue(changes)
+    }
+
+    private fun updateScrollToClue(changes : PlayboardChanges) {
+        if (changes.currentWord != changes.previousWord)
+            scrollToClueIfEnabled()
+    }
+
+    private fun scrollToClueIfEnabled() {
+        settings.getPlayEnsureVisible { ensureVisible ->
+            if (ensureVisible) {
+                settingsFlow.getOnce { boardEditSettings ->
+                    _scrollToClueEvent.value = getCurrentPositionState(
+                        boardEditSettings,
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Get fresh board state for current board
+     */
+    override protected fun getBoardState(
+        boardEditSettings : BoardEditSettings,
+    ) : BoardState {
+        val puz = board?.puzzle
+        if (board == null || puz == null)
+            return BoardState()
+
+        val selectedPositions = board.currentWord.zone.toSet()
+
+        return BoardState(
+            boxes = getBoxes(boardEditSettings, selectedPositions),
+            pinnedBoxes = getPinnedBoxes(boardEditSettings, selectedPositions),
+        )
+    }
+
+    private fun getBoxes(
+        boardEditSettings : BoardEditSettings,
+        selectedPositions : Set<Position>,
+    ) : ImmutableList<ImmutableList<BoxState?>> {
+        val puz = board?.puzzle
+        if (puz == null)
+            return persistentListOf()
+
+        return (0 until height).map { row ->
+            (0 until width).map { col ->
+                getBoxState(
+                    boardEditSettings,
+                    row,
+                    col,
+                    puz.checkedGetBox(row, col),
+                    selectedPositions,
+                )
+            }.toImmutableList()
+        }.toImmutableList()
+    }
+
+    private fun getPinnedBoxes(
+        boardEditSettings : BoardEditSettings,
+        selectedPositions : Set<Position>,
+    ) : ImmutableList<ImmutableList<BoxState?>>? {
+        val puz = board?.puzzle
+        if (puz == null)
+            return null
+
+        return if (puz.hasPinnedClueID()) {
+            puz.pinnedClue?.zone?.let { zone ->
+                if (zone.size() <= width) {
+                    val padding = List((width - zone.size()) / 2) { col ->
+                        BoxState(height, col)
+                    }
+                    val pinned = zone.map { pos ->
+                        val box = puz.checkedGetBox(pos)
+                        getBoxState(
+                            boardEditSettings,
+                            pos.row,
+                            pos.col,
+                            box,
+                            selectedPositions,
+                        )
+                    }.toImmutableList()
+                    persistentListOf((padding + pinned).toImmutableList())
+                } else {
+                    val rows = zone.size() / width
+                    (0 until rows).map { row ->
+                        (0 until width).map { col ->
+                            val pos = zone.getPosition(row * width + col)
+                            val box = puz.checkedGetBox(pos)
+                            getBoxState(
+                                boardEditSettings,
+                                pos.row,
+                                pos.col,
+                                box,
+                                selectedPositions,
+                            )
+                        }.toImmutableList()
+                    }.toImmutableList()
+                }
+            }
+        } else null
+    }
+
+    /**
+     * Returns null if scroll to clue not enabled
+     */
+    private fun getCurrentPositionState(
+        boardEditSettings : BoardEditSettings,
+    ) : CurrentPositionState? {
+        if (board == null || !boardEditSettings.ensureVisible)
+            return null
+
+        val cursor = board?.highlightLetter
+        if (cursor == null)
+            return null
+
+        val selectedPositions = board.currentWord.zone
+        if (selectedPositions.isEmpty)
+            return null
+
+        val topRow = selectedPositions.map { it.row }.min()
+        val bottomRow = selectedPositions.map { it.row }.max()
+        val leftCol = selectedPositions.map { it.col }.min()
+        val rightCol = selectedPositions.map { it.col }.max()
+
+        return CurrentPositionState(
+            cursorRow = cursor.row,
+            cursorCol = cursor.col,
+            currentWordTopRow = topRow,
+            currentWordBottomRow = bottomRow,
+            currentWordLeftCol = leftCol,
+            currentWordRightCol = rightCol,
+        )
+    }
+}
