@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -254,10 +255,13 @@ fun PlayPage(
         @Composable
         fun Modifier.clueBarHeight() : Modifier {
             val state by viewModel.playUIState.collectAsStateWithLifecycle()
-            if (state.expandableClueLine)
-                return this
-            else
+            if (state.expandableClueLine) {
+                return this.heightIn(
+                    min = TopAppBarDefaults.TopAppBarExpandedHeight,
+                )
+            } else {
                 return this.height(TopAppBarDefaults.TopAppBarExpandedHeight)
+            }
         }
 
         @Composable
