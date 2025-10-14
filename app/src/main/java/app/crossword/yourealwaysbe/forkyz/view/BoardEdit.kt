@@ -1,6 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.view
 
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.parcelize.Parcelize
 
 import android.os.Parcelable
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.LocalTextStyle
@@ -29,6 +31,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 import app.crossword.yourealwaysbe.forkyz.settings.FitToScreenMode
@@ -42,6 +45,8 @@ private val MIN_DP_PER_BOX : Float = 10f
 private val ZOOM_FACTOR : Float = 1.25f
 private val MAX_SCALE : Float = MAX_BOX_SIZE_DP / BASE_BOX_SIZE_DP
 private val MIN_SCALE : Float = MIN_DP_PER_BOX / BASE_BOX_SIZE_DP
+private val MAX_SCALE_WORD : Float = 1f
+private val MIN_SCALE_WORD : Float = 0.6f
 // how close to screen border to scroll to it
 private val STICKY_PAN_THRESHOLD_DP : Float = 10f
 private val DOUBLE_CLICK_INTERVAL : Int = 300 // ms
@@ -403,7 +408,7 @@ private fun offsetToBox(
  * input connection
  */
 @Composable
-fun BoardFull(
+fun BoardEdit(
     modifier : Modifier = Modifier,
     inputConnectionMediator : InputConnectionMediator,
     state : BoardEditState,
@@ -443,7 +448,7 @@ fun BoardFull(
 }
 
 @Composable
-fun BoardFullBody(
+private fun BoardFullBody(
     modifier : Modifier = Modifier,
     state : BoardEditState,
     colors : BoardColorScheme,
@@ -483,9 +488,7 @@ fun BoardFullBody(
                                 state,
                                 localDensity.density,
                                 offset,
-                            )?.let { box ->
-                                onTap(box.row, box.col)
-                            }
+                            )?.let { box -> onTap(box.row, box.col) }
                         }
                     },
                     onLongPress = { offset ->
@@ -494,9 +497,7 @@ fun BoardFullBody(
                             state,
                             localDensity.density,
                             offset,
-                        )?.let { box ->
-                            onLongPress(box.row, box.col)
-                        }
+                        )?.let { box -> onLongPress(box.row, box.col) }
                     },
                 )
             }.pointerInput(true) {
@@ -645,5 +646,123 @@ fun BoardFullBody(
             }
         }
     }
+}
+
+/**
+ * Full interactive board view
+ *
+ * Max width is an argument rather than using BoxWithConstraints so it
+ * can be used with intrinsic measurements.
+ *
+ * @param maxWidth max width in dp to render board
+ * @param onTap gets board row, col of tap
+ * @param onLongPress gets board row, col of long press
+ * @param body passes a focusReceiver callback for giving focus to the
+ * input connection
+ */
+@Composable
+fun WordEdit(
+    modifier : Modifier = Modifier,
+    maxWidth : Dp,
+    state : BoxInputState,
+    inputConnectionMediator : InputConnectionMediator,
+    colors : BoardColorScheme,
+    viewModel : WordEditViewModel,
+    onTap : (Int, Int) -> Unit,
+    onLongPress : (Int, Int) -> Unit,
+) {
+    BoxInput(
+        modifier = modifier,
+        state = state,
+        inputConnectionMediator = inputConnectionMediator,
+        onNewResponse = viewModel::playLetter,
+        onDeleteResponse = viewModel::deleteLetter,
+    ) {
+        BoardWordBody(
+            maxWidth = maxWidth,
+            colors = colors,
+            state = state,
+            viewModel = viewModel,
+            onTap = onTap,
+            onLongPress = onLongPress,
+        )
+
+        val newResponse by viewModel
+            .newResponseEvent
+            .collectAsStateWithLifecycle()
+        LaunchedEffect(newResponse) {
+            newResponse?.let(state::setResponse)
+            viewModel.clearNewResponseEvent()
+        }
+    }
+}
+
+private fun offsetToBoxWord(
+    density : Float,
+    boxSize : Float,
+    widthBoxes : Int,
+    offset : Offset,
+    boxes : ImmutableList<BoxState?>,
+) : BoxState? {
+    val row = (offset.y / boxSize).toInt()
+    val col = (offset.x / boxSize).toInt()
+    val index = widthBoxes * row + col
+    return boxes.getOrNull(index)
+}
+
+@Composable
+private fun BoardWordBody(
+    modifier : Modifier = Modifier,
+    maxWidth : Dp,
+    colors : BoardColorScheme,
+    state : BoxInputState,
+    viewModel : WordEditViewModel,
+    onTap : (Int, Int) -> Unit,
+    onLongPress : (Int, Int) -> Unit,
+) {
+    val localDensity = LocalDensity.current
+    val displayWidth = with (localDensity) { maxWidth.toPx() }
+    val localTextStyle = LocalTextStyle.current
+    val boardState by viewModel.boardState.collectAsStateWithLifecycle()
+    val length = boardState.boxes.size
+    val boxProfile
+        = remember(localDensity, colors, length, localTextStyle) {
+            val baseBoxSizePx = BASE_BOX_SIZE_DP * localDensity.density
+            val fillScale = displayWidth / (baseBoxSizePx * length)
+            val scale = Math.max(
+                MIN_SCALE_WORD,
+                Math.min(MAX_SCALE_WORD, fillScale),
+            )
+            BoxProfile.build(localDensity, colors, scale, localTextStyle)
+        }
+    val widthBoxes = (displayWidth / boxProfile.boxSizePx).toInt()
+
+    BoardWord(
+        modifier = Modifier.pointerInput(true) {
+            detectTapGestures(
+                onTap = { offset ->
+                    offsetToBoxWord(
+                        localDensity.density,
+                        boxProfile.boxSizePx,
+                        widthBoxes,
+                        offset,
+                        boardState.boxes,
+                    )?.let { box -> onTap(box.row, box.col) }
+                },
+                onLongPress = { offset ->
+                    offsetToBoxWord(
+                        localDensity.density,
+                        boxProfile.boxSizePx,
+                        widthBoxes,
+                        offset,
+                        boardState.boxes,
+                    )?.let { box -> onLongPress(box.row, box.col) }
+                },
+            )
+        },
+        profile = boxProfile,
+        boxes = boardState.boxes,
+        widthBoxes = widthBoxes,
+    )
 }
 

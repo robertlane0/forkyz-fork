@@ -235,20 +235,6 @@ class PlayPageViewModel @Inject constructor(
         getBoard()?.nextWord()
     }
 
-    fun clickBoard(row : Int, col : Int) {
-        // only show keyboard if double click a word
-        // hide if it's a new word
-        getBoard()?.let { board ->
-            val newPos = Position(row, col)
-            val previousWord = board.setHighlightLetter(newPos)
-            if (previousWord?.checkInWord(newPos.row, newPos.col) ?: false) {
-                showKeyboard()
-            } else {
-                hideKeyboard()
-            }
-        }
-    }
-
     fun longClickBoard(row : Int, col : Int) {
         getBoard()?.let { board ->
             val position = Position(row, col)

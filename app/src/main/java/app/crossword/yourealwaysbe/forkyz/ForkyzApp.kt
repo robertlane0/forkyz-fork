@@ -211,12 +211,18 @@ fun ForkyzApp(
                 )
             }
             composable<Notes> { backStackEntry ->
-                val viewModel = hiltViewModel<NotesPageViewModel>()
                 val notes : Notes = backStackEntry.toRoute()
-                // TODO: should this be set here?
-                viewModel.notesClueID = if (
-                    notes.listName != null && notes.clueIndex != null
-                ) ClueID(notes.listName, notes.clueIndex) else null
+                val viewModel = hiltViewModel<
+                    NotesPageViewModel,
+                    NotesPageViewModel.NotesPageViewModelFactory,
+                > { factory ->
+                    factory.create(
+                        if (notes.listName != null && notes.clueIndex != null)
+                            ClueID(notes.listName, notes.clueIndex)
+                        else
+                            null
+                    )
+                }
                 NotesPage(
                     viewModel = viewModel,
                     themeHelper = themeHelper,

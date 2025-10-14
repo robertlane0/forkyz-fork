@@ -25,6 +25,7 @@ import app.crossword.yourealwaysbe.puz.ClueID
 import app.crossword.yourealwaysbe.puz.Playboard
 import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges
 import app.crossword.yourealwaysbe.puz.Playboard.PlayboardListener
+import app.crossword.yourealwaysbe.puz.Playboard.Word
 import app.crossword.yourealwaysbe.puz.Position
 import app.crossword.yourealwaysbe.puz.Zone
 
@@ -120,6 +121,10 @@ data class BoardState(
     val currentPosition : CurrentPositionState? = null,
 )
 
+data class WordState(
+    val boxes : ImmutableList<BoxState?> = persistentListOf(),
+)
+
 data class BoardEditSettings(
     val renderSettings : RenderSettings = RenderSettings(),
     val ensureVisible : Boolean = false,
@@ -171,20 +176,24 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
         }
     }
 
+    fun clearNewResponseEvent() {
+        _newResponseEvent.value = null
+    }
+
     override fun onPlayboardChange(changes : PlayboardChanges) {
         // TODO: ignore non-board changes
         updateBoardState()
         updateResponse()
     }
 
-    private fun updateResponse() {
-        board?.currentResponse?.let { _newResponseEvent.value = it }
-    }
-
-    private fun updateBoardState() {
+    protected fun updateBoardState() {
         settingsFlow.getOnce { boardEditSettings ->
             mediatedBoardState.current = getBoardState(boardEditSettings)
         }
+    }
+
+    private fun updateResponse() {
+        board?.currentResponse?.let { _newResponseEvent.value = it }
     }
 
     /**
@@ -194,12 +203,21 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
         boardEditSettings : BoardEditSettings,
     ) : BaseBoardState
 
+    /**
+     * Get state of a box
+     *
+     * @param selectedPositions to be highlighted as selected (not
+     * highlighted)
+     * @param clueID treat as only showing clueID in a horizontal row if
+     * not null
+     */
     protected fun getBoxState(
         boardEditSettings : BoardEditSettings,
         row : Int,
         col : Int,
         box : Box?,
-        selectedPositions : Set<Position>,
+        selectedPositions : Set<Position> = setOf(),
+        clueID : ClueID? = null,
     ) : BoxState? {
         val puz = board?.puzzle
         if (box == null || puz == null)
@@ -234,12 +252,12 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
             cheated = cheated,
             marks = marks,
             flagsState = getFlagsState(box),
-            scratchState = getScratchState(boardEditSettings, box),
+            scratchState = getScratchState(boardEditSettings, box, clueID),
             textColor
                 = if (box.hasTextColor()) colorFromInt(box.textColor) else null,
             shape = if (box.hasShape()) getShape(box.shape) else null,
             isError = isError,
-            separators = getSeparators(boardEditSettings, position),
+            separators = getSeparators(boardEditSettings, position, clueID),
         )
     }
 
@@ -286,6 +304,7 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
     private fun getScratchState(
         boardEditSettings : BoardEditSettings,
         box : Box,
+        clueID : ClueID?,
     ) : ScratchState {
         val puz = board?.puzzle
         if (puz == null || !boardEditSettings.renderSettings.displayScratch)
@@ -295,6 +314,8 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
         var scratchDown : String? = null
 
         for (cid in box.getIsPartOfClues()) {
+            if (cid == clueID)
+                continue
             puz.getNote(cid)?.scratch?.let { scratch ->
                 val pos = box.getCluePosition(cid)
                 scratch.getOrNull(pos)?.let { scratchChar ->
@@ -427,18 +448,24 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
         inferSeparators : Boolean,
         offset : Int,
         separators : Separators,
+        allAcross : Boolean,
     ) : Separators {
         clue?.getSeparator(offset + 1, inferSeparators)?.let { separator ->
             val cid = clue.clueID
             val zone = clue.zone
             if (!(zone?.isEmpty() ?: false)) {
-                // try to figure out where to put the separator, default
-                // to right
-                var dir = zone.getDirection(offset)
-                if (dir == Zone.Direction.INCONCLUSIVE)
-                    dir = zone.getDirection(offset - 1)
-                if (dir == Zone.Direction.INCONCLUSIVE)
-                    dir = Zone.Direction.RIGHT
+
+                var dir = Zone.Direction.RIGHT
+
+                if (!allAcross) {
+                    // try to figure out where to put the separator, default
+                    // to right
+                    dir = zone.getDirection(offset)
+                    if (dir == Zone.Direction.INCONCLUSIVE)
+                        dir = zone.getDirection(offset - 1)
+                    if (dir == Zone.Direction.INCONCLUSIVE)
+                        dir = Zone.Direction.RIGHT
+                }
 
                 // on opposite site if coming from start (-1)
                 if (offset < 0)
@@ -458,20 +485,36 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
 
     /**
      * Add all separators for clue for box
+     *
+     * @param allAcross whether all separators should be treated as
+     * across (right) (useful if only displaying a word in a row)
      */
     private fun addSeparators(
         clue : Clue,
         inferSeparators : Boolean,
         position : Position,
         separators : Separators,
+        allAcross : Boolean = false,
     ) : Separators {
         var result = separators
         if (clue?.hasSeparators(inferSeparators) ?: false) {
             val offset = clue.getZone().indexOf(position)
-            result = addSeparator(clue, inferSeparators, offset, result)
+            result = addSeparator(
+                clue,
+                inferSeparators,
+                offset,
+                result,
+                allAcross,
+            )
             // add start sep if needed
             if (offset == 0)
-                result = addSeparator(clue, inferSeparators, -1, result)
+                result = addSeparator(
+                    clue,
+                    inferSeparators,
+                    -1,
+                    result,
+                    allAcross,
+                )
         }
         return result
     }
@@ -484,6 +527,7 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
     private fun getSeparators(
         boardEditSettings : BoardEditSettings,
         position : Position,
+        clueID : ClueID?,
     ) : Separators {
         var separators = Separators()
 
@@ -500,25 +544,28 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
             return separators
 
         // do other clues first if they should be there
-        if (displaySeparators == DisplaySeparators.DS_ALWAYS) {
-            box.getIsPartOfClues().forEach { cid ->
-                separators = addSeparators(
-                    puz.getClue(cid),
-                    inferSeparators,
-                    position,
-                    separators,
-                )
+        if (clueID == null) {
+            if (displaySeparators == DisplaySeparators.DS_ALWAYS) {
+                box.getIsPartOfClues().forEach { cid ->
+                    separators = addSeparators(
+                        clue = puz.getClue(cid),
+                        inferSeparators = inferSeparators,
+                        position = position,
+                        separators = separators,
+                    )
+                }
             }
         }
 
         // current clue takes precedence
-        val currentCID = board?.currentWord?.clueID
-        if (box.isPartOf(currentCID)) {
+        val currentCID = clueID ?: board?.currentWord?.clueID
+        if (currentCID != null && box.isPartOf(currentCID)) {
             separators = addSeparators(
-                puz.getClue(currentCID),
-                inferSeparators,
-                position,
-                separators,
+                clue = puz.getClue(currentCID),
+                inferSeparators = inferSeparators,
+                position = position,
+                separators = separators,
+                allAcross = (clueID != null),
             )
         }
 
@@ -558,10 +605,6 @@ class BoardEditViewModel(
 
     fun clearScrollToClueEvent() {
         _scrollToClueEvent.value = null
-    }
-
-    fun clearNewResponseEvent() {
-        _newResponseEvent.value = null
     }
 
     override fun onPlayboardChange(changes : PlayboardChanges) {
@@ -699,6 +742,51 @@ class BoardEditViewModel(
             currentWordBottomRow = bottomRow,
             currentWordLeftCol = leftCol,
             currentWordRightCol = rightCol,
+        )
+    }
+}
+
+/**
+ * Word edit view model for word
+ *
+ * Or current word if word is null
+ */
+class WordEditViewModel(
+    viewModelScope : CoroutineScope,
+    settings : ForkyzSettings,
+    board : Playboard?,
+    private val word : Word? = null,
+) : BaseBoardEditViewModel<WordState>(
+    viewModelScope,
+    settings,
+    board,
+) {
+    /**
+     * Get fresh board state for current board
+     */
+    override protected fun getBoardState(
+        boardEditSettings : BoardEditSettings,
+    ) : WordState {
+        val puz = board?.puzzle
+        val zone = (word ?: board?.currentWord)?.zone
+        if (board == null || puz == null || zone == null)
+            return WordState()
+
+        return WordState(
+            boxes = zone.map { pos ->
+                if (pos == null) {
+                    null
+                } else {
+                    getBoxState(
+                        boardEditSettings,
+                        pos.row,
+                        pos.col,
+                        puz.checkedGetBox(pos),
+                        setOf(),
+                        word?.clueID,
+                    )
+                }
+            }.toImmutableList(),
         )
     }
 }

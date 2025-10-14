@@ -65,12 +65,11 @@ import app.crossword.yourealwaysbe.forkyz.settings.GridRatio
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
 import app.crossword.yourealwaysbe.forkyz.view.BoardEditView.BoardClickListener
-import app.crossword.yourealwaysbe.forkyz.view.BoardFull
+import app.crossword.yourealwaysbe.forkyz.view.BoardEdit
 import app.crossword.yourealwaysbe.forkyz.view.ClueTabs
 import app.crossword.yourealwaysbe.forkyz.view.OKDialog
 import app.crossword.yourealwaysbe.forkyz.view.SpecialKey
 import app.crossword.yourealwaysbe.forkyz.view.rememberBoardEditState
-import app.crossword.yourealwaysbe.forkyz.view.rememberScrollingImageViewState
 import app.crossword.yourealwaysbe.puz.ClueID
 
 private val ACROSTIC_CLUE_TABS_WORD_SCALE = 0.7F
@@ -373,16 +372,18 @@ fun PlayPage(
             val state by viewModel.playUIState.collectAsStateWithLifecycle()
             val locked = state.fitToScreenMode == FitToScreenMode.FTSM_LOCKED
             val boardColorScheme = themeHelper.getBoardColorScheme()
-            val viewState = rememberScrollingImageViewState()
 
-            BoardFull(
+            BoardEdit(
                 modifier = modifier,
                 inputConnectionMediator = inputConnectionMediator,
                 state = boardEditState,
                 viewModel = viewModel.boardEditViewModel,
                 colors = boardColorScheme,
                 doubleTapFitBoard = state.doubleTapFitBoard,
-                onTap = viewModel::clickBoard,
+                onTap = { row, col ->
+                    boardEditState.requestFocus()
+                    viewModel.clickBoard(row, col)
+                },
                 onLongPress = viewModel::longClickBoard,
             )
 

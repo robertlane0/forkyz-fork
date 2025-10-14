@@ -6,16 +6,16 @@ import javax.inject.Inject
 import android.content.Context
 import android.text.InputType
 import android.view.View
-import android.view.ViewGroup.LayoutParams
 import android.view.inputmethod.BaseInputConnection
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 
 import dagger.hilt.android.AndroidEntryPoint
@@ -68,17 +68,8 @@ class BoxInputView(
             currentInputConnection?.setResponse(response)
         }
 
-    init {
-        layoutParams = LayoutParams(
-            LayoutParams.MATCH_PARENT,
-            LayoutParams.MATCH_PARENT,
-        )
-    }
-
     override fun onMeasure(widthMeasureSpec : Int, heightMeasureSpec : Int) {
-        val parentWidth = MeasureSpec.getSize(widthMeasureSpec)
-        val parentHeight = MeasureSpec.getSize(heightMeasureSpec)
-        setMeasuredDimension(parentWidth, parentHeight)
+        setMeasuredDimension(1, 1)
     }
 
     override fun onNewResponse(response : String?) {
@@ -165,7 +156,7 @@ fun BoxInput(
 ) {
     Box(modifier = modifier) {
         AndroidView(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.size(1.dp, 1.dp),
             factory = { context ->
                 val boxInputView = BoxInputView(context).apply {
                     setFocusable(true)

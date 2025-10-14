@@ -726,6 +726,20 @@ open class PuzzlePageViewModel @Inject constructor(
         voiceCommandDispatcher.registerVoiceCommand(command)
     }
 
+    fun clickBoard(row : Int, col : Int) {
+        // only show keyboard if double click a word
+        // hide if it's a new word
+        getBoard()?.let { board ->
+            val newPos = Position(row, col)
+            val previousWord = board.setHighlightLetter(newPos)
+            if (previousWord?.checkInWord(newPos.row, newPos.col) ?: false) {
+                showKeyboard()
+            } else {
+                hideKeyboard()
+            }
+        }
+    }
+
     protected fun registerVoiceCommandBack() {
         val app : Application = getApplication()
         registerVoiceCommand(

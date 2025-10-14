@@ -2,7 +2,6 @@
 package app.crossword.yourealwaysbe.forkyz
 
 import java.util.Locale
-import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -10,6 +9,9 @@ import kotlinx.coroutines.flow.combine
 import android.app.Application
 import androidx.lifecycle.viewModelScope
 
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 
 import app.crossword.yourealwaysbe.forkyz.exttools.CROSSWORD_SOLVER_BLANK
@@ -22,7 +24,7 @@ import app.crossword.yourealwaysbe.forkyz.util.MediatedStateWithFlow
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
-import app.crossword.yourealwaysbe.forkyz.view.BoardEditText
+import app.crossword.yourealwaysbe.forkyz.view.WordEditViewModel
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Clue
 import app.crossword.yourealwaysbe.puz.ClueID
@@ -151,8 +153,11 @@ private data class NotesSettings(
     val interaction : InteractionSettings,
 )
 
-@HiltViewModel
-class NotesPageViewModel @Inject constructor(
+@HiltViewModel(
+    assistedFactory = NotesPageViewModel.NotesPageViewModelFactory::class
+)
+class NotesPageViewModel @AssistedInject constructor(
+    @Assisted val notesClueID : ClueID?,
     application : Application,
     settings : ForkyzSettings,
     currentPuzzleHolder : CurrentPuzzleHolder,
@@ -165,6 +170,11 @@ class NotesPageViewModel @Inject constructor(
     fileHandlerProvider,
     utils,
 ) {
+    @AssistedFactory
+    interface NotesPageViewModelFactory {
+        fun create(notesClueID : ClueID?) : NotesPageViewModel
+    }
+
     private val mediatedNotesUIState
         = MediatedStateWithFlow<NotesPageUIState, NotesSettings>(
             viewModelScope,
@@ -207,24 +217,23 @@ class NotesPageViewModel @Inject constructor(
     /**
      * The length of a prediction if just accepted or null
      */
-    public val acceptedPredictionEvent : StateFlow<Int?>
+    val acceptedPredictionEvent : StateFlow<Int?>
         = _acceptedPredictionEvent
+
+    val wordEditViewModel = WordEditViewModel(
+        viewModelScope,
+        settings,
+        getBoard(),
+        notesClueID?.let { getBoard()?.getClueWord(it) },
+    )
 
     init {
         setupVoiceCommands()
+        updateState()
     }
 
-    /**
-     * Clue id for notes instance
-     *
-     * Null means puzzle notes. Sets notes ui state.
-     */
-    var notesClueID : ClueID?
-        get() { return currentNotesUIState.notesClueID }
-        set(value) { updateState(value) }
-
     val notesClue : Clue?
-        get() { return currentNotesUIState.notesClue }
+        get() { return getBoard()?.puzzle?.getClue(notesClueID) }
 
     val isPuzzleNotes : Boolean
         get() { return currentNotesUIState.isPuzzleNotes }
@@ -244,9 +253,11 @@ class NotesPageViewModel @Inject constructor(
     val boardNotesValue : String
         get() {
             return getBoard()?.let { board ->
+                val zone = notesClue?.getZone() ?: board.currentWord.zone
                 return String(
-                    board.currentWordBoxes.map { box ->
-                        if (box.isBlank())
+                    zone.map { pos ->
+                        val box = board.puzzle?.checkedGetBox(pos)
+                        if (box?.isBlank() ?: true)
                             BLANK_CHAR
                         else
                             box.response[0]
@@ -460,7 +471,7 @@ class NotesPageViewModel @Inject constructor(
 
     override fun onPlayboardChange(changes : PlayboardChanges) {
         super.onPlayboardChange(changes)
-        updateState(currentNotesUIState.notesClueID)
+        updateState()
     }
 
     private val maxPuzzleDimension : Int
@@ -520,16 +531,10 @@ class NotesPageViewModel @Inject constructor(
     }
 
     /**
-     * Update state for current clue ID
-     */
-    private fun updateState() {
-        updateState(notesClueID)
-    }
-
-    /**
      * Update state for given clue ID
      */
-    private fun updateState(cid : ClueID?) {
+    private fun updateState() {
+        val cid = notesClueID
         settings.getPlayScratchDisplay() { displayScratch ->
             val puz = getPuzzle()
             val suppressNotesList = getSuppressNotesList(cid, displayScratch)

@@ -173,6 +173,12 @@ data class BoxProfile(
     }
 }
 
+/**
+ * Draw full board
+ *
+ * Assumes on a blockColor background and skips drawing the background
+ * again.
+ */
 @Composable
 fun Board(
     modifier : Modifier = Modifier,
@@ -190,21 +196,81 @@ fun Board(
             ),
         contentAlignment = Alignment.TopStart,
     ) {
-        boxes.forEach { rowBoxes ->
-            rowBoxes.filterNotNull().forEach { box ->
+        boxes.forEachIndexed { row, rowBoxes ->
+            rowBoxes.forEachIndexed { col, box ->
+                if (box != null) {
+                    Square(
+                        modifier = Modifier.graphicsLayer {
+                            translationX = profile.boxSizePx * col
+                            translationY = profile.boxSizePx * row
+                        },
+                        textMeasurer = textMeasurer,
+                        profile = profile,
+                        box = box,
+                    )
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Draw a single word
+ *
+ * Does not assume on a blockColor background
+ */
+@Composable
+fun BoardWord(
+    modifier : Modifier = Modifier,
+    profile : BoxProfile,
+    boxes : ImmutableList<BoxState?>,
+    widthBoxes : Int,
+) {
+    if (boxes.size == 0 || widthBoxes <= 0)
+        return
+
+    val textMeasurer = rememberTextMeasurer(cacheSize = TEXT_MEASURE_CACHE_SIZE)
+    val width = Math.min(boxes.size, widthBoxes)
+    val height = Math.ceil(boxes.size / widthBoxes.toDouble()).toInt()
+
+    Box(
+        modifier = modifier.requiredSize(
+            profile.boxSize * width,
+            profile.boxSize * height,
+        ),
+    ) {
+        boxes.forEachIndexed { index, box ->
+            if (box != null) {
+                val row = index / width
+                val col = index % width
                 Square(
                     modifier = Modifier.graphicsLayer {
-                        translationX = profile.boxSizePx * box.col
-                        translationY = profile.boxSizePx * box.row
+                        translationX = col * profile.boxSizePx
+                        translationY = row * profile.boxSizePx
+                    }.drawBehind {
+                        // box size
+                        val bs = profile.boxSizePx
+                        // box border
+                        val bb = profile.boxBorderPx
+                        // half box border
+                        val hbb = 0.5f * bb
+
+                        drawRect(
+                            color = profile.colors.blockColor,
+                            topLeft = Offset(hbb, hbb),
+                            size = Size(bs - bb, bs - bb),
+                            style = Stroke(width = bb),
+                        )
                     },
-                    textMeasurer = textMeasurer,
-                    profile = profile,
-                    box = box,
+                    textMeasurer,
+                    profile,
+                    box,
                 )
             }
         }
     }
 }
+
 
 @Composable
 private fun Square(

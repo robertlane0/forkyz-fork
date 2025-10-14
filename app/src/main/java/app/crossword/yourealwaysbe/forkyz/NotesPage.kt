@@ -7,10 +7,12 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
@@ -52,7 +54,7 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.ViewCompat
@@ -69,15 +71,16 @@ import app.crossword.yourealwaysbe.forkyz.util.addAlpha
 import app.crossword.yourealwaysbe.forkyz.view.BoardEditText
 import app.crossword.yourealwaysbe.forkyz.view.BoardEditText.BoardEditFilter
 import app.crossword.yourealwaysbe.forkyz.view.BoardEditView.BoardClickListener
-import app.crossword.yourealwaysbe.forkyz.view.BoardWordEditView
 import app.crossword.yourealwaysbe.forkyz.view.OKCancelDialog
 import app.crossword.yourealwaysbe.forkyz.view.ScrollingImageView
 import app.crossword.yourealwaysbe.forkyz.view.ScrollingImageView.Point
+import app.crossword.yourealwaysbe.forkyz.view.WordEdit
 import app.crossword.yourealwaysbe.puz.Clue
 import app.crossword.yourealwaysbe.puz.ClueID
 import app.crossword.yourealwaysbe.puz.MovementStrategy
 import app.crossword.yourealwaysbe.puz.Playboard.Word
 import app.crossword.yourealwaysbe.puz.Position
+import app.crossword.yourelawaysbe.forkyz.view.BoxInputState
 
 private val VERTICAL_BOARD_PADDING = 6.dp
 
@@ -315,30 +318,31 @@ fun NotesPage(
         }
 
         @Composable
-        fun MiniboardRow() {
+        fun MiniboardRow(maxWidth : Dp) {
             val state by viewModel.notesUIState.collectAsStateWithLifecycle()
+            if (state.isPuzzleNotes || state.word == null)
+                return
+
+            val boardColorScheme = themeHelper.getBoardColorScheme()
+            val boxInputState = remember { BoxInputState() }
 
             BoardLabel(R.string.board_lab)
-            Miniboard(
-                word = state.word,
+            WordEdit(
                 modifier = Modifier.onKeyEvent(::onMiniboardKeyEvent)
-                    .padding(
-                        vertical = VERTICAL_BOARD_PADDING
-                    ),
-                onClick = { _, _ -> viewModel.showKeyboard() },
-                onLongClick = {
+                    .padding(vertical = VERTICAL_BOARD_PADDING),
+                maxWidth = maxWidth,
+                state = boxInputState,
+                inputConnectionMediator = inputConnectionMediator,
+                colors = boardColorScheme,
+                viewModel = viewModel.wordEditViewModel,
+                onTap = { row, col ->
+                    boxInputState.requestFocus()
+                    setFocussedEntry(NoteEntry.BOARD, true)
+                    viewModel.clickBoard(row, col)
+                },
+                onLongPress = { _, _ ->
                     transferToFocussed(NoteEntry.BOARD)
                 },
-                longClickAccessibilityAction
-                    = R.string.transfer_board_to_focussed_view,
-                scratchMode = false,
-                useSuppressNotesList = true,
-                suppressNotesList = state.suppressNotesList,
-                onFocusChanged = { focussed ->
-                    setFocussedEntry(NoteEntry.BOARD, focussed)
-                },
-                movementStrategy = state.movementStrategy,
-                renderSettings = state.renderSettings,
             )
         }
 
@@ -659,25 +663,24 @@ fun NotesPage(
 
         @Composable
         fun ActivityBody(modifier : Modifier) {
-            Column(modifier.fillMaxHeight()) {
-                Column(
-                    modifier = Modifier.weight(1.0F)
-                        .verticalScroll(rememberScrollState())
-                        .height(IntrinsicSize.Max),
-                ) {
-                    val state by viewModel.notesUIState
-                        .collectAsStateWithLifecycle()
-                    if (!state.isPuzzleNotes && state.word != null) {
-                        MiniboardRow()
+            BoxWithConstraints(modifier.fillMaxSize()) {
+                val miniboardMaxWidth = maxWidth
+                Column() {
+                    Column(
+                        modifier = Modifier.weight(1f)
+                            .verticalScroll(rememberScrollState())
+                            .height(IntrinsicSize.Max),
+                    ) {
+                        MiniboardRow(maxWidth = miniboardMaxWidth)
+                        ScratchRow()
+                        TextRow(modifier = Modifier.weight(1.0F))
+                        FlagRow()
+                        AnagramSourceRow()
+                        AnagramSolutionRow()
+                        VoiceButtons()
                     }
-                    ScratchRow()
-                    TextRow(modifier = Modifier.weight(1.0F))
-                    FlagRow()
-                    AnagramSourceRow()
-                    AnagramSolutionRow()
-                    VoiceButtons()
+                    Keyboard()
                 }
-                Keyboard()
             }
             TransferConfirmationDialog()
         }
