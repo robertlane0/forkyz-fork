@@ -14,14 +14,15 @@ import app.crossword.yourealwaysbe.forkyz.settings.ClueHighlight
 import app.crossword.yourealwaysbe.forkyz.settings.ClueTabsDouble
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.RenderSettings
-import app.crossword.yourealwaysbe.forkyz.util.addAlpha
 import app.crossword.yourealwaysbe.forkyz.util.MediatedStateWithFlow
+import app.crossword.yourealwaysbe.forkyz.util.addAlpha
 import app.crossword.yourealwaysbe.puz.Clue
 import app.crossword.yourealwaysbe.puz.ClueID
 import app.crossword.yourealwaysbe.puz.Playboard
 import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges
 import app.crossword.yourealwaysbe.puz.Playboard.PlayboardListener
 import app.crossword.yourealwaysbe.puz.Playboard.Word
+import app.crossword.yourealwaysbe.puz.Position
 
 /**
  * Indicates that panel should skip to clue on page
@@ -115,6 +116,8 @@ class ClueTabsViewModel(
     private val viewModelScope : CoroutineScope,
     private val settings : ForkyzSettings,
     val board : Playboard?,
+    val playLetter : (String) -> Unit,
+    val deleteLetter : () -> Unit,
 ) : PlayboardListener {
     private val mediatedUIState
         = MediatedStateWithFlow<ClueTabsState, ClueTabsSettings>(
@@ -138,6 +141,8 @@ class ClueTabsViewModel(
 
     // remembered from latest state update
     private var isShowCount : Boolean = false
+    private val wordEditViewModels : MutableMap<ClueID, WordEditViewModel?>
+        = mutableMapOf()
 
     val numPages : Int
         get() { return currentUIState.numPages }
@@ -162,6 +167,25 @@ class ClueTabsViewModel(
 
     init {
         board?.addListener(this)
+    }
+
+    fun getWordEditViewModel(clueID : ClueID) : WordEditViewModel? {
+        return wordEditViewModels.getOrPut(clueID) {
+            board?.getClueWord(clueID)?.let { word ->
+                WordEditViewModel(
+                    viewModelScope,
+                    settings,
+                    board,
+                    playLetter,
+                    deleteLetter,
+                    word,
+                )
+            }
+        }
+    }
+
+    fun onBoxClick(row : Int, col : Int) {
+        board?.setHighlightLetter(Position(row, col))
     }
 
     override fun onPlayboardChange(changes : PlayboardChanges) {

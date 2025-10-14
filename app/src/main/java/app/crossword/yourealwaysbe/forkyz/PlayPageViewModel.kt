@@ -182,13 +182,17 @@ class PlayPageViewModel @Inject constructor(
         viewModelScope,
         settings,
         getBoard(),
+        this::playLetter,
+        this::deleteLetter,
     )
 
     val clueTabsViewModel = ClueTabsViewModel(
         application,
         viewModelScope,
         settings,
-        getBoard()
+        getBoard(),
+        this::playLetter,
+        this::deleteLetter,
     )
     init {
         settings.getPlayClueTabsPage(0) { clueTabsViewModel.setPage(0, it) }

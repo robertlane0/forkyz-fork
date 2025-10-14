@@ -23,7 +23,6 @@ import app.crossword.yourealwaysbe.forkyz.view.ClueTabsViewModel
 import app.crossword.yourealwaysbe.forkyz.view.WordEditViewModel
 import app.crossword.yourealwaysbe.puz.Clue
 import app.crossword.yourealwaysbe.puz.ClueID
-import app.crossword.yourealwaysbe.puz.MovementStrategy
 import app.crossword.yourealwaysbe.puz.Playboard.Word
 import app.crossword.yourealwaysbe.puz.Position
 
@@ -58,10 +57,7 @@ class ClueListPageViewModel @Inject constructor(
         settings.liveClueListShowWords,
         false,
     )
-    val movementStrategy : StateFlow<MovementStrategy> = stateIn(
-        settings.livePlayMovementStrategyClueList,
-        MovementStrategy.MOVE_NEXT_CLUE,
-    )
+
     val renderSettings : StateFlow<RenderSettings> = stateIn(
         settings.livePlayRenderSettings,
         RenderSettings(),
@@ -71,6 +67,8 @@ class ClueListPageViewModel @Inject constructor(
         viewModelScope,
         settings,
         getBoard(),
+        this::playLetter,
+        this::deleteLetter,
     )
 
     val clueTabsViewModel = ClueTabsViewModel(
@@ -78,6 +76,8 @@ class ClueListPageViewModel @Inject constructor(
         viewModelScope,
         settings,
         getBoard(),
+        this::playLetter,
+        this::deleteLetter,
     )
 
     fun toggleShowAllWords() {
@@ -93,7 +93,7 @@ class ClueListPageViewModel @Inject constructor(
             board.puzzle.getClue(cid)?.let { clue ->
                 if (clue.hasZone()) {
                     val oldWord = board.getCurrentWord()
-                    if (clue.getClueID() != board.getClueID())
+                    if (cid != board.getClueID())
                         board.jumpToClue(clue)
                     displayKeyboard(oldWord)
                 }
@@ -103,14 +103,16 @@ class ClueListPageViewModel @Inject constructor(
 
     fun deleteLetter() {
         getBoard()?.let { board ->
-            settings.getPlayScratchMode() { scratchMode ->
-                val oldMovementStrategy = board.getMovementStrategy()
-                board.setMovementStrategy(getClueListMovementStrategy())
-                if (scratchMode)
-                    board.deleteScratchLetter()
-                else
-                    board.deleteOrUndoLetter()
-                board.setMovementStrategy(oldMovementStrategy)
+            settings.getPlayScratchMode { scratchMode ->
+                settings.getPlayMovementStrategyClueList { movementStrategy ->
+                    val oldMovementStrategy = board.getMovementStrategy()
+                    board.setMovementStrategy(movementStrategy)
+                    if (scratchMode)
+                        board.deleteScratchLetter()
+                    else
+                        board.deleteOrUndoLetter()
+                    board.setMovementStrategy(oldMovementStrategy)
+                }
             }
         }
     }
@@ -120,15 +122,21 @@ class ClueListPageViewModel @Inject constructor(
     }
 
     fun playLetter(c : Char) {
+        playLetter(c.toString())
+    }
+
+    fun playLetter(c : String) {
         getBoard()?.let { board ->
-            settings.getPlayScratchMode() { scratchMode ->
-                val oldMovementStrategy = board.getMovementStrategy()
-                board.setMovementStrategy(getClueListMovementStrategy())
-                if (scratchMode)
-                    board.playScratchLetter(c)
-                else
-                    board.playLetter(c)
-                board.setMovementStrategy(oldMovementStrategy)
+            settings.getPlayScratchMode { scratchMode ->
+                settings.getPlayMovementStrategyClueList { movementStrategy ->
+                    val oldMovementStrategy = board.getMovementStrategy()
+                    board.setMovementStrategy(movementStrategy)
+                    if (scratchMode)
+                        board.playScratchLetter(c)
+                    else
+                        board.playLetter(c)
+                    board.setMovementStrategy(oldMovementStrategy)
+                }
             }
         }
     }
@@ -416,10 +424,6 @@ class ClueListPageViewModel @Inject constructor(
         get() {
             return clueTabsViewModel.isHistoryPage(currentPageNum)
         }
-
-    private fun getClueListMovementStrategy() : MovementStrategy {
-        return movementStrategy.value
-    }
 
     private fun <T> stateIn(flow : Flow<T>, initialValue : T) : StateFlow<T> {
         return flow.stateInSubscribed(viewModelScope, initialValue)

@@ -423,8 +423,8 @@ fun BoardEdit(
         modifier = modifier,
         state = boxInputState,
         inputConnectionMediator = inputConnectionMediator,
-        onNewResponse = viewModel::playLetter,
-        onDeleteResponse = viewModel::deleteLetter,
+        onNewResponse = viewModel.playLetter,
+        onDeleteResponse = viewModel.deleteLetter,
     ) {
         BoardFullBody(
             state = state,
@@ -676,15 +676,14 @@ fun WordEdit(
         modifier = inputModifier,
         state = state,
         inputConnectionMediator = inputConnectionMediator,
-        onNewResponse = viewModel::playLetter,
-        onDeleteResponse = viewModel::deleteLetter,
+        onNewResponse = viewModel.playLetter,
+        onDeleteResponse = viewModel.deleteLetter,
     ) {
         if (!incognitoMode) {
-            BoardWordBody(
+            WordEditNoInput(
                 modifier = boardModifier,
                 maxWidth = maxWidth,
                 colors = colors,
-                state = state,
                 viewModel = viewModel,
                 onTap = onTap,
                 onLongPress = onLongPress,
@@ -715,11 +714,10 @@ private fun offsetToBoxWord(
 }
 
 @Composable
-private fun BoardWordBody(
+fun WordEditNoInput(
     modifier : Modifier = Modifier,
     maxWidth : Dp,
     colors : BoardColorScheme,
-    state : BoxInputState,
     viewModel : WordEditViewModel,
     onTap : (Int, Int) -> Unit,
     onLongPress : (Int, Int) -> Unit,
@@ -742,7 +740,7 @@ private fun BoardWordBody(
     val widthBoxes = (displayWidth / boxProfile.boxSizePx).toInt()
 
     BoardWord(
-        modifier = Modifier.pointerInput(true) {
+        modifier = modifier.pointerInput(true) {
             detectTapGestures(
                 onTap = { offset ->
                     offsetToBoxWord(

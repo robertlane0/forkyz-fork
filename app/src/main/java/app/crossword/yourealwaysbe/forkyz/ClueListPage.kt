@@ -217,7 +217,7 @@ fun ClueListPage(
                 },
                 onClueLongClickDescription
                     = stringResource(R.string.open_clue_notes),
-                onClueBoardClick = { cid, _ -> viewModel.clueClick(cid) },
+                onClueBoardClick = viewModel::clueClick,
                 onClueBoardClickDescription = stringResource(R.string.select_clue),
                 showAllWords = showAllWords,
                 boardColorScheme = boardColorScheme,

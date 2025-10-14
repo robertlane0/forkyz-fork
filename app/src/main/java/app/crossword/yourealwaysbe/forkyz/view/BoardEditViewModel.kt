@@ -134,6 +134,8 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
     private val viewModelScope : CoroutineScope,
     protected val settings : ForkyzSettings,
     protected val board : Playboard?,
+    val playLetter : (String) -> Unit,
+    val deleteLetter : () -> Unit,
 ) : PlayboardListener {
     protected val settingsFlow : Flow<BoardEditSettings>
         = combine(
@@ -156,24 +158,6 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
     init {
         board?.addListener(this)
         board?.currentResponse?.let { _newResponseEvent.value = it }
-    }
-
-    fun playLetter(response : String) {
-        settings.getPlayScratchMode { scratchMode ->
-            if (scratchMode)
-                board?.playScratchLetter(response)
-            else
-                board?.playLetter(response)
-        }
-    }
-
-    fun deleteLetter() {
-        settings.getPlayScratchMode { scratchMode ->
-            if (scratchMode)
-                board?.deleteScratchLetter()
-            else
-                board?.deleteOrUndoLetter()
-        }
     }
 
     fun clearNewResponseEvent() {
@@ -577,10 +561,14 @@ class BoardEditViewModel(
     viewModelScope : CoroutineScope,
     settings : ForkyzSettings,
     board : Playboard?,
+    playLetter : (String) -> Unit,
+    deleteLetter : () -> Unit,
 ) : BaseBoardEditViewModel<BoardState>(
     viewModelScope,
     settings,
     board,
+    playLetter,
+    deleteLetter,
 ) {
     val width : Int
         get() { return board?.puzzle?.width ?: 0 }
@@ -755,11 +743,15 @@ class WordEditViewModel(
     viewModelScope : CoroutineScope,
     settings : ForkyzSettings,
     board : Playboard?,
+    playLetter : (String) -> Unit,
+    deleteLetter : () -> Unit,
     private val word : Word? = null,
 ) : BaseBoardEditViewModel<WordState>(
     viewModelScope,
     settings,
     board,
+    playLetter,
+    deleteLetter,
 ) {
     /**
      * Get fresh board state for current board

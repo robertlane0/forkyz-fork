@@ -224,6 +224,8 @@ class NotesPageViewModel @AssistedInject constructor(
         viewModelScope,
         settings,
         getBoard(),
+        this::playLetterToBoard,
+        this::deleteLetterFromBoard,
         notesClueID?.let { getBoard()?.getClueWord(it) },
     )
 
@@ -293,6 +295,10 @@ class NotesPageViewModel @AssistedInject constructor(
         }
 
     fun playLetterToBoard(c : Char) {
+        playLetterToBoard(c.toString())
+    }
+
+    fun playLetterToBoard(c : String) {
         getBoard()?.let { board ->
             val oldMovementStrategy = board.getMovementStrategy()
             board.setMovementStrategy(movementStrategy)

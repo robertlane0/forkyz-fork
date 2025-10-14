@@ -77,7 +77,7 @@ private val UNFILLED_CLUE_ALPHA = 1.0F
  * @param boardColorScheme colors for board rendering
  * @param showAllWords show miniboard beneath each clue
  * @param maxWordScale maximum scale of miniboard (else fits space)
- * @param onClueClick callback when clue clicked, takes clue
+ * @param onClueClick callback when clue clicked
  * @param onClueClickDescription accessibility action text for click
  * action
  * @param onClueLongClick callback when a clue is long clicked, takes
@@ -85,8 +85,8 @@ private val UNFILLED_CLUE_ALPHA = 1.0F
  * @param onClueLongClickDescription accessibility action text for long
  * click
  * @param onClueBoardClick callback when the miniboard for a clue is
- * clicked, takes clue (jumped to) and previousWord argument
- * @param onClueBoardClickDescription accessibility action text for long
+ * clicked, takes clue clicked
+ * * @param onClueBoardClickDescription accessibility action text for long
  * click on miniboard
  * @param onBarLongClick when tab bar long clicked
  * @param onBarLongClickDescription accessibility action text for long
@@ -104,7 +104,7 @@ fun ClueTabs(
     onClueClickDescription : String? = null, /* TODO */
     onClueLongClick : (ClueID) -> Unit = { },
     onClueLongClickDescription : String? = null,
-    onClueBoardClick : (ClueID, Word?) -> Unit = { _, _ -> },
+    onClueBoardClick : (ClueID) -> Unit = { },
     onClueBoardClickDescription : String? = null,
     onBarLongClick : () -> Unit = { },
     onBarLongClickDescription : String? = null,
@@ -130,7 +130,7 @@ fun ClueTabs(
     }
 
     @Composable
-    fun ClueItem(clue : ClueItem) {
+    fun ClueItem(clue : ClueItem, maxWidth : Dp) {
         // padding is a bit all over the place depending on what bits
         // are visible..
         Column(
@@ -196,36 +196,26 @@ fun ClueTabs(
                 }
 
                 if (showAllWords) {
-                    viewModel.board?.let { board ->
-                        clue.word?.let { word ->
-                            val state by viewModel.uiState
-                                .collectAsStateWithLifecycle()
-                            BoardWordEdit(
+                    val wordEditWidth = maxWidth
+                    viewModel.getWordEditViewModel(clue.cid)?.let {
+                        wordEditViewModel->
+                            WordEditNoInput(
                                 modifier = Modifier.padding(
                                     vertical = CLUE_VERTICAL_PADDING.toDp(),
                                     horizontal = CLUE_HORIZONTAL_PADDING,
                                 ),
-                                board = board,
-                                contentDescription
-                                    = stringResource(R.string.clue_word),
-                                word = word,
-                                onClick = { _, previousWord ->
-                                    onClueBoardClick(clue.cid, previousWord)
+                                maxWidth
+                                    = maxWidth - CLUE_HORIZONTAL_PADDING * 2,
+                                colors = boardColorScheme,
+                                viewModel = wordEditViewModel,
+                                onTap = { row, col ->
+                                    viewModel.onBoxClick(row, col)
+                                    onClueBoardClick(clue.cid)
                                 },
-                                onLongClick = { onClueLongClick(clue.cid) },
-                                clickAccessibilityAction
-                                    = onClueBoardClickDescription,
-                                longClickAccessibilityAction
-                                    = onClueLongClickDescription,
-                                maxWordScale = maxWordScale,
-                                renderWithExpectedWidth = true,
-                                totalPadding = CLUE_HORIZONTAL_PADDING * 2,
-                                focusable = false,
-                                renderSettings = state.renderSettings,
-                                scratchMode = state.scratchMode,
-                                boardColorScheme = boardColorScheme,
+                                onLongPress = { _, _->
+                                    onClueLongClick(clue.cid)
+                                },
                             )
-                        }
                     }
                 }
             }
@@ -234,7 +224,7 @@ fun ClueTabs(
     }
 
     @Composable
-    fun Page(paneIndex : Int, page : Int) {
+    fun Page(paneIndex : Int, page : Int, maxWidth : Dp) {
         val state by viewModel.uiState.collectAsStateWithLifecycle()
         val listState = rememberLazyListState()
         val coroutineScope = rememberCoroutineScope()
@@ -256,7 +246,7 @@ fun ClueTabs(
         ) {
             items(state.pages.get(page).clues) {
                 key(it.cid.toString()) {
-                    ClueItem(it)
+                    ClueItem(it, maxWidth)
                 }
             }
         }
@@ -266,7 +256,8 @@ fun ClueTabs(
     @OptIn(ExperimentalMaterial3Api::class)
     fun Pane(
         modifier : Modifier = Modifier,
-        paneIndex : Int = 0,
+        paneIndex : Int,
+        maxWidth : Dp,
     ) {
         val state by viewModel.uiState.collectAsStateWithLifecycle()
         val numPages = state.numPages
@@ -325,7 +316,7 @@ fun ClueTabs(
                     }
                 }
                 HorizontalPager(state = pagerState) { page ->
-                    Page(paneIndex, page)
+                    Page(paneIndex, page, maxWidth)
                 }
             }
         }
@@ -353,15 +344,19 @@ fun ClueTabs(
             viewModel.isDouble = isDouble
         }
 
+        val paneWidth = maxWidth / (if (isDouble) 2 else 1)
+
         Row() {
             Pane(
                 modifier = Modifier.weight(1.0F),
                 paneIndex = 0,
+                maxWidth = paneWidth
             )
             if (isDouble) {
                 Pane(
                     modifier = Modifier.weight(1.0F),
                     paneIndex = 1,
+                    maxWidth = paneWidth,
                 )
             }
         }
