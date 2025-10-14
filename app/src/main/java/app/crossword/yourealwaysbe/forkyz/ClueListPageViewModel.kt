@@ -20,6 +20,7 @@ import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.util.stateInSubscribed
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 import app.crossword.yourealwaysbe.forkyz.view.ClueTabsViewModel
+import app.crossword.yourealwaysbe.forkyz.view.WordEditViewModel
 import app.crossword.yourealwaysbe.puz.Clue
 import app.crossword.yourealwaysbe.puz.ClueID
 import app.crossword.yourealwaysbe.puz.MovementStrategy
@@ -64,6 +65,12 @@ class ClueListPageViewModel @Inject constructor(
     val renderSettings : StateFlow<RenderSettings> = stateIn(
         settings.livePlayRenderSettings,
         RenderSettings(),
+    )
+
+    val wordEditViewModel = WordEditViewModel(
+        viewModelScope,
+        settings,
+        getBoard(),
     )
 
     val clueTabsViewModel = ClueTabsViewModel(

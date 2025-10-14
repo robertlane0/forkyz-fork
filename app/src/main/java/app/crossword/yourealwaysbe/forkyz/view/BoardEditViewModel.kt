@@ -768,7 +768,8 @@ class WordEditViewModel(
         boardEditSettings : BoardEditSettings,
     ) : WordState {
         val puz = board?.puzzle
-        val zone = (word ?: board?.currentWord)?.zone
+        val shownWord = word ?: board?.currentWord
+        val zone = shownWord?.zone
         if (board == null || puz == null || zone == null)
             return WordState()
 
@@ -783,7 +784,7 @@ class WordEditViewModel(
                         pos.col,
                         puz.checkedGetBox(pos),
                         setOf(),
-                        word?.clueID,
+                        shownWord?.clueID,
                     )
                 }
             }.toImmutableList(),

@@ -5,6 +5,7 @@ import android.net.Uri
 import android.view.View
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
@@ -22,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -42,7 +44,9 @@ import app.crossword.yourealwaysbe.forkyz.menu.BaseMenuModifier
 import app.crossword.yourealwaysbe.forkyz.menu.MenuText
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
+import app.crossword.yourealwaysbe.forkyz.view.BoxInputState
 import app.crossword.yourealwaysbe.forkyz.view.ClueTabs
+import app.crossword.yourealwaysbe.forkyz.view.WordEdit
 import app.crossword.yourealwaysbe.puz.Clue
 import app.crossword.yourealwaysbe.puz.ClueID
 import app.crossword.yourealwaysbe.puz.MovementStrategy
@@ -222,25 +226,39 @@ fun ClueListPage(
 
         @Composable
         fun ActivityBody(modifier : Modifier) {
-            Column(modifier = modifier) {
-                val showAllWords
-                    by viewModel.showAllWords.collectAsStateWithLifecycle()
-                val movementStrategy
-                    by viewModel.movementStrategy.collectAsStateWithLifecycle()
+            BoxWithConstraints(modifier = modifier) {
+                val boardMaxWidth = maxWidth
+                Column() {
+                    val showAllWords
+                        by viewModel.showAllWords.collectAsStateWithLifecycle()
+                    val boxInputState = remember { BoxInputState() }
 
-                Miniboard(
-                    onClick = { _, _ -> viewModel.showKeyboard() },
-                    onLongClick = { viewModel.launchCurrentClueNotes() },
-                    longClickAccessibilityAction = R.string.open_clue_notes,
-                    incognitoMode = showAllWords,
-                    movementStrategy = movementStrategy,
-                )
-                ClueLists(
-                    Modifier.fillMaxWidth().weight(1.0F),
-                    showAllWords,
-                )
-                VoiceButtons()
-                Keyboard()
+                    WordEdit(
+                        maxWidth = boardMaxWidth,
+                        state = boxInputState,
+                        inputConnectionMediator = inputConnectionMediator,
+                        colors = themeHelper.getBoardColorScheme(),
+                        viewModel = viewModel.wordEditViewModel,
+                        onTap = { row, col ->
+                            boxInputState.requestFocus()
+                            viewModel.clickBoard(row, col)
+                        },
+                        onLongPress = { _, _ ->
+                            viewModel.launchCurrentClueNotes()
+                        },
+                        incognitoMode = showAllWords,
+                    )
+                    ClueLists(
+                        Modifier.fillMaxWidth().weight(1.0F),
+                        showAllWords,
+                    )
+                    VoiceButtons()
+                    Keyboard()
+
+                    LaunchedEffect(Unit) {
+                        boxInputState.requestFocus()
+                    }
+                }
             }
         }
 

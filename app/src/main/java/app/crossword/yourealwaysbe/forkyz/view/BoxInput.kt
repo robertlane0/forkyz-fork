@@ -1,5 +1,5 @@
 
-package app.crossword.yourelawaysbe.forkyz.view
+package app.crossword.yourealwaysbe.forkyz.view
 
 import javax.inject.Inject
 

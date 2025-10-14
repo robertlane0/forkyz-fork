@@ -36,6 +36,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -71,6 +72,7 @@ import app.crossword.yourealwaysbe.forkyz.util.addAlpha
 import app.crossword.yourealwaysbe.forkyz.view.BoardEditText
 import app.crossword.yourealwaysbe.forkyz.view.BoardEditText.BoardEditFilter
 import app.crossword.yourealwaysbe.forkyz.view.BoardEditView.BoardClickListener
+import app.crossword.yourealwaysbe.forkyz.view.BoxInputState
 import app.crossword.yourealwaysbe.forkyz.view.OKCancelDialog
 import app.crossword.yourealwaysbe.forkyz.view.ScrollingImageView
 import app.crossword.yourealwaysbe.forkyz.view.ScrollingImageView.Point
@@ -80,7 +82,6 @@ import app.crossword.yourealwaysbe.puz.ClueID
 import app.crossword.yourealwaysbe.puz.MovementStrategy
 import app.crossword.yourealwaysbe.puz.Playboard.Word
 import app.crossword.yourealwaysbe.puz.Position
-import app.crossword.yourelawaysbe.forkyz.view.BoxInputState
 
 private val VERTICAL_BOARD_PADDING = 6.dp
 
@@ -344,6 +345,11 @@ fun NotesPage(
                     transferToFocussed(NoteEntry.BOARD)
                 },
             )
+
+            LaunchedEffect(Unit) {
+                boxInputState.requestFocus()
+                setFocussedEntry(NoteEntry.BOARD, true)
+            }
         }
 
         /**

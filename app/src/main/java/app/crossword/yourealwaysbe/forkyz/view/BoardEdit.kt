@@ -37,8 +37,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.crossword.yourealwaysbe.forkyz.settings.FitToScreenMode
 import app.crossword.yourealwaysbe.forkyz.theme.BoardColorScheme
 import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
-import app.crossword.yourelawaysbe.forkyz.view.BoxInput
-import app.crossword.yourelawaysbe.forkyz.view.BoxInputState
 
 private val MAX_BOX_SIZE_DP : Float = 160f
 private val MIN_DP_PER_BOX : Float = 10f
@@ -670,22 +668,28 @@ fun WordEdit(
     viewModel : WordEditViewModel,
     onTap : (Int, Int) -> Unit,
     onLongPress : (Int, Int) -> Unit,
+    incognitoMode : Boolean = false,
 ) {
+    val inputModifier = if (incognitoMode) Modifier else modifier
+    val boardModifier = if (incognitoMode) modifier else Modifier
     BoxInput(
-        modifier = modifier,
+        modifier = inputModifier,
         state = state,
         inputConnectionMediator = inputConnectionMediator,
         onNewResponse = viewModel::playLetter,
         onDeleteResponse = viewModel::deleteLetter,
     ) {
-        BoardWordBody(
-            maxWidth = maxWidth,
-            colors = colors,
-            state = state,
-            viewModel = viewModel,
-            onTap = onTap,
-            onLongPress = onLongPress,
-        )
+        if (!incognitoMode) {
+            BoardWordBody(
+                modifier = boardModifier,
+                maxWidth = maxWidth,
+                colors = colors,
+                state = state,
+                viewModel = viewModel,
+                onTap = onTap,
+                onLongPress = onLongPress,
+            )
+        }
 
         val newResponse by viewModel
             .newResponseEvent
