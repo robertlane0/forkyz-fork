@@ -83,7 +83,7 @@ data class BoxState(
     val response : String = Box.BLANK,
     val clueNumber : String? = null,
     val boxColor : Color? = null,
-    val barState : BarState = BarState(),
+    val barState : BarState? = null,
     val highlighted : Boolean = false,
     val selected : Boolean = false,
     val cheated : Boolean = false,
@@ -230,7 +230,8 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
             clueNumber = if (box.hasClueNumber()) box.clueNumber else null,
             response = box.response ?: Box.BLANK,
             boxColor = if (box.hasColor()) colorFromInt(box.color) else null,
-            barState = getBarState(box),
+            // bars don't make sense if showing a horizontal clue
+            barState = if (clueID == null) getBarState(box) else null,
             highlighted = highlighted,
             selected = selected,
             cheated = cheated,

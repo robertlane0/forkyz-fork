@@ -352,15 +352,17 @@ private fun DrawScope.drawBars(
     profile : BoxProfile,
     box : BoxState,
 ) {
-    // box size
-    val bs = profile.boxSizePx
-    // half stroke
-    val hs = 0.5f * profile.barWidth
+    box.barState?.let { barState ->
+        // box size
+        val bs = profile.boxSizePx
+        // half stroke
+        val hs = 0.5f * profile.barWidth
 
-    drawBar(profile, box, box.barState.top, 0f, hs, bs, hs)
-    drawBar(profile, box, box.barState.bottom, 0f, bs - hs, bs, bs - hs)
-    drawBar(profile, box, box.barState.left, hs, 0f, hs, bs)
-    drawBar(profile, box, box.barState.right, bs - hs, 0f, bs - hs, bs)
+        drawBar(profile, box, barState.top, 0f, hs, bs, hs)
+        drawBar(profile, box, barState.bottom, 0f, bs - hs, bs, bs - hs)
+        drawBar(profile, box, barState.left, hs, 0f, hs, bs)
+        drawBar(profile, box, barState.right, bs - hs, 0f, bs - hs, bs)
+    }
 }
 
 private fun DrawScope.drawBar(
@@ -730,7 +732,7 @@ private fun getBarColor(profile : BoxProfile, box : BoxState) : Color {
     else
         profile.colors.blockColor
     val base = getBaseBoxColor(profile, box)
-    return box.barState.color?.let { getRelativeColor(base, it) } ?: default
+    return box.barState?.color?.let { getRelativeColor(base, it) } ?: default
 }
 
 /**
