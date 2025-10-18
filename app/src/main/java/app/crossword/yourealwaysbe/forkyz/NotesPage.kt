@@ -77,6 +77,7 @@ import app.crossword.yourealwaysbe.forkyz.view.OKCancelDialog
 import app.crossword.yourealwaysbe.forkyz.view.ScrollingImageView
 import app.crossword.yourealwaysbe.forkyz.view.ScrollingImageView.Point
 import app.crossword.yourealwaysbe.forkyz.view.WordEdit
+import app.crossword.yourealwaysbe.forkyz.view.rememberBoardTextMeasurer
 import app.crossword.yourealwaysbe.puz.Clue
 import app.crossword.yourealwaysbe.puz.ClueID
 import app.crossword.yourealwaysbe.puz.MovementStrategy
@@ -132,6 +133,8 @@ fun NotesPage(
         announce = announce,
 
     ) {
+        val textMeasurer = rememberBoardTextMeasurer()
+
         var focussedEntry : NoteEntry?
             by rememberSaveable { mutableStateOf(null) }
 
@@ -331,6 +334,7 @@ fun NotesPage(
             WordEdit(
                 modifier = Modifier.onKeyEvent(::onMiniboardKeyEvent)
                     .padding(vertical = VERTICAL_BOARD_PADDING),
+                textMeasurer = textMeasurer,
                 maxWidth = maxWidth,
                 state = boxInputState,
                 inputConnectionMediator = inputConnectionMediator,

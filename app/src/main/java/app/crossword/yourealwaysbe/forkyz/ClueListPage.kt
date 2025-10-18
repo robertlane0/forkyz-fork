@@ -47,6 +47,7 @@ import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
 import app.crossword.yourealwaysbe.forkyz.view.BoxInputState
 import app.crossword.yourealwaysbe.forkyz.view.ClueTabs
 import app.crossword.yourealwaysbe.forkyz.view.WordEdit
+import app.crossword.yourealwaysbe.forkyz.view.rememberBoardTextMeasurer
 import app.crossword.yourealwaysbe.puz.Clue
 import app.crossword.yourealwaysbe.puz.ClueID
 import app.crossword.yourealwaysbe.puz.MovementStrategy
@@ -97,6 +98,8 @@ fun ClueListPage(
         launchVoiceInput = launchVoiceInput,
         announce = announce,
     ) {
+        val textMeasurer = rememberBoardTextMeasurer()
+
         fun onKeyEvent(event : KeyEvent) : Boolean {
             when (event.key) {
                 Key.DirectionLeft -> {
@@ -207,6 +210,7 @@ fun ClueListPage(
             val boardColorScheme = themeHelper.getBoardColorScheme()
             ClueTabs(
                 modifier = modifier,
+                textMeasurer = textMeasurer,
                 viewModel = viewModel.clueTabsViewModel,
                 isPortrait = isPortrait,
                 onClueClick = viewModel::clueClick,
@@ -234,6 +238,7 @@ fun ClueListPage(
                     val boxInputState = remember { BoxInputState() }
 
                     WordEdit(
+                        textMeasurer = textMeasurer,
                         maxWidth = boardMaxWidth,
                         state = boxInputState,
                         inputConnectionMediator = inputConnectionMediator,

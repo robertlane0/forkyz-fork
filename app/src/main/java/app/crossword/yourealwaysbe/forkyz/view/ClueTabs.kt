@@ -44,6 +44,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -72,6 +73,7 @@ private val UNFILLED_CLUE_ALPHA = 1.0F
  * Clue tabs view
  *
  * @param modifier modifier
+ * @param textMeasurer shared text measurer for rendering board words
  * @param viewModel a ClueTabsViewModel to get data from backend
  * @param isPortrait true if the current display is portrait
  * @param boardColorScheme colors for board rendering
@@ -96,6 +98,7 @@ private val UNFILLED_CLUE_ALPHA = 1.0F
 @Composable
 fun ClueTabs(
     modifier : Modifier = Modifier,
+    textMeasurer : TextMeasurer,
     viewModel : ClueTabsViewModel,
     isPortrait : Boolean,
     boardColorScheme : BoardColorScheme,
@@ -204,6 +207,7 @@ fun ClueTabs(
                                     vertical = CLUE_VERTICAL_PADDING.toDp(),
                                     horizontal = CLUE_HORIZONTAL_PADDING,
                                 ),
+                                textMeasurer = textMeasurer,
                                 maxWidth
                                     = maxWidth - CLUE_HORIZONTAL_PADDING * 2,
                                 colors = boardColorScheme,

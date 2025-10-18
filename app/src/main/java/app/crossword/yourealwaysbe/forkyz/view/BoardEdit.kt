@@ -31,6 +31,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
@@ -661,6 +662,7 @@ private fun BoardFullBody(
 @Composable
 fun WordEdit(
     modifier : Modifier = Modifier,
+    textMeasurer : TextMeasurer,
     maxWidth : Dp,
     state : BoxInputState,
     inputConnectionMediator : InputConnectionMediator,
@@ -682,6 +684,7 @@ fun WordEdit(
         if (!incognitoMode) {
             WordEditNoInput(
                 modifier = boardModifier,
+                textMeasurer = textMeasurer,
                 maxWidth = maxWidth,
                 colors = colors,
                 viewModel = viewModel,
@@ -716,6 +719,7 @@ private fun offsetToBoxWord(
 @Composable
 fun WordEditNoInput(
     modifier : Modifier = Modifier,
+    textMeasurer : TextMeasurer,
     maxWidth : Dp,
     colors : BoardColorScheme,
     viewModel : WordEditViewModel,
@@ -762,6 +766,7 @@ fun WordEditNoInput(
                 },
             )
         },
+        textMeasurer = textMeasurer,
         profile = boxProfile,
         boxes = boardState.boxes,
         widthBoxes = widthBoxes,

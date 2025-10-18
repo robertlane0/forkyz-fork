@@ -64,12 +64,13 @@ import app.crossword.yourealwaysbe.forkyz.settings.FitToScreenMode
 import app.crossword.yourealwaysbe.forkyz.settings.GridRatio
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
-import app.crossword.yourealwaysbe.forkyz.view.BoardEditView.BoardClickListener
 import app.crossword.yourealwaysbe.forkyz.view.BoardEdit
+import app.crossword.yourealwaysbe.forkyz.view.BoardEditView.BoardClickListener
 import app.crossword.yourealwaysbe.forkyz.view.ClueTabs
 import app.crossword.yourealwaysbe.forkyz.view.OKDialog
 import app.crossword.yourealwaysbe.forkyz.view.SpecialKey
 import app.crossword.yourealwaysbe.forkyz.view.rememberBoardEditState
+import app.crossword.yourealwaysbe.forkyz.view.rememberBoardTextMeasurer
 import app.crossword.yourealwaysbe.puz.ClueID
 
 private val ACROSTIC_CLUE_TABS_WORD_SCALE = 0.7F
@@ -333,6 +334,8 @@ fun PlayPage(
 
         @Composable
         fun CluesList(modifier : Modifier) {
+            val textMeasurer = rememberBoardTextMeasurer()
+
             val state by viewModel.playUIState.collectAsStateWithLifecycle()
 
             if (!state.showClueTabs)
@@ -349,6 +352,7 @@ fun PlayPage(
 
             ClueTabs(
                 modifier = modifier,
+                textMeasurer = textMeasurer,
                 viewModel = viewModel.clueTabsViewModel,
                 isPortrait = isPortrait,
                 showAllWords = showAllWords,

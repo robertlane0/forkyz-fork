@@ -174,6 +174,19 @@ data class BoxProfile(
 }
 
 /**
+ * A text measurer to use for boards
+ *
+ * Since lots of same letters drawn at same scale, best to share a
+ * cache between word edits. The full board keeps its own because it has
+ * its own scale that is unlikely to match other board views.
+ */
+@Composable
+fun rememberBoardTextMeasurer() : TextMeasurer {
+    return rememberTextMeasurer(cacheSize = TEXT_MEASURE_CACHE_SIZE)
+}
+
+
+/**
  * Draw full board
  *
  * Assumes on a blockColor background and skips drawing the background
@@ -222,6 +235,7 @@ fun Board(
 @Composable
 fun BoardWord(
     modifier : Modifier = Modifier,
+    textMeasurer : TextMeasurer,
     profile : BoxProfile,
     boxes : ImmutableList<BoxState?>,
     widthBoxes : Int,
