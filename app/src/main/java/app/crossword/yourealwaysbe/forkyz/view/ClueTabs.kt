@@ -268,8 +268,11 @@ fun ClueTabs(
         val pages = state.pages
 
         if (numPages > 0) {
-            val uiStatePage = state.panePages.get(paneIndex)
             val coroutineScope = rememberCoroutineScope()
+            val uiStatePage = Math.min(
+                state.panePages.get(paneIndex),
+                numPages - 1,
+            )
             val pagerState = rememberPagerState(
                 pageCount = { numPages },
                 initialPage = uiStatePage,
