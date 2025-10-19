@@ -61,6 +61,11 @@ class InputConnectionMediator() {
         }
     }
 
+    fun clearReceiver() {
+        hideNative()
+        registerReceiver(null)
+    }
+
     fun focusReceiver() {
         receiver?.let { it.getView().requestFocus() }
     }

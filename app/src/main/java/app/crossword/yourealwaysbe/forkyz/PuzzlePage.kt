@@ -1245,10 +1245,12 @@ fun PuzzlePage(
     }
 
     fun doBackAction() {
-        if (viewModel.keyboardState.value.hideOnBack)
+        if (viewModel.keyboardState.value.hideOnBack) {
             viewModel.hideKeyboard(true)
-        else
+        } else {
+            inputConnectionMediator.clearReceiver()
             onBack()
+        }
     }
 
     @OptIn(ExperimentalComposeUiApi::class)
