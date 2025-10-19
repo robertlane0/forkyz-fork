@@ -943,33 +943,42 @@ class BrowsePageViewModel @Inject constructor(
         isNewPuzzleList : Boolean = false,
         puzzleFilter : String? = currentUIState.puzzleFilter,
     ) {
-        settings.getRatingsDisableRatings() { disableRatings ->
-            val state = currentUIState
-            val sortOrder = state.sortOrder
-            var newPuzzleList : List<PuzGroup> = state.puzzleList
-            if (isNewPuzzleList || puzzleFilter != currentUIState.puzzleFilter)
-                newPuzzleList = getPuzzleList(puzzleFilter, state.sortOrder)
+        settings.getRatingsDisableRatings { disableRatings ->
+            settings.getBrowseAlwaysShowRating { alwaysShowRating ->
+                val state = currentUIState
+                val sortOrder = state.sortOrder
+                var newPuzzleList : List<PuzGroup> = state.puzzleList
+                if (
+                    isNewPuzzleList
+                    || puzzleFilter != currentUIState.puzzleFilter
+                ) {
+                    newPuzzleList = getPuzzleList(puzzleFilter, state.sortOrder)
+                }
 
-            val displayInternalStorageMessage = (
-                currentUIState.displayInternalStorageMessage
-                && puzzles.isEmpty()
-                && !isArchive
-            )
+                val displayInternalStorageMessage = (
+                    currentUIState.displayInternalStorageMessage
+                    && puzzles.isEmpty()
+                    && !isArchive
+                )
 
-            val showRatings = (!isArchive && state.showRatings)
-                || (isArchive && !disableRatings)
+                val showRatings = !disableRatings && (
+                    alwaysShowRating || isViewArchive
+                )
 
-            // reset to false when new puzzle list
-            val isSwipeRefreshing = !isNewPuzzleList && state.isSwipeRefreshing
+                // reset to false when new puzzle list
+                val isSwipeRefreshing
+                    = !isNewPuzzleList && state.isSwipeRefreshing
 
-            currentUIState = state.copy(
-                isViewArchive = isArchive,
-                puzzleFilter = puzzleFilter,
-                puzzleList = newPuzzleList,
-                displayInternalStorageMessage = displayInternalStorageMessage,
-                showRatings = showRatings,
-                isSwipeRefreshing = isSwipeRefreshing,
-            )
+                currentUIState = state.copy(
+                    isViewArchive = isArchive,
+                    puzzleFilter = puzzleFilter,
+                    puzzleList = newPuzzleList,
+                    displayInternalStorageMessage
+                        = displayInternalStorageMessage,
+                    showRatings = showRatings,
+                    isSwipeRefreshing = isSwipeRefreshing,
+                )
+            }
         }
     }
 
