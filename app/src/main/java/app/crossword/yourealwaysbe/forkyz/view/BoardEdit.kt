@@ -134,7 +134,7 @@ class BoardEditState private constructor(
             }
         }
 
-    internal var boxInputState : BoxInputState? = null
+    internal var boxInputState = BoxInputState()
 
     private var fitScale : Float = 0f
         private set
@@ -417,12 +417,9 @@ fun BoardEdit(
     onTap : (Int, Int) -> Unit,
     onLongPress : (Int, Int) -> Unit,
 ) {
-    val boxInputState : BoxInputState = remember { BoxInputState() }
-    state.boxInputState = boxInputState
-
     BoxInput(
         modifier = modifier,
-        state = boxInputState,
+        state = state.boxInputState,
         inputConnectionMediator = inputConnectionMediator,
         onNewResponse = viewModel.playLetter,
         onDeleteResponse = viewModel.deleteLetter,
@@ -440,7 +437,7 @@ fun BoardEdit(
             .newResponseEvent
             .collectAsStateWithLifecycle()
         LaunchedEffect(newResponse) {
-            newResponse?.let(boxInputState::setResponse)
+            newResponse?.let(state.boxInputState::setResponse)
             viewModel.clearNewResponseEvent()
         }
     }
@@ -682,12 +679,13 @@ fun WordEdit(
         onDeleteResponse = viewModel.deleteLetter,
     ) {
         if (!incognitoMode) {
-            WordEditNoInput(
+            val boardState by viewModel.boardState.collectAsStateWithLifecycle()
+            BoxesEditNoInput(
                 modifier = boardModifier,
                 textMeasurer = textMeasurer,
                 maxWidth = maxWidth,
                 colors = colors,
-                viewModel = viewModel,
+                boxes = boardState.boxes,
                 onTap = onTap,
                 onLongPress = onLongPress,
             )
@@ -726,11 +724,32 @@ fun WordEditNoInput(
     onTap : (Int, Int) -> Unit,
     onLongPress : (Int, Int) -> Unit,
 ) {
+    val boardState by viewModel.boardState.collectAsStateWithLifecycle()
+    BoxesEditNoInput(
+        modifier = modifier,
+        textMeasurer = textMeasurer,
+        maxWidth = maxWidth,
+        colors = colors,
+        boxes = boardState.boxes,
+        onTap = onTap,
+        onLongPress = onLongPress,
+    )
+}
+
+@Composable
+fun BoxesEditNoInput(
+    modifier : Modifier = Modifier,
+    textMeasurer : TextMeasurer,
+    maxWidth : Dp,
+    colors : BoardColorScheme,
+    boxes : ImmutableList<BoxState?>,
+    onTap : (Int, Int) -> Unit,
+    onLongPress : (Int, Int) -> Unit,
+) {
     val localDensity = LocalDensity.current
     val displayWidth = with (localDensity) { maxWidth.toPx() }
     val localTextStyle = LocalTextStyle.current
-    val boardState by viewModel.boardState.collectAsStateWithLifecycle()
-    val length = boardState.boxes.size
+    val length = boxes.size
     val boxProfile
         = remember(localDensity, colors, length, localTextStyle) {
             val baseBoxSizePx = BASE_BOX_SIZE_DP * localDensity.density
@@ -752,7 +771,7 @@ fun WordEditNoInput(
                         boxProfile.boxSizePx,
                         widthBoxes,
                         offset,
-                        boardState.boxes,
+                        boxes,
                     )?.let { box -> onTap(box.row, box.col) }
                 },
                 onLongPress = { offset ->
@@ -761,14 +780,14 @@ fun WordEditNoInput(
                         boxProfile.boxSizePx,
                         widthBoxes,
                         offset,
-                        boardState.boxes,
+                        boxes,
                     )?.let { box -> onLongPress(box.row, box.col) }
                 },
             )
         },
         textMeasurer = textMeasurer,
         profile = boxProfile,
-        boxes = boardState.boxes,
+        boxes = boxes,
         widthBoxes = widthBoxes,
     )
 }

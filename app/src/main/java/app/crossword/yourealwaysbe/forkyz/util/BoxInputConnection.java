@@ -112,6 +112,8 @@ public class BoxInputConnection extends BaseInputConnection {
 
     public void refreshInput() {
         InputMethodManager imm = getInputMethodManager();
+        // TODO: only invalidate if keyboard shown (else connection dies
+        // sometimes)
         utils.invalidateInput(imm, targetView);
     }
 

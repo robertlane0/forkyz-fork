@@ -1,6 +1,8 @@
 
 package app.crossword.yourealwaysbe.forkyz
 
+import kotlinx.collections.immutable.persistentListOf
+
 import android.net.Uri
 import android.view.View
 import androidx.activity.compose.setContent
@@ -69,14 +71,15 @@ import app.crossword.yourealwaysbe.forkyz.menu.MenuText
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
 import app.crossword.yourealwaysbe.forkyz.util.addAlpha
+import app.crossword.yourealwaysbe.forkyz.util.letterOrDigitKeyToChar
 import app.crossword.yourealwaysbe.forkyz.view.BoardEditText
-import app.crossword.yourealwaysbe.forkyz.view.BoardEditText.BoardEditFilter
-import app.crossword.yourealwaysbe.forkyz.view.BoardEditView.BoardClickListener
+import app.crossword.yourealwaysbe.forkyz.view.BoardEditTextState
 import app.crossword.yourealwaysbe.forkyz.view.BoxInputState
 import app.crossword.yourealwaysbe.forkyz.view.OKCancelDialog
 import app.crossword.yourealwaysbe.forkyz.view.ScrollingImageView
 import app.crossword.yourealwaysbe.forkyz.view.ScrollingImageView.Point
 import app.crossword.yourealwaysbe.forkyz.view.WordEdit
+import app.crossword.yourealwaysbe.forkyz.view.rememberBoardEditTextState
 import app.crossword.yourealwaysbe.forkyz.view.rememberBoardTextMeasurer
 import app.crossword.yourealwaysbe.puz.Clue
 import app.crossword.yourealwaysbe.puz.ClueID
@@ -324,7 +327,7 @@ fun NotesPage(
         @Composable
         fun MiniboardRow(maxWidth : Dp) {
             val state by viewModel.notesUIState.collectAsStateWithLifecycle()
-            if (state.isPuzzleNotes || state.word == null)
+            if (state.isPuzzleNotes)
                 return
 
             val boardColorScheme = themeHelper.getBoardColorScheme()
@@ -357,155 +360,80 @@ fun NotesPage(
         }
 
         /**
-         * BoardEditView
+         * BoardEditText for notes page.
          *
-         * @param the value that should occupy the view
-         * @param contentDescription id of content description for widget
-         * @param onClick on click callback
-         * @param onLongClick on long click callback
-         * @param longClickAccessibilityAction the accessibility action
-         * description for long click
-         * @param delete see BoardEditFilter
-         * @param filter see BoardEditFilter
-         * @param postChange see BoardEditFilter with extra full value arg
-         * @param onFocusChanged call back for gain/lose focus
-         * @param shadowValue the shadow value to use
-         * @param separatorsClue clue to copy separators from or null
-         * @param inferSeparators whether to infer separators from clue
-         * @param selectionPosition if non-null and in range, select this cel
+         * Provides some arguments of BoardEditText directly
          */
         @Composable
-        fun BoardEdit(
+        fun NotesBoardEditText(
+            maxWidth : Dp,
+            boardEditTextState : BoardEditTextState,
             value : String,
-            contentDescription : Int,
-            onClick : () -> Unit,
-            onLongClick : () -> Unit,
-            longClickAccessibilityAction : Int,
-            delete : (Char, Int) -> Boolean = { _, _ -> true },
-            filter : (Char, Char, Int) -> Char = { _, newChar, _ -> newChar },
-            postChange : (Int, Char, Boolean, String) -> Unit = { _, _, _, _ -> },
-            onFocusChanged : (Boolean) -> Unit = { },
-            shadowValue : String? = "",
-            separatorsClue : Clue? = null,
-            inferSeparators : Boolean = false,
-            selectionPosition : Int? = null,
+            onDelete : (Int) -> Unit = { null },
+            onChange : (Int, Char) -> String? = { _, _ -> null },
+            separators : Boolean = false,
+            shadow : String? = null,
+            onTap : () -> Unit,
+            onLongPress : () -> Unit,
+            onFocusChanged : (Boolean) -> Unit,
         ) {
             val state by viewModel.notesUIState.collectAsStateWithLifecycle()
             val boardColorScheme = themeHelper.getBoardColorScheme()
-            val longClickAccessibilityActionString
-                = stringResource(longClickAccessibilityAction)
 
-            AndroidView(
+            val separatorsList = if (separators)
+                state.clueSeparators
+            else
+                persistentListOf()
+
+            BoardEditText(
                 modifier = Modifier.fillMaxWidth()
                     .padding(vertical = VERTICAL_BOARD_PADDING),
-                factory = { context ->
-                    val view = BoardEditText(context, boardColorScheme).apply {
-                        setFocusable(true)
-                        setFocusableInTouchMode(true)
-                        setContentDescription(
-                            context.getString(contentDescription),
-                        )
-                        setContextMenuListener(
-                            object : ScrollingImageView.ClickListener {
-                                override fun onTap(point : Point?) {
-                                    onClick()
-                                }
-                                override fun onContextMenu(point : Point) {
-                                    onLongClick()
-                                }
-                            }
-                        )
-                        setFilter(object : BoardEditFilter {
-                            override fun delete(
-                                oldChar : Char,
-                                pos : Int,
-                            ) : Boolean {
-                                return delete(oldChar, pos)
-                            }
-
-                            override fun filter(
-                                oldChar : Char,
-                                newChar : Char,
-                                pos : Int,
-                            ) : Char {
-                                return filter(oldChar, newChar, pos)
-                            }
-
-                            override fun postChange(
-                                pos : Int,
-                                oldChar : Char,
-                                isDelete : Boolean,
-                            ) {
-                                // getView() for BoardEditText just returns
-                                // "this", but toString() on its own uses
-                                // the toString() of NotesActivity (i think)
-                                postChange(
-                                    pos,
-                                    oldChar,
-                                    isDelete,
-                                    getView().toString(),
-                                )
-                            }
-                        })
-                    }
-                    ViewCompat.replaceAccessibilityAction(
-                        view,
-                        AccessibilityActionCompat.ACTION_LONG_CLICK,
-                        longClickAccessibilityActionString,
-                        null
-                    )
-                    view.setOnFocusChangeListener({ _, gainFocus ->
-                        if (gainFocus)
-                            inputConnectionMediator.registerReceiver(view)
-                        onFocusChanged(gainFocus)
-                    })
-
-                    view
-                },
-                update = { view ->
-                    view.apply {
-                        setLength(state.boxesLength)
-                        setFromString(value)
-                        setShadow(shadowValue)
-                        if (separatorsClue != null) {
-                            setSeparatorsFromClue(
-                                separatorsClue,
-                                inferSeparators,
-                            )
-                        }
-                        if (selectionPosition != null)
-                            setSelectedCol(selectionPosition)
-                        setRenderSettings(state.renderSettings)
-                        setSkipFilled(state.skipFilled)
-                        setBoardColorScheme(boardColorScheme)
-                    }
-                },
+                textMeasurer = textMeasurer,
+                maxWidth = maxWidth,
+                inputConnectionMediator = inputConnectionMediator,
+                colors = boardColorScheme,
+                state = boardEditTextState,
+                length = state.boxesLength,
+                value = value,
+                onDelete = onDelete,
+                onChange = onChange,
+                skipFilled = state.skipFilled,
+                separators = separatorsList,
+                shadow = shadow,
+                onTap = onTap,
+                onLongPress = onLongPress,
+                onFocusChanged = onFocusChanged,
+                // TODO: content description
             )
         }
 
         @Composable
-        fun ScratchRow() {
+        fun ScratchRow(maxWidth : Dp) {
             val state by viewModel.notesUIState.collectAsStateWithLifecycle()
+            val boardEditTextState = rememberBoardEditTextState()
 
             BoardLabel(R.string.scratch_lab)
-            BoardEdit(
+            NotesBoardEditText(
+                maxWidth = maxWidth,
+                boardEditTextState = boardEditTextState,
                 value = state.scratchValue,
-                contentDescription = R.string.scratch_lab,
-                onClick = viewModel::showKeyboard,
-                onLongClick = {
+                onDelete = viewModel::deleteScratch,
+                onChange = viewModel::changeScratch,
+                separators = true,
+                shadow = null,
+                onTap = {
+                    boardEditTextState.requestFocus()
+                    viewModel.showKeyboard()
+                },
+                onLongPress = {
                     transferToFocussed(NoteEntry.SCRATCH, NoteEntry.BOARD)
                 },
-                postChange = { _, _, _, value ->
-                    viewModel.setScratchValue(value)
-                },
-                longClickAccessibilityAction
-                    = R.string.transfer_scratch_to_focussed_view,
                 onFocusChanged = { focussed ->
                     setFocussedEntry(NoteEntry.SCRATCH, focussed)
                 },
-                separatorsClue = state.notesClue,
-                inferSeparators = state.inferSeparators,
             )
+            //contentDescription = R.string.scratch_lab,
+            //longClickAccessibilityAction = R.string.transfer_scratch_to_focussed_view,
         }
 
         @Composable
@@ -589,72 +517,85 @@ fun NotesPage(
         }
 
         @Composable
-        fun AnagramSourceRow() {
+        fun AnagramSourceRow(maxWidth : Dp) {
             val state by viewModel.notesUIState.collectAsStateWithLifecycle()
             val acceptedPredictionEvent
                 by viewModel.acceptedPredictionEvent.collectAsStateWithLifecycle()
+            val boardEditTextState = rememberBoardEditTextState()
 
-            var selectionPosition : Int? = acceptedPredictionEvent?.let {
-                // to end if filled boxes, else to first free space
-                if (it >= state.boxesLength)
-                    it - 1
-                else if (it > 0)
-                    it
-                else
-                    null
+            LaunchedEffect(acceptedPredictionEvent) {
+                acceptedPredictionEvent?.let {
+                    // to end if filled boxes, else to first free space
+                    if (it >= state.boxesLength)
+                        it - 1
+                    else if (it > 0)
+                        it
+                    else
+                        null
+                }?.let { newSelected ->
+                    boardEditTextState.selected = newSelected
+                }
+                if (acceptedPredictionEvent != null)
+                    viewModel.clearAcceptedPredictionEvent()
             }
-            if (acceptedPredictionEvent != null)
-                viewModel.clearAcceptedPredictionEvent()
 
             BoardLabel(R.string.anagram_source_lab)
-            BoardEdit(
+            NotesBoardEditText(
+                maxWidth = maxWidth,
+                boardEditTextState = boardEditTextState,
                 value = state.anagramSourceValue,
-                shadowValue = state.anagramSourcePredictionValue,
-                contentDescription = R.string.anagram_source_lab,
-                onClick = {
-                    // TODO: show keyboard for view!
+                onDelete = viewModel::deleteAnagramSource,
+                onChange = viewModel::changeAnagramSource,
+                separators = false,
+                shadow = state.anagramSourcePredictionValue,
+                onTap = {
+                    boardEditTextState.requestFocus()
                     viewModel.showKeyboard()
                 },
-                onLongClick = viewModel::shuffleAnagramSource,
-                filter = { oldChar, newChar, _ ->
-                    viewModel.filterAnagramSource(oldChar, newChar)
-                },
-                postChange = viewModel::updateAnagramSource,
-                longClickAccessibilityAction
-                    = R.string.shuffle_anagram_source,
+                onLongPress = viewModel::shuffleAnagramSource,
                 onFocusChanged = { focussed ->
                     setFocussedEntry(NoteEntry.ANAGRAM_SOURCE, focussed)
                 },
-                selectionPosition = selectionPosition,
             )
+
+// TODO
+//            BoardEdit(
+//                contentDescription = R.string.anagram_source_lab,
+//                longClickAccessibilityAction
+//                    = R.string.shuffle_anagram_source,
         }
 
         @Composable
-        fun AnagramSolutionRow() {
+        fun AnagramSolutionRow(maxWidth : Dp) {
             val state by viewModel.notesUIState.collectAsStateWithLifecycle()
+            val boardEditTextState = rememberBoardEditTextState()
 
             BoardLabel(R.string.anagram_solution_lab)
-            BoardEdit(
+            NotesBoardEditText(
+                maxWidth = maxWidth,
+                boardEditTextState = boardEditTextState,
                 value = state.anagramSolutionValue,
-                contentDescription = R.string.anagram_source_lab,
-                onClick = { viewModel.showKeyboard() },
-                onLongClick = {
-                    transferToFocussed(NoteEntry.ANAGRAM_SOLUTION, NoteEntry.BOARD)
+                onDelete = viewModel::deleteAnagramSolution,
+                onChange = viewModel::changeAnagramSolution,
+                separators = true,
+                shadow = null,
+                onTap = {
+                    boardEditTextState.requestFocus()
+                    viewModel.showKeyboard()
                 },
-                filter = { _, newChar, _ ->
-                    viewModel.filterAnagramSolution(newChar)
+                onLongPress = {
+                    transferToFocussed(
+                        NoteEntry.ANAGRAM_SOLUTION,
+                        NoteEntry.BOARD,
+                    )
                 },
-                postChange = { pos, oldChar, _, newValue ->
-                    viewModel.updateAnagramSolution(pos, oldChar, newValue)
-                },
-                longClickAccessibilityAction
-                    = R.string.transfer_anagram_solution_to_focussed_view,
                 onFocusChanged = { focussed ->
                     setFocussedEntry(NoteEntry.ANAGRAM_SOLUTION, focussed)
                 },
-                separatorsClue = state.notesClue,
-                inferSeparators = state.inferSeparators,
             )
+//                contentDescription = R.string.anagram_source_lab,
+//                longClickAccessibilityAction
+//                    = R.string.transfer_anagram_solution_to_focussed_view,
         }
 
         @Composable
@@ -682,11 +623,11 @@ fun NotesPage(
                             .height(IntrinsicSize.Max),
                     ) {
                         MiniboardRow(maxWidth = miniboardMaxWidth)
-                        ScratchRow()
+                        ScratchRow(maxWidth = miniboardMaxWidth)
                         TextRow(modifier = Modifier.weight(1.0F))
                         FlagRow()
-                        AnagramSourceRow()
-                        AnagramSolutionRow()
+                        AnagramSourceRow(maxWidth = miniboardMaxWidth)
+                        AnagramSolutionRow(maxWidth = miniboardMaxWidth)
                         VoiceButtons()
                     }
                     Keyboard()

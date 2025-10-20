@@ -64,6 +64,7 @@ import app.crossword.yourealwaysbe.forkyz.settings.FitToScreenMode
 import app.crossword.yourealwaysbe.forkyz.settings.GridRatio
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
+import app.crossword.yourealwaysbe.forkyz.util.letterOrDigitKeyToChar
 import app.crossword.yourealwaysbe.forkyz.view.BoardEdit
 import app.crossword.yourealwaysbe.forkyz.view.BoardEditView.BoardClickListener
 import app.crossword.yourealwaysbe.forkyz.view.ClueTabs
