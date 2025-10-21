@@ -2,6 +2,7 @@
 package app.crossword.yourealwaysbe.forkyz.view
 
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.requiredSize
@@ -21,6 +22,7 @@ import androidx.compose.ui.graphics.colorspace.ColorSpaces
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
@@ -33,6 +35,8 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+
+import coil3.compose.AsyncImage
 
 import app.crossword.yourealwaysbe.forkyz.theme.BoardColorScheme
 
@@ -198,6 +202,7 @@ fun Board(
     width : Int,
     height : Int,
     boxes : ImmutableList<ImmutableList<BoxState?>>,
+    images : ImmutableList<Image> = persistentListOf(),
     profile : BoxProfile,
 ) {
     val textMeasurer = rememberTextMeasurer(cacheSize = TEXT_MEASURE_CACHE_SIZE)
@@ -223,6 +228,21 @@ fun Board(
                     )
                 }
             }
+        }
+
+        images.forEach { image ->
+            AsyncImage(
+                modifier = Modifier.requiredSize(
+                    profile.boxSize * image.width,
+                    profile.boxSize * image.height,
+                ).graphicsLayer {
+                    translationX = profile.boxSizePx * image.col
+                    translationY = profile.boxSizePx * image.row
+                },
+                model = image.url,
+                contentDescription = null,
+                contentScale = ContentScale.FillBounds,
+            )
         }
     }
 }

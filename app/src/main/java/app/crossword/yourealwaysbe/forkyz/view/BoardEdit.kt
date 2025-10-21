@@ -591,6 +591,7 @@ private fun BoardFullBody(
                             width = viewModel.width,
                             height = viewModel.height,
                             boxes = board.boxes,
+                            images = board.images,
                             profile = boxProfile,
                         )
 

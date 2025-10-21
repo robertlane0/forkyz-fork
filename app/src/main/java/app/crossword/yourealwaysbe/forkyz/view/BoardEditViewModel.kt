@@ -27,6 +27,7 @@ import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges
 import app.crossword.yourealwaysbe.puz.Playboard.PlayboardListener
 import app.crossword.yourealwaysbe.puz.Playboard.Word
 import app.crossword.yourealwaysbe.puz.Position
+import app.crossword.yourealwaysbe.puz.PuzImage
 import app.crossword.yourealwaysbe.puz.Zone
 
 enum class Bar {
@@ -39,6 +40,17 @@ enum class Shape {
     HEART, SPADE, STAR, SQUARE, RHOMBUS, FORWARD_SLASH, BACK_SLASH,
     X
 }
+
+/**
+ * Image, data in boxes
+ */
+data class Image(
+    val row : Int,
+    val col : Int,
+    val width : Int,
+    val height : Int,
+    val url : String,
+)
 
 data class FlagsState(
     val flagAcross : Boolean = false,
@@ -119,6 +131,7 @@ data class BoardState(
     val boxes : ImmutableList<ImmutableList<BoxState?>> = persistentListOf(),
     val pinnedBoxes : ImmutableList<ImmutableList<BoxState?>>? = null,
     val currentPosition : CurrentPositionState? = null,
+    val images : ImmutableList<Image> = persistentListOf(),
 )
 
 data class WordState(
@@ -584,7 +597,8 @@ class BoardEditViewModel(
             } else 0
         }
 
-    val _scrollToClueEvent = MutableStateFlow<CurrentPositionState?>(null)
+    private val _scrollToClueEvent
+        = MutableStateFlow<CurrentPositionState?>(null)
     val scrollToClueEvent : StateFlow<CurrentPositionState?>
         = _scrollToClueEvent
 
@@ -630,9 +644,20 @@ class BoardEditViewModel(
 
         val selectedPositions = board.currentWord.zone.toSet()
 
+        val images = board?.puzzle?.images?.map {
+            Image(
+                row = it.row,
+                col = it.col,
+                width = it.width,
+                height = it.height,
+                url = it.url,
+            )
+        }?.toImmutableList() ?: persistentListOf()
+
         return BoardState(
             boxes = getBoxes(boardEditSettings, selectedPositions),
             pinnedBoxes = getPinnedBoxes(boardEditSettings, selectedPositions),
+            images = images,
         )
     }
 

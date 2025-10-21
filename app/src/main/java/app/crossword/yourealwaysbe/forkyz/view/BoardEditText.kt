@@ -173,7 +173,7 @@ fun BoardEditText(
         modifier = modifier.onFocusChanged {
             if (!it.hasFocus)
                 state.selected = -1
-            else
+            else if (state.selected < 0)
                 state.selected = 0
             onFocusChanged(it.hasFocus)
         }.onKeyEvent(::onKeyEvent),
