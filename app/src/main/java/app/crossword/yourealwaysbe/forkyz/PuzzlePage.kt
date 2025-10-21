@@ -86,7 +86,6 @@ import app.crossword.yourealwaysbe.forkyz.theme.BoardColorScheme
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer
 import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
-import app.crossword.yourealwaysbe.forkyz.view.BoardWordEdit
 import app.crossword.yourealwaysbe.forkyz.view.ChooseFlagColorDialog
 import app.crossword.yourealwaysbe.forkyz.view.ForkyzKeyboard
 import app.crossword.yourealwaysbe.forkyz.view.OKCancelDialog
@@ -133,64 +132,6 @@ class PuzzlePageScope(
         get() {
             return viewModel.voiceState.value.equalsAnnounceClue
         }
-
-    /**
-     * Miniboard current word view
-     *
-     * Shows current word on board. Assumes should take immediate focus
-     * and setup as view targeted by keyboard.
-     *
-     * @param word if not null show this word not the currently selected
-     * @param onClick onClick method for BoardClickListener
-     * @param onLongClick onLongClick method for BoardClickListener
-     * @param longClickAccessibilityAction string ID of long click
-     * action description
-     * @param incognitoMode whether to make the view invisible and take
-     * no space (ok, 1 pixel)
-     * @param useSuppressNotesList whether to use the given
-     * suppressNotesList or let BoardWordEditView use its default
-     * @param suppressNotesList for PlayboardRenderer.drawBox
-     * @param movementStrategy the movement strategy to use for the miniboard
-     * @param renderSettings settings for renderer
-     */
-    @Composable
-    fun Miniboard(
-        modifier : Modifier = Modifier,
-        word : Word? = null,
-        onClick : (Position?, Word?) -> Unit,
-        onLongClick : (Position?) -> Unit,
-        longClickAccessibilityAction : Int,
-        incognitoMode : Boolean = false,
-        scratchMode : Boolean = false,
-        useSuppressNotesList : Boolean = false,
-        suppressNotesList : Set<String>? = null,
-        onFocusChanged : (Boolean) -> Unit = { },
-        movementStrategy : MovementStrategy = MovementStrategy.STOP_ON_END,
-        renderSettings : RenderSettings = RenderSettings(),
-        boardColorScheme : BoardColorScheme = themeHelper.getBoardColorScheme(),
-    ) {
-        viewModel.getBoard()?.let { board ->
-            BoardWordEdit(
-                modifier = modifier,
-                board = board,
-                word = word,
-                contentDescription = stringResource(R.string.current_word),
-                onClick = onClick,
-                onLongClick = onLongClick,
-                longClickAccessibilityAction
-                    = stringResource(longClickAccessibilityAction),
-                inputConnectionMediator = inputConnectionMediator,
-                incognitoMode = incognitoMode,
-                scratchMode = scratchMode,
-                useSuppressNotesList = useSuppressNotesList,
-                suppressNotesList = suppressNotesList,
-                onFocusChanged = onFocusChanged,
-                movementStrategy = movementStrategy,
-                renderSettings = renderSettings,
-                boardColorScheme = boardColorScheme,
-            )
-        }
-    }
 
     /**
      * Use if you want to update your UI based on the timer

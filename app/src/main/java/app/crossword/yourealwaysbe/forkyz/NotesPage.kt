@@ -76,8 +76,6 @@ import app.crossword.yourealwaysbe.forkyz.view.BoardEditText
 import app.crossword.yourealwaysbe.forkyz.view.BoardEditTextState
 import app.crossword.yourealwaysbe.forkyz.view.BoxInputState
 import app.crossword.yourealwaysbe.forkyz.view.OKCancelDialog
-import app.crossword.yourealwaysbe.forkyz.view.ScrollingImageView
-import app.crossword.yourealwaysbe.forkyz.view.ScrollingImageView.Point
 import app.crossword.yourealwaysbe.forkyz.view.WordEdit
 import app.crossword.yourealwaysbe.forkyz.view.rememberBoardEditTextState
 import app.crossword.yourealwaysbe.forkyz.view.rememberBoardTextMeasurer
