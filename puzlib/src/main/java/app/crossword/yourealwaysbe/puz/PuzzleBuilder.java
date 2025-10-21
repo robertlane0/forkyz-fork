@@ -467,7 +467,7 @@ public class PuzzleBuilder {
                     byte[] bytes = StreamUtils.getStreamBytes(is);
                     String type = connection.getContentType();
                     image.setURL(
-                        "data:" + type + "," + Base64.encodeBytes(bytes)
+                        "data:" + type + ";base64," + Base64.encodeBytes(bytes)
                     );
                 }
             } catch (IOException | URISyntaxException e) {
