@@ -471,11 +471,8 @@ class PlayPageViewModel @Inject constructor(
         // hide if it's a new word
         getBoard()?.let { board ->
             val newPos = board.getHighlightLetter()
-            if (previous.checkInWord(newPos.row, newPos.col)) {
+            if (previous.checkInWord(newPos.row, newPos.col))
                 showKeyboard()
-            } else {
-                hideKeyboard()
-            }
         }
     }
 
