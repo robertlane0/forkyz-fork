@@ -103,6 +103,13 @@ fun BoardEditText(
     onLongPress : () -> Unit,
     onFocusChanged : (Boolean) -> Unit,
 ) {
+    fun refreshInput() {
+        if (state.selected >= 0) {
+            val selectedChar = value.getOrElse(state.selected) { BLANK }
+            state.setResponse(selectedChar)
+        }
+    }
+
     fun isSelectedBlank(s : String) : Boolean {
         return (s.getOrElse(state.selected) { BLANK }) == BLANK
     }
@@ -114,7 +121,8 @@ fun BoardEditText(
     fun onNewResponse(response : String) {
         response.getOrNull(0)?.let { newChar ->
             if (isAcceptableCharacterResponse(newChar)) {
-                onChange(state.selected, newChar)?.let { newValue ->
+                val newValue = onChange(state.selected, newChar)
+                if (newValue != null) {
                     state.selected = Math.min(length - 1, state.selected + 1)
                     while (
                         !isSelectedBlank(newValue)
@@ -122,6 +130,10 @@ fun BoardEditText(
                     ) {
                         state.selected += 1
                     }
+                } else {
+                    // input will need refreshing as there's no change
+                    // so the ime will be confused
+                    refreshInput()
                 }
             }
         }
@@ -223,10 +235,7 @@ fun BoardEditText(
         )
 
         LaunchedEffect(value, state.selected) {
-            if (state.selected >= 0) {
-                val selectedChar = value.getOrElse(state.selected) { BLANK }
-                state.setResponse(selectedChar)
-            }
+            refreshInput()
         }
     }
 }

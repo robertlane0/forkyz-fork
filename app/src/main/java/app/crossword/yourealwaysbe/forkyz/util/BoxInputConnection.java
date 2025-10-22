@@ -1,6 +1,9 @@
 
 package app.crossword.yourealwaysbe.forkyz.util;
 
+import android.view.inputmethod.SurroundingText;
+import android.view.inputmethod.TextSnapshot;
+
 import java.util.Locale;
 
 import android.content.Context;
@@ -112,15 +115,35 @@ public class BoxInputConnection extends BaseInputConnection {
 
     public void refreshInput() {
         InputMethodManager imm = getInputMethodManager();
-        // TODO: only invalidate if keyboard shown (else connection dies
-        // sometimes)
-        utils.invalidateInput(imm, targetView);
+        // Don't use invalidateInput -- it is more efficient but leads
+        // to what looks like a race condition with showSoftInput. It
+        // starts a new session ID but showSoftInput tries to connect to
+        // the wrong one and keyboard entry breaks. This is in the logs:
+        // "RemoteInputConnectionImpl: Session id mismatch
+        // header.sessionId: 0 currentSessionId: 1"
+        imm.restartInput(targetView);
+        //utils.invalidateInput(imm, targetView);
     }
 
     @Override
     public boolean beginBatchEdit() {
         batchEditNestingDepth += 1;
         return true;
+    }
+
+    @Override
+    public TextSnapshot takeSnapshot() {
+        return new TextSnapshot(
+            new SurroundingText(
+                boardEditable.toString(),
+                0,
+                boardEditable.length(),
+                0
+            ),
+            boardEditable.getCompositionStart(),
+            boardEditable.getCompositionEnd(),
+            getCursorCapsMode(TextUtils.CAP_MODE_CHARACTERS)
+        );
     }
 
     @Override
@@ -315,6 +338,14 @@ public class BoxInputConnection extends BaseInputConnection {
         @SuppressWarnings("rawtypes")
         public int nextSpanTransition(int start, int limit, Class type) {
             return spannable.nextSpanTransition(start, limit, type);
+        }
+
+        public int getCompositionStart() {
+            return getComposingSpanStart(spannable);
+        }
+
+        public int getCompositionEnd() {
+            return getComposingSpanEnd(spannable);
         }
 
         public void setResponse(String response) {

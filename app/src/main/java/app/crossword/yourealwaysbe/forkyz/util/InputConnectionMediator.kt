@@ -82,7 +82,7 @@ class InputConnectionMediator() {
                     getInputMethodManager()?.let { imm ->
                         if (nativeChanged)
                             imm.restartInput(view)
-                        imm.showSoftInput(view, 0)
+                        val res = imm.showSoftInput(view, 0)
                     }
                 }
             }
