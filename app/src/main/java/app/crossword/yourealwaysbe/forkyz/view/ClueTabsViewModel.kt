@@ -185,7 +185,8 @@ class ClueTabsViewModel(
     }
 
     fun onBoxClick(row : Int, col : Int) {
-        board?.setHighlightLetter(Position(row, col))
+        val clueID = board?.clueID
+        board?.setHighlightLetter(Position(row, col), clueID)
     }
 
     override fun onPlayboardChange(changes : PlayboardChanges) {

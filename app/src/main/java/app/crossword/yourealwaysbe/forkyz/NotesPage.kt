@@ -344,7 +344,7 @@ fun NotesPage(
                 onTap = { row, col ->
                     boxInputState.requestFocus()
                     setFocussedEntry(NoteEntry.BOARD, true)
-                    viewModel.clickBoard(row, col)
+                    viewModel.clickBoard(row, col, fixClue = true)
                 },
                 onLongPress = { _, _ ->
                     transferToFocussed(NoteEntry.BOARD)

@@ -247,7 +247,7 @@ fun ClueListPage(
                         viewModel = viewModel.wordEditViewModel,
                         onTap = { row, col ->
                             boxInputState.requestFocus()
-                            viewModel.clickBoard(row, col)
+                            viewModel.clickBoard(row, col, fixClue = true)
                         },
                         onLongPress = { _, _ ->
                             viewModel.launchCurrentClueNotes()

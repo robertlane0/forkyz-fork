@@ -726,12 +726,19 @@ open class PuzzlePageViewModel @Inject constructor(
         voiceCommandDispatcher.registerVoiceCommand(command)
     }
 
-    fun clickBoard(row : Int, col : Int) {
+    /**
+     * General click board action
+     *
+     * @param fixClue don't allow current clue to change because of
+     * click
+     */
+    fun clickBoard(row : Int, col : Int, fixClue : Boolean = false) {
         // only show keyboard if double click a word
         // hide if it's a new word
         getBoard()?.let { board ->
             val newPos = Position(row, col)
-            val previousWord = board.setHighlightLetter(newPos)
+            val clueID = if (fixClue) board.clueID else null
+            val previousWord = board.setHighlightLetter(newPos, clueID)
             if (previousWord?.checkInWord(newPos.row, newPos.col) ?: false) {
                 showKeyboard()
             } else {
