@@ -962,7 +962,7 @@ class BrowsePageViewModel @Inject constructor(
                 )
 
                 val showRatings = !disableRatings && (
-                    alwaysShowRating || isViewArchive
+                    alwaysShowRating || isArchive
                 )
 
                 // reset to false when new puzzle list
@@ -1009,8 +1009,11 @@ class BrowsePageViewModel @Inject constructor(
         val showRatings = browseSettings.displaySettings
             .ratingsSettings
             .let { rs ->
-                !rs.disableRatings && (rs.browseAlwaysShowRating || isViewArchive)
+                !rs.disableRatings && (
+                    rs.browseAlwaysShowRating || state.isViewArchive
+                )
             }
+
         val indicateIfSolution = browseSettings.displaySettings
             .indicateIfSolution
         val dayNightMode = browseSettings.displaySettings.appDayNightMode
@@ -1019,7 +1022,7 @@ class BrowsePageViewModel @Inject constructor(
             browseSettings.externalSettings.fileHandlerStorageLocation
                 == StorageLocation.SL_INTERNAL
             && puzzles.isEmpty()
-            && !isViewArchive
+            && !state.isViewArchive
         )
         val isNotificationPermissionNeeded = browseSettings.downloaderSettings
             .downloadersSettings
