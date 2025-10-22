@@ -123,13 +123,18 @@ fun BoardEditText(
             if (isAcceptableCharacterResponse(newChar)) {
                 val newValue = onChange(state.selected, newChar)
                 if (newValue != null) {
-                    state.selected = Math.min(length - 1, state.selected + 1)
+                    val nextSelected = Math.min(length - 1, state.selected + 1)
+                    state.selected = nextSelected
                     while (
-                        !isSelectedBlank(newValue)
-                        && state.selected < (length-1)
+                        skipFilled
+                        && !isSelectedBlank(newValue)
+                        && state.selected < (length - 1)
                     ) {
                         state.selected += 1
                     }
+                    // go back if we didn't find a blank
+                    if (skipFilled && !isSelectedBlank(newValue))
+                        state.selected = nextSelected
                 } else {
                     // input will need refreshing as there's no change
                     // so the ime will be confused
