@@ -910,6 +910,11 @@ class PuzzlePageScope(
         )
     }
 
+    fun doExitPage() {
+        inputConnectionMediator.clearReceiver()
+        onBack()
+    }
+
     private fun actionSupportSource() {
         viewModel.supportURL?.let { url ->
             openURI(url.toUri())
@@ -1139,12 +1144,10 @@ fun PuzzlePage(
     }
 
     fun doBackAction() {
-        if (viewModel.keyboardState.value.hideOnBack) {
+        if (viewModel.keyboardState.value.hideOnBack)
             viewModel.hideKeyboard(true)
-        } else {
-            inputConnectionMediator.clearReceiver()
+        else
             onBack()
-        }
     }
 
     @OptIn(ExperimentalComposeUiApi::class)

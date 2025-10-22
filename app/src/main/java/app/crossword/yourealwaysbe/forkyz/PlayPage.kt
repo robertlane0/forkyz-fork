@@ -285,7 +285,7 @@ fun PlayPage(
                         ClueText(modifier = Modifier.fillMaxWidth())
                     }
                 },
-                onBack = { onBack() },
+                onBack = { doExitPage() },
                 actions = { OverflowMenu() },
             )
         }

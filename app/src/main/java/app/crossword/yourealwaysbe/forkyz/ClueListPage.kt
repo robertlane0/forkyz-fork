@@ -201,7 +201,7 @@ fun ClueListPage(
         fun TopAppBar() {
             themeHelper.ForkyzTopAppBar(
                 title = { Text(stringResource(R.string.clues_list_label)) },
-                onBack = { onBack() },
+                onBack = { doExitPage() },
                 actions = { OverflowMenu() },
             )
         }

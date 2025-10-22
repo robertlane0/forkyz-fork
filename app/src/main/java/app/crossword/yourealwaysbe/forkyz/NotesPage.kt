@@ -312,7 +312,7 @@ fun NotesPage(
                         )
                     }
                 },
-                onBack = { onBack() },
+                onBack = { doExitPage() },
                 actions = { OverflowMenu() },
             )
         }
