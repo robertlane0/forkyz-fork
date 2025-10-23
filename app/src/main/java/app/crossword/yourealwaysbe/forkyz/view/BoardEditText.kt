@@ -82,6 +82,7 @@ fun rememberBoardEditTextState() : BoardEditTextState {
  * index -1 or null if no separators
  * @param shadow value to show "behind" actual value (in blanks, grey)
  * @param onLongPress call back when board long pressed
+ * @param onLongPressDescription for accessibility
  * @param onFocusChanged call back when focus on input changes
  */
 @Composable
@@ -101,7 +102,9 @@ fun BoardEditText(
     shadow : String? = null,
     onTap : () -> Unit,
     onLongPress : () -> Unit,
+    onLongPressDescription : String,
     onFocusChanged : (Boolean) -> Unit,
+    contentDescription : String,
 ) {
     fun refreshInput() {
         if (state.selected >= 0) {
@@ -237,6 +240,8 @@ fun BoardEditText(
                 onTap()
             },
             onLongPress = { _, _ -> onLongPress() },
+            onLongPressDescription = onLongPressDescription,
+            boxesContentDescription = contentDescription,
         )
 
         LaunchedEffect(value, state.selected) {

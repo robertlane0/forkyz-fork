@@ -252,6 +252,8 @@ fun ClueListPage(
                         onLongPress = { _, _ ->
                             viewModel.launchCurrentClueNotes()
                         },
+                        onLongPressDescription
+                            = stringResource(R.string.open_clue_list),
                         incognitoMode = showAllWords,
                     )
                     ClueLists(

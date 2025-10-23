@@ -31,10 +31,15 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.onLongClick
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
+import app.crossword.yourealwaysbe.forkyz.R
 import app.crossword.yourealwaysbe.forkyz.settings.FitToScreenMode
 import app.crossword.yourealwaysbe.forkyz.theme.BoardColorScheme
 import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
@@ -416,6 +421,7 @@ fun BoardEdit(
     doubleTapFitBoard : Boolean,
     onTap : (Int, Int) -> Unit,
     onLongPress : (Int, Int) -> Unit,
+    onLongPressDescription : String,
 ) {
     BoxInput(
         modifier = modifier,
@@ -431,6 +437,7 @@ fun BoardEdit(
             doubleTapFitBoard = doubleTapFitBoard,
             onTap = onTap,
             onLongPress = onLongPress,
+            onLongPressDescription = onLongPressDescription,
         )
 
         val newResponse by viewModel
@@ -452,6 +459,7 @@ private fun BoardFullBody(
     doubleTapFitBoard : Boolean,
     onTap : (Int, Int) -> Unit,
     onLongPress : (Int, Int) -> Unit,
+    onLongPressDescription : String,
 ) {
     state.boardWidthBoxes = viewModel.width
     // more hacking of remembering that pinned has 1 box padding
@@ -461,13 +469,21 @@ private fun BoardFullBody(
         + if (viewModel.pinnedHeight > 0) 1 else 0
     )
 
+    val boardContentDescription = stringResource(R.string.board_description)
     val localDensity = LocalDensity.current
     var lastTapTime = remember { 0L }
 
     Box(
         modifier = modifier
             .fillMaxSize()
-            .pointerInput(true) {
+            .semantics {
+                onLongClick(
+                    // handled by pointer input
+                    action = null,
+                    label = onLongPressDescription,
+                )
+                contentDescription = boardContentDescription
+            }.pointerInput(true) {
                 detectTapGestures(
                     onTap = { offset ->
                         // don't use onDoubleTap to avoid delay of onTap
@@ -668,6 +684,7 @@ fun WordEdit(
     viewModel : WordEditViewModel,
     onTap : (Int, Int) -> Unit,
     onLongPress : (Int, Int) -> Unit,
+    onLongPressDescription : String,
     incognitoMode : Boolean = false,
 ) {
     val inputModifier = if (incognitoMode) Modifier else modifier
@@ -689,6 +706,8 @@ fun WordEdit(
                 boxes = boardState.boxes,
                 onTap = onTap,
                 onLongPress = onLongPress,
+                onLongPressDescription = onLongPressDescription,
+                boxesContentDescription = stringResource(R.string.word_description),
             )
         }
 
@@ -724,6 +743,7 @@ fun WordEditNoInput(
     viewModel : WordEditViewModel,
     onTap : (Int, Int) -> Unit,
     onLongPress : (Int, Int) -> Unit,
+    onLongPressDescription : String,
 ) {
     val boardState by viewModel.boardState.collectAsStateWithLifecycle()
     BoxesEditNoInput(
@@ -734,6 +754,8 @@ fun WordEditNoInput(
         boxes = boardState.boxes,
         onTap = onTap,
         onLongPress = onLongPress,
+        onLongPressDescription = onLongPressDescription,
+        boxesContentDescription = stringResource(R.string.word_description),
     )
 }
 
@@ -746,6 +768,8 @@ fun BoxesEditNoInput(
     boxes : ImmutableList<BoxState?>,
     onTap : (Int, Int) -> Unit,
     onLongPress : (Int, Int) -> Unit,
+    onLongPressDescription : String,
+    boxesContentDescription : String,
 ) {
     val localDensity = LocalDensity.current
     val displayWidth = with (localDensity) { maxWidth.toPx() }
@@ -764,7 +788,14 @@ fun BoxesEditNoInput(
     val widthBoxes = (displayWidth / boxProfile.boxSizePx).toInt()
 
     BoardWord(
-        modifier = modifier.pointerInput(true) {
+        modifier = modifier.semantics {
+                onLongClick(
+                    // handled by pointer input
+                    action = null,
+                    label = onLongPressDescription,
+                )
+                contentDescription = boxesContentDescription
+            }.pointerInput(true) {
             detectTapGestures(
                 onTap = { offset ->
                     offsetToBoxWord(

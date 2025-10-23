@@ -103,13 +103,13 @@ fun ClueTabs(
     boardColorScheme : BoardColorScheme,
     showAllWords : Boolean = false,
     onClueClick : (ClueID) -> Unit = { },
-    onClueClickDescription : String? = null, /* TODO */
+    onClueClickDescription : String = "",
     onClueLongClick : (ClueID) -> Unit = { },
-    onClueLongClickDescription : String? = null,
+    onClueLongClickDescription : String = "",
     onClueBoardClick : (ClueID) -> Unit = { },
-    onClueBoardClickDescription : String? = null,
+    onClueBoardClickDescription : String = "",
     onBarLongClick : () -> Unit = { },
-    onBarLongClickDescription : String? = null,
+    onBarLongClickDescription : String = "",
     maxWordScale : Float? = null,
     onPageChange : (Int, Int) -> Unit = { _, _ -> },
 ) {
@@ -218,6 +218,7 @@ fun ClueTabs(
                                 onLongPress = { _, _->
                                     onClueLongClick(clue.cid)
                                 },
+                                onLongPressDescription = onClueLongClickDescription,
                             )
                     }
                 }

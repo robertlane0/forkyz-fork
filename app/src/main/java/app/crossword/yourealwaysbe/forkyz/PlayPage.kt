@@ -389,6 +389,8 @@ fun PlayPage(
                     viewModel.clickBoard(row, col)
                 },
                 onLongPress = viewModel::longClickBoard,
+                onLongPressDescription
+                    = stringResource(R.string.open_clue_notes),
             )
 
             LaunchedEffect(Unit) {

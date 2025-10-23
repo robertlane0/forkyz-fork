@@ -349,6 +349,8 @@ fun NotesPage(
                 onLongPress = { _, _ ->
                     transferToFocussed(NoteEntry.BOARD)
                 },
+                onLongPressDescription
+                    = stringResource(R.string.transfer_board_to_focussed_view),
             )
 
             LaunchedEffect(Unit) {
@@ -373,7 +375,9 @@ fun NotesPage(
             shadow : String? = null,
             onTap : () -> Unit,
             onLongPress : () -> Unit,
+            onLongPressDescription : String,
             onFocusChanged : (Boolean) -> Unit,
+            contentDescription : String,
         ) {
             val state by viewModel.notesUIState.collectAsStateWithLifecycle()
             val boardColorScheme = themeHelper.getBoardColorScheme()
@@ -400,8 +404,9 @@ fun NotesPage(
                 shadow = shadow,
                 onTap = onTap,
                 onLongPress = onLongPress,
+                onLongPressDescription = onLongPressDescription,
                 onFocusChanged = onFocusChanged,
-                // TODO: content description
+                contentDescription = contentDescription,
             )
         }
 
@@ -426,12 +431,13 @@ fun NotesPage(
                 onLongPress = {
                     transferToFocussed(NoteEntry.SCRATCH, NoteEntry.BOARD)
                 },
+                onLongPressDescription
+                    = stringResource(R.string.transfer_scratch_to_focussed_view),
                 onFocusChanged = { focussed ->
                     setFocussedEntry(NoteEntry.SCRATCH, focussed)
                 },
+                contentDescription = stringResource(R.string.scratch_lab),
             )
-            //contentDescription = R.string.scratch_lab,
-            //longClickAccessibilityAction = R.string.transfer_scratch_to_focussed_view,
         }
 
         @Composable
@@ -551,16 +557,14 @@ fun NotesPage(
                     viewModel.showKeyboard()
                 },
                 onLongPress = viewModel::shuffleAnagramSource,
+                onLongPressDescription
+                    = stringResource(R.string.shuffle_anagram_source),
                 onFocusChanged = { focussed ->
                     setFocussedEntry(NoteEntry.ANAGRAM_SOURCE, focussed)
                 },
+                contentDescription
+                    = stringResource(R.string.anagram_source_lab),
             )
-
-// TODO
-//            BoardEdit(
-//                contentDescription = R.string.anagram_source_lab,
-//                longClickAccessibilityAction
-//                    = R.string.shuffle_anagram_source,
         }
 
         @Composable
@@ -587,13 +591,15 @@ fun NotesPage(
                         NoteEntry.BOARD,
                     )
                 },
+                onLongPressDescription = stringResource(
+                    R.string.transfer_anagram_solution_to_focussed_view
+                ),
                 onFocusChanged = { focussed ->
                     setFocussedEntry(NoteEntry.ANAGRAM_SOLUTION, focussed)
                 },
+                contentDescription
+                    = stringResource(R.string.anagram_source_lab),
             )
-//                contentDescription = R.string.anagram_source_lab,
-//                longClickAccessibilityAction
-//                    = R.string.transfer_anagram_solution_to_focussed_view,
         }
 
         @Composable
