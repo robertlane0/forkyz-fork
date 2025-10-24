@@ -4,7 +4,6 @@ package app.crossword.yourealwaysbe.forkyz
 import kotlinx.serialization.Serializable
 
 import android.net.Uri
-import android.view.View
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.Color
@@ -77,7 +76,7 @@ fun ForkyzApp(
     setImportSettingsURICallback : (((Uri) -> Unit)?) -> Unit,
     setOnVoiceCommandCallback : (((List<String>?) -> Unit)?) -> Unit,
     launchVoiceInput : () -> Unit,
-    announce : (AnnounceData, View) -> Unit,
+    announce : (AnnounceData) -> Unit,
     onSetFullScreen : () -> Unit,
     startShakeDetector : (() -> Unit) -> Unit,
     stopShakeDetector : () -> Unit,

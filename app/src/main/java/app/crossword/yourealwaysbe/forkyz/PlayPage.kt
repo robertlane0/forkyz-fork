@@ -2,7 +2,6 @@
 package app.crossword.yourealwaysbe.forkyz
 
 import android.net.Uri
-import android.view.View
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -108,7 +107,7 @@ fun PlayPage(
     setStatusBarColor : (Color) -> Unit,
     setOnVoiceCommandCallback : (((List<String>?) -> Unit)?) -> Unit,
     launchVoiceInput : () -> Unit,
-    announce : (AnnounceData, View) -> Unit,
+    announce : (AnnounceData) -> Unit,
     onSetFullScreen : () -> Unit,
     startShakeDetector : (() -> Unit) -> Unit,
     stopShakeDetector : () -> Unit,

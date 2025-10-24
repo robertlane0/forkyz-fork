@@ -15,8 +15,6 @@ import android.provider.Settings
 import android.speech.RecognizerIntent
 import android.speech.tts.TextToSpeech
 import android.util.Log
-import android.view.View
-import android.view.accessibility.AccessibilityManager
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultCallback
@@ -34,7 +32,6 @@ import androidx.core.app.ShareCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
 import androidx.core.net.toUri
-import androidx.core.view.ViewCompat
 
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -223,14 +220,6 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
     private val voiceInputLauncher : ActivityResultLauncher<String> =
         registerForActivityResult(SpeechContract()) { text ->
             onVoiceCommand?.let { it(text) }
-        }
-
-    private val isAccessibilityServiceRunning : Boolean
-        get() {
-            val manager = getSystemService(
-                Context.ACCESSIBILITY_SERVICE
-            ) as AccessibilityManager?
-            return manager?.isEnabled() ?: false
         }
 
     private val getSAFURI = registerForActivityResult(OpenDocumentTree()) {
@@ -537,38 +526,32 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
      * Announce text with accessibility if running or tts
      *
      * @param data what to announce
-     * @param view the view to announce from (setStateDescription)
-     * if accessibility service is running
      */
-    protected fun announce(data : AnnounceData, view : View) {
+    protected fun announce(data : AnnounceData) {
         val text = data.message
-        if (isAccessibilityServiceRunning) {
-            ViewCompat.setStateDescription(view, text)
-        } else {
-            if (ttsService == null) {
-                ttsService = TextToSpeech(
-                    applicationContext,
-                    { status ->
-                        if (status == TextToSpeech.SUCCESS) {
-                            ttsReady = true
-                            announce(data, view)
-                        }
+        if (ttsService == null) {
+            ttsService = TextToSpeech(
+                applicationContext,
+                { status ->
+                    if (status == TextToSpeech.SUCCESS) {
+                        ttsReady = true
+                        announce(data)
                     }
-                )
-            } else if (!ttsReady) {
-                // hopefully rare occasion where tts being prepared but not
-                // ready yet
-                Toast.makeText(
-                    this,
-                    R.string.speech_not_ready,
-                    Toast.LENGTH_SHORT,
-                ).show()
-            } else {
-                ttsService?.speak(
-                    text, TextToSpeech.QUEUE_FLUSH, null,
-                    "ForkyzSpeak_" + (speechReqCount++)
-                );
-            }
+                }
+            )
+        } else if (!ttsReady) {
+            // hopefully rare occasion where tts being prepared but not
+            // ready yet
+            Toast.makeText(
+                this,
+                R.string.speech_not_ready,
+                Toast.LENGTH_SHORT,
+            ).show()
+        } else {
+            ttsService?.speak(
+                text, TextToSpeech.QUEUE_FLUSH, null,
+                "ForkyzSpeak_" + (speechReqCount++)
+            );
         }
     }
 

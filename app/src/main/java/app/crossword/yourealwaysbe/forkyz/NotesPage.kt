@@ -4,7 +4,6 @@ package app.crossword.yourealwaysbe.forkyz
 import kotlinx.collections.immutable.persistentListOf
 
 import android.net.Uri
-import android.view.View
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -59,9 +58,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.view.ViewCompat
-import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 import app.crossword.yourealwaysbe.forkyz.exttools.AppNotFoundException
@@ -109,7 +105,7 @@ fun NotesPage(
     setStatusBarColor : (Color) -> Unit,
     setOnVoiceCommandCallback : (((List<String>?) -> Unit)?) -> Unit,
     launchVoiceInput : () -> Unit,
-    announce : (AnnounceData, View) -> Unit,
+    announce : (AnnounceData) -> Unit,
 ) {
     PuzzlePage(
         viewModel = viewModel,

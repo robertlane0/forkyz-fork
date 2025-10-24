@@ -7,10 +7,6 @@ import kotlinx.coroutines.delay
 
 import android.net.Uri
 import android.util.Log
-import android.view.View
-import android.view.accessibility.AccessibilityManager
-import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -53,7 +49,6 @@ import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -951,8 +946,7 @@ fun PuzzlePage(
     setStatusBarColor : (Color) -> Unit,
     launchVoiceInput : () -> Unit,
     setOnVoiceCommandCallback : (((List<String>?) -> Unit)?) -> Unit,
-    // TODO: remove need for View
-    announce : (AnnounceData, View) -> Unit,
+    announce : (AnnounceData) -> Unit,
     body : @Composable PuzzlePageScope.() -> Unit,
 ) {
     /**
@@ -962,10 +956,9 @@ fun PuzzlePage(
     fun Launchers() {
         val announcement
             by viewModel.announceEvent.collectAsStateWithLifecycle()
-        val view = LocalView.current
         LaunchedEffect(announcement) {
             announcement?.let { data ->
-                announce(data, view)
+                announce(data)
                 viewModel.clearAnnounceEvent()
             }
         }

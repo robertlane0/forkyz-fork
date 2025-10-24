@@ -2,7 +2,6 @@
 package app.crossword.yourealwaysbe.forkyz
 
 import android.net.Uri
-import android.view.View
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -75,7 +74,7 @@ fun ClueListPage(
     setStatusBarColor : (Color) -> Unit,
     setOnVoiceCommandCallback : (((List<String>?) -> Unit)?) -> Unit,
     launchVoiceInput : () -> Unit,
-    announce : (AnnounceData, View) -> Unit,
+    announce : (AnnounceData) -> Unit,
 ) {
     PuzzlePage(
         viewModel = viewModel,
