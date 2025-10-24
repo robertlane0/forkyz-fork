@@ -23,12 +23,14 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.Density
@@ -543,7 +545,7 @@ private fun DrawScope.drawClueNumber(
     box.clueNumber?.let { number ->
         drawText(
             textMeasurer = textMeasurer,
-            text = number,
+            text = AnnotatedString.fromHtml(number),
             topLeft = Offset(profile.markOffset, profile.markOffset),
             style = getMarkTextStyle(profile, box),
         )
@@ -557,6 +559,29 @@ private fun DrawScope.drawOffsetText(
     textMeasurer : TextMeasurer,
     style : TextStyle,
     text : String,
+    x : Float,
+    y : Float,
+    adjustX : Float,
+    adjustY : Float,
+) {
+    drawOffsetText(
+        textMeasurer = textMeasurer,
+        style = style,
+        text = AnnotatedString(text),
+        x = x,
+        y = y,
+        adjustX = adjustX,
+        adjustY = adjustY,
+    )
+}
+
+/**
+ * Draw text at x, y and offset by fraction of size
+ */
+private fun DrawScope.drawOffsetText(
+    textMeasurer : TextMeasurer,
+    style : TextStyle,
+    text : AnnotatedString,
     x : Float,
     y : Float,
     adjustX : Float,
@@ -597,7 +622,7 @@ private fun DrawScope.drawMarks(
                 drawOffsetText(
                     textMeasurer,
                     style,
-                    mark,
+                    AnnotatedString.fromHtml(mark),
                     coords[row],
                     coords[col],
                     adjusts[row],
