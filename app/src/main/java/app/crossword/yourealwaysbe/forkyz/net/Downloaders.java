@@ -130,7 +130,7 @@ public class Downloaders {
     }
 
     public void download(LocalDate date, List<Downloader> downloaders) {
-        if ((downloaders == null) || (downloaders.size() == 0)) {
+        if (downloaders == null) {
             downloaders = getDownloaders(date);
         }
 
