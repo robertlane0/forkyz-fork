@@ -16,21 +16,31 @@ import app.crossword.yourealwaysbe.forkyz.util.getOnce
 import app.crossword.yourealwaysbe.forkyz.util.stateInSubscribed
 
 /**
+ * If is available right now
+ *
+ * That is "available" being sometime today, and refined via
+ * availableHours
+ */
+fun isAvailableNow(availableHours : Long?, available : Boolean) : Boolean {
+    return available && (availableHours == null || availableHours < 0)
+}
+
+/**
  * Info on a downloader to display
  *
  * @param downloaderId the internal name (id) of the downloader
  * @param displayName the resource string of the name to display the
  * downloader with
  * @param availableHours how many hours until the downloader is
- * available, null or value >= 0 means not available
+ * available, null means not known
+ * @param availableNow if available now
  */
 data class DownloaderData(
     val internalName : String,
     val displayName : String,
     val availableHours : Long?,
-) {
-    val available : Boolean = !(availableHours == null || availableHours >= 0)
-}
+    val availableNow : Boolean,
+)
 
 /**
  * The UI state
@@ -72,13 +82,13 @@ class DownloadDialogViewModel(
         downloadersState.filterNotNull().getOnce() { downloaders ->
             cb(
                 downloaders.downloaders.filter { downloader ->
-                    if (!(downloader.internalName in state.selected)) {
-                        false
+                    if (downloader.internalName in state.selected) {
+                        isAvailableNow(
+                            downloader.getUntilAvailable(date)?.toHours(),
+                            downloader.isAvailable(date),
+                        )
                     } else {
-                        val availableHours = downloader
-                            .getUntilAvailable(state.date)
-                            ?.toHours()
-                        availableHours != null && availableHours < 0
+                        false
                     }
                 }
             )
@@ -119,11 +129,15 @@ class DownloadDialogViewModel(
             ?.map { downloader ->
                 val availableHours
                     = downloader.getUntilAvailable(date)?.toHours()
-
+                val availableNow = isAvailableNow(
+                    availableHours,
+                    downloader.isAvailable(date),
+                )
                 DownloaderData(
                     internalName = downloader.internalName,
                     displayName = downloader.name,
                     availableHours = availableHours,
+                    availableNow = availableNow,
                 )
             } ?: listOf()
         // if changing from empty downloaders to some, select all

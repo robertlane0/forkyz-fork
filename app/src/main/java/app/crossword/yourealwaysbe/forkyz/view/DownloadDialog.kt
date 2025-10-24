@@ -103,7 +103,7 @@ private fun getDownloaderEnabled(
     downloaders : List<DownloaderData>,
     index : Int,
 ) : Boolean {
-    return downloaders.get(index)?.let { it.available } ?: false
+    return downloaders.get(index)?.let { it.availableNow } ?: false
 }
 
 @Composable
@@ -120,9 +120,12 @@ private fun DownloaderLabel(
         ) {
             Text(displayName)
 
-            val availabilityLabel = if (downloader.availableHours == null) {
+            val availabilityLabel = if (downloader.availableNow) {
+                null
+            } else if (downloader.availableHours == null) {
                 stringResource(R.string.downloader_not_available)
             } else if (availableHours < 0) {
+                // should not happen because it's available now!
                 null
             } else if (availableHours == 0L) {
                 stringResource(R.string.downloader_available_soon)
