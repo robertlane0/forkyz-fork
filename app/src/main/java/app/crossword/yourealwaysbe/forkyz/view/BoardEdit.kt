@@ -64,6 +64,8 @@ internal class BoardEditStateSaveable(
     val doneFirstFit : Boolean,
     val pendingFit : Boolean,
     val runningScale : Float,
+    val savedX : Float,
+    val savedY : Float,
 ) : Parcelable
 
 /**
@@ -77,6 +79,8 @@ class BoardEditState private constructor(
     initDoneFirstFit : Boolean,
     initPendingFit : Boolean,
     initRunningScale : Float,
+    initSavedX : Float,
+    initSavedY : Float,
 ) {
     constructor() : this(
         initX = 0f,
@@ -86,6 +90,8 @@ class BoardEditState private constructor(
         initDoneFirstFit = false,
         initPendingFit = false,
         initRunningScale = 1f,
+        initSavedX = 0f,
+        initSavedY = 0f,
     )
 
     var x by mutableFloatStateOf(initX)
@@ -98,6 +104,9 @@ class BoardEditState private constructor(
         private set
     var doneFirstFit by mutableStateOf<Boolean>(initDoneFirstFit)
         private set
+    private var savedX : Float = initSavedX
+    private var savedY : Float = initSavedY
+
 
     // for zoomFit
     var viewWidthPx : Float = 0f
@@ -158,6 +167,8 @@ class BoardEditState private constructor(
                     it.doneFirstFit,
                     it.pendingFit,
                     it.runningScale,
+                    it.savedX,
+                    it.savedY,
                 )
             },
             restore = {
@@ -169,6 +180,8 @@ class BoardEditState private constructor(
                     initDoneFirstFit = it.doneFirstFit,
                     initPendingFit = it.pendingFit,
                     initRunningScale = it.runningScale,
+                    initSavedX = it.savedX,
+                    initSavedY = it.savedY,
                 )
             },
         )
@@ -215,6 +228,10 @@ class BoardEditState private constructor(
         runningScale = 1f
     }
 
+    fun resetRunningScale() {
+        runningScale = 1f
+    }
+
     fun zoomFit() {
         if (fitScale > 0) {
             x = 0f
@@ -223,6 +240,22 @@ class BoardEditState private constructor(
         } else {
             pendingFit = true
         }
+    }
+
+    /**
+     * Remember current offset for resetOffset
+     */
+    fun markOffset() {
+        savedX = x
+        savedY = y
+    }
+
+    /**
+     * Return to last marked offset
+     */
+    fun resetOffset() {
+        x = savedX
+        y = savedY
     }
 
     /**
@@ -530,11 +563,19 @@ private fun BoardFullBody(
                 //https://stackoverflow.com/questions/68686117/how-to-detect-the-end-of-transform-gesture-in-jetpack-compose
                 awaitPointerEventScope {
                     while (true) {
+                        var cancelled = false
                         do {
                             val event = awaitPointerEvent()
-                            val canceled = event.changes.any { it.isConsumed }
-                        } while (!canceled && event.changes.any { it.pressed })
-                        state.commitRunningScale()
+                            cancelled = event.changes.any { it.isConsumed }
+                        } while (!cancelled && event.changes.any { it.pressed })
+
+                        if (cancelled) {
+                            state.resetRunningScale()
+                            state.resetOffset()
+                        } else {
+                            state.commitRunningScale()
+                            state.markOffset()
+                        }
                     }
                 }
             },
