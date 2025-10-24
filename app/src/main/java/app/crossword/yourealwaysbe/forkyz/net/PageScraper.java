@@ -229,6 +229,11 @@ public class PageScraper extends AbstractDownloader {
         for (String url : urls) {
             String fileName = url;
             int lastSlashIdx = fileName.lastIndexOf("/");
+            // get last subdir if no filename
+            if (!fileName.isEmpty() && lastSlashIdx == fileName.length() - 1) {
+                fileName = fileName.substring(0, fileName.length() - 1);
+                lastSlashIdx = fileName.lastIndexOf("/");
+            }
             if (lastSlashIdx > 0)
                  fileName = fileName.substring(lastSlashIdx + 1);
             int extensionIdx = fileName.lastIndexOf(".");
