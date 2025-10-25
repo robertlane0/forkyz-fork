@@ -739,8 +739,11 @@ open class PuzzlePageViewModel @Inject constructor(
             val newPos = Position(row, col)
             val clueID = if (fixClue) board.clueID else null
             val previousWord = board.setHighlightLetter(newPos, clueID)
-            if (previousWord?.checkInWord(newPos.row, newPos.col) ?: false)
+            if (previousWord?.checkInWord(newPos.row, newPos.col) ?: false) {
                 showKeyboard()
+            } else {
+                hideKeyboard()
+            }
         }
     }
 
@@ -906,7 +909,6 @@ open class PuzzlePageViewModel @Inject constructor(
         handleChangeTimer()
         handleChangeAccessibility(changes)
         handleChangeMenu(changes)
-        handleChangeKeyboardVisibility(changes)
     }
 
     override protected fun onCleared() {
@@ -1225,11 +1227,6 @@ open class PuzzlePageViewModel @Inject constructor(
                 canRevealInitialBoxLetter = canRevealInitialBoxLetter,
             )
         }
-    }
-
-    private fun handleChangeKeyboardVisibility(changes : PlayboardChanges) {
-        if (changes.previousWord != changes.currentWord)
-            hideKeyboard()
     }
 
     private fun getUpdatedKeyboardState(
