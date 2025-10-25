@@ -1,9 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.util;
 
-import android.view.inputmethod.SurroundingText;
-import android.view.inputmethod.TextSnapshot;
-
 import java.util.Locale;
 
 import android.content.Context;
@@ -129,21 +126,6 @@ public class BoxInputConnection extends BaseInputConnection {
     public boolean beginBatchEdit() {
         batchEditNestingDepth += 1;
         return true;
-    }
-
-    @Override
-    public TextSnapshot takeSnapshot() {
-        return new TextSnapshot(
-            new SurroundingText(
-                boardEditable.toString(),
-                0,
-                boardEditable.length(),
-                0
-            ),
-            boardEditable.getCompositionStart(),
-            boardEditable.getCompositionEnd(),
-            getCursorCapsMode(TextUtils.CAP_MODE_CHARACTERS)
-        );
     }
 
     @Override
