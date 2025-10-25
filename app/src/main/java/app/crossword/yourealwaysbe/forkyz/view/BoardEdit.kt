@@ -21,6 +21,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -829,6 +830,7 @@ fun BoxesEditNoInput(
             BoxProfile.build(localDensity, colors, scale, localTextStyle)
         }
     val widthBoxes = (displayWidth / boxProfile.boxSizePx).toInt()
+    val stateBoxes by rememberUpdatedState(boxes)
 
     BoardWord(
         modifier = modifier.semantics {
@@ -839,27 +841,27 @@ fun BoxesEditNoInput(
                 )
                 contentDescription = boxesContentDescription
             }.pointerInput(true) {
-            detectTapGestures(
-                onTap = { offset ->
-                    offsetToBoxWord(
-                        localDensity.density,
-                        boxProfile.boxSizePx,
-                        widthBoxes,
-                        offset,
-                        boxes,
-                    )?.let { box -> onTap(box.row, box.col) }
-                },
-                onLongPress = { offset ->
-                    offsetToBoxWord(
-                        localDensity.density,
-                        boxProfile.boxSizePx,
-                        widthBoxes,
-                        offset,
-                        boxes,
-                    )?.let { box -> onLongPress(box.row, box.col) }
-                },
-            )
-        },
+                detectTapGestures(
+                    onTap = { offset ->
+                        offsetToBoxWord(
+                            localDensity.density,
+                            boxProfile.boxSizePx,
+                            widthBoxes,
+                            offset,
+                            stateBoxes,
+                        )?.let { box -> onTap(box.row, box.col) }
+                    },
+                    onLongPress = { offset ->
+                        offsetToBoxWord(
+                            localDensity.density,
+                            boxProfile.boxSizePx,
+                            widthBoxes,
+                            offset,
+                            stateBoxes,
+                        )?.let { box -> onLongPress(box.row, box.col) }
+                    },
+                )
+            },
         textMeasurer = textMeasurer,
         profile = boxProfile,
         boxes = boxes,
