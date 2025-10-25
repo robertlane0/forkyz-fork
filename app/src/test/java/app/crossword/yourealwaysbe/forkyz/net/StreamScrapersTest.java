@@ -110,7 +110,7 @@ public class StreamScrapersTest {
     @Test
     public void testPuzzleMe() throws Exception {
         testScraper(
-            "https://observer.co.uk/puzzles/everyman/article/everyman-no-4109",
+            "https://observer.co.uk/puzzles/everyman/article/everyman-no-4123",
             new PuzzleMeStreamScraper()
         );
     }
