@@ -54,6 +54,74 @@ public class PlayboardTextRenderer {
         }
     }
 
+    public static String getShortClueText(
+        Context context,
+        Clue clue,
+        boolean showNumber,
+        boolean showDirection,
+        boolean showCount
+    ) {
+        String listName = getShortListName(clue);
+        String displayNum = showNumber ? clue.getDisplayNumber() : null;
+        String hint = clue.getHint();
+        boolean hasCount = clue.hasZone();
+        int count = hasCount ? clue.getZone().size() : -1;
+
+        if (showDirection) {
+            if (hasCount && showCount) {
+                if (displayNum != null) {
+                    return context.getString(
+                        R.string.clue_format_short_with_count,
+                        displayNum, listName, hint, count
+                    );
+                } else {
+                    return context.getString(
+                        R.string.clue_format_short_no_num_with_count,
+                        listName, hint, count
+                    );
+                }
+            } else {
+                if (displayNum != null) {
+                    return context.getString(
+                        R.string.clue_format_short,
+                        displayNum, listName, hint
+                    );
+                } else {
+                    return context.getString(
+                        R.string.clue_format_short_no_num,
+                        listName, hint
+                    );
+                }
+            }
+        } else {
+            if (hasCount && showCount) {
+                if (displayNum != null) {
+                    return context.getString(
+                        R.string.clue_format_short_no_dir_with_count,
+                        displayNum, hint, count
+                    );
+                } else {
+                    return context.getString(
+                        R.string.clue_format_short_no_num_no_dir_with_count,
+                        hint, count
+                    );
+                }
+            } else {
+                if (displayNum != null) {
+                    return context.getString(
+                        R.string.clue_format_short_no_dir,
+                        displayNum, hint
+                    );
+                } else {
+                    return context.getString(
+                        R.string.clue_format_short_no_num_no_dir,
+                        hint
+                    );
+                }
+            }
+        }
+    }
+
     public static CharSequence getAccessibleCurrentClueWord(
         Context context, Playboard board, boolean showCount
     ) {
@@ -218,5 +286,13 @@ public class PlayboardTextRenderer {
                 return false;
         }
         return true;
+    }
+
+    private static String getShortListName(Clue clue) {
+       String listName = clue == null ? null : clue.getClueID().listName();
+        if (listName == null || listName.isEmpty())
+            return "";
+        else
+            return listName.substring(0,1).toLowerCase();
     }
 }

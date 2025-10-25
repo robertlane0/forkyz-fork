@@ -432,7 +432,7 @@ class PlayPageViewModel @Inject constructor(
     private fun getClueText(cb : (String?) -> Unit) {
         val clue = getBoard()?.clue
         if (clue != null) {
-            getLongClueText(clue, cb)
+            getClueLineClueText(clue, cb)
         } else {
             cb(null)
         }

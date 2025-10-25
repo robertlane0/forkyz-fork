@@ -113,6 +113,12 @@ enum Theme {
     T_LEGACY_LIKE = 2;
 }
 
+enum ClueListClueLine {
+  CLCL_FULL = 0;
+  CLCL_ABBREVIATED = 1;
+  CLCL_NONE = 2;
+}
+
 message Settings {
     bool alwaysAnnounceBox = 1;
     bool alwaysAnnounceClue = 2;
@@ -244,4 +250,5 @@ message Settings {
     bool dontConfirmBrowseDelete = 129;
     bool downloadElPaisExperto = 130;
     bool expandableClueLine = 131;
+    ClueListClueLine clueListNameInClueLine = 132;
 }

@@ -31,6 +31,7 @@ import app.crossword.yourealwaysbe.forkyz.exttools.SharePuzzleData
 import app.crossword.yourealwaysbe.forkyz.exttools.ShareTextData
 import app.crossword.yourealwaysbe.forkyz.exttools.askChatGPTForCurrentClue
 import app.crossword.yourealwaysbe.forkyz.exttools.isChatGPTEnabled
+import app.crossword.yourealwaysbe.forkyz.settings.ClueListClueLine
 import app.crossword.yourealwaysbe.forkyz.settings.ExternalToolSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.KeyboardLayout
@@ -1059,14 +1060,38 @@ open class PuzzlePageViewModel @Inject constructor(
         )
     }
 
-    protected fun getLongClueText(clue : Clue, cb : (String) -> Unit) {
-        settings.getPlayShowCount() { showCount ->
-            val text = PlayboardTextRenderer.getLongClueText(
-                getApplication(),
-                clue,
-                showCount
-            )
-            cb(text)
+    protected fun getClueLineClueText(clue : Clue, cb : (String) -> Unit) {
+        settings.getPlayShowCount { showCount ->
+            settings.getPlayClueListNameInClueLine { clueListClueLine ->
+                val text = when (clueListClueLine) {
+                    ClueListClueLine.CLCL_ABBREVIATED -> {
+                        PlayboardTextRenderer.getShortClueText(
+                            getApplication(),
+                            clue,
+                            true,
+                            true,
+                            showCount
+                        )
+                    }
+                    ClueListClueLine.CLCL_NONE -> {
+                        PlayboardTextRenderer.getShortClueText(
+                            getApplication(),
+                            clue,
+                            false,
+                            false,
+                            showCount
+                        )
+                    }
+                    else -> {
+                        PlayboardTextRenderer.getLongClueText(
+                            getApplication(),
+                            clue,
+                            showCount
+                        )
+                    }
+                }
+                cb(text)
+            }
         }
     }
 

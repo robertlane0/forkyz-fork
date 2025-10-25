@@ -326,6 +326,11 @@
     <string name="orientation_lock_unlocked">Unlocked</string>
     <string name="expandable_clue_line">Expandable Clue Line</string>
     <string name="expandable_clue_line_desc">The clue line display expands for long clues to avoid small text.</string>
+    <string name="clue_list_name_in_clue_line">Clue List Display in Clue Line</string>
+    <string name="clue_list_name_in_clue_line_desc">How to show clue list name in clue display.</string>
+    <string name="clue_list_clue_line_full">Full</string>
+    <string name="clue_list_clue_line_abbreviated">Abbreviated</string>
+    <string name="clue_list_clue_line_none">None</string>
 
     <!-- preferences download -->
     <string name="auto_downloaders">Automatic Download Sources</string>

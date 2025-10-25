@@ -594,7 +594,7 @@ class NotesPageViewModel @AssistedInject constructor(
                 else
                     maxPuzzleDimension
 
-                getLongClueText(clue) { text ->
+                getClueLineClueText(clue) { text ->
                     val oldAnagramSource
                         = currentNotesUIState.anagramSourceValue
                     val newAnagramSource = note?.anagramSource ?: ""

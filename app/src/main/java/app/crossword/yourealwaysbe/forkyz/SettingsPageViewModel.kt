@@ -29,6 +29,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import app.crossword.yourealwaysbe.forkyz.net.DownloadersProvider
 import app.crossword.yourealwaysbe.forkyz.settings.BrowseSwipeAction
 import app.crossword.yourealwaysbe.forkyz.settings.ClueHighlight
+import app.crossword.yourealwaysbe.forkyz.settings.ClueListClueLine
 import app.crossword.yourealwaysbe.forkyz.settings.ClueTabsDouble
 import app.crossword.yourealwaysbe.forkyz.settings.CycleUnfilledMode
 import app.crossword.yourealwaysbe.forkyz.settings.DeleteCrossingModeSetting
@@ -1070,6 +1071,36 @@ class SettingsPageViewModel @Inject constructor(
             settings.livePlayExpandableClueLine.stateInHere(),
             settings::setPlayExpandableClueLine,
         ),
+        SettingsList<ClueListClueLine>(
+            SettingsPage.DISPLAY,
+            R.string.clue_list_name_in_clue_line,
+            R.string.clue_list_name_in_clue_line_desc,
+            listOf(
+                SettingsListEntry(
+                    R.string.clue_list_clue_line_full,
+                    ClueListClueLine.CLCL_FULL,
+                ),
+                SettingsListEntry(
+                    R.string.clue_list_clue_line_abbreviated,
+                    ClueListClueLine.CLCL_ABBREVIATED,
+                ),
+                SettingsListEntry(
+                    R.string.clue_list_clue_line_none,
+                    ClueListClueLine.CLCL_NONE,
+                ),
+            ),
+            settings.livePlayClueListNameInClueLine.stateInHere(
+                ClueListClueLine.CLCL_FULL,
+            ),
+            settings::setPlayClueListNameInClueLine,
+        ),
+        SettingsBoolean(
+            SettingsPage.DISPLAY,
+            R.string.show_length,
+            R.string.show_length_desc,
+            settings.livePlayShowCount.stateInHere(),
+            settings::setPlayShowCount,
+        ),
         SettingsList<FitToScreenMode>(
             SettingsPage.DISPLAY,
             R.string.fit_to_screen_mode,
@@ -1143,13 +1174,6 @@ class SettingsPageViewModel @Inject constructor(
             R.string.indicate_show_errors_desc,
             settings.livePlayIndicateShowErrors.stateInHere(),
             settings::setPlayIndicateShowErrors,
-        ),
-        SettingsBoolean(
-            SettingsPage.DISPLAY,
-            R.string.show_length,
-            R.string.show_length_desc,
-            settings.livePlayShowCount.stateInHere(),
-            settings::setPlayShowCount,
         ),
         SettingsBoolean(
             SettingsPage.DISPLAY,

@@ -140,6 +140,7 @@ object SettingsSerializer : Serializer<Settings> {
         .setDontConfirmCleanup(false)
         .setDontConfirmBrowseDelete(false)
         .setExpandableClueLine(false)
+        .setClueListNameInClueLine(ClueListClueLine.CLCL_FULL)
         .build()
 
     override suspend fun readFrom(input: InputStream) : Settings {

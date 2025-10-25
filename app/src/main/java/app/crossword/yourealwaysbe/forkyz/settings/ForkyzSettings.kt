@@ -375,6 +375,20 @@ class ForkyzSettings(val settingsStore: DataStore<Settings>) {
         }
     }
 
+    val livePlayClueListNameInClueLine : Flow<ClueListClueLine>
+        = settingsMap { it.clueListNameInClueLine }
+
+    fun getPlayClueListNameInClueLine(cb : (ClueListClueLine) -> Unit)
+        = settingsOnce(cb) { it.clueListNameInClueLine }
+
+    fun setPlayClueListNameInClueLine(value : ClueListClueLine) {
+        settingsUpdate { settings ->
+            settings.toBuilder()
+                .setClueListNameInClueLine(value)
+                .build()
+        }
+    }
+
     val liveClueListClueTabsDouble : Flow<ClueTabsDouble>
         = settingsMap { it.clueTabsDouble }
 
@@ -2826,6 +2840,21 @@ class ForkyzSettings(val settingsStore: DataStore<Settings>) {
             "scratchMode",
             { s, key -> json.put(key, s.scratchMode) },
             { key -> json.optBoolean(key)?.let { setPlayScratchMode(it) } },
+        )
+        run(
+            "clueListNameInClueLine",
+            { s, key -> json.put(key, s.clueListNameInClueLine.toString()) },
+            { key ->
+               json.optString(key)?.let {
+                   try {
+                       setPlayClueListNameInClueLine(
+                           ClueListClueLine.valueOf(it)
+                       )
+                   } catch (e : IllegalArgumentException) {
+                       // ignore
+                   }
+               }
+            },
         )
         run(
             "showCluesOnPlayScreen",

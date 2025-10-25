@@ -379,9 +379,12 @@ class ClueTabsViewModel(
         }
         return ClueItem(
             cid = clue.clueID,
-            text = getClueText(
-                clue = clue,
-                showDirection = showDirection,
+            text = PlayboardTextRenderer.getShortClueText(
+                application,
+                clue,
+                true,
+                showDirection,
+                isShowCount,
             ),
             isFlagged = clue.isFlagged,
             flagColor = flagColor,
@@ -389,79 +392,6 @@ class ClueTabsViewModel(
             selected = clue.clueID == board?.puzzle?.currentClueID,
             word = board?.getClueWord(clue.clueID),
         )
-    }
-
-    private fun getClueText(
-        clue : Clue,
-        showDirection : Boolean,
-    ) : String {
-        val listName = getShortListName(clue)
-        val displayNum = clue.displayNumber
-        val hint = clue.hint
-        val hasCount = clue.hasZone()
-        val count = if (hasCount) clue.getZone().size() else -1
-
-        if (showDirection) {
-            if (hasCount && isShowCount) {
-                if (displayNum != null) {
-                    return application.getString(
-                        R.string.clue_format_short_with_count,
-                        displayNum, listName, hint, count
-                    )
-                } else {
-                    return application.getString(
-                        R.string.clue_format_short_no_num_with_count,
-                        listName, hint, count
-                    )
-                }
-            } else {
-                if (displayNum != null) {
-                    return application.getString(
-                        R.string.clue_format_short,
-                        displayNum, listName, hint
-                    )
-                } else {
-                    return application.getString(
-                        R.string.clue_format_short_no_num,
-                        listName, hint
-                    )
-                }
-            }
-        } else {
-            if (hasCount && isShowCount) {
-                if (displayNum != null) {
-                    return application.getString(
-                        R.string.clue_format_short_no_dir_with_count,
-                        displayNum, hint, count
-                    )
-                } else {
-                    return application.getString(
-                        R.string.clue_format_short_no_num_no_dir_with_count,
-                        hint, count
-                    )
-                }
-            } else {
-                if (displayNum != null) {
-                    return application.getString(
-                        R.string.clue_format_short_no_dir,
-                        displayNum, hint
-                    )
-                } else {
-                    return application.getString(
-                        R.string.clue_format_short_no_num_no_dir,
-                        hint
-                    )
-                }
-            }
-        }
-    }
-
-    private fun getShortListName(clue : Clue) : String {
-        val listName = clue.clueID.listName
-        if (listName == null || listName.isEmpty())
-            return "";
-        else
-            return listName.substring(0,1).lowercase()
     }
 
     /**

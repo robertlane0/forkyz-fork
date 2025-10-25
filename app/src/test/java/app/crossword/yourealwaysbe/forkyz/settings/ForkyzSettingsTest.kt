@@ -74,6 +74,7 @@ class ForkyzSettingsTest {
         .setCleanupAge(-1)
         .setClueBelowGrid(false)
         .setClueHighlight(ClueHighlight.CH_RADIO_BUTTON)
+        .setClueListNameInClueLine(ClueListClueLine.CLCL_FULL)
         .setClueTabsDouble(ClueTabsDouble.CTD_NEVER)
         .setCrosswordSolverEnabled(true)
         .setCustomDailyTitle("")
@@ -206,6 +207,7 @@ class ForkyzSettingsTest {
         .setCleanupAge(10)
         .setClueBelowGrid(true)
         .setClueHighlight(ClueHighlight.CH_BOTH)
+        .setClueListNameInClueLine(ClueListClueLine.CLCL_NONE)
         .setClueTabsDouble(ClueTabsDouble.CTD_WIDE)
         .setCrosswordSolverEnabled(false)
         .setCustomDailyTitle("xx")
@@ -318,6 +320,7 @@ class ForkyzSettingsTest {
 
     val settingsValue3 = Settings.newBuilder()
         .mergeFrom(settingsValue2)
+        .setClueListNameInClueLine(ClueListClueLine.CLCL_FULL)
         .setDontConfirmCleanup(true)
         .setDontConfirmBrowseDelete(false)
         .setExpandableClueLine(false)
