@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 import dev.darkokoa.datetimewheelpicker.WheelDatePicker
+import dev.darkokoa.datetimewheelpicker.core.format.CjkSuffixConfig
 import dev.darkokoa.datetimewheelpicker.core.format.DateFormatter
 import dev.darkokoa.datetimewheelpicker.core.format.MonthDisplayStyle
 import dev.darkokoa.datetimewheelpicker.core.format.dateFormatter
@@ -71,15 +72,19 @@ fun DownloadDialog(
             ) {
                 val date = state.date
                 val day = date.getDayOfWeek()
-                    .getDisplayName(TextStyle.FULL, java.util.Locale.getDefault())
+                    .getDisplayName(
+                        TextStyle.FULL,
+                        java.util.Locale.getDefault(),
+                    )
 
                 Text(text = day)
                 WheelDatePicker(
                     modifier = Modifier.padding(vertical = 8.dp),
                     startDate = date.toKotlinLocalDate(),
                     dateFormatter = dateFormatter(
-                        Locale.current,
-                        MonthDisplayStyle.SHORT,
+                        locale = Locale.current,
+                        monthDisplayStyle = MonthDisplayStyle.SHORT,
+                        cjkSuffixConfig = CjkSuffixConfig.ShowAll,
                     ),
                     onSnappedDate = { newDate ->
                         viewModel.date = newDate.toJavaLocalDate()
