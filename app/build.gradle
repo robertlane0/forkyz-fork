@@ -34,7 +34,7 @@ android {
         applicationId "app.crossword.yourealwaysbe.forkyz"
         namespace = "app.crossword.yourealwaysbe.forkyz"
         minSdkVersion 23
-        targetSdkVersion 35
+        targetSdkVersion 36
         multiDexEnabled = true
         vectorDrawables {
             useSupportLibrary = true
