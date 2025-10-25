@@ -358,8 +358,10 @@ class PlayPageViewModel @Inject constructor(
 
         if (!unfilledClues.isEmpty()) {
             // bit inefficient, but saves a field
-            val idx = Random.nextInt(unfilledClues.size);
-            board.jumpToClue(unfilledClues[idx]);
+            val idx = Random.nextInt(unfilledClues.size)
+            val oldWord = board.currentWord
+            board.jumpToClue(unfilledClues[idx])
+            displayKeyboard(oldWord)
         }
     }
 
