@@ -218,7 +218,10 @@ fun ClueTabs(
                                 onLongPress = { _, _->
                                     onClueLongClick(clue.cid)
                                 },
-                                onLongPressDescription = onClueLongClickDescription,
+                                onLongPressDescription
+                                    = onClueLongClickDescription,
+                                contentDescription
+                                    = stringResource(R.string.clue_word),
                             )
                     }
                 }

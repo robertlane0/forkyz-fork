@@ -605,7 +605,6 @@
     <string name="announce_last_box_response">Last box of clue %1$s.</string>
     <string name="announce_only_box_response">Only box of clue %1$s.</string>
     <string name="board_description">The crossword puzzle.</string>
-    <string name="word_description">A word in the crossword puzzle.</string>
 
     <!-- browse menu -->
     <string name="sort">Sort</string>

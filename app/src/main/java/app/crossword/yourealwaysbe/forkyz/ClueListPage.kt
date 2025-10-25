@@ -254,6 +254,8 @@ fun ClueListPage(
                         onLongPressDescription
                             = stringResource(R.string.open_clue_list),
                         incognitoMode = showAllWords,
+                        contentDescription
+                            = stringResource(R.string.current_word),
                     )
                     ClueLists(
                         Modifier.fillMaxWidth().weight(1.0F),

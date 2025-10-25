@@ -727,6 +727,7 @@ fun WordEdit(
     onLongPress : (Int, Int) -> Unit,
     onLongPressDescription : String,
     incognitoMode : Boolean = false,
+    contentDescription : String = "",
 ) {
     val inputModifier = if (incognitoMode) Modifier else modifier
     val boardModifier = if (incognitoMode) modifier else Modifier
@@ -748,7 +749,7 @@ fun WordEdit(
                 onTap = onTap,
                 onLongPress = onLongPress,
                 onLongPressDescription = onLongPressDescription,
-                boxesContentDescription = stringResource(R.string.word_description),
+                boxesContentDescription = contentDescription,
             )
         }
 
@@ -785,6 +786,7 @@ fun WordEditNoInput(
     onTap : (Int, Int) -> Unit,
     onLongPress : (Int, Int) -> Unit,
     onLongPressDescription : String,
+    contentDescription : String,
 ) {
     val boardState by viewModel.boardState.collectAsStateWithLifecycle()
     BoxesEditNoInput(
@@ -796,7 +798,7 @@ fun WordEditNoInput(
         onTap = onTap,
         onLongPress = onLongPress,
         onLongPressDescription = onLongPressDescription,
-        boxesContentDescription = stringResource(R.string.word_description),
+        boxesContentDescription = contentDescription,
     )
 }
 
