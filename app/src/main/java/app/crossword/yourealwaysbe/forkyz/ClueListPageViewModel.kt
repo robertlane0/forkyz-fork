@@ -93,7 +93,7 @@ class ClueListPageViewModel @Inject constructor(
             board.puzzle.getClue(cid)?.let { clue ->
                 if (clue.hasZone()) {
                     val oldWord = board.getCurrentWord()
-                    if (cid != board.getClueID())
+                    if (cid != board.clueID)
                         board.jumpToClue(clue)
                     displayKeyboard(oldWord)
                 }

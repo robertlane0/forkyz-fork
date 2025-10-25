@@ -212,7 +212,7 @@ fun ClueTabs(
                                 colors = boardColorScheme,
                                 viewModel = wordEditViewModel,
                                 onTap = { row, col ->
-                                    viewModel.onBoxClick(row, col)
+                                    viewModel.onBoxClick(row, col, clue.cid)
                                     onClueBoardClick(clue.cid)
                                 },
                                 onLongPress = { _, _->
