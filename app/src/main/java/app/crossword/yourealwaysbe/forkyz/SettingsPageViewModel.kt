@@ -408,16 +408,23 @@ class SettingsPageViewModel @Inject constructor(
             }.stateInSubscribed(viewModelScope, listOf())
 
     private val downloadCustomDailyURLErrorMsg : StateFlow<String?>
-        = settings.liveDownloadCustomDailyURL.map { url ->
-            if (url.trim().isEmpty()) {
-                application.getString(R.string.custom_url_missing)
-            } else {
-                try {
-                    DateTimeFormatter.ofPattern(url)
-                    null
-                } catch (e : IllegalArgumentException) {
-                    e.message
+        = combine(
+            settings.liveDownloadCustomDaily,
+            settings.liveDownloadCustomDailyURL,
+        ) { enabled, url ->
+            if (enabled) {
+                if (url.trim().isEmpty()) {
+                    application.getString(R.string.custom_url_missing)
+                } else {
+                    try {
+                        DateTimeFormatter.ofPattern(url)
+                        null
+                    } catch (e : IllegalArgumentException) {
+                        e.message
+                    }
                 }
+            } else {
+                null
             }
         }.stateInSubscribed(viewModelScope, null)
 
