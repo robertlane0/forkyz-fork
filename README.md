@@ -110,13 +110,14 @@ Supported import file formats (can be zipped or unzipped):
 * Przekrój Magazine JSON and HTML,
 * RCI Jeux Mots-Fléchés and Croisés HJSON,
 * Raetsel Zentrale Schwedenratsel JSON,
+* Smart Games JSON,
 * Spoonbill,
 * Uclick XML,
 * Wall Street Journal JSON,
 * .xd,
 * XWord JSON.
 
-Current downloaders are De Standaard, De Telegraaf, Guardian Daily Cryptic/Everyman/Quick, Hamburger Abendblatt, Independent Daily Cryptic, Irish News Cryptic, Thomas Joseph Crossword, Le Parisien, Metro (UK), Newsday, Sheffer Crossword, Universal Crosssword, USA Today, Jonesin' Crosswords, Premier Crossword, the Wall Street Journal (Sat/Sun), Keglar's Cryptics, Cryptic Cru Archives, Private Eye, and Przekroj Magazine.
+Current downloaders are De Standaard, De Telegraaf, El Pais Experto, Guardian Daily Cryptic/Quick, Hamburger Abendblatt, Independent Daily Cryptic, Irish News Cryptic, Thomas Joseph Crossword, Le Parisien, Metro (UK), Newsday, New York Times (Syndicated), Sheffer Crossword, Sud Ouest Mot-Fléchés/Croisés, TF1 Mot-Fléchés/Croisés, Universal Crosssword, USA Today, Jonesin' Crosswords, Premier Crossword, the Wall Street Journal (Sat/Sun), Keglar's Cryptics, Cryptic Cru Archives, Private Eye, and Przekrój Magazine.
 
 ### Sharing From a Browser
 
@@ -133,7 +134,7 @@ This only works for a limited number of sites, but may work for sites using simi
 * MyCrossword.co.uk,
 * Observer (Everyman at least),
 * De Telegraaf (embedded from Pzzl.net),
-* Przekroj,
+* Przekrój,
 * Wall Street Journal.
 
 ## Compilation
