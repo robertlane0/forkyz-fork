@@ -693,6 +693,21 @@ public class Downloaders {
             ));
         }
 
+        if (settings.getDownloadTF1MotsCroises()) {
+            downloaders.add(AbstractRCIJeuxMXJDateDownloader.buildMCJ(
+                "tf1motcroises",
+                context.getString((R.string.tf1_mots_croises)),
+                AbstractDateDownloader.DAYS_DAILY,
+                Duration.ofHours(1),
+                "https://www.tf1info.fr/",
+                "https://www.rcijeux.fr/drupal_game/lci/mcroises/grids/%d.mcj",
+                "'https://www.tf1info.fr/jeux/mots-croises/'",
+                4739,
+                LocalDate.of(2025, 10, 26),
+                1
+            ));
+        }
+
         if (settings.getDownloadTF1MotsFleches()) {
             downloaders.add(AbstractRCIJeuxMXJDateDownloader.buildMFJ(
                 "tf1motfleches",

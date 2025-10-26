@@ -571,6 +571,13 @@ class SettingsPageViewModel @Inject constructor(
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
+            R.string.tf1_mots_croises,
+            R.string.updates_daily,
+            settings.liveDownloadTF1MotsCroises.stateInHere(),
+            settings::setDownloadTF1MotsCroises,
+        ),
+        SettingsBoolean(
+            SettingsPage.PUZZLE_SOURCES_DAILY,
             R.string.tf1_mots_fleches,
             R.string.updates_daily,
             settings.liveDownloadTF1MotsFleches.stateInHere(),

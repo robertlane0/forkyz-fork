@@ -442,6 +442,7 @@ class ForkyzSettings(val settingsStore: DataStore<Settings>) {
             settings.downloadSheffer,
             settings.downloadSudOuestMotsCroises,
             settings.downloadSudOuestMotsFleches,
+            settings.downloadTF1MotsCroises,
             settings.downloadTF1MotsFleches,
             settings.downloadUniversal,
             settings.downloadUSAToday,
@@ -1100,7 +1101,7 @@ class ForkyzSettings(val settingsStore: DataStore<Settings>) {
     }
 
     val liveDownloadSudOuestMotsCroises : Flow<Boolean>
-        = settingsMap { it.downloadSudOuestMotsCroises}
+        = settingsMap { it.downloadSudOuestMotsCroises }
 
     fun getDownloadSudOuestMotsCroises(cb : (Boolean) -> Unit)
         = settingsOnce(cb) { it.downloadSudOuestMotsCroises }
@@ -1112,7 +1113,7 @@ class ForkyzSettings(val settingsStore: DataStore<Settings>) {
     }
 
     val liveDownloadSudOuestMotsFleches : Flow<Boolean>
-        = settingsMap { it.downloadSudOuestMotsFleches}
+        = settingsMap { it.downloadSudOuestMotsFleches }
 
     fun getDownloadSudOuestMotsFleches(cb : (Boolean) -> Unit)
         = settingsOnce(cb) { it.downloadSudOuestMotsFleches }
@@ -1123,8 +1124,20 @@ class ForkyzSettings(val settingsStore: DataStore<Settings>) {
         }
     }
 
+    val liveDownloadTF1MotsCroises : Flow<Boolean>
+        = settingsMap { it.downloadTF1MotsCroises }
+
+    fun getDownloadTF1MotsCroises(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.downloadTF1MotsCroises }
+
+    fun setDownloadTF1MotsCroises(value : Boolean) {
+        settingsUpdate { settings ->
+            settings.toBuilder().setDownloadTF1MotsCroises(value).build()
+        }
+    }
+
     val liveDownloadTF1MotsFleches : Flow<Boolean>
-        = settingsMap { it.downloadTF1MotsFleches}
+        = settingsMap { it.downloadTF1MotsFleches }
 
     fun getDownloadTF1MotsFleches(cb : (Boolean) -> Unit)
         = settingsOnce(cb) { it.downloadTF1MotsFleches }
@@ -2575,6 +2588,13 @@ class ForkyzSettings(val settingsStore: DataStore<Settings>) {
             { s, key -> json.put(key, s.downloadSudOuestMotsFleches) },
             { key -> json.optBoolean(key)?.let {
                 setDownloadSudOuestMotsFleches(it) }
+            },
+        )
+        run(
+            "downloadTF1MotsCroises",
+            { s, key -> json.put(key, s.downloadTF1MotsCroises) },
+            { key -> json.optBoolean(key)?.let {
+                setDownloadTF1MotsCroises(it) }
             },
         )
         run(

@@ -26,6 +26,7 @@ data class DownloadersSettings(
     val downloadSheffer : Boolean,
     val downloadSudOuestMotsCroises : Boolean,
     val downloadSudOuestMotsFleches : Boolean,
+    val downloadTF1MotsCroises : Boolean,
     val downloadTF1MotsFleches : Boolean,
     val downloadUniversal : Boolean,
     val downloadUSAToday : Boolean,

@@ -254,4 +254,5 @@ message Settings {
     bool downloadTF1MotsFleches = 133;
     bool downloadSudOuestMotsFleches = 134;
     bool downloadSudOuestMotsCroises = 135;
+    bool downloadTF1MotsCroises = 136;
 }

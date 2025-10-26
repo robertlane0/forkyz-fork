@@ -144,6 +144,7 @@ object SettingsSerializer : Serializer<Settings> {
         .setDownloadTF1MotsFleches(true)
         .setDownloadSudOuestMotsFleches(true)
         .setDownloadSudOuestMotsCroises(true)
+        .setDownloadTF1MotsCroises(true)
         .build()
 
     override suspend fun readFrom(input: InputStream) : Settings {
