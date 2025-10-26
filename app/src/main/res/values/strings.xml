@@ -267,6 +267,7 @@
     <string name="toggle_all_scrapers_desc">Toggle all scrapers.</string>
     <string name="elpais_experto">(ES) El País Experto</string>
     <string name="elpais_experto_desc">Updates Daily</string>
+    <string name="tf1_mots_fleches">(FR) TF1 Mots Fléchés</string>
 
     <!-- preferences display -->
     <string name="clue_below_grid">Clue Below Grid</string>

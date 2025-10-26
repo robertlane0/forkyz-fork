@@ -663,6 +663,21 @@ public class Downloaders {
             ));
         }
 
+        if (settings.getDownloadTF1MotsFleches()) {
+            downloaders.add(new AbstractRCIJeuxMFJDateDownloader(
+                "tf1motfleches",
+                context.getString((R.string.tf1_mots_fleches)),
+                AbstractDateDownloader.DAYS_DAILY,
+                Duration.ofHours(1),
+                "https://www.tf1info.fr/",
+                "https://www.rcijeux.fr/drupal_game/lci/mfleches/grids/%d.mfj",
+                "'https://www.tf1info.fr/jeux/mots-fleches/'",
+                5395,
+                LocalDate.of(2025, 10, 26),
+                1
+            ));
+        }
+
         if (settings.getDownloadUniversal()) {
             downloaders.add(new UclickDownloader(
                 "universal",

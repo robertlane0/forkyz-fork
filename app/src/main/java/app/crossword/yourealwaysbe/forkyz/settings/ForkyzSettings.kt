@@ -440,6 +440,7 @@ class ForkyzSettings(val settingsStore: DataStore<Settings>) {
             settings.downloadNewYorkTimesSyndicated,
             settings.downloadPremier,
             settings.downloadSheffer,
+            settings.downloadTF1MotsFleches,
             settings.downloadUniversal,
             settings.downloadUSAToday,
             settings.downloadWaPoSunday,
@@ -1093,6 +1094,18 @@ class ForkyzSettings(val settingsStore: DataStore<Settings>) {
     fun setDownloadSheffer(value : Boolean) {
         settingsUpdate { settings ->
             settings.toBuilder().setDownloadSheffer(value).build()
+        }
+    }
+
+    val liveDownloadTF1MotsFleches : Flow<Boolean>
+        = settingsMap { it.downloadTF1MotsFleches}
+
+    fun getDownloadTF1MotsFleches(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.downloadTF1MotsFleches }
+
+    fun setDownloadTF1MotsFleches(value : Boolean) {
+        settingsUpdate { settings ->
+            settings.toBuilder().setDownloadTF1MotsFleches(value).build()
         }
     }
 
@@ -2523,6 +2536,13 @@ class ForkyzSettings(val settingsStore: DataStore<Settings>) {
             "downloadSheffer",
             { s, key -> json.put(key, s.downloadSheffer) },
             { key -> json.optBoolean(key)?.let { setDownloadSheffer(it) } },
+        )
+        run(
+            "downloadTF1MotsFleches",
+            { s, key -> json.put(key, s.downloadTF1MotsFleches) },
+            { key -> json.optBoolean(key)?.let {
+                setDownloadTF1MotsFleches(it) }
+            },
         )
         run(
             "downloadTimeout",

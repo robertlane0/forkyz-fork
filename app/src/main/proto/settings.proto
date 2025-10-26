@@ -251,4 +251,5 @@ message Settings {
     bool downloadElPaisExperto = 130;
     bool expandableClueLine = 131;
     ClueListClueLine clueListNameInClueLine = 132;
+    bool downloadTF1MotsFleches = 133;
 }

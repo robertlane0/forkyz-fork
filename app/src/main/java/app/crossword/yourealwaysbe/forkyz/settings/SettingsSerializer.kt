@@ -141,6 +141,7 @@ object SettingsSerializer : Serializer<Settings> {
         .setDontConfirmBrowseDelete(false)
         .setExpandableClueLine(false)
         .setClueListNameInClueLine(ClueListClueLine.CLCL_FULL)
+        .setDownloadTF1MotsFleches(true)
         .build()
 
     override suspend fun readFrom(input: InputStream) : Settings {
