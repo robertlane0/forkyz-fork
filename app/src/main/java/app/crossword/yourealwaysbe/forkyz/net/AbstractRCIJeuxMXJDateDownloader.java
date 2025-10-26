@@ -7,13 +7,17 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Map;
 
-import app.crossword.yourealwaysbe.puz.io.RCIJeuxMFJIO;
 import app.crossword.yourealwaysbe.puz.Puzzle;
+import app.crossword.yourealwaysbe.puz.io.PuzzleParser;
+import app.crossword.yourealwaysbe.puz.io.RCIJeuxMCJIO;
+import app.crossword.yourealwaysbe.puz.io.RCIJeuxMFJIO;
 
 /**
  * Abstract downloader for RCI Jeux puzzles.
+ *
+ * Build with buildMFJ or buildMCJ for arrow words or crosswords.
  */
-public class AbstractRCIJeuxMFJDateDownloader extends AbstractDateDownloader {
+public class AbstractRCIJeuxMXJDateDownloader extends AbstractDateDownloader {
     private static final int ARCHIVE_LENGTH_DAYS = 364;
     private static final DateTimeFormatter titleDateFormat
         = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -32,7 +36,36 @@ public class AbstractRCIJeuxMFJDateDownloader extends AbstractDateDownloader {
      * daysBetween is the number of days between each puzzle (e.g. 1 for daily,
      * 14 for fortnightly)
      */
-    protected AbstractRCIJeuxMFJDateDownloader(
+    private AbstractRCIJeuxMXJDateDownloader(
+        String internalName,
+        String downloaderName,
+        DayOfWeek[] days,
+        Duration utcAvailabilityOffset,
+        String supportUrl,
+        String sourceUrlFormat,
+        String shareUrlFormatPattern,
+        PuzzleParser puzzleParser,
+        int baseCWNumber,
+        LocalDate baseDate,
+        int daysBetween
+    ) {
+        super(
+            internalName,
+            downloaderName,
+            days,
+            utcAvailabilityOffset,
+            supportUrl,
+            puzzleParser,
+            null,
+            shareUrlFormatPattern
+        );
+        this.sourceUrlFormat = sourceUrlFormat;
+        this.baseDate = baseDate;
+        this.baseCWNumber = baseCWNumber;
+        this.daysBetween = daysBetween;
+    }
+
+    public static AbstractRCIJeuxMXJDateDownloader buildMFJ(
         String internalName,
         String downloaderName,
         DayOfWeek[] days,
@@ -44,20 +77,46 @@ public class AbstractRCIJeuxMFJDateDownloader extends AbstractDateDownloader {
         LocalDate baseDate,
         int daysBetween
     ) {
-        super(
+        return new AbstractRCIJeuxMXJDateDownloader(
             internalName,
             downloaderName,
             days,
             utcAvailabilityOffset,
             supportUrl,
+            sourceUrlFormat,
+            shareUrlFormatPattern,
             new RCIJeuxMFJIO(),
-            null,
-            shareUrlFormatPattern
+            baseCWNumber,
+            baseDate,
+            daysBetween
         );
-        this.sourceUrlFormat = sourceUrlFormat;
-        this.baseDate = baseDate;
-        this.baseCWNumber = baseCWNumber;
-        this.daysBetween = daysBetween;
+    }
+
+    public static AbstractRCIJeuxMXJDateDownloader buildMCJ(
+        String internalName,
+        String downloaderName,
+        DayOfWeek[] days,
+        Duration utcAvailabilityOffset,
+        String supportUrl,
+        String sourceUrlFormat,
+        String shareUrlFormatPattern,
+        int baseCWNumber,
+        LocalDate baseDate,
+        int daysBetween
+    ) {
+        return new AbstractRCIJeuxMXJDateDownloader(
+            internalName,
+            downloaderName,
+            days,
+            utcAvailabilityOffset,
+            supportUrl,
+            sourceUrlFormat,
+            shareUrlFormatPattern,
+            new RCIJeuxMCJIO(),
+            baseCWNumber,
+            baseDate,
+            daysBetween
+        );
     }
 
     @Override

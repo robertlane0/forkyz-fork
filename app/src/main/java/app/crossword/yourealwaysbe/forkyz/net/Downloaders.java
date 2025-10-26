@@ -501,7 +501,7 @@ public class Downloaders {
         }
 
         if (settings.getDownloadLeParisienF1()) {
-            downloaders.add(new AbstractRCIJeuxMFJDateDownloader(
+            downloaders.add(AbstractRCIJeuxMXJDateDownloader.buildMFJ(
                 "leparisienf1",
                 context.getString((R.string.le_parisien_daily_f1)),
                 AbstractDateDownloader.DAYS_DAILY,
@@ -517,7 +517,7 @@ public class Downloaders {
         }
 
         if (settings.getDownloadLeParisienF2()) {
-            downloaders.add(new AbstractRCIJeuxMFJDateDownloader(
+            downloaders.add(AbstractRCIJeuxMXJDateDownloader.buildMFJ(
                 "leparisienf2",
                 context.getString((R.string.le_parisien_daily_f2)),
                 AbstractDateDownloader.DAYS_DAILY,
@@ -533,7 +533,7 @@ public class Downloaders {
         }
 
         if (settings.getDownloadLeParisienF3()) {
-            downloaders.add(new AbstractRCIJeuxMFJDateDownloader(
+            downloaders.add(AbstractRCIJeuxMXJDateDownloader.buildMFJ(
                 "leparisienf3",
                 context.getString((R.string.le_parisien_daily_f3)),
                 AbstractDateDownloader.DAYS_DAILY,
@@ -549,7 +549,7 @@ public class Downloaders {
         }
 
         if (settings.getDownloadLeParisienF4()) {
-            downloaders.add(new AbstractRCIJeuxMFJDateDownloader(
+            downloaders.add(AbstractRCIJeuxMXJDateDownloader.buildMFJ(
                 "leparisienf4",
                 context.getString((R.string.le_parisien_daily_f4)),
                 AbstractDateDownloader.DAYS_DAILY,
@@ -663,8 +663,23 @@ public class Downloaders {
             ));
         }
 
+        if (settings.getDownloadSudOuestMotsCroises()) {
+            downloaders.add(AbstractRCIJeuxMXJDateDownloader.buildMCJ(
+                "sudouestmotcroises",
+                context.getString((R.string.sud_ouest_mots_croises)),
+                AbstractDateDownloader.DAYS_DAILY,
+                Duration.ofHours(1),
+                "https://abonnement.sudouest.fr/",
+                "https://www.rcijeux.fr/drupal_game/gso/mcroises/grids/%d.mcj",
+                "'https://www.sudouest.fr/jeux/mots-croises/'",
+                1992,
+                LocalDate.of(2025, 10, 26),
+                1
+            ));
+        }
+
         if (settings.getDownloadSudOuestMotsFleches()) {
-            downloaders.add(new AbstractRCIJeuxMFJDateDownloader(
+            downloaders.add(AbstractRCIJeuxMXJDateDownloader.buildMFJ(
                 "sudouestmotfleches",
                 context.getString((R.string.sud_ouest_mots_fleches)),
                 AbstractDateDownloader.DAYS_DAILY,
@@ -679,7 +694,7 @@ public class Downloaders {
         }
 
         if (settings.getDownloadTF1MotsFleches()) {
-            downloaders.add(new AbstractRCIJeuxMFJDateDownloader(
+            downloaders.add(AbstractRCIJeuxMXJDateDownloader.buildMFJ(
                 "tf1motfleches",
                 context.getString((R.string.tf1_mots_fleches)),
                 AbstractDateDownloader.DAYS_DAILY,

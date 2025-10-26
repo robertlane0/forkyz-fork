@@ -557,6 +557,13 @@ class SettingsPageViewModel @Inject constructor(
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
+            R.string.sud_ouest_mots_croises,
+            R.string.updates_daily,
+            settings.liveDownloadSudOuestMotsCroises.stateInHere(),
+            settings::setDownloadSudOuestMotsCroises,
+        ),
+        SettingsBoolean(
+            SettingsPage.PUZZLE_SOURCES_DAILY,
             R.string.sud_ouest_mots_fleches,
             R.string.updates_daily,
             settings.liveDownloadSudOuestMotsFleches.stateInHere(),

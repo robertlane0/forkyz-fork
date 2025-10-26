@@ -269,6 +269,7 @@
     <string name="elpais_experto_desc">Updates Daily</string>
     <string name="tf1_mots_fleches">(FR) TF1 Mots Fléchés</string>
     <string name="sud_ouest_mots_fleches">(FR) Sud Ouest Mots Fléchés</string>
+    <string name="sud_ouest_mots_croises">(FR) Sud Ouest Mots Croisés</string>
 
     <!-- preferences display -->
     <string name="clue_below_grid">Clue Below Grid</string>

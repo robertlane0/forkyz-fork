@@ -253,4 +253,5 @@ message Settings {
     ClueListClueLine clueListNameInClueLine = 132;
     bool downloadTF1MotsFleches = 133;
     bool downloadSudOuestMotsFleches = 134;
+    bool downloadSudOuestMotsCroises = 135;
 }
