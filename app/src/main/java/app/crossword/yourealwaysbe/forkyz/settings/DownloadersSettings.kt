@@ -24,6 +24,7 @@ data class DownloadersSettings(
     val downloadNewYorkTimesSyndicated : Boolean,
     val downloadPremier : Boolean,
     val downloadSheffer : Boolean,
+    val downloadSudOuestMotsFleches : Boolean,
     val downloadTF1MotsFleches : Boolean,
     val downloadUniversal : Boolean,
     val downloadUSAToday : Boolean,

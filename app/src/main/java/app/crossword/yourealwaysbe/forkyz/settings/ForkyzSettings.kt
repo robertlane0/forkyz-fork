@@ -440,6 +440,7 @@ class ForkyzSettings(val settingsStore: DataStore<Settings>) {
             settings.downloadNewYorkTimesSyndicated,
             settings.downloadPremier,
             settings.downloadSheffer,
+            settings.downloadSudOuestMotsFleches,
             settings.downloadTF1MotsFleches,
             settings.downloadUniversal,
             settings.downloadUSAToday,
@@ -1094,6 +1095,18 @@ class ForkyzSettings(val settingsStore: DataStore<Settings>) {
     fun setDownloadSheffer(value : Boolean) {
         settingsUpdate { settings ->
             settings.toBuilder().setDownloadSheffer(value).build()
+        }
+    }
+
+    val liveDownloadSudOuestMotsFleches : Flow<Boolean>
+        = settingsMap { it.downloadSudOuestMotsFleches}
+
+    fun getDownloadSudOuestMotsFleches(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.downloadSudOuestMotsFleches }
+
+    fun setDownloadSudOuestMotsFleches(value : Boolean) {
+        settingsUpdate { settings ->
+            settings.toBuilder().setDownloadSudOuestMotsFleches(value).build()
         }
     }
 
@@ -2536,6 +2549,13 @@ class ForkyzSettings(val settingsStore: DataStore<Settings>) {
             "downloadSheffer",
             { s, key -> json.put(key, s.downloadSheffer) },
             { key -> json.optBoolean(key)?.let { setDownloadSheffer(it) } },
+        )
+        run(
+            "downloadSudOuestMotsFleches",
+            { s, key -> json.put(key, s.downloadSudOuestMotsFleches) },
+            { key -> json.optBoolean(key)?.let {
+                setDownloadSudOuestMotsFleches(it) }
+            },
         )
         run(
             "downloadTF1MotsFleches",

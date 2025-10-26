@@ -142,6 +142,7 @@ object SettingsSerializer : Serializer<Settings> {
         .setExpandableClueLine(false)
         .setClueListNameInClueLine(ClueListClueLine.CLCL_FULL)
         .setDownloadTF1MotsFleches(true)
+        .setDownloadSudOuestMotsFleches(true)
         .build()
 
     override suspend fun readFrom(input: InputStream) : Settings {

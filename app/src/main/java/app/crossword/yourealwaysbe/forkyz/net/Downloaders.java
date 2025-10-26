@@ -663,6 +663,21 @@ public class Downloaders {
             ));
         }
 
+        if (settings.getDownloadSudOuestMotsFleches()) {
+            downloaders.add(new AbstractRCIJeuxMFJDateDownloader(
+                "sudouestmotfleches",
+                context.getString((R.string.sud_ouest_mots_fleches)),
+                AbstractDateDownloader.DAYS_DAILY,
+                Duration.ofHours(1),
+                "https://abonnement.sudouest.fr/",
+                "https://www.rcijeux.fr/drupal_game/gso/mfleches/grids/%d.mfj",
+                "'https://www.sudouest.fr/jeux/mots-fleches/'",
+                1988,
+                LocalDate.of(2025, 10, 22),
+                1
+            ));
+        }
+
         if (settings.getDownloadTF1MotsFleches()) {
             downloaders.add(new AbstractRCIJeuxMFJDateDownloader(
                 "tf1motfleches",
