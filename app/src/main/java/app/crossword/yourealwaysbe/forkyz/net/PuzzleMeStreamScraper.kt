@@ -19,6 +19,8 @@ import app.crossword.yourealwaysbe.puz.io.AmuseLabsJSONIO
 import app.crossword.yourealwaysbe.puz.io.StreamUtils
 import app.crossword.yourealwaysbe.puz.util.JSONParser
 
+private val DEOBFUSCATE_TIMEOUT = 30000L
+
 /**
  * Get embedded PuzzleMe puzzles
  *
@@ -251,9 +253,14 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
      * Brute-force deobfuscate obfuscated crossword puzzle data.
      */
     fun deobfuscateRawc(rawc : String) : String {
+        val startTime = System.currentTimeMillis()
         val candidateQueue = ArrayDeque<List<Int>>(listOf(listOf()))
 
         while (candidateQueue.isNotEmpty()) {
+            val timeSoFar = System.currentTimeMillis() - startTime
+            if (timeSoFar > DEOBFUSCATE_TIMEOUT)
+                return "{}"
+
             val candidateKeyPrefix = candidateQueue.removeFirst()
 
             if (candidateKeyPrefix.size == 7) {
