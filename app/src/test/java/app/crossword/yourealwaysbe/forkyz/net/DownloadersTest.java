@@ -105,6 +105,10 @@ public class DownloadersTest {
             true, // downloadNewYorkTimesSyndicated
             true, // downloadPremier
             true, // downloadSheffer
+            true, // downloadSudOuestMotsCroises
+            true, // downloadSudOuestMotsFleches
+            true, // downloadTF1MotsCroises
+            true, // downloadTF1MotsFleches
             true, // downloadUniversal
             true, // downloadUSAToday
             true, // downloadWaPoSunday
@@ -114,7 +118,7 @@ public class DownloadersTest {
             true, // scrapeKegler
             true, // scrapePrivateEye
             true, // scrapePrzekroj
-            false , // downloadCustomDaily
+            false, // downloadCustomDaily
             "", // customDailyTitle,
             "", // customDailyUrl,
             true, // suppressSummaryNotifications,
