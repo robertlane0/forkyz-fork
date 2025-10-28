@@ -156,17 +156,28 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
             settings.livePlayEnsureVisible,
             ::BoardEditSettings,
         )
-    private val mediatedBoardState
-        = MediatedStateWithFlow<BaseBoardState, BoardEditSettings>(
+    private lateinit var mediatedBoardState
+        : MediatedStateWithFlow<BaseBoardState, BoardEditSettings>
+    lateinit var boardState : StateFlow<BaseBoardState>
+        private set
+
+    val _newResponseEvent = MutableStateFlow<String?>(null)
+    val newResponseEvent : StateFlow<String?> = _newResponseEvent
+
+    /**
+     * Must be called during init of derived class
+     */
+    protected fun initBoardState() {
+        mediatedBoardState = MediatedStateWithFlow<
+            BaseBoardState, BoardEditSettings
+        >(
             viewModelScope,
             getBoardState(BoardEditSettings()),
             { state, boardEditSettings -> getBoardState(boardEditSettings) },
             settingsFlow,
         )
-    val boardState : StateFlow<BaseBoardState> = mediatedBoardState.stateFlow
-
-    val _newResponseEvent = MutableStateFlow<String?>(null)
-    val newResponseEvent : StateFlow<String?> = _newResponseEvent
+        boardState = mediatedBoardState.stateFlow
+    }
 
     init {
         board?.addListener(this)
@@ -603,6 +614,7 @@ class BoardEditViewModel(
         = _scrollToClueEvent
 
     init {
+        initBoardState()
         scrollToClueIfEnabled()
     }
 
@@ -779,6 +791,8 @@ class WordEditViewModel(
     playLetter,
     deleteLetter,
 ) {
+    init { initBoardState() }
+
     /**
      * Get fresh board state for current board
      */
