@@ -1,6 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.view
 
+import kotlin.math.roundToInt
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.parcelize.Parcelize
 
@@ -829,7 +830,9 @@ fun BoxesEditNoInput(
             )
             BoxProfile.build(localDensity, colors, scale, localTextStyle)
         }
-    val widthBoxes = (displayWidth / boxProfile.boxSizePx).toInt()
+    // Should normally divide to exactly an integer, but floating point
+    // errors means we may go slightly under from time to time
+    val widthBoxes = (displayWidth / boxProfile.boxSizePx).roundToInt()
     val stateBoxes by rememberUpdatedState(boxes)
 
     BoardWord(
