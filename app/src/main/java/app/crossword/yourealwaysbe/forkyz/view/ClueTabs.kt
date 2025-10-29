@@ -309,24 +309,26 @@ fun ClueTabs(
             }
 
             Column(modifier = modifier) {
-                SecondaryTabRow(
-                    modifier = Modifier.combinedClickable(
-                        onClick = { /* handled in Tab */ },
-                        onLongClick = onBarLongClick,
-                        onLongClickLabel = onBarLongClickDescription,
-                    ),
-                    selectedTabIndex = pagerState.currentPage,
-                ) {
-                    pages.forEachIndexed { idx, page ->
-                        Tab(
-                            selected = idx == pagerState.currentPage,
-                            onClick = { viewModel.setPage(paneIndex, idx) },
-                            text = { Text(page.listName) },
-                        )
+                if (pages.size > 0) {
+                    SecondaryTabRow(
+                        modifier = Modifier.combinedClickable(
+                            onClick = { /* handled in Tab */ },
+                            onLongClick = onBarLongClick,
+                            onLongClickLabel = onBarLongClickDescription,
+                        ),
+                        selectedTabIndex = Math.min(pagerState.currentPage, pages.size - 1),
+                    ) {
+                        pages.forEachIndexed { idx, page ->
+                            Tab(
+                                selected = idx == pagerState.currentPage,
+                                onClick = { viewModel.setPage(paneIndex, idx) },
+                                text = { Text(page.listName) },
+                            )
+                        }
                     }
-                }
-                HorizontalPager(state = pagerState) { page ->
-                    Page(paneIndex, page, maxWidth)
+                    HorizontalPager(state = pagerState) { page ->
+                        Page(paneIndex, page, maxWidth)
+                    }
                 }
             }
         }
