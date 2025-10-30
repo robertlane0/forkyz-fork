@@ -33,8 +33,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -116,7 +118,10 @@ fun ClueTabs(
     @Composable
     fun Modifier.clueItemBackground(clueSelected : Boolean) : Modifier {
         val state by viewModel.uiState.collectAsStateWithLifecycle()
-        if (state.highlightSelectedBackground && clueSelected)
+        val highlightSelectedBackground by remember {
+            derivedStateOf { state.highlightSelectedBackground }
+        }
+        if (highlightSelectedBackground && clueSelected)
             return this.background(MaterialTheme.colorScheme.secondaryContainer)
         else
             return this
@@ -125,7 +130,10 @@ fun ClueTabs(
     @Composable
     fun clueItemForeground(clueSelected : Boolean) : Color {
         val state by viewModel.uiState.collectAsStateWithLifecycle()
-        if (state.highlightSelectedBackground && clueSelected)
+        val highlightSelectedBackground by remember {
+            derivedStateOf { state.highlightSelectedBackground }
+        }
+        if (highlightSelectedBackground && clueSelected)
             return MaterialTheme.colorScheme.onSecondaryContainer
         else
             return MaterialTheme.colorScheme.onSurface
@@ -188,7 +196,10 @@ fun ClueTabs(
 
                         val state by viewModel.uiState
                             .collectAsStateWithLifecycle()
-                        if (state.highlightSelectedRadio) {
+                        val highlightSelectedRadio by remember {
+                            derivedStateOf { state.highlightSelectedRadio }
+                        }
+                        if (highlightSelectedRadio) {
                             RadioButton(
                                 selected = clue.selected,
                                 onClick = { onClueClick(clue.cid) },
@@ -233,11 +244,14 @@ fun ClueTabs(
     @Composable
     fun Page(paneIndex : Int, page : Int, maxWidth : Dp) {
         val state by viewModel.uiState.collectAsStateWithLifecycle()
+        val snapToClueEvent by remember {
+            derivedStateOf { state.snapToClueEvent }
+        }
         val listState = rememberLazyListState()
         val coroutineScope = rememberCoroutineScope()
 
-        LaunchedEffect(state.snapToClueEvent) {
-            state.snapToClueEvent?.let { event ->
+        LaunchedEffect(snapToClueEvent) {
+            snapToClueEvent?.let { event ->
                 if (event.paneIndex == paneIndex && event.pageNum == page) {
                     coroutineScope.launch {
                         listState.scrollToItem(event.clueIndex)
@@ -247,11 +261,12 @@ fun ClueTabs(
             }
         }
 
+        val clues by remember { derivedStateOf { state.pages.get(page).clues } }
         LazyColumn(
             modifier = Modifier.fillMaxWidth().fillMaxHeight(),
             state = listState,
         ) {
-            items(state.pages.get(page).clues) {
+            items(clues) {
                 key(it.cid.toString()) {
                     ClueItem(it, maxWidth)
                 }
@@ -267,15 +282,18 @@ fun ClueTabs(
         maxWidth : Dp,
     ) {
         val state by viewModel.uiState.collectAsStateWithLifecycle()
-        val numPages = state.numPages
-        val pages = state.pages
+        val numPages by remember { derivedStateOf { state.numPages } }
 
         if (numPages > 0) {
             val coroutineScope = rememberCoroutineScope()
-            val uiStatePage = Math.min(
-                state.panePages.get(paneIndex),
-                numPages - 1,
-            )
+            val uiStatePage by remember(paneIndex) {
+                derivedStateOf {
+                    Math.min(
+                        state.panePages.get(paneIndex),
+                        numPages - 1,
+                    )
+                }
+            }
             val pagerState = rememberPagerState(
                 pageCount = { numPages },
                 initialPage = uiStatePage,
@@ -309,6 +327,9 @@ fun ClueTabs(
             }
 
             Column(modifier = modifier) {
+                val pages by remember {
+                    derivedStateOf { state.pages }
+                }
                 if (pages.size > 0) {
                     SecondaryTabRow(
                         modifier = Modifier.combinedClickable(
@@ -316,7 +337,10 @@ fun ClueTabs(
                             onLongClick = onBarLongClick,
                             onLongClickLabel = onBarLongClickDescription,
                         ),
-                        selectedTabIndex = Math.min(pagerState.currentPage, pages.size - 1),
+                        selectedTabIndex = Math.min(
+                            pagerState.currentPage,
+                            pages.size - 1,
+                        ),
                     ) {
                         pages.forEachIndexed { idx, page ->
                             Tab(
@@ -351,7 +375,9 @@ fun ClueTabs(
         modifier = modifier.background(MaterialTheme.colorScheme.surface),
     ) {
         val state by viewModel.uiState.collectAsStateWithLifecycle()
-        val isDouble = isDouble(state.doubleMode, maxWidth, isPortrait)
+        val isDouble by remember(maxWidth, isPortrait) {
+            derivedStateOf { isDouble(state.doubleMode, maxWidth, isPortrait) }
+        }
         LaunchedEffect(isDouble) {
             viewModel.isDouble = isDouble
         }

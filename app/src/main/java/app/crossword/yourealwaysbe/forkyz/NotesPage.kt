@@ -38,6 +38,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -244,18 +245,22 @@ fun NotesPage(
 
         @Composable
         fun OverflowMenu() {
-            val state by viewModel.menuState.collectAsStateWithLifecycle()
-            val uiState by viewModel.notesUIState.collectAsStateWithLifecycle()
-
             IconButton(onClick = { viewModel.expandMenu(PuzzleSubMenu.MAIN) }) {
                 Icon(
                     Icons.Default.MoreVert,
                     contentDescription = stringResource(R.string.overflow),
                 )
             }
+
+            val state by viewModel.menuState.collectAsStateWithLifecycle()
+            val expanded by remember {
+                derivedStateOf {
+                    state.expanded == PuzzleSubMenu.MAIN
+                }
+            }
             DropdownMenu(
                 modifier = BaseMenuModifier,
-                expanded = state.expanded == PuzzleSubMenu.MAIN,
+                expanded = expanded,
                 onDismissRequest = viewModel::dismissMenu,
             ) {
                 MenuClueFlagToggle()
@@ -265,7 +270,12 @@ fun NotesPage(
                 MenuShowErrors()
                 MenuReveal()
                 MenuExternalTools()
-                if (!uiState.isPuzzleNotes) {
+                val uiState
+                    by viewModel.notesUIState.collectAsStateWithLifecycle()
+                val isPuzzleNotes by remember {
+                    derivedStateOf { uiState.isPuzzleNotes }
+                }
+                if (!isPuzzleNotes) {
                     MenuEditClue() {
                         viewModel.editClue(viewModel.notesClueID)
                     }
@@ -291,7 +301,10 @@ fun NotesPage(
         @Composable
         fun TopAppBar() {
             val state by viewModel.notesUIState.collectAsStateWithLifecycle()
-            val modifier = if (state.expandableClueLine)
+            val expandableClueLine by remember {
+                derivedStateOf { state.expandableClueLine }
+            }
+            val modifier = if (expandableClueLine)
                 Modifier
             else
                 Modifier.height(TopAppBarDefaults.TopAppBarExpandedHeight)
@@ -299,7 +312,14 @@ fun NotesPage(
             themeHelper.ForkyzTopAppBar(
                 modifier = modifier,
                 title = {
-                    if (state.isPuzzleNotes) {
+                    val isPuzzleNotes by remember {
+                        derivedStateOf { state.isPuzzleNotes }
+                    }
+                    val clueText by remember {
+                        derivedStateOf { state.clueText }
+                    }
+
+                    if (isPuzzleNotes) {
                         Text(stringResource(R.string.menu_notes_puzzle))
                     } else {
                         ClueText(
@@ -321,7 +341,10 @@ fun NotesPage(
         @Composable
         fun MiniboardRow(maxWidth : Dp) {
             val state by viewModel.notesUIState.collectAsStateWithLifecycle()
-            if (state.isPuzzleNotes)
+            val isPuzzleNotes by remember {
+                derivedStateOf { state.isPuzzleNotes }
+            }
+            if (isPuzzleNotes)
                 return
 
             val boardColorScheme = themeHelper.getBoardColorScheme()
@@ -379,10 +402,17 @@ fun NotesPage(
             val state by viewModel.notesUIState.collectAsStateWithLifecycle()
             val boardColorScheme = themeHelper.getBoardColorScheme()
 
-            val separatorsList = if (separators)
-                state.clueSeparators
-            else
-                persistentListOf()
+            val separatorsList by remember(separators) {
+                derivedStateOf {
+                    if (separators)
+                        state.clueSeparators
+                    else
+                        persistentListOf()
+                }
+            }
+            val skipFilled by remember {
+                derivedStateOf { state.skipFilled }
+            }
 
             BoardEditText(
                 modifier = Modifier.fillMaxWidth()
@@ -396,7 +426,7 @@ fun NotesPage(
                 value = value,
                 onDelete = onDelete,
                 onChange = onChange,
-                skipFilled = state.skipFilled,
+                skipFilled = skipFilled,
                 separators = separatorsList,
                 shadow = shadow,
                 onTap = onTap,
@@ -410,13 +440,16 @@ fun NotesPage(
         @Composable
         fun ScratchRow(maxWidth : Dp) {
             val state by viewModel.notesUIState.collectAsStateWithLifecycle()
+            val scratchValue by remember {
+                derivedStateOf { state.scratchValue }
+            }
             val boardEditTextState = rememberBoardEditTextState()
 
             BoardLabel(R.string.scratch_lab)
             NotesBoardEditText(
                 maxWidth = maxWidth,
                 boardEditTextState = boardEditTextState,
-                value = state.scratchValue,
+                value = scratchValue,
                 onDelete = viewModel::deleteScratch,
                 onChange = viewModel::changeScratch,
                 separators = true,
@@ -440,7 +473,10 @@ fun NotesPage(
         @Composable
         fun TextRow(modifier : Modifier) {
             val state by viewModel.notesUIState.collectAsStateWithLifecycle()
-            val hintStringID = if (state.isPuzzleNotes)
+            val isPuzzleNotes by remember {
+                derivedStateOf { state.isPuzzleNotes }
+            }
+            val hintStringID = if (isPuzzleNotes)
                 R.string.general_puzzle_notes
             else
                 R.string.general_clue_notes
@@ -450,8 +486,9 @@ fun NotesPage(
 
             // needs immediate updates:
             // https://medium.com/androiddevelopers/effective-state-management-for-textfield-in-compose-d6e5b070fbe5
-            var localText by remember(state.textValue) {
-                mutableStateOf(state.textValue)
+            val textValue by remember { derivedStateOf { state.textValue } }
+            var localText by remember(textValue) {
+                mutableStateOf(textValue)
             }
 
             BoardLabel(R.string.notes_lab)
@@ -477,7 +514,10 @@ fun NotesPage(
         @Composable
         fun FlagRow() {
             val state by viewModel.notesUIState.collectAsStateWithLifecycle()
-            if (!state.isPuzzleNotes) {
+            val isPuzzleNotes by remember {
+                derivedStateOf { state.isPuzzleNotes }
+            }
+            if (!isPuzzleNotes) {
                 Row(
                     modifier = Modifier.fillMaxWidth()
                         .padding(horizontal = 4.dp),
@@ -494,7 +534,9 @@ fun NotesPage(
                         ),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        val clueFlagColor = state.clueFlagColor
+                        val clueFlagColor by remember {
+                            derivedStateOf { state.clueFlagColor }
+                        }
                         var checkColors = CheckboxDefaults.colors()
                         if (!Clue.isDefaultFlagColor(clueFlagColor)) {
                             val color = Color(addAlpha(clueFlagColor))
@@ -505,9 +547,12 @@ fun NotesPage(
                         }
 
                         Text(stringResource(R.string.flag_clue))
+                        val checked by remember {
+                            derivedStateOf { state.clueFlagged }
+                        }
                         Checkbox(
                             modifier = Modifier.padding(10.dp),
-                            checked = state.clueFlagged,
+                            checked = checked,
                             // needs to be null so parent gets long click
                             onCheckedChange = null,
                             colors = checkColors,
@@ -541,14 +586,20 @@ fun NotesPage(
             }
 
             BoardLabel(R.string.anagram_source_lab)
+            val anagramSourceValue by remember {
+                derivedStateOf { state.anagramSourceValue }
+            }
+            val anagramSourcePredictionValue by remember {
+                derivedStateOf { state.anagramSourcePredictionValue }
+            }
             NotesBoardEditText(
                 maxWidth = maxWidth,
                 boardEditTextState = boardEditTextState,
-                value = state.anagramSourceValue,
+                value = anagramSourceValue,
                 onDelete = viewModel::deleteAnagramSource,
                 onChange = viewModel::changeAnagramSource,
                 separators = false,
-                shadow = state.anagramSourcePredictionValue,
+                shadow = anagramSourcePredictionValue,
                 onTap = {
                     boardEditTextState.requestFocus()
                     viewModel.showKeyboard()
@@ -570,10 +621,13 @@ fun NotesPage(
             val boardEditTextState = rememberBoardEditTextState()
 
             BoardLabel(R.string.anagram_solution_lab)
+            val anagramSolutionValue by remember {
+                derivedStateOf { state.anagramSolutionValue }
+            }
             NotesBoardEditText(
                 maxWidth = maxWidth,
                 boardEditTextState = boardEditTextState,
-                value = state.anagramSolutionValue,
+                value = anagramSolutionValue,
                 onDelete = viewModel::deleteAnagramSolution,
                 onChange = viewModel::changeAnagramSolution,
                 separators = true,
@@ -602,8 +656,10 @@ fun NotesPage(
         @Composable
         fun TransferConfirmationDialog() {
             val state by viewModel.notesUIState.collectAsStateWithLifecycle()
-
-            if (state.confirmTransferRequest != null) {
+            val confirmTransferRequest by remember {
+                derivedStateOf { state.confirmTransferRequest }
+            }
+            if (confirmTransferRequest != null) {
                 OKCancelDialog(
                     title = R.string.copy_conflict,
                     summary = R.string.transfer_overwrite_warning,

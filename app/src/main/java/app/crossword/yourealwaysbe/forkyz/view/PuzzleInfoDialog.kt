@@ -19,7 +19,9 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.integerResource
@@ -46,8 +48,6 @@ fun PuzzleInfoDialog(
     viewModel : PuzzleInfoDialogViewModel,
     onClose : () -> Unit = { },
 ) {
-    val state by viewModel.uiState.collectAsStateWithLifecycle()
-
     PlainDialog(
         onClose = onClose,
         usePlatformDefaultWidth = false,
@@ -64,9 +64,12 @@ fun PuzzleInfoDialog(
                     FinishedInfo(viewModel.finishedViewModel)
                 }
             }
+            val state by viewModel.uiState.collectAsStateWithLifecycle()
+            val showRating by remember { derivedStateOf { state.showRating } }
+            val rating by remember { derivedStateOf { state.rating } }
             PuzzleRating(
-                state.showRating,
-                state.rating,
+                showRating,
+                rating,
                 onSet = viewModel::setRating,
             )
         }
@@ -79,8 +82,6 @@ fun PuzzleFinishedDialog(
     onDone : () -> Unit = { },
     onShare : () -> Unit = { },
 ) {
-    val state by viewModel.uiState.collectAsStateWithLifecycle()
-
     TwoButtonDialog(
         title = R.string.puzzle_finished_title,
         positiveText = R.string.done,
@@ -89,9 +90,14 @@ fun PuzzleFinishedDialog(
         onNegative = onShare,
     ) {
         Column() {
+            val state by viewModel.uiState.collectAsStateWithLifecycle()
+            val showRating by remember {
+                derivedStateOf { state?.showRating ?: true }
+            }
+            val rating by remember { derivedStateOf { state?.rating ?: 0 } }
             PuzzleRating(
-                state?.showRating ?: true,
-                state?.rating ?: 0,
+                showRating,
+                rating,
                 onSet = viewModel::setRating,
             )
             BoxWithConstraints() {
@@ -115,42 +121,46 @@ fun PuzzleFinishedDialog(
 private fun InfoHeadingData(
     viewModel : PuzzleInfoDialogViewModel,
 ) {
-    val state by viewModel.uiState.collectAsStateWithLifecycle()
-
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        val state by viewModel.uiState.collectAsStateWithLifecycle()
+        val title by remember { derivedStateOf { state.title } }
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = state.title ?: stringResource(R.string.puzzle_info),
+            text = title ?: stringResource(R.string.puzzle_info),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.headlineSmall,
         )
         if (state.author.length > 0) {
+            val author by remember { derivedStateOf { state.author } }
             Text(
-                text = AnnotatedString.fromHtml(state.author),
+                text = AnnotatedString.fromHtml(author),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleMedium,
             )
         }
         if (state.copyright.length > 0) {
+            val copyright by remember { derivedStateOf { state.copyright } }
             Text(
-                text = AnnotatedString.fromHtml(state.copyright),
+                text = AnnotatedString.fromHtml(copyright),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodySmall,
             )
         }
+        val elapsed by remember { derivedStateOf { state.elapsed } }
         Text(
             text = stringResource(
                 R.string.elapsed_time,
-                TimeUtils.convertMillisecondsToTime(state.elapsed),
+                TimeUtils.convertMillisecondsToTime(elapsed),
             ),
             style = MaterialTheme.typography.titleMedium,
         )
+        val progress by remember { derivedStateOf { state.progress / 100F } }
         LinearProgressIndicator(
             modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-            progress = { state.progress / 100F },
+            progress = { progress },
         )
         Text(
             text = state.filename,
@@ -165,11 +175,12 @@ fun PuzzleInfo(
     viewModel : PuzzleInfoDialogViewModel,
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-
-    state.introduction?.let { introduction ->
+    val introduction by remember { derivedStateOf { state.introduction } }
+    introduction?.let { introduction ->
         InfoSection(R.string.introduction, introduction)
     }
-    state.notes?.let { notes ->
+    val notes by remember { derivedStateOf { state.notes } }
+    notes?.let { notes ->
         InfoSection(R.string.notes, notes)
     }
 }
@@ -290,3 +301,4 @@ private fun PuzzleRating(
         }
     }
 }
+

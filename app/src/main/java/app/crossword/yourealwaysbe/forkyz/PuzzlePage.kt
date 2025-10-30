@@ -33,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -137,9 +138,12 @@ class PuzzlePageScope(
     fun OnTimerUpdate(onTimerUpdate : () -> Unit) {
         val state by viewModel.uiState.collectAsStateWithLifecycle()
         val scope = rememberCoroutineScope()
-        LifecycleResumeEffect(state.showTimer) {
+        val showTimer by remember {
+            derivedStateOf { state.showTimer }
+        }
+        LifecycleResumeEffect(showTimer) {
             scope.launch {
-                while (state.showTimer) {
+                while (showTimer) {
                     delay(1000L)
                     onTimerUpdate()
                 }
@@ -161,7 +165,10 @@ class PuzzlePageScope(
         // potentially just a material bug that might be fixed in
         // future
 
-        val color = if (state.showErrorsState.isShowing)
+        val isShowing by remember {
+            derivedStateOf { state.showErrorsState.isShowing }
+        }
+        val color = if (isShowing)
             themeHelper.cheatedColor
         else
             themeHelper.statusBarColor
@@ -244,8 +251,12 @@ class PuzzlePageScope(
     fun VoiceButtons() {
         val state by viewModel.voiceState.collectAsStateWithLifecycle()
 
-        val showVoiceButton = state.showVoiceButton
-        val showAnnounceButton = state.showAnnounceButton
+        val showVoiceButton by remember {
+            derivedStateOf { state.showVoiceButton }
+        }
+        val showAnnounceButton by remember {
+            derivedStateOf { state.showAnnounceButton }
+        }
 
         if (showVoiceButton || showAnnounceButton) {
             Row(
@@ -358,10 +369,13 @@ class PuzzlePageScope(
     @Composable
     fun MenuNotesSub() {
         val state by viewModel.menuState.collectAsStateWithLifecycle()
+        val expanded by remember {
+            derivedStateOf { state.expanded == PuzzleSubMenu.NOTES }
+        }
 
         DropdownMenu(
             modifier = BaseMenuModifier,
-            expanded = state.expanded == PuzzleSubMenu.NOTES,
+            expanded = expanded,
             onDismissRequest = viewModel::dismissMenu,
         ) {
             MenuDropdownHeading(
@@ -408,8 +422,11 @@ class PuzzlePageScope(
     @Composable
     fun MenuScratchMode() {
         val state by viewModel.menuState.collectAsStateWithLifecycle()
+        val isScratchMode by remember {
+            derivedStateOf { state.isScratchMode }
+        }
         MenuCheckedItem(
-            checked = state.isScratchMode,
+            checked = isScratchMode,
             text = { MenuText(stringResource(R.string.scratch_mode)) },
             onClick = {
                 viewModel.toggleScratchMode()
@@ -432,12 +449,19 @@ class PuzzlePageScope(
     @Composable
     fun MenuShowErrors() {
         val state by viewModel.menuState.collectAsStateWithLifecycle()
-        if (!state.showErrorsState.enabled)
+        val enabled by remember {
+            derivedStateOf { state.showErrorsState.enabled }
+        }
+        if (!enabled)
             return
 
+
+        val isShowing by remember {
+            derivedStateOf { state.showErrorsState.isShowing }
+        }
         MenuSubEntry(
             text = {
-                if (state.showErrorsState.isShowing)
+                if (isShowing)
                     MenuText(stringResource(R.string.showing_errors))
                 else
                     MenuText(stringResource(R.string.show_errors))
@@ -449,12 +473,18 @@ class PuzzlePageScope(
     @Composable
     fun MenuShowErrorsSub() {
         val state by viewModel.menuState.collectAsStateWithLifecycle()
-        if (!state.showErrorsState.enabled)
+        val showErrorsState by remember {
+            derivedStateOf { state.showErrorsState }
+        }
+        if (!showErrorsState.enabled)
             return
 
+        val expanded by remember {
+            derivedStateOf { state.expanded == PuzzleSubMenu.SHOW_ERRORS }
+        }
         DropdownMenu(
             modifier = BaseMenuModifier,
-            expanded = state.expanded == PuzzleSubMenu.SHOW_ERRORS,
+            expanded = expanded,
             onDismissRequest = viewModel::dismissMenu,
         ) {
             MenuDropdownHeading(
@@ -462,7 +492,7 @@ class PuzzlePageScope(
                 onClick = viewModel::closeMenu,
             )
             MenuCheckedItem(
-                checked = state.showErrorsState.isShowingErrorsCursor,
+                checked = showErrorsState.isShowingErrorsCursor,
                 text = {
                     MenuText(stringResource(R.string.show_errors_cursor))
                 },
@@ -472,7 +502,7 @@ class PuzzlePageScope(
                 }
             )
             MenuCheckedItem(
-                checked = state.showErrorsState.isShowingErrorsClue,
+                checked = showErrorsState.isShowingErrorsClue,
                 text = { MenuText(stringResource(R.string.show_errors_clue)) },
                 onClick = {
                     viewModel.toggleShowErrorsClue()
@@ -480,7 +510,7 @@ class PuzzlePageScope(
                 }
             )
             MenuCheckedItem(
-                checked = state.showErrorsState.isShowingErrorsGrid,
+                checked = showErrorsState.isShowingErrorsGrid,
                 text = {
                     MenuText(stringResource(R.string.show_errors_full_grid))
                 },
@@ -495,7 +525,8 @@ class PuzzlePageScope(
     @Composable
     fun MenuReveal() {
         val state by viewModel.menuState.collectAsStateWithLifecycle()
-        if (!state.canReveal)
+        val canReveal by remember { derivedStateOf { state.canReveal } }
+        if (!canReveal)
             return
 
         MenuSubEntry(
@@ -507,19 +538,26 @@ class PuzzlePageScope(
     @Composable
     fun MenuRevealSub() {
         val state by viewModel.menuState.collectAsStateWithLifecycle()
-        if (!state.canReveal)
+        val canReveal by remember { derivedStateOf { state.canReveal } }
+        if (!canReveal)
             return
 
+        val expanded by remember {
+            derivedStateOf { state.expanded == PuzzleSubMenu.REVEAL }
+        }
         DropdownMenu(
             modifier = BaseMenuModifier,
-            expanded = state.expanded == PuzzleSubMenu.REVEAL,
+            expanded = expanded,
             onDismissRequest = viewModel::dismissMenu,
         ) {
             MenuDropdownHeading(
                 R.string.reveal,
                 onClick = viewModel::closeMenu,
             )
-            if (state.canRevealInitialBoxLetter) {
+            val canRevealInitialBoxLetter by remember {
+                derivedStateOf { state.canRevealInitialBoxLetter }
+            }
+            if (canRevealInitialBoxLetter) {
                 DropdownMenuItem(
                     text = {
                         MenuText(stringResource(R.string.initial_letter))
@@ -544,7 +582,10 @@ class PuzzlePageScope(
                     viewModel.dismissMenu()
                 },
             )
-            if (state.canRevealInitialLetters) {
+            val canRevealInitialLetters by remember {
+                derivedStateOf { state.canRevealInitialLetters }
+            }
+            if (canRevealInitialLetters) {
                 DropdownMenuItem(
                     text = {
                         MenuText(stringResource(R.string.initial_letters))
@@ -590,9 +631,12 @@ class PuzzlePageScope(
     ) {
         val state by viewModel.menuState.collectAsStateWithLifecycle()
 
+        val expanded by remember {
+            derivedStateOf { state.expanded == PuzzleSubMenu.ZOOM }
+        }
         DropdownMenu(
             modifier = BaseMenuModifier,
-            expanded = state.expanded == PuzzleSubMenu.ZOOM,
+            expanded = expanded,
             onDismissRequest = viewModel::dismissMenu,
         ) {
             MenuDropdownHeading(
@@ -642,7 +686,10 @@ class PuzzlePageScope(
     @Composable
     fun MenuExternalTools() {
         val state by viewModel.menuState.collectAsStateWithLifecycle()
-        if (!state.externalToolsState.hasExternal)
+        val hasExternal by remember {
+            derivedStateOf { state.externalToolsState.hasExternal }
+        }
+        if (!hasExternal)
             return
 
         MenuSubEntry(
@@ -672,19 +719,25 @@ class PuzzlePageScope(
         onCallAnagramSolver : () -> Unit = { },
     ) {
         val state by viewModel.menuState.collectAsStateWithLifecycle()
-        if (!state.externalToolsState.hasExternal)
+        val externalToolsState by remember {
+            derivedStateOf { state.externalToolsState }
+        }
+        if (!externalToolsState.hasExternal)
             return
 
+        val expanded by remember {
+            derivedStateOf { state.expanded == PuzzleSubMenu.EXTERNAL_TOOLS }
+        }
         DropdownMenu(
             modifier = BaseMenuModifier,
-            expanded = state.expanded == PuzzleSubMenu.EXTERNAL_TOOLS,
+            expanded = expanded,
             onDismissRequest = viewModel::dismissMenu,
         ) {
             MenuDropdownHeading(
                 R.string.external_tools,
                 onClick = viewModel::closeMenu,
             )
-            if (state.externalToolsState.hasExternalDictionary) {
+            if (externalToolsState.hasExternalDictionary) {
                 DropdownMenuItem(
                     text = {
                         MenuText(
@@ -697,7 +750,7 @@ class PuzzlePageScope(
                     },
                 )
             }
-            if (state.externalToolsState.hasCrosswordSolver) {
+            if (externalToolsState.hasCrosswordSolver) {
                 DropdownMenuItem(
                     text = {
                         MenuText(stringResource(R.string.help_crossword_solver))
@@ -724,7 +777,7 @@ class PuzzlePageScope(
 
                 }
             }
-            if (state.externalToolsState.hasChatGPT) {
+            if (externalToolsState.hasChatGPT) {
                 DropdownMenuItem(
                     text = {
                         MenuText(stringResource(R.string.help_query_chat_gpt))
@@ -735,7 +788,7 @@ class PuzzlePageScope(
                     },
                 )
             }
-            if (state.externalToolsState.hasDuckDuckGo) {
+            if (externalToolsState.hasDuckDuckGo) {
                 DropdownMenuItem(
                     text = {
                         MenuText(stringResource(R.string.help_duckduckgo))
@@ -746,7 +799,7 @@ class PuzzlePageScope(
                     },
                 )
             }
-            if (state.externalToolsState.hasFifteenSquared) {
+            if (externalToolsState.hasFifteenSquared) {
                 DropdownMenuItem(
                     text = {
                         MenuText(stringResource(R.string.help_fifteen_squared))
@@ -772,9 +825,12 @@ class PuzzlePageScope(
     fun MenuShareSub() {
         val state by viewModel.menuState.collectAsStateWithLifecycle()
 
+        val expanded by remember {
+            derivedStateOf { state.expanded == PuzzleSubMenu.SHARE }
+        }
         DropdownMenu(
             modifier = BaseMenuModifier,
-            expanded = state.expanded == PuzzleSubMenu.SHARE,
+            expanded = expanded,
             onDismissRequest = viewModel::dismissMenu,
         ) {
             MenuDropdownHeading(
@@ -1027,7 +1083,8 @@ fun PuzzlePage(
         }
 
         val state by viewModel.uiState.collectAsStateWithLifecycle()
-        when (state.showDialog) {
+        val showDialog by remember { derivedStateOf { state.showDialog } }
+        when (showDialog) {
             PuzzleDialog.REVEAL_ALL -> {
                 OKCancelDialog(
                     title = R.string.reveal_puzzle,
@@ -1148,8 +1205,11 @@ fun PuzzlePage(
     fun HandleBack() {
         val keyboardState
             by viewModel.keyboardState.collectAsStateWithLifecycle()
+        val hideOnBack by remember {
+            derivedStateOf { keyboardState.hideOnBack }
+        }
         BackHandler(
-            enabled = keyboardState.hideOnBack,
+            enabled = hideOnBack,
             onBack = ::doBackAction,
         )
     }

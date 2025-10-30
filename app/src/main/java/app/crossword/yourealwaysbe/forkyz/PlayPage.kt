@@ -30,7 +30,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -150,7 +152,10 @@ fun PlayPage(
         fun PlayLaunchers() {
             val state by viewModel.playUIState.collectAsStateWithLifecycle()
 
-            LaunchedEffect(state.isRandomClueOnShake) {
+            val isRandomClueOnShake by remember {
+                derivedStateOf { state.isRandomClueOnShake }
+            }
+            LaunchedEffect(isRandomClueOnShake) {
                 if (state.isRandomClueOnShake) {
                     startShakeDetector {
                         viewModel.pickRandomUnfilledClue()
@@ -159,16 +164,25 @@ fun PlayPage(
                     stopShakeDetector()
                 }
             }
+
             LaunchedEffect(Unit) {
                 viewModel.getInitialSizeInfo { fitToScreenMode, scale ->
                     boardEditState.setInitialFitToScreen(fitToScreenMode, scale)
                 }
             }
-            LaunchedEffect(state.fitToScreenMode) {
-                boardEditState.updateFitToScreenMode(state.fitToScreenMode)
+
+            val fitToScreenMode by remember {
+                derivedStateOf { state.fitToScreenMode }
             }
-            LaunchedEffect(state.isFullScreen) {
-                if (state.isFullScreen)
+            LaunchedEffect(fitToScreenMode) {
+                boardEditState.updateFitToScreenMode(fitToScreenMode)
+            }
+
+            val isFullScreen by remember {
+                derivedStateOf { state.isFullScreen }
+            }
+            LaunchedEffect(isFullScreen) {
+                if (isFullScreen)
                     onSetFullScreen()
             }
         }
@@ -198,7 +212,15 @@ fun PlayPage(
         @Composable
         fun OverflowMenu() {
             val state by viewModel.menuState.collectAsStateWithLifecycle()
+            val expanded by remember {
+                derivedStateOf { state.expanded == PuzzleSubMenu.MAIN }
+            }
             val uiState by viewModel.playUIState.collectAsStateWithLifecycle()
+            val fitLocked by remember {
+                derivedStateOf {
+                    uiState.fitToScreenMode == FitToScreenMode.FTSM_LOCKED
+                }
+            }
 
             IconButton(onClick = { viewModel.expandMenu(PuzzleSubMenu.MAIN) }) {
                 Icon(
@@ -208,12 +230,12 @@ fun PlayPage(
             }
             DropdownMenu(
                 modifier = BaseMenuModifier,
-                expanded = state.expanded == PuzzleSubMenu.MAIN,
+                expanded = expanded,
                 onDismissRequest = viewModel::dismissMenu,
             ) {
                 MenuClues()
                 MenuNotes()
-                if (uiState.fitToScreenMode != FitToScreenMode.FTSM_LOCKED)
+                if (!fitLocked)
                     MenuZoom()
                 MenuScratchMode()
                 MenuSpecialEntry()
@@ -231,7 +253,7 @@ fun PlayPage(
             MenuRevealSub()
             MenuExternalToolsSub()
             MenuShareSub()
-            if (uiState.fitToScreenMode != FitToScreenMode.FTSM_LOCKED)
+            if (!fitLocked)
                 MenuZoomSub()
         }
 
@@ -241,9 +263,12 @@ fun PlayPage(
         @Composable
         fun ClueText(modifier : Modifier) {
             val state by viewModel.playUIState.collectAsStateWithLifecycle()
+            val clueText by remember {
+                derivedStateOf { state.clueText }
+            }
             ClueText(
                 modifier = modifier,
-                clueText = state.clueText,
+                clueText = clueText,
                 onClick = ::toggleShowClueTabs,
                 onClickDescription = stringResource(R.string.toggle_clue_tabs),
                 onLongClick = viewModel::launchClueList,
@@ -254,7 +279,10 @@ fun PlayPage(
         @Composable
         fun Modifier.clueBarHeight() : Modifier {
             val state by viewModel.playUIState.collectAsStateWithLifecycle()
-            if (state.expandableClueLine) {
+            val expandableClueLine by remember {
+                derivedStateOf { state.expandableClueLine }
+            }
+            if (expandableClueLine) {
                 return this.heightIn(
                     min = TopAppBarDefaults.TopAppBarExpandedHeight,
                 )
@@ -266,14 +294,19 @@ fun PlayPage(
         @Composable
         fun TopAppBar() {
             val state by viewModel.playUIState.collectAsStateWithLifecycle()
+            val isClueBelowGrid by remember {
+                derivedStateOf { state.isClueBelowGrid }
+            }
+            val puzzleTitle by remember {
+                derivedStateOf { state.puzzleTitle }
+            }
 
             themeHelper.ForkyzTopAppBar(
                 modifier = Modifier.clueBarHeight(),
                 title = {
-                    if (state.isClueBelowGrid) {
-                        val title = state.puzzleTitle ?: stringResource(
-                            R.string.app_name
-                        )
+                    if (isClueBelowGrid) {
+                        val title = puzzleTitle
+                            ?: stringResource(R.string.app_name)
                         Text(
                             text = AnnotatedString.fromHtml(title),
                             minLines = 1,
@@ -292,8 +325,11 @@ fun PlayPage(
         @Composable
         fun IntroDialog() {
             val state by viewModel.playUIState.collectAsStateWithLifecycle()
+            val firstPlayMessage by remember {
+                derivedStateOf { state.firstPlayMessage }
+            }
 
-            state.firstPlayMessage?.let { firstPlayMessage ->
+            firstPlayMessage?.let { firstPlayMessage ->
                 OKDialog(
                     title = R.string.introduction,
                     summary = firstPlayMessage,
@@ -336,16 +372,22 @@ fun PlayPage(
             val textMeasurer = rememberBoardTextMeasurer()
 
             val state by viewModel.playUIState.collectAsStateWithLifecycle()
+            val showClueTabs by remember {
+                derivedStateOf { state.showClueTabs }
+            }
 
-            if (!state.showClueTabs)
+            if (!showClueTabs)
                 return
 
-            val showAllWords = state.isAcrostic
+            val isAcrostic by remember {
+                derivedStateOf { state.isAcrostic }
+            }
+            val showAllWords = isAcrostic
             val onBarLongClick : () -> Unit
-                = if (state.isAcrostic) ::toggleShowClueTabs
+                = if (isAcrostic) ::toggleShowClueTabs
                 else { { } }
             val onBarLongClickDescription
-                = if (state.isAcrostic) stringResource(R.string.toggle_clue_tabs)
+                = if (isAcrostic) stringResource(R.string.toggle_clue_tabs)
                 else ""
             val boardColorScheme = themeHelper.getBoardColorScheme()
 
@@ -373,7 +415,9 @@ fun PlayPage(
         @Composable
         fun Board(modifier : Modifier) {
             val state by viewModel.playUIState.collectAsStateWithLifecycle()
-            val locked = state.fitToScreenMode == FitToScreenMode.FTSM_LOCKED
+            val doubleTapFitBoard by remember {
+                derivedStateOf { state.doubleTapFitBoard }
+            }
             val boardColorScheme = themeHelper.getBoardColorScheme()
 
             BoardEdit(
@@ -382,7 +426,7 @@ fun PlayPage(
                 state = boardEditState,
                 viewModel = viewModel.boardEditViewModel,
                 colors = boardColorScheme,
-                doubleTapFitBoard = state.doubleTapFitBoard,
+                doubleTapFitBoard = doubleTapFitBoard,
                 onTap = { row, col ->
                     boardEditState.requestFocus()
                     viewModel.clickBoard(row, col)
@@ -393,10 +437,6 @@ fun PlayPage(
             )
 
             LaunchedEffect(Unit) {
-                // TODO: this is called over and over because the
-                // Board keeps getting recomposed, maybe due to
-                // boardSizePortrait modifier. Harmless, but
-                // suggests an issue elsewhere
                 boardEditState.requestFocus()
             }
         }
@@ -419,14 +459,25 @@ fun PlayPage(
             maxHeight : Dp,
         ) : Modifier {
             val state by viewModel.playUIState.collectAsStateWithLifecycle()
-            val aspect = state.puzzleAspectRatio
+            val aspect by remember {
+                derivedStateOf { state.puzzleAspectRatio }
+            }
+            val isAcrostic by remember {
+                derivedStateOf { state.isAcrostic }
+            }
+            val showClueTabs by remember {
+                derivedStateOf { state.showClueTabs }
+            }
 
-            val desiredHeight = if (state.isAcrostic) {
+            val desiredHeight = if (isAcrostic) {
                 val minHeight = ACROSTIC_BOARD_HEIGHT_RATIO_MIN * displayHeight
                 val aspectHeight = width / aspect
                 max(minHeight.dp, aspectHeight)
-            } else if (state.showClueTabs) {
-                when (state.portraitGridRatio) {
+            } else if (showClueTabs) {
+                val portraitGridRatio by remember {
+                    derivedStateOf { state.portraitGridRatio }
+                }
+                when (portraitGridRatio) {
                     GridRatio.GR_ONE_TO_ONE -> width
                     GridRatio.GR_THIRTY_PCNT -> fracDp(0.3, displayHeight)
                     GridRatio.GR_FORTY_PCNT -> fracDp(0.4, displayHeight)
@@ -444,15 +495,26 @@ fun PlayPage(
         @Composable
         fun Modifier.boardWidthLandscape() : Modifier {
             val state by viewModel.playUIState.collectAsStateWithLifecycle()
-            val aspect = state.puzzleAspectRatio
+            val aspect by remember {
+                derivedStateOf { state.puzzleAspectRatio }
+            }
+            val isAcrostic by remember {
+                derivedStateOf { state.isAcrostic }
+            }
+            val showClueTabs by remember {
+                derivedStateOf { state.showClueTabs }
+            }
 
-            if (state.isAcrostic) {
+            if (isAcrostic) {
                 val maxWidth = (
                     ACROSTIC_BOARD_WIDTH_RATIO_MAX * displayWidth
                 ).toInt().dp
                 return this.aspectRatio(aspect).widthIn(max=maxWidth)
-            } else if (state.showClueTabs) {
-                return when (state.landscapeGridRatio) {
+            } else if (showClueTabs) {
+                val landscapeGridRatio by remember {
+                    derivedStateOf { state.landscapeGridRatio }
+                }
+                return when (landscapeGridRatio) {
                     GridRatio.GR_ONE_TO_ONE -> this.aspectRatio(1.0F)
                     GridRatio.GR_THIRTY_PCNT -> this.fillMaxWidth(0.3F)
                     GridRatio.GR_FORTY_PCNT -> this.fillMaxWidth(0.4F)
@@ -467,7 +529,8 @@ fun PlayPage(
 
         fun onSpecialKeyUp(key : SpecialKey) {
             when (key) {
-                SpecialKey.KEY_CHANGE_CLUE_DIRECTION -> viewModel.toggleSelection()
+                SpecialKey.KEY_CHANGE_CLUE_DIRECTION ->
+                    viewModel.toggleSelection()
                 SpecialKey.KEY_NEXT_CLUE -> viewModel.nextClue()
                 SpecialKey.KEY_PREVIOUS_CLUE -> viewModel.prevClue()
             }
@@ -551,7 +614,9 @@ fun PlayPage(
                     val state by viewModel
                         .playUIState
                         .collectAsStateWithLifecycle()
-                    val showClueBar = state.isClueBelowGrid
+                    val showClueBar by remember {
+                        derivedStateOf { state.isClueBelowGrid }
+                    }
                     val clueBarHeight = if (showClueBar)
                         TopAppBarDefaults.TopAppBarExpandedHeight
                     else
@@ -583,9 +648,13 @@ fun PlayPage(
         fun ActivityBodyLandscape(modifier : Modifier) {
             Column(modifier.fillMaxHeight().fillMaxWidth()) {
                 Row(Modifier.weight(1.0F).fillMaxWidth()) {
-                    val state by viewModel.playUIState.collectAsStateWithLifecycle()
+                    val state
+                        by viewModel.playUIState.collectAsStateWithLifecycle()
+                    val showClueTabs by remember {
+                        derivedStateOf { state.showClueTabs }
+                    }
 
-                    val boardWidthModifier = if (state.showClueTabs)
+                    val boardWidthModifier = if (showClueTabs)
                         Modifier.width(IntrinsicSize.Min)
                     else
                         Modifier.fillMaxWidth()
@@ -595,11 +664,14 @@ fun PlayPage(
                             Modifier.boardWidthLandscape()
                                 .weight(1.0F),
                         )
-                        if (state.isClueBelowGrid)
+                        val isClueBelowGrid by remember {
+                            derivedStateOf { state.isClueBelowGrid }
+                        }
+                        if (isClueBelowGrid)
                             ClueBar(Modifier.fillMaxWidth())
                     }
 
-                    if (state.showClueTabs) {
+                    if (showClueTabs) {
                         Column(Modifier.weight(1.0F).fillMaxHeight()) {
                             CluesList(Modifier.weight(1.0F).fillMaxWidth())
                             VoiceButtons()

@@ -14,7 +14,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
@@ -39,68 +41,72 @@ fun DownloadDialog(
     onOpenSettings : () -> Unit,
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-
-    val downloaders : List<DownloaderData>? = state.downloaders
-    if (downloaders == null) {
+    val downloaders by remember {
+        derivedStateOf { state.downloaders }
+    }
+    downloaders?.let { downloaders ->
         // do nothing yet
-    } else if (downloaders.size > 0) {
-        val selected = (0 until downloaders.size).filter {
-            state.selected.contains(downloaders.get(it).internalName)
-        }.toSet()
+        if (downloaders.size > 0) {
+            val selected = (0 until downloaders.size).filter {
+                state.selected.contains(downloaders.get(it).internalName)
+            }.toSet()
 
-        MultiListDialog(
-            title = R.string.download_puzzles,
-            allOrNoneLabel = R.string.select_sources,
-            numItems = downloaders.size,
-            getItem = { index -> DownloaderLabel(downloaders, index) },
-            getEnabled = { index -> getDownloaderEnabled(downloaders, index) },
-            selected = selected,
-            onSelect = { onDownload() },
-            onDismissRequest = onCancel,
-            onSelectionChange = { newSelection ->
-                viewModel.setSelection(
-                    newSelection.filter { 0 <= it && it < downloaders.size }
-                        .map { downloaders[it].internalName }
-                        .toSet()
-                )
-            },
-            okLabel = R.string.download,
-        ) {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                val date = state.date
-                val day = date.getDayOfWeek()
-                    .getDisplayName(
-                        TextStyle.FULL,
-                        java.util.Locale.getDefault(),
+            MultiListDialog(
+                title = R.string.download_puzzles,
+                allOrNoneLabel = R.string.select_sources,
+                numItems = downloaders.size,
+                getItem = { index -> DownloaderLabel(downloaders, index) },
+                getEnabled = { index ->
+                    getDownloaderEnabled(downloaders, index)
+                },
+                selected = selected,
+                onSelect = { onDownload() },
+                onDismissRequest = onCancel,
+                onSelectionChange = { newSelection ->
+                    viewModel.setSelection(
+                        newSelection.filter { 0 <= it && it < downloaders.size }
+                            .map { downloaders[it].internalName }
+                            .toSet()
                     )
+                },
+                okLabel = R.string.download,
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    val date by remember { derivedStateOf { state.date } }
+                    val day = date.getDayOfWeek()
+                        .getDisplayName(
+                            TextStyle.FULL,
+                            java.util.Locale.getDefault(),
+                        )
 
-                Text(text = day)
-                WheelDatePicker(
-                    modifier = Modifier.padding(vertical = 8.dp),
-                    startDate = date.toKotlinLocalDate(),
-                    dateFormatter = dateFormatter(
-                        locale = Locale.current,
-                        monthDisplayStyle = MonthDisplayStyle.SHORT,
-                        cjkSuffixConfig = CjkSuffixConfig.ShowAll,
-                    ),
-                    onSnappedDate = { newDate ->
-                        viewModel.date = newDate.toJavaLocalDate()
-                    },
-                )
+                    Text(text = day)
+                    WheelDatePicker(
+                        modifier = Modifier.padding(vertical = 8.dp),
+                        startDate = date.toKotlinLocalDate(),
+                        dateFormatter = dateFormatter(
+                            locale = Locale.current,
+                            monthDisplayStyle = MonthDisplayStyle.SHORT,
+                            cjkSuffixConfig = CjkSuffixConfig.ShowAll,
+                        ),
+                        onSnappedDate = { newDate ->
+                            viewModel.date = newDate.toJavaLocalDate()
+                        },
+                    )
+                }
             }
+        } else {
+            TwoButtonDialog(
+                title = R.string.no_downloaders_enabled,
+                summary = R.string.no_downloaders_enabled_msg,
+                positiveText = R.string.settings,
+                onPositive = onOpenSettings,
+                negativeText = android.R.string.cancel,
+                onNegative = onCancel,
+            )
         }
-    } else {
-        TwoButtonDialog(
-            title = R.string.no_downloaders_enabled,
-            summary = R.string.no_downloaders_enabled_msg,
-            positiveText = R.string.settings,
-            onPositive = onOpenSettings,
-            negativeText = android.R.string.cancel,
-            onNegative = onCancel,
-        )
     }
 }
 

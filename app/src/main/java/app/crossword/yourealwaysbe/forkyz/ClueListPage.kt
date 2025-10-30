@@ -20,6 +20,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -162,17 +163,23 @@ fun ClueListPage(
 
         @Composable
         fun OverflowMenu() {
-            val state by viewModel.menuState.collectAsStateWithLifecycle()
-
             IconButton(onClick = { viewModel.expandMenu(PuzzleSubMenu.MAIN) }) {
                 Icon(
                     Icons.Default.MoreVert,
                     contentDescription = stringResource(R.string.overflow),
                 )
             }
+
+
+            val state by viewModel.menuState.collectAsStateWithLifecycle()
+            val expanded by remember {
+                derivedStateOf {
+                    state.expanded == PuzzleSubMenu.MAIN
+                }
+            }
             DropdownMenu(
                 modifier = BaseMenuModifier,
-                expanded = state.expanded == PuzzleSubMenu.MAIN,
+                expanded = expanded,
                 onDismissRequest = viewModel::dismissMenu,
             ) {
                 MenuNotes()
@@ -281,3 +288,4 @@ fun ClueListPage(
         }
     }
 }
+

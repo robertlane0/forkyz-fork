@@ -32,8 +32,6 @@ fun SpecialEntryDialog(
     viewModel : SpecialEntryDialogViewModel,
     onClose : () -> Unit,
 ) {
-    val response by viewModel.response.collectAsStateWithLifecycle()
-    val forceCaps by viewModel.forceCaps.collectAsStateWithLifecycle()
     OKCancelDialog(
         title = R.string.special_entry,
         summary = R.string.enter_special_desc,
@@ -43,6 +41,7 @@ fun SpecialEntryDialog(
             onClose()
         },
     ) {
+        val response by viewModel.response.collectAsStateWithLifecycle()
         // needs immediate updates:
         // https://medium.com/androiddevelopers/effective-state-management-for-textfield-in-compose-d6e5b070fbe5
         var currentResponse by remember(response) {
@@ -64,6 +63,7 @@ fun SpecialEntryDialog(
             modifier = Modifier.padding(top = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
+            val forceCaps by viewModel.forceCaps.collectAsStateWithLifecycle()
             Switch(
                 modifier = Modifier.padding(end = 10.dp),
                 checked = forceCaps,

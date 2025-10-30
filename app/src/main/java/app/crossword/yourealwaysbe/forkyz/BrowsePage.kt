@@ -44,6 +44,7 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -162,7 +163,6 @@ fun BrowsePage(
 
     @Composable
     fun Launchers() {
-        val state by viewModel.uiState.collectAsStateWithLifecycle()
         val loadEvent by viewModel.puzzleLoaded.collectAsStateWithLifecycle()
 
         LaunchedEffect(loadEvent) {
@@ -172,11 +172,18 @@ fun BrowsePage(
             }
         }
 
-        val isDownloadOnStartUp = state.isDownloadOnStartUp
-        val needsNotificationCheck = (
-            state.isBackgroundDownloadEnabled
-            || isDownloadOnStartUp
-        ) &&  state.isNotificationPermissionNeeded
+        val state by viewModel.uiState.collectAsStateWithLifecycle()
+        val isDownloadOnStartUp by remember {
+            derivedStateOf { state.isDownloadOnStartUp }
+        }
+        val needsNotificationCheck by remember {
+            derivedStateOf {
+                (
+                    state.isBackgroundDownloadEnabled
+                    || state.isDownloadOnStartUp
+                ) &&  state.isNotificationPermissionNeeded
+            }
+        }
         LaunchedEffect(needsNotificationCheck) {
             if (needsNotificationCheck)
                 onCheckRequestNotificationPermissions()
@@ -215,7 +222,9 @@ fun BrowsePage(
     @Composable
     fun ToggleArchiveSelectedButton() {
         val state by viewModel.uiState.collectAsStateWithLifecycle()
-        val isArchive = state.isViewArchive
+        val isArchive by remember {
+            derivedStateOf { state.isViewArchive }
+        }
         IconButton(onClick = viewModel::toggleArchiveSelectedPuzzles) {
             Icon(
                 painter = painterResource(toggleArchiveIcon(isArchive)),
@@ -305,10 +314,14 @@ fun BrowsePage(
     fun ThemeButton() {
         val state by viewModel.uiState.collectAsStateWithLifecycle()
 
-        val dnmIcon = when (state.dayNightMode) {
-            DayNightMode.DNM_NIGHT -> R.drawable.night_mode
-            DayNightMode.DNM_SYSTEM -> R.drawable.system_daynight_mode
-            else -> R.drawable.day_mode
+        val dnmIcon by remember {
+            derivedStateOf {
+                when (state.dayNightMode) {
+                    DayNightMode.DNM_NIGHT -> R.drawable.night_mode
+                    DayNightMode.DNM_SYSTEM -> R.drawable.system_daynight_mode
+                    else -> R.drawable.day_mode
+                }
+            }
         }
 
         IconButton(onClick = viewModel::nextDayNightMode) {
@@ -343,12 +356,15 @@ fun BrowsePage(
     @Composable
     fun MenuSwitchLists() {
         val state by viewModel.uiState.collectAsStateWithLifecycle()
-        val isArchive = state.isViewArchive
-
-        val menuText = if (isArchive)
-            R.string.title_view_crosswords
-        else
-            R.string.title_view_archives
+        val isArchive by remember { derivedStateOf { state.isViewArchive } }
+        val menuText by remember {
+            derivedStateOf {
+                if (isArchive)
+                    R.string.title_view_crosswords
+                else
+                    R.string.title_view_archives
+            }
+        }
 
         DropdownMenuItem(
             text = { MenuText(stringResource(menuText)) },
@@ -362,9 +378,14 @@ fun BrowsePage(
     @Composable
     fun MenuSortSub() {
         val state by viewModel.menuState.collectAsStateWithLifecycle()
+        val expanded by remember {
+            derivedStateOf {
+                state.expanded == BrowseSubMenu.SORT_ORDER
+            }
+        }
         DropdownMenu(
             modifier = BaseMenuModifier,
-            expanded = state.expanded == BrowseSubMenu.SORT_ORDER,
+            expanded = expanded,
             onDismissRequest = viewModel::dismissMenu,
         ) {
             MenuDropdownHeading(
@@ -397,17 +418,20 @@ fun BrowsePage(
 
     @Composable
     fun OverflowMenu() {
-        val state by viewModel.menuState.collectAsStateWithLifecycle()
-
         IconButton(onClick = { viewModel.expandMenu(BrowseSubMenu.MAIN) }) {
             Icon(
                 Icons.Default.MoreVert,
                 contentDescription = stringResource(R.string.overflow),
             )
         }
+
+        val state by viewModel.menuState.collectAsStateWithLifecycle()
+        val expanded by remember {
+            derivedStateOf { state.expanded == BrowseSubMenu.MAIN }
+        }
         DropdownMenu(
             modifier = BaseMenuModifier,
-            expanded = state.expanded == BrowseSubMenu.MAIN,
+            expanded = expanded,
             onDismissRequest = viewModel::dismissMenu,
         ) {
             MenuSort()
@@ -428,15 +452,13 @@ fun BrowsePage(
     @Composable
     fun TopAppBar() {
         val state by viewModel.uiState.collectAsStateWithLifecycle()
-        val titleId = if (state.isViewArchive)
-            R.string.title_view_archives
-        else
-            R.string.title_view_crosswords
-
-        if (state.isSelecting) {
+        val isSelecting by remember { derivedStateOf { state.isSelecting } }
+        if (isSelecting) {
             themeHelper.ForkyzTopAppBar(
                 title = {
-                    val numSelected = state.selectedPuzzleIDs.size
+                    val numSelected by remember {
+                        derivedStateOf { state.selectedPuzzleIDs.size }
+                    }
                     Text(
                         pluralStringResource(
                             id = R.plurals.num_selected,
@@ -452,6 +474,14 @@ fun BrowsePage(
                 onBack = viewModel::clearSelection,
             )
         } else {
+            val titleId by remember {
+                derivedStateOf {
+                    if (state.isViewArchive)
+                        R.string.title_view_archives
+                    else
+                        R.string.title_view_crosswords
+                }
+            }
             themeHelper.ForkyzTopAppBar(
                 title = { Text(stringResource(titleId)) },
                 actions = {
@@ -466,7 +496,10 @@ fun BrowsePage(
     @Composable
     fun PuzzleSearchBar() {
         val state by viewModel.uiState.collectAsStateWithLifecycle()
-        state.puzzleFilter?.let { puzzleFilter ->
+        val puzzleFilter by remember {
+            derivedStateOf { state.puzzleFilter }
+        }
+        puzzleFilter?.let { puzzleFilter ->
             SearchBar(
                 showSearchBar = true,
                 searchTerm = puzzleFilter,
@@ -480,12 +513,18 @@ fun BrowsePage(
     @Composable
     fun IntroMessages() {
         val state by viewModel.uiState.collectAsStateWithLifecycle()
-        if (state.displayNoPuzzlesMessage) {
-            val noPuzzlesMsg = if (state.isViewArchive)
-                R.string.no_puzzles
-            else
-                R.string.no_puzzles_download_or_configure_storage
-
+        val displayNoPuzzlesMessage by remember {
+            derivedStateOf { state.displayNoPuzzlesMessage }
+        }
+        if (displayNoPuzzlesMessage) {
+            val noPuzzlesMsg by remember {
+                derivedStateOf {
+                    if (state.isViewArchive)
+                        R.string.no_puzzles
+                    else
+                        R.string.no_puzzles_download_or_configure_storage
+                }
+            }
             Text(
                 modifier = Modifier.padding(30.dp),
                 text = stringResource(noPuzzlesMsg),
@@ -529,11 +568,17 @@ fun BrowsePage(
     @Composable
     fun PuzzleDetails(pe : PuzEntry) {
         val state by viewModel.uiState.collectAsStateWithLifecycle()
-        val percentFilled = if (state.showPercentageCorrect)
-            pe.percentComplete
-        else
-            pe.percentFilled
-        val isSelected = pe.id in state.selectedPuzzleIDs
+        val percentFilled by remember {
+            derivedStateOf {
+                if (state.showPercentageCorrect)
+                    pe.percentComplete
+                else
+                    pe.percentFilled
+            }
+        }
+        val isSelected by remember {
+            derivedStateOf { pe.id in state.selectedPuzzleIDs }
+        }
         val backgroundColor = if (isSelected)
             MaterialTheme.colorScheme.primaryContainer
         else
@@ -542,13 +587,16 @@ fun BrowsePage(
             MaterialTheme.colorScheme.onPrimaryContainer
         else
             MaterialTheme.colorScheme.onSurfaceVariant
+        val isSelecting by remember {
+            derivedStateOf { state.isSelecting }
+        }
 
         Row(
             modifier = Modifier.heightIn(min=MIN_PUZZLE_ITEM_HEIGHT)
                 .background(backgroundColor)
                 .combinedClickable(
                     onClick = {
-                        if (state.isSelecting)
+                        if (isSelecting)
                             viewModel.toggleSelectPuzzle(pe.id)
                         else
                             viewModel.loadPuzzle(pe.id)
@@ -557,7 +605,10 @@ fun BrowsePage(
                 ).padding(vertical=8.dp, horizontal=HORIZONTAL_PADDING),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            if (state?.sortOrder == AccessorSetting.AS_SOURCE) {
+            val sortOrder by remember {
+                derivedStateOf { state.sortOrder }
+            }
+            if (sortOrder == AccessorSetting.AS_SOURCE) {
                 // wide enough for a wednesday
                 val dateWidth = with(LocalDensity.current) {
                     81.sp.toDp()
@@ -632,9 +683,7 @@ fun BrowsePage(
 
     @Composable
     fun Puzzle(pe : PuzEntry) {
-        val state by viewModel.uiState.collectAsStateWithLifecycle()
         val swipeState = rememberSwipeToDismissBoxState()
-
         LaunchedEffect(swipeState.settledValue) {
             if (
                 swipeState.settledValue == SwipeToDismissBoxValue.StartToEnd
@@ -645,9 +694,11 @@ fun BrowsePage(
             }
         }
 
+        val state by viewModel.uiState.collectAsStateWithLifecycle()
+        val disableSwipe by remember { derivedStateOf { state.disableSwipe } }
         SwipeToDismissBox(
             state = swipeState,
-            enabled = !state.disableSwipe,
+            enabled = !disableSwipe,
             backgroundContent = {
                 val background = when (swipeState.targetValue) {
                     SwipeToDismissBoxValue.StartToEnd,
@@ -663,7 +714,9 @@ fun BrowsePage(
                         -> Alignment.CenterEnd
                     else -> Alignment.CenterStart
                 }
-                val isArchive = state?.isViewArchive ?: false
+                val isArchive by remember {
+                    derivedStateOf { state.isViewArchive }
+                }
 
                 Box(
                     modifier = Modifier.fillMaxWidth().fillMaxHeight()
@@ -699,7 +752,9 @@ fun BrowsePage(
         listState : LazyListState,
     ) {
         val state by viewModel.uiState.collectAsStateWithLifecycle()
-        val puzzles = state.puzzleList
+        val puzzles by remember {
+            derivedStateOf { state.puzzleList }
+        }
         val refreshState = rememberPullToRefreshState()
 
         // move up if items above appear, but not on return to page
@@ -707,7 +762,11 @@ fun BrowsePage(
         var lastScrollToTopID by rememberSaveable {
             mutableStateOf(puzzles.firstOrNull()?.puzzles?.firstOrNull()?.id)
         }
-        val firstID = puzzles.firstOrNull()?.puzzles?.firstOrNull()?.id
+        val firstID by remember {
+            derivedStateOf {
+                puzzles.firstOrNull()?.puzzles?.firstOrNull()?.id
+            }
+        }
         LaunchedEffect(firstID) {
             if (!puzzles.isEmpty() && firstID != lastScrollToTopID) {
                 lastScrollToTopID = firstID
@@ -715,9 +774,12 @@ fun BrowsePage(
             }
         }
 
+        val isRefreshing by remember {
+            derivedStateOf { state.isSwipeRefreshing }
+        }
         PullToRefreshBox(
             modifier = modifier.fillMaxWidth(),
-            isRefreshing = state?.isSwipeRefreshing ?: false,
+            isRefreshing = isRefreshing,
             onRefresh = viewModel::swipeRefreshPuzzleList,
             state = refreshState,
         ) {
@@ -745,7 +807,8 @@ fun BrowsePage(
     @Composable
     fun UIBusy() {
         val state by viewModel.uiState.collectAsStateWithLifecycle()
-        if (state.isBusy) {
+        val isBusy by remember { derivedStateOf { state.isBusy } }
+        if (isBusy) {
             Row(
                 modifier = Modifier.fillMaxWidth()
                     .padding(vertical=10.dp),
@@ -804,7 +867,9 @@ fun BrowsePage(
     @Composable
     fun NewVersionDialog() {
         val state by viewModel.uiState.collectAsStateWithLifecycle()
-        val currentVersion = state.currentVersion
+        val currentVersion by remember {
+            derivedStateOf { state.currentVersion }
+        }
         TwoButtonDialog(
             title = stringResource(R.string.new_version_title, currentVersion),
             summary = stringResource(R.string.new_version_message),
@@ -840,7 +905,9 @@ fun BrowsePage(
     @Composable
     fun ConfirmDeleteSelectedDialog() {
         val state by viewModel.uiState.collectAsStateWithLifecycle()
-        val numSelected = state.selectedPuzzleIDs.size
+        val numSelected by remember {
+            derivedStateOf { state.selectedPuzzleIDs.size }
+        }
         OKCancelDialog(
             title = stringResource(R.string.confirm_delete),
             summary = pluralStringResource(
@@ -855,7 +922,10 @@ fun BrowsePage(
     @Composable
     fun DisplayDialogs() {
         val state by viewModel.uiState.collectAsStateWithLifecycle()
-        when (state.showDialog) {
+        val showDialog by remember {
+            derivedStateOf { state.showDialog }
+        }
+        when (showDialog) {
             BrowseDialog.NOTIFICATIONS_PERMISSION
                 -> NotificationPermissionsDialog()
             BrowseDialog.NEW_VERSION
@@ -953,7 +1023,7 @@ fun BrowsePage(
     }
     val puzzleListState = rememberLazyListState()
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    val isSelecting = state.isSelecting
+    val isSelecting by remember { derivedStateOf { state.isSelecting } }
 
     Scaffold(
         modifier = Modifier.onKeyEvent(::onKeyEvent),

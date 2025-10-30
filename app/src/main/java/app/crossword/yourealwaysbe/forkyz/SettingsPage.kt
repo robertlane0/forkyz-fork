@@ -35,6 +35,7 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -297,9 +298,9 @@ fun SettingsPage(
 
     @Composable
     fun TopAppBar(scrollBehavior : TopAppBarScrollBehavior) {
-        val state by viewModel.state.collectAsStateWithLifecycle()
+        val title by remember { derivedStateOf { state.currentPage.title } }
         themeHelper.ForkyzTopAppBar(
-            title = { Text(stringResource(id = state.currentPage.title)) },
+            title = { Text(stringResource(id = title)) },
             onBack = ::handleBack,
             actions = {
                 IconButton(onClick = viewModel::startSearch) {
@@ -520,12 +521,18 @@ fun SettingsPage(
     }
 
     @Composable
-    fun DisplayDialogs(state : SettingsPageViewState) {
-        if (state.storageChangedAppExit) {
+    fun DisplayDialogs() {
+        val storageChangedAppExit by remember {
+            derivedStateOf { state.storageChangedAppExit }
+        }
+        if (storageChangedAppExit) {
             StorageChangedAppExitDialog()
         }
 
-        state.activeInputItem?.let {
+        val activeInputItem by remember {
+            derivedStateOf { state.activeInputItem }
+        }
+        activeInputItem?.let {
             when (it) {
                 is SettingsDynamicList<*> -> ActiveListItemDialog(it)
                 is SettingsDynamicMultiList<*> -> ActiveMultiListItemDialog(it)
@@ -539,7 +546,8 @@ fun SettingsPage(
     @OptIn(ExperimentalComposeUiApi::class)
     @Composable
     fun HandleBack() {
-        BackHandler(enabled = state.hasBackStack) {
+        val hasBackStack by remember { derivedStateOf { state.hasBackStack } }
+        BackHandler(enabled = hasBackStack) {
             handleBack()
         }
     }
@@ -551,10 +559,11 @@ fun SettingsPage(
 
     // Reset list state/scroll on new list
     // https://slack-chats.kotlinlang.org/t/510683/what-would-be-to-best-way-to-reset-the-scroll-of-a-lazylist-
-    val scrollBehavior = key(state.settingsItems) {
+    val settingsItems by remember { derivedStateOf { state.settingsItems } }
+    val scrollBehavior = key(settingsItems) {
         TopAppBarDefaults.pinnedScrollBehavior()
     }
-    val listState = key(state.settingsItems) {
+    val listState = key(settingsItems) {
         rememberLazyListState()
     }
 
@@ -582,9 +591,13 @@ fun SettingsPage(
         )
     ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
+            val inSearchMode by remember {
+                derivedStateOf { state.inSearchMode }
+            }
+            val searchTerm by remember { derivedStateOf { state.searchTerm } }
             SearchBar(
-                showSearchBar = state.inSearchMode,
-                searchTerm = state.searchTerm,
+                showSearchBar = inSearchMode,
+                searchTerm = searchTerm,
                 onValueChange = viewModel::setSearchTerm,
                 onClose = viewModel::endSearch,
                 hint = stringResource(R.string.filter_settings_hint),
@@ -594,7 +607,7 @@ fun SettingsPage(
                 modifier = Modifier.fillMaxWidth(),
                 state = listState,
             ) {
-                itemsIndexed(state.settingsItems) { index, item ->
+                itemsIndexed(settingsItems) { index, item ->
                     SettingsItem(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -609,6 +622,6 @@ fun SettingsPage(
             }
         }
 
-        DisplayDialogs(state)
+        DisplayDialogs()
     }
 }
