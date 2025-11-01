@@ -1,5 +1,15 @@
 # Forkyz Changelog
 
+## Version 74
+
+- New downloaders: TF1/Sud Ouest Mots Felches/Croises.
+- Options on how clue lists/numbers are shown in clue display (display settings).
+- Allow clue line to expand with clue size (display settings).
+- Borrow Kotwords/xword-dl's clever deobfuscation for Everyman decoding.
+- Rewrite board rendering code in Compose (please report bugs).
+- Minor bug fixes and new bugs.
+- Target Android 16.
+
 ## Version 73
 
 - Use Compose Navigation for moving between pages (please report bugs).
