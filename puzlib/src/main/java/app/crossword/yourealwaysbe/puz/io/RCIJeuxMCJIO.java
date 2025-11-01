@@ -5,10 +5,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import org.hjson.JsonArray;
@@ -16,7 +12,6 @@ import org.hjson.JsonObject;
 import org.hjson.JsonValue;
 
 import app.crossword.yourealwaysbe.puz.Box;
-import app.crossword.yourealwaysbe.puz.Position;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.PuzzleBuilder;
 
