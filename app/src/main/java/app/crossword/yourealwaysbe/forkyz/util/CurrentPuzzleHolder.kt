@@ -263,8 +263,8 @@ public class CurrentPuzzleHolder @Inject constructor(
 class PuzzleSaveService() : Service() {
     companion object {
         @JvmField
-        val NOTIFICATION_CHANNEL_ID = "forkyz.save"
-        private val NOTIFICATION_ID = 10102
+        final val NOTIFICATION_CHANNEL_ID = "forkyz.save"
+        private final val NOTIFICATION_ID = 10102
     }
 
     @Inject
