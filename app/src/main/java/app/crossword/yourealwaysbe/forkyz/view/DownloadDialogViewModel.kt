@@ -81,7 +81,7 @@ class DownloadDialogViewModel(
         val state = mediatedUIState.current
         downloadersState.filterNotNull().getOnce() { downloaders ->
             cb(
-                downloaders.downloaders.filter { downloader ->
+                downloaders.getDownloaders().filter { downloader ->
                     if (downloader.internalName in state.selected) {
                         isAvailableNow(
                             downloader.getUntilAvailable(date)?.toHours(),
@@ -125,7 +125,7 @@ class DownloadDialogViewModel(
     ) : DownloaderDialogUIState{
         val date = newDate ?: state.date
         val downloaders = downloadersSettings
-            .downloaders
+            .getDownloaders()
             ?.map { downloader ->
                 val availableHours
                     = downloader.getUntilAvailable(date)?.toHours()

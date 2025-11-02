@@ -69,7 +69,7 @@ class DownloadersProvider @Inject constructor(
             nativeBackendUtils,
             fileHandler,
             downloadersSettings,
-            DownloadersListener(
+            NotificationDownloadersListener(
                 applicationContext,
                 notifications,
                 downloadersSettings,
@@ -77,7 +77,7 @@ class DownloadersProvider @Inject constructor(
         )
     }
 
-    private class DownloadersListener(
+    private class NotificationDownloadersListener(
         private val applicationContext : Context,
         private val notifications : Notifications,
         private val downloadersSettings : DownloadersSettings,

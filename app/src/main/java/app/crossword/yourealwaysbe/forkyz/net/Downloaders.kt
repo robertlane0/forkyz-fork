@@ -1,216 +1,162 @@
-package app.crossword.yourealwaysbe.forkyz.net;
 
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
+package app.crossword.yourealwaysbe.forkyz.net
 
-import android.util.Log;
+import java.time.Duration
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.Semaphore
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 
-import app.crossword.yourealwaysbe.forkyz.ForkyzActivity;
-import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
-import app.crossword.yourealwaysbe.forkyz.R;
-import app.crossword.yourealwaysbe.forkyz.settings.DownloadersSettings;
-import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils;
-import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler;
-import app.crossword.yourealwaysbe.puz.io.BrainsOnlyIO;
-import app.crossword.yourealwaysbe.puz.io.GuardianJSONIO;
-import app.crossword.yourealwaysbe.puz.io.IO;
-import app.crossword.yourealwaysbe.puz.io.JPZIO;
-import app.crossword.yourealwaysbe.puz.io.PMLIO;
-import app.crossword.yourealwaysbe.puz.io.PrzekrojIO;
-import app.crossword.yourealwaysbe.puz.io.RCIJeuxMFJIO;
+import android.util.Log
 
-public class Downloaders {
-    private static final String TAG = "ForkyzDownloaders";
-    private static final int NUM_DOWNLOAD_THREADS = 3;
+import app.crossword.yourealwaysbe.forkyz.ForkyzActivity
+import app.crossword.yourealwaysbe.forkyz.ForkyzApplication
+import app.crossword.yourealwaysbe.forkyz.R
+import app.crossword.yourealwaysbe.forkyz.settings.DownloadersSettings
+import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
+import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler
+import app.crossword.yourealwaysbe.puz.io.BrainsOnlyIO
+import app.crossword.yourealwaysbe.puz.io.GuardianJSONIO
+import app.crossword.yourealwaysbe.puz.io.IO
+import app.crossword.yourealwaysbe.puz.io.JPZIO
+import app.crossword.yourealwaysbe.puz.io.PMLIO
+import app.crossword.yourealwaysbe.puz.io.PrzekrojIO
+import app.crossword.yourealwaysbe.puz.io.RCIJeuxMFJIO
 
-    public static interface DownloadersListener {
-        /**
-         * Called if no internet connection for download
-         */
-        default void onNoConnection() { }
+private val TAG = "ForkyzDownloaders"
+private val NUM_DOWNLOAD_THREADS = 3
 
-        default void onPuzzleDownloadStarted(String name) { }
+interface DownloadersListener {
+    /**
+     * Called if no internet connection for download
+     */
+    fun onNoConnection() { }
 
-        default void onPuzzleDownloadFinished(
-            String name,
-            Downloader.DownloadResult result
-        ) { }
+    fun onPuzzleDownloadStarted(name : String) { }
 
-        default void onDownloadsFinished(
-            boolean someDownloaded,
-            boolean someFailed
-        ) { }
-    }
+    fun onPuzzleDownloadFinished(
+        name : String,
+        result : Downloader.DownloadResult,
+    ) { }
 
+    fun onDownloadsFinished(
+        someDownloaded : Boolean,
+        someFailed : Boolean,
+    ) { }
+}
+
+class Downloaders(
+    private val utils : NativeBackendUtils,
+    private val fileHandler : FileHandler,
+    private val settings : DownloadersSettings,
+    private val downloadersListener : DownloadersListener? = null,
+) {
     // In the main download method, lock all other downloaders so that
     // the list of existing files does not change externally. I.e. two
     // separate downloaders don't cause duplicate downloads.
-    private static final Semaphore puzzleDirLock = new Semaphore(1);
+    private val puzzleDirLock = Semaphore(1)
 
-    private DownloadersSettings settings;
-    private FileHandler fileHandler;
-    private NativeBackendUtils utils;
-    private DownloadersListener downloadersListener;
-
-    /**
-     * Create a downloader instance that does not notify
-     */
-    public Downloaders(
-        NativeBackendUtils utils,
-        FileHandler fileHandler,
-        DownloadersSettings settings
-    ) {
-        this(utils, fileHandler, settings, null);
+    fun getDownloaders(date : LocalDate) : List<Downloader> {
+        return getDownloaders().filter { it.isAvailable(date) }
     }
 
-    /**
-     * Create a downloader instance
-     *
-     * Can pass a null fileHandler if no download methods will be called.
-     */
-    public Downloaders(
-        NativeBackendUtils utils,
-        FileHandler fileHandler,
-        DownloadersSettings settings,
-        DownloadersListener downloadersListener
-    ) {
-        this.utils = utils;
-        this.fileHandler = fileHandler;
-        this.settings = settings;
-        this.downloadersListener = downloadersListener;
+    fun download(date : LocalDate) {
+        download(date, getDownloaders(date))
     }
 
-    public List<Downloader> getDownloaders(LocalDate date) {
-        List<Downloader> retVal = new LinkedList<Downloader>();
-        for (Downloader d : getDownloaders()) {
-            if (d.isAvailable(date))
-                retVal.add(d);
-        }
-        return retVal;
-    }
-
-    public void download(LocalDate date) {
-        download(date, getDownloaders(date));
-    }
-
-    // Downloads the latest puzzles newer/equal to than the given date for the given set of
-    // downloaders.
+    // Downloads the latest puzzles newer/equal to than the given date
+    // for the given set of downloaders.
     //
-    // If downloaders is null, then the full list of downloaders will be used.
-    public void downloadLatestInRange(
-        LocalDate from, LocalDate to, List<Downloader> downloaders
+    // If downloaders is null, then the full list of downloaders will be
+    // used.
+    fun downloadLatestInRange(
+        from : LocalDate,
+        to : LocalDate,
+        givenDownloaders : List<Downloader>?,
     ) {
-        if (downloaders == null) {
-            downloaders = getDownloaders();
-        }
+        val downloaders = givenDownloaders ?: getDownloaders()
 
-        HashMap<Downloader, LocalDate> puzzlesToDownload
-            = new HashMap<Downloader, LocalDate>();
-        for (Downloader d : downloaders) {
-            LocalDate latestDate = d.getLatestDate(to);
+        val puzzlesToDownload = HashMap<Downloader, LocalDate>()
+        for (d in downloaders) {
+            val latestDate = d.getLatestDate(to)
             if (latestDate != null && !latestDate.isBefore(from)) {
                 Log.i(
                     TAG,
                     "Will try to download puzzle " + d + " @ " + latestDate
-                );
-                puzzlesToDownload.put(d, latestDate);
+                )
+                puzzlesToDownload.put(d, latestDate)
             }
         }
 
         if (!puzzlesToDownload.isEmpty()) {
-            download(puzzlesToDownload);
+            download(puzzlesToDownload)
         }
     }
 
-    public void download(LocalDate date, List<Downloader> downloaders) {
-        if (downloaders == null) {
-            downloaders = getDownloaders(date);
-        }
+    fun download(
+        date : LocalDate,
+        givenDownloaders : List<Downloader>?,
+    ) {
+        val downloaders = givenDownloaders ?: getDownloaders(date)
 
-        HashMap<Downloader, LocalDate> puzzlesToDownload = new HashMap<Downloader, LocalDate>();
-        for (Downloader d : downloaders) {
-            if (d.isAvailable(date))
-                puzzlesToDownload.put(d, date);
-        }
+        val puzzlesToDownload = downloaders.filter {
+            it.isAvailable(date)
+        }.map { it to date }.toMap()
 
-        download(puzzlesToDownload);
+        download(puzzlesToDownload)
     }
 
-    public List<Downloader> getAutoDownloaders() {
-        List<Downloader> available = getDownloaders();
-
-        List<Downloader> downloaders = new LinkedList<>();
-        for (Downloader downloader : available) {
-            boolean isAuto = settings
-                .getAutoDownloaders()
-                .contains(downloader.getInternalName());
-            if (isAuto)
-                downloaders.add(downloader);
+    fun getAutoDownloaders() : List<Downloader> {
+        return getDownloaders().filter {
+            settings.autoDownloaders
+                .contains(it.getInternalName())
         }
-
-        return downloaders;
     }
 
-    private void download(Map<Downloader, LocalDate> puzzlesToDownload) {
-        if (fileHandler == null)
-            return;
-
-        boolean hasConnection = utils.hasNetworkConnection();
-        if (!hasConnection) {
+    private fun download(puzzlesToDownload : Map<Downloader, LocalDate>) {
+        if (!utils.hasNetworkConnection()) {
             if (downloadersListener != null)
-                downloadersListener.onNoConnection();
-            return;
+                downloadersListener.onNoConnection()
+            return
         }
 
         try {
-            acquirePuzzleDirLock();
+            acquirePuzzleDirLock()
 
-            Set<String> fileNames = fileHandler.getPuzzleNames();
+            val fileNames = fileHandler.getPuzzleNames()
 
-            ExecutorService downloadExecutor
-                = Executors.newFixedThreadPool(NUM_DOWNLOAD_THREADS);
-            final AtomicBoolean somethingDownloaded = new AtomicBoolean(false);
-            final AtomicBoolean somethingFailed = new AtomicBoolean(false);
+            val downloadExecutor
+                = Executors.newFixedThreadPool(NUM_DOWNLOAD_THREADS)
+            val somethingDownloaded = AtomicBoolean(false)
+            val somethingFailed = AtomicBoolean(false)
 
-            for (
-                Map.Entry<Downloader, LocalDate> puzzle
-                    : puzzlesToDownload.entrySet()
-            ) {
-                Downloader downloader = puzzle.getKey();
-                LocalDate date = puzzle.getValue();
-
-                downloadExecutor.submit(() -> {
-                    Downloader.DownloadResult result = downloadPuzzle(
+            puzzlesToDownload.forEach { puzzle ->
+                val downloader = puzzle.key
+                val date = puzzle.value
+                downloadExecutor.submit {
+                    val result = downloadPuzzle(
                         downloader,
                         date,
-                        fileNames
-                    );
+                        fileNames,
+                    )
                     if (result.isSuccess())
-                        somethingDownloaded.set(true);
+                        somethingDownloaded.set(true)
                     else if (result.isFailed())
-                        somethingFailed.set(true);
-                });
+                        somethingFailed.set(true)
+                }
             }
 
-            downloadExecutor.shutdown();
+            downloadExecutor.shutdown()
 
             try {
                 downloadExecutor.awaitTermination(
                     Long.MAX_VALUE, TimeUnit.MILLISECONDS
-                );
-            } catch (InterruptedException e) {
+                )
+            } catch (e : InterruptedException) {
                 // Oh well
             }
 
@@ -218,23 +164,23 @@ public class Downloaders {
                 downloadersListener.onDownloadsFinished(
                     somethingDownloaded.get(),
                     somethingFailed.get()
-                );
+                )
             }
         } finally {
-            releasePuzzleDirLock();
+            releasePuzzleDirLock()
         }
     }
 
-    private void acquirePuzzleDirLock() {
+    private fun acquirePuzzleDirLock() {
         try {
-            puzzleDirLock.acquire();
-        } catch (InterruptedException e) {
+            puzzleDirLock.acquire()
+        } catch (e : InterruptedException) {
             // oh well
         }
     }
 
-    private void releasePuzzleDirLock() {
-        puzzleDirLock.release();
+    private fun releasePuzzleDirLock() {
+        puzzleDirLock.release()
     }
 
     /**
@@ -243,51 +189,49 @@ public class Downloaders {
      * Only saves if we don't already have it. Only call if
      * puzzleDirLock is acquired (so existingFileNames doesn't expire).
      */
-    private Downloader.DownloadResult downloadPuzzle(
-        Downloader d,
-        LocalDate date,
-        Set<String> existingFileNames
-    ) {
+    private fun downloadPuzzle(
+        d : Downloader,
+        date : LocalDate,
+        existingFileNames : Set<String>,
+    ) : Downloader.DownloadResult {
         // failed unless proven otherwise!
-        Downloader.DownloadResult result = Downloader.DownloadResult.FAILED;
+        var result = Downloader.DownloadResult.FAILED
 
-        if (fileHandler == null)
-            return result;
-
-        Log.i(TAG, "Downloading " + d.toString());
+        Log.i(TAG, "Downloading " + d.toString())
         if (downloadersListener != null)
-            downloadersListener.onPuzzleDownloadStarted(d.getName());
+            downloadersListener.onPuzzleDownloadStarted(d.getName())
 
         try {
-            result = d.download(date, existingFileNames);
+            result = d.download(date, existingFileNames)
 
             if (result.isSuccess()) {
-                String fileName = result.getFileName();
+                val fileName = result.getFileName()
                 if (!existingFileNames.contains(fileName)) {
                     fileHandler.saveNewPuzzle(
-                        result.getPuzzle(), fileName
-                    );
+                        result.getPuzzle(),
+                        fileName,
+                    )
                 }
             }
-        } catch (Exception e) {
-            Log.w(TAG, "Failed to download "+d.getName(), e);
+        } catch (e : Exception) {
+            Log.w(TAG, "Failed to download "+d.getName(), e)
         }
 
         if (downloadersListener != null) {
             downloadersListener.onPuzzleDownloadFinished(
                 d.getName(),
-                result
-            );
+                result,
+            )
         }
 
-        return result;
+        return result
     }
 
-    public List<Downloader> getDownloaders() {
-        List<Downloader> downloaders = new LinkedList<>();
+    fun getDownloaders() : List<Downloader> {
+        val downloaders : MutableList<Downloader> = mutableListOf()
 
-        if (settings.getDownloadDeStandaard()) {
-            downloaders.add(new KeesingDownloader(
+        if (settings.downloadDeStandaard) {
+            downloaders.add(KeesingDownloader(
                 "destandaard",
                 utils.getString(R.string.de_standaard),
                 AbstractDateDownloader.DAYS_DAILY,
@@ -296,44 +240,46 @@ public class Downloaders {
                 "'https://www.standaard.be/kruiswoordraadsel'",
                 "hetnieuwsbladpremium",
                 "crossword_today_hetnieuwsbladpremium"
-            ));
+            ))
         }
 
-        if (settings.getDownloadDeTelegraaf()) {
-            downloaders.add(new AbstractDateDownloader(
+        if (settings.downloadDeTelegraaf) {
+            downloaders.add(AbstractDateDownloader(
                 "detelegraaf",
                 utils.getString(R.string.de_telegraaf),
                 AbstractDateDownloader.DAYS_SATURDAY,
                 Duration.ofHours(-1), // midnight, tested
                 "https://www.telegraaf.nl/abonnement/telegraaf/abonnement-bestellen/",
-                new BrainsOnlyIO(),
+                BrainsOnlyIO(),
                 "'https://pzzl.net/servlet/MH_kruis/netcrossword?date='"
                     + "yyMMdd",
-                "'https://www.telegraaf.nl/puzzels/kruiswoord'"
-            ));
+                "'https://www.telegraaf.nl/puzzels/kruiswoord'",
+            ))
         }
 
-        if (settings.getDownloadElPaisExperto()) {
-            downloaders.add(new ElPaisExpertoDownloader(
+        if (settings.downloadElPaisExperto) {
+            downloaders.add(ElPaisExpertoDownloader(
                 "elpaisexperto",
-                utils.getString(R.string.elpais_experto)
-            ));
+                utils.getString(R.string.elpais_experto),
+            ))
         }
 
-        if (settings.getDownloadGuardianDailyCryptic()) {
-            downloaders.add(new GuardianDailyCrypticDownloader(
-                "guardian", utils.getString(R.string.guardian_daily)
-            ));
+        if (settings.downloadGuardianDailyCryptic) {
+            downloaders.add(GuardianDailyCrypticDownloader(
+                "guardian",
+                utils.getString(R.string.guardian_daily),
+            ))
         }
 
-        if (settings.getDownloadGuardianWeeklyQuiptic()) {
-            downloaders.add(new GuardianWeeklyQuipticDownloader(
-                "guardianQuiptic", utils.getString(R.string.guardian_quiptic)
-            ));
+        if (settings.downloadGuardianWeeklyQuiptic) {
+            downloaders.add(GuardianWeeklyQuipticDownloader(
+                "guardianQuiptic",
+                utils.getString(R.string.guardian_quiptic),
+            ))
         }
 
-        if (settings.getDownloadHamAbend()) {
-            downloaders.add(new RaetselZentraleSchwedenDownloader(
+        if (settings.downloadHamAbend) {
+            downloaders.add(RaetselZentraleSchwedenDownloader(
                 "hamabend",
                 utils.getString(R.string.hamburger_abendblatt_daily),
                 "hhab",
@@ -342,57 +288,57 @@ public class Downloaders {
                 "https://www.abendblatt.de/plus",
                 "'https://www.abendblatt.de/ratgeber/wissen/"
                     + "article106560367/Spielen-Sie-hier-taeglich"
-                    + "-das-kostenlose-Kreuzwortraetsel.html'"
-            ));
+                    + "-das-kostenlose-Kreuzwortraetsel.html'",
+            ))
         }
 
-        if (settings.getDownloadIndependentDailyCryptic()) {
-            downloaders.add(new AbstractDateDownloader(
+        if (settings.downloadIndependentDailyCryptic) {
+            downloaders.add(AbstractDateDownloader(
                 "independent",
                 utils.getString(R.string.independent_daily),
                 AbstractDateDownloader.DAYS_DAILY,
                 Duration.ZERO, // midnight UK (actually further in advance)
                 "https://www.independent.co.uk/donations",
-                new JPZIO(),
+                JPZIO(),
                 "'https://ams.cdn.arkadiumhosted.com/assets/gamesfeed/"
                     + "independent/daily-crossword/c_'yyMMdd'.xml'",
                 "'https://puzzles.independent.co.uk/games/"
-                    + "cryptic-crossword-independent'"
-            ));
+                    + "cryptic-crossword-independent'",
+            ))
         }
 
-        if (settings.getDownloadIrishNewsCryptic()) {
-            downloaders.add(new AbstractDateDownloader(
+        if (settings.downloadIrishNewsCryptic) {
+            downloaders.add(AbstractDateDownloader(
                 "irishnewscryptic",
                 utils.getString(R.string.irish_news_cryptic),
                 AbstractDateDownloader.DAYS_WEEKDAY,
                 Duration.ZERO,
                 "https://www.irishnews.com/",
-                new PAPuzzlesStreamScraper(),
+                PAPuzzlesStreamScraper(),
                 "'https://www.irishnews.com/puzzles/cryptic-crossword/'",
                 "'https://www.irishnews.com/puzzles/cryptic-crossword/'",
-                ZonedDateTime.now(ZoneId.of("Europe/Belfast")).toLocalDate()
-             ));
+                ZonedDateTime.now(ZoneId.of("Europe/Belfast")).toLocalDate(),
+             ))
         }
 
-        if (settings.getDownloadJonesin()) {
-            downloaders.add(new AbstractDateDownloader(
+        if (settings.downloadJonesin) {
+            downloaders.add(AbstractDateDownloader(
                 "jonesin",
                 utils.getString(R.string.jonesin_crosswords),
                 AbstractDateDownloader.DAYS_THURSDAY,
                 Duration.ofDays(-2), // by experiment
                 "https://crosswordnexus.com/jonesin/",
-                new IO(),
+                IO(),
                 "'https://herbach.dnsalias.com/Jonesin/jz'yyMMdd'.puz'",
                 "'https://crosswordnexus.com/solve/?"
-                    + "puzzle=/downloads/jonesin/jonesin'yyMMdd'.puz'"
-            ));
+                    + "puzzle=/downloads/jonesin/jonesin'yyMMdd'.puz'",
+            ))
         }
 
-        if (settings.getDownloadJoseph()) {
-            String arkadiumUrl = "https://www.arkadium.com/games/"
-                + "joseph-crossword-kingsfeatures/";
-            downloaders.add(new KingDigitalLoginDownloader(
+        if (settings.downloadJoseph) {
+            val arkadiumUrl = "https://www.arkadium.com/games/" +
+                "joseph-crossword-kingsfeatures/"
+            downloaders.add(KingDigitalLoginDownloader(
                 "Joseph",
                 "Joseph",
                 utils.getString(R.string.joseph_crossword),
@@ -404,31 +350,31 @@ public class Downloaders {
                 "KFS+Arkadium$",
                 "Puzzles&Games",
                 "",
-                "JCC01"
-            ));
+                "JCC01",
+            ))
         }
 
-        if (settings.getDownload20Minutes()) {
-            downloaders.add(new AbstractDateDownloader(
+        if (settings.download20Minutes) {
+            downloaders.add(AbstractDateDownloader(
                 "20minutes",
                 utils.getString(R.string.vingminutes),
                 AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofHours(1), // by experiment
                 "https://www.20minutes.fr",
-                new RCIJeuxMFJIO(),
+                RCIJeuxMFJIO(),
                 "'https://www.rcijeux.fr/drupal_game/20minutes/grids/'ddMMyy'.mfj'",
-                "'https://www.20minutes.fr/services/mots-fleches'"
-            ));
+                "'https://www.20minutes.fr/services/mots-fleches'",
+            ))
         }
 
-        if (settings.getDownloadLATimes()) {
-            downloaders.add(new LATimesDownloader(
+        if (settings.downloadLATimes) {
+            downloaders.add(LATimesDownloader(
                 "latimes",
-                utils.getString(R.string.la_times)
-            ));
+                utils.getString(R.string.la_times),
+            ))
         }
 
-        if (settings.getDownloadLeParisienF1()) {
+        if (settings.downloadLeParisienF1) {
             downloaders.add(AbstractRCIJeuxMXJDateDownloader.buildMFJ(
                 "leparisienf1",
                 utils.getString((R.string.le_parisien_daily_f1)),
@@ -440,11 +386,11 @@ public class Downloaders {
                 "'https://www.leparisien.fr/jeux/mots-fleches/'",
                 2536,
                 LocalDate.of(2022, 6, 21),
-                1
-            ));
+                1,
+            ))
         }
 
-        if (settings.getDownloadLeParisienF2()) {
+        if (settings.downloadLeParisienF2) {
             downloaders.add(AbstractRCIJeuxMXJDateDownloader.buildMFJ(
                 "leparisienf2",
                 utils.getString((R.string.le_parisien_daily_f2)),
@@ -456,11 +402,11 @@ public class Downloaders {
                 "'https://www.leparisien.fr/jeux/mots-fleches/force-2/'",
                 2536,
                 LocalDate.of(2022, 6, 21),
-                1
-            ));
+                1,
+            ))
         }
 
-        if (settings.getDownloadLeParisienF3()) {
+        if (settings.downloadLeParisienF3) {
             downloaders.add(AbstractRCIJeuxMXJDateDownloader.buildMFJ(
                 "leparisienf3",
                 utils.getString((R.string.le_parisien_daily_f3)),
@@ -472,11 +418,11 @@ public class Downloaders {
                 "'https://www.leparisien.fr/jeux/mots-fleches/force-3/'",
                 300,
                 LocalDate.of(2023, 3, 4),
-                1
-            ));
+                1,
+            ))
         }
 
-        if (settings.getDownloadLeParisienF4()) {
+        if (settings.downloadLeParisienF4) {
             downloaders.add(AbstractRCIJeuxMXJDateDownloader.buildMFJ(
                 "leparisienf4",
                 utils.getString((R.string.le_parisien_daily_f4)),
@@ -488,40 +434,40 @@ public class Downloaders {
                 "'https://www.leparisien.fr/jeux/mots-fleches/force-4/'",
                 300,
                 LocalDate.of(2023, 3, 4),
-                1
-            ));
+                1,
+            ))
         }
 
-        if (settings.getDownloadMetroCryptic()) {
-            downloaders.add(new AbstractDateDownloader(
+        if (settings.downloadMetroCryptic) {
+            downloaders.add(AbstractDateDownloader(
                 "metrocryptic",
                 utils.getString(R.string.metro_cryptic),
                 AbstractDateDownloader.DAYS_NO_SUNDAY,
                 Duration.ZERO,
                 "https://metro.co.uk/",
-                new PMLIO(),
+                PMLIO(),
                 "'https://metro.co.uk/puzzles/cryptic-crossword'",
                 "'https://metro.co.uk/puzzles/cryptic-crossword'",
-                ZonedDateTime.now(ZoneId.of("Europe/London")).toLocalDate()
-            ));
+                ZonedDateTime.now(ZoneId.of("Europe/London")).toLocalDate(),
+            ))
         }
 
-        if (settings.getDownloadMetroQuick()) {
-            downloaders.add(new AbstractDateDownloader(
+        if (settings.downloadMetroQuick) {
+            downloaders.add(AbstractDateDownloader(
                 "metroquick",
                 utils.getString(R.string.metro_quick),
                 AbstractDateDownloader.DAYS_NO_SUNDAY,
                 Duration.ZERO,
                 "https://metro.co.uk/",
-                new PMLIO(),
+                PMLIO(),
                 "'https://metro.co.uk/puzzles/quick-crossword'",
                 "'https://metro.co.uk/puzzles/quick-crossword'",
-                ZonedDateTime.now(ZoneId.of("Europe/London")).toLocalDate()
-            ));
+                ZonedDateTime.now(ZoneId.of("Europe/London")).toLocalDate(),
+            ))
         }
 
-        if (settings.getDownloadNewsday()) {
-            downloaders.add(new AbstractDateDownloader(
+        if (settings.downloadNewsday) {
+            downloaders.add(AbstractDateDownloader(
                 "newsday",
                 utils.getString(R.string.newsday),
                 AbstractDateDownloader.DAYS_DAILY,
@@ -529,34 +475,34 @@ public class Downloaders {
                 // i can't browse this site for a more specific URL
                 // (GDPR)
                 "https://www.newsday.com",
-                new BrainsOnlyIO(),
+                BrainsOnlyIO(),
                 "'https://brainsonly.com/servlets-newsday-crossword/"
                     + "newsdaycrossword?date='yyMMdd",
-                "'https://www.newsday.com'"
-            ));
+                "'https://www.newsday.com'",
+            ))
         }
 
-        if (settings.getDownloadNewYorkTimesSyndicated()) {
-            downloaders.add(new AbstractDateDownloader(
+        if (settings.downloadNewYorkTimesSyndicated) {
+            downloaders.add(AbstractDateDownloader(
                 "nytsyndicated",
                 utils.getString(R.string.new_york_times_syndicated),
                 AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofHours(5), // guess midnight NY
                 "https://www.seattletimes.com/games-nytimes-crossword/",
-                new BrainsOnlyIO(),
+                BrainsOnlyIO(),
                 "'https://nytsyn.pzzl.com/nytsyn-crossword-mh/"
                     + "nytsyncrossword?date='"
                     + "yyMMdd",
                 "'https://nytsyn.pzzl.com/cwd_seattle/#/s/'"
                     + "yyMMdd",
-                LocalDate.now().plusDays(-7)
-            ));
+                LocalDate.now().plusDays(-7),
+            ))
         }
 
-        if (settings.getDownloadPremier()) {
-            String arkadiumUrl = "https://www.arkadium.com/games/"
-                + "premier-crossword-kingsfeatures/";
-            downloaders.add(new KingDigitalLoginDownloader(
+        if (settings.downloadPremier) {
+            val arkadiumUrl = "https://www.arkadium.com/games/" +
+                "premier-crossword-kingsfeatures/"
+            downloaders.add(KingDigitalLoginDownloader(
                 "Premier",
                 "Premier",
                 utils.getString(R.string.premier_crossword),
@@ -568,14 +514,14 @@ public class Downloaders {
                 "KFS+Arkadium$",
                 "Puzzles&Games",
                 arkadiumUrl,
-                "PCC01"
-            ));
+                "PCC01",
+            ))
         }
 
-        if (settings.getDownloadSheffer()) {
-            String arkadiumUrl = "'https://www.arkadium.com/games/"
-                + "sheffer-crossword-kingsfeatures/'";
-            downloaders.add(new KingDigitalLoginDownloader(
+        if (settings.downloadSheffer) {
+            val arkadiumUrl = "'https://www.arkadium.com/games/" +
+                "sheffer-crossword-kingsfeatures/'"
+            downloaders.add(KingDigitalLoginDownloader(
                 "Sheffer",
                 "Sheffer",
                 utils.getString(R.string.sheffer_crossword),
@@ -587,11 +533,11 @@ public class Downloaders {
                 "KFS+Arkadium$",
                 "Puzzles&Games",
                 "",
-                "SHCC01"
-            ));
+                "SHCC01",
+            ))
         }
 
-        if (settings.getDownloadSudOuestMotsCroises()) {
+        if (settings.downloadSudOuestMotsCroises) {
             downloaders.add(AbstractRCIJeuxMXJDateDownloader.buildMCJ(
                 "sudouestmotcroises",
                 utils.getString((R.string.sud_ouest_mots_croises)),
@@ -602,11 +548,11 @@ public class Downloaders {
                 "'https://www.sudouest.fr/jeux/mots-croises/'",
                 1992,
                 LocalDate.of(2025, 10, 26),
-                1
-            ));
+                1,
+            ))
         }
 
-        if (settings.getDownloadSudOuestMotsFleches()) {
+        if (settings.downloadSudOuestMotsFleches) {
             downloaders.add(AbstractRCIJeuxMXJDateDownloader.buildMFJ(
                 "sudouestmotfleches",
                 utils.getString((R.string.sud_ouest_mots_fleches)),
@@ -617,11 +563,11 @@ public class Downloaders {
                 "'https://www.sudouest.fr/jeux/mots-fleches/'",
                 1988,
                 LocalDate.of(2025, 10, 22),
-                1
-            ));
+                1,
+            ))
         }
 
-        if (settings.getDownloadTF1MotsCroises()) {
+        if (settings.downloadTF1MotsCroises) {
             downloaders.add(AbstractRCIJeuxMXJDateDownloader.buildMCJ(
                 "tf1motcroises",
                 utils.getString((R.string.tf1_mots_croises)),
@@ -632,11 +578,11 @@ public class Downloaders {
                 "'https://www.tf1info.fr/jeux/mots-croises/'",
                 4739,
                 LocalDate.of(2025, 10, 26),
-                1
-            ));
+                1,
+            ))
         }
 
-        if (settings.getDownloadTF1MotsFleches()) {
+        if (settings.downloadTF1MotsFleches) {
             downloaders.add(AbstractRCIJeuxMXJDateDownloader.buildMFJ(
                 "tf1motfleches",
                 utils.getString((R.string.tf1_mots_fleches)),
@@ -647,12 +593,12 @@ public class Downloaders {
                 "'https://www.tf1info.fr/jeux/mots-fleches/'",
                 5395,
                 LocalDate.of(2025, 10, 26),
-                1
-            ));
+                1,
+            ))
         }
 
-        if (settings.getDownloadUniversal()) {
-            downloaders.add(new UclickDownloader(
+        if (settings.downloadUniversal) {
+            downloaders.add(UclickDownloader(
                 "universal",
                 "fcx",
                 utils.getString(R.string.universal_crossword),
@@ -660,12 +606,12 @@ public class Downloaders {
                 "http://www.uclick.com/client/spi/fcx/",
                 AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofMinutes(6 * 60 + 30), // 06:30 by experiment
-                null
-            ));
+                null,
+            ))
         }
 
-        if (settings.getDownloadUSAToday()) {
-            downloaders.add(new UclickDownloader(
+        if (settings.downloadUSAToday) {
+            downloaders.add(UclickDownloader(
                 "usatoday",
                 "usaon",
                 utils.getString(R.string.usa_today),
@@ -673,118 +619,113 @@ public class Downloaders {
                 "https://subscribe.usatoday.com",
                 AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofMinutes(6 * 60 + 30), // 06:30 by experiment
-                "'https://games.usatoday.com/en/games/uclick-crossword'"
-            ));
+                "'https://games.usatoday.com/en/games/uclick-crossword'",
+            ))
         }
 
-        if (settings.getDownloadWaPoSunday()) {
-            downloaders.add(new AbstractDateDownloader(
+        if (settings.downloadWaPoSunday) {
+            downloaders.add(AbstractDateDownloader(
                 "waposunday",
                 utils.getString(R.string.washington_post_sunday),
                 AbstractDateDownloader.DAYS_SUNDAY,
                 Duration.ofHours(-1), // by experiment
                 "https://subscribe.wsj.com",
-                new IO(),
+                IO(),
                 "'https://herbach.dnsalias.com/Wapo/wp'yyMMdd'.puz'",
-                "'https://subscribe.washingtonpost.com'"
-            ));
+                "'https://subscribe.washingtonpost.com'",
+            ))
         }
 
-        if (settings.getDownloadWsj()) {
-            downloaders.add(new AbstractDateDownloader(
+        if (settings.downloadWsj) {
+            downloaders.add(AbstractDateDownloader(
                 "wsj",
                 utils.getString(R.string.wall_street_journal),
                 AbstractDateDownloader.DAYS_NO_SUNDAY,
                 Duration.ofHours(-3), // by experiment
                 "https://subscribe.wsj.com",
-                new IO(),
+                IO(),
                 "'https://herbach.dnsalias.com/wsj/wsj'yyMMdd'.puz'",
-                "'https://www.wsj.com/news/puzzle'"
-            ));
+                "'https://www.wsj.com/news/puzzle'",
+            ))
         }
 
-        addCustomDownloaders(downloaders);
+        addCustomDownloaders(downloaders)
 
-        if (settings.getScrapeCru()) {
-            downloaders.add(new PageScraper.Puz(
+        if (settings.scrapeCru) {
+            downloaders.add(PageScraper.Puz(
                 // certificate doesn't seem to work for me
                 // "https://theworld.com/~wij/puzzles/cru/index.html",
                 "https://archive.nytimes.com/www.nytimes.com/premium/xword/cryptic-archive.html",
                 "crypticcru",
                 utils.getString(R.string.cru_puzzle_workshop),
-                "https://archive.nytimes.com/www.nytimes.com/premium/xword/cryptic-archive.html"
-            ));
+                "https://archive.nytimes.com/www.nytimes.com/premium/xword/cryptic-archive.html",
+            ))
         }
 
-        if (settings.getScrapeKegler()) {
-            downloaders.add(new PageScraper.Puz(
+        if (settings.scrapeKegler) {
+            downloaders.add(PageScraper.Puz(
                 "https://kegler.gitlab.io/Block_style/index.html",
                 "keglar",
                 utils.getString(R.string.keglars_cryptics),
-                "https://kegler.gitlab.io/"
-            ));
+                "https://kegler.gitlab.io/",
+            ))
         }
 
-        if (settings.getScrapePrivateEye()) {
-            downloaders.add(new PageScraper.Puz(
+        if (settings.scrapePrivateEye) {
+            downloaders.add(PageScraper.Puz(
                 "https://www.private-eye.co.uk/pictures/crossword/download/",
                 "privateeye",
                 utils.getString(R.string.private_eye),
                 "https://shop.private-eye.co.uk",
-                true // download from end of page
-            ));
+                true, // download from end of page
+            ))
         }
 
-        if (settings.getScrapePrzekroj()) {
-            downloaders.add(new PageScraper(
+        if (settings.scrapePrzekroj) {
+            downloaders.add(PageScraper(
                 "https://przekroj.org/krzyzowki/.*",
-                new PrzekrojIO(),
+                PrzekrojIO(),
                 "https://przekroj.org/humor-rozmaitosci/krzyzowki/",
                 "przekroj",
                 utils.getString(R.string.przekroj),
                 "https://przekroj.pl/sklep",
                 true, // share file url
-                false // read top down
-            ));
+                false, // read top down
+            ))
         }
 
-        if (settings.getScrapeGuardianQuick()) {
-            downloaders.add(new PageScraper(
+        if (settings.scrapeGuardianQuick) {
+            downloaders.add(PageScraper(
                 "https://www.theguardian.com/crosswords/quick/\\d*",
-                new GuardianJSONIO(),
+                GuardianJSONIO(),
                 "https://www.theguardian.com/crosswords/series/quick",
                 "guardianQuick",
                 utils.getString(R.string.guardian_quick),
                 "https://support.theguardian.com",
                 true, // share file url
-                false // read top down
-            ));
+                false, // read top down
+            ))
         }
 
-        for (Downloader downloader : downloaders)
-            downloader.setTimeout(settings.getDownloadTimeout());
+        downloaders.forEach { it.setTimeout(settings.downloadTimeout) }
 
-        return downloaders;
+        return downloaders
     }
 
-    private void addCustomDownloaders(List<Downloader> downloaders) {
-        if (settings.getDownloadCustomDaily()) {
-            String title = settings.getCustomDailyTitle();
-            if (title == null || title.trim().isEmpty())
-                title = utils.getString(R.string.custom_daily_title);
+    private fun addCustomDownloaders(downloaders : MutableList<Downloader>) {
+        if (settings.downloadCustomDaily) {
+            var title = settings.customDailyTitle
+            if (title.trim().isEmpty())
+                title = utils.getString(R.string.custom_daily_title)
 
-            String urlDateFormatPattern = settings.getCustomDailyUrl();
+            val urlDateFormatPattern = settings.customDailyUrl
 
-            if (
-                urlDateFormatPattern != null
-                && !urlDateFormatPattern.trim().isEmpty()
-            ) {
+            if (!urlDateFormatPattern.trim().isEmpty()) {
                 downloaders.add(
-                    new CustomDailyDownloader(
-                        "custom", title, urlDateFormatPattern
-                    )
-                );
+                    CustomDailyDownloader("custom", title, urlDateFormatPattern),
+                )
             }
         }
     }
 }
+
