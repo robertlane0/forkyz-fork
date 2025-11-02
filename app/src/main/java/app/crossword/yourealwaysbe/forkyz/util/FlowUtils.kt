@@ -57,7 +57,7 @@ private val SUBSCRIBED_TIMEOUT = 5000L
 class MediatedStateWithFlow<T, M>(
     scope : CoroutineScope,
     initialValue : T,
-    onUpdate : (T, M) -> T,
+    onUpdate : suspend (T, M) -> T,
     mediate : Flow<M>,
 ) {
     private val emitter = MutableStateFlow<T>(initialValue)

@@ -60,11 +60,11 @@ class Downloaders(
     // separate downloaders don't cause duplicate downloads.
     private val puzzleDirLock = Semaphore(1)
 
-    fun getDownloaders(date : LocalDate) : List<Downloader> {
+    suspend fun getDownloaders(date : LocalDate) : List<Downloader> {
         return getDownloaders().filter { it.isAvailable(date) }
     }
 
-    fun download(date : LocalDate) {
+    suspend fun download(date : LocalDate) {
         download(date, getDownloaders(date))
     }
 
@@ -73,7 +73,7 @@ class Downloaders(
     //
     // If downloaders is null, then the full list of downloaders will be
     // used.
-    fun downloadLatestInRange(
+    suspend fun downloadLatestInRange(
         from : LocalDate,
         to : LocalDate,
         givenDownloaders : List<Downloader>?,
@@ -97,7 +97,7 @@ class Downloaders(
         }
     }
 
-    fun download(
+    suspend fun download(
         date : LocalDate,
         givenDownloaders : List<Downloader>?,
     ) {
@@ -110,14 +110,16 @@ class Downloaders(
         download(puzzlesToDownload)
     }
 
-    fun getAutoDownloaders() : List<Downloader> {
+    suspend fun getAutoDownloaders() : List<Downloader> {
         return getDownloaders().filter {
             settings.autoDownloaders
                 .contains(it.getInternalName())
         }
     }
 
-    private fun download(puzzlesToDownload : Map<Downloader, LocalDate>) {
+    private suspend fun download(
+        puzzlesToDownload : Map<Downloader, LocalDate>,
+    ) {
         if (!utils.hasNetworkConnection()) {
             if (downloadersListener != null)
                 downloadersListener.onNoConnection()
@@ -227,7 +229,7 @@ class Downloaders(
         return result
     }
 
-    fun getDownloaders() : List<Downloader> {
+    suspend fun getDownloaders() : List<Downloader> {
         val downloaders : MutableList<Downloader> = mutableListOf()
 
         if (settings.downloadDeStandaard) {
@@ -712,7 +714,9 @@ class Downloaders(
         return downloaders
     }
 
-    private fun addCustomDownloaders(downloaders : MutableList<Downloader>) {
+    private suspend fun addCustomDownloaders(
+        downloaders : MutableList<Downloader>,
+    ) {
         if (settings.downloadCustomDaily) {
             var title = settings.customDailyTitle
             if (title.trim().isEmpty())

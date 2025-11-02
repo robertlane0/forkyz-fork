@@ -7,8 +7,6 @@ import java.time.Period
 import java.time.format.DateTimeFormatter
 import java.util.ArrayList
 import java.util.Collections
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 import java.util.function.BiConsumer
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -224,9 +222,10 @@ class BrowsePageViewModel @Inject constructor(
 
     // important that it is single thread to avoid multiple
     // simultaneous operations
-    private val executorService = Executors.newSingleThreadExecutor()
-    // not fixed num in case user creates loads of downloads
-    private val downloadExecutorService = Executors.newCachedThreadPool()
+    private val uiLockDispatcher
+        = Dispatchers.IO.limitedParallelism(1, "UI Lock")
+    private val autoDownloadDispatcher
+        = Dispatchers.IO.limitedParallelism(1, "Auto Downloads")
 
     private val mediatedUIState = MediatedStateWithFlow<UIState, BrowseSettings>(
         viewModelScope,
@@ -605,10 +604,10 @@ class BrowsePageViewModel @Inject constructor(
     @MainThread
     fun download(date : LocalDate, downloaders : List<Downloader>) {
         downloadersProvider.get { dls ->
-            downloadExecutorService.execute {
+            viewModelScope.launch(Dispatchers.IO) {
                 dls.download(date, downloaders)
                 if (!isViewArchive)
-                    runMain(this::startLoadPuzzleList)
+                    runMain(this@BrowsePageViewModel::startLoadPuzzleList)
             }
         }
     }
@@ -625,30 +624,26 @@ class BrowsePageViewModel @Inject constructor(
 
         settings.getDownloadersSettings { downloaderSettings ->
         downloadersProvider.get { dls ->
-            downloadExecutorService.execute {
-                // Should not run in parallel with other auto downloads.
-                // If multiple calls are made rapidly, the first will
-                // lock the block below and update lastDL so future
-                // blocks don't redownload. Could have used a separate
-                // single-thread autodownload executor instead, but this
-                // avoids an extra thread and field variable.
-                synchronized (this@BrowsePageViewModel) {
-                    val lastDL = settings.getBrowseLastDownloadSync()
-                    val downloadCutoff
-                        = System.currentTimeMillis() - (12 * 60 * 60 * 1000)
+            // Should not run in parallel with other auto downloads.
+            // If multiple calls are made rapidly, the first will
+            // lock the block below and update lastDL so future
+            // blocks don't redownload. Could have used a separate
+            // single-thread autodownload executor instead, but this
+            // avoids an extra thread and field variable.
+            viewModelScope.launch(autoDownloadDispatcher) {
+                val lastDL = settings.getBrowseLastDownloadSync()
+                val downloadCutoff
+                    = System.currentTimeMillis() - (12 * 60 * 60 * 1000)
 
-                    val isDownload
-                        = downloaderSettings.downloadOnStartUp
-                        && downloadCutoff > lastDL
+                val isDownload
+                    = downloaderSettings.downloadOnStartUp
+                    && downloadCutoff > lastDL
 
-                    if (isDownload) {
-                        settings.setBrowseLastDownload(
-                            System.currentTimeMillis()
-                        )
-                        runMain {
-                            download(LocalDate.now(), dls.getAutoDownloaders())
-                        }
-                    }
+                if (isDownload) {
+                    settings.setBrowseLastDownload(
+                        System.currentTimeMillis()
+                    )
+                    download(LocalDate.now(), dls.getAutoDownloaders())
                 }
             }
         }}
@@ -882,16 +877,11 @@ class BrowsePageViewModel @Inject constructor(
             fileHandler.getCrosswordsDirectory()
     }
 
-    override protected fun onCleared() {
-        executorService.shutdown()
-        downloadExecutorService.shutdown()
-    }
-
     private fun threadWithUILock(taskName : String, r : Runnable) {
         // no lock actually needed because executorService is single
         // threaded guaranteed
         Log.i(TAG, "Starting task " + taskName + " with isUIBusy")
-        executorService.execute {
+        viewModelScope.launch(uiLockDispatcher) {
             try {
                 setUIBusy(true)
                 r.run()

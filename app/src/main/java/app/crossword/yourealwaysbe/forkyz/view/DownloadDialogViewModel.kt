@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.launch
 
 import app.crossword.yourealwaysbe.forkyz.net.Downloader
 import app.crossword.yourealwaysbe.forkyz.net.Downloaders
@@ -56,7 +57,7 @@ data class DownloaderDialogUIState (
 )
 
 class DownloadDialogViewModel(
-    viewModelScope : CoroutineScope,
+    private val viewModelScope : CoroutineScope,
     private val downloadersProvider : DownloadersProvider,
 ) {
     // use to cache an up to date downloaders object
@@ -80,18 +81,20 @@ class DownloadDialogViewModel(
     fun getSelectedDownloaders(cb : (List<Downloader>) -> Unit) {
         val state = mediatedUIState.current
         downloadersState.filterNotNull().getOnce() { downloaders ->
-            cb(
-                downloaders.getDownloaders().filter { downloader ->
-                    if (downloader.internalName in state.selected) {
-                        isAvailableNow(
-                            downloader.getUntilAvailable(date)?.toHours(),
-                            downloader.isAvailable(date),
-                        )
-                    } else {
-                        false
+            viewModelScope.launch {
+                cb(
+                    downloaders.getDownloaders().filter { downloader ->
+                        if (downloader.internalName in state.selected) {
+                            isAvailableNow(
+                                downloader.getUntilAvailable(date)?.toHours(),
+                                downloader.isAvailable(date),
+                            )
+                        } else {
+                            false
+                        }
                     }
-                }
-            )
+                )
+            }
         }
     }
 
@@ -99,11 +102,13 @@ class DownloadDialogViewModel(
         get() { return mediatedUIState.current.date }
         set(value) {
             downloadersState.filterNotNull().getOnce() { downloadersSettings ->
-                mediatedUIState.current = getUpdatedUIState(
-                    mediatedUIState.current,
-                    downloadersSettings,
-                    value,
-                )
+                viewModelScope.launch {
+                    mediatedUIState.current = getUpdatedUIState(
+                        mediatedUIState.current,
+                        downloadersSettings,
+                        value,
+                    )
+                }
             }
         }
 
@@ -118,7 +123,7 @@ class DownloadDialogViewModel(
     /**
      * Get updated UI state with new date if not null
      */
-    private fun getUpdatedUIState(
+    private suspend fun getUpdatedUIState(
         state : DownloaderDialogUIState,
         downloadersSettings : Downloaders,
         newDate : LocalDate? = null

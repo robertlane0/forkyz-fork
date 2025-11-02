@@ -18,12 +18,11 @@ class NativeBackendUtils @Inject constructor(
     @param:ApplicationContext private val applicationContext : Context,
     private val utils : AndroidVersionUtils,
 ) {
-    // TODO: will need to become suspend fun
-    fun getString(resourceID : Int) : String {
+    suspend fun getString(resourceID : Int) : String {
         return applicationContext.getString(resourceID)
     }
 
-    fun getString(resourceID : Int, vararg formatArgs: Any) : String {
+    suspend fun getString(resourceID : Int, vararg formatArgs: Any) : String {
         return applicationContext.getString(resourceID, formatArgs)
     }
 
