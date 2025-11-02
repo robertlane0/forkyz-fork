@@ -1,5 +1,9 @@
 # Forkyz Changelog
 
+## Version 75
+
+- Fix unwanted announcements (must now be enabled explicitly in settings).
+
 ## Version 74
 
 - New downloaders: TF1/Sud Ouest Mots Felches/Croises.

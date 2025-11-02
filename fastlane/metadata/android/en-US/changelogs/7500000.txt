@@ -1,0 +1,1 @@
+- Fix unwanted announcements (must now be enabled explicitly in settings).
