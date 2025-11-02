@@ -6,7 +6,6 @@ import java.util.Locale;
 import java.util.regex.Pattern;
 
 import app.crossword.yourealwaysbe.forkyz.util.NetUtilsKt;
-import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.io.WallStreetJournalJSONIO;
 
@@ -31,12 +30,6 @@ public class WSJStreamScraper extends AbstractStreamScraper {
         );
 
     private static final String DEFAULT_SOURCE = "Wall Street Journal";
-
-    private AndroidVersionUtils utils;
-
-    public WSJStreamScraper(AndroidVersionUtils utils) {
-        this.utils = utils;
-    }
 
     // args: puzzles/crossword/yyyymmdd/xxxxx
     private static final String DATA_URL_FORMAT

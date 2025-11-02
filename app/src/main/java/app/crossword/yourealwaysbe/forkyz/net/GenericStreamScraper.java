@@ -5,7 +5,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.io.StreamUtils;
 
@@ -17,7 +16,7 @@ import app.crossword.yourealwaysbe.puz.io.StreamUtils;
 public class GenericStreamScraper extends AbstractStreamScraper {
     private AbstractStreamScraper[] streamScrapers;
 
-    public GenericStreamScraper(AndroidVersionUtils utils) {
+    public GenericStreamScraper() {
         streamScrapers = new AbstractStreamScraper[] {
             // WIP
             // new AmuseLabsStreamScraper(),
@@ -26,7 +25,7 @@ public class GenericStreamScraper extends AbstractStreamScraper {
             new PAPuzzlesStreamScraper(),
             new PzzlNetStreamScraper(),
             new RaetselZentraleSchwedenStreamScraper(),
-            new WSJStreamScraper(utils),
+            new WSJStreamScraper(),
             new PzzlComStreamScraper(),
             new MyCrosswordStreamScraper(),
             new PMLStreamScraper(),

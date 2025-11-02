@@ -20,7 +20,6 @@ import app.crossword.yourealwaysbe.forkyz.util.files.DirHandle;
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandle;
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler;
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle;
-import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.io.PuzzleStreamReader;
 import app.crossword.yourealwaysbe.puz.io.StreamUtils;
@@ -47,7 +46,6 @@ public class PuzzleImporter {
     public static PuzHandle importUri(
         Context context,
         FileHandler fileHandler,
-        AndroidVersionUtils utils,
         Uri uri,
         int timeout
     ) {
@@ -60,7 +58,7 @@ public class PuzzleImporter {
             )
         ) {
             return importInputStream(
-                context, fileHandler, utils, null, is, getFileName(uri), timeout
+                context, fileHandler, null, is, getFileName(uri), timeout
             );
         } catch (IOException e) {
             String url = uri.toString();
@@ -70,7 +68,6 @@ public class PuzzleImporter {
                 return importInputStream(
                     context,
                     fileHandler,
-                    utils,
                     url,
                     is,
                     getFileName(uri),
@@ -84,7 +81,7 @@ public class PuzzleImporter {
     }
 
     public static List<PuzHandle> processToImportDirectory(
-        Context context, FileHandler fileHandler, AndroidVersionUtils utils
+        Context context, FileHandler fileHandler
     ) {
         List<PuzHandle> importedFiles = new ArrayList<>();
 
@@ -96,7 +93,6 @@ public class PuzzleImporter {
                 PuzHandle ph = importInputStream(
                     context,
                     fileHandler,
-                    utils,
                     null,
                     is,
                     fileHandler.getName(fh),
@@ -175,7 +171,6 @@ public class PuzzleImporter {
     private static PuzHandle importInputStream(
         Context context,
         FileHandler fileHandler,
-        AndroidVersionUtils utils,
         String url,
         InputStream is,
         String fileName,
@@ -186,7 +181,7 @@ public class PuzzleImporter {
         Puzzle puz = PuzzleStreamReader.parseInputStatic(bis);
         if (puz == null) {
             bis.reset();
-            puz = importPuzzleFromWebPage(context, utils, url, bis, timeout);
+            puz = importPuzzleFromWebPage(context, url, bis, timeout);
         }
 
         if (puz == null)
@@ -224,13 +219,12 @@ public class PuzzleImporter {
      */
     private static Puzzle importPuzzleFromWebPage(
         Context context,
-        AndroidVersionUtils utils,
         String url,
         InputStream is,
         int timeout
     ) {
         try {
-            GenericStreamScraper scraper = new GenericStreamScraper(utils);
+            GenericStreamScraper scraper = new GenericStreamScraper();
             scraper.setTimeout(timeout);
             return scraper.parseInput(is, url);
         } catch (Exception e) {

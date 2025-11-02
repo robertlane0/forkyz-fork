@@ -63,9 +63,7 @@ public class PuzzleImporterTest {
 
         // do import
         FileHandler fileHandler = getFileHandler();
-        PuzzleImporter.processToImportDirectory(
-            context, fileHandler, new TiramisuUtil()
-        );
+        PuzzleImporter.processToImportDirectory(context, fileHandler);
 
         // see what file system is like now
         Set<String> expectedToImport = Collections.emptySet();
@@ -98,16 +96,12 @@ public class PuzzleImporterTest {
 
         // do import
         FileHandler fileHandler = getFileHandler();
-        PuzzleImporter.processToImportDirectory(
-            context, fileHandler, new TiramisuUtil()
-        );
+        PuzzleImporter.processToImportDirectory(context, fileHandler);
 
         // one more time
         testIPuz = new File(toImport, "test.ipuz");
         copyResourceToFile("/test.ipuz", testIPuz);
-        PuzzleImporter.processToImportDirectory(
-            context, fileHandler, new TiramisuUtil()
-        );
+        PuzzleImporter.processToImportDirectory(context, fileHandler);
 
         // see what file system is like now
         Set<String> expectedToImport = Collections.emptySet();

@@ -808,7 +808,6 @@ class BrowsePageViewModel @Inject constructor(
                     val ph = PuzzleImporter.importUri(
                         getApplication(),
                         fileHandler,
-                        utils,
                         uri,
                         timeout,
                     )
@@ -848,7 +847,6 @@ class BrowsePageViewModel @Inject constructor(
                 val imported = PuzzleImporter.processToImportDirectory(
                     getApplication(),
                     fileHandler,
-                    utils,
                 )
 
                 imported.forEach { ph ->
