@@ -15,15 +15,14 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import android.content.Context;
 import android.util.Log;
 
 import app.crossword.yourealwaysbe.forkyz.ForkyzActivity;
 import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
 import app.crossword.yourealwaysbe.forkyz.R;
 import app.crossword.yourealwaysbe.forkyz.settings.DownloadersSettings;
+import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils;
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler;
-import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 import app.crossword.yourealwaysbe.puz.io.BrainsOnlyIO;
 import app.crossword.yourealwaysbe.puz.io.GuardianJSONIO;
 import app.crossword.yourealwaysbe.puz.io.IO;
@@ -60,22 +59,20 @@ public class Downloaders {
     // separate downloaders don't cause duplicate downloads.
     private static final Semaphore puzzleDirLock = new Semaphore(1);
 
-    private Context context;
     private DownloadersSettings settings;
     private FileHandler fileHandler;
-    private AndroidVersionUtils utils;
+    private NativeBackendUtils utils;
     private DownloadersListener downloadersListener;
 
     /**
      * Create a downloader instance that does not notify
      */
     public Downloaders(
-        Context context,
-        AndroidVersionUtils utils,
+        NativeBackendUtils utils,
         FileHandler fileHandler,
         DownloadersSettings settings
     ) {
-        this(context, utils, fileHandler, settings, null);
+        this(utils, fileHandler, settings, null);
     }
 
     /**
@@ -84,13 +81,11 @@ public class Downloaders {
      * Can pass a null fileHandler if no download methods will be called.
      */
     public Downloaders(
-        Context context,
-        AndroidVersionUtils utils,
+        NativeBackendUtils utils,
         FileHandler fileHandler,
         DownloadersSettings settings,
         DownloadersListener downloadersListener
     ) {
-        this.context = context;
         this.utils = utils;
         this.fileHandler = fileHandler;
         this.settings = settings;
@@ -172,7 +167,7 @@ public class Downloaders {
         if (fileHandler == null)
             return;
 
-        boolean hasConnection = utils.hasNetworkConnection(context);
+        boolean hasConnection = utils.hasNetworkConnection();
         if (!hasConnection) {
             if (downloadersListener != null)
                 downloadersListener.onNoConnection();
@@ -294,7 +289,7 @@ public class Downloaders {
         if (settings.getDownloadDeStandaard()) {
             downloaders.add(new KeesingDownloader(
                 "destandaard",
-                context.getString(R.string.de_standaard),
+                utils.getString(R.string.de_standaard),
                 AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofHours(-1), // midnight, tested
                 "https://aboshop.standaard.be/",
@@ -307,7 +302,7 @@ public class Downloaders {
         if (settings.getDownloadDeTelegraaf()) {
             downloaders.add(new AbstractDateDownloader(
                 "detelegraaf",
-                context.getString(R.string.de_telegraaf),
+                utils.getString(R.string.de_telegraaf),
                 AbstractDateDownloader.DAYS_SATURDAY,
                 Duration.ofHours(-1), // midnight, tested
                 "https://www.telegraaf.nl/abonnement/telegraaf/abonnement-bestellen/",
@@ -321,26 +316,26 @@ public class Downloaders {
         if (settings.getDownloadElPaisExperto()) {
             downloaders.add(new ElPaisExpertoDownloader(
                 "elpaisexperto",
-                context.getString(R.string.elpais_experto)
+                utils.getString(R.string.elpais_experto)
             ));
         }
 
         if (settings.getDownloadGuardianDailyCryptic()) {
             downloaders.add(new GuardianDailyCrypticDownloader(
-                "guardian", context.getString(R.string.guardian_daily)
+                "guardian", utils.getString(R.string.guardian_daily)
             ));
         }
 
         if (settings.getDownloadGuardianWeeklyQuiptic()) {
             downloaders.add(new GuardianWeeklyQuipticDownloader(
-                "guardianQuiptic", context.getString(R.string.guardian_quiptic)
+                "guardianQuiptic", utils.getString(R.string.guardian_quiptic)
             ));
         }
 
         if (settings.getDownloadHamAbend()) {
             downloaders.add(new RaetselZentraleSchwedenDownloader(
                 "hamabend",
-                context.getString(R.string.hamburger_abendblatt_daily),
+                utils.getString(R.string.hamburger_abendblatt_daily),
                 "hhab",
                 AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofHours(1), // midnight Germany (verified)
@@ -354,7 +349,7 @@ public class Downloaders {
         if (settings.getDownloadIndependentDailyCryptic()) {
             downloaders.add(new AbstractDateDownloader(
                 "independent",
-                context.getString(R.string.independent_daily),
+                utils.getString(R.string.independent_daily),
                 AbstractDateDownloader.DAYS_DAILY,
                 Duration.ZERO, // midnight UK (actually further in advance)
                 "https://www.independent.co.uk/donations",
@@ -369,7 +364,7 @@ public class Downloaders {
         if (settings.getDownloadIrishNewsCryptic()) {
             downloaders.add(new AbstractDateDownloader(
                 "irishnewscryptic",
-                context.getString(R.string.irish_news_cryptic),
+                utils.getString(R.string.irish_news_cryptic),
                 AbstractDateDownloader.DAYS_WEEKDAY,
                 Duration.ZERO,
                 "https://www.irishnews.com/",
@@ -383,7 +378,7 @@ public class Downloaders {
         if (settings.getDownloadJonesin()) {
             downloaders.add(new AbstractDateDownloader(
                 "jonesin",
-                context.getString(R.string.jonesin_crosswords),
+                utils.getString(R.string.jonesin_crosswords),
                 AbstractDateDownloader.DAYS_THURSDAY,
                 Duration.ofDays(-2), // by experiment
                 "https://crosswordnexus.com/jonesin/",
@@ -400,7 +395,7 @@ public class Downloaders {
             downloaders.add(new KingDigitalLoginDownloader(
                 "Joseph",
                 "Joseph",
-                context.getString(R.string.joseph_crossword),
+                utils.getString(R.string.joseph_crossword),
                 AbstractDateDownloader.DAYS_NO_SUNDAY,
                 Duration.ofDays(-20), // by experiment
                 "https://puzzles.kingdigital.com",
@@ -416,7 +411,7 @@ public class Downloaders {
         if (settings.getDownload20Minutes()) {
             downloaders.add(new AbstractDateDownloader(
                 "20minutes",
-                context.getString(R.string.vingminutes),
+                utils.getString(R.string.vingminutes),
                 AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofHours(1), // by experiment
                 "https://www.20minutes.fr",
@@ -429,14 +424,14 @@ public class Downloaders {
         if (settings.getDownloadLATimes()) {
             downloaders.add(new LATimesDownloader(
                 "latimes",
-                context.getString(R.string.la_times)
+                utils.getString(R.string.la_times)
             ));
         }
 
         if (settings.getDownloadLeParisienF1()) {
             downloaders.add(AbstractRCIJeuxMXJDateDownloader.buildMFJ(
                 "leparisienf1",
-                context.getString((R.string.le_parisien_daily_f1)),
+                utils.getString((R.string.le_parisien_daily_f1)),
                 AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofHours(1),
                 "https://abonnement.leparisien.fr",
@@ -452,7 +447,7 @@ public class Downloaders {
         if (settings.getDownloadLeParisienF2()) {
             downloaders.add(AbstractRCIJeuxMXJDateDownloader.buildMFJ(
                 "leparisienf2",
-                context.getString((R.string.le_parisien_daily_f2)),
+                utils.getString((R.string.le_parisien_daily_f2)),
                 AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofHours(1),
                 "https://abonnement.leparisien.fr",
@@ -468,7 +463,7 @@ public class Downloaders {
         if (settings.getDownloadLeParisienF3()) {
             downloaders.add(AbstractRCIJeuxMXJDateDownloader.buildMFJ(
                 "leparisienf3",
-                context.getString((R.string.le_parisien_daily_f3)),
+                utils.getString((R.string.le_parisien_daily_f3)),
                 AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofHours(1),
                 "https://abonnement.leparisien.fr",
@@ -484,7 +479,7 @@ public class Downloaders {
         if (settings.getDownloadLeParisienF4()) {
             downloaders.add(AbstractRCIJeuxMXJDateDownloader.buildMFJ(
                 "leparisienf4",
-                context.getString((R.string.le_parisien_daily_f4)),
+                utils.getString((R.string.le_parisien_daily_f4)),
                 AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofHours(1),
                 "https://abonnement.leparisien.fr",
@@ -500,7 +495,7 @@ public class Downloaders {
         if (settings.getDownloadMetroCryptic()) {
             downloaders.add(new AbstractDateDownloader(
                 "metrocryptic",
-                context.getString(R.string.metro_cryptic),
+                utils.getString(R.string.metro_cryptic),
                 AbstractDateDownloader.DAYS_NO_SUNDAY,
                 Duration.ZERO,
                 "https://metro.co.uk/",
@@ -514,7 +509,7 @@ public class Downloaders {
         if (settings.getDownloadMetroQuick()) {
             downloaders.add(new AbstractDateDownloader(
                 "metroquick",
-                context.getString(R.string.metro_quick),
+                utils.getString(R.string.metro_quick),
                 AbstractDateDownloader.DAYS_NO_SUNDAY,
                 Duration.ZERO,
                 "https://metro.co.uk/",
@@ -528,7 +523,7 @@ public class Downloaders {
         if (settings.getDownloadNewsday()) {
             downloaders.add(new AbstractDateDownloader(
                 "newsday",
-                context.getString(R.string.newsday),
+                utils.getString(R.string.newsday),
                 AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofHours(5), // midnight US? (by experiment)
                 // i can't browse this site for a more specific URL
@@ -544,7 +539,7 @@ public class Downloaders {
         if (settings.getDownloadNewYorkTimesSyndicated()) {
             downloaders.add(new AbstractDateDownloader(
                 "nytsyndicated",
-                context.getString(R.string.new_york_times_syndicated),
+                utils.getString(R.string.new_york_times_syndicated),
                 AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofHours(5), // guess midnight NY
                 "https://www.seattletimes.com/games-nytimes-crossword/",
@@ -564,7 +559,7 @@ public class Downloaders {
             downloaders.add(new KingDigitalLoginDownloader(
                 "Premier",
                 "Premier",
-                context.getString(R.string.premier_crossword),
+                utils.getString(R.string.premier_crossword),
                 AbstractDateDownloader.DAYS_SUNDAY,
                 Duration.ofHours(0), // guess midnight NY
                 "https://puzzles.kingdigital.com",
@@ -583,7 +578,7 @@ public class Downloaders {
             downloaders.add(new KingDigitalLoginDownloader(
                 "Sheffer",
                 "Sheffer",
-                context.getString(R.string.sheffer_crossword),
+                utils.getString(R.string.sheffer_crossword),
                 AbstractDateDownloader.DAYS_NO_SUNDAY,
                 Duration.ofDays(-20), // from full puzzle list during login
                 "https://puzzles.kingdigital.com",
@@ -599,7 +594,7 @@ public class Downloaders {
         if (settings.getDownloadSudOuestMotsCroises()) {
             downloaders.add(AbstractRCIJeuxMXJDateDownloader.buildMCJ(
                 "sudouestmotcroises",
-                context.getString((R.string.sud_ouest_mots_croises)),
+                utils.getString((R.string.sud_ouest_mots_croises)),
                 AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofHours(1),
                 "https://abonnement.sudouest.fr/",
@@ -614,7 +609,7 @@ public class Downloaders {
         if (settings.getDownloadSudOuestMotsFleches()) {
             downloaders.add(AbstractRCIJeuxMXJDateDownloader.buildMFJ(
                 "sudouestmotfleches",
-                context.getString((R.string.sud_ouest_mots_fleches)),
+                utils.getString((R.string.sud_ouest_mots_fleches)),
                 AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofHours(1),
                 "https://abonnement.sudouest.fr/",
@@ -629,7 +624,7 @@ public class Downloaders {
         if (settings.getDownloadTF1MotsCroises()) {
             downloaders.add(AbstractRCIJeuxMXJDateDownloader.buildMCJ(
                 "tf1motcroises",
-                context.getString((R.string.tf1_mots_croises)),
+                utils.getString((R.string.tf1_mots_croises)),
                 AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofHours(1),
                 "https://www.tf1info.fr/",
@@ -644,7 +639,7 @@ public class Downloaders {
         if (settings.getDownloadTF1MotsFleches()) {
             downloaders.add(AbstractRCIJeuxMXJDateDownloader.buildMFJ(
                 "tf1motfleches",
-                context.getString((R.string.tf1_mots_fleches)),
+                utils.getString((R.string.tf1_mots_fleches)),
                 AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofHours(1),
                 "https://www.tf1info.fr/",
@@ -660,8 +655,8 @@ public class Downloaders {
             downloaders.add(new UclickDownloader(
                 "universal",
                 "fcx",
-                context.getString(R.string.universal_crossword),
-                context.getString(R.string.uclick_copyright),
+                utils.getString(R.string.universal_crossword),
+                utils.getString(R.string.uclick_copyright),
                 "http://www.uclick.com/client/spi/fcx/",
                 AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofMinutes(6 * 60 + 30), // 06:30 by experiment
@@ -673,8 +668,8 @@ public class Downloaders {
             downloaders.add(new UclickDownloader(
                 "usatoday",
                 "usaon",
-                context.getString(R.string.usa_today),
-                context.getString(R.string.usa_today),
+                utils.getString(R.string.usa_today),
+                utils.getString(R.string.usa_today),
                 "https://subscribe.usatoday.com",
                 AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofMinutes(6 * 60 + 30), // 06:30 by experiment
@@ -685,7 +680,7 @@ public class Downloaders {
         if (settings.getDownloadWaPoSunday()) {
             downloaders.add(new AbstractDateDownloader(
                 "waposunday",
-                context.getString(R.string.washington_post_sunday),
+                utils.getString(R.string.washington_post_sunday),
                 AbstractDateDownloader.DAYS_SUNDAY,
                 Duration.ofHours(-1), // by experiment
                 "https://subscribe.wsj.com",
@@ -698,7 +693,7 @@ public class Downloaders {
         if (settings.getDownloadWsj()) {
             downloaders.add(new AbstractDateDownloader(
                 "wsj",
-                context.getString(R.string.wall_street_journal),
+                utils.getString(R.string.wall_street_journal),
                 AbstractDateDownloader.DAYS_NO_SUNDAY,
                 Duration.ofHours(-3), // by experiment
                 "https://subscribe.wsj.com",
@@ -716,7 +711,7 @@ public class Downloaders {
                 // "https://theworld.com/~wij/puzzles/cru/index.html",
                 "https://archive.nytimes.com/www.nytimes.com/premium/xword/cryptic-archive.html",
                 "crypticcru",
-                context.getString(R.string.cru_puzzle_workshop),
+                utils.getString(R.string.cru_puzzle_workshop),
                 "https://archive.nytimes.com/www.nytimes.com/premium/xword/cryptic-archive.html"
             ));
         }
@@ -725,7 +720,7 @@ public class Downloaders {
             downloaders.add(new PageScraper.Puz(
                 "https://kegler.gitlab.io/Block_style/index.html",
                 "keglar",
-                context.getString(R.string.keglars_cryptics),
+                utils.getString(R.string.keglars_cryptics),
                 "https://kegler.gitlab.io/"
             ));
         }
@@ -734,7 +729,7 @@ public class Downloaders {
             downloaders.add(new PageScraper.Puz(
                 "https://www.private-eye.co.uk/pictures/crossword/download/",
                 "privateeye",
-                context.getString(R.string.private_eye),
+                utils.getString(R.string.private_eye),
                 "https://shop.private-eye.co.uk",
                 true // download from end of page
             ));
@@ -746,7 +741,7 @@ public class Downloaders {
                 new PrzekrojIO(),
                 "https://przekroj.org/humor-rozmaitosci/krzyzowki/",
                 "przekroj",
-                context.getString(R.string.przekroj),
+                utils.getString(R.string.przekroj),
                 "https://przekroj.pl/sklep",
                 true, // share file url
                 false // read top down
@@ -759,7 +754,7 @@ public class Downloaders {
                 new GuardianJSONIO(),
                 "https://www.theguardian.com/crosswords/series/quick",
                 "guardianQuick",
-                context.getString(R.string.guardian_quick),
+                utils.getString(R.string.guardian_quick),
                 "https://support.theguardian.com",
                 true, // share file url
                 false // read top down
@@ -776,7 +771,7 @@ public class Downloaders {
         if (settings.getDownloadCustomDaily()) {
             String title = settings.getCustomDailyTitle();
             if (title == null || title.trim().isEmpty())
-                title = context.getString(R.string.custom_daily_title);
+                title = utils.getString(R.string.custom_daily_title);
 
             String urlDateFormatPattern = settings.getCustomDailyUrl();
 

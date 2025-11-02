@@ -18,6 +18,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import app.crossword.yourealwaysbe.forkyz.R
 import app.crossword.yourealwaysbe.forkyz.settings.DownloadersSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
+import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.Notifications
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
@@ -36,7 +37,8 @@ class DownloadersProvider @Inject constructor(
     private val utils : AndroidVersionUtils,
     private val settings : ForkyzSettings,
     private val fileHandlerProvider : FileHandlerProvider,
-    private val notifications : Notifications
+    private val notifications : Notifications,
+    private val nativeBackendUtils : NativeBackendUtils,
 ) {
     companion object {
         @JvmField
@@ -64,8 +66,7 @@ class DownloadersProvider @Inject constructor(
         fileHandler : FileHandler,
     ) : Downloaders {
         return Downloaders(
-            applicationContext,
-            utils,
+            nativeBackendUtils,
             fileHandler,
             downloadersSettings,
             DownloadersListener(
