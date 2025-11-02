@@ -231,7 +231,7 @@ class PuzzlePageScope(
             Key.Equals -> {
                 if (isAnnounceClueEquals) {
                     if (event.type == KeyEventType.KeyUp)
-                        viewModel.announceClue(false)
+                        viewModel.announceClue()
                     true
                 } else false
             }

@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.combine
 import android.app.Application
 import android.content.Context
 import android.net.Uri
-import android.view.accessibility.AccessibilityManager
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 
@@ -826,25 +825,25 @@ open class PuzzlePageViewModel @Inject constructor(
         }
     }
 
-    fun announceClue(onlyIfAccessibilityService : Boolean = false) {
+    fun announceClue() {
         getBoard()?.let { board ->
             settings.getPlayShowCount() { showCount ->
                 PlayboardTextRenderer.getAccessibleCurrentClueWord(
                     getApplication(), board, showCount
                 )?.let {
-                    announce(AnnounceData(it), onlyIfAccessibilityService)
+                    announce(AnnounceData(it))
                 }
             }
         }
     }
 
-   fun announceBox(onlyIfAccessibilityService : Boolean) {
+   fun announceBox() {
         getBoard()?.let { board ->
             PlayboardTextRenderer.getAccessibleCurrentBox(
                 getApplication(),
                 board,
             )?.let {
-                announce(AnnounceData(it), onlyIfAccessibilityService)
+                announce(AnnounceData(it))
             }
         }
     }
@@ -1042,7 +1041,7 @@ open class PuzzlePageViewModel @Inject constructor(
         registerVoiceCommand(
             VoiceCommand(
                 app.getString(R.string.command_announce_clue),
-                { announceClue(false) },
+                { announceClue() },
             )
         )
     }
@@ -1203,29 +1202,13 @@ open class PuzzlePageViewModel @Inject constructor(
         }
     }
 
-    private fun isAccessibilityServiceRunning() : Boolean {
-        val app : Application = getApplication()
-        val manager = app.getSystemService(
-            Context.ACCESSIBILITY_SERVICE
-        ) as AccessibilityManager?;
-        return manager != null && manager.isEnabled();
-    }
-
-    private fun announce(
-        data : AnnounceData,
-        onlyIfAccessibilityService : Boolean,
-    ) {
-        if (!onlyIfAccessibilityService || isAccessibilityServiceRunning()) {
-            _announceEvent.value = data
-        }
+    private fun announce(data : AnnounceData) {
+        _announceEvent.value = data
     }
 
     private fun handleChangeAccessibility(changes : PlayboardChanges) {
-        val accessibilityRunning = isAccessibilityServiceRunning()
-        settings.getVoiceAlwaysAnnounceBox() { announceBoxSetting ->
-        settings.getVoiceAlwaysAnnounceClue() { announceClueSetting ->
-            val announceBox = accessibilityRunning || announceBoxSetting
-            val announceClue = accessibilityRunning || announceClueSetting
+        settings.getVoiceAlwaysAnnounceBox() { announceBox ->
+        settings.getVoiceAlwaysAnnounceClue() { announceClue ->
             val board = getBoard()
 
             if (board != null && (announceClue || announceBox)) {
@@ -1235,9 +1218,9 @@ open class PuzzlePageViewModel @Inject constructor(
                 val isNewPosition = changes.getPreviousPosition() != newPos
 
                 if (isNewWord && announceClue)
-                    announceClue(!announceClueSetting)
+                    announceClue()
                 else if (isNewPosition && announceBox)
-                    announceBox(!announceBoxSetting)
+                    announceBox()
             }
         }}
     }

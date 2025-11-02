@@ -502,12 +502,12 @@
 
     <!-- preferences voice -->
     <string name="about_voice_commands">About Voice Commands</string>
-    <string name="announce_box_always">Always Announce Boxes</string>
-    <string name="announce_box_always_desc">Always announce box contents on change, not just when an accessibility service is active.</string>
-    <string name="announce_clue_always">Always Announce Clues</string>
-    <string name="announce_clue_always_desc">Always announce clues on change, not just when an accessibility service is active.</string>
+    <string name="announce_box_always">Announce Boxes</string>
+    <string name="announce_box_always_desc">Announce box contents on change.</string>
+    <string name="announce_clue_always">Announce Clues</string>
+    <string name="announce_clue_always_desc">Announce clues on change.</string>
     <string name="announce_clue_button">Show Button to Announce Clue</string>
-    <string name="announce_clue_button_desc">Add an on-screen button to announce current clue and word contents. Uses accessibility service if running.</string>
+    <string name="announce_clue_button_desc">Add an on-screen button to announce current clue and word contents.</string>
     <string name="announce_clue_equals">Announce Clue with Equals Key</string>
     <string name="announce_clue_equals_desc">Press equals key to announce current clue and word.</string>
     <string name="voice_with_button">Show Button to Activate Voice</string>
