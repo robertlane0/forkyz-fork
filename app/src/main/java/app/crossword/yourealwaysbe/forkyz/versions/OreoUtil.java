@@ -13,6 +13,7 @@ import android.util.Log;
 
 import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
 import app.crossword.yourealwaysbe.forkyz.R;
+import app.crossword.yourealwaysbe.forkyz.net.DownloadersProvider;
 import app.crossword.yourealwaysbe.forkyz.util.PuzzleExportService;
 import app.crossword.yourealwaysbe.forkyz.util.PuzzleSaveService;
 
@@ -33,7 +34,7 @@ public class OreoUtil extends NougatUtil {
             = context.getString(R.string.download_notification_channel_desc);
         int importance = NotificationManager.IMPORTANCE_LOW;
         NotificationChannel channel = new NotificationChannel(
-            ForkyzApplication.PUZZLE_DOWNLOAD_CHANNEL_ID,
+            DownloadersProvider.PUZZLE_DOWNLOAD_CHANNEL_ID,
             name,
             importance
         );

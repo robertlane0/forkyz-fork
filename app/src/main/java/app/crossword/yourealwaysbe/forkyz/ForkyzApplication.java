@@ -17,8 +17,6 @@ import javax.inject.Inject;
 public class ForkyzApplication
         extends Application
         implements Configuration.Provider {
-    public static final String PUZZLE_DOWNLOAD_CHANNEL_ID = "forkyz.downloads";
-
     @Inject
     protected AndroidVersionUtils utils;
 

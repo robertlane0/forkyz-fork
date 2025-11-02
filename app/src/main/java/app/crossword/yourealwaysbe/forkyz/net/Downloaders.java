@@ -15,14 +15,8 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import android.annotation.SuppressLint;
-import android.app.Notification;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 
 import app.crossword.yourealwaysbe.forkyz.ForkyzActivity;
 import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
@@ -42,16 +36,35 @@ public class Downloaders {
     private static final String TAG = "ForkyzDownloaders";
     private static final int NUM_DOWNLOAD_THREADS = 3;
 
+    public static interface DownloadersListener {
+        /**
+         * Called if no internet connection for download
+         */
+        default void onNoConnection() { }
+
+        default void onPuzzleDownloadStarted(String name) { }
+
+        default void onPuzzleDownloadFinished(
+            String name,
+            Downloader.DownloadResult result
+        ) { }
+
+        default void onDownloadsFinished(
+            boolean someDownloaded,
+            boolean someFailed
+        ) { }
+    }
+
     // In the main download method, lock all other downloaders so that
     // the list of existing files does not change externally. I.e. two
     // separate downloaders don't cause duplicate downloads.
     private static final Semaphore puzzleDirLock = new Semaphore(1);
 
     private Context context;
-    private NotificationManagerCompat notificationManager;
     private DownloadersSettings settings;
     private FileHandler fileHandler;
     private AndroidVersionUtils utils;
+    private DownloadersListener downloadersListener;
 
     /**
      * Create a downloader instance that does not notify
@@ -68,9 +81,6 @@ public class Downloaders {
     /**
      * Create a downloader instance
      *
-     * Pass a null notification manager if notifications not needed.
-     * Notifications only used if not disabled in settings.
-     *
      * Can pass a null fileHandler if no download methods will be called.
      */
     public Downloaders(
@@ -78,13 +88,13 @@ public class Downloaders {
         AndroidVersionUtils utils,
         FileHandler fileHandler,
         DownloadersSettings settings,
-        NotificationManagerCompat notificationManager
+        DownloadersListener downloadersListener
     ) {
         this.context = context;
         this.utils = utils;
         this.fileHandler = fileHandler;
         this.settings = settings;
-        this.notificationManager = notificationManager;
+        this.downloadersListener = downloadersListener;
     }
 
     public List<Downloader> getDownloaders(LocalDate date) {
@@ -163,23 +173,15 @@ public class Downloaders {
             return;
 
         boolean hasConnection = utils.hasNetworkConnection(context);
-
         if (!hasConnection) {
-            notifyNoConnection();
+            if (downloadersListener != null)
+                downloadersListener.onNoConnection();
             return;
         }
 
         try {
             acquirePuzzleDirLock();
 
-            NotificationCompat.Builder not = new NotificationCompat.Builder(
-                context, ForkyzApplication.PUZZLE_DOWNLOAD_CHANNEL_ID
-            ).setSmallIcon(android.R.drawable.stat_sys_download)
-                .setContentTitle(
-                    context.getString(R.string.puzzles_downloading)
-                ).setWhen(System.currentTimeMillis());
-
-            int nextNotificationId = 1;
             Set<String> fileNames = fileHandler.getPuzzleNames();
 
             ExecutorService downloadExecutor
@@ -191,7 +193,6 @@ public class Downloaders {
                 Map.Entry<Downloader, LocalDate> puzzle
                     : puzzlesToDownload.entrySet()
             ) {
-                int notificationId = nextNotificationId++;
                 Downloader downloader = puzzle.getKey();
                 LocalDate date = puzzle.getValue();
 
@@ -199,8 +200,6 @@ public class Downloaders {
                     Downloader.DownloadResult result = downloadPuzzle(
                         downloader,
                         date,
-                        not,
-                        notificationId,
                         fileNames
                     );
                     if (result.isSuccess())
@@ -220,13 +219,10 @@ public class Downloaders {
                 // Oh well
             }
 
-            if (this.notificationManager != null) {
-                this.notificationManager.cancel(0);
-            }
-
-            if (isNotifyingSummary()) {
-                this.postDownloadedGeneral(
-                    somethingDownloaded.get(), somethingFailed.get()
+            if (downloadersListener != null) {
+                downloadersListener.onDownloadsFinished(
+                    somethingDownloaded.get(),
+                    somethingFailed.get()
                 );
             }
         } finally {
@@ -252,12 +248,9 @@ public class Downloaders {
      * Only saves if we don't already have it. Only call if
      * puzzleDirLock is acquired (so existingFileNames doesn't expire).
      */
-    @SuppressLint("MissingPermission") // canNotify does check
     private Downloader.DownloadResult downloadPuzzle(
         Downloader d,
         LocalDate date,
-        NotificationCompat.Builder not,
-        int notificationId,
         Set<String> existingFileNames
     ) {
         // failed unless proven otherwise!
@@ -267,18 +260,10 @@ public class Downloaders {
             return result;
 
         Log.i(TAG, "Downloading " + d.toString());
+        if (downloadersListener != null)
+            downloadersListener.onPuzzleDownloadStarted(d.getName());
 
         try {
-            String contentText = context.getString(
-                R.string.puzzles_downloading_from, d.getName()
-            );
-            not.setContentText(contentText)
-                .setContentIntent(getContentIntent());
-
-            if (isNotifyingIndividual()) {
-                this.notificationManager.notify(0, not.build());
-            }
-
             result = d.download(date, existingFileNames);
 
             if (result.isSuccess()) {
@@ -293,66 +278,14 @@ public class Downloaders {
             Log.w(TAG, "Failed to download "+d.getName(), e);
         }
 
-        if (isNotifyingIndividual()) {
-            this.postDownloadedNotification(
-                notificationId, d.getName(), result
+        if (downloadersListener != null) {
+            downloadersListener.onPuzzleDownloadFinished(
+                d.getName(),
+                result
             );
         }
 
         return result;
-    }
-
-    @SuppressLint("MissingPermission") // canNotify does check
-    private void postDownloadedGeneral(
-        Boolean somethingDownloaded, Boolean somethingFailed
-    ) {
-        int messageId;
-        if (somethingDownloaded && somethingFailed)
-            messageId = R.string.puzzles_downloaded_some;
-        else if (somethingDownloaded)
-            messageId = R.string.puzzles_downloaded_all;
-        else if (somethingFailed)
-            messageId = R.string.puzzles_downloaded_none;
-        else // nothing downloaded or failed
-            return;
-        Notification not = new NotificationCompat.Builder(
-            context, ForkyzApplication.PUZZLE_DOWNLOAD_CHANNEL_ID
-        ).setSmallIcon(android.R.drawable.stat_sys_download_done)
-            .setContentTitle(context.getString(messageId))
-            .setContentIntent(getContentIntent())
-            .setWhen(System.currentTimeMillis())
-            .build();
-
-        if (canNotify()) {
-            this.notificationManager.notify(0, not);
-        }
-    }
-
-    @SuppressLint("MissingPermission") // canNotify does check
-    private void postDownloadedNotification(
-        int i, String name, Downloader.DownloadResult result
-    ) {
-        // don't notify unless success or failure
-        // notifications about existing puzzles would be annoying
-        if (!(result.isSuccess() || result.isFailed()))
-            return;
-
-        int messageId = result.isSuccess()
-            ? R.string.puzzle_downloaded
-            : R.string.puzzle_download_failed;
-
-        Notification not
-            = new NotificationCompat.Builder(
-                context, ForkyzApplication.PUZZLE_DOWNLOAD_CHANNEL_ID
-            ).setSmallIcon(android.R.drawable.stat_sys_download_done)
-                .setContentIntent(getContentIntent())
-                .setContentTitle(context.getString(messageId, name))
-                .setWhen(System.currentTimeMillis())
-                .build();
-
-        if (canNotify()) {
-            this.notificationManager.notify(i, not);
-        }
     }
 
     public List<Downloader> getDownloaders() {
@@ -858,52 +791,5 @@ public class Downloaders {
                 );
             }
         }
-    }
-
-    private boolean canNotify() {
-        return notificationManager != null
-            && utils.hasPostNotificationsPermission(context);
-    }
-
-    private boolean isNotifyingSummary() {
-        return canNotify()
-            && notificationManager.areNotificationsEnabled()
-            && !settings.getSuppressSummaryNotifications();
-    }
-
-    private boolean isNotifyingIndividual() {
-        return canNotify()
-            && notificationManager.areNotificationsEnabled()
-            && !settings.getSuppressIndividualNotifications();
-    }
-
-    @SuppressLint("MissingPermission") // canNotify does check
-    private void notifyNoConnection() {
-        if (!isNotifyingSummary())
-            return;
-
-        Notification not = new NotificationCompat.Builder(
-            context, ForkyzApplication.PUZZLE_DOWNLOAD_CHANNEL_ID
-        ).setSmallIcon(android.R.drawable.stat_sys_download_done)
-            .setContentTitle(
-                context.getString(R.string.puzzle_download_no_connection)
-            )
-            .setContentIntent(getContentIntent())
-            .setWhen(System.currentTimeMillis())
-            .build();
-
-        if (canNotify()) {
-            this.notificationManager.notify(0, not);
-        }
-    }
-
-    /**
-     * Make a content intent for a notification
-     */
-    private PendingIntent getContentIntent() {
-        Intent notificationIntent = new Intent(context, ForkyzActivity.class);
-        return PendingIntent.getActivity(
-            context, 0, notificationIntent, utils.immutablePendingIntentFlag()
-        );
     }
 }
