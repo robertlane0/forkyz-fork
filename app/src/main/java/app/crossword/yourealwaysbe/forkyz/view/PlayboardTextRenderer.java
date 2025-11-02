@@ -1,6 +1,8 @@
 
 package app.crossword.yourealwaysbe.forkyz.view;
 
+import java.util.Locale;
+
 import android.content.Context;
 
 import app.crossword.yourealwaysbe.forkyz.R;
@@ -293,6 +295,6 @@ public class PlayboardTextRenderer {
         if (listName == null || listName.isEmpty())
             return "";
         else
-            return listName.substring(0,1).toLowerCase();
+            return listName.substring(0,1).toLowerCase(Locale.getDefault());
     }
 }

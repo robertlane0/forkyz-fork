@@ -267,8 +267,8 @@
     <string name="toggle_all_scrapers_desc">Toggle all scrapers.</string>
     <string name="elpais_experto">(ES) El País Experto</string>
     <string name="elpais_experto_desc">Updates Daily</string>
-    <string name="tf1_mots_croises">(FR) TF1 Mots Croisés</string>
-    <string name="tf1_mots_fleches">(FR) TF1 Mots Fléchés</string>
+    <string name="tf1_mots_croises" tools:ignore="Typos">(FR) TF1 Mots Croisés</string>
+    <string name="tf1_mots_fleches" tools:ignore="Typos">(FR) TF1 Mots Fléchés</string>
     <string name="sud_ouest_mots_fleches">(FR) Sud Ouest Mots Fléchés</string>
     <string name="sud_ouest_mots_croises">(FR) Sud Ouest Mots Croisés</string>
 
