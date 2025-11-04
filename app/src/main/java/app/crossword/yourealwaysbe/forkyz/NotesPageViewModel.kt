@@ -241,6 +241,7 @@ class NotesPageViewModel @AssistedInject constructor(
         this::playLetterToBoard,
         this::deleteLetterFromBoard,
         notesClueID?.let { getBoard()?.getClueWord(it) },
+        showOwnScratch = false,
     )
 
     init {

@@ -218,6 +218,8 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
      * highlighted)
      * @param clueID treat as only showing clueID in a horizontal row if
      * not null
+     * @param showOwnScratch whether to show scratch (if enabled) of the
+     * current displayed
      */
     protected fun getBoxState(
         boardEditSettings : BoardEditSettings,
@@ -226,6 +228,7 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
         box : Box?,
         selectedPositions : Set<Position> = setOf(),
         clueID : ClueID? = null,
+        showOwnScratch : Boolean = true,
     ) : BoxState? {
         val puz = board?.puzzle
         if (box == null || puz == null)
@@ -261,7 +264,12 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
             cheated = cheated,
             marks = marks,
             flagsState = getFlagsState(box),
-            scratchState = getScratchState(boardEditSettings, box, clueID),
+            scratchState = getScratchState(
+                boardEditSettings,
+                box,
+                clueID,
+                showOwnScratch,
+            ),
             textColor
                 = if (box.hasTextColor()) colorFromInt(box.textColor) else null,
             shape = if (box.hasShape()) getShape(box.shape) else null,
@@ -314,6 +322,7 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
         boardEditSettings : BoardEditSettings,
         box : Box,
         clueID : ClueID?,
+        showOwnScratch : Boolean,
     ) : ScratchState {
         val puz = board?.puzzle
         if (puz == null || !boardEditSettings.renderSettings.displayScratch)
@@ -323,7 +332,7 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
         var scratchDown : String? = null
 
         for (cid in box.getIsPartOfClues()) {
-            if (cid == clueID)
+            if (cid == clueID && !showOwnScratch)
                 continue
             puz.getNote(cid)?.scratch?.let { scratch ->
                 val pos = box.getCluePosition(cid)
@@ -776,6 +785,9 @@ class BoardEditViewModel(
  * Word edit view model for word
  *
  * Or current word if word is null
+ *
+ * @param showOwnScratch whether to show scratch for current word being
+ * displayed if scratch view enabled
  */
 class WordEditViewModel(
     viewModelScope : CoroutineScope,
@@ -784,6 +796,7 @@ class WordEditViewModel(
     playLetter : (String) -> Unit,
     deleteLetter : () -> Unit,
     private val word : Word? = null,
+    private val showOwnScratch : Boolean = true,
 ) : BaseBoardEditViewModel<WordState>(
     viewModelScope,
     settings,
@@ -817,6 +830,7 @@ class WordEditViewModel(
                         puz.checkedGetBox(pos),
                         setOf(),
                         shownWord?.clueID,
+                        showOwnScratch,
                     )
                 }
             }.toImmutableList(),
