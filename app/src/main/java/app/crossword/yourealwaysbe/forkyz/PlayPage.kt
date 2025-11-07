@@ -418,6 +418,9 @@ fun PlayPage(
             val doubleTapFitBoard by remember {
                 derivedStateOf { state.doubleTapFitBoard }
             }
+            val dontSnapBoardToBorders by remember {
+                derivedStateOf { state.dontSnapBoardToBorders }
+            }
             val boardColorScheme = themeHelper.getBoardColorScheme()
 
             BoardEdit(
@@ -427,6 +430,7 @@ fun PlayPage(
                 viewModel = viewModel.boardEditViewModel,
                 colors = boardColorScheme,
                 doubleTapFitBoard = doubleTapFitBoard,
+                dontSnapBoardToBorders = dontSnapBoardToBorders,
                 onTap = { row, col ->
                     boardEditState.requestFocus()
                     viewModel.clickBoard(row, col)

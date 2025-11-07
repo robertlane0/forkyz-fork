@@ -1589,6 +1589,13 @@ class SettingsPageViewModel @Inject constructor(
             settings.livePlayDoubleTapFitBoard.stateInHere(),
             settings::setPlayDoubleTapFitBoard,
         ),
+        SettingsBoolean(
+            SettingsPage.INTERACTION,
+            R.string.dont_snap_board_to_borders,
+            R.string.dont_snap_board_to_borders_desc,
+            settings.livePlayDontSnapBoardToBorders.stateInHere(),
+            settings::setPlayDontSnapBoardToBorders,
+        ),
         SettingsList<DeleteCrossingModeSetting>(
             SettingsPage.INTERACTION,
             R.string.dont_delete_crossing,

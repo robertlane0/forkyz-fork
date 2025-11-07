@@ -54,7 +54,7 @@ private val MIN_SCALE : Float = MIN_DP_PER_BOX / BASE_BOX_SIZE_DP
 private val MAX_SCALE_WORD : Float = 1f
 private val MIN_SCALE_WORD : Float = 0.6f
 // how close to screen border to scroll to it
-private val STICKY_PAN_THRESHOLD_DP : Float = 10f
+private val STICKY_PAN_THRESHOLD_DP : Float = 5f
 private val DOUBLE_CLICK_INTERVAL : Int = 300 // ms
 
 @Parcelize
@@ -109,7 +109,6 @@ class BoardEditState private constructor(
     private var savedX : Float = initSavedX
     private var savedY : Float = initSavedY
 
-
     // for zoomFit
     var viewWidthPx : Float = 0f
         set(value) {
@@ -149,6 +148,7 @@ class BoardEditState private constructor(
                 calcFitZoom()
             }
         }
+    var dontSnapBoardToBorders : Boolean = false
 
     internal var boxInputState = BoxInputState()
 
@@ -347,12 +347,15 @@ class BoardEditState private constructor(
         val newX = x + delta
         if (sizePx > 0 && sizeBoxes > 0 && density > 0) {
             val threshold = STICKY_PAN_THRESHOLD_DP * density
-            if (Math.abs(newX) < threshold) {
+            if (Math.abs(newX) < threshold && !dontSnapBoardToBorders) {
                 return 0f
             } else {
                 val boardSize = BASE_BOX_SIZE_DP * density * sizeBoxes * scale
                 val farX = sizePx - boardSize
-                if (Math.abs(farX - newX) < threshold) {
+                if (
+                    Math.abs(farX - newX) < threshold
+                    && !dontSnapBoardToBorders
+                ) {
                     return farX
                 } else {
                     return newX
@@ -454,6 +457,7 @@ fun BoardEdit(
     colors : BoardColorScheme,
     viewModel : BoardEditViewModel,
     doubleTapFitBoard : Boolean,
+    dontSnapBoardToBorders : Boolean,
     onTap : (Int, Int) -> Unit,
     onLongPress : (Int, Int) -> Unit,
     onLongPressDescription : String,
@@ -470,6 +474,7 @@ fun BoardEdit(
             colors = colors,
             viewModel = viewModel,
             doubleTapFitBoard = doubleTapFitBoard,
+            dontSnapBoardToBorders = dontSnapBoardToBorders,
             onTap = onTap,
             onLongPress = onLongPress,
             onLongPressDescription = onLongPressDescription,
@@ -492,6 +497,7 @@ private fun BoardFullBody(
     colors : BoardColorScheme,
     viewModel : BoardEditViewModel,
     doubleTapFitBoard : Boolean,
+    dontSnapBoardToBorders : Boolean,
     onTap : (Int, Int) -> Unit,
     onLongPress : (Int, Int) -> Unit,
     onLongPressDescription : String,
@@ -503,6 +509,8 @@ private fun BoardFullBody(
         + viewModel.pinnedHeight
         + if (viewModel.pinnedHeight > 0) 1 else 0
     )
+    println("FORKYZ: dont snap " + dontSnapBoardToBorders)
+    state.dontSnapBoardToBorders = dontSnapBoardToBorders
 
     val boardContentDescription = stringResource(R.string.board_description)
     val localDensity = LocalDensity.current

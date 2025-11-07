@@ -255,4 +255,5 @@ message Settings {
     bool downloadSudOuestMotsFleches = 134;
     bool downloadSudOuestMotsCroises = 135;
     bool downloadTF1MotsCroises = 136;
+    bool dontSnapBoardToBorders = 137;
 }

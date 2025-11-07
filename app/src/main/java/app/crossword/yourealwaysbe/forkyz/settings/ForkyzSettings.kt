@@ -389,6 +389,18 @@ class ForkyzSettings(val settingsStore: DataStore<Settings>) {
         }
     }
 
+    val livePlayDontSnapBoardToBorders : Flow<Boolean>
+        = settingsMap { it.dontSnapBoardToBorders }
+
+    fun getPlayDontSnapBoardToBorders(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.dontSnapBoardToBorders }
+
+    fun setPlayDontSnapBoardToBorders(value : Boolean) {
+        settingsUpdate { settings ->
+            settings.toBuilder().setDontSnapBoardToBorders(value).build()
+        }
+    }
+
     val liveClueListClueTabsDouble : Flow<ClueTabsDouble>
         = settingsMap { it.clueTabsDouble }
 
@@ -2427,6 +2439,13 @@ class ForkyzSettings(val settingsStore: DataStore<Settings>) {
             { s, key -> json.put(key, s.dontConfirmBrowseDelete) },
             { key ->
                 json.optBoolean(key)?.let { setBrowseDontConfirmDelete(it) }
+            },
+        )
+        run(
+            "dontSnapBoardToBorders",
+            { s, key -> json.put(key, s.dontSnapBoardToBorders) },
+            { key ->
+                json.optBoolean(key)?.let { setPlayDontSnapBoardToBorders(it) }
             },
         )
         run(

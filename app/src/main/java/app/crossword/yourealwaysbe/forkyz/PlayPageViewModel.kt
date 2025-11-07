@@ -70,6 +70,7 @@ data class PlayPageUIState(
     val doubleTapFitBoard : Boolean = false,
     val ensureVisible : Boolean = false,
     val expandableClueLine : Boolean = false,
+    val dontSnapBoardToBorders : Boolean = false,
 )
 
 private data class PlayClueTabsSettings(
@@ -93,12 +94,13 @@ private data class PlayInteractionSettings(
     val scratchMode : Boolean,
     val doubleTapFitBoard : Boolean,
     val ensureVisible : Boolean,
+    val dontSnapBoardToBorders : Boolean,
 )
 
 private data class PlaySettings(
     val clueTabsSettings : PlayClueTabsSettings,
     val displaySettings : PlayDisplaySettings,
-    val interationSettings : PlayInteractionSettings,
+    val interactionSettings : PlayInteractionSettings,
 )
 
 @HiltViewModel
@@ -133,19 +135,22 @@ class PlayPageViewModel @Inject constructor(
                     landscapeGridRatio
                         = playSettings.clueTabsSettings.gridRatioLandscape,
                     isRandomClueOnShake
-                        = playSettings.interationSettings.randomClueOnShake,
+                        = playSettings.interactionSettings.randomClueOnShake,
                     fitToScreenMode
                         = playSettings.displaySettings.fitToScreenMode,
                     isFullScreen = playSettings.displaySettings.fullScreen,
                     renderSettings
                         = playSettings.displaySettings.renderSettings,
-                    scratchMode = playSettings.interationSettings.scratchMode,
+                    scratchMode = playSettings.interactionSettings.scratchMode,
                     doubleTapFitBoard
-                        = playSettings.interationSettings.doubleTapFitBoard,
+                        = playSettings.interactionSettings.doubleTapFitBoard,
                     ensureVisible
-                        = playSettings.interationSettings.ensureVisible,
+                        = playSettings.interactionSettings.ensureVisible,
                     expandableClueLine
                         = playSettings.displaySettings.expandableClueLine,
+                    dontSnapBoardToBorders = playSettings
+                        .interactionSettings
+                        .dontSnapBoardToBorders,
                 )
             },
             combine(
@@ -170,6 +175,7 @@ class PlayPageViewModel @Inject constructor(
                     settings.livePlayScratchMode,
                     settings.livePlayDoubleTapFitBoard,
                     settings.livePlayEnsureVisible,
+                    settings.livePlayDontSnapBoardToBorders,
                     ::PlayInteractionSettings,
                 ),
                 ::PlaySettings,

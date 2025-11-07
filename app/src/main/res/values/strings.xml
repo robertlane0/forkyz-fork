@@ -476,6 +476,8 @@
     <string name="movement_style_desc">Select what happens when you type past the end of a word.</string>
     <string name="movement_style_clue_list">Clue List Movement Style</string>
     <string name="movement_style_clue_list_desc">Select what happens when you type past the end of a word on the clue list screen.</string>
+    <string name="dont_snap_board_to_borders">Don\'t Snap Grid to Borders</string>
+    <string name="dont_snap_board_to_borders_desc">Don\'t snap grid edges to the edges of the screen.</string>
 
     <string name="play_letter_undo">Played Letter Undo Stack</string>
     <string name="play_letter_undo_desc">Delete undoes recently played letters or deletes if no recent letters to undo.</string>
