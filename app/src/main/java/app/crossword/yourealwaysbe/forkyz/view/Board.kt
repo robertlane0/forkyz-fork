@@ -623,10 +623,10 @@ private fun DrawScope.drawMarks(
                     textMeasurer,
                     style,
                     AnnotatedString.fromHtml(mark),
-                    coords[row],
                     coords[col],
-                    adjusts[row],
+                    coords[row],
                     adjusts[col],
+                    adjusts[row],
                 )
             }
         }
