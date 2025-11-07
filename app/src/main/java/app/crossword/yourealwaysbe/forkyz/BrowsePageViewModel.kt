@@ -14,9 +14,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
 
 import android.app.Application
 import android.net.Uri
+import android.os.Parcelable
 import android.util.Log
 import androidx.annotation.MainThread
 import androidx.lifecycle.AndroidViewModel
@@ -129,7 +131,10 @@ data class UIState(
 
 /**
  * Entry for puzzle in list
+ *
+ * Parcelable so it can be used as a key in BrowsePage
  */
+@Parcelize
 data class PuzEntry(
     val id : String,
     val caption : String,
@@ -141,7 +146,7 @@ data class PuzEntry(
     val source : String,
     val title : String,
     val author : String,
-)
+) : Parcelable
 
 /**
  * Group of puzzles with shared header
@@ -706,8 +711,9 @@ class BrowsePageViewModel @Inject constructor(
             Log.i(TAG, "Done refreshing current puzzle in list with isUIBusy")
             if (refreshedMeta != null) {
                 val pd = getPuzData(refreshedMeta)
-                if (pd.puzEntry.id in puzzles)
+                if (pd.puzEntry.id in puzzles) {
                     puzzles[pd.puzEntry.id] = pd
+                }
                 updateState(isNewPuzzleList = true)
             }
         }
@@ -791,7 +797,6 @@ class BrowsePageViewModel @Inject constructor(
         uris : Collection<Uri>,
         cb : (Boolean, Boolean) -> Unit,
     ) {
-
         fileHandlerProvider.get { fileHandler ->
         settings.getDownloadTimeout { timeout ->
             threadWithUILock("import URIs") {
