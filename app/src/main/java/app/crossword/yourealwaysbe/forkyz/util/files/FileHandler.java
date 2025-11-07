@@ -291,6 +291,16 @@ public abstract class FileHandler {
         if (puz == null)
             return null;
 
+        return getRefreshedPuzMetaFile(puzHandle, puz);
+    }
+
+    /**
+     * Get the meta record for the given puzzle
+     */
+    public synchronized PuzMetaFile getRefreshedPuzMetaFile(
+        PuzHandle puzHandle,
+        Puzzle puz
+    ) {
         MetaCache.MetaRecord metaRecord = metaCache.addRecord(
             this, puzHandle, puz
         );

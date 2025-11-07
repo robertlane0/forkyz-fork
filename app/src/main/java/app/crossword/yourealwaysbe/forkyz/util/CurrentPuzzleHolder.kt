@@ -154,15 +154,10 @@ public class CurrentPuzzleHolder @Inject constructor(
         }
     }
 
-    /**
-     * Get/refresh meta of current puzzle
-     *
-     * Delegates to io thread and calls back on main. Does nothing if
-     * nothing loaded. If error, calls back with null.
-     */
     @MainThread
     fun getFreshCurrentPuzzleMeta(cb : Consumer<PuzMetaFile?>) {
-        if (puzHandle == null)
+        val puz = board?.getPuzzle()
+        if (puzHandle == null || puz == null)
             return
 
         ioScope.launch {
@@ -170,20 +165,12 @@ public class CurrentPuzzleHolder @Inject constructor(
             mainScope.launch {
                 fileHandlerProvider.get() { fileHandler ->
                     ioScope.launch {
-                        var meta : PuzMetaFile? = null
-                        try {
-                            meta = fileHandler.loadPuzMetaFile(puzHandle)
-                        } catch (e : IOException) {
-                            Log.e(
-                                TAG,
-                                "Could not get current puzzle meta: " + e,
-                            )
-                        } finally {
-                            ioLock.unlock()
-                            mainScope.launch {
-                                cb.accept(meta)
-                            }
-                        }
+                        val meta = fileHandler.getRefreshedPuzMetaFile(
+                            puzHandle,
+                            puz,
+                        )
+                        ioLock.unlock()
+                        mainScope.launch { cb.accept(meta) }
                     }
                 }
             }
