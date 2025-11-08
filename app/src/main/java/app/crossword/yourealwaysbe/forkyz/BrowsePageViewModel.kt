@@ -46,6 +46,8 @@ import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzMetaFile
+import app.crossword.yourealwaysbe.forkyz.util.importPuzzleURI
+import app.crossword.yourealwaysbe.forkyz.util.processPuzzleToImportDirectory
 import app.crossword.yourealwaysbe.forkyz.view.DownloadDialogViewModel
 
 private val TAG = "ForkyzBrowsePage"
@@ -808,11 +810,14 @@ class BrowsePageViewModel @Inject constructor(
                 var needsReload = false
 
                 uris.forEach { uri ->
-                    val ph = utils.importPuzzleURI(
-                        fileHandler,
-                        uri,
-                        timeout,
-                    )
+                    val ph = runBlocking {
+                        importPuzzleURI(
+                            utils,
+                            fileHandler,
+                            uri,
+                            timeout,
+                        )
+                    }
 
                     someFailed = someFailed || (ph == null)
                     someSucceeded = someSucceeded || (ph != null)
@@ -846,8 +851,9 @@ class BrowsePageViewModel @Inject constructor(
     fun processToImportDirectory() {
         fileHandlerProvider.get { fileHandler ->
             threadWithUILock("process to import dir") {
-                val imported
-                    = utils.processPuzzlesToImportDirectory(fileHandler)
+                val imported = runBlocking {
+                    processPuzzleToImportDirectory(utils, fileHandler)
+                }
 
                 imported.forEach { ph ->
                     try {
