@@ -5,8 +5,8 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
-import android.app.Application
 import androidx.lifecycle.viewModelScope
 
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,7 +30,6 @@ import app.crossword.yourealwaysbe.puz.Position
 
 @HiltViewModel
 class ClueListPageViewModel @Inject constructor(
-    val application : Application,
     settings : ForkyzSettings,
     utils : NativeBackendUtils,
     currentPuzzleHolder : CurrentPuzzleHolder,
@@ -245,32 +244,32 @@ class ClueListPageViewModel @Inject constructor(
         registerVoiceCommandBack()
         registerVoiceCommandNotes()
 
-        val app : Application = application
-
-        registerVoiceCommand(VoiceCommand(
-            app.getString(R.string.command_left),
-            { _ -> moveLeft() }
-        ))
-        registerVoiceCommand(VoiceCommand(
-            app.getString(R.string.command_right),
-            { _ -> moveRight() }
-        ))
-        registerVoiceCommand(VoiceCommand(
-            app.getString(R.string.command_up),
-            { _ -> moveUp() }
-        ))
-        registerVoiceCommand(VoiceCommand(
-            app.getString(R.string.command_down),
-            { _ -> moveDown() }
-        ))
-        registerVoiceCommand(VoiceCommand(
-            app.getString(R.string.command_next),
-            { _ -> moveNextPage() },
-        ))
-        registerVoiceCommand(VoiceCommand(
-            app.getString(R.string.command_previous),
-            { _ -> movePrevPage() },
-        ))
+        viewModelScope.launch {
+            registerVoiceCommand(VoiceCommand(
+                utils.getString(R.string.command_left),
+                { _ -> moveLeft() }
+            ))
+            registerVoiceCommand(VoiceCommand(
+                utils.getString(R.string.command_right),
+                { _ -> moveRight() }
+            ))
+            registerVoiceCommand(VoiceCommand(
+                utils.getString(R.string.command_up),
+                { _ -> moveUp() }
+            ))
+            registerVoiceCommand(VoiceCommand(
+                utils.getString(R.string.command_down),
+                { _ -> moveDown() }
+            ))
+            registerVoiceCommand(VoiceCommand(
+                utils.getString(R.string.command_next),
+                { _ -> moveNextPage() },
+            ))
+            registerVoiceCommand(VoiceCommand(
+                utils.getString(R.string.command_previous),
+                { _ -> movePrevPage() },
+            ))
+        }
     }
 
     /**

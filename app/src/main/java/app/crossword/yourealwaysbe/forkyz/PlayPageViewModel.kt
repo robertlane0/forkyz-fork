@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
-import android.app.Application
 import androidx.lifecycle.viewModelScope
 
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -106,7 +105,6 @@ private data class PlaySettings(
 
 @HiltViewModel
 class PlayPageViewModel @Inject constructor(
-    val application : Application,
     settings : ForkyzSettings,
     utils : NativeBackendUtils,
     currentPuzzleHolder : CurrentPuzzleHolder,
@@ -391,48 +389,48 @@ class PlayPageViewModel @Inject constructor(
         registerVoiceCommandBack()
         registerVoiceCommandNotes()
 
-        val app : Application = application
-
-        registerVoiceCommand(VoiceCommand(
-            app.getString(R.string.command_delete),
-            { deleteLetter() },
-        ))
-        registerVoiceCommand(VoiceCommand(
-            app.getString(R.string.command_toggle),
-            { toggleSelection() },
-        ))
-        registerVoiceCommand(VoiceCommand(
-            app.getString(R.string.command_next),
-            { nextClue() }
-        ))
-        registerVoiceCommand(VoiceCommand(
-            app.getString(R.string.command_previous),
-            { prevClue() },
-        ))
-        registerVoiceCommand(VoiceCommand(
-            app.getString(R.string.command_left),
-            { moveLeft() },
-        ))
-        registerVoiceCommand(VoiceCommand(
-            app.getString(R.string.command_right),
-            { moveRight() },
-        ))
-        registerVoiceCommand(VoiceCommand(
-            app.getString(R.string.command_up),
-            { moveUp() },
-        ))
-        registerVoiceCommand(VoiceCommand(
-            app.getString(R.string.command_down),
-            { moveDown() },
-        ))
-        registerVoiceCommand(VoiceCommand(
-            app.getString(R.string.command_clues),
-            { launchClueList() },
-        ))
-        registerVoiceCommand(VoiceCommand(
-            app.getString(R.string.command_jump_random),
-            { pickRandomUnfilledClue() }
-        ))
+        viewModelScope.launch {
+            registerVoiceCommand(VoiceCommand(
+                utils.getString(R.string.command_delete),
+                { deleteLetter() },
+            ))
+            registerVoiceCommand(VoiceCommand(
+                utils.getString(R.string.command_toggle),
+                { toggleSelection() },
+            ))
+            registerVoiceCommand(VoiceCommand(
+                utils.getString(R.string.command_next),
+                { nextClue() }
+            ))
+            registerVoiceCommand(VoiceCommand(
+                utils.getString(R.string.command_previous),
+                { prevClue() },
+            ))
+            registerVoiceCommand(VoiceCommand(
+                utils.getString(R.string.command_left),
+                { moveLeft() },
+            ))
+            registerVoiceCommand(VoiceCommand(
+                utils.getString(R.string.command_right),
+                { moveRight() },
+            ))
+            registerVoiceCommand(VoiceCommand(
+                utils.getString(R.string.command_up),
+                { moveUp() },
+            ))
+            registerVoiceCommand(VoiceCommand(
+                utils.getString(R.string.command_down),
+                { moveDown() },
+            ))
+            registerVoiceCommand(VoiceCommand(
+                utils.getString(R.string.command_clues),
+                { launchClueList() },
+            ))
+            registerVoiceCommand(VoiceCommand(
+                utils.getString(R.string.command_jump_random),
+                { pickRandomUnfilledClue() }
+            ))
+        }
     }
 
     private suspend fun getClueText() : String? {

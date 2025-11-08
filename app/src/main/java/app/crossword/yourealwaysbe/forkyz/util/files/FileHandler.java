@@ -26,6 +26,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
 
+import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.io.IO;
@@ -408,6 +409,8 @@ public abstract class FileHandler {
         throws IOException {
         return new BufferedInputStream(getInputStream(fileHandle));
     }
+
+    public abstract FileHandlerSettings getSettings();
 
     protected LocalDate getModifiedDate(FileHandle file) {
         return Instant.ofEpochMilli(getLastModified(file))

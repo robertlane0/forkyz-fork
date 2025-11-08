@@ -1,10 +1,10 @@
 
 package app.crossword.yourealwaysbe.forkyz.util
 
-import java.io.BufferedInputStream
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
+import java.io.OutputStream
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -14,7 +14,10 @@ import androidx.core.content.FileProvider
 
 import dagger.hilt.android.qualifiers.ApplicationContext
 
+import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings
+import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler
+import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerSAF
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 
@@ -58,10 +61,13 @@ class NativeBackendUtils @Inject constructor(
     }
 
     @Throws(IOException::class)
-    fun openBufferedInputStream(uri : Uri) : InputStream {
-        return BufferedInputStream(
-            applicationContext.getContentResolver().openInputStream(uri)
-        )
+    fun openInputStream(uri : Uri) : InputStream? {
+        return applicationContext.getContentResolver().openInputStream(uri)
+    }
+
+    @Throws(IOException::class)
+    fun openOutputStream(uri : Uri) : OutputStream? {
+        return applicationContext.getContentResolver().openOutputStream(uri)
     }
 
     fun getShareDir() : File {
@@ -76,6 +82,28 @@ class NativeBackendUtils @Inject constructor(
             applicationContext,
             authority,
             shareFile,
+        )
+    }
+
+    fun getFilterClueToAlphabeticRegex() : String {
+        return utils.getFilterClueToAlphabeticRegex()
+    }
+
+    fun initialiseSAFForRoot(uri : Uri) : FileHandler? {
+        return FileHandlerSAF.initialiseSAFForRoot(
+            applicationContext,
+            uri,
+        )
+    }
+
+    fun readSAFHandlerFromSettings(
+        fileHandlerSettings : FileHandlerSettings,
+        settings : ForkyzSettings,
+    ) : FileHandler? {
+        return FileHandlerSAF.readHandlerFromSettings(
+            applicationContext,
+            fileHandlerSettings,
+            settings,
         )
     }
 }

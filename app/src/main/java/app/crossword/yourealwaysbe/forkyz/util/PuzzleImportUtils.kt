@@ -47,12 +47,12 @@ suspend fun importPuzzleURI(
         return null
 
     try {
-        return utils.openBufferedInputStream(uri)?.use { inputStream ->
+        return utils.openInputStream(uri)?.use { inputStream ->
             importInputStream(
                 utils,
                 fileHandler,
                 null,
-                inputStream,
+                BufferedInputStream(inputStream),
                 getFileName(uri),
                 timeout,
             )

@@ -5,6 +5,8 @@ import java.io.IOException;
 
 import android.content.Context;
 
+import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings;
+import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 
 /**
@@ -18,6 +20,19 @@ public class FileHandlerInternal extends FileHandlerJavaFile {
     @Override
     public boolean isStorageMounted() {
         return true;
+    }
+
+    @Override
+    public FileHandlerSettings getSettings() {
+        return new FileHandlerSettings(
+            StorageLocation.SL_INTERNAL,
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        );
     }
 
     @Override

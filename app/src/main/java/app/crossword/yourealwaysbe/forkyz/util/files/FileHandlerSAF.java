@@ -443,6 +443,7 @@ public class FileHandlerSAF extends FileHandler {
     /**
      * Return a settings object for the file handler
      */
+    @Override
     public FileHandlerSettings getSettings() {
         return new FileHandlerSettings(
             StorageLocation.SL_EXTERNAL_SAF,

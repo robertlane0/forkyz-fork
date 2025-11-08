@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-import android.app.Application
 import androidx.lifecycle.viewModelScope
 
 import dagger.assisted.Assisted
@@ -31,7 +30,6 @@ import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.util.getOnce
 import app.crossword.yourealwaysbe.forkyz.util.stateInSubscribed
-import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 import app.crossword.yourealwaysbe.forkyz.view.WordEditViewModel
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Clue
@@ -176,12 +174,10 @@ private data class NotesSettings(
 )
 class NotesPageViewModel @AssistedInject constructor(
     @Assisted val notesClueID : ClueID?,
-    val application : Application,
     settings : ForkyzSettings,
     utils : NativeBackendUtils,
     currentPuzzleHolder : CurrentPuzzleHolder,
     fileHandlerProvider : FileHandlerProvider,
-    val versionUtils : AndroidVersionUtils,
 ) : PuzzlePageViewModel(
     settings,
     utils,
@@ -505,8 +501,6 @@ class NotesPageViewModel @AssistedInject constructor(
         }
 
     private fun setupVoiceCommands() {
-        val app : Application = application
-
         registerVoiceCommandAnswer()
         registerVoiceCommandLetter()
         registerVoiceCommandClear()
@@ -514,43 +508,45 @@ class NotesPageViewModel @AssistedInject constructor(
         registerVoiceCommandClueHelp()
         registerVoiceCommandBack()
 
-        registerVoiceCommand(
-            VoiceCommand(
-                app.getString(R.string.command_left),
-                { _ -> moveLeft() }
+        viewModelScope.launch {
+            registerVoiceCommand(
+                VoiceCommand(
+                    utils.getString(R.string.command_left),
+                    { _ -> moveLeft() }
+                )
             )
-        )
-        registerVoiceCommand(
-            VoiceCommand(
-                app.getString(R.string.command_right),
-                { _ -> moveRight() }
+            registerVoiceCommand(
+                VoiceCommand(
+                    utils.getString(R.string.command_right),
+                    { _ -> moveRight() }
+                )
             )
-        )
-        registerVoiceCommand(
-            VoiceCommand(
-                app.getString(R.string.command_scratch),
-                { text ->
-                    // remove non-word as not usually entered into grids
-                    val prepped = text.replace("\\W+", "")
-                        .uppercase(Locale.getDefault())
+            val clear = utils.getString(R.string.command_clear)
+            registerVoiceCommand(
+                VoiceCommand(
+                    utils.getString(R.string.command_scratch),
+                    { text ->
+                        // remove non-word as not usually entered into grids
+                        val prepped = text.replace("\\W+", "")
+                            .uppercase(Locale.getDefault())
 
-                    // means you can't enter "clear" into scratch, but oh well
-                    val clear = app.getString(R.string.command_clear)
-                    if (clear.equals(text, ignoreCase = true)) {
-                        setScratchValue("")
-                    } else {
-                        val len = Math.min(prepped.length, boxesLength)
-                        setScratchValue(prepped.substring(0, len))
+                        // means you can't enter "clear" into scratch, but oh well
+                        if (clear.equals(text, ignoreCase = true)) {
+                            setScratchValue("")
+                        } else {
+                            val len = Math.min(prepped.length, boxesLength)
+                            setScratchValue(prepped.substring(0, len))
+                        }
                     }
-                }
+                )
             )
-        )
-        registerVoiceCommand(
-            VoiceCommand(
-                app.getString(R.string.command_flag),
-                { _ -> toggleNotesClueFlag() }
+            registerVoiceCommand(
+                VoiceCommand(
+                    utils.getString(R.string.command_flag),
+                    { _ -> toggleNotesClueFlag() }
+                )
             )
-        )
+        }
     }
 
     /**
@@ -817,7 +813,7 @@ class NotesPageViewModel @AssistedInject constructor(
 
         // strip HTML and spaces
         val strippedHint = hint.replace(
-            versionUtils.getFilterClueToAlphabeticRegex().toRegex(), ""
+            utils.getFilterClueToAlphabeticRegex().toRegex(), ""
         )
 
         val sourceIdx = strippedHint.indexOf(leadChars, ignoreCase = true)

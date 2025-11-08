@@ -18,9 +18,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-import android.app.Application
 import android.net.Uri
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.material.color.DynamicColors
 
@@ -45,10 +44,10 @@ import app.crossword.yourealwaysbe.forkyz.settings.MovementStrategySetting
 import app.crossword.yourealwaysbe.forkyz.settings.Orientation
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation
 import app.crossword.yourealwaysbe.forkyz.settings.Theme
+import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerSAF
 import app.crossword.yourealwaysbe.forkyz.util.mediate
 import app.crossword.yourealwaysbe.forkyz.util.stateInSubscribed
-import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 
 enum class SettingsPage(val title : Int) {
     ROOT(R.string.settings_label),
@@ -341,11 +340,10 @@ data class SettingsPageViewState(
 
 @HiltViewModel
 class SettingsPageViewModel @Inject constructor(
-    application : Application,
     private val settings : ForkyzSettings,
-    private val utils : AndroidVersionUtils,
+    private val utils : NativeBackendUtils,
     private val downloadersProvider : DownloadersProvider,
-) : AndroidViewModel(application) {
+) : ViewModel() {
 
     private val fileActionMutex = Mutex()
 
@@ -372,17 +370,15 @@ class SettingsPageViewModel @Inject constructor(
     private val storageLocationsStateFlow
         : StateFlow<List<SettingsListEntry<StorageLocation>>>
             = settings.liveFileHandlerSettings.map { fhSettings ->
-                val app : Application = getApplication()
-
                 val safRootURI = if (fhSettings.safRootURI.length > 0)
                     fhSettings.safRootURI
                 else
-                    app.getString(R.string.external_storage_saf_none_selected)
+                    utils.getString(R.string.external_storage_saf_none_selected)
 
                 val label = (
-                    app.getString(R.string.external_storage_saf)
+                    utils.getString(R.string.external_storage_saf)
                     + " "
-                    + app.getString(
+                    + utils.getString(
                         R.string.external_storage_saf_current_uri,
                         safRootURI
                     )
@@ -414,7 +410,7 @@ class SettingsPageViewModel @Inject constructor(
         ) { enabled, url ->
             if (enabled) {
                 if (url.trim().isEmpty()) {
-                    application.getString(R.string.custom_url_missing)
+                    utils.getString(R.string.custom_url_missing)
                 } else {
                     try {
                         DateTimeFormatter.ofPattern(url)
@@ -1821,23 +1817,29 @@ class SettingsPageViewModel @Inject constructor(
     fun startSearch() {
         if (!state.value.inSearchMode) {
             resetBackStack()
-            _state.value = state.value.copy(
-                currentPage = SettingsPage.SEARCH,
-                searchTerm = "",
-                hasBackStack = true,
-                settingsItems = settingsItemsList.filter(string_filter(""))
-            )
+            viewModelScope.launch {
+                val filter = stringFilter("")
+                _state.value = state.value.copy(
+                    currentPage = SettingsPage.SEARCH,
+                    searchTerm = "",
+                    hasBackStack = true,
+                    settingsItems = settingsItemsList.filter { filter(it) },
+                )
+            }
         }
     }
 
     fun setSearchTerm(term : String) {
         if (state.value.inSearchMode) {
             // no back stack push for refining a search
-            _state.value = state.value.copy(
-                searchTerm = term,
-                hasBackStack = true,
-                settingsItems = settingsItemsList.filter(string_filter(term))
-            )
+            viewModelScope.launch {
+                val filter = stringFilter(term)
+                _state.value = state.value.copy(
+                    searchTerm = term,
+                    hasBackStack = true,
+                    settingsItems = settingsItemsList.filter { filter(it) },
+                )
+            }
         }
     }
 
@@ -1871,13 +1873,11 @@ class SettingsPageViewModel @Inject constructor(
      * Set new URI return false if failed
      */
     fun setNewExternalStorageSAFURI(uri : Uri) : Boolean {
-        val fileHandler = FileHandlerSAF.initialiseSAFForRoot(
-            getApplication(), uri
-        )
-
-        if (fileHandler != null) {
+        val fileHandler = utils.initialiseSAFForRoot(uri)
+        val handlerSettings = fileHandler?.getSettings()
+        if (fileHandler != null && handlerSettings != null) {
             settings.setFileHandlerSettings(
-                fileHandler.getSettings(),
+                handlerSettings,
                 this::newFileHandlerAppExit,
             )
             return true
@@ -1898,10 +1898,8 @@ class SettingsPageViewModel @Inject constructor(
     fun exportSettings(uri : Uri) {
         viewModelScope.launch(Dispatchers.IO) {
             fileActionMutex.withLock {
-                val app : Application = getApplication()
                 try {
-                    app.getContentResolver()
-                        .openOutputStream(uri)
+                    utils.openOutputStream(uri)
                         .use(settings::exportSettings)
                     showMessage(R.string.preferences_exported)
                 } catch (e : IOException) {
@@ -1914,10 +1912,8 @@ class SettingsPageViewModel @Inject constructor(
     fun importSettings(uri : Uri) {
         viewModelScope.launch(Dispatchers.IO) {
             fileActionMutex.withLock {
-                val app : Application = getApplication()
                 try {
-                    app.getContentResolver()
-                        .openInputStream(uri)
+                    utils.openInputStream(uri)
                         .use(settings::importSettings)
                     showMessage(R.string.preferences_imported)
                 } catch (e : IOException) {
@@ -1945,19 +1941,17 @@ class SettingsPageViewModel @Inject constructor(
         stateBackStack.addLast(rootState)
     }
 
-    private fun page_filter(page : SettingsPage) : (SettingsItem) -> Boolean
+    private fun pageFilter(page : SettingsPage) : (SettingsItem) -> Boolean
         = { item : SettingsItem -> item.page == page }
 
-    private fun string_filter(s : String) : (SettingsItem) -> Boolean {
-        // annoying to have to get resources in view model!
-        val app : Application = getApplication()
+    private fun stringFilter(s : String) : suspend (SettingsItem) -> Boolean {
         return { item : SettingsItem ->
             when (item) {
                 is SettingsHeading -> false
                 is SettingsNamedItem -> {
-                    app.getString(item.title).contains(s, ignoreCase = true)
+                    utils.getString(item.title).contains(s, ignoreCase = true)
                         || item.summary?.let {
-                            app.getString(it).contains(s, ignoreCase = true)
+                            utils.getString(it).contains(s, ignoreCase = true)
                         } ?: false
                 }
                 else -> false
@@ -1973,7 +1967,7 @@ class SettingsPageViewModel @Inject constructor(
             searchTerm = "",
             hasBackStack = hasBackStack,
             settingsItems = settingsItemsList.filter(
-                page_filter(page)
+                pageFilter(page)
             ),
             activeInputItem = null,
             storageChangedAppExit = false,
@@ -1999,12 +1993,10 @@ class SettingsPageViewModel @Inject constructor(
                 } else {
                     // possibly returning to SAF, see if something
                     // viable is set up already
-                    val fileHandler
-                        = FileHandlerSAF.readHandlerFromSettings(
-                            getApplication(),
-                            fileHandlerSettings,
-                            settings
-                        )
+                    val fileHandler = utils.readSAFHandlerFromSettings(
+                        fileHandlerSettings,
+                        settings,
+                    )
 
                     if (fileHandler == null) {
                         raiseNeedsURI(RequestedURI.SAF)
