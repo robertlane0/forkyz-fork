@@ -17,12 +17,14 @@ import app.crossword.yourealwaysbe.forkyz.settings.RenderSettings
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
+import app.crossword.yourealwaysbe.forkyz.util.getOnce
 import app.crossword.yourealwaysbe.forkyz.util.stateInSubscribed
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 import app.crossword.yourealwaysbe.forkyz.view.ClueTabsViewModel
 import app.crossword.yourealwaysbe.forkyz.view.WordEditViewModel
 import app.crossword.yourealwaysbe.puz.Clue
 import app.crossword.yourealwaysbe.puz.ClueID
+import app.crossword.yourealwaysbe.puz.MovementStrategy
 import app.crossword.yourealwaysbe.puz.Playboard.Word
 import app.crossword.yourealwaysbe.puz.Position
 
@@ -104,7 +106,7 @@ class ClueListPageViewModel @Inject constructor(
     fun deleteLetter() {
         getBoard()?.let { board ->
             settings.getPlayScratchMode { scratchMode ->
-                settings.getPlayMovementStrategyClueList { movementStrategy ->
+                movementStrategyFlow.getOnce { movementStrategy ->
                     val oldMovementStrategy = board.getMovementStrategy()
                     board.setMovementStrategy(movementStrategy)
                     if (scratchMode)
@@ -128,7 +130,7 @@ class ClueListPageViewModel @Inject constructor(
     fun playLetter(c : String) {
         getBoard()?.let { board ->
             settings.getPlayScratchMode { scratchMode ->
-                settings.getPlayMovementStrategyClueList { movementStrategy ->
+                movementStrategyFlow.getOnce { movementStrategy ->
                     val oldMovementStrategy = board.getMovementStrategy()
                     board.setMovementStrategy(movementStrategy)
                     if (scratchMode)
@@ -427,5 +429,17 @@ class ClueListPageViewModel @Inject constructor(
 
     private fun <T> stateIn(flow : Flow<T>, initialValue : T) : StateFlow<T> {
         return flow.stateInSubscribed(viewModelScope, initialValue)
+    }
+
+    private val movementStrategyFlow : StateFlow<MovementStrategy> = stateIn(
+        settings.livePlayMovementStrategyClueList,
+        MovementStrategy.MOVE_NEXT_CLUE,
+    )
+    init {
+        movementStrategyFlow.getOnce {
+            // Because the flow is only active when subscribed this value
+            // will be behind by one keypress, so make sure it is correct at
+            // first by an initial getOnce.
+        }
     }
 }
