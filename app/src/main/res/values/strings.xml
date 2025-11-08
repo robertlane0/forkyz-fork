@@ -651,6 +651,7 @@
     <string name="clues_list_label">Clues</string>
 
     <!-- keyboard -->
+    <string name="key_special_entry">à</string>
     <string name="key_a">a</string>
     <string name="key_b">b</string>
     <string name="key_c">c</string>

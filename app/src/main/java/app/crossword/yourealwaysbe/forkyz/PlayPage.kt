@@ -537,6 +537,7 @@ fun PlayPage(
                     viewModel.toggleSelection()
                 SpecialKey.KEY_NEXT_CLUE -> viewModel.nextClue()
                 SpecialKey.KEY_PREVIOUS_CLUE -> viewModel.prevClue()
+                else -> onSpecialKeyUpPuzzlePage(key)
             }
         }
 

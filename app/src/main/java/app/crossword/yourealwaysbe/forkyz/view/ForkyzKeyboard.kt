@@ -53,7 +53,8 @@ private val BUTTON_PADDING_FRAC_COMPACT = 0.0F
 enum class SpecialKey {
     KEY_CHANGE_CLUE_DIRECTION,
     KEY_NEXT_CLUE,
-    KEY_PREVIOUS_CLUE
+    KEY_PREVIOUS_CLUE,
+    KEY_SPECIAL_ENTRY,
 }
 
 fun getForkyzKeyboardEditorInfo() : EditorInfo {
@@ -124,6 +125,16 @@ fun ForkyzKeyboard(
         }
     }
 
+    @Composable
+    fun Modifier.buttonVerticalPadding() : Modifier {
+        val screenHeight = LocalWindowInfo.current.containerSize.height.dp
+        val paddingFrac = if (compact)
+            BUTTON_PADDING_FRAC_COMPACT
+        else
+            BUTTON_PADDING_FRAC
+        return this.padding(vertical = screenHeight * paddingFrac)
+    }
+
     /**
      * A single key
      *
@@ -146,13 +157,6 @@ fun ForkyzKeyboard(
         val currentOnUp by rememberUpdatedState(onUp)
         val scope = rememberCoroutineScope()
         val haptic = LocalHapticFeedback.current
-
-        val screenHeight = LocalWindowInfo.current.containerSize.height.dp
-        val paddingFrac = if (compact)
-            BUTTON_PADDING_FRAC_COMPACT
-        else
-            BUTTON_PADDING_FRAC
-        val verticalPadding = screenHeight * paddingFrac
 
         content(
             modifier.pointerInput(true) {
@@ -182,7 +186,7 @@ fun ForkyzKeyboard(
                     heldButtonJob.cancel()
                     currentOnUp()
                 }
-            }.padding(vertical = verticalPadding)
+            }.buttonVerticalPadding()
         )
     }
 
@@ -219,6 +223,34 @@ fun ForkyzKeyboard(
                     ),
                 )
             }
+        }
+    }
+
+    /**
+     * For sending a special entry key event
+     *
+     * @param key the special key this represents
+     * @param symbol id of drawable to display on key
+     * @param contentDescription id of icon description
+     */
+    @Composable
+    fun SpecialEntryKey(modifier : Modifier = Modifier) {
+        TextButton(
+            modifier = modifier.buttonVerticalPadding(),
+            onClick = {
+                onSpecialKeyDown(SpecialKey.KEY_SPECIAL_ENTRY)
+                onSpecialKeyUp(SpecialKey.KEY_SPECIAL_ENTRY)
+            },
+            colors = ButtonDefaults.textButtonColors().copy(
+                contentColor = MaterialTheme.colorScheme.onSurface,
+            ),
+        ) {
+            Text(
+                text = stringResource(R.string.key_special_entry),
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = FontWeight.SemiBold,
+                ),
+            )
         }
     }
 
@@ -363,48 +395,46 @@ fun ForkyzKeyboard(
             }
             Row() {
                 val m1 = Modifier.weight(1.0F)
-                val m2 = Modifier.weight(2.0F)
-                val m6 = Modifier.weight(6.0F)
+                val m4 = Modifier.weight(4.0F)
                 IconKey(
-                    m2,
+                    m1,
                     KeyEvent.KEYCODE_DPAD_UP,
                     R.drawable.arrow_up,
                     R.string.key_up,
                 )
                 IconKey(
-                    m2,
+                    m1,
                     KeyEvent.KEYCODE_DPAD_DOWN,
                     R.drawable.arrow_down,
                     R.string.key_down,
                 )
                 SpecialIconKey(
-                    m2,
+                    m1,
                     SpecialKey.KEY_PREVIOUS_CLUE,
                     R.drawable.ic_prev_clue,
                     R.string.prev_clue,
                 )
-                Box(m1)
                 IconKey(
-                    m6,
+                    m4,
                     KeyEvent.KEYCODE_SPACE,
                     R.drawable.space,
                     R.string.key_space,
                 )
-                Box(m1)
+                SpecialEntryKey(m1)
                 SpecialIconKey(
-                    m2,
+                    m1,
                     SpecialKey.KEY_NEXT_CLUE,
                     R.drawable.ic_next_clue,
                     R.string.next_clue,
                 )
                 IconKey(
-                    m2,
+                    m1,
                     KeyEvent.KEYCODE_DPAD_LEFT,
                     R.drawable.arrow_left,
                     R.string.key_left,
                 )
                 IconKey(
-                    m2,
+                    m1,
                     KeyEvent.KEYCODE_DPAD_RIGHT,
                     R.drawable.arrow_right,
                     R.string.key_right,
@@ -471,48 +501,46 @@ fun ForkyzKeyboard(
             }
             Row() {
                 val m1 = Modifier.weight(1.0F)
-                val m2 = Modifier.weight(2.0F)
-                val m6 = Modifier.weight(6.0F)
+                val m4 = Modifier.weight(4.0F)
                 IconKey(
-                    m2,
+                    m1,
                     KeyEvent.KEYCODE_DPAD_UP,
                     R.drawable.arrow_up,
                     R.string.key_up,
                 )
                 IconKey(
-                    m2,
+                    m1,
                     KeyEvent.KEYCODE_DPAD_DOWN,
                     R.drawable.arrow_down,
                     R.string.key_down,
                 )
                 SpecialIconKey(
-                    m2,
+                    m1,
                     SpecialKey.KEY_PREVIOUS_CLUE,
                     R.drawable.ic_prev_clue,
                     R.string.prev_clue,
                 )
-                Box(m1)
                 IconKey(
-                    m6,
+                    m4,
                     KeyEvent.KEYCODE_SPACE,
                     R.drawable.space,
                     R.string.key_space,
                 )
-                Box(m1)
+                SpecialEntryKey(m1)
                 SpecialIconKey(
-                    m2,
+                    m1,
                     SpecialKey.KEY_NEXT_CLUE,
                     R.drawable.ic_next_clue,
                     R.string.next_clue,
                 )
                 IconKey(
-                    m2,
+                    m1,
                     KeyEvent.KEYCODE_DPAD_LEFT,
                     R.drawable.arrow_left,
                     R.string.key_left,
                 )
                 IconKey(
-                    m2,
+                    m1,
                     KeyEvent.KEYCODE_DPAD_RIGHT,
                     R.drawable.arrow_right,
                     R.string.key_right,
@@ -575,48 +603,46 @@ fun ForkyzKeyboard(
             }
             Row() {
                 val m1 = Modifier.weight(1.0F)
-                val m2 = Modifier.weight(2.0F)
-                val m6 = Modifier.weight(6.0F)
+                val m4 = Modifier.weight(4.0F)
                 IconKey(
-                    m2,
+                    m1,
                     KeyEvent.KEYCODE_DPAD_UP,
                     R.drawable.arrow_up,
                     R.string.key_up,
                 )
                 IconKey(
-                    m2,
+                    m1,
                     KeyEvent.KEYCODE_DPAD_DOWN,
                     R.drawable.arrow_down,
                     R.string.key_down,
                 )
                 SpecialIconKey(
-                    m2,
+                    m1,
                     SpecialKey.KEY_PREVIOUS_CLUE,
                     R.drawable.ic_prev_clue,
                     R.string.prev_clue,
                 )
-                Box(m1)
                 IconKey(
-                    m6,
+                    m4,
                     KeyEvent.KEYCODE_SPACE,
                     R.drawable.space,
                     R.string.key_space,
                 )
-                Box(m1)
+                SpecialEntryKey(m1)
                 SpecialIconKey(
-                    m2,
+                    m1,
                     SpecialKey.KEY_NEXT_CLUE,
                     R.drawable.ic_next_clue,
                     R.string.next_clue,
                 )
                 IconKey(
-                    m2,
+                    m1,
                     KeyEvent.KEYCODE_DPAD_LEFT,
                     R.drawable.arrow_left,
                     R.string.key_left,
                 )
                 IconKey(
-                    m2,
+                    m1,
                     KeyEvent.KEYCODE_DPAD_RIGHT,
                     R.drawable.arrow_right,
                     R.string.key_right,
@@ -681,48 +707,46 @@ fun ForkyzKeyboard(
             }
             Row() {
                 val m1 = Modifier.weight(1.0F)
-                val m2 = Modifier.weight(2.0F)
-                val m6 = Modifier.weight(6.0F)
+                val m4 = Modifier.weight(4.0F)
                 IconKey(
-                    m2,
+                    m1,
                     KeyEvent.KEYCODE_DPAD_UP,
                     R.drawable.arrow_up,
                     R.string.key_up,
                 )
                 IconKey(
-                    m2,
+                    m1,
                     KeyEvent.KEYCODE_DPAD_DOWN,
                     R.drawable.arrow_down,
                     R.string.key_down,
                 )
                 SpecialIconKey(
-                    m2,
+                    m1,
                     SpecialKey.KEY_PREVIOUS_CLUE,
                     R.drawable.ic_prev_clue,
                     R.string.prev_clue,
                 )
-                Box(m1)
                 IconKey(
-                    m6,
+                    m4,
                     KeyEvent.KEYCODE_SPACE,
                     R.drawable.space,
                     R.string.key_space,
                 )
-                Box(m1)
+                SpecialEntryKey(m1)
                 SpecialIconKey(
-                    m2,
+                    m1,
                     SpecialKey.KEY_NEXT_CLUE,
                     R.drawable.ic_next_clue,
                     R.string.next_clue,
                 )
                 IconKey(
-                    m2,
+                    m1,
                     KeyEvent.KEYCODE_DPAD_LEFT,
                     R.drawable.arrow_left,
                     R.string.key_left,
                 )
                 IconKey(
-                    m2,
+                    m1,
                     KeyEvent.KEYCODE_DPAD_RIGHT,
                     R.drawable.arrow_right,
                     R.string.key_right,
@@ -786,48 +810,46 @@ fun ForkyzKeyboard(
             }
             Row() {
                 val m1 = Modifier.weight(1.0F)
-                val m2 = Modifier.weight(2.0F)
-                val m6 = Modifier.weight(6.0F)
+                val m4 = Modifier.weight(4.0F)
                 IconKey(
-                    m2,
+                    m1,
                     KeyEvent.KEYCODE_DPAD_UP,
                     R.drawable.arrow_up,
                     R.string.key_up,
                 )
                 IconKey(
-                    m2,
+                    m1,
                     KeyEvent.KEYCODE_DPAD_DOWN,
                     R.drawable.arrow_down,
                     R.string.key_down,
                 )
                 SpecialIconKey(
-                    m2,
+                    m1,
                     SpecialKey.KEY_PREVIOUS_CLUE,
                     R.drawable.ic_prev_clue,
                     R.string.prev_clue,
                 )
-                Box(m1)
                 IconKey(
-                    m6,
+                    m4,
                     KeyEvent.KEYCODE_SPACE,
                     R.drawable.space,
                     R.string.key_space,
                 )
-                Box(m1)
+                SpecialEntryKey(m1)
                 SpecialIconKey(
-                    m2,
+                    m1,
                     SpecialKey.KEY_NEXT_CLUE,
                     R.drawable.ic_next_clue,
                     R.string.next_clue,
                 )
                 IconKey(
-                    m2,
+                    m1,
                     KeyEvent.KEYCODE_DPAD_LEFT,
                     R.drawable.arrow_left,
                     R.string.key_left,
                 )
                 IconKey(
-                    m2,
+                    m1,
                     KeyEvent.KEYCODE_DPAD_RIGHT,
                     R.drawable.arrow_right,
                     R.string.key_right,

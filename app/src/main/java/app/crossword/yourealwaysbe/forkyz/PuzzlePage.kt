@@ -246,6 +246,15 @@ class PuzzlePageScope(
         }
     }
 
+    fun onSpecialKeyUpPuzzlePage(key : SpecialKey) {
+        return when (key) {
+            SpecialKey.KEY_SPECIAL_ENTRY -> {
+                viewModel.doSpecialEntry()
+            }
+            else -> { /* ignore */ }
+        }
+    }
+
     @Composable
     @OptIn(ExperimentalMaterial3Api::class)
     fun VoiceButtons() {
@@ -298,11 +307,17 @@ class PuzzlePageScope(
         }
     }
 
+    /**
+     * The built-in keyboard
+     *
+     * If providing own onSpecialKeyUp, call through to
+     * onSpecialKeyUpPuzzlePage for anything not handled.
+     */
     @Composable
     fun Keyboard(
         showSpecialKeys : Boolean = false,
         onSpecialKeyDown : (SpecialKey) -> Unit = { },
-        onSpecialKeyUp : (SpecialKey) -> Unit = { },
+        onSpecialKeyUp : (SpecialKey) -> Unit = ::onSpecialKeyUpPuzzlePage,
     ) {
         val state by viewModel.keyboardState.collectAsStateWithLifecycle()
 
