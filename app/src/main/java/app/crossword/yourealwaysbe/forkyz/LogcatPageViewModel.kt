@@ -18,6 +18,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
+import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerShared
 
 data class ShareLogcatData(
@@ -28,7 +29,8 @@ data class ShareLogcatData(
 @HiltViewModel
 class LogcatPageViewModel @Inject constructor(
     application : Application,
-    val utils : AndroidVersionUtils,
+    val utils : NativeBackendUtils,
+    val versionUtils : AndroidVersionUtils,
 ) : AndroidViewModel(application) {
 
     private val _logcatText = MutableStateFlow<List<String>>(listOf())
@@ -40,7 +42,7 @@ class LogcatPageViewModel @Inject constructor(
     fun loadLogcat() {
         viewModelScope.launch(Dispatchers.IO) {
             val app : Application = getApplication()
-            val uid = utils.getApplicationUID(app)
+            val uid = versionUtils.getApplicationUID(app)
             val uidFlag : String = if (uid < 0) {
                 ""
             } else {
@@ -66,7 +68,7 @@ class LogcatPageViewModel @Inject constructor(
 
     fun shareLogcat() {
         FileHandlerShared.getLogcatShareUri(
-            getApplication(),
+            utils,
             logcatText.value,
         ) {
             it?.let { uri ->

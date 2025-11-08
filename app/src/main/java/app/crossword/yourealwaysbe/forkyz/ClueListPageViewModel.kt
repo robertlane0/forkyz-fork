@@ -15,11 +15,11 @@ import app.crossword.yourealwaysbe.forkyz.settings.CycleUnfilledMode
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.RenderSettings
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
+import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.util.getOnce
 import app.crossword.yourealwaysbe.forkyz.util.stateInSubscribed
-import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 import app.crossword.yourealwaysbe.forkyz.view.ClueTabsViewModel
 import app.crossword.yourealwaysbe.forkyz.view.WordEditViewModel
 import app.crossword.yourealwaysbe.puz.Clue
@@ -30,17 +30,16 @@ import app.crossword.yourealwaysbe.puz.Position
 
 @HiltViewModel
 class ClueListPageViewModel @Inject constructor(
-    application : Application,
+    val application : Application,
     settings : ForkyzSettings,
+    utils : NativeBackendUtils,
     currentPuzzleHolder : CurrentPuzzleHolder,
     fileHandlerProvider : FileHandlerProvider,
-    utils : AndroidVersionUtils,
 ) : PuzzlePageViewModel(
-    application,
     settings,
+    utils,
     currentPuzzleHolder,
     fileHandlerProvider,
-    utils,
 ) {
     init {
         setupVoiceCommands()
@@ -74,7 +73,7 @@ class ClueListPageViewModel @Inject constructor(
     )
 
     val clueTabsViewModel = ClueTabsViewModel(
-        application,
+        utils,
         viewModelScope,
         settings,
         getBoard(),
@@ -246,7 +245,7 @@ class ClueListPageViewModel @Inject constructor(
         registerVoiceCommandBack()
         registerVoiceCommandNotes()
 
-        val app : Application = getApplication()
+        val app : Application = application
 
         registerVoiceCommand(VoiceCommand(
             app.getString(R.string.command_left),

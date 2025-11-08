@@ -9,11 +9,11 @@ import kotlin.text.Regex
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
-import android.app.Application
-import android.content.Context
 import android.net.Uri
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -40,12 +40,12 @@ import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer
 import app.crossword.yourealwaysbe.forkyz.util.KeyboardInfo
 import app.crossword.yourealwaysbe.forkyz.util.KeyboardManagerKt
 import app.crossword.yourealwaysbe.forkyz.util.MediatedStateWithFlow
+import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerShared
 import app.crossword.yourealwaysbe.forkyz.util.mediate
-import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 import app.crossword.yourealwaysbe.forkyz.view.PlayboardTextRenderer
 import app.crossword.yourealwaysbe.forkyz.view.PuzzleFinishedDialogViewModel
 import app.crossword.yourealwaysbe.forkyz.view.PuzzleInfoDialogViewModel
@@ -242,12 +242,11 @@ private data class UIStateSettings(
 // will lose this tag and become an open base class
 @HiltViewModel
 open class PuzzlePageViewModel @Inject constructor(
-    application : Application,
     val settings : ForkyzSettings,
+    val utils : NativeBackendUtils,
     val currentPuzzleHolder : CurrentPuzzleHolder,
     val fileHandlerProvider : FileHandlerProvider,
-    val utils : AndroidVersionUtils,
-) : AndroidViewModel(application), PlayboardListener {
+) : ViewModel(), PlayboardListener {
     private val _announceEvent = MutableStateFlow<AnnounceData?>(null)
     val announceEvent : StateFlow<AnnounceData?> = _announceEvent
 
@@ -578,22 +577,26 @@ open class PuzzlePageViewModel @Inject constructor(
     }
 
     fun requestHelpForCurrentClue() {
-        val app : Application = getApplication()
-
-        if (!utils.hasNetworkConnection(getApplication())) {
-            sendToast(app.getString(R.string.help_query_but_no_active_network))
-        } else {
-            getBoard()?.let { board ->
-                askChatGPTForCurrentClue(
-                    app,
-                    settings,
-                    board,
-                ) { response ->
-                    val app : Application = getApplication()
-                    sendDialogMessage(
-                        app.getString(R.string.help_query_response_title),
-                        response,
+        viewModelScope.launch {
+            if (!utils.hasNetworkConnection()) {
+                sendToast(
+                    utils.getString(R.string.help_query_but_no_active_network)
+                )
+            } else {
+                getBoard()?.let { board ->
+                    val responseTitle = utils.getString(
+                        R.string.help_query_response_title,
                     )
+                    askChatGPTForCurrentClue(
+                        utils,
+                        settings,
+                        board,
+                    ) { response ->
+                        sendDialogMessage(
+                            responseTitle,
+                            response,
+                        )
+                    }
                 }
             }
         }
@@ -615,38 +618,43 @@ open class PuzzlePageViewModel @Inject constructor(
     }
 
     fun shareClue(withResponse : Boolean) {
-        getBoard()?.let { board ->
-            board.getClue()?.let { clue ->
-                ShareTextData.buildShareClue(
-                    getApplication(),
-                    settings,
-                    board,
-                    clue,
-                    withResponse,
+        viewModelScope.launch {
+            getBoard()?.let { board ->
+                board.getClue()?.let { clue ->
+                    ShareTextData.buildShareClue(
+                        utils,
+                        settings,
+                        board,
+                        clue,
+                        withResponse,
+                    )?.let { _externalToolEvent.value = it }
+                }
+            }
+        }
+    }
+
+    fun sharePuzzle(writeBlank : Boolean, omitExtensions : Boolean) {
+        viewModelScope.launch {
+            getPuzzle()?.let { puz ->
+                SharePuzzleData.build(
+                    utils,
+                    puz,
+                    writeBlank,
+                    omitExtensions,
                     { _externalToolEvent.value = it },
                 )
             }
         }
     }
 
-    fun sharePuzzle(writeBlank : Boolean, omitExtensions : Boolean) {
-        getPuzzle()?.let { puz ->
-            SharePuzzleData.build(
-                getApplication(),
-                puz,
-                writeBlank,
-                omitExtensions,
-                { _externalToolEvent.value = it },
-            )
-        }
-    }
-
     fun shareCompletion() {
-        getPuzzle()?.let { puz ->
-            _externalToolEvent.value = ShareTextData.buildShareCompletion(
-                getApplication(),
-                puz,
-            )
+        viewModelScope.launch {
+            getPuzzle()?.let { puz ->
+                _externalToolEvent.value = ShareTextData.buildShareCompletion(
+                    utils,
+                    puz,
+                )
+            }
         }
     }
 
@@ -748,24 +756,26 @@ open class PuzzlePageViewModel @Inject constructor(
     }
 
     protected fun registerVoiceCommandBack() {
-        val app : Application = getApplication()
-        registerVoiceCommand(
-            VoiceCommand(
-                app.getString(R.string.command_back),
-                { _ -> doBack() }
+        viewModelScope.launch {
+            registerVoiceCommand(
+                VoiceCommand(
+                    utils.getString(R.string.command_back),
+                    { _ -> doBack() }
+                )
             )
-        )
+        }
     }
 
     /**
      * Voice command launch notes current clue
      */
     protected fun registerVoiceCommandNotes() {
-        val app : Application = getApplication()
-        registerVoiceCommand(VoiceCommand(
-            app.getString(R.string.command_notes),
-            { launchCurrentClueNotes() },
-        ))
+        viewModelScope.launch {
+            registerVoiceCommand(VoiceCommand(
+                utils.getString(R.string.command_notes),
+                { launchCurrentClueNotes() },
+            ))
+        }
     }
 
     /**
@@ -773,19 +783,20 @@ open class PuzzlePageViewModel @Inject constructor(
      */
     // public for now to give a route through puzzle activity
     fun registerVoiceCommandAnswer() {
-        val app : Application = getApplication()
-        registerVoiceCommand(
-            VoiceCommand(
-                app.getString(R.string.command_answer),
-                app.getString(R.string.command_answer_alt),
-                { answer ->
-                    // remove non-word as not usually entered into grids
-                    val prepped = answer.replace("\\W+".toRegex(), "")
-                        .uppercase(Locale.getDefault())
-                    getBoard()?.playAnswer(prepped)
-                }
+        viewModelScope.launch {
+            registerVoiceCommand(
+                VoiceCommand(
+                    utils.getString(R.string.command_answer),
+                    utils.getString(R.string.command_answer_alt),
+                    { answer ->
+                        // remove non-word as not usually entered into grids
+                        val prepped = answer.replace("\\W+".toRegex(), "")
+                            .uppercase(Locale.getDefault())
+                        getBoard()?.playAnswer(prepped)
+                    }
+                )
             )
-        )
+        }
     }
 
     fun callCrosswordSolver() {
@@ -804,15 +815,19 @@ open class PuzzlePageViewModel @Inject constructor(
     }
 
     fun searchDuckDuckGo() {
-        getBoard()?.getClue()
-            ?.let { DuckDuckGoData.build(getApplication(), it) }
-            ?.let { _externalToolEvent.value = it }
+        viewModelScope.launch {
+            getBoard()?.getClue()
+                ?.let { DuckDuckGoData.build(utils, it) }
+                ?.let { _externalToolEvent.value = it }
+            }
     }
 
     fun searchFifteenSquared() {
-        getPuzzle()?.let {
-            FifteenSquaredData.build(getApplication(), it)
-        }?.let { _externalToolEvent.value = it }
+        viewModelScope.launch {
+            getPuzzle()?.let {
+                FifteenSquaredData.build(utils, it)
+            }?.let { _externalToolEvent.value = it }
+        }
     }
 
     fun callExternalDictionary() {
@@ -826,10 +841,11 @@ open class PuzzlePageViewModel @Inject constructor(
     }
 
     fun announceClue() {
-        getBoard()?.let { board ->
-            settings.getPlayShowCount() { showCount ->
+        viewModelScope.launch {
+            getBoard()?.let { board ->
+                val showCount = settings.livePlayShowCount.first()
                 PlayboardTextRenderer.getAccessibleCurrentClueWord(
-                    getApplication(), board, showCount
+                    utils, board, showCount
                 )?.let {
                     announce(AnnounceData(it))
                 }
@@ -838,12 +854,14 @@ open class PuzzlePageViewModel @Inject constructor(
     }
 
    fun announceBox() {
-        getBoard()?.let { board ->
-            PlayboardTextRenderer.getAccessibleCurrentBox(
-                getApplication(),
-                board,
-            )?.let {
-                announce(AnnounceData(it))
+        viewModelScope.launch {
+            getBoard()?.let { board ->
+                PlayboardTextRenderer.getAccessibleCurrentBox(
+                    utils,
+                    board,
+                )?.let {
+                    announce(AnnounceData(it))
+                }
             }
         }
     }
@@ -983,115 +1001,119 @@ open class PuzzlePageViewModel @Inject constructor(
      * Prepared command for inputting letters
      */
     protected fun registerVoiceCommandLetter() {
-        val app : Application = getApplication()
-        registerVoiceCommand(
-            VoiceCommand(
-                app.getString(R.string.command_letter),
-                { letter ->
-                    if (letter != null && !letter.isEmpty()) {
-                        getBoard()?.playLetter(
-                            Character.toUpperCase(letter[0])
-                        )
-                    }
-                },
+        viewModelScope.launch {
+            registerVoiceCommand(
+                VoiceCommand(
+                    utils.getString(R.string.command_letter),
+                    { letter ->
+                        if (letter != null && !letter.isEmpty()) {
+                            getBoard()?.playLetter(
+                                Character.toUpperCase(letter[0])
+                            )
+                        }
+                    },
+                )
             )
-        )
+        }
     }
 
     /**
      * Prepared command for jumping to clue number
      */
     protected fun registerVoiceCommandNumber() {
-        val app : Application = getApplication()
-        registerVoiceCommand(
-            VoiceCommand(
-                app.getString(R.string.command_number),
-                { textNumber ->
-                    val prepped = WordsToNumbersUtil
-                        .convertTextualNumbersInDocument(textNumber)
-                    try {
-                        val number = prepped.toInt()
-                        getBoard()?.jumpToClue(number.toString())
-                    } catch (e : NumberFormatException) {
-                        getBoard()?.jumpToClue(textNumber)
-                    }
-                },
+        viewModelScope.launch {
+            registerVoiceCommand(
+                VoiceCommand(
+                    utils.getString(R.string.command_number),
+                    { textNumber ->
+                        val prepped = WordsToNumbersUtil
+                            .convertTextualNumbersInDocument(textNumber)
+                        try {
+                            val number = prepped.toInt()
+                            getBoard()?.jumpToClue(number.toString())
+                        } catch (e : NumberFormatException) {
+                            getBoard()?.jumpToClue(textNumber)
+                        }
+                    },
+                )
             )
-        )
+        }
     }
 
     /**
      * Prepared command for clearing current word
      */
     protected fun registerVoiceCommandClear() {
-        val app : Application = getApplication()
-        registerVoiceCommand(
-            VoiceCommand(
-                app.getString(R.string.command_clear),
-                { getBoard()?.clearWord() },
+        viewModelScope.launch {
+            registerVoiceCommand(
+                VoiceCommand(
+                    utils.getString(R.string.command_clear),
+                    { getBoard()?.clearWord() },
+                )
             )
-        )
+        }
     }
 
     /**
      * Prepared command for announcing current clue
      */
     protected fun registerVoiceCommandAnnounceClue() {
-        val app : Application = getApplication()
-        registerVoiceCommand(
-            VoiceCommand(
-                app.getString(R.string.command_announce_clue),
-                { announceClue() },
+        viewModelScope.launch {
+            registerVoiceCommand(
+                VoiceCommand(
+                    utils.getString(R.string.command_announce_clue),
+                    { announceClue() },
+                )
             )
-        )
+        }
     }
 
     /**
      * Prepared command for requesting help
      */
     protected fun registerVoiceCommandClueHelp() {
-        val app : Application = getApplication()
-        registerVoiceCommand(
-            VoiceCommand(
-                app.getString(R.string.command_current_clue_help),
-                { requestHelpForCurrentClue() }
+        viewModelScope.launch {
+            registerVoiceCommand(
+                VoiceCommand(
+                    utils.getString(R.string.command_current_clue_help),
+                    { requestHelpForCurrentClue() }
+                )
             )
-        )
+        }
     }
 
-    protected fun getClueLineClueText(clue : Clue, cb : (String) -> Unit) {
-        settings.getPlayShowCount { showCount ->
-            settings.getPlayClueListNameInClueLine { clueListClueLine ->
-                val text = when (clueListClueLine) {
-                    ClueListClueLine.CLCL_ABBREVIATED -> {
-                        PlayboardTextRenderer.getShortClueText(
-                            getApplication(),
-                            clue,
-                            true,
-                            true,
-                            showCount
-                        )
-                    }
-                    ClueListClueLine.CLCL_NONE -> {
-                        PlayboardTextRenderer.getShortClueText(
-                            getApplication(),
-                            clue,
-                            false,
-                            false,
-                            showCount
-                        )
-                    }
-                    else -> {
-                        PlayboardTextRenderer.getLongClueText(
-                            getApplication(),
-                            clue,
-                            showCount
-                        )
-                    }
-                }
-                cb(text)
+    protected suspend fun getClueLineClueText(clue : Clue) : String {
+        val showCount = settings.livePlayShowCount.first()
+        val clueListClueLine
+            = settings.livePlayClueListNameInClueLine.first()
+        val text = when (clueListClueLine) {
+            ClueListClueLine.CLCL_ABBREVIATED -> {
+                PlayboardTextRenderer.getShortClueText(
+                    utils,
+                    clue,
+                    true,
+                    true,
+                    showCount
+                )
+            }
+            ClueListClueLine.CLCL_NONE -> {
+                PlayboardTextRenderer.getShortClueText(
+                    utils,
+                    clue,
+                    false,
+                    false,
+                    showCount
+                )
+            }
+            else -> {
+                PlayboardTextRenderer.getLongClueText(
+                    utils,
+                    clue,
+                    showCount
+                )
             }
         }
+        return text
     }
 
     protected fun showFlagClueDialog(clueID : ClueID) {

@@ -4,13 +4,11 @@ package app.crossword.yourealwaysbe.forkyz.exttools
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-import android.app.Activity
-import android.content.Context
-import android.content.Intent
 import android.net.Uri
 import androidx.core.net.toUri
 
 import app.crossword.yourealwaysbe.forkyz.R
+import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.puz.Clue
 
 // removing enums (of format (label=3,4-4;2) reduced IPuz form)
@@ -18,15 +16,15 @@ private val ENUMERATION_HINT_RE
     = "^(.*?)(?:\\s*\\((?:\\w+=)?[\\d\\s\\p{Punct}]*\\))?$".toRegex()
 private val ENUMERATION_HINT_GRP = 1
 
-
 class DuckDuckGoData(uri : Uri) : HTMLToolData(uri) {
     companion object {
         /**
          * Build DuckDuckGo search for clue
-         *
-         * Needs context for getString
          */
-        fun build(context : Context, clue : Clue) : DuckDuckGoData? {
+        suspend fun build(
+            utils : NativeBackendUtils,
+            clue : Clue,
+        ) : DuckDuckGoData? {
             var hint = clue?.getHint()
             if (hint == null)
                 return null;
@@ -40,8 +38,8 @@ class DuckDuckGoData(uri : Uri) : HTMLToolData(uri) {
             hint = hint?.replace("&[A-Za-z\\d#]+;".toRegex(), "")
             hint = hint?.replace("[^-A-Za-z\\s\\d]".toRegex(), "")
 
-            val uri = context.getResources()
-                .getString(R.string.duckduckgo_search_url, hint)
+            val uri = utils
+                .getString(R.string.duckduckgo_search_url, hint ?: "")
                 .toUri()
 
             return DuckDuckGoData(uri)

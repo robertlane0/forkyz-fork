@@ -2,26 +2,27 @@
 package app.crossword.yourealwaysbe.forkyz.exttools
 
 import android.net.Uri
-import android.content.Context
-import app.crossword.yourealwaysbe.puz.Puzzle
-import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerShared
-import app.crossword.yourealwaysbe.forkyz.R
 import androidx.core.app.ShareCompat
+
+import app.crossword.yourealwaysbe.forkyz.R
+import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
+import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerShared
+import app.crossword.yourealwaysbe.puz.Puzzle
 
 class SharePuzzleData(
     val mimeType : String,
     val uri : Uri,
 ) : ExternalToolData() {
     companion object {
-        fun build(
-            context : Context,
+        suspend fun build(
+            utils : NativeBackendUtils,
             puz : Puzzle,
             writeBlank : Boolean,
             omitExtensions : Boolean,
             cb : (SharePuzzleData) -> Unit,
         ) {
             FileHandlerShared.getShareUri(
-                context,
+                utils,
                 puz,
                 writeBlank,
                 omitExtensions

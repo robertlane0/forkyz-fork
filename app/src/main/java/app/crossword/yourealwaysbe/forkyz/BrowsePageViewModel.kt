@@ -217,8 +217,8 @@ private data class BrowseSettings(
 
 @HiltViewModel
 class BrowsePageViewModel @Inject constructor(
-    val utils : NativeBackendUtils,
     val settings : ForkyzSettings,
+    val utils : NativeBackendUtils,
     val fileHandlerProvider : FileHandlerProvider,
     val currentPuzzleHolder : CurrentPuzzleHolder,
     val downloadersProvider : DownloadersProvider,

@@ -107,7 +107,7 @@
             android:exported="false"
         />
         <provider
-            android:name="app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerShared"
+            android:name="app.crossword.yourealwaysbe.forkyz.util.files.FileProviderShared"
             android:authorities="${applicationId}.files"
             android:exported="false"
             android:grantUriPermissions="true"

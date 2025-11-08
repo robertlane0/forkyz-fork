@@ -5,6 +5,7 @@ import javax.inject.Inject
 import kotlin.random.Random
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
 
 import android.app.Application
 import androidx.lifecycle.viewModelScope
@@ -17,9 +18,9 @@ import app.crossword.yourealwaysbe.forkyz.settings.GridRatio
 import app.crossword.yourealwaysbe.forkyz.settings.RenderSettings
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
 import app.crossword.yourealwaysbe.forkyz.util.MediatedStateWithFlow
+import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
-import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 import app.crossword.yourealwaysbe.forkyz.view.BoardEditViewModel
 import app.crossword.yourealwaysbe.forkyz.view.ClueTabsViewModel
 import app.crossword.yourealwaysbe.puz.Box
@@ -105,17 +106,16 @@ private data class PlaySettings(
 
 @HiltViewModel
 class PlayPageViewModel @Inject constructor(
-    application : Application,
+    val application : Application,
     settings : ForkyzSettings,
+    utils : NativeBackendUtils,
     currentPuzzleHolder : CurrentPuzzleHolder,
     fileHandlerProvider : FileHandlerProvider,
-    utils : AndroidVersionUtils,
 ) : PuzzlePageViewModel(
-    application,
     settings,
+    utils,
     currentPuzzleHolder,
     fileHandlerProvider,
-    utils,
 ) {
     private val mediatedPlayUIState
         = MediatedStateWithFlow<PlayPageUIState, PlaySettings>(
@@ -193,7 +193,7 @@ class PlayPageViewModel @Inject constructor(
     )
 
     val clueTabsViewModel = ClueTabsViewModel(
-        application,
+        utils,
         viewModelScope,
         settings,
         getBoard(),
@@ -391,7 +391,7 @@ class PlayPageViewModel @Inject constructor(
         registerVoiceCommandBack()
         registerVoiceCommandNotes()
 
-        val app : Application = getApplication()
+        val app : Application = application
 
         registerVoiceCommand(VoiceCommand(
             app.getString(R.string.command_delete),
@@ -435,18 +435,16 @@ class PlayPageViewModel @Inject constructor(
         ))
     }
 
-    private fun getClueText(cb : (String?) -> Unit) {
-        val clue = getBoard()?.clue
-        if (clue != null) {
-            getClueLineClueText(clue, cb)
-        } else {
-            cb(null)
+    private suspend fun getClueText() : String? {
+        return getBoard()?.clue?.let {
+            getClueLineClueText(it)
         }
     }
 
     private fun updateState() {
-        getPuzzle()?.let { puz ->
-            getClueText { clueText ->
+        viewModelScope.launch {
+            getPuzzle()?.let { puz ->
+                val clueText = getClueText()
                 val aspectRatio = if (puz.height == 0)
                     1F
                 else

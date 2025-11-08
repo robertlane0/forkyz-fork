@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 import android.app.Application
 import androidx.lifecycle.viewModelScope
@@ -25,6 +26,7 @@ import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.RenderSettings
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
 import app.crossword.yourealwaysbe.forkyz.util.MediatedStateWithFlow
+import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.util.getOnce
@@ -174,17 +176,17 @@ private data class NotesSettings(
 )
 class NotesPageViewModel @AssistedInject constructor(
     @Assisted val notesClueID : ClueID?,
-    application : Application,
+    val application : Application,
     settings : ForkyzSettings,
+    utils : NativeBackendUtils,
     currentPuzzleHolder : CurrentPuzzleHolder,
     fileHandlerProvider : FileHandlerProvider,
-    utils : AndroidVersionUtils,
+    val versionUtils : AndroidVersionUtils,
 ) : PuzzlePageViewModel(
-    application,
     settings,
+    utils,
     currentPuzzleHolder,
     fileHandlerProvider,
-    utils,
 ) {
     @AssistedFactory
     interface NotesPageViewModelFactory {
@@ -503,7 +505,7 @@ class NotesPageViewModel @AssistedInject constructor(
         }
 
     private fun setupVoiceCommands() {
-        val app : Application = getApplication()
+        val app : Application = application
 
         registerVoiceCommandAnswer()
         registerVoiceCommandLetter()
@@ -593,7 +595,8 @@ class NotesPageViewModel @AssistedInject constructor(
                 else
                     maxPuzzleDimension
 
-                getClueLineClueText(clue) { text ->
+                viewModelScope.launch {
+                    val text = getClueLineClueText(clue)
                     val oldAnagramSource
                         = currentNotesUIState.anagramSourceValue
                     val newAnagramSource = note?.anagramSource ?: ""
@@ -814,7 +817,7 @@ class NotesPageViewModel @AssistedInject constructor(
 
         // strip HTML and spaces
         val strippedHint = hint.replace(
-            utils.getFilterClueToAlphabeticRegex().toRegex(), ""
+            versionUtils.getFilterClueToAlphabeticRegex().toRegex(), ""
         )
 
         val sourceIdx = strippedHint.indexOf(leadChars, ignoreCase = true)

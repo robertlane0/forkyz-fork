@@ -5,8 +5,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
-import android.app.Application
 import androidx.core.content.ContextCompat
 
 import app.crossword.yourealwaysbe.forkyz.R
@@ -15,6 +16,7 @@ import app.crossword.yourealwaysbe.forkyz.settings.ClueTabsDouble
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.RenderSettings
 import app.crossword.yourealwaysbe.forkyz.util.MediatedStateWithFlow
+import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.addAlpha
 import app.crossword.yourealwaysbe.puz.Clue
 import app.crossword.yourealwaysbe.puz.ClueID
@@ -112,7 +114,7 @@ private data class ClueTabsSettings(
 )
 
 class ClueTabsViewModel(
-    private val application : Application,
+    private val utils : NativeBackendUtils,
     private val viewModelScope : CoroutineScope,
     private val settings : ForkyzSettings,
     val board : Playboard?,
@@ -189,9 +191,11 @@ class ClueTabsViewModel(
     }
 
     override fun onPlayboardChange(changes : PlayboardChanges) {
-        currentUIState = currentUIState.copy(pages = getStatePages())
-        if (changes.previousWord != board?.currentWord)
-            snapToClueIfEnabled()
+        viewModelScope.launch {
+            currentUIState = currentUIState.copy(pages = getStatePages())
+            if (changes.previousWord != board?.currentWord)
+                snapToClueIfEnabled()
+        }
     }
 
     /**
@@ -294,10 +298,10 @@ class ClueTabsViewModel(
     }
 
     private fun getInitialUIState() : ClueTabsState {
-        return ClueTabsState(pages = getStatePages())
+        return ClueTabsState(pages = runBlocking { getStatePages() })
     }
 
-    private fun getUpdatedUIState(
+    private suspend fun getUpdatedUIState(
         state : ClueTabsState,
         clueTabsSettings : ClueTabsSettings,
     ) : ClueTabsState {
@@ -326,7 +330,7 @@ class ClueTabsViewModel(
         )
     }
 
-    private fun getStatePages() : List<ClueList> {
+    private suspend fun getStatePages() : List<ClueList> {
         val listPages = (board?.puzzle?.clueListNames ?: listOf())
             .sorted()
             .map { listName ->
@@ -342,7 +346,7 @@ class ClueTabsViewModel(
             }
 
         val historyPage = ClueList(
-            application.getString(R.string.clue_tab_history),
+            utils.getString(R.string.clue_tab_history),
             (board?.puzzle?.history ?: listOf())
                 .map {
                     getClueItem(
@@ -355,7 +359,10 @@ class ClueTabsViewModel(
         return listPages + historyPage
     }
 
-    private fun getClueItem(cid : ClueID, showDirection : Boolean) : ClueItem {
+    private suspend fun getClueItem(
+        cid : ClueID,
+        showDirection : Boolean,
+    ) : ClueItem {
         return board?.puzzle?.getClue(cid)?.let {
             getClueItem(it, showDirection)
         } ?: ClueItem(
@@ -369,7 +376,10 @@ class ClueTabsViewModel(
         )
     }
 
-    private fun getClueItem(clue : Clue, showDirection : Boolean) : ClueItem {
+    private suspend fun getClueItem(
+        clue : Clue,
+        showDirection : Boolean,
+    ) : ClueItem {
         val flagColor = if (
             clue.isFlagged && !clue.isDefaultFlagColor()
         ) {
@@ -380,7 +390,7 @@ class ClueTabsViewModel(
         return ClueItem(
             cid = clue.clueID,
             text = PlayboardTextRenderer.getShortClueText(
-                application,
+                utils,
                 clue,
                 true,
                 showDirection,

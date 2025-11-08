@@ -5,14 +5,14 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
 import java.util.function.Consumer
+import kotlinx.coroutines.flow.first
 
-import android.content.Context
-import android.content.Intent
 import android.net.Uri
 import androidx.core.app.ShareCompat
 
 import app.crossword.yourealwaysbe.forkyz.R
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
+import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Clue
@@ -24,37 +24,32 @@ open class ShareTextData(
     val message : String
 ) : ExternalToolData() {
     companion object {
-        fun buildShareClue(
-            context : Context,
+        suspend fun buildShareClue(
+            utils : NativeBackendUtils,
             settings : ForkyzSettings,
             board : Playboard,
             clue : Clue,
             withResponse : Boolean,
-            cb : Consumer<ShareTextData>,
-        ) {
-            val puz = board.getPuzzle()
-            if (puz != null) {
+        ) : ShareTextData? {
+            return board.getPuzzle()?.let { puz ->
                 val response = board.getCurrentWordBoxes()
-                getShareClueMessage(
-                    context,
+                val shareMessage = getShareClueMessage(
+                    utils,
                     settings,
                     puz,
                     clue,
                     response,
                     withResponse,
-                ) { shareMessage : String ->
-                     cb.accept(
-                         ShareTextData(
-                            context.getString(R.string.share_clue_title),
-                            shareMessage,
-                        )
-                    )
-                }
+                )
+                return ShareTextData(
+                    utils.getString(R.string.share_clue_title),
+                    shareMessage,
+                )
             }
         }
 
-        fun buildShareCompletion(
-            context : Context,
+        suspend fun buildShareCompletion(
+            utils : NativeBackendUtils,
             puz : Puzzle,
         ) : ShareTextData {
             val source = puz.source ?: puz.title ?: ""
@@ -65,7 +60,7 @@ open class ShareTextData(
             val message = if (date != null) {
                 val dateFormat
                     = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
-                context.resources.getQuantityString(
+                utils.getQuantityString(
                     R.plurals.share_message_with_date,
                     cheatedBoxes,
                     source,
@@ -74,7 +69,7 @@ open class ShareTextData(
                     completionTime,
                 )
             } else {
-                context.resources.getQuantityString(
+                utils.getQuantityString(
                     R.plurals.share_message_no_date,
                     cheatedBoxes,
                     source,
@@ -84,57 +79,48 @@ open class ShareTextData(
             }
 
             return ShareTextData(
-                context.getString(R.string.share_your_time),
+                utils.getString(R.string.share_your_time),
                 message,
             )
         }
 
-        private fun getShareClueMessage(
-            context : Context,
+        private suspend fun getShareClueMessage(
+            utils : NativeBackendUtils,
             settings : ForkyzSettings,
             puz : Puzzle,
             clue : Clue,
             response : Array<Box>,
             withResponse : Boolean,
-            cb : (String) -> Unit,
-        ) {
-            getShareClueText(context, settings, clue) { clueText ->
-                val responseText
-                    = if (withResponse) getShareResponseText(context, response)
-                    else null
+        ) : String {
+            val clueText = getShareClueText(utils, settings, clue)
+            val puzzleDetails = getSharePuzzleDetails(utils, puz)
 
-                val puzzleDetails = getSharePuzzleDetails(context, puz)
-
-                if (withResponse) {
-                    cb(
-                        context.getString(
-                            R.string.share_clue_response_text,
-                            clueText,
-                            responseText,
-                            puzzleDetails,
-                        )
-                    )
-                } else {
-                    cb(
-                        context.getString(
-                            R.string.share_clue_text,
-                            clueText,
-                            puzzleDetails,
-                        )
-                    )
-                }
+            if (withResponse) {
+                val responseText = getShareResponseText(utils, response)
+                return utils.getString(
+                    R.string.share_clue_response_text,
+                    clueText,
+                    responseText,
+                    puzzleDetails,
+                )
+            } else {
+                return utils.getString(
+                    R.string.share_clue_text,
+                    clueText,
+                    puzzleDetails,
+                )
             }
         }
 
-        private fun getShareResponseText(
-            context : Context,
+        private suspend fun getShareResponseText(
+            utils : NativeBackendUtils,
             boxes : Array<Box>
         ) : String {
             val responseText = StringBuilder()
             for (box in boxes) {
                 if (box.isBlank()) {
                     responseText.append(
-                        context.getString(R.string.share_clue_blank_box),
+                        utils.getString(R.string.share_clue_blank_box),
                     )
                 } else {
                     responseText.append(box.getResponse())
@@ -143,35 +129,35 @@ open class ShareTextData(
             return responseText.toString()
         }
 
-        private fun getShareClueText(
-            context : Context,
+        private suspend fun getShareClueText(
+            utils : NativeBackendUtils,
             settings : ForkyzSettings,
             clue : Clue?,
-            cb : (String) -> Unit,
-        ) {
-            settings.getPlayShowCount() { showCount ->
-                if (clue == null) {
-                    cb(context.getString(R.string.unknown_hint))
-                } else {
-                    val wordLen = if (clue.hasZone()) clue.getZone().size() else -1
+        ) : String {
+            val showCount = settings.livePlayShowCount.first()
+            if (clue == null) {
+                return utils.getString(R.string.unknown_hint)
+            } else {
+                val wordLen = if (clue.hasZone())
+                    clue.getZone().size()
+                else
+                    -1
 
-                    if (showCount && wordLen >= 0) {
-                        cb(
-                            context.getString(
-                                R.string.clue_format_short_no_num_no_dir_with_count,
-                                clue.getHint(),
-                                wordLen,
-                            )
-                        )
-                    } else {
-                        cb(clue.getHint())
-                    }
+                if (showCount && wordLen >= 0) {
+                    return utils.getString(
+                        R.string
+                            .clue_format_short_no_num_no_dir_with_count,
+                        clue.getHint(),
+                        wordLen,
+                    )
+                } else {
+                    return clue.getHint()
                 }
             }
         }
 
-        private fun getSharePuzzleDetails(
-            context : Context,
+        private suspend fun getSharePuzzleDetails(
+            utils : NativeBackendUtils,
             puz : Puzzle,
         ) : String {
             var source = puz.getSource()
@@ -199,14 +185,14 @@ open class ShareTextData(
 
             if (shareUrl == null || shareUrl.isEmpty()) {
                 return if (author != null) {
-                    context.getString(
+                    utils.getString(
                         R.string.share_puzzle_details_author_no_url,
                         source,
                         title,
                         author,
                     )
                 } else {
-                    context.getString(
+                    utils.getString(
                         R.string.share_puzzle_details_no_author_no_url,
                         source,
                         title,
@@ -214,7 +200,7 @@ open class ShareTextData(
                 }
             } else {
                 return if (author != null) {
-                    context.getString(
+                    utils.getString(
                         R.string.share_puzzle_details_author_url,
                         source,
                         title,
@@ -222,7 +208,7 @@ open class ShareTextData(
                         shareUrl,
                     )
                 } else {
-                    context.getString(
+                    utils.getString(
                         R.string.share_puzzle_details_no_author_url,
                         source,
                         title,

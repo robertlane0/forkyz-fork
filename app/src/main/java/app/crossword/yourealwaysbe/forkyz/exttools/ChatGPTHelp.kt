@@ -2,9 +2,10 @@
 package app.crossword.yourealwaysbe.forkyz.exttools
 
 import java.io.IOException
-import kotlin.coroutines.CoroutineContext
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 import android.content.Context
@@ -17,6 +18,7 @@ import org.json.JSONObject
 import app.crossword.yourealwaysbe.forkyz.R
 import app.crossword.yourealwaysbe.forkyz.settings.ExternalToolSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
+import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.getURLJSON
 import app.crossword.yourealwaysbe.puz.Playboard
 
@@ -38,24 +40,22 @@ private val QUERY_TIMEOUT = 30000
  *
  * @param callback delivers text response for OK dialog
  */
-fun askChatGPTForCurrentClue(
-    context : Context,
+suspend fun askChatGPTForCurrentClue(
+    utils : NativeBackendUtils,
     settings : ForkyzSettings,
     board : Playboard,
     callback : (String) -> Unit,
 ) {
-    settings.getExtChatGPTAPIKey() { apiKey ->
-        apiKey?.let { apiKey ->
-            val query = makeQuery(context, board)
-            if (query == null) {
-                callback(context.getString(R.string.help_no_clue_to_query))
-            } else {
-                makeRequest(apiKey, query) { response ->
-                    if (response == null)
-                        callback(context.getString(R.string.help_query_failed))
-                    else
-                        callback(response)
-                }
+    settings.liveExtChatGPTAPIKey.first()?.let { apiKey ->
+        val query = makeQuery(utils, board)
+        if (query == null) {
+            callback(utils.getString(R.string.help_no_clue_to_query))
+        } else {
+            makeRequest(apiKey, query) { response ->
+                if (response == null)
+                    callback(utils.getString(R.string.help_query_failed))
+                else
+                    callback(response)
             }
         }
     }
@@ -72,25 +72,29 @@ fun isChatGPTEnabled(settings : ForkyzSettings, cb : (Boolean) -> Unit) {
 fun isChatGPTEnabled(extSettings : ExternalToolSettings) : Boolean
     = isChatGPTEnabled(extSettings.chatGPTAPIKey)
 
-private fun makeRequest(
+private suspend fun makeRequest(
     apiKey : String,
     query : String,
-    callback : (String?) -> Unit,
+    callback : suspend (String?) -> Unit,
 ) {
-    val ioScope = CoroutineScope(Dispatchers.IO)
-    ioScope.launch {
-        try {
-            val json = getURLJSON(
-                url = CHAT_GPT_API_URL,
-                timeout = QUERY_TIMEOUT,
-                headers = mapOf("Authorization" to "Bearer " + apiKey),
-                data = getQueryData(query),
-            )
-            callback(getQueryResponse(json))
-        } catch (e : IOException) {
-            callback(null)
-        } catch (e : JSONException) {
-            callback(null)
+    val entryContext = currentCoroutineContext()
+    coroutineScope {
+        launch(Dispatchers.IO) {
+            try {
+                val json = getURLJSON(
+                    url = CHAT_GPT_API_URL,
+                    timeout = QUERY_TIMEOUT,
+                    headers = mapOf("Authorization" to "Bearer " + apiKey),
+                    data = getQueryData(query),
+                )
+                launch(entryContext) {
+                    callback(getQueryResponse(json))
+                }
+            } catch (e : IOException) {
+                launch(entryContext) { callback(null) }
+            } catch (e : JSONException) {
+                launch(entryContext) { callback(null) }
+            }
         }
     }
 }
@@ -117,8 +121,11 @@ private fun getQueryResponse(json : JSONObject) : String {
     }
 }
 
-private fun makeQuery(context : Context, board : Playboard) : String? {
-    val blank = context.getString(R.string.share_clue_blank_box)
+private suspend fun makeQuery(
+    utils : NativeBackendUtils,
+    board : Playboard,
+) : String? {
+    val blank = utils.getString(R.string.share_clue_blank_box)
 
     val puz = board.getPuzzle()
     if (puz == null)
@@ -165,22 +172,22 @@ private fun makeQuery(context : Context, board : Playboard) : String? {
     }
 
     if (response != null && solution != null) {
-        return context.getString(
+        return utils.getString(
             R.string.help_query_solution_and_response,
             hint, response, solution
         )
     } else if (response != null) {
-        return context.getString(
+        return utils.getString(
             R.string.help_query_just_response,
             hint, response
         )
     } else if (solution != null) {
-        return context.getString(
+        return utils.getString(
             R.string.help_query_just_solution,
             hint, solution
         )
     } else {
-        return context.getString(R.string.help_query_just_clue, clue)
+        return utils.getString(R.string.help_query_just_clue, clue)
     }
 }
 
