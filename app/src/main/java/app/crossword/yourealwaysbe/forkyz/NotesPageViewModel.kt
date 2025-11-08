@@ -8,6 +8,7 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 
 import android.app.Application
 import androidx.lifecycle.viewModelScope
@@ -26,6 +27,8 @@ import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
 import app.crossword.yourealwaysbe.forkyz.util.MediatedStateWithFlow
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
+import app.crossword.yourealwaysbe.forkyz.util.getOnce
+import app.crossword.yourealwaysbe.forkyz.util.stateInSubscribed
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 import app.crossword.yourealwaysbe.forkyz.view.WordEditViewModel
 import app.crossword.yourealwaysbe.puz.Box
@@ -120,7 +123,6 @@ private data class AnagramValues(
  * notes)
  * @param clueText the clue text to display with the clue, or null if
  * this is the zone of cells with no clue attached
- * @param movementStrategy the movement strategy to use on the miniboard
  */
 data class NotesPageUIState(
     val notesClueID : ClueID? = null,
@@ -135,7 +137,6 @@ data class NotesPageUIState(
     val clueFlagged : Boolean = false,
     val clueFlagColor : Int = 0,
     val confirmTransferRequest : TransferRequest? = null,
-    val movementStrategy : MovementStrategy = MovementStrategy.STOP_ON_END,
     val renderSettings : RenderSettings = RenderSettings(),
     val skipFilled : Boolean = false,
     val expandableClueLine : Boolean = false,
@@ -160,7 +161,6 @@ private data class DisplaySettings(
 )
 
 private data class InteractionSettings(
-    val stopOnEndStrategy : MovementStrategy,
     val skipFilled : Boolean,
 )
 
@@ -197,8 +197,6 @@ class NotesPageViewModel @AssistedInject constructor(
             NotesPageUIState(),
             { state, notesSettings ->
                 state.copy(
-                    movementStrategy
-                        = notesSettings.interaction.stopOnEndStrategy,
                     renderSettings = notesSettings.display.renderSettings,
                     skipFilled = notesSettings.interaction.skipFilled,
                     expandableClueLine
@@ -216,11 +214,7 @@ class NotesPageViewModel @AssistedInject constructor(
                     settings.livePlayExpandableClueLine,
                     ::DisplaySettings,
                 ),
-                combine(
-                    settings.livePlayStopOnEndStrategy,
-                    settings.livePlaySkipFilled,
-                    ::InteractionSettings,
-                ),
+                settings.livePlaySkipFilled.map(::InteractionSettings),
                 ::NotesSettings,
             ),
         )
@@ -316,18 +310,22 @@ class NotesPageViewModel @AssistedInject constructor(
     fun playLetterToBoard(c : String) {
         getBoard()?.let { board ->
             val oldMovementStrategy = board.getMovementStrategy()
-            board.setMovementStrategy(movementStrategy)
-            board.playLetter(c)
-            board.setMovementStrategy(oldMovementStrategy)
+            movementStrategyFlow.getOnce { movementStrategy ->
+                board.setMovementStrategy(movementStrategy)
+                board.playLetter(c)
+                board.setMovementStrategy(oldMovementStrategy)
+            }
         }
     }
 
     fun deleteLetterFromBoard() {
         getBoard()?.let { board ->
-            val oldMovementStrategy = board.getMovementStrategy()
-            board.setMovementStrategy(movementStrategy)
-            board.deleteOrUndoLetter()
-            board.setMovementStrategy(oldMovementStrategy)
+            movementStrategyFlow.getOnce { movementStrategy ->
+                val oldMovementStrategy = board.getMovementStrategy()
+                board.setMovementStrategy(movementStrategy)
+                board.deleteOrUndoLetter()
+                board.setMovementStrategy(oldMovementStrategy)
+            }
         }
     }
 
@@ -941,8 +939,18 @@ class NotesPageViewModel @AssistedInject constructor(
         )
     }
 
-    private val movementStrategy : MovementStrategy
-        get() { return currentNotesUIState.movementStrategy }
+    private val movementStrategyFlow : StateFlow<MovementStrategy>
+        = settings.livePlayStopOnEndStrategy.stateInSubscribed(
+            viewModelScope,
+            MovementStrategy.STOP_ON_END,
+        )
+    init {
+        movementStrategyFlow.getOnce {
+            // Because the flow is not permanently subscribed, an initial get
+            // is needed to prime it with the right value. It will be one
+            // keypress behind forevermore.
+        }
+    }
 
     private val currentAnagramValues : AnagramValues
         get() { return AnagramValues(anagramSourceValue, anagramSolutionValue) }
@@ -950,4 +958,6 @@ class NotesPageViewModel @AssistedInject constructor(
     private var currentNotesUIState : NotesPageUIState
         get() { return mediatedNotesUIState.current }
         set(value) { mediatedNotesUIState.current = value }
+
+
 }

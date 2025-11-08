@@ -78,7 +78,6 @@ import app.crossword.yourealwaysbe.forkyz.view.rememberBoardEditTextState
 import app.crossword.yourealwaysbe.forkyz.view.rememberBoardTextMeasurer
 import app.crossword.yourealwaysbe.puz.Clue
 import app.crossword.yourealwaysbe.puz.ClueID
-import app.crossword.yourealwaysbe.puz.MovementStrategy
 import app.crossword.yourealwaysbe.puz.Playboard.Word
 import app.crossword.yourealwaysbe.puz.Position
 
