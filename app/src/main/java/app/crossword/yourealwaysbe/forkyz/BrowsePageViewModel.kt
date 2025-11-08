@@ -14,14 +14,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.parcelize.Parcelize
 
-import android.app.Application
 import android.net.Uri
 import android.os.Parcelable
 import android.util.Log
 import androidx.annotation.MainThread
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -40,13 +40,12 @@ import app.crossword.yourealwaysbe.forkyz.util.AppPuzzleUtils
 import app.crossword.yourealwaysbe.forkyz.util.BackgroundDownloadManager
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
 import app.crossword.yourealwaysbe.forkyz.util.MediatedStateWithFlow
-import app.crossword.yourealwaysbe.forkyz.util.PuzzleImporter
+import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.files.DirHandle
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzMetaFile
-import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 import app.crossword.yourealwaysbe.forkyz.view.DownloadDialogViewModel
 
 private val TAG = "ForkyzBrowsePage"
@@ -216,14 +215,13 @@ private data class BrowseSettings(
 
 @HiltViewModel
 class BrowsePageViewModel @Inject constructor(
-    application : Application,
-    val utils : AndroidVersionUtils,
+    val utils : NativeBackendUtils,
     val settings : ForkyzSettings,
     val fileHandlerProvider : FileHandlerProvider,
     val currentPuzzleHolder : CurrentPuzzleHolder,
     val downloadersProvider : DownloadersProvider,
     val backgroundDownloadManager : BackgroundDownloadManager,
-) : AndroidViewModel(application) {
+) : ViewModel() {
 
     // important that it is single thread to avoid multiple
     // simultaneous operations
@@ -411,12 +409,14 @@ class BrowsePageViewModel @Inject constructor(
                 else
                     fileHandler.getCrosswordsDirectory()
 
-                puzzles = fileHandler.getPuzMetas(directory)
-                    .map(this::getPuzData)
-                    .associateBy(
-                        { it.puzEntry.id },
-                        { it },
-                    ).toMutableMap()
+                puzzles = runBlocking {
+                    fileHandler.getPuzMetas(directory)
+                        .map { getPuzData(it) }
+                        .associateBy(
+                            { it.puzEntry.id },
+                            { it },
+                        ).toMutableMap()
+                }
 
                 runMain {
                     updateState(
@@ -624,7 +624,7 @@ class BrowsePageViewModel @Inject constructor(
      * auto download jobs. Don't do anything if no network
      */
     fun autoDownloadIfRequired() {
-        if (!utils.hasNetworkConnection(getApplication()))
+        if (!utils.hasNetworkConnection())
             return
 
         settings.getDownloadersSettings { downloaderSettings ->
@@ -676,14 +676,14 @@ class BrowsePageViewModel @Inject constructor(
                         } catch (ee : Exception) {
                             ee.printStackTrace()
                         }
-
-                        val application : Application = getApplication()
-                        sendToast(
-                            application.getString(
-                                R.string.unable_to_read_file,
-                                (filename ?: "")
+                        viewModelScope.launch {
+                            sendToast(
+                                utils.getString(
+                                    R.string.unable_to_read_file,
+                                    (filename ?: "")
+                                )
                             )
-                        )
+                        }
                     }
                 }
             )
@@ -710,11 +710,13 @@ class BrowsePageViewModel @Inject constructor(
             setUIBusy(false)
             Log.i(TAG, "Done refreshing current puzzle in list with isUIBusy")
             if (refreshedMeta != null) {
-                val pd = getPuzData(refreshedMeta)
-                if (pd.puzEntry.id in puzzles) {
-                    puzzles[pd.puzEntry.id] = pd
+                viewModelScope.launch {
+                    val pd = getPuzData(refreshedMeta)
+                    if (pd.puzEntry.id in puzzles) {
+                        puzzles[pd.puzEntry.id] = pd
+                    }
+                    updateState(isNewPuzzleList = true)
                 }
-                updateState(isNewPuzzleList = true)
             }
         }
     }
@@ -727,13 +729,14 @@ class BrowsePageViewModel @Inject constructor(
     @MainThread
     fun importURIs(uris : Collection<Uri>) {
         importURIsAndCallback(uris) { someFailed, someSucceeded ->
-            val application : Application = getApplication()
-            if (someFailed)
-                sendToast(application.getString(R.string.import_failure))
-            else if (someSucceeded)
-                sendToast(application.getString(R.string.import_success))
-            if (someSucceeded)
-                updateState(isNewPuzzleList = true)
+            viewModelScope.launch {
+                if (someFailed)
+                    sendToast(utils.getString(R.string.import_failure))
+                else if (someSucceeded)
+                    sendToast(utils.getString(R.string.import_success))
+                if (someSucceeded)
+                    updateState(isNewPuzzleList = true)
+            }
         }
     }
 
@@ -805,8 +808,7 @@ class BrowsePageViewModel @Inject constructor(
                 var needsReload = false
 
                 uris.forEach { uri ->
-                    val ph = PuzzleImporter.importUri(
-                        getApplication(),
+                    val ph = utils.importPuzzleURI(
                         fileHandler,
                         uri,
                         timeout,
@@ -818,7 +820,7 @@ class BrowsePageViewModel @Inject constructor(
                     if (!isViewArchive && ph != null && !needsReload) {
                         try {
                             val pm = fileHandler.loadPuzMetaFile(ph)
-                            val pd = getPuzData(pm)
+                            val pd = runBlocking { getPuzData(pm) }
                             puzzles[pd.puzEntry.id] = pd
                         } catch (e : IOException) {
                             // fall back to full reload
@@ -844,15 +846,13 @@ class BrowsePageViewModel @Inject constructor(
     fun processToImportDirectory() {
         fileHandlerProvider.get { fileHandler ->
             threadWithUILock("process to import dir") {
-                val imported = PuzzleImporter.processToImportDirectory(
-                    getApplication(),
-                    fileHandler,
-                )
+                val imported
+                    = utils.processPuzzlesToImportDirectory(fileHandler)
 
                 imported.forEach { ph ->
                     try {
                         val pm = fileHandler.loadPuzMetaFile(ph)
-                        val pd = getPuzData(pm)
+                        val pd = runBlocking { getPuzData(pm) }
                         puzzles[pd.puzEntry.id] = pd
                     } catch (e : IOException) {
                         Log.w(TAG, "Could not load meta for handle " + ph)
@@ -1094,8 +1094,7 @@ class BrowsePageViewModel @Inject constructor(
         }
     }
 
-    private fun getPuzData(pm : PuzMetaFile) : PuzData {
-        val application : Application = getApplication()
+    private suspend fun getPuzData(pm : PuzMetaFile) : PuzData {
         val entry = PuzEntry(
             id = pm.mainFileURI,
             caption = getCaption(pm),
@@ -1105,7 +1104,7 @@ class BrowsePageViewModel @Inject constructor(
             rating = pm.rating,
             hasSolution = pm.hasSolution(),
             source = getSource(pm)
-                ?: application.getString(R.string.unknown_source),
+                ?: utils.getString(R.string.unknown_source),
             title = getTitle(pm),
             author = pm.author ?: "",
         )
@@ -1160,7 +1159,7 @@ class BrowsePageViewModel @Inject constructor(
         }
     }
 
-    private fun getCaption(pm : PuzMetaFile) : String {
+    private suspend fun getCaption(pm : PuzMetaFile) : String {
         var caption = pm.title ?: ""
         val title = getTitle(pm)
         val author = pm.author ?: ""
@@ -1168,8 +1167,7 @@ class BrowsePageViewModel @Inject constructor(
             && !title.contains(author, ignoreCase=true)
             && !caption.contains(author, ignoreCase=true)
         if (addAuthor) {
-            val application : Application = getApplication()
-            caption = application.getString(
+            caption = utils.getString(
                 R.string.puzzle_caption_with_author,
                 caption,
                 author
@@ -1251,7 +1249,7 @@ class BrowsePageViewModel @Inject constructor(
     }
 
     private val currentVersion : String
-        = utils.getApplicationVersionName(getApplication())
+        = utils.getApplicationVersionName()
 
     private var currentUIState : UIState
         get() { return mediatedUIState.current }
