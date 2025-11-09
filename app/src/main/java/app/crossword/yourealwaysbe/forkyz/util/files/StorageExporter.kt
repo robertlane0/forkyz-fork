@@ -7,6 +7,7 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 
+import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.puz.io.StreamUtils
 
 private val TAG = "ForkyzStorageExporter"
@@ -23,6 +24,7 @@ private val TAG = "ForkyzStorageExporter"
 @Throws(IOException::class)
 fun exportStorage(
     context : Context,
+    utils : NativeBackendUtils,
     fileHandler : FileHandler,
     target : Uri,
 ) : Boolean {
@@ -30,6 +32,7 @@ fun exportStorage(
     Log.i(TAG, "Creating target handler")
     val targetHandler = FileHandlerSAF.initialiseSAFForRoot(
         context,
+        utils,
         target,
         false
     )

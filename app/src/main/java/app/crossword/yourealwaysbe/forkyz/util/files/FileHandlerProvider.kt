@@ -18,14 +18,14 @@ import app.crossword.yourealwaysbe.forkyz.R
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation
+import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.getOnceNotNull
 import app.crossword.yourealwaysbe.forkyz.util.stateInSubscribed
-import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 
 @Singleton
 class FileHandlerProvider @Inject constructor(
     @param:ApplicationContext private val applicationContext : Context,
-    private val utils : AndroidVersionUtils,
+    private val utils : NativeBackendUtils,
     private val settings : ForkyzSettings,
 ) {
     // state flow to ensure only once file handler unless settings
@@ -51,16 +51,16 @@ class FileHandlerProvider @Inject constructor(
         when (loc) {
             StorageLocation.SL_EXTERNAL_SAF -> {
                 fh = FileHandlerSAF.readHandlerFromSettings(
-                    applicationContext, fileHandlerSettings, settings
+                    applicationContext, utils, fileHandlerSettings, settings
                 )
             }
             else -> {
-                fh = FileHandlerInternal(applicationContext)
+                fh = FileHandlerInternal(utils)
             }
         }
 
         if (fh == null || !fh.isStorageMounted()) {
-            fh = FileHandlerInternal(applicationContext)
+            fh = FileHandlerInternal(utils)
             val t = Toast.makeText(
                 applicationContext,
                 R.string.storage_problem_falling_back_internal,
@@ -69,7 +69,7 @@ class FileHandlerProvider @Inject constructor(
             t.show()
         }
 
-        if (fh.isStorageFull(utils)) {
+        if (fh.isStorageFull()) {
             val t = Toast.makeText(
                 applicationContext,
                 R.string.storage_full_warning,

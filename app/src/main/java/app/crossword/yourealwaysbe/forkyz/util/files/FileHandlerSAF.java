@@ -20,6 +20,7 @@ import android.util.Log;
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings;
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings;
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation;
+import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils;
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 import app.crossword.yourealwaysbe.puz.io.StreamUtils;
 
@@ -31,6 +32,7 @@ public class FileHandlerSAF extends FileHandler {
     private static final String TO_IMPORT_DONE_NAME = "to-import-done";
     private static final String TO_IMPORT_FAILED_NAME = "to-import-failed";
 
+    private Context context;
     private Uri rootUri;
     private Uri crosswordsFolderUri;
     private Uri archiveFolderUri;
@@ -67,6 +69,7 @@ public class FileHandlerSAF extends FileHandler {
      */
     public FileHandlerSAF(
         Context context,
+        NativeBackendUtils utils,
         Uri rootUri,
         Uri crosswordsFolderUri,
         Uri archiveFolderUri,
@@ -74,7 +77,8 @@ public class FileHandlerSAF extends FileHandler {
         Uri toImportDoneFolderUri,
         Uri toImportFailedFolderUri
     ) {
-        super(context);
+        super(utils);
+        this.context = context;
         this.rootUri = rootUri;
         this.crosswordsFolderUri = crosswordsFolderUri;
         this.archiveFolderUri = archiveFolderUri;
@@ -316,7 +320,7 @@ public class FileHandlerSAF extends FileHandler {
     }
 
     @Override
-    public boolean isStorageFull(AndroidVersionUtils utils) {
+    public boolean isStorageFull() {
         // In general storage size doesn't make sense for SAF (e.g. size
         // of cloud storage). There is a method of getting space [1] for
         // local directories, but it delays start up by about 0.5s,
@@ -353,9 +357,10 @@ public class FileHandlerSAF extends FileHandler {
      */
     public static FileHandlerSAF initialiseSAFForRoot(
         Context applicationContext,
+        NativeBackendUtils utils,
         Uri rootUri
     ) {
-        return initialiseSAFForRoot(applicationContext, rootUri, true);
+        return initialiseSAFForRoot(applicationContext, utils, rootUri, true);
     }
 
     /**
@@ -370,6 +375,7 @@ public class FileHandlerSAF extends FileHandler {
      * settings for readHandlerFromSettings to work
      *
      * @param applicationContext the application context
+     * @param utils native backend utils
      * @param rootUri the root permitted folder for storage
      * @param keepPermission whether to keep access permission to
      * rootUri
@@ -377,6 +383,7 @@ public class FileHandlerSAF extends FileHandler {
      */
     public static FileHandlerSAF initialiseSAFForRoot(
         Context applicationContext,
+        NativeBackendUtils utils,
         Uri rootUri,
         boolean keepPermission
     ) {
@@ -425,6 +432,7 @@ public class FileHandlerSAF extends FileHandler {
 
                 return new FileHandlerSAF(
                     applicationContext,
+                    utils,
                     rootUri,
                     crosswordsFolderUri,
                     archiveFolderUri,
@@ -469,6 +477,7 @@ public class FileHandlerSAF extends FileHandler {
      */
     public static FileHandlerSAF readHandlerFromSettings(
         Context applicationContext,
+        NativeBackendUtils utils,
         FileHandlerSettings fileHandlerSettings,
         ForkyzSettings settings
     ) {
@@ -510,6 +519,7 @@ public class FileHandlerSAF extends FileHandler {
                 ) {
                     fileHandler = new FileHandlerSAF(
                         applicationContext,
+                        utils,
                         rootFolderUri,
                         crosswordsFolderUri,
                         archiveFolderUri,
@@ -535,7 +545,7 @@ public class FileHandlerSAF extends FileHandler {
             && !rootFolder.isEmpty()
         ) {
             fileHandler = initialiseSAFForRoot(
-                applicationContext, Uri.parse(rootFolder)
+                applicationContext, utils, Uri.parse(rootFolder)
             );
             // update settings to good values
             if (fileHandler != null && settings != null) {
@@ -600,7 +610,7 @@ public class FileHandlerSAF extends FileHandler {
     }
 
     private ContentResolver getContentResolver() {
-        return getApplicationContext().getContentResolver();
+        return context.getContentResolver();
     }
 
     public String getMimeType(FileHandle f) {

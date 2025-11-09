@@ -3,18 +3,16 @@ package app.crossword.yourealwaysbe.forkyz.util.files;
 
 import java.io.IOException;
 
-import android.content.Context;
-
+import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils;
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings;
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation;
-import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
 
 /**
  * File storage in the default internal app storage location
  */
 public class FileHandlerInternal extends FileHandlerJavaFile {
-    public FileHandlerInternal(Context applicationContext) {
-        super(applicationContext, applicationContext.getFilesDir());
+    public FileHandlerInternal(NativeBackendUtils utils) {
+        super(utils, utils.getAppFilesDir());
     }
 
     @Override
@@ -36,11 +34,10 @@ public class FileHandlerInternal extends FileHandlerJavaFile {
     }
 
     @Override
-    public boolean isStorageFull(AndroidVersionUtils utils) {
+    public boolean isStorageFull() {
         try {
-            return utils.isInternalStorageFull(
-                getApplicationContext(), MINIMUM_STORAGE_REQUIRED
-            );
+            return getNativeBackendUtils()
+                .isInternalStorageFull(MINIMUM_STORAGE_REQUIRED);
         } catch (IOException e) {
             // we don't know it's not full...
             return false;

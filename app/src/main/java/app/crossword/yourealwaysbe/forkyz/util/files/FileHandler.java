@@ -22,12 +22,11 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
 
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings;
-import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils;
+import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.io.IO;
 import app.crossword.yourealwaysbe.puz.io.IPuzIO;
@@ -70,19 +69,19 @@ public abstract class FileHandler {
     private ExecutorService executorService
         = Executors.newSingleThreadExecutor();
 
-    private Context applicationContext;
+    private NativeBackendUtils utils;
     private MetaCache metaCache;
 
-    protected FileHandler(Context applicationContext) {
-        this.applicationContext = applicationContext;
-        this.metaCache = new MetaCache(applicationContext);
+    protected FileHandler(NativeBackendUtils utils) {
+        this.utils = utils;
+        this.metaCache = utils.getMetaCache();
     }
 
     /**
      * For testing allow a meta cache to be passed in
      */
-    protected FileHandler(Context applicationContext, MetaCache metaCache) {
-        this.applicationContext = applicationContext;
+    protected FileHandler(NativeBackendUtils utils, MetaCache metaCache) {
+        this.utils = utils;
         this.metaCache = metaCache;
     }
 
@@ -92,7 +91,7 @@ public abstract class FileHandler {
     public abstract DirHandle getToImportDoneDirectory();
     public abstract DirHandle getToImportFailedDirectory();
     public abstract boolean isStorageMounted();
-    public abstract boolean isStorageFull(AndroidVersionUtils utils);
+    public abstract boolean isStorageFull();
     public abstract Iterable<FileHandle> listFiles(final DirHandle dir);
     public abstract String getName(FileHandle f);
 
@@ -432,8 +431,8 @@ public abstract class FileHandler {
         return name.substring(0, name.lastIndexOf(".")) + FileHandler.FILE_EXT_FORKYZ;
     }
 
-    protected Context getApplicationContext() {
-        return applicationContext;
+    protected NativeBackendUtils getNativeBackendUtils() {
+        return utils;
     }
 
     /**

@@ -21,6 +21,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.qualifiers.ApplicationContext
 
 import app.crossword.yourealwaysbe.forkyz.R
+import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.util.files.exportStorage
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
@@ -44,10 +45,13 @@ class PuzzleExportService() : Service() {
     lateinit var context : Context
 
     @Inject
-    lateinit var utils : AndroidVersionUtils
+    lateinit var versionUtils : AndroidVersionUtils
 
     @Inject
     lateinit var fileHandlerProvider : FileHandlerProvider
+
+    @Inject
+    lateinit var utils : NativeBackendUtils
 
     override fun onBind(intent : Intent): IBinder? {
         return null
@@ -74,7 +78,7 @@ class PuzzleExportService() : Service() {
             this,
             NOTIFICATION_ID,
             notification,
-            utils.foregroundServiceTypeDataSync(),
+            versionUtils.foregroundServiceTypeDataSync(),
         )
 
         Toast.makeText(
@@ -109,6 +113,7 @@ class PuzzleExportService() : Service() {
                 try {
                     success = exportStorage(
                         context,
+                        utils,
                         fileHandler,
                         uri,
                     )

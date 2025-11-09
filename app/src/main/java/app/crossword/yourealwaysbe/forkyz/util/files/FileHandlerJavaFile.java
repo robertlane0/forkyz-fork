@@ -9,8 +9,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Iterator;
 
-import android.content.Context;
 import android.net.Uri;
+
+import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils;
 
 /**
  * Base implementation of java.io.File-based file access from a given
@@ -20,9 +21,9 @@ public abstract class FileHandlerJavaFile extends FileHandler {
     private File rootDirectory;
 
     public FileHandlerJavaFile(
-        Context applicationContext, File rootDirectory
+        NativeBackendUtils utils, File rootDirectory
     ) {
-        super(applicationContext);
+        super(utils);
         this.rootDirectory = rootDirectory;
     }
 
@@ -30,9 +31,9 @@ public abstract class FileHandlerJavaFile extends FileHandler {
      * For testing purposes, allow a meta cache to be passed in
      */
     public FileHandlerJavaFile(
-        Context applicationContext, MetaCache metaCache, File rootDirectory
+        NativeBackendUtils utils, MetaCache metaCache, File rootDirectory
     ) {
-        super(applicationContext, metaCache);
+        super(utils, metaCache);
         this.rootDirectory = rootDirectory;
     }
 

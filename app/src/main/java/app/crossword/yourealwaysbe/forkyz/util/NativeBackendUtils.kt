@@ -18,6 +18,7 @@ import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerSAF
+import app.crossword.yourealwaysbe.forkyz.util.files.MetaCache
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 
@@ -92,6 +93,7 @@ class NativeBackendUtils @Inject constructor(
     fun initialiseSAFForRoot(uri : Uri) : FileHandler? {
         return FileHandlerSAF.initialiseSAFForRoot(
             applicationContext,
+            this,
             uri,
         )
     }
@@ -102,9 +104,23 @@ class NativeBackendUtils @Inject constructor(
     ) : FileHandler? {
         return FileHandlerSAF.readHandlerFromSettings(
             applicationContext,
+            this,
             fileHandlerSettings,
             settings,
         )
+    }
+
+    fun getMetaCache() : MetaCache {
+        return MetaCache(applicationContext)
+    }
+
+    fun getAppFilesDir() : File {
+        return applicationContext.getFilesDir()
+    }
+
+    @Throws(IOException::class)
+    fun isInternalStorageFull(minimumRequired : Long) : Boolean {
+        return utils.isInternalStorageFull(applicationContext, minimumRequired)
     }
 }
 
