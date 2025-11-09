@@ -3,7 +3,6 @@ package app.crossword.yourealwaysbe.forkyz.util.files
 
 import java.io.IOException
 
-import android.content.Context
 import android.net.Uri
 import android.util.Log
 
@@ -15,7 +14,6 @@ private val TAG = "ForkyzStorageExporter"
 /**
  * Export the files managed by fileHandler to an external uri
  *
- * @param context application context
  * @param fileHandler the file handler managing the source data
  * @param target the uri where the storage will be copied to
  * @return false if failed
@@ -23,19 +21,13 @@ private val TAG = "ForkyzStorageExporter"
  */
 @Throws(IOException::class)
 fun exportStorage(
-    context : Context,
     utils : NativeBackendUtils,
     fileHandler : FileHandler,
     target : Uri,
 ) : Boolean {
     Log.i(TAG, "Exporting storage to " + target)
     Log.i(TAG, "Creating target handler")
-    val targetHandler = FileHandlerSAF.initialiseSAFForRoot(
-        context,
-        utils,
-        target,
-        false
-    )
+    val targetHandler = utils.getTargetFileHandler(target)
     if (targetHandler == null) {
         Log.e(TAG, "Could not create target handler, not exporting.")
         return false

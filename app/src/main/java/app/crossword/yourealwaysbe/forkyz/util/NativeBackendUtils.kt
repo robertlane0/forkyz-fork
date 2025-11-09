@@ -122,5 +122,17 @@ class NativeBackendUtils @Inject constructor(
     fun isInternalStorageFull(minimumRequired : Long) : Boolean {
         return utils.isInternalStorageFull(applicationContext, minimumRequired)
     }
+
+    /**
+     * Get a file handler rooted at uri for export
+     */
+    fun getTargetFileHandler(uri : Uri) : FileHandler? {
+        return FileHandlerSAF.initialiseSAFForRoot(
+            applicationContext,
+            this,
+            uri,
+            false
+        )
+    }
 }
 

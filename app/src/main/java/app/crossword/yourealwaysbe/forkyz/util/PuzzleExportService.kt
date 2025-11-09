@@ -112,7 +112,6 @@ class PuzzleExportService() : Service() {
                 var success = false
                 try {
                     success = exportStorage(
-                        context,
                         utils,
                         fileHandler,
                         uri,
