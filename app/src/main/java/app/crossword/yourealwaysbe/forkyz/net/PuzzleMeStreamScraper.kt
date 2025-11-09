@@ -33,6 +33,8 @@ private val DEOBFUSCATE_TIMEOUT = 30000L
  *      ...
  * >
  *
+ * or from URL similar to Stage 2
+ *
  * Stage 2: get embedded puzzle from
  *  https://cdn2.amuselabs.com/puzzleme/crossword?id=<id>&set=<set>
  *
@@ -44,8 +46,18 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
     companion object {
         private val TAG = "ForkyzPuzzleMeStrmSrpr"
         private val DEFAULT_SOURCE = "PuzzleMe"
+        private val DEFAULT_CDN = "cdn2"
+        private val DEFAULT_SUBDIR = "puzzleme"
         private val STAGE2_URL_FORMAT
-            = "https://cdn2.amuselabs.com/puzzleme/crossword?id=%s&set=%s"
+            = "https://%s.amuselabs.com/%s/crossword?id=%s&set=%s"
+        private val STAGE2_URL_RE = Pattern.compile(
+            "https://(cdn.).amuselabs.com/([^/]*)/crossword[^\"]*"
+                + "id=([^&\"]*)[^\"]*set=([^&\"]*).*"
+        )
+        private val CDN_REGEX = RegexScrape(STAGE2_URL_RE, 1)
+        private val SUBDIR_REGEX = RegexScrape(STAGE2_URL_RE, 2)
+        private val CW_ID_REGEX = RegexScrape(STAGE2_URL_RE, 3)
+        private val CW_SET_REGEX = RegexScrape(STAGE2_URL_RE, 4)
         private val RAWC_REGEX = RegexScrape(
             Pattern.compile("\"rawc\":\\s*\"([^\"]*)\""),
             1,
@@ -87,11 +99,29 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
 
         val div = doc.selectFirst(".pm-embed-div")
 
-        val cwID = div?.attribute("data-id")?.value
-        val cwSet = div?.attribute("data-set")?.value
-        if (cwID == null || cwSet == null)
-            return bis
-        return getInputStream(STAGE2_URL_FORMAT.format(cwID, cwSet))?.use {
+        var cwID = div?.attribute("data-id")?.value
+        var cwSet = div?.attribute("data-set")?.value
+        var cdn = DEFAULT_CDN
+        var subdir = DEFAULT_SUBDIR
+        if (cwID == null || cwSet == null) {
+            val results = regexScrape(
+                bis,
+                arrayOf(CDN_REGEX, SUBDIR_REGEX, CW_ID_REGEX, CW_SET_REGEX),
+            )
+            bis.reset()
+
+            if (results.size == 4) {
+                cdn = results[0]
+                subdir = results[1]
+                cwID = results[2]
+                cwSet = results[3]
+            } else {
+                return bis
+            }
+        }
+        return getInputStream(
+            STAGE2_URL_FORMAT.format(cdn, subdir, cwID, cwSet),
+        )?.use {
             StreamUtils.makeByteArrayInputStream(it)
         } ?: bis
     }

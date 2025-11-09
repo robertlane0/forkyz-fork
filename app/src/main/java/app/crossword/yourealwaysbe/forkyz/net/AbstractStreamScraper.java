@@ -110,7 +110,7 @@ public abstract class AbstractStreamScraper implements StreamScraper {
         for (Element ele : doc.select(selector)) {
             String att = ele.attr(attribute);
             Matcher m = regex.matcher(att);
-            if (m.matches())
+            if (m.find())
                 return m.replaceFirst(extractString);
         }
 
