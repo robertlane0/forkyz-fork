@@ -1,0 +1,3 @@
+Forkyz est un fork non officiel de l'application Shortyz Crosswords apportant plusieurs nouvelles fonctionnalités et compatible avec les versions Android récentes.
+
+De multiples mots croisés peuvent être importés à partir de fichiers ou peuvent être téléchargés et joués. Les importations supportent différents formats de fichiers, y compris AcrossLite (.puz), JPZ et IPuz. Une liste de liens vers les créateurs de mots croisés en ligne est donnée. Les puzzles peuvent également être téléchargés directement en utilisant les téléchargeurs intégrés.
