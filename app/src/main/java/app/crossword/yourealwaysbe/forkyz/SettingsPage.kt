@@ -56,6 +56,7 @@ import androidx.lifecycle.lifecycleScope
 
 import app.crossword.yourealwaysbe.forkyz.theme.ForkyzTopAppBar
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
+import app.crossword.yourealwaysbe.forkyz.util.NativeFrontendUtils
 import app.crossword.yourealwaysbe.forkyz.view.ListDialog
 import app.crossword.yourealwaysbe.forkyz.view.MultiListDialog
 import app.crossword.yourealwaysbe.forkyz.view.OKCancelDialog
@@ -222,18 +223,8 @@ private fun SettingsHeading(
 fun SettingsPage(
     viewModel : SettingsPageViewModel,
     themeHelper : ThemeHelper,
-    onExit : () -> Unit,
-    toast : (String) -> Unit,
-    openHTMLPage : (Int) -> Unit,
-    openLogcatPage : () -> Unit,
-    onBack : () -> Unit,
-    onGetSAFURI : () -> Unit,
-    onExportSettings : () -> Unit,
-    onImportSettings : () -> Unit,
-    onExportPuzzles : () -> Unit,
-    setSAFURICallback : (((Uri) -> Unit)?) -> Unit,
-    setExportSettingsURICallback : (((Uri) -> Unit)?) -> Unit,
-    setImportSettingsURICallback : (((Uri) -> Unit)?) -> Unit,
+    utils : NativeFrontendUtils,
+    pageOpener : PageOpener,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -249,26 +240,26 @@ fun SettingsPage(
             RequestedURI.SAF -> {
                 val msg = stringResource(R.string.storage_select_saf_info)
                 LaunchedEffect(needsURI) {
-                    toast(msg)
-                    onGetSAFURI()
+                    utils.toast(msg)
+                    utils.onGetSAFURI()
                     viewModel.clearNeedsURI()
                 }
             }
             RequestedURI.SETTINGS_EXPORT -> {
                 LaunchedEffect(needsURI) {
-                    onExportSettings()
+                    utils.onExportSettings()
                     viewModel.clearNeedsURI()
                 }
             }
             RequestedURI.SETTINGS_IMPORT -> {
                 LaunchedEffect(needsURI) {
-                    onImportSettings()
+                    utils.onImportSettings()
                     viewModel.clearNeedsURI()
                 }
             }
             RequestedURI.PUZZLES_EXPORT -> {
                 LaunchedEffect(needsURI) {
-                    onExportPuzzles()
+                    utils.onExportPuzzles()
                     viewModel.clearNeedsURI()
                 }
             }
@@ -283,7 +274,7 @@ fun SettingsPage(
         val messages by viewModel.messages.collectAsStateWithLifecycle()
         val msgStrings = messages.map { stringResource(it) }
         LaunchedEffect(msgStrings) {
-            msgStrings.forEach(toast)
+            msgStrings.forEach(utils::toast)
             viewModel.clearMessages()
         }
     }
@@ -292,7 +283,7 @@ fun SettingsPage(
         if (viewModel.state.value.hasBackStack)
             viewModel.popState()
         else
-            onBack()
+            pageOpener.onBack()
     }
 
     @Composable
@@ -383,7 +374,9 @@ fun SettingsPage(
                             title = title,
                             summary = summary,
                             errorMsg = errorMsg?.value,
-                            onClick = { openHTMLPage(item.rawAssetID) },
+                            onClick = {
+                                pageOpener.openHTMLPage(item.rawAssetID)
+                            },
                         )
                     }
                     is SettingsAction -> {
@@ -401,7 +394,7 @@ fun SettingsPage(
                             title = title,
                             summary = summary,
                             errorMsg = errorMsg?.value,
-                            onClick = openLogcatPage,
+                            onClick = { pageOpener.openLogcatPage() },
                         )
                     }
                     else -> { } /* ignore */
@@ -418,9 +411,9 @@ fun SettingsPage(
             text = {
                 Text(stringResource(R.string.storage_changed_please_restart))
             },
-            onDismissRequest = onExit,
+            onDismissRequest = utils::onExit,
             confirmButton = {
-                TextButton(onClick = onExit) {
+                TextButton(onClick = utils::onExit) {
                     Text(stringResource(R.string.exit))
                 }
             },
@@ -569,17 +562,17 @@ fun SettingsPage(
     val failedToInitialiseSAF
         = stringResource(R.string.failed_to_initialise_saf)
     DisposableEffect(Unit) {
-        setSAFURICallback { uri ->
+        utils.setSAFURICallback { uri ->
             if (!viewModel.setNewExternalStorageSAFURI(uri))
-                toast(failedToInitialiseSAF)
+                utils.toast(failedToInitialiseSAF)
         }
-        setExportSettingsURICallback(viewModel::exportSettings)
-        setImportSettingsURICallback(viewModel::importSettings)
+        utils.setExportSettingsURICallback(viewModel::exportSettings)
+        utils.setImportSettingsURICallback(viewModel::importSettings)
 
         onDispose {
-            setSAFURICallback(null)
-            setExportSettingsURICallback(null)
-            setImportSettingsURICallback(null)
+            utils.setSAFURICallback(null)
+            utils.setExportSettingsURICallback(null)
+            utils.setImportSettingsURICallback(null)
         }
     }
 

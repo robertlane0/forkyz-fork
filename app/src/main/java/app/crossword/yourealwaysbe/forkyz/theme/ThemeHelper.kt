@@ -4,9 +4,6 @@ package app.crossword.yourealwaysbe.forkyz.theme
 import javax.inject.Inject
 import javax.inject.Singleton
 
-import android.app.Activity
-import android.app.Application
-import android.content.res.Configuration
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material3.ExperimentalMaterial3Api

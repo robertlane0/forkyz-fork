@@ -96,6 +96,8 @@ import app.crossword.yourealwaysbe.forkyz.settings.AccessorSetting
 import app.crossword.yourealwaysbe.forkyz.settings.BrowseSwipeAction
 import app.crossword.yourealwaysbe.forkyz.settings.DayNightMode
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
+import app.crossword.yourealwaysbe.forkyz.util.NativeFrontendUtils
+import app.crossword.yourealwaysbe.forkyz.util.NativeImportFinishedResult
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.view.CircleProgressBar
 import app.crossword.yourealwaysbe.forkyz.view.DownloadDialog
@@ -103,47 +105,23 @@ import app.crossword.yourealwaysbe.forkyz.view.OKCancelDialog
 import app.crossword.yourealwaysbe.forkyz.view.OKDialog
 import app.crossword.yourealwaysbe.forkyz.view.RatingBar
 import app.crossword.yourealwaysbe.forkyz.view.SearchBar
-import app.crossword.yourealwaysbe.forkyz.view.TwoButtonDialog
-
-import app.crossword.yourealwaysbe.forkyz.view.rememberSwipeToDismissBoxState
 import app.crossword.yourealwaysbe.forkyz.view.SwipeToDismissBox
 import app.crossword.yourealwaysbe.forkyz.view.SwipeToDismissBoxValue
+import app.crossword.yourealwaysbe.forkyz.view.TwoButtonDialog
+import app.crossword.yourealwaysbe.forkyz.view.rememberSwipeToDismissBoxState
 
 private val DATE_FORMAT = DateTimeFormatter.ofPattern("EEEE\ndd MMM\nyyyy")
 private val HORIZONTAL_PADDING = 16.dp
 private val FAB_OPEN_ANGLE = 45F
 private val MIN_PUZZLE_ITEM_HEIGHT = 72.dp
 
-/**
- * Browse page
- *
- * @param openAppSettings open the native application (e.g. Android)
- * settings
- * @param openSettingsPage open the Forkyz settings page
- */
 @OptIn(ExperimentalMaterial3Api::class,ExperimentalAnimationApi::class)
 @Composable
 fun BrowsePage(
     viewModel : BrowsePageViewModel,
     themeHelper : ThemeHelper,
-    toast : (String) -> Unit,
-    openAppSettings : () -> Unit,
-    openHTMLPage : (Int) -> Unit,
-    openOnlineSources : () -> Unit,
-    openPlayPage : () -> Unit,
-    openReleaseNotes : () -> Unit,
-    openSettingsPage : () -> Unit,
-    getPendingImports : (() -> Collection<Uri>),
-    clearPendingImports : (() -> Unit),
-    onBack : () -> Unit,
-    onCheckAndWarnNetworkState : () -> Unit,
-    onCheckRequestNotificationPermissions : () -> Unit,
-    onImport : () -> Unit,
-    onImportFinish : (ImportFinishResult) -> Unit,
-    onExit : () -> Unit,
-    setOnImportCompleteCallback : (((Boolean) -> Unit)?) -> Unit,
-    setOnImportURIsCallback : (((Collection<Uri>) -> Unit)?) -> Unit,
-    setOnNotificationPermissionDeniedCallback : ((() -> Unit)?) -> Unit,
+    utils : NativeFrontendUtils,
+    pageOpener : PageOpener,
 ) {
     fun startLoadPuzzleList(archive : Boolean) {
         viewModel.startLoadPuzzleList(archive)
@@ -154,9 +132,9 @@ fun BrowsePage(
     }
 
     fun showDownloadDialog() {
-        onCheckAndWarnNetworkState()
+        utils.onCheckAndWarnNetworkState()
         if (viewModel.uiState.value.isNotificationPermissionNeeded)
-            onCheckRequestNotificationPermissions()
+            utils.onCheckRequestNotificationPermissions()
 
         viewModel.showDownloadDialog()
     }
@@ -168,7 +146,7 @@ fun BrowsePage(
         LaunchedEffect(loadEvent) {
             if (loadEvent) {
                 viewModel.clearPuzzleLoaded()
-                openPlayPage()
+                pageOpener.openPlayPage()
             }
         }
 
@@ -186,19 +164,23 @@ fun BrowsePage(
         }
         LaunchedEffect(needsNotificationCheck) {
             if (needsNotificationCheck)
-                onCheckRequestNotificationPermissions()
+                utils.onCheckRequestNotificationPermissions()
         }
 
         val toasts by viewModel.toastMessages.collectAsStateWithLifecycle()
         LaunchedEffect(toasts) {
-            toasts.forEach(toast)
+            toasts.forEach(utils::toast)
             viewModel.clearToastMessages()
         }
 
         val importFinishResult
             by viewModel.importFinishResult.collectAsStateWithLifecycle()
         LaunchedEffect(importFinishResult) {
-            importFinishResult?.let(onImportFinish)
+            importFinishResult?.let {
+                utils.onImportFinish(
+                    NativeImportFinishedResult(it.someFailed, it.someSucceeded)
+                )
+            }
         }
     }
 
@@ -270,7 +252,7 @@ fun BrowsePage(
     @Composable
     fun OnlineSourcesButton(close : () -> Unit) {
         SpeedDialButton(
-            onClick = openOnlineSources,
+            onClick = { pageOpener.openOnlineSources() },
             labelContent = { Text(stringResource(R.string.online_sources)) },
             painter = painterResource(R.drawable.ic_online_sources),
             contentDescription = stringResource(R.string.online_sources),
@@ -281,7 +263,7 @@ fun BrowsePage(
     @Composable
     fun ImportPuzzlesButton(close : () -> Unit) {
         SpeedDialButton(
-            onClick = onImport,
+            onClick = utils::onImport,
             labelContent = { Text(stringResource(R.string.import_puzzle)) },
             painter = painterResource(R.drawable.ic_import),
             contentDescription = stringResource(R.string.import_puzzle),
@@ -438,11 +420,11 @@ fun BrowsePage(
             MenuCleanup()
             MenuSwitchLists()
             MenuHelp(
-                openHelp = { openHTMLPage(R.raw.filescreen) },
+                openHelp = { pageOpener.openHTMLPage(R.raw.filescreen) },
                 onDismiss = viewModel::dismissMenu,
             )
             MenuSettings(
-                openSettings = openSettingsPage,
+                openSettings = { pageOpener.openSettingsPage() },
                 onDismiss = viewModel::dismissMenu,
             )
         }
@@ -858,7 +840,7 @@ fun BrowsePage(
             onPositive = viewModel::disableNotifications,
             negativeText = R.string.android_app_settings_button,
             onNegative = {
-                openAppSettings()
+                utils.openAppSettings()
                 viewModel.dismissNotificationsDialog()
             },
         )
@@ -875,7 +857,7 @@ fun BrowsePage(
             summary = stringResource(R.string.new_version_message),
             positiveText = stringResource(R.string.view_release_notes),
             onPositive = {
-                openReleaseNotes()
+                pageOpener.openReleaseNotes()
                 viewModel.flagSeenCurrentVersion()
             },
             negativeText = stringResource(R.string.close),
@@ -948,7 +930,7 @@ fun BrowsePage(
                 onDownload = viewModel::okDownloadDialog,
                 onOpenSettings = {
                     viewModel.clearDownloadDialog()
-                    openSettingsPage()
+                    pageOpener.openSettingsPage()
                 },
             )
         }
@@ -965,7 +947,7 @@ fun BrowsePage(
                     else
                         R.string.import_failure_long
                 ),
-                onClose = onExit,
+                onClose = utils::onExit,
             )
         }
     }
@@ -979,7 +961,7 @@ fun BrowsePage(
                     if (isSelecting)
                         viewModel.clearSelection()
                     else
-                        onBack()
+                        pageOpener.onBack()
                 }
                 return true
             }
@@ -992,24 +974,24 @@ fun BrowsePage(
         viewModel.autoDownloadIfRequired()
         viewModel.processToImportDirectory()
 
-        val uris = getPendingImports()
+        val uris = utils.getPendingImports()
         if (!uris.isEmpty()) {
-            clearPendingImports()
+            utils.clearPendingImports()
             viewModel.importURIsAndFinish(uris)
         }
     }
 
     DisposableEffect(Unit) {
-        setOnImportCompleteCallback(viewModel::setImportedNowExitResult)
-        setOnImportURIsCallback(viewModel::importURIs)
-        setOnNotificationPermissionDeniedCallback(
+        utils.setOnImportCompleteCallback(viewModel::setImportedNowExitResult)
+        utils.setOnImportURIsCallback(viewModel::importURIs)
+        utils.setOnNotificationPermissionDeniedCallback(
             viewModel::flagNotificationPermissionsDenied
         )
 
         onDispose {
-            setOnImportCompleteCallback(null)
-            setOnImportURIsCallback(null)
-            setOnNotificationPermissionDeniedCallback(null)
+            utils.setOnImportCompleteCallback(null)
+            utils.setOnImportURIsCallback(null)
+            utils.setOnNotificationPermissionDeniedCallback(null)
         }
     }
 

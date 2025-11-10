@@ -57,14 +57,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 import com.squareup.seismic.ShakeDetector
 
-import app.crossword.yourealwaysbe.forkyz.exttools.AppNotFoundException
-import app.crossword.yourealwaysbe.forkyz.exttools.ExternalToolData
 import app.crossword.yourealwaysbe.forkyz.menu.BaseMenuModifier
 import app.crossword.yourealwaysbe.forkyz.menu.MenuText
 import app.crossword.yourealwaysbe.forkyz.settings.FitToScreenMode
 import app.crossword.yourealwaysbe.forkyz.settings.GridRatio
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
-import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
+import app.crossword.yourealwaysbe.forkyz.util.NativeFrontendUtils
 import app.crossword.yourealwaysbe.forkyz.util.letterOrDigitKeyToChar
 import app.crossword.yourealwaysbe.forkyz.view.BoardEdit
 import app.crossword.yourealwaysbe.forkyz.view.ClueTabs
@@ -80,65 +78,21 @@ private val ACROSTIC_BOARD_HEIGHT_RATIO_MIN = 0.25F
 // max width of board in landscape / acrostic
 private val ACROSTIC_BOARD_WIDTH_RATIO_MAX = 0.7F
 
-/**
- * Main play page
- *
- * @param startShakeDetector start shake detection with hear shake
- * callback
- * @param stopShakeDetector stop shake detection
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlayPage(
     viewModel : PlayPageViewModel,
     themeHelper : ThemeHelper,
-    inputConnectionMediator : InputConnectionMediator,
-    displayWidth : Int,
-    displayHeight : Int,
-    isPortrait : Boolean,
-    openNotesPage : (ClueID?) -> Unit,
-    openClueListPage : () -> Unit,
-    openHTMLPage : (Int) -> Unit,
-    openSettingsPage : () -> Unit,
-    openURI : (Uri) -> Unit,
-    onFinish : () -> Unit,
-    onBack : () -> Unit,
-    toast : (String) -> Unit,
-    handleExternalToolEvent : (ExternalToolData) -> Unit,
-    setOnAppNotFoundCallback : (((AppNotFoundException) -> Unit)?) -> Unit,
-    setStatusBarColor : (Color) -> Unit,
-    setOnVoiceCommandCallback : (((List<String>?) -> Unit)?) -> Unit,
-    launchVoiceInput : () -> Unit,
-    announce : (AnnounceData) -> Unit,
-    onSetFullScreen : () -> Unit,
-    startShakeDetector : (() -> Unit) -> Unit,
-    stopShakeDetector : () -> Unit,
-    resumeShakeDetector : () -> Unit,
-    pauseShakeDetector : () -> Unit,
+    utils : NativeFrontendUtils,
+    pageOpener : PageOpener,
 ) {
     val boardEditState = rememberBoardEditState()
 
     PuzzlePage(
         viewModel = viewModel,
         themeHelper = themeHelper,
-        inputConnectionMediator = inputConnectionMediator,
-        displayWidth = displayWidth,
-        displayHeight = displayHeight,
-        isPortrait = isPortrait,
-        openClueListPage = openClueListPage,
-        openNotesPage = openNotesPage,
-        openHTMLPage = openHTMLPage,
-        openSettingsPage = openSettingsPage,
-        openURI = openURI,
-        onFinish = onFinish,
-        onBack = onBack,
-        toast = toast,
-        handleExternalToolEvent = handleExternalToolEvent,
-        setOnAppNotFoundCallback = setOnAppNotFoundCallback,
-        setStatusBarColor = setStatusBarColor,
-        setOnVoiceCommandCallback = setOnVoiceCommandCallback,
-        launchVoiceInput = launchVoiceInput,
-        announce = announce,
+        utils = utils,
+        pageOpener = pageOpener,
     ) {
         fun toggleShowClueTabs() {
             val isShowing = viewModel.playUIState.value?.showClueTabs ?: false
@@ -157,11 +111,11 @@ fun PlayPage(
             }
             LaunchedEffect(isRandomClueOnShake) {
                 if (state.isRandomClueOnShake) {
-                    startShakeDetector {
+                    utils.startShakeDetector {
                         viewModel.pickRandomUnfilledClue()
                     }
                 } else {
-                    stopShakeDetector()
+                    utils.stopShakeDetector()
                 }
             }
 
@@ -183,7 +137,7 @@ fun PlayPage(
             }
             LaunchedEffect(isFullScreen) {
                 if (isFullScreen)
-                    onSetFullScreen()
+                    utils.onSetFullScreen()
             }
         }
 
@@ -395,7 +349,7 @@ fun PlayPage(
                 modifier = modifier,
                 textMeasurer = textMeasurer,
                 viewModel = viewModel.clueTabsViewModel,
-                isPortrait = isPortrait,
+                isPortrait = utils.isPortrait,
                 showAllWords = showAllWords,
                 onClueClick = viewModel::clickClue,
                 onClueClickDescription = stringResource(R.string.select_clue),
@@ -425,7 +379,7 @@ fun PlayPage(
 
             BoardEdit(
                 modifier = modifier,
-                inputConnectionMediator = inputConnectionMediator,
+                inputConnectionMediator = utils.inputConnectionMediator,
                 state = boardEditState,
                 viewModel = viewModel.boardEditViewModel,
                 colors = boardColorScheme,
@@ -474,7 +428,8 @@ fun PlayPage(
             }
 
             val desiredHeight = if (isAcrostic) {
-                val minHeight = ACROSTIC_BOARD_HEIGHT_RATIO_MIN * displayHeight
+                val minHeight
+                    = ACROSTIC_BOARD_HEIGHT_RATIO_MIN * utils.displayHeight
                 val aspectHeight = width / aspect
                 max(minHeight.dp, aspectHeight)
             } else if (showClueTabs) {
@@ -483,10 +438,10 @@ fun PlayPage(
                 }
                 when (portraitGridRatio) {
                     GridRatio.GR_ONE_TO_ONE -> width
-                    GridRatio.GR_THIRTY_PCNT -> fracDp(0.3, displayHeight)
-                    GridRatio.GR_FORTY_PCNT -> fracDp(0.4, displayHeight)
-                    GridRatio.GR_FIFTY_PCNT -> fracDp(0.5, displayHeight)
-                    GridRatio.GR_SIXTY_PCNT -> fracDp(0.6, displayHeight)
+                    GridRatio.GR_THIRTY_PCNT -> fracDp(0.3, utils.displayHeight)
+                    GridRatio.GR_FORTY_PCNT -> fracDp(0.4, utils.displayHeight)
+                    GridRatio.GR_FIFTY_PCNT -> fracDp(0.5, utils.displayHeight)
+                    GridRatio.GR_SIXTY_PCNT -> fracDp(0.6, utils.displayHeight)
                     else -> width / aspect
                 }
             } else {
@@ -511,7 +466,7 @@ fun PlayPage(
 
             if (isAcrostic) {
                 val maxWidth = (
-                    ACROSTIC_BOARD_WIDTH_RATIO_MAX * displayWidth
+                    ACROSTIC_BOARD_WIDTH_RATIO_MAX * utils.displayWidth
                 ).toInt().dp
                 return this.aspectRatio(aspect).widthIn(max=maxWidth)
             } else if (showClueTabs) {
@@ -692,7 +647,7 @@ fun PlayPage(
 
         @Composable
         fun ActivityBody(modifier : Modifier) {
-            if (isPortrait)
+            if (utils.isPortrait)
                 ActivityBodyPortrait(modifier)
             else
                 ActivityBodyLandscape(modifier)
@@ -701,9 +656,9 @@ fun PlayPage(
         }
 
         LifecycleResumeEffect(Unit) {
-            resumeShakeDetector()
+            utils.resumeShakeDetector()
             onPauseOrDispose {
-                pauseShakeDetector()
+                utils.pauseShakeDetector()
                 viewModel.saveScale(boardEditState.scale)
             }
         }

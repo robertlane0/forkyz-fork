@@ -68,8 +68,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 
-import app.crossword.yourealwaysbe.forkyz.exttools.AppNotFoundException
-import app.crossword.yourealwaysbe.forkyz.exttools.ExternalToolData
 import app.crossword.yourealwaysbe.forkyz.menu.BaseMenuModifier
 import app.crossword.yourealwaysbe.forkyz.menu.MenuDropdownHeading
 import app.crossword.yourealwaysbe.forkyz.menu.MenuHelp
@@ -81,7 +79,7 @@ import app.crossword.yourealwaysbe.forkyz.settings.RenderSettings
 import app.crossword.yourealwaysbe.forkyz.theme.BoardColorScheme
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer
-import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
+import app.crossword.yourealwaysbe.forkyz.util.NativeFrontendUtils
 import app.crossword.yourealwaysbe.forkyz.view.ChooseFlagColorDialog
 import app.crossword.yourealwaysbe.forkyz.view.ForkyzKeyboard
 import app.crossword.yourealwaysbe.forkyz.view.OKCancelDialog
@@ -108,16 +106,8 @@ private val TAG = "ForkyzPuzzlePage"
 class PuzzlePageScope(
     private val viewModel : PuzzlePageViewModel,
     private val themeHelper : ThemeHelper,
-    private val inputConnectionMediator : InputConnectionMediator,
-    private val displayWidth : Int,
-    private val displayHeight : Int,
-    private val isPortrait : Boolean,
-    private val openHTMLPage : (Int) -> Unit,
-    private val openSettingsPage : () -> Unit,
-    private val openURI : (Uri) -> Unit,
-    private val onBack : () -> Unit,
-    private val setStatusBarColor : (Color) -> Unit,
-    private val launchVoiceInput : () -> Unit,
+    private val utils : NativeFrontendUtils,
+    private val pageOpener : PageOpener,
 ) {
     val isVolumeDownActivatesVoicePref : Boolean
         get() {
@@ -176,7 +166,7 @@ class PuzzlePageScope(
         // for older devices where Compose doesn't draw over status bar
         // for some reason
         LaunchedEffect(color) {
-            setStatusBarColor(color)
+            utils.setStatusBarColor(color)
         }
 
         return this.background(color).statusBarsPadding()
@@ -225,7 +215,7 @@ class PuzzlePageScope(
         return when (event.key) {
             Key.Escape -> {
                 if (event.type == KeyEventType.KeyUp)
-                    onBack()
+                    pageOpener.onBack()
                 return true
             }
             Key.Equals -> {
@@ -238,7 +228,7 @@ class PuzzlePageScope(
             Key.VolumeDown -> {
                 if (isVolumeDownActivatesVoicePref) {
                     if (event.type == KeyEventType.KeyUp)
-                        launchVoiceInput()
+                        utils.launchVoiceInput()
                     true
                 } else false
             }
@@ -278,7 +268,7 @@ class PuzzlePageScope(
                     FilledIconButton(
                         modifier = Modifier.padding(horizontal=10.dp)
                             .width(50.dp),
-                        onClick = { launchVoiceInput() },
+                        onClick = { utils.launchVoiceInput() },
                     ) {
                         Icon(
                             modifier = Modifier.width(50.dp),
@@ -324,12 +314,12 @@ class PuzzlePageScope(
         LaunchedEffect(state.needsRefresh) {
             if (state.needsRefresh) {
                 if (state.visibility == KeyboardVisibility.NATIVE) {
-                    inputConnectionMediator.showNative(state.forceCaps)
+                    utils.inputConnectionMediator.showNative(state.forceCaps)
                 } else {
-                    inputConnectionMediator.hideNative()
+                    utils.inputConnectionMediator.hideNative()
                 }
                 if (state.visibility == KeyboardVisibility.FORKYZ) {
-                    inputConnectionMediator.focusReceiver()
+                    utils.inputConnectionMediator.focusReceiver()
                 }
                 viewModel.markKeyboardRefreshed()
             }
@@ -339,8 +329,8 @@ class PuzzlePageScope(
             ForkyzKeyboard(
                 modifier = Modifier.fillMaxWidth()
                     .background(MaterialTheme.colorScheme.surface),
-                inputConnection
-                    = inputConnectionMediator.forkyzKeyboardInputConnection,
+                inputConnection = utils.inputConnectionMediator
+                    .forkyzKeyboardInputConnection,
                 onHideClick = { viewModel.hideKeyboard(true) },
                 onSpecialKeyDown = onSpecialKeyDown,
                 onSpecialKeyUp = onSpecialKeyUp,
@@ -941,7 +931,7 @@ class PuzzlePageScope(
     @Composable
     fun MenuHelp() {
         MenuHelp(
-            openHelp = { openHTMLPage(R.raw.play) },
+            openHelp = { pageOpener.openHTMLPage(R.raw.play) },
             onDismiss = viewModel::dismissMenu,
         )
     }
@@ -949,7 +939,7 @@ class PuzzlePageScope(
     @Composable
     fun MenuSettings() {
         MenuSettings(
-            openSettings = openSettingsPage,
+            openSettings = { pageOpener.openSettingsPage() },
             onDismiss = viewModel::dismissMenu,
         )
     }
@@ -977,20 +967,20 @@ class PuzzlePageScope(
     }
 
     fun doExitPage() {
-        inputConnectionMediator.clearReceiver()
-        onBack()
+        utils.inputConnectionMediator.clearReceiver()
+        pageOpener.onBack()
     }
 
     private fun actionSupportSource() {
         viewModel.supportURL?.let { url ->
-            openURI(url.toUri())
+            utils.openURI(url.toUri())
         }
     }
 
     private fun openShareUrl() {
         viewModel.shareURL?.let { url ->
             if (!url.isEmpty()) {
-                openURI(url.toUri())
+                utils.openURI(url.toUri())
             }
         }
     }
@@ -1000,24 +990,8 @@ class PuzzlePageScope(
 fun PuzzlePage(
     viewModel : PuzzlePageViewModel,
     themeHelper : ThemeHelper,
-    inputConnectionMediator : InputConnectionMediator,
-    displayWidth : Int,
-    displayHeight : Int,
-    isPortrait : Boolean,
-    openClueListPage : () -> Unit,
-    openNotesPage : (ClueID?) -> Unit,
-    openHTMLPage : (Int) -> Unit,
-    openSettingsPage : () -> Unit,
-    openURI : (Uri) -> Unit,
-    onFinish : () -> Unit,
-    onBack : () -> Unit,
-    toast : (String) -> Unit,
-    handleExternalToolEvent : (ExternalToolData) -> Unit,
-    setOnAppNotFoundCallback : (((AppNotFoundException) -> Unit)?) -> Unit,
-    setStatusBarColor : (Color) -> Unit,
-    launchVoiceInput : () -> Unit,
-    setOnVoiceCommandCallback : (((List<String>?) -> Unit)?) -> Unit,
-    announce : (AnnounceData) -> Unit,
+    utils : NativeFrontendUtils,
+    pageOpener : PageOpener,
     body : @Composable PuzzlePageScope.() -> Unit,
 ) {
     /**
@@ -1029,7 +1003,7 @@ fun PuzzlePage(
             by viewModel.announceEvent.collectAsStateWithLifecycle()
         LaunchedEffect(announcement) {
             announcement?.let { data ->
-                announce(data)
+                utils.announce(data.message)
                 viewModel.clearAnnounceEvent()
             }
         }
@@ -1037,7 +1011,7 @@ fun PuzzlePage(
             by viewModel.openClueListEvent.collectAsStateWithLifecycle()
         LaunchedEffect(openClueList) {
             if (openClueList) {
-                openClueListPage()
+                pageOpener.openClueListPage()
                 viewModel.clearOpenClueListEvent()
             }
         }
@@ -1045,7 +1019,7 @@ fun PuzzlePage(
             by viewModel.openNotesEvent.collectAsStateWithLifecycle()
         LaunchedEffect(openNotes) {
             openNotes?.let { openNotes ->
-                openNotesPage(openNotes.clueID)
+                pageOpener.openNotesPage(openNotes.clueID)
                 viewModel.clearOpenNotesEvent()
             }
         }
@@ -1053,21 +1027,21 @@ fun PuzzlePage(
             by viewModel.externalToolEvent.collectAsStateWithLifecycle()
         LaunchedEffect(externalTool) {
             externalTool?.let { tool ->
-                handleExternalToolEvent(tool)
+                utils.handleExternalToolEvent(tool)
                 viewModel.clearExternalToolEvent()
             }
         }
         val sendToast by viewModel.sendToastEvent.collectAsStateWithLifecycle()
         LaunchedEffect(sendToast) {
             sendToast?.let {
-                toast(it.text)
+                utils.toast(it.text)
                 viewModel.clearSendToast()
             }
         }
         val backEvent by viewModel.backEvent.collectAsStateWithLifecycle()
         LaunchedEffect(backEvent) {
             if (backEvent) {
-                onBack()
+                pageOpener.onBack()
                 viewModel.clearBackEvent()
             }
         }
@@ -1190,7 +1164,7 @@ fun PuzzlePage(
                 negativeText= stringResource(R.string.website),
                 onNegative = {
                     viewModel.clearAppNotFoundDialog()
-                    openURI(appNotFoundDialogState.appURL.toUri())
+                    utils.openURI(appNotFoundDialogState.appURL.toUri())
                 },
                 positiveText = stringResource(android.R.string.ok),
                 onPositive = viewModel::clearAppNotFoundDialog,
@@ -1212,7 +1186,7 @@ fun PuzzlePage(
         if (viewModel.keyboardState.value.hideOnBack)
             viewModel.hideKeyboard(true)
         else
-            onBack()
+            pageOpener.onBack()
     }
 
     @OptIn(ExperimentalComposeUiApi::class)
@@ -1233,32 +1207,24 @@ fun PuzzlePage(
         PuzzlePageScope(
             viewModel = viewModel,
             themeHelper = themeHelper,
-            inputConnectionMediator = inputConnectionMediator,
-            displayWidth = displayWidth,
-            displayHeight = displayHeight,
-            isPortrait = isPortrait,
-            openHTMLPage = openHTMLPage,
-            openSettingsPage = openSettingsPage,
-            openURI = openURI,
-            onBack = ::doBackAction,
-            setStatusBarColor = setStatusBarColor,
-            launchVoiceInput = launchVoiceInput,
+            utils = utils,
+            pageOpener = pageOpener,
         )
     }
 
     DisposableEffect(Unit) {
-        setOnVoiceCommandCallback(viewModel::dispatchVoiceCommand)
-        setOnAppNotFoundCallback(viewModel::handleAppNotFoundException)
+        utils.setOnVoiceCommandCallback(viewModel::dispatchVoiceCommand)
+        utils.setOnAppNotFoundCallback(viewModel::handleAppNotFoundException)
         onDispose {
-            setOnVoiceCommandCallback(null)
-            setOnAppNotFoundCallback(null)
+            utils.setOnVoiceCommandCallback(null)
+            utils.setOnAppNotFoundCallback(null)
         }
     }
 
     LifecycleResumeEffect(Unit) {
         if (!viewModel.canResume) {
             Log.i(TAG, "No puzzle board, puzzle activity finishing.")
-            onFinish()
+            utils.onFinish()
         }
         viewModel.startTimer()
 

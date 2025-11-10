@@ -37,13 +37,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
-import app.crossword.yourealwaysbe.forkyz.exttools.AppNotFoundException
-import app.crossword.yourealwaysbe.forkyz.exttools.ExternalToolData
-import app.crossword.yourealwaysbe.forkyz.exttools.ExternalToolLauncher
 import app.crossword.yourealwaysbe.forkyz.menu.BaseMenuModifier
 import app.crossword.yourealwaysbe.forkyz.menu.MenuText
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
-import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
+import app.crossword.yourealwaysbe.forkyz.util.NativeFrontendUtils
 import app.crossword.yourealwaysbe.forkyz.util.letterOrDigitKeyToChar
 import app.crossword.yourealwaysbe.forkyz.view.BoxInputState
 import app.crossword.yourealwaysbe.forkyz.view.ClueTabs
@@ -58,46 +55,14 @@ import app.crossword.yourealwaysbe.puz.MovementStrategy
 fun ClueListPage(
     viewModel : ClueListPageViewModel,
     themeHelper : ThemeHelper,
-    inputConnectionMediator : InputConnectionMediator,
-    displayWidth : Int,
-    displayHeight : Int,
-    isPortrait : Boolean,
-    openClueListPage : () -> Unit,
-    openNotesPage : (ClueID?) -> Unit,
-    openHTMLPage : (Int) -> Unit,
-    openSettingsPage : () -> Unit,
-    openURI : (Uri) -> Unit,
-    onFinish : () -> Unit,
-    onBack : () -> Unit,
-    toast : (String) -> Unit,
-    handleExternalToolEvent : (ExternalToolData) -> Unit,
-    setOnAppNotFoundCallback : (((AppNotFoundException) -> Unit)?) -> Unit,
-    setStatusBarColor : (Color) -> Unit,
-    setOnVoiceCommandCallback : (((List<String>?) -> Unit)?) -> Unit,
-    launchVoiceInput : () -> Unit,
-    announce : (AnnounceData) -> Unit,
+    utils : NativeFrontendUtils,
+    pageOpener : PageOpener,
 ) {
     PuzzlePage(
         viewModel = viewModel,
         themeHelper = themeHelper,
-        inputConnectionMediator = inputConnectionMediator,
-        displayWidth = displayWidth,
-        displayHeight = displayHeight,
-        isPortrait = isPortrait,
-        openClueListPage = openClueListPage,
-        openNotesPage = openNotesPage,
-        openHTMLPage = openHTMLPage,
-        openSettingsPage = openSettingsPage,
-        openURI = openURI,
-        onFinish = onFinish,
-        onBack = onBack,
-        toast = toast,
-        handleExternalToolEvent = handleExternalToolEvent,
-        setOnAppNotFoundCallback = setOnAppNotFoundCallback,
-        setStatusBarColor = setStatusBarColor,
-        setOnVoiceCommandCallback = setOnVoiceCommandCallback,
-        launchVoiceInput = launchVoiceInput,
-        announce = announce,
+        utils = utils,
+        pageOpener = pageOpener,
     ) {
         val textMeasurer = rememberBoardTextMeasurer()
 
@@ -219,7 +184,7 @@ fun ClueListPage(
                 modifier = modifier,
                 textMeasurer = textMeasurer,
                 viewModel = viewModel.clueTabsViewModel,
-                isPortrait = isPortrait,
+                isPortrait = utils.isPortrait,
                 onClueClick = viewModel::clueClick,
                 onClueClickDescription = stringResource(R.string.select_clue),
                 onClueLongClick = { cid ->
@@ -248,7 +213,7 @@ fun ClueListPage(
                         textMeasurer = textMeasurer,
                         maxWidth = boardMaxWidth,
                         state = boxInputState,
-                        inputConnectionMediator = inputConnectionMediator,
+                        inputConnectionMediator = utils.inputConnectionMediator,
                         colors = themeHelper.getBoardColorScheme(),
                         viewModel = viewModel.wordEditViewModel,
                         onTap = { row, col ->

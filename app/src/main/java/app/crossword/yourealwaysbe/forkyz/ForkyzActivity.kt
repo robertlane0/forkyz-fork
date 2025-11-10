@@ -43,22 +43,16 @@ import app.crossword.yourealwaysbe.forkyz.exttools.ExternalToolLauncher
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
+import app.crossword.yourealwaysbe.forkyz.util.NativeFrontendUtils
+import app.crossword.yourealwaysbe.forkyz.util.NativeImportFinishedResult
 import app.crossword.yourealwaysbe.forkyz.util.NightModeHelper
 import app.crossword.yourealwaysbe.forkyz.util.OrientationHelper
 import app.crossword.yourealwaysbe.forkyz.util.PuzzleExportService
+import app.crossword.yourealwaysbe.forkyz.util.ShareFileData
 import app.crossword.yourealwaysbe.forkyz.util.SpeechContract
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 
 private val TAG = "ForkyzActivity"
-
-/**
- * Data for sharing a file using Android share
- */
-data class ShareFileData(
-    val title : String,
-    val uri : Uri,
-    val mimeType : String,
-)
 
 /**
  * Notification that intent imports have finished
@@ -122,7 +116,7 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
     lateinit var orientationHelper : OrientationHelper
 
     @Inject
-    lateinit var utils : AndroidVersionUtils
+    lateinit var versionUtils : AndroidVersionUtils
 
     // Only used for setting nightmode for non-compose views
     // breaking mvvm here -- rather than introduce a
@@ -134,7 +128,6 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
     private var nightMode : NightModeHelper? = null
     private lateinit var nm : NotificationManagerCompat
     private var pendingImports : Collection<Uri> = listOf()
-    protected val inputConnectionMediator = InputConnectionMediator()
     private var ttsService : TextToSpeech? = null
     private var ttsReady : Boolean = false
     private var shakeDetector : ShakeDetector? = null
@@ -203,20 +196,6 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
                 onNotificationPermissionDenied?.let { it() }
         }
 
-    private val displayWidth : Int by lazy {
-        val metrics = getResources().getDisplayMetrics()
-        (metrics.widthPixels / metrics.density).toInt()
-    }
-
-    private val displayHeight : Int by lazy {
-        val metrics = getResources().getDisplayMetrics()
-        (metrics.heightPixels / metrics.density).toInt()
-    }
-
-    private val isPortrait : Boolean by lazy {
-        displayWidth <= displayHeight
-    }
-
     private val voiceInputLauncher : ActivityResultLauncher<String> =
         registerForActivityResult(SpeechContract()) { text ->
             onVoiceCommand?.let { it(text) }
@@ -260,7 +239,7 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
                         TAG,
                         "Could not start puzzle export service on foreground"
                     )
-                    toast(getString(R.string.puzzles_export_failed))
+                    utils.toast(getString(R.string.puzzles_export_failed))
                 }
             }
         }
@@ -295,49 +274,7 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
         setContent() {
             ForkyzApp(
                 themeHelper = themeHelper,
-                toast = this::toast,
-                inputConnectionMediator = inputConnectionMediator,
-                displayWidth = displayWidth,
-                displayHeight = displayHeight,
-                isPortrait = isPortrait,
-                openAppSettings = this::openAppSettings,
-                openURI = this::openURI,
-                getPendingImports = this::getPendingImports,
-                clearPendingImports = this::clearPendingImports,
-                onFinish = this::finish,
-                onCheckAndWarnNetworkState
-                    = this::checkAndWarnNetworkState,
-                onCheckRequestNotificationPermissions
-                    = this::checkRequestNotificationPermissions,
-                onImport = { getImportURI.launch(IMPORT_MIME_TYPE) },
-                onImportFinish = this::onImportFinish,
-                onExit = this::doExit,
-                onGetSAFURI = { getSAFURI.launch(null) },
-                onExportSettings
-                    = { exportSettings.launch(SETTINGS_DEFAULT_FILENAME) },
-                onImportSettings
-                    = { importSettings.launch(SETTINGS_MIME_TYPE) },
-                onExportPuzzles = { exportPuzzles.launch(null) },
-                onShareFile = this::shareFile,
-                handleExternalToolEvent = this::handleExternalToolEvent,
-                setOnAppNotFoundCallback = { onAppNotFound = it },
-                setOnImportCompleteCallback = { onImportComplete = it },
-                setOnImportURIsCallback = { onImportURIs = it },
-                setOnNotificationPermissionDeniedCallback = {
-                    onNotificationPermissionDenied = it
-                },
-                setStatusBarColor = this::legacySetStatusBarColor,
-                setSAFURICallback = { onSAFURI = it },
-                setExportSettingsURICallback = { onExportSettingsURI = it },
-                setImportSettingsURICallback = { onImportSettingsURI = it },
-                setOnVoiceCommandCallback = { onVoiceCommand = it },
-                launchVoiceInput = this::launchVoiceInput,
-                announce = this::announce,
-                onSetFullScreen = { utils.setFullScreen(getWindow()) },
-                startShakeDetector = this::startShakeDetector,
-                stopShakeDetector = this::stopShakeDetector,
-                resumeShakeDetector = this::resumeShakeDetector,
-                pauseShakeDetector = this::pauseShakeDetector,
+                utils = utils,
             )
         }
 
@@ -361,83 +298,8 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
         }
     }
 
-    protected fun handleExternalToolEvent(tool : ExternalToolData) {
-        try {
-            tool.accept(ExternalToolLauncher(this))
-        } catch (e : AppNotFoundException) {
-            onAppNotFound?.let { it(e) }
-        }
-    }
-
-    /**
-     * Share a file through Android share
-     */
-    private fun shareFile(data : ShareFileData) {
-        val shareIntent = ShareCompat.IntentBuilder(this)
-            .setChooserTitle(data.title)
-            .setStream(data.uri)
-            .setType(data.mimeType)
-            .createChooserIntent()
-        startActivity(shareIntent)
-    }
-
-    /**
-     * Display a long toast
-     */
-    private fun toast(message : String) {
-        Toast.makeText(getApplication(), message, Toast.LENGTH_LONG).show()
-    }
-
-    private fun openAppSettings() {
-        val appPackage = getPackageName()
-        val intent = Intent(
-            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-            ("package:" + appPackage).toUri(),
-        )
-        intent.addCategory(Intent.CATEGORY_DEFAULT)
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        startActivity(intent)
-    }
-
-    private fun legacySetStatusBarColor(color : Color) {
-        utils.legacySetStatusBarColor(this, color.toArgb())
-    }
-
-    private fun checkAndWarnNetworkState() {
-        if (!utils.hasNetworkConnection(this)) {
-            toast(getString(R.string.download_but_no_active_network))
-        }
-    }
-
-    private fun openURI(uri : Uri) {
-        val i = Intent(Intent.ACTION_VIEW);
-        i.setData(uri)
-        startActivity(i);
-    }
-
-    /**
-     * Request notification permissions if needed
-     *
-     * E.g. not if settings block them. Doesn't ask twice in an
-     * activities life
-     */
-    private fun checkRequestNotificationPermissions() {
-        if (nm.areNotificationsEnabled())
-            return
-
-        val showRationale
-            = utils.shouldShowRequestNotificationPermissionRationale(
-                this
-            )
-
-        if (showRationale)
-            toast(getString(R.string.notifications_request_rationale))
-
-        utils.requestPostNotifications(notificationPermissionLauncher)
-    }
-
-    private fun clearPendingImports() {
-        pendingImports = listOf()
+    override fun hearShake() {
+        onHearShake?.let { it() }
     }
 
     private fun setPendingImport(uri : Uri?) {
@@ -448,8 +310,8 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
         pendingImports = uri
     }
 
-    private fun getPendingImports() : Collection<Uri> {
-        return pendingImports
+    private fun doExportPuzzles() {
+        exportPuzzles.launch(null)
     }
 
     /**
@@ -492,101 +354,263 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
         }
     }
 
-    private fun doExit() {
-        // ask all Forkyz activities to close
-        val close = Intent(FORKYZ_CLOSE_ACTION)
-        // -1 so all Forkyz activities close
-        close.putExtra(FORKYZ_CLOSE_TASK_ID, -1)
-        close.setPackage(getPackageName())
-        sendBroadcast(close)
-        finish()
-    }
+    private val utils = object : NativeFrontendUtils {
+        override val inputConnectionMediator = InputConnectionMediator()
 
-    private fun onImportFinish(ifr : ImportFinishResult) {
-        sendBroadcast(
-            Intent(INTENT_IMPORT_COMPLETE_ACTION).putExtra(
-                INTENT_IMPORT_TASK_ID,
-                taskId,
-            ).putExtra(
-                INTENT_IMPORT_SUCCESS,
-                !ifr.someFailed && ifr.someSucceeded
-            ).setPackage(getPackageName())
-        )
-    }
-
-    protected fun launchVoiceInput() {
-        try {
-            voiceInputLauncher.launch(RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-        } catch (e : ActivityNotFoundException) {
-           toast(getString(R.string.no_speech_recognition_available))
+        override val displayWidth : Int by lazy {
+            val metrics = getResources().getDisplayMetrics()
+            (metrics.widthPixels / metrics.density).toInt()
         }
-    }
 
-    /**
-     * Announce text with accessibility if running or tts
-     *
-     * @param data what to announce
-     */
-    protected fun announce(data : AnnounceData) {
-        val text = data.message
-        if (ttsService == null) {
-            ttsService = TextToSpeech(
-                applicationContext,
-                { status ->
-                    if (status == TextToSpeech.SUCCESS) {
-                        ttsReady = true
-                        announce(data)
+        override val displayHeight : Int by lazy {
+            val metrics = getResources().getDisplayMetrics()
+            (metrics.heightPixels / metrics.density).toInt()
+        }
+
+        override val isPortrait : Boolean by lazy {
+            displayWidth <= displayHeight
+        }
+
+        override fun onFinish() { finish() }
+
+        override fun onExit() {
+            // ask all Forkyz activities to close
+            val close = Intent(FORKYZ_CLOSE_ACTION)
+            // -1 so all Forkyz activities close
+            close.putExtra(FORKYZ_CLOSE_TASK_ID, -1)
+            close.setPackage(getPackageName())
+            sendBroadcast(close)
+            finish()
+        }
+
+        override fun toast(msg : String) {
+            Toast.makeText(getApplication(), msg, Toast.LENGTH_LONG).show()
+        }
+
+        override fun openAppSettings() {
+            val appPackage = getPackageName()
+            val intent = Intent(
+                Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                ("package:" + appPackage).toUri(),
+            )
+            intent.addCategory(Intent.CATEGORY_DEFAULT)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivity(intent)
+        }
+
+        override fun openURI(uri : Uri) {
+            val i = Intent(Intent.ACTION_VIEW);
+            i.setData(uri)
+            startActivity(i);
+        }
+
+        override fun getPendingImports() : Collection<Uri> {
+            return pendingImports
+        }
+
+        override fun clearPendingImports() {
+            pendingImports = listOf()
+        }
+
+        override fun onCheckAndWarnNetworkState() {
+            if (!versionUtils.hasNetworkConnection(this@ForkyzActivity)) {
+                toast(getString(R.string.download_but_no_active_network))
+            }
+        }
+
+        /**
+         * Request notification permissions if needed
+         *
+         * E.g. not if settings block them. Doesn't ask twice in an
+         * activity's life
+         */
+        override fun onCheckRequestNotificationPermissions() {
+            if (nm.areNotificationsEnabled())
+                return
+
+            val showRationale
+                = versionUtils.shouldShowRequestNotificationPermissionRationale(
+                    this@ForkyzActivity
+                )
+
+            if (showRationale)
+                toast(getString(R.string.notifications_request_rationale))
+
+            versionUtils.requestPostNotifications(
+                notificationPermissionLauncher,
+            )
+        }
+
+        override fun onImport() {
+            getImportURI.launch(IMPORT_MIME_TYPE)
+        }
+
+        override fun onImportFinish(ifr : NativeImportFinishedResult) {
+            sendBroadcast(
+                Intent(INTENT_IMPORT_COMPLETE_ACTION).putExtra(
+                    INTENT_IMPORT_TASK_ID,
+                    taskId,
+                ).putExtra(
+                    INTENT_IMPORT_SUCCESS,
+                    !ifr.someFailed && ifr.someSucceeded
+                ).setPackage(getPackageName())
+            )
+        }
+
+        override fun onGetSAFURI() {
+            getSAFURI.launch(null)
+        }
+
+        override fun onExportSettings() {
+            exportSettings.launch(SETTINGS_DEFAULT_FILENAME)
+        }
+
+        override fun onImportSettings() {
+            importSettings.launch(SETTINGS_MIME_TYPE)
+        }
+
+        override fun onExportPuzzles() {
+            doExportPuzzles()
+        }
+
+        /**
+         * Share a file through Android share
+         */
+        override fun onShareFile(data : ShareFileData) {
+            val shareIntent = ShareCompat.IntentBuilder(this@ForkyzActivity)
+                .setChooserTitle(data.title)
+                .setStream(data.uri)
+                .setType(data.mimeType)
+                .createChooserIntent()
+            startActivity(shareIntent)
+        }
+
+        override fun handleExternalToolEvent(tool : ExternalToolData) {
+            try {
+                tool.accept(ExternalToolLauncher(this@ForkyzActivity))
+            } catch (e : AppNotFoundException) {
+                onAppNotFound?.let { it(e) }
+            }
+        }
+
+
+        override fun setOnAppNotFoundCallback(
+            cb : ((AppNotFoundException) -> Unit)?,
+        ) {
+            onAppNotFound = cb
+        }
+
+        override fun setOnImportCompleteCallback(cb : ((Boolean) -> Unit)?) {
+            onImportComplete = cb
+        }
+
+        override fun setOnImportURIsCallback(
+            cb : ((Collection<Uri>) -> Unit)?,
+        ) {
+            onImportURIs = cb
+        }
+
+        override fun setOnNotificationPermissionDeniedCallback(
+            cb : (() -> Unit)?,
+        ) {
+            onNotificationPermissionDenied = cb
+        }
+
+        override fun setStatusBarColor(color : Color) {
+            versionUtils.legacySetStatusBarColor(
+                this@ForkyzActivity,
+                color.toArgb(),
+            )
+        }
+
+        override fun setSAFURICallback(cb : ((Uri) -> Unit)?) {
+            onSAFURI = cb
+        }
+
+        override fun setExportSettingsURICallback(cb : ((Uri) -> Unit)?) {
+            onExportSettingsURI = cb
+        }
+
+        override fun setImportSettingsURICallback(cb : ((Uri) -> Unit)?) {
+            onImportSettingsURI = cb
+        }
+
+        override fun setOnVoiceCommandCallback(
+            cb : ((List<String>?) -> Unit)?,
+        ) {
+            onVoiceCommand = cb
+        }
+
+        override fun launchVoiceInput() {
+            try {
+                voiceInputLauncher.launch(
+                    RecognizerIntent.LANGUAGE_MODEL_FREE_FORM,
+                )
+            } catch (e : ActivityNotFoundException) {
+               toast(getString(R.string.no_speech_recognition_available))
+            }
+        }
+
+        override fun announce(text : CharSequence) {
+            if (ttsService == null) {
+                ttsService = TextToSpeech(
+                    applicationContext,
+                    { status ->
+                        if (status == TextToSpeech.SUCCESS) {
+                            ttsReady = true
+                            announce(text)
+                        }
                     }
-                }
-            )
-        } else if (!ttsReady) {
-            // hopefully rare occasion where tts being prepared but not
-            // ready yet
-            Toast.makeText(
-                this,
-                R.string.speech_not_ready,
-                Toast.LENGTH_SHORT,
-            ).show()
-        } else {
-            ttsService?.speak(
-                text, TextToSpeech.QUEUE_FLUSH, null,
-                "ForkyzSpeak_" + (speechReqCount++)
-            );
+                )
+            } else if (!ttsReady) {
+                // hopefully rare occasion where tts being prepared but not
+                // ready yet
+                Toast.makeText(
+                    this@ForkyzActivity,
+                    R.string.speech_not_ready,
+                    Toast.LENGTH_SHORT,
+                ).show()
+            } else {
+                ttsService?.speak(
+                    text, TextToSpeech.QUEUE_FLUSH, null,
+                    "ForkyzSpeak_" + (speechReqCount++)
+                );
+            }
         }
-    }
 
-    override fun hearShake() {
-        onHearShake?.let { it() }
-    }
-
-    private fun startShakeDetector(onHearShake : () -> Unit) {
-        this.onHearShake = onHearShake
-        if (shakeDetector == null)
-            shakeDetector = ShakeDetector(this)
-        resumeShakeDetector()
-    }
-
-    private fun resumeShakeDetector() {
-        shakeDetector?.let {
-            it.start(
-                getSystemService(SENSOR_SERVICE) as SensorManager,
-                SensorManager.SENSOR_DELAY_GAME
-            )
+        override fun onSetFullScreen() {
+            versionUtils.setFullScreen(getWindow())
         }
-    }
 
-    private fun pauseShakeDetector() {
-        shakeDetector?.let { sd ->
-            sd.stop()
-            val manager = (getSystemService(SENSOR_SERVICE) as SensorManager)
-            manager.unregisterListener(sd)
+        override fun startShakeDetector(onHearShake : () -> Unit) {
+            this@ForkyzActivity.onHearShake = onHearShake
+            if (shakeDetector == null)
+                shakeDetector = ShakeDetector(this@ForkyzActivity)
+            resumeShakeDetector()
         }
-    }
 
-    private fun stopShakeDetector() {
-        pauseShakeDetector()
-        shakeDetector = null
-        onHearShake = null
+        override fun resumeShakeDetector() {
+            shakeDetector?.let {
+                it.start(
+                    getSystemService(SENSOR_SERVICE) as SensorManager,
+                    SensorManager.SENSOR_DELAY_GAME
+                )
+            }
+        }
+
+        override fun pauseShakeDetector() {
+            shakeDetector?.let { sd ->
+                sd.stop()
+                val manager = (getSystemService(SENSOR_SERVICE) as SensorManager)
+                manager.unregisterListener(sd)
+            }
+        }
+
+        override fun stopShakeDetector() {
+            pauseShakeDetector()
+            shakeDetector = null
+            onHearShake = null
+        }
     }
 }
 
