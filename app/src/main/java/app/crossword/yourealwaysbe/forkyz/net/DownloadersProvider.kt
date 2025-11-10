@@ -13,8 +13,6 @@ import android.content.Context
 import androidx.annotation.MainThread
 import androidx.core.app.NotificationManagerCompat
 
-import dagger.hilt.android.qualifiers.ApplicationContext
-
 import app.crossword.yourealwaysbe.forkyz.R
 import app.crossword.yourealwaysbe.forkyz.settings.DownloadersSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
@@ -23,7 +21,6 @@ import app.crossword.yourealwaysbe.forkyz.util.Notifications
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.util.getOnce
-import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 
 /**
  * Convenience for constructing Downloaders objects
@@ -33,12 +30,10 @@ import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
  */
 @Singleton
 class DownloadersProvider @Inject constructor(
-    @param:ApplicationContext private val applicationContext : Context,
-    private val utils : AndroidVersionUtils,
     private val settings : ForkyzSettings,
     private val fileHandlerProvider : FileHandlerProvider,
     private val notifications : Notifications,
-    private val nativeBackendUtils : NativeBackendUtils,
+    private val utils : NativeBackendUtils,
 ) {
     companion object {
         @JvmField
@@ -66,25 +61,25 @@ class DownloadersProvider @Inject constructor(
         fileHandler : FileHandler,
     ) : Downloaders {
         return Downloaders(
-            nativeBackendUtils,
+            utils,
             fileHandler,
             downloadersSettings,
             NotificationDownloadersListener(
-                applicationContext,
                 notifications,
                 downloadersSettings,
+                utils,
             ),
         )
     }
 
     private class NotificationDownloadersListener(
-        private val applicationContext : Context,
         private val notifications : Notifications,
         private val downloadersSettings : DownloadersSettings,
+        private val utils : NativeBackendUtils,
     ) : DownloadersListener {
         private var nextNotificationID : Int = 1
 
-        override fun onNoConnection() {
+        override suspend fun onNoConnection() {
             if (downloadersSettings.suppressSummaryNotifications)
                 return
 
@@ -92,13 +87,13 @@ class DownloadersProvider @Inject constructor(
                 PUZZLE_DOWNLOAD_CHANNEL_ID,
                 0,
                 android.R.drawable.stat_sys_download_done,
-                applicationContext.getString(
+                utils.getString(
                     R.string.puzzle_download_no_connection,
                 ),
             )
         }
 
-        override fun onPuzzleDownloadStarted(name : String) {
+        override suspend fun onPuzzleDownloadStarted(name : String) {
             if (downloadersSettings.suppressIndividualNotifications)
                 return
 
@@ -106,15 +101,15 @@ class DownloadersProvider @Inject constructor(
                 PUZZLE_DOWNLOAD_CHANNEL_ID,
                 0,
                 android.R.drawable.stat_sys_download,
-                applicationContext.getString(R.string.puzzles_downloading),
-                applicationContext.getString(
+                utils.getString(R.string.puzzles_downloading),
+                utils.getString(
                     R.string.puzzles_downloading_from,
                     name,
                 ),
             )
         }
 
-        override fun onPuzzleDownloadFinished(
+        override suspend fun onPuzzleDownloadFinished(
             name : String,
             result : Downloader.DownloadResult,
         ) {
@@ -135,11 +130,11 @@ class DownloadersProvider @Inject constructor(
                 PUZZLE_DOWNLOAD_CHANNEL_ID,
                 nextNotificationID++,
                 android.R.drawable.stat_sys_download_done,
-                applicationContext.getString(messageId, name),
+                utils.getString(messageId, name),
             )
         }
 
-        override fun onDownloadsFinished(
+        override suspend fun onDownloadsFinished(
             someDownloaded : Boolean,
             someFailed : Boolean,
         ) {
@@ -162,7 +157,7 @@ class DownloadersProvider @Inject constructor(
                     PUZZLE_DOWNLOAD_CHANNEL_ID,
                     0,
                     android.R.drawable.stat_sys_download_done,
-                    applicationContext.getString(messageID),
+                    utils.getString(messageID),
                 )
             }
         }

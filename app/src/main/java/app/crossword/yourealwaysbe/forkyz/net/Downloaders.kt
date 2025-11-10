@@ -10,6 +10,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlinx.coroutines.runBlocking
 
 import android.util.Log
 
@@ -34,16 +35,16 @@ interface DownloadersListener {
     /**
      * Called if no internet connection for download
      */
-    fun onNoConnection() { }
+    suspend fun onNoConnection() { }
 
-    fun onPuzzleDownloadStarted(name : String) { }
+    suspend fun onPuzzleDownloadStarted(name : String) { }
 
-    fun onPuzzleDownloadFinished(
+    suspend fun onPuzzleDownloadFinished(
         name : String,
         result : Downloader.DownloadResult,
     ) { }
 
-    fun onDownloadsFinished(
+    suspend fun onDownloadsFinished(
         someDownloaded : Boolean,
         someFailed : Boolean,
     ) { }
@@ -200,8 +201,9 @@ class Downloaders(
         var result = Downloader.DownloadResult.FAILED
 
         Log.i(TAG, "Downloading " + d.toString())
-        if (downloadersListener != null)
-            downloadersListener.onPuzzleDownloadStarted(d.getName())
+        runBlocking {
+            downloadersListener?.onPuzzleDownloadStarted(d.getName())
+        }
 
         try {
             result = d.download(date, existingFileNames)
@@ -219,8 +221,8 @@ class Downloaders(
             Log.w(TAG, "Failed to download "+d.getName(), e)
         }
 
-        if (downloadersListener != null) {
-            downloadersListener.onPuzzleDownloadFinished(
+        runBlocking {
+            downloadersListener?.onPuzzleDownloadFinished(
                 d.getName(),
                 result,
             )
