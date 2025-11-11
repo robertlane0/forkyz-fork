@@ -2,7 +2,6 @@
 package app.crossword.yourealwaysbe.forkyz.util
 
 import java.io.IOException
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -17,8 +16,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import androidx.core.net.toUri
 
-import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.qualifiers.ApplicationContext
+import org.koin.android.ext.android.inject
 
 import app.crossword.yourealwaysbe.forkyz.R
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
@@ -26,7 +24,6 @@ import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.util.files.exportStorage
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 
-@AndroidEntryPoint
 class PuzzleExportService() : Service() {
     companion object {
         val PUZZLE_EXPORT_URI = "puzzleExportURI"
@@ -40,18 +37,11 @@ class PuzzleExportService() : Service() {
     private val ioScope = CoroutineScope(Dispatchers.IO.limitedParallelism(1))
     private val mainScope = CoroutineScope(Dispatchers.Main)
 
-    @Inject
-    @ApplicationContext
-    lateinit var context : Context
-
-    @Inject
-    lateinit var versionUtils : AndroidVersionUtils
-
-    @Inject
-    lateinit var fileHandlerProvider : FileHandlerProvider
-
-    @Inject
-    lateinit var utils : NativeBackendUtils
+    // TODO: koin application context?
+    private val context : Context by inject()
+    private val versionUtils : AndroidVersionUtils by inject()
+    private val fileHandlerProvider : FileHandlerProvider by inject()
+    private val utils : NativeBackendUtils by inject()
 
     override fun onBind(intent : Intent): IBinder? {
         return null

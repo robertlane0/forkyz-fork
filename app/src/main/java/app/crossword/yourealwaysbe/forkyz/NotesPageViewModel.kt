@@ -13,11 +13,6 @@ import kotlinx.coroutines.launch
 
 import androidx.lifecycle.viewModelScope
 
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
-import dagger.hilt.android.lifecycle.HiltViewModel
-
 import app.crossword.yourealwaysbe.forkyz.exttools.CROSSWORD_SOLVER_BLANK
 import app.crossword.yourealwaysbe.forkyz.exttools.CrosswordSolverData
 import app.crossword.yourealwaysbe.forkyz.exttools.ExternalDictionaries
@@ -169,11 +164,8 @@ private data class NotesSettings(
     val interaction : InteractionSettings,
 )
 
-@HiltViewModel(
-    assistedFactory = NotesPageViewModel.NotesPageViewModelFactory::class
-)
-class NotesPageViewModel @AssistedInject constructor(
-    @Assisted val notesClueID : ClueID?,
+class NotesPageViewModel(
+    val notesClueID : ClueID?,
     settings : ForkyzSettings,
     utils : NativeBackendUtils,
     currentPuzzleHolder : CurrentPuzzleHolder,
@@ -184,11 +176,6 @@ class NotesPageViewModel @AssistedInject constructor(
     currentPuzzleHolder,
     fileHandlerProvider,
 ) {
-    @AssistedFactory
-    interface NotesPageViewModelFactory {
-        fun create(notesClueID : ClueID?) : NotesPageViewModel
-    }
-
     private val mediatedNotesUIState
         = MediatedStateWithFlow<NotesPageUIState, NotesSettings>(
             viewModelScope,

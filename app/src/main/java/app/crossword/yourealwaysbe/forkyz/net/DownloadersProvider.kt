@@ -2,16 +2,12 @@
 package app.crossword.yourealwaysbe.forkyz.net
 
 import java.util.function.Consumer
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 
-import android.content.Context
 import androidx.annotation.MainThread
-import androidx.core.app.NotificationManagerCompat
 
 import app.crossword.yourealwaysbe.forkyz.R
 import app.crossword.yourealwaysbe.forkyz.settings.DownloadersSettings
@@ -28,8 +24,7 @@ import app.crossword.yourealwaysbe.forkyz.util.getOnce
  * Since most arguments are injectable, no need to fetch them in all
  * places.
  */
-@Singleton
-class DownloadersProvider @Inject constructor(
+class DownloadersProvider(
     private val settings : ForkyzSettings,
     private val fileHandlerProvider : FileHandlerProvider,
     private val notifications : Notifications,

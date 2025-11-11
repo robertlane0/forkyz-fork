@@ -1,15 +1,12 @@
 
 package app.crossword.yourealwaysbe.forkyz
 
-import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 import androidx.lifecycle.viewModelScope
-
-import dagger.hilt.android.lifecycle.HiltViewModel
 
 import app.crossword.yourealwaysbe.forkyz.settings.CycleUnfilledMode
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
@@ -28,8 +25,7 @@ import app.crossword.yourealwaysbe.puz.MovementStrategy
 import app.crossword.yourealwaysbe.puz.Playboard.Word
 import app.crossword.yourealwaysbe.puz.Position
 
-@HiltViewModel
-class ClueListPageViewModel @Inject constructor(
+class ClueListPageViewModel(
     settings : ForkyzSettings,
     utils : NativeBackendUtils,
     currentPuzzleHolder : CurrentPuzzleHolder,

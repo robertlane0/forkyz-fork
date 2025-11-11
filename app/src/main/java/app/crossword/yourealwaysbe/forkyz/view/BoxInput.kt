@@ -1,8 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.view
 
-import javax.inject.Inject
-
 import android.content.Context
 import android.text.InputType
 import android.view.View
@@ -18,7 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 
-import dagger.hilt.android.AndroidEntryPoint
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 import app.crossword.yourealwaysbe.forkyz.util.BoxInputConnection
 import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
@@ -46,15 +45,14 @@ class BoxInputState {
 /**
  * A View class that is blank except it establishes input connections
  */
-@AndroidEntryPoint
 class BoxInputView(
     context : Context,
 ) : View(context, null),
     BoxInputConnection.BoxInputListener,
-    KeyboardManageableView {
+    KeyboardManageableView,
+    KoinComponent {
 
-    @Inject
-    lateinit var utils : AndroidVersionUtils
+    private val utils : AndroidVersionUtils by inject()
 
     private var currentInputConnection : BoxInputConnection? = null
     private var nativeInput : Boolean = false

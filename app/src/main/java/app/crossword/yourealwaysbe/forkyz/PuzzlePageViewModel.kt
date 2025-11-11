@@ -4,7 +4,6 @@ package app.crossword.yourealwaysbe.forkyz
 import java.io.IOException
 import java.util.Deque
 import java.util.Locale
-import javax.inject.Inject
 import kotlin.text.Regex
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,8 +14,6 @@ import kotlinx.coroutines.launch
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-
-import dagger.hilt.android.lifecycle.HiltViewModel
 
 import org.jg.wordstonumbers.WordsToNumbersUtil
 
@@ -239,9 +236,7 @@ private data class UIStateSettings(
     val showErrorsGrid : Boolean,
 )
 
-// will lose this tag and become an open base class
-@HiltViewModel
-open class PuzzlePageViewModel @Inject constructor(
+open class PuzzlePageViewModel(
     val settings : ForkyzSettings,
     val utils : NativeBackendUtils,
     val currentPuzzleHolder : CurrentPuzzleHolder,

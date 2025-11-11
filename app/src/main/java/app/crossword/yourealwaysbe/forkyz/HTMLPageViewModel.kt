@@ -5,25 +5,22 @@ import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
 import java.util.stream.Collectors
-import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-import android.app.Application
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.fromHtml
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
-import dagger.hilt.android.lifecycle.HiltViewModel
+import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 
-@HiltViewModel
-class HTMLPageViewModel @Inject constructor(
-    application : Application,
-) : AndroidViewModel(application) {
+class HTMLPageViewModel(
+    private val utils : NativeBackendUtils,
+) : ViewModel() {
 
     private val _assetText = MutableStateFlow<AnnotatedString>(
         buildAnnotatedString { }
@@ -32,12 +29,9 @@ class HTMLPageViewModel @Inject constructor(
 
     fun loadAsset(rawAssetID : Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            val app : Application = getApplication()
             try {
                 BufferedReader(
-                    InputStreamReader(
-                        app.getResources().openRawResource(rawAssetID)
-                    )
+                    InputStreamReader(utils.getRawResource(rawAssetID))
                 ).use { reader ->
                     val htmlData
                         = reader.lines().collect(Collectors.joining("\n"))
@@ -45,7 +39,7 @@ class HTMLPageViewModel @Inject constructor(
                 }
             } catch (e : IOException) {
                 _assetText.value = buildAnnotatedString {
-                    append(app.getString(R.string.asset_not_found))
+                    append(utils.getString(R.string.asset_not_found))
                 }
             }
         }

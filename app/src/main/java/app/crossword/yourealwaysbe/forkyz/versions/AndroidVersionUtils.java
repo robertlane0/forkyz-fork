@@ -16,17 +16,9 @@ import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import androidx.activity.result.ActivityResultLauncher;
 
-import dagger.Module;
-import dagger.Provides;
-import dagger.hilt.InstallIn;
-import dagger.hilt.components.SingletonComponent;
-
 public interface AndroidVersionUtils {
 
-    @Module
-    @InstallIn(SingletonComponent.class)
     public static class Factory {
-        @Provides
         public static AndroidVersionUtils provideAndroidVersionUtils() {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM)
                 return new VanillaIceCreamUtil();

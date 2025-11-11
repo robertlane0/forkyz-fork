@@ -1,18 +1,16 @@
 
 package app.crossword.yourealwaysbe.forkyz.util
 
+import java.io.BufferedReader
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
+import java.io.InputStreamReader
 import java.io.OutputStream
-import javax.inject.Inject
-import javax.inject.Singleton
 
 import android.content.Context
 import android.net.Uri
 import androidx.core.content.FileProvider
-
-import dagger.hilt.android.qualifiers.ApplicationContext
 
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
@@ -28,9 +26,8 @@ private val SHARE_DIR = "shared"
 /**
  * Collects functions that viewmodels &c. need that depend on context
  */
-@Singleton
-class NativeBackendUtils @Inject constructor(
-    @param:ApplicationContext private val applicationContext : Context,
+class NativeBackendUtils(
+    private val applicationContext : Context,
     private val utils : AndroidVersionUtils,
 ) {
     suspend fun getString(resourceID : Int) : String {
@@ -51,6 +48,11 @@ class NativeBackendUtils @Inject constructor(
             quantity,
             *formatArgs,
         )
+    }
+
+    @Throws(IOException::class)
+    fun getRawResource(rawAssetID : Int) : InputStream {
+        return applicationContext.resources.openRawResource(rawAssetID)
     }
 
     fun hasNetworkConnection() : Boolean {
@@ -133,6 +135,25 @@ class NativeBackendUtils @Inject constructor(
             uri,
             false
         )
+    }
+
+    fun getLogcat() : List<String>? {
+        val uid = utils.getApplicationUID(applicationContext)
+        val uidFlag : String = if (uid < 0) {
+            ""
+        } else {
+            " --uid " + uid.toString()
+        }
+        val process = Runtime.getRuntime().exec("logcat -d" + uidFlag)
+        try {
+            BufferedReader(
+                InputStreamReader(process.getInputStream())
+            ).useLines {
+                return it.toList()
+            }
+        } catch (e : IOException) {
+            return null
+        }
     }
 }
 

@@ -1,7 +1,5 @@
 package app.crossword.yourealwaysbe.forkyz
 
-import javax.inject.Inject
-
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding

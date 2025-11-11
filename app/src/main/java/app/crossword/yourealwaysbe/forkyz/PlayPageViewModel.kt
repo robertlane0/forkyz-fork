@@ -1,15 +1,12 @@
 
 package app.crossword.yourealwaysbe.forkyz
 
-import javax.inject.Inject
 import kotlin.random.Random
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 import androidx.lifecycle.viewModelScope
-
-import dagger.hilt.android.lifecycle.HiltViewModel
 
 import app.crossword.yourealwaysbe.forkyz.settings.FitToScreenMode
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
@@ -103,8 +100,7 @@ private data class PlaySettings(
     val interactionSettings : PlayInteractionSettings,
 )
 
-@HiltViewModel
-class PlayPageViewModel @Inject constructor(
+class PlayPageViewModel(
     settings : ForkyzSettings,
     utils : NativeBackendUtils,
     currentPuzzleHolder : CurrentPuzzleHolder,

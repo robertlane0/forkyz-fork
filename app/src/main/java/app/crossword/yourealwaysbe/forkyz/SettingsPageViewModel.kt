@@ -3,7 +3,6 @@ package app.crossword.yourealwaysbe.forkyz
 
 import java.io.IOException
 import java.time.format.DateTimeFormatter
-import javax.inject.Inject
 import kotlin.collections.ArrayDeque
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,8 +21,6 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.material.color.DynamicColors
-
-import dagger.hilt.android.lifecycle.HiltViewModel
 
 import app.crossword.yourealwaysbe.forkyz.net.DownloadersProvider
 import app.crossword.yourealwaysbe.forkyz.settings.BrowseSwipeAction
@@ -338,8 +335,7 @@ data class SettingsPageViewState(
         get() = currentPage == SettingsPage.SEARCH
 }
 
-@HiltViewModel
-class SettingsPageViewModel @Inject constructor(
+class SettingsPageViewModel(
     private val settings : ForkyzSettings,
     private val utils : NativeBackendUtils,
     private val downloadersProvider : DownloadersProvider,

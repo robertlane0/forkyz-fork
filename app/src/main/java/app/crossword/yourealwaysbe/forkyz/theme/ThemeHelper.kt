@@ -1,9 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.theme
 
-import javax.inject.Inject
-import javax.inject.Singleton
-
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -14,7 +11,6 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.material.appbar.AppBarLayout
@@ -25,8 +21,7 @@ import app.crossword.yourealwaysbe.forkyz.settings.DayNightMode
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.Theme
 
-@Singleton
-class ThemeHelper @Inject constructor(val settings : ForkyzSettings) {
+class ThemeHelper(val settings : ForkyzSettings) {
     val cheatedColor : Color
         @Composable
         get() {

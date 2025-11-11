@@ -1,6 +1,5 @@
 package app.crossword.yourealwaysbe.forkyz
 
-import javax.inject.Inject
 import kotlinx.coroutines.launch
 
 import android.os.Bundle
@@ -32,8 +31,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-
-import dagger.hilt.android.AndroidEntryPoint
 
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 import app.crossword.yourealwaysbe.forkyz.util.ShareFileData

@@ -1,8 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.util
 
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -18,8 +16,7 @@ import app.crossword.yourealwaysbe.forkyz.R
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.Orientation
 
-@Singleton
-class OrientationHelper @Inject constructor(val settings : ForkyzSettings) {
+class OrientationHelper(val settings : ForkyzSettings) {
     @SuppressWarnings("SourceLockedOrientationActivity")
     fun <T> applyOrientation(activity : T)
     where T : Activity, T : LifecycleOwner {

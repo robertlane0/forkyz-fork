@@ -10,7 +10,6 @@ plugins {
     id 'androidx.room' version "$roomVersion" apply false
     id 'com.android.application' version '8.13.0' apply false
     id 'com.android.library' version '8.13.0' apply false
-    id 'com.google.dagger.hilt.android' version "$hiltVersion" apply false
     id 'com.google.devtools.ksp' version '2.2.20-2.0.2' apply false
     id 'com.google.protobuf' version '0.9.5' apply false
     id 'io.github.goooler.shadow' version '8.1.8' apply false

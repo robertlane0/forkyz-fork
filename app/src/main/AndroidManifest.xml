@@ -118,7 +118,7 @@
             />
         </provider>
         <!-- Work manager setup
-            https://developer.android.com/reference/androidx/hilt/work/HiltWorker -->
+            https://insert-koin.io/docs/reference/koin-android/workmanager -->
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"

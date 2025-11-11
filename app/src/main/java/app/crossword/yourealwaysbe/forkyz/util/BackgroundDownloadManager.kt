@@ -6,8 +6,6 @@ import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.util.Set
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -16,7 +14,6 @@ import android.content.Context
 import android.util.Log
 import androidx.annotation.MainThread
 import androidx.concurrent.futures.CallbackToFutureAdapter
-import androidx.hilt.work.HiltWorker
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
@@ -28,14 +25,6 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.google.common.util.concurrent.ListenableFuture
 
-import dagger.Module
-import dagger.Provides
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
-import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
-
 import app.crossword.yourealwaysbe.forkyz.net.DownloadersProvider
 import app.crossword.yourealwaysbe.forkyz.settings.BackgroundDownloadSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
@@ -46,27 +35,12 @@ private val TAG = "ForkyzBackgroundDLMan"
 private val DOWNLOAD_WORK_NAME_HOURLY = "backgroundDownloadHourly"
 private val DOWNLOAD_WORK_NAME_DAILY = "backgroundDownloadDaily"
 
-@Module
-@InstallIn(SingletonComponent::class)
-class WorkManagerModule {
-    @Provides
-    @Singleton
-    fun provideWorkManager(
-        @ApplicationContext applicationContext : Context,
-    ) : WorkManager {
-        return WorkManager.getInstance(applicationContext)
-    }
-}
-
 /**
  * Schedule background downloads using Android WorkManager
  */
-@Singleton
-class BackgroundDownloadManager @Inject constructor(
-    @param:ApplicationContext private val applicationContext : Context,
+class BackgroundDownloadManager(
     private val workManager : WorkManager,
     private val settings : ForkyzSettings,
-
 ) {
     init {
         settings.liveBackgroundDownloadSettings
@@ -272,10 +246,9 @@ abstract class BaseDownloadWorker(
     }
 }
 
-@HiltWorker
-class HourlyDownloadWorker @AssistedInject constructor(
-    @Assisted context : Context,
-    @Assisted params : WorkerParameters,
+class HourlyDownloadWorker(
+    context : Context,
+    params : WorkerParameters,
     utils : AndroidVersionUtils,
     settings : ForkyzSettings,
     fileHandlerProvider : FileHandlerProvider,
@@ -288,7 +261,6 @@ class HourlyDownloadWorker @AssistedInject constructor(
     fileHandlerProvider,
     downloadersProvider,
 ) {
-    @Override
     override fun startWork() : ListenableFuture<ListenableWorker.Result> {
         Log.i(TAG, "Starting hourly download.")
         return CallbackToFutureAdapter.getFuture { completer ->
@@ -298,10 +270,9 @@ class HourlyDownloadWorker @AssistedInject constructor(
     }
 }
 
-@HiltWorker
-public class DailyDownloadWorker @AssistedInject constructor(
-    @Assisted context : Context,
-    @Assisted params : WorkerParameters,
+class DailyDownloadWorker(
+    context : Context,
+    params : WorkerParameters,
     utils : AndroidVersionUtils,
     settings : ForkyzSettings,
     fileHandlerProvider : FileHandlerProvider,
@@ -315,7 +286,6 @@ public class DailyDownloadWorker @AssistedInject constructor(
     fileHandlerProvider,
     downloadersProvider,
 ) {
-    @Override
     override fun startWork() : ListenableFuture<ListenableWorker.Result> {
         Log.i(TAG, "Starting daily download.")
         return CallbackToFutureAdapter.getFuture { completer ->

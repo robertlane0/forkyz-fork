@@ -8,7 +8,6 @@ import java.time.format.DateTimeFormatter
 import java.util.ArrayList
 import java.util.Collections
 import java.util.function.BiConsumer
-import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,8 +22,6 @@ import android.util.Log
 import androidx.annotation.MainThread
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-
-import dagger.hilt.android.lifecycle.HiltViewModel
 
 import app.crossword.yourealwaysbe.forkyz.net.Downloader
 import app.crossword.yourealwaysbe.forkyz.net.DownloadersProvider
@@ -215,8 +212,7 @@ private data class BrowseSettings(
     val downloaderSettings : BrowseDownloaderSettings,
 )
 
-@HiltViewModel
-class BrowsePageViewModel @Inject constructor(
+class BrowsePageViewModel(
     val settings : ForkyzSettings,
     val utils : NativeBackendUtils,
     val fileHandlerProvider : FileHandlerProvider,

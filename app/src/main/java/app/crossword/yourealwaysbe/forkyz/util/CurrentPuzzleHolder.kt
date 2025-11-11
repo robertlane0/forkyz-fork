@@ -3,8 +3,6 @@ package app.crossword.yourealwaysbe.forkyz.util
 
 import java.io.IOException
 import java.util.function.Consumer
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -20,8 +18,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 
-import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.qualifiers.ApplicationContext
+import org.koin.android.ext.android.inject
 
 import app.crossword.yourealwaysbe.forkyz.R
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
@@ -36,12 +33,11 @@ import app.crossword.yourealwaysbe.puz.Playboard
  * Holder for the current puzzle being played
  *
  * Singleton and app-wide. Persists until application destroyed
- * (property of Hilt singletons). Can be Hilt-injected into whichever
+ * (property of Hilt singletons). Can be injected into whichever
  * class needs access to get/set the current puzzle.
  */
-@Singleton
-public class CurrentPuzzleHolder @Inject constructor(
-    @param:ApplicationContext val appContext : Context,
+public class CurrentPuzzleHolder(
+    val appContext : Context,
     val settings : ForkyzSettings,
     val fileHandlerProvider : FileHandlerProvider,
 ) {
@@ -246,7 +242,6 @@ public class CurrentPuzzleHolder @Inject constructor(
     }
 }
 
-@AndroidEntryPoint
 class PuzzleSaveService() : Service() {
     companion object {
         @JvmField
@@ -254,15 +249,9 @@ class PuzzleSaveService() : Service() {
         private final val NOTIFICATION_ID = 10102
     }
 
-    @Inject
-    @ApplicationContext
-    lateinit var context : Context
-
-    @Inject
-    lateinit var currentPuzzleHolder : CurrentPuzzleHolder
-
-    @Inject
-    lateinit var utils : AndroidVersionUtils
+    private val context : Context by inject()
+    private val currentPuzzleHolder : CurrentPuzzleHolder by inject()
+    private val utils : AndroidVersionUtils by inject()
 
     override fun onBind(intent : Intent): IBinder? {
         return null

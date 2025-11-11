@@ -1,8 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz
 
-import javax.inject.Inject
-
 import android.content.ActivityNotFoundException
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -33,7 +31,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
 import androidx.core.net.toUri
 
-import dagger.hilt.android.AndroidEntryPoint
+import org.koin.android.ext.android.inject
 
 import com.squareup.seismic.ShakeDetector
 
@@ -106,24 +104,15 @@ val INTENT_IMPORT_SUCCESS = "app.crossword.yourealwaysbe.INTENT_IMPORT_SUCCESS"
 val SETTINGS_MIME_TYPE = "application/json"
 val SETTINGS_DEFAULT_FILENAME = "forkyz_settings.json"
 
-@AndroidEntryPoint
 open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
-
-    @Inject
-    lateinit var themeHelper : ThemeHelper
-
-    @Inject
-    lateinit var orientationHelper : OrientationHelper
-
-    @Inject
-    lateinit var versionUtils : AndroidVersionUtils
-
+    private val versionUtils : AndroidVersionUtils by inject()
+    private val themeHelper : ThemeHelper by inject()
     // Only used for setting nightmode for non-compose views
     // breaking mvvm here -- rather than introduce a
     // ForkyzActivityViewModel for this legacy band-aid.
     // TODO: remove with NightModeHelper once all colors from Compose
-    @Inject
-    lateinit var settings : ForkyzSettings
+    private val settings : ForkyzSettings by inject()
+    private val orientationHelper : OrientationHelper by inject()
 
     private var nightMode : NightModeHelper? = null
     private lateinit var nm : NotificationManagerCompat

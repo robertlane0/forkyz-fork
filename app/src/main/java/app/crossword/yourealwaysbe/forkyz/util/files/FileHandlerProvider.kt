@@ -1,8 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.util.files
 
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.StateFlow
@@ -12,8 +10,6 @@ import android.content.Context
 import android.widget.Toast
 import androidx.annotation.MainThread
 
-import dagger.hilt.android.qualifiers.ApplicationContext
-
 import app.crossword.yourealwaysbe.forkyz.R
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
@@ -22,9 +18,8 @@ import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.getOnceNotNull
 import app.crossword.yourealwaysbe.forkyz.util.stateInSubscribed
 
-@Singleton
-class FileHandlerProvider @Inject constructor(
-    @param:ApplicationContext private val applicationContext : Context,
+class FileHandlerProvider(
+    private val applicationContext : Context,
     private val utils : NativeBackendUtils,
     private val settings : ForkyzSettings,
 ) {
