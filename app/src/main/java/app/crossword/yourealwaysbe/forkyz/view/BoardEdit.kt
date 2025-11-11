@@ -509,7 +509,6 @@ private fun BoardFullBody(
         + viewModel.pinnedHeight
         + if (viewModel.pinnedHeight > 0) 1 else 0
     )
-    println("FORKYZ: dont snap " + dontSnapBoardToBorders)
     state.dontSnapBoardToBorders = dontSnapBoardToBorders
 
     val boardContentDescription = stringResource(R.string.board_description)
