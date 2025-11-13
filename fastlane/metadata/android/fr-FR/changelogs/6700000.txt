@@ -1,0 +1,8 @@
+- Déplacez l'activité Naviguer pour composer.
+- Ajouter des confirmations et des modifications par défaut pour les swips sur Browse.
+- Positionnement / rendu correct du clavier avec des polices plus grandes.
+- Répare chaque racleur.
+- D'autres petits ordres et nouveaux bugs.
+
+
+Changelog traduit avec Argos Translate.

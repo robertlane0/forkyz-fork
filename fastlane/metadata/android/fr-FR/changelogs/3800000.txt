@@ -1,0 +1,13 @@
+- Nouveaux téléchargeurs De Telegraaf et De Standaard.
+- Nouveau écran de jeu pour les puzzles acrostiques.
+- Rationaliser le rendu de la carte (veuillez signaler les bugs).
+- Enveloppez les longues vues de planche dans la liste des indices et des notes.
+- Un nouvel analyseur XML Keesing.
+- Caractéristiques supplémentaires CerveauxUniquement: boîtes circulaires, carré de rebus, info puzzle.
+- Caractéristiques supplémentaires IPuz: étiquettes d'indices, n'importe quel mot croisé, acrostique, "smart" indexation cellulaire (par défaut 0-basé maintenant).
+- Caractéristiques supplémentaires JPZ: soutenir les extensions acrostiques d'Alex Boisvert.
+- Cellules de groupe sans indice pour entrer plus facilement.
+- Remake icône de l'application avec Android 13 support d'icône thématique.
+- Correction du mode scratch dans la vue principale et d'autres bugs.
+
+Changelog traduit avec Argos Translate.

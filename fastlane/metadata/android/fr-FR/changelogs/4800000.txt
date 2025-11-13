@@ -1,0 +1,7 @@
+- Sauter des lettres qui ne seront pas supprimées lors de l'effacement
+- Lorsque les mots non remplis du cycle sont activés, le cycle recule aussi bien que vers l'avant
+- Détecter les fichiers .puz avec "pas de solution" (c'est-à-dire toutes les réponses X ou tous les D)
+- Couleur du drapeau par défaut en mode nuit
+- Correction de la position du bouton d'action flottant sur certains appareils
+
+Changelog traduit avec Argos Translate.

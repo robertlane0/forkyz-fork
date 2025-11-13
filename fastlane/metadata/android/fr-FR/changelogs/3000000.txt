@@ -1,0 +1,3 @@
+En option PuzzleMe liste d'indices de style mobile montrant tous les mots
+
+Changelog traduit avec Argos Translate.

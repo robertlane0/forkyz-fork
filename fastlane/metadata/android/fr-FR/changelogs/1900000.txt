@@ -1,0 +1,9 @@
+- Prise en charge des cellules colorées en JPZ et IPuz
+- Barres de support en JPZ et IPuz
+- Supporter le HTML dans le texte indice/titre/etc
+- Notes de joueur pour le puzzle entier ainsi que juste indice
+- Prise en charge limitée des listes d'indices supplémentaires (pas seulement en sens inverse)
+- Permettre que les cellules qui seraient généralement numérotées ne soient pas numérotées
+
+
+Changelog traduit avec Argos Translate.

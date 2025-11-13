@@ -1,0 +1,5 @@
+- Supporter les formes de fond dans les spécifications IPuz (à la fois IPuz et JPZ import).
+- Sauter à l'indice aléatoire via les paramètres d'interaction ou la voix ("jump").
+- Supprimer Notre Temps Geant Force 2 téléchargeur (pas un puzzle régulier).
+
+Changelog traduit avec Argos Translate.

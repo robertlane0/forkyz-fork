@@ -1,0 +1,3 @@
+- Corrections et mises à jour de la bibliothèque.
+
+Changelog traduit avec Argos Translate.

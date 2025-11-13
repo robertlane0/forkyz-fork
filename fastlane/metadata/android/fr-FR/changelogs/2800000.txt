@@ -1,0 +1,3 @@
+- Correction en mode paysage.
+
+Changelog traduit avec Argos Translate.

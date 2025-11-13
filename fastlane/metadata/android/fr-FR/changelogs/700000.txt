@@ -1,0 +1,7 @@
+- Importer des fichiers de stockage.
+- Mise à jour des pages d'aide, y compris les notes.
+- Liste des sources externes où des puzzles peuvent être téléchargés.
+- Le nouveau mode clavier par défaut se cache uniquement avec le bouton arrière.
+- Réglage du comportement zoom/snap sur la carte de jeu.
+
+Changelog traduit avec Argos Translate.

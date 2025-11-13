@@ -1,0 +1,11 @@
+- Nouveau téléchargement quotidien : Hamburger Abendblatt (allemand).
+- Nouveau téléchargement quotidien : Le Parisien.
+- Nouveau racleur : Przekroj Magazine (polonais), avec photos !
+- Tentative de gérer correctement le clavier natif (peut maintenant entrer les diacritiques et les émojis).
+- Permettre une source de téléchargement personnalisée dans n'importe quel format pris en charge, pas seulement .puz.
+- Nouveaux formats d'importation supportés : Raetselzentrale Schwedenratsel JSON, RCI Jeux Mots Flèches JSON, Guardian HTML, Przekroj HTML et JSON.
+- Actualiser la liste des sources de puzzle en ligne.
+- Correct charset pour Across Lite (.puz) version 2.0 et up.
+- Ajouter l'URL de partage. Visible lors du partage d'indices, et peut être ouvert depuis le menu de partage.
+
+Changelog traduit avec Argos Translate.

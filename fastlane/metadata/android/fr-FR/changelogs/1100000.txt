@@ -1,0 +1,4 @@
+- Ajoutez un indice de changement et des boutons de direction au clavier.
+- Afficher l'auteur du puzzle sur l'écran.
+
+Changelog traduit avec Argos Translate.

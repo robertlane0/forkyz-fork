@@ -1,0 +1,7 @@
+- Cache meta data pour accélérer la navigation (après première vue).
+- Nettoyer le comportement zoom/scroll.
+- Ajouter un lien d'option de menu pour prendre en charge les sources de puzzle.
+- Améliorer la navigation des touches fléchées (y compris les corrections de bugs).
+- Correction de l'écrasement dans la navigation quand le dernier puzzle a été supprimé.
+
+Changelog traduit avec Argos Translate.

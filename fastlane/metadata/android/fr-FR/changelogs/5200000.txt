@@ -1,0 +1,7 @@
+- Fixez le prochain indice erratique.
+- Correction du crash sur Android 7.
+- Correction de crash dans anagram helper sur Android 9 et le réglage de prédiction.
+- Correction du crash sur l'importation de puzzle externe.
+- Date de lecture et titre complet en format Cerveaux seulement.
+
+Changelog traduit avec Argos Translate.

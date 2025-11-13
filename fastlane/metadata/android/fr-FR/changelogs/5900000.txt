@@ -1,0 +1,10 @@
+- Nouveaux puzzles: partage de mycrossword.co.uk, grattez Guardian Everyman et Quick.
+- Ajouter la forme de puzzle comme taille de grille par défaut dans l'écran de lecture (paramètres d'affichage).
+- Ajouter les mêmes options de taille de grille pour le paysage que le portrait (paramètres d'affichage).
+- Ajouter des options pour afficher deux listes d'indices côte à côte (paramètres d'affichage).
+- Ajouter l'option au cycle non rempli seulement lors de l'avancement (réglages d'interaction).
+- Ajouter l'option pour changer de direction avant de bouger avec les touches fléchées (réglages d'interaction).
+- Ajouter les paramètres import/export.
+- Supprimer l'indicateur de mise au point de la carte sur l'écran de jeu lors de l'utilisation des clés matérielles.
+
+Changelog traduit avec Argos Translate.

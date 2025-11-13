@@ -1,0 +1,5 @@
+- Formes de support au format TCA puz (LA Times).
+- Correction d'un bug clavier intégré (merci @MIC132MIC).
+- Arrêter correctement la détection de secousse si elle est activée en arrière-plan.
+
+Changelog traduit avec Argos Translate.

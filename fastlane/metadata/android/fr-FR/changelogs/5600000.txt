@@ -1,0 +1,6 @@
+- Ajouter une fonction de notation de puzzle via la boîte de dialogue info puzzle.
+- Indiquez dans la barre d'état lorsque les erreurs sont actives.
+- Soutenir les derniers puzzles Hamburger Abendblatt.
+- Ajouter une pause clavier à la fin de la pile de défaire.
+
+Changelog traduit avec Argos Translate.

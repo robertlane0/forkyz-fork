@@ -1,0 +1,5 @@
+- Avertissement si aucune connexion lors du téléchargement.
+- Ajouter une option de thème légué.
+- Permettre aux téléchargeurs automatiques/de fond d'être une sous-sélection des téléchargeurs activés.
+
+Changelog traduit avec Argos Translate.

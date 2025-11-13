@@ -1,0 +1,3 @@
+Supprimer la notification "échec" lors du téléchargement d'un puzzle existant.
+
+Changelog traduit avec Argos Translate.

@@ -1,0 +1,4 @@
+- Prise en charge des configurations des claviers QWERTZ, Colemak et Dvorak.
+- Source de .puz quotidienne personnalisée ajoutée aux téléchargements.
+
+Changelog traduit avec Argos Translate.

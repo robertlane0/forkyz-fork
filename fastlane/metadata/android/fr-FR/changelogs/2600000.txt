@@ -1,0 +1,6 @@
+- Ajouter timeout configurable au téléchargement du puzzle.
+- Paralléliser les téléchargements.
+- Prise en charge des cellules de rebus dans les fichiers AcrossLite (.puz).
+- Prise en charge des messages d'introduction du puzzle (dans "info") et des messages d'achèvement (sur la boîte de dialogue complète).
+
+Changelog traduit avec Argos Translate.

@@ -1,0 +1,8 @@
+- Ajouter la disposition du clavier AZERTY (merci Patrik Herbeuval).
+- Ajouter TCA JSON parser et LA Times downloader (via Chicago Tribune).
+- Ajouter une option pour le comportement de mouvement à la fin de l'indice dans Clue List.
+- Ajouter une option pour supprimer la boîte de dialogue de confirmation.
+- Fix Everyman importer via part (encore une fois).
+- Fixez des bouchons de force pour clavier natif.
+
+Changelog traduit avec Argos Translate.

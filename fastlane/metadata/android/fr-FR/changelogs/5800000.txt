@@ -1,0 +1,3 @@
+- Correction du crash en cas d'erreurs de présentation.
+
+Changelog traduit avec Argos Translate.

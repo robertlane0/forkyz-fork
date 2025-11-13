@@ -1,0 +1,7 @@
+- Ajoute l'option Caps force à la boîte de dialogue d'entrée spéciale.
+- Réparer le téléchargeur Cryptique Irlandais.
+- Correction du comportement stop-on-end sur la liste des indices et la page des notes.
+- Déplacer les paramètres vers la datastore (exige que les paramètres exportés soient réexportés).
+- Remise en œuvre de la liste de Clue dans Compose (en espérant invisible sauf positionnement de menu).
+
+Changelog traduit avec Argos Translate.

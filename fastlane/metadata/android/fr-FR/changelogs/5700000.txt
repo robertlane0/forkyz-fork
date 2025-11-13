@@ -1,0 +1,6 @@
+- Puzzle de rendu en carreaux (sur écran) (pour les grandes grilles et les gros zooms).
+- Option pour indiquer dans la liste de puzzle si le puzzle a une solution (paramètres de navigateur).
+- L'amélioration de la cohérence de la barre d'état indique des erreurs.
+- Ajouter une gamme complète d'options à la liste des indices et des pages de notes.
+
+Changelog traduit avec Argos Translate.

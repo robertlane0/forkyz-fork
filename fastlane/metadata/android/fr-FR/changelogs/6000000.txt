@@ -1,0 +1,8 @@
+- Ajouter PPL en format de puzzle / partage pris en charge et corriger le téléchargement Metro.
+- Ajouter Irish Times et Guardian Quiptic (merci winkelnp) téléchargeurs.
+- Afficher l'indice sélectionné dans la liste par le bouton surligné ou radio (réglages d'affichage).
+- Afficher les séparateurs de mots sur la grille (paramètres d'affichage).
+- Ajoutez 15squared.net (puzzle) et DuckDuckGo (clue) à des outils externes.
+
+
+Changelog traduit avec Argos Translate.

@@ -1,0 +1,5 @@
+- Correction des chargements automatiques cassés
+- Ajouter un indice de modification au menu des notes
+- Fixer le défilement à l'indice de comportement
+
+Changelog traduit avec Argos Translate.

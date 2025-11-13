@@ -1,0 +1,6 @@
+- Ajouter la boîte de dialogue de confirmation de suppression.
+- Correction afficher les erreurs état-bar indicateur sur les anciennes versions Android.
+- Réparation des téléchargements de métro.
+- Déplacez le widget de liste d'indices vers Composer.
+
+Changelog traduit avec Argos Translate.

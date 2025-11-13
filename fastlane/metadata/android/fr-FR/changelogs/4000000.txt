@@ -1,0 +1,6 @@
+- Ajouter "Task Chat GPT for help" (configurer dans les paramètres d'interaction).
+- Bienvenue aux utilisateurs de nouvelles versions, avec lien vers les notes de sortie.
+- Pour les cellules non attachées aux indices, basculer entre la sélection de la cellule et toutes les cellules détachées.
+- Ajouter Nathan Curtis et Luckystreak XWords à la page des sources en ligne.
+
+Changelog traduit avec Argos Translate.

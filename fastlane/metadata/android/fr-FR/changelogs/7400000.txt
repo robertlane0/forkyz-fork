@@ -1,0 +1,9 @@
+- Nouveaux téléchargeurs : TF1/Sud Ouest Mots Felches/Croises.
+- Options sur la façon dont les listes/nombres d'indices sont affichés dans l'affichage des indices (paramètres d'affichage).
+- Laisser la ligne d'indice s'étendre avec la taille de l'indice (paramètres d'affichage).
+- Emprunter Kotwords/xword-dl pour le décodage de tous les hommes.
+- Réécrire le code de rendu de la carte dans Compose (veuillez signaler les bogues).
+- Corrections mineures et nouveaux bugs.
+- Cibler Android 16.
+
+Changelog traduit avec Argos Translate.

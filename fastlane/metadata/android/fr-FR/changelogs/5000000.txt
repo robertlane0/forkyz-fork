@@ -1,0 +1,8 @@
+- Importez des puzzles en partageant une URL avec Forkyz (travaille avec des liens vers des fichiers de puzzle et des pages web pour Crossword Nexus, Exolve, Guardian, Hamburger Abendblatt, Metro (UK), Przekroj, De Standaard, De Telegraaf, Wall Street Journal (parfois), et similaire).
+- Supporter de nouveaux formats d'entrée (AM Universal JSON, Exolve, PA Puzzles HTML, SpooNBill, Wall Street Journal JSON, .xd, XWord).
+- Télécharger pour UK Metro quotidien cryptique.
+- Aptitude à signaler les cellules.
+- Ajouter le pourcentage d'option correcte dans le navigateur de puzzle.
+- Édition d'indices non sélectionnables.
+
+Changelog traduit avec Argos Translate.

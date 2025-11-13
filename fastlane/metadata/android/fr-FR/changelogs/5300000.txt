@@ -1,0 +1,8 @@
+- Mettre à jour le modèle ChatGPT (merci Adam Cole).
+- Ajouter "play letter undo stack" (paramètres d'interaction, merci @jimmylord).
+- Faites respecter l'indice précédent.
+- Changez "montrer l'indice des erreurs" pour montrer seulement les mauvaises lettres comme indiqué.
+- Affiner les options "ne pas supprimer le croisement" (paramètres d'interaction).
+- Faire le thème un peu plus "Matériel 3".
+
+Changelog traduit avec Argos Translate.

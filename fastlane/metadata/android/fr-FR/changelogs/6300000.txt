@@ -1,0 +1,6 @@
+- Correction des téléchargements de fond.
+- Correction du gel de la liste des indices lors de l'activation des erreurs.
+- Améliorer la fiabilité du puzzle.
+- Correction de la valeur initiale dans la boîte de dialogue d'entrée spéciale.
+
+Changelog traduit avec Argos Translate.

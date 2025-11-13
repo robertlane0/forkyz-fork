@@ -1,0 +1,5 @@
+- Ajout d'un indice de partage / fonctionnalité de tableau.
+- Prendre en charge les notes sur tous les indices, les cellules avec des nombres dans différentes positions, et entrer plusieurs caractères dans une seule cellule.
+- Activer l'échelle automatique de taille de texte d'indice pour les anciens appareils, supprimer l'option de menu de taille de texte d'indice.
+
+Changelog traduit avec Argos Translate.

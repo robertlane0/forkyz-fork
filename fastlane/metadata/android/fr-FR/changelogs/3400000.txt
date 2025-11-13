@@ -1,0 +1,3 @@
+- Support USA Today Sunday téléchargements (thx th0mcat).
+
+Changelog traduit avec Argos Translate.

@@ -1,0 +1,5 @@
+- Passez au thème Matériau 3.
+- Activer les couleurs dynamiques (Matériel You) dans les paramètres.
+- Revoir les paramètres de l'écran dans les sous-écrans.
+
+Changelog traduit avec Argos Translate.

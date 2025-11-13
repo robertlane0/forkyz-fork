@@ -1,0 +1,4 @@
+- Supprimer LA Times et Washington Post Classic téléchargements.
+- Autoriser l'importation de plusieurs fichiers simultanément.
+
+Changelog traduit avec Argos Translate.

@@ -1,0 +1,6 @@
+- Configurer la répétition du clavier intégré (réglages du clavier).
+- Attendez jusqu'à ce qu'Internet soit disponible avant de télécharger automatiquement.
+- La version mini Android a atteint 5 (SDK21, mises à jour de la bibliothèque).
+- Correction de l'écrasement lors du zoom dans le maximum.
+
+Changelog traduit avec Argos Translate.

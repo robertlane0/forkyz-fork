@@ -1,0 +1,5 @@
+- Permettre la personnalisation des téléchargements automatiques, et prendre en charge les anciens appareils.
+- Ramenez le clavier natif (votre kilométrage peut varier).
+- Restaurer le comportement de la prochaine liste pour la prochaine stratégie de mouvement des indices.
+
+Changelog traduit avec Argos Translate.

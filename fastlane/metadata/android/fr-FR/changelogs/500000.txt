@@ -1,0 +1,8 @@
+- Compatible avec Android 11.
+- Mise à jour des puzzles téléchargeables.
+- Ajustements au thème et à l'assurance-chômage.
+- Ecran de résolution des notes/anagrammes.
+- Supprimer l'intégration de Google.
+- Enlever Crashlytics.
+
+Changelog traduit avec Argos Translate.

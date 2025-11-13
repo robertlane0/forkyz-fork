@@ -1,0 +1,6 @@
+- Ajoutez des commandes vocales aux activités de puzzle.
+- Configuration des téléchargeurs maintenant conscient du temps de disponibilité prévu des sources de puzzle.
+- Cibler Android 13.
+- Des modifications mineures de l'UI.
+
+Changelog traduit avec Argos Translate.

@@ -1,0 +1,7 @@
+- Mettez à jour Joseph, Metro, Premier et Sheffer téléchargeurs.
+- Supprimez le téléchargeur Everyman depuis le déménagement de Guardian. Support expérimental en partageant l'URL Observateur Everyman avec Forkyz, susceptible de casser bientôt.
+- Mark Le Parisien télécharger car il ne télécharge pas les vrais puzzles actuels.
+- Réparer les téléchargements horaires et protéger contre les téléchargements simultanés.
+- Déplacer l'écran principal vers Composer.
+
+Changelog traduit avec Argos Translate.

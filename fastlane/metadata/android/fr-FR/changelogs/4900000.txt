@@ -1,0 +1,7 @@
+- Ajoutez le menu et les paramètres d'outils externes (solveur de mots croisés de billthefarmer, dictionnaires, ChatGPT).
+- Prévoir des lettres anagrammes dans les notes (paramètres d'interaction).
+- Fixez la direction des changements, le téléchargement de Przekroj et la lecture des métadonnées de date.
+- Faire l'analyse de certains fichiers de puzzle (JSON) plus clément.
+- Effacer les sections vides lors du déplacement/suppression des puzzles.
+
+Changelog traduit avec Argos Translate.

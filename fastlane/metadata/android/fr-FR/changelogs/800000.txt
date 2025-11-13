@@ -1,0 +1,8 @@
+- Importation de fichiers IPuz
+- Utiliser IPuz comme format de fichier backend au lieu de l'ensemble
+- Supprimer les actions du système HTTP/download en faveur de "open with"
+- Prévenir les multiples activités de navigation simultanée
+- Évitez de recharger la liste de puzzles dans l'activité de navigation sur supprimer/déplacer, et perdre la position de défilement
+- Noms de fichiers d'importation plus amis
+
+Changelog traduit avec Argos Translate.

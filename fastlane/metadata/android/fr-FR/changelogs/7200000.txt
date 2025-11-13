@@ -1,0 +1,6 @@
+- Ajouter El Pais Experto téléchargeur.
+- Ajouter le partage d'achèvement et le temps d'achèvement en millis (merci @develinthedetails).
+- Ajouter une flèche de retour aux sous-menus (merci @develsinthedetails).
+- Modifications à la gestion des paramètres du moteur (veuillez signaler les bogues).
+
+Changelog traduit avec Argos Translate.

@@ -1,0 +1,13 @@
+- Nouvelle application Forkyz Scanner soumise à FDroid (photos, images, PDF).
+- Ajouter des erreurs d'affichage pour l'option des indices complétés.
+- Ajoute la fonctionnalité d'édition des indices depuis le menu de la liste des indices.
+- Correction Hamburger Abendblatt télécharger.
+- Cacher afficher les erreurs et révéler les options lorsque le puzzle n'a pas de solution stockée.
+- Brighten thème standard gris un peu.
+- Simplifiez les écrans de notes d'aide/release avec un meilleur support thématique.
+- Utilisez les entrées de texte de matériel dans les endroits.
+- Fermer après l'importation externe pour éviter la bizarrerie du lanceur.
+- Ouvrir les fichiers partagés et application/json.
+- Les améliorations du clavier natif devraient fonctionner sur plus d'appareils.
+
+Changelog traduit avec Argos Translate.

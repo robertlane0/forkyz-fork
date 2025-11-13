@@ -1,0 +1,4 @@
+- Ajouter le cycle sur les mots non remplis dans les paramètres.
+- Ajouter des drapeaux multicolores (longer l'index du drapeau sur les notes ou utiliser le menu).
+
+Changelog traduit avec Argos Translate.

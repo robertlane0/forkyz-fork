@@ -1,0 +1,3 @@
+- Correction de bogue: définissez la source et supportez l'URL correctement pour les téléchargements Guardian.
+
+Changelog traduit avec Argos Translate.

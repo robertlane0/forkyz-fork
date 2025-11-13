@@ -1,0 +1,5 @@
+- Utilisez Compose Navigation pour déplacer entre les pages (veuillez signaler les bogues).
+- Correction plantage sur Android 10 et ci-dessous.
+- Corrections de bugs (anagrammes, saut-à-clue, recherche de puzzle, couleur de barre d'état) et nouveaux bugs.
+
+Changelog traduit avec Argos Translate.

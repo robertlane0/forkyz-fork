@@ -1,0 +1,7 @@
+- Support initial pour les puzzles à barres en format IPuz (essai sur les puzzles Square Chase seulement).
+- Ajoutez "flag indice".
+- Ajouter l'option de bouton de cache pour le clavier (bon pour la navigation gestuelle).
+- Afficher le nombre de mots dans la liste des indices lorsque l'option est définie.
+- Recoder la stratégie de mouvement parallèle.
+
+Changelog traduit avec Argos Translate.

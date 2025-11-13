@@ -1,0 +1,3 @@
+- Correction des annonces indésirables (doit maintenant être activé explicitement dans les paramètres).
+
+Changelog traduit avec Argos Translate.

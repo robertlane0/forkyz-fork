@@ -1,0 +1,6 @@
+- Ajouter un filtre à la liste des puzzles
+- Importer automatiquement les fichiers du dossier "to-import"
+- Inférer certaines métadonnées du nom de fichier si nécessaire (supporte les conventions xword-dl et Forkyz par défaut)
+- Signaler les messages d'erreur ChatGPT en réponse
+
+Changelog traduit avec Argos Translate.

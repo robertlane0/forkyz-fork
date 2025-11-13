@@ -1,0 +1,6 @@
+- Changer le comportement de la longue pression sur la page des notes (pression longue d'un widget sur le widget actuellement focalisé).
+- Correction du chevauchement UI qui s'est produit sur certaines versions Android.
+- Correction du crash à importer sur les noms de fichiers dupliqués.
+- Prévoyez aussi des chars anagrammes quand l'indice n'est pas sur le tableau.
+
+Changelog traduit avec Argos Translate.

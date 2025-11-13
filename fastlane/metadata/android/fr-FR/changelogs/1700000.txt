@@ -1,0 +1,3 @@
+- Correction des pannes lorsque la première case est vide, et lorsque les répertoires de mots croisés ont été supprimés.
+
+Changelog traduit avec Argos Translate.

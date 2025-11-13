@@ -1,0 +1,8 @@
+- Les sources expérimentales sont maintenant des racleurs, visibles dans la boîte de dialogue de téléchargement.
+- Ajouter Private Eye comme source téléchargeable.
+- Soutenir les indices partagés dans les puzzles Guardian.
+- Ajouter une fonctionnalité de caractères spéciaux.
+- Actualiser la liste des sources en ligne.
+- Supprimer Washington Post source: AmuseLabs masque maintenant leurs données, je suppose pour empêcher les téléchargements tiers.
+
+Changelog traduit avec Argos Translate.

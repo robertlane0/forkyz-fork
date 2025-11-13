@@ -1,0 +1,7 @@
+- Mise à jour de la liste des sources de puzzle en ligne.
+- Ajouter des erreurs sous l'option curseur.
+- Amuse Labs et King Les téléchargements numériques pris en charge : les boîtes circulaires fonctionnent maintenant pour les puzzles LA Times, ramènent Washington Post, LAT Sundays, Joseph, Sheffer et Premier crossword downloaders.
+- Boîtes en cercle réactivées dans des puzzles JPZ.
+- Amélioration de l'erreur dans les couleurs de nuit.
+
+Changelog traduit avec Argos Translate.

@@ -1,0 +1,10 @@
+- Amélioration de l'accessibilité : annonces d'indices/boîtes via TalkBack ou SMS-to-Speech.
+- Supporter plus de style de puzzle (couleurs, points/dashes, blocs).
+- Supporter plus de fonctionnalités de style IPuz (plus quelques relaxations comme les couleurs HTML).
+- Supportez les cellules JPZ "clue", déplacez les citations au message d'achèvement.
+- Support barres cassées dans RCI Jeux importations, plus plus de puzzles français (merci slock83).
+- Correction du bug de nettoyage pour les puzzles terminés.
+- Affichez l'introduction en première sortie, ajoutez les données d'achèvement aux informations de puzzle.
+- Changez les notes de sortie.
+
+Changelog traduit avec Argos Translate.

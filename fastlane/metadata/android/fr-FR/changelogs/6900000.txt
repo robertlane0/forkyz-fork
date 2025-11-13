@@ -1,0 +1,7 @@
+- Nouveau dialogue de téléchargement.
+- C'est un casse-tête.
+- Transition complète des widgets de l'application finale vers Composer.
+- Répare le partage de tous les hommes.
+- Corrections mineures et nouveaux bugs.
+
+Changelog traduit avec Argos Translate.

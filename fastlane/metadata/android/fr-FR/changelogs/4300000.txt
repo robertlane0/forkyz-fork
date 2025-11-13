@@ -1,0 +1,4 @@
+- Retravail en arrière-plan pour la gestion des paramètres et d'autres parties (veuillez signaler les problèmes).
+- Corrections mineures de bugs, améliorations de cohérence et léger changement de thème.
+
+Changelog traduit avec Argos Translate.

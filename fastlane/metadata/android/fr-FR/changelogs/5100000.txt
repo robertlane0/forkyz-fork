@@ -1,0 +1,7 @@
+- Ajouter une option compacte pour le clavier Forkyz (réglages de clavier).
+- Ajout d'une option de rapport grille/clue pour l'écran Play (paramètres d'affichage).
+- Ajouter une ligne d'indice optionnelle sous la grille (paramètres d'affichage).
+- Ajouter un téléchargeur NYT Syndicat et Pzzl.com share-import.
+- Cibler Android 14, mettre à jour les libs, version min KitKat maintenant.
+
+Changelog traduit avec Argos Translate.

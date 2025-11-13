@@ -1,0 +1,4 @@
+- Déplacez-vous vers des "zones" au lieu de seulement des indices croisés/bas, et permettre des nombres d'indices non standard. Supporte par exemple les spirales et les rangées de jardins en IPuz et JPZ.
+- Option de rétroaction haptique sur clavier.
+
+Changelog traduit avec Argos Translate.

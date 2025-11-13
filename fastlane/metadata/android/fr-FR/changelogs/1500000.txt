@@ -1,0 +1,7 @@
+- Téléchargement de réparation pour Android 12
+- Note page: long presse board tandis que source anagramme sélectionné copie maintenant la carte à la solution anagramme.
+- Comportement corrigé snap-to-clue
+- Pairs fixes dans les onglets d'indices
+
+
+Changelog traduit avec Argos Translate.

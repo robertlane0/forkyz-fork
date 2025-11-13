@@ -1,0 +1,4 @@
+- Mot de solution "Pinned" dans les puzzles Hamburger Abendblatt.
+- Déplacez l'option « Afficher tous les mots » dans le menu de la liste des indices.
+
+Changelog traduit avec Argos Translate.

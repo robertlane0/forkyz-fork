@@ -1,0 +1,4 @@
+- Correction de la touche de suppression sur le clavier intégré.
+- Essayez une importation plus robuste de chaque homme à partir de l'URL partagée.
+
+Changelog traduit avec Argos Translate.

@@ -1,0 +1,9 @@
+- Réécrire la page Notes dans Compose.
+- Ajouter le visionneur de journaux dans les paramètres.
+- Ajouter des puzzles export dans les paramètres.
+- Correction des téléchargements Guardian.
+- Correction du clavier dans la liste des clés.
+- Correction du temps de puzzle dans Info Dialog.
+- Réparer l'accident pendant l'économie au réveil du téléphone.
+
+Changelog traduit avec Argos Translate.

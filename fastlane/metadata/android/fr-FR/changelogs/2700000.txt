@@ -1,0 +1,4 @@
+- Contrôle légèrement plus fin des notifications dans les réglages.
+- Avertissez les téléchargements ratés.
+
+Changelog traduit avec Argos Translate.

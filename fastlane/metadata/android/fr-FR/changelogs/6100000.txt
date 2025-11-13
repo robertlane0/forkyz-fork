@@ -1,0 +1,10 @@
+- Cible Android 15.
+- Ajouter Metro Télécharger rapidement.
+- Réécrire l'écran des paramètres.
+- Ajout d'une option pour forcer l'entrée native à la case supérieure (réglages du clavier).
+- Ajouter "verrouillé" à l'écran (paramètres d'affichage).
+- Pressez longuement pour déplacer la solution d'anagramme vers la source sur la page Notes (source focus d'abord).
+- Ça change pour les séparateurs.
+- Corrections mineures et nouveaux bugs.
+
+Changelog traduit avec Argos Translate.
