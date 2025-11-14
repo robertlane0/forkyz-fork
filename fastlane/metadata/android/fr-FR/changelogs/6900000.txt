@@ -1,5 +1,5 @@
 - Nouveau dialogue de téléchargement.
-- C'est un casse-tête.
+- Affiche tous les puzzles dans les paramètres [corrected by Clem0908].
 - Transition complète des widgets de l'application finale vers Composer.
 - Répare le partage de tous les hommes.
 - Corrections mineures et nouveaux bugs.
