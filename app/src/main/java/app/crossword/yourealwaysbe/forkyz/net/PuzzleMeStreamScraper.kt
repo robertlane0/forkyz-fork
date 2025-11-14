@@ -11,7 +11,7 @@ import kotlin.collections.ArrayDeque
 import android.util.Base64
 import android.util.Log
 
-import org.json.JSONException
+import app.crossword.yourealwaysbe.org.json.JSONException
 
 import app.crossword.yourealwaysbe.forkyz.util.getURLInputStream
 import app.crossword.yourealwaysbe.puz.Puzzle
