@@ -572,6 +572,7 @@
     <string name="app_name">Forkyz</string>
     <string name="settings_label">Paramètres</string>
     <string name="clues_list_label">Indices</string>
+    <string name="key_special_entry">à</string>
     <string name="key_a">a</string>
     <string name="key_b">b</string>
     <string name="key_c">c</string>
