@@ -256,4 +256,6 @@ message Settings {
     bool downloadSudOuestMotsCroises = 135;
     bool downloadTF1MotsCroises = 136;
     bool dontSnapBoardToBorders = 137;
+    bool downloadNRCInHetMidden = 138;
+    bool downloadNRCScrypto = 139;
 }

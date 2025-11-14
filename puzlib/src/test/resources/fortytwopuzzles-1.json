@@ -1,0 +1,47 @@
+{
+  "puzzle": {
+    "width": 5,
+    "height": 5,
+    "values": [
+      "@", 1,   2,   3,   "@",
+      4,   0,   0,   0,   "@",
+      5,   0,   0,   0,   6,
+      7,   0,   0,   0,   0,
+      "@", "@", "@", "@", 0
+    ],
+    "solution": [
+      "@", "O", "N", "E", "@",
+      "F", "O", "U", "R", "@",
+      "F", "I", "V", "E", "S",
+      "S", "E", "V", "E", "N",
+      "@", "@", "@", "@", "X"
+    ],
+    "hclues": {
+      "1": "The first number",
+      "4": "The fourth number",
+      "5": "The fifth number plus an 'S'",
+      "7": "The seventh number"
+    },
+    "vclues": {
+      "1": "Seemingly random vowels",
+      "2": "Seemingly random letters",
+      "3": "The most common letter in the alphabet and an 'R'",
+      "4": "For crying out loud",
+      "6": "The sixth number, but the second letter is an 'N'"
+    },
+    "hwords": {
+      "1": "ONE",
+      "4": "FOUR",
+      "5": "FIVES",
+      "7": "SEVEN"
+    },
+    "vwords": {
+      "1": "OOIE",
+      "2": "NUVV",
+      "3": "EREE",
+      "4": "FFS",
+      "6": "SNX"
+    },
+    "date": "18-11-2025"
+  }
+}

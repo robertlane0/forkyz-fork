@@ -22,6 +22,8 @@ data class DownloadersSettings(
     val downloadMetroQuick : Boolean,
     val downloadNewsday : Boolean,
     val downloadNewYorkTimesSyndicated : Boolean,
+    val downloadNRCInHetMidden : Boolean,
+    val downloadNRCScrypto : Boolean,
     val downloadPremier : Boolean,
     val downloadSheffer : Boolean,
     val downloadSudOuestMotsCroises : Boolean,

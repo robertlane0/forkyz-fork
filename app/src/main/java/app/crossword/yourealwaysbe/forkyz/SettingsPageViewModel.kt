@@ -542,6 +542,13 @@ class SettingsPageViewModel(
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
+            R.string.nrc_in_het_midden,
+            R.string.nrc_in_het_midden_desc,
+            settings.liveDownloadNRCInHetMidden.stateInHere(),
+            settings::setDownloadNRCInHetMidden,
+        ),
+        SettingsBoolean(
+            SettingsPage.PUZZLE_SOURCES_DAILY,
             R.string.sheffer_crossword,
             R.string.updates_mon_sat,
             settings.liveDownloadSheffer.stateInHere(),
@@ -630,6 +637,13 @@ class SettingsPageViewModel(
             settings.liveDownloadGuardianWeeklyQuiptic.stateInHere(),
             settings::setDownloadGuardianWeeklyQuiptic,
         ),
+        SettingsBoolean(
+            SettingsPage.PUZZLE_SOURCES_WEEKLY,
+            R.string.nrc_scrypto,
+            R.string.nrc_scrypto_desc,
+            settings.liveDownloadNRCScrypto.stateInHere(),
+            settings::setDownloadNRCScrypto,
+        )
     )
 
     val downloadersTogglesWeeklyLarge = listOf(

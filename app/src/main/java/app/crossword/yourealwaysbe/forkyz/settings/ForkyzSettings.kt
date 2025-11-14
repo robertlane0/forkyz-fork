@@ -450,6 +450,8 @@ class ForkyzSettings(val settingsStore: DataStore<Settings>) {
             settings.downloadMetroQuick,
             settings.downloadNewsday,
             settings.downloadNewYorkTimesSyndicated,
+            settings.downloadNRCInHetMidden,
+            settings.downloadNRCScrypto,
             settings.downloadPremier,
             settings.downloadSheffer,
             settings.downloadSudOuestMotsCroises,
@@ -1085,6 +1087,30 @@ class ForkyzSettings(val settingsStore: DataStore<Settings>) {
     fun setDownloadNewsday(value : Boolean) {
         settingsUpdate { settings ->
             settings.toBuilder().setDownloadNewsday(value).build()
+        }
+    }
+
+    val liveDownloadNRCInHetMidden : Flow<Boolean>
+        = settingsMap { it.downloadNRCInHetMidden }
+
+    fun getDownloadNRCInHetMidden(cb: (Boolean) -> Unit)
+        = settingsOnce(cb) { it.downloadNRCInHetMidden }
+
+    fun setDownloadNRCInHetMidden(value : Boolean) {
+        settingsUpdate { settings ->
+            settings.toBuilder().setDownloadNRCInHetMidden(value).build()
+        }
+    }
+
+    val liveDownloadNRCScrypto : Flow<Boolean>
+        = settingsMap { it.downloadNRCScrypto }
+
+    fun getDownloadNRCScrypto(cb: (Boolean) -> Unit)
+        = settingsOnce(cb) { it.downloadNRCScrypto }
+
+    fun setDownloadNRCScrypto(value : Boolean) {
+        settingsUpdate { settings ->
+            settings.toBuilder().setDownloadNRCScrypto(value).build()
         }
     }
 
@@ -2584,6 +2610,16 @@ class ForkyzSettings(val settingsStore: DataStore<Settings>) {
             "downloadNewsday",
             { s, key -> json.put(key, s.downloadNewsday) },
             { key -> json.optBoolean(key)?.let { setDownloadNewsday(it) } },
+        )
+        run(
+            "downloadNRCInHetMidden",
+            { s, key -> json.put(key, s.downloadNRCInHetMidden) },
+            { key -> json.optBoolean(key)?.let { setDownloadNRCInHetMidden(it) } },
+        )
+        run(
+            "downloadNRCScrypto",
+            { s, key -> json.put(key, s.downloadNRCScrypto) },
+            { key -> json.optBoolean(key)?.let { setDownloadNRCScrypto(it) } },
         )
         run(
             "downloadPremier",

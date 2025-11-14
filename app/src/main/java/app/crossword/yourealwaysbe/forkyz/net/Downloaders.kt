@@ -5,7 +5,6 @@ import java.time.Duration
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
@@ -21,9 +20,11 @@ import app.crossword.yourealwaysbe.forkyz.settings.DownloadersSettings
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler
 import app.crossword.yourealwaysbe.puz.io.BrainsOnlyIO
+import app.crossword.yourealwaysbe.puz.io.FortyTwoPuzzlesIO
 import app.crossword.yourealwaysbe.puz.io.GuardianJSONIO
 import app.crossword.yourealwaysbe.puz.io.IO
 import app.crossword.yourealwaysbe.puz.io.JPZIO
+import app.crossword.yourealwaysbe.puz.io.NRCInHetMiddenIO
 import app.crossword.yourealwaysbe.puz.io.PMLIO
 import app.crossword.yourealwaysbe.puz.io.PrzekrojIO
 import app.crossword.yourealwaysbe.puz.io.RCIJeuxMFJIO
@@ -500,6 +501,32 @@ class Downloaders(
                 "'https://nytsyn.pzzl.com/cwd_seattle/#/s/'"
                     + "yyMMdd",
                 LocalDate.now().plusDays(-7),
+            ))
+        }
+
+        if (settings.downloadNRCInHetMidden) {
+            downloaders.add(AbstractDateDownloader(
+                "nrc_inhetmidden",
+                utils.getString(R.string.nrc_in_het_midden),
+                AbstractDateDownloader.DAYS_WEEKDAY,
+                Duration.ofHours(1), // Wild guess
+                "https://abonnementen.nrc.nl/",
+                NRCInHetMiddenIO(),
+                "'https://api.42puzzles.com/player/nrc/rrFksRq7v6pSweNyhBXk?date='" + "yyyy-MM-dd",
+                "'https://www.nrc.nl/puzzels/inhetmidden/'"
+            ))
+        }
+
+        if (settings.downloadNRCScrypto) {
+            downloaders.add(AbstractDateDownloader(
+                "nrc_scrypto",
+                utils.getString(R.string.nrc_scrypto),
+                AbstractDateDownloader.DAYS_SATURDAY,
+                Duration.ofHours(1), // Wild guess
+                "https://abonnementen.nrc.nl/",
+                FortyTwoPuzzlesIO("Scrypto", "NRC"),
+                "'https://api.42puzzles.com/player/nrc/AIbjYuckKZdc4pUpBKjW?date='" + "yyyy-MM-dd",
+                "'https://www.nrc.nl/puzzels/scrypto/'"
             ))
         }
 

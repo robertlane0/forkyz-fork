@@ -53,6 +53,8 @@ class DownloadersTest(
                 true, // downloadMetroQuick
                 true, // downloadNewsday
                 true, // downloadNewYorkTimesSyndicated
+                true, // downloadNRCInHetMidden
+                true, // downloadNRCScrypto
                 true, // downloadPremier
                 true, // downloadSheffer
                 true, // downloadSudOuestMotsCroises

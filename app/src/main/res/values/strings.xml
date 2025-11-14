@@ -244,6 +244,10 @@
     <string name="le_parisien_daily_f3_desc">Daily crossword in French, level 3. No longer matches live site, but puzzles still available.</string>
     <string name="le_parisien_daily_f4">(FR) Legacy Le Parisien Force 4</string>
     <string name="le_parisien_daily_f4_desc">Daily crossword in French, level 4. No longer matches live site, but puzzles still available.</string>
+    <string name="nrc_in_het_midden">(NL) NRC In Het Midden</string>
+    <string name="nrc_in_het_midden_desc">Updates Monday-Friday, in Dutch.</string>
+    <string name="nrc_scrypto">(NL) NRC Scrypto</string>
+    <string name="nrc_scrypto_desc">Updates Saturdays, in Dutch.</string>
     <string name="guardian_daily">Guardian Daily Cryptic</string>
     <string name="guardian_quiptic">Guardian Weekly Quiptic</string>
     <string name="independent_daily">Independent Daily Cryptic</string>

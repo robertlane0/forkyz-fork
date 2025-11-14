@@ -1,0 +1,39 @@
+{
+  "puzzle": {
+    "width": 5,
+    "height": 5,
+    "values": [
+      "@", 1,    0,   0,   "@",
+      2,   0,   "@",  "@", "@",
+      "@", "#", "#3", "#", "@",
+      4,   0,    0,   0,   0,
+      "@", "@",  0,   "@", 0
+    ],
+    "solution": [
+      "@", "O", "N", "E", "@",
+      "F", "O", "@", "@", "@",
+      "F", "M", "I", "D", "@",
+      "S", "E", "V", "E", "N",
+      "@", "@", "E", "@", "O"
+    ],
+    "hclues": {
+      "1": "The first number",
+      "2": "The fourth number, first two letters only",
+      "4": "The seventh number"
+    },
+    "vclues": {
+      "1": "Seemingly random letters",
+      "3": "Five, but without the first letter"
+    },
+    "hwords": {
+      "1": "ONE",
+      "2": "FO",
+      "4": "SEVEN"
+    },
+    "vwords": {
+      "1": "OOME",
+      "3": "IVE"
+    },
+    "date": "18-11-2025"
+  }
+}

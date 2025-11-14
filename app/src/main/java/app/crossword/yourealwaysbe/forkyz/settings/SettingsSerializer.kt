@@ -66,6 +66,8 @@ object SettingsSerializer : Serializer<Settings> {
         .setDownloadMetroQuick(true)
         .setDownloadNewYorkTimesSyndicated(true)
         .setDownloadNewsday(true)
+        .setDownloadNRCInHetMidden(true)
+        .setDownloadNRCScrypto(true)
         .setDownloadPremier(true)
         .setDownloadSheffer(true)
         .setDownloadTimeout(30000)
