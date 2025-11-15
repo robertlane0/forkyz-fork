@@ -692,4 +692,6 @@
     <string name="jump_to_end">Aller à la fin</string>
     <string name="logcat">Logcat</string>
     <string name="share_logcat">Partager Logcat</string>
+    <string name="dont_snap_board_to_borders">Ne Pas Attacher La Grille Aux Bords</string>
+    <string name="dont_snap_board_to_borders_desc">Ne pas attacher les bords de la grille aux bords de l\'écran.</string>
 </resources>
