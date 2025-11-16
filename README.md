@@ -158,7 +158,7 @@ Or to build and install, with device connected
 Translations are welcome. Here is a quick guide to what is needed.
 
 * Most strings are in `app/src/main/res/values/strings.xml` and need a copy in `app/src/main/res/values-<lang>/strings.xml`.
-* Help pages &c. are in `app/src/main/res/raw/<screen>.html` and need a copy in `app/src/main/res/raw-<lang>/<screen>.html` 
+* Help pages &c. are in `app/src/main/res/raw/<screen>.html` and need a copy in `app/src/main/res/raw-<lang>/<screen>.html`.
 * The following resources in the `raw` directory should not be translated (do not create a new copy, the one in `res` will be used instead).
     * `license.html` -- unless you have an officially translated version.
     * `release.thml` -- generated from changelogs (see Fastlane translations below).
