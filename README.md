@@ -153,6 +153,20 @@ Or to build and install, with device connected
   * ./puzlib A platform independent Java library for dealing with puzzle formats.
   * ./gfx Misc art assets.
 
+## Translations
+
+Translations are welcome. Here is a quick guide to what is needed.
+
+* Most strings are in `app/src/main/res/values/strings.xml` and need a copy in `app/src/main/res/values-<lang>/strings.xml`.
+* Help pages &c. are in `app/src/main/res/raw/<screen>.html` and need a copy in `app/src/main/res/raw-<lang>/<screen>.html` 
+* The following resources in the `raw` directory should not be translated (do not create a new copy, the one in `res` will be used instead).
+    * `license.html` -- unless you have an officially translated version.
+    * `release.thml` -- generated from changelogs (see Fastlane translations below).
+* The following files in `fastlane/metadata/android/en-US/` need a copy in `fastlane/metadata/android/<lang>`: `full_description.txt`, `short_description.txt`, `title.txt`. The files in the `changelogs` directory are optional. By default i will create auto-translations with [Argos Translate][argostranslate]. This avoids a barrier to releases. I will accept corrections though.
+* Finally, create a translated copy of `puzlib/src/main/resources/app/crossword/yourealwaysbe/puz/strings.properties` with the name `puzlib/src/main/resources/app/crossword/yourealwaysbe/puz/strings_<lang>.properties`.
+
+The last bullet is a file of clue list names. These have a strange status. Some input formats include the list name as part of the file (which will be used instead of any translations). Some don't encode the list name, but are kind of tied to a particular country. Hardcoded strings are used for these. The properties file will be used for formats that don't specify the list name, but aren't tied to a country. Note, the list names are decided on import, so the translation won't apply to previously downloaded/imported puzzles.
+
 ## Thanks
 
 Jonathan Blandford of [GNOME Crosswords][gnome-crosswords] for discussion on acrostics and the IPuz file on which the acrostic screenshot is based.
@@ -172,3 +186,4 @@ The IPuz spec is reproduced [here][ipuz-spec].
 [online-sources]: https://hague.gitlab.io/forkyz/
 [ipuz-spec]: https://hague.gitlab.io/forkyz/ipuz.html
 [releases]: https://gitlab.com/Hague/forkyz/-/releases
+[argostranslate]: https://github.com/argosopentech/argos-translate
