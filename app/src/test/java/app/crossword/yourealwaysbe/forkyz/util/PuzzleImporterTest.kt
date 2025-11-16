@@ -8,11 +8,14 @@ import kotlinx.coroutines.runBlocking
 
 import android.content.Context
 
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import org.junit.runner.RunWith
+
+import org.koin.core.context.stopKoin
 
 import org.mockito.Mock
 import org.mockito.Mockito.mock
@@ -24,7 +27,6 @@ import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerJavaFile
 import app.crossword.yourealwaysbe.forkyz.util.files.MetaCache
-import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 import app.crossword.yourealwaysbe.forkyz.versions.TiramisuUtil
 import app.crossword.yourealwaysbe.puz.io.StreamUtils
 
@@ -39,6 +41,11 @@ class PuzzleImporterTest {
 
     private val utils = NativeBackendUtils(context, TiramisuUtil())
     private var fileHandler: FileHandler? = null
+
+    @After
+    fun tearDown() {
+        stopKoin()
+    }
 
     @Test
     fun testBasic() {
@@ -170,7 +177,7 @@ class PuzzleImporterTest {
         if (fileHandler == null) {
             val metaCache = mock(MetaCache::class.java)
             fileHandler = object : FileHandlerJavaFile(
-                context,
+                utils,
                 metaCache,
                 folder.root,
             ) {
@@ -178,9 +185,7 @@ class PuzzleImporterTest {
                     return true
                 }
 
-                override fun isStorageFull(
-                    versionUtils : AndroidVersionUtils,
-                ) : Boolean {
+                override fun isStorageFull() : Boolean {
                     return false
                 }
 

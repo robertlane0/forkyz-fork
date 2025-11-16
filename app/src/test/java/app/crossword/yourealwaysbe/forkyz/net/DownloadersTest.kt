@@ -86,17 +86,19 @@ class DownloadersTest(
          * prefs). Returned as a list of pairs: (internalName, downloader).
          */
         @Parameters(name = "Downloader {0}")
+        @JvmStatic
         fun downloaders() : Iterable<Array<Any>>? {
             val context = mock(Context::class.java)
             initialiseMocks(context)
             try {
                 mockStatic(Log::class.java).use { _ ->
+                    val utils = NativeBackendUtils(
+                        context,
+                        TiramisuUtil(),
+                    )
                     val dls = Downloaders(
-                        NativeBackendUtils(
-                            context,
-                            TiramisuUtil(),
-                        ),
-                        NoopFileHandler(context),
+                        utils,
+                        NoopFileHandler(utils),
                         settings,
                     )
                     val downloaders = runBlocking { dls.getDownloaders() }

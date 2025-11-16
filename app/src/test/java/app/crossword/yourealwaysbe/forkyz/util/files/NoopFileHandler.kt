@@ -7,15 +7,14 @@ import java.io.FileOutputStream
 import java.io.InputStream
 import java.io.OutputStream
 
-import android.content.Context
 import android.net.Uri
 import androidx.core.net.toUri
 
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation
-import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
+import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 
-class NoopFileHandler(context : Context) : FileHandler(context) {
+class NoopFileHandler(utils : NativeBackendUtils) : FileHandler(utils) {
     override fun getCrosswordsDirectory() : DirHandle {
         return DirHandle(File("none"))
     }
@@ -40,7 +39,7 @@ class NoopFileHandler(context : Context) : FileHandler(context) {
         return false
     }
 
-    override fun isStorageFull(utils : AndroidVersionUtils) : Boolean {
+    override fun isStorageFull() : Boolean {
         return false
     }
 

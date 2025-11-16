@@ -11,7 +11,6 @@ import android.os.Build;
 import android.os.storage.StorageManager;
 import android.util.Log;
 
-import app.crossword.yourealwaysbe.forkyz.ForkyzApplication;
 import app.crossword.yourealwaysbe.forkyz.R;
 import app.crossword.yourealwaysbe.forkyz.net.DownloadersProvider;
 import app.crossword.yourealwaysbe.forkyz.util.PuzzleExportService;
