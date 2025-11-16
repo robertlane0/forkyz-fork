@@ -1,0 +1,8 @@
+- Ajouter la traduction française (merci Clem0908).
+- Ajouter une touche spéciale au clavier intégré.
+- Ajouter le réglage au tour de la carte en appuyant sur le bord de l'écran (réglages d'interaction).
+- Réparez chaque racleur.
+- Correction de bugs mineurs d'interface utilisateur et de réduire la quantité de snap.
+- Backend refactoring, veuillez signaler les bugs.
+
+Changelog traduit avec Argos Translate.

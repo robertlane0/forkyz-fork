@@ -1,5 +1,14 @@
 # Forkyz Changelog
 
+## Version 76
+
+- Add French translation (thanks Clem0908).
+- Add special entry key to built-in keyboard.
+- Add setting to turn of board snapping to screen edge (interaction settings).
+- Fix Everyman scraper again.
+- Fix minor UI bugs and reduce board snap amount.
+- Backend refactoring, please report bugs.
+
 ## Version 75
 
 - Fix unwanted announcements (must now be enabled explicitly in settings).

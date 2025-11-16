@@ -10,10 +10,12 @@ end
 set forkyz_version $argv[1]
 
 set changelog fastlane/metadata/android/en-US/changelogs/{$forkyz_version}00000.txt
+set changelog-fr fastlane/metadata/android/fr-FR/changelogs/{$forkyz_version}00000.txt
 
 nvim $changelog
 git add $changelog
 python scripts/make_release_notes.py
+git add $changelog-fr
 nvim app/src/main/AndroidManifest.xml
 
 echo "Ready to commit!"

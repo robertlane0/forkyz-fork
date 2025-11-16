@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="perm_boot_desc">Requis pour (facultatif) permettre le téléchargement périodique de fond de puzzles.</string>
     <string name="vibrate_desc">Requis pour la rétroaction haptique sur clavier intégré.</string>
     <string name="are_you_sure">Etes-vous sûr ?</string>
@@ -91,8 +91,10 @@
     <string name="no_cleanup_action">Aucune action de nettoyage</string>
     <string name="no_cleanup_action_msg">Le nettoyage n\'effectuera aucune action parce que les âges de nettoyage dans les paramètres de Parcourir sont définis à Jamais.</string>
     <string name="confirm_delete">Confirmer Supprimer</string>
+    <!-- in French "one" also applies to 0 but there is always a -->
+    <!-- puzzle when this message is used -->
     <plurals name="confirm_delete_msg">
-        <item quantity="one">Supprimer le puzzle sélectionné ?</item>
+        <item tools:ignore="ImpliedQuantity" quantity="one">Supprimer le puzzle sélectionné ?</item>
         <item quantity="many">Supprimer les puzzles sélectionnés ?</item>
         <item quantity="other">Supprimer les puzzles sélectionnés ?</item>
     </plurals>
