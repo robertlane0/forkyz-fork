@@ -329,8 +329,7 @@ class PuzzlePageScope(
             ForkyzKeyboard(
                 modifier = Modifier.fillMaxWidth()
                     .background(MaterialTheme.colorScheme.surface),
-                inputConnection = utils.inputConnectionMediator
-                    .forkyzKeyboardInputConnection,
+                inputConnectionMediator = utils.inputConnectionMediator,
                 onHideClick = { viewModel.hideKeyboard(true) },
                 onSpecialKeyDown = onSpecialKeyDown,
                 onSpecialKeyUp = onSpecialKeyUp,

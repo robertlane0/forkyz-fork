@@ -5,10 +5,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.coroutineScope
 
-import android.view.KeyEvent
-import android.view.MotionEvent
-import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputConnection
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -45,6 +41,7 @@ import androidx.compose.ui.unit.dp
 
 import app.crossword.yourealwaysbe.forkyz.R
 import app.crossword.yourealwaysbe.forkyz.settings.KeyboardLayout
+import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
 
 // percent of display height
 private val BUTTON_PADDING_FRAC = 0.003F
@@ -57,15 +54,11 @@ enum class SpecialKey {
     KEY_SPECIAL_ENTRY,
 }
 
-fun getForkyzKeyboardEditorInfo() : EditorInfo {
-    return EditorInfo()
-}
-
 /**
  * Software Keyboard
  *
  * @param modifier modifier
- * @param inputConnection connection to send regular key events on
+ * @param inputConnectionMediator connection to send regular key events on
  * @param onSpecialKeyDown when a special key (such as change dir) is
  * pressed down
  * @param onSpecialKeyDown when a special key (such as change dir) is
@@ -84,7 +77,7 @@ fun getForkyzKeyboardEditorInfo() : EditorInfo {
 @Composable
 fun ForkyzKeyboard(
     modifier : Modifier = Modifier,
-    inputConnection : InputConnection? = null,
+    inputConnectionMediator : InputConnectionMediator,
     onSpecialKeyDown : (SpecialKey) -> Unit = { },
     onSpecialKeyUp : (SpecialKey) -> Unit = { },
     onHideClick : () -> Unit = { },
@@ -97,19 +90,14 @@ fun ForkyzKeyboard(
     repeatInterval : Long = 75,
 ) {
     fun inputConnectionKey(keyCode : Int, action : Int) {
-        val event = KeyEvent(action, keyCode)
-        val flagged = KeyEvent.changeFlags(
-            event,
-            KeyEvent.FLAG_KEEP_TOUCH_MODE or KeyEvent.FLAG_SOFT_KEYBOARD,
-        )
-        inputConnection?.sendKeyEvent(flagged)
+        inputConnectionMediator.sendForkyzKey(keyCode, action)
     }
 
     val onKeyDown = { code : Int ->
-        inputConnectionKey(code, KeyEvent.ACTION_DOWN)
+        inputConnectionKey(code, inputConnectionMediator.keyDown)
     }
     val onKeyUp = { code : Int ->
-        inputConnectionKey(code, KeyEvent.ACTION_UP)
+        inputConnectionKey(code, inputConnectionMediator.keyUp)
     }
 
     @Composable
@@ -342,30 +330,30 @@ fun ForkyzKeyboard(
         Column(modifier.fillMaxWidth()) {
             Row() {
                 val m1 = Modifier.weight(1.0F)
-                TextKey(m1, KeyEvent.KEYCODE_Q, R.string.key_q)
-                TextKey(m1, KeyEvent.KEYCODE_W, R.string.key_w)
-                TextKey(m1, KeyEvent.KEYCODE_E, R.string.key_e)
-                TextKey(m1, KeyEvent.KEYCODE_R, R.string.key_r)
-                TextKey(m1, KeyEvent.KEYCODE_T, R.string.key_t)
-                TextKey(m1, KeyEvent.KEYCODE_Y, R.string.key_y)
-                TextKey(m1, KeyEvent.KEYCODE_U, R.string.key_u)
-                TextKey(m1, KeyEvent.KEYCODE_I, R.string.key_i)
-                TextKey(m1, KeyEvent.KEYCODE_O, R.string.key_o)
-                TextKey(m1, KeyEvent.KEYCODE_P, R.string.key_p)
+                TextKey(m1, inputConnectionMediator.keyQ, R.string.key_q)
+                TextKey(m1, inputConnectionMediator.keyW, R.string.key_w)
+                TextKey(m1, inputConnectionMediator.keyE, R.string.key_e)
+                TextKey(m1, inputConnectionMediator.keyR, R.string.key_r)
+                TextKey(m1, inputConnectionMediator.keyT, R.string.key_t)
+                TextKey(m1, inputConnectionMediator.keyY, R.string.key_y)
+                TextKey(m1, inputConnectionMediator.keyU, R.string.key_u)
+                TextKey(m1, inputConnectionMediator.keyI, R.string.key_i)
+                TextKey(m1, inputConnectionMediator.keyO, R.string.key_o)
+                TextKey(m1, inputConnectionMediator.keyP, R.string.key_p)
             }
             Row() {
                 val m1 = Modifier.weight(1.0F)
                 val m2 = Modifier.weight(2.0F)
                 Box(m1)
-                TextKey(m2, KeyEvent.KEYCODE_A, R.string.key_a)
-                TextKey(m2, KeyEvent.KEYCODE_S, R.string.key_s)
-                TextKey(m2, KeyEvent.KEYCODE_D, R.string.key_d)
-                TextKey(m2, KeyEvent.KEYCODE_F, R.string.key_f)
-                TextKey(m2, KeyEvent.KEYCODE_G, R.string.key_g)
-                TextKey(m2, KeyEvent.KEYCODE_H, R.string.key_h)
-                TextKey(m2, KeyEvent.KEYCODE_J, R.string.key_j)
-                TextKey(m2, KeyEvent.KEYCODE_K, R.string.key_k)
-                TextKey(m2, KeyEvent.KEYCODE_L, R.string.key_l)
+                TextKey(m2, inputConnectionMediator.keyA, R.string.key_a)
+                TextKey(m2, inputConnectionMediator.keyS, R.string.key_s)
+                TextKey(m2, inputConnectionMediator.keyD, R.string.key_d)
+                TextKey(m2, inputConnectionMediator.keyF, R.string.key_f)
+                TextKey(m2, inputConnectionMediator.keyG, R.string.key_g)
+                TextKey(m2, inputConnectionMediator.keyH, R.string.key_h)
+                TextKey(m2, inputConnectionMediator.keyJ, R.string.key_j)
+                TextKey(m2, inputConnectionMediator.keyK, R.string.key_k)
+                TextKey(m2, inputConnectionMediator.keyL, R.string.key_l)
                 Box(m1)
             }
             Row() {
@@ -379,16 +367,16 @@ fun ForkyzKeyboard(
                     R.string.change_direction,
                 )
                 Box(m1)
-                TextKey(m2, KeyEvent.KEYCODE_Z, R.string.key_z)
-                TextKey(m2, KeyEvent.KEYCODE_X, R.string.key_x)
-                TextKey(m2, KeyEvent.KEYCODE_C, R.string.key_c)
-                TextKey(m2, KeyEvent.KEYCODE_V, R.string.key_v)
-                TextKey(m2, KeyEvent.KEYCODE_B, R.string.key_b)
-                TextKey(m2, KeyEvent.KEYCODE_N, R.string.key_n)
-                TextKey(m2, KeyEvent.KEYCODE_M, R.string.key_m)
+                TextKey(m2, inputConnectionMediator.keyZ, R.string.key_z)
+                TextKey(m2, inputConnectionMediator.keyX, R.string.key_x)
+                TextKey(m2, inputConnectionMediator.keyC, R.string.key_c)
+                TextKey(m2, inputConnectionMediator.keyV, R.string.key_v)
+                TextKey(m2, inputConnectionMediator.keyB, R.string.key_b)
+                TextKey(m2, inputConnectionMediator.keyN, R.string.key_n)
+                TextKey(m2, inputConnectionMediator.keyM, R.string.key_m)
                 IconKey(
                     m3,
-                    KeyEvent.KEYCODE_DEL,
+                    inputConnectionMediator.keyDelete,
                     R.drawable.delete,
                     R.string.key_delete,
                 )
@@ -398,13 +386,13 @@ fun ForkyzKeyboard(
                 val m4 = Modifier.weight(4.0F)
                 IconKey(
                     m1,
-                    KeyEvent.KEYCODE_DPAD_UP,
+                    inputConnectionMediator.keyUp,
                     R.drawable.arrow_up,
                     R.string.key_up,
                 )
                 IconKey(
                     m1,
-                    KeyEvent.KEYCODE_DPAD_DOWN,
+                    inputConnectionMediator.keyDown,
                     R.drawable.arrow_down,
                     R.string.key_down,
                 )
@@ -416,7 +404,7 @@ fun ForkyzKeyboard(
                 )
                 IconKey(
                     m4,
-                    KeyEvent.KEYCODE_SPACE,
+                    inputConnectionMediator.keySpace,
                     R.drawable.space,
                     R.string.key_space,
                 )
@@ -429,13 +417,13 @@ fun ForkyzKeyboard(
                 )
                 IconKey(
                     m1,
-                    KeyEvent.KEYCODE_DPAD_LEFT,
+                    inputConnectionMediator.keyLeft,
                     R.drawable.arrow_left,
                     R.string.key_left,
                 )
                 IconKey(
                     m1,
-                    KeyEvent.KEYCODE_DPAD_RIGHT,
+                    inputConnectionMediator.keyRight,
                     R.drawable.arrow_right,
                     R.string.key_right,
                 )
@@ -448,30 +436,30 @@ fun ForkyzKeyboard(
         Column(modifier.fillMaxWidth()) {
             Row() {
                 val m1 = Modifier.weight(1.0F)
-                TextKey(m1, KeyEvent.KEYCODE_Q, R.string.key_q)
-                TextKey(m1, KeyEvent.KEYCODE_W, R.string.key_w)
-                TextKey(m1, KeyEvent.KEYCODE_E, R.string.key_e)
-                TextKey(m1, KeyEvent.KEYCODE_R, R.string.key_r)
-                TextKey(m1, KeyEvent.KEYCODE_T, R.string.key_t)
-                TextKey(m1, KeyEvent.KEYCODE_Z, R.string.key_z)
-                TextKey(m1, KeyEvent.KEYCODE_U, R.string.key_u)
-                TextKey(m1, KeyEvent.KEYCODE_I, R.string.key_i)
-                TextKey(m1, KeyEvent.KEYCODE_O, R.string.key_o)
-                TextKey(m1, KeyEvent.KEYCODE_P, R.string.key_p)
+                TextKey(m1, inputConnectionMediator.keyQ, R.string.key_q)
+                TextKey(m1, inputConnectionMediator.keyW, R.string.key_w)
+                TextKey(m1, inputConnectionMediator.keyE, R.string.key_e)
+                TextKey(m1, inputConnectionMediator.keyR, R.string.key_r)
+                TextKey(m1, inputConnectionMediator.keyT, R.string.key_t)
+                TextKey(m1, inputConnectionMediator.keyZ, R.string.key_z)
+                TextKey(m1, inputConnectionMediator.keyU, R.string.key_u)
+                TextKey(m1, inputConnectionMediator.keyI, R.string.key_i)
+                TextKey(m1, inputConnectionMediator.keyO, R.string.key_o)
+                TextKey(m1, inputConnectionMediator.keyP, R.string.key_p)
             }
             Row() {
                 val m1 = Modifier.weight(1.0F)
                 val m2 = Modifier.weight(2.0F)
                 Box(m1)
-                TextKey(m2, KeyEvent.KEYCODE_A, R.string.key_a)
-                TextKey(m2, KeyEvent.KEYCODE_S, R.string.key_s)
-                TextKey(m2, KeyEvent.KEYCODE_D, R.string.key_d)
-                TextKey(m2, KeyEvent.KEYCODE_F, R.string.key_f)
-                TextKey(m2, KeyEvent.KEYCODE_G, R.string.key_g)
-                TextKey(m2, KeyEvent.KEYCODE_H, R.string.key_h)
-                TextKey(m2, KeyEvent.KEYCODE_J, R.string.key_j)
-                TextKey(m2, KeyEvent.KEYCODE_K, R.string.key_k)
-                TextKey(m2, KeyEvent.KEYCODE_L, R.string.key_l)
+                TextKey(m2, inputConnectionMediator.keyA, R.string.key_a)
+                TextKey(m2, inputConnectionMediator.keyS, R.string.key_s)
+                TextKey(m2, inputConnectionMediator.keyD, R.string.key_d)
+                TextKey(m2, inputConnectionMediator.keyF, R.string.key_f)
+                TextKey(m2, inputConnectionMediator.keyG, R.string.key_g)
+                TextKey(m2, inputConnectionMediator.keyH, R.string.key_h)
+                TextKey(m2, inputConnectionMediator.keyJ, R.string.key_j)
+                TextKey(m2, inputConnectionMediator.keyK, R.string.key_k)
+                TextKey(m2, inputConnectionMediator.keyL, R.string.key_l)
                 Box(m1)
             }
             Row() {
@@ -485,16 +473,16 @@ fun ForkyzKeyboard(
                     R.string.change_direction,
                 )
                 Box(m1)
-                TextKey(m2, KeyEvent.KEYCODE_Y, R.string.key_y)
-                TextKey(m2, KeyEvent.KEYCODE_X, R.string.key_x)
-                TextKey(m2, KeyEvent.KEYCODE_C, R.string.key_c)
-                TextKey(m2, KeyEvent.KEYCODE_V, R.string.key_v)
-                TextKey(m2, KeyEvent.KEYCODE_B, R.string.key_b)
-                TextKey(m2, KeyEvent.KEYCODE_N, R.string.key_n)
-                TextKey(m2, KeyEvent.KEYCODE_M, R.string.key_m)
+                TextKey(m2, inputConnectionMediator.keyY, R.string.key_y)
+                TextKey(m2, inputConnectionMediator.keyX, R.string.key_x)
+                TextKey(m2, inputConnectionMediator.keyC, R.string.key_c)
+                TextKey(m2, inputConnectionMediator.keyV, R.string.key_v)
+                TextKey(m2, inputConnectionMediator.keyB, R.string.key_b)
+                TextKey(m2, inputConnectionMediator.keyN, R.string.key_n)
+                TextKey(m2, inputConnectionMediator.keyM, R.string.key_m)
                 IconKey(
                     m3,
-                    KeyEvent.KEYCODE_DEL,
+                    inputConnectionMediator.keyDelete,
                     R.drawable.delete,
                     R.string.key_delete,
                 )
@@ -504,13 +492,13 @@ fun ForkyzKeyboard(
                 val m4 = Modifier.weight(4.0F)
                 IconKey(
                     m1,
-                    KeyEvent.KEYCODE_DPAD_UP,
+                    inputConnectionMediator.keyUp,
                     R.drawable.arrow_up,
                     R.string.key_up,
                 )
                 IconKey(
                     m1,
-                    KeyEvent.KEYCODE_DPAD_DOWN,
+                    inputConnectionMediator.keyDown,
                     R.drawable.arrow_down,
                     R.string.key_down,
                 )
@@ -522,7 +510,7 @@ fun ForkyzKeyboard(
                 )
                 IconKey(
                     m4,
-                    KeyEvent.KEYCODE_SPACE,
+                    inputConnectionMediator.keySpace,
                     R.drawable.space,
                     R.string.key_space,
                 )
@@ -535,13 +523,13 @@ fun ForkyzKeyboard(
                 )
                 IconKey(
                     m1,
-                    KeyEvent.KEYCODE_DPAD_LEFT,
+                    inputConnectionMediator.keyLeft,
                     R.drawable.arrow_left,
                     R.string.key_left,
                 )
                 IconKey(
                     m1,
-                    KeyEvent.KEYCODE_DPAD_RIGHT,
+                    inputConnectionMediator.keyRight,
                     R.drawable.arrow_right,
                     R.string.key_right,
                 )
@@ -554,29 +542,29 @@ fun ForkyzKeyboard(
         Column(modifier.fillMaxWidth()) {
             Row() {
                 val m1 = Modifier.weight(1.0F)
-                TextKey(m1, KeyEvent.KEYCODE_A, R.string.key_a)
-                TextKey(m1, KeyEvent.KEYCODE_Z, R.string.key_z)
-                TextKey(m1, KeyEvent.KEYCODE_E, R.string.key_e)
-                TextKey(m1, KeyEvent.KEYCODE_R, R.string.key_r)
-                TextKey(m1, KeyEvent.KEYCODE_T, R.string.key_t)
-                TextKey(m1, KeyEvent.KEYCODE_Y, R.string.key_y)
-                TextKey(m1, KeyEvent.KEYCODE_U, R.string.key_u)
-                TextKey(m1, KeyEvent.KEYCODE_I, R.string.key_i)
-                TextKey(m1, KeyEvent.KEYCODE_O, R.string.key_o)
-                TextKey(m1, KeyEvent.KEYCODE_P, R.string.key_p)
+                TextKey(m1, inputConnectionMediator.keyA, R.string.key_a)
+                TextKey(m1, inputConnectionMediator.keyZ, R.string.key_z)
+                TextKey(m1, inputConnectionMediator.keyE, R.string.key_e)
+                TextKey(m1, inputConnectionMediator.keyR, R.string.key_r)
+                TextKey(m1, inputConnectionMediator.keyT, R.string.key_t)
+                TextKey(m1, inputConnectionMediator.keyY, R.string.key_y)
+                TextKey(m1, inputConnectionMediator.keyU, R.string.key_u)
+                TextKey(m1, inputConnectionMediator.keyI, R.string.key_i)
+                TextKey(m1, inputConnectionMediator.keyO, R.string.key_o)
+                TextKey(m1, inputConnectionMediator.keyP, R.string.key_p)
             }
             Row() {
                 val m1 = Modifier.weight(1.0F)
-                TextKey(m1, KeyEvent.KEYCODE_Q, R.string.key_q)
-                TextKey(m1, KeyEvent.KEYCODE_S, R.string.key_s)
-                TextKey(m1, KeyEvent.KEYCODE_D, R.string.key_d)
-                TextKey(m1, KeyEvent.KEYCODE_F, R.string.key_f)
-                TextKey(m1, KeyEvent.KEYCODE_G, R.string.key_g)
-                TextKey(m1, KeyEvent.KEYCODE_H, R.string.key_h)
-                TextKey(m1, KeyEvent.KEYCODE_J, R.string.key_j)
-                TextKey(m1, KeyEvent.KEYCODE_K, R.string.key_k)
-                TextKey(m1, KeyEvent.KEYCODE_L, R.string.key_l)
-                TextKey(m1, KeyEvent.KEYCODE_M, R.string.key_m)
+                TextKey(m1, inputConnectionMediator.keyQ, R.string.key_q)
+                TextKey(m1, inputConnectionMediator.keyS, R.string.key_s)
+                TextKey(m1, inputConnectionMediator.keyD, R.string.key_d)
+                TextKey(m1, inputConnectionMediator.keyF, R.string.key_f)
+                TextKey(m1, inputConnectionMediator.keyG, R.string.key_g)
+                TextKey(m1, inputConnectionMediator.keyH, R.string.key_h)
+                TextKey(m1, inputConnectionMediator.keyJ, R.string.key_j)
+                TextKey(m1, inputConnectionMediator.keyK, R.string.key_k)
+                TextKey(m1, inputConnectionMediator.keyL, R.string.key_l)
+                TextKey(m1, inputConnectionMediator.keyM, R.string.key_m)
             }
             Row() {
                 val m1 = Modifier.weight(1.0F)
@@ -587,16 +575,16 @@ fun ForkyzKeyboard(
                     R.drawable.ic_change_direction,
                     R.string.change_direction,
                 )
-                TextKey(m1, KeyEvent.KEYCODE_W, R.string.key_w)
-                TextKey(m1, KeyEvent.KEYCODE_X, R.string.key_x)
-                TextKey(m1, KeyEvent.KEYCODE_C, R.string.key_c)
-                TextKey(m1, KeyEvent.KEYCODE_V, R.string.key_v)
-                TextKey(m1, KeyEvent.KEYCODE_B, R.string.key_b)
-                TextKey(m1, KeyEvent.KEYCODE_N, R.string.key_n)
+                TextKey(m1, inputConnectionMediator.keyW, R.string.key_w)
+                TextKey(m1, inputConnectionMediator.keyX, R.string.key_x)
+                TextKey(m1, inputConnectionMediator.keyC, R.string.key_c)
+                TextKey(m1, inputConnectionMediator.keyV, R.string.key_v)
+                TextKey(m1, inputConnectionMediator.keyB, R.string.key_b)
+                TextKey(m1, inputConnectionMediator.keyN, R.string.key_n)
                 Box(m1)
                 IconKey(
                     m2,
-                    KeyEvent.KEYCODE_DEL,
+                    inputConnectionMediator.keyDelete,
                     R.drawable.delete,
                     R.string.key_delete,
                 )
@@ -606,13 +594,13 @@ fun ForkyzKeyboard(
                 val m4 = Modifier.weight(4.0F)
                 IconKey(
                     m1,
-                    KeyEvent.KEYCODE_DPAD_UP,
+                    inputConnectionMediator.keyUp,
                     R.drawable.arrow_up,
                     R.string.key_up,
                 )
                 IconKey(
                     m1,
-                    KeyEvent.KEYCODE_DPAD_DOWN,
+                    inputConnectionMediator.keyDown,
                     R.drawable.arrow_down,
                     R.string.key_down,
                 )
@@ -624,7 +612,7 @@ fun ForkyzKeyboard(
                 )
                 IconKey(
                     m4,
-                    KeyEvent.KEYCODE_SPACE,
+                    inputConnectionMediator.keySpace,
                     R.drawable.space,
                     R.string.key_space,
                 )
@@ -637,13 +625,13 @@ fun ForkyzKeyboard(
                 )
                 IconKey(
                     m1,
-                    KeyEvent.KEYCODE_DPAD_LEFT,
+                    inputConnectionMediator.keyLeft,
                     R.drawable.arrow_left,
                     R.string.key_left,
                 )
                 IconKey(
                     m1,
-                    KeyEvent.KEYCODE_DPAD_RIGHT,
+                    inputConnectionMediator.keyRight,
                     R.drawable.arrow_right,
                     R.string.key_right,
                 )
@@ -656,29 +644,29 @@ fun ForkyzKeyboard(
         Column(modifier.fillMaxWidth()) {
             Row() {
                 val m1 = Modifier.weight(1.0F)
-                TextKey(m1, KeyEvent.KEYCODE_Q, R.string.key_q)
-                TextKey(m1, KeyEvent.KEYCODE_W, R.string.key_w)
-                TextKey(m1, KeyEvent.KEYCODE_F, R.string.key_f)
-                TextKey(m1, KeyEvent.KEYCODE_P, R.string.key_p)
-                TextKey(m1, KeyEvent.KEYCODE_G, R.string.key_g)
-                TextKey(m1, KeyEvent.KEYCODE_J, R.string.key_j)
-                TextKey(m1, KeyEvent.KEYCODE_L, R.string.key_l)
-                TextKey(m1, KeyEvent.KEYCODE_U, R.string.key_u)
-                TextKey(m1, KeyEvent.KEYCODE_Y, R.string.key_y)
+                TextKey(m1, inputConnectionMediator.keyQ, R.string.key_q)
+                TextKey(m1, inputConnectionMediator.keyW, R.string.key_w)
+                TextKey(m1, inputConnectionMediator.keyF, R.string.key_f)
+                TextKey(m1, inputConnectionMediator.keyP, R.string.key_p)
+                TextKey(m1, inputConnectionMediator.keyG, R.string.key_g)
+                TextKey(m1, inputConnectionMediator.keyJ, R.string.key_j)
+                TextKey(m1, inputConnectionMediator.keyL, R.string.key_l)
+                TextKey(m1, inputConnectionMediator.keyU, R.string.key_u)
+                TextKey(m1, inputConnectionMediator.keyY, R.string.key_y)
                 Box(m1)
             }
             Row() {
                 val m1 = Modifier.weight(1.0F)
-                TextKey(m1, KeyEvent.KEYCODE_A, R.string.key_a)
-                TextKey(m1, KeyEvent.KEYCODE_R, R.string.key_r)
-                TextKey(m1, KeyEvent.KEYCODE_S, R.string.key_s)
-                TextKey(m1, KeyEvent.KEYCODE_T, R.string.key_t)
-                TextKey(m1, KeyEvent.KEYCODE_D, R.string.key_d)
-                TextKey(m1, KeyEvent.KEYCODE_H, R.string.key_h)
-                TextKey(m1, KeyEvent.KEYCODE_N, R.string.key_n)
-                TextKey(m1, KeyEvent.KEYCODE_E, R.string.key_e)
-                TextKey(m1, KeyEvent.KEYCODE_I, R.string.key_i)
-                TextKey(m1, KeyEvent.KEYCODE_O, R.string.key_o)
+                TextKey(m1, inputConnectionMediator.keyA, R.string.key_a)
+                TextKey(m1, inputConnectionMediator.keyR, R.string.key_r)
+                TextKey(m1, inputConnectionMediator.keyS, R.string.key_s)
+                TextKey(m1, inputConnectionMediator.keyT, R.string.key_t)
+                TextKey(m1, inputConnectionMediator.keyD, R.string.key_d)
+                TextKey(m1, inputConnectionMediator.keyH, R.string.key_h)
+                TextKey(m1, inputConnectionMediator.keyN, R.string.key_n)
+                TextKey(m1, inputConnectionMediator.keyE, R.string.key_e)
+                TextKey(m1, inputConnectionMediator.keyI, R.string.key_i)
+                TextKey(m1, inputConnectionMediator.keyO, R.string.key_o)
             }
             Row() {
                 val m1 = Modifier.weight(1.0F)
@@ -691,16 +679,16 @@ fun ForkyzKeyboard(
                     R.string.change_direction,
                 )
                 Box(m1)
-                TextKey(m2, KeyEvent.KEYCODE_Z, R.string.key_z)
-                TextKey(m2, KeyEvent.KEYCODE_X, R.string.key_x)
-                TextKey(m2, KeyEvent.KEYCODE_C, R.string.key_c)
-                TextKey(m2, KeyEvent.KEYCODE_V, R.string.key_v)
-                TextKey(m2, KeyEvent.KEYCODE_B, R.string.key_b)
-                TextKey(m2, KeyEvent.KEYCODE_K, R.string.key_k)
-                TextKey(m2, KeyEvent.KEYCODE_M, R.string.key_m)
+                TextKey(m2, inputConnectionMediator.keyZ, R.string.key_z)
+                TextKey(m2, inputConnectionMediator.keyX, R.string.key_x)
+                TextKey(m2, inputConnectionMediator.keyC, R.string.key_c)
+                TextKey(m2, inputConnectionMediator.keyV, R.string.key_v)
+                TextKey(m2, inputConnectionMediator.keyB, R.string.key_b)
+                TextKey(m2, inputConnectionMediator.keyK, R.string.key_k)
+                TextKey(m2, inputConnectionMediator.keyM, R.string.key_m)
                 IconKey(
                     m3,
-                    KeyEvent.KEYCODE_DEL,
+                    inputConnectionMediator.keyDelete,
                     R.drawable.delete,
                     R.string.key_delete,
                 )
@@ -710,13 +698,13 @@ fun ForkyzKeyboard(
                 val m4 = Modifier.weight(4.0F)
                 IconKey(
                     m1,
-                    KeyEvent.KEYCODE_DPAD_UP,
+                    inputConnectionMediator.keyUp,
                     R.drawable.arrow_up,
                     R.string.key_up,
                 )
                 IconKey(
                     m1,
-                    KeyEvent.KEYCODE_DPAD_DOWN,
+                    inputConnectionMediator.keyDown,
                     R.drawable.arrow_down,
                     R.string.key_down,
                 )
@@ -728,7 +716,7 @@ fun ForkyzKeyboard(
                 )
                 IconKey(
                     m4,
-                    KeyEvent.KEYCODE_SPACE,
+                    inputConnectionMediator.keySpace,
                     R.drawable.space,
                     R.string.key_space,
                 )
@@ -741,13 +729,13 @@ fun ForkyzKeyboard(
                 )
                 IconKey(
                     m1,
-                    KeyEvent.KEYCODE_DPAD_LEFT,
+                    inputConnectionMediator.keyLeft,
                     R.drawable.arrow_left,
                     R.string.key_left,
                 )
                 IconKey(
                     m1,
-                    KeyEvent.KEYCODE_DPAD_RIGHT,
+                    inputConnectionMediator.keyRight,
                     R.drawable.arrow_right,
                     R.string.key_right,
                 )
@@ -764,7 +752,7 @@ fun ForkyzKeyboard(
                 val m3 = Modifier.weight(3.0F)
                 IconKey(
                     m3,
-                    KeyEvent.KEYCODE_DEL,
+                    inputConnectionMediator.keyDelete,
                     R.drawable.delete,
                     R.string.key_delete,
                 )
@@ -774,52 +762,52 @@ fun ForkyzKeyboard(
                     R.drawable.ic_change_direction,
                     R.string.change_direction,
                 )
-                TextKey(m2, KeyEvent.KEYCODE_P, R.string.key_p)
-                TextKey(m2, KeyEvent.KEYCODE_Y, R.string.key_y)
-                TextKey(m2, KeyEvent.KEYCODE_F, R.string.key_f)
-                TextKey(m2, KeyEvent.KEYCODE_G, R.string.key_g)
-                TextKey(m2, KeyEvent.KEYCODE_C, R.string.key_c)
-                TextKey(m2, KeyEvent.KEYCODE_R, R.string.key_r)
-                TextKey(m2, KeyEvent.KEYCODE_L, R.string.key_l)
+                TextKey(m2, inputConnectionMediator.keyP, R.string.key_p)
+                TextKey(m2, inputConnectionMediator.keyY, R.string.key_y)
+                TextKey(m2, inputConnectionMediator.keyF, R.string.key_f)
+                TextKey(m2, inputConnectionMediator.keyG, R.string.key_g)
+                TextKey(m2, inputConnectionMediator.keyC, R.string.key_c)
+                TextKey(m2, inputConnectionMediator.keyR, R.string.key_r)
+                TextKey(m2, inputConnectionMediator.keyL, R.string.key_l)
             }
             Row() {
                 val m1 = Modifier.weight(1.0F)
-                TextKey(m1, KeyEvent.KEYCODE_A, R.string.key_a)
-                TextKey(m1, KeyEvent.KEYCODE_O, R.string.key_o)
-                TextKey(m1, KeyEvent.KEYCODE_E, R.string.key_e)
-                TextKey(m1, KeyEvent.KEYCODE_U, R.string.key_u)
-                TextKey(m1, KeyEvent.KEYCODE_I, R.string.key_i)
-                TextKey(m1, KeyEvent.KEYCODE_D, R.string.key_d)
-                TextKey(m1, KeyEvent.KEYCODE_H, R.string.key_h)
-                TextKey(m1, KeyEvent.KEYCODE_T, R.string.key_t)
-                TextKey(m1, KeyEvent.KEYCODE_N, R.string.key_n)
-                TextKey(m1, KeyEvent.KEYCODE_S, R.string.key_s)
+                TextKey(m1, inputConnectionMediator.keyA, R.string.key_a)
+                TextKey(m1, inputConnectionMediator.keyO, R.string.key_o)
+                TextKey(m1, inputConnectionMediator.keyE, R.string.key_e)
+                TextKey(m1, inputConnectionMediator.keyU, R.string.key_u)
+                TextKey(m1, inputConnectionMediator.keyI, R.string.key_i)
+                TextKey(m1, inputConnectionMediator.keyD, R.string.key_d)
+                TextKey(m1, inputConnectionMediator.keyH, R.string.key_h)
+                TextKey(m1, inputConnectionMediator.keyT, R.string.key_t)
+                TextKey(m1, inputConnectionMediator.keyN, R.string.key_n)
+                TextKey(m1, inputConnectionMediator.keyS, R.string.key_s)
             }
             Row() {
                 val m1 = Modifier.weight(1.0F)
                 Box(m1)
-                TextKey(m1, KeyEvent.KEYCODE_Q, R.string.key_q)
-                TextKey(m1, KeyEvent.KEYCODE_J, R.string.key_j)
-                TextKey(m1, KeyEvent.KEYCODE_K, R.string.key_k)
-                TextKey(m1, KeyEvent.KEYCODE_X, R.string.key_x)
-                TextKey(m1, KeyEvent.KEYCODE_B, R.string.key_b)
-                TextKey(m1, KeyEvent.KEYCODE_M, R.string.key_m)
-                TextKey(m1, KeyEvent.KEYCODE_W, R.string.key_w)
-                TextKey(m1, KeyEvent.KEYCODE_V, R.string.key_v)
-                TextKey(m1, KeyEvent.KEYCODE_Z, R.string.key_z)
+                TextKey(m1, inputConnectionMediator.keyQ, R.string.key_q)
+                TextKey(m1, inputConnectionMediator.keyJ, R.string.key_j)
+                TextKey(m1, inputConnectionMediator.keyK, R.string.key_k)
+                TextKey(m1, inputConnectionMediator.keyX, R.string.key_x)
+                TextKey(m1, inputConnectionMediator.keyB, R.string.key_b)
+                TextKey(m1, inputConnectionMediator.keyM, R.string.key_m)
+                TextKey(m1, inputConnectionMediator.keyW, R.string.key_w)
+                TextKey(m1, inputConnectionMediator.keyV, R.string.key_v)
+                TextKey(m1, inputConnectionMediator.keyZ, R.string.key_z)
             }
             Row() {
                 val m1 = Modifier.weight(1.0F)
                 val m4 = Modifier.weight(4.0F)
                 IconKey(
                     m1,
-                    KeyEvent.KEYCODE_DPAD_UP,
+                    inputConnectionMediator.keyUp,
                     R.drawable.arrow_up,
                     R.string.key_up,
                 )
                 IconKey(
                     m1,
-                    KeyEvent.KEYCODE_DPAD_DOWN,
+                    inputConnectionMediator.keyDown,
                     R.drawable.arrow_down,
                     R.string.key_down,
                 )
@@ -831,7 +819,7 @@ fun ForkyzKeyboard(
                 )
                 IconKey(
                     m4,
-                    KeyEvent.KEYCODE_SPACE,
+                    inputConnectionMediator.keySpace,
                     R.drawable.space,
                     R.string.key_space,
                 )
@@ -844,13 +832,13 @@ fun ForkyzKeyboard(
                 )
                 IconKey(
                     m1,
-                    KeyEvent.KEYCODE_DPAD_LEFT,
+                    inputConnectionMediator.keyLeft,
                     R.drawable.arrow_left,
                     R.string.key_left,
                 )
                 IconKey(
                     m1,
-                    KeyEvent.KEYCODE_DPAD_RIGHT,
+                    inputConnectionMediator.keyRight,
                     R.drawable.arrow_right,
                     R.string.key_right,
                 )
