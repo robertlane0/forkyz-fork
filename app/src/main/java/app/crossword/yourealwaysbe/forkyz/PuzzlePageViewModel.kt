@@ -1001,7 +1001,7 @@ open class PuzzlePageViewModel(
                 VoiceCommand(
                     utils.getString(R.string.command_letter),
                     { letter ->
-                        if (letter != null && !letter.isEmpty()) {
+                        if (!letter.isEmpty()) {
                             getBoard()?.playLetter(
                                 Character.toUpperCase(letter[0])
                             )

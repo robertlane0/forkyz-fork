@@ -106,7 +106,7 @@ class PuzzleInfoDialogViewModel(
     ) : PuzzleInfoUIState {
         val puz = puzzle
         val showPercentageCorrect = puzzleInfoSettings.showPercentageCorrect
-        val elapsed = timer?.let { it.elapsed } ?: puz?.time ?: 0L
+        val elapsed = timer?.let { it.getElapsed() } ?: puz?.time ?: 0L
         val progress = if (showPercentageCorrect)
             puz?.percentComplete ?: 0
         else
