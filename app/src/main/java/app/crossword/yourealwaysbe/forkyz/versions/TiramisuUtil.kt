@@ -19,13 +19,6 @@ import androidx.core.content.ContextCompat
 
 @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
 open class TiramisuUtil  : RUtil() {
-    public override fun <T  : Serializable> getSerializable(
-        bundle : Bundle,
-        key : String, klass : Class<T>,
-    ) : T? {
-        return bundle.getSerializable<T>(key, klass)
-    }
-
     public override fun hasPostNotificationsPermission(
         context : Context,
     ) : Boolean {

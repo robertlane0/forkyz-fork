@@ -72,17 +72,6 @@ interface AndroidVersionUtils {
     fun hasNetworkConnection(context : Context) : Boolean
 
     /**
-     * Convenience method for type-safe Bundle.getSerializalbe
-     *
-     * Should end up in a BundleCompat one day, i hope.
-     */
-    fun <T  : Serializable> getSerializable(
-        bundle : Bundle,
-        key : String,
-        klass : Class<T>,
-    ) : T?
-
-    /**
      * Has POST_NOTIFICATIONS permission or is not on an API that needs it
      */
     fun hasPostNotificationsPermission(context : Context) : Boolean
