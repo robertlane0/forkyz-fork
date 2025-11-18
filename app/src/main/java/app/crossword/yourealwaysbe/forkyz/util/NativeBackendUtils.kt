@@ -59,7 +59,7 @@ class NativeBackendUtils(
         return utils.hasNetworkConnection(applicationContext)
     }
 
-    fun getApplicationVersionName() : String {
+    fun getApplicationVersionName() : String? {
         return utils.getApplicationVersionName(applicationContext)
     }
 
@@ -89,7 +89,7 @@ class NativeBackendUtils(
     }
 
     fun getFilterClueToAlphabeticRegex() : String {
-        return utils.getFilterClueToAlphabeticRegex()
+        return utils.filterClueToAlphabeticRegex
     }
 
     fun initialiseSAFForRoot(uri : Uri) : FileHandler? {

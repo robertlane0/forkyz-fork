@@ -1251,7 +1251,7 @@ class BrowsePageViewModel(
     }
 
     private val currentVersion : String
-        = utils.getApplicationVersionName()
+        = utils.getApplicationVersionName() ?: ""
 
     private var currentUIState : UIState
         get() { return mediatedUIState.current }
