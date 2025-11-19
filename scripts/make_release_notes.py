@@ -43,9 +43,9 @@ LANGS = [
         """
             <h1>Forkyz</h1>
             <p>
-                C'est une fourche non officielle du Shortyz application
-                de mots croisés. Il met en œuvre un certain nombre de
-                nouvelles caractéristiques et enlever certaines
+                Forkyz est une bifurcation non officielle de l'application
+                de mots croisés Shortyz. Elle met en œuvre un certain nombre
+                de nouvelles caractéristiques et enlève certaines
                 bibliothèques/traceurs non ouverts.
             </p>
         """,
@@ -58,7 +58,7 @@ release_file_fmt = "app/src/main/res/raw{lang}/release.html"
 changelogs_folder_fmt = "fastlane/metadata/android/{folder}/changelogs"
 changes_md = "docs/changes.md"
 
-TRANSLATE_ACKS = "\nChangelog translated with Argos Translate."
+TRANSLATE_ACKS = "\nChangelog automatically translated with Argos Translate."
 
 def version_number(filepath : Path) -> int:
     end = -len("00000.txt")
