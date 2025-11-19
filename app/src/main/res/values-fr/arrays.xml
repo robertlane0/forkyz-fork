@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+     <string-array name="flag_color_labels">
+         <item>Défaut</item>
+         <item>Couleur 1</item>
+         <item>Couleur 2</item>
+         <item>Couleur 3</item>
+         <item>Couleur 4</item>
+     </string-array>
+</resources>
