@@ -27,8 +27,8 @@ class SharePuzzleData(
                 writeBlank,
                 omitExtensions
             ) { puzUri ->
-                val mimeType = FileHandlerShared.getShareUriMimeType()
-                cb(SharePuzzleData(mimeType, puzUri))
+                val mimeType = FileHandlerShared.SHARE_URI_MIME_TYPE
+                puzUri?.let { cb(SharePuzzleData(mimeType, it)) }
             }
         }
     }

@@ -41,7 +41,7 @@ class LogcatPageViewModel(
             logcatText.value,
         ) {
             it?.let { uri ->
-                val mimeType = FileHandlerShared.getLogcatShareUriMimeType()
+                val mimeType = FileHandlerShared.LOGCAT_SHARE_URI_MIME_TYPE
                 _shareLogcatEvent.value = ShareLogcatData(mimeType, uri)
             }
         }

@@ -85,7 +85,7 @@ suspend fun processPuzzleToImportDirectory(
 ) : List<PuzHandle> {
     val importedFiles : MutableList<PuzHandle> = mutableListOf()
 
-    val toImportDir = fileHandler.getToImportDirectory()
+    val toImportDir = fileHandler.toImportDirectory
 
     for (fh in fileHandler.listFiles(toImportDir)) {
         try {
@@ -103,18 +103,18 @@ suspend fun processPuzzleToImportDirectory(
                     // unneeded dir creation in java file mode
                     // (currently SAF creates all dirs upfront)
                     val toImportFailedDir
-                        = fileHandler.getToImportFailedDirectory()
+                        = fileHandler.toImportFailedDirectory
                     fileHandler.moveTo(fh, toImportDir, toImportFailedDir)
                 } else {
                     val toImportDoneDir
-                        = fileHandler.getToImportDoneDirectory()
+                        = fileHandler.toImportDoneDirectory
                     importedFiles.add(ph)
                     fileHandler.moveTo(fh, toImportDir, toImportDoneDir)
                 }
             }
         } catch (e : IOException) {
             val toImportFailedDir
-                = fileHandler.getToImportFailedDirectory()
+                = fileHandler.toImportFailedDirectory
             fileHandler.moveTo(fh, toImportDir, toImportFailedDir)
         }
     }

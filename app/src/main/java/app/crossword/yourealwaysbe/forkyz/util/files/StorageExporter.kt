@@ -36,37 +36,37 @@ fun exportStorage(
     Log.i(TAG, "Exporting crosswords folder")
     exportDirectory(
         fileHandler,
-        fileHandler.getCrosswordsDirectory(),
+        fileHandler.crosswordsDirectory,
         targetHandler,
-        targetHandler.getCrosswordsDirectory(),
+        targetHandler.crosswordsDirectory,
     )
     Log.i(TAG, "Exporting archive folder")
     exportDirectory(
         fileHandler,
-        fileHandler.getArchiveDirectory(),
+        fileHandler.archiveDirectory,
         targetHandler,
-        targetHandler.getArchiveDirectory(),
+        targetHandler.archiveDirectory,
     )
     Log.i(TAG, "Exporting to import folder")
     exportDirectory(
         fileHandler,
-        fileHandler.getToImportDirectory(),
+        fileHandler.toImportDirectory,
         targetHandler,
-        targetHandler.getToImportDirectory(),
+        targetHandler.toImportDirectory,
     )
     Log.i(TAG, "Exporting to import done folder")
     exportDirectory(
         fileHandler,
-        fileHandler.getToImportDoneDirectory(),
+        fileHandler.toImportDoneDirectory,
         targetHandler,
-        targetHandler.getToImportDoneDirectory(),
+        targetHandler.toImportDoneDirectory,
     )
     Log.i(TAG, "Exporting to import failed folder")
     exportDirectory(
         fileHandler,
-        fileHandler.getToImportFailedDirectory(),
+        fileHandler.toImportFailedDirectory,
         targetHandler,
-        targetHandler.getToImportFailedDirectory(),
+        targetHandler.toImportFailedDirectory,
     )
 
     Log.i(TAG, "Export done")
@@ -84,14 +84,15 @@ private fun exportDirectory(
 
     for (handle in sourceHandler.listFiles(sourceDir)) {
         val name = sourceHandler.getName(handle)
-        val newHandle = targetHandler.createFileHandle(
+        targetHandler.createFileHandle(
             targetDir,
             name,
-            handle.mimeType,
-        )
-        sourceHandler.getInputStream(handle).use { ins ->
-            targetHandler.getOutputStream(newHandle).use { outs ->
-                StreamUtils.copyStream(ins, outs)
+            handle.mimeType ?: FileHandler.MIME_TYPE_GENERIC,
+        )?.let { newHandle ->
+            sourceHandler.getInputStream(handle).use { ins ->
+                targetHandler.getOutputStream(newHandle).use { outs ->
+                    StreamUtils.copyStream(ins, outs)
+                }
             }
         }
     }

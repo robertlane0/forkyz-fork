@@ -54,7 +54,7 @@ class FileHandlerProvider(
             }
         }
 
-        if (fh == null || !fh.isStorageMounted()) {
+        if (fh == null || !fh.isStorageMounted) {
             fh = FileHandlerInternal(utils)
             val t = Toast.makeText(
                 applicationContext,
@@ -64,7 +64,7 @@ class FileHandlerProvider(
             t.show()
         }
 
-        if (fh.isStorageFull()) {
+        if (fh.isStorageFull) {
             val t = Toast.makeText(
                 applicationContext,
                 R.string.storage_full_warning,

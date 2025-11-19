@@ -153,7 +153,8 @@ public class CurrentPuzzleHolder(
     @MainThread
     fun getFreshCurrentPuzzleMeta(cb : Consumer<PuzMetaFile?>) {
         val puz = board?.getPuzzle()
-        if (puzHandle == null || puz == null)
+        val curHandle = puzHandle
+        if (curHandle == null || puz == null)
             return
 
         ioScope.launch {
@@ -162,7 +163,7 @@ public class CurrentPuzzleHolder(
                 fileHandlerProvider.get() { fileHandler ->
                     ioScope.launch {
                         val meta = fileHandler.getRefreshedPuzMetaFile(
-                            puzHandle,
+                            curHandle,
                             puz,
                         )
                         ioLock.unlock()
@@ -180,7 +181,8 @@ public class CurrentPuzzleHolder(
      */
     fun saveBoardService(cb : () -> Unit = { }) {
         val puz = board?.getPuzzle()
-        if (puz == null) {
+        val curHandle = puzHandle
+        if (puz == null || curHandle == null) {
             Log.e(TAG, "No puzzle associated to the board to save.")
             cb()
         } else {
@@ -190,7 +192,7 @@ public class CurrentPuzzleHolder(
                     fileHandlerProvider.get() { fileHandler ->
                         ioScope.launch {
                             try {
-                                fileHandler.save(puz, puzHandle)
+                                fileHandler.save(puz, curHandle)
                             } catch (e : IOException) {
                                 Log.e(TAG, "Error saving puzzle.")
                                 e.printStackTrace()

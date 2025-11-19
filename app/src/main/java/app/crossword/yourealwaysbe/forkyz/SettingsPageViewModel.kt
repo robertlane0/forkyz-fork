@@ -1870,7 +1870,7 @@ class SettingsPageViewModel(
      */
     fun setNewExternalStorageSAFURI(uri : Uri) : Boolean {
         val fileHandler = utils.initialiseSAFForRoot(uri)
-        val handlerSettings = fileHandler?.getSettings()
+        val handlerSettings = fileHandler?.settings
         if (fileHandler != null && handlerSettings != null) {
             settings.setFileHandlerSettings(
                 handlerSettings,
@@ -1998,7 +1998,7 @@ class SettingsPageViewModel(
                         raiseNeedsURI(RequestedURI.SAF)
                     } else {
                         settings.setFileHandlerSettings(
-                            fileHandler.getSettings(),
+                            fileHandler.settings,
                             this::newFileHandlerAppExit,
                         )
                     }

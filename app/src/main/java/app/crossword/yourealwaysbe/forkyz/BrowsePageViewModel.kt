@@ -403,9 +403,9 @@ class BrowsePageViewModel(
         fileHandlerProvider.get { fileHandler ->
             threadWithUILock("load files") {
                 val directory = if (archive)
-                    fileHandler.getArchiveDirectory()
+                    fileHandler.archiveDirectory
                 else
-                    fileHandler.getCrosswordsDirectory()
+                    fileHandler.crosswordsDirectory
 
                 puzzles = runBlocking {
                     fileHandler.getPuzMetas(directory)
@@ -475,9 +475,9 @@ class BrowsePageViewModel(
                     BrowseSwipeAction.BSA_DELETE -> deletePuzzle(puzzleID)
                     else -> {
                         val targetDir = if (isViewArchive)
-                            fileHandler.getCrosswordsDirectory()
+                            fileHandler.crosswordsDirectory
                         else
-                            fileHandler.getArchiveDirectory()
+                            fileHandler.archiveDirectory
 
                         movePuzzle(puzzleID, targetDir)
                     }
@@ -493,9 +493,9 @@ class BrowsePageViewModel(
     fun toggleArchiveSelectedPuzzles() {
         fileHandlerProvider.get { fileHandler ->
             val destDir = if (isViewArchive)
-                fileHandler.getCrosswordsDirectory()
+                fileHandler.crosswordsDirectory
             else
-                fileHandler.getArchiveDirectory()
+                fileHandler.archiveDirectory
 
             clearSelection()
             movePuzzles(currentUIState.selectedPuzzleIDs, destDir)
@@ -546,15 +546,15 @@ class BrowsePageViewModel(
                 val archiveMaxAge = getMaxAge(archiveMaxAgeSetting)
 
                 if (maxAge != null || archiveMaxAge != null) {
-                    val crosswords = fileHandler.getCrosswordsDirectory()
-                    val archive = fileHandler.getArchiveDirectory()
+                    val crosswords = fileHandler.crosswordsDirectory
+                    val archive = fileHandler.archiveDirectory
 
                     val toArchive = ArrayList<PuzHandle>()
                     val toDelete = ArrayList<PuzHandle>()
 
                     fileHandler.getPuzMetas(crosswords).forEach { pm ->
                         val doClean
-                            = pm.getComplete() == 100
+                            = pm.complete == 100
                             || (maxAge != null && getDate(pm).isBefore(maxAge))
 
                         if (doClean) {
@@ -820,9 +820,10 @@ class BrowsePageViewModel(
 
                     if (!isViewArchive && ph != null && !needsReload) {
                         try {
-                            val pm = fileHandler.loadPuzMetaFile(ph)
-                            val pd = runBlocking { getPuzData(pm) }
-                            puzzles[pd.puzEntry.id] = pd
+                            fileHandler.loadPuzMetaFile(ph)?.let { pm ->
+                                val pd = runBlocking { getPuzData(pm) }
+                                puzzles[pd.puzEntry.id] = pd
+                            }
                         } catch (e : IOException) {
                             // fall back to full reload
                             needsReload = true
@@ -853,9 +854,10 @@ class BrowsePageViewModel(
 
                 imported.forEach { ph ->
                     try {
-                        val pm = fileHandler.loadPuzMetaFile(ph)
-                        val pd = runBlocking { getPuzData(pm) }
-                        puzzles[pd.puzEntry.id] = pd
+                        fileHandler.loadPuzMetaFile(ph)?.let { pm ->
+                            val pd = runBlocking { getPuzData(pm) }
+                            puzzles[pd.puzEntry.id] = pd
+                        }
                     } catch (e : IOException) {
                         Log.w(TAG, "Could not load meta for handle " + ph)
                     }
@@ -879,9 +881,9 @@ class BrowsePageViewModel(
      */
     private fun getViewedDirectory(fileHandler : FileHandler) : DirHandle {
         return if (isViewArchive)
-            fileHandler.getArchiveDirectory()
+            fileHandler.archiveDirectory
         else
-            fileHandler.getCrosswordsDirectory()
+            fileHandler.crosswordsDirectory
     }
 
     private fun threadWithUILock(taskName : String, r : Runnable) {
@@ -1104,7 +1106,7 @@ class BrowsePageViewModel(
             percentComplete = pm.complete,
             percentFilled = pm.filled,
             rating = pm.rating,
-            hasSolution = pm.hasSolution(),
+            hasSolution = pm.hasSolution,
             source = getSource(pm)
                 ?: utils.getString(R.string.unknown_source),
             title = getTitle(pm),
