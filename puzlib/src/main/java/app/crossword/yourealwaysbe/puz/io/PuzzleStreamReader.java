@@ -33,7 +33,8 @@ public class PuzzleStreamReader implements PuzzleParser {
         new ExolveIO(),
         new PMLIO(),
         new TCAJSONIO(),
-        new SmartGamesJSONIO()
+        new SmartGamesJSONIO(),
+        new FortyTwoPuzzlesIO(),
     };
 
     /**

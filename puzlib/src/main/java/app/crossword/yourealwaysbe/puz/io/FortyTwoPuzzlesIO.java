@@ -32,6 +32,10 @@ public class FortyTwoPuzzlesIO extends AbstractJSONIO {
     private String title;
     private String author;
 
+    public FortyTwoPuzzlesIO() {
+        this(null, null);
+    }
+
     public FortyTwoPuzzlesIO(String title, String author) {
         this.title = title;
         this.author = author;
