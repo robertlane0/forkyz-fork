@@ -1,3 +1,4 @@
+
 package app.crossword.yourealwaysbe.puz.io;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -84,29 +85,41 @@ public class NRCInHetMiddenIOTest {
         assertEquals("3", boxes[2][1].getClueNumber());
 
         ClueList acrossClues = puz.getClues(ACROSS_CLUES);
-        assertEquals(acrossClues.getClueByNumber("m1").getHint(), "MIDDENWOORD");
-        assertEquals(acrossClues.getClueByNumber("m2").getHint(), "MIDDENWOORD");
+        assertEquals(
+            acrossClues.getClueByNumber("m1").getHint(),
+            "MIDDENWOORD"
+        );
+        assertEquals(
+            acrossClues.getClueByNumber("m2").getHint(),
+            "MIDDENWOORD"
+        );
     }
 
     @Test
     public void testPuzzle1() throws Exception {
         NRCInHetMiddenIO parser = new NRCInHetMiddenIO();
-        PuzzleBuilder builder = parser.parsePuzzle(getTestPuzzleInputStream("/inhetmidden-1.json"));
+        PuzzleBuilder builder = parser.parsePuzzle(
+            getTestPuzzleInputStream("/inhetmidden-1.json")
+        );
         assertIsTestPuzzle1(builder.getPuzzle());
     }
 
     @Test
     public void testPuzzle2() throws Exception {
         NRCInHetMiddenIO parser = new NRCInHetMiddenIO();
-        PuzzleBuilder builder = parser.parsePuzzle(getTestPuzzleInputStream("/inhetmidden-2.json"));
+        PuzzleBuilder builder = parser.parsePuzzle(
+            getTestPuzzleInputStream("/inhetmidden-2.json")
+        );
         assertIsTestPuzzle2(builder.getPuzzle());
     }
 
     @Test
     public void testPuzzle3() throws Exception {
         NRCInHetMiddenIO parser = new NRCInHetMiddenIO();
-        PuzzleBuilder builder = parser.parsePuzzle(getTestPuzzleInputStream("/inhetmidden-3.json"));
+        PuzzleBuilder builder = parser.parsePuzzle(
+            getTestPuzzleInputStream("/inhetmidden-3.json")
+        );
         assertIsTestPuzzle3(builder.getPuzzle());
     }
-
 }
+

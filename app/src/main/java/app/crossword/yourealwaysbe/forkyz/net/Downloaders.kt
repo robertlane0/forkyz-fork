@@ -512,7 +512,8 @@ class Downloaders(
                 Duration.ofHours(1), // Wild guess
                 "https://abonnementen.nrc.nl/",
                 NRCInHetMiddenIO(),
-                "'https://api.42puzzles.com/player/nrc/rrFksRq7v6pSweNyhBXk?date='" + "yyyy-MM-dd",
+                "'https://api.42puzzles.com/player/nrc/rrFksRq7v6pSweNyhBXk"
+                    + "?date='yyyy-MM-dd",
                 "'https://www.nrc.nl/puzzels/inhetmidden/'"
             ))
         }
@@ -525,7 +526,8 @@ class Downloaders(
                 Duration.ofHours(1), // Wild guess
                 "https://abonnementen.nrc.nl/",
                 FortyTwoPuzzlesIO("Scrypto", "NRC"),
-                "'https://api.42puzzles.com/player/nrc/AIbjYuckKZdc4pUpBKjW?date='" + "yyyy-MM-dd",
+                "'https://api.42puzzles.com/player/nrc/AIbjYuckKZdc4pUpBKjW"
+                    + "?date='yyyy-MM-dd",
                 "'https://www.nrc.nl/puzzels/scrypto/'"
             ))
         }

@@ -1,3 +1,4 @@
+
 package app.crossword.yourealwaysbe.puz.io;
 
 import org.json.JSONArray;
@@ -20,9 +21,9 @@ import app.crossword.yourealwaysbe.puz.util.JSONParser;
 /**
  * Parser for puzzles distributed by 42puzzles.com.
  *
- * The format is in JSON, and contains a bit more than just the puzzle. The puzzle itself is found
- * under the "puzzle" key, which is akin to IPuz, but slightly different, so we can't use it
- * directly.
+ * The format is in JSON, and contains a bit more than just the puzzle. The
+ * puzzle itself is found under the "puzzle" key, which is akin to IPuz, but
+ * slightly different, so we can't use it directly.
  */
 public class FortyTwoPuzzlesIO extends AbstractJSONIO {
     private JSONObject srcPuzzle;
@@ -57,8 +58,16 @@ public class FortyTwoPuzzlesIO extends AbstractJSONIO {
 
         Box[] boxes = parseBoxes();
         PuzzleBuilder builder = new PuzzleBuilder(boxes, width, height);
-        parseClues(builder, srcPuzzle.getJSONObject("hclues"), DefaultListNames.ACROSS_LIST);
-        parseClues(builder, srcPuzzle.getJSONObject("vclues"), DefaultListNames.DOWN_LIST);
+        parseClues(
+            builder,
+            srcPuzzle.getJSONObject("hclues"),
+            DefaultListNames.ACROSS_LIST
+        );
+        parseClues(
+            builder,
+            srcPuzzle.getJSONObject("vclues"),
+            DefaultListNames.DOWN_LIST
+        );
 
         setMetadata(builder);
 
@@ -73,7 +82,9 @@ public class FortyTwoPuzzlesIO extends AbstractJSONIO {
         for (int row = 0; row < height; row++) {
             for (int col = 0; col < width; col++) {
                 int index = row * width + col;
-                String value = srcValues.get(index).toString(); // Might be int, might be string, so convert it explicitly to string
+                // Might be int, might be string, so convert it explicitly to
+                // string
+                String value = srcValues.get(index).toString();
                 String solution = srcSolutions.getString(index);
                 boxes[index] = createBox(value, solution);
             }
@@ -85,9 +96,9 @@ public class FortyTwoPuzzlesIO extends AbstractJSONIO {
     protected Box createBox(String value, String solution) {
         Box box = new Box();
 
-        // 42puzzles seems to use the # sign as a mark that boxes should be highlighted. This mark
-        // is prepended to whatever else is in the value string, so it needs to be cut off for
-        // further processing.
+        // 42puzzles seems to use the # sign as a mark that boxes should be
+        // highlighted. This mark is prepended to whatever else is in the value
+        // string, so it needs to be cut off for further processing.
         boolean isHighlighted = false;
         if (value.startsWith("#")) {
             isHighlighted = true;
@@ -111,8 +122,9 @@ public class FortyTwoPuzzlesIO extends AbstractJSONIO {
         }
 
         if (!solution.equals("@")) {
-            // 42games uses the Dutch "Ĳ "digram which is not supported in general. It is common in
-            // crossword puzzles to use the "Y" in place.
+            // 42games uses the Dutch "Ĳ "digram which is not supported in
+            // general. It is common in crossword puzzles to use the "Y" in
+            // place.
             solution = solution.replace("Ĳ", "Y");
 
             box.setSolution(solution);
@@ -121,13 +133,24 @@ public class FortyTwoPuzzlesIO extends AbstractJSONIO {
         return box;
     }
 
-    protected void parseClues(PuzzleBuilder builder, JSONObject srcClues, String listName) {
-        // The JSONObject returns its keys in random order. Since we know that all keys are numbers,
-        // we can convert them to actual numbers and sort them this way.
-        List<Integer> clueNums = srcClues.keySet().stream().map(Integer::parseInt).sorted().toList();
+    protected void parseClues(
+        PuzzleBuilder builder,
+        JSONObject srcClues,
+        String listName
+    ) {
+        // The JSONObject returns its keys in random order. Since we know that
+        // all keys are numbers, we can convert them to actual numbers and sort
+        // them this way.
+        List<Integer> clueNums = srcClues.keySet()
+            .stream()
+            .map(Integer::parseInt)
+            .sorted()
+            .toList();
         for (Integer clueNum : clueNums) {
             String clueStr = clueNum.toString();
-            PuzzleBuilder.BasicClue clue = new PuzzleBuilder.BasicClue(clueStr, srcClues.getString(clueStr));
+            PuzzleBuilder.BasicClue clue = new PuzzleBuilder.BasicClue(
+                clueStr, srcClues.getString(clueStr)
+            );
             if (listName.equals(DefaultListNames.ACROSS_LIST)) {
                 builder.addAcrossClue(listName, clue);
             } else {
@@ -141,9 +164,10 @@ public class FortyTwoPuzzlesIO extends AbstractJSONIO {
         builder.setAuthor(author);
         String dateStr = srcPuzzle.optString("date");
         if (dateStr != null) {
-            LocalDate date = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+            LocalDate date = LocalDate.parse(
+                dateStr, DateTimeFormatter.ofPattern("dd-MM-yyyy")
+            );
             builder.setDate(date);
         }
     }
-
 }
