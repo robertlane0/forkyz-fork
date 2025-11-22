@@ -108,6 +108,11 @@ File getReleaseKeyStoreFile() {
     return filename ? file(filename) : null
 }
 
+// https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+configurations {
+    mockitoAgent
+}
+
 dependencies {
     def lifecycle_version = "2.9.4"
     // 2.10.0 has a bug maybe that prevents background threads in
@@ -166,6 +171,10 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:5.20.0'
     testImplementation 'org.robolectric:robolectric:4.16'
 
+    mockitoAgent('org.mockito:mockito-core:5.20.0') {
+        transitive = false
+    }
+
     // To avoid duplicate classes pulled in by libraries
     // https://stackoverflow.com/a/75298544/6882587
     constraints {
@@ -175,6 +184,14 @@ dependencies {
         implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0") {
             because("kotlin-stdlib-jdk8 is now a part of kotlin-stdlib")
         }
+    }
+}
+
+tasks.withType(Test) { task ->
+    // Claude tells me doFirst is needed to prevent resolution of
+    // configurations.mockitoAgent.asPath at build time.
+    task.doFirst {
+        jvmArgs "-javaagent:${configurations.mockitoAgent.asPath}"
     }
 }
 
