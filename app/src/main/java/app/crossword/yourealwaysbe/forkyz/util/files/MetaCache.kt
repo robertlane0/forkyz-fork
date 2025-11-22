@@ -202,7 +202,7 @@ class MetaCache(
     }
 
 
-    inner class MetaRecord(private val dbRow : CachedMeta) {
+    class MetaRecord(private val dbRow : CachedMeta) {
         val isUpdatable : Boolean
             // updatable field now defunct
             get() = dbRow.isUpdatable

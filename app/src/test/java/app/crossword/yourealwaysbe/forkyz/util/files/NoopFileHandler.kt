@@ -15,33 +15,27 @@ import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 
 class NoopFileHandler(utils : NativeBackendUtils) : FileHandler(utils) {
-    override fun getCrosswordsDirectory() : DirHandle {
-        return DirHandle(File("none"))
-    }
-
-    override fun getArchiveDirectory() : DirHandle {
-        return DirHandle(File("none"))
-    }
-
-    override fun getToImportDirectory() : DirHandle {
-        return DirHandle(File("none"))
-    }
-
-    override fun getToImportDoneDirectory() : DirHandle {
-        return DirHandle(File("none"))
-    }
-
-    override fun getToImportFailedDirectory() : DirHandle {
-        return DirHandle(File("none"))
-    }
-
-    override fun isStorageMounted() : Boolean {
-        return false
-    }
-
-    override fun isStorageFull() : Boolean {
-        return false
-    }
+    override val crosswordsDirectory : DirHandle
+        get() { return DirHandle(File("none")) }
+    override val archiveDirectory : DirHandle
+        get() { return DirHandle(File("none")) }
+    override val toImportDirectory : DirHandle
+        get() { return DirHandle(File("none")) }
+    override val toImportDoneDirectory : DirHandle
+        get() { return DirHandle(File("none")) }
+    override val toImportFailedDirectory : DirHandle
+        get() { return DirHandle(File("none")) }
+    override val isStorageMounted = false
+    override val isStorageFull = false
+    override val settings = FileHandlerSettings(
+        StorageLocation.SL_INTERNAL,
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+    )
 
     override fun listFiles(dir : DirHandle) : Iterable<FileHandle> {
         return listOf()
@@ -49,18 +43,6 @@ class NoopFileHandler(utils : NativeBackendUtils) : FileHandler(utils) {
 
     override fun getName(f : FileHandle) : String {
         return "none"
-    }
-
-    override fun getSettings() : FileHandlerSettings {
-        return FileHandlerSettings(
-            StorageLocation.SL_INTERNAL,
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-        )
     }
 
     protected override fun exists(dir : DirHandle) : Boolean {
@@ -71,11 +53,11 @@ class NoopFileHandler(utils : NativeBackendUtils) : FileHandler(utils) {
         return false
     }
 
-    protected override fun getUri(f : DirHandle) : Uri {
+    override fun getUri(d : DirHandle) : Uri {
         return "content://none".toUri()
     }
 
-    protected override fun getUri(f : FileHandle) : Uri {
+    override fun getUri(f : FileHandle) : Uri {
         return "content://none".toUri()
     }
 
@@ -87,13 +69,13 @@ class NoopFileHandler(utils : NativeBackendUtils) : FileHandler(utils) {
         return FileHandle(File("none"))
     }
 
-    protected override fun getOutputStream(
+    override fun getOutputStream(
         fileHandle : FileHandle
     ) : OutputStream {
         return FileOutputStream(File("none"))
     }
 
-    protected override fun getInputStream(
+    override fun getInputStream(
         fileHandle : FileHandle,
     ) : InputStream {
         return FileInputStream(File("none"))

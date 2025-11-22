@@ -7,6 +7,7 @@ import java.io.IOException
 import kotlinx.coroutines.runBlocking
 
 import android.content.Context
+import androidx.core.net.toUri
 
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -18,6 +19,8 @@ import org.junit.runner.RunWith
 import org.koin.core.context.stopKoin
 
 import org.mockito.Mock
+import org.mockito.Mockito
+import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 
 import org.robolectric.RobolectricTestRunner
@@ -27,8 +30,21 @@ import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerJavaFile
 import app.crossword.yourealwaysbe.forkyz.util.files.MetaCache
+import app.crossword.yourealwaysbe.forkyz.util.files.MetaCache.CachedMeta
+import app.crossword.yourealwaysbe.forkyz.util.files.MetaCache.MetaRecord
 import app.crossword.yourealwaysbe.forkyz.versions.TiramisuUtil
 import app.crossword.yourealwaysbe.puz.io.StreamUtils
+
+// thanks: https://derekwilson.net/blog/2018/08/23/mokito-kotlin
+object MockitoHelper {
+    @Suppress("CheckResult")
+    fun <T> anyObject() : T {
+        Mockito.any<T>()
+        return uninitialized()
+    }
+    @Suppress("UNCHECKED_CAST")
+    fun <T> uninitialized() : T = null as T
+}
 
 @RunWith(RobolectricTestRunner::class)
 class PuzzleImporterTest {
@@ -37,10 +53,10 @@ class PuzzleImporterTest {
     val folder = TemporaryFolder()
 
     @Mock
-    val context: Context = mock(Context::class.java)
+    val context : Context = mock(Context::class.java)
 
     private val utils = NativeBackendUtils(context, TiramisuUtil())
-    private var fileHandler: FileHandler? = null
+    private var fileHandler : FileHandler? = null
 
     @After
     fun tearDown() {
@@ -116,7 +132,7 @@ class PuzzleImporterTest {
         assertEquals(expectedToImportDone, toImportDone.list()?.toSet())
     }
 
-    private fun getDirectoryFiles(directory: File): Set<String> {
+    private fun getDirectoryFiles(directory : File) : Set<String> {
         return directory.listFiles()
             ?.filter { it.isFile }
             ?.map { it.name }
@@ -124,7 +140,7 @@ class PuzzleImporterTest {
             ?: emptySet()
     }
 
-    private fun getCrosswordTitles(): Set<String> {
+    private fun getCrosswordTitles() : Set<String> {
         val fileHandler = getFileHandler()
 
         val gotCrosswordTitles = mutableSetOf<String>()
@@ -133,35 +149,35 @@ class PuzzleImporterTest {
             fileHandler.crosswordsDirectory
         )
         for (pm in pms) {
-            gotCrosswordTitles.add(
-                fileHandler.load(pm.puzHandle).title
-            )
+            fileHandler.load(pm.puzHandle)?.let {
+                gotCrosswordTitles.add(it.title)
+            }
         }
 
         return gotCrosswordTitles
     }
 
-    private fun getCrosswordsFolder(): File {
+    private fun getCrosswordsFolder() : File {
         val crosswords = File(folder.root, "crosswords")
         crosswords.mkdirs()
         return crosswords
     }
 
-    private fun getToImportFolder(): File {
+    private fun getToImportFolder() : File {
         val crosswords = getCrosswordsFolder()
         val toImport = File(crosswords, "to-import")
         toImport.mkdirs()
         return toImport
     }
 
-    private fun getToImportDoneFolder(): File {
+    private fun getToImportDoneFolder() : File {
         val crosswords = getCrosswordsFolder()
         val toImportDone = File(crosswords, "to-import-done")
         toImportDone.mkdirs()
         return toImportDone
     }
 
-    private fun getToImportFailedFolder(): File {
+    private fun getToImportFailedFolder() : File {
         val crosswords = getCrosswordsFolder()
         val toImportFailed = File(crosswords, "to-import-failed")
         toImportFailed.mkdirs()
@@ -176,30 +192,47 @@ class PuzzleImporterTest {
     private fun getFileHandler() : FileHandler {
         if (fileHandler == null) {
             val metaCache = mock(MetaCache::class.java)
+            `when`(
+                metaCache.addRecord(
+                    MockitoHelper.anyObject(),
+                    MockitoHelper.anyObject(),
+                    MockitoHelper.anyObject(),
+                )
+            ).thenReturn(
+                MetaRecord(
+                    CachedMeta(
+                        mainFileUri = "content://none".toUri(),
+                        metaFileUri = null,
+                        directoryUri = "content://none".toUri(),
+                        isUpdatable = false,
+                        date = null,
+                        percentComplete = 0,
+                        percentFilled = 0,
+                        source = null,
+                        title = null,
+                        author = null,
+                        rating = 0.toChar(),
+                        hasSolution = false,
+                    )
+                )
+            )
+
             fileHandler = object : FileHandlerJavaFile(
                 utils,
                 metaCache,
                 folder.root,
             ) {
-                override fun isStorageMounted() : Boolean {
-                    return true
-                }
-
-                override fun isStorageFull() : Boolean {
-                    return false
-                }
-
-                override fun getSettings() : FileHandlerSettings {
-                    return FileHandlerSettings(
-                        StorageLocation.SL_INTERNAL,
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
-                    )
-                }
+                override val isStorageMounted = true
+                override val isStorageFull = false
+                override val settings = FileHandlerSettings(
+                    StorageLocation.SL_INTERNAL,
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                )
             }
         }
         return fileHandler!!
