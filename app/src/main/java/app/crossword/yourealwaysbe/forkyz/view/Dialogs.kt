@@ -108,6 +108,7 @@ fun OKCancelDialog(
  * @param onPositive callback on positive
  * @param negativeText resource ID of negative text
  * @param onNegative callback on positive
+ * @param onCancel callback if dialog dismissed with no answer
  */
 @Composable
 fun TwoButtonDialog(
@@ -116,7 +117,8 @@ fun TwoButtonDialog(
     positiveText : Int,
     onPositive : () -> Unit,
     negativeText : Int,
-    onNegative: () -> Unit,
+    onNegative : () -> Unit,
+    onCancel : () -> Unit = onNegative,
     body : @Composable () -> Unit = { },
 ) {
     TwoButtonDialog(
@@ -126,6 +128,7 @@ fun TwoButtonDialog(
         onPositive = onPositive,
         negativeText = stringResource(negativeText),
         onNegative = onNegative,
+        onCancel = onCancel,
         body = body,
     )
 }
@@ -138,12 +141,13 @@ fun TwoButtonDialog(
     onPositive : () -> Unit,
     negativeText : String,
     onNegative: () -> Unit,
+    onCancel : () -> Unit = onNegative,
     body : @Composable () -> Unit = { },
 ) {
     PlainDialog(
         title = title,
         summary = summary,
-        onClose = onNegative,
+        onClose = onCancel,
     ) {
         body()
 

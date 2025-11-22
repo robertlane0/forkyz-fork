@@ -88,6 +88,7 @@ fun PuzzleFinishedDialog(
         onPositive = onDone,
         negativeText = R.string.share,
         onNegative = onShare,
+        onCancel = onDone,
     ) {
         Column() {
             val state by viewModel.uiState.collectAsStateWithLifecycle()
