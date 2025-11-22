@@ -33,53 +33,52 @@ class DownloadersTest(
 ) {
     companion object {
         private val settings = DownloadersSettings(
-                true, // downloadDeStandaard
-                true, // downloadDeTelegraaf
-                true, // downloadElPaisExperto
-                true, // downloadGuardianDailyCryptic
-                true, // downloadGuardianWeeklyQuiptic
-                true, // downloadHamAbend
-                true, // downloadIndependentDailyCryptic
-                true, // downloadIrishNewsCryptic
-                true, // downloadJonesin
-                true, // downloadJoseph
-                true, // download20Minutes
-                true, // downloadLATimes
-                true, // downloadLeParisienF1
-                true, // downloadLeParisienF2
-                true, // downloadLeParisienF3
-                true, // downloadLeParisienF4
-                true, // downloadMetroCryptic
-                true, // downloadMetroQuick
-                true, // downloadNewsday
-                true, // downloadNewYorkTimesSyndicated
-                true, // downloadNRCInHetMidden
-                true, // downloadNRCScrypto
-                true, // downloadPremier
-                true, // downloadSheffer
-                true, // downloadSudOuestMotsCroises
-                true, // downloadSudOuestMotsFleches
-                true, // downloadTF1MotsCroises
-                true, // downloadTF1MotsFleches
-                true, // downloadUniversal
-                true, // downloadUSAToday
-                true, // downloadWaPoSunday
-                true, // downloadWsj
-                true, // scrapeCru
-                true, // scrapeGuardianQuick
-                true, // scrapeKegler
-                true, // scrapePrivateEye
-                true, // scrapePrzekroj
-                false, // downloadCustomDaily
-                "", // customDailyTitle,
-                "", // customDailyUrl,
-                true, // suppressSummaryNotifications,
-                true, // suppressIndividualNotifications,
-                Collections.emptySet(), // autoDownloaders,
-                30000, // downloadTimeout,
-                false, // downloadOnStartup
-            )
-
+            true, // downloadDeStandaard
+            true, // downloadDeTelegraaf
+            true, // downloadElPaisExperto
+            true, // downloadGuardianDailyCryptic
+            true, // downloadGuardianWeeklyQuiptic
+            true, // downloadHamAbend
+            true, // downloadIndependentDailyCryptic
+            true, // downloadIrishNewsCryptic
+            true, // downloadJonesin
+            true, // downloadJoseph
+            true, // download20Minutes
+            true, // downloadLATimes
+            true, // downloadLeParisienF1
+            true, // downloadLeParisienF2
+            true, // downloadLeParisienF3
+            true, // downloadLeParisienF4
+            true, // downloadMetroCryptic
+            true, // downloadMetroQuick
+            true, // downloadNewsday
+            true, // downloadNewYorkTimesSyndicated
+            true, // downloadNRCInHetMidden
+            true, // downloadNRCScrypto
+            true, // downloadPremier
+            true, // downloadSheffer
+            true, // downloadSudOuestMotsCroises
+            true, // downloadSudOuestMotsFleches
+            true, // downloadTF1MotsCroises
+            true, // downloadTF1MotsFleches
+            true, // downloadUniversal
+            true, // downloadUSAToday
+            true, // downloadWaPoSunday
+            true, // downloadWsj
+            true, // scrapeCru
+            true, // scrapeGuardianQuick
+            true, // scrapeKegler
+            true, // scrapePrivateEye
+            true, // scrapePrzekroj
+            false, // downloadCustomDaily
+            "", // customDailyTitle,
+            "", // customDailyUrl,
+            true, // suppressSummaryNotifications,
+            true, // suppressIndividualNotifications,
+            Collections.emptySet(), // autoDownloaders,
+            30000, // downloadTimeout,
+            false, // downloadOnStartup
+        )
 
         /**
          * Parameters are the list of downloaders
