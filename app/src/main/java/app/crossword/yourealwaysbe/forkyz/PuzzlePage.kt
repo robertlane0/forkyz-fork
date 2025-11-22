@@ -1223,7 +1223,7 @@ fun PuzzlePage(
     LifecycleResumeEffect(Unit) {
         if (!viewModel.canResume) {
             Log.i(TAG, "No puzzle board, puzzle activity finishing.")
-            utils.onFinish()
+            pageOpener.onBack()
         }
         viewModel.startTimer()
 
