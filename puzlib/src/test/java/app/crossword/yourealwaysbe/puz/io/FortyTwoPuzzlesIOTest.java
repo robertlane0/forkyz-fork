@@ -1,3 +1,4 @@
+
 package app.crossword.yourealwaysbe.puz.io;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -75,8 +76,9 @@ public class FortyTwoPuzzlesIOTest {
 
     @Test
     public void testPuzzle1() throws Exception {
-        FortyTwoPuzzlesIO parser = new FortyTwoPuzzlesIO("Test", "Forkyz");
+        FortyTwoPuzzlesIO parser = new FortyTwoPuzzlesIO();
         PuzzleBuilder builder = parser.parsePuzzle(getTestPuzzle1InputStream());
         assertIsTestPuzzle1(builder.getPuzzle());
     }
 }
+

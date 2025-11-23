@@ -29,17 +29,6 @@ public class FortyTwoPuzzlesIO extends AbstractJSONIO {
     private JSONObject srcPuzzle;
     private int width;
     private int height;
-    private String title;
-    private String author;
-
-    public FortyTwoPuzzlesIO() {
-        this(null, null);
-    }
-
-    public FortyTwoPuzzlesIO(String title, String author) {
-        this.title = title;
-        this.author = author;
-    }
 
     @Override
     public Puzzle parseInput(InputStream is) throws Exception {
@@ -164,8 +153,6 @@ public class FortyTwoPuzzlesIO extends AbstractJSONIO {
     }
 
     protected void setMetadata(PuzzleBuilder builder) {
-        builder.setTitle(title);
-        builder.setAuthor(author);
         String dateStr = srcPuzzle.optString("date");
         if (dateStr != null) {
             LocalDate date = LocalDate.parse(

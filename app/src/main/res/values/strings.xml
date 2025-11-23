@@ -787,4 +787,9 @@
     <string name="jump_to_end">Jump to End</string>
     <string name="logcat">Logcat</string>
     <string name="share_logcat">Share Logcat</string>
+
+    <!-- downloaders -->
+    <string name="nrc">NRC</string>
+    <string name="nrc_scrypto_title">Scrypto</string>
+    <string name="nrc_in_het_midden_title">In Het Midden</string>
 </resources>

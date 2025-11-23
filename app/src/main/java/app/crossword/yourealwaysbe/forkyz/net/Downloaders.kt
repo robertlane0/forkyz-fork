@@ -505,7 +505,7 @@ class Downloaders(
         }
 
         if (settings.downloadNRCInHetMidden) {
-            downloaders.add(AbstractDateDownloader(
+            downloaders.add(WithMetaDataDownloader(
                 "nrc_inhetmidden",
                 utils.getString(R.string.nrc_in_het_midden),
                 AbstractDateDownloader.DAYS_WEEKDAY,
@@ -514,21 +514,25 @@ class Downloaders(
                 NRCInHetMiddenIO(),
                 "'https://api.42puzzles.com/player/nrc/rrFksRq7v6pSweNyhBXk"
                     + "?date='yyyy-MM-dd",
-                "'https://www.nrc.nl/puzzels/inhetmidden/'"
+                "'https://www.nrc.nl/puzzels/inhetmidden/'",
+                utils.getString(R.string.nrc_in_het_midden_title),
+                utils.getString(R.string.nrc),
             ))
         }
 
         if (settings.downloadNRCScrypto) {
-            downloaders.add(AbstractDateDownloader(
+            downloaders.add(WithMetaDataDownloader(
                 "nrc_scrypto",
                 utils.getString(R.string.nrc_scrypto),
                 AbstractDateDownloader.DAYS_SATURDAY,
                 Duration.ofHours(1), // Wild guess
                 "https://abonnementen.nrc.nl/",
-                FortyTwoPuzzlesIO("Scrypto", "NRC"),
+                FortyTwoPuzzlesIO(),
                 "'https://api.42puzzles.com/player/nrc/AIbjYuckKZdc4pUpBKjW"
                     + "?date='yyyy-MM-dd",
-                "'https://www.nrc.nl/puzzels/scrypto/'"
+                "'https://www.nrc.nl/puzzels/scrypto/'",
+                utils.getString(R.string.nrc_scrypto_title),
+                utils.getString(R.string.nrc),
             ))
         }
 

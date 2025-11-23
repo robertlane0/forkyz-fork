@@ -27,10 +27,6 @@ public class NRCInHetMiddenIO extends FortyTwoPuzzlesIO {
 
     public String middenwoordHint = "MIDDENWOORD";
 
-    public NRCInHetMiddenIO() {
-        super("In het midden", "NRC");
-    }
-
     @Override
     protected PuzzleBuilder parsePuzzle(InputStream is) throws Exception {
         PuzzleBuilder builder = super.parsePuzzle(is);
