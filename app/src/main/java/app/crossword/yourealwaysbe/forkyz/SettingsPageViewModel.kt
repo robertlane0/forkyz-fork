@@ -394,7 +394,8 @@ class SettingsPageViewModel(
             = downloadersProvider.liveDownloaders.filterNotNull().map { dls ->
                 dls.getDownloaders().map { downloader ->
                     SettingsListEntry(
-                        downloader.getName(), downloader.getInternalName()
+                        downloader.name,
+                        downloader.internalName,
                     )
                 }
             }.stateInSubscribed(viewModelScope, listOf())

@@ -84,7 +84,7 @@ class KingDigitalLoginDownloader(
             return null
 
         try {
-            Log.i(TAG, "Downloading " + getName() + " for date " + date)
+            Log.i(TAG, "Downloading " + name + " for date " + date)
 
             val key = getLoginKey(headers)
             if (key == null) {
@@ -111,7 +111,7 @@ class KingDigitalLoginDownloader(
             ).use(JPZIO::readPuzzle)?.let { puz ->
                 with (puz) {
                     setDate(date)
-                    setSource(getName())
+                    setSource(name)
                     setSourceUrl(url)
                     setSupportUrl(getSupportUrl())
                     setShareUrl(getShareUrl(date))
@@ -121,14 +121,14 @@ class KingDigitalLoginDownloader(
         } catch (e : IOException) {
             Log.i(
                 TAG,
-                "Error downloading " + getName() + " for date " + date
+                "Error downloading " + name + " for date " + date
                     + ": " + e
             );
             return null
         } catch (e : JSONException) {
             Log.i(
                 TAG,
-                "Error downloading " + getName() + " for date " + date
+                "Error downloading " + name + " for date " + date
                     + ": " + e
             );
             return null

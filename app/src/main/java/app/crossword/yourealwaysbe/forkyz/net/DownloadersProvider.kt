@@ -113,10 +113,10 @@ class DownloadersProvider(
 
             // don't notify unless success or failure
             // notifications about existing puzzles would be annoying
-            if (!(result.isSuccess() || result.isFailed()))
+            if (!(result.isSuccess || result.isFailed))
                 return
 
-            val messageId = if (result.isSuccess())
+            val messageId = if (result.isSuccess)
                 R.string.puzzle_downloaded
             else
                 R.string.puzzle_download_failed;

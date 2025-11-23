@@ -108,7 +108,7 @@ class DownloadersTest(
 
                         override fun get(i : Int) : Array<Any> {
                             val d = downloaders.get(i)
-                            return arrayOf(d.getInternalName(), d)
+                            return arrayOf(d.internalName, d)
                         }
                     }
                 }
@@ -126,9 +126,9 @@ class DownloadersTest(
     @Test
     fun testDownloaders() {
         mockStatic(Log::class.java).use { _ ->
-            downloader.getLatestDate()?.let { latest ->
+            downloader.latestDate?.let { latest ->
                 val res = downloader.download(latest, setOf())
-                assertTrue(res.isSuccess())
+                assertTrue(res.isSuccess)
             }
         }
     }

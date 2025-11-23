@@ -114,8 +114,7 @@ class Downloaders(
 
     suspend fun getAutoDownloaders() : List<Downloader> {
         return getDownloaders().filter {
-            settings.autoDownloaders
-                .contains(it.getInternalName())
+            settings.autoDownloaders.contains(it.internalName)
         }
     }
 
@@ -147,9 +146,9 @@ class Downloaders(
                         date,
                         fileNames,
                     )
-                    if (result.isSuccess())
+                    if (result.isSuccess)
                         somethingDownloaded.set(true)
-                    else if (result.isFailed())
+                    else if (result.isFailed)
                         somethingFailed.set(true)
                 }
             }
@@ -203,28 +202,31 @@ class Downloaders(
 
         Log.i(TAG, "Downloading " + d.toString())
         runBlocking {
-            downloadersListener?.onPuzzleDownloadStarted(d.getName())
+            downloadersListener?.onPuzzleDownloadStarted(d.name)
         }
 
         try {
             result = d.download(date, existingFileNames)
 
-            if (result.isSuccess()) {
-                val fileName = result.getFileName()
-                if (!existingFileNames.contains(fileName)) {
-                    fileHandler.saveNewPuzzle(
-                        result.getPuzzle(),
-                        fileName,
-                    )
+            if (result.isSuccess) {
+                result.fileName?.let { fileName ->
+                    if (!existingFileNames.contains(fileName)) {
+                        result.puzzle?.let { puz ->
+                            fileHandler.saveNewPuzzle(
+                                puz,
+                                fileName,
+                            )
+                        }
+                    }
                 }
             }
         } catch (e : Exception) {
-            Log.w(TAG, "Failed to download "+d.getName(), e)
+            Log.w(TAG, "Failed to download "+d.name, e)
         }
 
         runBlocking {
             downloadersListener?.onPuzzleDownloadFinished(
-                d.getName(),
+                d.name,
                 result,
             )
         }
@@ -744,7 +746,7 @@ class Downloaders(
             ))
         }
 
-        downloaders.forEach { it.setTimeout(settings.downloadTimeout) }
+        downloaders.forEach { it.timeout = settings.downloadTimeout }
 
         return downloaders
     }
