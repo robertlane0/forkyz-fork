@@ -7,6 +7,7 @@ import android.content.Context
 import android.net.Uri
 import androidx.annotation.NonNull
 import androidx.annotation.Nullable
+import androidx.core.net.toUri
 import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Database
@@ -46,7 +47,7 @@ class MetaCache(
 
         @TypeConverter
         fun fromUriString(value : String?) : Uri? {
-            return value?.let { Uri.parse(it) }
+            return value?.let { it.toUri() }
         }
 
         @TypeConverter

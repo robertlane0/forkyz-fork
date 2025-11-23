@@ -4,6 +4,7 @@ package app.crossword.yourealwaysbe.forkyz.util.files
 import java.io.File
 
 import android.net.Uri
+import androidx.core.net.toUri
 
 class DirHandle {
     // common to all implementations
@@ -28,7 +29,7 @@ class DirHandle {
     private var file : File? = null
 
     internal constructor(file : File) {
-        this.uri = Uri.parse(file.toURI().toString())
+        this.uri = file.toURI().toString().toUri()
         this.file = file
     }
 

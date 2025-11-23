@@ -14,6 +14,7 @@ import android.net.Uri
 import android.os.Build
 import android.provider.DocumentsContract
 import android.util.Log
+import androidx.core.net.toUri
 
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
@@ -552,12 +553,12 @@ class FileHandlerSAF(
                 && !toImportDoneFolder.isEmpty()
                 && toImportFailedFolder.isEmpty()
             ) {
-                val rootFolderUri = Uri.parse(rootFolder)
-                val crosswordsFolderUri = Uri.parse(crosswordsFolder)
-                val archiveFolderUri = Uri.parse(archiveFolder)
-                val toImportFolderUri = Uri.parse(toImportFolder)
-                val toImportDoneFolderUri = Uri.parse(toImportDoneFolder)
-                val toImportFailedFolderUri = Uri.parse(toImportFailedFolder)
+                val rootFolderUri = rootFolder.toUri()
+                val crosswordsFolderUri = crosswordsFolder.toUri()
+                val archiveFolderUri = archiveFolder.toUri()
+                val toImportFolderUri = toImportFolder.toUri()
+                val toImportDoneFolderUri = toImportDoneFolder.toUri()
+                val toImportFailedFolderUri = toImportFailedFolder.toUri()
 
                 val resolver = applicationContext.getContentResolver()
 
@@ -598,7 +599,7 @@ class FileHandlerSAF(
                 fileHandler = initialiseSAFForRoot(
                     applicationContext,
                     utils,
-                    Uri.parse(rootFolder),
+                    rootFolder.toUri(),
                 )
                 // update settings to good values
                 if (fileHandler != null)

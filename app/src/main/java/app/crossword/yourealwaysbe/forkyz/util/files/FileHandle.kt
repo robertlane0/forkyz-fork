@@ -5,6 +5,7 @@ import java.io.File
 import java.util.Objects
 
 import android.net.Uri
+import androidx.core.net.toUri
 
 class FileHandle {
     // common to all implementations
@@ -29,7 +30,7 @@ class FileHandle {
     private var file : File? = null
 
     internal constructor(file : File) {
-        this.uri = Uri.parse(file.toURI().toString())
+        this.uri = file.toURI().toString().toUri()
         this.file = file
     }
 
