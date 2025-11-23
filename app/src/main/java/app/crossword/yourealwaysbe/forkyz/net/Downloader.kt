@@ -93,9 +93,10 @@ interface Downloader {
     /**
      * Most recent puzzle date up to until (inclusive)
      *
-     * May return null if there is no most recent
+     * @param until latest date until this date (or null if today)
+     * @return null if there is no most recent
      */
-    fun getLatestDate(until : LocalDate) : LocalDate?
+    fun getLatestDate(until : LocalDate?) : LocalDate?
 
     var timeout : Int
 }

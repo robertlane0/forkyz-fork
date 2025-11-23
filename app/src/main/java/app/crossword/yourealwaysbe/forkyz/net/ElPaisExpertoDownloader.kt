@@ -27,8 +27,8 @@ class ElPaisExpertoDownloader(
         .minusDays(7),
 ) {
     override protected fun download(
-        date : LocalDate?,
-        headers : Map<String?, String?>?,
+        date : LocalDate,
+        headers : Map<String, String>?,
     ) : Puzzle? {
         val fullHeaders = headers?.toMutableMap() ?: mutableMapOf()
         fullHeaders.putIfAbsent("Origin", "https://elpais.com")

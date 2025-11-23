@@ -77,12 +77,9 @@ class KingDigitalLoginDownloader(
     )
 
     override protected fun download(
-        date : LocalDate?,
+        date : LocalDate,
         headers : Map<String, String>?,
     ) : Puzzle? {
-        if (date == null)
-            return null
-
         try {
             Log.i(TAG, "Downloading " + name + " for date " + date)
 
