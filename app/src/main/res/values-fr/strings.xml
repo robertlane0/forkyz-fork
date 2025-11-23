@@ -743,4 +743,11 @@
     <string name="jump_to_end">Aller à la fin</string>
     <string name="logcat">Logcat</string>
     <string name="share_logcat">Partager Logcat</string>
+    <string name="nrc_in_het_midden">(NL) NRC In Het Midden</string>
+    <string name="nrc_in_het_midden_desc">Mises à jour du lundi au vendredi, en néerlandais.</string>
+    <string name="nrc_scrypto">(NL) NRC Scrypto</string>
+    <string name="nrc_scrypto_desc">Mises à jour samedi, en néerlandais.</string>
+    <string name="nrc">NRC</string>
+    <string name="nrc_scrypto_title">Scrypto</string>
+    <string name="nrc_in_het_midden_title">In Het Midden</string>
 </resources>
