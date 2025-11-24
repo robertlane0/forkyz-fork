@@ -100,18 +100,22 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
         val doc = getDocument(bis)
         bis.reset()
 
+        if (doc == null)
+            return bis
+
         val div = doc.selectFirst(".pm-embed-div")
 
         var cwID = div?.attribute("data-id")?.value
         var cwSet = div?.attribute("data-set")?.value
-        var cdn = DEFAULT_CDN
-        var subdir = DEFAULT_SUBDIR
+        var cdn : String? = DEFAULT_CDN
+        var subdir : String? = DEFAULT_SUBDIR
         if (cwID == null || cwSet == null) {
             val results = regexScrape(
                 bis,
                 arrayOf(CDN_REGEX, SUBDIR_REGEX, CW_ID_REGEX, CW_SET_REGEX),
             )
             bis.reset()
+
 
             if (results.size == 4) {
                 cdn = results[0]
@@ -122,11 +126,14 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
                 return bis
             }
         }
-        return getInputStream(
-            STAGE2_URL_FORMAT.format(cdn, subdir, cwID, cwSet),
-        )?.use {
-            StreamUtils.makeByteArrayInputStream(it)
-        } ?: bis
+        if (cdn == null || subdir == null || cwID == null || cwSet == null)
+            return bis
+        else
+            return getInputStream(
+                STAGE2_URL_FORMAT.format(cdn, subdir, cwID, cwSet),
+            )?.use {
+                StreamUtils.makeByteArrayInputStream(it)
+            } ?: bis
     }
 
     /**

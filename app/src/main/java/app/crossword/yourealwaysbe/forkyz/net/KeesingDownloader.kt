@@ -41,7 +41,7 @@ class KeesingDownloader(
 ) {
     override fun getSourceUrl(date : LocalDate) : String? {
         val scraper = KeesingStreamScraper()
-        scraper.setTimeout(timeout)
+        scraper.timeout = timeout
         return scraper.getPuzzleURL(clientID, puzzleSetID)
     }
 

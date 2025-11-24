@@ -1,0 +1,145 @@
+
+package app.crossword.yourealwaysbe.forkyz.net
+
+import java.io.BufferedReader
+import java.io.IOException
+import java.io.InputStream
+import java.io.InputStreamReader
+import java.net.URISyntaxException
+import java.util.Locale
+import java.util.regex.Pattern
+
+import android.util.Log
+
+import org.json.JSONException
+import org.json.JSONObject
+import org.json.JSONTokener
+
+import app.crossword.yourealwaysbe.puz.Puzzle
+import app.crossword.yourealwaysbe.puz.io.KeesingXMLIO
+
+/**
+ * Downloader for Keesing.com embedded crosswords
+ *
+ * First look for web.keesing.com and also a data-customerid and a
+ * data-puzzleid.
+ *
+ * Then go to the following, where puzzlesetid is puzzleid_customerid
+ *
+ * https://web.keesing.com/Content/GetPuzzleInfo/?clientid=<customerid>&puzzleid=<puzzlesetid>
+ *
+ * Note, De Standaard adds _yyyymmdd to the end of the URL. Try without (it
+ * works) because i don't know how to reliably get the date from the webpage.
+ *
+ * Then gets puzzle from
+ *
+ * https://web.keesing.com/content/getxml?clientid=<customerid>&puzzleid=<puzzleid>"
+ *
+ */
+class KeesingStreamScraper : AbstractStreamScraper() {
+    @Throws(Exception::class)
+    public override fun parseInput(
+        inputStream : InputStream,
+        url : String?
+    ) : Puzzle? {
+        // get customerID and puzzleID
+        val matchers = arrayOf<RegexScrape>(CUSTOMER_ID_MATCH, PUZZLE_ID_MATCH)
+        val results = regexScrape(inputStream, matchers)
+        val customerID = results[0]
+        val puzzleID = results[1]
+        if (customerID == null || puzzleID == null)
+            return null
+
+        val puzzleSetID = String.format(
+            Locale.US,
+            PUZZLE_SET_ID_FORMAT,
+            puzzleID,
+            customerID,
+        )
+
+        return getPuzzleURL(customerID, puzzleSetID)?.let { getPuzzle(it) }
+    }
+
+    fun getPuzzle(puzzleURL : String) : Puzzle? {
+        try {
+            getInputStream(puzzleURL).use { inputStream ->
+                val puz = KeesingXMLIO.readPuzzle(inputStream)
+                if (
+                    puz != null
+                    && puz.getSource() != null
+                    && !puz.getSource().isEmpty()
+                ) {
+                    puz.setSource(DEFAULT_SOURCE)
+                }
+                return puz
+            }
+        } catch (e : Exception) {
+            return null
+        }
+    }
+
+    /**
+     * Fetch puzzle ID using passed data then make puzzle URL from it.
+     *
+     * Goes online.
+     */
+    fun getPuzzleURL(customerID : String, puzzleSetID : String) : String? {
+        val idUrl = String.format(
+            Locale.US,
+            ID_URL_FORMAT,
+            customerID,
+            puzzleSetID,
+        )
+        try {
+            BufferedReader(
+                InputStreamReader(getInputStream(idUrl))
+            ).use { reader ->
+                val rawJson = StringBuilder()
+                var line : String?
+                while ((reader.readLine().also { line = it }) != null)
+                    rawJson.append(line + "\n")
+
+                val json = JSONObject(JSONTokener(rawJson.toString()))
+                val puzzleID = json.getString("puzzleID")
+                return String.format(
+                    Locale.US,
+                    XML_URL_FORMAT,
+                    customerID,
+                    puzzleID,
+                )
+            }
+        } catch (e : JSONException) {
+            Log.e(TAG, "Could not read Keesing JSON: " + e)
+            return null
+        } catch (e : IOException) {
+            Log.e(TAG, "Could not read Keesing JSON: " + e)
+            return null
+        } catch (e : URISyntaxException) {
+            Log.e(TAG, "Could not read Keesing JSON: " + e)
+            return null
+        }
+    }
+
+    companion object {
+        private const val TAG = "ForkyzKeesingStrmScrp"
+
+        private val CUSTOMER_ID_MATCH
+            = RegexScrape(Pattern.compile("data-customerid=\"([^\"]*)\""), 1)
+        private val PUZZLE_ID_MATCH = RegexScrape(
+            Pattern.compile("data-puzzleid=\"([^\"]*)\""),
+            1,
+        )
+
+        // puzzleid_customerid
+        private const val PUZZLE_SET_ID_FORMAT = "%s_%s"
+        private val ID_URL_FORMAT = (
+            "https://web.keesing.com/Content/GetPuzzleInfo/?"
+            + "clientid=%s&puzzleid=%s"
+        )
+        private const val XML_URL_FORMAT =
+            "https://web.keesing.com/content/getxml?clientid=%s&puzzleid=%s"
+
+        private const val DEFAULT_SOURCE = "Keesing"
+    }
+}
+

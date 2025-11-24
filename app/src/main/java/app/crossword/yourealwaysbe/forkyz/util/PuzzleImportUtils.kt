@@ -229,7 +229,7 @@ private fun importPuzzleFromWebPage(
 ) : Puzzle? {
     try {
         val scraper = GenericStreamScraper()
-        scraper.setTimeout(timeout)
+        scraper.timeout = timeout
         return scraper.parseInput(inputStream, url)
     } catch (e : Exception) {
         return null
