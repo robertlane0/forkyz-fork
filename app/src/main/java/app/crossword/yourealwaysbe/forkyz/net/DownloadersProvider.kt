@@ -31,7 +31,6 @@ class DownloadersProvider(
     private val utils : NativeBackendUtils,
 ) {
     companion object {
-        @JvmField
         val PUZZLE_DOWNLOAD_CHANNEL_ID = "forkyz.downloads"
     }
 

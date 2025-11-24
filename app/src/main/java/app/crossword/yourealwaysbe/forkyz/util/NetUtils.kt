@@ -33,7 +33,6 @@ private val HTTP_OK_RESPONSE = 200
  * @throws IOException
  */
 @Throws(IOException::class)
-@JvmOverloads
 fun getURLInputStream(
     url : URL,
     timeout : Int,
@@ -73,7 +72,6 @@ fun getURLInputStream(
 }
 
 @Throws(IOException::class, URISyntaxException::class)
-@JvmOverloads
 fun getURLInputStream(
     url : String,
     timeout : Int,
@@ -84,7 +82,6 @@ fun getURLInputStream(
 }
 
 @Throws(IOException::class)
-@JvmOverloads
 fun apacheGetURLInputStream(
     url : URI,
     timeout : Int,
@@ -103,7 +100,6 @@ fun apacheGetURLInputStream(
 }
 
 @Throws(IOException::class)
-@JvmOverloads
 fun apacheGetURLInputStream(
     url : String,
     timeout : Int,
@@ -116,7 +112,6 @@ fun apacheGetURLInputStream(
  * Makes a JSON post request and reads JSON response
  */
 @Throws(IOException::class, JSONException::class)
-@JvmOverloads
 fun getURLJSON(
     url : String,
     timeout : Int,
@@ -127,3 +122,4 @@ fun getURLJSON(
         JSONUtils::streamToJSON
     )
 }
+

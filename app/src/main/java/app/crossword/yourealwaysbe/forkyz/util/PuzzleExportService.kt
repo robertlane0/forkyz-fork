@@ -27,8 +27,6 @@ import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 class PuzzleExportService() : Service() {
     companion object {
         val PUZZLE_EXPORT_URI = "puzzleExportURI"
-
-        @JvmField
         final val NOTIFICATION_CHANNEL_ID = "forkyz.export"
         private final val NOTIFICATION_ID = 10103
     }

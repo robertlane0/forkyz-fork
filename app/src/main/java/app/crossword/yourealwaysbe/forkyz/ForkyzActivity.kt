@@ -83,7 +83,6 @@ private val IMPORT_MIME_TYPE =  "*/*"
  * prevents the user from returning to a puzzle from the home screen
  * (annoying)
  */
-@JvmField
 val FORKYZ_CLOSE_ACTION = "app.crossword.yourealwaysbe.FORKYZ_CLOSE_ACTION"
 
 /**

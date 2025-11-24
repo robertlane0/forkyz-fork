@@ -34,7 +34,6 @@ import app.crossword.yourealwaysbe.forkyz.settings.DayNightMode
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.Theme
 
-@JvmRecord
 data class BoardColorScheme(
     val cellColor : Color,
     val blockColor : Color,
@@ -55,7 +54,6 @@ data class BoardColorScheme(
     val flagColor4 : Color,
 )
 
-@JvmRecord
 data class CircleProgressBarColorScheme(
     val progressNull : Color,
     val progressInProgress : Color,

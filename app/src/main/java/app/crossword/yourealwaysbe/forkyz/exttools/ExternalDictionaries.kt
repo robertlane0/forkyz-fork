@@ -69,7 +69,6 @@ class ExternalDictionaries {
         }
 
 
-        @JvmStatic // remove once all Kotlin
         fun build(
             settings : ForkyzSettings?,
             word : String?,

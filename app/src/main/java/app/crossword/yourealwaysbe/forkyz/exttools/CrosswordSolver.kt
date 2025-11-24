@@ -56,7 +56,6 @@ class CrosswordSolverData(
          * @param request string in crossword solver format (. for
          * blank)
          */
-        @JvmStatic // remove when all Kotlin
         fun buildMissingLetters(request : String?) : CrosswordSolverData
             = CrosswordSolverData(
                 CrosswordSolverRequestType.MISSING_LETTERS,
@@ -69,7 +68,6 @@ class CrosswordSolverData(
          * @param request string in crossword solver format (. for
          * blank)
          */
-        @JvmStatic // remove when all Kotlin
         fun buildAnagram(request : String?) : CrosswordSolverData
             = CrosswordSolverData(
                 CrosswordSolverRequestType.ANAGRAM,

@@ -246,7 +246,6 @@ public class CurrentPuzzleHolder(
 
 class PuzzleSaveService() : Service() {
     companion object {
-        @JvmField
         final val NOTIFICATION_CHANNEL_ID = "forkyz.save"
         private final val NOTIFICATION_ID = 10102
     }

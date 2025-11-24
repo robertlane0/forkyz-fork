@@ -22,9 +22,7 @@ import app.crossword.yourealwaysbe.puz.io.PuzzleParser
  * Check each line against the regex return group
  */
 class RegexScrape(
-    @JvmField
     val regex : Pattern,
-    @JvmField
     val group : Int,
 )
 
@@ -191,7 +189,6 @@ abstract class AbstractStreamScraper : StreamScraper {
         /**
          * Convencience method for regexScrape with one match
          */
-        @JvmStatic
         fun regexScrape(
             inputStream : InputStream,
             regexScrapes : RegexScrape,
@@ -203,7 +200,6 @@ abstract class AbstractStreamScraper : StreamScraper {
         /**
          * Parse input as HTML, return document or null
          */
-        @JvmStatic
         fun getDocument(inputStream : InputStream) : Document? {
             try {
                 return Jsoup.parse(inputStream, null, "")

@@ -258,7 +258,6 @@ open class AbstractDateDownloader constructor(
         protected const val TAG : String = "ForkyzDateDownloader"
 
         // These lists must be sorted for binary search.
-        @JvmField
         var DAYS_SUNDAY = arrayOf(DayOfWeek.SUNDAY)
         var DAYS_MONDAY = arrayOf(DayOfWeek.MONDAY)
         var DAYS_TUESDAY = arrayOf(DayOfWeek.TUESDAY)
@@ -266,7 +265,6 @@ open class AbstractDateDownloader constructor(
         var DAYS_THURSDAY = arrayOf(DayOfWeek.THURSDAY)
         var DAYS_FRIDAY = arrayOf(DayOfWeek.FRIDAY)
         var DAYS_SATURDAY = arrayOf(DayOfWeek.SATURDAY)
-        @JvmField
         var DAYS_DAILY = arrayOf(
             DayOfWeek.MONDAY,
             DayOfWeek.TUESDAY,
@@ -284,7 +282,6 @@ open class AbstractDateDownloader constructor(
             DayOfWeek.FRIDAY,
             DayOfWeek.SATURDAY
         )
-        @JvmField
         var DAYS_WEEKDAY = arrayOf(
             DayOfWeek.MONDAY,
             DayOfWeek.TUESDAY,

@@ -37,7 +37,6 @@ object AppPuzzleUtils {
     /**
      * Generate a file name for the given puzzle
      */
-    @JvmStatic
     fun generateFileName(puzzle : Puzzle) : String {
         var name = puzzle.getSource()
         if (name == null || name.isEmpty())
@@ -70,7 +69,6 @@ object AppPuzzleUtils {
      * Takes source as first argument to avoid needing if source == null
      * logic before use.
      */
-    @JvmStatic
     fun deriveSource(
         source : String?,
         filename : String?,
@@ -104,7 +102,6 @@ object AppPuzzleUtils {
      * Takes date as first argument to avoid needing if date == null
      * logic before use.
      */
-    @JvmStatic
     fun deriveDate(date : LocalDate?, filename : String?) : LocalDate? {
         if (date != null) return date
 

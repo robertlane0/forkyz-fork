@@ -448,7 +448,6 @@ class FileHandlerSAF(
         /**
          * Convenience for same with keeping permission
          */
-        @JvmOverloads
         fun initialiseSAFForRoot(
             applicationContext : Context,
             utils : NativeBackendUtils,

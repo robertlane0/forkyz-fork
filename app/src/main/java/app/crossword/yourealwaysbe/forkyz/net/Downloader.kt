@@ -8,7 +8,6 @@ import app.crossword.yourealwaysbe.puz.Puzzle
 
 interface Downloader {
     class DownloadResult {
-        @JvmField
         var puzzle : Puzzle? = null
         var fileName : String? = null
         var failed : Boolean = false
@@ -32,9 +31,7 @@ interface Downloader {
             get() = puzzle != null && fileName != null
 
         companion object {
-            @JvmField
             val FAILED : DownloadResult = DownloadResult(true)
-            @JvmField
             val ALREADY_EXISTS : DownloadResult = DownloadResult(false)
         }
     }
