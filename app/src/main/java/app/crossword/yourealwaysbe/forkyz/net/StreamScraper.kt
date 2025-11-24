@@ -1,12 +1,12 @@
 
-package app.crossword.yourealwaysbe.forkyz.net;
+package app.crossword.yourealwaysbe.forkyz.net
 
-import java.io.InputStream;
+import java.io.InputStream
 
-import app.crossword.yourealwaysbe.puz.Puzzle;
-import app.crossword.yourealwaysbe.puz.io.PuzzleParser;
+import app.crossword.yourealwaysbe.puz.Puzzle
+import app.crossword.yourealwaysbe.puz.io.PuzzleParser
 
-public interface StreamScraper extends PuzzleParser {
+interface StreamScraper : PuzzleParser {
     /**
      * Parse puzzle from input stream from a given URL
      *
@@ -19,5 +19,7 @@ public interface StreamScraper extends PuzzleParser {
      * @param url the url the data is coming from (may be null)
      * @return parse puzzle or null if failed or not in right format
      */
-    public Puzzle parseInput(InputStream is, String url) throws Exception;
+    @Throws(Exception::class)
+    fun parseInput(inputStream : InputStream, url: String?): Puzzle?
 }
+

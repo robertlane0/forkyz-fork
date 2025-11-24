@@ -64,7 +64,10 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
         )
     }
 
-    override fun parseInput(inputStream : InputStream, url : String) : Puzzle? {
+    override fun parseInput(
+        inputStream : InputStream,
+        url : String?,
+    ) : Puzzle? {
         Log.i(TAG, "Trying PuzzleMe scraper on " + url)
         // so we can reuse
         val is1 = StreamUtils.makeByteArrayInputStream(inputStream)
