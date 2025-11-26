@@ -2,9 +2,11 @@
 package app.crossword.yourealwaysbe.forkyz.util.files
 
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 import android.content.Context
 import android.widget.Toast
@@ -36,6 +38,8 @@ class FileHandlerProvider(
         liveFileHandler.getOnceNotNull(cb)
     }
 
+    // so can launch toasts
+    @OptIn(DelicateCoroutinesApi::class)
     private fun createFileHandler(
         fileHandlerSettings : FileHandlerSettings,
     ) : FileHandler {
@@ -56,21 +60,25 @@ class FileHandlerProvider(
 
         if (fh == null || !fh.isStorageMounted) {
             fh = FileHandlerInternal(utils)
-            val t = Toast.makeText(
-                applicationContext,
-                R.string.storage_problem_falling_back_internal,
-                Toast.LENGTH_LONG
-            )
-            t.show()
+            GlobalScope.launch(Dispatchers.Main) {
+                val t = Toast.makeText(
+                    applicationContext,
+                    R.string.storage_problem_falling_back_internal,
+                    Toast.LENGTH_LONG
+                )
+                t.show()
+            }
         }
 
         if (fh.isStorageFull) {
-            val t = Toast.makeText(
-                applicationContext,
-                R.string.storage_full_warning,
-                Toast.LENGTH_LONG
-            )
-            t.show()
+            GlobalScope.launch(Dispatchers.Main) {
+                val t = Toast.makeText(
+                    applicationContext,
+                    R.string.storage_full_warning,
+                    Toast.LENGTH_LONG
+                )
+                t.show()
+            }
         }
 
         return fh
