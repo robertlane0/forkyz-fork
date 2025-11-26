@@ -563,7 +563,7 @@ class FileHandlerSAF(
                 && !archiveFolder.isEmpty()
                 && !toImportFolder.isEmpty()
                 && !toImportDoneFolder.isEmpty()
-                && toImportFailedFolder.isEmpty()
+                && !toImportFailedFolder.isEmpty()
             ) {
                 val rootFolderUri = rootFolder.toUri()
                 val crosswordsFolderUri = crosswordsFolder.toUri()
