@@ -4,11 +4,10 @@ package app.crossword.yourealwaysbe.forkyz.exttools
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-import android.net.Uri
-import androidx.core.net.toUri
-
 import app.crossword.yourealwaysbe.forkyz.R
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
+import app.crossword.yourealwaysbe.forkyz.util.Uri
+import app.crossword.yourealwaysbe.forkyz.util.toUri
 import app.crossword.yourealwaysbe.puz.Clue
 
 // removing enums (of format (label=3,4-4;2) reduced IPuz form)

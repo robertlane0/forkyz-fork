@@ -7,7 +7,6 @@ import java.io.IOException
 import kotlinx.coroutines.runBlocking
 
 import android.content.Context
-import androidx.core.net.toUri
 
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -32,6 +31,7 @@ import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerJavaFile
 import app.crossword.yourealwaysbe.forkyz.util.files.MetaCache
 import app.crossword.yourealwaysbe.forkyz.util.files.MetaCache.CachedMeta
 import app.crossword.yourealwaysbe.forkyz.util.files.MetaCache.MetaRecord
+import app.crossword.yourealwaysbe.forkyz.util.toUri
 import app.crossword.yourealwaysbe.forkyz.versions.TiramisuUtil
 import app.crossword.yourealwaysbe.puz.io.StreamUtils
 

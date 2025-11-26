@@ -17,7 +17,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.material.color.DynamicColors
@@ -42,6 +41,7 @@ import app.crossword.yourealwaysbe.forkyz.settings.Orientation
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation
 import app.crossword.yourealwaysbe.forkyz.settings.Theme
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
+import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerSAF
 import app.crossword.yourealwaysbe.forkyz.util.mediate
 import app.crossword.yourealwaysbe.forkyz.util.stateInSubscribed

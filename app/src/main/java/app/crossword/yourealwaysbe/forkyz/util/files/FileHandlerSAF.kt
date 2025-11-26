@@ -10,17 +10,20 @@ import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.database.Cursor
-import android.net.Uri
 import android.os.Build
 import android.provider.DocumentsContract
 import android.util.Log
-import androidx.core.net.toUri
 
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
+import app.crossword.yourealwaysbe.forkyz.util.Uri
+import app.crossword.yourealwaysbe.forkyz.util.toForkyzUri
+import app.crossword.yourealwaysbe.forkyz.util.toUri
 import app.crossword.yourealwaysbe.puz.io.StreamUtils
+
+import androidx.core.net.toUri as toAndroidUri
 
 /**
  * Construct FileHandler from context and folder URIs
@@ -83,9 +86,9 @@ class FileHandlerSAF(
     override fun listFiles(dir : DirHandle) : Iterable<FileHandle> {
         val resolver = this.contentResolver
         val dirUri = dir.uri
-        val dirTreeId = DocumentsContract.getDocumentId(dirUri)
+        val dirTreeId = DocumentsContract.getDocumentId(dirUri.toAndroidUri())
         val dirTreeUri = DocumentsContract.buildDocumentUriUsingTree(
-            rootUri,
+            rootUri.toAndroidUri(),
             dirTreeId,
         )
 
@@ -115,12 +118,15 @@ class FileHandlerSAF(
 
                     if (DocumentsContract.Document.MIME_TYPE_DIR != mimeType) {
                         val uri = DocumentsContract.buildDocumentUriUsingTree(
-                            dirUri,
+                            dirUri.toAndroidUri(),
                             id,
                         )
 
                         files.add(
-                            FileHandle(uri, Meta(name, modified, mimeType))
+                            FileHandle(
+                                uri.toForkyzUri(),
+                                Meta(name, modified, mimeType),
+                            )
                         )
                     }
                 }
@@ -181,7 +187,7 @@ class FileHandlerSAF(
         try {
             DocumentsContract.deleteDocument(
                 this.contentResolver,
-                fileHandle.uri,
+                fileHandle.uri.toAndroidUri(),
             )
         } catch (e : FileNotFoundException) {
             // seems like our work is done
@@ -208,9 +214,9 @@ class FileHandlerSAF(
             try {
                 DocumentsContract.moveDocument(
                     this.contentResolver,
-                    fileHandle.uri,
-                    srcDirHandle.uri,
-                    destDirHandle.uri,
+                    fileHandle.uri.toAndroidUri(),
+                    srcDirHandle.uri.toAndroidUri(),
+                    destDirHandle.uri.toAndroidUri(),
                 )
             } catch (e : FileNotFoundException) {
                 Log.e(
@@ -242,17 +248,17 @@ class FileHandlerSAF(
         try {
             DocumentsContract.createDocument(
                 contentResolver,
-                destDirHandle.uri,
+                destDirHandle.uri.toAndroidUri(),
                 getMimeType(fileHandle),
                 getName(fileHandle),
             )?.let { newUri ->
                 getBufferedInputStream(fileHandle).use { inputStream ->
-                    getFileHandle(newUri)?.let { outHandle ->
+                    getFileHandle(newUri.toForkyzUri())?.let { outHandle ->
                         getBufferedOutputStream(outHandle).use { outputStream ->
                             StreamUtils.copyStream(inputStream, outputStream)
                             DocumentsContract.deleteDocument(
                                 contentResolver,
-                                fileHandle.uri,
+                                fileHandle.uri.toAndroidUri(),
                             )
                         }
                     }
@@ -285,7 +291,10 @@ class FileHandlerSAF(
     @Throws(IOException::class)
     override fun getOutputStream(fileHandle : FileHandle) : OutputStream {
         try {
-            val os = contentResolver.openOutputStream(fileHandle.uri, "wt")
+            val os = contentResolver.openOutputStream(
+                fileHandle.uri.toAndroidUri(),
+                "wt",
+            )
             if (os == null) {
                 throw IOException(
                     "Could not get output stream for " + fileHandle,
@@ -301,7 +310,9 @@ class FileHandlerSAF(
     @Throws(IOException::class)
     override fun getInputStream(fileHandle : FileHandle) : InputStream {
         try {
-            val inStream = contentResolver.openInputStream(fileHandle.uri)
+            val inStream = contentResolver.openInputStream(
+                fileHandle.uri.toAndroidUri(),
+            )
             if (inStream == null) {
                 throw IOException(
                     "Could not get output stream for " + fileHandle,
@@ -346,10 +357,10 @@ class FileHandlerSAF(
         try {
             val uri = DocumentsContract.createDocument(
                 this.contentResolver,
-                dir.uri,
+                dir.uri.toAndroidUri(),
                 mimeType,
                 fileName,
-            )
+            )?.toForkyzUri()
             if (uri != null) {
                 return FileHandle(
                     uri,
@@ -365,7 +376,7 @@ class FileHandlerSAF(
 
     private fun getMetaFromUri(uri : Uri) : Meta? {
         this.contentResolver.query(
-            uri,
+            uri.toAndroidUri(),
             arrayOf<String>(
                 DocumentsContract.Document.COLUMN_DISPLAY_NAME,
                 DocumentsContract.Document.COLUMN_LAST_MODIFIED,
@@ -456,13 +467,15 @@ class FileHandlerSAF(
         ) : FileHandlerSAF? {
             try {
                 val resolver = applicationContext.getContentResolver()
-                val dirId = DocumentsContract.getTreeDocumentId(rootUri)
+                val dirId = DocumentsContract.getTreeDocumentId(
+                    rootUri.toAndroidUri(),
+                )
 
                 val crosswordsFolderUri
                     = DocumentsContract.buildDocumentUriUsingTree(
-                        rootUri,
+                        rootUri.toAndroidUri(),
                         dirId,
-                    )
+                    )?.toForkyzUri()
 
                 val subDirs = Companion.searchCreateDirectories(
                     arrayOf<String>(
@@ -495,7 +508,7 @@ class FileHandlerSAF(
                             or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                         )
                         resolver.takePersistableUriPermission(
-                            rootUri,
+                            rootUri.toAndroidUri(),
                             takeFlags,
                         )
                     }
@@ -591,10 +604,7 @@ class FileHandlerSAF(
                 }
             }
 
-            if (
-                fileHandler == null
-                && !rootFolder.isEmpty()
-            ) {
+            if (fileHandler == null && !rootFolder.isEmpty()) {
                 fileHandler = initialiseSAFForRoot(
                     applicationContext,
                     utils,
@@ -611,7 +621,7 @@ class FileHandlerSAF(
         private fun exists(resolver : ContentResolver, uri : Uri) : Boolean {
             try {
                 resolver.query(
-                    uri,
+                    uri.toAndroidUri(),
                     arrayOf<String>(
                         DocumentsContract.Document.COLUMN_DOCUMENT_ID,
                     ),
@@ -643,13 +653,14 @@ class FileHandlerSAF(
             baseUri : Uri,
             resolver : ContentResolver,
         ) : Array<Uri?> {
-            val dirId = DocumentsContract.getTreeDocumentId(baseUri)
+            val androidBaseUri = baseUri.toAndroidUri()
+            val dirId = DocumentsContract.getTreeDocumentId(androidBaseUri)
             val dirUri = DocumentsContract.buildDocumentUriUsingTree(
-                baseUri,
+                androidBaseUri,
                 dirId,
             )
             val childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(
-                baseUri,
+                androidBaseUri,
                 dirId,
             )
 
@@ -680,9 +691,9 @@ class FileHandlerSAF(
                                 if (names[i] == curName) {
                                     desiredUris[i] = DocumentsContract
                                         .buildDocumentUriUsingTree(
-                                            baseUri,
+                                            androidBaseUri,
                                             curID,
-                                        )
+                                        )?.toForkyzUri()
                                 }
                             }
                         }
@@ -697,7 +708,7 @@ class FileHandlerSAF(
                         dirUri,
                         DocumentsContract.Document.MIME_TYPE_DIR,
                         names[i],
-                    )
+                    )?.toForkyzUri()
                 }
             }
 

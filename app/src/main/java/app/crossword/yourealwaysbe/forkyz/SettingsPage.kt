@@ -3,7 +3,6 @@ package app.crossword.yourealwaysbe.forkyz
 
 import kotlinx.coroutines.launch
 
-import android.net.Uri
 import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -57,6 +56,7 @@ import androidx.lifecycle.lifecycleScope
 import app.crossword.yourealwaysbe.forkyz.theme.ForkyzTopAppBar
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 import app.crossword.yourealwaysbe.forkyz.util.NativeFrontendUtils
+import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.view.ListDialog
 import app.crossword.yourealwaysbe.forkyz.view.MultiListDialog
 import app.crossword.yourealwaysbe.forkyz.view.OKCancelDialog

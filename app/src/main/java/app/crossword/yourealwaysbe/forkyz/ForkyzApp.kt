@@ -3,12 +3,10 @@ package app.crossword.yourealwaysbe.forkyz
 
 import kotlinx.serialization.Serializable
 
-import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.core.net.toUri
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -22,6 +20,8 @@ import app.crossword.yourealwaysbe.forkyz.exttools.ExternalToolData
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
 import app.crossword.yourealwaysbe.forkyz.util.NativeFrontendUtils
+import app.crossword.yourealwaysbe.forkyz.util.Uri
+import app.crossword.yourealwaysbe.forkyz.util.toUri
 import app.crossword.yourealwaysbe.puz.ClueID
 
 /**

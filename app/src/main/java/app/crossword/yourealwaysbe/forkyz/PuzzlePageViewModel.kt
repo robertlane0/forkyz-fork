@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
@@ -38,6 +37,7 @@ import app.crossword.yourealwaysbe.forkyz.util.KeyboardInfo
 import app.crossword.yourealwaysbe.forkyz.util.KeyboardManagerKt
 import app.crossword.yourealwaysbe.forkyz.util.MediatedStateWithFlow
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
+import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider

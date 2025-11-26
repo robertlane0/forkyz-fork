@@ -1,11 +1,10 @@
 
 package app.crossword.yourealwaysbe.forkyz.exttools
 
-import android.net.Uri
-import androidx.core.net.toUri
-
 import app.crossword.yourealwaysbe.forkyz.R
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
+import app.crossword.yourealwaysbe.forkyz.util.Uri
+import app.crossword.yourealwaysbe.forkyz.util.toUri
 import app.crossword.yourealwaysbe.puz.Puzzle
 
 class FifteenSquaredData(uri : Uri) : HTMLToolData(uri) {

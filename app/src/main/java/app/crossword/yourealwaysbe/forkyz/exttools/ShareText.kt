@@ -7,13 +7,13 @@ import java.util.Locale
 import java.util.function.Consumer
 import kotlinx.coroutines.flow.first
 
-import android.net.Uri
 import androidx.core.app.ShareCompat
 
 import app.crossword.yourealwaysbe.forkyz.R
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
+import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Clue
 import app.crossword.yourealwaysbe.puz.Playboard

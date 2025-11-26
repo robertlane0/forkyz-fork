@@ -3,7 +3,6 @@ package app.crossword.yourealwaysbe.forkyz
 
 import java.time.format.DateTimeFormatter
 
-import android.net.Uri
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
@@ -74,7 +73,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.LifecycleEventEffect
@@ -98,7 +96,9 @@ import app.crossword.yourealwaysbe.forkyz.settings.DayNightMode
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 import app.crossword.yourealwaysbe.forkyz.util.NativeFrontendUtils
 import app.crossword.yourealwaysbe.forkyz.util.NativeImportFinishedResult
+import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
+import app.crossword.yourealwaysbe.forkyz.util.toUri
 import app.crossword.yourealwaysbe.forkyz.view.CircleProgressBar
 import app.crossword.yourealwaysbe.forkyz.view.DownloadDialog
 import app.crossword.yourealwaysbe.forkyz.view.OKCancelDialog

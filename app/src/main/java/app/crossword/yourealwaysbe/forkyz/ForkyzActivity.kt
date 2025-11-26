@@ -7,7 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.hardware.SensorManager
-import android.net.Uri
+import android.net.Uri as AndroidUri
 import android.os.Bundle
 import android.provider.Settings
 import android.speech.RecognizerIntent
@@ -29,7 +29,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.ShareCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
-import androidx.core.net.toUri
+import androidx.core.net.toUri as toAndroidUri
 
 import org.koin.android.ext.android.inject
 
@@ -48,6 +48,9 @@ import app.crossword.yourealwaysbe.forkyz.util.OrientationHelper
 import app.crossword.yourealwaysbe.forkyz.util.PuzzleExportService
 import app.crossword.yourealwaysbe.forkyz.util.ShareFileData
 import app.crossword.yourealwaysbe.forkyz.util.SpeechContract
+import app.crossword.yourealwaysbe.forkyz.util.Uri
+import app.crossword.yourealwaysbe.forkyz.util.toForkyzUri
+import app.crossword.yourealwaysbe.forkyz.util.toUri
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 
 private val TAG = "ForkyzActivity"
@@ -170,8 +173,8 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
 
     private val getImportURI = registerForActivityResult(
         ActivityResultContracts.GetMultipleContents(),
-        ActivityResultCallback<List<Uri>>() { uris ->
-            onImportURIs?.let { it(uris) }
+        ActivityResultCallback<List<AndroidUri>>() { uris ->
+            onImportURIs?.let { it(uris.map { it.toForkyzUri() }) }
         },
     )
 
@@ -190,28 +193,28 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
         }
 
     private val getSAFURI = registerForActivityResult(OpenDocumentTree()) {
-        uri : Uri? -> uri?.let { uri ->
-            onSAFURI?.let { it(uri) }
+        uri : AndroidUri? -> uri?.let { uri ->
+            onSAFURI?.let { it(uri.toForkyzUri()) }
         }
     }
 
     private val importSettings = registerForActivityResult(GetContent()) {
-        uri : Uri? -> uri?.let { uri ->
-            onImportSettingsURI?.let { it(uri) }
+        uri : AndroidUri? -> uri?.let { uri ->
+            onImportSettingsURI?.let { it(uri.toForkyzUri()) }
         }
     }
 
     private val exportSettings = registerForActivityResult(
         CreateDocument(SETTINGS_MIME_TYPE)
     ) {
-        uri : Uri? -> uri?.let { uri ->
-            onExportSettingsURI?.let { it(uri) }
+        uri : AndroidUri? -> uri?.let { uri ->
+            onExportSettingsURI?.let { it(uri.toForkyzUri()) }
         }
     }
 
     private val exportPuzzles
         = registerForActivityResult(OpenDocumentTree()) {
-            uri : Uri? -> uri?.let {
+            uri : AndroidUri? -> uri?.let {
                 try {
                     Log.i(TAG, "Starting puzzle export")
                     val intent = Intent(this, PuzzleExportService::class.java)
@@ -318,7 +321,7 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
         val action = intent.action
         if (Intent.ACTION_VIEW == action) {
             // loaded by onResume
-            setPendingImport(intent.data)
+            setPendingImport(intent.data?.toForkyzUri())
         } else if (Intent.ACTION_SEND == action) {
             if (intent.hasExtra(Intent.EXTRA_TEXT)) {
                 setPendingImport(
@@ -379,7 +382,7 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
             val appPackage = getPackageName()
             val intent = Intent(
                 Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                ("package:" + appPackage).toUri(),
+                ("package:" + appPackage).toAndroidUri(),
             )
             intent.addCategory(Intent.CATEGORY_DEFAULT)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -388,7 +391,7 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
 
         override fun openURI(uri : Uri) {
             val i = Intent(Intent.ACTION_VIEW);
-            i.setData(uri)
+            i.setData(uri.toAndroidUri())
             startActivity(i);
         }
 
@@ -467,7 +470,7 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
         override fun onShareFile(data : ShareFileData) {
             val shareIntent = ShareCompat.IntentBuilder(this@ForkyzActivity)
                 .setChooserTitle(data.title)
-                .setStream(data.uri)
+                .setStream(data.uri.toAndroidUri())
                 .setType(data.mimeType)
                 .createChooserIntent()
             startActivity(shareIntent)

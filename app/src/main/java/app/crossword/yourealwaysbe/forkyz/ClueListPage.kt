@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz
 
-import android.net.Uri
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -41,6 +40,7 @@ import app.crossword.yourealwaysbe.forkyz.menu.BaseMenuModifier
 import app.crossword.yourealwaysbe.forkyz.menu.MenuText
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 import app.crossword.yourealwaysbe.forkyz.util.NativeFrontendUtils
+import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.letterOrDigitKeyToChar
 import app.crossword.yourealwaysbe.forkyz.view.BoxInputState
 import app.crossword.yourealwaysbe.forkyz.view.ClueTabs

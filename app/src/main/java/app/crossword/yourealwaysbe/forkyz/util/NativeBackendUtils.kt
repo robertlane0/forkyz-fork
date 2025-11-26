@@ -9,11 +9,11 @@ import java.io.InputStreamReader
 import java.io.OutputStream
 
 import android.content.Context
-import android.net.Uri
 import androidx.core.content.FileProvider
 
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
+import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerSAF
 import app.crossword.yourealwaysbe.forkyz.util.files.MetaCache
@@ -65,12 +65,16 @@ class NativeBackendUtils(
 
     @Throws(IOException::class)
     fun openInputStream(uri : Uri) : InputStream? {
-        return applicationContext.getContentResolver().openInputStream(uri)
+        return applicationContext
+            .getContentResolver()
+            .openInputStream(uri.toAndroidUri())
     }
 
     @Throws(IOException::class)
     fun openOutputStream(uri : Uri) : OutputStream? {
-        return applicationContext.getContentResolver().openOutputStream(uri)
+        return applicationContext
+            .getContentResolver()
+            .openOutputStream(uri.toAndroidUri())
     }
 
     fun getShareDir() : File {
@@ -85,7 +89,7 @@ class NativeBackendUtils(
             applicationContext,
             authority,
             shareFile,
-        )
+        ).toForkyzUri()
     }
 
     fun getFilterClueToAlphabeticRegex() : String {

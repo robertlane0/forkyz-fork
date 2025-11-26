@@ -1,11 +1,11 @@
 
 package app.crossword.yourealwaysbe.forkyz.util
 
-import android.net.Uri
 import androidx.compose.ui.graphics.Color
 
-import app.crossword.yourealwaysbe.forkyz.exttools.ExternalToolData
 import app.crossword.yourealwaysbe.forkyz.exttools.AppNotFoundException
+import app.crossword.yourealwaysbe.forkyz.exttools.ExternalToolData
+import app.crossword.yourealwaysbe.forkyz.util.Uri
 
 data class ShareFileData(
     val title : String,

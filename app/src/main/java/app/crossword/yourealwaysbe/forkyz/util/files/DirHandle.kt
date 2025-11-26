@@ -3,8 +3,8 @@ package app.crossword.yourealwaysbe.forkyz.util.files
 
 import java.io.File
 
-import android.net.Uri
-import androidx.core.net.toUri
+import app.crossword.yourealwaysbe.forkyz.util.Uri
+import app.crossword.yourealwaysbe.forkyz.util.toUri
 
 class DirHandle {
     // common to all implementations

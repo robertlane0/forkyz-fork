@@ -1,11 +1,11 @@
 
 package app.crossword.yourealwaysbe.forkyz.exttools
 
-import android.net.Uri
 import androidx.core.app.ShareCompat
 
 import app.crossword.yourealwaysbe.forkyz.R
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
+import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerShared
 import app.crossword.yourealwaysbe.puz.Puzzle
 
@@ -42,7 +42,7 @@ fun ExternalToolLauncher.visit(data : SharePuzzleData) {
     val title = this.activity.getString(R.string.share_puzzle_title)
     val shareIntent = ShareCompat.IntentBuilder(this.activity)
         .setChooserTitle(title)
-        .setStream(data.uri)
+        .setStream(data.uri.toAndroidUri())
         .setType(data.mimeType)
         .createChooserIntent();
     this.activity.startActivity(shareIntent);

@@ -4,10 +4,8 @@ package app.crossword.yourealwaysbe.forkyz.util.files
 import java.time.LocalDate
 
 import android.content.Context
-import android.net.Uri
 import androidx.annotation.NonNull
 import androidx.annotation.Nullable
-import androidx.core.net.toUri
 import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Database
@@ -26,7 +24,9 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 import app.crossword.yourealwaysbe.forkyz.util.AppPuzzleUtils
+import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle
+import app.crossword.yourealwaysbe.forkyz.util.toUri
 import app.crossword.yourealwaysbe.puz.Puzzle
 
 class MetaCache(

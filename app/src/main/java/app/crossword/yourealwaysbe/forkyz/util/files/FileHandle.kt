@@ -4,8 +4,8 @@ package app.crossword.yourealwaysbe.forkyz.util.files
 import java.io.File
 import java.util.Objects
 
-import android.net.Uri
-import androidx.core.net.toUri
+import app.crossword.yourealwaysbe.forkyz.util.Uri
+import app.crossword.yourealwaysbe.forkyz.util.toUri
 
 class FileHandle {
     // common to all implementations

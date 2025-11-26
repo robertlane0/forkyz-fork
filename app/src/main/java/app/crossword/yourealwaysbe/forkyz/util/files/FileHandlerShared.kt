@@ -9,13 +9,13 @@ import java.io.PrintStream
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 
 import app.crossword.yourealwaysbe.forkyz.util.AppPuzzleUtils.generateFileName
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
+import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.io.IPuzIO
 

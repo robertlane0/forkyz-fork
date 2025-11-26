@@ -16,11 +16,11 @@ import java.time.ZoneId
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-import android.net.Uri
 import android.util.Log
 
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
+import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.files.MetaCache.MetaRecord
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle.IPuz
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle.VisitorIO

@@ -8,9 +8,8 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 
-import android.net.Uri
-
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
+import app.crossword.yourealwaysbe.forkyz.util.Uri
 
 /**
  * Base implementation of java.io.File-based file access from a given

@@ -9,11 +9,11 @@ import java.net.URISyntaxException
 import java.time.LocalDate
 
 import android.content.Context
-import android.net.Uri
 import android.util.Log
 
 import app.crossword.yourealwaysbe.forkyz.R
 import app.crossword.yourealwaysbe.forkyz.net.GenericStreamScraper
+import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.files.DirHandle
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandle
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler

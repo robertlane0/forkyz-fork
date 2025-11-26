@@ -7,12 +7,11 @@ import java.io.FileOutputStream
 import java.io.InputStream
 import java.io.OutputStream
 
-import android.net.Uri
-import androidx.core.net.toUri
-
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
+import app.crossword.yourealwaysbe.forkyz.util.Uri
+import app.crossword.yourealwaysbe.forkyz.util.toUri
 
 class NoopFileHandler(utils : NativeBackendUtils) : FileHandler(utils) {
     override val crosswordsDirectory : DirHandle
