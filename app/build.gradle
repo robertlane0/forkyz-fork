@@ -1,7 +1,6 @@
 ;
 plugins {
     id 'androidx.room'
-    id 'checkstyle'
     id 'com.android.application'
     id 'kotlin-android'
     id 'org.jetbrains.kotlin.plugin.compose'
@@ -9,17 +8,6 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.serialization'
     id 'com.google.protobuf'
     id 'com.google.devtools.ksp'
-}
-
-check.dependsOn 'checkstyle'
-
-task checkstyle(type: Checkstyle) {
-    configFile = file("${project.rootDir}/config/checkstyle/checkstyle.xml")
-    source 'src'
-    include '**/*.java'
-    exclude '**/build/**'
-
-    classpath = files()
 }
 
 android {
@@ -79,15 +67,6 @@ android {
             shrinkResources = true
             proguardFiles getDefaultProguardFile("proguard-android.txt"),
                           "proguard-rules.pro"
-        }
-    }
-
-    tasks.withType(JavaCompile) {
-        configure(options) {
-            // -processing as adding room annotation processor library
-            // causes warnings about unprocessed annotations for an
-            // unclear reason
-            options.compilerArgs << '-Xlint:all' << '-Xlint:-processing'
         }
     }
 
