@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Forkyz" parent="Theme.Material3.DynamicColors.Light">
+        <!--
+            Needed for AppCompatActivity which is only needed so that things
+            like PlayboardRenderer can load from the right colors.xml.
+            Remove once all Compose.
+        -->
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionModeOverlay">true</item>
+    </style>
+</resources>

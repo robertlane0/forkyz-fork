@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="clue_text_size">17</integer>
+    <integer name="max_rating">5</integer>
+</resources>
+
