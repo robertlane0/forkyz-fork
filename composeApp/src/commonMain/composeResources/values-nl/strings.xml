@@ -395,7 +395,7 @@
     <string name="background_download_days">Puzzels ophalen op de dagen</string>
     <string name="background_download_days_desc">Puzzels op de achtergrond ophalen op de geselecteerde dagen.</string>
     <string name="background_download_days_time">Dagelijkse ophaaltijd</string>
-    <string name="background_download_days_time_desc">Selecteer ophaaltijd wanneer er op de geselecteerde dagen opgehaald wordt (exacte tijd hangt af van beperkingen en telefoonoptimalisaties).</string>
+    <string name="background_download_days_time_desc">Selecteer ophaaltijd wanneer er op de geselecteerde dagen opgehaald wordt (exacte tijd hangt af van beperkingen en telefoonoptimimalisaties).</string>
     <string name="background_download_fri">Vrijdag</string>
     <string name="background_download_hourly">Puzzels uurlijks ophalen</string>
     <string name="background_download_hourly_desc">Puzzels eens per uur op de achtergrond ophalen.</string>

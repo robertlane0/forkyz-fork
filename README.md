@@ -175,7 +175,7 @@ Translations are welcome. Here is a quick guide to what is needed.
   and need a copy in
   `composeApp/src/commonMain/composeResources/values-<lang>/strings.xml`.
 * Help pages &c. are in
-  `compoaseApp/src/commonMain/composeResources/files/en/<screen>.html`
+  `composeApp/src/commonMain/composeResources/files/en/<screen>.html`
   and need a copy in
   `composeApp/src/commonMain/composeResources/files/<lang>/<screen>.html`.
 * Android strings are in
