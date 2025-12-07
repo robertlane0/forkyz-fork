@@ -1,6 +1,8 @@
 
 package app.crossword.yourealwaysbe.forkyz
 
+import kotlinx.coroutines.launch
+
 import android.content.ActivityNotFoundException
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -30,11 +32,20 @@ import androidx.core.app.ShareCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
 import androidx.core.net.toUri as toAndroidUri
+import androidx.lifecycle.lifecycleScope
+
+import org.jetbrains.compose.resources.getString
 
 import org.koin.android.ext.android.inject
 
 import com.squareup.seismic.ShakeDetector
 
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.download_but_no_active_network
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.no_speech_recognition_available
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.notifications_request_rationale
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.puzzles_export_failed
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.speech_not_ready
 import app.crossword.yourealwaysbe.forkyz.exttools.AppNotFoundException
 import app.crossword.yourealwaysbe.forkyz.exttools.ExternalToolData
 import app.crossword.yourealwaysbe.forkyz.exttools.ExternalToolLauncher
@@ -231,7 +242,9 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
                         TAG,
                         "Could not start puzzle export service on foreground"
                     )
-                    utils.toast(getString(R.string.puzzles_export_failed))
+                    lifecycleScope.launch {
+                        utils.toast(getString(Res.string.puzzles_export_failed))
+                    }
                 }
             }
         }
@@ -406,7 +419,9 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
 
         override fun onCheckAndWarnNetworkState() {
             if (!versionUtils.hasNetworkConnection(this@ForkyzActivity)) {
-                toast(getString(R.string.download_but_no_active_network))
+                lifecycleScope.launch {
+                    toast(getString(Res.string.download_but_no_active_network))
+                }
             }
         }
 
@@ -425,8 +440,11 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
                     this@ForkyzActivity
                 )
 
-            if (showRationale)
-                toast(getString(R.string.notifications_request_rationale))
+            if (showRationale) {
+                lifecycleScope.launch {
+                    toast(getString(Res.string.notifications_request_rationale))
+                }
+            }
 
             versionUtils.requestPostNotifications(
                 notificationPermissionLauncher,
@@ -478,10 +496,12 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
         }
 
         override fun handleExternalToolEvent(tool : ExternalToolData) {
-            try {
-                tool.accept(ExternalToolLauncher(this@ForkyzActivity))
-            } catch (e : AppNotFoundException) {
-                onAppNotFound?.let { it(e) }
+            lifecycleScope.launch {
+                try {
+                    tool.accept(ExternalToolLauncher(this@ForkyzActivity))
+                } catch (e : AppNotFoundException) {
+                    onAppNotFound?.let { it(e) }
+                }
             }
         }
 
@@ -539,7 +559,9 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
                     RecognizerIntent.LANGUAGE_MODEL_FREE_FORM,
                 )
             } catch (e : ActivityNotFoundException) {
-               toast(getString(R.string.no_speech_recognition_available))
+                lifecycleScope.launch {
+                   toast(getString(Res.string.no_speech_recognition_available))
+                }
             }
         }
 
@@ -557,11 +579,9 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
             } else if (!ttsReady) {
                 // hopefully rare occasion where tts being prepared but not
                 // ready yet
-                Toast.makeText(
-                    this@ForkyzActivity,
-                    R.string.speech_not_ready,
-                    Toast.LENGTH_SHORT,
-                ).show()
+                lifecycleScope.launch {
+                    toast(getString(Res.string.speech_not_ready))
+                }
             } else {
                 ttsService?.speak(
                     text, TextToSpeech.QUEUE_FLUSH, null,

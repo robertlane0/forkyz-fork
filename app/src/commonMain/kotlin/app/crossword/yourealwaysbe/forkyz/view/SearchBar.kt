@@ -16,10 +16,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 
-import app.crossword.yourealwaysbe.forkyz.R
+import org.jetbrains.compose.resources.stringResource
+
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.filter_settings_close
 
 @Composable
 fun SearchBar(
@@ -50,7 +52,7 @@ fun SearchBar(
             IconButton(onClick = onClose) {
                 Icon(
                     Icons.Filled.Close,
-                    stringResource(R.string.filter_settings_close),
+                    stringResource(Res.string.filter_settings_close),
                 )
             }
         }

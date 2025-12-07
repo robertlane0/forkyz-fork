@@ -6,15 +6,18 @@ import kotlinx.serialization.Serializable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 
+import org.jetbrains.compose.resources.stringResource
+
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.online_sources_url
 import app.crossword.yourealwaysbe.forkyz.exttools.AppNotFoundException
 import app.crossword.yourealwaysbe.forkyz.exttools.ExternalToolData
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
@@ -41,20 +44,22 @@ private data class Notes(
 @Serializable
 private object Settings
 @Serializable
-private data class HTML(val rawAssetID : Int)
+private data class HTML(val page : HTMLPage)
 @Serializable
 private object Logcat
 
 /**
  * Page open funs
  *
- * @param openHTMLPage take ID of raw HTML asset
+ * @param openHTMLPage take unqualified name of file to open in
+ * composeResources/files. E.g. releases.html will resolve to en/release.html
+ * for example.
  */
 data class PageOpener(
     val openPlayPage : () -> Unit,
     val openClueListPage : () -> Unit,
     val openNotesPage : (ClueID?) -> Unit,
-    val openHTMLPage : (Int) -> Unit,
+    val openHTMLPage : (HTMLPage) -> Unit,
     val openOnlineSources : () -> Unit,
     val openReleaseNotes : () -> Unit,
     val openSettingsPage : () -> Unit,
@@ -87,11 +92,11 @@ private fun ForkyzAppMain(
             utils.onFinish()
     }
 
-    fun openHTMLPage(rawAssetID : Int) {
-        navController.navigate(route = HTML(rawAssetID))
+    fun openHTMLPage(page : HTMLPage) {
+        navController.navigate(route = HTML(page))
     }
 
-    val onlineSourcesURL = stringResource(R.string.online_sources_url)
+    val onlineSourcesURL = stringResource(Res.string.online_sources_url)
 
     val pageOpener = PageOpener(
         openPlayPage = { navController.navigate(route = Play) },
@@ -103,7 +108,7 @@ private fun ForkyzAppMain(
         },
         openHTMLPage = ::openHTMLPage,
         openOnlineSources = { utils.openURI(onlineSourcesURL.toUri()) },
-        openReleaseNotes = { openHTMLPage(R.raw.release) },
+        openReleaseNotes = { openHTMLPage(HTMLPage.RELEASE_NOTES) },
         openSettingsPage = { navController.navigate(route = Settings) },
         openLogcatPage = { navController.navigate(route = Logcat) },
         onBack = ::doBackAction,
@@ -168,7 +173,7 @@ private fun ForkyzAppMain(
             HTMLPage(
                 viewModel = viewModel,
                 themeHelper = themeHelper,
-                rawAssetID = html.rawAssetID,
+                page = html.page,
                 onBack = ::doBackAction,
             )
         }

@@ -44,7 +44,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.fromHtml
@@ -53,7 +52,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
-import app.crossword.yourealwaysbe.forkyz.R
+import org.jetbrains.compose.resources.stringResource
+
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_word
 import app.crossword.yourealwaysbe.forkyz.settings.ClueTabsDouble
 import app.crossword.yourealwaysbe.forkyz.theme.BoardColorScheme
 import app.crossword.yourealwaysbe.puz.ClueID
@@ -232,7 +234,7 @@ fun ClueTabs(
                                 onLongPressDescription
                                     = onClueLongClickDescription,
                                 contentDescription
-                                    = stringResource(R.string.clue_word),
+                                    = stringResource(Res.string.clue_word),
                             )
                     }
                 }

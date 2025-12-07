@@ -8,6 +8,13 @@ import kotlinx.coroutines.launch
 
 import androidx.lifecycle.viewModelScope
 
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_down
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_left
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_next
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_previous
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_right
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_up
 import app.crossword.yourealwaysbe.forkyz.settings.CycleUnfilledMode
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.RenderSettings
@@ -242,27 +249,27 @@ class ClueListPageViewModel(
 
         viewModelScope.launch {
             registerVoiceCommand(VoiceCommand(
-                utils.getString(R.string.command_left),
+                utils.getString(Res.string.command_left),
                 { _ -> moveLeft() }
             ))
             registerVoiceCommand(VoiceCommand(
-                utils.getString(R.string.command_right),
+                utils.getString(Res.string.command_right),
                 { _ -> moveRight() }
             ))
             registerVoiceCommand(VoiceCommand(
-                utils.getString(R.string.command_up),
+                utils.getString(Res.string.command_up),
                 { _ -> moveUp() }
             ))
             registerVoiceCommand(VoiceCommand(
-                utils.getString(R.string.command_down),
+                utils.getString(Res.string.command_down),
                 { _ -> moveDown() }
             ))
             registerVoiceCommand(VoiceCommand(
-                utils.getString(R.string.command_next),
+                utils.getString(Res.string.command_next),
                 { _ -> moveNextPage() },
             ))
             registerVoiceCommand(VoiceCommand(
-                utils.getString(R.string.command_previous),
+                utils.getString(Res.string.command_previous),
                 { _ -> movePrevPage() },
             ))
         }

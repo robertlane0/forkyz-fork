@@ -16,6 +16,18 @@ import androidx.lifecycle.viewModelScope
 
 import org.jg.wordstonumbers.WordsToNumbersUtil
 
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_announce_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_answer
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_answer_alt
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_back
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_clear
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_current_clue_help
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_letter
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_notes
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_number
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.help_query_but_no_active_network
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.help_query_response_title
 import app.crossword.yourealwaysbe.forkyz.exttools.AppNotFoundException
 import app.crossword.yourealwaysbe.forkyz.exttools.CrosswordSolverData
 import app.crossword.yourealwaysbe.forkyz.exttools.DuckDuckGoData
@@ -575,12 +587,12 @@ open class PuzzlePageViewModel(
         viewModelScope.launch {
             if (!utils.hasNetworkConnection()) {
                 sendToast(
-                    utils.getString(R.string.help_query_but_no_active_network)
+                    utils.getString(Res.string.help_query_but_no_active_network)
                 )
             } else {
                 getBoard()?.let { board ->
                     val responseTitle = utils.getString(
-                        R.string.help_query_response_title,
+                        Res.string.help_query_response_title,
                     )
                     askChatGPTForCurrentClue(
                         utils,
@@ -755,7 +767,7 @@ open class PuzzlePageViewModel(
         viewModelScope.launch {
             registerVoiceCommand(
                 VoiceCommand(
-                    utils.getString(R.string.command_back),
+                    utils.getString(Res.string.command_back),
                     { _ -> doBack() }
                 )
             )
@@ -768,7 +780,7 @@ open class PuzzlePageViewModel(
     protected fun registerVoiceCommandNotes() {
         viewModelScope.launch {
             registerVoiceCommand(VoiceCommand(
-                utils.getString(R.string.command_notes),
+                utils.getString(Res.string.command_notes),
                 { launchCurrentClueNotes() },
             ))
         }
@@ -782,8 +794,8 @@ open class PuzzlePageViewModel(
         viewModelScope.launch {
             registerVoiceCommand(
                 VoiceCommand(
-                    utils.getString(R.string.command_answer),
-                    utils.getString(R.string.command_answer_alt),
+                    utils.getString(Res.string.command_answer),
+                    utils.getString(Res.string.command_answer_alt),
                     { answer ->
                         // remove non-word as not usually entered into grids
                         val prepped = answer.replace("\\W+".toRegex(), "")
@@ -1000,7 +1012,7 @@ open class PuzzlePageViewModel(
         viewModelScope.launch {
             registerVoiceCommand(
                 VoiceCommand(
-                    utils.getString(R.string.command_letter),
+                    utils.getString(Res.string.command_letter),
                     { letter ->
                         if (!letter.isEmpty()) {
                             getBoard()?.playLetter(
@@ -1020,7 +1032,7 @@ open class PuzzlePageViewModel(
         viewModelScope.launch {
             registerVoiceCommand(
                 VoiceCommand(
-                    utils.getString(R.string.command_number),
+                    utils.getString(Res.string.command_number),
                     { textNumber ->
                         val prepped = WordsToNumbersUtil
                             .convertTextualNumbersInDocument(textNumber)
@@ -1043,7 +1055,7 @@ open class PuzzlePageViewModel(
         viewModelScope.launch {
             registerVoiceCommand(
                 VoiceCommand(
-                    utils.getString(R.string.command_clear),
+                    utils.getString(Res.string.command_clear),
                     { getBoard()?.clearWord() },
                 )
             )
@@ -1057,7 +1069,7 @@ open class PuzzlePageViewModel(
         viewModelScope.launch {
             registerVoiceCommand(
                 VoiceCommand(
-                    utils.getString(R.string.command_announce_clue),
+                    utils.getString(Res.string.command_announce_clue),
                     { announceClue() },
                 )
             )
@@ -1071,7 +1083,7 @@ open class PuzzlePageViewModel(
         viewModelScope.launch {
             registerVoiceCommand(
                 VoiceCommand(
-                    utils.getString(R.string.command_current_clue_help),
+                    utils.getString(Res.string.command_current_clue_help),
                     { requestHelpForCurrentClue() }
                 )
             )

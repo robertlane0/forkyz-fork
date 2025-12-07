@@ -1,6 +1,8 @@
 
 package app.crossword.yourealwaysbe.forkyz.util
 
+import kotlinx.coroutines.runBlocking
+
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -10,9 +12,12 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 
+import org.jetbrains.compose.resources.getString
+
 import org.koin.android.ext.android.inject
 
-import app.crossword.yourealwaysbe.forkyz.R
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.saving_puzzle
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 
 private val TAG = "ForkyzSaveSrvcCllr";
@@ -62,11 +67,13 @@ class PuzzleSaveService() : Service() {
         flags : Int,
         startId : Int,
     ) : Int {
+        // can't really launch coroutine here
+        val savingPuzzle = runBlocking { getString(Res.string.saving_puzzle) }
         val notification = NotificationCompat.Builder(
             this,
             NOTIFICATION_CHANNEL_ID,
         ).setSmallIcon(android.R.drawable.ic_menu_save)
-            .setContentTitle(context.getString(R.string.saving_puzzle))
+            .setContentTitle(savingPuzzle)
             .setWhen(System.currentTimeMillis())
             .build()
 

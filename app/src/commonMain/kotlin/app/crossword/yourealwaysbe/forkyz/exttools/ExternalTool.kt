@@ -31,7 +31,7 @@ class AppNotFoundException(
  * gets from settings, threading, and so on.
  */
 abstract class ExternalToolData {
-    abstract fun accept(launcher : ExternalToolLauncher)
+    abstract suspend fun accept(launcher : ExternalToolLauncher)
 }
 
 /**

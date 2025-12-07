@@ -13,6 +13,9 @@ import androidx.core.content.FileProvider
 import androidx.room.Room.databaseBuilder
 import androidx.room.RoomDatabase
 
+import org.jetbrains.compose.resources.PluralStringResource
+import org.jetbrains.compose.resources.StringResource
+
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.util.Uri
@@ -32,32 +35,27 @@ class AndroidNativeBackendUtils(
     private val applicationContext : Context,
     private val utils : AndroidVersionUtils,
 ) : NativeBackendUtils {
-    override suspend fun getString(resourceID : Int) : String {
-        return applicationContext.getString(resourceID)
+    override suspend fun getString(resourceID : StringResource) : String {
+        return org.jetbrains.compose.resources.getString(resourceID)
     }
 
     override suspend fun getString(
-        resourceID : Int,
+        resourceID : StringResource,
         vararg formatArgs: Any,
     ) : String {
-        return applicationContext.getString(resourceID, *formatArgs)
+        return org.jetbrains.compose.resources.getString(resourceID, *formatArgs)
     }
 
     override suspend fun getQuantityString(
-        resourceID : Int,
+        resourceID : PluralStringResource,
         quantity : Int,
         vararg formatArgs: Any,
     ) : String {
-        return applicationContext.resources.getQuantityString(
+        return org.jetbrains.compose.resources.getPluralString(
             resourceID,
             quantity,
             *formatArgs,
         )
-    }
-
-    @Throws(IOException::class)
-    override fun getRawResource(rawAssetID : Int) : InputStream {
-        return applicationContext.resources.openRawResource(rawAssetID)
     }
 
     override fun hasNetworkConnection() : Boolean {

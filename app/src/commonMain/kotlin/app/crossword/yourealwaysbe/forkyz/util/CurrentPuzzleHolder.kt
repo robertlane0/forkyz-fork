@@ -11,7 +11,6 @@ import kotlinx.coroutines.CoroutineScope
 import android.util.Log
 import androidx.annotation.MainThread
 
-import app.crossword.yourealwaysbe.forkyz.R
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle

@@ -12,7 +12,11 @@ import android.content.Context
 import android.widget.Toast
 import androidx.annotation.MainThread
 
-import app.crossword.yourealwaysbe.forkyz.R
+import org.jetbrains.compose.resources.getString
+
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.storage_full_warning
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.storage_problem_falling_back_internal
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation
@@ -63,7 +67,7 @@ class AndroidFileHandlerProvider(
             GlobalScope.launch(Dispatchers.Main) {
                 val t = Toast.makeText(
                     applicationContext,
-                    R.string.storage_problem_falling_back_internal,
+                    getString(Res.string.storage_problem_falling_back_internal),
                     Toast.LENGTH_LONG
                 )
                 t.show()
@@ -74,7 +78,7 @@ class AndroidFileHandlerProvider(
             GlobalScope.launch(Dispatchers.Main) {
                 val t = Toast.makeText(
                     applicationContext,
-                    R.string.storage_full_warning,
+                    getString(Res.string.storage_full_warning),
                     Toast.LENGTH_LONG
                 )
                 t.show()

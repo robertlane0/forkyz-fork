@@ -32,10 +32,20 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
+import org.jetbrains.compose.resources.stringResource
+
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clues_list_label
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.current_word
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.open_clue_list
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.open_clue_notes
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.overflow
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.select_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.select_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_all_words_clue_list
 import app.crossword.yourealwaysbe.forkyz.menu.BaseMenuModifier
 import app.crossword.yourealwaysbe.forkyz.menu.MenuText
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
@@ -117,7 +127,7 @@ fun ClueListPage(
             MenuCheckedItem(
                 checked = showAllWords,
                 text = {
-                    MenuText(stringResource(R.string.show_all_words_clue_list))
+                    MenuText(stringResource(Res.string.show_all_words_clue_list))
                 },
                 onClick = {
                     viewModel.toggleShowAllWords()
@@ -131,7 +141,7 @@ fun ClueListPage(
             IconButton(onClick = { viewModel.expandMenu(PuzzleSubMenu.MAIN) }) {
                 Icon(
                     Icons.Default.MoreVert,
-                    contentDescription = stringResource(R.string.overflow),
+                    contentDescription = stringResource(Res.string.overflow),
                 )
             }
 
@@ -171,7 +181,7 @@ fun ClueListPage(
         @Composable
         fun TopAppBar() {
             themeHelper.ForkyzTopAppBar(
-                title = { Text(stringResource(R.string.clues_list_label)) },
+                title = { Text(stringResource(Res.string.clues_list_label)) },
                 onBack = { doExitPage() },
                 actions = { OverflowMenu() },
             )
@@ -186,15 +196,15 @@ fun ClueListPage(
                 viewModel = viewModel.clueTabsViewModel,
                 isPortrait = utils.isPortrait,
                 onClueClick = viewModel::clueClick,
-                onClueClickDescription = stringResource(R.string.select_clue),
+                onClueClickDescription = stringResource(Res.string.select_clue),
                 onClueLongClick = { cid ->
                     viewModel.selectClue(cid)
                     viewModel.launchClueNotes(cid)
                 },
                 onClueLongClickDescription
-                    = stringResource(R.string.open_clue_notes),
+                    = stringResource(Res.string.open_clue_notes),
                 onClueBoardClick = viewModel::clueClick,
-                onClueBoardClickDescription = stringResource(R.string.select_clue),
+                onClueBoardClickDescription = stringResource(Res.string.select_clue),
                 showAllWords = showAllWords,
                 boardColorScheme = boardColorScheme,
             )
@@ -224,10 +234,10 @@ fun ClueListPage(
                             viewModel.launchCurrentClueNotes()
                         },
                         onLongPressDescription
-                            = stringResource(R.string.open_clue_list),
+                            = stringResource(Res.string.open_clue_list),
                         incognitoMode = showAllWords,
                         contentDescription
-                            = stringResource(R.string.current_word),
+                            = stringResource(Res.string.current_word),
                     )
                     ClueLists(
                         Modifier.fillMaxWidth().weight(1.0F),

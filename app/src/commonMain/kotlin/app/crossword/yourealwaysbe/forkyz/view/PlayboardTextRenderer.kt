@@ -2,7 +2,30 @@ package app.crossword.yourealwaysbe.forkyz.view
 
 import java.util.Locale
 
-import app.crossword.yourealwaysbe.forkyz.R
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.announce_box_response
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.announce_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.announce_clue_word_response
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.announce_first_box_response
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.announce_last_box_response
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.announce_only_box_response
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.announce_word_response
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_format_long
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_format_long_no_num
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_format_long_no_num_with_count
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_format_long_with_count
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_format_short
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_format_short_no_dir
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_format_short_no_dir_with_count
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_format_short_no_num
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_format_short_no_num_no_dir
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_format_short_no_num_no_dir_with_count
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_format_short_no_num_with_count
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_format_short_with_count
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.cur_box_blank
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.cur_box_blank
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.unknown_hint
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.word_all_blank
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Clue
@@ -16,14 +39,14 @@ object PlayboardTextRenderer {
         showCount : Boolean,
     ) : String {
         if (clue == null)
-            return utils.getString(R.string.unknown_hint)
+            return utils.getString(Res.string.unknown_hint)
 
         val wordLen = if (clue.hasZone()) clue.zone.size() else -1
 
         return if (showCount && wordLen >= 0) {
             if (clue.hasClueNumber()) {
                 utils.getString(
-                    R.string.clue_format_long_with_count,
+                    Res.string.clue_format_long_with_count,
                     clue.clueID.listName,
                     clue.clueNumber,
                     clue.hint,
@@ -31,7 +54,7 @@ object PlayboardTextRenderer {
                 )
             } else {
                 utils.getString(
-                    R.string.clue_format_long_no_num_with_count,
+                    Res.string.clue_format_long_no_num_with_count,
                     clue.clueID.listName,
                     clue.hint,
                     wordLen
@@ -40,14 +63,14 @@ object PlayboardTextRenderer {
         } else {
             if (clue.hasClueNumber()) {
                 utils.getString(
-                    R.string.clue_format_long,
+                    Res.string.clue_format_long,
                     clue.clueID.listName,
                     clue.clueNumber,
                     clue.hint
                 )
             } else {
                 utils.getString(
-                    R.string.clue_format_long_no_num,
+                    Res.string.clue_format_long_no_num,
                     clue.clueID.listName,
                     clue.hint
                 )
@@ -72,24 +95,24 @@ object PlayboardTextRenderer {
             if (hasCount && showCount) {
                 if (displayNum != null) {
                     utils.getString(
-                        R.string.clue_format_short_with_count,
+                        Res.string.clue_format_short_with_count,
                         displayNum, listName, hint, count
                     )
                 } else {
                     utils.getString(
-                        R.string.clue_format_short_no_num_with_count,
+                        Res.string.clue_format_short_no_num_with_count,
                         listName, hint, count
                     )
                 }
             } else {
                 if (displayNum != null) {
                     utils.getString(
-                        R.string.clue_format_short,
+                        Res.string.clue_format_short,
                         displayNum, listName, hint
                     )
                 } else {
                     utils.getString(
-                        R.string.clue_format_short_no_num,
+                        Res.string.clue_format_short_no_num,
                         listName, hint
                     )
                 }
@@ -98,24 +121,24 @@ object PlayboardTextRenderer {
             if (hasCount && showCount) {
                 if (displayNum != null) {
                     utils.getString(
-                        R.string.clue_format_short_no_dir_with_count,
+                        Res.string.clue_format_short_no_dir_with_count,
                         displayNum, hint, count
                     )
                 } else {
                     utils.getString(
-                        R.string.clue_format_short_no_num_no_dir_with_count,
+                        Res.string.clue_format_short_no_num_no_dir_with_count,
                         hint, count
                     )
                 }
             } else {
                 if (displayNum != null) {
                     utils.getString(
-                        R.string.clue_format_short_no_dir,
+                        Res.string.clue_format_short_no_dir,
                         displayNum, hint
                     )
                 } else {
                     utils.getString(
-                        R.string.clue_format_short_no_num_no_dir,
+                        Res.string.clue_format_short_no_num_no_dir,
                         hint
                     )
                 }
@@ -140,7 +163,7 @@ object PlayboardTextRenderer {
             word == null -> clue
             clue == null -> word
             else -> utils.getString(
-                R.string.announce_clue_word_response,
+                Res.string.announce_clue_word_response,
                 clue,
                 word,
             )
@@ -157,7 +180,7 @@ object PlayboardTextRenderer {
 
         val clue = getLongClueText(utils, board.clue, showCount)
 
-        return utils.getString(R.string.announce_clue, clue)
+        return utils.getString(Res.string.announce_clue, clue)
     }
 
     suspend fun getAccessibleCurrentBox(
@@ -214,23 +237,23 @@ object PlayboardTextRenderer {
 
         val response = getAccessibleBoxResponseText(
             box,
-            utils.getString(R.string.cur_box_blank),
+            utils.getString(Res.string.cur_box_blank),
         )
 
         return when {
             firstBox && lastBox -> utils.getString(
-                R.string.announce_only_box_response,
+                Res.string.announce_only_box_response,
                 response,
             )
             firstBox -> utils.getString(
-                R.string.announce_first_box_response,
+                Res.string.announce_first_box_response,
                 response,
             )
             lastBox -> utils.getString(
-                R.string.announce_last_box_response,
+                Res.string.announce_last_box_response,
                 response,
             )
-            else -> utils.getString(R.string.announce_box_response, response)
+            else -> utils.getString(Res.string.announce_box_response, response)
         }
     }
 
@@ -255,18 +278,18 @@ object PlayboardTextRenderer {
             return null
 
         val announceText = if (isAllBlank(boxes))
-            utils.getString(R.string.word_all_blank)
+            utils.getString(Res.string.word_all_blank)
         else
             getAccessibleBoxesResponseText(utils, boxes)
 
-        return utils.getString(R.string.announce_word_response, announceText)
+        return utils.getString(Res.string.announce_word_response, announceText)
     }
 
     private suspend fun getAccessibleBoxesResponseText(
         utils : NativeBackendUtils,
         boxes : Array<Box>?,
     ) : String {
-        val blank = utils.getString(R.string.cur_box_blank)
+        val blank = utils.getString(Res.string.cur_box_blank)
         return buildString {
             boxes?.forEach { box ->
                 if (length > 0)

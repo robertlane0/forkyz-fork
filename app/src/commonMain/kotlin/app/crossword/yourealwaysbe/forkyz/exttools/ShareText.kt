@@ -7,7 +7,20 @@ import java.util.Locale
 import java.util.function.Consumer
 import kotlinx.coroutines.flow.first
 
-import app.crossword.yourealwaysbe.forkyz.R
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_format_short_no_num_no_dir_with_count
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_clue_blank_box
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_clue_response_text
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_clue_text
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_clue_title
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_message_no_date
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_message_with_date
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_puzzle_details_author_no_url
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_puzzle_details_author_url
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_puzzle_details_no_author_no_url
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_puzzle_details_no_author_url
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_your_time
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.unknown_hint
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
@@ -40,7 +53,7 @@ open class ShareTextData(
                     withResponse,
                 )
                 return ShareTextData(
-                    utils.getString(R.string.share_clue_title),
+                    utils.getString(Res.string.share_clue_title),
                     shareMessage,
                 )
             }
@@ -59,7 +72,7 @@ open class ShareTextData(
                 val dateFormat
                     = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
                 utils.getQuantityString(
-                    R.plurals.share_message_with_date,
+                    Res.plurals.share_message_with_date,
                     cheatedBoxes,
                     source,
                     dateFormat.format(date),
@@ -68,7 +81,7 @@ open class ShareTextData(
                 )
             } else {
                 utils.getQuantityString(
-                    R.plurals.share_message_no_date,
+                    Res.plurals.share_message_no_date,
                     cheatedBoxes,
                     source,
                     cheatedBoxes,
@@ -77,7 +90,7 @@ open class ShareTextData(
             }
 
             return ShareTextData(
-                utils.getString(R.string.share_your_time),
+                utils.getString(Res.string.share_your_time),
                 message,
             )
         }
@@ -96,14 +109,14 @@ open class ShareTextData(
             if (withResponse) {
                 val responseText = getShareResponseText(utils, response)
                 return utils.getString(
-                    R.string.share_clue_response_text,
+                    Res.string.share_clue_response_text,
                     clueText,
                     responseText,
                     puzzleDetails,
                 )
             } else {
                 return utils.getString(
-                    R.string.share_clue_text,
+                    Res.string.share_clue_text,
                     clueText,
                     puzzleDetails,
                 )
@@ -118,7 +131,7 @@ open class ShareTextData(
             for (box in boxes) {
                 if (box.isBlank()) {
                     responseText.append(
-                        utils.getString(R.string.share_clue_blank_box),
+                        utils.getString(Res.string.share_clue_blank_box),
                     )
                 } else {
                     responseText.append(box.getResponse())
@@ -134,7 +147,7 @@ open class ShareTextData(
         ) : String {
             val showCount = settings.livePlayShowCount.first()
             if (clue == null) {
-                return utils.getString(R.string.unknown_hint)
+                return utils.getString(Res.string.unknown_hint)
             } else {
                 val wordLen = if (clue.hasZone())
                     clue.getZone().size()
@@ -143,7 +156,7 @@ open class ShareTextData(
 
                 if (showCount && wordLen >= 0) {
                     return utils.getString(
-                        R.string
+                        Res.string
                             .clue_format_short_no_num_no_dir_with_count,
                         clue.getHint(),
                         wordLen,
@@ -184,14 +197,14 @@ open class ShareTextData(
             if (shareUrl == null || shareUrl.isEmpty()) {
                 return if (author != null) {
                     utils.getString(
-                        R.string.share_puzzle_details_author_no_url,
+                        Res.string.share_puzzle_details_author_no_url,
                         source,
                         title,
                         author,
                     )
                 } else {
                     utils.getString(
-                        R.string.share_puzzle_details_no_author_no_url,
+                        Res.string.share_puzzle_details_no_author_no_url,
                         source,
                         title,
                     )
@@ -199,7 +212,7 @@ open class ShareTextData(
             } else {
                 return if (author != null) {
                     utils.getString(
-                        R.string.share_puzzle_details_author_url,
+                        Res.string.share_puzzle_details_author_url,
                         source,
                         title,
                         author,
@@ -207,7 +220,7 @@ open class ShareTextData(
                     )
                 } else {
                     utils.getString(
-                        R.string.share_puzzle_details_no_author_url,
+                        Res.string.share_puzzle_details_no_author_url,
                         source,
                         title,
                         shareUrl,
@@ -217,10 +230,10 @@ open class ShareTextData(
         }
     }
 
-    override fun accept(launcher : ExternalToolLauncher) {
+    override suspend fun accept(launcher : ExternalToolLauncher) {
         launcher.visit(this)
     }
 }
 
-expect fun ExternalToolLauncher.visit(data : ShareTextData)
+expect suspend fun ExternalToolLauncher.visit(data : ShareTextData)
 

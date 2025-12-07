@@ -1,7 +1,8 @@
 
 package app.crossword.yourealwaysbe.forkyz.exttools
 
-import app.crossword.yourealwaysbe.forkyz.R
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.search_fifteen_squared_url
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.toUri
@@ -31,7 +32,7 @@ class FifteenSquaredData(uri : Uri) : HTMLToolData(uri) {
             title = title.replace(".", "")
 
             val uri = utils.getString(
-                R.string.search_fifteen_squared_url, source, title
+                Res.string.search_fifteen_squared_url, source, title
             ).toUri()
 
             return FifteenSquaredData(uri)

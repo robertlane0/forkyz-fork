@@ -4,7 +4,8 @@ package app.crossword.yourealwaysbe.forkyz.exttools
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-import app.crossword.yourealwaysbe.forkyz.R
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.duckduckgo_search_url
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.toUri
@@ -38,7 +39,7 @@ class DuckDuckGoData(uri : Uri) : HTMLToolData(uri) {
             hint = hint?.replace("[^-A-Za-z\\s\\d]".toRegex(), "")
 
             val uri = utils
-                .getString(R.string.duckduckgo_search_url, hint ?: "")
+                .getString(Res.string.duckduckgo_search_url, hint ?: "")
                 .toUri()
 
             return DuckDuckGoData(uri)

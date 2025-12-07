@@ -25,6 +25,7 @@ kotlin {
 
         commonMain.dependencies {
             implementation 'androidx.datastore:datastore-core-okio:1.2.0'
+            implementation 'org.jetbrains.compose.components:components-resources:1.9.3'
         }
 
         androidMain.dependencies {
@@ -162,4 +163,8 @@ wire {
     sourcePath {
         srcDir("src/commonMain/proto")
     }
+}
+
+compose.resources {
+    packageOfResClass = "app.crossword.yourealwaysbe.forkyz.app.generated.resources"
 }

@@ -22,6 +22,12 @@ import androidx.annotation.MainThread
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.import_failure
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.import_success
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.puzzle_caption_with_author
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.unable_to_read_file
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.unknown_source
 import app.crossword.yourealwaysbe.forkyz.net.Downloader
 import app.crossword.yourealwaysbe.forkyz.net.DownloadersProvider
 import app.crossword.yourealwaysbe.forkyz.settings.AccessorSetting
@@ -678,7 +684,7 @@ class BrowsePageViewModel(
                         viewModelScope.launch {
                             sendToast(
                                 utils.getString(
-                                    R.string.unable_to_read_file,
+                                    Res.string.unable_to_read_file,
                                     (filename ?: "")
                                 )
                             )
@@ -730,9 +736,9 @@ class BrowsePageViewModel(
         importURIsAndCallback(uris) { someFailed, someSucceeded ->
             viewModelScope.launch {
                 if (someFailed)
-                    sendToast(utils.getString(R.string.import_failure))
+                    sendToast(utils.getString(Res.string.import_failure))
                 else if (someSucceeded)
-                    sendToast(utils.getString(R.string.import_success))
+                    sendToast(utils.getString(Res.string.import_success))
                 if (someSucceeded)
                     updateState(isNewPuzzleList = true)
             }
@@ -1109,7 +1115,7 @@ class BrowsePageViewModel(
             rating = pm.rating,
             hasSolution = pm.hasSolution,
             source = getSource(pm)
-                ?: utils.getString(R.string.unknown_source),
+                ?: utils.getString(Res.string.unknown_source),
             title = getTitle(pm),
             author = pm.author ?: "",
         )
@@ -1173,7 +1179,7 @@ class BrowsePageViewModel(
             && !caption.contains(author, ignoreCase=true)
         if (addAuthor) {
             caption = utils.getString(
-                R.string.puzzle_caption_with_author,
+                Res.string.puzzle_caption_with_author,
                 caption,
                 author
             )

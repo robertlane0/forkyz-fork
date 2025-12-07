@@ -50,8 +50,6 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.res.integerResource
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.fromHtml
@@ -62,9 +60,74 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
+
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.announce_clue_label
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.are_you_sure
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_hint
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.completed
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.edit_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.edit_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.errors
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.external_app_install_msg
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.external_app_not_installed
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.external_tools
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.external_tools
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.fit_to_screen
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.help_crossword_solver
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.help_crossword_solver_anagram
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.help_duckduckgo
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.help_external_dictionary
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.help_fifteen_squared
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.help_query_chat_gpt
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_announce
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_voice
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.info
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.initial_letter
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.initial_letters
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.letter
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.menu_flag_cell_toggle
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.menu_flag_clue_toggle
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.menu_notes
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.menu_notes
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.menu_notes_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.menu_notes_puzzle
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ok
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.puzzle
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.reveal
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.reveal
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.reveal_puzzle
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.scratch_mode
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_clue_response
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_puzzle_full
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_puzzle_open_share_url
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_puzzle_orig
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_puzzle_without_extensions
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_errors
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_errors
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_errors_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_errors_cursor
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_errors_full_grid
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.showing_errors
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.special_entry
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.support_puzzle_source
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.unknown_hint
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.voice_command
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.website
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.word
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.zoom
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.zoom
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.zoom_in
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.zoom_in_max
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.zoom_out
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.zoom_reset
 import app.crossword.yourealwaysbe.forkyz.menu.BaseMenuModifier
 import app.crossword.yourealwaysbe.forkyz.menu.MenuDropdownHeading
 import app.crossword.yourealwaysbe.forkyz.menu.MenuHelp
@@ -101,6 +164,7 @@ import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.Zone
 
 private val TAG = "ForkyzPuzzlePage"
+private val CLUE_TEXT_SIZE = 17.sp
 
 class PuzzlePageScope(
     private val viewModel : PuzzlePageViewModel,
@@ -191,19 +255,18 @@ class PuzzlePageScope(
             onLongClick = onLongClick,
             onLongClickLabel = onLongClickDescription,
         )
-        val text = clueText ?: stringResource(R.string.unknown_hint)
+        val text = clueText ?: stringResource(Res.string.unknown_hint)
 
         // Text doesn't support autoSize yet, so rebuild BasicText
         // from (or close enough)
         // https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/material/material/src/commonMain/kotlin/androidx/compose/material/Text.kt
         val color = LocalContentColor.current
-        val clueSize = integerResource(R.integer.clue_text_size)
         BasicText(
             modifier = fullModifier,
             text = AnnotatedString.fromHtml(text),
             autoSize =  TextAutoSize.StepBased(
                 minFontSize = 5.sp,
-                maxFontSize = clueSize.sp,
+                maxFontSize = CLUE_TEXT_SIZE,
                 stepSize = 1.sp,
             ),
             color = { color },
@@ -271,9 +334,9 @@ class PuzzlePageScope(
                     ) {
                         Icon(
                             modifier = Modifier.width(50.dp),
-                            painter = painterResource(R.drawable.ic_voice),
+                            painter = painterResource(Res.drawable.ic_voice),
                             contentDescription
-                                = stringResource(R.string.voice_command),
+                                = stringResource(Res.string.voice_command),
                         )
                     }
                 }
@@ -285,9 +348,9 @@ class PuzzlePageScope(
                     ) {
                         Icon(
                             modifier = Modifier.width(50.dp),
-                            painter = painterResource(R.drawable.ic_announce),
+                            painter = painterResource(Res.drawable.ic_announce),
                             contentDescription = stringResource(
-                                R.string.announce_clue_label,
+                                Res.string.announce_clue_label,
                             ),
                         )
                     }
@@ -364,7 +427,7 @@ class PuzzlePageScope(
     @Composable
     fun MenuNotes() {
         MenuSubEntry(
-            text = { MenuText(stringResource(R.string.menu_notes)) },
+            text = { MenuText(stringResource(Res.string.menu_notes)) },
             onClick = { viewModel.expandMenu(PuzzleSubMenu.NOTES) },
         )
     }
@@ -382,11 +445,11 @@ class PuzzlePageScope(
             onDismissRequest = viewModel::dismissMenu,
         ) {
             MenuDropdownHeading(
-                R.string.menu_notes,
+                Res.string.menu_notes,
                 onClick = viewModel::closeMenu,
             )
             DropdownMenuItem(
-                text = { MenuText(stringResource(R.string.menu_notes_clue)) },
+                text = { MenuText(stringResource(Res.string.menu_notes_clue)) },
                 onClick = {
                     viewModel.launchCurrentClueNotes()
                     viewModel.dismissMenu()
@@ -394,7 +457,7 @@ class PuzzlePageScope(
             )
             DropdownMenuItem(
                 text = {
-                    MenuText(stringResource(R.string.menu_notes_puzzle))
+                    MenuText(stringResource(Res.string.menu_notes_puzzle))
                 },
                 onClick = {
                     viewModel.launchPuzzleNotes()
@@ -403,7 +466,7 @@ class PuzzlePageScope(
             )
             DropdownMenuItem(
                 text = {
-                    MenuText(stringResource(R.string.menu_flag_clue_toggle))
+                    MenuText(stringResource(Res.string.menu_flag_clue_toggle))
                 },
                 onClick = {
                     viewModel.toggleClueFlag()
@@ -412,7 +475,7 @@ class PuzzlePageScope(
             )
             DropdownMenuItem(
                 text = {
-                    MenuText(stringResource(R.string.menu_flag_cell_toggle))
+                    MenuText(stringResource(Res.string.menu_flag_cell_toggle))
                 },
                 onClick = {
                     viewModel.toggleCellFlag()
@@ -430,7 +493,7 @@ class PuzzlePageScope(
         }
         MenuCheckedItem(
             checked = isScratchMode,
-            text = { MenuText(stringResource(R.string.scratch_mode)) },
+            text = { MenuText(stringResource(Res.string.scratch_mode)) },
             onClick = {
                 viewModel.toggleScratchMode()
                 viewModel.dismissMenu()
@@ -441,7 +504,7 @@ class PuzzlePageScope(
     @Composable
     fun MenuSpecialEntry() {
         DropdownMenuItem(
-            text = { MenuText(stringResource(R.string.special_entry)) },
+            text = { MenuText(stringResource(Res.string.special_entry)) },
             onClick = {
                 viewModel.doSpecialEntry()
                 viewModel.dismissMenu()
@@ -465,9 +528,9 @@ class PuzzlePageScope(
         MenuSubEntry(
             text = {
                 if (isShowing)
-                    MenuText(stringResource(R.string.showing_errors))
+                    MenuText(stringResource(Res.string.showing_errors))
                 else
-                    MenuText(stringResource(R.string.show_errors))
+                    MenuText(stringResource(Res.string.show_errors))
             },
             onClick = { viewModel.expandMenu(PuzzleSubMenu.SHOW_ERRORS) },
         )
@@ -491,13 +554,13 @@ class PuzzlePageScope(
             onDismissRequest = viewModel::dismissMenu,
         ) {
             MenuDropdownHeading(
-                R.string.show_errors,
+                Res.string.show_errors,
                 onClick = viewModel::closeMenu,
             )
             MenuCheckedItem(
                 checked = showErrorsState.isShowingErrorsCursor,
                 text = {
-                    MenuText(stringResource(R.string.show_errors_cursor))
+                    MenuText(stringResource(Res.string.show_errors_cursor))
                 },
                 onClick = {
                     viewModel.toggleShowErrorsCursor()
@@ -506,7 +569,7 @@ class PuzzlePageScope(
             )
             MenuCheckedItem(
                 checked = showErrorsState.isShowingErrorsClue,
-                text = { MenuText(stringResource(R.string.show_errors_clue)) },
+                text = { MenuText(stringResource(Res.string.show_errors_clue)) },
                 onClick = {
                     viewModel.toggleShowErrorsClue()
                     viewModel.dismissMenu()
@@ -515,7 +578,7 @@ class PuzzlePageScope(
             MenuCheckedItem(
                 checked = showErrorsState.isShowingErrorsGrid,
                 text = {
-                    MenuText(stringResource(R.string.show_errors_full_grid))
+                    MenuText(stringResource(Res.string.show_errors_full_grid))
                 },
                 onClick = {
                     viewModel.toggleShowErrorsGrid()
@@ -533,7 +596,7 @@ class PuzzlePageScope(
             return
 
         MenuSubEntry(
-            text = { MenuText(stringResource(R.string.reveal)) },
+            text = { MenuText(stringResource(Res.string.reveal)) },
             onClick = { viewModel.expandMenu(PuzzleSubMenu.REVEAL) },
         )
     }
@@ -554,7 +617,7 @@ class PuzzlePageScope(
             onDismissRequest = viewModel::dismissMenu,
         ) {
             MenuDropdownHeading(
-                R.string.reveal,
+                Res.string.reveal,
                 onClick = viewModel::closeMenu,
             )
             val canRevealInitialBoxLetter by remember {
@@ -563,7 +626,7 @@ class PuzzlePageScope(
             if (canRevealInitialBoxLetter) {
                 DropdownMenuItem(
                     text = {
-                        MenuText(stringResource(R.string.initial_letter))
+                        MenuText(stringResource(Res.string.initial_letter))
                     },
                     onClick = {
                         viewModel.revealInitialLetter()
@@ -572,14 +635,14 @@ class PuzzlePageScope(
                 )
             }
             DropdownMenuItem(
-                text = { MenuText(stringResource(R.string.letter)) },
+                text = { MenuText(stringResource(Res.string.letter)) },
                 onClick = {
                     viewModel.revealLetter()
                     viewModel.dismissMenu()
                 },
             )
             DropdownMenuItem(
-                text = { MenuText(stringResource(R.string.word)) },
+                text = { MenuText(stringResource(Res.string.word)) },
                 onClick = {
                     viewModel.revealWord()
                     viewModel.dismissMenu()
@@ -591,7 +654,7 @@ class PuzzlePageScope(
             if (canRevealInitialLetters) {
                 DropdownMenuItem(
                     text = {
-                        MenuText(stringResource(R.string.initial_letters))
+                        MenuText(stringResource(Res.string.initial_letters))
                     },
                     onClick = {
                         viewModel.revealInitialLetters()
@@ -600,14 +663,14 @@ class PuzzlePageScope(
                 )
             }
             DropdownMenuItem(
-                text = { MenuText(stringResource(R.string.errors)) },
+                text = { MenuText(stringResource(Res.string.errors)) },
                 onClick = {
                     viewModel.revealErrors()
                     viewModel.dismissMenu()
                 },
             )
             DropdownMenuItem(
-                text = { MenuText(stringResource(R.string.puzzle)) },
+                text = { MenuText(stringResource(Res.string.puzzle)) },
                 onClick = {
                     viewModel.revealPuzzle()
                     viewModel.dismissMenu()
@@ -619,7 +682,7 @@ class PuzzlePageScope(
     @Composable
     fun MenuZoom() {
         MenuSubEntry(
-            text = { MenuText(stringResource(R.string.zoom)) },
+            text = { MenuText(stringResource(Res.string.zoom)) },
             onClick = { viewModel.expandMenu(PuzzleSubMenu.ZOOM) },
         )
     }
@@ -643,18 +706,18 @@ class PuzzlePageScope(
             onDismissRequest = viewModel::dismissMenu,
         ) {
             MenuDropdownHeading(
-                R.string.zoom,
+                Res.string.zoom,
                 onClick = viewModel::closeMenu,
             )
             DropdownMenuItem(
-                text = { MenuText(stringResource(R.string.zoom_in)) },
+                text = { MenuText(stringResource(Res.string.zoom_in)) },
                 onClick = {
                     onZoomIn()
                     viewModel.dismissMenu()
                 },
             )
             DropdownMenuItem(
-                text = { MenuText(stringResource(R.string.zoom_in_max)) },
+                text = { MenuText(stringResource(Res.string.zoom_in_max)) },
                 onClick = {
                     onZoomInMax()
                     viewModel.dismissMenu()
@@ -662,7 +725,7 @@ class PuzzlePageScope(
             )
             DropdownMenuItem(
                 text = {
-                    MenuText(stringResource(R.string.zoom_out))
+                    MenuText(stringResource(Res.string.zoom_out))
                 },
                 onClick = {
                     onZoomOut()
@@ -670,14 +733,14 @@ class PuzzlePageScope(
                 },
             )
             DropdownMenuItem(
-                text = { MenuText(stringResource(R.string.fit_to_screen)) },
+                text = { MenuText(stringResource(Res.string.fit_to_screen)) },
                 onClick = {
                     onZoomFit()
                     viewModel.dismissMenu()
                 },
             )
             DropdownMenuItem(
-                text = { MenuText(stringResource(R.string.zoom_reset)) },
+                text = { MenuText(stringResource(Res.string.zoom_reset)) },
                 onClick = {
                     onZoomReset()
                     viewModel.dismissMenu()
@@ -696,7 +759,7 @@ class PuzzlePageScope(
             return
 
         MenuSubEntry(
-            text = { MenuText(stringResource(R.string.external_tools)) },
+            text = { MenuText(stringResource(Res.string.external_tools)) },
             onClick = { viewModel.expandMenu(PuzzleSubMenu.EXTERNAL_TOOLS) },
         )
     }
@@ -737,14 +800,14 @@ class PuzzlePageScope(
             onDismissRequest = viewModel::dismissMenu,
         ) {
             MenuDropdownHeading(
-                R.string.external_tools,
+                Res.string.external_tools,
                 onClick = viewModel::closeMenu,
             )
             if (externalToolsState.hasExternalDictionary) {
                 DropdownMenuItem(
                     text = {
                         MenuText(
-                            stringResource(R.string.help_external_dictionary)
+                            stringResource(Res.string.help_external_dictionary)
                         )
                     },
                     onClick = {
@@ -756,7 +819,7 @@ class PuzzlePageScope(
             if (externalToolsState.hasCrosswordSolver) {
                 DropdownMenuItem(
                     text = {
-                        MenuText(stringResource(R.string.help_crossword_solver))
+                        MenuText(stringResource(Res.string.help_crossword_solver))
                     },
                     onClick = {
                         viewModel.dismissMenu()
@@ -768,7 +831,7 @@ class PuzzlePageScope(
                         text = {
                             MenuText(
                                 stringResource(
-                                    R.string.help_crossword_solver_anagram
+                                    Res.string.help_crossword_solver_anagram
                                 )
                             )
                         },
@@ -783,7 +846,7 @@ class PuzzlePageScope(
             if (externalToolsState.hasChatGPT) {
                 DropdownMenuItem(
                     text = {
-                        MenuText(stringResource(R.string.help_query_chat_gpt))
+                        MenuText(stringResource(Res.string.help_query_chat_gpt))
                     },
                     onClick = {
                         viewModel.requestHelpForCurrentClue()
@@ -794,7 +857,7 @@ class PuzzlePageScope(
             if (externalToolsState.hasDuckDuckGo) {
                 DropdownMenuItem(
                     text = {
-                        MenuText(stringResource(R.string.help_duckduckgo))
+                        MenuText(stringResource(Res.string.help_duckduckgo))
                     },
                     onClick = {
                         viewModel.searchDuckDuckGo()
@@ -805,7 +868,7 @@ class PuzzlePageScope(
             if (externalToolsState.hasFifteenSquared) {
                 DropdownMenuItem(
                     text = {
-                        MenuText(stringResource(R.string.help_fifteen_squared))
+                        MenuText(stringResource(Res.string.help_fifteen_squared))
                     },
                     onClick = {
                         viewModel.searchFifteenSquared()
@@ -819,7 +882,7 @@ class PuzzlePageScope(
     @Composable
     fun MenuShare() {
         MenuSubEntry(
-            text = { MenuText(stringResource(R.string.share)) },
+            text = { MenuText(stringResource(Res.string.share)) },
             onClick = { viewModel.expandMenu(PuzzleSubMenu.SHARE) },
         )
     }
@@ -837,13 +900,13 @@ class PuzzlePageScope(
             onDismissRequest = viewModel::dismissMenu,
         ) {
             MenuDropdownHeading(
-                R.string.share,
+                Res.string.share,
                 onClick = viewModel::closeMenu,
             )
 
             if ((viewModel.getPuzzle()?.percentComplete ?: 0) == 100) {
                 DropdownMenuItem(
-                    text = { MenuText(stringResource(R.string.completed)) },
+                    text = { MenuText(stringResource(Res.string.completed)) },
                     onClick = {
                         viewModel.shareCompletion()
                         viewModel.dismissMenu()
@@ -852,7 +915,7 @@ class PuzzlePageScope(
             }
 
             DropdownMenuItem(
-                text = { MenuText(stringResource(R.string.share_clue)) },
+                text = { MenuText(stringResource(Res.string.share_clue)) },
                 onClick = {
                     viewModel.shareClue(false)
                     viewModel.dismissMenu()
@@ -860,7 +923,7 @@ class PuzzlePageScope(
             )
             DropdownMenuItem(
                 text = {
-                    MenuText(stringResource(R.string.share_clue_response))
+                    MenuText(stringResource(Res.string.share_clue_response))
                 },
                 onClick = {
                     viewModel.shareClue(true)
@@ -869,7 +932,7 @@ class PuzzlePageScope(
             )
             DropdownMenuItem(
                 text = {
-                    MenuText(stringResource(R.string.share_puzzle_full))
+                    MenuText(stringResource(Res.string.share_puzzle_full))
                 },
                 onClick = {
                     viewModel.sharePuzzle(false, false)
@@ -879,7 +942,7 @@ class PuzzlePageScope(
             DropdownMenuItem(
                 text = {
                     MenuText(
-                        stringResource(R.string.share_puzzle_without_extensions)
+                        stringResource(Res.string.share_puzzle_without_extensions)
                     )
                 },
                 onClick = {
@@ -888,7 +951,7 @@ class PuzzlePageScope(
                 },
             )
             DropdownMenuItem(
-                text = { MenuText(stringResource(R.string.share_puzzle_orig)) },
+                text = { MenuText(stringResource(Res.string.share_puzzle_orig)) },
                 onClick = {
                     viewModel.sharePuzzle(true, true)
                     viewModel.dismissMenu()
@@ -897,7 +960,7 @@ class PuzzlePageScope(
             DropdownMenuItem(
                 text = {
                     MenuText(
-                        stringResource(R.string.share_puzzle_open_share_url)
+                        stringResource(Res.string.share_puzzle_open_share_url)
                     )
                 },
                 onClick = {
@@ -918,7 +981,7 @@ class PuzzlePageScope(
         onEditClue : () -> Unit = viewModel::editClue,
     ) {
         DropdownMenuItem(
-            text = { MenuText(stringResource(R.string.edit_clue)) },
+            text = { MenuText(stringResource(Res.string.edit_clue)) },
             onClick = {
                 viewModel.dismissMenu()
                 onEditClue()
@@ -929,7 +992,7 @@ class PuzzlePageScope(
     @Composable
     fun MenuHelp() {
         MenuHelp(
-            openHelp = { pageOpener.openHTMLPage(R.raw.play) },
+            openHelp = { pageOpener.openHTMLPage(HTMLPage.PLAY_HELP) },
             onDismiss = viewModel::dismissMenu,
         )
     }
@@ -945,7 +1008,7 @@ class PuzzlePageScope(
     @Composable
     fun MenuPuzzleInfo() {
         DropdownMenuItem(
-            text = { MenuText(stringResource(R.string.info)) },
+            text = { MenuText(stringResource(Res.string.info)) },
             onClick = {
                 viewModel.showInfoDialog()
                 viewModel.dismissMenu()
@@ -956,7 +1019,7 @@ class PuzzlePageScope(
     @Composable
     fun MenuSupportPuzzleSource() {
         DropdownMenuItem(
-            text = { MenuText(stringResource(R.string.support_puzzle_source)) },
+            text = { MenuText(stringResource(Res.string.support_puzzle_source)) },
             onClick = {
                 actionSupportSource()
                 viewModel.dismissMenu()
@@ -1074,8 +1137,8 @@ fun PuzzlePage(
         when (showDialog) {
             PuzzleDialog.REVEAL_ALL -> {
                 OKCancelDialog(
-                    title = R.string.reveal_puzzle,
-                    summary = R.string.are_you_sure,
+                    title = Res.string.reveal_puzzle,
+                    summary = Res.string.are_you_sure,
                     onCancel = viewModel::clearRevealDialog,
                     onOK = viewModel::confirmRevealPuzzle,
                 )
@@ -1122,8 +1185,8 @@ fun PuzzlePage(
             .collectAsStateWithLifecycle()
         editClueDialogState?.let { editClueDialogState ->
             StringDialog(
-                title = R.string.edit_clue,
-                hint = R.string.clue_hint,
+                title = Res.string.edit_clue,
+                hint = Res.string.clue_hint,
                 value = editClueDialogState.hint,
                 onValueChange = { hint ->
                     viewModel.confirmEditClue(
@@ -1152,19 +1215,19 @@ fun PuzzlePage(
         appNotFoundDialogState?.let { appNotFoundDialogState ->
             TwoButtonDialog(
                 title = stringResource(
-                    R.string.external_app_not_installed,
+                    Res.string.external_app_not_installed,
                     appNotFoundDialogState.appName,
                 ),
                 summary = stringResource(
-                    R.string.external_app_install_msg,
+                    Res.string.external_app_install_msg,
                     appNotFoundDialogState.appName,
                 ),
-                negativeText= stringResource(R.string.website),
+                negativeText= stringResource(Res.string.website),
                 onNegative = {
                     viewModel.clearAppNotFoundDialog()
                     utils.openURI(appNotFoundDialogState.appURL.toUri())
                 },
-                positiveText = stringResource(android.R.string.ok),
+                positiveText = stringResource(Res.string.ok),
                 onPositive = viewModel::clearAppNotFoundDialog,
             )
         }

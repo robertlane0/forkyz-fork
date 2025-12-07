@@ -8,9 +8,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringArrayResource
 
-import app.crossword.yourealwaysbe.forkyz.R
+import org.jetbrains.compose.resources.stringArrayResource
+
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.flag_color_labels
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.flag_color_title
 import app.crossword.yourealwaysbe.forkyz.theme.BoardColorScheme
 import app.crossword.yourealwaysbe.forkyz.util.addAlpha
 import app.crossword.yourealwaysbe.forkyz.util.delAlpha
@@ -35,7 +38,7 @@ fun ChooseFlagColorDialog(
         colorToInt(boardColorScheme.flagColor3),
         colorToInt(boardColorScheme.flagColor4),
     )
-    val labels = stringArrayResource(R.array.flag_color_labels).toList()
+    val labels = stringArrayResource(Res.array.flag_color_labels).toList()
     var selected by remember {
         mutableIntStateOf(
             Math.max(
@@ -46,7 +49,7 @@ fun ChooseFlagColorDialog(
     }
 
     ListDialog(
-        R.string.flag_color_title,
+        Res.string.flag_color_title,
         labels = labels,
         selected = selected,
         colorOf = { index ->

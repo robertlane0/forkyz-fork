@@ -25,14 +25,29 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.integerResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
-import app.crossword.yourealwaysbe.forkyz.R
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.stringResource
+
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.completed
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.completed_in
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.done
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.elapsed_time
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.hinted_boxes
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.introduction
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.notes
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.num_hinted_boxes
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.puzzle_finished_title
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.puzzle_info
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.total_boxes
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.total_clues
 import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 import app.crossword.yourealwaysbe.forkyz.view.TwoButtonDialog
 
@@ -83,10 +98,10 @@ fun PuzzleFinishedDialog(
     onShare : () -> Unit = { },
 ) {
     TwoButtonDialog(
-        title = R.string.puzzle_finished_title,
-        positiveText = R.string.done,
+        title = Res.string.puzzle_finished_title,
+        positiveText = Res.string.done,
         onPositive = onDone,
-        negativeText = R.string.share,
+        negativeText = Res.string.share,
         onNegative = onShare,
         onCancel = onDone,
     ) {
@@ -130,7 +145,7 @@ private fun InfoHeadingData(
         val title by remember { derivedStateOf { state.title } }
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = title ?: stringResource(R.string.puzzle_info),
+            text = title ?: stringResource(Res.string.puzzle_info),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.headlineSmall,
         )
@@ -153,7 +168,7 @@ private fun InfoHeadingData(
         val elapsed by remember { derivedStateOf { state.elapsed } }
         Text(
             text = stringResource(
-                R.string.elapsed_time,
+                Res.string.elapsed_time,
                 TimeUtils.convertMillisecondsToTime(elapsed),
             ),
             style = MaterialTheme.typography.titleMedium,
@@ -178,17 +193,17 @@ fun PuzzleInfo(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val introduction by remember { derivedStateOf { state.introduction } }
     introduction?.let { introduction ->
-        InfoSection(R.string.introduction, introduction)
+        InfoSection(Res.string.introduction, introduction)
     }
     val notes by remember { derivedStateOf { state.notes } }
     notes?.let { notes ->
-        InfoSection(R.string.notes, notes)
+        InfoSection(Res.string.notes, notes)
     }
 }
 
 @Composable
 private fun InfoSection(
-    titleID : Int,
+    titleID : StringResource,
     contentHTML: String,
 ) {
     if (contentHTML.length > 0) {
@@ -201,7 +216,7 @@ private fun InfoSection(
 
 @Composable
 private fun InfoSection(
-    titleID : Int?,
+    titleID : StringResource?,
     content: @Composable () -> Unit,
 ) {
     titleID?.let { titleID ->
@@ -222,32 +237,32 @@ private fun FinishedInfo(
     val finishedState by viewModel.uiState.collectAsStateWithLifecycle()
 
     finishedState?.let { finishedState ->
-        InfoSection(titleID = if (showTitle) R.string.completed else null) {
+        InfoSection(titleID = if (showTitle) Res.string.completed else null) {
             Column(
                 modifier = Modifier.padding(vertical = COMPLETION_TABLE_PADDING),
             ) {
                 CompletionDataRow(
-                    R.string.completed_in,
+                    Res.string.completed_in,
                     TimeUtils.convertMillisecondsToTime(
                         finishedState.completionTime
                     ),
                 )
                 CompletionDataRow(
-                    R.string.total_clues,
+                    Res.string.total_clues,
                     finishedState.numberOfClues.toString(),
                 )
                 CompletionDataRow(
-                    R.string.total_boxes,
+                    Res.string.total_boxes,
                     finishedState.numberOfBoxes.toString(),
                 )
 
                 val cheatedString = stringResource(
-                    R.string.num_hinted_boxes,
+                    Res.string.num_hinted_boxes,
                     finishedState.numberOfCheatedBoxes,
                     finishedState.percentCheated,
                 )
                 CompletionDataRow(
-                    R.string.hinted_boxes,
+                    Res.string.hinted_boxes,
                     cheatedString,
                 )
             }
@@ -260,7 +275,7 @@ private fun FinishedInfo(
 
 @Composable
 private fun CompletionDataRow(
-    title : Int,
+    title : StringResource,
     value : String,
 ) {
     Row(
@@ -294,7 +309,6 @@ private fun PuzzleRating(
         ) {
             RatingBar(
                 modifier = Modifier.padding(top=10.dp),
-                numStars = integerResource(R.integer.max_rating),
                 stepSize = 1.0F,
                 onSet = { rating -> onSet(rating.toInt()) },
                 rating = rating.toFloat(),

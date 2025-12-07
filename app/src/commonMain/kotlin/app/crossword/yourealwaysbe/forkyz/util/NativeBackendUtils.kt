@@ -8,6 +8,9 @@ import java.io.OutputStream
 
 import androidx.room.RoomDatabase
 
+import org.jetbrains.compose.resources.PluralStringResource
+import org.jetbrains.compose.resources.StringResource
+
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.util.Uri
@@ -18,15 +21,16 @@ import app.crossword.yourealwaysbe.forkyz.util.files.MetaCache
  * Collects functions that viewmodels &c. need that depend on context
  */
 interface NativeBackendUtils {
-    suspend fun getString(resourceID : Int) : String
-    suspend fun getString(resourceID : Int, vararg formatArgs: Any) : String
-    suspend fun getQuantityString(
-        resourceID : Int,
-        quantity : Int,
-        vararg formatArgs: Any,
+    suspend fun getString(resourceID : StringResource) : String
+    suspend fun getString(
+        resourceID : StringResource,
+        vararg formatArgs : Any,
     ) : String
-    @Throws(IOException::class)
-    fun getRawResource(rawAssetID : Int) : InputStream
+    suspend fun getQuantityString(
+        resourceID : PluralStringResource,
+        quantity : Int,
+        vararg formatArgs : Any,
+    ) : String
     fun hasNetworkConnection() : Boolean
     fun getApplicationVersionName() : String?
     @Throws(IOException::class)

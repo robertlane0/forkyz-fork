@@ -28,10 +28,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
+import org.jetbrains.compose.resources.stringResource
+
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.jump_to_end
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.logcat
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_logcat
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_logcat
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 import app.crossword.yourealwaysbe.forkyz.util.ShareFileData
 
@@ -52,7 +58,7 @@ fun LogcatPage(
         }
 
         val event by viewModel.shareLogcatEvent.collectAsStateWithLifecycle()
-        val title = stringResource(R.string.share_logcat)
+        val title = stringResource(Res.string.share_logcat)
         LaunchedEffect(event) {
             event?.let { event ->
                 onShareFile(ShareFileData(title, event.uri, event.mimeType))
@@ -70,7 +76,7 @@ fun LogcatPage(
         Scaffold(
             topBar = {
                 themeHelper.ForkyzTopAppBar(
-                    title = { Text(stringResource(R.string.logcat)) },
+                    title = { Text(stringResource(Res.string.logcat)) },
                     onBack = onBack,
                     scrollBehavior = scrollBehavior,
                     actions = {
@@ -78,7 +84,7 @@ fun LogcatPage(
                             Icon(
                                 Icons.Filled.Share,
                                 stringResource(
-                                    R.string.share_logcat
+                                    Res.string.share_logcat
                                 ),
                             )
                         }
@@ -102,7 +108,7 @@ fun LogcatPage(
                     ) {
                         Icon(
                             Icons.Default.KeyboardArrowDown,
-                            stringResource(R.string.jump_to_end),
+                            stringResource(Res.string.jump_to_end),
                         )
                     }
                 }

@@ -8,6 +8,17 @@ import kotlinx.coroutines.launch
 
 import androidx.lifecycle.viewModelScope
 
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_clues
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_delete
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_down
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_jump_random
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_left
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_next
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_previous
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_right
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_toggle
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_up
 import app.crossword.yourealwaysbe.forkyz.settings.FitToScreenMode
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.GridRatio
@@ -387,43 +398,43 @@ class PlayPageViewModel(
 
         viewModelScope.launch {
             registerVoiceCommand(VoiceCommand(
-                utils.getString(R.string.command_delete),
+                utils.getString(Res.string.command_delete),
                 { deleteLetter() },
             ))
             registerVoiceCommand(VoiceCommand(
-                utils.getString(R.string.command_toggle),
+                utils.getString(Res.string.command_toggle),
                 { toggleSelection() },
             ))
             registerVoiceCommand(VoiceCommand(
-                utils.getString(R.string.command_next),
+                utils.getString(Res.string.command_next),
                 { nextClue() }
             ))
             registerVoiceCommand(VoiceCommand(
-                utils.getString(R.string.command_previous),
+                utils.getString(Res.string.command_previous),
                 { prevClue() },
             ))
             registerVoiceCommand(VoiceCommand(
-                utils.getString(R.string.command_left),
+                utils.getString(Res.string.command_left),
                 { moveLeft() },
             ))
             registerVoiceCommand(VoiceCommand(
-                utils.getString(R.string.command_right),
+                utils.getString(Res.string.command_right),
                 { moveRight() },
             ))
             registerVoiceCommand(VoiceCommand(
-                utils.getString(R.string.command_up),
+                utils.getString(Res.string.command_up),
                 { moveUp() },
             ))
             registerVoiceCommand(VoiceCommand(
-                utils.getString(R.string.command_down),
+                utils.getString(Res.string.command_down),
                 { moveDown() },
             ))
             registerVoiceCommand(VoiceCommand(
-                utils.getString(R.string.command_clues),
+                utils.getString(Res.string.command_clues),
                 { launchClueList() },
             ))
             registerVoiceCommand(VoiceCommand(
-                utils.getString(R.string.command_jump_random),
+                utils.getString(Res.string.command_jump_random),
                 { pickRandomUnfilledClue() }
             ))
         }

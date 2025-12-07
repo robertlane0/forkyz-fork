@@ -19,6 +19,9 @@ class AndroidNotifications(
     private val notificationManager
         = NotificationManagerCompat.from(applicationContext)
 
+    override val downloadIcon = android.R.drawable.stat_sys_download
+    override val downloadDoneIcon = android.R.drawable.stat_sys_download_done
+
     /**
      * Post a notification to channel with ID
      *

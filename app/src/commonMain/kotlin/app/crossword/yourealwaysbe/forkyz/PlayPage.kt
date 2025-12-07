@@ -42,8 +42,6 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.TextOverflow
@@ -56,6 +54,25 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 import com.squareup.seismic.ShakeDetector
 
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
+
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.app_name
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clues
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_next_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_prev_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.introduction
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.next_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.open_clue_list
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.open_clue_notes
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.open_clue_notes
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.overflow
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.prev_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.select_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.select_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.toggle_clue_tabs
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.toggle_clue_tabs
 import app.crossword.yourealwaysbe.forkyz.menu.BaseMenuModifier
 import app.crossword.yourealwaysbe.forkyz.menu.MenuText
 import app.crossword.yourealwaysbe.forkyz.settings.FitToScreenMode
@@ -155,7 +172,7 @@ fun PlayPage(
         @Composable
         fun MenuClues() {
             DropdownMenuItem(
-                text = { MenuText(stringResource(R.string.clues)) },
+                text = { MenuText(stringResource(Res.string.clues)) },
                 onClick = {
                     viewModel.launchClueList()
                     viewModel.dismissMenu()
@@ -179,7 +196,7 @@ fun PlayPage(
             IconButton(onClick = { viewModel.expandMenu(PuzzleSubMenu.MAIN) }) {
                 Icon(
                     Icons.Default.MoreVert,
-                    contentDescription = stringResource(R.string.overflow),
+                    contentDescription = stringResource(Res.string.overflow),
                 )
             }
             DropdownMenu(
@@ -224,9 +241,9 @@ fun PlayPage(
                 modifier = modifier,
                 clueText = clueText,
                 onClick = ::toggleShowClueTabs,
-                onClickDescription = stringResource(R.string.toggle_clue_tabs),
+                onClickDescription = stringResource(Res.string.toggle_clue_tabs),
                 onLongClick = viewModel::launchClueList,
-                onLongClickDescription = stringResource(R.string.open_clue_list),
+                onLongClickDescription = stringResource(Res.string.open_clue_list),
             )
         }
 
@@ -260,7 +277,7 @@ fun PlayPage(
                 title = {
                     if (isClueBelowGrid) {
                         val title = puzzleTitle
-                            ?: stringResource(R.string.app_name)
+                            ?: stringResource(Res.string.app_name)
                         Text(
                             text = AnnotatedString.fromHtml(title),
                             minLines = 1,
@@ -285,7 +302,7 @@ fun PlayPage(
 
             firstPlayMessage?.let { firstPlayMessage ->
                 OKDialog(
-                    title = R.string.introduction,
+                    title = Res.string.introduction,
                     summary = firstPlayMessage,
                     onClose = viewModel::clearFirstPlayMessage,
                 )
@@ -307,15 +324,15 @@ fun PlayPage(
             ) {
                 IconButton(onClick = viewModel::prevClue) {
                     Icon(
-                        painter = painterResource(R.drawable.ic_prev_clue),
-                        contentDescription = stringResource(R.string.prev_clue),
+                        painter = painterResource(Res.drawable.ic_prev_clue),
+                        contentDescription = stringResource(Res.string.prev_clue),
                     )
                 }
                 ClueText(Modifier.weight(1.0F))
                 IconButton(onClick = viewModel::nextClue) {
                     Icon(
-                        painter = painterResource(R.drawable.ic_next_clue),
-                        contentDescription = stringResource(R.string.next_clue),
+                        painter = painterResource(Res.drawable.ic_next_clue),
+                        contentDescription = stringResource(Res.string.next_clue),
                     )
                 }
             }
@@ -341,7 +358,7 @@ fun PlayPage(
                 = if (isAcrostic) ::toggleShowClueTabs
                 else { { } }
             val onBarLongClickDescription
-                = if (isAcrostic) stringResource(R.string.toggle_clue_tabs)
+                = if (isAcrostic) stringResource(Res.string.toggle_clue_tabs)
                 else ""
             val boardColorScheme = themeHelper.getBoardColorScheme()
 
@@ -352,12 +369,12 @@ fun PlayPage(
                 isPortrait = utils.isPortrait,
                 showAllWords = showAllWords,
                 onClueClick = viewModel::clickClue,
-                onClueClickDescription = stringResource(R.string.select_clue),
+                onClueClickDescription = stringResource(Res.string.select_clue),
                 onClueLongClick = viewModel::launchClueNotes,
                 onClueLongClickDescription
-                    = stringResource(R.string.open_clue_notes),
+                    = stringResource(Res.string.open_clue_notes),
                 onClueBoardClick = viewModel::clickClue,
-                onClueBoardClickDescription = stringResource(R.string.select_clue),
+                onClueBoardClickDescription = stringResource(Res.string.select_clue),
                 onBarLongClick = onBarLongClick,
                 onBarLongClickDescription = onBarLongClickDescription,
                 maxWordScale = ACROSTIC_CLUE_TABS_WORD_SCALE,
@@ -391,7 +408,7 @@ fun PlayPage(
                 },
                 onLongPress = viewModel::longClickBoard,
                 onLongPressDescription
-                    = stringResource(R.string.open_clue_notes),
+                    = stringResource(Res.string.open_clue_notes),
             )
 
             LaunchedEffect(Unit) {

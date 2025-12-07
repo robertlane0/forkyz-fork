@@ -10,7 +10,8 @@ import java.time.LocalDate
 
 import android.util.Log
 
-import app.crossword.yourealwaysbe.forkyz.R
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.import_fallback_source
 import app.crossword.yourealwaysbe.forkyz.net.GenericStreamScraper
 import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.files.DirHandle
@@ -139,7 +140,7 @@ private suspend fun ensurePuzSource(
     )
 
     if (source == null || source.isEmpty())
-        source = utils.getString(R.string.import_fallback_source)
+        source = utils.getString(Res.string.import_fallback_source)
 
     puz.setSource(source)
 }

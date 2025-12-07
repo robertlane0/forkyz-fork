@@ -21,6 +21,415 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.material.color.DynamicColors
 
+import org.jetbrains.compose.resources.StringResource
+
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.aard2
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.about_forkyz
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.about_scrapes
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.about_voice_commands
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.announce_box_always
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.announce_box_always_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.announce_clue_always
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.announce_clue_always_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.announce_clue_button
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.announce_clue_button_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.announce_clue_equals
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.announce_clue_equals_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.archive
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.auto_downloaders
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.auto_downloaders_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.automatic_download
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.automatic_download_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_0
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_1
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_10
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_11
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_12
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_13
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_14
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_15
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_16
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_17
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_18
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_19
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_2
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_20
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_21
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_22
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_23
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_3
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_4
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_5
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_6
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_7
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_8
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_9
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_constraints_config
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_days
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_days_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_days_time
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_days_time_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_fri
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_hourly
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_hourly_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_mon
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_opts
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_opts_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_sat
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_sun
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_thu
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_time_config
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_tue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_wed
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.browse_always_show_rating
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.browse_always_show_rating_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.browse_indicate_if_solution
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.browse_indicate_if_solution_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.browse_show_percentage_correct
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.browse_show_percentage_correct_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.browser_settings
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.browser_settings_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.chat_gpt_api_key
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.chat_gpt_api_key
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.chat_gpt_api_key_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.chat_gpt_api_key_message
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.cleanup_age_never
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.cleanup_age_never
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.cleanup_age_one_week
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.cleanup_age_one_week
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.cleanup_age_thirty_days
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.cleanup_age_thirty_days
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.cleanup_age_two_days
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.cleanup_age_two_days
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.cleanup_archives
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.cleanup_archives_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.cleanup_unfinished
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.cleanup_unfinished_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_below_grid
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_below_grid_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_highlight
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_highlight_background
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_highlight_both
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_highlight_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_highlight_none
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_highlight_radio_button
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_list_clue_line_abbreviated
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_list_clue_line_full
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_list_clue_line_none
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_list_name_in_clue_line
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_list_name_in_clue_line_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_tabs_double
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_tabs_double_always
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_tabs_double_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_tabs_double_landscape
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_tabs_double_never
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_tabs_double_wide
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.crossword_solver_enabled
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.crossword_solver_enabled_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.cru_puzzle_workshop
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.cru_puzzle_workshop_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.custom
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.custom_daily
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.custom_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.custom_title
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.custom_title_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.custom_title_hint
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.custom_url
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.custom_url_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.custom_url_hint
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.custom_url_missing
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.cycle_unfilled
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.cycle_unfilled_always
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.cycle_unfilled_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.cycle_unfilled_forwards
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.cycle_unfilled_never
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.daily_crosswords
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.daily_crosswords_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.de_standaard
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.de_standaard_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.de_telegraaf
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.de_telegraaf_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.delete
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.delete_crossing_delete
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.delete_crossing_preserve_filled_cells
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.delete_crossing_preserve_filled_words
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.delete_on_cleanup
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.delete_on_cleanup_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.dictionary_none
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.disable_ratings
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.disable_ratings_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.disable_swipe
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.disable_swipe_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.display_scratch
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.display_scratch_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.display_separators
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.display_separators_always
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.display_separators_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.display_separators_never
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.display_separators_selected
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.display_settings
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.display_settings_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.dont_confirm_browse_delete
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.dont_confirm_browse_delete_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.dont_confirm_cleanup
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.dont_confirm_cleanup_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.dont_delete_crossing
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.dont_delete_crossing_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.dont_snap_board_to_borders
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.dont_snap_board_to_borders_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.double_tap_zoom
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.double_tap_zoom_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.download_charging
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.download_charging_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.download_roaming
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.download_roaming_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.download_settings
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.download_settings_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.download_timeout
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.download_timeout_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.download_wifi_only
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.download_wifi_only_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.duckduckgo
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.duckduckgo_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.dynamic_theme
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.elpais_experto
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.elpais_experto_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.enter_changes_direction
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.enter_changes_direction_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.expandable_clue_line
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.expandable_clue_line_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.external_dictionary
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.external_dictionary_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.external_storage_saf
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.external_storage_saf_current_uri
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.external_storage_saf_none_selected
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.external_tools_settings
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.external_tools_settings_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.fifteen_seconds
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.fifteen_squared
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.fifteen_squared_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.filter_settings_title
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.fit_to_screen_mode
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.fit_to_screen_mode_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.fit_to_screen_mode_locked
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.fit_to_screen_mode_never
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.fit_to_screen_mode_start
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.forty_five_seconds
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.free_dictionary
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.full_screen
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.full_screen_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.grid_ratio_fifty_pcnt
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.grid_ratio_fifty_pcnt
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.grid_ratio_forty_pcnt
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.grid_ratio_forty_pcnt
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.grid_ratio_landscape
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.grid_ratio_landscape_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.grid_ratio_one_to_one
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.grid_ratio_one_to_one
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.grid_ratio_portrait
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.grid_ratio_portrait_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.grid_ratio_puzzle
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.grid_ratio_puzzle
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.grid_ratio_sixty_pcnt
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.grid_ratio_sixty_pcnt
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.grid_ratio_thirty_pcnt
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.grid_ratio_thirty_pcnt
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.guardian_daily
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.guardian_quick
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.guardian_quick_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.guardian_quiptic
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.hamburger_abendblatt_daily
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.hamburger_abendblatt_daily_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.independent_daily
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.indicate_show_errors
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.indicate_show_errors_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.infer_separators
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.infer_separators_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.interaction_settings
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.interaction_settings_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.internal_storage
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.irish_news_cryptic
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.jonesin_crosswords
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.joseph_crossword
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keglars_cryptics
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keglars_cryptics_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_always_show
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_azerty
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_built_in
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_colemak
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_compact
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_compact_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_dvorak
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_force_caps
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_force_caps_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_haptic
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_haptic_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_hide_button
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_hide_button_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_hide_manual
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_layout
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_layout_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_native
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_never_show
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_qwerty
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_qwertz
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_repeat_delay
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_repeat_delay_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_repeat_delay_hint
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_repeat_interval
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_repeat_interval_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_repeat_interval_hint
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_settings
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_settings_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_show_sparingly_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_showhide
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_showhide_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_use_native
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_use_native_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.la_times
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.la_times_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.large_sized
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.le_parisien_daily_f1
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.le_parisien_daily_f1_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.le_parisien_daily_f2
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.le_parisien_daily_f2_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.le_parisien_daily_f3
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.le_parisien_daily_f3_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.le_parisien_daily_f4
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.le_parisien_daily_f4_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.legacy_like_theme
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.legacy_like_theme
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.license
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.logcat
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.metro_cryptic
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.metro_quick
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.movement_strategy_next_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.movement_strategy_next_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.movement_strategy_next_parallel_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.movement_strategy_next_word
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.movement_strategy_stop_end
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.movement_strategy_stop_end
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.movement_style
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.movement_style_clue_list
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.movement_style_clue_list_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.movement_style_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.new_york_times_syndicated
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.newsday
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.no_hint_highlighting
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.no_hint_highlighting_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.no_puzzle_download_notifs
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.no_puzzle_download_notifs_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.no_summary_download_notifs
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.no_summary_download_notifs_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.nrc_in_het_midden
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.nrc_in_het_midden_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.nrc_scrypto
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.nrc_scrypto_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.orientation_lock
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.orientation_lock_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.orientation_lock_landscape
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.orientation_lock_portrait
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.orientation_lock_unlocked
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.play_letter_undo
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.play_letter_undo_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.predict_anagram_chars
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.predict_anagram_chars_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.preferences_export
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.preferences_export_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.preferences_export_failed
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.preferences_export_import
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.preferences_export_import_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.preferences_exported
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.preferences_import
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.preferences_import_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.preferences_import_failed
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.preferences_imported
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.premier_crossword
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.preserve_correct
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.preserve_correct_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.private_eye
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.private_eye_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.przekroj
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.przekroj_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.puzzles_export
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.puzzles_export_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.quick_dic
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.random_clue_on_shake
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.random_clue_on_shake_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.regular_sized
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.release_notes
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.scraper_sources
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.scraper_sources_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.scroll_to_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.scroll_to_clue_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.select_sources
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.select_sources_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.settings_label
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.sheffer_crossword
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_length
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_length_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_timer
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_timer_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.sixty_seconds
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.skip_filled
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.skip_filled_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.snap_current
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.snap_current_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.space_change_dir
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.space_change_dir_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.standard_theme
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.standard_theme
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.storage_location
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.storage_location_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.sud_ouest_mots_croises
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.sud_ouest_mots_fleches
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.swipe_action
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.swipe_action_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.tf1_mots_croises
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.tf1_mots_fleches
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.theme_preference
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.theme_preference_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.thirty_seconds
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.toggle_all_daily_sources
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.toggle_all_daily_sources_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.toggle_all_scrapers
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.toggle_all_scrapers_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.toggle_all_weekly_sources
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.toggle_all_weekly_sources_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.toggle_before_move
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.toggle_before_move_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.universal_crossword
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.updates_daily
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.updates_daily
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.updates_daily
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.updates_daily
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.updates_daily
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.updates_mon_fri
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.updates_mon_fri
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.updates_mon_sat
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.updates_mon_sat
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.updates_mon_sat
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.updates_mon_sat
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.updates_mon_sat
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.updates_mon_sat
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.updates_sundays
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.updates_sundays
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.updates_sundays
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.updates_thursdays
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.usa_today
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.vingminutes
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.vingminutes_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.voice_settings
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.voice_settings_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.voice_with_button
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.voice_with_button_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.voice_with_volume
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.voice_with_volume_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.wall_street_journal
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.washington_post_sunday
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.weekly_crosswords
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.weekly_crosswords_desc
 import app.crossword.yourealwaysbe.forkyz.net.DownloadersProvider
 import app.crossword.yourealwaysbe.forkyz.settings.BrowseSwipeAction
 import app.crossword.yourealwaysbe.forkyz.settings.ClueHighlight
@@ -45,22 +454,22 @@ import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.mediate
 import app.crossword.yourealwaysbe.forkyz.util.stateInSubscribed
 
-enum class SettingsPage(val title : Int) {
-    ROOT(R.string.settings_label),
-    PUZZLE_SOURCES(R.string.select_sources),
-    PUZZLE_SOURCES_DAILY(R.string.daily_crosswords),
-    PUZZLE_SOURCES_WEEKLY(R.string.weekly_crosswords),
-    PUZZLE_SOURCES_SCRAPERS(R.string.scraper_sources),
-    DOWNLOAD(R.string.download_settings),
-    DOWNLOAD_BACKGROUND(R.string.background_download_opts),
-    BROWSER(R.string.browser_settings),
-    DISPLAY(R.string.display_settings),
-    INTERACTION(R.string.interaction_settings),
-    KEYBOARD(R.string.keyboard_settings),
-    VOICE_ACCESSIBILITY(R.string.voice_settings),
-    EXTERNAL_TOOLS(R.string.external_tools_settings),
-    EXPORT_IMPORT(R.string.preferences_export_import),
-    SEARCH(R.string.filter_settings_title),
+enum class SettingsPage(val title : StringResource) {
+    ROOT(Res.string.settings_label),
+    PUZZLE_SOURCES(Res.string.select_sources),
+    PUZZLE_SOURCES_DAILY(Res.string.daily_crosswords),
+    PUZZLE_SOURCES_WEEKLY(Res.string.weekly_crosswords),
+    PUZZLE_SOURCES_SCRAPERS(Res.string.scraper_sources),
+    DOWNLOAD(Res.string.download_settings),
+    DOWNLOAD_BACKGROUND(Res.string.background_download_opts),
+    BROWSER(Res.string.browser_settings),
+    DISPLAY(Res.string.display_settings),
+    INTERACTION(Res.string.interaction_settings),
+    KEYBOARD(Res.string.keyboard_settings),
+    VOICE_ACCESSIBILITY(Res.string.voice_settings),
+    EXTERNAL_TOOLS(Res.string.external_tools_settings),
+    EXPORT_IMPORT(Res.string.preferences_export_import),
+    SEARCH(Res.string.filter_settings_title),
 }
 
 /**
@@ -83,8 +492,8 @@ abstract class SettingsItem(
  */
 abstract class SettingsNamedItem(
     page : SettingsPage,
-    val title : Int,
-    val summary : Int?,
+    val title : StringResource,
+    val summary : StringResource?,
     val errorMsg : StateFlow<String?>? = null
 ) : SettingsItem(page)
 
@@ -94,21 +503,21 @@ abstract class SettingsNamedItem(
  */
 open class SettingsInputItem(
     page : SettingsPage,
-    title : Int,
-    summary : Int?,
+    title : StringResource,
+    summary : StringResource?,
     errorMsg : StateFlow<String?>? = null
 ) : SettingsNamedItem(page, title, summary, errorMsg)
 
 class SettingsSubPage(
     page : SettingsPage,
-    summary : Int?,
+    summary : StringResource?,
     val subpage : SettingsPage,
 ) : SettingsNamedItem(page, subpage.title, summary)
 
 class SettingsBoolean(
     page : SettingsPage,
-    title : Int,
-    summary : Int?,
+    title : StringResource,
+    summary : StringResource?,
     val value : StateFlow<Boolean>,
     val setValue : (Boolean) -> Unit,
 ) : SettingsNamedItem(page, title, summary)
@@ -119,8 +528,8 @@ enum class TriState {
 
 class SettingsTriState(
     page : SettingsPage,
-    title : Int,
-    summary : Int?,
+    title : StringResource,
+    summary : StringResource?,
     val value : StateFlow<TriState>,
     val setValue : (TriState) -> Unit,
 ) : SettingsNamedItem(page, title, summary) {
@@ -128,8 +537,8 @@ class SettingsTriState(
         fun build(
             scope : CoroutineScope,
             page : SettingsPage,
-            title : Int,
-            summary : Int?,
+            title : StringResource,
+            summary : StringResource?,
             booleans : List<SettingsBoolean>,
         ) : SettingsTriState {
             return SettingsTriState(
@@ -165,18 +574,18 @@ class SettingsTriState(
  * One must be non-null
  */
 class SettingsListEntry<T> private constructor(
-    val labelId : Int?,
+    val labelId : StringResource?,
     val labelString : String?,
     val value : T,
 ) {
-    constructor(label : Int, value : T) : this(label, null, value)
+    constructor(label : StringResource, value : T) : this(label, null, value)
     constructor(s : String, value : T) : this(null, s, value)
 }
 
 open class SettingsDynamicList<T>(
     page : SettingsPage,
-    title : Int,
-    summary : Int?,
+    title : StringResource,
+    summary : StringResource?,
     val entries : StateFlow<List<SettingsListEntry<T>>>,
     val value : StateFlow<T>,
     private val setValue : (T) -> Unit,
@@ -191,8 +600,8 @@ open class SettingsDynamicList<T>(
 
 class SettingsList<T>(
     page : SettingsPage,
-    title : Int,
-    summary : Int?,
+    title : StringResource,
+    summary : StringResource?,
     entries : List<SettingsListEntry<T>>,
     value : StateFlow<T>,
     setValue : (T) -> Unit,
@@ -207,8 +616,8 @@ class SettingsList<T>(
 
 open class SettingsDynamicMultiList<T>(
     page : SettingsPage,
-    title : Int,
-    summary : Int?,
+    title : StringResource,
+    summary : StringResource?,
     val entries : StateFlow<List<SettingsListEntry<T>>>,
     val value : StateFlow<Set<T>>,
     private val setValue : (Set<T>) -> Unit,
@@ -227,8 +636,8 @@ open class SettingsDynamicMultiList<T>(
 
 open class SettingsMultiList<T>(
     page : SettingsPage,
-    title : Int,
-    summary : Int?,
+    title : StringResource,
+    summary : StringResource?,
     entries : List<SettingsListEntry<T>>,
     value : StateFlow<Set<T>>,
     val setValue : (Set<T>) -> Unit,
@@ -246,20 +655,20 @@ open class SettingsMultiList<T>(
  */
 class SettingsString(
     page : SettingsPage,
-    title : Int,
-    summary : Int?,
-    val hint : Int?,
+    title : StringResource,
+    summary : StringResource?,
+    val hint : StringResource?,
     val value : StateFlow<String>,
     val setValue : (String) -> Unit,
     errorMsg : StateFlow<String?>? = null,
-    val dialogMsg : Int? = null,
+    val dialogMsg : StringResource? = null,
 ) : SettingsInputItem(page, title, summary, errorMsg)
 
 class SettingsInteger(
     page : SettingsPage,
-    title : Int,
-    summary : Int?,
-    val hint : Int?,
+    title : StringResource,
+    summary : StringResource?,
+    val hint : StringResource?,
     val value : StateFlow<Int>,
     val setValue : (Int) -> Unit,
     errorMsg : StateFlow<String?>? = null,
@@ -267,21 +676,21 @@ class SettingsInteger(
 
 class SettingsHeading(
     page : SettingsPage,
-    title : Int,
-    summary : Int? = null,
+    title : StringResource,
+    summary : StringResource? = null,
 ) : SettingsNamedItem(page, title, summary)
 
 class SettingsHTMLPage(
     page : SettingsPage,
-    title : Int,
-    summary : Int?,
-    val rawAssetID : Int,
+    title : StringResource,
+    summary : StringResource?,
+    val htmlPage : HTMLPage,
 ) : SettingsNamedItem(page, title, summary) {
     constructor(
         page : SettingsPage,
-        title : Int,
-        rawAssetID : Int,
-    ) : this(page, title, null, rawAssetID)
+        title : StringResource,
+        htmlPage : HTMLPage,
+    ) : this(page, title, null, htmlPage)
 }
 
 class SettingsDivider(
@@ -290,8 +699,8 @@ class SettingsDivider(
 
 class SettingsAction(
     page : SettingsPage,
-    title : Int,
-    summary : Int?,
+    title : StringResource,
+    summary : StringResource?,
     val onClick : () -> Unit,
 ) : SettingsNamedItem(page, title, summary)
 
@@ -302,7 +711,7 @@ class SettingsAction(
  */
 class SettingsLogcat(
     page : SettingsPage,
-    title : Int,
+    title : StringResource,
 ) : SettingsNamedItem(page, title, null)
 
 enum class RequestedURI {
@@ -345,18 +754,18 @@ class SettingsPageViewModel(
     private val availableThemeSettings =
         if (DynamicColors.isDynamicColorAvailable()) {
             listOf(
-                SettingsListEntry(R.string.standard_theme, Theme.T_STANDARD),
-                SettingsListEntry(R.string.dynamic_theme, Theme.T_DYNAMIC),
+                SettingsListEntry(Res.string.standard_theme, Theme.T_STANDARD),
+                SettingsListEntry(Res.string.dynamic_theme, Theme.T_DYNAMIC),
                 SettingsListEntry(
-                    R.string.legacy_like_theme,
+                    Res.string.legacy_like_theme,
                     Theme.T_LEGACY_LIKE,
                 ),
             )
         } else {
             listOf(
-                SettingsListEntry(R.string.standard_theme, Theme.T_STANDARD),
+                SettingsListEntry(Res.string.standard_theme, Theme.T_STANDARD),
                 SettingsListEntry(
-                    R.string.legacy_like_theme,
+                    Res.string.legacy_like_theme,
                     Theme.T_LEGACY_LIKE,
                 ),
             )
@@ -368,20 +777,20 @@ class SettingsPageViewModel(
                 val safRootURI = if (fhSettings.safRootURI.length > 0)
                     fhSettings.safRootURI
                 else
-                    utils.getString(R.string.external_storage_saf_none_selected)
+                    utils.getString(Res.string.external_storage_saf_none_selected)
 
                 val label = (
-                    utils.getString(R.string.external_storage_saf)
+                    utils.getString(Res.string.external_storage_saf)
                     + " "
                     + utils.getString(
-                        R.string.external_storage_saf_current_uri,
+                        Res.string.external_storage_saf_current_uri,
                         safRootURI
                     )
                 )
 
                 listOf(
                     SettingsListEntry(
-                        R.string.internal_storage,
+                        Res.string.internal_storage,
                         StorageLocation.SL_INTERNAL,
                     ),
                     SettingsListEntry(label, StorageLocation.SL_EXTERNAL_SAF),
@@ -406,7 +815,7 @@ class SettingsPageViewModel(
         ) { enabled, url ->
             if (enabled) {
                 if (url.trim().isEmpty()) {
-                    utils.getString(R.string.custom_url_missing)
+                    utils.getString(Res.string.custom_url_missing)
                 } else {
                     try {
                         DateTimeFormatter.ofPattern(url)
@@ -423,183 +832,183 @@ class SettingsPageViewModel(
     private val downloadersTogglesDaily = listOf(
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
-            R.string.de_standaard,
-            R.string.de_standaard_desc,
+            Res.string.de_standaard,
+            Res.string.de_standaard_desc,
             settings.liveDownloadDeStandaard.stateInHere(),
             settings::setDownloadDeStandaard,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
-            R.string.elpais_experto,
-            R.string.elpais_experto_desc,
+            Res.string.elpais_experto,
+            Res.string.elpais_experto_desc,
             settings.liveDownloadElPaisExperto.stateInHere(),
             settings::setDownloadElPaisExperto,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
-            R.string.guardian_daily,
-            R.string.updates_mon_fri,
+            Res.string.guardian_daily,
+            Res.string.updates_mon_fri,
             settings.liveDownloadGuardianDailyCryptic.stateInHere(),
             settings::setDownloadGuardianDailyCryptic,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
-            R.string.hamburger_abendblatt_daily,
-            R.string.hamburger_abendblatt_daily_desc,
+            Res.string.hamburger_abendblatt_daily,
+            Res.string.hamburger_abendblatt_daily_desc,
             settings.liveDownloadHamAbend.stateInHere(),
             settings::setDownloadHamAbend,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
-            R.string.independent_daily,
+            Res.string.independent_daily,
             null,
             settings.liveDownloadIndependentDailyCryptic.stateInHere(),
             settings::setDownloadIndependentDailyCryptic,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
-            R.string.irish_news_cryptic,
-            R.string.updates_mon_fri,
+            Res.string.irish_news_cryptic,
+            Res.string.updates_mon_fri,
             settings.liveDownloadIrishNewsCryptic.stateInHere(),
             settings::setDownloadIrishNewsCryptic,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
-            R.string.joseph_crossword,
-            R.string.updates_mon_sat,
+            Res.string.joseph_crossword,
+            Res.string.updates_mon_sat,
             settings.liveDownloadJoseph.stateInHere(),
             settings::setDownloadJoseph,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
-            R.string.vingminutes,
-            R.string.vingminutes_desc,
+            Res.string.vingminutes,
+            Res.string.vingminutes_desc,
             settings.liveDownload20Minutes.stateInHere(),
             settings::setDownload20Minutes,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
-            R.string.la_times,
-            R.string.la_times_desc,
+            Res.string.la_times,
+            Res.string.la_times_desc,
             settings.liveDownloadLATimes.stateInHere(),
             settings::setDownloadLATimes,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
-            R.string.le_parisien_daily_f1,
-            R.string.le_parisien_daily_f1_desc,
+            Res.string.le_parisien_daily_f1,
+            Res.string.le_parisien_daily_f1_desc,
             settings.liveDownloadLeParisienF1.stateInHere(),
             settings::setDownloadLeParisienF1,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
-            R.string.le_parisien_daily_f2,
-            R.string.le_parisien_daily_f2_desc,
+            Res.string.le_parisien_daily_f2,
+            Res.string.le_parisien_daily_f2_desc,
             settings.liveDownloadLeParisienF2.stateInHere(),
             settings::setDownloadLeParisienF2,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
-            R.string.le_parisien_daily_f3,
-            R.string.le_parisien_daily_f3_desc,
+            Res.string.le_parisien_daily_f3,
+            Res.string.le_parisien_daily_f3_desc,
             settings.liveDownloadLeParisienF3.stateInHere(),
             settings::setDownloadLeParisienF3,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
-            R.string.le_parisien_daily_f4,
-            R.string.le_parisien_daily_f4_desc,
+            Res.string.le_parisien_daily_f4,
+            Res.string.le_parisien_daily_f4_desc,
             settings.liveDownloadLeParisienF4.stateInHere(),
             settings::setDownloadLeParisienF4,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
-            R.string.metro_cryptic,
-            R.string.updates_mon_sat,
+            Res.string.metro_cryptic,
+            Res.string.updates_mon_sat,
             settings.liveDownloadMetroCryptic.stateInHere(),
             settings::setDownloadMetroCryptic,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
-            R.string.metro_quick,
-            R.string.updates_mon_sat,
+            Res.string.metro_quick,
+            Res.string.updates_mon_sat,
             settings.liveDownloadMetroQuick.stateInHere(),
             settings::setDownloadMetroQuick,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
-            R.string.newsday,
+            Res.string.newsday,
             null,
             settings.liveDownloadNewsday.stateInHere(),
             settings::setDownloadNewsday,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
-            R.string.new_york_times_syndicated,
+            Res.string.new_york_times_syndicated,
             null,
             settings.liveDownloadNewYorkTimesSyndicated.stateInHere(),
             settings::setDownloadNewYorkTimesSyndicated,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
-            R.string.nrc_in_het_midden,
-            R.string.nrc_in_het_midden_desc,
+            Res.string.nrc_in_het_midden,
+            Res.string.nrc_in_het_midden_desc,
             settings.liveDownloadNRCInHetMidden.stateInHere(),
             settings::setDownloadNRCInHetMidden,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
-            R.string.sheffer_crossword,
-            R.string.updates_mon_sat,
+            Res.string.sheffer_crossword,
+            Res.string.updates_mon_sat,
             settings.liveDownloadSheffer.stateInHere(),
             settings::setDownloadSheffer,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
-            R.string.sud_ouest_mots_croises,
-            R.string.updates_daily,
+            Res.string.sud_ouest_mots_croises,
+            Res.string.updates_daily,
             settings.liveDownloadSudOuestMotsCroises.stateInHere(),
             settings::setDownloadSudOuestMotsCroises,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
-            R.string.sud_ouest_mots_fleches,
-            R.string.updates_daily,
+            Res.string.sud_ouest_mots_fleches,
+            Res.string.updates_daily,
             settings.liveDownloadSudOuestMotsFleches.stateInHere(),
             settings::setDownloadSudOuestMotsFleches,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
-            R.string.tf1_mots_croises,
-            R.string.updates_daily,
+            Res.string.tf1_mots_croises,
+            Res.string.updates_daily,
             settings.liveDownloadTF1MotsCroises.stateInHere(),
             settings::setDownloadTF1MotsCroises,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
-            R.string.tf1_mots_fleches,
-            R.string.updates_daily,
+            Res.string.tf1_mots_fleches,
+            Res.string.updates_daily,
             settings.liveDownloadTF1MotsFleches.stateInHere(),
             settings::setDownloadTF1MotsFleches,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
-            R.string.universal_crossword,
-            R.string.updates_mon_sat,
+            Res.string.universal_crossword,
+            Res.string.updates_mon_sat,
             settings.liveDownloadUniversal.stateInHere(),
             settings::setDownloadUniversal,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
-            R.string.usa_today,
-            R.string.updates_daily,
+            Res.string.usa_today,
+            Res.string.updates_daily,
             settings.liveDownloadUSAToday.stateInHere(),
             settings::setDownloadUSAToday,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
-            R.string.wall_street_journal,
-            R.string.updates_mon_sat,
+            Res.string.wall_street_journal,
+            Res.string.updates_mon_sat,
             settings.liveDownloadWsj.stateInHere(),
             settings::setDownloadWsj,
         ),
@@ -608,8 +1017,8 @@ class SettingsPageViewModel(
     val downloadersTogglesCustomDaily = listOf(
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,
-            R.string.custom,
-            R.string.custom_desc,
+            Res.string.custom,
+            Res.string.custom_desc,
             settings.liveDownloadCustomDaily.stateInHere(),
             settings::setDownloadCustomDaily,
         )
@@ -618,29 +1027,29 @@ class SettingsPageViewModel(
     val downloadersTogglesWeeklyRegular = listOf(
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_WEEKLY,
-            R.string.de_telegraaf,
-            R.string.de_telegraaf_desc,
+            Res.string.de_telegraaf,
+            Res.string.de_telegraaf_desc,
             settings.liveDownloadDeTelegraaf.stateInHere(),
             settings::setDownloadDeTelegraaf,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_WEEKLY,
-            R.string.jonesin_crosswords,
-            R.string.updates_thursdays,
+            Res.string.jonesin_crosswords,
+            Res.string.updates_thursdays,
             settings.liveDownloadJonesin.stateInHere(),
             settings::setDownloadJonesin,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_WEEKLY,
-            R.string.guardian_quiptic,
-            R.string.updates_sundays,
+            Res.string.guardian_quiptic,
+            Res.string.updates_sundays,
             settings.liveDownloadGuardianWeeklyQuiptic.stateInHere(),
             settings::setDownloadGuardianWeeklyQuiptic,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_WEEKLY,
-            R.string.nrc_scrypto,
-            R.string.nrc_scrypto_desc,
+            Res.string.nrc_scrypto,
+            Res.string.nrc_scrypto_desc,
             settings.liveDownloadNRCScrypto.stateInHere(),
             settings::setDownloadNRCScrypto,
         )
@@ -649,15 +1058,15 @@ class SettingsPageViewModel(
     val downloadersTogglesWeeklyLarge = listOf(
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_WEEKLY,
-            R.string.premier_crossword,
-            R.string.updates_sundays,
+            Res.string.premier_crossword,
+            Res.string.updates_sundays,
             settings.liveDownloadPremier.stateInHere(),
             settings::setDownloadPremier,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_WEEKLY,
-            R.string.washington_post_sunday,
-            R.string.updates_sundays,
+            Res.string.washington_post_sunday,
+            Res.string.updates_sundays,
             settings.liveDownloadWaPoSunday.stateInHere(),
             settings::setDownloadWaPoSunday,
         ),
@@ -666,36 +1075,36 @@ class SettingsPageViewModel(
     val downloadersTogglesScrapers = listOf(
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_SCRAPERS,
-            R.string.cru_puzzle_workshop,
-            R.string.cru_puzzle_workshop_desc,
+            Res.string.cru_puzzle_workshop,
+            Res.string.cru_puzzle_workshop_desc,
             settings.liveScrapeCru.stateInHere(),
             settings::setScrapeCru,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_SCRAPERS,
-            R.string.guardian_quick,
-            R.string.guardian_quick_desc,
+            Res.string.guardian_quick,
+            Res.string.guardian_quick_desc,
             settings.liveScrapeGuardianQuick.stateInHere(),
             settings::setScrapeGuardianQuick,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_SCRAPERS,
-            R.string.keglars_cryptics,
-            R.string.keglars_cryptics_desc,
+            Res.string.keglars_cryptics,
+            Res.string.keglars_cryptics_desc,
             settings.liveScrapeKegler.stateInHere(),
             settings::setScrapeKegler,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_SCRAPERS,
-            R.string.private_eye,
-            R.string.private_eye_desc,
+            Res.string.private_eye,
+            Res.string.private_eye_desc,
             settings.liveScrapePrivateEye.stateInHere(),
             settings::setScrapePrivateEye,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_SCRAPERS,
-            R.string.przekroj,
-            R.string.przekroj_desc,
+            Res.string.przekroj,
+            Res.string.przekroj_desc,
             settings.liveScrapePrzekroj.stateInHere(),
             settings::setScrapePrzekroj,
         ),
@@ -704,8 +1113,8 @@ class SettingsPageViewModel(
     private val settingsItemsList : List<SettingsItem> = listOf(
         SettingsDynamicList<StorageLocation>(
             SettingsPage.ROOT,
-            R.string.storage_location,
-            R.string.storage_location_desc,
+            Res.string.storage_location,
+            Res.string.storage_location_desc,
             storageLocationsStateFlow,
             settings.liveFileHandlerStorageLocation.stateInHere(
                 StorageLocation.SL_INTERNAL,
@@ -714,110 +1123,110 @@ class SettingsPageViewModel(
         ),
         SettingsSubPage(
             SettingsPage.ROOT,
-            R.string.select_sources_desc,
+            Res.string.select_sources_desc,
             SettingsPage.PUZZLE_SOURCES,
         ),
         SettingsSubPage(
             SettingsPage.ROOT,
-            R.string.download_settings_desc,
+            Res.string.download_settings_desc,
             SettingsPage.DOWNLOAD,
         ),
         SettingsSubPage(
             SettingsPage.ROOT,
-            R.string.browser_settings_desc,
+            Res.string.browser_settings_desc,
             SettingsPage.BROWSER,
         ),
         SettingsSubPage(
             SettingsPage.ROOT,
-            R.string.display_settings_desc,
+            Res.string.display_settings_desc,
             SettingsPage.DISPLAY,
         ),
         SettingsSubPage(
             SettingsPage.ROOT,
-            R.string.interaction_settings_desc,
+            Res.string.interaction_settings_desc,
             SettingsPage.INTERACTION,
         ),
         SettingsSubPage(
             SettingsPage.ROOT,
-            R.string.keyboard_settings_desc,
+            Res.string.keyboard_settings_desc,
             SettingsPage.KEYBOARD,
         ),
         SettingsSubPage(
             SettingsPage.ROOT,
-            R.string.voice_settings_desc,
+            Res.string.voice_settings_desc,
             SettingsPage.VOICE_ACCESSIBILITY,
         ),
         SettingsSubPage(
             SettingsPage.ROOT,
-            R.string.external_tools_settings_desc,
+            Res.string.external_tools_settings_desc,
             SettingsPage.EXTERNAL_TOOLS,
         ),
         SettingsSubPage(
             SettingsPage.ROOT,
-            R.string.preferences_export_import_desc,
+            Res.string.preferences_export_import_desc,
             SettingsPage.EXPORT_IMPORT,
         ),
         SettingsHeading(
             SettingsPage.ROOT,
-            R.string.about_forkyz,
+            Res.string.about_forkyz,
         ),
         SettingsHTMLPage(
             SettingsPage.ROOT,
-            R.string.release_notes,
-            R.raw.release,
+            Res.string.release_notes,
+            HTMLPage.RELEASE_NOTES,
         ),
         SettingsHTMLPage(
             SettingsPage.ROOT,
-            R.string.license,
-            R.raw.license,
+            Res.string.license,
+            HTMLPage.LICENSE,
         ),
         SettingsLogcat(
             SettingsPage.ROOT,
-            R.string.logcat,
+            Res.string.logcat,
         ),
 
         // Sources
         SettingsSubPage(
             SettingsPage.PUZZLE_SOURCES,
-            R.string.daily_crosswords_desc,
+            Res.string.daily_crosswords_desc,
             SettingsPage.PUZZLE_SOURCES_DAILY,
         ),
         SettingsSubPage(
             SettingsPage.PUZZLE_SOURCES,
-            R.string.weekly_crosswords_desc,
+            Res.string.weekly_crosswords_desc,
             SettingsPage.PUZZLE_SOURCES_WEEKLY,
         ),
         SettingsSubPage(
             SettingsPage.PUZZLE_SOURCES,
-            R.string.scraper_sources_desc,
+            Res.string.scraper_sources_desc,
             SettingsPage.PUZZLE_SOURCES_SCRAPERS,
         ),
         SettingsTriState.build(
             viewModelScope,
             SettingsPage.PUZZLE_SOURCES_DAILY,
-            R.string.toggle_all_daily_sources,
-            R.string.toggle_all_daily_sources_desc,
+            Res.string.toggle_all_daily_sources,
+            Res.string.toggle_all_daily_sources_desc,
             downloadersTogglesDaily + downloadersTogglesCustomDaily,
         ),
     ) + downloadersTogglesDaily + listOf(
         SettingsHeading(
             SettingsPage.PUZZLE_SOURCES_DAILY,
-            R.string.custom_daily,
+            Res.string.custom_daily,
         ),
     ) + downloadersTogglesCustomDaily + listOf(
         SettingsString(
             SettingsPage.PUZZLE_SOURCES_DAILY,
-            R.string.custom_title,
-            R.string.custom_title_desc,
-            R.string.custom_title_hint,
+            Res.string.custom_title,
+            Res.string.custom_title_desc,
+            Res.string.custom_title_hint,
             settings.liveDownloadCustomDailyTitle.stateInHere(),
             settings::setDownloadCustomDailyTitle,
         ),
         SettingsString(
             SettingsPage.PUZZLE_SOURCES_DAILY,
-            R.string.custom_url,
-            R.string.custom_url_desc,
-            R.string.custom_url_hint,
+            Res.string.custom_url,
+            Res.string.custom_url_desc,
+            Res.string.custom_url_hint,
             settings.liveDownloadCustomDailyURL.stateInHere(),
             settings::setDownloadCustomDailyURL,
             downloadCustomDailyURLErrorMsg,
@@ -825,81 +1234,81 @@ class SettingsPageViewModel(
         SettingsTriState.build(
             viewModelScope,
             SettingsPage.PUZZLE_SOURCES_WEEKLY,
-            R.string.toggle_all_weekly_sources,
-            R.string.toggle_all_weekly_sources_desc,
+            Res.string.toggle_all_weekly_sources,
+            Res.string.toggle_all_weekly_sources_desc,
             downloadersTogglesWeeklyRegular + downloadersTogglesWeeklyLarge,
         ),
         SettingsHeading(
             SettingsPage.PUZZLE_SOURCES_WEEKLY,
-            R.string.regular_sized,
+            Res.string.regular_sized,
             null,
         ),
     ) + downloadersTogglesWeeklyRegular + listOf(
         SettingsHeading(
             SettingsPage.PUZZLE_SOURCES_WEEKLY,
-            R.string.large_sized,
+            Res.string.large_sized,
             null,
         ),
     ) + downloadersTogglesWeeklyLarge + listOf(
         SettingsTriState.build(
             viewModelScope,
             SettingsPage.PUZZLE_SOURCES_SCRAPERS,
-            R.string.toggle_all_scrapers,
-            R.string.toggle_all_scrapers_desc,
+            Res.string.toggle_all_scrapers,
+            Res.string.toggle_all_scrapers_desc,
             downloadersTogglesScrapers,
         ),
     ) + downloadersTogglesScrapers + listOf(
         SettingsDivider(SettingsPage.PUZZLE_SOURCES_SCRAPERS),
         SettingsHTMLPage(
             SettingsPage.PUZZLE_SOURCES_SCRAPERS,
-            R.string.about_scrapes,
-            R.raw.scrapes,
+            Res.string.about_scrapes,
+            HTMLPage.SCRAPERS_HELP,
         ),
 
         // Download
         SettingsBoolean(
             SettingsPage.DOWNLOAD,
-            R.string.automatic_download,
-            R.string.automatic_download_desc,
+            Res.string.automatic_download,
+            Res.string.automatic_download_desc,
             settings.liveDownloadOnStartUp.stateInHere(),
             settings::setDownloadOnStartUp,
         ),
         SettingsSubPage(
             SettingsPage.DOWNLOAD,
-            R.string.background_download_opts_desc,
+            Res.string.background_download_opts_desc,
             SettingsPage.DOWNLOAD_BACKGROUND,
         ),
         SettingsDynamicMultiList<String>(
             SettingsPage.DOWNLOAD,
-            R.string.auto_downloaders,
-            R.string.auto_downloaders_desc,
+            Res.string.auto_downloaders,
+            Res.string.auto_downloaders_desc,
             downloadAutoDownloadersStateFlow,
             settings.liveDownloadAutoDownloaders.stateInHere(),
             settings::setDownloadAutoDownloaders,
         ),
         SettingsBoolean(
             SettingsPage.DOWNLOAD,
-            R.string.no_summary_download_notifs,
-            R.string.no_summary_download_notifs_desc,
+            Res.string.no_summary_download_notifs,
+            Res.string.no_summary_download_notifs_desc,
             settings.liveDownloadSuppressSummaryMessages.stateInHere(),
             settings::setDownloadSuppressSummaryMessages,
         ),
         SettingsBoolean(
             SettingsPage.DOWNLOAD,
-            R.string.no_puzzle_download_notifs,
-            R.string.no_puzzle_download_notifs_desc,
+            Res.string.no_puzzle_download_notifs,
+            Res.string.no_puzzle_download_notifs_desc,
             settings.liveDownloadSuppressMessages.stateInHere(),
             settings::setDownloadSuppressMessages,
         ),
         SettingsList<Int>(
             SettingsPage.DOWNLOAD,
-            R.string.download_timeout,
-            R.string.download_timeout_desc,
+            Res.string.download_timeout,
+            Res.string.download_timeout_desc,
             listOf(
-                SettingsListEntry(R.string.fifteen_seconds, 15000),
-                SettingsListEntry(R.string.thirty_seconds, 30000),
-                SettingsListEntry(R.string.forty_five_seconds, 45000),
-                SettingsListEntry(R.string.sixty_seconds, 60000),
+                SettingsListEntry(Res.string.fifteen_seconds, 15000),
+                SettingsListEntry(Res.string.thirty_seconds, 30000),
+                SettingsListEntry(Res.string.forty_five_seconds, 45000),
+                SettingsListEntry(Res.string.sixty_seconds, 60000),
             ),
             settings.liveDownloadTimeout.stateInHere(),
             settings::setDownloadTimeout,
@@ -908,87 +1317,87 @@ class SettingsPageViewModel(
         // Background Download
         SettingsHeading(
             SettingsPage.DOWNLOAD_BACKGROUND,
-            R.string.background_download_time_config,
+            Res.string.background_download_time_config,
         ),
         SettingsBoolean(
             SettingsPage.DOWNLOAD_BACKGROUND,
-            R.string.background_download_hourly,
-            R.string.background_download_hourly_desc,
+            Res.string.background_download_hourly,
+            Res.string.background_download_hourly_desc,
             settings.liveDownloadHourly.stateInHere(),
             { value -> settings.setDownloadHourly(value) },
         ),
         SettingsMultiList(
             SettingsPage.DOWNLOAD_BACKGROUND,
-            R.string.background_download_days,
-            R.string.background_download_days_desc,
+            Res.string.background_download_days,
+            Res.string.background_download_days_desc,
             listOf(
                 // matches Java DayOfWeek
-                SettingsListEntry(R.string.background_download_mon, "1"),
-                SettingsListEntry(R.string.background_download_tue, "2"),
-                SettingsListEntry(R.string.background_download_wed, "3"),
-                SettingsListEntry(R.string.background_download_thu, "4"),
-                SettingsListEntry(R.string.background_download_fri, "5"),
-                SettingsListEntry(R.string.background_download_sat, "6"),
-                SettingsListEntry(R.string.background_download_sun, "7"),
+                SettingsListEntry(Res.string.background_download_mon, "1"),
+                SettingsListEntry(Res.string.background_download_tue, "2"),
+                SettingsListEntry(Res.string.background_download_wed, "3"),
+                SettingsListEntry(Res.string.background_download_thu, "4"),
+                SettingsListEntry(Res.string.background_download_fri, "5"),
+                SettingsListEntry(Res.string.background_download_sat, "6"),
+                SettingsListEntry(Res.string.background_download_sun, "7"),
             ),
             settings.liveDownloadDays.stateInHere(),
             { value -> settings.setDownloadDays(value) },
         ),
         SettingsList<Int>(
             SettingsPage.DOWNLOAD_BACKGROUND,
-            R.string.background_download_days_time,
-            R.string.background_download_days_time_desc,
+            Res.string.background_download_days_time,
+            Res.string.background_download_days_time_desc,
             listOf(
-                SettingsListEntry(R.string.background_download_0, 0),
-                SettingsListEntry(R.string.background_download_1, 1),
-                SettingsListEntry(R.string.background_download_2, 2),
-                SettingsListEntry(R.string.background_download_3, 3),
-                SettingsListEntry(R.string.background_download_4, 4),
-                SettingsListEntry(R.string.background_download_5, 5),
-                SettingsListEntry(R.string.background_download_6, 6),
-                SettingsListEntry(R.string.background_download_7, 7),
-                SettingsListEntry(R.string.background_download_8, 8),
-                SettingsListEntry(R.string.background_download_9, 9),
-                SettingsListEntry(R.string.background_download_10, 10),
-                SettingsListEntry(R.string.background_download_11, 11),
-                SettingsListEntry(R.string.background_download_12, 12),
-                SettingsListEntry(R.string.background_download_13, 13),
-                SettingsListEntry(R.string.background_download_14, 14),
-                SettingsListEntry(R.string.background_download_15, 15),
-                SettingsListEntry(R.string.background_download_16, 16),
-                SettingsListEntry(R.string.background_download_17, 17),
-                SettingsListEntry(R.string.background_download_18, 18),
-                SettingsListEntry(R.string.background_download_19, 19),
-                SettingsListEntry(R.string.background_download_20, 20),
-                SettingsListEntry(R.string.background_download_21, 21),
-                SettingsListEntry(R.string.background_download_22, 22),
-                SettingsListEntry(R.string.background_download_23, 23),
+                SettingsListEntry(Res.string.background_download_0, 0),
+                SettingsListEntry(Res.string.background_download_1, 1),
+                SettingsListEntry(Res.string.background_download_2, 2),
+                SettingsListEntry(Res.string.background_download_3, 3),
+                SettingsListEntry(Res.string.background_download_4, 4),
+                SettingsListEntry(Res.string.background_download_5, 5),
+                SettingsListEntry(Res.string.background_download_6, 6),
+                SettingsListEntry(Res.string.background_download_7, 7),
+                SettingsListEntry(Res.string.background_download_8, 8),
+                SettingsListEntry(Res.string.background_download_9, 9),
+                SettingsListEntry(Res.string.background_download_10, 10),
+                SettingsListEntry(Res.string.background_download_11, 11),
+                SettingsListEntry(Res.string.background_download_12, 12),
+                SettingsListEntry(Res.string.background_download_13, 13),
+                SettingsListEntry(Res.string.background_download_14, 14),
+                SettingsListEntry(Res.string.background_download_15, 15),
+                SettingsListEntry(Res.string.background_download_16, 16),
+                SettingsListEntry(Res.string.background_download_17, 17),
+                SettingsListEntry(Res.string.background_download_18, 18),
+                SettingsListEntry(Res.string.background_download_19, 19),
+                SettingsListEntry(Res.string.background_download_20, 20),
+                SettingsListEntry(Res.string.background_download_21, 21),
+                SettingsListEntry(Res.string.background_download_22, 22),
+                SettingsListEntry(Res.string.background_download_23, 23),
             ),
             settings.liveDownloadDaysTime.stateInHere(),
             { value -> settings.setDownloadDaysTime(value) },
         ),
         SettingsHeading(
             SettingsPage.DOWNLOAD_BACKGROUND,
-            R.string.background_download_constraints_config,
+            Res.string.background_download_constraints_config,
         ),
         SettingsBoolean(
             SettingsPage.DOWNLOAD_BACKGROUND,
-            R.string.download_wifi_only,
-            R.string.download_wifi_only_desc,
+            Res.string.download_wifi_only,
+            Res.string.download_wifi_only_desc,
             settings.liveDownloadRequireUnmetered.stateInHere(),
             { value -> settings.setDownloadRequireUnmetered(value) },
         ),
         SettingsBoolean(
             SettingsPage.DOWNLOAD_BACKGROUND,
-            R.string.download_roaming,
-            R.string.download_roaming_desc,
+            Res.string.download_roaming,
+            Res.string.download_roaming_desc,
             settings.liveDownloadAllowRoaming.stateInHere(),
             { value -> settings.setDownloadAllowRoaming(value) },
         ),
         SettingsBoolean(
             SettingsPage.DOWNLOAD_BACKGROUND,
-            R.string.download_charging,
-            R.string.download_charging_desc,
+            Res.string.download_charging,
+            Res.string.download_charging_desc,
             settings.liveDownloadRequireCharging.stateInHere(),
             { value -> settings.setDownloadRequireCharging(value) },
         ),
@@ -996,62 +1405,62 @@ class SettingsPageViewModel(
         // Browser
         SettingsBoolean(
             SettingsPage.BROWSER,
-            R.string.dont_confirm_cleanup,
-            R.string.dont_confirm_cleanup_desc,
+            Res.string.dont_confirm_cleanup,
+            Res.string.dont_confirm_cleanup_desc,
             settings.liveBrowseDontConfirmCleanup.stateInHere(),
             settings::setBrowseDontConfirmCleanup,
         ),
         SettingsBoolean(
             SettingsPage.BROWSER,
-            R.string.delete_on_cleanup,
-            R.string.delete_on_cleanup_desc,
+            Res.string.delete_on_cleanup,
+            Res.string.delete_on_cleanup_desc,
             settings.liveBrowseDeleteOnCleanup.stateInHere(),
             settings::setBrowseDeleteOnCleanup,
         ),
         SettingsList<Int>(
             SettingsPage.BROWSER,
-            R.string.cleanup_unfinished,
-            R.string.cleanup_unfinished_desc,
+            Res.string.cleanup_unfinished,
+            Res.string.cleanup_unfinished_desc,
             listOf(
-                SettingsListEntry(R.string.cleanup_age_two_days, 2),
-                SettingsListEntry(R.string.cleanup_age_one_week, 7),
-                SettingsListEntry(R.string.cleanup_age_thirty_days, 30),
-                SettingsListEntry(R.string.cleanup_age_never, -1),
+                SettingsListEntry(Res.string.cleanup_age_two_days, 2),
+                SettingsListEntry(Res.string.cleanup_age_one_week, 7),
+                SettingsListEntry(Res.string.cleanup_age_thirty_days, 30),
+                SettingsListEntry(Res.string.cleanup_age_never, -1),
             ),
             settings.liveBrowseCleanupAge.stateInHere(),
             settings::setBrowseCleanupAge,
         ),
         SettingsList<Int>(
             SettingsPage.BROWSER,
-            R.string.cleanup_archives,
-            R.string.cleanup_archives_desc,
+            Res.string.cleanup_archives,
+            Res.string.cleanup_archives_desc,
             listOf(
-                SettingsListEntry(R.string.cleanup_age_two_days, 2),
-                SettingsListEntry(R.string.cleanup_age_one_week, 7),
-                SettingsListEntry(R.string.cleanup_age_thirty_days, 30),
-                SettingsListEntry(R.string.cleanup_age_never, -1),
+                SettingsListEntry(Res.string.cleanup_age_two_days, 2),
+                SettingsListEntry(Res.string.cleanup_age_one_week, 7),
+                SettingsListEntry(Res.string.cleanup_age_thirty_days, 30),
+                SettingsListEntry(Res.string.cleanup_age_never, -1),
             ),
             settings.liveBrowseCleanupAgeArchive.stateInHere(),
             settings::setBrowseCleanupAgeArchive,
         ),
         SettingsBoolean(
             SettingsPage.BROWSER,
-            R.string.disable_swipe,
-            R.string.disable_swipe_desc,
+            Res.string.disable_swipe,
+            Res.string.disable_swipe_desc,
             settings.liveBrowseDisableSwipe.stateInHere(),
             settings::setBrowseDisableSwipe,
         ),
         SettingsList<BrowseSwipeAction>(
             SettingsPage.BROWSER,
-            R.string.swipe_action,
-            R.string.swipe_action_desc,
+            Res.string.swipe_action,
+            Res.string.swipe_action_desc,
             listOf(
                 SettingsListEntry(
-                    R.string.delete,
+                    Res.string.delete,
                     BrowseSwipeAction.BSA_DELETE
                 ),
                 SettingsListEntry(
-                    R.string.archive,
+                    Res.string.archive,
                     BrowseSwipeAction.BSA_ARCHIVE
                 ),
             ),
@@ -1062,29 +1471,29 @@ class SettingsPageViewModel(
         ),
         SettingsBoolean(
             SettingsPage.BROWSER,
-            R.string.dont_confirm_browse_delete,
-            R.string.dont_confirm_browse_delete_desc,
+            Res.string.dont_confirm_browse_delete,
+            Res.string.dont_confirm_browse_delete_desc,
             settings.liveBrowseDontConfirmDelete.stateInHere(),
             settings::setBrowseDontConfirmDelete,
         ),
         SettingsBoolean(
             SettingsPage.BROWSER,
-            R.string.browse_show_percentage_correct,
-            R.string.browse_show_percentage_correct_desc,
+            Res.string.browse_show_percentage_correct,
+            Res.string.browse_show_percentage_correct_desc,
             settings.liveBrowseShowPercentageCorrect.stateInHere(),
             settings::setBrowseShowPercentageCorrect,
         ),
         SettingsBoolean(
             SettingsPage.BROWSER,
-            R.string.browse_always_show_rating,
-            R.string.browse_always_show_rating_desc,
+            Res.string.browse_always_show_rating,
+            Res.string.browse_always_show_rating_desc,
             settings.liveBrowseAlwaysShowRating.stateInHere(),
             settings::setBrowseAlwaysShowRating,
         ),
         SettingsBoolean(
             SettingsPage.BROWSER,
-            R.string.browse_indicate_if_solution,
-            R.string.browse_indicate_if_solution_desc,
+            Res.string.browse_indicate_if_solution,
+            Res.string.browse_indicate_if_solution_desc,
             settings.liveBrowseIndicateIfSolution.stateInHere(),
             settings::setBrowseIndicateIfSolution,
         ),
@@ -1092,41 +1501,41 @@ class SettingsPageViewModel(
         // Display
         SettingsList<Theme>(
             SettingsPage.DISPLAY,
-            R.string.theme_preference,
-            R.string.theme_preference_desc,
+            Res.string.theme_preference,
+            Res.string.theme_preference_desc,
             availableThemeSettings,
             settings.liveAppTheme.stateInHere(Theme.T_STANDARD),
             settings::setAppTheme,
         ),
         SettingsBoolean(
             SettingsPage.DISPLAY,
-            R.string.clue_below_grid,
-            R.string.clue_below_grid_desc,
+            Res.string.clue_below_grid,
+            Res.string.clue_below_grid_desc,
             settings.livePlayClueBelowGrid.stateInHere(),
             settings::setPlayClueBelowGrid,
         ),
         SettingsBoolean(
             SettingsPage.DISPLAY,
-            R.string.expandable_clue_line,
-            R.string.expandable_clue_line_desc,
+            Res.string.expandable_clue_line,
+            Res.string.expandable_clue_line_desc,
             settings.livePlayExpandableClueLine.stateInHere(),
             settings::setPlayExpandableClueLine,
         ),
         SettingsList<ClueListClueLine>(
             SettingsPage.DISPLAY,
-            R.string.clue_list_name_in_clue_line,
-            R.string.clue_list_name_in_clue_line_desc,
+            Res.string.clue_list_name_in_clue_line,
+            Res.string.clue_list_name_in_clue_line_desc,
             listOf(
                 SettingsListEntry(
-                    R.string.clue_list_clue_line_full,
+                    Res.string.clue_list_clue_line_full,
                     ClueListClueLine.CLCL_FULL,
                 ),
                 SettingsListEntry(
-                    R.string.clue_list_clue_line_abbreviated,
+                    Res.string.clue_list_clue_line_abbreviated,
                     ClueListClueLine.CLCL_ABBREVIATED,
                 ),
                 SettingsListEntry(
-                    R.string.clue_list_clue_line_none,
+                    Res.string.clue_list_clue_line_none,
                     ClueListClueLine.CLCL_NONE,
                 ),
             ),
@@ -1137,26 +1546,26 @@ class SettingsPageViewModel(
         ),
         SettingsBoolean(
             SettingsPage.DISPLAY,
-            R.string.show_length,
-            R.string.show_length_desc,
+            Res.string.show_length,
+            Res.string.show_length_desc,
             settings.livePlayShowCount.stateInHere(),
             settings::setPlayShowCount,
         ),
         SettingsList<FitToScreenMode>(
             SettingsPage.DISPLAY,
-            R.string.fit_to_screen_mode,
-            R.string.fit_to_screen_mode_desc,
+            Res.string.fit_to_screen_mode,
+            Res.string.fit_to_screen_mode_desc,
             listOf(
                 SettingsListEntry(
-                    R.string.fit_to_screen_mode_never,
+                    Res.string.fit_to_screen_mode_never,
                     FitToScreenMode.FTSM_NEVER,
                 ),
                 SettingsListEntry(
-                    R.string.fit_to_screen_mode_start,
+                    Res.string.fit_to_screen_mode_start,
                     FitToScreenMode.FTSM_START,
                 ),
                 SettingsListEntry(
-                    R.string.fit_to_screen_mode_locked,
+                    Res.string.fit_to_screen_mode_locked,
                     FitToScreenMode.FTSM_LOCKED,
                 ),
             ),
@@ -1167,33 +1576,33 @@ class SettingsPageViewModel(
         ),
         SettingsBoolean(
             SettingsPage.DISPLAY,
-            R.string.display_scratch,
-            R.string.display_scratch_desc,
+            Res.string.display_scratch,
+            Res.string.display_scratch_desc,
             settings.livePlayScratchDisplay.stateInHere(),
             settings::setPlayScratchDisplay,
         ),
         SettingsBoolean(
             SettingsPage.DISPLAY,
-            R.string.no_hint_highlighting,
-            R.string.no_hint_highlighting_desc,
+            Res.string.no_hint_highlighting,
+            Res.string.no_hint_highlighting_desc,
             settings.livePlaySuppressHintHighlighting.stateInHere(),
             settings::setPlaySuppressHintHighlighting,
         ),
         SettingsList<DisplaySeparators>(
             SettingsPage.DISPLAY,
-            R.string.display_separators,
-            R.string.display_separators_desc,
+            Res.string.display_separators,
+            Res.string.display_separators_desc,
             listOf(
                 SettingsListEntry(
-                    R.string.display_separators_never,
+                    Res.string.display_separators_never,
                     DisplaySeparators.DS_NEVER,
                 ),
                 SettingsListEntry(
-                    R.string.display_separators_selected,
+                    Res.string.display_separators_selected,
                     DisplaySeparators.DS_SELECTED,
                 ),
                 SettingsListEntry(
-                    R.string.display_separators_always,
+                    Res.string.display_separators_always,
                     DisplaySeparators.DS_ALWAYS,
                 ),
             ),
@@ -1204,47 +1613,47 @@ class SettingsPageViewModel(
         ),
         SettingsBoolean(
             SettingsPage.DISPLAY,
-            R.string.infer_separators,
-            R.string.infer_separators_desc,
+            Res.string.infer_separators,
+            Res.string.infer_separators_desc,
             settings.livePlayInferSeparators.stateInHere(),
             settings::setPlayInferSeparators,
         ),
         SettingsBoolean(
             SettingsPage.DISPLAY,
-            R.string.indicate_show_errors,
-            R.string.indicate_show_errors_desc,
+            Res.string.indicate_show_errors,
+            Res.string.indicate_show_errors_desc,
             settings.livePlayIndicateShowErrors.stateInHere(),
             settings::setPlayIndicateShowErrors,
         ),
         SettingsBoolean(
             SettingsPage.DISPLAY,
-            R.string.show_timer,
-            R.string.show_timer_desc,
+            Res.string.show_timer,
+            Res.string.show_timer_desc,
             settings.livePlayShowTimer.stateInHere(),
             settings::setPlayShowTimer,
         ),
         SettingsBoolean(
             SettingsPage.DISPLAY,
-            R.string.full_screen,
-            R.string.full_screen_desc,
+            Res.string.full_screen,
+            Res.string.full_screen_desc,
             settings.livePlayFullScreen.stateInHere(),
             settings::setPlayFullScreen,
         ),
         SettingsList<Orientation>(
             SettingsPage.DISPLAY,
-            R.string.orientation_lock,
-            R.string.orientation_lock_desc,
+            Res.string.orientation_lock,
+            Res.string.orientation_lock_desc,
             listOf(
                 SettingsListEntry(
-                    R.string.orientation_lock_unlocked,
+                    Res.string.orientation_lock_unlocked,
                     Orientation.O_UNLOCKED,
                 ),
                 SettingsListEntry(
-                    R.string.orientation_lock_portrait,
+                    Res.string.orientation_lock_portrait,
                     Orientation.O_PORTRAIT,
                 ),
                 SettingsListEntry(
-                    R.string.orientation_lock_landscape,
+                    Res.string.orientation_lock_landscape,
                     Orientation.O_LANDSCAPE,
                 ),
             ),
@@ -1255,31 +1664,31 @@ class SettingsPageViewModel(
         ),
         SettingsList<GridRatio>(
             SettingsPage.DISPLAY,
-            R.string.grid_ratio_portrait,
-            R.string.grid_ratio_portrait_desc,
+            Res.string.grid_ratio_portrait,
+            Res.string.grid_ratio_portrait_desc,
             listOf(
                 SettingsListEntry(
-                    R.string.grid_ratio_puzzle,
+                    Res.string.grid_ratio_puzzle,
                     GridRatio.GR_PUZZLE_SHAPE,
                 ),
                 SettingsListEntry(
-                    R.string.grid_ratio_one_to_one,
+                    Res.string.grid_ratio_one_to_one,
                     GridRatio.GR_ONE_TO_ONE,
                 ),
                 SettingsListEntry(
-                    R.string.grid_ratio_thirty_pcnt,
+                    Res.string.grid_ratio_thirty_pcnt,
                     GridRatio.GR_THIRTY_PCNT,
                 ),
                 SettingsListEntry(
-                    R.string.grid_ratio_forty_pcnt,
+                    Res.string.grid_ratio_forty_pcnt,
                     GridRatio.GR_FORTY_PCNT,
                 ),
                 SettingsListEntry(
-                    R.string.grid_ratio_fifty_pcnt,
+                    Res.string.grid_ratio_fifty_pcnt,
                     GridRatio.GR_FIFTY_PCNT,
                 ),
                 SettingsListEntry(
-                    R.string.grid_ratio_sixty_pcnt,
+                    Res.string.grid_ratio_sixty_pcnt,
                     GridRatio.GR_SIXTY_PCNT,
                 ),
             ),
@@ -1290,31 +1699,31 @@ class SettingsPageViewModel(
         ),
         SettingsList<GridRatio>(
             SettingsPage.DISPLAY,
-            R.string.grid_ratio_landscape,
-            R.string.grid_ratio_landscape_desc,
+            Res.string.grid_ratio_landscape,
+            Res.string.grid_ratio_landscape_desc,
             listOf(
                 SettingsListEntry(
-                    R.string.grid_ratio_puzzle,
+                    Res.string.grid_ratio_puzzle,
                     GridRatio.GR_PUZZLE_SHAPE,
                 ),
                 SettingsListEntry(
-                    R.string.grid_ratio_one_to_one,
+                    Res.string.grid_ratio_one_to_one,
                     GridRatio.GR_ONE_TO_ONE,
                 ),
                 SettingsListEntry(
-                    R.string.grid_ratio_thirty_pcnt,
+                    Res.string.grid_ratio_thirty_pcnt,
                     GridRatio.GR_THIRTY_PCNT,
                 ),
                 SettingsListEntry(
-                    R.string.grid_ratio_forty_pcnt,
+                    Res.string.grid_ratio_forty_pcnt,
                     GridRatio.GR_FORTY_PCNT,
                 ),
                 SettingsListEntry(
-                    R.string.grid_ratio_fifty_pcnt,
+                    Res.string.grid_ratio_fifty_pcnt,
                     GridRatio.GR_FIFTY_PCNT,
                 ),
                 SettingsListEntry(
-                    R.string.grid_ratio_sixty_pcnt,
+                    Res.string.grid_ratio_sixty_pcnt,
                     GridRatio.GR_SIXTY_PCNT,
                 ),
             ),
@@ -1325,23 +1734,23 @@ class SettingsPageViewModel(
         ),
         SettingsList<ClueTabsDouble>(
             SettingsPage.DISPLAY,
-            R.string.clue_tabs_double,
-            R.string.clue_tabs_double_desc,
+            Res.string.clue_tabs_double,
+            Res.string.clue_tabs_double_desc,
             listOf(
                 SettingsListEntry(
-                    R.string.clue_tabs_double_never,
+                    Res.string.clue_tabs_double_never,
                     ClueTabsDouble.CTD_NEVER,
                 ),
                 SettingsListEntry(
-                    R.string.clue_tabs_double_landscape,
+                    Res.string.clue_tabs_double_landscape,
                     ClueTabsDouble.CTD_LANDSCAPE,
                 ),
                 SettingsListEntry(
-                    R.string.clue_tabs_double_wide,
+                    Res.string.clue_tabs_double_wide,
                     ClueTabsDouble.CTD_WIDE,
                 ),
                 SettingsListEntry(
-                    R.string.clue_tabs_double_always,
+                    Res.string.clue_tabs_double_always,
                     ClueTabsDouble.CTD_ALWAYS,
                 ),
             ),
@@ -1352,23 +1761,23 @@ class SettingsPageViewModel(
         ),
         SettingsList<ClueHighlight>(
             SettingsPage.DISPLAY,
-            R.string.clue_highlight,
-            R.string.clue_highlight_desc,
+            Res.string.clue_highlight,
+            Res.string.clue_highlight_desc,
             listOf(
                 SettingsListEntry(
-                    R.string.clue_highlight_none,
+                    Res.string.clue_highlight_none,
                     ClueHighlight.CH_NONE,
                 ),
                 SettingsListEntry(
-                    R.string.clue_highlight_radio_button,
+                    Res.string.clue_highlight_radio_button,
                     ClueHighlight.CH_RADIO_BUTTON,
                 ),
                 SettingsListEntry(
-                    R.string.clue_highlight_background,
+                    Res.string.clue_highlight_background,
                     ClueHighlight.CH_BACKGROUND,
                 ),
                 SettingsListEntry(
-                    R.string.clue_highlight_both,
+                    Res.string.clue_highlight_both,
                     ClueHighlight.CH_BOTH,
                 ),
             ),
@@ -1381,23 +1790,23 @@ class SettingsPageViewModel(
         // Keyboard
         SettingsList<KeyboardMode>(
             SettingsPage.KEYBOARD,
-            R.string.keyboard_showhide,
-            R.string.keyboard_showhide_desc,
+            Res.string.keyboard_showhide,
+            Res.string.keyboard_showhide_desc,
             listOf(
                 SettingsListEntry(
-                    R.string.keyboard_always_show,
+                    Res.string.keyboard_always_show,
                     KeyboardMode.KM_ALWAYS_SHOW,
                 ),
                 SettingsListEntry(
-                    R.string.keyboard_hide_manual,
+                    Res.string.keyboard_hide_manual,
                     KeyboardMode.KM_HIDE_MANUAL,
                 ),
                 SettingsListEntry(
-                    R.string.keyboard_show_sparingly_desc,
+                    Res.string.keyboard_show_sparingly_desc,
                     KeyboardMode.KM_SHOW_SPARINGLY,
                 ),
                 SettingsListEntry(
-                    R.string.keyboard_never_show,
+                    Res.string.keyboard_never_show,
                     KeyboardMode.KM_NEVER_SHOW,
                 ),
             ),
@@ -1408,38 +1817,38 @@ class SettingsPageViewModel(
         ),
         SettingsBoolean(
             SettingsPage.KEYBOARD,
-            R.string.keyboard_use_native,
-            R.string.keyboard_use_native_desc,
+            Res.string.keyboard_use_native,
+            Res.string.keyboard_use_native_desc,
             settings.liveKeyboardUseNative.stateInHere(),
             settings::setKeyboardUseNative,
         ),
         SettingsHeading(
             SettingsPage.KEYBOARD,
-            R.string.keyboard_built_in,
+            Res.string.keyboard_built_in,
         ),
         SettingsList<KeyboardLayout>(
             SettingsPage.KEYBOARD,
-            R.string.keyboard_layout,
-            R.string.keyboard_layout_desc,
+            Res.string.keyboard_layout,
+            Res.string.keyboard_layout_desc,
             listOf(
                 SettingsListEntry(
-                    R.string.keyboard_qwerty,
+                    Res.string.keyboard_qwerty,
                     KeyboardLayout.KL_QWERTY,
                 ),
                 SettingsListEntry(
-                    R.string.keyboard_qwertz,
+                    Res.string.keyboard_qwertz,
                     KeyboardLayout.KL_QWERTZ,
                 ),
                 SettingsListEntry(
-                    R.string.keyboard_azerty,
+                    Res.string.keyboard_azerty,
                     KeyboardLayout.KL_AZERTY,
                 ),
                 SettingsListEntry(
-                    R.string.keyboard_dvorak,
+                    Res.string.keyboard_dvorak,
                     KeyboardLayout.KL_DVORAK,
                 ),
                 SettingsListEntry(
-                    R.string.keyboard_colemak,
+                    Res.string.keyboard_colemak,
                     KeyboardLayout.KL_COLEMAK,
                 ),
             ),
@@ -1450,49 +1859,49 @@ class SettingsPageViewModel(
         ),
         SettingsBoolean(
             SettingsPage.KEYBOARD,
-            R.string.keyboard_hide_button,
-            R.string.keyboard_hide_button_desc,
+            Res.string.keyboard_hide_button,
+            Res.string.keyboard_hide_button_desc,
             settings.liveKeyboardHideButton.stateInHere(),
             settings::setKeyboardHideButton,
         ),
         SettingsBoolean(
             SettingsPage.KEYBOARD,
-            R.string.keyboard_compact,
-            R.string.keyboard_compact_desc,
+            Res.string.keyboard_compact,
+            Res.string.keyboard_compact_desc,
             settings.liveKeyboardCompact.stateInHere(),
             settings::setKeyboardCompact,
         ),
         SettingsBoolean(
             SettingsPage.KEYBOARD,
-            R.string.keyboard_haptic,
-            R.string.keyboard_haptic_desc,
+            Res.string.keyboard_haptic,
+            Res.string.keyboard_haptic_desc,
             settings.liveKeyboardHaptic.stateInHere(),
             settings::setKeyboardHaptic,
         ),
         SettingsInteger(
             SettingsPage.KEYBOARD,
-            R.string.keyboard_repeat_delay,
-            R.string.keyboard_repeat_delay_desc,
-            R.string.keyboard_repeat_delay_hint,
+            Res.string.keyboard_repeat_delay,
+            Res.string.keyboard_repeat_delay_desc,
+            Res.string.keyboard_repeat_delay_hint,
             settings.liveKeyboardRepeatDelay.stateInHere(),
             settings::setKeyboardRepeatDelay,
         ),
         SettingsInteger(
             SettingsPage.KEYBOARD,
-            R.string.keyboard_repeat_interval,
-            R.string.keyboard_repeat_interval_desc,
-            R.string.keyboard_repeat_interval_hint,
+            Res.string.keyboard_repeat_interval,
+            Res.string.keyboard_repeat_interval_desc,
+            Res.string.keyboard_repeat_interval_hint,
             settings.liveKeyboardRepeatInterval.stateInHere(),
             settings::setKeyboardRepeatInterval,
         ),
         SettingsHeading(
             SettingsPage.KEYBOARD,
-            R.string.keyboard_native,
+            Res.string.keyboard_native,
         ),
         SettingsBoolean(
             SettingsPage.KEYBOARD,
-            R.string.keyboard_force_caps,
-            R.string.keyboard_force_caps_desc,
+            Res.string.keyboard_force_caps,
+            Res.string.keyboard_force_caps_desc,
             settings.liveKeyboardForceCaps.stateInHere(),
             settings::setKeyboardForceCaps,
         ),
@@ -1500,37 +1909,37 @@ class SettingsPageViewModel(
         // Interaction
         SettingsBoolean(
             SettingsPage.INTERACTION,
-            R.string.snap_current,
-            R.string.snap_current_desc,
+            Res.string.snap_current,
+            Res.string.snap_current_desc,
             settings.livePlayEnsureVisible.stateInHere(),
             settings::setPlayEnsureVisible,
         ),
         SettingsBoolean(
             SettingsPage.INTERACTION,
-            R.string.scroll_to_clue,
-            R.string.scroll_to_clue_desc,
+            Res.string.scroll_to_clue,
+            Res.string.scroll_to_clue_desc,
             settings.liveClueListSnapToClue.stateInHere(),
             settings::setClueListSnapToClue,
         ),
         SettingsList<MovementStrategySetting>(
             SettingsPage.INTERACTION,
-            R.string.movement_style,
-            R.string.movement_style_desc,
+            Res.string.movement_style,
+            Res.string.movement_style_desc,
             listOf(
                 SettingsListEntry(
-                    R.string.movement_strategy_next_word,
+                    Res.string.movement_strategy_next_word,
                     MovementStrategySetting.MSS_MOVE_NEXT_ON_AXIS,
                 ),
                 SettingsListEntry(
-                    R.string.movement_strategy_stop_end,
+                    Res.string.movement_strategy_stop_end,
                     MovementStrategySetting.MSS_STOP_ON_END,
                 ),
                 SettingsListEntry(
-                    R.string.movement_strategy_next_clue,
+                    Res.string.movement_strategy_next_clue,
                     MovementStrategySetting.MSS_MOVE_NEXT_CLUE,
                 ),
                 SettingsListEntry(
-                    R.string.movement_strategy_next_parallel_clue,
+                    Res.string.movement_strategy_next_parallel_clue,
                     MovementStrategySetting.MSS_MOVE_PARALLEL_WORD,
                 ),
             ),
@@ -1541,15 +1950,15 @@ class SettingsPageViewModel(
         ),
         SettingsList<MovementStrategySetting>(
             SettingsPage.INTERACTION,
-            R.string.movement_style_clue_list,
-            R.string.movement_style_clue_list_desc,
+            Res.string.movement_style_clue_list,
+            Res.string.movement_style_clue_list_desc,
             listOf(
                 SettingsListEntry(
-                    R.string.movement_strategy_stop_end,
+                    Res.string.movement_strategy_stop_end,
                     MovementStrategySetting.MSS_STOP_ON_END,
                 ),
                 SettingsListEntry(
-                    R.string.movement_strategy_next_clue,
+                    Res.string.movement_strategy_next_clue,
                     MovementStrategySetting.MSS_MOVE_NEXT_CLUE,
                 ),
             ),
@@ -1560,26 +1969,26 @@ class SettingsPageViewModel(
         ),
         SettingsBoolean(
             SettingsPage.INTERACTION,
-            R.string.skip_filled,
-            R.string.skip_filled_desc,
+            Res.string.skip_filled,
+            Res.string.skip_filled_desc,
             settings.livePlaySkipFilled.stateInHere(),
             settings::setPlaySkipFilled,
         ),
         SettingsList<CycleUnfilledMode>(
             SettingsPage.INTERACTION,
-            R.string.cycle_unfilled,
-            R.string.cycle_unfilled_desc,
+            Res.string.cycle_unfilled,
+            Res.string.cycle_unfilled_desc,
             listOf(
                 SettingsListEntry(
-                    R.string.cycle_unfilled_never,
+                    Res.string.cycle_unfilled_never,
                     CycleUnfilledMode.CU_NEVER,
                 ),
                 SettingsListEntry(
-                    R.string.cycle_unfilled_forwards,
+                    Res.string.cycle_unfilled_forwards,
                     CycleUnfilledMode.CU_FORWARDS,
                 ),
                 SettingsListEntry(
-                    R.string.cycle_unfilled_always,
+                    Res.string.cycle_unfilled_always,
                     CycleUnfilledMode.CU_ALWAYS,
                 ),
             ),
@@ -1590,33 +1999,33 @@ class SettingsPageViewModel(
         ),
         SettingsBoolean(
             SettingsPage.INTERACTION,
-            R.string.double_tap_zoom,
-            R.string.double_tap_zoom_desc,
+            Res.string.double_tap_zoom,
+            Res.string.double_tap_zoom_desc,
             settings.livePlayDoubleTapFitBoard.stateInHere(),
             settings::setPlayDoubleTapFitBoard,
         ),
         SettingsBoolean(
             SettingsPage.INTERACTION,
-            R.string.dont_snap_board_to_borders,
-            R.string.dont_snap_board_to_borders_desc,
+            Res.string.dont_snap_board_to_borders,
+            Res.string.dont_snap_board_to_borders_desc,
             settings.livePlayDontSnapBoardToBorders.stateInHere(),
             settings::setPlayDontSnapBoardToBorders,
         ),
         SettingsList<DeleteCrossingModeSetting>(
             SettingsPage.INTERACTION,
-            R.string.dont_delete_crossing,
-            R.string.dont_delete_crossing_desc,
+            Res.string.dont_delete_crossing,
+            Res.string.dont_delete_crossing_desc,
             listOf(
                 SettingsListEntry(
-                    R.string.delete_crossing_delete,
+                    Res.string.delete_crossing_delete,
                     DeleteCrossingModeSetting.DCMS_DELETE,
                 ),
                 SettingsListEntry(
-                    R.string.delete_crossing_preserve_filled_words,
+                    Res.string.delete_crossing_preserve_filled_words,
                     DeleteCrossingModeSetting.DCMS_PRESERVE_FILLED_WORDS,
                 ),
                 SettingsListEntry(
-                    R.string.delete_crossing_preserve_filled_cells,
+                    Res.string.delete_crossing_preserve_filled_cells,
                     DeleteCrossingModeSetting.DCMS_PRESERVE_FILLED_CELLS,
                 ),
             ),
@@ -1627,57 +2036,57 @@ class SettingsPageViewModel(
         ),
         SettingsBoolean(
             SettingsPage.INTERACTION,
-            R.string.preserve_correct,
-            R.string.preserve_correct_desc,
+            Res.string.preserve_correct,
+            Res.string.preserve_correct_desc,
             settings.livePlayPreserveCorrectLettersInShowErrors.stateInHere(),
             settings::setPlayPreserveCorrectLettersInShowErrors,
         ),
         SettingsBoolean(
             SettingsPage.INTERACTION,
-            R.string.play_letter_undo,
-            R.string.play_letter_undo_desc,
+            Res.string.play_letter_undo,
+            Res.string.play_letter_undo_desc,
             settings.livePlayPlayLetterUndoEnabled.stateInHere(),
             settings::setPlayPlayLetterUndoEnabled,
         ),
         SettingsBoolean(
             SettingsPage.INTERACTION,
-            R.string.space_change_dir,
-            R.string.space_change_dir_desc,
+            Res.string.space_change_dir,
+            Res.string.space_change_dir_desc,
             settings.livePlaySpaceChangesDirection.stateInHere(),
             settings::setPlaySpaceChangesDirection,
         ),
         SettingsBoolean(
             SettingsPage.INTERACTION,
-            R.string.enter_changes_direction,
-            R.string.enter_changes_direction_desc,
+            Res.string.enter_changes_direction,
+            Res.string.enter_changes_direction_desc,
             settings.livePlayEnterChangesDirection.stateInHere(),
             settings::setPlayEnterChangesDirection,
         ),
         SettingsBoolean(
             SettingsPage.INTERACTION,
-            R.string.toggle_before_move,
-            R.string.toggle_before_move_desc,
+            Res.string.toggle_before_move,
+            Res.string.toggle_before_move_desc,
             settings.livePlayToggleBeforeMove.stateInHere(),
             settings::setPlayToggleBeforeMove,
         ),
         SettingsBoolean(
             SettingsPage.INTERACTION,
-            R.string.random_clue_on_shake,
-            R.string.random_clue_on_shake_desc,
+            Res.string.random_clue_on_shake,
+            Res.string.random_clue_on_shake_desc,
             settings.livePlayRandomClueOnShake.stateInHere(),
             settings::setPlayRandomClueOnShake,
         ),
         SettingsBoolean(
             SettingsPage.INTERACTION,
-            R.string.predict_anagram_chars,
-            R.string.predict_anagram_chars_desc,
+            Res.string.predict_anagram_chars,
+            Res.string.predict_anagram_chars_desc,
             settings.livePlayPredictAnagramChars.stateInHere(),
             settings::setPlayPredictAnagramChars,
         ),
         SettingsBoolean(
             SettingsPage.INTERACTION,
-            R.string.disable_ratings,
-            R.string.disable_ratings_desc,
+            Res.string.disable_ratings,
+            Res.string.disable_ratings_desc,
             settings.liveRatingsDisableRatings.stateInHere(),
             settings::setRatingsDisableRatings,
         ),
@@ -1685,73 +2094,73 @@ class SettingsPageViewModel(
         // Voice & Accessibility
         SettingsBoolean(
             SettingsPage.VOICE_ACCESSIBILITY,
-            R.string.voice_with_volume,
-            R.string.voice_with_volume_desc,
+            Res.string.voice_with_volume,
+            Res.string.voice_with_volume_desc,
             settings.liveVoiceVolumeActivatesVoice.stateInHere(),
             settings::setVoiceVolumeActivatesVoice,
         ),
         SettingsBoolean(
             SettingsPage.VOICE_ACCESSIBILITY,
-            R.string.voice_with_button,
-            R.string.voice_with_button_desc,
+            Res.string.voice_with_button,
+            Res.string.voice_with_button_desc,
             settings.liveVoiceButtonActivatesVoice.stateInHere(),
             settings::setVoiceButtonActivatesVoice,
         ),
         SettingsBoolean(
             SettingsPage.VOICE_ACCESSIBILITY,
-            R.string.announce_clue_button,
-            R.string.announce_clue_button_desc,
+            Res.string.announce_clue_button,
+            Res.string.announce_clue_button_desc,
             settings.liveVoiceButtonAnnounceClue.stateInHere(),
             settings::setVoiceButtonAnnounceClue,
         ),
         SettingsBoolean(
             SettingsPage.VOICE_ACCESSIBILITY,
-            R.string.announce_clue_equals,
-            R.string.announce_clue_equals_desc,
+            Res.string.announce_clue_equals,
+            Res.string.announce_clue_equals_desc,
             settings.liveVoiceEqualsAnnounceClue.stateInHere(),
             settings::setVoiceEqualsAnnounceClue,
         ),
         SettingsBoolean(
             SettingsPage.VOICE_ACCESSIBILITY,
-            R.string.announce_clue_always,
-            R.string.announce_clue_always_desc,
+            Res.string.announce_clue_always,
+            Res.string.announce_clue_always_desc,
             settings.liveVoiceAlwaysAnnounceClue.stateInHere(),
             settings::setVoiceAlwaysAnnounceClue,
         ),
         SettingsBoolean(
             SettingsPage.VOICE_ACCESSIBILITY,
-            R.string.announce_box_always,
-            R.string.announce_box_always_desc,
+            Res.string.announce_box_always,
+            Res.string.announce_box_always_desc,
             settings.liveVoiceAlwaysAnnounceBox.stateInHere(),
             settings::setVoiceAlwaysAnnounceBox,
         ),
         SettingsDivider(SettingsPage.VOICE_ACCESSIBILITY),
         SettingsHTMLPage(
             SettingsPage.VOICE_ACCESSIBILITY,
-            R.string.about_voice_commands,
-            R.raw.voice_commands,
+            Res.string.about_voice_commands,
+            HTMLPage.VOICE_COMMANDS_HELP,
         ),
 
         // External Tools
         SettingsList<ExternalDictionarySetting>(
             SettingsPage.EXTERNAL_TOOLS,
-            R.string.external_dictionary,
-            R.string.external_dictionary_desc,
+            Res.string.external_dictionary,
+            Res.string.external_dictionary_desc,
             listOf(
                 SettingsListEntry(
-                    R.string.dictionary_none,
+                    Res.string.dictionary_none,
                     ExternalDictionarySetting.EDS_NONE,
                 ),
                 SettingsListEntry(
-                    R.string.free_dictionary,
+                    Res.string.free_dictionary,
                     ExternalDictionarySetting.EDS_FREE,
                 ),
                 SettingsListEntry(
-                    R.string.quick_dic,
+                    Res.string.quick_dic,
                     ExternalDictionarySetting.EDS_QUICK,
                 ),
                 SettingsListEntry(
-                    R.string.aard2,
+                    Res.string.aard2,
                     ExternalDictionarySetting.EDS_AARD2,
                 ),
             ),
@@ -1762,31 +2171,31 @@ class SettingsPageViewModel(
         ),
         SettingsBoolean(
             SettingsPage.EXTERNAL_TOOLS,
-            R.string.crossword_solver_enabled,
-            R.string.crossword_solver_enabled_desc,
+            Res.string.crossword_solver_enabled,
+            Res.string.crossword_solver_enabled_desc,
             settings.liveExtCrosswordSolverEnabled.stateInHere(),
             settings::setExtCrosswordSolverEnabled,
         ),
         SettingsString(
             SettingsPage.EXTERNAL_TOOLS,
-            R.string.chat_gpt_api_key,
-            R.string.chat_gpt_api_key_desc,
-            R.string.chat_gpt_api_key,
+            Res.string.chat_gpt_api_key,
+            Res.string.chat_gpt_api_key_desc,
+            Res.string.chat_gpt_api_key,
             settings.liveExtChatGPTAPIKey.stateInHere(),
             settings::setExtChatGPTAPIKey,
-            dialogMsg = R.string.chat_gpt_api_key_message,
+            dialogMsg = Res.string.chat_gpt_api_key_message,
         ),
         SettingsBoolean(
             SettingsPage.EXTERNAL_TOOLS,
-            R.string.duckduckgo,
-            R.string.duckduckgo_desc,
+            Res.string.duckduckgo,
+            Res.string.duckduckgo_desc,
             settings.liveExtDuckDuckGoEnabled.stateInHere(),
             settings::setExtDuckDuckGoEnabled,
         ),
         SettingsBoolean(
             SettingsPage.EXTERNAL_TOOLS,
-            R.string.fifteen_squared,
-            R.string.fifteen_squared_desc,
+            Res.string.fifteen_squared,
+            Res.string.fifteen_squared_desc,
             settings.liveExtFifteenSquaredEnabled.stateInHere(),
             settings::setExtFifteenSquaredEnabled,
         ),
@@ -1794,20 +2203,20 @@ class SettingsPageViewModel(
         // Export/Import
         SettingsAction(
             SettingsPage.EXPORT_IMPORT,
-            R.string.preferences_export,
-            R.string.preferences_export_desc,
+            Res.string.preferences_export,
+            Res.string.preferences_export_desc,
             this::startSettingsExport,
         ),
         SettingsAction(
             SettingsPage.EXPORT_IMPORT,
-            R.string.preferences_import,
-            R.string.preferences_import_desc,
+            Res.string.preferences_import,
+            Res.string.preferences_import_desc,
             this::startSettingsImport,
         ),
         SettingsAction(
             SettingsPage.EXPORT_IMPORT,
-            R.string.puzzles_export,
-            R.string.puzzles_export_desc,
+            Res.string.puzzles_export,
+            Res.string.puzzles_export_desc,
             this::startPuzzlesExport,
         ),
     )
@@ -1817,12 +2226,11 @@ class SettingsPageViewModel(
     private val stateBackStack = ArrayDeque<SettingsPageViewState>()
     // separate as should not appear on back stack
     private val _needsURI = MutableStateFlow<RequestedURI>(RequestedURI.NONE)
-    // separate from back stack, int is resource id of messages to show
-    private val _messages = MutableStateFlow<List<Int>>(listOf())
+    private val _messages = MutableStateFlow<List<String>>(listOf())
 
     val state : StateFlow<SettingsPageViewState> = _state
     val needsURI : StateFlow<RequestedURI> = _needsURI
-    val messages : StateFlow<List<Int>> = _messages
+    val messages : StateFlow<List<String>> = _messages
 
     fun startSearch() {
         if (!state.value.inSearchMode) {
@@ -1911,9 +2319,9 @@ class SettingsPageViewModel(
                 try {
                     utils.openOutputStream(uri)
                         .use(settings::exportSettings)
-                    showMessage(R.string.preferences_exported)
+                    showMessage(Res.string.preferences_exported)
                 } catch (e : IOException) {
-                    showMessage(R.string.preferences_export_failed)
+                    showMessage(Res.string.preferences_export_failed)
                 }
             }
         }
@@ -1925,16 +2333,18 @@ class SettingsPageViewModel(
                 try {
                     utils.openInputStream(uri)
                         .use(settings::importSettings)
-                    showMessage(R.string.preferences_imported)
+                    showMessage(Res.string.preferences_imported)
                 } catch (e : IOException) {
-                    showMessage(R.string.preferences_import_failed)
+                    showMessage(Res.string.preferences_import_failed)
                 }
             }
         }
     }
 
-    private fun showMessage(msg : Int) {
-        _messages.value = messages.value + msg
+    private fun showMessage(msg : StringResource) {
+        viewModelScope.launch {
+            _messages.value = messages.value + utils.getString(msg)
+        }
     }
 
     private fun raiseNeedsURI(uriType : RequestedURI) {

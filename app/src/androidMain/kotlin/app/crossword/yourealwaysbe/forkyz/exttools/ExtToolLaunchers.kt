@@ -8,7 +8,13 @@ import android.content.Intent
 import androidx.core.app.ShareCompat
 import androidx.core.net.toUri
 
-import app.crossword.yourealwaysbe.forkyz.R
+import org.jetbrains.compose.resources.getString
+
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.aard2
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.crossword_solver
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.quick_dic
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_puzzle_title
 import app.crossword.yourealwaysbe.forkyz.util.toAndroidUri
 
 private val CROSSWORD_SOLVER = "org.billthefarmer.crossword"
@@ -17,20 +23,20 @@ private val CROSSWORD_SOLVER_WEBSITE_URL
 private val FREE_URL_FORMAT = "https://www.thefreedictionary.com/%s"
 
 @Throws(AppNotFoundException::class)
-actual fun ExternalToolLauncher.visit(data : CrosswordSolverData) {
+actual suspend fun ExternalToolLauncher.visit(data : CrosswordSolverData) {
     ExternalCaller.launchApp(
         this.activity,
         CROSSWORD_SOLVER,
         data.requestType.uri,
         android.content.Intent.EXTRA_TEXT,
         data.request,
-        this.activity.getString(R.string.crossword_solver),
+        getString(Res.string.crossword_solver),
         CROSSWORD_SOLVER_WEBSITE_URL,
     )
 }
 
 @Throws(AppNotFoundException::class)
-actual fun ExternalToolLauncher.visit(data : FreeDictionaryData) {
+actual suspend fun ExternalToolLauncher.visit(data : FreeDictionaryData) {
     val intent = Intent(Intent.ACTION_VIEW)
     intent.setData(
         String.format(
@@ -46,14 +52,14 @@ actual fun ExternalToolLauncher.visit(data : FreeDictionaryData) {
  * Launch or display warning if app not installed
  */
 @Throws(AppNotFoundException::class)
-actual fun ExternalToolLauncher.visit(data : QuickDictionaryData) {
+actual suspend fun ExternalToolLauncher.visit(data : QuickDictionaryData) {
     ExternalCaller.launchApp(
         this.activity,
         "de.reimardoeffinger.quickdic",
         "com.hughes.android.dictionary.DictionaryActivity",
         "searchToken",
         data.word,
-        this.activity.getString(R.string.quick_dic),
+        getString(Res.string.quick_dic),
         "https://github.com/rdoeffinger/Dictionary/releases",
     )
 }
@@ -62,25 +68,25 @@ actual fun ExternalToolLauncher.visit(data : QuickDictionaryData) {
  * Launch or display warning if app not installed
  */
 @Throws(AppNotFoundException::class)
-actual fun ExternalToolLauncher.visit(data : Aard2DictionaryData) {
+actual suspend fun ExternalToolLauncher.visit(data : Aard2DictionaryData) {
     ExternalCaller.launchIntent(
         this.activity,
         "aard2.lookup",
         SearchManager.QUERY,
         data.word,
-        this.activity.getString(R.string.aard2),
+        getString(Res.string.aard2),
         "https://aarddict.org/",
     )
 }
 
-actual fun ExternalToolLauncher.visit(data : HTMLToolData) {
+actual suspend fun ExternalToolLauncher.visit(data : HTMLToolData) {
     val i = Intent(Intent.ACTION_VIEW)
     i.setData(data.uri.toAndroidUri())
     this.activity.startActivity(i)
 }
 
-actual fun ExternalToolLauncher.visit(data : SharePuzzleData) {
-    val title = this.activity.getString(R.string.share_puzzle_title)
+actual suspend fun ExternalToolLauncher.visit(data : SharePuzzleData) {
+    val title = getString(Res.string.share_puzzle_title)
     val shareIntent = ShareCompat.IntentBuilder(this.activity)
         .setChooserTitle(title)
         .setStream(data.uri.toAndroidUri())
@@ -89,7 +95,7 @@ actual fun ExternalToolLauncher.visit(data : SharePuzzleData) {
     this.activity.startActivity(shareIntent);
 }
 
-actual fun ExternalToolLauncher.visit(data : ShareTextData) {
+actual suspend fun ExternalToolLauncher.visit(data : ShareTextData) {
     // ShareCompat from
     // https://stackoverflow.com/a/39619468/6882587
     // assume works better than the out-of-date android docs!

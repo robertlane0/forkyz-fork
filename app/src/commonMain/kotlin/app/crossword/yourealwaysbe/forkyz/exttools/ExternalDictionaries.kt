@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.exttools
 
-import app.crossword.yourealwaysbe.forkyz.R
 import app.crossword.yourealwaysbe.forkyz.settings.ExternalDictionarySetting
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.puz.Box
@@ -11,19 +10,19 @@ import app.crossword.yourealwaysbe.puz.Zone
 abstract class ExternalDictionaryData(val word : String) : ExternalToolData()
 
 class FreeDictionaryData(word : String) : ExternalDictionaryData(word) {
-    override fun accept(launcher : ExternalToolLauncher) {
+    override suspend fun accept(launcher : ExternalToolLauncher) {
         launcher.visit(this)
     }
 }
 
 class QuickDictionaryData(word : String) : ExternalDictionaryData(word) {
-    override fun accept(launcher : ExternalToolLauncher) {
+    override suspend fun accept(launcher : ExternalToolLauncher) {
         launcher.visit(this)
     }
 }
 
 class Aard2DictionaryData(word : String) : ExternalDictionaryData(word) {
-    override fun accept(launcher : ExternalToolLauncher) {
+    override suspend fun accept(launcher : ExternalToolLauncher) {
         launcher.visit(this)
     }
 }
@@ -83,9 +82,9 @@ class ExternalDictionaries {
 }
 
 @Throws(AppNotFoundException::class)
-expect fun ExternalToolLauncher.visit(data : FreeDictionaryData)
+expect suspend fun ExternalToolLauncher.visit(data : FreeDictionaryData)
 @Throws(AppNotFoundException::class)
-expect fun ExternalToolLauncher.visit(data : QuickDictionaryData)
+expect suspend fun ExternalToolLauncher.visit(data : QuickDictionaryData)
 @Throws(AppNotFoundException::class)
-expect fun ExternalToolLauncher.visit(data : Aard2DictionaryData)
+expect suspend fun ExternalToolLauncher.visit(data : Aard2DictionaryData)
 

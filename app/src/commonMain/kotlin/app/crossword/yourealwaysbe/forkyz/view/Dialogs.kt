@@ -36,7 +36,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.fromHtml
@@ -45,7 +44,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 
-import app.crossword.yourealwaysbe.forkyz.R
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.stringResource
+
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.cancel
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ok
 
 private val DIALOG_BUTTON_PADDING = 4.dp
 private val DIALOG_PADDING = 20.dp
@@ -65,8 +69,8 @@ private val ENABLED_ALPHA = 1.0F
  */
 @Composable
 fun OKCancelDialog(
-    title : Int,
-    summary : Int?,
+    title : StringResource,
+    summary : StringResource?,
     onCancel : () -> Unit,
     onOK : () -> Unit,
     body : @Composable () -> Unit = { },
@@ -91,9 +95,9 @@ fun OKCancelDialog(
     TwoButtonDialog(
         title = title,
         summary = summary,
-        positiveText = stringResource(android.R.string.ok),
+        positiveText = stringResource(Res.string.ok),
         onPositive = onOK,
-        negativeText = stringResource(android.R.string.cancel),
+        negativeText = stringResource(Res.string.cancel),
         onNegative = onCancel,
         body = body,
     )
@@ -112,11 +116,11 @@ fun OKCancelDialog(
  */
 @Composable
 fun TwoButtonDialog(
-    title : Int,
-    summary : Int? = null,
-    positiveText : Int,
+    title : StringResource,
+    summary : StringResource? = null,
+    positiveText : StringResource,
     onPositive : () -> Unit,
-    negativeText : Int,
+    negativeText : StringResource,
     onNegative : () -> Unit,
     onCancel : () -> Unit = onNegative,
     body : @Composable () -> Unit = { },
@@ -185,7 +189,7 @@ fun TwoButtonDialog(
  */
 @Composable
 fun OKDialog(
-    title : Int,
+    title : StringResource,
     summary : String?,
     onClose : () -> Unit,
     body : @Composable () -> Unit = { },
@@ -222,7 +226,7 @@ fun OKDialog(
                     horizontal = DIALOG_BUTTON_PADDING,
                 ),
             ) {
-                Text(stringResource(android.R.string.ok))
+                Text(stringResource(Res.string.ok))
             }
         }
     }
@@ -237,9 +241,9 @@ fun OKDialog(
  */
 @Composable
 fun StringDialog(
-    title : Int,
-    summary : Int? = null,
-    hint : Int?,
+    title : StringResource,
+    summary : StringResource? = null,
+    hint : StringResource?,
     value : String?,
     onValueChange : (String) -> Unit,
     onDismissRequest : () -> Unit,
@@ -280,8 +284,8 @@ fun StringDialog(
  */
 @Composable
 fun ListDialog(
-    title : Int,
-    summary : Int? = null,
+    title : StringResource,
+    summary : StringResource? = null,
     labels : List<String>,
     colorOf : (@Composable (Int) -> Color)? = null,
     selected : Int,
@@ -346,9 +350,9 @@ fun ListDialog(
  */
 @Composable
 fun MultiListDialog(
-    title : Int,
-    summary : Int? = null,
-    allOrNoneLabel : Int? = null,
+    title : StringResource,
+    summary : StringResource? = null,
+    allOrNoneLabel : StringResource? = null,
     numItems : Int,
     getItem : @Composable (Int) -> Unit,
     getEnabled : (Int) -> Boolean = { true },
@@ -356,7 +360,7 @@ fun MultiListDialog(
     onSelect : (Set<Int>) -> Unit = { },
     onDismissRequest : () -> Unit = { },
     onSelectionChange : (Set<Int>) -> Unit = { },
-    okLabel : Int? = null,
+    okLabel : StringResource? = null,
     body : @Composable () -> Unit = { },
 ) {
     var selectedState by remember { mutableStateOf(selected) }
@@ -371,9 +375,9 @@ fun MultiListDialog(
     TwoButtonDialog(
         title = title,
         summary = summary,
-        negativeText = android.R.string.cancel,
+        negativeText = Res.string.cancel,
         onNegative = onDismissRequest,
-        positiveText = okLabel ?: android.R.string.ok,
+        positiveText = okLabel ?: Res.string.ok,
         onPositive = { onSelect(selectedState) }
     ) {
         body()

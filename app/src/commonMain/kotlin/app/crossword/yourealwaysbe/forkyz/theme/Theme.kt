@@ -25,11 +25,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.res.stringResource
 import androidx.core.view.WindowCompat
 import com.google.android.material.color.DynamicColors
 
-import app.crossword.yourealwaysbe.forkyz.R
+import org.jetbrains.compose.resources.stringResource
+
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.back
 import app.crossword.yourealwaysbe.forkyz.settings.DayNightMode
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.Theme
@@ -260,7 +262,7 @@ fun ForkyzTopAppBar(
                 IconButton(onClick = onBack) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
-                        stringResource(R.string.back),
+                        stringResource(Res.string.back),
                     )
                 }
             }

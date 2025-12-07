@@ -4,6 +4,7 @@ package app.crossword.yourealwaysbe.forkyz
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
+import java.util.Locale
 import java.util.stream.Collectors
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +17,23 @@ import androidx.compose.ui.text.fromHtml
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
+import org.jetbrains.compose.resources.MissingResourceException
+
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.asset_not_found
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.html_file_full_path
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
+
+enum class HTMLPage(val unqualifiedFileName : String) {
+    BROWSE_HELP("filescreen.html"),
+    LICENSE("license.html"),
+    PLAY_HELP("play.html"),
+    RELEASE_NOTES("release.html"),
+    SCRAPERS_HELP("scrapes.html"),
+    VOICE_COMMANDS_HELP("voice_commands.html"),
+}
+
+private val DEFAULT_FILES_DIR = "en/%s"
 
 class HTMLPageViewModel(
     private val utils : NativeBackendUtils,
@@ -27,19 +44,32 @@ class HTMLPageViewModel(
     )
     val assetText : StateFlow<AnnotatedString> = _assetText
 
-    fun loadAsset(rawAssetID : Int) {
+    fun loadAsset(page : HTMLPage) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                BufferedReader(
-                    InputStreamReader(utils.getRawResource(rawAssetID))
-                ).use { reader ->
-                    val htmlData
-                        = reader.lines().collect(Collectors.joining("\n"))
-                    _assetText.value =  AnnotatedString.fromHtml(htmlData)
+                val path = utils.getString(
+                    Res.string.html_file_full_path,
+                    page.unqualifiedFileName,
+                )
+                val htmlData = Res.readBytes(path).decodeToString()
+                _assetText.value = AnnotatedString.fromHtml(htmlData)
+            } catch (e : MissingResourceException) {
+                try {
+                    val path = String.format(
+                        Locale.US,
+                        DEFAULT_FILES_DIR,
+                        page.unqualifiedFileName,
+                    )
+                    val htmlData = Res.readBytes(path).decodeToString()
+                    _assetText.value = AnnotatedString.fromHtml(htmlData)
+                } catch (e : IOException) {
+                    _assetText.value = buildAnnotatedString {
+                        append(utils.getString(Res.string.asset_not_found))
+                    }
                 }
             } catch (e : IOException) {
                 _assetText.value = buildAnnotatedString {
-                    append(utils.getString(R.string.asset_not_found))
+                    append(utils.getString(Res.string.asset_not_found))
                 }
             }
         }

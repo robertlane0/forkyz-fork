@@ -3,7 +3,6 @@ package app.crossword.yourealwaysbe.forkyz.exttools
 
 import kotlinx.coroutines.CoroutineScope
 
-import app.crossword.yourealwaysbe.forkyz.R
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerShared
@@ -35,10 +34,10 @@ class SharePuzzleData(
         }
     }
 
-    override fun accept(launcher : ExternalToolLauncher) {
+    override suspend fun accept(launcher : ExternalToolLauncher) {
         launcher.visit(this)
     }
 }
 
-expect fun ExternalToolLauncher.visit(data : SharePuzzleData)
+expect suspend fun ExternalToolLauncher.visit(data : SharePuzzleData)
 

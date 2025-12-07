@@ -10,7 +10,8 @@ import kotlinx.coroutines.runBlocking
 
 import androidx.core.content.ContextCompat
 
-import app.crossword.yourealwaysbe.forkyz.R
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_tab_history
 import app.crossword.yourealwaysbe.forkyz.settings.ClueHighlight
 import app.crossword.yourealwaysbe.forkyz.settings.ClueTabsDouble
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
@@ -346,7 +347,7 @@ class ClueTabsViewModel(
             }
 
         val historyPage = ClueList(
-            utils.getString(R.string.clue_tab_history),
+            utils.getString(Res.string.clue_tab_history),
             (board?.puzzle?.history ?: listOf())
                 .map {
                     getClueItem(

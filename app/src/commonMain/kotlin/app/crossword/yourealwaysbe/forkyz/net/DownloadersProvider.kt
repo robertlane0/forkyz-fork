@@ -9,7 +9,15 @@ import kotlinx.coroutines.flow.map
 
 import androidx.annotation.MainThread
 
-import app.crossword.yourealwaysbe.forkyz.R
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.puzzle_download_failed
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.puzzle_download_no_connection
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.puzzle_downloaded
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.puzzles_downloaded_all
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.puzzles_downloaded_none
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.puzzles_downloaded_some
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.puzzles_downloading
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.puzzles_downloading_from
 import app.crossword.yourealwaysbe.forkyz.settings.DownloadersSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
@@ -80,9 +88,9 @@ class DownloadersProvider(
             notifications.notify(
                 PUZZLE_DOWNLOAD_CHANNEL_ID,
                 0,
-                android.R.drawable.stat_sys_download_done,
+                notifications.downloadDoneIcon,
                 utils.getString(
-                    R.string.puzzle_download_no_connection,
+                    Res.string.puzzle_download_no_connection,
                 ),
             )
         }
@@ -94,10 +102,10 @@ class DownloadersProvider(
             notifications.notify(
                 PUZZLE_DOWNLOAD_CHANNEL_ID,
                 0,
-                android.R.drawable.stat_sys_download,
-                utils.getString(R.string.puzzles_downloading),
+                notifications.downloadIcon,
+                utils.getString(Res.string.puzzles_downloading),
                 utils.getString(
-                    R.string.puzzles_downloading_from,
+                    Res.string.puzzles_downloading_from,
                     name,
                 ),
             )
@@ -116,14 +124,14 @@ class DownloadersProvider(
                 return
 
             val messageId = if (result.isSuccess)
-                R.string.puzzle_downloaded
+                Res.string.puzzle_downloaded
             else
-                R.string.puzzle_download_failed;
+                Res.string.puzzle_download_failed;
 
             notifications.notify(
                 PUZZLE_DOWNLOAD_CHANNEL_ID,
                 nextNotificationID++,
-                android.R.drawable.stat_sys_download_done,
+                notifications.downloadDoneIcon,
                 utils.getString(messageId, name),
             )
         }
@@ -138,19 +146,19 @@ class DownloadersProvider(
                 return
 
             val messageID = if (someDownloaded && someFailed)
-                R.string.puzzles_downloaded_some
+                Res.string.puzzles_downloaded_some
             else if (someDownloaded)
-                R.string.puzzles_downloaded_all
+                Res.string.puzzles_downloaded_all
             else if (someFailed)
-                R.string.puzzles_downloaded_none;
+                Res.string.puzzles_downloaded_none;
             else // nothing downloaded or failed
-                -1
+                null
 
-            if (messageID >= 0) {
+            if (messageID != null) {
                 notifications.notify(
                     PUZZLE_DOWNLOAD_CHANNEL_ID,
                     0,
-                    android.R.drawable.stat_sys_download_done,
+                    notifications.downloadDoneIcon,
                     utils.getString(messageID),
                 )
             }

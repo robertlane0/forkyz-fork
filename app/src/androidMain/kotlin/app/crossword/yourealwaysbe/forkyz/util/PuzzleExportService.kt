@@ -5,6 +5,7 @@ import java.io.IOException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 import android.app.Service
 import android.content.Context
@@ -14,9 +15,15 @@ import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 
+import org.jetbrains.compose.resources.getString
+
 import org.koin.android.ext.android.inject
 
-import app.crossword.yourealwaysbe.forkyz.R
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.exporting_puzzles
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.exporting_puzzles
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.puzzles_export_failed
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.puzzles_exported
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
@@ -54,11 +61,13 @@ class PuzzleExportService() : Service() {
         if (intent == null || uri == null)
             return START_NOT_STICKY
 
+        // can't really launch before notification
+        val title = runBlocking { getString(Res.string.exporting_puzzles) }
         val notification = NotificationCompat.Builder(
             this,
             NOTIFICATION_CHANNEL_ID,
         ).setSmallIcon(android.R.drawable.ic_menu_save)
-            .setContentTitle(context.getString(R.string.exporting_puzzles))
+            .setContentTitle(title)
             .setWhen(System.currentTimeMillis())
             .build()
 
@@ -69,25 +78,29 @@ class PuzzleExportService() : Service() {
             versionUtils.foregroundServiceTypeDataSync(),
         )
 
-        Toast.makeText(
-            context,
-            R.string.exporting_puzzles,
-            Toast.LENGTH_SHORT
-        ).show()
+        mainScope.launch {
+            Toast.makeText(
+                context,
+                getString(Res.string.exporting_puzzles),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
 
         exportPuzzles(uri) { success ->
             val resultMsg = if (success)
-                R.string.puzzles_exported
+                Res.string.puzzles_exported
             else
-                R.string.puzzles_export_failed
+                Res.string.puzzles_export_failed
 
-            Toast.makeText(
-                context,
-                resultMsg,
-                Toast.LENGTH_SHORT
-            ).show()
+            mainScope.launch {
+                Toast.makeText(
+                    context,
+                    getString(resultMsg),
+                    Toast.LENGTH_SHORT
+                ).show()
 
-            stopSelf()
+                stopSelf()
+            }
         }
 
         // don't re-export if killed

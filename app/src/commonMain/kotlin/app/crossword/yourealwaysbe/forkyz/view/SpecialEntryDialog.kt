@@ -20,11 +20,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
-import app.crossword.yourealwaysbe.forkyz.R
+import org.jetbrains.compose.resources.stringResource
+
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.enter_special_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.special_character
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.special_entry
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.special_entry_force_caps
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 
 @Composable
@@ -33,8 +38,8 @@ fun SpecialEntryDialog(
     onClose : () -> Unit,
 ) {
     OKCancelDialog(
-        title = R.string.special_entry,
-        summary = R.string.enter_special_desc,
+        title = Res.string.special_entry,
+        summary = Res.string.enter_special_desc,
         onCancel = { onClose() },
         onOK = {
             viewModel.playResponse()
@@ -50,7 +55,7 @@ fun SpecialEntryDialog(
 
         OutlinedTextField(
             label = {
-                Text(stringResource(R.string.special_character))
+                Text(stringResource(Res.string.special_character))
             },
             value = currentResponse,
             onValueChange = {
@@ -71,7 +76,7 @@ fun SpecialEntryDialog(
             )
             Text(
                 stringResource(
-                    R.string.special_entry_force_caps
+                    Res.string.special_entry_force_caps
                 ),
             )
         }

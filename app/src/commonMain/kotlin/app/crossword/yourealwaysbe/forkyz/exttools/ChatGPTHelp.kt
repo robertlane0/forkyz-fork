@@ -13,7 +13,14 @@ import androidx.annotation.MainThread
 import org.json.JSONException
 import org.json.JSONObject
 
-import app.crossword.yourealwaysbe.forkyz.R
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.help_no_clue_to_query
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.help_query_failed
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.help_query_just_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.help_query_just_response
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.help_query_just_solution
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.help_query_solution_and_response
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_clue_blank_box
 import app.crossword.yourealwaysbe.forkyz.settings.ExternalToolSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
@@ -47,11 +54,11 @@ suspend fun askChatGPTForCurrentClue(
     settings.liveExtChatGPTAPIKey.first()?.let { apiKey ->
         val query = makeQuery(utils, board)
         if (query == null) {
-            callback(utils.getString(R.string.help_no_clue_to_query))
+            callback(utils.getString(Res.string.help_no_clue_to_query))
         } else {
             makeRequest(apiKey, query) { response ->
                 if (response == null)
-                    callback(utils.getString(R.string.help_query_failed))
+                    callback(utils.getString(Res.string.help_query_failed))
                 else
                     callback(response)
             }
@@ -123,7 +130,7 @@ private suspend fun makeQuery(
     utils : NativeBackendUtils,
     board : Playboard,
 ) : String? {
-    val blank = utils.getString(R.string.share_clue_blank_box)
+    val blank = utils.getString(Res.string.share_clue_blank_box)
 
     val puz = board.getPuzzle()
     if (puz == null)
@@ -171,21 +178,21 @@ private suspend fun makeQuery(
 
     if (response != null && solution != null) {
         return utils.getString(
-            R.string.help_query_solution_and_response,
+            Res.string.help_query_solution_and_response,
             hint, response, solution
         )
     } else if (response != null) {
         return utils.getString(
-            R.string.help_query_just_response,
+            Res.string.help_query_just_response,
             hint, response
         )
     } else if (solution != null) {
         return utils.getString(
-            R.string.help_query_just_solution,
+            Res.string.help_query_just_solution,
             hint, solution
         )
     } else {
-        return utils.getString(R.string.help_query_just_clue, clue)
+        return utils.getString(Res.string.help_query_just_clue, clue)
     }
 }
 

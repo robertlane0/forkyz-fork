@@ -54,12 +54,37 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.stringResource
+
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.anagram_solution_lab
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.anagram_source_lab
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.anagram_source_lab
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.anagram_source_lab
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.board_lab
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.choose_flag_color
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.copy_conflict
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.flag_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.general_clue_notes
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.general_puzzle_notes
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.menu_flag_cell_toggle
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.menu_flag_clue_toggle
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.menu_notes_puzzle
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.notes_lab
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.overflow
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.scratch_lab
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.scratch_lab
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.shuffle_anagram_source
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.transfer_anagram_solution_to_focussed_view
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.transfer_board_to_focussed_view
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.transfer_overwrite_warning
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.transfer_scratch_to_focussed_view
 import app.crossword.yourealwaysbe.forkyz.menu.BaseMenuModifier
 import app.crossword.yourealwaysbe.forkyz.menu.MenuText
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
@@ -185,7 +210,7 @@ fun NotesPage(
         fun MenuClueFlagToggle() {
             DropdownMenuItem(
                 text = {
-                    MenuText(stringResource(R.string.menu_flag_clue_toggle))
+                    MenuText(stringResource(Res.string.menu_flag_clue_toggle))
                 },
                 onClick = {
                     viewModel.toggleClueFlag()
@@ -198,7 +223,7 @@ fun NotesPage(
         fun MenuCellFlagToggle() {
             DropdownMenuItem(
                 text = {
-                    MenuText(stringResource(R.string.menu_flag_cell_toggle))
+                    MenuText(stringResource(Res.string.menu_flag_cell_toggle))
                 },
                 onClick = {
                     viewModel.toggleCellFlag()
@@ -212,7 +237,7 @@ fun NotesPage(
             IconButton(onClick = { viewModel.expandMenu(PuzzleSubMenu.MAIN) }) {
                 Icon(
                     Icons.Default.MoreVert,
-                    contentDescription = stringResource(R.string.overflow),
+                    contentDescription = stringResource(Res.string.overflow),
                 )
             }
 
@@ -284,7 +309,7 @@ fun NotesPage(
                     }
 
                     if (isPuzzleNotes) {
-                        Text(stringResource(R.string.menu_notes_puzzle))
+                        Text(stringResource(Res.string.menu_notes_puzzle))
                     } else {
                         ClueText(
                             modifier = Modifier.fillMaxWidth(),
@@ -298,7 +323,7 @@ fun NotesPage(
         }
 
         @Composable
-        fun BoardLabel(stringID : Int) {
+        fun BoardLabel(stringID : StringResource) {
             Text(stringResource(stringID))
         }
 
@@ -314,7 +339,7 @@ fun NotesPage(
             val boardColorScheme = themeHelper.getBoardColorScheme()
             val boxInputState = remember { BoxInputState() }
 
-            BoardLabel(R.string.board_lab)
+            BoardLabel(Res.string.board_lab)
             WordEdit(
                 modifier = Modifier.onKeyEvent(::onMiniboardKeyEvent)
                     .padding(vertical = VERTICAL_BOARD_PADDING),
@@ -334,7 +359,7 @@ fun NotesPage(
                     transferToFocussed(NoteEntry.BOARD)
                 },
                 onLongPressDescription
-                    = stringResource(R.string.transfer_board_to_focussed_view),
+                    = stringResource(Res.string.transfer_board_to_focussed_view),
             )
 
             LaunchedEffect(Unit) {
@@ -409,7 +434,7 @@ fun NotesPage(
             }
             val boardEditTextState = rememberBoardEditTextState()
 
-            BoardLabel(R.string.scratch_lab)
+            BoardLabel(Res.string.scratch_lab)
             NotesBoardEditText(
                 maxWidth = maxWidth,
                 boardEditTextState = boardEditTextState,
@@ -426,11 +451,11 @@ fun NotesPage(
                     transferToFocussed(NoteEntry.SCRATCH, NoteEntry.BOARD)
                 },
                 onLongPressDescription
-                    = stringResource(R.string.transfer_scratch_to_focussed_view),
+                    = stringResource(Res.string.transfer_scratch_to_focussed_view),
                 onFocusChanged = { focussed ->
                     setFocussedEntry(NoteEntry.SCRATCH, focussed)
                 },
-                contentDescription = stringResource(R.string.scratch_lab),
+                contentDescription = stringResource(Res.string.scratch_lab),
             )
         }
 
@@ -441,9 +466,9 @@ fun NotesPage(
                 derivedStateOf { state.isPuzzleNotes }
             }
             val hintStringID = if (isPuzzleNotes)
-                R.string.general_puzzle_notes
+                Res.string.general_puzzle_notes
             else
-                R.string.general_clue_notes
+                Res.string.general_clue_notes
             val textStyle = LocalTextStyle.current.copy(
                 fontFamily = FontFamily.Monospace
             )
@@ -455,7 +480,7 @@ fun NotesPage(
                 mutableStateOf(textValue)
             }
 
-            BoardLabel(R.string.notes_lab)
+            BoardLabel(Res.string.notes_lab)
             TextField(
                 modifier = modifier.fillMaxWidth()
                     .padding(vertical = VERTICAL_BOARD_PADDING)
@@ -493,7 +518,7 @@ fun NotesPage(
                             onLongClick = viewModel::longClickNotesClueFlag,
                             onClick = viewModel::toggleNotesClueFlag,
                             onLongClickLabel = stringResource(
-                                R.string.choose_flag_color
+                                Res.string.choose_flag_color
                             ),
                         ),
                         verticalAlignment = Alignment.CenterVertically
@@ -510,7 +535,7 @@ fun NotesPage(
                             )
                         }
 
-                        Text(stringResource(R.string.flag_clue))
+                        Text(stringResource(Res.string.flag_clue))
                         val checked by remember {
                             derivedStateOf { state.clueFlagged }
                         }
@@ -549,7 +574,7 @@ fun NotesPage(
                     viewModel.clearAcceptedPredictionEvent()
             }
 
-            BoardLabel(R.string.anagram_source_lab)
+            BoardLabel(Res.string.anagram_source_lab)
             val anagramSourceValue by remember {
                 derivedStateOf { state.anagramSourceValue }
             }
@@ -570,12 +595,12 @@ fun NotesPage(
                 },
                 onLongPress = viewModel::shuffleAnagramSource,
                 onLongPressDescription
-                    = stringResource(R.string.shuffle_anagram_source),
+                    = stringResource(Res.string.shuffle_anagram_source),
                 onFocusChanged = { focussed ->
                     setFocussedEntry(NoteEntry.ANAGRAM_SOURCE, focussed)
                 },
                 contentDescription
-                    = stringResource(R.string.anagram_source_lab),
+                    = stringResource(Res.string.anagram_source_lab),
             )
         }
 
@@ -584,7 +609,7 @@ fun NotesPage(
             val state by viewModel.notesUIState.collectAsStateWithLifecycle()
             val boardEditTextState = rememberBoardEditTextState()
 
-            BoardLabel(R.string.anagram_solution_lab)
+            BoardLabel(Res.string.anagram_solution_lab)
             val anagramSolutionValue by remember {
                 derivedStateOf { state.anagramSolutionValue }
             }
@@ -607,13 +632,13 @@ fun NotesPage(
                     )
                 },
                 onLongPressDescription = stringResource(
-                    R.string.transfer_anagram_solution_to_focussed_view
+                    Res.string.transfer_anagram_solution_to_focussed_view
                 ),
                 onFocusChanged = { focussed ->
                     setFocussedEntry(NoteEntry.ANAGRAM_SOLUTION, focussed)
                 },
                 contentDescription
-                    = stringResource(R.string.anagram_source_lab),
+                    = stringResource(Res.string.anagram_source_lab),
             )
         }
 
@@ -625,8 +650,8 @@ fun NotesPage(
             }
             if (confirmTransferRequest != null) {
                 OKCancelDialog(
-                    title = R.string.copy_conflict,
-                    summary = R.string.transfer_overwrite_warning,
+                    title = Res.string.copy_conflict,
+                    summary = Res.string.transfer_overwrite_warning,
                     onOK = { viewModel.confirmTransferRequest(true) },
                     onCancel = { viewModel.confirmTransferRequest(false) },
                 )

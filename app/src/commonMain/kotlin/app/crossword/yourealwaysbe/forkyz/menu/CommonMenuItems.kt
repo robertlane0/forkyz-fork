@@ -11,13 +11,19 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 
-import app.crossword.yourealwaysbe.forkyz.R
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
+
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.help
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_submenu
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_submenu
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.settings
 
 val BaseMenuModifier = Modifier.defaultMinSize(minWidth = 200.dp)
 
@@ -36,7 +42,7 @@ fun MenuSubEntry(
         onClick = onClick,
         trailingIcon = {
             Icon(
-                painter = painterResource(R.drawable.ic_submenu),
+                painter = painterResource(Res.drawable.ic_submenu),
                 contentDescription = null,
             )
         }
@@ -46,13 +52,13 @@ fun MenuSubEntry(
 
 @Composable
 fun MenuDropdownHeading(
-    titleId : Int,
+    titleId : StringResource,
     onClick : () -> Unit,
 ) {
     DropdownMenuItem(
         leadingIcon = {
                 Icon(
-                    painter = painterResource(R.drawable.ic_submenu),
+                    painter = painterResource(Res.drawable.ic_submenu),
                     modifier = Modifier.rotate(180f),
                     contentDescription = null,
                 )
@@ -74,7 +80,7 @@ fun MenuHelp(
     onDismiss : () -> Unit = { },
 ) {
     DropdownMenuItem(
-        text = { MenuText(stringResource(R.string.help)) },
+        text = { MenuText(stringResource(Res.string.help)) },
         onClick = {
             openHelp()
             onDismiss()
@@ -88,7 +94,7 @@ fun MenuSettings(
     onDismiss : () -> Unit = { },
 ) {
     DropdownMenuItem(
-        text = { MenuText(stringResource(R.string.settings)) },
+        text = { MenuText(stringResource(Res.string.settings)) },
         onClick = {
             openSettings()
             onDismiss()

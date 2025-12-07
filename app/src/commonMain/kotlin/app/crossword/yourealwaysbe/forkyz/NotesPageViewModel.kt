@@ -13,6 +13,12 @@ import kotlinx.coroutines.launch
 
 import androidx.lifecycle.viewModelScope
 
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_clear
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_flag
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_left
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_right
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_scratch
 import app.crossword.yourealwaysbe.forkyz.exttools.CrosswordSolverData
 import app.crossword.yourealwaysbe.forkyz.exttools.ExternalDictionaries
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
@@ -493,20 +499,20 @@ class NotesPageViewModel(
         viewModelScope.launch {
             registerVoiceCommand(
                 VoiceCommand(
-                    utils.getString(R.string.command_left),
+                    utils.getString(Res.string.command_left),
                     { _ -> moveLeft() }
                 )
             )
             registerVoiceCommand(
                 VoiceCommand(
-                    utils.getString(R.string.command_right),
+                    utils.getString(Res.string.command_right),
                     { _ -> moveRight() }
                 )
             )
-            val clear = utils.getString(R.string.command_clear)
+            val clear = utils.getString(Res.string.command_clear)
             registerVoiceCommand(
                 VoiceCommand(
-                    utils.getString(R.string.command_scratch),
+                    utils.getString(Res.string.command_scratch),
                     { text ->
                         // remove non-word as not usually entered into grids
                         val prepped = text.replace("\\W+", "")
@@ -524,7 +530,7 @@ class NotesPageViewModel(
             )
             registerVoiceCommand(
                 VoiceCommand(
-                    utils.getString(R.string.command_flag),
+                    utils.getString(Res.string.command_flag),
                     { _ -> toggleNotesClueFlag() }
                 )
             )

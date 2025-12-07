@@ -16,10 +16,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
+import org.jetbrains.compose.resources.stringResource
+
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.app_name
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 
 private val PADDING = 20.dp
@@ -29,18 +32,18 @@ private val PADDING = 20.dp
 fun HTMLPage(
     viewModel : HTMLPageViewModel,
     themeHelper : ThemeHelper,
-    rawAssetID : Int,
+    page : HTMLPage,
     onBack : () -> Unit,
 ) {
-    LaunchedEffect(rawAssetID) {
-        viewModel.loadAsset(rawAssetID)
+    LaunchedEffect(page) {
+        viewModel.loadAsset(page)
     }
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     Scaffold(
         topBar = {
             themeHelper.ForkyzTopAppBar(
-                title = { Text(stringResource(R.string.app_name)) },
+                title = { Text(stringResource(Res.string.app_name)) },
                 onBack = onBack,
                 scrollBehavior = scrollBehavior,
             )

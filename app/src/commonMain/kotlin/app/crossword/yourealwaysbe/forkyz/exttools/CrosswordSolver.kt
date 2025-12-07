@@ -75,11 +75,11 @@ class CrosswordSolverData(
         }
     }
 
-    override fun accept(launcher : ExternalToolLauncher) {
+    override suspend fun accept(launcher : ExternalToolLauncher) {
         launcher.visit(this)
     }
 }
 
 @Throws(AppNotFoundException::class)
-expect fun ExternalToolLauncher.visit(data : CrosswordSolverData)
+expect suspend fun ExternalToolLauncher.visit(data : CrosswordSolverData)
 

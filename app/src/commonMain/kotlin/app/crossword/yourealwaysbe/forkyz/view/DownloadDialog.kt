@@ -19,8 +19,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.pluralStringResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -31,7 +29,21 @@ import dev.darkokoa.datetimewheelpicker.core.format.DateFormatter
 import dev.darkokoa.datetimewheelpicker.core.format.MonthDisplayStyle
 import dev.darkokoa.datetimewheelpicker.core.format.dateFormatter
 
-import app.crossword.yourealwaysbe.forkyz.R
+import org.jetbrains.compose.resources.pluralStringResource
+import org.jetbrains.compose.resources.stringResource
+
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.cancel
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.download
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.download_puzzles
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.downloader_available_future
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.downloader_available_hours
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.downloader_available_soon
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.downloader_not_available
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.no_downloaders_enabled
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.no_downloaders_enabled_msg
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.select_sources
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.settings
 
 @Composable
 fun DownloadDialog(
@@ -52,8 +64,8 @@ fun DownloadDialog(
             }.toSet()
 
             MultiListDialog(
-                title = R.string.download_puzzles,
-                allOrNoneLabel = R.string.select_sources,
+                title = Res.string.download_puzzles,
+                allOrNoneLabel = Res.string.select_sources,
                 numItems = downloaders.size,
                 getItem = { index -> DownloaderLabel(downloaders, index) },
                 getEnabled = { index ->
@@ -69,7 +81,7 @@ fun DownloadDialog(
                             .toSet()
                     )
                 },
-                okLabel = R.string.download,
+                okLabel = Res.string.download,
             ) {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
@@ -99,11 +111,11 @@ fun DownloadDialog(
             }
         } else {
             TwoButtonDialog(
-                title = R.string.no_downloaders_enabled,
-                summary = R.string.no_downloaders_enabled_msg,
-                positiveText = R.string.settings,
+                title = Res.string.no_downloaders_enabled,
+                summary = Res.string.no_downloaders_enabled_msg,
+                positiveText = Res.string.settings,
                 onPositive = onOpenSettings,
-                negativeText = android.R.string.cancel,
+                negativeText = Res.string.cancel,
                 onNegative = onCancel,
             )
         }
@@ -134,20 +146,20 @@ private fun DownloaderLabel(
             val availabilityLabel = if (downloader.availableNow) {
                 null
             } else if (downloader.availableHours == null) {
-                stringResource(R.string.downloader_not_available)
+                stringResource(Res.string.downloader_not_available)
             } else if (availableHours < 0) {
                 // should not happen because it's available now!
                 null
             } else if (availableHours == 0L) {
-                stringResource(R.string.downloader_available_soon)
+                stringResource(Res.string.downloader_available_soon)
             } else if (availableHours < 24L) {
                 pluralStringResource(
-                    R.plurals.downloader_available_hours,
+                    Res.plurals.downloader_available_hours,
                     availableHours.toInt(),
                     availableHours,
                 )
             } else {
-                stringResource(R.string.downloader_available_future)
+                stringResource(Res.string.downloader_available_future)
             }
 
             availabilityLabel?.let {

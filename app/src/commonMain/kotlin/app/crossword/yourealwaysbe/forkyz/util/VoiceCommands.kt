@@ -47,8 +47,7 @@ class VoiceCommands {
         /**
          * Construct a VoiceCommand
          *
-         * @param commandId the R.string id for the word identifying
-         * this command
+         * @param command the word identifying this command
          * @param execute a function that consumes the string after the
          * command word
          */

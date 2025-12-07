@@ -64,9 +64,6 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.integerResource
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.pluralStringResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.TextAlign
@@ -83,6 +80,72 @@ import com.leinardi.android.speeddial.compose.SpeedDial
 import com.leinardi.android.speeddial.compose.SpeedDialOverlay
 import com.leinardi.android.speeddial.compose.SpeedDialState
 
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.pluralStringResource
+import org.jetbrains.compose.resources.stringResource
+
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.add_puzzle
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.android_app_settings_button
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.by_date_asc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.by_date_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.by_source
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.cleanup
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.close
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.confirm_cleanup
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.confirm_cleanup_msg
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.confirm_delete
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.confirm_delete_msg
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.day_mode
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.delete
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.delete_selected
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.disable_notifications
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.disable_notifications_button
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.download_puzzles
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.download_puzzles
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.filter_puzzles
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.filter_puzzles
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.filter_puzzles_hint
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.has_solution_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_delete
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_delete
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_download
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_import
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_menu_archive
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_menu_unarchive
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_online_sources
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_solution
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.import_failure_long
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.import_puzzle
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.import_puzzle
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.import_success_long
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.imports_title
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.internal_storage_description
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.new_version_message
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.new_version_title
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.night_mode
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.no_cleanup_action
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.no_cleanup_action_msg
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.no_puzzles
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.no_puzzles_download_or_configure_storage
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.notifications_denied_msg
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.num_selected
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.online_sources
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.online_sources
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.overflow
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.please_wait
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.sort
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.sort
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.system_daynight_mode
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.title_view_archives
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.title_view_archives
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.title_view_crosswords
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.title_view_crosswords
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.toggle_archive
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.toggle_archive_selected
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.view_release_notes
 import app.crossword.yourealwaysbe.forkyz.menu.BaseMenuModifier
 import app.crossword.yourealwaysbe.forkyz.menu.MenuDropdownHeading
 import app.crossword.yourealwaysbe.forkyz.menu.MenuHelp
@@ -188,17 +251,17 @@ fun BrowsePage(
     fun DeleteSelectedButton() {
         IconButton(onClick = viewModel::deleteSelectedPuzzles) {
             Icon(
-                painter = painterResource(R.drawable.ic_delete),
-                contentDescription = stringResource(R.string.delete_selected),
+                painter = painterResource(Res.drawable.ic_delete),
+                contentDescription = stringResource(Res.string.delete_selected),
             )
         }
     }
 
-    fun toggleArchiveIcon(isArchive : Boolean) : Int {
+    fun toggleArchiveIcon(isArchive : Boolean) : DrawableResource {
         if (isArchive)
-            return R.drawable.ic_menu_unarchive
+            return Res.drawable.ic_menu_unarchive
         else
-            return R.drawable.ic_menu_archive
+            return Res.drawable.ic_menu_archive
     }
 
     @Composable
@@ -211,7 +274,7 @@ fun BrowsePage(
             Icon(
                 painter = painterResource(toggleArchiveIcon(isArchive)),
                 contentDescription
-                    = stringResource(R.string.toggle_archive_selected),
+                    = stringResource(Res.string.toggle_archive_selected),
             )
         }
     }
@@ -221,7 +284,7 @@ fun BrowsePage(
         Icon(
             modifier = modifier,
             imageVector = Icons.Filled.Add,
-            contentDescription = stringResource(R.string.add_puzzle),
+            contentDescription = stringResource(Res.string.add_puzzle),
         )
     }
 
@@ -253,9 +316,9 @@ fun BrowsePage(
     fun OnlineSourcesButton(close : () -> Unit) {
         SpeedDialButton(
             onClick = { pageOpener.openOnlineSources() },
-            labelContent = { Text(stringResource(R.string.online_sources)) },
-            painter = painterResource(R.drawable.ic_online_sources),
-            contentDescription = stringResource(R.string.online_sources),
+            labelContent = { Text(stringResource(Res.string.online_sources)) },
+            painter = painterResource(Res.drawable.ic_online_sources),
+            contentDescription = stringResource(Res.string.online_sources),
             close = close,
         )
     }
@@ -264,9 +327,9 @@ fun BrowsePage(
     fun ImportPuzzlesButton(close : () -> Unit) {
         SpeedDialButton(
             onClick = utils::onImport,
-            labelContent = { Text(stringResource(R.string.import_puzzle)) },
-            painter = painterResource(R.drawable.ic_import),
-            contentDescription = stringResource(R.string.import_puzzle),
+            labelContent = { Text(stringResource(Res.string.import_puzzle)) },
+            painter = painterResource(Res.drawable.ic_import),
+            contentDescription = stringResource(Res.string.import_puzzle),
             close = close,
         )
     }
@@ -275,9 +338,9 @@ fun BrowsePage(
     fun DownloadPuzzlesButton(close : () -> Unit) {
         SpeedDialButton(
             onClick = ::showDownloadDialog,
-            labelContent = { Text(stringResource(R.string.download_puzzles)) },
-            painter = painterResource(R.drawable.ic_download),
-            contentDescription = stringResource(R.string.download_puzzles),
+            labelContent = { Text(stringResource(Res.string.download_puzzles)) },
+            painter = painterResource(Res.drawable.ic_download),
+            contentDescription = stringResource(Res.string.download_puzzles),
             close = close,
         )
     }
@@ -287,7 +350,7 @@ fun BrowsePage(
         IconButton(onClick = viewModel::startPuzzleFilter) {
             Icon(
                 Icons.Filled.Search,
-                stringResource(R.string.filter_puzzles),
+                stringResource(Res.string.filter_puzzles),
             )
         }
     }
@@ -299,9 +362,9 @@ fun BrowsePage(
         val dnmIcon by remember {
             derivedStateOf {
                 when (state.dayNightMode) {
-                    DayNightMode.DNM_NIGHT -> R.drawable.night_mode
-                    DayNightMode.DNM_SYSTEM -> R.drawable.system_daynight_mode
-                    else -> R.drawable.day_mode
+                    DayNightMode.DNM_NIGHT -> Res.drawable.night_mode
+                    DayNightMode.DNM_SYSTEM -> Res.drawable.system_daynight_mode
+                    else -> Res.drawable.day_mode
                 }
             }
         }
@@ -309,7 +372,7 @@ fun BrowsePage(
         IconButton(onClick = viewModel::nextDayNightMode) {
             Icon(
                 painter = painterResource(dnmIcon),
-                stringResource(R.string.filter_puzzles),
+                stringResource(Res.string.filter_puzzles),
             )
         }
     }
@@ -317,7 +380,7 @@ fun BrowsePage(
     @Composable
     fun MenuSort() {
         MenuSubEntry(
-            text = { MenuText(stringResource(R.string.sort)) },
+            text = { MenuText(stringResource(Res.string.sort)) },
             onClick = {
                 viewModel.expandMenu(BrowseSubMenu.SORT_ORDER)
             }
@@ -327,7 +390,7 @@ fun BrowsePage(
     @Composable
     fun MenuCleanup() {
         DropdownMenuItem(
-            text = { MenuText(stringResource(R.string.cleanup)) },
+            text = { MenuText(stringResource(Res.string.cleanup)) },
             onClick = {
                 viewModel.cleanupPuzzles()
                 viewModel.dismissMenu()
@@ -342,9 +405,9 @@ fun BrowsePage(
         val menuText by remember {
             derivedStateOf {
                 if (isArchive)
-                    R.string.title_view_crosswords
+                    Res.string.title_view_crosswords
                 else
-                    R.string.title_view_archives
+                    Res.string.title_view_archives
             }
         }
 
@@ -371,25 +434,25 @@ fun BrowsePage(
             onDismissRequest = viewModel::dismissMenu,
         ) {
             MenuDropdownHeading(
-                R.string.sort,
+                Res.string.sort,
                 onClick = viewModel::closeMenu,
             )
             DropdownMenuItem(
-                text = { MenuText(stringResource(R.string.by_date_desc)) },
+                text = { MenuText(stringResource(Res.string.by_date_desc)) },
                 onClick = {
                     viewModel.setSortOrder(AccessorSetting.AS_DATE_DESC)
                     viewModel.dismissMenu()
                 }
             )
             DropdownMenuItem(
-                text = { MenuText(stringResource(R.string.by_date_asc)) },
+                text = { MenuText(stringResource(Res.string.by_date_asc)) },
                 onClick = {
                     viewModel.setSortOrder(AccessorSetting.AS_DATE_ASC)
                     viewModel.dismissMenu()
                 }
             )
             DropdownMenuItem(
-                text = { MenuText(stringResource(R.string.by_source)) },
+                text = { MenuText(stringResource(Res.string.by_source)) },
                 onClick = {
                     viewModel.setSortOrder(AccessorSetting.AS_SOURCE)
                     viewModel.dismissMenu()
@@ -403,7 +466,7 @@ fun BrowsePage(
         IconButton(onClick = { viewModel.expandMenu(BrowseSubMenu.MAIN) }) {
             Icon(
                 Icons.Default.MoreVert,
-                contentDescription = stringResource(R.string.overflow),
+                contentDescription = stringResource(Res.string.overflow),
             )
         }
 
@@ -420,7 +483,7 @@ fun BrowsePage(
             MenuCleanup()
             MenuSwitchLists()
             MenuHelp(
-                openHelp = { pageOpener.openHTMLPage(R.raw.filescreen) },
+                openHelp = { pageOpener.openHTMLPage(HTMLPage.BROWSE_HELP) },
                 onDismiss = viewModel::dismissMenu,
             )
             MenuSettings(
@@ -443,8 +506,8 @@ fun BrowsePage(
                     }
                     Text(
                         pluralStringResource(
-                            id = R.plurals.num_selected,
-                            count = numSelected,
+                            resource = Res.plurals.num_selected,
+                            quantity = numSelected,
                             numSelected,
                         ),
                     )
@@ -459,9 +522,9 @@ fun BrowsePage(
             val titleId by remember {
                 derivedStateOf {
                     if (state.isViewArchive)
-                        R.string.title_view_archives
+                        Res.string.title_view_archives
                     else
-                        R.string.title_view_crosswords
+                        Res.string.title_view_crosswords
                 }
             }
             themeHelper.ForkyzTopAppBar(
@@ -487,7 +550,7 @@ fun BrowsePage(
                 searchTerm = puzzleFilter,
                 onValueChange = viewModel::setPuzzleFilter,
                 onClose = viewModel::clearPuzzleFilter,
-                hint = stringResource(R.string.filter_puzzles_hint),
+                hint = stringResource(Res.string.filter_puzzles_hint),
             )
         }
     }
@@ -502,9 +565,9 @@ fun BrowsePage(
             val noPuzzlesMsg by remember {
                 derivedStateOf {
                     if (state.isViewArchive)
-                        R.string.no_puzzles
+                        Res.string.no_puzzles
                     else
-                        R.string.no_puzzles_download_or_configure_storage
+                        Res.string.no_puzzles_download_or_configure_storage
                 }
             }
             Text(
@@ -516,7 +579,7 @@ fun BrowsePage(
         if (state.displayInternalStorageMessage) {
             Text(
                 modifier = Modifier.padding(30.dp),
-                text = stringResource(R.string.internal_storage_description),
+                text = stringResource(Res.string.internal_storage_description),
                 style = MaterialTheme.typography.bodyLarge,
             )
         }
@@ -536,8 +599,8 @@ fun BrowsePage(
 
     @Composable
     fun SwipeActionIcon(
-        drawableId : Int,
-        contentDescriptionId : Int,
+        drawableId : DrawableResource,
+        contentDescriptionId : StringResource,
     ) {
         Icon(
             modifier = Modifier.size(MIN_PUZZLE_ITEM_HEIGHT * 0.65F)
@@ -633,9 +696,9 @@ fun BrowsePage(
                     if (showHasSolution) {
                         Icon(
                             modifier = Modifier.width(10.dp),
-                            painter = painterResource(R.drawable.ic_solution),
+                            painter = painterResource(Res.drawable.ic_solution),
                             contentDescription
-                                = stringResource(R.string.has_solution_desc),
+                                = stringResource(Res.string.has_solution_desc),
                             tint = textColor,
                         )
                     }
@@ -651,7 +714,6 @@ fun BrowsePage(
                     if (state.showRatings) {
                         RatingBar(
                             modifier = Modifier.padding(top=4.dp),
-                            numStars = integerResource(R.integer.max_rating),
                             stepSize = 1.0F,
                             isIndicator = true,
                             style = android.R.attr.ratingBarStyleSmall,
@@ -712,12 +774,13 @@ fun BrowsePage(
                         ) {
                             SwipeActionIcon(
                                 drawableId = toggleArchiveIcon(isArchive),
-                                contentDescriptionId = R.string.toggle_archive,
+                                contentDescriptionId
+                                    = Res.string.toggle_archive,
                             )
                         } else {
                             SwipeActionIcon(
-                                drawableId = R.drawable.ic_delete,
-                                contentDescriptionId = R.string.delete,
+                                drawableId = Res.drawable.ic_delete,
+                                contentDescriptionId = Res.string.delete,
                             )
                         }
                     }
@@ -800,7 +863,7 @@ fun BrowsePage(
                 CircularProgressIndicator()
                 Text(
                     modifier = Modifier.padding(start=10.dp),
-                    text = stringResource(R.string.please_wait),
+                    text = stringResource(Res.string.please_wait),
                     style = MaterialTheme.typography.headlineSmall,
                 )
             }
@@ -834,11 +897,11 @@ fun BrowsePage(
     @Composable
     fun NotificationPermissionsDialog() {
         TwoButtonDialog(
-            title = R.string.disable_notifications,
-            summary = R.string.notifications_denied_msg,
-            positiveText = R.string.disable_notifications_button,
+            title = Res.string.disable_notifications,
+            summary = Res.string.notifications_denied_msg,
+            positiveText = Res.string.disable_notifications_button,
             onPositive = viewModel::disableNotifications,
-            negativeText = R.string.android_app_settings_button,
+            negativeText = Res.string.android_app_settings_button,
             onNegative = {
                 utils.openAppSettings()
                 viewModel.dismissNotificationsDialog()
@@ -853,14 +916,14 @@ fun BrowsePage(
             derivedStateOf { state.currentVersion }
         }
         TwoButtonDialog(
-            title = stringResource(R.string.new_version_title, currentVersion),
-            summary = stringResource(R.string.new_version_message),
-            positiveText = stringResource(R.string.view_release_notes),
+            title = stringResource(Res.string.new_version_title, currentVersion),
+            summary = stringResource(Res.string.new_version_message),
+            positiveText = stringResource(Res.string.view_release_notes),
             onPositive = {
                 pageOpener.openReleaseNotes()
                 viewModel.flagSeenCurrentVersion()
             },
-            negativeText = stringResource(R.string.close),
+            negativeText = stringResource(Res.string.close),
             onNegative = viewModel::flagSeenCurrentVersion,
         )
     }
@@ -868,8 +931,8 @@ fun BrowsePage(
     @Composable
     fun NoCleanupActionDialog() {
         OKDialog(
-            title = R.string.no_cleanup_action,
-            summary = stringResource(R.string.no_cleanup_action_msg),
+            title = Res.string.no_cleanup_action,
+            summary = stringResource(Res.string.no_cleanup_action_msg),
             onClose = viewModel::clearNoCleanupAction,
         )
     }
@@ -877,8 +940,8 @@ fun BrowsePage(
     @Composable
     fun ConfirmCleanupDialog() {
         OKCancelDialog(
-            title = R.string.confirm_cleanup,
-            summary = R.string.confirm_cleanup_msg,
+            title = Res.string.confirm_cleanup,
+            summary = Res.string.confirm_cleanup_msg,
             onCancel = viewModel::clearConfirmCleanup,
             onOK = viewModel::cleanupPuzzlesConfirmed,
         )
@@ -891,10 +954,10 @@ fun BrowsePage(
             derivedStateOf { state.selectedPuzzleIDs.size }
         }
         OKCancelDialog(
-            title = stringResource(R.string.confirm_delete),
+            title = stringResource(Res.string.confirm_delete),
             summary = pluralStringResource(
-                id = R.plurals.confirm_delete_msg,
-                count = numSelected,
+                resource = Res.plurals.confirm_delete_msg,
+                quantity = numSelected,
             ),
             onCancel = viewModel::cancelDeleteSelectedPuzzles,
             onOK = viewModel::confirmDeleteSelectedPuzzles,
@@ -940,12 +1003,12 @@ fun BrowsePage(
             .collectAsStateWithLifecycle()
         exitDialogSuccess?.let { success ->
             OKDialog(
-                title = stringResource(R.string.imports_title),
+                title = stringResource(Res.string.imports_title),
                 summary = stringResource(
                     if (success)
-                        R.string.import_success_long
+                        Res.string.import_success_long
                     else
-                        R.string.import_failure_long
+                        Res.string.import_failure_long
                 ),
                 onClose = utils::onExit,
             )

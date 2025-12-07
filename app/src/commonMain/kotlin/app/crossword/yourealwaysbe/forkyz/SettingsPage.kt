@@ -45,7 +45,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -53,6 +52,16 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 
+import org.jetbrains.compose.resources.stringResource
+
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.exit
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.failed_to_initialise_saf
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.filter_settings_hint
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.filter_settings_hint
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.storage_changed_please_restart
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.storage_changed_title
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.storage_select_saf_info
 import app.crossword.yourealwaysbe.forkyz.theme.ForkyzTopAppBar
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 import app.crossword.yourealwaysbe.forkyz.util.NativeFrontendUtils
@@ -238,7 +247,7 @@ fun SettingsPage(
         val needsURI by viewModel.needsURI.collectAsStateWithLifecycle()
         when (needsURI) {
             RequestedURI.SAF -> {
-                val msg = stringResource(R.string.storage_select_saf_info)
+                val msg = stringResource(Res.string.storage_select_saf_info)
                 LaunchedEffect(needsURI) {
                     utils.toast(msg)
                     utils.onGetSAFURI()
@@ -272,9 +281,8 @@ fun SettingsPage(
     @Composable
     fun ShowMessages() {
         val messages by viewModel.messages.collectAsStateWithLifecycle()
-        val msgStrings = messages.map { stringResource(it) }
-        LaunchedEffect(msgStrings) {
-            msgStrings.forEach(utils::toast)
+        LaunchedEffect(messages) {
+            messages.forEach(utils::toast)
             viewModel.clearMessages()
         }
     }
@@ -290,13 +298,13 @@ fun SettingsPage(
     fun TopAppBar(scrollBehavior : TopAppBarScrollBehavior) {
         val title by remember { derivedStateOf { state.currentPage.title } }
         themeHelper.ForkyzTopAppBar(
-            title = { Text(stringResource(id = title)) },
+            title = { Text(stringResource(title)) },
             onBack = ::handleBack,
             actions = {
                 IconButton(onClick = viewModel::startSearch) {
                     Icon(
                         Icons.Filled.Search,
-                        stringResource(R.string.filter_settings_hint),
+                        stringResource(Res.string.filter_settings_hint),
                     )
                 }
             },
@@ -375,7 +383,7 @@ fun SettingsPage(
                             summary = summary,
                             errorMsg = errorMsg?.value,
                             onClick = {
-                                pageOpener.openHTMLPage(item.rawAssetID)
+                                pageOpener.openHTMLPage(item.htmlPage)
                             },
                         )
                     }
@@ -407,14 +415,14 @@ fun SettingsPage(
     @Composable
     fun StorageChangedAppExitDialog() {
         AlertDialog(
-            title = { Text(stringResource(R.string.storage_changed_title)) },
+            title = { Text(stringResource(Res.string.storage_changed_title)) },
             text = {
-                Text(stringResource(R.string.storage_changed_please_restart))
+                Text(stringResource(Res.string.storage_changed_please_restart))
             },
             onDismissRequest = utils::onExit,
             confirmButton = {
                 TextButton(onClick = utils::onExit) {
-                    Text(stringResource(R.string.exit))
+                    Text(stringResource(Res.string.exit))
                 }
             },
         )
@@ -560,7 +568,7 @@ fun SettingsPage(
     }
 
     val failedToInitialiseSAF
-        = stringResource(R.string.failed_to_initialise_saf)
+        = stringResource(Res.string.failed_to_initialise_saf)
     DisposableEffect(Unit) {
         utils.setSAFURICallback { uri ->
             if (!viewModel.setNewExternalStorageSAFURI(uri))
@@ -592,7 +600,7 @@ fun SettingsPage(
                 searchTerm = searchTerm,
                 onValueChange = viewModel::setSearchTerm,
                 onClose = viewModel::endSearch,
-                hint = stringResource(R.string.filter_settings_hint),
+                hint = stringResource(Res.string.filter_settings_hint),
             )
 
             LazyColumn(

@@ -34,12 +34,238 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalWindowInfo
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
-import app.crossword.yourealwaysbe.forkyz.R
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
+
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.arrow_down
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.arrow_down
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.arrow_down
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.arrow_down
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.arrow_down
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.arrow_left
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.arrow_left
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.arrow_left
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.arrow_left
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.arrow_left
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.arrow_right
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.arrow_right
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.arrow_right
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.arrow_right
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.arrow_right
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.arrow_up
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.arrow_up
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.arrow_up
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.arrow_up
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.arrow_up
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.change_direction
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.change_direction
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.change_direction
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.change_direction
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.change_direction
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.delete
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.delete
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.delete
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.delete
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.delete
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.hide_keyboard
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_change_direction
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_change_direction
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_change_direction
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_change_direction
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_change_direction
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_keyboard_hide
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_next_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_next_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_next_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_next_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_next_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_prev_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_prev_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_prev_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_prev_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_prev_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_a
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_a
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_a
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_a
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_a
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_b
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_b
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_b
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_b
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_b
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_c
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_c
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_c
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_c
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_c
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_d
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_d
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_d
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_d
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_d
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_delete
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_delete
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_delete
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_delete
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_delete
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_down
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_down
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_down
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_down
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_down
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_e
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_e
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_e
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_e
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_e
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_f
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_f
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_f
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_f
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_f
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_g
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_g
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_g
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_g
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_g
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_h
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_h
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_h
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_h
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_h
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_i
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_i
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_i
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_i
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_i
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_j
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_j
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_j
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_j
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_j
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_k
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_k
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_k
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_k
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_k
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_l
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_l
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_l
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_l
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_l
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_left
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_left
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_left
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_left
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_left
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_m
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_m
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_m
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_m
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_m
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_n
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_n
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_n
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_n
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_n
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_o
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_o
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_o
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_o
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_o
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_p
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_p
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_p
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_p
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_p
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_q
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_q
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_q
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_q
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_q
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_r
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_r
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_r
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_r
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_r
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_right
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_right
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_right
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_right
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_right
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_s
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_s
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_s
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_s
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_s
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_space
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_space
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_space
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_space
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_space
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_special_entry
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_t
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_t
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_t
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_t
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_t
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_u
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_u
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_u
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_u
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_u
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_up
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_up
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_up
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_up
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_up
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_v
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_v
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_v
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_v
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_v
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_w
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_w
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_w
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_w
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_w
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_x
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_x
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_x
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_x
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_x
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_y
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_y
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_y
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_y
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_y
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_z
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_z
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_z
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_z
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.key_z
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.next_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.next_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.next_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.next_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.next_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.prev_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.prev_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.prev_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.prev_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.prev_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.space
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.space
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.space
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.space
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.space
 import app.crossword.yourealwaysbe.forkyz.settings.KeyboardLayout
 import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
 
@@ -105,8 +331,8 @@ fun ForkyzKeyboard(
         Row(Modifier.fillMaxWidth().background(Color.Black)) {
             IconButton(onClick = onHideClick) {
                 Icon(
-                    painter = painterResource(R.drawable.ic_keyboard_hide),
-                    contentDescription = stringResource(R.string.hide_keyboard),
+                    painter = painterResource(Res.drawable.ic_keyboard_hide),
+                    contentDescription = stringResource(Res.string.hide_keyboard),
                     tint = Color.White,
                 )
             }
@@ -190,7 +416,7 @@ fun ForkyzKeyboard(
     fun TextKey(
         modifier : Modifier = Modifier,
         keyCode : Int,
-        symbol : Int,
+        symbol : StringResource,
     ) {
         BaseKey(
             modifier,
@@ -234,7 +460,7 @@ fun ForkyzKeyboard(
             ),
         ) {
             Text(
-                text = stringResource(R.string.key_special_entry),
+                text = stringResource(Res.string.key_special_entry),
                 style = MaterialTheme.typography.titleLarge.copy(
                     fontWeight = FontWeight.SemiBold,
                 ),
@@ -253,8 +479,8 @@ fun ForkyzKeyboard(
     @Composable
     fun BaseIconKey(
         modifier : Modifier = Modifier,
-        symbol : Int,
-        contentDescription : Int,
+        symbol : DrawableResource,
+        contentDescription : StringResource,
         onDown : () -> Unit,
         onUp : () -> Unit,
     ) {
@@ -286,8 +512,8 @@ fun ForkyzKeyboard(
     fun IconKey(
         modifier : Modifier = Modifier,
         keyCode : Int,
-        symbol : Int,
-        contentDescription : Int,
+        symbol : DrawableResource,
+        contentDescription : StringResource,
     ) {
         BaseIconKey(
             modifier = modifier,
@@ -309,8 +535,8 @@ fun ForkyzKeyboard(
     fun SpecialIconKey(
         modifier : Modifier = Modifier,
         key : SpecialKey,
-        symbol : Int,
-        contentDescription : Int,
+        symbol : DrawableResource,
+        contentDescription : StringResource,
     ) {
         if (showSpecialKeys) {
             BaseIconKey(
@@ -330,30 +556,30 @@ fun ForkyzKeyboard(
         Column(modifier.fillMaxWidth()) {
             Row() {
                 val m1 = Modifier.weight(1.0F)
-                TextKey(m1, inputConnectionMediator.keyQ, R.string.key_q)
-                TextKey(m1, inputConnectionMediator.keyW, R.string.key_w)
-                TextKey(m1, inputConnectionMediator.keyE, R.string.key_e)
-                TextKey(m1, inputConnectionMediator.keyR, R.string.key_r)
-                TextKey(m1, inputConnectionMediator.keyT, R.string.key_t)
-                TextKey(m1, inputConnectionMediator.keyY, R.string.key_y)
-                TextKey(m1, inputConnectionMediator.keyU, R.string.key_u)
-                TextKey(m1, inputConnectionMediator.keyI, R.string.key_i)
-                TextKey(m1, inputConnectionMediator.keyO, R.string.key_o)
-                TextKey(m1, inputConnectionMediator.keyP, R.string.key_p)
+                TextKey(m1, inputConnectionMediator.keyQ, Res.string.key_q)
+                TextKey(m1, inputConnectionMediator.keyW, Res.string.key_w)
+                TextKey(m1, inputConnectionMediator.keyE, Res.string.key_e)
+                TextKey(m1, inputConnectionMediator.keyR, Res.string.key_r)
+                TextKey(m1, inputConnectionMediator.keyT, Res.string.key_t)
+                TextKey(m1, inputConnectionMediator.keyY, Res.string.key_y)
+                TextKey(m1, inputConnectionMediator.keyU, Res.string.key_u)
+                TextKey(m1, inputConnectionMediator.keyI, Res.string.key_i)
+                TextKey(m1, inputConnectionMediator.keyO, Res.string.key_o)
+                TextKey(m1, inputConnectionMediator.keyP, Res.string.key_p)
             }
             Row() {
                 val m1 = Modifier.weight(1.0F)
                 val m2 = Modifier.weight(2.0F)
                 Box(m1)
-                TextKey(m2, inputConnectionMediator.keyA, R.string.key_a)
-                TextKey(m2, inputConnectionMediator.keyS, R.string.key_s)
-                TextKey(m2, inputConnectionMediator.keyD, R.string.key_d)
-                TextKey(m2, inputConnectionMediator.keyF, R.string.key_f)
-                TextKey(m2, inputConnectionMediator.keyG, R.string.key_g)
-                TextKey(m2, inputConnectionMediator.keyH, R.string.key_h)
-                TextKey(m2, inputConnectionMediator.keyJ, R.string.key_j)
-                TextKey(m2, inputConnectionMediator.keyK, R.string.key_k)
-                TextKey(m2, inputConnectionMediator.keyL, R.string.key_l)
+                TextKey(m2, inputConnectionMediator.keyA, Res.string.key_a)
+                TextKey(m2, inputConnectionMediator.keyS, Res.string.key_s)
+                TextKey(m2, inputConnectionMediator.keyD, Res.string.key_d)
+                TextKey(m2, inputConnectionMediator.keyF, Res.string.key_f)
+                TextKey(m2, inputConnectionMediator.keyG, Res.string.key_g)
+                TextKey(m2, inputConnectionMediator.keyH, Res.string.key_h)
+                TextKey(m2, inputConnectionMediator.keyJ, Res.string.key_j)
+                TextKey(m2, inputConnectionMediator.keyK, Res.string.key_k)
+                TextKey(m2, inputConnectionMediator.keyL, Res.string.key_l)
                 Box(m1)
             }
             Row() {
@@ -363,22 +589,22 @@ fun ForkyzKeyboard(
                 SpecialIconKey(
                     m2,
                     SpecialKey.KEY_CHANGE_CLUE_DIRECTION,
-                    R.drawable.ic_change_direction,
-                    R.string.change_direction,
+                    Res.drawable.ic_change_direction,
+                    Res.string.change_direction,
                 )
                 Box(m1)
-                TextKey(m2, inputConnectionMediator.keyZ, R.string.key_z)
-                TextKey(m2, inputConnectionMediator.keyX, R.string.key_x)
-                TextKey(m2, inputConnectionMediator.keyC, R.string.key_c)
-                TextKey(m2, inputConnectionMediator.keyV, R.string.key_v)
-                TextKey(m2, inputConnectionMediator.keyB, R.string.key_b)
-                TextKey(m2, inputConnectionMediator.keyN, R.string.key_n)
-                TextKey(m2, inputConnectionMediator.keyM, R.string.key_m)
+                TextKey(m2, inputConnectionMediator.keyZ, Res.string.key_z)
+                TextKey(m2, inputConnectionMediator.keyX, Res.string.key_x)
+                TextKey(m2, inputConnectionMediator.keyC, Res.string.key_c)
+                TextKey(m2, inputConnectionMediator.keyV, Res.string.key_v)
+                TextKey(m2, inputConnectionMediator.keyB, Res.string.key_b)
+                TextKey(m2, inputConnectionMediator.keyN, Res.string.key_n)
+                TextKey(m2, inputConnectionMediator.keyM, Res.string.key_m)
                 IconKey(
                     m3,
                     inputConnectionMediator.keyDelete,
-                    R.drawable.delete,
-                    R.string.key_delete,
+                    Res.drawable.delete,
+                    Res.string.key_delete,
                 )
             }
             Row() {
@@ -387,45 +613,45 @@ fun ForkyzKeyboard(
                 IconKey(
                     m1,
                     inputConnectionMediator.keyUp,
-                    R.drawable.arrow_up,
-                    R.string.key_up,
+                    Res.drawable.arrow_up,
+                    Res.string.key_up,
                 )
                 IconKey(
                     m1,
                     inputConnectionMediator.keyDown,
-                    R.drawable.arrow_down,
-                    R.string.key_down,
+                    Res.drawable.arrow_down,
+                    Res.string.key_down,
                 )
                 SpecialIconKey(
                     m1,
                     SpecialKey.KEY_PREVIOUS_CLUE,
-                    R.drawable.ic_prev_clue,
-                    R.string.prev_clue,
+                    Res.drawable.ic_prev_clue,
+                    Res.string.prev_clue,
                 )
                 IconKey(
                     m4,
                     inputConnectionMediator.keySpace,
-                    R.drawable.space,
-                    R.string.key_space,
+                    Res.drawable.space,
+                    Res.string.key_space,
                 )
                 SpecialEntryKey(m1)
                 SpecialIconKey(
                     m1,
                     SpecialKey.KEY_NEXT_CLUE,
-                    R.drawable.ic_next_clue,
-                    R.string.next_clue,
+                    Res.drawable.ic_next_clue,
+                    Res.string.next_clue,
                 )
                 IconKey(
                     m1,
                     inputConnectionMediator.keyLeft,
-                    R.drawable.arrow_left,
-                    R.string.key_left,
+                    Res.drawable.arrow_left,
+                    Res.string.key_left,
                 )
                 IconKey(
                     m1,
                     inputConnectionMediator.keyRight,
-                    R.drawable.arrow_right,
-                    R.string.key_right,
+                    Res.drawable.arrow_right,
+                    Res.string.key_right,
                 )
             }
         }
@@ -436,30 +662,30 @@ fun ForkyzKeyboard(
         Column(modifier.fillMaxWidth()) {
             Row() {
                 val m1 = Modifier.weight(1.0F)
-                TextKey(m1, inputConnectionMediator.keyQ, R.string.key_q)
-                TextKey(m1, inputConnectionMediator.keyW, R.string.key_w)
-                TextKey(m1, inputConnectionMediator.keyE, R.string.key_e)
-                TextKey(m1, inputConnectionMediator.keyR, R.string.key_r)
-                TextKey(m1, inputConnectionMediator.keyT, R.string.key_t)
-                TextKey(m1, inputConnectionMediator.keyZ, R.string.key_z)
-                TextKey(m1, inputConnectionMediator.keyU, R.string.key_u)
-                TextKey(m1, inputConnectionMediator.keyI, R.string.key_i)
-                TextKey(m1, inputConnectionMediator.keyO, R.string.key_o)
-                TextKey(m1, inputConnectionMediator.keyP, R.string.key_p)
+                TextKey(m1, inputConnectionMediator.keyQ, Res.string.key_q)
+                TextKey(m1, inputConnectionMediator.keyW, Res.string.key_w)
+                TextKey(m1, inputConnectionMediator.keyE, Res.string.key_e)
+                TextKey(m1, inputConnectionMediator.keyR, Res.string.key_r)
+                TextKey(m1, inputConnectionMediator.keyT, Res.string.key_t)
+                TextKey(m1, inputConnectionMediator.keyZ, Res.string.key_z)
+                TextKey(m1, inputConnectionMediator.keyU, Res.string.key_u)
+                TextKey(m1, inputConnectionMediator.keyI, Res.string.key_i)
+                TextKey(m1, inputConnectionMediator.keyO, Res.string.key_o)
+                TextKey(m1, inputConnectionMediator.keyP, Res.string.key_p)
             }
             Row() {
                 val m1 = Modifier.weight(1.0F)
                 val m2 = Modifier.weight(2.0F)
                 Box(m1)
-                TextKey(m2, inputConnectionMediator.keyA, R.string.key_a)
-                TextKey(m2, inputConnectionMediator.keyS, R.string.key_s)
-                TextKey(m2, inputConnectionMediator.keyD, R.string.key_d)
-                TextKey(m2, inputConnectionMediator.keyF, R.string.key_f)
-                TextKey(m2, inputConnectionMediator.keyG, R.string.key_g)
-                TextKey(m2, inputConnectionMediator.keyH, R.string.key_h)
-                TextKey(m2, inputConnectionMediator.keyJ, R.string.key_j)
-                TextKey(m2, inputConnectionMediator.keyK, R.string.key_k)
-                TextKey(m2, inputConnectionMediator.keyL, R.string.key_l)
+                TextKey(m2, inputConnectionMediator.keyA, Res.string.key_a)
+                TextKey(m2, inputConnectionMediator.keyS, Res.string.key_s)
+                TextKey(m2, inputConnectionMediator.keyD, Res.string.key_d)
+                TextKey(m2, inputConnectionMediator.keyF, Res.string.key_f)
+                TextKey(m2, inputConnectionMediator.keyG, Res.string.key_g)
+                TextKey(m2, inputConnectionMediator.keyH, Res.string.key_h)
+                TextKey(m2, inputConnectionMediator.keyJ, Res.string.key_j)
+                TextKey(m2, inputConnectionMediator.keyK, Res.string.key_k)
+                TextKey(m2, inputConnectionMediator.keyL, Res.string.key_l)
                 Box(m1)
             }
             Row() {
@@ -469,22 +695,22 @@ fun ForkyzKeyboard(
                 SpecialIconKey(
                     m2,
                     SpecialKey.KEY_CHANGE_CLUE_DIRECTION,
-                    R.drawable.ic_change_direction,
-                    R.string.change_direction,
+                    Res.drawable.ic_change_direction,
+                    Res.string.change_direction,
                 )
                 Box(m1)
-                TextKey(m2, inputConnectionMediator.keyY, R.string.key_y)
-                TextKey(m2, inputConnectionMediator.keyX, R.string.key_x)
-                TextKey(m2, inputConnectionMediator.keyC, R.string.key_c)
-                TextKey(m2, inputConnectionMediator.keyV, R.string.key_v)
-                TextKey(m2, inputConnectionMediator.keyB, R.string.key_b)
-                TextKey(m2, inputConnectionMediator.keyN, R.string.key_n)
-                TextKey(m2, inputConnectionMediator.keyM, R.string.key_m)
+                TextKey(m2, inputConnectionMediator.keyY, Res.string.key_y)
+                TextKey(m2, inputConnectionMediator.keyX, Res.string.key_x)
+                TextKey(m2, inputConnectionMediator.keyC, Res.string.key_c)
+                TextKey(m2, inputConnectionMediator.keyV, Res.string.key_v)
+                TextKey(m2, inputConnectionMediator.keyB, Res.string.key_b)
+                TextKey(m2, inputConnectionMediator.keyN, Res.string.key_n)
+                TextKey(m2, inputConnectionMediator.keyM, Res.string.key_m)
                 IconKey(
                     m3,
                     inputConnectionMediator.keyDelete,
-                    R.drawable.delete,
-                    R.string.key_delete,
+                    Res.drawable.delete,
+                    Res.string.key_delete,
                 )
             }
             Row() {
@@ -493,45 +719,45 @@ fun ForkyzKeyboard(
                 IconKey(
                     m1,
                     inputConnectionMediator.keyUp,
-                    R.drawable.arrow_up,
-                    R.string.key_up,
+                    Res.drawable.arrow_up,
+                    Res.string.key_up,
                 )
                 IconKey(
                     m1,
                     inputConnectionMediator.keyDown,
-                    R.drawable.arrow_down,
-                    R.string.key_down,
+                    Res.drawable.arrow_down,
+                    Res.string.key_down,
                 )
                 SpecialIconKey(
                     m1,
                     SpecialKey.KEY_PREVIOUS_CLUE,
-                    R.drawable.ic_prev_clue,
-                    R.string.prev_clue,
+                    Res.drawable.ic_prev_clue,
+                    Res.string.prev_clue,
                 )
                 IconKey(
                     m4,
                     inputConnectionMediator.keySpace,
-                    R.drawable.space,
-                    R.string.key_space,
+                    Res.drawable.space,
+                    Res.string.key_space,
                 )
                 SpecialEntryKey(m1)
                 SpecialIconKey(
                     m1,
                     SpecialKey.KEY_NEXT_CLUE,
-                    R.drawable.ic_next_clue,
-                    R.string.next_clue,
+                    Res.drawable.ic_next_clue,
+                    Res.string.next_clue,
                 )
                 IconKey(
                     m1,
                     inputConnectionMediator.keyLeft,
-                    R.drawable.arrow_left,
-                    R.string.key_left,
+                    Res.drawable.arrow_left,
+                    Res.string.key_left,
                 )
                 IconKey(
                     m1,
                     inputConnectionMediator.keyRight,
-                    R.drawable.arrow_right,
-                    R.string.key_right,
+                    Res.drawable.arrow_right,
+                    Res.string.key_right,
                 )
             }
         }
@@ -542,29 +768,29 @@ fun ForkyzKeyboard(
         Column(modifier.fillMaxWidth()) {
             Row() {
                 val m1 = Modifier.weight(1.0F)
-                TextKey(m1, inputConnectionMediator.keyA, R.string.key_a)
-                TextKey(m1, inputConnectionMediator.keyZ, R.string.key_z)
-                TextKey(m1, inputConnectionMediator.keyE, R.string.key_e)
-                TextKey(m1, inputConnectionMediator.keyR, R.string.key_r)
-                TextKey(m1, inputConnectionMediator.keyT, R.string.key_t)
-                TextKey(m1, inputConnectionMediator.keyY, R.string.key_y)
-                TextKey(m1, inputConnectionMediator.keyU, R.string.key_u)
-                TextKey(m1, inputConnectionMediator.keyI, R.string.key_i)
-                TextKey(m1, inputConnectionMediator.keyO, R.string.key_o)
-                TextKey(m1, inputConnectionMediator.keyP, R.string.key_p)
+                TextKey(m1, inputConnectionMediator.keyA, Res.string.key_a)
+                TextKey(m1, inputConnectionMediator.keyZ, Res.string.key_z)
+                TextKey(m1, inputConnectionMediator.keyE, Res.string.key_e)
+                TextKey(m1, inputConnectionMediator.keyR, Res.string.key_r)
+                TextKey(m1, inputConnectionMediator.keyT, Res.string.key_t)
+                TextKey(m1, inputConnectionMediator.keyY, Res.string.key_y)
+                TextKey(m1, inputConnectionMediator.keyU, Res.string.key_u)
+                TextKey(m1, inputConnectionMediator.keyI, Res.string.key_i)
+                TextKey(m1, inputConnectionMediator.keyO, Res.string.key_o)
+                TextKey(m1, inputConnectionMediator.keyP, Res.string.key_p)
             }
             Row() {
                 val m1 = Modifier.weight(1.0F)
-                TextKey(m1, inputConnectionMediator.keyQ, R.string.key_q)
-                TextKey(m1, inputConnectionMediator.keyS, R.string.key_s)
-                TextKey(m1, inputConnectionMediator.keyD, R.string.key_d)
-                TextKey(m1, inputConnectionMediator.keyF, R.string.key_f)
-                TextKey(m1, inputConnectionMediator.keyG, R.string.key_g)
-                TextKey(m1, inputConnectionMediator.keyH, R.string.key_h)
-                TextKey(m1, inputConnectionMediator.keyJ, R.string.key_j)
-                TextKey(m1, inputConnectionMediator.keyK, R.string.key_k)
-                TextKey(m1, inputConnectionMediator.keyL, R.string.key_l)
-                TextKey(m1, inputConnectionMediator.keyM, R.string.key_m)
+                TextKey(m1, inputConnectionMediator.keyQ, Res.string.key_q)
+                TextKey(m1, inputConnectionMediator.keyS, Res.string.key_s)
+                TextKey(m1, inputConnectionMediator.keyD, Res.string.key_d)
+                TextKey(m1, inputConnectionMediator.keyF, Res.string.key_f)
+                TextKey(m1, inputConnectionMediator.keyG, Res.string.key_g)
+                TextKey(m1, inputConnectionMediator.keyH, Res.string.key_h)
+                TextKey(m1, inputConnectionMediator.keyJ, Res.string.key_j)
+                TextKey(m1, inputConnectionMediator.keyK, Res.string.key_k)
+                TextKey(m1, inputConnectionMediator.keyL, Res.string.key_l)
+                TextKey(m1, inputConnectionMediator.keyM, Res.string.key_m)
             }
             Row() {
                 val m1 = Modifier.weight(1.0F)
@@ -572,21 +798,21 @@ fun ForkyzKeyboard(
                 SpecialIconKey(
                     m2,
                     SpecialKey.KEY_CHANGE_CLUE_DIRECTION,
-                    R.drawable.ic_change_direction,
-                    R.string.change_direction,
+                    Res.drawable.ic_change_direction,
+                    Res.string.change_direction,
                 )
-                TextKey(m1, inputConnectionMediator.keyW, R.string.key_w)
-                TextKey(m1, inputConnectionMediator.keyX, R.string.key_x)
-                TextKey(m1, inputConnectionMediator.keyC, R.string.key_c)
-                TextKey(m1, inputConnectionMediator.keyV, R.string.key_v)
-                TextKey(m1, inputConnectionMediator.keyB, R.string.key_b)
-                TextKey(m1, inputConnectionMediator.keyN, R.string.key_n)
+                TextKey(m1, inputConnectionMediator.keyW, Res.string.key_w)
+                TextKey(m1, inputConnectionMediator.keyX, Res.string.key_x)
+                TextKey(m1, inputConnectionMediator.keyC, Res.string.key_c)
+                TextKey(m1, inputConnectionMediator.keyV, Res.string.key_v)
+                TextKey(m1, inputConnectionMediator.keyB, Res.string.key_b)
+                TextKey(m1, inputConnectionMediator.keyN, Res.string.key_n)
                 Box(m1)
                 IconKey(
                     m2,
                     inputConnectionMediator.keyDelete,
-                    R.drawable.delete,
-                    R.string.key_delete,
+                    Res.drawable.delete,
+                    Res.string.key_delete,
                 )
             }
             Row() {
@@ -595,45 +821,45 @@ fun ForkyzKeyboard(
                 IconKey(
                     m1,
                     inputConnectionMediator.keyUp,
-                    R.drawable.arrow_up,
-                    R.string.key_up,
+                    Res.drawable.arrow_up,
+                    Res.string.key_up,
                 )
                 IconKey(
                     m1,
                     inputConnectionMediator.keyDown,
-                    R.drawable.arrow_down,
-                    R.string.key_down,
+                    Res.drawable.arrow_down,
+                    Res.string.key_down,
                 )
                 SpecialIconKey(
                     m1,
                     SpecialKey.KEY_PREVIOUS_CLUE,
-                    R.drawable.ic_prev_clue,
-                    R.string.prev_clue,
+                    Res.drawable.ic_prev_clue,
+                    Res.string.prev_clue,
                 )
                 IconKey(
                     m4,
                     inputConnectionMediator.keySpace,
-                    R.drawable.space,
-                    R.string.key_space,
+                    Res.drawable.space,
+                    Res.string.key_space,
                 )
                 SpecialEntryKey(m1)
                 SpecialIconKey(
                     m1,
                     SpecialKey.KEY_NEXT_CLUE,
-                    R.drawable.ic_next_clue,
-                    R.string.next_clue,
+                    Res.drawable.ic_next_clue,
+                    Res.string.next_clue,
                 )
                 IconKey(
                     m1,
                     inputConnectionMediator.keyLeft,
-                    R.drawable.arrow_left,
-                    R.string.key_left,
+                    Res.drawable.arrow_left,
+                    Res.string.key_left,
                 )
                 IconKey(
                     m1,
                     inputConnectionMediator.keyRight,
-                    R.drawable.arrow_right,
-                    R.string.key_right,
+                    Res.drawable.arrow_right,
+                    Res.string.key_right,
                 )
             }
         }
@@ -644,29 +870,29 @@ fun ForkyzKeyboard(
         Column(modifier.fillMaxWidth()) {
             Row() {
                 val m1 = Modifier.weight(1.0F)
-                TextKey(m1, inputConnectionMediator.keyQ, R.string.key_q)
-                TextKey(m1, inputConnectionMediator.keyW, R.string.key_w)
-                TextKey(m1, inputConnectionMediator.keyF, R.string.key_f)
-                TextKey(m1, inputConnectionMediator.keyP, R.string.key_p)
-                TextKey(m1, inputConnectionMediator.keyG, R.string.key_g)
-                TextKey(m1, inputConnectionMediator.keyJ, R.string.key_j)
-                TextKey(m1, inputConnectionMediator.keyL, R.string.key_l)
-                TextKey(m1, inputConnectionMediator.keyU, R.string.key_u)
-                TextKey(m1, inputConnectionMediator.keyY, R.string.key_y)
+                TextKey(m1, inputConnectionMediator.keyQ, Res.string.key_q)
+                TextKey(m1, inputConnectionMediator.keyW, Res.string.key_w)
+                TextKey(m1, inputConnectionMediator.keyF, Res.string.key_f)
+                TextKey(m1, inputConnectionMediator.keyP, Res.string.key_p)
+                TextKey(m1, inputConnectionMediator.keyG, Res.string.key_g)
+                TextKey(m1, inputConnectionMediator.keyJ, Res.string.key_j)
+                TextKey(m1, inputConnectionMediator.keyL, Res.string.key_l)
+                TextKey(m1, inputConnectionMediator.keyU, Res.string.key_u)
+                TextKey(m1, inputConnectionMediator.keyY, Res.string.key_y)
                 Box(m1)
             }
             Row() {
                 val m1 = Modifier.weight(1.0F)
-                TextKey(m1, inputConnectionMediator.keyA, R.string.key_a)
-                TextKey(m1, inputConnectionMediator.keyR, R.string.key_r)
-                TextKey(m1, inputConnectionMediator.keyS, R.string.key_s)
-                TextKey(m1, inputConnectionMediator.keyT, R.string.key_t)
-                TextKey(m1, inputConnectionMediator.keyD, R.string.key_d)
-                TextKey(m1, inputConnectionMediator.keyH, R.string.key_h)
-                TextKey(m1, inputConnectionMediator.keyN, R.string.key_n)
-                TextKey(m1, inputConnectionMediator.keyE, R.string.key_e)
-                TextKey(m1, inputConnectionMediator.keyI, R.string.key_i)
-                TextKey(m1, inputConnectionMediator.keyO, R.string.key_o)
+                TextKey(m1, inputConnectionMediator.keyA, Res.string.key_a)
+                TextKey(m1, inputConnectionMediator.keyR, Res.string.key_r)
+                TextKey(m1, inputConnectionMediator.keyS, Res.string.key_s)
+                TextKey(m1, inputConnectionMediator.keyT, Res.string.key_t)
+                TextKey(m1, inputConnectionMediator.keyD, Res.string.key_d)
+                TextKey(m1, inputConnectionMediator.keyH, Res.string.key_h)
+                TextKey(m1, inputConnectionMediator.keyN, Res.string.key_n)
+                TextKey(m1, inputConnectionMediator.keyE, Res.string.key_e)
+                TextKey(m1, inputConnectionMediator.keyI, Res.string.key_i)
+                TextKey(m1, inputConnectionMediator.keyO, Res.string.key_o)
             }
             Row() {
                 val m1 = Modifier.weight(1.0F)
@@ -675,22 +901,22 @@ fun ForkyzKeyboard(
                 SpecialIconKey(
                     m2,
                     SpecialKey.KEY_CHANGE_CLUE_DIRECTION,
-                    R.drawable.ic_change_direction,
-                    R.string.change_direction,
+                    Res.drawable.ic_change_direction,
+                    Res.string.change_direction,
                 )
                 Box(m1)
-                TextKey(m2, inputConnectionMediator.keyZ, R.string.key_z)
-                TextKey(m2, inputConnectionMediator.keyX, R.string.key_x)
-                TextKey(m2, inputConnectionMediator.keyC, R.string.key_c)
-                TextKey(m2, inputConnectionMediator.keyV, R.string.key_v)
-                TextKey(m2, inputConnectionMediator.keyB, R.string.key_b)
-                TextKey(m2, inputConnectionMediator.keyK, R.string.key_k)
-                TextKey(m2, inputConnectionMediator.keyM, R.string.key_m)
+                TextKey(m2, inputConnectionMediator.keyZ, Res.string.key_z)
+                TextKey(m2, inputConnectionMediator.keyX, Res.string.key_x)
+                TextKey(m2, inputConnectionMediator.keyC, Res.string.key_c)
+                TextKey(m2, inputConnectionMediator.keyV, Res.string.key_v)
+                TextKey(m2, inputConnectionMediator.keyB, Res.string.key_b)
+                TextKey(m2, inputConnectionMediator.keyK, Res.string.key_k)
+                TextKey(m2, inputConnectionMediator.keyM, Res.string.key_m)
                 IconKey(
                     m3,
                     inputConnectionMediator.keyDelete,
-                    R.drawable.delete,
-                    R.string.key_delete,
+                    Res.drawable.delete,
+                    Res.string.key_delete,
                 )
             }
             Row() {
@@ -699,45 +925,45 @@ fun ForkyzKeyboard(
                 IconKey(
                     m1,
                     inputConnectionMediator.keyUp,
-                    R.drawable.arrow_up,
-                    R.string.key_up,
+                    Res.drawable.arrow_up,
+                    Res.string.key_up,
                 )
                 IconKey(
                     m1,
                     inputConnectionMediator.keyDown,
-                    R.drawable.arrow_down,
-                    R.string.key_down,
+                    Res.drawable.arrow_down,
+                    Res.string.key_down,
                 )
                 SpecialIconKey(
                     m1,
                     SpecialKey.KEY_PREVIOUS_CLUE,
-                    R.drawable.ic_prev_clue,
-                    R.string.prev_clue,
+                    Res.drawable.ic_prev_clue,
+                    Res.string.prev_clue,
                 )
                 IconKey(
                     m4,
                     inputConnectionMediator.keySpace,
-                    R.drawable.space,
-                    R.string.key_space,
+                    Res.drawable.space,
+                    Res.string.key_space,
                 )
                 SpecialEntryKey(m1)
                 SpecialIconKey(
                     m1,
                     SpecialKey.KEY_NEXT_CLUE,
-                    R.drawable.ic_next_clue,
-                    R.string.next_clue,
+                    Res.drawable.ic_next_clue,
+                    Res.string.next_clue,
                 )
                 IconKey(
                     m1,
                     inputConnectionMediator.keyLeft,
-                    R.drawable.arrow_left,
-                    R.string.key_left,
+                    Res.drawable.arrow_left,
+                    Res.string.key_left,
                 )
                 IconKey(
                     m1,
                     inputConnectionMediator.keyRight,
-                    R.drawable.arrow_right,
-                    R.string.key_right,
+                    Res.drawable.arrow_right,
+                    Res.string.key_right,
                 )
             }
         }
@@ -753,48 +979,48 @@ fun ForkyzKeyboard(
                 IconKey(
                     m3,
                     inputConnectionMediator.keyDelete,
-                    R.drawable.delete,
-                    R.string.key_delete,
+                    Res.drawable.delete,
+                    Res.string.key_delete,
                 )
                 SpecialIconKey(
                     m3,
                     SpecialKey.KEY_CHANGE_CLUE_DIRECTION,
-                    R.drawable.ic_change_direction,
-                    R.string.change_direction,
+                    Res.drawable.ic_change_direction,
+                    Res.string.change_direction,
                 )
-                TextKey(m2, inputConnectionMediator.keyP, R.string.key_p)
-                TextKey(m2, inputConnectionMediator.keyY, R.string.key_y)
-                TextKey(m2, inputConnectionMediator.keyF, R.string.key_f)
-                TextKey(m2, inputConnectionMediator.keyG, R.string.key_g)
-                TextKey(m2, inputConnectionMediator.keyC, R.string.key_c)
-                TextKey(m2, inputConnectionMediator.keyR, R.string.key_r)
-                TextKey(m2, inputConnectionMediator.keyL, R.string.key_l)
+                TextKey(m2, inputConnectionMediator.keyP, Res.string.key_p)
+                TextKey(m2, inputConnectionMediator.keyY, Res.string.key_y)
+                TextKey(m2, inputConnectionMediator.keyF, Res.string.key_f)
+                TextKey(m2, inputConnectionMediator.keyG, Res.string.key_g)
+                TextKey(m2, inputConnectionMediator.keyC, Res.string.key_c)
+                TextKey(m2, inputConnectionMediator.keyR, Res.string.key_r)
+                TextKey(m2, inputConnectionMediator.keyL, Res.string.key_l)
             }
             Row() {
                 val m1 = Modifier.weight(1.0F)
-                TextKey(m1, inputConnectionMediator.keyA, R.string.key_a)
-                TextKey(m1, inputConnectionMediator.keyO, R.string.key_o)
-                TextKey(m1, inputConnectionMediator.keyE, R.string.key_e)
-                TextKey(m1, inputConnectionMediator.keyU, R.string.key_u)
-                TextKey(m1, inputConnectionMediator.keyI, R.string.key_i)
-                TextKey(m1, inputConnectionMediator.keyD, R.string.key_d)
-                TextKey(m1, inputConnectionMediator.keyH, R.string.key_h)
-                TextKey(m1, inputConnectionMediator.keyT, R.string.key_t)
-                TextKey(m1, inputConnectionMediator.keyN, R.string.key_n)
-                TextKey(m1, inputConnectionMediator.keyS, R.string.key_s)
+                TextKey(m1, inputConnectionMediator.keyA, Res.string.key_a)
+                TextKey(m1, inputConnectionMediator.keyO, Res.string.key_o)
+                TextKey(m1, inputConnectionMediator.keyE, Res.string.key_e)
+                TextKey(m1, inputConnectionMediator.keyU, Res.string.key_u)
+                TextKey(m1, inputConnectionMediator.keyI, Res.string.key_i)
+                TextKey(m1, inputConnectionMediator.keyD, Res.string.key_d)
+                TextKey(m1, inputConnectionMediator.keyH, Res.string.key_h)
+                TextKey(m1, inputConnectionMediator.keyT, Res.string.key_t)
+                TextKey(m1, inputConnectionMediator.keyN, Res.string.key_n)
+                TextKey(m1, inputConnectionMediator.keyS, Res.string.key_s)
             }
             Row() {
                 val m1 = Modifier.weight(1.0F)
                 Box(m1)
-                TextKey(m1, inputConnectionMediator.keyQ, R.string.key_q)
-                TextKey(m1, inputConnectionMediator.keyJ, R.string.key_j)
-                TextKey(m1, inputConnectionMediator.keyK, R.string.key_k)
-                TextKey(m1, inputConnectionMediator.keyX, R.string.key_x)
-                TextKey(m1, inputConnectionMediator.keyB, R.string.key_b)
-                TextKey(m1, inputConnectionMediator.keyM, R.string.key_m)
-                TextKey(m1, inputConnectionMediator.keyW, R.string.key_w)
-                TextKey(m1, inputConnectionMediator.keyV, R.string.key_v)
-                TextKey(m1, inputConnectionMediator.keyZ, R.string.key_z)
+                TextKey(m1, inputConnectionMediator.keyQ, Res.string.key_q)
+                TextKey(m1, inputConnectionMediator.keyJ, Res.string.key_j)
+                TextKey(m1, inputConnectionMediator.keyK, Res.string.key_k)
+                TextKey(m1, inputConnectionMediator.keyX, Res.string.key_x)
+                TextKey(m1, inputConnectionMediator.keyB, Res.string.key_b)
+                TextKey(m1, inputConnectionMediator.keyM, Res.string.key_m)
+                TextKey(m1, inputConnectionMediator.keyW, Res.string.key_w)
+                TextKey(m1, inputConnectionMediator.keyV, Res.string.key_v)
+                TextKey(m1, inputConnectionMediator.keyZ, Res.string.key_z)
             }
             Row() {
                 val m1 = Modifier.weight(1.0F)
@@ -802,45 +1028,45 @@ fun ForkyzKeyboard(
                 IconKey(
                     m1,
                     inputConnectionMediator.keyUp,
-                    R.drawable.arrow_up,
-                    R.string.key_up,
+                    Res.drawable.arrow_up,
+                    Res.string.key_up,
                 )
                 IconKey(
                     m1,
                     inputConnectionMediator.keyDown,
-                    R.drawable.arrow_down,
-                    R.string.key_down,
+                    Res.drawable.arrow_down,
+                    Res.string.key_down,
                 )
                 SpecialIconKey(
                     m1,
                     SpecialKey.KEY_PREVIOUS_CLUE,
-                    R.drawable.ic_prev_clue,
-                    R.string.prev_clue,
+                    Res.drawable.ic_prev_clue,
+                    Res.string.prev_clue,
                 )
                 IconKey(
                     m4,
                     inputConnectionMediator.keySpace,
-                    R.drawable.space,
-                    R.string.key_space,
+                    Res.drawable.space,
+                    Res.string.key_space,
                 )
                 SpecialEntryKey(m1)
                 SpecialIconKey(
                     m1,
                     SpecialKey.KEY_NEXT_CLUE,
-                    R.drawable.ic_next_clue,
-                    R.string.next_clue,
+                    Res.drawable.ic_next_clue,
+                    Res.string.next_clue,
                 )
                 IconKey(
                     m1,
                     inputConnectionMediator.keyLeft,
-                    R.drawable.arrow_left,
-                    R.string.key_left,
+                    Res.drawable.arrow_left,
+                    Res.string.key_left,
                 )
                 IconKey(
                     m1,
                     inputConnectionMediator.keyRight,
-                    R.drawable.arrow_right,
-                    R.string.key_right,
+                    Res.drawable.arrow_right,
+                    Res.string.key_right,
                 )
             }
         }

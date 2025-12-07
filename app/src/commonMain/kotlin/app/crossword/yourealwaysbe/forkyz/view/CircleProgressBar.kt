@@ -12,14 +12,17 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.sp
 
-import app.crossword.yourealwaysbe.forkyz.R
+import org.jetbrains.compose.resources.painterResource
+
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_done
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_play
 import app.crossword.yourealwaysbe.forkyz.theme.CircleProgressBarColorScheme
 
 @Composable
@@ -29,8 +32,8 @@ fun CircleProgressBar(
     complete : Boolean,
     percentFilled : Int,
 ) {
-    val icPlay = painterResource(id = R.drawable.ic_play)
-    val icDone = painterResource(id = R.drawable.ic_done)
+    val icPlay = painterResource(Res.drawable.ic_play)
+    val icDone = painterResource(Res.drawable.ic_done)
     val textMeasurer = rememberTextMeasurer()
     val localDensity = LocalDensity.current
     val density = localDensity.density
