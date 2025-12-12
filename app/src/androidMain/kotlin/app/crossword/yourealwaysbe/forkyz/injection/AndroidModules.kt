@@ -17,14 +17,15 @@ import app.crossword.yourealwaysbe.forkyz.settings.Settings
 import app.crossword.yourealwaysbe.forkyz.settings.createDataStore
 import app.crossword.yourealwaysbe.forkyz.util.AndroidBackgroundDownloadManager
 import app.crossword.yourealwaysbe.forkyz.util.AndroidNativeBackendUtils
+import app.crossword.yourealwaysbe.forkyz.util.AndroidNotifications
 import app.crossword.yourealwaysbe.forkyz.util.AndroidPuzzleSaveServiceCaller
 import app.crossword.yourealwaysbe.forkyz.util.BackgroundDownloadManager
 import app.crossword.yourealwaysbe.forkyz.util.DailyDownloadWorker
 import app.crossword.yourealwaysbe.forkyz.util.HourlyDownloadWorker
 import app.crossword.yourealwaysbe.forkyz.util.MigrationHelper
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
-import app.crossword.yourealwaysbe.forkyz.util.AndroidNotifications
 import app.crossword.yourealwaysbe.forkyz.util.Notifications
+import app.crossword.yourealwaysbe.forkyz.util.OrientationHelper
 import app.crossword.yourealwaysbe.forkyz.util.PuzzleSaveServiceCaller
 import app.crossword.yourealwaysbe.forkyz.util.files.AndroidFileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
@@ -67,8 +68,9 @@ val androidModule = module {
     single<PuzzleSaveServiceCaller> {
         AndroidPuzzleSaveServiceCaller(androidContext())
     }
-    singleOf(::MigrationHelper)
     single<WorkManager> { WorkManager.getInstance(androidContext()) }
+    singleOf(::MigrationHelper)
+    singleOf(::OrientationHelper)
     workerOf(::DailyDownloadWorker)
     workerOf(::HourlyDownloadWorker)
 }

@@ -3,11 +3,9 @@ package app.crossword.yourealwaysbe.forkyz
 
 import java.time.format.DateTimeFormatter
 
-import android.os.Bundle
-import androidx.activity.compose.setContent
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
@@ -33,11 +31,17 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FloatingActionButtonMenu
+import androidx.compose.material3.FloatingActionButtonMenuItem
+import androidx.compose.material3.FloatingActionButtonMenuScope
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.ToggleFloatingActionButton
+import androidx.compose.material3.animateFloatingActionButton
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
@@ -52,9 +56,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEvent
@@ -74,11 +80,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-
-import com.leinardi.android.speeddial.compose.FabWithLabel
-import com.leinardi.android.speeddial.compose.SpeedDial
-import com.leinardi.android.speeddial.compose.SpeedDialOverlay
-import com.leinardi.android.speeddial.compose.SpeedDialState
 
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
@@ -176,9 +177,14 @@ import app.crossword.yourealwaysbe.forkyz.view.rememberSwipeToDismissBoxState
 private val DATE_FORMAT = DateTimeFormatter.ofPattern("EEEE\ndd MMM\nyyyy")
 private val HORIZONTAL_PADDING = 16.dp
 private val FAB_OPEN_ANGLE = 45F
+private val FAB_OVERLAY_ALPHA = 0.6F
 private val MIN_PUZZLE_ITEM_HEIGHT = 72.dp
 
-@OptIn(ExperimentalMaterial3Api::class,ExperimentalAnimationApi::class)
+@OptIn(
+    ExperimentalMaterial3Api::class,
+    ExperimentalMaterial3ExpressiveApi::class,
+    ExperimentalAnimationApi::class,
+)
 @Composable
 fun BrowsePage(
     viewModel : BrowsePageViewModel,
@@ -280,69 +286,90 @@ fun BrowsePage(
     }
 
     @Composable
-    fun AddPuzzleIcon(modifier : Modifier = Modifier) {
+    fun AddPuzzleIcon(modifier : Modifier = Modifier, tint : Color) {
         Icon(
             modifier = modifier,
             imageVector = Icons.Filled.Add,
             contentDescription = stringResource(Res.string.add_puzzle),
+            tint = tint,
         )
     }
 
     @Composable
-    fun SpeedDialButton(
-        onClick : () -> Unit,
-        labelContent : @Composable () -> Unit,
-        painter : Painter,
-        contentDescription : String,
-        close : () -> Unit,
-    ) {
-        FabWithLabel(
+    fun FloatingActionButtonMenuScope.OnlineSourcesButton(close : () -> Unit) {
+        FloatingActionButtonMenuItem(
             onClick = {
                 close()
-                onClick()
+                pageOpener.openOnlineSources()
             },
-            labelContent = labelContent,
-            fabContainerColor = MaterialTheme.colorScheme.primary,
-            fabContentColor = MaterialTheme.colorScheme.onPrimary,
-        ) {
-            Icon(
-                painter = painter,
-                contentDescription = contentDescription,
+            text = { Text(stringResource(Res.string.online_sources)) },
+            icon = {
+                Icon(
+                    painter = painterResource(Res.drawable.ic_online_sources),
+                    contentDescription
+                        = stringResource(Res.string.online_sources),
+                )
+            },
+        )
+    }
+
+    @Composable
+    fun FloatingActionButtonMenuScope.ImportPuzzlesButton(close : () -> Unit) {
+        FloatingActionButtonMenuItem(
+            onClick = {
+                close()
+                utils.onImport()
+            },
+            text = { Text(stringResource(Res.string.import_puzzle)) },
+            icon = {
+                Icon(
+                    painter = painterResource(Res.drawable.ic_import),
+                    contentDescription
+                        = stringResource(Res.string.import_puzzle),
+                )
+            },
+        )
+    }
+
+    @Composable
+    fun FloatingActionButtonMenuScope.DownloadPuzzlesButton(
+        close : () -> Unit,
+    ) {
+        FloatingActionButtonMenuItem(
+            onClick = {
+                close()
+                showDownloadDialog()
+            },
+            text = { Text(stringResource(Res.string.download_puzzles)) },
+            icon = {
+                Icon(
+                    painter = painterResource(Res.drawable.ic_download),
+                    contentDescription
+                        = stringResource(Res.string.download_puzzles),
+                )
+            },
+        )
+    }
+
+    @Composable
+    fun FABOverlay(
+        modifier : Modifier = Modifier,
+        visible : Boolean,
+        onClick : () -> Unit,
+        onClickLabel : String,
+    ) {
+        if (visible) {
+            Box(
+                modifier = modifier.fillMaxWidth()
+                    .fillMaxHeight()
+                    .alpha(FAB_OVERLAY_ALPHA)
+                    .background(MaterialTheme.colorScheme.background)
+                    .clickable(
+                        onClick = onClick,
+                        onClickLabel = onClickLabel
+                    ),
             )
         }
-    }
-
-    @Composable
-    fun OnlineSourcesButton(close : () -> Unit) {
-        SpeedDialButton(
-            onClick = { pageOpener.openOnlineSources() },
-            labelContent = { Text(stringResource(Res.string.online_sources)) },
-            painter = painterResource(Res.drawable.ic_online_sources),
-            contentDescription = stringResource(Res.string.online_sources),
-            close = close,
-        )
-    }
-
-    @Composable
-    fun ImportPuzzlesButton(close : () -> Unit) {
-        SpeedDialButton(
-            onClick = utils::onImport,
-            labelContent = { Text(stringResource(Res.string.import_puzzle)) },
-            painter = painterResource(Res.drawable.ic_import),
-            contentDescription = stringResource(Res.string.import_puzzle),
-            close = close,
-        )
-    }
-
-    @Composable
-    fun DownloadPuzzlesButton(close : () -> Unit) {
-        SpeedDialButton(
-            onClick = ::showDownloadDialog,
-            labelContent = { Text(stringResource(Res.string.download_puzzles)) },
-            painter = painterResource(Res.drawable.ic_download),
-            contentDescription = stringResource(Res.string.download_puzzles),
-            close = close,
-        )
     }
 
     @Composable
@@ -1060,49 +1087,53 @@ fun BrowsePage(
 
     Launchers()
 
-    var speedDialState by rememberSaveable {
-        mutableStateOf(SpeedDialState.Collapsed)
-    }
-    val toggleSpeedDial = {
-        speedDialState = speedDialState.toggle()
-    }
     val puzzleListState = rememberLazyListState()
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val isSelecting by remember { derivedStateOf { state.isSelecting } }
+    var fabMenuExpanded by rememberSaveable { mutableStateOf(false) }
+    val fabVisible by remember {
+        derivedStateOf {
+            !isSelecting && (
+                puzzleListState.lastScrolledBackward
+                || !puzzleListState.canScrollBackward
+            )
+        }
+    }
+    val toggleFAB = { fabMenuExpanded = !fabMenuExpanded }
+    val primaryColor = MaterialTheme.colorScheme.primary
 
     Scaffold(
         modifier = Modifier.onKeyEvent(::onKeyEvent),
         topBar = { TopAppBar() },
         floatingActionButton = {
-            AnimatedVisibility(
-                visible = !isSelecting && (
-                    puzzleListState.lastScrolledBackward
-                    || !puzzleListState.canScrollBackward
-                ),
-            ) {
-                SpeedDial(
-                    state = speedDialState,
-                    onFabClick = {
-                        speedDialState = speedDialState.toggle()
-                    },
-                    fabClosedContent = { AddPuzzleIcon() },
-                    fabClosedContainerColor
-                        = MaterialTheme.colorScheme.primary,
-                    fabClosedContentColor
-                        = MaterialTheme.colorScheme.onPrimary,
-                    // doesn't rotate shape in compose
-                    fabOpenedContent = {
+            FloatingActionButtonMenu(
+                expanded = fabMenuExpanded,
+                button = {
+                    ToggleFloatingActionButton(
+                        modifier = Modifier.animateFloatingActionButton(
+                            visible = fabVisible || fabMenuExpanded,
+                            alignment = Alignment.BottomEnd,
+                        ),
+                        checked = fabMenuExpanded,
+                        onCheckedChange = { checked ->
+                            fabMenuExpanded = checked
+                        },
+                        containerColor = { primaryColor },
+                    ) {
+                        val modifier = if (fabMenuExpanded)
+                            Modifier.rotate(FAB_OPEN_ANGLE)
+                        else
+                            Modifier
                         AddPuzzleIcon(
-                            Modifier.rotate(FAB_OPEN_ANGLE),
+                            modifier = modifier,
+                            tint = MaterialTheme.colorScheme.onPrimary,
                         )
-                    },
-                    fabAnimationRotateAngle = FAB_OPEN_ANGLE,
-                    reverseAnimationOnClose = true,
-                ) {
-                    item { DownloadPuzzlesButton(toggleSpeedDial) }
-                    item { ImportPuzzlesButton(toggleSpeedDial) }
-                    item { OnlineSourcesButton(toggleSpeedDial) }
-                }
+                    }
+                },
+            ) {
+                DownloadPuzzlesButton(toggleFAB)
+                ImportPuzzlesButton(toggleFAB)
+                OnlineSourcesButton(toggleFAB)
             }
         },
     ) { innerPadding ->
@@ -1110,9 +1141,10 @@ fun BrowsePage(
             modifier = Modifier.padding(innerPadding),
             puzzleListState = puzzleListState,
         )
-        SpeedDialOverlay(
-            visible = speedDialState.isExpanded(),
-            onClick = toggleSpeedDial,
+        FABOverlay(
+            visible = fabMenuExpanded,
+            onClick = toggleFAB,
+            onClickLabel = stringResource(Res.string.close),
         )
         DisplayDialogs()
     }

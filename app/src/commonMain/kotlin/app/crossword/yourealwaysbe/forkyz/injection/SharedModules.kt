@@ -17,12 +17,10 @@ import app.crossword.yourealwaysbe.forkyz.net.DownloadersProvider
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
-import app.crossword.yourealwaysbe.forkyz.util.OrientationHelper
 
 val sharedModule = module {
     singleOf(::CurrentPuzzleHolder)
     singleOf(::ForkyzSettings)
-    singleOf(::OrientationHelper)
     singleOf(::ThemeHelper)
     singleOf(::DownloadersProvider)
     viewModelOf(::BrowsePageViewModel)
