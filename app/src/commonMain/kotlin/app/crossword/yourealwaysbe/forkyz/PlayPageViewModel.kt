@@ -5,6 +5,8 @@ import kotlin.random.Random
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 import androidx.lifecycle.viewModelScope
 
@@ -122,6 +124,10 @@ class PlayPageViewModel(
     currentPuzzleHolder,
     fileHandlerProvider,
 ) {
+    // so we don't interleave updates and end up with out of date clue
+    // lines
+    private val updateStateLock = Mutex()
+
     private val mediatedPlayUIState
         = MediatedStateWithFlow<PlayPageUIState, PlaySettings>(
             viewModelScope,
@@ -449,27 +455,31 @@ class PlayPageViewModel(
     private fun updateState() {
         viewModelScope.launch {
             getPuzzle()?.let { puz ->
-                val clueText = getClueText()
-                val aspectRatio = if (puz.height == 0)
-                    1F
-                else
-                    puz.width.toFloat() / puz.height
+                updateStateLock.withLock {
+                    val clueText = getClueText()
+                    val aspectRatio = if (puz.height == 0)
+                        1F
+                    else
+                        puz.width.toFloat() / puz.height
 
-                val firstPlayMessage = if (
-                    isFirstPlay && !firstPlayCleared && puz.hasIntroMessage()
-                ) {
-                    puz.getIntroMessage()
-                } else {
-                    null
+                    val firstPlayMessage = if (
+                        isFirstPlay
+                        && !firstPlayCleared
+                        && puz.hasIntroMessage()
+                    ) {
+                        puz.getIntroMessage()
+                    } else {
+                        null
+                    }
+
+                    currentUIState = currentUIState.copy(
+                        puzzleTitle = puz.title,
+                        clueText = clueText,
+                        puzzleAspectRatio = aspectRatio,
+                        isAcrostic = isAcrostic,
+                        firstPlayMessage = firstPlayMessage,
+                    )
                 }
-
-                currentUIState = currentUIState.copy(
-                    puzzleTitle = puz.title,
-                    clueText = clueText,
-                    puzzleAspectRatio = aspectRatio,
-                    isAcrostic = isAcrostic,
-                    firstPlayMessage = firstPlayMessage,
-                )
             }
         }
     }
