@@ -44,15 +44,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextMeasurer
-import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 import org.jetbrains.compose.resources.stringResource
+
+import be.digitalia.compose.htmlconverter.htmlToAnnotatedString
 
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_word
@@ -192,7 +192,9 @@ fun ClueTabs(
                                     else
                                         UNFILLED_CLUE_ALPHA
                                 ),
-                            text = AnnotatedString.fromHtml(clue.text),
+                            text = remember(clue.text) {
+                                htmlToAnnotatedString(clue.text)
+                            },
                             color = clueItemForeground(clue.selected),
                         )
 

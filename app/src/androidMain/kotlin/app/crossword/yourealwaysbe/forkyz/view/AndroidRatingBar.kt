@@ -19,7 +19,7 @@ actual fun RatingBar(
     stepSize : Float,
     onSet : (Float) -> Unit,
     isIndicator : Boolean,
-    style : Int,
+    style : RatingBarStyle,
 ) {
     val selected = MaterialTheme.colorScheme.primary.toArgb()
     val unselected = MaterialTheme.colorScheme
@@ -34,11 +34,15 @@ actual fun RatingBar(
         arrayOf(intArrayOf()),
         intArrayOf(unselected),
     )
+    val androidStyle = when (style) {
+        RatingBarStyle.SMALL -> android.R.attr.ratingBarStyleSmall
+        else -> 0
+    }
     AndroidView(
         modifier = modifier,
         factory = { context ->
-            val view = if (style != 0)
-                RatingBar(context, null, style)
+            val view = if (androidStyle != 0)
+                RatingBar(context, null, androidStyle)
             else
                 RatingBar(context)
 

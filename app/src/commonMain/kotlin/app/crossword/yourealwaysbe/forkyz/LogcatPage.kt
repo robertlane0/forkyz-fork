@@ -2,9 +2,6 @@ package app.crossword.yourealwaysbe.forkyz
 
 import kotlinx.coroutines.launch
 
-import android.os.Bundle
-import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items

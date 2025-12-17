@@ -19,7 +19,8 @@ import androidx.room.Transaction
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
-import androidx.sqlite.db.SupportSQLiteDatabase
+import androidx.sqlite.SQLiteConnection
+import androidx.sqlite.execSQL
 
 import app.crossword.yourealwaysbe.forkyz.util.AppPuzzleUtils
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
@@ -103,31 +104,31 @@ class MetaCache(private val utils : NativeBackendUtils) {
     @TypeConverters(Converters::class)
     interface CachedMetaDao {
         @Query("SELECT * FROM cachedMeta WHERE directoryUri = :directory")
-        fun getDirCache(directory : Uri) : List<CachedMeta>
+        suspend fun getDirCache(directory : Uri) : List<CachedMeta>
 
         @Query("SELECT * FROM cachedMeta WHERE mainFileUri = :mainFileUri")
-        fun getCache(mainFileUri : Uri) : CachedMeta?
+        suspend fun getCache(mainFileUri : Uri) : CachedMeta?
 
         @Query(
             "SELECT mainFileUri FROM cachedMeta "
             + "WHERE directoryUri = :directory"
         )
-        fun getDirFileUris(directory : Uri) : List<Uri>
+        suspend fun getDirFileUris(directory : Uri) : List<Uri>
 
         @Insert(onConflict = OnConflictStrategy.REPLACE)
-        fun insertAll(vararg metas : CachedMeta)
+        suspend fun insertAll(vararg metas : CachedMeta)
 
         @Query("DELETE FROM cachedMeta WHERE mainFileUri = :mainFileUri")
-        fun delete(mainFileUri : Uri)
+        suspend fun delete(mainFileUri : Uri)
 
         @Delete
-        fun delete(cm : CachedMeta)
+        suspend fun delete(cm : CachedMeta)
 
         /**
          * Delete files in dir not in puzMetaFiles
          */
         @Transaction
-        fun deleteOutside(
+        suspend fun deleteOutside(
             directory : Uri,
             puzMetaFiles : Collection<PuzMetaFile>,
         ) {
@@ -158,16 +159,16 @@ class MetaCache(private val utils : NativeBackendUtils) {
              * https://medium.com/androiddevelopers/understanding-migrations-with-room-f01e04b07929
              */
             private val MIGRATION_l_2 = object : Migration(1, 2) {
-                override fun migrate(db : SupportSQLiteDatabase) {
-                    db.execSQL(
+                override fun migrate(connection : SQLiteConnection) {
+                    connection.execSQL(
                         "ALTER TABLE cachedMeta ADD COLUMN author TEXT",
                     )
                 }
             }
 
             private val MIGRATION_2_3 = object : Migration(2, 3) {
-                override fun migrate(db : SupportSQLiteDatabase) {
-                    db.execSQL(
+                override fun migrate(connection : SQLiteConnection) {
+                    connection.execSQL(
                         "ALTER TABLE cachedMeta "
                         + "ADD COLUMN rating INTEGER NOT NULL DEFAULT 0",
                     )
@@ -175,8 +176,8 @@ class MetaCache(private val utils : NativeBackendUtils) {
             }
 
             private val MIGRATION_3_4 = object : Migration(3, 4) {
-                override fun migrate(db : SupportSQLiteDatabase) {
-                    db.execSQL(
+                override fun migrate(connection : SQLiteConnection) {
+                    connection.execSQL(
                         "ALTER TABLE cachedMeta "
                         + "ADD COLUMN hasSolution INTEGER NOT NULL DEFAULT 0",
                     )
@@ -228,7 +229,7 @@ class MetaCache(private val utils : NativeBackendUtils) {
     /**
      * Returns all cached meta data records for the given directory
      */
-    fun getDirCache(
+    suspend fun getDirCache(
         fileHandler : FileHandler,
         dirHandle : DirHandle,
     ) : Map<Uri, MetaRecord> {
@@ -245,7 +246,7 @@ class MetaCache(private val utils : NativeBackendUtils) {
      *
      * @return null if no entry in cache
      */
-    fun getCache(puzFileUri : Uri) : MetaRecord? {
+    suspend fun getCache(puzFileUri : Uri) : MetaRecord? {
         return dao.getCache(puzFileUri)?.let { MetaRecord(it) }
     }
 
@@ -254,7 +255,7 @@ class MetaCache(private val utils : NativeBackendUtils) {
      *
      * Uses derived date if puz has no date.
      */
-    fun addRecord(
+    suspend fun addRecord(
         fileHandler : FileHandler,
         puzHandle : PuzHandle,
         puz : Puzzle,
@@ -299,14 +300,14 @@ class MetaCache(private val utils : NativeBackendUtils) {
     /**
      * Remove a record from the cache
      */
-    fun deleteRecord(fileHandler : FileHandler, puzHandle : PuzHandle) {
+    suspend fun deleteRecord(fileHandler : FileHandler, puzHandle : PuzHandle) {
         dao.delete(fileHandler.getUri(puzHandle.mainFileHandle))
     }
 
     /**
      * Remove all records from directory that are not in the handles
      */
-    fun cleanupCache(
+    suspend fun cleanupCache(
         fileHandler : FileHandler,
         dir : DirHandle,
         puzMetaFiles : List<PuzMetaFile>,

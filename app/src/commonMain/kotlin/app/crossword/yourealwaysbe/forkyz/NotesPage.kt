@@ -3,7 +3,6 @@ package app.crossword.yourealwaysbe.forkyz
 
 import kotlinx.collections.immutable.persistentListOf
 
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

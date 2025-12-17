@@ -39,5 +39,6 @@ class SharePuzzleData(
     }
 }
 
+@Throws(AppNotFoundException::class)
 expect suspend fun ExternalToolLauncher.visit(data : SharePuzzleData)
 

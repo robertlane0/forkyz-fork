@@ -11,7 +11,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 import android.content.Context
-import android.util.Log
 import androidx.annotation.MainThread
 import androidx.concurrent.futures.CallbackToFutureAdapter
 import androidx.work.Constraints
@@ -28,6 +27,7 @@ import com.google.common.util.concurrent.ListenableFuture
 import app.crossword.yourealwaysbe.forkyz.net.DownloadersProvider
 import app.crossword.yourealwaysbe.forkyz.settings.BackgroundDownloadSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
+import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 
@@ -44,8 +44,8 @@ class AndroidBackgroundDownloadManager(
 ) : BackgroundDownloadManager {
     init {
         settings.liveBackgroundDownloadSettings
-            .observeForeverWithLifecycle { value ->
-                Log.i(
+            .observeForeverWithProcessLifecycle { value ->
+                AppLogger.i(
                     TAG,
                     "Triggering update background download work with: " + value,
                 )
@@ -68,7 +68,7 @@ class AndroidBackgroundDownloadManager(
     @MainThread
     private fun updateBackgroundDownloads() {
         settings.getBackgroundDownloadSettings { bgSettings ->
-            Log.i(
+            AppLogger.i(
                 TAG,
                 "Updating background download work schedule with: "
                     + bgSettings,
@@ -221,7 +221,7 @@ abstract class BaseDownloadWorker(
     protected fun doDownload(
         completer : CallbackToFutureAdapter.Completer<ListenableWorker.Result>,
     ) {
-        Log.i(TAG, "Downloading most recent puzzles")
+        AppLogger.i(TAG, "Downloading most recent puzzles")
 
         downloadersProvider.get { dls ->
             downloadScope.launch {
@@ -232,13 +232,13 @@ abstract class BaseDownloadWorker(
                     )
 
                     completer.set(ListenableWorker.Result.success())
-                    Log.i(TAG, "Download success.")
+                    AppLogger.i(TAG, "Download success.")
 
                     // This is used to tell BrowseActivity that
                     // puzzles may have been updated while paused.
                     settings.setBrowseNewPuzzle(true)
                 } catch (e : Exception) {
-                    Log.i(TAG, "Download exception: ")
+                    AppLogger.i(TAG, "Download exception: ")
                     completer.setException(e)
                 }
             }
@@ -262,7 +262,7 @@ class HourlyDownloadWorker(
     downloadersProvider,
 ) {
     override fun startWork() : ListenableFuture<ListenableWorker.Result> {
-        Log.i(TAG, "Starting hourly download.")
+        AppLogger.i(TAG, "Starting hourly download.")
         return CallbackToFutureAdapter.getFuture { completer ->
             doDownload(completer)
             "BaseDownloadWorker.doDownload"
@@ -287,7 +287,7 @@ class DailyDownloadWorker(
     downloadersProvider,
 ) {
     override fun startWork() : ListenableFuture<ListenableWorker.Result> {
-        Log.i(TAG, "Starting daily download.")
+        AppLogger.i(TAG, "Starting daily download.")
         return CallbackToFutureAdapter.getFuture { completer ->
             settings.getBackgroundDownloadSettings { bgSettings ->
                 manager.scheduleNextDailyDownload(bgSettings)

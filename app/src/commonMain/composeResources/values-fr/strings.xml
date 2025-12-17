@@ -44,6 +44,7 @@
     <string name="import_failure">Certaines importations ont échoué</string>
     <string name="import_success_long">Les puzzles sélectionnés ont été importés dans Forkyz.</string>
     <string name="import_failure_long">Certains puzzles n'ont pas été importés dans Forkyz.</string>
+    <string name="select_puzzle_files">Sélectionner les fichiers de puzzle</string>
 
     <!-- Browse -->
     <string name="unknown_source">Source inconnue</string>

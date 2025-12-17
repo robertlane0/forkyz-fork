@@ -14,7 +14,6 @@ import android.os.Bundle
 import android.provider.Settings
 import android.speech.RecognizerIntent
 import android.speech.tts.TextToSpeech
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultCallback
@@ -52,6 +51,7 @@ import app.crossword.yourealwaysbe.forkyz.exttools.ExternalToolLauncher
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 import app.crossword.yourealwaysbe.forkyz.util.AndroidInputConnectionMediator
+import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.NativeFrontendUtils
 import app.crossword.yourealwaysbe.forkyz.util.NativeImportFinishedResult
 import app.crossword.yourealwaysbe.forkyz.util.NightModeHelper
@@ -228,7 +228,7 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
         = registerForActivityResult(OpenDocumentTree()) {
             uri : AndroidUri? -> uri?.let {
                 try {
-                    Log.i(TAG, "Starting puzzle export")
+                    AppLogger.i(TAG, "Starting puzzle export")
                     val intent = Intent(this, PuzzleExportService::class.java)
                     intent.putExtra(
                         PuzzleExportService.PUZZLE_EXPORT_URI,
@@ -238,7 +238,7 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
                 // use IllegalState as
                 // ForegroundServiceNotAllowedException requires API 31
                 } catch (e : IllegalStateException) {
-                    Log.i(
+                    AppLogger.i(
                         TAG,
                         "Could not start puzzle export service on foreground"
                     )

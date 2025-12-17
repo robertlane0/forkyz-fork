@@ -55,5 +55,6 @@ interface NativeBackendUtils {
      */
     fun getTargetFileHandler(uri : Uri) : FileHandler?
     fun getLogcat() : List<String>?
+    val isDynamicColorAvailable : Boolean
 }
 

@@ -18,7 +18,7 @@ import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
 
-val sharedModule = module {
+val sharedModules = module {
     singleOf(::CurrentPuzzleHolder)
     singleOf(::ForkyzSettings)
     singleOf(::ThemeHelper)

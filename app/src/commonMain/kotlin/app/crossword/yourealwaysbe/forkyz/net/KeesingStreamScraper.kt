@@ -9,12 +9,11 @@ import java.net.URISyntaxException
 import java.util.Locale
 import java.util.regex.Pattern
 
-import android.util.Log
-
 import org.json.JSONException
 import org.json.JSONObject
 import org.json.JSONTokener
 
+import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.io.KeesingXMLIO
 
@@ -109,13 +108,13 @@ class KeesingStreamScraper : AbstractStreamScraper() {
                 )
             }
         } catch (e : JSONException) {
-            Log.e(TAG, "Could not read Keesing JSON: " + e)
+            AppLogger.e(TAG, "Could not read Keesing JSON: " + e)
             return null
         } catch (e : IOException) {
-            Log.e(TAG, "Could not read Keesing JSON: " + e)
+            AppLogger.e(TAG, "Could not read Keesing JSON: " + e)
             return null
         } catch (e : URISyntaxException) {
-            Log.e(TAG, "Could not read Keesing JSON: " + e)
+            AppLogger.e(TAG, "Could not read Keesing JSON: " + e)
             return null
         }
     }

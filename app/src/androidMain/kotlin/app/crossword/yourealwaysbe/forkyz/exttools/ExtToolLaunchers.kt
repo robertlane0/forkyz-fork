@@ -79,12 +79,14 @@ actual suspend fun ExternalToolLauncher.visit(data : Aard2DictionaryData) {
     )
 }
 
+@Throws(AppNotFoundException::class)
 actual suspend fun ExternalToolLauncher.visit(data : HTMLToolData) {
     val i = Intent(Intent.ACTION_VIEW)
     i.setData(data.uri.toAndroidUri())
     this.activity.startActivity(i)
 }
 
+@Throws(AppNotFoundException::class)
 actual suspend fun ExternalToolLauncher.visit(data : SharePuzzleData) {
     val title = getString(Res.string.share_puzzle_title)
     val shareIntent = ShareCompat.IntentBuilder(this.activity)
@@ -95,6 +97,7 @@ actual suspend fun ExternalToolLauncher.visit(data : SharePuzzleData) {
     this.activity.startActivity(shareIntent);
 }
 
+@Throws(AppNotFoundException::class)
 actual suspend fun ExternalToolLauncher.visit(data : ShareTextData) {
     // ShareCompat from
     // https://stackoverflow.com/a/39619468/6882587

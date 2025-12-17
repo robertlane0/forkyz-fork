@@ -6,16 +6,11 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.PrintStream
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-import android.os.Handler
-import android.os.Looper
-import android.util.Log
-
+import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.AppPuzzleUtils.generateFileName
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
@@ -104,7 +99,7 @@ object FileHandlerShared {
                 IPuzIO.writePuzzle(puz, os, writeBlank, omitExtensions)
             }
         } catch (e : IOException) {
-            Log.e(TAG, "Could not create file for sharing : " + e)
+            AppLogger.e(TAG, "Could not create file for sharing : " + e)
             return null
         }
 
@@ -126,7 +121,7 @@ object FileHandlerShared {
                     os.println(line)
             }
         } catch (e : IOException) {
-            Log.e(TAG, "Could not create file for sharing : " + e)
+            AppLogger.e(TAG, "Could not create file for sharing : " + e)
             return null
         }
 

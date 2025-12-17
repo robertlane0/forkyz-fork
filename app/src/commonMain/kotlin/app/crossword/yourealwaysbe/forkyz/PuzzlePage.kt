@@ -5,7 +5,6 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -40,7 +39,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -49,10 +47,6 @@ import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
-import androidx.compose.ui.res.integerResource
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
@@ -61,9 +55,14 @@ import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigationevent.NavigationEventInfo
+import androidx.navigationevent.compose.NavigationBackHandler
+import androidx.navigationevent.compose.rememberNavigationEventState
 
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+
+import be.digitalia.compose.htmlconverter.htmlToAnnotatedString
 
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.announce_clue_label
@@ -138,6 +137,7 @@ import app.crossword.yourealwaysbe.forkyz.settings.KeyboardLayout
 import app.crossword.yourealwaysbe.forkyz.settings.RenderSettings
 import app.crossword.yourealwaysbe.forkyz.theme.BoardColorScheme
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
+import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer
 import app.crossword.yourealwaysbe.forkyz.util.NativeFrontendUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
@@ -263,7 +263,7 @@ class PuzzlePageScope(
         val color = LocalContentColor.current
         BasicText(
             modifier = fullModifier,
-            text = AnnotatedString.fromHtml(text),
+            text = remember(text) { htmlToAnnotatedString(text) },
             autoSize =  TextAutoSize.StepBased(
                 minFontSize = 5.sp,
                 maxFontSize = CLUE_TEXT_SIZE,
@@ -992,7 +992,7 @@ class PuzzlePageScope(
     @Composable
     fun MenuHelp() {
         MenuHelp(
-            openHelp = { pageOpener.openHTMLPage(HTMLPage.PLAY_HELP) },
+            openHelp = { pageOpener.openHTMLPage(HTMLFile.PLAY_HELP) },
             onDismiss = viewModel::dismissMenu,
         )
     }
@@ -1258,9 +1258,13 @@ fun PuzzlePage(
         val hideOnBack by remember {
             derivedStateOf { keyboardState.hideOnBack }
         }
-        BackHandler(
-            enabled = hideOnBack,
-            onBack = ::doBackAction,
+        val backState = rememberNavigationEventState(
+            currentInfo = NavigationEventInfo.None,
+        )
+        NavigationBackHandler(
+            state = backState,
+            isBackEnabled = hideOnBack,
+            onBackCompleted = ::doBackAction,
         )
     }
 
@@ -1284,7 +1288,7 @@ fun PuzzlePage(
 
     LifecycleResumeEffect(Unit) {
         if (!viewModel.canResume) {
-            Log.i(TAG, "No puzzle board, puzzle activity finishing.")
+            AppLogger.i(TAG, "No puzzle board, puzzle activity finishing.")
             pageOpener.onBack()
         }
         viewModel.startTimer()

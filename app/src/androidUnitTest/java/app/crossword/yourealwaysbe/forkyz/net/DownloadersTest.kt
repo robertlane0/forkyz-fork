@@ -13,8 +13,6 @@ import org.junit.runners.Parameterized.Parameters
 import org.junit.runners.Parameterized
 
 import android.content.Context
-import android.util.Log
-
 import app.crossword.yourealwaysbe.forkyz.settings.DownloadersSettings
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.files.NoopFileHandler

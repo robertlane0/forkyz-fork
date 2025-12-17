@@ -37,8 +37,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.state.ToggleableState
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -46,6 +44,8 @@ import androidx.compose.ui.window.DialogProperties
 
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
+
+import be.digitalia.compose.htmlconverter.htmlToAnnotatedString
 
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.cancel
@@ -491,7 +491,9 @@ fun PlainDialog(
                     title?.let { title ->
                         Text(
                             modifier = Modifier.padding(bottom = DIALOG_PADDING),
-                            text = AnnotatedString.fromHtml(title),
+                            text = remember(title) {
+                                htmlToAnnotatedString(title)
+                            },
                             style = MaterialTheme.typography.headlineSmall,
                         )
                     }
@@ -499,7 +501,9 @@ fun PlainDialog(
                         Text(
                             modifier = Modifier.fillMaxWidth()
                                 .padding(bottom = DIALOG_PADDING),
-                            text = AnnotatedString.fromHtml(summary),
+                            text = remember(summary) {
+                                htmlToAnnotatedString(summary)
+                            },
                         )
                     }
                     body()

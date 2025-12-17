@@ -8,14 +8,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.CoroutineScope
 
-import android.util.Log
 import androidx.annotation.MainThread
 
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
+import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzMetaFile
-import app.crossword.yourealwaysbe.forkyz.util.observeForeverWithLifecycle
+import app.crossword.yourealwaysbe.forkyz.util.observeForeverWithProcessLifecycle
 import app.crossword.yourealwaysbe.puz.Playboard
 
 /**
@@ -163,7 +163,7 @@ public class CurrentPuzzleHolder(
         val puz = board?.getPuzzle()
         val curHandle = puzHandle
         if (puz == null || curHandle == null) {
-            Log.e(TAG, "No puzzle associated to the board to save.")
+            AppLogger.e(TAG, "No puzzle associated to the board to save.")
             cb()
         } else {
             ioScope.launch {
@@ -174,7 +174,7 @@ public class CurrentPuzzleHolder(
                             try {
                                 fileHandler.save(puz, curHandle)
                             } catch (e : IOException) {
-                                Log.e(TAG, "Error saving puzzle.")
+                                AppLogger.e(TAG, "Error saving puzzle.")
                                 e.printStackTrace()
                             } finally {
                                 ioLock.unlock()
@@ -194,33 +194,35 @@ public class CurrentPuzzleHolder(
         // Ok to observe forever because this is a singleton that lives
         // forever.
         settings.livePlayPreserveCorrectLettersInShowErrors
-            .observeForeverWithLifecycle() {
+            .observeForeverWithProcessLifecycle() {
                 board?.setPreserveCorrectLettersInShowErrors(it)
             }
-        settings.livePlayDeleteCrossingMode.observeForeverWithLifecycle() {
-            board?.setDeleteCrossingMode(it)
-        }
-        settings.livePlayShowErrorsGrid.observeForeverWithLifecycle() {
+        settings.livePlayDeleteCrossingMode
+            .observeForeverWithProcessLifecycle() {
+                board?.setDeleteCrossingMode(it)
+            }
+        settings.livePlayShowErrorsGrid.observeForeverWithProcessLifecycle() {
             board?.setShowErrorsGrid(it)
         }
-        settings.livePlayShowErrorsCursor.observeForeverWithLifecycle() {
+        settings.livePlayShowErrorsCursor.observeForeverWithProcessLifecycle() {
             board?.setShowErrorsCursor(it)
         }
-        settings.livePlayShowErrorsClue.observeForeverWithLifecycle() {
+        settings.livePlayShowErrorsClue.observeForeverWithProcessLifecycle() {
             board?.setShowErrorsClue(it)
         }
-        settings.livePlayToggleBeforeMove.observeForeverWithLifecycle() {
+        settings.livePlayToggleBeforeMove.observeForeverWithProcessLifecycle() {
             board?.setToggleBeforeMove(it)
         }
-        settings.livePlayMovementStrategy.observeForeverWithLifecycle() {
+        settings.livePlayMovementStrategy.observeForeverWithProcessLifecycle() {
             board?.setMovementStrategy(it)
         }
-        settings.livePlaySkipFilled.observeForeverWithLifecycle {
+        settings.livePlaySkipFilled.observeForeverWithProcessLifecycle {
             board?.setSkipCompletedLetters(it)
         }
-        settings.livePlayPlayLetterUndoEnabled.observeForeverWithLifecycle {
-            board?.setPlayLetterUndoStackEnabled(it)
-        }
+        settings.livePlayPlayLetterUndoEnabled
+            .observeForeverWithProcessLifecycle {
+                board?.setPlayLetterUndoStackEnabled(it)
+            }
     }
 }
 

@@ -7,10 +7,9 @@ import java.io.InputStream
 import java.nio.charset.Charset
 import java.util.regex.Pattern
 import kotlin.collections.ArrayDeque
+import kotlin.io.encoding.Base64
 
-import android.util.Base64
-import android.util.Log
-
+import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.org.json.JSONException
 
 import app.crossword.yourealwaysbe.forkyz.util.getURLInputStream
@@ -68,7 +67,7 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
         inputStream : InputStream,
         url : String?,
     ) : Puzzle? {
-        Log.i(TAG, "Trying PuzzleMe scraper on " + url)
+        AppLogger.i(TAG, "Trying PuzzleMe scraper on " + url)
         // so we can reuse
         val is1 = StreamUtils.makeByteArrayInputStream(inputStream)
         val is2 = getStage2InputStream(is1)
@@ -83,7 +82,7 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
                     return puz
                 }
         } catch (e : IOException) {
-            Log.i(TAG, "Could not scrape PuzzleMe: " + e)
+            AppLogger.i(TAG, "Could not scrape PuzzleMe: " + e)
             return null
         }
     }
@@ -160,7 +159,7 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
     private fun base64Decode(s : String) : String? {
         try {
             return String(
-                Base64.decode(s, Base64.DEFAULT),
+                Base64.Default.decode(s),
                 Charset.forName("UTF-8"),
             )
         } catch (e : IllegalArgumentException) {
@@ -219,7 +218,7 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
                 }
 
                 val b64Chunk = chunkStr.substring(base64Start, base64End)
-                val decoded = Base64.decode(b64Chunk, Base64.DEFAULT)
+                val decoded = Base64.Default.decode(b64Chunk)
 
                 // Check for invalid UTF-8 bytes
                 for (byte in decoded) {

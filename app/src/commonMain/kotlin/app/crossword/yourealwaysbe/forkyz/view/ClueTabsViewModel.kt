@@ -8,8 +8,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
-import androidx.core.content.ContextCompat
-
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_tab_history
 import app.crossword.yourealwaysbe.forkyz.settings.ClueHighlight

@@ -3,9 +3,7 @@ package app.crossword.yourealwaysbe.forkyz.view
 
 import kotlin.math.roundToInt
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.parcelize.Parcelize
 
-import android.os.Parcelable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
@@ -47,6 +45,8 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.board_descript
 import app.crossword.yourealwaysbe.forkyz.settings.FitToScreenMode
 import app.crossword.yourealwaysbe.forkyz.theme.BoardColorScheme
 import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
+import app.crossword.yourealwaysbe.forkyz.util.Parcelable
+import app.crossword.yourealwaysbe.forkyz.util.Parcelize
 
 private val MAX_BOX_SIZE_DP : Float = 160f
 private val MIN_DP_PER_BOX : Float = 10f

@@ -7,7 +7,6 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
@@ -18,6 +17,7 @@ import org.koin.android.ext.android.inject
 
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.saving_puzzle
+import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 
 private val TAG = "ForkyzSaveSrvcCllr";
@@ -31,7 +31,7 @@ class AndroidPuzzleSaveServiceCaller(
         // which case you get paused without ever being foregrounded, so you
         // get an exception.
         try {
-            Log.i(TAG, "Saving board on foreground")
+            AppLogger.i(TAG, "Saving board on foreground")
             ContextCompat.startForegroundService(
                 context,
                 Intent(context, PuzzleSaveService::class.java),
@@ -39,7 +39,7 @@ class AndroidPuzzleSaveServiceCaller(
         // use IllegalState as ForegroundServiceNotAllowedException
         // requires API 31
         } catch (e : IllegalStateException) {
-            Log.i(
+            AppLogger.i(
                 TAG,
                 "Save on foreground not allowed, save in background"
             )

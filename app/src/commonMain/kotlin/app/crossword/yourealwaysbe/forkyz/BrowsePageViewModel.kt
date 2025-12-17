@@ -14,10 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.parcelize.Parcelize
 
-import android.os.Parcelable
-import android.util.Log
 import androidx.annotation.MainThread
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -38,11 +35,14 @@ import app.crossword.yourealwaysbe.forkyz.settings.DownloadersSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.RatingsSettings
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation
+import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.AppPuzzleUtils
 import app.crossword.yourealwaysbe.forkyz.util.BackgroundDownloadManager
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
 import app.crossword.yourealwaysbe.forkyz.util.MediatedStateWithFlow
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
+import app.crossword.yourealwaysbe.forkyz.util.Parcelable
+import app.crossword.yourealwaysbe.forkyz.util.Parcelize
 import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.files.DirHandle
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler
@@ -672,7 +672,7 @@ class BrowsePageViewModel(
                 puzzleData.puzHandle,
                 { _puzzleLoaded.value = true },
                 { e ->
-                    Log.e(TAG, "Could not load file: " + e)
+                    AppLogger.e(TAG, "Could not load file: " + e)
 
                     fileHandlerProvider.get { fileHandler ->
                         var filename : String? = null
@@ -709,11 +709,11 @@ class BrowsePageViewModel(
      */
     @MainThread
     fun refreshCurrentPuzzleMeta() {
-        Log.i(TAG, "Refreshing current puzzle in list with isUIBusy")
+        AppLogger.i(TAG, "Refreshing current puzzle in list with isUIBusy")
         setUIBusy(true)
         currentPuzzleHolder.getFreshCurrentPuzzleMeta() { refreshedMeta ->
             setUIBusy(false)
-            Log.i(TAG, "Done refreshing current puzzle in list with isUIBusy")
+            AppLogger.i(TAG, "Done refreshing current puzzle in list with isUIBusy")
             if (refreshedMeta != null) {
                 viewModelScope.launch {
                     val pd = getPuzData(refreshedMeta)
@@ -866,7 +866,7 @@ class BrowsePageViewModel(
                             puzzles[pd.puzEntry.id] = pd
                         }
                     } catch (e : IOException) {
-                        Log.w(TAG, "Could not load meta for handle " + ph)
+                        AppLogger.w(TAG, "Could not load meta for handle " + ph)
                     }
                 }
 
@@ -896,14 +896,14 @@ class BrowsePageViewModel(
     private fun threadWithUILock(taskName : String, r : Runnable) {
         // no lock actually needed because executorService is single
         // threaded guaranteed
-        Log.i(TAG, "Starting task " + taskName + " with isUIBusy")
+        AppLogger.i(TAG, "Starting task " + taskName + " with isUIBusy")
         viewModelScope.launch(uiLockDispatcher) {
             try {
                 setUIBusy(true)
                 r.run()
             } finally {
                 setUIBusy(false)
-                Log.i(TAG, "Finished task " + taskName + " with isUIBusy")
+                AppLogger.i(TAG, "Finished task " + taskName + " with isUIBusy")
             }
         }
     }

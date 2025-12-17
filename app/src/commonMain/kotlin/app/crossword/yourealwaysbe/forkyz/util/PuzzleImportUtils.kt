@@ -8,11 +8,10 @@ import java.io.InputStream
 import java.net.URISyntaxException
 import java.time.LocalDate
 
-import android.util.Log
-
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.import_fallback_source
 import app.crossword.yourealwaysbe.forkyz.net.GenericStreamScraper
+import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.files.DirHandle
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandle
@@ -198,7 +197,7 @@ private suspend fun importInputStream(
             puz, AppPuzzleUtils.generateFileName(puz)
         )
     } catch (e : IOException) {
-        Log.e(TAG, "Failed to save imported puzzle: " + e)
+        AppLogger.e(TAG, "Failed to save imported puzzle: " + e)
         return null
     }
 

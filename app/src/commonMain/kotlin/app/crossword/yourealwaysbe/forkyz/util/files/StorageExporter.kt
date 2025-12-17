@@ -3,8 +3,7 @@ package app.crossword.yourealwaysbe.forkyz.util.files
 
 import java.io.IOException
 
-import android.util.Log
-
+import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.puz.io.StreamUtils
@@ -25,43 +24,43 @@ fun exportStorage(
     fileHandler : FileHandler,
     target : Uri,
 ) : Boolean {
-    Log.i(TAG, "Exporting storage to " + target)
-    Log.i(TAG, "Creating target handler")
+    AppLogger.i(TAG, "Exporting storage to " + target)
+    AppLogger.i(TAG, "Creating target handler")
     val targetHandler = utils.getTargetFileHandler(target)
     if (targetHandler == null) {
-        Log.e(TAG, "Could not create target handler, not exporting.")
+        AppLogger.e(TAG, "Could not create target handler, not exporting.")
         return false
     }
 
-    Log.i(TAG, "Exporting crosswords folder")
+    AppLogger.i(TAG, "Exporting crosswords folder")
     exportDirectory(
         fileHandler,
         fileHandler.crosswordsDirectory,
         targetHandler,
         targetHandler.crosswordsDirectory,
     )
-    Log.i(TAG, "Exporting archive folder")
+    AppLogger.i(TAG, "Exporting archive folder")
     exportDirectory(
         fileHandler,
         fileHandler.archiveDirectory,
         targetHandler,
         targetHandler.archiveDirectory,
     )
-    Log.i(TAG, "Exporting to import folder")
+    AppLogger.i(TAG, "Exporting to import folder")
     exportDirectory(
         fileHandler,
         fileHandler.toImportDirectory,
         targetHandler,
         targetHandler.toImportDirectory,
     )
-    Log.i(TAG, "Exporting to import done folder")
+    AppLogger.i(TAG, "Exporting to import done folder")
     exportDirectory(
         fileHandler,
         fileHandler.toImportDoneDirectory,
         targetHandler,
         targetHandler.toImportDoneDirectory,
     )
-    Log.i(TAG, "Exporting to import failed folder")
+    AppLogger.i(TAG, "Exporting to import failed folder")
     exportDirectory(
         fileHandler,
         fileHandler.toImportFailedDirectory,
@@ -69,7 +68,7 @@ fun exportStorage(
         targetHandler.toImportFailedDirectory,
     )
 
-    Log.i(TAG, "Export done")
+    AppLogger.i(TAG, "Export done")
     return true
 }
 

@@ -12,6 +12,7 @@ import android.content.Context
 import androidx.core.content.FileProvider
 import androidx.room.Room.databaseBuilder
 import androidx.room.RoomDatabase
+import com.google.android.material.color.DynamicColors
 
 import org.jetbrains.compose.resources.PluralStringResource
 import org.jetbrains.compose.resources.StringResource
@@ -43,7 +44,10 @@ class AndroidNativeBackendUtils(
         resourceID : StringResource,
         vararg formatArgs: Any,
     ) : String {
-        return org.jetbrains.compose.resources.getString(resourceID, *formatArgs)
+        return org.jetbrains.compose.resources.getString(
+            resourceID,
+            *formatArgs,
+        )
     }
 
     override suspend fun getQuantityString(
@@ -171,5 +175,10 @@ class AndroidNativeBackendUtils(
             return null
         }
     }
+
+    override val isDynamicColorAvailable : Boolean
+        get() {
+            return DynamicColors.isDynamicColorAvailable()
+        }
 }
 

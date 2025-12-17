@@ -12,11 +12,10 @@ import android.content.Intent
 import android.database.Cursor
 import android.os.Build
 import android.provider.DocumentsContract
-import android.util.Log
-
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation
+import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.toAndroidUri
@@ -214,14 +213,14 @@ class FileHandlerSAF(
                     destDirHandle.uri.toAndroidUri(),
                 )
             } catch (e : FileNotFoundException) {
-                Log.e(
+                AppLogger.e(
                     TAG,
                     "Attempt to move " + fileHandle + " to "
                         + destDirHandle + " failed.",
                 )
                 e.printStackTrace()
             } catch (e : IllegalArgumentException) {
-                Log.e(
+                AppLogger.e(
                     TAG,
                     "Attempt to move " + fileHandle + " to "
                         + destDirHandle + " failed.",
@@ -260,21 +259,21 @@ class FileHandlerSAF(
                 }
             }
         } catch (e : IllegalArgumentException) {
-            Log.e(
+            AppLogger.e(
                 TAG,
                 "Attempt to move " + fileHandle + " to "
                     + destDirHandle + " failed.",
             )
             e.printStackTrace()
         } catch (e : IllegalStateException) {
-            Log.e(
+            AppLogger.e(
                 TAG,
                 "Attempt to move " + fileHandle + " to "
                     + destDirHandle + " failed.",
             )
             e.printStackTrace()
         } catch (e : IOException) {
-            Log.e(
+            AppLogger.e(
                 TAG,
                 "Attempt to move " + fileHandle + " to "
                     + destDirHandle + " failed.",
@@ -327,7 +326,7 @@ class FileHandlerSAF(
                 return exists(resolver, crosswordsFolderUri)
                     && exists(resolver, archiveFolderUri)
             } catch (e : UnsupportedOperationException) {
-                Log.e(TAG, "Unsupported operation accessing SAF")
+                AppLogger.e(TAG, "Unsupported operation accessing SAF")
                 e.printStackTrace()
                 return false
             }
@@ -520,7 +519,7 @@ class FileHandlerSAF(
                     )
                 }
             } catch (e : Exception) {
-                Log.e(TAG, "Unable to (re-)configure SAF directory.")
+                AppLogger.e(TAG, "Unable to (re-)configure SAF directory.")
             }
 
             return null
@@ -589,12 +588,12 @@ class FileHandlerSAF(
                         )
                     }
                 } catch (e : SecurityException) {
-                    Log.e(
+                    AppLogger.e(
                         TAG,
                         "Permission not granted to configured SAF directories.",
                     )
                 } catch (e : UnsupportedOperationException) {
-                    Log.e(TAG, "Unsupported operation with SAF")
+                    AppLogger.e(TAG, "Unsupported operation with SAF")
                     e.printStackTrace()
                 }
             }

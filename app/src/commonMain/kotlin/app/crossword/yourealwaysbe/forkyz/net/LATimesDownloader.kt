@@ -1,6 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
+import java.net.URI
 import java.net.URL
 import java.time.Duration
 import java.time.LocalDate
@@ -45,7 +46,7 @@ class LATimesDownloader(
 ) {
     override fun getSourceUrl(date : LocalDate) : String? {
         val url = date.format(PUZZLES_FEED_FORMAT)
-        return getInputStream(URL(url), null)?.use { input ->
+        return getInputStream(URI(url).toURL(), null)?.use { input ->
             val puzzles = JSONUtils.streamToJSONArray(input)
             (0 until puzzles.length()).forEach {
                 val puzzle = puzzles.getJSONObject(it)

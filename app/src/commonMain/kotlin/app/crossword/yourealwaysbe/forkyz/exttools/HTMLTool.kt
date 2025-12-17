@@ -9,5 +9,6 @@ open class HTMLToolData(val uri : Uri) : ExternalToolData() {
     }
 }
 
+@Throws(AppNotFoundException::class)
 expect suspend fun ExternalToolLauncher.visit(data : HTMLToolData)
 

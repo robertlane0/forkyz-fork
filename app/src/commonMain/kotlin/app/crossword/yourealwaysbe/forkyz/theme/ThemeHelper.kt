@@ -11,13 +11,11 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.lifecycle.ProcessLifecycleOwner
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.google.android.material.appbar.AppBarLayout
 
 import app.crossword.yourealwaysbe.forkyz.settings.DayNightMode
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.Theme
+import app.crossword.yourealwaysbe.forkyz.util.collectAsStateWithProcessLifecycle
 
 class ThemeHelper(val settings : ForkyzSettings) {
     val cheatedColor : Color
@@ -104,15 +102,13 @@ class ThemeHelper(val settings : ForkyzSettings) {
 
     @Composable
     private fun getAppDayNightModeState() : State<DayNightMode> =
-        settings.liveAppDayNightMode.collectAsStateWithLifecycle(
+        settings.liveAppDayNightMode.collectAsStateWithProcessLifecycle(
             DayNightMode.DNM_SYSTEM,
-            ProcessLifecycleOwner.get(),
         )
 
     @Composable
     private fun getAppThemeState() : State<Theme> =
-        settings.liveAppTheme.collectAsStateWithLifecycle(
+        settings.liveAppTheme.collectAsStateWithProcessLifecycle(
             Theme.T_STANDARD,
-            ProcessLifecycleOwner.get(),
         )
 }

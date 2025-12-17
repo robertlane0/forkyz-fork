@@ -1,8 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.theme
 
-import android.app.Activity
-import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
@@ -16,17 +14,10 @@ import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
-import androidx.core.view.WindowCompat
-import com.google.android.material.color.DynamicColors
 
 import org.jetbrains.compose.resources.stringResource
 
@@ -63,7 +54,7 @@ data class CircleProgressBarColorScheme(
     val progressError : Color,
 )
 
-private val lightScheme = lightColorScheme(
+internal val lightScheme = lightColorScheme(
     primary = primaryLight,
     onPrimary = onPrimaryLight,
     primaryContainer = primaryContainerLight,
@@ -101,7 +92,7 @@ private val lightScheme = lightColorScheme(
     surfaceContainerHighest = surfaceContainerHighestLight,
 )
 
-private val darkScheme = darkColorScheme(
+internal val darkScheme = darkColorScheme(
     primary = primaryDark,
     onPrimary = onPrimaryDark,
     primaryContainer = primaryContainerDark,
@@ -194,42 +185,11 @@ private val darkCircleProgressBarColorScheme = CircleProgressBarColorScheme(
 )
 
 @Composable
-fun AppTheme(
+expect fun AppTheme(
     appTheme : Theme,
     darkMode : Boolean,
     content : @Composable() () -> Unit,
-) {
-    val context = LocalContext.current
-    val view = LocalView.current
-
-    val colorScheme = when (appTheme) {
-        // only diff is app bar, see ForkyzTopAppBar
-        Theme.T_LEGACY_LIKE -> if (darkMode) darkScheme else lightScheme
-        Theme.T_DYNAMIC ->
-            if (DynamicColors.isDynamicColorAvailable()) {
-                if (darkMode) dynamicDarkColorScheme(context)
-                else dynamicLightColorScheme(context)
-            } else {
-                if (darkMode) darkScheme else lightScheme
-            }
-        // Theme.T_STANDARD
-        else -> if (darkMode) darkScheme else lightScheme
-    }
-
-    if (!view.isInEditMode) {
-        SideEffect {
-            val window = (view.context as Activity).window
-            val isLight = !darkMode && appTheme != Theme.T_LEGACY_LIKE
-            WindowCompat.getInsetsController(window, view)
-                .isAppearanceLightStatusBars = isLight
-        }
-    }
-
-    MaterialTheme(
-        colorScheme = colorScheme,
-        content = content
-    )
-}
+)
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)

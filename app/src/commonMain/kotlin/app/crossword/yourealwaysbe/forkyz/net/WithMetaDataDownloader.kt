@@ -8,8 +8,7 @@ import java.time.DayOfWeek
 import java.time.Duration
 import java.time.LocalDate
 
-import android.util.Log
-
+import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.puz.io.PuzzleParser
 import app.crossword.yourealwaysbe.puz.Puzzle
 
@@ -57,9 +56,9 @@ class WithMetaDataDownloader(
                 title?.let { puz.title = it }
             }
         } catch (e : IOException) {
-            Log.e(TAG, "Download failed with: " + e)
+            AppLogger.e(TAG, "Download failed with: " + e)
         } catch (e : URISyntaxException) {
-            Log.e(TAG, "Download failed with: " + e)
+            AppLogger.e(TAG, "Download failed with: " + e)
         }
 
         return null;

@@ -69,9 +69,6 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.integerResource
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -86,6 +83,8 @@ import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
+
+import be.digitalia.compose.htmlconverter.htmlToAnnotatedString
 
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.add_puzzle
@@ -168,6 +167,7 @@ import app.crossword.yourealwaysbe.forkyz.view.DownloadDialog
 import app.crossword.yourealwaysbe.forkyz.view.OKCancelDialog
 import app.crossword.yourealwaysbe.forkyz.view.OKDialog
 import app.crossword.yourealwaysbe.forkyz.view.RatingBar
+import app.crossword.yourealwaysbe.forkyz.view.RatingBarStyle
 import app.crossword.yourealwaysbe.forkyz.view.SearchBar
 import app.crossword.yourealwaysbe.forkyz.view.SwipeToDismissBox
 import app.crossword.yourealwaysbe.forkyz.view.SwipeToDismissBoxValue
@@ -510,7 +510,7 @@ fun BrowsePage(
             MenuCleanup()
             MenuSwitchLists()
             MenuHelp(
-                openHelp = { pageOpener.openHTMLPage(HTMLPage.BROWSE_HELP) },
+                openHelp = { pageOpener.openHTMLPage(HTMLFile.BROWSE_HELP) },
                 onDismiss = viewModel::dismissMenu,
             )
             MenuSettings(
@@ -619,7 +619,7 @@ fun BrowsePage(
                 .background(MaterialTheme.colorScheme.background)
                 .padding(horizontal=HORIZONTAL_PADDING)
                 .padding(top=4.dp, bottom=4.dp),
-            text = AnnotatedString.fromHtml(header),
+            text = remember (header) { htmlToAnnotatedString(header) },
             color = MaterialTheme.colorScheme.onBackground,
         )
     }
@@ -712,7 +712,9 @@ fun BrowsePage(
                         minLines = 1,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        text = AnnotatedString.fromHtml(pe.title),
+                        text = remember (pe.title) {
+                            htmlToAnnotatedString(pe.title)
+                        },
                         style = MaterialTheme.typography.headlineSmall,
                         color = textColor,
                     )
@@ -735,7 +737,9 @@ fun BrowsePage(
                         modifier = Modifier.weight(1.0F)
                             .padding(horizontal=10.dp),
                         maxLines = 3,
-                        text = AnnotatedString.fromHtml(pe.caption),
+                        text = remember(pe.caption) {
+                            htmlToAnnotatedString(pe.caption)
+                        },
                         color = textColor,
                     )
                     if (state.showRatings) {
@@ -743,7 +747,7 @@ fun BrowsePage(
                             modifier = Modifier.padding(top=4.dp),
                             stepSize = 1.0F,
                             isIndicator = true,
-                            style = android.R.attr.ratingBarStyleSmall,
+                            style = RatingBarStyle.SMALL,
                             rating = pe.rating.code.toFloat(),
                         )
                     }
@@ -912,8 +916,8 @@ fun BrowsePage(
                 IntroMessages()
                 PuzzleList(
                     modifier = Modifier.weight(1.0F)
-                        .focusable()
-                        .focusRequester(requester),
+                        .focusRequester(requester)
+                        .focusable(),
                     listState = puzzleListState,
                 )
                 UIBusy()

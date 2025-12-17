@@ -12,9 +12,8 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Arrays
 
-import android.util.Log
-
 import app.crossword.yourealwaysbe.forkyz.net.Downloader.DownloadResult
+import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.io.PuzzleParser
 
@@ -147,9 +146,9 @@ open class AbstractDateDownloader constructor(
                 e.printStackTrace()
             }
         } catch (e : URISyntaxException) {
-            Log.e(TAG, "Malformed URL in download: " + e)
+            AppLogger.e(TAG, "Malformed URL in download: " + e)
         } catch (e : MalformedURLException) {
-            Log.e(TAG, "Malformed URL in download: " + e)
+            AppLogger.e(TAG, "Malformed URL in download: " + e)
         }
 
         return null

@@ -1,6 +1,5 @@
 package app.crossword.yourealwaysbe.forkyz
 
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -27,16 +26,22 @@ import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 
 private val PADDING = 20.dp
 
+/**
+ * HTML Page
+ *
+ * @param unqualifiedFileName should come from HTMLFile class in view
+ * model
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HTMLPage(
     viewModel : HTMLPageViewModel,
     themeHelper : ThemeHelper,
-    page : HTMLPage,
+    unqualifiedFileName : String,
     onBack : () -> Unit,
 ) {
-    LaunchedEffect(page) {
-        viewModel.loadAsset(page)
+    LaunchedEffect(unqualifiedFileName) {
+        viewModel.loadAsset(unqualifiedFileName)
     }
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()

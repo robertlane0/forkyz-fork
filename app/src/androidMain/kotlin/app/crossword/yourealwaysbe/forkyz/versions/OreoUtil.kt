@@ -9,7 +9,6 @@ import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import android.os.storage.StorageManager
-import android.util.Log
 import androidx.annotation.RequiresApi
 
 import org.jetbrains.compose.resources.getString
@@ -22,6 +21,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.export_notific
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.save_notification_channel_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.save_notification_channel_name
 import app.crossword.yourealwaysbe.forkyz.net.DownloadersProvider
+import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.PuzzleExportService
 import app.crossword.yourealwaysbe.forkyz.util.PuzzleSaveService
 
@@ -30,7 +30,7 @@ private val TAG = "ForkyzOreoUtil"
 @RequiresApi(api = Build.VERSION_CODES.O)
 open class OreoUtil : NougatUtil() {
     public override fun createNotificationChannels(context : Context) {
-        Log.i(TAG, "Creating notification channels")
+        AppLogger.i(TAG, "Creating notification channels")
 
         // think need all channels right away
         runBlocking {

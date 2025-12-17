@@ -3,8 +3,6 @@ package app.crossword.yourealwaysbe.forkyz.net
 import java.io.InputStream
 
 import android.util.Base64
-import android.util.Log
-
 import org.junit.Assert
 import org.junit.Test
 

@@ -11,8 +11,6 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlinx.coroutines.runBlocking
 
-import android.util.Log
-
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.cru_puzzle_workshop
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.custom_daily_title
@@ -59,6 +57,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.vingminutes
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.wall_street_journal
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.washington_post_sunday
 import app.crossword.yourealwaysbe.forkyz.settings.DownloadersSettings
+import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler
 import app.crossword.yourealwaysbe.puz.io.BrainsOnlyIO
@@ -128,7 +127,7 @@ class Downloaders(
         for (d in downloaders) {
             val latestDate = d.getLatestDate(to)
             if (latestDate != null && !latestDate.isBefore(from)) {
-                Log.i(
+                AppLogger.i(
                     TAG,
                     "Will try to download puzzle " + d + " @ " + latestDate
                 )
@@ -145,11 +144,13 @@ class Downloaders(
         date : LocalDate,
         givenDownloaders : List<Downloader>?,
     ) {
+        AppLogger.i(TAG, "Download $date and $givenDownloaders")
         val downloaders = givenDownloaders ?: getDownloaders(date)
 
         val puzzlesToDownload = downloaders.filter {
             it.isAvailable(date)
         }.map { it to date }.toMap()
+        AppLogger.i(TAG, "Really download $date and $puzzlesToDownload")
 
         download(puzzlesToDownload)
     }
@@ -242,7 +243,7 @@ class Downloaders(
         // failed unless proven otherwise!
         var result = Downloader.DownloadResult.FAILED
 
-        Log.i(TAG, "Downloading " + d.toString())
+        AppLogger.i(TAG, "Downloading " + d.toString())
         runBlocking {
             downloadersListener?.onPuzzleDownloadStarted(d.name)
         }
@@ -263,7 +264,7 @@ class Downloaders(
                 }
             }
         } catch (e : Exception) {
-            Log.w(TAG, "Failed to download "+d.name, e)
+            AppLogger.w(TAG, "Failed to download "+d.name, e)
         }
 
         runBlocking {

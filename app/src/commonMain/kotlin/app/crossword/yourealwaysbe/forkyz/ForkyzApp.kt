@@ -31,22 +31,28 @@ import app.crossword.yourealwaysbe.puz.ClueID
  * Navigation routes
  */
 @Serializable
-private object Browse
+internal object Browse
 @Serializable
-private object Play
+internal object Play
 @Serializable
-private object ClueList
+internal object ClueList
 @Serializable
-private data class Notes(
+internal data class Notes(
     val listName : String?,
     val clueIndex : Int?,
 )
 @Serializable
-private object Settings
+internal object Settings
+/**
+ * Get unqualifiedFileName from HTMLFile
+ *
+ * Cannot use complex data in routes.
+ * See: https://developer.android.com/guide/navigation/use-graph/navigate
+ */
 @Serializable
-private data class HTML(val page : HTMLPage)
+internal data class HTML(val unqualifiedFileName : String)
 @Serializable
-private object Logcat
+internal object Logcat
 
 /**
  * Page open funs
@@ -59,7 +65,7 @@ data class PageOpener(
     val openPlayPage : () -> Unit,
     val openClueListPage : () -> Unit,
     val openNotesPage : (ClueID?) -> Unit,
-    val openHTMLPage : (HTMLPage) -> Unit,
+    val openHTMLPage : (HTMLFile) -> Unit,
     val openOnlineSources : () -> Unit,
     val openReleaseNotes : () -> Unit,
     val openSettingsPage : () -> Unit,
@@ -92,8 +98,8 @@ private fun ForkyzAppMain(
             utils.onFinish()
     }
 
-    fun openHTMLPage(page : HTMLPage) {
-        navController.navigate(route = HTML(page))
+    fun openHTMLPage(page : HTMLFile) {
+        navController.navigate(route = HTML(page.unqualifiedFileName))
     }
 
     val onlineSourcesURL = stringResource(Res.string.online_sources_url)
@@ -108,7 +114,7 @@ private fun ForkyzAppMain(
         },
         openHTMLPage = ::openHTMLPage,
         openOnlineSources = { utils.openURI(onlineSourcesURL.toUri()) },
-        openReleaseNotes = { openHTMLPage(HTMLPage.RELEASE_NOTES) },
+        openReleaseNotes = { openHTMLPage(HTMLFile.RELEASE_NOTES) },
         openSettingsPage = { navController.navigate(route = Settings) },
         openLogcatPage = { navController.navigate(route = Logcat) },
         onBack = ::doBackAction,
@@ -173,7 +179,7 @@ private fun ForkyzAppMain(
             HTMLPage(
                 viewModel = viewModel,
                 themeHelper = themeHelper,
-                page = html.page,
+                unqualifiedFileName = html.unqualifiedFileName,
                 onBack = ::doBackAction,
             )
         }

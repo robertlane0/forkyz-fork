@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz
 
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -75,6 +74,9 @@ fun ClueListPage(
         pageOpener = pageOpener,
     ) {
         val textMeasurer = rememberBoardTextMeasurer()
+        // the top board that will always have focus (hidden out of view
+        // but still focused in show all words)
+        val boxInputState = remember { BoxInputState() }
 
         fun onKeyEvent(event : KeyEvent) : Boolean {
             when (event.key) {
@@ -195,7 +197,10 @@ fun ClueListPage(
                 textMeasurer = textMeasurer,
                 viewModel = viewModel.clueTabsViewModel,
                 isPortrait = utils.isPortrait,
-                onClueClick = viewModel::clueClick,
+                onClueClick = { cid ->
+                    boxInputState.requestFocus()
+                    viewModel.clueClick(cid)
+                },
                 onClueClickDescription = stringResource(Res.string.select_clue),
                 onClueLongClick = { cid ->
                     viewModel.selectClue(cid)
@@ -203,8 +208,12 @@ fun ClueListPage(
                 },
                 onClueLongClickDescription
                     = stringResource(Res.string.open_clue_notes),
-                onClueBoardClick = viewModel::clueClick,
-                onClueBoardClickDescription = stringResource(Res.string.select_clue),
+                onClueBoardClick = { cid ->
+                    boxInputState.requestFocus()
+                    viewModel.clueClick(cid)
+                },
+                onClueBoardClickDescription
+                    = stringResource(Res.string.select_clue),
                 showAllWords = showAllWords,
                 boardColorScheme = boardColorScheme,
             )
@@ -217,7 +226,6 @@ fun ClueListPage(
                 Column() {
                     val showAllWords
                         by viewModel.showAllWords.collectAsStateWithLifecycle()
-                    val boxInputState = remember { BoxInputState() }
 
                     WordEdit(
                         textMeasurer = textMeasurer,

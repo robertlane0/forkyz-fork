@@ -15,10 +15,10 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-
-import android.util.Log
+import kotlinx.coroutines.runBlocking
 
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings
+import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.files.MetaCache.MetaRecord
@@ -33,6 +33,11 @@ import app.crossword.yourealwaysbe.puz.io.StreamUtils
  * Abstraction layer for file operations
  *
  * Implementations provided for different file backends
+ *
+ * TODO: currently uses runBlocking for MetaCache suspend funs based on
+ * assumption that this is only called from contexts where IO blocking
+ * is ok. A goal might be to move from executorService to coroutines and
+ * make proper use of suspend funs (and locks to avoid races..).
  */
 abstract class FileHandler {
     // used for saving meta cache to DB since we currently save puzzles
@@ -168,7 +173,7 @@ abstract class FileHandler {
             }
         )
 
-        metaCache.deleteRecord(this, ph)
+        runBlocking { metaCache.deleteRecord(this@FileHandler, ph) }
     }
 
     @Synchronized
@@ -198,7 +203,7 @@ abstract class FileHandler {
         )
 
         // TODO : can we move record instead? What is new Uri?
-        metaCache.deleteRecord(this, ph)
+        runBlocking { metaCache.deleteRecord(this@FileHandler, ph) }
     }
 
     /**
@@ -224,12 +229,16 @@ abstract class FileHandler {
         val metas = mutableListOf<PuzMetaFile>()
 
         val rawFileList = listFiles(dirHandle)
-        val cachedMetas = metaCache.getDirCache(this, dirHandle)
+        val cachedMetas = runBlocking {
+            metaCache.getDirCache(this@FileHandler, dirHandle)
+        }
 
         loadMetasFromPuzFiles(dirHandle, rawFileList, cachedMetas, metas)
         loadMetasFromIPuzFiles(dirHandle, rawFileList, cachedMetas, metas)
 
-        metaCache.cleanupCache(this, dirHandle, metas)
+        runBlocking {
+            metaCache.cleanupCache(this@FileHandler, dirHandle, metas)
+        }
 
         return metas
     }
@@ -276,7 +285,9 @@ abstract class FileHandler {
         puzHandle : PuzHandle,
         puz : Puzzle,
     ) : PuzMetaFile {
-        val metaRecord = metaCache.addRecord(this, puzHandle, puz)
+        val metaRecord = runBlocking {
+            metaCache.addRecord(this@FileHandler, puzHandle, puz)
+        }
         return PuzMetaFile(this, puzHandle, metaRecord)
     }
 
@@ -306,7 +317,9 @@ abstract class FileHandler {
         )
 
         if (puz != null) {
-            val mr = metaCache.addRecord(this, ph, puz)
+            val mr = runBlocking {
+                metaCache.addRecord(this@FileHandler, ph, puz)
+            }
             // if the puzzle doesn't have its own date, use the detected
             // one
             if (puz.getDate() == null)
@@ -344,7 +357,9 @@ abstract class FileHandler {
         // Cannot be done on main thread
         if (success) {
             executorService.execute {
-                metaCache.addRecord(this, ph, puz)
+                runBlocking {
+                    metaCache.addRecord(this@FileHandler, ph, puz)
+                }
             }
         }
     }
@@ -451,7 +466,7 @@ abstract class FileHandler {
                     }
                 }
             } catch (e : IOException) {
-                Log.w(
+                AppLogger.w(
                     TAG,
                     "Could not load "
                         + ph.mainFileHandle.uri
@@ -649,7 +664,7 @@ abstract class FileHandler {
             try {
                 return loadPuzMetaFile(ph)
             } catch (e : IOException) {
-                Log.w(TAG, "Could not load puz meta for " + ph + " : " + e)
+                AppLogger.w(TAG, "Could not load puz meta for " + ph + " : " + e)
                 return null
             }
         }

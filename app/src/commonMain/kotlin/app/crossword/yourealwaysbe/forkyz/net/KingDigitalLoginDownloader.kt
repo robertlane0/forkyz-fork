@@ -9,12 +9,11 @@ import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 import java.util.Locale
 
-import android.util.Log
-
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 
+import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.getURLInputStream
 import app.crossword.yourealwaysbe.forkyz.util.getURLJSON
 import app.crossword.yourealwaysbe.puz.Puzzle
@@ -81,23 +80,23 @@ class KingDigitalLoginDownloader(
         headers : Map<String, String>?,
     ) : Puzzle? {
         try {
-            Log.i(TAG, "Downloading " + name + " for date " + date)
+            AppLogger.i(TAG, "Downloading " + name + " for date " + date)
 
             val key = getLoginKey(headers)
             if (key == null) {
-                Log.i("TAG", "Could not login to King Digital")
+                AppLogger.i("TAG", "Could not login to King Digital")
                 return null
             }
 
             val assets = getPuzzleAssets(headers, date, key)
             if (assets ==  null) {
-                Log.i(TAG, "Could not get puzzle list from King Digital")
+                AppLogger.i(TAG, "Could not get puzzle list from King Digital")
                 return null
             }
 
             val url = getPuzURLForDate(assets, date)
             if (url == null) {
-                Log.i(TAG, "Did not find puzzle for " + date)
+                AppLogger.i(TAG, "Did not find puzzle for " + date)
                 return null
             }
 
@@ -116,14 +115,14 @@ class KingDigitalLoginDownloader(
                 puz
             }
         } catch (e : IOException) {
-            Log.i(
+            AppLogger.i(
                 TAG,
                 "Error downloading " + name + " for date " + date
                     + ": " + e
             );
             return null
         } catch (e : JSONException) {
-            Log.i(
+            AppLogger.i(
                 TAG,
                 "Error downloading " + name + " for date " + date
                     + ": " + e

@@ -227,6 +227,7 @@ class NotesPageViewModel(
     init {
         setupVoiceCommands()
         updateState()
+        setClueText()
     }
 
     val notesClue : Clue?
@@ -579,31 +580,51 @@ class NotesPageViewModel(
                 else
                     maxPuzzleDimension
 
+                val oldAnagramSource
+                    = currentNotesUIState.anagramSourceValue
+                val newAnagramSource = note?.anagramSource ?: ""
+
+                currentNotesUIState = currentNotesUIState.copy(
+                    notesClueID = cid,
+                    boxesLength = boxesLength,
+                    scratchValue = note?.scratch ?: "",
+                    textValue = note?.text ?: "",
+                    anagramSourceValue = newAnagramSource,
+                    anagramSolutionValue = note?.anagramSolution ?: "",
+                    anagramPrediction = null,
+                    clueFlagged = clue.isFlagged(),
+                    clueFlagColor = clue.flagColor,
+                )
+
+                if (oldAnagramSource != newAnagramSource) {
+                    settings.getPlayPredictAnagramChars() { predict ->
+                        if (predict)
+                            predictAnagramChars()
+                    }
+                }
+
+                // launch only this -- not too critical if it's behind
+                // since it doesn't change (TODO: move outside of update
+                // state)
                 viewModelScope.launch {
                     val text = getClueLineClueText(clue)
-                    val oldAnagramSource
-                        = currentNotesUIState.anagramSourceValue
-                    val newAnagramSource = note?.anagramSource ?: ""
-
                     currentNotesUIState = currentNotesUIState.copy(
-                        notesClueID = cid,
                         clueText = text,
-                        boxesLength = boxesLength,
-                        scratchValue = note?.scratch ?: "",
-                        textValue = note?.text ?: "",
-                        anagramSourceValue = newAnagramSource,
-                        anagramSolutionValue = note?.anagramSolution ?: "",
-                        anagramPrediction = null,
-                        clueFlagged = clue.isFlagged(),
-                        clueFlagColor = clue.flagColor,
                     )
+                }
+            }
+        }
+    }
 
-                    if (oldAnagramSource != newAnagramSource) {
-                        settings.getPlayPredictAnagramChars() { predict ->
-                            if (predict)
-                                predictAnagramChars()
-                        }
-                    }
+    private fun setClueText() {
+        notesClueID?.let { cid ->
+            val clue = getPuzzle()?.let { it.getClue(cid) }
+            if (clue != null) {
+                viewModelScope.launch {
+                    val text = getClueLineClueText(clue)
+                    currentNotesUIState = currentNotesUIState.copy(
+                        clueText = text,
+                    )
                 }
             }
         }

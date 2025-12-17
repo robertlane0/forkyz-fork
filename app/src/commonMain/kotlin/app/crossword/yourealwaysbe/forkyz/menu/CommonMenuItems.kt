@@ -1,8 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.menu
 
-import android.app.Activity
-import android.content.Intent
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -13,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource

@@ -9,8 +9,8 @@ import org.koin.android.ext.koin.androidLogger
 import org.koin.androidx.workmanager.koin.workManagerFactory
 import org.koin.core.context.startKoin
 
-import app.crossword.yourealwaysbe.forkyz.injection.androidModule
-import app.crossword.yourealwaysbe.forkyz.injection.sharedModule
+import app.crossword.yourealwaysbe.forkyz.injection.androidModules
+import app.crossword.yourealwaysbe.forkyz.injection.sharedModules
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 import app.crossword.yourealwaysbe.forkyz.util.MigrationHelper
@@ -28,7 +28,7 @@ class ForkyzApplication() : Application() {
         startKoin {
             androidLogger()
             androidContext(this@ForkyzApplication)
-            modules(androidModule, sharedModule)
+            modules(androidModules, sharedModules)
             workManagerFactory()
         }
 

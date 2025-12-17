@@ -24,15 +24,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.integerResource
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
+
+import be.digitalia.compose.htmlconverter.htmlToAnnotatedString
 
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.completed
@@ -152,7 +151,7 @@ private fun InfoHeadingData(
         if (state.author.length > 0) {
             val author by remember { derivedStateOf { state.author } }
             Text(
-                text = AnnotatedString.fromHtml(author),
+                text = remember(author) { htmlToAnnotatedString(author) },
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleMedium,
             )
@@ -160,7 +159,7 @@ private fun InfoHeadingData(
         if (state.copyright.length > 0) {
             val copyright by remember { derivedStateOf { state.copyright } }
             Text(
-                text = AnnotatedString.fromHtml(copyright),
+                text = remember(copyright) { htmlToAnnotatedString(copyright) },
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodySmall,
             )
@@ -209,7 +208,13 @@ private fun InfoSection(
     if (contentHTML.length > 0) {
         InfoSection(
             titleID = titleID,
-            content = { Text(text = AnnotatedString.fromHtml(contentHTML)) },
+            content = {
+                Text(
+                    text = remember(contentHTML) {
+                        htmlToAnnotatedString(contentHTML)
+                    },
+                )
+            },
         )
     }
 }
@@ -267,7 +272,11 @@ private fun FinishedInfo(
                 )
             }
             finishedState.completionMessage?.let { completionMessage ->
-                Text(text = AnnotatedString.fromHtml(completionMessage))
+                Text(
+                    text = remember(completionMessage) {
+                        htmlToAnnotatedString(completionMessage)
+                    },
+                )
             }
         }
     }

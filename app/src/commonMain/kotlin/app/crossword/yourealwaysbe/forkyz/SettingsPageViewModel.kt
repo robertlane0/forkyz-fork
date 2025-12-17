@@ -19,7 +19,6 @@ import kotlinx.coroutines.sync.withLock
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.android.material.color.DynamicColors
 
 import org.jetbrains.compose.resources.StringResource
 
@@ -684,12 +683,12 @@ class SettingsHTMLPage(
     page : SettingsPage,
     title : StringResource,
     summary : StringResource?,
-    val htmlPage : HTMLPage,
+    val htmlPage : HTMLFile,
 ) : SettingsNamedItem(page, title, summary) {
     constructor(
         page : SettingsPage,
         title : StringResource,
-        htmlPage : HTMLPage,
+        htmlPage : HTMLFile,
     ) : this(page, title, null, htmlPage)
 }
 
@@ -752,7 +751,7 @@ class SettingsPageViewModel(
     private val fileActionMutex = Mutex()
 
     private val availableThemeSettings =
-        if (DynamicColors.isDynamicColorAvailable()) {
+        if (utils.isDynamicColorAvailable) {
             listOf(
                 SettingsListEntry(Res.string.standard_theme, Theme.T_STANDARD),
                 SettingsListEntry(Res.string.dynamic_theme, Theme.T_DYNAMIC),
@@ -1173,12 +1172,12 @@ class SettingsPageViewModel(
         SettingsHTMLPage(
             SettingsPage.ROOT,
             Res.string.release_notes,
-            HTMLPage.RELEASE_NOTES,
+            HTMLFile.RELEASE_NOTES,
         ),
         SettingsHTMLPage(
             SettingsPage.ROOT,
             Res.string.license,
-            HTMLPage.LICENSE,
+            HTMLFile.LICENSE,
         ),
         SettingsLogcat(
             SettingsPage.ROOT,
@@ -1262,7 +1261,7 @@ class SettingsPageViewModel(
         SettingsHTMLPage(
             SettingsPage.PUZZLE_SOURCES_SCRAPERS,
             Res.string.about_scrapes,
-            HTMLPage.SCRAPERS_HELP,
+            HTMLFile.SCRAPERS_HELP,
         ),
 
         // Download
@@ -2138,7 +2137,7 @@ class SettingsPageViewModel(
         SettingsHTMLPage(
             SettingsPage.VOICE_ACCESSIBILITY,
             Res.string.about_voice_commands,
-            HTMLPage.VOICE_COMMANDS_HELP,
+            HTMLFile.VOICE_COMMANDS_HELP,
         ),
 
         // External Tools

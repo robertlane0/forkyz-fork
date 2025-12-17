@@ -31,7 +31,7 @@ import app.crossword.yourealwaysbe.forkyz.util.files.AndroidFileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 
-val androidModule = module {
+val androidModules = module {
     single<AndroidVersionUtils> {
         AndroidVersionUtils.Factory.provideAndroidVersionUtils()
     }

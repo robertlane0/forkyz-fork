@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.util
 
-import java.util.function.Consumer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -12,7 +11,6 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.WhileSubscribed
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
@@ -22,9 +20,8 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ProcessLifecycleOwner
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 
 // 5000ms is apparently LiveData default for timing out on
 // subscriptions, someone said, on the internet
@@ -161,16 +158,17 @@ fun <T> Flow<T?>.getOnceNotNull(cb : (T) -> Unit) {
 /**
  * Like observeForever on LiveData
  *
- * Uses GlobalScope / main. Consumer for BackgroundDownloadManager.java
+ * Uses GlobalScope / main.
  *
- * Uses ProcessLifecycleOwner for lifecycle.
+ * Uses sort of ProcessLifecycleOwner for lifecycle.
  */
-@OptIn(DelicateCoroutinesApi::class)
-fun <T> Flow<T>.observeForeverWithLifecycle(cb : Consumer<T>) {
-    GlobalScope.launch(Dispatchers.Main) {
-        ProcessLifecycleOwner.get().repeatOnLifecycle(Lifecycle.State.STARTED) {
-            collect(cb::accept)
-        }
-    }
-}
+expect fun <T> Flow<T>.observeForeverWithProcessLifecycle(cb : (T) -> Unit)
+
+/**
+ * collectAsStateWithLifecycle using ProcessLifecycle
+ */
+@Composable
+expect fun <T> Flow<T>.collectAsStateWithProcessLifecycle(
+    initialValue : T,
+) : State<T>
 
