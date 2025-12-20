@@ -14,22 +14,22 @@ import argostranslate.translate
 
 @dataclass
 class Lang:
-    res_suffix : str
+    res_file_folder : str
     fastlane_folder : str
     changes_header : str
     version_header_fmt : str
     translate_lang : str
 
 DEFAULT_LANG = Lang(
-    "",
+    "en",
     "en-US",
     """
-        <h1>Forkyz</h1><br>
+        <h1>Forkyz</h1>
         <p>
             This is an unofficial fork of the Shortyz
             crossword app. It implements a number of new features and
             removes some non-open libraries / trackers.
-        </p><br>
+        </p>
     """,
     "Version {version}",
     "en",
@@ -38,7 +38,7 @@ DEFAULT_LANG = Lang(
 LANGS = [
     DEFAULT_LANG,
     Lang(
-        "-fr",
+        "fr",
         "fr-FR",
         """
             <h1>Forkyz</h1>
@@ -54,7 +54,7 @@ LANGS = [
     ),
 ]
 
-release_file_fmt = "app/src/main/res/raw{lang}/release.html"
+release_file_fmt = "app/src/commonMain/composeResources/files/{lang}/release.html"
 changelogs_folder_fmt = "fastlane/metadata/android/{folder}/changelogs"
 changes_md = "docs/changes.md"
 
@@ -121,7 +121,7 @@ def translate_changelogs():
 
 def compile_app_release_notes():
     for lang in LANGS:
-        release_file = release_file_fmt.format(lang=lang.res_suffix)
+        release_file = release_file_fmt.format(lang=lang.res_file_folder)
         with open(release_file.format(release_file), "w") as release_file:
             release_file.write(lang.changes_header)
 
@@ -132,23 +132,31 @@ def compile_app_release_notes():
             changelogs.sort(key=lambda file: -version_number(file))
 
             for num, file in enumerate(changelogs):
-                if num > 0:
-                    release_file.write("<br>\n")
                 release_file.write(
                     "<h2>"
                     + lang.version_header_fmt.format(
                         version=version_number(file),
-                    ) + "</h2><br>\n"
+                    ) + "</h2>\n"
                 )
                 release_file.write("\n")
+                in_list = False
                 with open(file) as changelog:
                     for line in changelog:
                         if line.startswith("-"):
+                            if not in_list:
+                                release_file.write("<ul>\n")
+                                in_list = True
+
                             line = line[1:]
                             line = line.strip()
-                            release_file.write(f"• {line}<br>\n")
+                            release_file.write(f"    <li>{line}</li>\n")
                         else:
-                            release_file.write(f"{line}<br>\n")
+                            if in_list:
+                                release_file.write("</ul>\n")
+                                in_list = False
+                            release_file.write(f"<p>{line}</p>\n")
+                if in_list:
+                    release_file.write("</ul>\n")
 
 def compile_docs_releasenotes():
     with open(changes_md, "w") as f:
