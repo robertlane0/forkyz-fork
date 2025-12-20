@@ -274,22 +274,23 @@ class PuzzlePageScope(
     }
 
     fun onKeyEventPuzzlePage(event : KeyEvent) : Boolean {
+        val isDown = event.type == KeyEventType.KeyDown
         return when (event.key) {
             Key.Escape -> {
-                if (event.type == KeyEventType.KeyUp)
+                if (isDown)
                     pageOpener.onBack()
                 return true
             }
             Key.Equals -> {
                 if (isAnnounceClueEquals) {
-                    if (event.type == KeyEventType.KeyUp)
+                    if (isDown)
                         viewModel.announceClue()
                     true
                 } else false
             }
             Key.VolumeDown -> {
                 if (isVolumeDownActivatesVoicePref) {
-                    if (event.type == KeyEventType.KeyUp)
+                    if (isDown)
                         utils.launchVoiceInput()
                     true
                 } else false
@@ -298,7 +299,7 @@ class PuzzlePageScope(
         }
     }
 
-    fun onSpecialKeyUpPuzzlePage(key : SpecialKey) {
+    fun onSpecialKeyDownPuzzlePage(key : SpecialKey) {
         return when (key) {
             SpecialKey.KEY_SPECIAL_ENTRY -> {
                 viewModel.doSpecialEntry()
@@ -362,14 +363,14 @@ class PuzzlePageScope(
     /**
      * The built-in keyboard
      *
-     * If providing own onSpecialKeyUp, call through to
-     * onSpecialKeyUpPuzzlePage for anything not handled.
+     * If providing own onSpecialKeyDown, call through to
+     * onSpecialKeyDownPuzzlePage for anything not handled.
      */
     @Composable
     fun Keyboard(
         showSpecialKeys : Boolean = false,
-        onSpecialKeyDown : (SpecialKey) -> Unit = { },
-        onSpecialKeyUp : (SpecialKey) -> Unit = ::onSpecialKeyUpPuzzlePage,
+        onSpecialKeyDown : (SpecialKey) -> Unit = ::onSpecialKeyDownPuzzlePage,
+        onSpecialKeyUp : (SpecialKey) -> Unit = { },
     ) {
         val state by viewModel.keyboardState.collectAsStateWithLifecycle()
 

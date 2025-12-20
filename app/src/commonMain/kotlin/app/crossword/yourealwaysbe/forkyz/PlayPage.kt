@@ -502,65 +502,65 @@ fun PlayPage(
             }
         }
 
-        fun onSpecialKeyUp(key : SpecialKey) {
+        fun onSpecialKeyDown(key : SpecialKey) {
             when (key) {
                 SpecialKey.KEY_CHANGE_CLUE_DIRECTION ->
                     viewModel.toggleSelection()
                 SpecialKey.KEY_NEXT_CLUE -> viewModel.nextClue()
                 SpecialKey.KEY_PREVIOUS_CLUE -> viewModel.prevClue()
-                else -> onSpecialKeyUpPuzzlePage(key)
+                else -> onSpecialKeyDownPuzzlePage(key)
             }
         }
 
         fun onKeyEvent(event : KeyEvent) : Boolean {
-            val isUp = event.type == KeyEventType.KeyUp
+            val isDown = event.type == KeyEventType.KeyDown
             var handled = false
 
             viewModel.keyboardPushBlockHide()
 
             when (event.key) {
                 Key.Search -> {
-                    if (isUp)
+                    if (isDown)
                         viewModel.nextClue()
                     handled = true
                 }
                 Key.DirectionDown -> {
-                    if (isUp)
+                    if (isDown)
                         viewModel.moveDown()
                     handled = true
                 }
                 Key.DirectionUp -> {
-                    if (isUp)
+                    if (isDown)
                         viewModel.moveUp()
                     handled = true
                 }
                 Key.DirectionLeft -> {
-                    if (isUp)
+                    if (isDown)
                         viewModel.moveLeft()
                     handled = true
                 }
                 Key.DirectionRight -> {
-                    if (isUp)
+                    if (isDown)
                         viewModel.moveRight()
                     handled = true
                 }
                 Key.DirectionCenter -> {
-                    if (isUp)
+                    if (isDown)
                         viewModel.toggleSelection()
                     handled = true
                 }
                 Key.Spacebar -> {
-                    if (isUp)
+                    if (isDown)
                         viewModel.playSpace()
                     handled = true
                 }
                 Key.Enter -> {
-                    if (isUp)
+                    if (isDown)
                         viewModel.playEnter()
                     handled = true
                 }
                 Key.Delete, Key.Backspace -> {
-                    if (isUp)
+                    if (isDown)
                         viewModel.deleteLetter()
                     handled = true
                 }
@@ -569,7 +569,7 @@ fun PlayPage(
             if (!handled) {
                 val keyChar = letterOrDigitKeyToChar(event.key)
                 if (keyChar != null) {
-                    if (event.type == KeyEventType.KeyUp)
+                    if (isDown)
                         viewModel.playLetter(keyChar)
                     handled = true
                 }
@@ -615,7 +615,7 @@ fun PlayPage(
                 VoiceButtons()
                 Keyboard(
                     showSpecialKeys = true,
-                    onSpecialKeyUp = ::onSpecialKeyUp,
+                    onSpecialKeyDown = ::onSpecialKeyDown,
                 )
             }
         }
@@ -656,7 +656,7 @@ fun PlayPage(
                 }
                 Keyboard(
                     showSpecialKeys = true,
-                    onSpecialKeyUp = ::onSpecialKeyUp,
+                    onSpecialKeyDown = ::onSpecialKeyDown,
                 )
             }
         }

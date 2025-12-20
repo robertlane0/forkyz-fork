@@ -287,7 +287,7 @@ enum class SpecialKey {
  * @param inputConnectionMediator connection to send regular key events on
  * @param onSpecialKeyDown when a special key (such as change dir) is
  * pressed down
- * @param onSpecialKeyDown when a special key (such as change dir) is
+ * @param onSpecialKeyUp when a special key (such as change dir) is
  * unpressed
  * @param onHideClick when hide button pressed
  * @param compact reduce vertical size of keyboard

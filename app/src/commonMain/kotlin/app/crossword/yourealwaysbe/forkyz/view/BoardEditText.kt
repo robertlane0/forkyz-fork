@@ -156,24 +156,25 @@ fun BoardEditText(
     }
 
     fun onKeyEvent(event : KeyEvent) : Boolean {
+        val isDown = event.type == KeyEventType.KeyDown
         when (event.key) {
             Key.DirectionLeft -> {
-                if (event.type == KeyEventType.KeyUp)
+                if (isDown)
                     state.selected = Math.max(state.selected - 1, 0)
                 return true
             }
             Key.DirectionRight -> {
-                if (event.type == KeyEventType.KeyUp)
+                if (isDown)
                     state.selected = Math.min(state.selected + 1, length - 1)
                 return true
             }
             Key.Delete, Key.Backspace -> {
-                if (event.type == KeyEventType.KeyUp)
+                if (isDown)
                     onDeleteResponse()
                 return true
             }
             Key.Spacebar -> {
-                if (event.type == KeyEventType.KeyUp)
+                if (isDown)
                     onNewResponse(" ")
                 return true
             }
@@ -181,7 +182,7 @@ fun BoardEditText(
 
         val keyChar = letterOrDigitKeyToChar(event.key)
         if (keyChar != null) {
-            if (event.type == KeyEventType.KeyUp)
+            if (isDown)
                 onNewResponse(keyChar.toString())
             return true
         }

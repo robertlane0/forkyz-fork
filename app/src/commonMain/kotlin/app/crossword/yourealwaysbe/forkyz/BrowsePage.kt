@@ -1047,10 +1047,10 @@ fun BrowsePage(
     }
 
     fun onKeyEvent(event : KeyEvent) : Boolean {
-        val isUp = event.type == KeyEventType.KeyUp
+        val isDown = event.type == KeyEventType.KeyDown
         when (event.key) {
             Key.Escape -> {
-                if (isUp) {
+                if (isDown) {
                     val isSelecting = viewModel.uiState.value.isSelecting
                     if (isSelecting)
                         viewModel.clearSelection()

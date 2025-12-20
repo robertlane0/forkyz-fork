@@ -79,34 +79,35 @@ fun ClueListPage(
         val boxInputState = remember { BoxInputState() }
 
         fun onKeyEvent(event : KeyEvent) : Boolean {
+            val isDown = event.type == KeyEventType.KeyDown
             when (event.key) {
                 Key.DirectionLeft -> {
-                    if (event.type == KeyEventType.KeyUp)
+                    if (isDown)
                         viewModel.moveLeft()
                     return true
                 }
                 Key.DirectionRight -> {
-                    if (event.type == KeyEventType.KeyUp)
+                    if (isDown)
                         viewModel.moveRight()
                     return true
                 }
                 Key.DirectionUp -> {
-                    if (event.type == KeyEventType.KeyUp)
+                    if (isDown)
                         viewModel.moveUp();
                     return true
                 }
                 Key.DirectionDown -> {
-                    if (event.type == KeyEventType.KeyUp)
+                    if (isDown)
                         viewModel.moveDown()
                     return true
                 }
                 Key.Delete, Key.Backspace -> {
-                    if (event.type == KeyEventType.KeyUp)
+                    if (isDown)
                         viewModel.deleteLetter()
                     return true
                 }
                 Key.Spacebar -> {
-                    if (event.type == KeyEventType.KeyUp)
+                    if (isDown)
                         viewModel.playSpace()
                     return true
                 }
@@ -114,7 +115,7 @@ fun ClueListPage(
 
             val keyChar = letterOrDigitKeyToChar(event.key)
             if (keyChar != null) {
-                if (event.type == KeyEventType.KeyUp)
+                if (isDown)
                     viewModel.playLetter(keyChar)
                 return true
             } else {
