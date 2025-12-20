@@ -50,6 +50,12 @@ import androidx.navigationevent.compose.rememberNavigationEventState
 
 import org.jetbrains.compose.resources.stringResource
 
+import io.github.vinceglb.filekit.absolutePath
+import io.github.vinceglb.filekit.dialogs.compose.rememberDirectoryPickerLauncher
+import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
+import io.github.vinceglb.filekit.dialogs.compose.rememberFileSaverLauncher
+import io.github.vinceglb.filekit.releaseBookmark
+
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.exit
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.failed_to_initialise_saf
@@ -62,6 +68,7 @@ import app.crossword.yourealwaysbe.forkyz.theme.ForkyzTopAppBar
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 import app.crossword.yourealwaysbe.forkyz.util.NativeFrontendUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
+import app.crossword.yourealwaysbe.forkyz.util.toUri
 import app.crossword.yourealwaysbe.forkyz.view.ListDialog
 import app.crossword.yourealwaysbe.forkyz.view.MultiListDialog
 import app.crossword.yourealwaysbe.forkyz.view.OKCancelDialog
@@ -73,6 +80,11 @@ private val SETTINGS_VERTICAL_PADDING = 14.dp
 private val SWITCH_PADDING = 4.dp
 
 private val TAG = "ForkyzSettingsPage"
+private val SETTINGS_DEFAULT_FILENAME = "forkyz_settings"
+private val SETTINGS_DEFAULT_EXT = "json"
+// allow import of all docs (parser will take care of detecting if it's a
+// puzzle that's recognised)
+private val IMPORT_MIME_TYPE =  "*/*"
 
 @Composable
 private fun SettingsClickable(
@@ -240,31 +252,66 @@ fun SettingsPage(
      */
     @Composable
     fun LaunchForExternalResults() {
+        val failedToInitialiseSAF
+            = stringResource(Res.string.failed_to_initialise_saf)
+        val safLauncher = rememberDirectoryPickerLauncher {
+            it?.let { file ->
+                val uri = file.absolutePath().toUri()
+                if (!viewModel.setNewExternalStorageSAFURI(uri))
+                    utils.toast(failedToInitialiseSAF)
+            }
+        }
+        val settingsExportLauncher = rememberFileSaverLauncher {
+            it?.let { file ->
+                val uri = file.absolutePath().toUri()
+                viewModel.exportSettings(uri) {
+                    file.releaseBookmark()
+                }
+            }
+        }
+        val settingsImportLauncher = rememberFilePickerLauncher {
+            it?.let { file ->
+                val uri = file.absolutePath().toUri()
+                viewModel.importSettings(uri) {
+                    file.releaseBookmark()
+                }
+            }
+        }
+        val puzzlesExportLauncher = rememberDirectoryPickerLauncher {
+            it?.let { file ->
+                val uri = file.absolutePath().toUri()
+                utils.onExportPuzzles(uri)
+            }
+        }
+
         val needsURI by viewModel.needsURI.collectAsStateWithLifecycle()
         when (needsURI) {
             RequestedURI.SAF -> {
                 val msg = stringResource(Res.string.storage_select_saf_info)
                 LaunchedEffect(needsURI) {
                     utils.toast(msg)
-                    utils.onGetSAFURI()
+                    safLauncher.launch()
                     viewModel.clearNeedsURI()
                 }
             }
             RequestedURI.SETTINGS_EXPORT -> {
                 LaunchedEffect(needsURI) {
-                    utils.onExportSettings()
+                    settingsExportLauncher.launch(
+                        suggestedName = SETTINGS_DEFAULT_FILENAME,
+                        extension = SETTINGS_DEFAULT_EXT,
+                    )
                     viewModel.clearNeedsURI()
                 }
             }
             RequestedURI.SETTINGS_IMPORT -> {
                 LaunchedEffect(needsURI) {
-                    utils.onImportSettings()
+                    settingsImportLauncher.launch()
                     viewModel.clearNeedsURI()
                 }
             }
             RequestedURI.PUZZLES_EXPORT -> {
                 LaunchedEffect(needsURI) {
-                    utils.onExportPuzzles()
+                    puzzlesExportLauncher.launch()
                     viewModel.clearNeedsURI()
                 }
             }
@@ -566,23 +613,6 @@ fun SettingsPage(
     }
     val listState = key(settingsItems) {
         rememberLazyListState()
-    }
-
-    val failedToInitialiseSAF
-        = stringResource(Res.string.failed_to_initialise_saf)
-    DisposableEffect(Unit) {
-        utils.setSAFURICallback { uri ->
-            if (!viewModel.setNewExternalStorageSAFURI(uri))
-                utils.toast(failedToInitialiseSAF)
-        }
-        utils.setExportSettingsURICallback(viewModel::exportSettings)
-        utils.setImportSettingsURICallback(viewModel::importSettings)
-
-        onDispose {
-            utils.setSAFURICallback(null)
-            utils.setExportSettingsURICallback(null)
-            utils.setImportSettingsURICallback(null)
-        }
     }
 
     Scaffold(

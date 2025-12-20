@@ -4,7 +4,12 @@ package app.crossword.yourealwaysbe.forkyz.util
 import java.net.URI
 
 actual fun makePlatformUri(uri : String) : PlatformUri {
-    return PlatformUri(URI(uri))
+    var jvmURI = URI(uri)
+    // default to file://
+    if (!jvmURI.isAbsolute()) {
+        jvmURI = URI("file:///").resolve(jvmURI)
+    }
+    return PlatformUri(jvmURI)
 }
 
 actual data class PlatformUri(val uri : URI) {

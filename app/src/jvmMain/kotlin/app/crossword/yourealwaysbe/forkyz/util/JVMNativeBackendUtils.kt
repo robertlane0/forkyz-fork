@@ -21,6 +21,7 @@ import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation
 import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerJavaFile
+import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerJVMSAF
 import app.crossword.yourealwaysbe.forkyz.util.files.MetaCache
 import app.crossword.yourealwaysbe.forkyz.util.toJVMURI
 import app.crossword.yourealwaysbe.forkyz.util.toUri
@@ -72,8 +73,6 @@ class JVMNativeBackendUtils : NativeBackendUtils {
 
     @Throws(IOException::class)
     override fun openInputStream(uri : Uri) : InputStream? {
-        println("uh: " + uri.toJVMURI())
-
         return FileInputStream(File(uri.toJVMURI()))
     }
 
@@ -95,8 +94,7 @@ class JVMNativeBackendUtils : NativeBackendUtils {
     }
 
     override fun initialiseSAFForRoot(uri : Uri) : FileHandler? {
-        // TODO
-        return null
+        return FileHandlerJVMSAF(this, uri)
     }
 
     override fun readSAFHandlerFromSettings(
@@ -143,8 +141,8 @@ class JVMNativeBackendUtils : NativeBackendUtils {
 
             // dummy values
             override val settings : FileHandlerSettings = FileHandlerSettings(
-                StorageLocation.SL_INTERNAL,
-                "",
+                StorageLocation.SL_EXTERNAL_SAF,
+                uri.toString(),
                 "",
                 "",
                 "",

@@ -1,17 +1,17 @@
 
 package app.crossword.yourealwaysbe.forkyz
 
-import java.awt.FileDialog
-import java.awt.Frame
-import java.io.File
-import java.net.URISyntaxException
+import java.io.IOException
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.awt.AwtWindow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -26,6 +26,9 @@ import org.koin.java.KoinJavaComponent.inject
 
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.app_name
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.exporting_puzzles
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.puzzles_export_failed
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.puzzles_exported
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.select_puzzle_files
 import app.crossword.yourealwaysbe.forkyz.exttools.AppNotFoundException
 import app.crossword.yourealwaysbe.forkyz.exttools.ExternalToolData
@@ -33,21 +36,26 @@ import app.crossword.yourealwaysbe.forkyz.injection.jvmModules
 import app.crossword.yourealwaysbe.forkyz.injection.sharedModules
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 import app.crossword.yourealwaysbe.forkyz.util.JVMInputConnectionMediator
+import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.NativeFrontendUtils
 import app.crossword.yourealwaysbe.forkyz.util.NativeImportFinishedResult
 import app.crossword.yourealwaysbe.forkyz.util.ShareFileData
 import app.crossword.yourealwaysbe.forkyz.util.Uri
+import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
+import app.crossword.yourealwaysbe.forkyz.util.files.exportStorage
 import app.crossword.yourealwaysbe.forkyz.util.toUri
 
 fun main() = application {
     val themeHelper : ThemeHelper by inject(ThemeHelper::class.java)
+    val fileHandlerProvider : FileHandlerProvider
+        by inject(FileHandlerProvider::class.java)
+    val backendUtils : NativeBackendUtils
+        by inject(NativeBackendUtils::class.java)
 
     val windowState = rememberWindowState(
         width = 600.dp,
         height = 1000.dp,
     )
-    var isImportOpen by remember { mutableStateOf(false) }
-    var onImportURIsCallback : ((Collection<Uri>) -> Unit)? = remember { null }
 
     val density = androidx.compose.ui.unit.Density(density = 1.0F)
 
@@ -101,10 +109,6 @@ fun main() = application {
             // TODO
         }
 
-        override fun onImport() {
-            isImportOpen = true
-        }
-
         override fun onImportFinish(ifr : NativeImportFinishedResult) {
             // TODO
         }
@@ -113,20 +117,33 @@ fun main() = application {
             // TODO
         }
 
-        override fun onGetSAFURI() {
-            // TODO
-        }
-
-        override fun onExportSettings() {
-            // TODO
-        }
-
-        override fun onImportSettings() {
-            // TODO
-        }
-
-        override fun onExportPuzzles() {
-            // TODO
+        @OptIn(DelicateCoroutinesApi::class)
+        override fun onExportPuzzles(uri : Uri) {
+            fileHandlerProvider.get() { fileHandler ->
+                GlobalScope.launch(Dispatchers.Main) {
+                    val exportingPuzzles
+                        = backendUtils.getString(Res.string.exporting_puzzles)
+                    toast(exportingPuzzles)
+                }
+                GlobalScope.launch(Dispatchers.IO) {
+                    var success = false
+                    try {
+                        success = exportStorage(backendUtils, fileHandler, uri)
+                    } catch (e : IOException) {
+                        // fall through
+                    }
+                    GlobalScope.launch(Dispatchers.Main) {
+                        val msg = if (success) {
+                            backendUtils.getString(Res.string.puzzles_exported)
+                        } else {
+                            backendUtils.getString(
+                                Res.string.puzzles_export_failed,
+                            )
+                        }
+                        toast(msg)
+                    }
+                }
+            }
         }
 
         override fun onShareFile(data : ShareFileData) {
@@ -143,12 +160,6 @@ fun main() = application {
             // TODO
         }
 
-        override fun setOnImportURIsCallback(
-            cb : ((Collection<Uri>) -> Unit)?,
-        ) {
-            onImportURIsCallback = cb
-        }
-
         override fun setOnNotificationPermissionDeniedCallback(
             cb : (() -> Unit)?,
         ) {
@@ -156,18 +167,6 @@ fun main() = application {
         }
 
         override fun setStatusBarColor(color : Color) {
-            // TODO
-        }
-
-        override fun setSAFURICallback(cb : ((Uri) -> Unit)?) {
-            // TODO
-        }
-
-        override fun setExportSettingsURICallback(cb : ((Uri) -> Unit)?) {
-            // TODO
-        }
-
-        override fun setImportSettingsURICallback(cb : ((Uri) -> Unit)?) {
             // TODO
         }
 
@@ -221,41 +220,6 @@ fun main() = application {
             themeHelper = themeHelper,
             utils = utils,
         )
-
-        if (isImportOpen) {
-            FilesDialog(
-                onCloseRequest = { uris ->
-                    isImportOpen = false
-                    onImportURIsCallback?.let { it(uris) }
-                },
-            )
-        }
     }
-}
-
-
-// thanks: https://kotlinlang.org/docs/multiplatform/compose-desktop-top-level-windows-management.html#swing-interoperability
-@Composable
-private fun FilesDialog(
-    parent : Frame? = null,
-    onCloseRequest : (result : Collection<Uri>) -> Unit,
-) {
-    val selectFiles = stringResource(Res.string.select_puzzle_files)
-    AwtWindow(
-        create = {
-            object : FileDialog(parent, selectFiles, LOAD) {
-                init { setMultipleMode(true) }
-
-                override fun setVisible(value : Boolean) {
-                    super.setVisible(value)
-                    if (value) {
-                        val uris = files.map { it.toURI().toString().toUri() }
-                        onCloseRequest(uris.toList())
-                    }
-                }
-            }
-        },
-        dispose = FileDialog::dispose
-    )
 }
 

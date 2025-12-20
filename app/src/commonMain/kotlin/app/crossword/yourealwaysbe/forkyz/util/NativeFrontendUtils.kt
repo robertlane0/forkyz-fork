@@ -33,22 +33,14 @@ interface NativeFrontendUtils {
     fun clearPendingImports() { }
     fun onCheckAndWarnNetworkState() { }
     fun onCheckRequestNotificationPermissions() { }
-    fun onImport() { }
     fun onImportFinish(ifr : NativeImportFinishedResult) { }
     fun handleExternalToolEvent(tool : ExternalToolData) { }
-    fun onGetSAFURI() { }
-    fun onExportSettings() { }
-    fun onImportSettings() { }
-    fun onExportPuzzles() { }
+    fun onExportPuzzles(uri : Uri) { }
     fun onShareFile(data : ShareFileData) { }
     fun setOnAppNotFoundCallback(cb : ((AppNotFoundException) -> Unit)?) { }
     fun setOnImportCompleteCallback(cb : ((Boolean) -> Unit)?) { }
-    fun setOnImportURIsCallback(cb : ((Collection<Uri>) -> Unit)?) { }
     fun setOnNotificationPermissionDeniedCallback(cb : (() -> Unit)?) { }
     fun setStatusBarColor(color : Color) { }
-    fun setSAFURICallback(cb : ((Uri) -> Unit)?) { }
-    fun setExportSettingsURICallback(cb : ((Uri) -> Unit)?) { }
-    fun setImportSettingsURICallback(cb : ((Uri) -> Unit)?) { }
     fun setOnVoiceCommandCallback(cb : ((List<String>?) -> Unit)?) { }
     fun launchVoiceInput() { }
     fun announce(text : CharSequence) { }

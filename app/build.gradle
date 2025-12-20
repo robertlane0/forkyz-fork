@@ -44,6 +44,7 @@ kotlin {
             implementation 'be.digitalia.compose.htmlconverter:htmlconverter:1.1.0'
             implementation 'com.github.jgraham0325:words-to-numbers:8a97d258fd'
             implementation 'io.github.darkokoa:datetime-wheel-picker:1.1.0-alpha05-compose1.9'
+            implementation 'io.github.vinceglb:filekit-dialogs-compose:0.12.0'
             implementation 'io.insert-koin:koin-compose'
             implementation 'io.insert-koin:koin-compose-viewmodel'
             implementation 'io.insert-koin:koin-compose-viewmodel-navigation'

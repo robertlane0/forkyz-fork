@@ -45,7 +45,7 @@ val jvmModules = module {
             )
         )
     }
-    single<FileHandlerProvider> { JVMFileHandlerProvider(get()) }
+    single<FileHandlerProvider> { JVMFileHandlerProvider(get(), get()) }
     single<NativeBackendUtils> { JVMNativeBackendUtils() }
     single<Notifications> { JVMNotifications() }
     single<PuzzleSaveServiceCaller> { JVMPuzzleSaveServiceCaller() }

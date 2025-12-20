@@ -21,7 +21,6 @@ import org.koin.android.ext.android.inject
 
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.exporting_puzzles
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.exporting_puzzles
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.puzzles_export_failed
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.puzzles_exported
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils

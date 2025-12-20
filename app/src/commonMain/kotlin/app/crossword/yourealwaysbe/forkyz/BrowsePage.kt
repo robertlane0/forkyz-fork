@@ -86,6 +86,11 @@ import org.jetbrains.compose.resources.stringResource
 
 import be.digitalia.compose.htmlconverter.htmlToAnnotatedString
 
+import io.github.vinceglb.filekit.absolutePath
+import io.github.vinceglb.filekit.dialogs.FileKitMode
+import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
+import io.github.vinceglb.filekit.releaseBookmark
+
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.add_puzzle
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.android_app_settings_button
@@ -315,10 +320,20 @@ fun BrowsePage(
 
     @Composable
     fun FloatingActionButtonMenuScope.ImportPuzzlesButton(close : () -> Unit) {
+        val launcher = rememberFilePickerLauncher(
+            mode = FileKitMode.Multiple(maxItems = 10),
+        ) {
+            it?.let { files ->
+                val uris = files.map { it.absolutePath().toUri() }
+                viewModel.importURIs(uris) {
+                    files.forEach { it.releaseBookmark() }
+                }
+            }
+        }
         FloatingActionButtonMenuItem(
             onClick = {
                 close()
-                utils.onImport()
+                launcher.launch()
             },
             text = { Text(stringResource(Res.string.import_puzzle)) },
             icon = {
@@ -1077,14 +1092,12 @@ fun BrowsePage(
 
     DisposableEffect(Unit) {
         utils.setOnImportCompleteCallback(viewModel::setImportedNowExitResult)
-        utils.setOnImportURIsCallback(viewModel::importURIs)
         utils.setOnNotificationPermissionDeniedCallback(
             viewModel::flagNotificationPermissionsDenied
         )
 
         onDispose {
             utils.setOnImportCompleteCallback(null)
-            utils.setOnImportURIsCallback(null)
             utils.setOnNotificationPermissionDeniedCallback(null)
         }
     }

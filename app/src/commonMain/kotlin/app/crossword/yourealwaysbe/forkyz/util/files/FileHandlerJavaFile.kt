@@ -37,19 +37,22 @@ abstract class FileHandlerJavaFile : FileHandler {
     }
 
     override val crosswordsDirectory : DirHandle
-        get() { return getGenericDirectory("crosswords") }
+        get() {
+            rootDirectory.mkdirs()
+            return DirHandle(rootDirectory)
+        }
 
     override val archiveDirectory : DirHandle
-        get() { return getGenericDirectory("crosswords/archive") }
+        get() { return getGenericDirectory("archive") }
 
     override val toImportDirectory : DirHandle
-        get() { return getGenericDirectory("crosswords/to-import") }
+        get() { return getGenericDirectory("to-import") }
 
     override val toImportDoneDirectory : DirHandle
-        get() { return getGenericDirectory("crosswords/to-import-done") }
+        get() { return getGenericDirectory("to-import-done") }
 
     override val toImportFailedDirectory : DirHandle
-        get() { return getGenericDirectory("crosswords/to-import-failed") }
+        get() { return getGenericDirectory("to-import-failed") }
 
     override fun listFiles(dir : DirHandle) : Iterable<FileHandle> {
         return object : Iterable<FileHandle> {

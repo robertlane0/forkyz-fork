@@ -84,10 +84,6 @@ private val INTENT_IMPORT_COMPLETE_ACTION
 private val INTENT_IMPORT_TASK_ID
     = "app.crossword.yourealwaysbe.INTENT_IMPORT_TASK_ID"
 
-// allow import of all docs (parser will take care of detecting if it's a
-// puzzle that's recognised)
-private val IMPORT_MIME_TYPE =  "*/*"
-
 /**
  * Request other instances close
  *
@@ -116,7 +112,6 @@ val INTENT_IMPORT_SUCCESS = "app.crossword.yourealwaysbe.INTENT_IMPORT_SUCCESS"
  * For ex/importing settings
  */
 val SETTINGS_MIME_TYPE = "application/json"
-val SETTINGS_DEFAULT_FILENAME = "forkyz_settings.json"
 
 open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
     private val versionUtils : AndroidVersionUtils by inject()
@@ -138,13 +133,9 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
 
     // callbacks from Compose
     private var onImportComplete : ((Boolean) -> Unit)? = null
-    private var onImportURIs : ((Collection<Uri>) -> Unit)? = null
     private var onNotificationPermissionDenied : (() -> Unit)? = null
     private var onHearShake : (() -> Unit)? = null
     private var onVoiceCommand : ((List<String>?) -> Unit)? = null
-    private var onSAFURI : ((Uri) -> Unit)? = null
-    private var onExportSettingsURI : ((Uri) -> Unit)? = null
-    private var onImportSettingsURI : ((Uri) -> Unit)? = null
     private var onAppNotFound : ((AppNotFoundException) -> Unit)? = null
 
     /**
@@ -183,13 +174,6 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
         }
     }
 
-    private val getImportURI = registerForActivityResult(
-        ActivityResultContracts.GetMultipleContents(),
-        ActivityResultCallback<List<AndroidUri>>() { uris ->
-            onImportURIs?.let { it(uris.map { it.toForkyzUri() }) }
-        },
-    )
-
     /**
      * When POST_NOTIFICATIONS permission needed
      */
@@ -204,48 +188,9 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
             onVoiceCommand?.let { it(text) }
         }
 
-    private val getSAFURI = registerForActivityResult(OpenDocumentTree()) {
-        uri : AndroidUri? -> uri?.let { uri ->
-            onSAFURI?.let { it(uri.toForkyzUri()) }
-        }
-    }
-
-    private val importSettings = registerForActivityResult(GetContent()) {
-        uri : AndroidUri? -> uri?.let { uri ->
-            onImportSettingsURI?.let { it(uri.toForkyzUri()) }
-        }
-    }
-
-    private val exportSettings = registerForActivityResult(
-        CreateDocument(SETTINGS_MIME_TYPE)
-    ) {
-        uri : AndroidUri? -> uri?.let { uri ->
-            onExportSettingsURI?.let { it(uri.toForkyzUri()) }
-        }
-    }
-
     private val exportPuzzles
         = registerForActivityResult(OpenDocumentTree()) {
             uri : AndroidUri? -> uri?.let {
-                try {
-                    AppLogger.i(TAG, "Starting puzzle export")
-                    val intent = Intent(this, PuzzleExportService::class.java)
-                    intent.putExtra(
-                        PuzzleExportService.PUZZLE_EXPORT_URI,
-                        uri.toString()
-                    )
-                    ContextCompat.startForegroundService(this, intent)
-                // use IllegalState as
-                // ForegroundServiceNotAllowedException requires API 31
-                } catch (e : IllegalStateException) {
-                    AppLogger.i(
-                        TAG,
-                        "Could not start puzzle export service on foreground"
-                    )
-                    lifecycleScope.launch {
-                        utils.toast(getString(Res.string.puzzles_export_failed))
-                    }
-                }
             }
         }
 
@@ -315,8 +260,26 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
         pendingImports = uri
     }
 
-    private fun doExportPuzzles() {
-        exportPuzzles.launch(null)
+    private fun doExportPuzzles(uri : Uri) {
+        try {
+            AppLogger.i(TAG, "Starting puzzle export")
+            val intent = Intent(this, PuzzleExportService::class.java)
+            intent.putExtra(
+                PuzzleExportService.PUZZLE_EXPORT_URI,
+                uri.toString()
+            )
+            ContextCompat.startForegroundService(this, intent)
+        // use IllegalState as
+        // ForegroundServiceNotAllowedException requires API 31
+        } catch (e : IllegalStateException) {
+            AppLogger.i(
+                TAG,
+                "Could not start puzzle export service on foreground"
+            )
+            lifecycleScope.launch {
+                utils.toast(getString(Res.string.puzzles_export_failed))
+            }
+        }
     }
 
     /**
@@ -451,10 +414,6 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
             )
         }
 
-        override fun onImport() {
-            getImportURI.launch(IMPORT_MIME_TYPE)
-        }
-
         override fun onImportFinish(ifr : NativeImportFinishedResult) {
             sendBroadcast(
                 Intent(INTENT_IMPORT_COMPLETE_ACTION).putExtra(
@@ -467,20 +426,8 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
             )
         }
 
-        override fun onGetSAFURI() {
-            getSAFURI.launch(null)
-        }
-
-        override fun onExportSettings() {
-            exportSettings.launch(SETTINGS_DEFAULT_FILENAME)
-        }
-
-        override fun onImportSettings() {
-            importSettings.launch(SETTINGS_MIME_TYPE)
-        }
-
-        override fun onExportPuzzles() {
-            doExportPuzzles()
+        override fun onExportPuzzles(uri : Uri) {
+            doExportPuzzles(uri)
         }
 
         /**
@@ -516,12 +463,6 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
             onImportComplete = cb
         }
 
-        override fun setOnImportURIsCallback(
-            cb : ((Collection<Uri>) -> Unit)?,
-        ) {
-            onImportURIs = cb
-        }
-
         override fun setOnNotificationPermissionDeniedCallback(
             cb : (() -> Unit)?,
         ) {
@@ -533,18 +474,6 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
                 this@ForkyzActivity,
                 color.toArgb(),
             )
-        }
-
-        override fun setSAFURICallback(cb : ((Uri) -> Unit)?) {
-            onSAFURI = cb
-        }
-
-        override fun setExportSettingsURICallback(cb : ((Uri) -> Unit)?) {
-            onExportSettingsURI = cb
-        }
-
-        override fun setImportSettingsURICallback(cb : ((Uri) -> Unit)?) {
-            onImportSettingsURI = cb
         }
 
         override fun setOnVoiceCommandCallback(

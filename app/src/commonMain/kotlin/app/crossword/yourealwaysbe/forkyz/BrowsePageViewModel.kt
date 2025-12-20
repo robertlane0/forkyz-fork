@@ -732,8 +732,9 @@ class BrowsePageViewModel(
      * Toast message when finished
      */
     @MainThread
-    fun importURIs(uris : Collection<Uri>) {
+    fun importURIs(uris : Collection<Uri>, onDone : () -> Unit) {
         importURIsAndCallback(uris) { someFailed, someSucceeded ->
+            onDone()
             viewModelScope.launch {
                 if (someFailed)
                     sendToast(utils.getString(Res.string.import_failure))

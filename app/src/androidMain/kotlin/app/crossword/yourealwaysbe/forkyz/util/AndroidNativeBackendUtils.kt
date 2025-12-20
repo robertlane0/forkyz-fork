@@ -153,7 +153,6 @@ class AndroidNativeBackendUtils(
             applicationContext,
             this,
             uri,
-            false
         )
     }
 

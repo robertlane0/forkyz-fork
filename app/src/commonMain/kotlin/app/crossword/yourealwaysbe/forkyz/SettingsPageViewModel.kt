@@ -2312,7 +2312,7 @@ class SettingsPageViewModel(
         _needsURI.value = RequestedURI.NONE
     }
 
-    fun exportSettings(uri : Uri) {
+    fun exportSettings(uri : Uri, onDone : () -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             fileActionMutex.withLock {
                 try {
@@ -2321,12 +2321,14 @@ class SettingsPageViewModel(
                     showMessage(Res.string.preferences_exported)
                 } catch (e : IOException) {
                     showMessage(Res.string.preferences_export_failed)
+                } finally {
+                    viewModelScope.launch(Dispatchers.Main) { onDone() }
                 }
             }
         }
     }
 
-    fun importSettings(uri : Uri) {
+    fun importSettings(uri : Uri, onDone : () -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             fileActionMutex.withLock {
                 try {
@@ -2335,6 +2337,8 @@ class SettingsPageViewModel(
                     showMessage(Res.string.preferences_imported)
                 } catch (e : IOException) {
                     showMessage(Res.string.preferences_import_failed)
+                } finally {
+                    viewModelScope.launch(Dispatchers.Main) { onDone() }
                 }
             }
         }

@@ -446,8 +446,6 @@ class FileHandlerSAF(
          * @param applicationContext the application context
          * @param utils native backend utils
          * @param rootUri the root permitted folder for storage
-         * @param keepPermission whether to keep access permission to
-         * rootUri
          * @return an initiated file handler if successful, else null
          */
         /**
@@ -457,7 +455,6 @@ class FileHandlerSAF(
             applicationContext : Context,
             utils : NativeBackendUtils,
             rootUri : Uri,
-            keepPermission : Boolean = true,
         ) : FileHandlerSAF? {
             try {
                 val resolver = applicationContext.getContentResolver()
@@ -495,18 +492,6 @@ class FileHandlerSAF(
                     && toImportDoneFolderUri != null
                     && toImportFailedFolderUri != null
                 ) {
-                    if (keepPermission) {
-                        // persist permissions
-                        val takeFlags = (
-                            Intent.FLAG_GRANT_READ_URI_PERMISSION
-                            or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                        )
-                        resolver.takePersistableUriPermission(
-                            rootUri.toAndroidUri(),
-                            takeFlags,
-                        )
-                    }
-
                     return FileHandlerSAF(
                         applicationContext,
                         utils,
@@ -519,7 +504,7 @@ class FileHandlerSAF(
                     )
                 }
             } catch (e : Exception) {
-                AppLogger.e(TAG, "Unable to (re-)configure SAF directory.")
+                AppLogger.e(TAG, "Unable to (re-)configure SAF directory: " + e)
             }
 
             return null
