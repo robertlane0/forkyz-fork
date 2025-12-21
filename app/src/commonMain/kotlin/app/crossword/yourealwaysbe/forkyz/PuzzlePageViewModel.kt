@@ -5,6 +5,7 @@ import java.io.IOException
 import java.util.Deque
 import java.util.Locale
 import kotlin.text.Regex
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -583,7 +584,7 @@ open class PuzzlePageViewModel(
     }
 
     fun requestHelpForCurrentClue() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             if (!utils.hasNetworkConnection()) {
                 sendToast(
                     utils.getString(Res.string.help_query_but_no_active_network)
@@ -593,16 +594,12 @@ open class PuzzlePageViewModel(
                     val responseTitle = utils.getString(
                         Res.string.help_query_response_title,
                     )
-                    askChatGPTForCurrentClue(
+                    val response = askChatGPTForCurrentClue(
                         utils,
                         settings,
                         board,
-                    ) { response ->
-                        sendDialogMessage(
-                            responseTitle,
-                            response,
-                        )
-                    }
+                    )
+                    sendDialogMessage(responseTitle, response)
                 }
             }
         }
