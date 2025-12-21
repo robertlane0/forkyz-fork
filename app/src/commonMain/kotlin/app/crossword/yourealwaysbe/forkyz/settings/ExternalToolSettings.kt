@@ -1,10 +1,15 @@
 
 package app.crossword.yourealwaysbe.forkyz.settings
 
-import app.crossword.yourealwaysbe.forkyz.exttools.isChatGPTEnabled
+data class LLMAgentSettings(
+    val llmAgent : LLMAgent,
+    val apiKey : String,
+) {
+    val isEnabled : Boolean = llmAgent != LLMAgent.LA_NONE
+}
 
 data class ExternalToolSettings(
-    val chatGPTAPIKey : String,
+    val llmAgentSettings : LLMAgentSettings,
     val crosswordSolverEnabled : Boolean,
     val duckDuckGoEnabled : Boolean,
     val externalDictionary : ExternalDictionarySetting,
@@ -12,15 +17,15 @@ data class ExternalToolSettings(
 ) {
     val hasExternal
         get() = (
-            hasChatGPT
+            hasLLMAgent
             || crosswordSolverEnabled
             || duckDuckGoEnabled
             || hasExternalDictionary
             || fifteenSquaredEnabled
         )
 
-    val hasChatGPT
-        get() = isChatGPTEnabled(this)
+    val hasLLMAgent
+        get() = llmAgentSettings.isEnabled
 
     val hasExternalDictionary
         get() = externalDictionary != ExternalDictionarySetting.EDS_NONE

@@ -108,7 +108,10 @@ fun migratePreferences(
         settings.setVoiceButtonAnnounceClue(it)
     }
     getString(prefs, "chatGPTAPIKey")?.let {
-        settings.setExtChatGPTAPIKey(it)
+        if (it.trim().length > 0) {
+            settings.setExtLLMAgent(LLMAgent.LA_CHATGPT)
+            settings.setExtLLMAgentAPIKey(it)
+        }
     }
     getInt(prefs, "cleanupAge")?.let {
         settings.setBrowseCleanupAge(it)

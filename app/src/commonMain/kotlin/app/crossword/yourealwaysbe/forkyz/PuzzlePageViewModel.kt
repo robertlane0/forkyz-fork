@@ -37,8 +37,8 @@ import app.crossword.yourealwaysbe.forkyz.exttools.ExternalToolData
 import app.crossword.yourealwaysbe.forkyz.exttools.FifteenSquaredData
 import app.crossword.yourealwaysbe.forkyz.exttools.SharePuzzleData
 import app.crossword.yourealwaysbe.forkyz.exttools.ShareTextData
-import app.crossword.yourealwaysbe.forkyz.exttools.askChatGPTForCurrentClue
-import app.crossword.yourealwaysbe.forkyz.exttools.isChatGPTEnabled
+import app.crossword.yourealwaysbe.forkyz.exttools.askLLMAgentForCurrentClue
+import app.crossword.yourealwaysbe.forkyz.exttools.isLLMAgentEnabled
 import app.crossword.yourealwaysbe.forkyz.settings.ClueListClueLine
 import app.crossword.yourealwaysbe.forkyz.settings.ExternalToolSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
@@ -88,14 +88,14 @@ class ShareStream(
 class SendToast(val text : String)
 
 data class ExternalToolsMenuState(
-    val hasChatGPT : Boolean = true,
+    val hasLLMAgent : Boolean = true,
     val hasCrosswordSolver : Boolean = true,
     val hasDuckDuckGo : Boolean = true,
     val hasFifteenSquared : Boolean = true,
     val hasExternalDictionary : Boolean = true,
 ) {
     val hasExternal : Boolean
-        = hasChatGPT
+        = hasLLMAgent
         || hasCrosswordSolver
         || hasDuckDuckGo
         || hasFifteenSquared
@@ -594,7 +594,7 @@ open class PuzzlePageViewModel(
                     val responseTitle = utils.getString(
                         Res.string.help_query_response_title,
                     )
-                    val response = askChatGPTForCurrentClue(
+                    val response = askLLMAgentForCurrentClue(
                         utils,
                         settings,
                         board,
@@ -1184,7 +1184,7 @@ open class PuzzlePageViewModel(
 
         val extSettings = menuSettings.externalToolSettings
         val externalToolsState = ExternalToolsMenuState(
-            extSettings.hasChatGPT,
+            extSettings.hasLLMAgent,
             extSettings.crosswordSolverEnabled,
             extSettings.duckDuckGoEnabled,
             extSettings.fifteenSquaredEnabled,

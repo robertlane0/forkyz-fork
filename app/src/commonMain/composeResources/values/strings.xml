@@ -753,12 +753,17 @@
     <string name="help_query_just_clue">Give me a hint for the crossword clue "%1$s".</string>
     <string name="help_no_clue_to_query">Please select a clue to ask for help with.</string>
     <string name="help_query_failed">Help query failed. Please check your network connection and API key in settings.</string>
-    <string name="help_query_response_title">ChatGPT Help Response</string>
-    <string name="help_query_chat_gpt">Ask ChatGPT for Help</string>
-    <string name="help_query_but_no_active_network">Please enable a network connection to contact ChatGPT.</string>
-    <string name="chat_gpt_api_key">ChatGPT API Key</string>
-    <string name="chat_gpt_api_key_desc">You need an API key to use ChatGPT help. You can get an API Key from your Open AI account settings.</string>
-    <string name="chat_gpt_api_key_message">ChatGPT is an external network service run by OpenAI requiring a network connection. Its responses are not filtered by Forkyz and may be misleading, give away the answer, or be otherwise problematic. Use at your own risk.</string>
+    <string name="help_query_response_title">LLM Agent Help Response</string>
+    <string name="help_query_llm_agent">Ask LLM Agent for Help</string>
+    <string name="help_query_but_no_active_network">Please enable a network connection to contact LLM Agent.</string>
+    <string name="llm_agent_api_key">LLM Agent API Key</string>
+    <string name="llm_agent_api_key_desc">You need an API key to use LLM Agents. You can get an API Key from your LLM account settings.</string>
+    <string name="llm_agent_api_key_message">LLM agents are external network services run by external companies requiring a network connection. The responses are not filtered by Forkyz and may be misleading, give away the answer, or be otherwise problematic. Use at your own risk.</string>
+    <string name="llm_agent">LLM Agent</string>
+    <string name="llm_agent_desc">Which LLM agent to use, if any.</string>
+    <string name="llm_agent_none">None</string>
+    <string name="llm_agent_chat_gpt">Chat GPT</string>
+    <string name="llm_agent_claude">Claude</string>
 
     <!-- external apps -->
     <string name="crossword_solver">Crossword Solver</string>

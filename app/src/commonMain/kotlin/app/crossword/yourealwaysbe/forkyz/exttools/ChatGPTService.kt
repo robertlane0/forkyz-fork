@@ -31,8 +31,7 @@ object ChatGPTService : LLMService {
         settings : ForkyzSettings,
         query : String
     ) : String? {
-        val apiKey = settings.liveExtChatGPTAPIKey.first() ?: return null
-
+        val apiKey = settings.liveExtLLMAgentAPIKey.first() ?: return null
         return withContext(Dispatchers.IO) {
             try {
                 val json = getURLJSON(
@@ -48,15 +47,6 @@ object ChatGPTService : LLMService {
                 null
             }
         }
-    }
-
-    override suspend fun isEnabled(settings : ForkyzSettings) : Boolean {
-        return isEnabled(settings.liveExternalToolSettings.first())
-    }
-
-    override fun isEnabled(settings : ExternalToolSettings) : Boolean {
-        val apiKey = settings.chatGPTAPIKey
-        return apiKey.trim().isNotEmpty()
     }
 
     private fun getQueryData(query : String) : JSONObject {

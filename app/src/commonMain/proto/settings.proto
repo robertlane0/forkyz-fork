@@ -119,6 +119,12 @@ enum ClueListClueLine {
   CLCL_NONE = 2;
 }
 
+enum LLMAgent {
+  LA_NONE = 0;
+  LA_CHATGPT = 1;
+  LA_CLAUDE = 2;
+}
+
 message Settings {
     bool alwaysAnnounceBox = 1;
     bool alwaysAnnounceClue = 2;
@@ -137,7 +143,7 @@ message Settings {
     bool browseShowPercentageCorrect = 15;
     bool buttonActivatesVoice = 16;
     bool buttonAnnounceClue = 17;
-    string chatGPTAPIKey = 18;
+    string llmAgentAPIKey = 18;
     int32 cleanupAge = 19;
     bool clueBelowGrid = 20;
     ClueHighlight clueHighlight = 21;
@@ -258,4 +264,5 @@ message Settings {
     bool dontSnapBoardToBorders = 137;
     bool downloadNRCInHetMidden = 138;
     bool downloadNRCScrypto = 139;
+    LLMAgent llmAgent = 140;
 }

@@ -19,29 +19,26 @@ import app.crossword.yourealwaysbe.puz.Playboard
  *
  * @return text response for OK dialog
  */
-suspend fun askChatGPTForCurrentClue(
+suspend fun askLLMAgentForCurrentClue(
     utils : NativeBackendUtils,
     settings : ForkyzSettings,
     board : Playboard
 ) : String {
-    val requester = LLMClueHelpRequester(ChatGPTService, utils, settings)
+    val requester = LLMClueHelpRequester(utils, settings)
     return requester.askForHelp(board)
 }
 
-fun isChatGPTEnabled(settings : ExternalToolSettings) : Boolean {
-    return ChatGPTService.isEnabled(settings)
+fun isLLMAgentEnabled(settings : ExternalToolSettings) : Boolean {
+    return settings.llmAgentSettings.isEnabled
 }
 
 /**
  * Requests help for the current clue using an LLM service
  */
 class LLMClueHelpRequester(
-    private val llmService : LLMService,
     private val utils : NativeBackendUtils,
     private val settings : ForkyzSettings,
 ) {
-    suspend fun isEnabled() : Boolean = llmService.isEnabled(settings)
-
     /**
      * Asks the LLM service for help with the current clue
      *
@@ -49,16 +46,13 @@ class LLMClueHelpRequester(
      * @return a string response suitable for displaying in a dialog
      */
     suspend fun askForHelp(board : Playboard) : String {
-        if (!isEnabled()) {
-            return utils.getString(Res.string.help_query_failed)
+        val response = getLLMService(settings)?.let { llmService ->
+            val query = makeQuery(board)
+            if (query == null) {
+                return utils.getString(Res.string.help_no_clue_to_query)
+            }
+            llmService.makeRequest(settings, query)
         }
-
-        val query = makeQuery(board)
-        if (query == null) {
-            return utils.getString(Res.string.help_no_clue_to_query)
-        }
-
-        val response = llmService.makeRequest(settings, query)
         return response ?: utils.getString(Res.string.help_query_failed)
     }
 

@@ -82,7 +82,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.help_crossword
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.help_duckduckgo
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.help_external_dictionary
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.help_fifteen_squared
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.help_query_chat_gpt
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.help_query_llm_agent
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_announce
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_voice
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.info
@@ -844,10 +844,10 @@ class PuzzlePageScope(
 
                 }
             }
-            if (externalToolsState.hasChatGPT) {
+            if (externalToolsState.hasLLMAgent) {
                 DropdownMenuItem(
                     text = {
-                        MenuText(stringResource(Res.string.help_query_chat_gpt))
+                        MenuText(stringResource(Res.string.help_query_llm_agent))
                     },
                     onClick = {
                         viewModel.requestHelpForCurrentClue()

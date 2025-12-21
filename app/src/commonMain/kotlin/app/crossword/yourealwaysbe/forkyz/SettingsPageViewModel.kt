@@ -89,10 +89,6 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.browse_show_pe
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.browse_show_percentage_correct_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.browser_settings
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.browser_settings_desc
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.chat_gpt_api_key
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.chat_gpt_api_key
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.chat_gpt_api_key_desc
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.chat_gpt_api_key_message
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.cleanup_age_never
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.cleanup_age_never
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.cleanup_age_one_week
@@ -300,6 +296,15 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.le_parisien_da
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.legacy_like_theme
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.legacy_like_theme
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.license
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.llm_agent
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.llm_agent_api_key
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.llm_agent_api_key
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.llm_agent_api_key_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.llm_agent_api_key_message
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.llm_agent_chat_gpt
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.llm_agent_claude
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.llm_agent_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.llm_agent_none
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.logcat
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.metro_cryptic
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.metro_quick
@@ -444,6 +449,7 @@ import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.GridRatio
 import app.crossword.yourealwaysbe.forkyz.settings.KeyboardLayout
 import app.crossword.yourealwaysbe.forkyz.settings.KeyboardMode
+import app.crossword.yourealwaysbe.forkyz.settings.LLMAgent
 import app.crossword.yourealwaysbe.forkyz.settings.MovementStrategySetting
 import app.crossword.yourealwaysbe.forkyz.settings.Orientation
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation
@@ -2175,14 +2181,32 @@ class SettingsPageViewModel(
             settings.liveExtCrosswordSolverEnabled.stateInHere(),
             settings::setExtCrosswordSolverEnabled,
         ),
+        SettingsList<LLMAgent>(
+            SettingsPage.EXTERNAL_TOOLS,
+            Res.string.llm_agent,
+            Res.string.llm_agent_desc,
+            listOf(
+                SettingsListEntry(Res.string.llm_agent_none, LLMAgent.LA_NONE),
+                SettingsListEntry(
+                    Res.string.llm_agent_chat_gpt,
+                    LLMAgent.LA_CHATGPT,
+                ),
+                SettingsListEntry(
+                    Res.string.llm_agent_claude,
+                    LLMAgent.LA_CLAUDE,
+                ),
+            ),
+            settings.liveExtLLMAgent.stateInHere(LLMAgent.LA_NONE),
+            settings::setExtLLMAgent,
+        ),
         SettingsString(
             SettingsPage.EXTERNAL_TOOLS,
-            Res.string.chat_gpt_api_key,
-            Res.string.chat_gpt_api_key_desc,
-            Res.string.chat_gpt_api_key,
-            settings.liveExtChatGPTAPIKey.stateInHere(),
-            settings::setExtChatGPTAPIKey,
-            dialogMsg = Res.string.chat_gpt_api_key_message,
+            Res.string.llm_agent_api_key,
+            Res.string.llm_agent_api_key_desc,
+            Res.string.llm_agent_api_key,
+            settings.liveExtLLMAgentAPIKey.stateInHere(),
+            settings::setExtLLMAgentAPIKey,
+            dialogMsg = Res.string.llm_agent_api_key_message,
         ),
         SettingsBoolean(
             SettingsPage.EXTERNAL_TOOLS,

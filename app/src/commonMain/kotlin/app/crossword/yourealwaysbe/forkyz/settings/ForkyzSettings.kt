@@ -299,15 +299,27 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         }
     }
 
-    val liveExtChatGPTAPIKey : Flow<String>
-        = settingsMap { it.chatGPTAPIKey }
+    val liveExtLLMAgent : Flow<LLMAgent>
+        = settingsMap { it.llmAgent }
 
-    fun getExtChatGPTAPIKey(cb : (String) -> Unit)
-        = settingsOnce(cb) { it.chatGPTAPIKey }
+    fun getExtLLMAgent(cb : (LLMAgent) -> Unit)
+        = settingsOnce(cb) { it.llmAgent }
 
-    fun setExtChatGPTAPIKey(value : String) {
+    fun setExtLLMAgent(value : LLMAgent) {
         settingsUpdate { settings ->
-            settings.copy(chatGPTAPIKey = value)
+            settings.copy(llmAgent = value)
+        }
+    }
+
+    val liveExtLLMAgentAPIKey : Flow<String>
+        = settingsMap { it.llmAgentAPIKey }
+
+    fun getExtLLMAgentAPIKey(cb : (String) -> Unit)
+        = settingsOnce(cb) { it.llmAgentAPIKey }
+
+    fun setExtLLMAgentAPIKey(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(llmAgentAPIKey = value)
         }
     }
 
@@ -477,7 +489,10 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         settings : Settings,
     ) : ExternalToolSettings {
         return ExternalToolSettings(
-            settings.chatGPTAPIKey,
+            LLMAgentSettings(
+                settings.llmAgent,
+                settings.llmAgentAPIKey,
+            ),
             settings.crosswordSolverEnabled,
             settings.duckDuckGoEnabled,
             settings.externalDictionary,
@@ -2282,9 +2297,22 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             },
         )
         run(
-            "chatGPTAPIKey",
-            { s, key -> json.put(key, s.chatGPTAPIKey) },
-            { key -> json.optString(key)?.let { setExtChatGPTAPIKey(it) } },
+            "llmAgent",
+            { s, key -> json.put(key, s.llmAgentAPIKey.toString()) },
+            { key ->
+               json.optString(key)?.let {
+                   try {
+                       setExtLLMAgent(LLMAgent.valueOf(it))
+                   } catch (e : IllegalArgumentException) {
+                       // ignore
+                   }
+               }
+            },
+        )
+        run(
+            "llmAgentAPIKey",
+            { s, key -> json.put(key, s.llmAgentAPIKey) },
+            { key -> json.optString(key)?.let { setExtLLMAgentAPIKey(it) } },
         )
         run(
             "cleanupAge",
