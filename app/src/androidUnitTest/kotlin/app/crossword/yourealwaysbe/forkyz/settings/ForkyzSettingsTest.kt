@@ -52,287 +52,284 @@ class TestDataStore(initialDataStoreSettings : Settings) : DataStore<Settings> {
 }
 
 class ForkyzSettingsTest {
-    val settingsValue1: Settings = Settings.newBuilder()
-        .setAlwaysAnnounceBox(false)
-        .setAlwaysAnnounceClue(false)
-        .setApplicationTheme(Theme.T_STANDARD)
-        .setArchiveCleanupAge(-1)
-        .clearAutoDownloaders()
-        .setBackgroundDownloadAllowRoaming(false)
-        .clearBackgroundDownloadDays()
-        .setBackgroundDownloadDaysTime(8)
-        .setBackgroundDownloadHourly(false)
-        .setBackgroundDownloadRequireCharging(false)
-        .setBackgroundDownloadRequireUnmetered(true)
-        .setBrowseAlwaysShowRating(false)
-        .setBrowseIndicateIfSolution(false)
-        .setBrowseNewPuzzle(false)
-        .setBrowseShowPercentageCorrect(false)
-        .setButtonActivatesVoice(false)
-        .setButtonAnnounceClue(false)
-        .setLLMAgent(LLMAgent.LA_NONE)
-        .setLLMAPIKey("")
-        .setCleanupAge(-1)
-        .setClueBelowGrid(false)
-        .setClueHighlight(ClueHighlight.CH_RADIO_BUTTON)
-        .setClueListNameInClueLine(ClueListClueLine.CLCL_FULL)
-        .setClueTabsDouble(ClueTabsDouble.CTD_NEVER)
-        .setCrosswordSolverEnabled(true)
-        .setCustomDailyTitle("")
-        .setCustomDailyUrl("")
-        .setCycleUnfilledMode(CycleUnfilledMode.CU_NEVER)
-        .setDeleteCrossingMode(DeleteCrossingModeSetting.DCMS_DELETE)
-        .setDeleteOnCleanup(false)
-        .setDisableRatings(false)
-        .setDisableSwipe(false)
-        .setDisplayScratch(false)
-        .setDisplaySeparators(DisplaySeparators.DS_ALWAYS)
-        .setDlLast(0)
-        .setDlOnStartup(false)
-        .setDontConfirmCleanup(true)
-        .setDontConfirmBrowseDelete(false)
-        .setDontSnapBoardToBorders(false)
-        .setDoubleTap(false)
-        .setDownload20Minutes(true)
-        .setDownloadCustomDaily(false)
-        .setDownloadDeStandaard(true)
-        .setDownloadDeTelegraaf(true)
-        .setDownloadGuardianDailyCryptic(true)
-        .setDownloadGuardianWeeklyQuiptic(true)
-        .setDownloadHamAbend(true)
-        .setDownloadIndependentDailyCryptic(true)
-        .setDownloadIrishNewsCryptic(true)
-        .setDownloadJonesin(true)
-        .setDownloadJoseph(true)
-        .setDownloadLaCroix(true)
-        .setDownloadLeParisienF1(true)
-        .setDownloadLeParisienF2(true)
-        .setDownloadLeParisienF3(true)
-        .setDownloadLeParisienF4(true)
-        .setDownloadMetroCryptic(true)
-        .setDownloadMetroQuick(true)
-        .setDownloadNewYorkTimesSyndicated(true)
-        .setDownloadNewsday(true)
-        .setDownloadPremier(true)
-        .setDownloadSheffer(true)
-        .setDownloadTimeout(30000)
-        .setDownloadUSAToday(true)
-        .setDownloadUniversal(true)
-        .setDownloadWaPoSunday(true)
-        .setDownloadWsj(true)
-        .setDuckDuckGoEnabled(true)
-        .setEnsureVisible(true)
-        .setEnterChangesDirection(true)
-        .setEqualsAnnounceClue(true)
-        .setExpandableClueLine(false)
-        .setExternalDictionary(ExternalDictionarySetting.EDS_FREE)
-        .setFifteenSquaredEnabled(true)
-        .setFitToScreenMode(FitToScreenMode.FTSM_NEVER)
-        .setFullScreen(false)
-        .setGridRatio(GridRatio.GR_PUZZLE_SHAPE)
-        .setGridRatioLand(GridRatio.GR_PUZZLE_SHAPE)
-        .setIndicateShowErrors(true)
-        .setInferSeparators(false)
-        .setKeyboardCompact(false)
-        .setKeyboardForceCaps(true)
-        .setKeyboardHaptic(true)
-        .setKeyboardHideButton(false)
-        .setKeyboardLayout(KeyboardLayout.KL_QWERTY)
-        .setKeyboardRepeatDelay(300)
-        .setKeyboardRepeatInterval(75)
-        .setKeyboardShowHide(KeyboardMode.KM_HIDE_MANUAL)
-        .setLastSeenVersion("")
-        .setMovementStrategy(MovementStrategySetting.MSS_MOVE_NEXT_ON_AXIS)
-        .setMovementStrategyClueList(MovementStrategySetting.MSS_MOVE_NEXT_CLUE)
-        .setOrientationLock(Orientation.O_UNLOCKED)
-        .setPlayActivityClueTabsPage(0)
-        .setPlayActivityClueTabsPage1(1)
-        .setPlayLetterUndoEnabled(false)
-        .setPredictAnagramChars(true)
-        .setPreserveCorrectLettersInShowErrors(false)
-        .setRandomClueOnShake(false)
-        .setSafArchiveFolderUri("")
-        .setSafCrosswordsFolderUri("")
-        .setSafRootUri("")
-        .setSafToImportDoneFolderUri("")
-        .setSafToImportFailedFolderUri("")
-        .setSafToImportFolderUri("")
-        .setScale(1.0F)
-        .setScrapeCru(true)
-        .setScrapeGuardianQuick(true)
-        .setScrapeKegler(true)
-        .setScrapePrivateEye(true)
-        .setScrapePrzekroj(true)
-        .setScratchMode(false)
-        .setShowCluesOnPlayScreen(true)
-        .setShowCount(false)
-        .setShowErrors(false)
-        .setShowErrorsClue(false)
-        .setShowErrorsCursor(false)
-        .setShowTimer(false)
-        .setShowWordsInClueList(false)
-        .setSkipFilled(false)
-        .setSnapClue(false)
-        .setSort(AccessorSetting.AS_DATE_DESC)
-        .setSpaceChangesDirection(true)
-        .setStorageLocation(StorageLocation.SL_INTERNAL)
-        .setSuppressHints(false)
-        .setSuppressMessages(false)
-        .setSuppressSummaryMessages(false)
-        .setSwipeAction(BrowseSwipeAction.BSA_DELETE)
-        .setToggleBeforeMove(false)
-        .setUiTheme(DayNightMode.DNM_DAY)
-        .setUseNativeKeyboard(false)
-        .setVolumeActivatesVoice(false)
-        .build()
+    val settingsValue1 : Settings = Settings(
+        alwaysAnnounceBox = false,
+        alwaysAnnounceClue = false,
+        applicationTheme = Theme.T_STANDARD,
+        archiveCleanupAge = -1,
+        autoDownloaders = listOf(),
+        backgroundDownloadAllowRoaming = false,
+        backgroundDownloadDays = listOf(),
+        backgroundDownloadDaysTime = 8,
+        backgroundDownloadHourly = false,
+        backgroundDownloadRequireCharging = false,
+        backgroundDownloadRequireUnmetered = true,
+        browseAlwaysShowRating = false,
+        browseIndicateIfSolution = false,
+        browseNewPuzzle = false,
+        browseShowPercentageCorrect = false,
+        buttonActivatesVoice = false,
+        buttonAnnounceClue = false,
+        llmAgent = LLMAgent.LA_NONE,
+        llmAgentAPIKey = "",
+        cleanupAge = -1,
+        clueBelowGrid = false,
+        clueHighlight = ClueHighlight.CH_RADIO_BUTTON,
+        clueListNameInClueLine = ClueListClueLine.CLCL_FULL,
+        clueTabsDouble = ClueTabsDouble.CTD_NEVER,
+        crosswordSolverEnabled = true,
+        customDailyTitle = "",
+        customDailyUrl = "",
+        cycleUnfilledMode = CycleUnfilledMode.CU_NEVER,
+        deleteCrossingMode = DeleteCrossingModeSetting.DCMS_DELETE,
+        deleteOnCleanup = false,
+        disableRatings = false,
+        disableSwipe = false,
+        displayScratch = false,
+        displaySeparators = DisplaySeparators.DS_ALWAYS,
+        dlLast = 0,
+        dlOnStartup = false,
+        dontConfirmCleanup = true,
+        dontConfirmBrowseDelete = false,
+        dontSnapBoardToBorders = false,
+        doubleTap = false,
+        download20Minutes = true,
+        downloadCustomDaily = false,
+        downloadDeStandaard = true,
+        downloadDeTelegraaf = true,
+        downloadGuardianDailyCryptic = true,
+        downloadGuardianWeeklyQuiptic = true,
+        downloadHamAbend = true,
+        downloadIndependentDailyCryptic = true,
+        downloadIrishNewsCryptic = true,
+        downloadJonesin = true,
+        downloadJoseph = true,
+        downloadLaCroix = true,
+        downloadLeParisienF1 = true,
+        downloadLeParisienF2 = true,
+        downloadLeParisienF3 = true,
+        downloadLeParisienF4 = true,
+        downloadMetroCryptic = true,
+        downloadMetroQuick = true,
+        downloadNewYorkTimesSyndicated = true,
+        downloadNewsday = true,
+        downloadPremier = true,
+        downloadSheffer = true,
+        downloadTimeout = 30000,
+        downloadUSAToday = true,
+        downloadUniversal = true,
+        downloadWaPoSunday = true,
+        downloadWsj = true,
+        duckDuckGoEnabled = true,
+        ensureVisible = true,
+        enterChangesDirection = true,
+        equalsAnnounceClue = true,
+        expandableClueLine = false,
+        externalDictionary = ExternalDictionarySetting.EDS_FREE,
+        fifteenSquaredEnabled = true,
+        fitToScreenMode = FitToScreenMode.FTSM_NEVER,
+        fullScreen = false,
+        gridRatio = GridRatio.GR_PUZZLE_SHAPE,
+        gridRatioLand = GridRatio.GR_PUZZLE_SHAPE,
+        indicateShowErrors = true,
+        inferSeparators = false,
+        keyboardCompact = false,
+        keyboardForceCaps = true,
+        keyboardHaptic = true,
+        keyboardHideButton = false,
+        keyboardLayout = KeyboardLayout.KL_QWERTY,
+        keyboardRepeatDelay = 300,
+        keyboardRepeatInterval = 75,
+        keyboardShowHide = KeyboardMode.KM_HIDE_MANUAL,
+        lastSeenVersion = "",
+        movementStrategy = MovementStrategySetting.MSS_MOVE_NEXT_ON_AXIS,
+        movementStrategyClueList = MovementStrategySetting.MSS_MOVE_NEXT_CLUE,
+        orientationLock = Orientation.O_UNLOCKED,
+        playActivityClueTabsPage = 0,
+        playActivityClueTabsPage1 = 1,
+        playLetterUndoEnabled = false,
+        predictAnagramChars = true,
+        preserveCorrectLettersInShowErrors = false,
+        randomClueOnShake = false,
+        safArchiveFolderUri = "",
+        safCrosswordsFolderUri = "",
+        safRootUri = "",
+        safToImportDoneFolderUri = "",
+        safToImportFailedFolderUri = "",
+        safToImportFolderUri = "",
+        scale = 1.0F,
+        scrapeCru = true,
+        scrapeGuardianQuick = true,
+        scrapeKegler = true,
+        scrapePrivateEye = true,
+        scrapePrzekroj = true,
+        scratchMode = false,
+        showCluesOnPlayScreen = true,
+        showCount = false,
+        showErrors = false,
+        showErrorsClue = false,
+        showErrorsCursor = false,
+        showTimer = false,
+        showWordsInClueList = false,
+        skipFilled = false,
+        snapClue = false,
+        sort = AccessorSetting.AS_DATE_DESC,
+        spaceChangesDirection = true,
+        storageLocation = StorageLocation.SL_INTERNAL,
+        suppressHints = false,
+        suppressMessages = false,
+        suppressSummaryMessages = false,
+        swipeAction = BrowseSwipeAction.BSA_DELETE,
+        toggleBeforeMove = false,
+        uiTheme = DayNightMode.DNM_DAY,
+        useNativeKeyboard = false,
+        volumeActivatesVoice = false,
+    )
 
-    val settingsValue2: Settings = Settings.newBuilder()
-        .setAlwaysAnnounceBox(true)
-        .setAlwaysAnnounceClue(true)
-        .setApplicationTheme(Theme.T_DYNAMIC)
-        .setArchiveCleanupAge(10)
-        .clearAutoDownloaders()
-        .addAutoDownloaders("autos")
-        .setBackgroundDownloadAllowRoaming(true)
-        .clearBackgroundDownloadDays()
-        .addBackgroundDownloadDays("1")
-        .setBackgroundDownloadDaysTime(9)
-        .setBackgroundDownloadHourly(true)
-        .setBackgroundDownloadRequireCharging(true)
-        .setBackgroundDownloadRequireUnmetered(false)
-        .setBrowseAlwaysShowRating(true)
-        .setBrowseIndicateIfSolution(true)
-        .setBrowseNewPuzzle(true)
-        .setBrowseShowPercentageCorrect(true)
-        .setButtonActivatesVoice(true)
-        .setButtonAnnounceClue(true)
-        .setLLMAgentAPIKey(LLMAgent.LA_CHATGPT)
-        .setLLMAgentAPIKey("xx")
-        .setCleanupAge(10)
-        .setClueBelowGrid(true)
-        .setClueHighlight(ClueHighlight.CH_BOTH)
-        .setClueListNameInClueLine(ClueListClueLine.CLCL_NONE)
-        .setClueTabsDouble(ClueTabsDouble.CTD_WIDE)
-        .setCrosswordSolverEnabled(false)
-        .setCustomDailyTitle("xx")
-        .setCustomDailyUrl("xx")
-        .setCycleUnfilledMode(CycleUnfilledMode.CU_ALWAYS)
-        .setDeleteCrossingMode(
-            DeleteCrossingModeSetting.DCMS_PRESERVE_FILLED_CELLS
-        )
-        .setDeleteOnCleanup(true)
-        .setDisableRatings(true)
-        .setDisableSwipe(true)
-        .setDisplayScratch(true)
-        .setDisplaySeparators(DisplaySeparators.DS_NEVER)
-        .setDlLast(0)
-        .setDlOnStartup(true)
-        .setDontConfirmCleanup(false)
-        .setDontConfirmBrowseDelete(true)
-        .setDontSnapBoardToBorders(true)
-        .setDoubleTap(true)
-        .setDownload20Minutes(false)
-        .setDownloadCustomDaily(true)
-        .setDownloadDeStandaard(false)
-        .setDownloadDeTelegraaf(false)
-        .setDownloadGuardianDailyCryptic(false)
-        .setDownloadGuardianWeeklyQuiptic(false)
-        .setDownloadHamAbend(false)
-        .setDownloadIndependentDailyCryptic(false)
-        .setDownloadIrishNewsCryptic(false)
-        .setDownloadJonesin(false)
-        .setDownloadJoseph(false)
-        .setDownloadLaCroix(false)
-        .setDownloadLeParisienF1(false)
-        .setDownloadLeParisienF2(false)
-        .setDownloadLeParisienF3(false)
-        .setDownloadLeParisienF4(false)
-        .setDownloadMetroCryptic(false)
-        .setDownloadMetroQuick(false)
-        .setDownloadNewYorkTimesSyndicated(false)
-        .setDownloadNewsday(false)
-        .setDownloadPremier(false)
-        .setDownloadSheffer(false)
-        .setDownloadTimeout(40000)
-        .setDownloadUSAToday(false)
-        .setDownloadUniversal(false)
-        .setDownloadWaPoSunday(false)
-        .setDownloadWsj(false)
-        .setDuckDuckGoEnabled(false)
-        .setEnsureVisible(false)
-        .setEnterChangesDirection(false)
-        .setEqualsAnnounceClue(false)
-        .setExpandableClueLine(true)
-        .setExternalDictionary(ExternalDictionarySetting.EDS_NONE)
-        .setFifteenSquaredEnabled(false)
-        .setFitToScreenMode(FitToScreenMode.FTSM_START)
-        .setFullScreen(true)
-        .setGridRatio(GridRatio.GR_ONE_TO_ONE)
-        .setGridRatioLand(GridRatio.GR_FIFTY_PCNT)
-        .setIndicateShowErrors(false)
-        .setInferSeparators(true)
-        .setKeyboardCompact(true)
-        .setKeyboardForceCaps(false)
-        .setKeyboardHaptic(false)
-        .setKeyboardHideButton(true)
-        .setKeyboardLayout(KeyboardLayout.KL_DVORAK)
-        .setKeyboardRepeatDelay(301)
-        .setKeyboardRepeatInterval(85)
-        .setKeyboardShowHide(KeyboardMode.KM_NEVER_SHOW)
-        .setLastSeenVersion("xx")
-        .setMovementStrategy(MovementStrategySetting.MSS_STOP_ON_END)
-        .setMovementStrategyClueList(MovementStrategySetting.MSS_STOP_ON_END)
-        .setOrientationLock(Orientation.O_PORTRAIT)
-        .setPlayActivityClueTabsPage(1)
-        .setPlayActivityClueTabsPage1(0)
-        .setPlayLetterUndoEnabled(true)
-        .setPredictAnagramChars(false)
-        .setPreserveCorrectLettersInShowErrors(true)
-        .setRandomClueOnShake(true)
-        .setSafArchiveFolderUri("xx")
-        .setSafCrosswordsFolderUri("xx")
-        .setSafRootUri("xx")
-        .setSafToImportDoneFolderUri("xx")
-        .setSafToImportFailedFolderUri("xx")
-        .setSafToImportFolderUri("xx")
-        .setScale(1.2F)
-        .setScrapeCru(false)
-        .setScrapeGuardianQuick(false)
-        .setScrapeKegler(false)
-        .setScrapePrivateEye(false)
-        .setScrapePrzekroj(false)
-        .setScratchMode(true)
-        .setShowCluesOnPlayScreen(false)
-        .setShowCount(true)
-        .setShowErrors(true)
-        .setShowErrorsClue(true)
-        .setShowErrorsCursor(true)
-        .setShowTimer(true)
-        .setShowWordsInClueList(true)
-        .setSkipFilled(true)
-        .setSnapClue(true)
-        .setSort(AccessorSetting.AS_DATE_ASC)
-        .setSpaceChangesDirection(false)
-        .setStorageLocation(StorageLocation.SL_EXTERNAL_SAF)
-        .setSuppressHints(true)
-        .setSuppressMessages(true)
-        .setSuppressSummaryMessages(true)
-        .setSwipeAction(BrowseSwipeAction.BSA_ARCHIVE)
-        .setToggleBeforeMove(true)
-        .setUiTheme(DayNightMode.DNM_NIGHT)
-        .setUseNativeKeyboard(true)
-        .setVolumeActivatesVoice(true)
-        .build()
+    val settingsValue2 : Settings = Settings(
+        alwaysAnnounceBox = true,
+        alwaysAnnounceClue = true,
+        applicationTheme = Theme.T_DYNAMIC,
+        archiveCleanupAge = 10,
+        autoDownloaders = listOf("autos"),
+        backgroundDownloadAllowRoaming = true,
+        backgroundDownloadDays = listOf("1"),
+        backgroundDownloadDaysTime = 9,
+        backgroundDownloadHourly = true,
+        backgroundDownloadRequireCharging = true,
+        backgroundDownloadRequireUnmetered = false,
+        browseAlwaysShowRating = true,
+        browseIndicateIfSolution = true,
+        browseNewPuzzle = true,
+        browseShowPercentageCorrect = true,
+        buttonActivatesVoice = true,
+        buttonAnnounceClue = true,
+        llmAgent = LLMAgent.LA_CHATGPT,
+        llmAgentAPIKey = "xx",
+        cleanupAge = 10,
+        clueBelowGrid = true,
+        clueHighlight = ClueHighlight.CH_BOTH,
+        clueListNameInClueLine = ClueListClueLine.CLCL_NONE,
+        clueTabsDouble = ClueTabsDouble.CTD_WIDE,
+        crosswordSolverEnabled = false,
+        customDailyTitle = "xx",
+        customDailyUrl = "xx",
+        cycleUnfilledMode = CycleUnfilledMode.CU_ALWAYS,
+        deleteCrossingMode
+            = DeleteCrossingModeSetting.DCMS_PRESERVE_FILLED_CELLS,
+        deleteOnCleanup = true,
+        disableRatings = true,
+        disableSwipe = true,
+        displayScratch = true,
+        displaySeparators = DisplaySeparators.DS_NEVER,
+        dlLast = 0,
+        dlOnStartup = true,
+        dontConfirmCleanup = false,
+        dontConfirmBrowseDelete = true,
+        dontSnapBoardToBorders = true,
+        doubleTap = true,
+        download20Minutes = false,
+        downloadCustomDaily = true,
+        downloadDeStandaard = false,
+        downloadDeTelegraaf = false,
+        downloadGuardianDailyCryptic = false,
+        downloadGuardianWeeklyQuiptic = false,
+        downloadHamAbend = false,
+        downloadIndependentDailyCryptic = false,
+        downloadIrishNewsCryptic = false,
+        downloadJonesin = false,
+        downloadJoseph = false,
+        downloadLaCroix = false,
+        downloadLeParisienF1 = false,
+        downloadLeParisienF2 = false,
+        downloadLeParisienF3 = false,
+        downloadLeParisienF4 = false,
+        downloadMetroCryptic = false,
+        downloadMetroQuick = false,
+        downloadNewYorkTimesSyndicated = false,
+        downloadNewsday = false,
+        downloadPremier = false,
+        downloadSheffer = false,
+        downloadTimeout = 40000,
+        downloadUSAToday = false,
+        downloadUniversal = false,
+        downloadWaPoSunday = false,
+        downloadWsj = false,
+        duckDuckGoEnabled = false,
+        ensureVisible = false,
+        enterChangesDirection = false,
+        equalsAnnounceClue = false,
+        expandableClueLine = true,
+        externalDictionary = ExternalDictionarySetting.EDS_NONE,
+        fifteenSquaredEnabled = false,
+        fitToScreenMode = FitToScreenMode.FTSM_START,
+        fullScreen = true,
+        gridRatio = GridRatio.GR_ONE_TO_ONE,
+        gridRatioLand = GridRatio.GR_FIFTY_PCNT,
+        indicateShowErrors = false,
+        inferSeparators = true,
+        keyboardCompact = true,
+        keyboardForceCaps = false,
+        keyboardHaptic = false,
+        keyboardHideButton = true,
+        keyboardLayout = KeyboardLayout.KL_DVORAK,
+        keyboardRepeatDelay = 301,
+        keyboardRepeatInterval = 85,
+        keyboardShowHide = KeyboardMode.KM_NEVER_SHOW,
+        lastSeenVersion = "xx",
+        movementStrategy = MovementStrategySetting.MSS_STOP_ON_END,
+        movementStrategyClueList = MovementStrategySetting.MSS_STOP_ON_END,
+        orientationLock = Orientation.O_PORTRAIT,
+        playActivityClueTabsPage = 1,
+        playActivityClueTabsPage1 = 0,
+        playLetterUndoEnabled = true,
+        predictAnagramChars = false,
+        preserveCorrectLettersInShowErrors = true,
+        randomClueOnShake = true,
+        safArchiveFolderUri = "xx",
+        safCrosswordsFolderUri = "xx",
+        safRootUri = "xx",
+        safToImportDoneFolderUri = "xx",
+        safToImportFailedFolderUri = "xx",
+        safToImportFolderUri = "xx",
+        scale = 1.2F,
+        scrapeCru = false,
+        scrapeGuardianQuick = false,
+        scrapeKegler = false,
+        scrapePrivateEye = false,
+        scrapePrzekroj = false,
+        scratchMode = true,
+        showCluesOnPlayScreen = false,
+        showCount = true,
+        showErrors = true,
+        showErrorsClue = true,
+        showErrorsCursor = true,
+        showTimer = true,
+        showWordsInClueList = true,
+        skipFilled = true,
+        snapClue = true,
+        sort = AccessorSetting.AS_DATE_ASC,
+        spaceChangesDirection = false,
+        storageLocation = StorageLocation.SL_EXTERNAL_SAF,
+        suppressHints = true,
+        suppressMessages = true,
+        suppressSummaryMessages = true,
+        swipeAction = BrowseSwipeAction.BSA_ARCHIVE,
+        toggleBeforeMove = true,
+        uiTheme = DayNightMode.DNM_NIGHT,
+        useNativeKeyboard = true,
+        volumeActivatesVoice = true,
+    )
 
-    val settingsValue3 = Settings.newBuilder()
-        .mergeFrom(settingsValue2)
-        .setClueListNameInClueLine(ClueListClueLine.CLCL_FULL)
-        .setDontConfirmCleanup(true)
-        .setDontConfirmBrowseDelete(false)
-        .setDontSnapBoardToBorders(false)
-        .setExpandableClueLine(false)
-        .setMovementStrategyClueList(MovementStrategySetting.MSS_MOVE_NEXT_CLUE)
-        .build()
+    val settingsValue3 = settingsValue2.copy(
+        clueListNameInClueLine = ClueListClueLine.CLCL_FULL,
+        dontConfirmCleanup = true,
+        dontConfirmBrowseDelete = false,
+        dontSnapBoardToBorders = false,
+        downloadLaCroix = true,
+        expandableClueLine = false,
+        movementStrategyClueList = MovementStrategySetting.MSS_MOVE_NEXT_CLUE,
+    )
 
     @ExperimentalCoroutinesApi
     private val testDispatcher = UnconfinedTestDispatcher()

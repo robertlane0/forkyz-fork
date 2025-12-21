@@ -6,23 +6,15 @@ import java.io.FileOutputStream
 import java.io.IOException
 import kotlinx.coroutines.runBlocking
 
-import android.content.Context
-
-import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
-import org.junit.runner.RunWith
 
-import org.koin.core.context.stopKoin
-
-import org.mockito.Mock
 import org.mockito.Mockito
-import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
-
-import org.robolectric.RobolectricTestRunner
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.stubbing
 
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation
@@ -32,7 +24,6 @@ import app.crossword.yourealwaysbe.forkyz.util.files.MetaCache
 import app.crossword.yourealwaysbe.forkyz.util.files.MetaCache.CachedMeta
 import app.crossword.yourealwaysbe.forkyz.util.files.MetaCache.MetaRecord
 import app.crossword.yourealwaysbe.forkyz.util.toUri
-import app.crossword.yourealwaysbe.forkyz.versions.TiramisuUtil
 import app.crossword.yourealwaysbe.puz.io.StreamUtils
 
 // thanks: https://derekwilson.net/blog/2018/08/23/mokito-kotlin
@@ -46,22 +37,13 @@ object MockitoHelper {
     fun <T> uninitialized() : T = null as T
 }
 
-@RunWith(RobolectricTestRunner::class)
 class PuzzleImporterTest {
 
     @get:Rule
     val folder = TemporaryFolder()
 
-    @Mock
-    val context : Context = mock(Context::class.java)
-
-    private val utils = NativeBackendUtils(context, TiramisuUtil())
+    private val utils = TestNativeBackendUtils()
     private var fileHandler : FileHandler? = null
-
-    @After
-    fun tearDown() {
-        stopKoin()
-    }
 
     @Test
     fun testBasic() {
@@ -192,35 +174,49 @@ class PuzzleImporterTest {
     private fun getFileHandler() : FileHandler {
         if (fileHandler == null) {
             val metaCache = mock(MetaCache::class.java)
-            `when`(
-                metaCache.addRecord(
-                    MockitoHelper.anyObject(),
-                    MockitoHelper.anyObject(),
-                    MockitoHelper.anyObject(),
-                )
-            ).thenReturn(
-                MetaRecord(
-                    CachedMeta(
-                        mainFileUri = "content://none".toUri(),
-                        metaFileUri = null,
-                        directoryUri = "content://none".toUri(),
-                        isUpdatable = false,
-                        date = null,
-                        percentComplete = 0,
-                        percentFilled = 0,
-                        source = null,
-                        title = null,
-                        author = null,
-                        rating = 0.toChar(),
-                        hasSolution = false,
+            stubbing(metaCache) {
+                onBlocking {
+                    metaCache.addRecord(
+                        MockitoHelper.anyObject(),
+                        MockitoHelper.anyObject(),
+                        MockitoHelper.anyObject(),
                     )
-                )
-            )
+                } doReturn
+                    MetaRecord(
+                        CachedMeta(
+                            mainFileUri = "content://none".toUri(),
+                            metaFileUri = null,
+                            directoryUri = "content://none".toUri(),
+                            isUpdatable = false,
+                            date = null,
+                            percentComplete = 0,
+                            percentFilled = 0,
+                            source = null,
+                            title = null,
+                            author = null,
+                            rating = 0.toChar(),
+                            hasSolution = false,
+                        )
+                    )
+                onBlocking {
+                    metaCache.getDirCache(
+                        MockitoHelper.anyObject(),
+                        MockitoHelper.anyObject(),
+                    )
+                } doReturn emptyMap()
+                onBlocking {
+                    metaCache.cleanupCache(
+                        MockitoHelper.anyObject(),
+                        MockitoHelper.anyObject(),
+                        MockitoHelper.anyObject(),
+                    )
+                } doReturn Unit
+            }
 
             fileHandler = object : FileHandlerJavaFile(
                 utils,
                 metaCache,
-                folder.root,
+                getCrosswordsFolder(),
             ) {
                 override val isStorageMounted = true
                 override val isStorageFull = false
@@ -250,3 +246,4 @@ class PuzzleImporterTest {
             }
     }
 }
+

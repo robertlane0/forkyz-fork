@@ -2311,10 +2311,11 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         )
         run(
             "llmAgent",
-            { s, key -> json.put(key, s.llmAgentAPIKey.toString()) },
+            { s, key -> json.put(key, s.llmAgent.toString()) },
             { key ->
                json.optString(key)?.let {
                    try {
+                       println("FORKYZ: setts " + it)
                        setExtLLMAgent(LLMAgent.valueOf(it))
                    } catch (e : IllegalArgumentException) {
                        // ignore

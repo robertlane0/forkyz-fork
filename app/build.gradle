@@ -33,7 +33,6 @@ kotlin {
         def lifecycle_version = "2.9.4"
 
         commonMain.dependencies {
-            implementation "androidx.lifecycle:lifecycle-process:$lifecycle_version"
             implementation "androidx.lifecycle:lifecycle-runtime-compose:$lifecycle_version"
             implementation "androidx.room:room-runtime:$roomVersion"
             implementation "io.coil-kt.coil3:coil-compose:3.3.0"
@@ -69,6 +68,7 @@ kotlin {
             // https://issuetracker.google.com/issues/387656869
             def work_version = "2.9.1"
 
+            implementation "androidx.lifecycle:lifecycle-process:$lifecycle_version"
             implementation "androidx.work:work-runtime:$work_version"
             implementation "io.ktor:ktor-client-android:3.3.2"
             implementation 'androidx.activity:activity-compose:1.12.1'
@@ -90,8 +90,12 @@ kotlin {
             implementation 'junit:junit:4.13.2'
             // thanks https://stackoverflow.com/a/30759769
             implementation 'org.json:json:20080701'
-            implementation 'org.mockito:mockito-core:5.20.0'
-            implementation 'org.robolectric:robolectric:4.16'
+            implementation 'org.mockito.kotlin:mockito-kotlin:6.1.0'
+        }
+
+        jvmTest.dependencies {
+            implementation 'junit:junit:4.13.2'
+            implementation 'org.mockito.kotlin:mockito-kotlin:6.1.0'
         }
 
         jvmMain.dependencies {

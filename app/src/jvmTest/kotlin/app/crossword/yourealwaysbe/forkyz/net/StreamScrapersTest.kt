@@ -3,7 +3,6 @@ package app.crossword.yourealwaysbe.forkyz.net
 
 import java.io.InputStream
 
-import android.util.Base64
 import org.junit.Assert
 import org.junit.Test
 
@@ -139,28 +138,11 @@ class StreamScrapersTest {
             url: String,
             scraper: StreamScraper,
         ) {
-            Mockito.mockStatic(Log::class.java)?.use {
-                Mockito.mockStatic(Base64::class.java)?.use { mockedB64 ->
-                    val inputStream : InputStream
-                        = getURLInputStream(url, TIMEOUT)
-                    run {
-                        mockedB64.`when`<Any?>(
-                            Verification {
-                                Base64.decode(
-                                    ArgumentMatchers.anyString(),
-                                    ArgumentMatchers.anyInt()
-                                )
-                            }
-                        ).thenAnswer(
-                            Answer { i: InvocationOnMock ->
-                                val arg = i.getArguments()[0] as String?
-                                java.util.Base64.getDecoder().decode(arg)
-                            }
-                        )
-                        val puz = scraper.parseInput(inputStream, url)
-                        Assert.assertNotNull(puz)
-                    }
-                }
+            val inputStream : InputStream
+                = getURLInputStream(url, TIMEOUT)
+            run {
+                val puz = scraper.parseInput(inputStream, url)
+                Assert.assertNotNull(puz)
             }
         }
 
