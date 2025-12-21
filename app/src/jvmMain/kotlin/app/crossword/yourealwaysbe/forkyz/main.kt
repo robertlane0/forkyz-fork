@@ -86,7 +86,7 @@ fun main() = application {
         }
 
         override fun openAppSettings() {
-            // TODO
+            // noop, no such thing on desktop
         }
 
         override fun openURI(uri : Uri) {
@@ -103,15 +103,15 @@ fun main() = application {
         }
 
         override fun onCheckAndWarnNetworkState() {
-            // TODO
+            // assume always connected
         }
 
         override fun onCheckRequestNotificationPermissions() {
-            // TODO
+            // permissions not needed
         }
 
         override fun onImportFinish(ifr : NativeImportFinishedResult) {
-            // TODO
+            // noop, since no pending imports (see getPendingImports)
         }
 
         override fun handleExternalToolEvent(tool : ExternalToolData) {
@@ -158,17 +158,18 @@ fun main() = application {
         }
 
         override fun setOnImportCompleteCallback(cb : ((Boolean) -> Unit)?) {
-            // TODO
+            // noop since no pending imports, see getPendingImports
         }
 
         override fun setOnNotificationPermissionDeniedCallback(
             cb : (() -> Unit)?,
         ) {
-            // TODO
+            // noop, since permissions not needed, see
+            // onCheckRequestNotificationPermissions
         }
 
         override fun setStatusBarColor(color : Color) {
-            // TODO
+            // noop, since no status bar
         }
 
         override fun setOnVoiceCommandCallback(
@@ -190,19 +191,19 @@ fun main() = application {
         }
 
         override fun startShakeDetector(onHearShake : () -> Unit) {
-            // TODO
+            // noop, no plans to implement on desktop
         }
 
         override fun stopShakeDetector() {
-            // TODO
+            // noop, no plans to implement on desktop
         }
 
         override fun resumeShakeDetector() {
-            // TODO
+            // noop, no plans to implement on desktop
         }
 
         override fun pauseShakeDetector() {
-            // TODO
+            // noop, no plans to implement on desktop
         }
     }
 
