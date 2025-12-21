@@ -40,8 +40,10 @@ import org.koin.core.context.startKoin
 import org.koin.java.KoinJavaComponent.inject
 
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.announce_not_implemented
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.app_name
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.exporting_puzzles
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.feature_not_implemented
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.puzzles_export_failed
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.puzzles_exported
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.select_puzzle_files
@@ -81,8 +83,11 @@ fun main() = application {
         height = 1000.dp,
     )
     val activeToasts = remember { mutableStateListOf<String>() }
-
     val density = androidx.compose.ui.unit.Density(density = 1.0F)
+    val featureNotImplemented
+        = stringResource(Res.string.feature_not_implemented)
+    val announceNotImplemented
+        = stringResource(Res.string.announce_not_implemented)
 
     val utils = object : NativeFrontendUtils {
         override val inputConnectionMediator = JVMInputConnectionMediator()
@@ -141,7 +146,7 @@ fun main() = application {
         }
 
         override fun handleExternalToolEvent(tool : ExternalToolData) {
-            // TODO
+            notifyFeatureNotImplemented()
         }
 
         @OptIn(DelicateCoroutinesApi::class)
@@ -174,13 +179,13 @@ fun main() = application {
         }
 
         override fun onShareFile(data : ShareFileData) {
-            // TODO
+            notifyFeatureNotImplemented()
         }
 
         override fun setOnAppNotFoundCallback(
             cb : ((AppNotFoundException) -> Unit)?,
         ) {
-            // TODO
+            // noop
         }
 
         override fun setOnImportCompleteCallback(cb : ((Boolean) -> Unit)?) {
@@ -201,15 +206,15 @@ fun main() = application {
         override fun setOnVoiceCommandCallback(
             cb : ((List<String>?) -> Unit)?,
         ) {
-            // TODO
+            // noop
         }
 
         override fun launchVoiceInput() {
-            // TODO
+            notifyFeatureNotImplemented()
         }
 
         override fun announce(text : CharSequence) {
-            // TODO
+            toast(announceNotImplemented)
         }
 
         override fun onSetFullScreen() {
@@ -230,6 +235,10 @@ fun main() = application {
 
         override fun pauseShakeDetector() {
             // noop, no plans to implement on desktop
+        }
+
+        private fun notifyFeatureNotImplemented() {
+            toast(featureNotImplemented)
         }
     }
 

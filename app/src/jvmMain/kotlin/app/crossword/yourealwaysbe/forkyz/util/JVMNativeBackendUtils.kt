@@ -81,12 +81,14 @@ class JVMNativeBackendUtils : NativeBackendUtils {
         return FileOutputStream(File(uri.toJVMURI()))
     }
 
-    override fun getShareDir() : File {
-        return File("share") // TODO
+    override val isShareFileAvailable : Boolean = false
+
+    override fun getShareDir() : File? {
+        return null
     }
 
     override fun getShareURIForFile(shareFile : File) : Uri {
-        return "todo".toUri()
+        return shareFile.toURI().toString().toUri()
     }
 
     override fun getFilterClueToAlphabeticRegex() : String {

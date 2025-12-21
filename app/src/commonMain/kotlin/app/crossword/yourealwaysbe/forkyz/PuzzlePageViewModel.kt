@@ -27,6 +27,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_curren
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_letter
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_notes
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_number
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.feature_not_implemented
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.help_query_but_no_active_network
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.help_query_response_title
 import app.crossword.yourealwaysbe.forkyz.exttools.AppNotFoundException
@@ -638,15 +639,19 @@ open class PuzzlePageViewModel(
 
     fun sharePuzzle(writeBlank : Boolean, omitExtensions : Boolean) {
         viewModelScope.launch {
-            getPuzzle()?.let { puz ->
-                SharePuzzleData.build(
-                    viewModelScope,
-                    utils,
-                    puz,
-                    writeBlank,
-                    omitExtensions,
-                    { _externalToolEvent.value = it },
-                )
+            if (utils.isShareFileAvailable) {
+                getPuzzle()?.let { puz ->
+                    SharePuzzleData.build(
+                        viewModelScope,
+                        utils,
+                        puz,
+                        writeBlank,
+                        omitExtensions,
+                        { _externalToolEvent.value = it },
+                    )
+                }
+            } else {
+                sendToast(utils.getString(Res.string.feature_not_implemented))
             }
         }
     }

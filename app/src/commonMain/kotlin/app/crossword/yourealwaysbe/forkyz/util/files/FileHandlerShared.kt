@@ -130,7 +130,7 @@ object FileHandlerShared {
 
     @Synchronized
     private fun cleanCache(utils : NativeBackendUtils) {
-        utils.getShareDir().listFiles()?.forEach { file ->
+        utils.getShareDir()?.listFiles()?.forEach { file ->
             val ageMillis = System.currentTimeMillis() - file.lastModified()
             if (ageMillis > CACHE_CLEAR_AGE_MILLIS)
                 file.delete()

@@ -37,7 +37,8 @@ interface NativeBackendUtils {
     fun openInputStream(uri : Uri) : InputStream?
     @Throws(IOException::class)
     fun openOutputStream(uri : Uri) : OutputStream?
-    fun getShareDir() : File
+    val isShareFileAvailable : Boolean
+    fun getShareDir() : File?
     fun getShareURIForFile(shareFile : File) : Uri
     fun getFilterClueToAlphabeticRegex() : String
     fun initialiseSAFForRoot(uri : Uri) : FileHandler?

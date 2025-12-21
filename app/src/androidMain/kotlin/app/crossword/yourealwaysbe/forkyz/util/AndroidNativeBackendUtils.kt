@@ -84,7 +84,9 @@ class AndroidNativeBackendUtils(
             .openOutputStream(uri.toAndroidUri())
     }
 
-    override fun getShareDir() : File {
+    override val isShareFileAvailable : Boolean = true
+
+    override fun getShareDir() : File? {
         val shareDir = File(applicationContext.getCacheDir(), SHARE_DIR)
         shareDir.mkdirs()
         return shareDir
