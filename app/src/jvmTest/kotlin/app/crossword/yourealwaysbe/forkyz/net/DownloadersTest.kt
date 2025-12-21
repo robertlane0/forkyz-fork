@@ -13,7 +13,7 @@ import org.junit.runners.Parameterized.Parameters
 import org.junit.runners.Parameterized
 
 import app.crossword.yourealwaysbe.forkyz.settings.DownloadersSettings
-import app.crossword.yourealwaysbe.forkyz.util.TestNativeBackendUtils
+import app.crossword.yourealwaysbe.forkyz.util.JVMNativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.files.NoopFileHandler
 
 import org.mockito.MockedStatic
@@ -86,7 +86,7 @@ class DownloadersTest(
         @Parameters(name = "Downloader {0}")
         @JvmStatic
         fun downloaders() : Iterable<Array<Any>>? {
-            val utils = TestNativeBackendUtils()
+            val utils = JVMNativeBackendUtils()
             val dls = Downloaders(
                 utils,
                 NoopFileHandler(utils),

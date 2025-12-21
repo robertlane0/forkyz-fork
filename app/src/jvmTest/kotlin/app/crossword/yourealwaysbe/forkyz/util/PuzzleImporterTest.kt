@@ -42,7 +42,7 @@ class PuzzleImporterTest {
     @get:Rule
     val folder = TemporaryFolder()
 
-    private val utils = TestNativeBackendUtils()
+    private val utils = JVMNativeBackendUtils()
     private var fileHandler : FileHandler? = null
 
     @Test
