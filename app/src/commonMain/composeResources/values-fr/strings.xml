@@ -284,7 +284,7 @@
     <string name="fit_to_screen_mode_start">Puzzle Démarrer</string>
     <string name="fit_to_screen_mode_locked">Verrouillé</string>
     <string name="full_screen">Plein écran</string>
-    <string name="full_screen_desc">Cachez la barre de notification.\nVous devez partir et rentrer dans un puzzle pour postuler.</string>
+    <string name="full_screen_desc">Vous devez partir et rentrer dans un puzzle pour postuler.</string>
     <string name="grid_ratio_portrait">Taille de grille en mode portrait</string>
     <string name="grid_ratio_portrait_desc">La taille de la grille en mode portrait lorsque des onglets d'indice apparaissent.</string>
     <string name="grid_ratio_landscape">Taille de grille en mode paysage</string>

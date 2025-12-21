@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 
@@ -212,7 +213,7 @@ fun main() = application {
         }
 
         override fun onSetFullScreen() {
-            // TODO
+            windowState.placement = WindowPlacement.Fullscreen
         }
 
         override fun startShakeDetector(onHearShake : () -> Unit) {

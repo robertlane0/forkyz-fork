@@ -284,7 +284,7 @@
     <string name="fit_to_screen_mode_start">Puzzle Start</string>
     <string name="fit_to_screen_mode_locked">Locked</string>
     <string name="full_screen">Full Screen</string>
-    <string name="full_screen_desc">Hides the notification bar.\nYou must leave and re-enter a puzzle to apply.</string>
+    <string name="full_screen_desc">You must leave and re-enter a puzzle to apply.</string>
     <string name="grid_ratio_portrait">Portrait Grid Size</string>
     <string name="grid_ratio_portrait_desc">The size of the grid in portrait mode when clue tabs are showing.</string>
     <string name="grid_ratio_landscape">Landscape Grid Size</string>
