@@ -1,3 +1,4 @@
+
 package app.crossword.yourealwaysbe.forkyz.net
 
 import java.io.InputStream
@@ -115,6 +116,15 @@ class StreamScrapersTest {
         testScraper(
             "https://observer.co.uk/puzzles/everyman/article/everyman-no-4123",
             PuzzleMeStreamScraper(),
+        )
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun testCrossweird() {
+        testScraper(
+            "https://crossweirdpuzzles.com/solver/?file=puzzles/forthebirds.ipuz",
+            CrossweirdStreamScraper(),
         )
     }
 

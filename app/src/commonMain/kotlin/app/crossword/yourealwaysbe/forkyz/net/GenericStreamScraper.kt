@@ -29,6 +29,7 @@ class GenericStreamScraper : AbstractStreamScraper() {
             MyCrosswordStreamScraper(),
             PMLStreamScraper(),
             PuzzleMeStreamScraper(),
+            CrossweirdStreamScraper(),
         )
     }
 
