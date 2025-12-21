@@ -5,11 +5,24 @@ import java.io.IOException
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
@@ -45,6 +58,12 @@ import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.util.files.exportStorage
 import app.crossword.yourealwaysbe.forkyz.util.toUri
 
+val TOAST_PANEL_PADDING = 30.dp
+val TOAST_OUTER_PADDING = 2.dp
+val TOAST_INNER_PADDING = 10.dp
+val TOAST_SHAPE = RoundedCornerShape(10.dp)
+val TOAST_DURATION = 5000L // ms
+
 fun main() = application {
     val themeHelper : ThemeHelper by inject(ThemeHelper::class.java)
     val fileHandlerProvider : FileHandlerProvider
@@ -56,6 +75,7 @@ fun main() = application {
         width = 600.dp,
         height = 1000.dp,
     )
+    val activeToasts = remember { mutableStateListOf<String>() }
 
     val density = androidx.compose.ui.unit.Density(density = 1.0F)
 
@@ -81,8 +101,13 @@ fun main() = application {
             exitApplication()
         }
 
+        @OptIn(DelicateCoroutinesApi::class)
         override fun toast(msg : String) {
-            // TODO
+            activeToasts.add(msg)
+            GlobalScope.launch(Dispatchers.Main) {
+                delay(TOAST_DURATION)
+                activeToasts.removeFirst()
+            }
         }
 
         override fun openAppSettings() {
@@ -207,6 +232,28 @@ fun main() = application {
         }
     }
 
+    @Composable
+    fun Toasts(modifier : Modifier) {
+        Column(modifier = modifier) {
+            activeToasts.forEach { msg ->
+                key (msg) {
+                    Text(
+                        modifier = Modifier
+                            .padding(TOAST_OUTER_PADDING)
+                            .clip(TOAST_SHAPE)
+                            .background(
+                                MaterialTheme.colorScheme.primaryContainer,
+                            )
+                            .padding(TOAST_INNER_PADDING),
+                        text = msg,
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    )
+                }
+            }
+        }
+    }
+
     startKoin {
         modules(sharedModules, jvmModules)
     }
@@ -218,10 +265,19 @@ fun main() = application {
         undecorated = true,
         resizable = true,
     ) {
-        ForkyzApp(
-            themeHelper = themeHelper,
-            utils = utils,
-        )
+        Box() {
+            ForkyzApp(
+                themeHelper = themeHelper,
+                utils = utils,
+            )
+
+            themeHelper.AppTheme {
+                Toasts(
+                    modifier = Modifier.align(Alignment.BottomCenter)
+                        .padding(TOAST_PANEL_PADDING),
+                )
+            }
+        }
     }
 }
 
