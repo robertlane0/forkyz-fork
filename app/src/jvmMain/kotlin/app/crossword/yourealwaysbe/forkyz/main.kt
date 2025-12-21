@@ -94,11 +94,12 @@ fun main() = application {
         }
 
         override fun getPendingImports() : Collection<Uri> {
+            // never any pending
             return listOf()
         }
 
         override fun clearPendingImports() {
-            // TODO
+            // noop, see getPendingImports
         }
 
         override fun onCheckAndWarnNetworkState() {
