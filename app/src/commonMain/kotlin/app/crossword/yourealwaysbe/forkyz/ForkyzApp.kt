@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -66,6 +67,7 @@ data class PageOpener(
     val openClueListPage : () -> Unit,
     val openNotesPage : (ClueID?) -> Unit,
     val openHTMLPage : (HTMLFile) -> Unit,
+    val openURI : (Uri) -> Unit,
     val openOnlineSources : () -> Unit,
     val openReleaseNotes : () -> Unit,
     val openSettingsPage : () -> Unit,
@@ -104,6 +106,7 @@ private fun ForkyzAppMain(
 
     val onlineSourcesURL = stringResource(Res.string.online_sources_url)
 
+    val uriHandler = LocalUriHandler.current
     val pageOpener = PageOpener(
         openPlayPage = { navController.navigate(route = Play) },
         openClueListPage = { navController.navigate(route = ClueList) },
@@ -113,7 +116,8 @@ private fun ForkyzAppMain(
             )
         },
         openHTMLPage = ::openHTMLPage,
-        openOnlineSources = { utils.openURI(onlineSourcesURL.toUri()) },
+        openURI = { uriHandler.openUri(it.toString()) },
+        openOnlineSources = { uriHandler.openUri(onlineSourcesURL.toString()) },
         openReleaseNotes = { openHTMLPage(HTMLFile.RELEASE_NOTES) },
         openSettingsPage = { navController.navigate(route = Settings) },
         openLogcatPage = { navController.navigate(route = Logcat) },

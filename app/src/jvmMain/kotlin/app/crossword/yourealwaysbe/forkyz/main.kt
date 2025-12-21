@@ -118,10 +118,6 @@ fun main() = application {
             // noop, no such thing on desktop
         }
 
-        override fun openURI(uri : Uri) {
-            // TODO
-        }
-
         override fun getPendingImports() : Collection<Uri> {
             // never any pending
             return listOf()

@@ -28,7 +28,6 @@ interface NativeFrontendUtils {
 
     fun toast(msg : String) { }
     fun openAppSettings() { }
-    fun openURI(uri : Uri) { }
     fun getPendingImports() : Collection<Uri> { return listOf() }
     fun clearPendingImports() { }
     fun onCheckAndWarnNetworkState() { }

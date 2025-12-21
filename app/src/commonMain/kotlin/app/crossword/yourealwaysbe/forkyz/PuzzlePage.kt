@@ -1035,14 +1035,14 @@ class PuzzlePageScope(
 
     private fun actionSupportSource() {
         viewModel.supportURL?.let { url ->
-            utils.openURI(url.toUri())
+            pageOpener.openURI(url.toUri())
         }
     }
 
     private fun openShareUrl() {
         viewModel.shareURL?.let { url ->
             if (!url.isEmpty()) {
-                utils.openURI(url.toUri())
+                pageOpener.openURI(url.toUri())
             }
         }
     }
@@ -1226,7 +1226,7 @@ fun PuzzlePage(
                 negativeText= stringResource(Res.string.website),
                 onNegative = {
                     viewModel.clearAppNotFoundDialog()
-                    utils.openURI(appNotFoundDialogState.appURL.toUri())
+                    pageOpener.openURI(appNotFoundDialogState.appURL.toUri())
                 },
                 positiveText = stringResource(Res.string.ok),
                 onPositive = viewModel::clearAppNotFoundDialog,

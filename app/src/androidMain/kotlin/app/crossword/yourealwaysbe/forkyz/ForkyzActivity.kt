@@ -366,12 +366,6 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
             startActivity(intent)
         }
 
-        override fun openURI(uri : Uri) {
-            val i = Intent(Intent.ACTION_VIEW);
-            i.setData(uri.toAndroidUri())
-            startActivity(i);
-        }
-
         override fun getPendingImports() : Collection<Uri> {
             return pendingImports
         }
