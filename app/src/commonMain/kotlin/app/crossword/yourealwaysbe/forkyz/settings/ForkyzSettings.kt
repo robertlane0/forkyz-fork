@@ -995,7 +995,7 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         = settingsMap { it.downloadLeParisienF1 }
 
     fun getDownloadLeParisienF1(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.downloadLATimes }
+        = settingsOnce(cb) { it.downloadLeParisienF1 }
 
     fun setDownloadLeParisienF1(value : Boolean) {
         settingsUpdate { settings ->
