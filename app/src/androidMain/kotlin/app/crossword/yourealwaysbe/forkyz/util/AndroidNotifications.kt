@@ -1,7 +1,8 @@
 
 package app.crossword.yourealwaysbe.forkyz.util
 
-import android.app.Notification
+import kotlinx.coroutines.channels.Channel
+
 import android.content.Intent
 import android.app.PendingIntent
 import androidx.core.app.NotificationCompat
@@ -21,6 +22,9 @@ class AndroidNotifications(
 
     override val downloadIcon = android.R.drawable.stat_sys_download
     override val downloadDoneIcon = android.R.drawable.stat_sys_download_done
+
+    // not used
+    override val notifications = Channel<Notification>()
 
     /**
      * Post a notification to channel with ID

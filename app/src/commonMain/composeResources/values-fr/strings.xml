@@ -29,7 +29,7 @@
     <!-- downloading -->
     <string name="download">Télécharger</string>
     <string name="puzzles_downloading">Téléchargement de Puzzles</string>
-    <string name="puzzles_downloading_from">Téléchargement de Puzzles depuis %s</string>
+    <string name="puzzles_downloading_from">Téléchargement de Puzzles depuis %1$s</string>
     <string name="puzzles_downloaded_all">Nouveaux Puzzles Téléchargés</string>
     <string name="puzzles_downloaded_some">Quelques Puzzles ont été Téléchargés et Certains ont Echoués</string>
     <string name="puzzles_downloaded_none">Téléchargements des Puzzle ont Echoué</string>
@@ -49,9 +49,9 @@
     <!-- Browse -->
     <string name="unknown_source">Source inconnue</string>
     <plurals name="num_selected">
-        <item quantity="one">%d Sélectionné</item>
-        <item quantity="many">%d Sélectionnés</item>
-        <item quantity="other">%d Sélectionné</item>
+        <item quantity="one">%1$d Sélectionné</item>
+        <item quantity="many">%1$d Sélectionnés</item>
+        <item quantity="other">%1$d Sélectionné</item>
     </plurals>
     <string name="delete">Supprimer</string>
     <string name="archive">Archive</string>

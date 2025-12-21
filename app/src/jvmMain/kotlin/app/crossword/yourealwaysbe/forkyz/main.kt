@@ -15,16 +15,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -52,6 +53,7 @@ import app.crossword.yourealwaysbe.forkyz.util.JVMInputConnectionMediator
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.NativeFrontendUtils
 import app.crossword.yourealwaysbe.forkyz.util.NativeImportFinishedResult
+import app.crossword.yourealwaysbe.forkyz.util.Notifications
 import app.crossword.yourealwaysbe.forkyz.util.ShareFileData
 import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
@@ -70,6 +72,8 @@ fun main() = application {
         by inject(FileHandlerProvider::class.java)
     val backendUtils : NativeBackendUtils
         by inject(NativeBackendUtils::class.java)
+    val notifications : Notifications
+        by inject(Notifications::class.java)
 
     val windowState = rememberWindowState(
         width = 600.dp,
@@ -229,6 +233,17 @@ fun main() = application {
 
         override fun pauseShakeDetector() {
             // noop, no plans to implement on desktop
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            val notification = notifications.notifications.receive()
+            val msg = listOf(
+                notification.title,
+                notification.message,
+            ).filterNotNull().joinToString("\n")
+            utils.toast(msg)
         }
     }
 
