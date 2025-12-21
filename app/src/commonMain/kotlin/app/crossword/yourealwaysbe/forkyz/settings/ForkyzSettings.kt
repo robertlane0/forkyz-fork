@@ -435,6 +435,7 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             settings.downloadJonesin,
             settings.downloadJoseph,
             settings.download20Minutes,
+            settings.downloadLaCroix,
             settings.downloadLATimes,
             settings.downloadLeParisienF1,
             settings.downloadLeParisienF2,
@@ -966,6 +967,18 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     fun setDownloadJoseph(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(downloadJoseph = value)
+        }
+    }
+
+    val liveDownloadLaCroix : Flow<Boolean>
+        = settingsMap { it.downloadLaCroix }
+
+    fun getDownloadLaCroix(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.downloadLaCroix }
+
+    fun setDownloadLaCroix(value : Boolean) {
+        settingsUpdate { settings ->
+            settings.copy(downloadLaCroix = value)
         }
     }
 
@@ -2549,6 +2562,11 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             "downloadJoseph",
             { s, key -> json.put(key, s.downloadJoseph) },
             { key -> json.optBoolean(key)?.let { setDownloadJoseph(it) } },
+        )
+        run(
+            "downloadLaCroix",
+            { s, key -> json.put(key, s.downloadLaCroix) },
+            { key -> json.optBoolean(key)?.let { setDownloadLaCroix(it) } },
         )
         run(
             "downloadLeParisienF1",

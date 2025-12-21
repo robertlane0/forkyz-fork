@@ -13,6 +13,7 @@ data class DownloadersSettings(
     val downloadJonesin : Boolean,
     val downloadJoseph : Boolean,
     val download20Minutes : Boolean,
+    val downloadLaCroix : Boolean,
     val downloadLATimes: Boolean,
     val downloadLeParisienF1 : Boolean,
     val downloadLeParisienF2 : Boolean,

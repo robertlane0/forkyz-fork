@@ -282,6 +282,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_showh
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_showhide_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_use_native
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_use_native_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.la_croix
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.la_times
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.la_times_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.large_sized
@@ -890,6 +891,13 @@ class SettingsPageViewModel(
             Res.string.vingminutes_desc,
             settings.liveDownload20Minutes.stateInHere(),
             settings::setDownload20Minutes,
+        ),
+        SettingsBoolean(
+            SettingsPage.PUZZLE_SOURCES_DAILY,
+            Res.string.la_croix,
+            Res.string.updates_mon_fri,
+            settings.liveDownloadLaCroix.stateInHere(),
+            settings::setDownloadLaCroix,
         ),
         SettingsBoolean(
             SettingsPage.PUZZLE_SOURCES_DAILY,

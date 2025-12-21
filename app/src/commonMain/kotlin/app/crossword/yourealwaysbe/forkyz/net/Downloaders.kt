@@ -26,6 +26,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.irish_news_cry
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.jonesin_crosswords
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.joseph_crossword
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keglars_cryptics
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.la_croix
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.la_times
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.le_parisien_daily_f1
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.le_parisien_daily_f2
@@ -150,7 +151,6 @@ class Downloaders(
         val puzzlesToDownload = downloaders.filter {
             it.isAvailable(date)
         }.map { it to date }.toMap()
-        AppLogger.i(TAG, "Really download $date and $puzzlesToDownload")
 
         download(puzzlesToDownload)
     }
@@ -414,6 +414,22 @@ class Downloaders(
                 RCIJeuxMFJIO(),
                 "'https://www.rcijeux.fr/drupal_game/20minutes/grids/'ddMMyy'.mfj'",
                 "'https://www.20minutes.fr/services/mots-fleches'",
+            ))
+        }
+
+        if (settings.downloadLaCroix) {
+            downloaders.add(AbstractRCIJeuxMXJDateDownloader.buildMCJ(
+                "lacroix",
+                utils.getString(Res.string.la_croix),
+                AbstractDateDownloader.DAYS_WEEKDAY,
+                Duration.ofHours(1),
+                "https://abonnement.la-croix.com/",
+                "https://www.rcijeux.fr/drupal_game/lacroix/mcroises1/"
+                    +"grids/gary%d.mcj",
+                "'https://www.la-croix.com/mots-croises'",
+                8787,
+                LocalDate.of(2025, 12, 19),
+                1,
             ))
         }
 

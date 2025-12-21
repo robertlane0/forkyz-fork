@@ -59,6 +59,7 @@ val DEFAULT_SETTINGS : Settings = Settings(
     downloadIrishNewsCryptic = true,
     downloadJonesin = true,
     downloadJoseph = true,
+    downloadLaCroix = true,
     downloadLATimes = true,
     downloadLeParisienF1 = true,
     downloadLeParisienF2 = true,
