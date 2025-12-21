@@ -14,6 +14,4 @@
 
     <!-- manifest -->
     <string name="app_name">Forkyz</string>
-    <string name="settings_label">Settings</string>
-    <string name="clues_list_label">Clues</string>
 </resources>
