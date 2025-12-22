@@ -718,6 +718,7 @@
     <string name="standard_theme">Standard Theme</string>
     <string name="dynamic_theme">Material You Dynamic Theme</string>
     <string name="legacy_like_theme">Legacy-Like Theme</string>
+    <string name="green_theme">Green Theme</string>
 
     <!-- voice commands -->
     <!-- make sure app/src/main/assets/.. help files match commands here -->

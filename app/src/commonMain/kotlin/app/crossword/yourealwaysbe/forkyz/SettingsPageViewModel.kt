@@ -214,6 +214,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.forty_five_sec
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.free_dictionary
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.full_screen
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.full_screen_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.green_theme
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.grid_ratio_fifty_pcnt
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.grid_ratio_fifty_pcnt
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.grid_ratio_forty_pcnt
@@ -766,6 +767,7 @@ class SettingsPageViewModel(
                     Res.string.legacy_like_theme,
                     Theme.T_LEGACY_LIKE,
                 ),
+                SettingsListEntry(Res.string.green_theme, Theme.T_GREEN),
             )
         } else {
             listOf(
@@ -774,6 +776,7 @@ class SettingsPageViewModel(
                     Res.string.legacy_like_theme,
                     Theme.T_LEGACY_LIKE,
                 ),
+                SettingsListEntry(Res.string.green_theme, Theme.T_GREEN),
             )
         }
 

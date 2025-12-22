@@ -2,6 +2,7 @@
 package app.crossword.yourealwaysbe.forkyz.theme
 
 import android.app.Activity
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
@@ -15,27 +16,25 @@ import com.google.android.material.color.DynamicColors
 import app.crossword.yourealwaysbe.forkyz.settings.Theme
 
 @Composable
+actual fun getDynamicTheme(darkMode : Boolean) : ColorScheme {
+    val context = LocalContext.current
+
+    return if (DynamicColors.isDynamicColorAvailable()) {
+        if (darkMode) dynamicDarkColorScheme(context)
+        else dynamicLightColorScheme(context)
+    } else {
+        if (darkMode) darkScheme else lightScheme
+    }
+}
+
+@Composable
 actual fun AppTheme(
     appTheme : Theme,
     darkMode : Boolean,
     content : @Composable() () -> Unit,
 ) {
-    val context = LocalContext.current
     val view = LocalView.current
-
-    val colorScheme = when (appTheme) {
-        // only diff is app bar, see ForkyzTopAppBar
-        Theme.T_LEGACY_LIKE -> if (darkMode) darkScheme else lightScheme
-        Theme.T_DYNAMIC ->
-            if (DynamicColors.isDynamicColorAvailable()) {
-                if (darkMode) dynamicDarkColorScheme(context)
-                else dynamicLightColorScheme(context)
-            } else {
-                if (darkMode) darkScheme else lightScheme
-            }
-        // Theme.T_STANDARD
-        else -> if (darkMode) darkScheme else lightScheme
-    }
+    val colorScheme = getColorScheme(appTheme, darkMode)
 
     if (!view.isInEditMode) {
         SideEffect {

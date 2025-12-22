@@ -752,4 +752,5 @@
     <string name="nrc">NRC</string>
     <string name="nrc_scrypto_title">Scrypto</string>
     <string name="nrc_in_het_midden_title">In Het Midden</string>
+    <string name="green_theme">Vert</string>
 </resources>

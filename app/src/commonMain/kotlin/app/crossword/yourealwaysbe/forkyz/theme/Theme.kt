@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -130,6 +131,82 @@ internal val darkScheme = darkColorScheme(
     surfaceContainerHighest = surfaceContainerHighestDark,
 )
 
+internal val greenLightScheme = lightColorScheme(
+    primary = primaryGreenLight,
+    onPrimary = onPrimaryGreenLight,
+    primaryContainer = primaryContainerGreenLight,
+    onPrimaryContainer = onPrimaryContainerGreenLight,
+    secondary = secondaryGreenLight,
+    onSecondary = onSecondaryGreenLight,
+    secondaryContainer = secondaryContainerGreenLight,
+    onSecondaryContainer = onSecondaryContainerGreenLight,
+    tertiary = tertiaryGreenLight,
+    onTertiary = onTertiaryGreenLight,
+    tertiaryContainer = tertiaryContainerGreenLight,
+    onTertiaryContainer = onTertiaryContainerGreenLight,
+    error = errorGreenLight,
+    onError = onErrorGreenLight,
+    errorContainer = errorContainerGreenLight,
+    onErrorContainer = onErrorContainerGreenLight,
+    background = backgroundGreenLight,
+    onBackground = onBackgroundGreenLight,
+    surface = surfaceGreenLight,
+    onSurface = onSurfaceGreenLight,
+    surfaceVariant = surfaceVariantGreenLight,
+    onSurfaceVariant = onSurfaceVariantGreenLight,
+    outline = outlineGreenLight,
+    //outlineVariant = outlineVariantGreenLight,
+    //scrim = scrimGreenLight,
+    inverseSurface = inverseSurfaceGreenLight,
+    inverseOnSurface = inverseOnSurfaceGreenLight,
+    inversePrimary = inversePrimaryGreenLight,
+    //surfaceDim = surfaceDimGreenLight,
+    //surfaceBright = surfaceBrightGreenLight,
+    surfaceContainerLowest = surfaceContainerLowestGreenLight,
+    surfaceContainerLow = surfaceContainerLowGreenLight,
+    surfaceContainer = surfaceContainerGreenLight,
+    surfaceContainerHigh = surfaceContainerHighGreenLight,
+    surfaceContainerHighest = surfaceContainerHighestGreenLight,
+)
+
+internal val greenDarkScheme = darkColorScheme(
+    primary = primaryGreenDark,
+    onPrimary = onPrimaryGreenDark,
+    primaryContainer = primaryContainerGreenDark,
+    onPrimaryContainer = onPrimaryContainerGreenDark,
+    secondary = secondaryGreenDark,
+    onSecondary = onSecondaryGreenDark,
+    secondaryContainer = secondaryContainerGreenDark,
+    onSecondaryContainer = onSecondaryContainerGreenDark,
+    tertiary = tertiaryGreenDark,
+    onTertiary = onTertiaryGreenDark,
+    tertiaryContainer = tertiaryContainerGreenDark,
+    onTertiaryContainer = onTertiaryContainerGreenDark,
+    error = errorGreenDark,
+    onError = onErrorGreenDark,
+    errorContainer = errorContainerGreenDark,
+    onErrorContainer = onErrorContainerGreenDark,
+    background = backgroundGreenDark,
+    onBackground = onBackgroundGreenDark,
+    surface = surfaceGreenDark,
+    onSurface = onSurfaceGreenDark,
+    surfaceVariant = surfaceVariantGreenDark,
+    onSurfaceVariant = onSurfaceVariantGreenDark,
+    outline = outlineGreenDark,
+    //outlineVariant = outlineVariantGreenDark,
+    //scrim = scrimGreenDark,
+    inverseSurface = inverseSurfaceGreenDark,
+    inverseOnSurface = inverseOnSurfaceGreenDark,
+    inversePrimary = inversePrimaryGreenDark,
+    //surfaceDim = surfaceDimGreenDark,
+    //surfaceBright = surfaceBrightGreenDark,
+    surfaceContainerLowest = surfaceContainerLowestGreenDark,
+    surfaceContainerLow = surfaceContainerLowGreenDark,
+    surfaceContainer = surfaceContainerGreenDark,
+    surfaceContainerHigh = surfaceContainerHighGreenDark,
+    surfaceContainerHighest = surfaceContainerHighestGreenDark,
+)
+
 private val lightBoardColorScheme = BoardColorScheme(
     currentWordHighlightColor = currentWordHighlightColorLight,
     currentLetterHighlightColor = currentLetterHighlightColorLight,
@@ -183,6 +260,25 @@ private val darkCircleProgressBarColorScheme = CircleProgressBarColorScheme(
     progressDone = progressDoneDark,
     progressError = progressErrorDark,
 )
+
+@Composable
+expect fun getDynamicTheme(darkMode : Boolean) : ColorScheme
+
+@Composable
+internal fun getColorScheme(
+    appTheme : Theme,
+    darkMode : Boolean,
+) : ColorScheme {
+    return when (appTheme) {
+        // only diff is app bar, see ForkyzTopAppBar
+        Theme.T_LEGACY_LIKE -> if (darkMode) darkScheme else lightScheme
+        Theme.T_DYNAMIC -> getDynamicTheme(darkMode)
+        Theme.T_GREEN -> if (darkMode) greenDarkScheme else greenLightScheme
+        // Theme.T_STANDARD
+        else -> if (darkMode) darkScheme else lightScheme
+    }
+
+}
 
 @Composable
 expect fun AppTheme(
