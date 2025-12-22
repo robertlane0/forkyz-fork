@@ -106,6 +106,7 @@ val surfaceContainerHighDark = Color(0xff2b2b2b)
 val surfaceContainerHighestDark = Color(0xff2d2d2d)
 
 // Green Theme
+// by https://material-foundation.github.io/material-theme-builder/
 
 val primaryGreenLight = Color(0xFF4C662B)
 val onPrimaryGreenLight = Color(0xFFFFFFFF)
@@ -180,6 +181,7 @@ val surfaceContainerHighGreenDark = Color(0xFF282B24)
 val surfaceContainerHighestGreenDark = Color(0xFF33362E)
 
 // Blue
+// by https://material-foundation.github.io/material-theme-builder/
 
 val primaryBlueLight = Color(0xFF4D5C92)
 val onPrimaryBlueLight = Color(0xFFFFFFFF)
@@ -254,6 +256,7 @@ val surfaceContainerHighBlueDark = Color(0xFF292A2F)
 val surfaceContainerHighestBlueDark = Color(0xFF34343A)
 
 // Orange
+// by https://material-foundation.github.io/material-theme-builder/
 
 val primaryOrangeLight = Color(0xFF8E4D30)
 val onPrimaryOrangeLight = Color(0xFFFFFFFF)
