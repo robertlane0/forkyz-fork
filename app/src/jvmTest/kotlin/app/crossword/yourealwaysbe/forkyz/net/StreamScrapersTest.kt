@@ -127,6 +127,15 @@ class StreamScrapersTest {
         )
     }
 
+    @Test
+    @Throws(Exception::class)
+    fun testSquarePursuit() {
+        testScraper(
+            "https://puzzleme.amuselabs.com/pmm/crossword?id=30e487cd&set=1383102e08ed60ddd50b4a1517cee19c96ce58fd08d719536855e37adfdeecf4",
+            PuzzleMeStreamScraper(),
+        )
+    }
+
     companion object {
         private const val TIMEOUT = 30000
 

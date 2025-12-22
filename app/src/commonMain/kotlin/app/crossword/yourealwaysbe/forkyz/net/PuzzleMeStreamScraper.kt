@@ -19,6 +19,8 @@ import app.crossword.yourealwaysbe.puz.io.StreamUtils
 import app.crossword.yourealwaysbe.puz.util.JSONParser
 
 private val DEOBFUSCATE_TIMEOUT = 30000L
+private val KEY_LEN = 7
+private val MAX_KEY_VALUE = 20
 
 /**
  * Get embedded PuzzleMe puzzles
@@ -231,9 +233,9 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
                                 0x0D.toUByte(),
                             )
                         )
+                        || ubyte == 0xC0.toUByte()
                         || ubyte == 0xC1.toUByte()
-                        || ubyte == 0xC2.toUByte()
-                        || ubyte >= 0xF6.toUByte()
+                        || ubyte >= 0xF5.toUByte()
                     ) {
                         return false
                     }
@@ -302,7 +304,7 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
 
             val candidateKeyPrefix = candidateQueue.removeFirst()
 
-            if (candidateKeyPrefix.size == 7) {
+            if (candidateKeyPrefix.size == KEY_LEN) {
                 val deobfuscated
                     = deobfuscateRawcWithKey(rawc, candidateKeyPrefix)
                 if (deobfuscated != null) {
@@ -315,13 +317,13 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
                 }
             }
 
-            // Expand by trying next digits (2-18)
-            for (nextDigit in 2..18) {
+            // Expand by trying next digits (2-max)
+            for (nextDigit in 2..MAX_KEY_VALUE) {
                 val newCandidate = candidateKeyPrefix + nextDigit
 
-                val remainingDigits = 7 - newCandidate.size
+                val remainingDigits = KEY_LEN - newCandidate.size
                 val minSpacing = 2 * remainingDigits
-                val maxSpacing = 18 * remainingDigits
+                val maxSpacing = MAX_KEY_VALUE * remainingDigits
 
                 // Test if any spacing within bounds produces valid output
                 val validPrefix = (minSpacing..maxSpacing).any { spacing ->
