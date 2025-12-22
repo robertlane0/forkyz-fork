@@ -112,6 +112,8 @@ enum Theme {
     T_DYNAMIC = 1;
     T_LEGACY_LIKE = 2;
     T_GREEN = 3;
+    T_BLUE = 4;
+    T_ORANGE = 5;
 }
 
 enum ClueListClueLine {

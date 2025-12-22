@@ -715,10 +715,12 @@
     <string name="share_puzzle_details_no_author_url">%1$s, %2$s\n%3$s</string>
 
     <!-- themes -->
-    <string name="standard_theme">Standard Theme</string>
+    <string name="standard_theme">Standard</string>
     <string name="dynamic_theme">Material You Dynamic Theme</string>
-    <string name="legacy_like_theme">Legacy-Like Theme</string>
-    <string name="green_theme">Green Theme</string>
+    <string name="legacy_like_theme">Legacy-Like</string>
+    <string name="green_theme">Material Green</string>
+    <string name="blue_theme">Material Blue</string>
+    <string name="orange_theme">Material Orange</string>
 
     <!-- voice commands -->
     <!-- make sure app/src/main/assets/.. help files match commands here -->

@@ -81,6 +81,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_dow
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_time_config
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_tue
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_wed
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.blue_theme
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.browse_always_show_rating
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.browse_always_show_rating_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.browse_indicate_if_solution
@@ -332,6 +333,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.nrc_in_het_mid
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.nrc_in_het_midden_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.nrc_scrypto
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.nrc_scrypto_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.orange_theme
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.orientation_lock
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.orientation_lock_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.orientation_lock_landscape
@@ -758,27 +760,25 @@ class SettingsPageViewModel(
 
     private val fileActionMutex = Mutex()
 
-    private val availableThemeSettings =
-        if (utils.isDynamicColorAvailable) {
-            listOf(
-                SettingsListEntry(Res.string.standard_theme, Theme.T_STANDARD),
-                SettingsListEntry(Res.string.dynamic_theme, Theme.T_DYNAMIC),
-                SettingsListEntry(
-                    Res.string.legacy_like_theme,
-                    Theme.T_LEGACY_LIKE,
-                ),
-                SettingsListEntry(Res.string.green_theme, Theme.T_GREEN),
-            )
-        } else {
-            listOf(
-                SettingsListEntry(Res.string.standard_theme, Theme.T_STANDARD),
-                SettingsListEntry(
-                    Res.string.legacy_like_theme,
-                    Theme.T_LEGACY_LIKE,
-                ),
-                SettingsListEntry(Res.string.green_theme, Theme.T_GREEN),
-            )
-        }
+    private val availableThemeSettings = listOf(
+            SettingsListEntry(Res.string.standard_theme, Theme.T_STANDARD),
+            SettingsListEntry(Res.string.dynamic_theme, Theme.T_DYNAMIC),
+        ) + (
+            if (utils.isDynamicColorAvailable) {
+                listOf(
+                    SettingsListEntry(
+                        Res.string.legacy_like_theme,
+                        Theme.T_LEGACY_LIKE,
+                    ),
+                )
+            } else {
+                listOf()
+            }
+        ) + listOf(
+            SettingsListEntry(Res.string.blue_theme, Theme.T_BLUE),
+            SettingsListEntry(Res.string.green_theme, Theme.T_GREEN),
+            SettingsListEntry(Res.string.orange_theme, Theme.T_ORANGE),
+        )
 
     private val storageLocationsStateFlow
         : StateFlow<List<SettingsListEntry<StorageLocation>>>

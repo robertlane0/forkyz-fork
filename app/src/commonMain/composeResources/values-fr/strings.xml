@@ -684,9 +684,9 @@
     <string name="share_puzzle_details_no_author_no_url">%1$s, %2$s</string>
     <string name="share_puzzle_details_author_url">%1$s, %2$s par %3$s\n%4$s</string>
     <string name="share_puzzle_details_no_author_url">%1$s, %2$s\n%3$s</string>
-    <string name="standard_theme">Norme Thème</string>
+    <string name="standard_theme">Norme</string>
     <string name="dynamic_theme">Matériel que vous dynamique Thème</string>
-    <string name="legacy_like_theme">Comme l'héritage Thème</string>
+    <string name="legacy_like_theme">Comme l'héritage</string>
     <string name="no_speech_recognition_available">Aucune entrée vocale disponible sur le système, veuillez vérifier les paramètres d'entrée Android.</string>
     <string name="command_letter">Lettre</string>
     <string name="command_answer">Solution</string>
@@ -752,5 +752,7 @@
     <string name="nrc">NRC</string>
     <string name="nrc_scrypto_title">Scrypto</string>
     <string name="nrc_in_het_midden_title">In Het Midden</string>
-    <string name="green_theme">Vert</string>
+    <string name="green_theme">Vert Material</string>
+    <string name="blue_theme">Bleu Material</string>
+    <string name="orange_theme">Orange Material</string>
 </resources>
