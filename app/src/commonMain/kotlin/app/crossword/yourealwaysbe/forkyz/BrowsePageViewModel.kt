@@ -1040,8 +1040,7 @@ class BrowsePageViewModel(
             .downloadOnStartUp
 
         val lastSeenVersion = browseSettings.externalSettings.lastSeenVersion
-        val isNewVersion
-            = !lastSeenVersion.isEmpty() && currentVersion != lastSeenVersion
+        val isNewVersion = currentVersion != lastSeenVersion
         val showDialog = if (
             state.showDialog == BrowseDialog.NONE && isNewVersion
         ) {
