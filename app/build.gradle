@@ -12,6 +12,15 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.serialization'
     id 'com.google.devtools.ksp'
     id 'com.squareup.wire'
+    id 'com.github.gmazzo.buildconfig'
+}
+
+def appPackageName = "app.crossword.yourealwaysbe.forkyz"
+def appVersion = 76
+
+buildConfig {
+    packageName(appPackageName)
+    buildConfigField(String, "APP_VERSION", appVersion)
 }
 
 kotlin {
@@ -120,11 +129,11 @@ kotlin {
 }
 
 android {
-    namespace = 'app.crossword.yourealwaysbe.forkyz'
+    namespace = appPackageName
     compileSdk = 36
 
     defaultConfig {
-        applicationId = 'app.crossword.yourealwaysbe.forkyz'
+        applicationId = appPackageName
         minSdk = 23
         targetSdk = 36
         multiDexEnabled = true
@@ -206,16 +215,16 @@ wire {
 }
 
 compose.resources {
-    packageOfResClass = "app.crossword.yourealwaysbe.forkyz.app.generated.resources"
+    packageOfResClass = "${appPackageName}.app.generated.resources"
 }
 
 compose.desktop {
     application {
-        mainClass = "app.crossword.yourealwaysbe.forkyz.MainKt"
+        mainClass = "${appPackageName}.MainKt"
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "app.crossword.yourealwaysbe.forkyz"
-            packageVersion = "1.0.0"
+            packageName = appPackageName
+            packageVersion = "${appVersion}.0.0"
         }
         buildTypes.release.proguard {
             obfuscate.set(false)

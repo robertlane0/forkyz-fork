@@ -9,6 +9,7 @@ plugins {
     id 'androidx.room' version "$roomVersion" apply false
     id 'com.android.application' version '8.13.0' apply false
     id 'com.android.library' version '8.13.0' apply false
+    id 'com.github.gmazzo.buildconfig' version "5.6.5" apply false
     id 'com.google.devtools.ksp' version '2.2.20-2.0.2' apply false
     id 'com.squareup.wire' version '5.4.0' apply false
     id 'io.github.goooler.shadow' version '8.1.8' apply false

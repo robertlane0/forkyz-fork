@@ -17,13 +17,14 @@ import org.jetbrains.compose.resources.StringResource
 
 import dev.dirs.ProjectDirectories
 
+import app.crossword.yourealwaysbe.forkyz.BuildConfig
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation
 import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler
-import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerJavaFile
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerJVMSAF
+import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerJavaFile
 import app.crossword.yourealwaysbe.forkyz.util.files.MetaCache
 import app.crossword.yourealwaysbe.forkyz.util.toJVMURI
 import app.crossword.yourealwaysbe.forkyz.util.toUri
@@ -73,7 +74,7 @@ class JVMNativeBackendUtils : NativeBackendUtils {
     }
 
     override fun getApplicationVersionName() : String? {
-        return null
+        return BuildConfig.APP_VERSION
     }
 
     @Throws(IOException::class)
