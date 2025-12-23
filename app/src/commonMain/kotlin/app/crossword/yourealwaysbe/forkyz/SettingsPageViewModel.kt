@@ -762,19 +762,19 @@ class SettingsPageViewModel(
 
     private val availableThemeSettings = listOf(
             SettingsListEntry(Res.string.standard_theme, Theme.T_STANDARD),
-            SettingsListEntry(Res.string.dynamic_theme, Theme.T_DYNAMIC),
         ) + (
             if (utils.isDynamicColorAvailable) {
                 listOf(
                     SettingsListEntry(
-                        Res.string.legacy_like_theme,
-                        Theme.T_LEGACY_LIKE,
+                        Res.string.dynamic_theme,
+                        Theme.T_DYNAMIC,
                     ),
                 )
             } else {
                 listOf()
             }
         ) + listOf(
+            SettingsListEntry(Res.string.legacy_like_theme, Theme.T_LEGACY_LIKE),
             SettingsListEntry(Res.string.blue_theme, Theme.T_BLUE),
             SettingsListEntry(Res.string.green_theme, Theme.T_GREEN),
             SettingsListEntry(Res.string.orange_theme, Theme.T_ORANGE),
