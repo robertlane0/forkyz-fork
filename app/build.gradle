@@ -131,6 +131,10 @@ android {
         }
     }
 
+    androidResources {
+        generateLocaleConfig = true
+    }
+
     room {
         schemaDirectory "$projectDir/schemas"
     }
