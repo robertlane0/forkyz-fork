@@ -309,8 +309,8 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
                     IntentCompat.getParcelableExtra(
                         intent,
                         Intent.EXTRA_STREAM,
-                        Uri::class.java,
-                    ),
+                        android.net.Uri::class.java,
+                    )?.let { it.toForkyzUri() },
                 )
             }
         } else if (Intent.ACTION_SEND_MULTIPLE == action) {
@@ -413,7 +413,6 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
         }
 
         override fun onImportFinish(ifr : NativeImportFinishedResult) {
-            println("FORKYZ: sending close")
             sendBroadcast(
                 Intent(INTENT_IMPORT_COMPLETE_ACTION).putExtra(
                     INTENT_IMPORT_TASK_ID,

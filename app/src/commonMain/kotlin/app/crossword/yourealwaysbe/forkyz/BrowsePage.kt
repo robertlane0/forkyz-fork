@@ -1085,10 +1085,8 @@ fun BrowsePage(
 
         val uris = utils.getPendingImports()
         if (!uris.isEmpty()) {
-            println("FORKYZ: getting " + uris)
             utils.clearPendingImports()
             if (utils.isExitAfterPendingImports) {
-                println("FORKYZ: import and finish")
                 viewModel.importURIsAndFinish(uris)
             } else
                 viewModel.importURIs(uris)
