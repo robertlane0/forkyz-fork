@@ -734,7 +734,15 @@ open class PuzzlePageViewModel(
     }
 
     fun dispatchVoiceCommand(text : List<String>?) {
-        text?.let { voiceCommandDispatcher.dispatch(it) }
+        text?.let { commandAlternatives ->
+            viewModelScope.launch(Dispatchers.IO) {
+                voiceCommandDispatcher.dispatch(
+                    settings,
+                    utils,
+                    commandAlternatives,
+                )
+            }
+        }
     }
 
     // public for now to give a route through puzzle activity to

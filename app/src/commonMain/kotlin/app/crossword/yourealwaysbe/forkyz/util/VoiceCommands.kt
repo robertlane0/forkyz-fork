@@ -1,6 +1,17 @@
 
 package app.crossword.yourealwaysbe.forkyz.util
 
+import kotlinx.coroutines.flow.first
+
+import app.crossword.yourealwaysbe.forkyz.HTMLFile
+import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
+import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
+import app.crossword.yourealwaysbe.forkyz.util.getFileResourceData
+import app.crossword.yourealwaysbe.forkyz.exttools.getLLMService
+
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.llm_agent_voice_command_prompt
+
 /**
  * Interpreting and dispatching voice commands
  */
@@ -14,11 +25,25 @@ class VoiceCommands {
     /**
      * Execute the result from speech service
      *
+     * Will use LLM Agent if settings say so
+     *
      * @param commandAlternatives list of speech result strings, each
      * considered to be possible alternatives, ordered by likelihood.
      * Dispatch searches through them in order until it finds a match.
      */
-    fun dispatch(commandAlternatives : List<String>) {
+    suspend fun dispatch(
+        settings : ForkyzSettings,
+        utils : NativeBackendUtils,
+        commandAlternatives : List<String>,
+    ) {
+        val useLLM = settings.liveVoiceLLMVoiceCommands.first()
+        if (useLLM)
+            dispatchWithLLM(settings, utils, commandAlternatives)
+        else
+            dispatch(commandAlternatives)
+    }
+
+    private fun dispatch(commandAlternatives : List<String>) {
         for (command in commandAlternatives) {
             val split = command.split(
                 "\\W+".toRegex(),
@@ -39,9 +64,51 @@ class VoiceCommands {
         }
     }
 
+    /**
+     * Falls back to non-LLM if not configured
+     */
+    private suspend fun dispatchWithLLM(
+        settings : ForkyzSettings,
+        utils : NativeBackendUtils,
+        commandAlternatives : List<String>,
+    ) {
+        val llmService = getLLMService(settings)
+        if (llmService == null) {
+            dispatch(commandAlternatives)
+        } else {
+            getLLMPrompt(utils, commandAlternatives)?.let { prompt ->
+                llmService.makeRequest(settings, prompt)?.let { response ->
+                    response.split("\n").forEach {
+                        dispatch(listOf(it))
+                    }
+                }
+            }
+        }
+    }
+
+    private suspend fun getLLMPrompt(
+        utils : NativeBackendUtils,
+        commandAlternatives : List<String>,
+    ) : String {
+        val userRequest = "'" + commandAlternatives.joinToString("' / '") + "'"
+        val availableCommands = commands
+            .map { it.commands }
+            .flatten().joinToString("; ")
+        val helpDocs = getFileResourceData(
+            utils,
+            HTMLFile.VOICE_COMMANDS_HELP.unqualifiedFileName,
+        )
+        return utils.getString(
+            Res.string.llm_agent_voice_command_prompt,
+            userRequest,
+            availableCommands,
+            helpDocs,
+        )
+    }
+
     class VoiceCommand {
         // list of starter keywords
-        private val commands : MutableList<String> = mutableListOf()
+        internal val commands : MutableList<String> = mutableListOf()
         private val executeCommand : (String) -> Unit
 
         /**

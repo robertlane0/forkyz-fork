@@ -74,7 +74,6 @@ object ClaudeService : LLMService {
     }
 
     private fun getQueryResponse(json : JSONObject) : String {
-        println("FORKYZ: " + json)
         if (json.has(CLAUDE_RESPONSE_ERROR)) {
             return json.getJSONObject(CLAUDE_RESPONSE_ERROR)
                 .getString(CLAUDE_RESPONSE_MESSAGE)

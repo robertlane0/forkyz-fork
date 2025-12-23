@@ -308,6 +308,8 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.llm_agent_chat
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.llm_agent_claude
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.llm_agent_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.llm_agent_none
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.llm_voice_commands
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.llm_voice_commands_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.logcat
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.metro_cryptic
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.metro_quick
@@ -2121,6 +2123,13 @@ class SettingsPageViewModel(
             Res.string.voice_with_button_desc,
             settings.liveVoiceButtonActivatesVoice.stateInHere(),
             settings::setVoiceButtonActivatesVoice,
+        ),
+        SettingsBoolean(
+            SettingsPage.VOICE_ACCESSIBILITY,
+            Res.string.llm_voice_commands,
+            Res.string.llm_voice_commands_desc,
+            settings.liveVoiceLLMVoiceCommands.stateInHere(),
+            settings::setVoiceLLMVoiceCommands,
         ),
         SettingsBoolean(
             SettingsPage.VOICE_ACCESSIBILITY,

@@ -30,6 +30,7 @@ val DEFAULT_SETTINGS : Settings = Settings(
     buttonAnnounceClue = false,
     llmAgent = LLMAgent.LA_NONE,
     llmAgentAPIKey = "",
+    llmVoiceCommands = false,
     cleanupAge = -1,
     clueBelowGrid = false,
     clueHighlight = ClueHighlight.CH_RADIO_BUTTON,

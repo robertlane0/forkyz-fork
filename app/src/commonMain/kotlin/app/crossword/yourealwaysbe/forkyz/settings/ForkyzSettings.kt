@@ -1295,6 +1295,18 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         }
     }
 
+    val liveVoiceLLMVoiceCommands : Flow<Boolean>
+        = settingsMap { it.llmVoiceCommands }
+
+    fun getVoiceLLMVoiceCommands(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.llmVoiceCommands }
+
+    fun setVoiceLLMVoiceCommands(value : Boolean) {
+        settingsUpdate { settings ->
+            settings.copy(llmVoiceCommands = value)
+        }
+    }
+
     val liveExtDictionarySetting : Flow<ExternalDictionarySetting>
         = settingsMap { it.externalDictionary }
 
@@ -2327,6 +2339,13 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             "llmAgentAPIKey",
             { s, key -> json.put(key, s.llmAgentAPIKey) },
             { key -> json.optString(key)?.let { setExtLLMAgentAPIKey(it) } },
+        )
+        run(
+            "llmVoiceCommands",
+            { s, key -> json.put(key, s.llmVoiceCommands) },
+            { key ->
+                json.optBoolean(key)?.let { setVoiceLLMVoiceCommands(it) }
+            },
         )
         run(
             "cleanupAge",
