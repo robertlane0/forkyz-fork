@@ -2327,7 +2327,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             { key ->
                json.optString(key)?.let {
                    try {
-                       println("FORKYZ: setts " + it)
                        setExtLLMAgent(LLMAgent.valueOf(it))
                    } catch (e : IllegalArgumentException) {
                        // ignore
