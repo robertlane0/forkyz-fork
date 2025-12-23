@@ -73,12 +73,22 @@ class JVMNativeBackendUtils : NativeBackendUtils {
 
     @Throws(IOException::class)
     override fun openInputStream(uri : Uri) : InputStream? {
-        return FileInputStream(File(uri.toJVMURI()))
+        try {
+            return FileInputStream(File(uri.toJVMURI()))
+        } catch (e : IllegalArgumentException) {
+            // not a file, make IOException
+            throw IOException(e.message)
+        }
     }
 
     @Throws(IOException::class)
     override fun openOutputStream(uri : Uri) : OutputStream? {
-        return FileOutputStream(File(uri.toJVMURI()))
+        try {
+            return FileOutputStream(File(uri.toJVMURI()))
+        } catch (e : IllegalArgumentException) {
+            // not a file, make IOException
+            throw IOException(e.message)
+        }
     }
 
     override val isShareFileAvailable : Boolean = false
