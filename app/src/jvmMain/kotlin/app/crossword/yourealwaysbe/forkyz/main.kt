@@ -69,7 +69,7 @@ val TOAST_INNER_PADDING = 10.dp
 val TOAST_SHAPE = RoundedCornerShape(10.dp)
 val TOAST_DURATION = 5000L // ms
 
-fun main() = application {
+fun main(args : Array<String>) = application {
     val themeHelper : ThemeHelper by inject(ThemeHelper::class.java)
     val fileHandlerProvider : FileHandlerProvider
         by inject(FileHandlerProvider::class.java)
@@ -83,11 +83,14 @@ fun main() = application {
         height = 1000.dp,
     )
     val activeToasts = remember { mutableStateListOf<String>() }
+    var onImportComplete : ((Boolean) -> Unit)? = null
+
     val density = androidx.compose.ui.unit.Density(density = 1.0F)
     val featureNotImplemented
         = stringResource(Res.string.feature_not_implemented)
     val announceNotImplemented
         = stringResource(Res.string.announce_not_implemented)
+    var pendingImports = args.map { it.toUri() }
 
     val utils = object : NativeFrontendUtils {
         override val inputConnectionMediator = JVMInputConnectionMediator()
@@ -102,6 +105,8 @@ fun main() = application {
             }
         override val isPortrait : Boolean
             get() { return displayWidth < displayHeight }
+
+        override val isExitAfterPendingImports : Boolean = false
 
         override fun onFinish() {
             exitApplication()
@@ -125,12 +130,11 @@ fun main() = application {
         }
 
         override fun getPendingImports() : Collection<Uri> {
-            // never any pending
-            return listOf()
+            return pendingImports
         }
 
         override fun clearPendingImports() {
-            // noop, see getPendingImports
+            pendingImports = listOf()
         }
 
         override fun onCheckAndWarnNetworkState() {
@@ -142,7 +146,9 @@ fun main() = application {
         }
 
         override fun onImportFinish(ifr : NativeImportFinishedResult) {
-            // noop, since no pending imports (see getPendingImports)
+            onImportComplete?.let {
+                it(!ifr.someFailed && ifr.someSucceeded)
+            }
         }
 
         override fun handleExternalToolEvent(tool : ExternalToolData) {
@@ -189,7 +195,7 @@ fun main() = application {
         }
 
         override fun setOnImportCompleteCallback(cb : ((Boolean) -> Unit)?) {
-            // noop since no pending imports, see getPendingImports
+            onImportComplete = cb
         }
 
         override fun setOnNotificationPermissionDeniedCallback(

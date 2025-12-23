@@ -339,6 +339,10 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
             displayWidth <= displayHeight
         }
 
+        // exit after pending imports to avoid multiple copies of the app
+        // running, which is hella confusing
+        override val isExitAfterPendingImports : Boolean = true
+
         override fun onFinish() { finish() }
 
         override fun onExit() {
@@ -409,6 +413,7 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
         }
 
         override fun onImportFinish(ifr : NativeImportFinishedResult) {
+            println("FORKYZ: sending close")
             sendBroadcast(
                 Intent(INTENT_IMPORT_COMPLETE_ACTION).putExtra(
                     INTENT_IMPORT_TASK_ID,

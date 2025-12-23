@@ -39,35 +39,42 @@ fun getURLInputStream(
     headers : Map<String, String>? = null,
     data : JSONObject? = null,
 ) : BufferedInputStream {
-    val conn = url.openConnection() as HttpURLConnection
-    with (conn) {
-        setConnectTimeout(timeout)
-        setReadTimeout(timeout)
-        setRequestProperty("Connection", "close")
-        setRequestProperty("Accept","*/*")
-        headers?.forEach { key, value ->
-            setRequestProperty(key, value)
-        }
-    }
+    val conn = url.openConnection()
+    when (conn) {
+        is HttpURLConnection -> {
+            with (conn) {
+                setConnectTimeout(timeout)
+                setReadTimeout(timeout)
+                setRequestProperty("Connection", "close")
+                setRequestProperty("Accept","*/*")
+                headers?.forEach { key, value ->
+                    setRequestProperty(key, value)
+                }
+            }
 
-    if (data != null) {
-        with (conn) {
-            setRequestMethod("POST")
-            setRequestProperty(
-                "Content-Type", "application/json",
-            )
-            setDoOutput(true)
-            BufferedOutputStream(getOutputStream()).use { os ->
-                val bytes = data.toString().toByteArray()
-                os.write(bytes, 0, bytes.size)
+            if (data != null) {
+                with (conn) {
+                    setRequestMethod("POST")
+                    setRequestProperty(
+                        "Content-Type", "application/json",
+                    )
+                    setDoOutput(true)
+                    BufferedOutputStream(getOutputStream()).use { os ->
+                        val bytes = data.toString().toByteArray()
+                        os.write(bytes, 0, bytes.size)
+                    }
+                }
+            }
+
+            if (conn.getResponseCode() != HTTP_OK_RESPONSE) {
+                return BufferedInputStream(conn.getErrorStream())
+            } else {
+                return BufferedInputStream(conn.getInputStream())
             }
         }
-    }
-
-    if (conn.getResponseCode() != HTTP_OK_RESPONSE) {
-        return BufferedInputStream(conn.getErrorStream())
-    } else {
-        return BufferedInputStream(conn.getInputStream())
+        else -> {
+            return BufferedInputStream(conn.getInputStream())
+        }
     }
 }
 
