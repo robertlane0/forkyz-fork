@@ -188,12 +188,6 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
             onVoiceCommand?.let { it(text) }
         }
 
-    private val exportPuzzles
-        = registerForActivityResult(OpenDocumentTree()) {
-            uri : AndroidUri? -> uri?.let {
-            }
-        }
-
     override protected fun onCreate(savedInstanceState : Bundle?) {
         super.onCreate(savedInstanceState)
         orientationHelper.applyOrientation(this)
