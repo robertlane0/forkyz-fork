@@ -39,10 +39,14 @@ interface NativeFrontendUtils {
     fun onExportPuzzles(uri : Uri) { }
     fun onShareFile(data : ShareFileData) { }
     fun setOnAppNotFoundCallback(cb : ((AppNotFoundException) -> Unit)?) { }
+    fun removeOnAppNotFoundCallback(cb : ((AppNotFoundException) -> Unit)?) { }
     fun setOnImportCompleteCallback(cb : ((Boolean) -> Unit)?) { }
+    fun removeOnImportCompleteCallback(cb : ((Boolean) -> Unit)?) { }
     fun setOnNotificationPermissionDeniedCallback(cb : (() -> Unit)?) { }
+    fun removeOnNotificationPermissionDeniedCallback(cb : (() -> Unit)?) { }
     fun setStatusBarColor(color : Color) { }
     fun setOnVoiceCommandCallback(cb : ((List<String>?) -> Unit)?) { }
+    fun removeOnVoiceCommandCallback(cb : ((List<String>?) -> Unit)?) { }
     fun launchVoiceInput() { }
     fun announce(text : CharSequence) { }
     fun onSetFullScreen() { }

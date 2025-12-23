@@ -451,14 +451,33 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
             onAppNotFound = cb
         }
 
+        override fun removeOnAppNotFoundCallback(
+            cb : ((AppNotFoundException) -> Unit)?,
+        ) {
+            if (onAppNotFound == cb)
+                onAppNotFound = null
+        }
+
         override fun setOnImportCompleteCallback(cb : ((Boolean) -> Unit)?) {
             onImportComplete = cb
+        }
+
+        override fun removeOnImportCompleteCallback(cb : ((Boolean) -> Unit)?) {
+            if (onImportComplete == cb)
+                onImportComplete = null
         }
 
         override fun setOnNotificationPermissionDeniedCallback(
             cb : (() -> Unit)?,
         ) {
             onNotificationPermissionDenied = cb
+        }
+
+        override fun removeOnNotificationPermissionDeniedCallback(
+            cb : (() -> Unit)?,
+        ) {
+            if (onNotificationPermissionDenied == cb)
+                onNotificationPermissionDenied = null
         }
 
         override fun setStatusBarColor(color : Color) {
@@ -472,6 +491,13 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
             cb : ((List<String>?) -> Unit)?,
         ) {
             onVoiceCommand = cb
+        }
+
+        override fun removeOnVoiceCommandCallback(
+            cb : ((List<String>?) -> Unit)?,
+        ) {
+            if (onVoiceCommand == cb)
+                onVoiceCommand = null
         }
 
         override fun launchVoiceInput() {

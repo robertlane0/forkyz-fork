@@ -1100,8 +1100,12 @@ fun BrowsePage(
         )
 
         onDispose {
-            utils.setOnImportCompleteCallback(null)
-            utils.setOnNotificationPermissionDeniedCallback(null)
+            utils.removeOnImportCompleteCallback(
+                viewModel::setImportedNowExitResult,
+            )
+            utils.removeOnNotificationPermissionDeniedCallback(
+                viewModel::flagNotificationPermissionsDenied
+            )
         }
     }
 

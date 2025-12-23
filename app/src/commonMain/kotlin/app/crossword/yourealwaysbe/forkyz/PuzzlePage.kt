@@ -1282,8 +1282,10 @@ fun PuzzlePage(
         utils.setOnVoiceCommandCallback(viewModel::dispatchVoiceCommand)
         utils.setOnAppNotFoundCallback(viewModel::handleAppNotFoundException)
         onDispose {
-            utils.setOnVoiceCommandCallback(null)
-            utils.setOnAppNotFoundCallback(null)
+            utils.removeOnVoiceCommandCallback(viewModel::dispatchVoiceCommand)
+            utils.removeOnAppNotFoundCallback(
+                viewModel::handleAppNotFoundException,
+            )
         }
     }
 

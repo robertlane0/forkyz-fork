@@ -194,11 +194,29 @@ fun main(args : Array<String>) = application {
             // noop
         }
 
+        override fun removeOnAppNotFoundCallback(
+            cb : ((AppNotFoundException) -> Unit)?,
+        ) {
+            // noop
+        }
+
         override fun setOnImportCompleteCallback(cb : ((Boolean) -> Unit)?) {
             onImportComplete = cb
         }
 
+        override fun removeOnImportCompleteCallback(cb : ((Boolean) -> Unit)?) {
+            if (onImportComplete == cb)
+                onImportComplete = null
+        }
+
         override fun setOnNotificationPermissionDeniedCallback(
+            cb : (() -> Unit)?,
+        ) {
+            // noop, since permissions not needed, see
+            // onCheckRequestNotificationPermissions
+        }
+
+        override fun removeOnNotificationPermissionDeniedCallback(
             cb : (() -> Unit)?,
         ) {
             // noop, since permissions not needed, see
@@ -210,6 +228,12 @@ fun main(args : Array<String>) = application {
         }
 
         override fun setOnVoiceCommandCallback(
+            cb : ((List<String>?) -> Unit)?,
+        ) {
+            // noop
+        }
+
+        override fun removeOnVoiceCommandCallback(
             cb : ((List<String>?) -> Unit)?,
         ) {
             // noop
