@@ -134,6 +134,8 @@ android {
 
     defaultConfig {
         applicationId = appPackageName
+        versionCode = appVersion * 100000
+        versionName = "$appVersion"
         minSdk = 23
         targetSdk = 36
         multiDexEnabled = true
