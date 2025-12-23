@@ -15,6 +15,8 @@ import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import org.jetbrains.compose.resources.PluralStringResource
 import org.jetbrains.compose.resources.StringResource
 
+import dev.dirs.ProjectDirectories
+
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation
@@ -32,8 +34,11 @@ import app.crossword.yourealwaysbe.forkyz.util.toUri
  * Currently hardcoded to ~/.local/share/forkyz.
  */
 val XDG_DATA_DIR : File = File(
-    File(File(File(System.getProperty("user.home")), ".local"), "share"),
-    "forkyz",
+    ProjectDirectories.from(
+        "app",
+        "crossword.yourealwaysbe",
+        "forkyz",
+    ).dataDir,
 )
 
 class JVMNativeBackendUtils : NativeBackendUtils {

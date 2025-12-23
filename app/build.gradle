@@ -105,7 +105,9 @@ kotlin {
             implementation(compose.desktop.macos_arm64)
             implementation(compose.desktop.windows_x64)
             implementation(compose.desktop.linux_x64)
+
             implementation 'androidx.sqlite:sqlite-bundled:2.6.2'
+            implementation 'dev.dirs:directories:26'
             implementation 'io.ktor:ktor-client-java:3.3.2'
             implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.10.2'
 
