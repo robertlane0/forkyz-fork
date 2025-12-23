@@ -71,6 +71,10 @@
 -dontwarn io.ktor.utils.io.jvm.javaio.PollersKt
 -keep class io.ktor.** { *; }
 
+# coil3
+-dontwarn coil3.**
+-keep class coil3.** { *; }
+
 # Keep all reflection methods that are dynamically accessed
 -keepclassmembers class * {
     ** getPath();
