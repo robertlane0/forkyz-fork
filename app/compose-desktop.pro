@@ -53,15 +53,6 @@
     ** clone();
 }
 
-# JUnit (test framework, shouldn't be in production but keeping to avoid notes)
--dontwarn junit.**
--dontwarn org.junit.**
--keep class junit.** { *; }
--keep class org.junit.** { *; }
--keepclassmembers class * {
-    ** suite();
-}
-
 # SLF4J
 -dontwarn org.slf4j.**
 -keep class org.slf4j.** { *; }
@@ -74,6 +65,9 @@
 # coil3
 -dontwarn coil3.**
 -keep class coil3.** { *; }
+
+# Build config
+-keep class app.crossword.yourealwaysbe.forkyz.BuildConfig { *; }
 
 # Keep all reflection methods that are dynamically accessed
 -keepclassmembers class * {
