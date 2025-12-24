@@ -1019,13 +1019,19 @@ class PuzzlePageScope(
 
     @Composable
     fun MenuSupportPuzzleSource() {
-        DropdownMenuItem(
-            text = { MenuText(stringResource(Res.string.support_puzzle_source)) },
-            onClick = {
-                actionSupportSource()
-                viewModel.dismissMenu()
-            }
-        )
+        val state by viewModel.menuState.collectAsStateWithLifecycle()
+        val hasSupport by remember { derivedStateOf { state.hasSupportURL} }
+        if (hasSupport) {
+            DropdownMenuItem(
+                text = {
+                    MenuText(stringResource(Res.string.support_puzzle_source))
+                },
+                onClick = {
+                    actionSupportSource()
+                    viewModel.dismissMenu()
+                }
+            )
+        }
     }
 
     fun doExitPage() {
