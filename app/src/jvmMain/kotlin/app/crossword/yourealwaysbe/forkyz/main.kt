@@ -52,6 +52,7 @@ import app.crossword.yourealwaysbe.forkyz.exttools.ExternalToolData
 import app.crossword.yourealwaysbe.forkyz.injection.jvmModules
 import app.crossword.yourealwaysbe.forkyz.injection.sharedModules
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
+import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
 import app.crossword.yourealwaysbe.forkyz.util.JVMInputConnectionMediator
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.NativeFrontendUtils
@@ -77,6 +78,8 @@ fun main(args : Array<String>) = application {
         by inject(NativeBackendUtils::class.java)
     val notifications : Notifications
         by inject(Notifications::class.java)
+    val currentPuzzleHolder : CurrentPuzzleHolder
+        by inject(CurrentPuzzleHolder::class.java)
 
     val windowState = rememberWindowState(
         width = 600.dp,
@@ -91,6 +94,12 @@ fun main(args : Array<String>) = application {
     val announceNotImplemented
         = stringResource(Res.string.announce_not_implemented)
     var pendingImports = args.map { it.toUri() }
+
+    fun doExitApplication() {
+        currentPuzzleHolder.saveBoardForApplicationExit {
+            exitApplication()
+        }
+    }
 
     val utils = object : NativeFrontendUtils {
         override val inputConnectionMediator = JVMInputConnectionMediator()
@@ -109,11 +118,11 @@ fun main(args : Array<String>) = application {
         override val isExitAfterPendingImports : Boolean = false
 
         override fun onFinish() {
-            exitApplication()
+            doExitApplication()
         }
 
         override fun onExit() {
-            exitApplication()
+            doExitApplication()
         }
 
         @OptIn(DelicateCoroutinesApi::class)
@@ -310,7 +319,7 @@ fun main(args : Array<String>) = application {
     }
 
     Window(
-        onCloseRequest = ::exitApplication,
+        onCloseRequest = ::doExitApplication,
         title = stringResource(Res.string.app_name),
         state = windowState,
         undecorated = true,

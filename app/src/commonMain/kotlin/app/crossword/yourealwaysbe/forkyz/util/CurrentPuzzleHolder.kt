@@ -129,6 +129,21 @@ public class CurrentPuzzleHolder(
         puzzleSaveServiceCaller.saveBoard(this)
     }
 
+    /**
+     * Save board, callback when done, and block future saves
+     *
+     * Designed for when the app is about to be killed. Blocking future
+     * saves makes it ok to kill the app in the callback.
+     */
+    fun saveBoardForApplicationExit(cb : () -> Unit) {
+        saveBoardService {
+            // never unlock, no more saves
+            ioLock.lock()
+            cb()
+        }
+    }
+
+
     @MainThread
     fun getFreshCurrentPuzzleMeta(cb : Consumer<PuzMetaFile?>) {
         val puz = board?.getPuzzle()
@@ -159,12 +174,12 @@ public class CurrentPuzzleHolder(
      * App should use saveBoard(), PuzzleSaveServiceCaller should use
      * this.
      */
-    fun saveBoardService(cb : () -> Unit = { }) {
+    fun saveBoardService(cb : suspend () -> Unit = { }) {
         val puz = board?.getPuzzle()
         val curHandle = puzHandle
         if (puz == null || curHandle == null) {
             AppLogger.e(TAG, "No puzzle associated to the board to save.")
-            cb()
+            ioScope.launch { cb() }
         } else {
             ioScope.launch {
                 ioLock.lock()
