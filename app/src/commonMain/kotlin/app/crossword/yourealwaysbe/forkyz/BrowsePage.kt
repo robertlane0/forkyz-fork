@@ -1117,7 +1117,9 @@ fun BrowsePage(
     var fabMenuExpanded by rememberSaveable { mutableStateOf(false) }
     val fabVisible by remember {
         derivedStateOf {
-            !isSelecting && (
+            !isSelecting
+            && !state.isViewArchive
+            && (
                 puzzleListState.lastScrolledBackward
                 || !puzzleListState.canScrollBackward
             )
