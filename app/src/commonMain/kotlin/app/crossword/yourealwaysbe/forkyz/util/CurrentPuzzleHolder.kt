@@ -143,7 +143,6 @@ public class CurrentPuzzleHolder(
         }
     }
 
-
     @MainThread
     fun getFreshCurrentPuzzleMeta(cb : Consumer<PuzMetaFile?>) {
         val puz = board?.getPuzzle()
