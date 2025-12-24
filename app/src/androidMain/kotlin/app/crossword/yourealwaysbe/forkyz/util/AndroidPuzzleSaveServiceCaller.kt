@@ -84,7 +84,7 @@ class PuzzleSaveService() : Service() {
             utils.foregroundServiceTypeShortService(),
         )
 
-        currentPuzzleHolder.saveBoardService(this::stopSelf)
+        currentPuzzleHolder.saveBoardService(cb = this::stopSelf)
 
         return START_STICKY
     }

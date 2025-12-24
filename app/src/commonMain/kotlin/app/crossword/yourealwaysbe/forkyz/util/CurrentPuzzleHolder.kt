@@ -3,10 +3,11 @@ package app.crossword.yourealwaysbe.forkyz.util
 
 import java.io.IOException
 import java.util.function.Consumer
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.CoroutineScope
 
 import androidx.annotation.MainThread
 
@@ -136,11 +137,13 @@ public class CurrentPuzzleHolder(
      * saves makes it ok to kill the app in the callback.
      */
     fun saveBoardForApplicationExit(cb : () -> Unit) {
-        saveBoardService {
-            // never unlock, no more saves
-            ioLock.lock()
-            cb()
-        }
+        saveBoardService(
+            cbWithLock = {
+                // cancel ioScope so no more saves
+                ioScope.cancel()
+                cb()
+            }
+        )
     }
 
     @MainThread
@@ -172,13 +175,23 @@ public class CurrentPuzzleHolder(
      *
      * App should use saveBoard(), PuzzleSaveServiceCaller should use
      * this.
+     *
+     * @param cb call back after all done
+     * @param cbWithLock call back after saved but before ioLock is
+     * released
      */
-    fun saveBoardService(cb : suspend () -> Unit = { }) {
+    fun saveBoardService(
+        cb : suspend () -> Unit = { },
+        cbWithLock : suspend () -> Unit = { }
+    ) {
         val puz = board?.getPuzzle()
         val curHandle = puzHandle
         if (puz == null || curHandle == null) {
-            AppLogger.e(TAG, "No puzzle associated to the board to save.")
-            ioScope.launch { cb() }
+            AppLogger.i(TAG, "No puzzle currently loaded to save.")
+            ioScope.launch {
+                cbWithLock()
+                cb()
+            }
         } else {
             ioScope.launch {
                 ioLock.lock()
@@ -191,6 +204,7 @@ public class CurrentPuzzleHolder(
                                 AppLogger.e(TAG, "Error saving puzzle.")
                                 e.printStackTrace()
                             } finally {
+                                cbWithLock()
                                 ioLock.unlock()
                                 cb()
                             }
