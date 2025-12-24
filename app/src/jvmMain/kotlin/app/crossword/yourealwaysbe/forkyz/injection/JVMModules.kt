@@ -31,7 +31,9 @@ import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.util.files.JVMFileHandlerProvider
 
 val jvmModules = module {
-    single<BackgroundDownloadManager> { JVMBackgroundDownloadManager() }
+    single<BackgroundDownloadManager> {
+        JVMBackgroundDownloadManager(get(), get())
+    }
     single<DataStore<Settings>> {
         createDataStore(
             fileSystem = FileSystem.SYSTEM,

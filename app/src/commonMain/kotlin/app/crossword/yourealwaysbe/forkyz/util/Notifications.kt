@@ -30,9 +30,9 @@ interface Notifications {
     fun notify(
         channelID : String,
         notificationID : Int,
-        iconID : Int,
         title : String,
         contentText : String? = null,
+        iconID : Int = -1,
     )
 
     fun cancel(notificationID : Int)

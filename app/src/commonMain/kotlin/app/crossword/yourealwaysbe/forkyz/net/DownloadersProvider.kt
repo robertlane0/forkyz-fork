@@ -86,12 +86,12 @@ class DownloadersProvider(
                 return
 
             notifications.notify(
-                PUZZLE_DOWNLOAD_CHANNEL_ID,
-                0,
-                notifications.downloadDoneIcon,
-                utils.getString(
+                channelID = PUZZLE_DOWNLOAD_CHANNEL_ID,
+                notificationID = 0,
+                title = utils.getString(
                     Res.string.puzzle_download_no_connection,
                 ),
+                iconID = notifications.downloadDoneIcon,
             )
         }
 
@@ -100,14 +100,14 @@ class DownloadersProvider(
                 return
 
             notifications.notify(
-                PUZZLE_DOWNLOAD_CHANNEL_ID,
-                0,
-                notifications.downloadIcon,
-                utils.getString(Res.string.puzzles_downloading),
-                utils.getString(
+                channelID = PUZZLE_DOWNLOAD_CHANNEL_ID,
+                notificationID = 0,
+                title = utils.getString(Res.string.puzzles_downloading),
+                contentText = utils.getString(
                     Res.string.puzzles_downloading_from,
                     name,
                 ),
+                iconID = notifications.downloadIcon,
             )
         }
 
@@ -129,10 +129,10 @@ class DownloadersProvider(
                 Res.string.puzzle_download_failed;
 
             notifications.notify(
-                PUZZLE_DOWNLOAD_CHANNEL_ID,
-                nextNotificationID++,
-                notifications.downloadDoneIcon,
-                utils.getString(messageId, name),
+                channelID = PUZZLE_DOWNLOAD_CHANNEL_ID,
+                notificationID = nextNotificationID++,
+                title = utils.getString(messageId, name),
+                iconID = notifications.downloadDoneIcon,
             )
         }
 
@@ -156,10 +156,10 @@ class DownloadersProvider(
 
             if (messageID != null) {
                 notifications.notify(
-                    PUZZLE_DOWNLOAD_CHANNEL_ID,
-                    0,
-                    notifications.downloadDoneIcon,
-                    utils.getString(messageID),
+                    channelID = PUZZLE_DOWNLOAD_CHANNEL_ID,
+                    notificationID = 0,
+                    title = utils.getString(messageID),
+                    iconID = notifications.downloadDoneIcon,
                 )
             }
         }

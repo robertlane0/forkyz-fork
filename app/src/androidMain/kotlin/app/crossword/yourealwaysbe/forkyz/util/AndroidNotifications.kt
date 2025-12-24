@@ -35,19 +35,22 @@ class AndroidNotifications(
     override fun notify(
         channelID : String,
         notificationID : Int,
-        iconID : Int,
         title : String,
         contentText : String?,
+        iconID : Int,
     ) {
         if (utils.hasPostNotificationsPermission(applicationContext)) {
-            val notification = NotificationCompat.Builder(
+            val builder = NotificationCompat.Builder(
                 applicationContext,
                 channelID,
-            ).setSmallIcon(iconID)
-                .setContentTitle(title)
+            ).setContentTitle(title)
                 .setContentText(contentText)
                 .setWhen(System.currentTimeMillis())
-                .build()
+
+            if (iconID >= 0)
+                builder.setSmallIcon(iconID)
+
+            val notification = builder.build()
             notificationManager.notify(notificationID, notification)
         }
     }

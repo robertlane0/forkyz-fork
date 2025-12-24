@@ -401,6 +401,8 @@
     <string name="no_summary_download_notifs_desc">Prevents summary download notification from appearing in the notifications list.</string>
     <string name="sixty_seconds">1 minute</string>
     <string name="thirty_seconds">30 seconds</string>
+    <string name="background_downloads_not_available">Background Downloads Not Available</string>
+    <string name="background_downloads_not_available_desc">Please disable in download settings.</string>
 
     <!-- preferences export/import -->
     <string name="preferences_export_import">Export/Import</string>

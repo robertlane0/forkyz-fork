@@ -23,9 +23,9 @@ class JVMNotifications : Notifications {
     override fun notify(
         channelID : String,
         notificationID : Int,
-        iconID : Int,
         title : String,
         contentText : String?,
+        iconID : Int,
     ) {
         GlobalScope.launch(Dispatchers.Main) {
             notifications.send(Notification(title, contentText))
