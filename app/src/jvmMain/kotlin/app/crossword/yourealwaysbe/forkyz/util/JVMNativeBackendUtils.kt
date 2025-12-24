@@ -17,7 +17,6 @@ import org.jetbrains.compose.resources.StringResource
 
 import dev.dirs.ProjectDirectories
 
-import app.crossword.yourealwaysbe.forkyz.BuildConfig
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation
@@ -71,10 +70,6 @@ class JVMNativeBackendUtils : NativeBackendUtils {
 
     override fun hasNetworkConnection() : Boolean {
         return true
-    }
-
-    override fun getApplicationVersionName() : String? {
-        return BuildConfig.APP_VERSION
     }
 
     @Throws(IOException::class)

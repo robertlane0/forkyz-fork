@@ -19,6 +19,7 @@ import androidx.annotation.MainThread
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
+import app.crossword.yourealwaysbe.forkyz.BuildConfig
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.import_failure
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.import_success
@@ -1259,8 +1260,7 @@ class BrowsePageViewModel(
         viewModelScope.launch(Dispatchers.Main) { run() }
     }
 
-    private val currentVersion : String
-        = utils.getApplicationVersionName() ?: ""
+    private val currentVersion : String = BuildConfig.APP_VERSION
 
     private var currentUIState : UIState
         get() { return mediatedUIState.current }

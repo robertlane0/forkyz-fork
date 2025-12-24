@@ -66,10 +66,6 @@ class AndroidNativeBackendUtils(
         return utils.hasNetworkConnection(applicationContext)
     }
 
-    override fun getApplicationVersionName() : String? {
-        return utils.getApplicationVersionName(applicationContext)
-    }
-
     @Throws(IOException::class)
     override fun openInputStream(uri : Uri) : InputStream? {
         return applicationContext

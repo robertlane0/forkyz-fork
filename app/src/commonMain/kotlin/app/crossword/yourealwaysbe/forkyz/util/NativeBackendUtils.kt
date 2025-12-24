@@ -32,7 +32,6 @@ interface NativeBackendUtils {
         vararg formatArgs : Any,
     ) : String
     fun hasNetworkConnection() : Boolean
-    fun getApplicationVersionName() : String?
     @Throws(IOException::class)
     fun openInputStream(uri : Uri) : InputStream?
     @Throws(IOException::class)

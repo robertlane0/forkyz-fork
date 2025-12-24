@@ -96,11 +96,6 @@ interface AndroidVersionUtils {
     fun invalidateInput(imm : InputMethodManager, view : View)
 
     /**
-     * Get the current application version name
-     */
-    fun getApplicationVersionName(context : Context) : String?
-
-    /**
      * Get the current application uid or -1
      */
     fun getApplicationUID(context : Context) : Int

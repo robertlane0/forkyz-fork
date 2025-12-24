@@ -45,19 +45,6 @@ open class TiramisuUtil  : RUtil() {
         imm.invalidateInput(view)
     }
 
-    public override fun getApplicationVersionName(context : Context) : String? {
-        try {
-            val info = context.getPackageManager()
-                .getPackageInfo(
-                    context.getPackageName(),
-                    PackageInfoFlags.of(0),
-                )
-            return info.versionName
-        } catch (e : PackageManager.NameNotFoundException) {
-            return null
-        }
-    }
-
     public override fun getApplicationUID(context : Context) : Int {
         try {
             val info = context.getPackageManager()

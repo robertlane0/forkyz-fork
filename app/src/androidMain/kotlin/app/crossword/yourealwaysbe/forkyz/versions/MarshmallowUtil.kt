@@ -93,17 +93,6 @@ open class MarshmallowUtil  : AndroidVersionUtils {
     }
 
     @Suppress("deprecation")
-    override fun getApplicationVersionName(context : Context) : String? {
-        try {
-            val info = context.getPackageManager()
-                .getPackageInfo(context.getPackageName(), 0)
-            return info.versionName
-        } catch (e : PackageManager.NameNotFoundException) {
-            return null
-        }
-    }
-
-    @Suppress("deprecation")
     override fun getApplicationUID(context : Context) : Int {
         try {
             val info = context.getPackageManager()
