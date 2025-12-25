@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.Forkyz" parent="Theme.Material3.DynamicColors.Light">
+    <style name="Theme.Forkyz" parent="Theme.Material3.DynamicColors.DayNight">
         <!--
             Needed for AppCompatActivity which is only needed so that things
             like PlayboardRenderer can load from the right colors.xml.
