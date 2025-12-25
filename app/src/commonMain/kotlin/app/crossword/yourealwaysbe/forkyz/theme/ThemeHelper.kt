@@ -1,8 +1,10 @@
 
 package app.crossword.yourealwaysbe.forkyz.theme
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
@@ -52,6 +54,7 @@ class ThemeHelper(val settings : ForkyzSettings) {
     fun AppTheme(content : @Composable() () -> Unit) {
         val dayNightMode by getAppDayNightModeState()
         val appTheme by getAppThemeState()
+        val colors = getColorScheme(appTheme, isDarkMode(dayNightMode))
         AppTheme(
             appTheme = appTheme,
             darkMode = isDarkMode(dayNightMode),

@@ -330,7 +330,6 @@ fun main(args : Array<String>) = application {
                 themeHelper = themeHelper,
                 utils = utils,
             )
-
             themeHelper.AppTheme {
                 Toasts(
                     modifier = Modifier.align(Alignment.BottomCenter)

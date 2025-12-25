@@ -3,8 +3,12 @@ package app.crossword.yourealwaysbe.forkyz
 
 import kotlinx.serialization.Serializable
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.navigation.compose.NavHost
@@ -75,16 +79,27 @@ data class PageOpener(
     val onBack : () -> Unit,
 )
 
+/**
+ * The application
+ *
+ * @param extraContent any native extra content needed, appears on top
+ * of main app.
+ */
 @Composable
 fun ForkyzApp(
     themeHelper : ThemeHelper,
     utils : NativeFrontendUtils,
 ) {
-    themeHelper.AppTheme() {
-        ForkyzAppMain(
-            themeHelper = themeHelper,
-            utils = utils,
-        )
+    themeHelper.AppTheme {
+        Box(
+            // add a background else gets something default from system
+            modifier = Modifier.background(MaterialTheme.colorScheme.background),
+        ) {
+            ForkyzAppMain(
+                themeHelper = themeHelper,
+                utils = utils,
+            )
+        }
     }
 }
 

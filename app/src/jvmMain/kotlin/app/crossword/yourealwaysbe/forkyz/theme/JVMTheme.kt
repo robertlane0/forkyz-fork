@@ -20,7 +20,7 @@ actual fun AppTheme(
 ) {
     MaterialTheme(
         colorScheme = getColorScheme(appTheme, darkMode),
-        content = content
+        content = content,
     )
 }
 
