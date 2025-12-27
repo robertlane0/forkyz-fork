@@ -34,7 +34,6 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.jump_to_end
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.logcat
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_logcat
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_logcat
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 import app.crossword.yourealwaysbe.forkyz.util.ShareFileData
 

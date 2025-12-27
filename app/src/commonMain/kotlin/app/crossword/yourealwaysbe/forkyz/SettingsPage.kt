@@ -60,7 +60,6 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.exit
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.failed_to_initialise_saf
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.filter_settings_hint
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.filter_settings_hint
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.storage_changed_please_restart
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.storage_changed_title
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.storage_select_saf_info

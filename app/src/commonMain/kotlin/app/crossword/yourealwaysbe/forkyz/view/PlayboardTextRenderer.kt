@@ -23,7 +23,6 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_format_sh
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_format_short_no_num_with_count
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_format_short_with_count
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.cur_box_blank
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.cur_box_blank
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.unknown_hint
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.word_all_blank
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils

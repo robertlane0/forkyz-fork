@@ -70,11 +70,9 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.are_you_sure
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_hint
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.completed
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.edit_clue
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.edit_clue
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.errors
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.external_app_install_msg
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.external_app_not_installed
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.external_tools
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.external_tools
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.fit_to_screen
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.help_crossword_solver
@@ -92,16 +90,13 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.letter
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.menu_flag_cell_toggle
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.menu_flag_clue_toggle
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.menu_notes
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.menu_notes
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.menu_notes_clue
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.menu_notes_puzzle
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ok
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.puzzle
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.reveal
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.reveal
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.reveal_puzzle
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.scratch_mode
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_clue
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_clue_response
@@ -109,7 +104,6 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_puzzle_f
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_puzzle_open_share_url
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_puzzle_orig
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_puzzle_without_extensions
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_errors
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_errors
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_errors_clue
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_errors_cursor
@@ -121,7 +115,6 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.unknown_hint
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.voice_command
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.website
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.word
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.zoom
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.zoom
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.zoom_in
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.zoom_in_max

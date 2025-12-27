@@ -37,7 +37,6 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.metro_quick
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.new_york_times_syndicated
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.newsday
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.nrc
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.nrc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.nrc_in_het_midden
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.nrc_in_het_midden_title
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.nrc_scrypto
@@ -52,7 +51,6 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.tf1_mots_crois
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.tf1_mots_fleches
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.uclick_copyright
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.universal_crossword
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.usa_today
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.usa_today
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.vingminutes
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.wall_street_journal

@@ -109,12 +109,9 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.delete_selecte
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.disable_notifications
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.disable_notifications_button
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.download_puzzles
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.download_puzzles
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.filter_puzzles
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.filter_puzzles
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.filter_puzzles_hint
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.has_solution_desc
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_delete
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_delete
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_download
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_import
@@ -123,7 +120,6 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_menu_unarch
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_online_sources
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_solution
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.import_failure_long
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.import_puzzle
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.import_puzzle
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.import_success_long
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.imports_title
@@ -138,15 +134,11 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.no_puzzles_dow
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.notifications_denied_msg
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.num_selected
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.online_sources
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.online_sources
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.overflow
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.please_wait
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.sort
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.sort
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.system_daynight_mode
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.title_view_archives
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.title_view_archives
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.title_view_crosswords
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.title_view_crosswords
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.toggle_archive
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.toggle_archive_selected

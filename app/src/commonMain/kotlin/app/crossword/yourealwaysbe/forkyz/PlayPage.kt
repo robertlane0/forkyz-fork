@@ -63,12 +63,9 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.introduction
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.next_clue
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.open_clue_list
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.open_clue_notes
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.open_clue_notes
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.overflow
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.prev_clue
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.select_clue
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.select_clue
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.toggle_clue_tabs
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.toggle_clue_tabs
 import app.crossword.yourealwaysbe.forkyz.menu.BaseMenuModifier
 import app.crossword.yourealwaysbe.forkyz.menu.MenuText

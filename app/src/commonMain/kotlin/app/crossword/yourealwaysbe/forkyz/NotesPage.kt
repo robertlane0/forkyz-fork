@@ -64,8 +64,6 @@ import org.jetbrains.compose.resources.stringResource
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.anagram_solution_lab
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.anagram_source_lab
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.anagram_source_lab
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.anagram_source_lab
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.board_lab
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.choose_flag_color
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.copy_conflict
@@ -77,7 +75,6 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.menu_flag_clue
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.menu_notes_puzzle
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.notes_lab
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.overflow
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.scratch_lab
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.scratch_lab
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.shuffle_anagram_source
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.transfer_anagram_solution_to_focussed_view

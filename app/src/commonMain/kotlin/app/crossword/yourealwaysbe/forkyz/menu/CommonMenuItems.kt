@@ -19,7 +19,6 @@ import org.jetbrains.compose.resources.stringResource
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.help
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_submenu
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_submenu
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.settings
 
 val BaseMenuModifier = Modifier.defaultMinSize(minWidth = 200.dp)

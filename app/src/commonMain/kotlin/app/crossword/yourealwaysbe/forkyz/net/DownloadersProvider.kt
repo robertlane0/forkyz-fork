@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.map
 
 import androidx.annotation.MainThread
 
+
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.puzzle_download_failed
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.puzzle_download_no_connection
@@ -25,7 +26,6 @@ import app.crossword.yourealwaysbe.forkyz.util.Notifications
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.util.getOnce
-
 /**
  * Convenience for constructing Downloaders objects
  *

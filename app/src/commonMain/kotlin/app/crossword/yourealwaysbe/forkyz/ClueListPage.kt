@@ -43,7 +43,6 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.open_clue_list
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.open_clue_notes
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.overflow
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.select_clue
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.select_clue
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_all_words_clue_list
 import app.crossword.yourealwaysbe.forkyz.menu.BaseMenuModifier
 import app.crossword.yourealwaysbe.forkyz.menu.MenuText
