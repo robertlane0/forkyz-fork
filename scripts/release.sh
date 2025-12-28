@@ -16,7 +16,7 @@ nvim $changelog
 git add $changelog
 python scripts/make_release_notes.py
 git add $changelog-fr
-nvim app/build.gradle
+nvim app/build.gradle.kts
 
 echo "Ready to commit!"
 echo "Don't forget to git add the new changelog."

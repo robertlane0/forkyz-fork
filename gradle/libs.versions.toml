@@ -1,0 +1,178 @@
+[versions]
+# Core
+kotlin = "2.2.20"
+ksp = "2.0.4"
+agp = "8.13.0"
+
+# Android
+compileSdk = "36"
+minSdk = "23"
+targetSdk = "36"
+
+# AndroidX
+activity = "1.12.2"
+appcompat = "1.7.1"
+arch-core = "2.2.0"
+concurrent-futures = "1.3.0"
+core-ktx = "1.17.0"
+datastore = "1.2.0"
+lifecycle = "2.10.0"
+preference = "1.2.1"
+room = "2.8.4"
+sqlite = "2.6.2"
+work = "2.9.1"
+
+# Compose
+compose = "1.9.3"
+compose-material = "1.9.3"
+compose-material-icons = "1.7.3"
+compose-material3 = "1.11.0-alpha01"
+compose-foundation = "1.9.3"
+compose-resources = "1.9.3"
+compose-navigation = "2.9.1"
+compose-navigationevent = "1.0.0-rc02"
+
+# Coil
+coil3 = "3.3.0"
+
+# Koin
+koin = "4.1.1"
+
+# Kotlin Libraries
+kotlinx-collections-immutable = "0.4.0"
+kotlinx-coroutines = "1.10.2"
+kotlinx-datetime = "0.7.1"
+
+# Ktor
+ktor-android = "3.3.3"
+ktor-java = "3.3.2"
+
+# Apache
+httpclient5 = "5.6"
+commons-text = "1.15.0"
+
+# Other Libraries
+base64 = "2.3.9"
+desugar = "2.1.5"
+directories = "26"
+hjson = "3.1.0"
+htmlconverter = "1.1.0"
+json = "20251224"
+json-legacy = "20080701"
+jsoup = "1.21.2"
+material = "1.13.0"
+seismic = "1.0.3"
+datetime-wheel-picker = "1.1.0-alpha05-compose1.9"
+filekit = "0.12.0"
+words-to-numbers = "8a97d258fd"
+
+# Testing
+junit4 = "4.13.2"
+junit5 = "6.1.0-M1"
+junit-platform = "1.11.4"
+mockito-kotlin = "6.1.0"
+
+# Plugins
+plugin-shadow = "9.3.0"
+plugin-buildconfig = "5.6.5"
+plugin-versions = "0.53.0"
+plugin-wire = "5.4.0"
+
+[libraries]
+# AndroidX Core
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity" }
+androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activity" }
+androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
+androidx-arch-core-testing = { module = "androidx.arch.core:core-testing", version.ref = "arch-core" }
+androidx-concurrent-futures = { module = "androidx.concurrent:concurrent-futures", version.ref = "concurrent-futures" }
+androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "core-ktx" }
+androidx-datastore-core-okio = { module = "androidx.datastore:datastore-core-okio", version.ref = "datastore" }
+androidx-preference-ktx = { module = "androidx.preference:preference-ktx", version.ref = "preference" }
+
+# Lifecycle
+androidx-lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "lifecycle" }
+androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
+
+# Room
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+androidx-sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
+
+# Work Manager
+androidx-work-runtime = { module = "androidx.work:work-runtime", version.ref = "work" }
+
+# Coil
+coil3-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil3" }
+coil3-network-ktor = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil3" }
+
+# Compose
+compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose-resources" }
+compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "compose-foundation" }
+compose-material = { module = "org.jetbrains.compose.material:material", version.ref = "compose-material" }
+compose-material-icons-extended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "compose-material-icons" }
+compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "compose-material3" }
+compose-navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "compose-navigation" }
+compose-navigationevent = { module = "org.jetbrains.androidx.navigationevent:navigationevent-compose", version.ref = "compose-navigationevent" }
+
+# Compose Desktop (for multiplatform)
+compose-desktop-macos-arm64 = { module = "org.jetbrains.compose.desktop:desktop-jvm-macos-arm64", version.ref = "compose" }
+compose-desktop-windows-x64 = { module = "org.jetbrains.compose.desktop:desktop-jvm-windows-x64", version.ref = "compose" }
+compose-desktop-linux-x64 = { module = "org.jetbrains.compose.desktop:desktop-jvm-linux-x64", version.ref = "compose" }
+
+# Koin
+koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
+koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin" }
+koin-compose-viewmodel-navigation = { module = "io.insert-koin:koin-compose-viewmodel-navigation", version.ref = "koin" }
+koin-androidx-workmanager = { module = "io.insert-koin:koin-androidx-workmanager", version.ref = "koin" }
+
+# Kotlin
+kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
+kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinx-collections-immutable" }
+kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
+
+# Ktor
+ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor-android" }
+ktor-client-java = { module = "io.ktor:ktor-client-java", version.ref = "ktor-java" }
+
+# Apache
+apache-httpclient5 = { module = "org.apache.httpcomponents.client5:httpclient5", version.ref = "httpclient5" }
+apache-commons-text = { module = "org.apache.commons:commons-text", version.ref = "commons-text" }
+
+# Other Libraries
+base64 = { module = "net.iharder:base64", version.ref = "base64" }
+datetime-wheel-picker = { module = "io.github.darkokoa:datetime-wheel-picker", version.ref = "datetime-wheel-picker" }
+desugar-jdk-libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar" }
+directories = { module = "dev.dirs:directories", version.ref = "directories" }
+filekit-dialogs-compose = { module = "io.github.vinceglb:filekit-dialogs-compose", version.ref = "filekit" }
+hjson = { module = "org.hjson:hjson", version.ref = "hjson" }
+htmlconverter = { module = "be.digitalia.compose.htmlconverter:htmlconverter", version.ref = "htmlconverter" }
+json = { module = "org.json:json", version.ref = "json" }
+json-legacy = { module = "org.json:json", version.ref = "json-legacy" }
+jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
+material = { module = "com.google.android.material:material", version.ref = "material" }
+seismic = { module = "com.squareup:seismic", version.ref = "seismic" }
+words-to-numbers = { module = "com.github.jgraham0325:words-to-numbers", version.ref = "words-to-numbers" }
+
+# Testing
+junit4 = { module = "junit:junit", version.ref = "junit4" }
+junit5-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit5" }
+junit5-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit5" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockito-kotlin" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "plugin-buildconfig" }
+compose = { id = "org.jetbrains.compose", version.ref = "compose" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin-plugin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlin-plugin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
+kotlin-plugin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version = "2.2.20-2.0.4" }
+room = { id = "androidx.room", version.ref = "room" }
+shadow = { id = "com.gradleup.shadow", version.ref = "plugin-shadow" }
+versions = { id = "com.github.ben-manes.versions", version.ref = "plugin-versions" }
+wire = { id = "com.squareup.wire", version.ref = "plugin-wire" }

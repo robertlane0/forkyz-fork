@@ -80,6 +80,7 @@
 }
 
 # Suppress reflection notes
+-dontnote app.crossword.yourealwaysbe.org.json.JSONObject
 -dontnote com.squareup.wire.KotlinConstructorBuilder
 -dontnote com.squareup.wire.internal.FieldBinding
 -dontnote com.squareup.wire.internal.ReflectionKt
@@ -116,6 +117,10 @@
 -dontnote dev.dirs.Util
 -dontnote io.ktor.http.content.BlockingBridgeKt
 -dontnote org.apache.hc.client5.http.entity.BrotliDecompressingEntity
+-dontnote org.apache.hc.client5.http.entity.compress.CommonsCompressRuntime
+-dontnote org.apache.hc.client5.http.impl.Brotli4jRuntime
+-dontnote org.apache.hc.client5.http.impl.ZstdRuntime
+-dontnote org.apache.hc.client5.http.socket.UnixDomainSocketFactory
 -dontnote org.apache.hc.client5.http.ssl.ConscryptClientTlsStrategy
 -dontnote org.jsoup.helper.AuthenticationHandler
 -dontnote org.jsoup.helper.RequestDispatch
@@ -146,3 +151,4 @@
 -keep class org.koin.core.module.Module
 -keep class org.koin.core.parameter.ParametersHolder
 -keep class org.koin.core.scope.Scope
+
