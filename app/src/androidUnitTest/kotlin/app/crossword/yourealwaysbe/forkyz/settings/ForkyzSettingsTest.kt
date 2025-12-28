@@ -330,6 +330,7 @@ class ForkyzSettingsTest {
         dontSnapBoardToBorders = false,
         downloadLaCroix = true,
         expandableClueLine = false,
+        llmVoiceCommands = false,
         movementStrategyClueList = MovementStrategySetting.MSS_MOVE_NEXT_CLUE,
     )
 
