@@ -62,6 +62,12 @@ private val MULTI_CHAR_RESPONSE_SIZE_FUDGE_FACTOR : Float = 0.8f
 // remember 26 characters and 100 numbers and 5 different zooms * 3 for
 // good measure!
 private val TEXT_MEASURE_CACHE_SIZE : Int = (26 + 100) * 5 * 3
+private val ERROR_BAR_STATE = BarState(
+    top = Bar.SOLID,
+    bottom = Bar.SOLID,
+    left = Bar.SOLID,
+    right = Bar.SOLID,
+)
 
 /**
  * Rendering data
@@ -320,6 +326,7 @@ private fun Square(
         modifier = modifier.requiredSize(profile.boxSize, profile.boxSize)
             .drawBehind {
                 drawBackground(profile, box)
+                drawError(profile, box)
                 drawBars(profile, box)
                 drawShape(profile, box)
                 drawFlags(profile, box)
@@ -385,26 +392,47 @@ private fun DrawScope.drawBackground(
     )
 }
 
+private fun DrawScope.drawError(
+    profile : BoxProfile,
+    box : BoxState,
+) {
+    if (box.isError) {
+        drawBars(
+            profile,
+            ERROR_BAR_STATE,
+            profile.colors.errorColor,
+        )
+    }
+}
+
 private fun DrawScope.drawBars(
     profile : BoxProfile,
     box : BoxState,
 ) {
     box.barState?.let { barState ->
-        // box size
-        val bs = profile.boxSizePx
-        // half stroke
-        val hs = 0.5f * profile.barWidth
-
-        drawBar(profile, box, barState.top, 0f, hs, bs, hs)
-        drawBar(profile, box, barState.bottom, 0f, bs - hs, bs, bs - hs)
-        drawBar(profile, box, barState.left, hs, 0f, hs, bs)
-        drawBar(profile, box, barState.right, bs - hs, 0f, bs - hs, bs)
+        drawBars(profile, barState, getBarColor(profile, box))
     }
+}
+
+private fun DrawScope.drawBars(
+    profile : BoxProfile,
+    barState : BarState,
+    barColor : Color,
+) {
+    // box size
+    val bs = profile.boxSizePx
+    // half stroke
+    val hs = 0.5f * profile.barWidth
+
+    drawBar(profile, barColor, barState.top, 0f, hs, bs, hs)
+    drawBar(profile, barColor, barState.bottom, 0f, bs - hs, bs, bs - hs)
+    drawBar(profile, barColor, barState.left, hs, 0f, hs, bs)
+    drawBar(profile, barColor, barState.right, bs - hs, 0f, bs - hs, bs)
 }
 
 private fun DrawScope.drawBar(
     profile : BoxProfile,
-    box : BoxState,
+    barColor : Color,
     bar : Bar,
     left : Float,
     top : Float,
@@ -422,7 +450,7 @@ private fun DrawScope.drawBar(
             end = Offset(right, bottom),
             strokeWidth = profile.barWidth,
             pathEffect = pathEffect,
-            color = getBarColor(profile, box),
+            color = barColor,
         )
     }
 }
@@ -504,36 +532,37 @@ private fun DrawScope.drawSeparators(
 
     val separators = box.separators
     val textStyle = profile.separatorTextStyle
+    val barColor = getBarColor(profile, box)
 
     val top = separators.top
     if (isWhitespace(top))
-        drawBar(profile, box, Bar.DOTTED, 0f, hs, bs, hs)
+        drawBar(profile, barColor, Bar.DOTTED, 0f, hs, bs, hs)
     else if ("-".equals(top))
-        drawBar(profile, box, Bar.SOLID, bc, 0f, bc, ds)
+        drawBar(profile, barColor, Bar.SOLID, bc, 0f, bc, ds)
     else if (top != null)
         drawOffsetText(textMeasurer, textStyle, top, bc, 0f, -0.5f, 0f)
 
     val bottom = separators.bottom
     if (isWhitespace(bottom))
-        drawBar(profile, box, Bar.DOTTED, 0f, bs - hs, bs, bs - hs)
+        drawBar(profile, barColor, Bar.DOTTED, 0f, bs - hs, bs, bs - hs)
     else if ("-".equals(bottom))
-        drawBar(profile, box, Bar.SOLID, bc, bs - ds, bc, bs)
+        drawBar(profile, barColor, Bar.SOLID, bc, bs - ds, bc, bs)
     else if (bottom != null)
         drawOffsetText(textMeasurer, textStyle, bottom, bc, bs, -0.5f, -1f)
 
     val left = separators.left
     if (isWhitespace(left))
-        drawBar(profile, box, Bar.DOTTED, hs, 0f, hs, bs)
+        drawBar(profile, barColor, Bar.DOTTED, hs, 0f, hs, bs)
     else if ("-".equals(left))
-        drawBar(profile, box, Bar.SOLID, 0f, bc, ds, bc)
+        drawBar(profile, barColor, Bar.SOLID, 0f, bc, ds, bc)
     else if (left != null)
         drawOffsetText(textMeasurer, textStyle, left, hto, bc, 0f, -0.5f)
 
     val right = separators.right
     if (isWhitespace(right))
-        drawBar(profile, box, Bar.DOTTED, bs - hs, 0f, bs - hs, bs)
+        drawBar(profile, barColor, Bar.DOTTED, bs - hs, 0f, bs - hs, bs)
     else if ("-".equals(right))
-        drawBar(profile, box, Bar.SOLID, bs - ds, bc, bs, bc)
+        drawBar(profile, barColor, Bar.SOLID, bs - ds, bc, bs, bc)
     else if (right != null)
         drawOffsetText(textMeasurer, textStyle, right, bs - hto, bc, -1f, -0.5f)
 }
@@ -763,12 +792,6 @@ private fun mixColors(
  * Depends on if it's a block, cell, highlighted, hinted, and so on.
  */
 private fun getBoxColor(profile : BoxProfile, box : BoxState) : Color {
-    if (box.isError) {
-        if (box.selected && !box.highlighted)
-            return profile.colors.currentWordHighlightColor
-        else
-            return profile.colors.errorHighlightColor
-    }
     if (box.highlighted)
         return profile.colors.currentLetterHighlightColor
     if (box.selected)
@@ -817,26 +840,14 @@ private fun getResponseTextStyle(
     profile : BoxProfile,
     box : BoxState,
 ) : TextStyle {
-    if (box.isError) {
-        if (box.selected && !box.highlighted) {
-            return profile.responseTextStyle.copy(
-                color = profile.colors.errorColor,
-            )
-        } else {
-             return profile.responseTextStyle.copy(
-                color = profile.colors.boardLetterColor,
-            )
-        }
-    } else {
-        return getTextStyle(
-            profile,
-            box,
-            profile.responseTextStyle,
-            profile.colors.boardLetterColor,
-            profile.colors.onBlockColor,
-            box.selected,
-        )
-    }
+    return getTextStyle(
+        profile,
+        box,
+        profile.responseTextStyle,
+        profile.colors.boardLetterColor,
+        profile.colors.onBlockColor,
+        box.selected,
+    )
 }
 
 private fun getMarkTextStyle(
