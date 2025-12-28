@@ -403,6 +403,7 @@
     <string name="thirty_seconds">30 secondes</string>
     <string name="background_downloads_not_available">Téléchargements d'arrière-plan indisponibles</string>
     <string name="background_downloads_not_available_desc">Veuillez désactiver cette option dans les paramètres de téléchargement.</string>
+    <string name="enable_auto_downloaders">Veuillez activer certaines sources de téléchargement automatiques en utilisant le réglage</string>
 
     <!-- preferences export/import -->
     <string name="preferences_export_import">Exportation/importation</string>

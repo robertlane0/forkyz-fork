@@ -187,6 +187,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.duckduckgo_des
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.dynamic_theme
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.elpais_experto
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.elpais_experto_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.enable_auto_downloaders
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.enter_changes_direction
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.enter_changes_direction_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.expandable_clue_line
@@ -413,6 +414,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.wall_street_jo
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.washington_post_sunday
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.weekly_crosswords
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.weekly_crosswords_desc
+import app.crossword.yourealwaysbe.forkyz.net.Downloader
 import app.crossword.yourealwaysbe.forkyz.net.DownloadersProvider
 import app.crossword.yourealwaysbe.forkyz.settings.BrowseSwipeAction
 import app.crossword.yourealwaysbe.forkyz.settings.ClueHighlight
@@ -504,7 +506,8 @@ class SettingsBoolean(
     summary : StringResource?,
     val value : StateFlow<Boolean>,
     val setValue : (Boolean) -> Unit,
-) : SettingsNamedItem(page, title, summary)
+    errorMsg : StateFlow<String?>? = null
+) : SettingsNamedItem(page, title, summary, errorMsg)
 
 enum class TriState {
     OFF, INDETERMINATE, ON
@@ -605,7 +608,8 @@ open class SettingsDynamicMultiList<T>(
     val entries : StateFlow<List<SettingsListEntry<T>>>,
     val value : StateFlow<Set<T>>,
     private val setValue : (Set<T>) -> Unit,
-) : SettingsInputItem(page, title, summary) {
+    errorMsg : StateFlow<String?>? = null,
+) : SettingsInputItem(page, title, summary, errorMsg) {
     fun selectItems(indices : Set<Int>) {
         entries.value?.let { entries ->
             setValue(
@@ -625,6 +629,7 @@ open class SettingsMultiList<T>(
     entries : List<SettingsListEntry<T>>,
     value : StateFlow<Set<T>>,
     val setValue : (Set<T>) -> Unit,
+    errorMsg : StateFlow<String?>? = null,
 ) : SettingsDynamicMultiList<T>(
     page,
     title,
@@ -632,6 +637,7 @@ open class SettingsMultiList<T>(
     MutableStateFlow<List<SettingsListEntry<T>>>(entries),
     value,
     setValue,
+    errorMsg,
 )
 
 /**
@@ -781,16 +787,70 @@ class SettingsPageViewModel(
                 )
            }.stateInSubscribed(viewModelScope, listOf())
 
+    private val liveDownloaders : Flow<List<Downloader>>
+        = downloadersProvider.liveDownloaders.filterNotNull().map { dls ->
+            dls.getDownloaders()
+        }
+
+    private val liveDownloadersInternalNames : Flow<List<String>>
+        = downloadersProvider.liveDownloaders.filterNotNull().map { dls ->
+            dls.getDownloaders().map { it.internalName }
+        }
+
     private val downloadAutoDownloadersStateFlow
         : StateFlow<List<SettingsListEntry<String>>>
-            = downloadersProvider.liveDownloaders.filterNotNull().map { dls ->
-                dls.getDownloaders().map { downloader ->
+            = liveDownloaders.map { downloaders ->
+                downloaders.map { downloader ->
                     SettingsListEntry(
                         downloader.name,
                         downloader.internalName,
                     )
                 }
             }.stateInSubscribed(viewModelScope, listOf())
+
+    private val areEnabledAutoDownloadersFlow : Flow<Boolean>
+        = combine(
+            settings.liveDownloadAutoDownloaders,
+            liveDownloadersInternalNames,
+        ) { enabledDownloaders, autoDownloaders ->
+            !enabledDownloaders.intersect(autoDownloaders).isEmpty()
+        }
+
+    private val downloadOnStartUpErrorMsg : StateFlow<String?>
+        = combine(
+            settings.liveDownloadOnStartUp,
+            areEnabledAutoDownloadersFlow,
+        ) { autoDownload, areEnabled ->
+            if (autoDownload && !areEnabled) {
+                utils.getString(Res.string.enable_auto_downloaders)
+            } else {
+                null
+            }
+        }.stateInSubscribed(viewModelScope, null)
+
+    private val downloadHourlyErrorMsg : StateFlow<String?>
+        = combine(
+            settings.liveDownloadHourly,
+            areEnabledAutoDownloadersFlow,
+        ) { isHourly, areEnabled ->
+            if (isHourly && !areEnabled) {
+                utils.getString(Res.string.enable_auto_downloaders)
+            } else {
+                null
+            }
+        }.stateInSubscribed(viewModelScope, null)
+
+    private val downloadDaysErrorMsg : StateFlow<String?>
+        = combine(
+            settings.liveDownloadDays,
+            areEnabledAutoDownloadersFlow,
+        ) { days, areEnabled ->
+            if (!days.isEmpty() && !areEnabled) {
+                utils.getString(Res.string.enable_auto_downloaders)
+            } else {
+                null
+            }
+        }.stateInSubscribed(viewModelScope, null)
 
     private val downloadCustomDailyURLErrorMsg : StateFlow<String?>
         = combine(
@@ -1263,6 +1323,7 @@ class SettingsPageViewModel(
             Res.string.automatic_download_desc,
             settings.liveDownloadOnStartUp.stateInHere(),
             settings::setDownloadOnStartUp,
+            downloadOnStartUpErrorMsg,
         ),
         SettingsSubPage(
             SettingsPage.DOWNLOAD,
@@ -1316,6 +1377,7 @@ class SettingsPageViewModel(
             Res.string.background_download_hourly_desc,
             settings.liveDownloadHourly.stateInHere(),
             { value -> settings.setDownloadHourly(value) },
+            downloadHourlyErrorMsg,
         ),
         SettingsMultiList(
             SettingsPage.DOWNLOAD_BACKGROUND,
@@ -1333,6 +1395,7 @@ class SettingsPageViewModel(
             ),
             settings.liveDownloadDays.stateInHere(),
             { value -> settings.setDownloadDays(value) },
+            downloadDaysErrorMsg,
         ),
         SettingsList<Int>(
             SettingsPage.DOWNLOAD_BACKGROUND,

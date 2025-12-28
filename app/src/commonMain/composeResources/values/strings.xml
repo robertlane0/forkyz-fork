@@ -403,6 +403,7 @@
     <string name="thirty_seconds">30 seconds</string>
     <string name="background_downloads_not_available">Background Downloads Not Available</string>
     <string name="background_downloads_not_available_desc">Please disable in download settings.</string>
+    <string name="enable_auto_downloaders">Please enable some Automatic Download Sources using the setting.</string>
 
     <!-- preferences export/import -->
     <string name="preferences_export_import">Export/Import</string>
