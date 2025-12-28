@@ -13,6 +13,7 @@ plugins {
     id 'com.google.devtools.ksp'
     id 'com.squareup.wire'
     id 'com.github.gmazzo.buildconfig'
+    id 'com.github.ben-manes.versions'
 }
 
 def appPackageName = "app.crossword.yourealwaysbe.forkyz"
