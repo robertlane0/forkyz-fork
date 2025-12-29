@@ -758,7 +758,15 @@
     <string name="green_theme">Vert Material</string>
     <string name="blue_theme">Bleu Material</string>
     <string name="orange_theme">Orange Material</string>
-    <string name="llm_agent_voice_command_prompt">Vous effectuez une traduction entre la parole humaine et une liste de commandes pour contrôler une application de mots croisés. La liste des commandes disponibles et leur description se trouvent à la fin de ce message. La parole a été traduite en texte par une IA. Elle a renvoyé la liste de possibilités suivante : %1$s. Traduisez cette liste en une liste de commandes, une par ligne, parmi les commandes disponibles ci-dessous. Formatez votre réponse uniquement avec la liste des commandes, séparées par un saut de ligne. N'incluez aucune autre information dans votre réponse. Les commandes disponibles sont : %2$s. La documentation d'aide est : %3$s.</string>
+    <string name="llm_agent_voice_command_prompt">Vous effectuez une traduction entre la parole humaine et une liste de commandes pour contrôler une application de mots croisés. La liste des commandes disponibles et leur description se trouvent à la fin de ce message. La parole a été traduite en texte par une IA. Elle a renvoyé la liste de possibilités suivante : %1$s. Traduisez cette liste en une liste de commandes, une par ligne, parmi les commandes disponibles ci-dessous. Formatez votre réponse uniquement avec la liste des commandes, séparées par un saut de ligne. N'incluez aucune autre information dans votre réponse. Les commandes disponibles sont : %2$s. La documentation d'aide est : %3$s. Le puzzle contient %4$s. L'indice actuellement sélectionné est %4$s.</string>
+    <!-- clue list, clue numbers (num letters) -->
+    <plurals name="llm_agent_voice_command_prompt_clue">
+        <item quantity="zero">%1$s %2$s (%3$d lettre)</item>
+        <item quantity="one">%1$s %2$s (%3$d lettre)</item>
+        <item quantity="other">%1$s %2$s (%3$d lettres)</item>
+    </plurals>
+    <string name="llm_agent_voice_command_prompt_no_clue">néant</string>
+    <string name="llm_agent_voice_command_prompt_clue_no_zone">%1$s %2$s</string>
     <string name="llm_voice_commands">Commandes vocales améliorées LLM</string>
     <string name="llm_voice_commands_desc">Nécessite la configuration de LLM dans des outils externes. Utilisez LLM pour améliorer l'interprétation des commandes vocales et permettre une communication en langage naturel.</string>
 </resources>

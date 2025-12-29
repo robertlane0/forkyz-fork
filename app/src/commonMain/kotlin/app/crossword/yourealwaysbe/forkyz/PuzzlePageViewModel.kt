@@ -734,13 +734,16 @@ open class PuzzlePageViewModel(
     }
 
     fun dispatchVoiceCommand(text : List<String>?) {
-        text?.let { commandAlternatives ->
-            viewModelScope.launch(Dispatchers.IO) {
-                voiceCommandDispatcher.dispatch(
-                    settings,
-                    utils,
-                    commandAlternatives,
-                )
+        getPuzzle()?.let { puz ->
+            text?.let { commandAlternatives ->
+                viewModelScope.launch(Dispatchers.IO) {
+                    voiceCommandDispatcher.dispatch(
+                        settings,
+                        utils,
+                        commandAlternatives,
+                        puz,
+                    )
+                }
             }
         }
     }

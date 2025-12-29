@@ -4,13 +4,18 @@ package app.crossword.yourealwaysbe.forkyz.util
 import kotlinx.coroutines.flow.first
 
 import app.crossword.yourealwaysbe.forkyz.HTMLFile
+import app.crossword.yourealwaysbe.forkyz.exttools.getLLMService
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.getFileResourceData
-import app.crossword.yourealwaysbe.forkyz.exttools.getLLMService
+import app.crossword.yourealwaysbe.puz.Clue
+import app.crossword.yourealwaysbe.puz.Puzzle
 
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.llm_agent_voice_command_prompt
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.llm_agent_voice_command_prompt_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.llm_agent_voice_command_prompt_clue_no_zone
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.llm_agent_voice_command_prompt_no_clue
 
 /**
  * Interpreting and dispatching voice commands
@@ -30,15 +35,17 @@ class VoiceCommands {
      * @param commandAlternatives list of speech result strings, each
      * considered to be possible alternatives, ordered by likelihood.
      * Dispatch searches through them in order until it finds a match.
+     * @param puz puzzle needed for LLM context
      */
     suspend fun dispatch(
         settings : ForkyzSettings,
         utils : NativeBackendUtils,
         commandAlternatives : List<String>,
+        puz : Puzzle,
     ) {
         val useLLM = settings.liveVoiceLLMVoiceCommands.first()
         if (useLLM)
-            dispatchWithLLM(settings, utils, commandAlternatives)
+            dispatchWithLLM(settings, utils, commandAlternatives, puz)
         else
             dispatch(commandAlternatives)
     }
@@ -71,12 +78,13 @@ class VoiceCommands {
         settings : ForkyzSettings,
         utils : NativeBackendUtils,
         commandAlternatives : List<String>,
+        puz : Puzzle,
     ) {
         val llmService = getLLMService(settings)
         if (llmService == null) {
             dispatch(commandAlternatives)
         } else {
-            getLLMPrompt(utils, commandAlternatives)?.let { prompt ->
+            getLLMPrompt(utils, commandAlternatives, puz)?.let { prompt ->
                 llmService.makeRequest(settings, prompt)?.let { response ->
                     response.split("\n").forEach {
                         dispatch(listOf(it))
@@ -89,6 +97,7 @@ class VoiceCommands {
     private suspend fun getLLMPrompt(
         utils : NativeBackendUtils,
         commandAlternatives : List<String>,
+        puz : Puzzle,
     ) : String {
         val userRequest = "'" + commandAlternatives.joinToString("' / '") + "'"
         val availableCommands = commands
@@ -98,12 +107,54 @@ class VoiceCommands {
             utils,
             HTMLFile.VOICE_COMMANDS_HELP.unqualifiedFileName,
         )
+        val cluesDesc = getLLMPromptCluesDescription(utils, puz)
+        val curClueDesc = getLLMPromptClueDescription(utils, puz.currentClue)
+            ?: utils.getString(
+                 Res.string.llm_agent_voice_command_prompt_no_clue,
+            )
+
         return utils.getString(
             Res.string.llm_agent_voice_command_prompt,
             userRequest,
             availableCommands,
             helpDocs,
+            cluesDesc,
+            curClueDesc,
         )
+    }
+
+    private suspend fun getLLMPromptCluesDescription(
+        utils : NativeBackendUtils,
+        puz : Puzzle,
+    ) : String {
+        return puz.getAllClues()
+            .map { clue -> getLLMPromptClueDescription(utils, clue) }
+            .filterNotNull()
+            .joinToString(", ")
+    }
+
+    private suspend fun getLLMPromptClueDescription(
+        utils : NativeBackendUtils,
+        clue : Clue?,
+    ) : String? {
+        return if (clue == null || !clue.hasClueNumber()) {
+            null
+        } else if (clue.hasZone()) {
+            val numLetters = clue.zone.size()
+            utils.getQuantityString(
+                Res.plurals.llm_agent_voice_command_prompt_clue,
+                numLetters,
+                clue.clueID.listName,
+                clue.clueNumber,
+                numLetters,
+            )
+        } else {
+            utils.getString(
+                Res.string.llm_agent_voice_command_prompt_clue_no_zone,
+                clue.clueID.listName,
+                clue.clueNumber,
+            )
+        }
     }
 
     class VoiceCommand {

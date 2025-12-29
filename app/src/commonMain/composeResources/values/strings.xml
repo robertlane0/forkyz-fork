@@ -775,7 +775,14 @@
     <string name="llm_agent_none">None</string>
     <string name="llm_agent_chat_gpt">Chat GPT</string>
     <string name="llm_agent_claude">Claude</string>
-    <string name="llm_agent_voice_command_prompt">You are translating between human spoken input and a list of commands to control a crossword application. The list of commands available and their help descriptions are given at the end of this message. The spoken words were translated by an AI into text. It returned the following list of possibilities: %1$s. Translate this into a list of commands, one per line, from the available commands below. Format your response as the list of commands only, separated by a newline character. Do not include any other information in your response.\nThe available commands are: %2$s.\nThe help documentation is%3$s.</string>
+    <string name="llm_agent_voice_command_prompt">You are translating between human spoken input and a list of commands to control a crossword application. The list of commands available and their help descriptions are given at the end of this message. The spoken words were translated by an AI into text. It returned the following list of possibilities: %1$s. Translate this into a list of commands, one per line, from the available commands below. Format your response as the list of commands only, separated by a newline character. Do not include any other information in your response.\nThe available commands are: %2$s.\nThe help documentation is%3$s. The puzzle contains %4$s. The currently selected clue is %5$s.</string>
+    <!-- clue list, clue numbers (num letters) -->
+    <string name="llm_agent_voice_command_prompt_no_clue">none</string>
+    <string name="llm_agent_voice_command_prompt_clue_no_zone">%1$s %2$s</string>
+    <plurals name="llm_agent_voice_command_prompt_clue">
+        <item quantity="one">%1$s %2$s (%3$d letter)</item>
+        <item quantity="other">%1$s %2$s (%3$d letters)</item>
+    </plurals>
 
     <!-- external apps -->
     <string name="crossword_solver">Crossword Solver</string>

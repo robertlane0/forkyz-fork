@@ -563,6 +563,13 @@ public class Puzzle {
         return currentclueID;
     }
 
+    /**
+     * Get currently selected clue or null
+     */
+    public Clue getCurrentClue() {
+        return getClue(getCurrentClueID());
+    }
+
     public void setScrambled(boolean scrambled) {
         this.scrambled = scrambled;
     }
