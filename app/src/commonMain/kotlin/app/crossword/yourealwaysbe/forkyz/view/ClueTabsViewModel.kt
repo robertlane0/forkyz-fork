@@ -330,12 +330,12 @@ class ClueTabsViewModel(
     }
 
     private suspend fun getStatePages() : List<ClueList> {
-        val listPages = (board?.puzzle?.clueListNames ?: listOf())
+        val listPages = (board?.puzzle?.clueListNames?.toList() ?: listOf())
             .sorted()
             .map { listName ->
                 ClueList(
                     listName,
-                    board?.puzzle?.getClues(listName)?.map {
+                    board?.puzzle?.getClues(listName)?.toList()?.map {
                         getClueItem(
                             clue = it,
                             showDirection = false,
@@ -346,7 +346,7 @@ class ClueTabsViewModel(
 
         val historyPage = ClueList(
             utils.getString(Res.string.clue_tab_history),
-            (board?.puzzle?.history ?: listOf())
+            (board?.puzzle?.history?.toList() ?: listOf())
                 .map {
                     getClueItem(
                         cid = it,
