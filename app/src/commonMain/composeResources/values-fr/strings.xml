@@ -725,7 +725,7 @@
     <string name="help_query_llm_agent">Demander de l'aide à LLM</string>
     <string name="help">Aide</string>
     <string name="clues">Indices</string>
-    <string name="help_query_but_no_active_network">Veuillez activer une connexion réseau pour contacter LLM.</string>
+    <string name="llm_query_but_no_active_network">Veuillez activer une connexion réseau pour contacter LLM.</string>
     <string name="llm_agent">LLM</string>
     <string name="llm_agent_desc">Quel LLM interroger.</string>
     <string name="llm_agent_none">Aucune</string>

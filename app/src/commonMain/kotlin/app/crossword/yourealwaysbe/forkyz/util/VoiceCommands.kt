@@ -44,7 +44,7 @@ class VoiceCommands {
         puz : Puzzle,
     ) {
         val useLLM = settings.liveVoiceLLMVoiceCommands.first()
-        if (useLLM)
+        if (useLLM && utils.hasNetworkConnection())
             dispatchWithLLM(settings, utils, commandAlternatives, puz)
         else
             dispatch(commandAlternatives)

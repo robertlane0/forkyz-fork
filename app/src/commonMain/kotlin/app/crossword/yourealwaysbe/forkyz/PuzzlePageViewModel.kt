@@ -28,8 +28,8 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_letter
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_notes
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_number
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.feature_not_implemented
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.help_query_but_no_active_network
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.help_query_response_title
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.llm_query_but_no_active_network
 import app.crossword.yourealwaysbe.forkyz.exttools.AppNotFoundException
 import app.crossword.yourealwaysbe.forkyz.exttools.CrosswordSolverData
 import app.crossword.yourealwaysbe.forkyz.exttools.DuckDuckGoData
@@ -588,7 +588,7 @@ open class PuzzlePageViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             if (!utils.hasNetworkConnection()) {
                 sendToast(
-                    utils.getString(Res.string.help_query_but_no_active_network)
+                    utils.getString(Res.string.llm_query_but_no_active_network)
                 )
             } else {
                 getBoard()?.let { board ->
@@ -734,15 +734,24 @@ open class PuzzlePageViewModel(
     }
 
     fun dispatchVoiceCommand(text : List<String>?) {
-        getPuzzle()?.let { puz ->
-            text?.let { commandAlternatives ->
-                viewModelScope.launch(Dispatchers.IO) {
-                    voiceCommandDispatcher.dispatch(
-                        settings,
-                        utils,
-                        commandAlternatives,
-                        puz,
-                    )
+        viewModelScope.launch {
+            val useLLM = settings.liveVoiceLLMVoiceCommands.first()
+            if (useLLM && !utils.hasNetworkConnection()) {
+                sendToast(
+                    utils.getString(Res.string.llm_query_but_no_active_network)
+                )
+            }
+            // try anyway, falls back to basic version
+            getPuzzle()?.let { puz ->
+                text?.let { commandAlternatives ->
+                    viewModelScope.launch(Dispatchers.IO) {
+                        voiceCommandDispatcher.dispatch(
+                            settings,
+                            utils,
+                            commandAlternatives,
+                            puz,
+                        )
+                    }
                 }
             }
         }

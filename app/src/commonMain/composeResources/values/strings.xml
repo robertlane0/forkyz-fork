@@ -766,7 +766,7 @@
     <string name="help_query_failed">Help query failed. Please check your network connection and API key in settings.</string>
     <string name="help_query_response_title">LLM Agent Help Response</string>
     <string name="help_query_llm_agent">Ask LLM Agent for Help</string>
-    <string name="help_query_but_no_active_network">Please enable a network connection to contact LLM Agent.</string>
+    <string name="llm_query_but_no_active_network">Please enable a network connection to contact LLM Agent.</string>
     <string name="llm_agent_api_key">LLM Agent API Key</string>
     <string name="llm_agent_api_key_desc">You need an API key to use LLM Agents. You can get an API Key from your LLM account settings.</string>
     <string name="llm_agent_api_key_message">LLM agents are external network services run by external companies requiring a network connection. The responses are not filtered by Forkyz and may be misleading, give away the answer, or be otherwise problematic. Use at your own risk.</string>
