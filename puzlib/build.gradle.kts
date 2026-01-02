@@ -36,4 +36,5 @@ tasks.compileJava {
     // causes warnings about unprocessed annotations for an
     // unclear reason
     options.compilerArgs.addAll(listOf("-Xlint:all", "-Xlint:-processing"))
+    options.encoding = "UTF-8"
 }

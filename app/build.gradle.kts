@@ -16,6 +16,7 @@ plugins {
     alias(libs.plugins.versions)
 }
 
+val appName = "Forkyz"
 val appPackageName = "app.crossword.yourealwaysbe.forkyz"
 val appVersion = 76
 
@@ -107,10 +108,10 @@ kotlin {
         jvmMain.dependencies {
             //pick whether to build just for the local environment, for
             //a large jar for everyone (the latter is about 30mb larger)
-            //implementation(compose.desktop.currentOs)
-            implementation(compose.desktop.macos_arm64)
-            implementation(compose.desktop.windows_x64)
-            implementation(compose.desktop.linux_x64)
+            implementation(compose.desktop.currentOs)
+            //implementation(compose.desktop.macos_arm64)
+            //implementation(compose.desktop.windows_x64)
+            //implementation(compose.desktop.linux_x64)
 
             implementation(libs.androidx.sqlite.bundled)
             implementation(libs.directories)
@@ -229,6 +230,26 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = appPackageName
             packageVersion = "${appVersion}.0.0"
+
+            linux {
+                shortcut = true
+                menuGroup = "$appName"
+                iconFile.set(
+                    project.file("src/jvmMain/resources/forkykz_icon.png")
+                )
+            }
+            macOS {
+                iconFile.set(
+                    project.file("src/jvmMain/resources/forkykz_icon.icns")
+                )
+            }
+            windows {
+                shortcut = true
+                menuGroup = "$appName"
+                iconFile.set(
+                    project.file("src/jvmMain/resources/forkykz_icon.ico")
+                )
+            }
         }
         buildTypes.release.proguard {
             obfuscate.set(false)
@@ -236,3 +257,4 @@ compose.desktop {
         }
     }
 }
+
