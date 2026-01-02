@@ -151,13 +151,14 @@ release_job:
           direct_asset_path: /windowsjar
           url: "$WINDOWS_JAR_URL"
 
-pages:
+create-pages:
   stage: pages
   image: node:lts
   script:
     - npm install showdown
     - cd docs
     - ./generate.sh
+  pages: true
   artifacts:
     paths:
       - public
