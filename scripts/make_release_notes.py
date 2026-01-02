@@ -43,10 +43,10 @@ LANGS = [
         """
             <h1>Forkyz</h1>
             <p>
-                Forkyz est une bifurcation non officielle de l'application
-                de mots croisés Shortyz. Elle met en œuvre un certain nombre
-                de nouvelles caractéristiques et enlève certaines
-                bibliothèques/traceurs non ouverts.
+                C'est un fork non officiel de l'application de
+                mots croisés Shortyz. Il met en œuvre un certain
+                nombre de nouvelles caractéristiques et enleve
+                certaines bibliothèques/traceurs non ouverts.
             </p>
         """,
         "Version {version}",
