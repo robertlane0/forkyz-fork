@@ -38,3 +38,4 @@ tasks.compileJava {
     options.compilerArgs.addAll(listOf("-Xlint:all", "-Xlint:-processing"))
     options.encoding = "UTF-8"
 }
+

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Terminal=false
+Name=Forkyz
+Comment=Forkyz Crossword Application
+Keywords=crosswords;games;puzzles;entertainment
+Exec=forkyz.sh
+Icon=com.gitlab.Hague.forkyz
+Categories=Game;

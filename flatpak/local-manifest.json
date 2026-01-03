@@ -1,0 +1,71 @@
+{
+  "command": "forkyz.sh",
+  "finish-args": [
+    "--share=network",
+    "--device=dri",
+    "--socket=x11",
+    "--env=JAVA_HOME=/app/jre"
+  ],
+  "id": "com.gitlab.Hague.forkyz",
+  "modules": [
+    {
+      "build-commands": [
+        "/usr/lib/sdk/openjdk17/install.sh"
+      ],
+      "buildsystem": "simple",
+      "name": "openjdk"
+    },
+    {
+      "build-commands": [
+        "install -Dm644 app.crossword.yourealwaysbe.forkyz-linux-x64-76.0.0-release.jar /app/lib/com.gitlab.Hague.forkyz.jar",
+        "install -Dm755 forkyz.sh /app/bin/forkyz.sh",
+        "install -Dm644 com.gitlab.Hague.forkyz.desktop /app/share/applications/com.gitlab.Hague.forkyz.desktop",
+        "install -Dm644 com.gitlab.Hague.forkyz.svg /app/share/icons/hicolor/scalable/apps/com.gitlab.Hague.forkyz.svg",
+        "install -Dm644 com.gitlab.Hague.forkyz.metainfo.xml /app/share/metainfo/com.gitlab.Hague.forkyz.metainfo.xml"
+      ],
+      "build-options": {
+        "env": {
+          "JAVA_HOME": "/usr/lib/sdk/openjdk17/jvm/openjdk-17",
+          "PATH": "/app/bin:/usr/bin:/usr/lib/sdk/openjdk17/bin"
+        }
+      },
+      "buildsystem": "simple",
+      "license-files": [
+        "LICENSE"
+      ],
+      "name": "forkyz",
+      "sources": [
+        {
+          "type": "file",
+          "path": "../LICENSE"
+        },
+        {
+          "type": "file",
+          "path": "com.gitlab.Hague.forkyz.metainfo.xml"
+        },
+        {
+          "type": "file",
+          "path": "com.gitlab.Hague.forkyz.desktop"
+        },
+        {
+          "type": "file",
+          "path": "com.gitlab.Hague.forkyz.svg"
+        },
+        {
+          "type": "file",
+          "path": "forkyz.sh"
+        },
+        {
+          "type": "file",
+          "path": "../app/build/compose/jars/app.crossword.yourealwaysbe.forkyz-linux-x64-76.0.0-release.jar"
+        }
+      ]
+    }
+  ],
+  "runtime": "org.freedesktop.Platform",
+  "runtime-version": "25.08",
+  "sdk": "org.freedesktop.Sdk",
+  "sdk-extensions": [
+    "org.freedesktop.Sdk.Extension.openjdk17"
+  ]
+}

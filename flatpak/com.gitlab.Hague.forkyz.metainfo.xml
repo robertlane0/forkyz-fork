@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.gitlab.Hague.forkyz</id>
+
+  <name>Forkyz</name>
+  <summary>Play crosswords.</summary>
+
+  <metadata_license>CC-BY-SA-4.0</metadata_license>
+  <project_license>GPL-3.0-only</project_license>
+
+  <description>
+    <p>
+      Forkyz is an unofficial fork of the Shortyz Android crossword application.
+    </p>
+    <p>
+      Puzzles can be imported from a large number of supported file formats, or downloaded from various outlets using the built-in downloaders.
+    </p>
+  </description>
+
+  <launchable type="desktop-id">com.gitlab.Hague.forkyz.desktop</launchable>
+
+  <developer_name>Matthew Hague</developer_name>
+
+  <releases>
+    <release version="76.0.0" date="2026-01-05">
+      <url type="details">https://hague.gitlab.io/forkyz/changes.html</url>
+      <description>
+        <p>First release of desktop version.</p>
+      </description>
+    </release>
+  </releases>
+</component>
