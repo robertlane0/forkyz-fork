@@ -39,6 +39,8 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.core.context.startKoin
 import org.koin.java.KoinJavaComponent.inject
 
+import io.github.vinceglb.filekit.FileKit
+
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.announce_not_implemented
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.app_name
@@ -71,6 +73,8 @@ val TOAST_SHAPE = RoundedCornerShape(10.dp)
 val TOAST_DURATION = 5000L // ms
 
 fun main(args : Array<String>) = application {
+    FileKit.init(appId = "forkyz")
+
     val themeHelper : ThemeHelper by inject(ThemeHelper::class.java)
     val fileHandlerProvider : FileHandlerProvider
         by inject(FileHandlerProvider::class.java)

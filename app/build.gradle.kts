@@ -237,6 +237,9 @@ compose.desktop {
                 iconFile.set(
                     project.file("src/jvmMain/resources/forkykz_icon.png")
                 )
+                // for FileKit
+                // https://filekit.mintlify.app/dialogs/setup
+                modules("jdk.security.auth")
             }
             macOS {
                 iconFile.set(

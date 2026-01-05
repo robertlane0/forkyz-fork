@@ -62,6 +62,17 @@
 -dontwarn coil3.**
 -keep class coil3.** { *; }
 
+# FileKit
+-keep class org.freedesktop.dbus.** { *; }
+-keep class io.github.vinceglb.filekit.** { *; }
+-keep class kotlinx.io.files.Path
+-dontnote io.github.vinceglb.filekit.dialogs.platform.windows.jna.IShellItemArray
+-dontnote io.github.vinceglb.filekit.dialogs.platform.windows.jna.ShellItemArray
+# Below recommended by docs
+# https://filekit.mintlify.app/dialogs/setup
+-keep class com.sun.jna.** { *; }
+-keep class * implements com.sun.jna.** { *; }
+
 # Build config
 -keep class app.crossword.yourealwaysbe.forkyz.BuildConfig { *; }
 
