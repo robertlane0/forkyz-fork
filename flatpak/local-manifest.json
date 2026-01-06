@@ -17,6 +17,14 @@
     },
     {
       "build-commands": [
+        "mkdir -p /app/lib",
+        "ln -sf /usr/lib/x86_64-linux-gnu/libdbus-1.so.3 /app/lib/libdbus-1.so"
+      ],
+      "buildsystem": "simple",
+      "name": "dbus-compat"
+    },
+    {
+      "build-commands": [
         "install -Dm644 app.crossword.yourealwaysbe.forkyz-linux-x64-76.0.0-release.jar /app/lib/com.gitlab.Hague.forkyz.jar",
         "install -Dm755 forkyz.sh /app/bin/forkyz.sh",
         "install -Dm644 com.gitlab.Hague.forkyz.desktop /app/share/applications/com.gitlab.Hague.forkyz.desktop",

@@ -61,3 +61,19 @@ It will take some time to download and calculate sha512 sums for all files. Then
 Currently the following dependencies don't parse properly, so will need manual adjustment (search sources, fix-up):
 
 * jdom2
+
+## DBus Fix
+
+The flatpak manifests contain symlinking of the dbus library:
+
+    {
+      "build-commands": [
+        "mkdir -p /app/lib",
+        "ln -sf /usr/lib/x86_64-linux-gnu/libdbus-1.so.3 /app/lib/libdbus-1.so"
+      ],
+      "buildsystem": "simple",
+      "name": "dbus-compat"
+    },
+
+with /app/lib added to LD_LIBRARY_PATH in forkyz.sh. This is because isSystemInDarkTheme does not work on flatpak as the Linux native code tries to load libdbus-1.so, which is not provided on the runtime. Only libdbus-1.so.3 is. The code above creates a needed symlink so the native theme detection will work.
+
