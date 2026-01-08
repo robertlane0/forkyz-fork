@@ -18,24 +18,27 @@
     {
       "build-commands": [
         "mkdir -p /app/lib",
-        "ln -sf /usr/lib/x86_64-linux-gnu/libdbus-1.so.3 /app/lib/libdbus-1.so"
+        "ln -sf /usr/lib/$(gcc -print-multiarch)/libdbus-1.so.3 /app/lib/libdbus-1.so"
       ],
       "buildsystem": "simple",
       "name": "dbus-compat"
     },
     {
       "build-commands": [
-        "install -Dm644 app.crossword.yourealwaysbe.forkyz-linux-x64-76.0.0-release.jar /app/lib/com.gitlab.Hague.forkyz.jar",
-        "install -Dm755 forkyz.sh /app/bin/forkyz.sh",
-        "install -Dm644 com.gitlab.Hague.forkyz.desktop /app/share/applications/com.gitlab.Hague.forkyz.desktop",
-        "install -Dm644 com.gitlab.Hague.forkyz.svg /app/share/icons/hicolor/scalable/apps/com.gitlab.Hague.forkyz.svg",
-        "install -Dm644 com.gitlab.Hague.forkyz.metainfo.xml /app/share/metainfo/com.gitlab.Hague.forkyz.metainfo.xml"
+        "./gradlew clean",
+        "./gradlew packageReleaseUberJarForCurrentOS",
+        "install -Dm644 app/build/compose/jars/app.crossword.yourealwaysbe.forkyz-*-release.jar /app/lib/com.gitlab.Hague.forkyz.jar",
+        "install -Dm755 flatpak/forkyz.sh /app/bin/forkyz.sh",
+        "install -Dm644 flatpak/com.gitlab.Hague.forkyz.desktop /app/share/applications/com.gitlab.Hague.forkyz.desktop",
+        "install -Dm644 flatpak/com.gitlab.Hague.forkyz.svg /app/share/icons/hicolor/scalable/apps/com.gitlab.Hague.forkyz.svg",
+        "install -Dm644 flatpak/com.gitlab.Hague.forkyz.metainfo.xml /app/share/metainfo/com.gitlab.Hague.forkyz.metainfo.xml"
       ],
       "build-options": {
         "env": {
           "JAVA_HOME": "/usr/lib/sdk/openjdk17/jvm/openjdk-17",
           "PATH": "/app/bin:/usr/bin:/usr/lib/sdk/openjdk17/bin"
-        }
+        },
+        "build-args": [ "--share=network" ]
       },
       "buildsystem": "simple",
       "license-files": [
@@ -44,28 +47,8 @@
       "name": "forkyz",
       "sources": [
         {
-          "type": "file",
-          "path": "../LICENSE"
-        },
-        {
-          "type": "file",
-          "path": "com.gitlab.Hague.forkyz.metainfo.xml"
-        },
-        {
-          "type": "file",
-          "path": "com.gitlab.Hague.forkyz.desktop"
-        },
-        {
-          "type": "file",
-          "path": "com.gitlab.Hague.forkyz.svg"
-        },
-        {
-          "type": "file",
-          "path": "forkyz.sh"
-        },
-        {
-          "type": "file",
-          "path": "../app/build/compose/jars/app.crossword.yourealwaysbe.forkyz-linux-x64-76.0.0-release.jar"
+          "type": "dir",
+          "path": "../"
         }
       ]
     }

@@ -18,7 +18,7 @@
     {
       "build-commands": [
         "mkdir -p /app/lib",
-        "ln -sf /usr/lib/x86_64-linux-gnu/libdbus-1.so.3 /app/lib/libdbus-1.so"
+        "ln -sf /usr/lib/$(gcc -print-multiarch)/libdbus-1.so.3 /app/lib/libdbus-1.so"
       ],
       "buildsystem": "simple",
       "name": "dbus-compat"
@@ -28,7 +28,7 @@
         "sed -i 's|distributionUrl=.*|distributionUrl=file\\:///run/build/forkyz/gradle-9.2.1-bin.zip|g' gradle/wrapper/gradle-wrapper.properties",
         "cat > settings.gradle.kts << 'SETTINGSEOF'\npluginManagement {\n    repositories {\n        maven { url = uri(\"/run/build/forkyz/dependencies\") }\n    }\n}\n\ndependencyResolutionManagement {\n    repositories {\n        maven { url = uri(\"/run/build/forkyz/dependencies\") }\n    }\n}\n\ninclude(\":app\", \":puzlib\")\nSETTINGSEOF\n",
         "./gradlew --offline --no-daemon packageReleaseUberJarForCurrentOS",
-        "install -D app/build/compose/jars/app.crossword.yourealwaysbe.forkyz-linux-x64-76.0.0-release.jar /app/lib/com.gitlab.Hague.forkyz.jar",
+        "install -D app/build/compose/jars/app.crossword.yourealwaysbe.forkyz-*-release.jar /app/lib/com.gitlab.Hague.forkyz.jar",
         "install -Dm755 flatpak/forkyz.sh /app/bin/forkyz.sh",
         "install -Dm644 flatpak/com.gitlab.Hague.forkyz.desktop /app/share/applications/com.gitlab.Hague.forkyz.desktop",
         "install -Dm644 flatpak/com.gitlab.Hague.forkyz.svg /app/share/icons/hicolor/scalable/apps/com.gitlab.Hague.forkyz.svg",
