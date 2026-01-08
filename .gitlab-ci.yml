@@ -25,6 +25,36 @@ build_android:
     reports:
       dotenv: android_job.env
 
+build_flatpak:
+  stage: build
+  image: ubuntu:24.04
+  rules:
+    - if: $CI_COMMIT_TAG
+  variables:
+    SECURE_FILES_DOWNLOAD_PATH: './'
+  script:
+    - export APP_VERSION=$(echo $CI_COMMIT_TAG | sed 's/\(v\|alpha\)\([0-9]*\).*/\2/')
+    - apt update
+    - apt install -y curl binutils fakeroot flatpak-builder
+    - flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+    - flatpak install --assumeyes org.freedesktop.Platform//25.08
+    - flatpak install --assumeyes org.freedesktop.Sdk//25.08
+    - flatpak install --assumeyes org.freedesktop.Sdk.Extension.openjdk17//25.08
+    - pushd flatpak
+    - flatpak-builder --repo=repo-local build-local local-manifest.json
+    - flatpak build-bundle repo-local forkyz-${APP_VERSION}.flatpak com.gitlab.Hague.forkyz --runtime-repo=https://flathub.org/repo/flathub.flatpakrepo
+    - mkdir share
+    - mv forkyz-${APP_VERSION}.flatpak share/
+  after_script:
+    - export APP_VERSION=$(echo $CI_COMMIT_TAG | sed 's/\(v\|alpha\)\([0-9]*\).*/\2/')
+    - echo "FLATPAK_URL=https://gitlab.com/Hague/forkyz/-/jobs/$CI_JOB_ID/artifacts/raw/flatpak/share/forkyz_${APP_VERSION}.flatpak" >> linux_job.env
+  artifacts:
+    paths:
+      - flatpak/share
+    expire_in: never
+    reports:
+      dotenv: flatpak_job.env
+
 build_linux:
   stage: build
   image: ubuntu:24.04
@@ -35,30 +65,19 @@ build_linux:
   script:
     - export APP_VERSION=$(echo $CI_COMMIT_TAG | sed 's/\(v\|alpha\)\([0-9]*\).*/\2/')
     - apt update
-    - apt install -y curl openjdk-17-jdk binutils fakeroot flatpak-builder
+    - apt install -y curl openjdk-17-jdk binutils fakeroot
     - update-alternatives --auto java
-    - flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-    - flatpak install --assumeyes org.freedesktop.Platform//25.08
-    - flatpak install --assumeyes org.freedesktop.Sdk//25.08
-    - flatpak install --assumeyes org.freedesktop.Sdk.Extension.openjdk17//25.08
     - ./gradlew packageReleaseDeb
     - ./gradlew packageReleaseUberJarForCurrentOS
     - ./gradlew --stop
-    - pushd flatpak
-    - flatpak-builder --repo=repo-local build-local local-manifest.json
-    - flatpak build-bundle repo-local forkyz-${APP_VERSION}.flatpak com.gitlab.Hague.forkyz --runtime-repo=https://flathub.org/repo/flathub.flatpakrepo
-    - mkdir share
-    - mv forkyz.flatpak share/
   after_script:
     - export APP_VERSION=$(echo $CI_COMMIT_TAG | sed 's/\(v\|alpha\)\([0-9]*\).*/\2/')
     - echo "DEB_APP_URL=https://gitlab.com/Hague/forkyz/-/jobs/$CI_JOB_ID/artifacts/raw/app/build/compose/binaries/main-release/deb/app.crossword.yourealwaysbe.forkyz_${APP_VERSION}.0.0-1_amd64.deb" >> linux_job.env
     - echo "DEB_JAR_URL=https://gitlab.com/Hague/forkyz/-/jobs/$CI_JOB_ID/artifacts/raw/app/build/compose/jars/app.crossword.yourealwaysbe.forkyz-linux-x64-${APP_VERSION}.0.0-release.jar" >> linux_job.env
-    - echo "FLATPAK_URL=https://gitlab.com/Hague/forkyz/-/jobs/$CI_JOB_ID/artifacts/raw/flatpak/share/forkyz_${APP_VERSION}.flatpak" >> linux_job.env
   artifacts:
     paths:
       - app/build/compose/binaries/main-release/deb
       - app/build/compose/jars
-      - flatpak/share
     expire_in: never
     reports:
       dotenv: linux_job.env
@@ -117,6 +136,8 @@ release_job:
   needs:
     - job: build_android
       artifacts: true
+    - job: build_flatpak
+      artifacts: true
     - job: build_linux
       artifacts: true
 #    - job: build_mac
@@ -144,10 +165,10 @@ release_job:
         - name: App APK Install File
           direct_asset_path: /apk
           url: "$ANDROID_APP_URL"
-        - name: Linux Flatpak
+        - name: Linux Flatpak (x86_64/amd64)
           direct_asset_path: /flatpak
           url: "$FLATPAK_URL"
-        - name: Linux (.deb) Install File
+        - name: Linux (.deb) Install File (x86_64/amd64)
           direct_asset_path: /deb
           url: "$DEB_APP_URL"
 #        - name: Mac Install File
@@ -156,7 +177,7 @@ release_job:
         - name: Windows Install File
           direct_asset_path: /msi
           url: "$WINDOWS_APP_URL"
-        - name: Linux Java Jar File
+        - name: Linux Java Jar File (x86_64/amd64)
           direct_asset_path: /linuxjar
           url: "$DEB_JAR_URL"
 #        - name: Mac Java Jar File
