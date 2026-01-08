@@ -8,7 +8,12 @@ follow a standard across/down set-up) and other customisations.
      alt="Get it on F-Droid"
      height="80">](https://f-droid.org/packages/app.crossword.yourealwaysbe.forkyz/)
 
-[Release APKs][releases] can be installed directly.
+[Releases][releases] can be installed directly on
+
+* Android
+* Linux (experimental)
+* Flatpak (experimental)
+* Windows (experimental)
 
 [Forkyz Scanner][forkyz-scanner] is a companion app for scanning crosswords from the camera, images, or PDFs.
 
@@ -141,11 +146,19 @@ This only works for a limited number of sites, but may work for sites using simi
 
 Gradle should compile fine as long as you have Java 17 or above.
 
+For Android:
+
     $ ./gradlew assembleDebug
 
 Or to build and install, with device connected
 
     $ ./gradlew installDebug
+
+For desktop:
+
+    $ ./gradlew run
+
+See `./gradlew tasks` for all build commands.
 
 ## Project Structure
 
