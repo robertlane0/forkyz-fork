@@ -181,6 +181,8 @@ Translations are welcome. Here is a quick guide to what is needed.
   The files in the `changelogs` directory are optional. By default i will
   create auto-translations with [Argos Translate][argostranslate]. This avoids
   a barrier to releases. I will accept corrections though.
+* The desktop metainfo in `flatpak/com.gitlab.Hague.forkyz.metainfo.xml` needs
+  additional elements for supported languages.
 * Finally, create a translated copy of
   `puzlib/src/main/resources/app/crossword/yourealwaysbe/puz/strings.properties`
   with the name

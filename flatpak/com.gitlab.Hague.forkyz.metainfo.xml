@@ -4,16 +4,23 @@
 
   <name>Forkyz</name>
   <summary>Play crosswords.</summary>
+  <summary xml:lang="fr">Jouer des Mots Croisés</summary>
 
   <metadata_license>CC-BY-SA-4.0</metadata_license>
   <project_license>GPL-3.0-only</project_license>
 
   <description>
     <p>
-      Forkyz is an unofficial fork of the Shortyz Android crossword application.
+      Forkyz is an unofficial fork of the Shortyz Android crossword
+      application. Puzzles can be imported from a large number of supported
+      file formats, or downloaded from various outlets using the built-in
+      downloaders.
     </p>
-    <p>
-      Puzzles can be imported from a large number of supported file formats, or downloaded from various outlets using the built-in downloaders.
+    <p xml:lang="fr">
+        Forkyz est un fork non officiel de l'application de mots croisés Shortyz.
+        Les mots croisés peuvent être importées à partir d'un grand nombre de cas de soutien
+        formats de fichiers, ou téléchargés à partir de divers points de vente en utilisant l' intégré
+        téléchargeurs.
     </p>
   </description>
 
@@ -26,6 +33,7 @@
       <url type="details">https://hague.gitlab.io/forkyz/changes.html</url>
       <description>
         <p>First release of desktop version.</p>
+        <p xml:lang="fr">Première version de la version de bureau.</p>
       </description>
     </release>
   </releases>
