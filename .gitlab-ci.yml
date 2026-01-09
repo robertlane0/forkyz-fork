@@ -162,7 +162,7 @@ release_job:
     description: 'release_changelog.txt'
     assets:
       links:
-        - name: App APK Install File
+        - name: Android APK Install File
           direct_asset_path: /apk
           url: "$ANDROID_APP_URL"
           link_type: 'package'
