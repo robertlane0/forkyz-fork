@@ -1,0 +1,15 @@
+- Ajouter les mots croisés néerlandais NRC et La Croix.
+- Supportez l'importation de partage à partir des pages web de Crossweird.
+- Support Claude ainsi que Chat GPT pour l'utilisation LLM (reconfiguration des besoins).
+- Option commandes vocales pour améliorer l'interprétation avec les LLM.
+- Ajouter des thèmes verts, bleus et oranges.
+- Affichez les erreurs avec une boîte rouge au lieu de changer de couleur de fond/fond.
+- Clavier intégré: déplacez la touche d'entrée spéciale vers une longue pression sur la direction de changement.
+- Matériel / clavier intégré: agir sur la touche vers le bas plutôt que vers le haut.
+- Déplacez-vous dans le nouveau menu de bouton d'action Material 3.
+- Prise en charge des paramètres de langue par application.
+- Raffinement de la traduction française (merci @d-faure, @Clem0908, @Ash Crow)
+- Plus de réécritures, corrections de bogues, nouveaux bogues.
+- Version de bureau initiale disponible : https://gitlab.com/Hague/forkyz/-/releases
+
+Changelog traduit automatiquement avec Argos Translate.

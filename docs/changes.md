@@ -1,5 +1,21 @@
 # Forkyz Changelog
 
+## Version 77
+
+- Add Dutch NRC and La Croix crossword sources.
+- Support share import from Crossweird web pages.
+- Support Claude as well as Chat GPT for LLM usage (needs re-configuring).
+- Voice commands option to enhance interpretation with LLMs.
+- Add Material green, blue, and orange themes.
+- Show errors with a red box instead of varying background/font colour changes.
+- Built-in keyboard: move special entry key to long-press on change direction.
+- Hardware/built-in keyboard: act on key down rather than up.
+- Move to new Material 3 action button menu.
+- Support per-app language settings.
+- Refinement of French translation (thanks @d-faure, @Clem0908, @Ash_Crow)
+- More backend rewrites, bugs fixes, new bugs.
+- Initial desktop version available: https://gitlab.com/Hague/forkyz/-/releases
+
 ## Version 76
 
 - Add French translation (thanks Clem0908).
