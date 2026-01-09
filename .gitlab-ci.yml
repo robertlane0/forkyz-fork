@@ -165,27 +165,34 @@ release_job:
         - name: App APK Install File
           direct_asset_path: /apk
           url: "$ANDROID_APP_URL"
+          link_type: 'package'
         - name: Linux Flatpak (x86_64/amd64)
           direct_asset_path: /flatpak
           url: "$FLATPAK_URL"
+          link_type: 'package'
         - name: Linux (.deb) Install File (x86_64/amd64)
           direct_asset_path: /deb
           url: "$DEB_APP_URL"
+          link_type: 'package'
         - name: Linux Java Jar File (x86_64/amd64)
           direct_asset_path: /linuxjar
           url: "$DEB_JAR_URL"
+          link_type: 'other'
 #        - name: Mac Install File
 #          direct_asset_path: /dmg
 #          url: "$DMG_APP_URL"
+#          link_type: 'package'
 #        - name: Mac Java Jar File
 #          direct_asset_path: /macjar
 #          url: "$DMG_JAR_URL"
         - name: Windows Install File
           direct_asset_path: /msi
           url: "$WINDOWS_APP_URL"
+          link_type: 'package'
         - name: Windows Java Jar File
           direct_asset_path: /windowsjar
           url: "$WINDOWS_JAR_URL"
+          link_type: 'other'
 
 create-pages:
   stage: pages
