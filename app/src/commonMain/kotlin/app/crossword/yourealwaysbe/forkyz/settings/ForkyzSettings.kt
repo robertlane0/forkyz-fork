@@ -1553,6 +1553,15 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     fun getKeyboardSettings(cb : (KeyboardSettings) -> Unit)
         = settingsOnce(cb, this::makeKeyboardSettings)
 
+    val liveKeyboardSplitWords : Flow<Boolean>
+        = settingsMap { it.keyboardSplitWords }
+
+    fun setKeyboardSplitWords(value : Boolean) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardSplitWords = value)
+        }
+    }
+
     val liveKeyboardUseNative : Flow<Boolean>
         = settingsMap { it.useNativeKeyboard }
 
@@ -2880,6 +2889,11 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
                    }
                }
             },
+        )
+        run(
+            "keyboardSplitWords",
+            { s, key -> json.put(key, s.keyboardSplitWords) },
+            { key -> json.optBoolean(key)?.let { setKeyboardSplitWords(it) } },
         )
         run(
             "lastSeenVersion",

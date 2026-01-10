@@ -460,6 +460,8 @@
     <string name="keyboard_force_caps_desc">Most crossword solutions use capital letters. If checked, convert all native keyboard input to upper case.</string>
     <string name="keyboard_built_in">Built-in Forkyz Keyboard</string>
     <string name="keyboard_native">Native Android Keyboard</string>
+    <string name="keyboard_split_words">Split Words</string>
+    <string name="keyboard_split_words_desc">Split responses from the native input method into individual characters rather than entering the complete word into one cell.</string>
 
     <!-- preferences interaction -->
     <string name="cycle_unfilled">Cycle on Unfilled Words </string>

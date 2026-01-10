@@ -102,7 +102,7 @@ fun ClueListPage(
                 }
                 Key.Delete, Key.Backspace -> {
                     if (isDown)
-                        viewModel.deleteLetter()
+                        viewModel.deleteResponse()
                     return true
                 }
                 Key.Spacebar -> {
@@ -115,7 +115,7 @@ fun ClueListPage(
             val keyChar = letterOrDigitKeyToChar(event.key)
             if (keyChar != null) {
                 if (isDown)
-                    viewModel.playLetter(keyChar)
+                    viewModel.playResponse(keyChar)
                 return true
             } else {
                 return onKeyEventPuzzlePage(event)

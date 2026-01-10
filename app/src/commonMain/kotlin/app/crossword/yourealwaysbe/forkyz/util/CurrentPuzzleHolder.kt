@@ -6,6 +6,7 @@ import java.util.function.Consumer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 
@@ -78,16 +79,20 @@ public class CurrentPuzzleHolder(
             // main scope needed because currently settings can only get
             // on main thread (because they return on main thread)
             mainScope.launch {
-                settings.getPlayPreserveCorrectLettersInShowErrors() {
-                    preserveCorrect ->
-                settings.getPlayDeleteCrossingMode() { deleteCrossingMode ->
-                settings.getPlayShowErrorsGrid() { showErrorsGrid ->
-                settings.getPlayShowErrorsCursor() { showErrorsCursor ->
-                settings.getPlayShowErrorsClue() { showErrorsClue ->
-                settings.getPlayToggleBeforeMove() { toggleBeforeMove ->
-                settings.getPlayMovementStrategy() { movementStrategy ->
-                settings.getPlaySkipFilled() { skipFilled ->
-                settings.getPlayPlayLetterUndoEnabled() { undoEnabled ->
+                val preserveCorrect
+                    = settings.livePlayPreserveCorrectLettersInShowErrors
+                        .first()
+                val deleteCrossingMode
+                    = settings.livePlayDeleteCrossingMode.first()
+                val showErrorsGrid = settings.livePlayShowErrorsGrid.first()
+                val showErrorsCursor = settings.livePlayShowErrorsCursor.first()
+                val showErrorsClue = settings.livePlayShowErrorsClue.first()
+                val toggleBeforeMove = settings.livePlayToggleBeforeMove.first()
+                val movementStrategy = settings.livePlayMovementStrategy.first()
+                val skipFilled = settings.livePlaySkipFilled.first()
+                val undoEnabled = settings.livePlayPlayLetterUndoEnabled.first()
+                val scratchMode = settings.livePlayScratchMode.first()
+                val splitWords = settings.liveKeyboardSplitWords.first()
                 fileHandlerProvider.get() { fileHandler ->
                     // on main thread so go back to io
                     ioScope.launch {
@@ -109,7 +114,9 @@ public class CurrentPuzzleHolder(
                                     showErrorsGrid,
                                     toggleBeforeMove,
                                     skipFilled,
-                                    undoEnabled
+                                    undoEnabled,
+                                    scratchMode,
+                                    splitWords,
                                 )
                                 this@CurrentPuzzleHolder.puzHandle = puzHandle
                                 cb.run()
@@ -120,7 +127,7 @@ public class CurrentPuzzleHolder(
                             ioLock.unlock()
                         }
                     }
-                }}}}}}}}}}
+                }
             }
         }
     }
@@ -251,6 +258,12 @@ public class CurrentPuzzleHolder(
             .observeForeverWithProcessLifecycle {
                 board?.setPlayLetterUndoStackEnabled(it)
             }
+        settings.livePlayScratchMode.observeForeverWithProcessLifecycle {
+            board?.setScratchMode(it)
+        }
+        settings.liveKeyboardSplitWords.observeForeverWithProcessLifecycle {
+            board?.setSplitResponses(it)
+        }
     }
 }
 

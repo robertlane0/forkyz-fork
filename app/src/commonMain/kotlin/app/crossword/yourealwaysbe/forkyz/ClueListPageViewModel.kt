@@ -70,8 +70,8 @@ class ClueListPageViewModel(
         viewModelScope,
         settings,
         getBoard(),
-        this::playLetter,
-        this::deleteLetter,
+        this::playResponse,
+        this::deleteResponse,
     )
 
     val clueTabsViewModel = ClueTabsViewModel(
@@ -79,8 +79,8 @@ class ClueListPageViewModel(
         viewModelScope,
         settings,
         getBoard(),
-        this::playLetter,
-        this::deleteLetter,
+        this::playResponse,
+        this::deleteResponse,
     )
 
     fun toggleShowAllWords() {
@@ -104,42 +104,32 @@ class ClueListPageViewModel(
         }
     }
 
-    fun deleteLetter() {
+    fun deleteResponse() {
         getBoard()?.let { board ->
-            settings.getPlayScratchMode { scratchMode ->
-                movementStrategyFlow.getOnce { movementStrategy ->
-                    val oldMovementStrategy = board.getMovementStrategy()
-                    board.setMovementStrategy(movementStrategy)
-                    if (scratchMode)
-                        board.deleteScratchLetter()
-                    else
-                        board.deleteOrUndoLetter()
-                    board.setMovementStrategy(oldMovementStrategy)
-                }
+            movementStrategyFlow.getOnce { movementStrategy ->
+                val oldMovementStrategy = board.getMovementStrategy()
+                board.setMovementStrategy(movementStrategy)
+                board.deleteOrUndoResponse()
+                board.setMovementStrategy(oldMovementStrategy)
             }
         }
     }
 
     fun playSpace() {
-        playLetter(' ')
+        playResponse(' ')
     }
 
-    fun playLetter(c : Char) {
-        playLetter(c.toString())
+    fun playResponse(c : Char) {
+        playResponse(c.toString())
     }
 
-    fun playLetter(c : String) {
+    fun playResponse(c : String) {
         getBoard()?.let { board ->
-            settings.getPlayScratchMode { scratchMode ->
-                movementStrategyFlow.getOnce { movementStrategy ->
-                    val oldMovementStrategy = board.getMovementStrategy()
-                    board.setMovementStrategy(movementStrategy)
-                    if (scratchMode)
-                        board.playScratchLetter(c)
-                    else
-                        board.playLetter(c)
-                    board.setMovementStrategy(oldMovementStrategy)
-                }
+            movementStrategyFlow.getOnce { movementStrategy ->
+                val oldMovementStrategy = board.getMovementStrategy()
+                board.setMovementStrategy(movementStrategy)
+                board.playResponse(c)
+                board.setMovementStrategy(oldMovementStrategy)
             }
         }
     }

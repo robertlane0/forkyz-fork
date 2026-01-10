@@ -270,4 +270,5 @@ message Settings {
     LLMAgent llmAgent = 140;
     bool downloadLaCroix = 141;
     bool llmVoiceCommands = 142;
+    bool keyboardSplitWords = 143;
 }

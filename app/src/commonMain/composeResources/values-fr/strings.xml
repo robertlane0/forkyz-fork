@@ -458,6 +458,8 @@
     <string name="keyboard_force_caps_desc">La plupart des solutions de mots croisés utilisent des lettres majuscules. Si coché, convertissez toutes les entrées de clavier natives en majuscules.</string>
     <string name="keyboard_built_in">Clavier Forkyz intégré</string>
     <string name="keyboard_native">Clavier Android natif</string>
+    <string name="keyboard_split_words">Paroles divisées.</string>
+    <string name="keyboard_split_words_desc">Diviser les réponses de la méthode d'entrée native en caractères individuels plutôt que d'entrer le mot complet dans une seule cellule.</string>
 
     <!-- preferences interaction -->
     <string name="cycle_unfilled">Cycle sur les mots non remplis</string>

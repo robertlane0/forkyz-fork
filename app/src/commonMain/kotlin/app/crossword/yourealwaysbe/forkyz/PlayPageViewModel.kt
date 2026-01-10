@@ -4,6 +4,7 @@ package app.crossword.yourealwaysbe.forkyz
 import kotlin.random.Random
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -199,8 +200,8 @@ class PlayPageViewModel(
         viewModelScope,
         settings,
         getBoard(),
-        this::playLetter,
-        this::deleteLetter,
+        this::playResponse,
+        this::deleteResponse,
     )
 
     val clueTabsViewModel = ClueTabsViewModel(
@@ -208,8 +209,8 @@ class PlayPageViewModel(
         viewModelScope,
         settings,
         getBoard(),
-        this::playLetter,
-        this::deleteLetter,
+        this::playResponse,
+        this::deleteResponse,
     )
     init {
         settings.getPlayClueTabsPage(0) { clueTabsViewModel.setPage(0, it) }
@@ -296,29 +297,19 @@ class PlayPageViewModel(
         settings.setPlayClueTabsPage(index, page)
     }
 
-    fun deleteLetter() {
+    fun deleteResponse() {
         getBoard()?.let { board ->
-            settings.getPlayScratchMode { scratchMode ->
-                if (scratchMode)
-                    board.deleteScratchLetter();
-                else
-                    board.deleteOrUndoLetter();
-            }
+            board.deleteOrUndoResponse()
         }
     }
 
-    fun playLetter(c : Char) {
-        playLetter(c.toString())
+    fun playResponse(c : Char) {
+        playResponse(c.toString())
     }
 
-    fun playLetter(c : String) {
+    fun playResponse(c : String) {
         getBoard()?.let { board ->
-            settings.getPlayScratchMode { scratchMode ->
-                if (scratchMode)
-                    board.playScratchLetter(c)
-                else
-                    board.playLetter(c)
-            }
+            board.playResponse(c)
         }
     }
 
@@ -327,7 +318,7 @@ class PlayPageViewModel(
             if (changesDir)
                 getBoard()?.toggleSelection()
             else
-                playLetter(' ')
+                playResponse(' ')
         }
     }
 
@@ -366,7 +357,7 @@ class PlayPageViewModel(
         if (board == null || puz == null)
             return
 
-        val currentID = board.getClueID();
+        val currentID = board.getClueID()
 
         val unfilledClues = puz.getAllClues().filter { clue ->
             val cid = clue.getClueID()
@@ -405,7 +396,7 @@ class PlayPageViewModel(
         viewModelScope.launch {
             registerVoiceCommand(VoiceCommand(
                 utils.getString(Res.string.command_delete),
-                { deleteLetter() },
+                { deleteResponse() },
             ))
             registerVoiceCommand(VoiceCommand(
                 utils.getString(Res.string.command_toggle),

@@ -98,6 +98,7 @@ fun BoardEditText(
     onDelete : (Int) -> Unit = { null },
     onChange : (Int, Char) -> String? = { _, _ -> null },
     skipFilled : Boolean = false,
+    splitWords : Boolean = false,
     separators : ImmutableList<String?> = persistentListOf(),
     shadow : String? = null,
     onTap : () -> Unit,
@@ -122,28 +123,49 @@ fun BoardEditText(
     }
 
     fun onNewResponse(response : String) {
-        response.getOrNull(0)?.let { newChar ->
-            if (isAcceptableCharacterResponse(newChar)) {
-                val newValue = onChange(state.selected, newChar)
+        val acceptable = response.filter(::isAcceptableCharacterResponse)
+        var changed = false
+
+        if (acceptable.length > 0) {
+            // enter just first char unless split words
+            val toEnter = if (splitWords)
+                acceptable
+            else
+                acceptable.substring(0,1)
+
+            var newValue : String? = null
+            for (newChar in toEnter) {
+                newValue = onChange(state.selected, newChar)
                 if (newValue != null) {
-                    val nextSelected = Math.min(length - 1, state.selected + 1)
-                    state.selected = nextSelected
-                    while (
-                        skipFilled
-                        && !isSelectedBlank(newValue)
-                        && state.selected < (length - 1)
-                    ) {
-                        state.selected += 1
+                    changed = true
+                    state.selected += 1
+                    if (state.selected >= length) {
+                        state.selected = Math.max(0, state.selected - 1)
+                        break
                     }
-                    // go back if we didn't find a blank
-                    if (skipFilled && !isSelectedBlank(newValue))
-                        state.selected = nextSelected
-                } else {
-                    // input will need refreshing as there's no change
-                    // so the ime will be confused
-                    refreshInput()
                 }
             }
+
+            if (newValue != null) {
+                // find next blank if skip filled
+                val endSelected = state.selected
+                while (
+                    skipFilled
+                    && !isSelectedBlank(newValue)
+                    && state.selected < (length - 1)
+                ) {
+                    state.selected += 1
+                }
+                // go back if we didn't find a blank
+                if (skipFilled && !isSelectedBlank(newValue))
+                    state.selected = endSelected
+            }
+        }
+
+        if (!changed) {
+            // input will need refreshing as there's no change
+            // so the ime will be confused
+            refreshInput()
         }
     }
 

@@ -99,6 +99,7 @@ val DEFAULT_SETTINGS : Settings = Settings(
     keyboardRepeatDelay = 300,
     keyboardRepeatInterval = 75,
     keyboardShowHide = KeyboardMode.KM_HIDE_MANUAL,
+    keyboardSplitWords = false,
     lastSeenVersion = "",
     movementStrategy = MovementStrategySetting.MSS_MOVE_NEXT_ON_AXIS,
     movementStrategyClueList = MovementStrategySetting.MSS_MOVE_NEXT_CLUE,

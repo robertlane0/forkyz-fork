@@ -135,6 +135,7 @@ data class NotesPageUIState(
     val confirmTransferRequest : TransferRequest? = null,
     val renderSettings : RenderSettings = RenderSettings(),
     val skipFilled : Boolean = false,
+    val splitWords : Boolean = false,
     val expandableClueLine : Boolean = false,
     val clueSeparators : ImmutableList<String?> = persistentListOf(),
 ) {
@@ -158,6 +159,7 @@ private data class DisplaySettings(
 
 private data class InteractionSettings(
     val skipFilled : Boolean,
+    val splitWords : Boolean,
 )
 
 private data class NotesSettings(
@@ -185,6 +187,7 @@ class NotesPageViewModel(
                 state.copy(
                     renderSettings = notesSettings.display.renderSettings,
                     skipFilled = notesSettings.interaction.skipFilled,
+                    splitWords = notesSettings.interaction.splitWords,
                     expandableClueLine
                         = notesSettings.display.expandableClueLine,
                     clueSeparators = getSeparators(
@@ -200,7 +203,11 @@ class NotesPageViewModel(
                     settings.livePlayExpandableClueLine,
                     ::DisplaySettings,
                 ),
-                settings.livePlaySkipFilled.map(::InteractionSettings),
+                combine(
+                    settings.livePlaySkipFilled,
+                    settings.liveKeyboardSplitWords,
+                    ::InteractionSettings,
+                ),
                 ::NotesSettings,
             ),
         )
@@ -299,7 +306,7 @@ class NotesPageViewModel(
             val oldMovementStrategy = board.getMovementStrategy()
             movementStrategyFlow.getOnce { movementStrategy ->
                 board.setMovementStrategy(movementStrategy)
-                board.playLetter(c)
+                board.playCellResponse(c)
                 board.setMovementStrategy(oldMovementStrategy)
             }
         }

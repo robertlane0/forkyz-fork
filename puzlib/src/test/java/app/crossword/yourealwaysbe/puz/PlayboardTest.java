@@ -829,6 +829,65 @@ public class PlayboardTest {
         assertClue(board, "Across", "1");
     }
 
+    @TestWithAndWithoutBlockObjects
+    public void testPlayAnswer(boolean blockObjects) throws Exception {
+        Puzzle puz = loadTestPuz(blockObjects);
+        Playboard board = new Playboard(puz);
+
+        // Move to middle of clue, enter answer, test set in full clue
+
+        moveToPosition(board, 1, 2);
+        board.playAnswer("ABCDE");
+
+        assertBoxLetter(puz, 1, 0, "A");
+        assertBoxLetter(puz, 1, 1, "B");
+        assertBoxLetter(puz, 1, 2, "C");
+        assertBoxLetter(puz, 1, 3, "D");
+        assertBoxLetter(puz, 1, 4, "E");
+
+        assertPosition(board, 1, 4);
+    }
+
+    public void testPlayLetters(boolean blockObjects) throws Exception {
+        Puzzle puz = loadTestPuz(blockObjects);
+        Playboard board = new Playboard(puz);
+
+        // Move to middle of clue, enter letters, test set from cur pos
+
+        moveToPosition(board, 1, 2);
+        board.playLetters("ABCDE");
+
+        assertBoxBlank(puz, 1, 0);
+        assertBoxBlank(puz, 1, 1);
+        assertBoxLetter(puz, 1, 2, "A");
+        assertBoxLetter(puz, 1, 3, "B");
+        assertBoxLetter(puz, 1, 4, "C");
+
+        assertPosition(board, 1, 4);
+    }
+
+    public void testPlayScratchLetters(boolean blockObjects) throws Exception {
+        Puzzle puz = loadTestPuz(blockObjects);
+        Playboard board = new Playboard(puz);
+
+        // Move to middle of clue, enter scratch letters, test set from cur pos
+
+        moveToPosition(board, 1, 2);
+        board.playScratchLetters("ABCDE");
+
+        assertBoxBlank(puz, 1, 0);
+        assertBoxBlank(puz, 1, 1);
+        assertBoxBlank(puz, 1, 2);
+        assertBoxBlank(puz, 1, 3);
+        assertBoxBlank(puz, 1, 4);
+        assertPosition(board, 1, 4);
+
+        assertEquals(
+            "  ABC",
+            puz.getNote(board.getClueID()).getScratch()
+        );
+    }
+
     private void checkNoMoveFullGrid(
         boolean blockObjects, MovementStrategy moveStrat
     ) throws Exception {

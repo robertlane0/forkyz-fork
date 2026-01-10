@@ -558,7 +558,7 @@ fun PlayPage(
                 }
                 Key.Delete, Key.Backspace -> {
                     if (isDown)
-                        viewModel.deleteLetter()
+                        viewModel.deleteResponse()
                     handled = true
                 }
             }
@@ -567,7 +567,7 @@ fun PlayPage(
                 val keyChar = letterOrDigitKeyToChar(event.key)
                 if (keyChar != null) {
                     if (isDown)
-                        viewModel.playLetter(keyChar)
+                        viewModel.playResponse(keyChar)
                     handled = true
                 }
             }

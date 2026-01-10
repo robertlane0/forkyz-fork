@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.Stack;
+import java.util.function.BiFunction;
 import java.util.logging.Logger;
 
 import app.crossword.yourealwaysbe.puz.util.PuzzleUtils;
@@ -43,6 +44,8 @@ public class Playboard {
     private boolean preserveCorrectLettersInShowErrors;
     private boolean toggleBeforeMove;
     private DeleteCrossingMode deleteCrossingMode = DeleteCrossingMode.DELETE;
+    private boolean scratchMode;
+    private boolean splitResponses;
     private Word previousWord = null;
     private Position previousPosition = null;
     // used by findZoneDelta to track last index to handle clues with
@@ -81,7 +84,9 @@ public class Playboard {
         boolean showErrorsGrid,
         boolean toggleBeforeMove,
         boolean skipCompletedLetters,
-        boolean undoEnabled
+        boolean undoEnabled,
+        boolean scratchMode,
+        boolean splitResponses
     ) {
         this(
             puzzle,
@@ -95,6 +100,8 @@ public class Playboard {
         this.toggleBeforeMove = toggleBeforeMove;
         this.skipCompletedLetters = skipCompletedLetters;
         playLetterUndoStack.setEnabled(undoEnabled);
+        this.scratchMode = scratchMode;
+        this.splitResponses = splitResponses;
     }
 
     public Playboard(Puzzle puzzle,
@@ -161,6 +168,24 @@ public class Playboard {
      */
     public void setDeleteCrossingMode(DeleteCrossingMode value){
         this.deleteCrossingMode = value;
+    }
+
+    /**
+     * Whether playResponse goes to scratch or to cell as normal
+     */
+    public void setScratchMode(boolean scratchMode) {
+        this.scratchMode = scratchMode;
+    }
+
+    /**
+     * Whether playResponses get split into characters
+     *
+     * Normally a word will go into one cell. With this mode, the word
+     * is split into characters and entered into neighbouring cells in
+     * the clue.
+     */
+    public void setSplitResponses(boolean splitResponses) {
+        this.splitResponses = splitResponses;
     }
 
     public Box[][] getBoxes() {
@@ -569,9 +594,21 @@ public class Playboard {
     }
 
     /**
+     * Delete response according to scratchMode
+     */
+    public Word deleteOrUndoResponse() {
+        if (scratchMode)
+            return deleteScratchLetter();
+        else
+            return deleteOrUndoLetter();
+    }
+
+    /**
      * Handler for the backspace key.  Uses the following algorithm:
      * -If current box is empty, move back one character.  If not, stay still.
      * -Delete the letter in the current box.
+     *
+     *  Prefer deleteOrUndoResponse unless letter not scratch needed.
      */
     public Word deleteOrUndoLetter() {
         Box currentBox = this.getCurrentBox();
@@ -649,7 +686,9 @@ public class Playboard {
         return wordToReturn;
     }
 
-    public void deleteScratchLetter() {
+    public Word deleteScratchLetter() {
+        Word prevWord = getCurrentWord();
+
         Box currentBox = this.getCurrentBox();
 
         pushNotificationDisabled();
@@ -673,6 +712,8 @@ public class Playboard {
 
         popNotificationDisabled();
         notifyChange();
+
+        return prevWord;
     }
 
     /**
@@ -1100,42 +1141,40 @@ public class Playboard {
         if (answer == null)
             return;
 
-        Position startPos = getHighlightLetter();
-        Zone zone = getCurrentZone();
-        if (zone == null)
-            return;
-
         pushNotificationDisabled();
-
-        int idx = 0;
-        for (Position pos : zone) {
-            if (idx >= answer.length())
-                break;
-
-            Box b = puzzle.checkedGetBox(pos);
-            if (Box.isBlock(b))
-                break;
-
-            if (
-                !preserveCorrectLettersInShowErrors
-                || !Objects.equals(b.getResponse(), b.getSolution())
-                || !isShowErrors()
-            ) {
-                b.setResponse(answer.charAt(idx));
-                b.setResponder(this.responder);
-                flagChange(pos);
-            }
-
-            idx += 1;
-        }
-
-        Position currentPos = getHighlightLetter();
-        if (!Objects.equals(currentPos, startPos))
-            setHighlightLetter(startPos);
-
+        jumpToClue(getClueID());
+        // use STOP_ON_END movement for entering answers
+        MovementStrategy oldMovementStrategy = getMovementStrategy();
+        setMovementStrategy(MovementStrategy.STOP_ON_END);
+        playLetters(answer);
+        setMovementStrategy(oldMovementStrategy);
         popNotificationDisabled();
+    }
 
-        notifyChange();
+    /**
+     * Insert the string as a sequence of letters into cells
+     *
+     * Starts from current pos and enters box-by-box until letters or
+     * current word runs out.
+     *
+     * See playResponse.
+     */
+    public Word playLetters(String letters) {
+        return playBoxLetters(
+            letters,
+            (box, letter) -> {
+                if (
+                    !preserveCorrectLettersInShowErrors
+                    || !Objects.equals(box.getResponse(), box.getSolution())
+                    || !isShowErrors()
+                ) {
+                    box.setResponse(letter);
+                    box.setResponder(this.responder);
+                    return true;
+                }
+                return false;
+            }
+        );
     }
 
     /**
@@ -1164,10 +1203,72 @@ public class Playboard {
         notifyChange();
     }
 
+    /**
+     * Plays the response and returns the previous word
+     *
+     * If response is null, nothing happens and the current word is
+     * returned. Response is added according to splitWords and
+     * scratchMode.
+     *
+     * This method should be preferred over playLetter(s) and
+     * playScratchLetter(s) unless a specific action is required.
+     */
+    public Word playResponse(String response) {
+        if (scratchMode)
+            return playScratchResponse(response);
+        else
+            return playCellResponse(response);
+    }
+
+    /**
+     * See playResponse, play to cell not scratch
+     */
+    public Word playCellResponse(String response) {
+        if (response == null)
+            return getCurrentWord();
+
+        boolean split = splitResponses
+            && (response.codePointCount(0, response.length()) > 1);
+
+        if (split)
+            return playLetters(response);
+        else
+            return playLetter(response);
+    }
+
+    /**
+     * See playResponse
+     */
+    public Word playScratchResponse(String response) {
+        if (response == null)
+            return getCurrentWord();
+
+        boolean split = splitResponses
+            && (response.codePointCount(0, response.length()) > 1);
+
+        if (split)
+            return playScratchLetters(response);
+        else
+            return playScratchLetter(response);
+    }
+
+    /**
+     * See playResponse with String
+     */
+    public Word playResponse(char letter) {
+        return playResponse(String.valueOf(letter));
+    }
+
+    /**
+     * See playResponse
+     */
     public Word playLetter(char letter) {
         return playLetter(String.valueOf(letter));
     }
 
+    /**
+     * See playResponse
+     */
     public Word playLetter(String letter) {
         Position pos = getHighlightLetter();
         Box b = puzzle.checkedGetBox(pos);
@@ -1205,41 +1306,49 @@ public class Playboard {
         }
     }
 
-    public void playScratchLetter(String letter) {
-        if (!letter.isEmpty())
-            playScratchLetter(letter.charAt(0));
+    /**
+     * Insert the string as a sequence of letters into cells scratch
+     *
+     * Starts from current pos and enters box-by-box until letters or
+     * current word runs out.
+     *
+     * See playResponse.
+     */
+    public Word playScratchLetters(String letters) {
+        return playBoxLetters(
+            letters,
+            (box, letter) -> {
+                if (letter.length() > 0)
+                    return setScratchLetter(box, letter.charAt(0));
+                else
+                    return false;
+            }
+        );
     }
 
-    public void playScratchLetter(char letter) {
+    /**
+     * See playResponse
+     */
+    public Word playScratchLetter(String letter) {
+        if (!letter.isEmpty())
+            return playScratchLetter(letter.charAt(0));
+        else
+            return getCurrentWord();
+    }
+
+    /**
+     * See playResponse
+     */
+    public Word playScratchLetter(char letter) {
+        Word prevWord = getCurrentWord();
+        pushNotificationDisabled();
         Position highlightPos = getHighlightLetter();
         Box box = puzzle.checkedGetBox(highlightPos);
-        if (Box.isBlock(box))
-            return;
-
-        pushNotificationDisabled();
-
-        ClueID cid = getClueID();
-        Note note = getNote();
-        int length = getCurrentWordLength();
-
-        // Create a note for this clue if we don't already have one
-        if (note == null) {
-            note = new Note(length);
-            puzzle.setNote(cid, note);
-        }
-
-        // Update the scratch text
-        int pos = box.getCluePosition(cid);
-        if (pos >= 0 && pos < length) {
-            note = note.withScratchLetter(pos, letter);
-            puzzle.setNote(cid, note);
-            flagChange(highlightPos);
-        }
-
+        setScratchLetter(box, letter);
         nextLetter();
         popNotificationDisabled();
-
         notifyChange();
+        return prevWord;
     }
 
     public Word previousLetter() {
@@ -1622,6 +1731,117 @@ public class Playboard {
             flagChange(pos);
             notifyChange();
         }
+    }
+
+    /**
+     * Framework for entering sequence of letters into cells
+     *
+     * Starts from current pos and enters box-by-box until letters or
+     * current word runs out. Calls back so entering action can be
+     * customised (e.g. main response or scratch). Returns true if
+     * changed.
+     *
+     * @return previous word
+     */
+    public Word playBoxLetters(
+        String letters,
+        BiFunction<Box, String, Boolean> callback
+    ) {
+        Word prevWord = getCurrentWord();
+
+        Zone zone = getCurrentZone();
+        if (zone == null)
+            return prevWord;
+
+        pushNotificationDisabled();
+
+        ClueID curID = getClueID();
+        Position startPos = getHighlightLetter();
+        int lettersIdx = 0;
+        int zoneIdx = 0;
+
+        boolean foundStart = false;
+
+        while (zoneIdx < zone.size()) {
+            Position pos = zone.getPosition(zoneIdx);
+            if (pos == null)
+                break;
+
+            // don't use zoneIdx again until next round
+            zoneIdx += 1;
+
+            foundStart |= Objects.equals(pos, startPos);
+            if (!foundStart)
+                continue;
+
+            Box b = puzzle.checkedGetBox(pos);
+            if (Box.isBlock(b))
+                break;
+
+            // get next letter and try to handle unicode
+            int codePoint = letters.codePointAt(lettersIdx);
+            String letter = Character.toString(codePoint);
+            boolean changed = callback.apply(b, letter);
+            if (changed)
+                flagChange(pos);
+
+            lettersIdx = letters.offsetByCodePoints(lettersIdx, 1);
+            if (lettersIdx >= letters.length())
+                break;
+        }
+
+        zoneIdx = Math.max(0, Math.min(zoneIdx - 1, zone.size() - 1));
+        Position endPos = zone.getPosition(zoneIdx);
+        if (endPos != null) {
+            setHighlightLetter(endPos, curID);
+            // don't clear undo stack as not user requested
+            playLetterUndoStack.pushClearDisabled();
+            Word next = this.nextLetter();
+            playLetterUndoStack.popClearDisabled();
+        }
+
+        popNotificationDisabled();
+
+        notifyChange();
+
+        return prevWord;
+    }
+
+    /**
+     * Play letter into scratch of box for current clue
+     *
+     * Does not change current position. Returns true if changed. Blocks
+     * change notifications, so caller must notify if change.
+     */
+    private boolean setScratchLetter(Box box, char letter) {
+        if (Box.isBlock(box))
+            return false;
+
+        pushNotificationDisabled();
+
+        ClueID cid = getClueID();
+        Note note = getNote();
+        int length = getCurrentWordLength();
+
+        // Create a note for this clue if we don't already have one
+        if (note == null) {
+            note = new Note(length);
+            puzzle.setNote(cid, note);
+        }
+
+        boolean changed = false;
+
+        // Update the scratch text
+        int pos = box.getCluePosition(cid);
+        if (pos >= 0 && pos < length) {
+            note = note.withScratchLetter(pos, letter);
+            puzzle.setNote(cid, note);
+            changed = true;
+        }
+
+        popNotificationDisabled();
+
+        return changed;
     }
 
     private void flagNotifying(boolean isNotifying) {

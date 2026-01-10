@@ -396,9 +396,8 @@ fun NotesPage(
                         persistentListOf()
                 }
             }
-            val skipFilled by remember {
-                derivedStateOf { state.skipFilled }
-            }
+            val skipFilled by remember { derivedStateOf { state.skipFilled } }
+            val splitWords by remember { derivedStateOf { state.splitWords} }
 
             BoardEditText(
                 modifier = Modifier.fillMaxWidth()
@@ -413,6 +412,7 @@ fun NotesPage(
                 onDelete = onDelete,
                 onChange = onChange,
                 skipFilled = skipFilled,
+                splitWords = splitWords,
                 separators = separatorsList,
                 shadow = shadow,
                 onTap = onTap,

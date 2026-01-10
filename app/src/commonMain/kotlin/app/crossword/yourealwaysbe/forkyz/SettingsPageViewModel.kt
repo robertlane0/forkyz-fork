@@ -273,6 +273,8 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_setti
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_show_sparingly_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_showhide
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_showhide_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_split_words
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_split_words_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_use_native
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_use_native_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.la_croix
@@ -1958,6 +1960,13 @@ class SettingsPageViewModel(
             Res.string.keyboard_force_caps_desc,
             settings.liveKeyboardForceCaps.stateInHere(),
             settings::setKeyboardForceCaps,
+        ),
+        SettingsBoolean(
+            SettingsPage.KEYBOARD,
+            Res.string.keyboard_split_words,
+            Res.string.keyboard_split_words_desc,
+            settings.liveKeyboardSplitWords.stateInHere(),
+            settings::setKeyboardSplitWords,
         ),
 
         // Interaction
