@@ -644,7 +644,7 @@
     <string name="total_boxes">Total Boxes</string>
     <string name="hinted_boxes">Hinted Boxes</string>
     <string name="done">Done</string>
-    <string name="num_hinted_boxes">%1$d (%2$d%%)</string>
+    <string name="num_hinted_boxes">%1$d (%2$d%)</string>
     <string name="share_your_time">Share your time</string>
     <plurals name="share_message_with_date">
         <item quantity="one">I finished the %1$s crossword for %2$s in #Forkyz with %3$d hint!\nI completed the crossword in %4$s.</item>

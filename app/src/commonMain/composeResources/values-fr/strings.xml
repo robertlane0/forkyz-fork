@@ -615,7 +615,7 @@
     <string name="total_boxes">Total des cases</string>
     <string name="hinted_boxes">Boîtes peintes</string>
     <string name="done">Fait</string>
-    <string name="num_hinted_boxes">%1$d (%2$d%%)</string>
+    <string name="num_hinted_boxes">%1$d (%2$d%)</string>
     <string name="share_your_time">Partagez votre temps</string>
     <plurals name="share_message_with_date">
         <item quantity="one">J'ai terminé le mot croisé %1$s pour %2$s dans #Forkyz avec %3$d aide !\nJ'ai complété le mot croisé dans %4$s.</item>
