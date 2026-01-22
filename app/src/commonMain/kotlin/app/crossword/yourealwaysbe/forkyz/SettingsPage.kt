@@ -36,6 +36,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -50,6 +51,7 @@ import androidx.navigationevent.compose.rememberNavigationEventState
 
 import org.jetbrains.compose.resources.stringResource
 
+import io.github.vinceglb.filekit.bookmarkData
 import io.github.vinceglb.filekit.absolutePath
 import io.github.vinceglb.filekit.dialogs.compose.rememberDirectoryPickerLauncher
 import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
@@ -251,13 +253,24 @@ fun SettingsPage(
      */
     @Composable
     fun LaunchForExternalResults() {
+        val coroutineScope = rememberCoroutineScope()
         val failedToInitialiseSAF
             = stringResource(Res.string.failed_to_initialise_saf)
         val safLauncher = rememberDirectoryPickerLauncher {
             it?.let { file ->
-                val uri = file.absolutePath().toUri()
-                if (!viewModel.setNewExternalStorageSAFURI(uri))
-                    utils.toast(failedToInitialiseSAF)
+                // HACK: calling bookmarkData takes persistable
+                // permission on Android. FileKit docs say we should
+                // really use this data for persisting. On JVM and
+                // Android it is just the URI, but it may be more
+                // complex on other system, so just passing on the URI
+                // will bite eventually.
+                // https://filekit.mintlify.app/core/bookmark-data
+                coroutineScope.launch {
+                    file.bookmarkData()
+                    val uri = file.absolutePath().toUri()
+                    if (!viewModel.setNewExternalStorageSAFURI(uri))
+                        utils.toast(failedToInitialiseSAF)
+                }
             }
         }
         val settingsExportLauncher = rememberFileSaverLauncher {
