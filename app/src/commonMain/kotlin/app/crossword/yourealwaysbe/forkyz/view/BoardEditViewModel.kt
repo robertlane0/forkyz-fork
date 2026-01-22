@@ -190,13 +190,17 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
 
     override fun onPlayboardChange(changes : PlayboardChanges) {
         // TODO: ignore non-board changes
-        updateBoardState()
+        updateBoardState(changes)
         updateResponse()
     }
 
-    protected fun updateBoardState() {
+    protected fun updateBoardState(changes : PlayboardChanges) {
         settingsFlow.getOnce { boardEditSettings ->
-            mediatedBoardState.current = getBoardState(boardEditSettings)
+            mediatedBoardState.current = getBoardState(
+                boardEditSettings,
+                changes,
+                mediatedBoardState.current,
+            )
         }
     }
 
@@ -209,6 +213,8 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
      */
     protected abstract fun getBoardState(
         boardEditSettings : BoardEditSettings,
+        changes : PlayboardChanges? = null,
+        prevState : BaseBoardState? = null,
     ) : BaseBoardState
 
     /**
@@ -658,6 +664,8 @@ class BoardEditViewModel(
      */
     override protected fun getBoardState(
         boardEditSettings : BoardEditSettings,
+        changes : PlayboardChanges?,
+        prevState : BoardState?,
     ) : BoardState {
         val puz = board?.puzzle
         if (board == null || puz == null)
@@ -676,7 +684,12 @@ class BoardEditViewModel(
         }?.toImmutableList() ?: persistentListOf()
 
         return BoardState(
-            boxes = getBoxes(boardEditSettings, selectedPositions),
+            boxes = getBoxes(
+                boardEditSettings,
+                selectedPositions,
+                changes,
+                prevState,
+            ),
             pinnedBoxes = getPinnedBoxes(boardEditSettings, selectedPositions),
             images = images,
         )
@@ -685,6 +698,8 @@ class BoardEditViewModel(
     private fun getBoxes(
         boardEditSettings : BoardEditSettings,
         selectedPositions : Set<Position>,
+        changes : PlayboardChanges? = null,
+        prevState : BoardState? = null,
     ) : ImmutableList<ImmutableList<BoxState?>> {
         val puz = board?.puzzle
         if (puz == null)
@@ -692,13 +707,21 @@ class BoardEditViewModel(
 
         return (0 until height).map { row ->
             (0 until width).map { col ->
-                getBoxState(
-                    boardEditSettings,
-                    row,
-                    col,
-                    puz.checkedGetBox(row, col),
-                    selectedPositions,
-                )
+                val changedBox = changes
+                    ?.cellChanges
+                    ?.contains(Position(row, col))
+                    ?: true
+                if (!changedBox && prevState != null) {
+                    prevState.boxes.get(row)?.get(col)
+                } else {
+                    getBoxState(
+                        boardEditSettings,
+                        row,
+                        col,
+                        puz.checkedGetBox(row, col),
+                        selectedPositions,
+                    )
+                }
             }.toImmutableList()
         }.toImmutableList()
     }
@@ -811,7 +834,10 @@ class WordEditViewModel(
      */
     override protected fun getBoardState(
         boardEditSettings : BoardEditSettings,
+        changes : PlayboardChanges?,
+        prevState : WordState?,
     ) : WordState {
+        // TODO: use changes
         val puz = board?.puzzle
         val shownWord = word ?: board?.currentWord
         val zone = shownWord?.zone

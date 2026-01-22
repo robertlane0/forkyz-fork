@@ -70,7 +70,6 @@ public class Playboard {
     private HashSet<Position> changedPositions = new HashSet<>();
     private HashSet<ClueID> changedClueIDs = new HashSet<>();
     // reuse same one for all notifications
-    private PlayboardChanges notificationChanges = new PlayboardChanges();
     private PlayLetterUndoStack playLetterUndoStack
         = new PlayLetterUndoStack(false);
 
@@ -1896,9 +1895,14 @@ public class Playboard {
                 = wholeBoard ? null : getPositionChanges();
             Collection<ClueID> clueEdits = getChangedClueIDs();
 
-            notificationChanges.setValues(
-                currentWord, previousWord, previousPosition, posChanges,
-                historyChange, lastHistoryIndex, clueEdits
+            PlayboardChanges notificationChanges = new PlayboardChanges(
+                currentWord,
+                previousWord,
+                previousPosition,
+                Set.copyOf(posChanges),
+                historyChange,
+                lastHistoryIndex,
+                Set.copyOf(clueEdits)
             );
 
             for (PlayboardListener listener : listeners) {
@@ -2294,22 +2298,7 @@ public class Playboard {
         private int lastHistoryIndex;
         private Collection<ClueID> changedClueIDs;
 
-        private static PlayboardChanges emptyChanges = new PlayboardChanges();
-        static {
-            emptyChanges.currentWord = null;
-            emptyChanges.previousWord = null;
-            emptyChanges.previousPosition = null;
-            emptyChanges.cellChanges = Collections.emptySet();
-            emptyChanges.historyChange = false;
-            emptyChanges.lastHistoryIndex = -1;
-            emptyChanges.changedClueIDs = Collections.emptySet();
-        }
-
-        public static PlayboardChanges getEmptyChanges() {
-            return emptyChanges;
-        }
-
-        private void setValues(
+        public PlayboardChanges(
             Word currentWord,
             Word previousWord,
             Position previousPosition,
@@ -2328,9 +2317,7 @@ public class Playboard {
         }
 
         /**
-         * The currently selected word
-         *
-         * May only be null if gotten via getEmptyChanges().
+         * The currently selected word (should not be null)
          */
         public Word getCurrentWord() { return currentWord; }
 
