@@ -186,6 +186,10 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
         board?.currentResponse?.let { _newResponseEvent.value = it }
     }
 
+    fun onCleared() {
+        board?.removeListener(this)
+    }
+
     fun clearNewResponseEvent() {
         _newResponseEvent.value = null
     }

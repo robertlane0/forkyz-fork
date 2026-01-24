@@ -489,6 +489,11 @@ class NotesPageViewModel(
         updateState()
     }
 
+    override protected fun onCleared() {
+        super.onCleared()
+        wordEditViewModel.onCleared()
+    }
+
     private val maxPuzzleDimension : Int
         get() {
             return getPuzzle()?.let { puz ->

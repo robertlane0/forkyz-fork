@@ -185,6 +185,11 @@ class ClueTabsViewModel(
         board?.addListener(this)
     }
 
+    fun onCleared() {
+        board?.removeListener(this)
+        wordEditViewModels.forEach { _, vm -> vm?.onCleared() }
+    }
+
     fun getWordEditViewModel(clueID : ClueID) : WordEditViewModel? {
         return wordEditViewModels.getOrPut(clueID) {
             board?.getClueWord(clueID)?.let { word ->

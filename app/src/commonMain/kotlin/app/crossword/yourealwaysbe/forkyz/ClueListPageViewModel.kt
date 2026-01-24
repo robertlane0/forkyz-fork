@@ -211,6 +211,12 @@ class ClueListPageViewModel(
         }
     }
 
+    override protected fun onCleared() {
+        super.onCleared()
+        wordEditViewModel.onCleared()
+        clueTabsViewModel.onCleared()
+    }
+
     private fun displayKeyboard(previousWord : Word?) {
         // only show keyboard if double click a word
         // else hide

@@ -384,6 +384,12 @@ class PlayPageViewModel(
         updateState()
     }
 
+    override protected fun onCleared() {
+        super.onCleared()
+        boardEditViewModel.onCleared()
+        clueTabsViewModel.onCleared()
+    }
+
     private fun setupVoiceCommands() {
         registerVoiceCommandAnswer()
         registerVoiceCommandLetter()
