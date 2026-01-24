@@ -1886,17 +1886,17 @@ public class Playboard {
             }
 
             Collection<Position> posChanges
-                = wholeBoard ? null : getPositionChanges();
-            Collection<ClueID> clueEdits = getChangedClueIDs();
+                = wholeBoard ? null : Set.copyOf(getPositionChanges());
+            Collection<ClueID> clueEdits = Set.copyOf(getChangedClueIDs());
 
             PlayboardChanges notificationChanges = new PlayboardChanges(
                 currentWord,
                 previousWord,
                 previousPosition,
-                Set.copyOf(posChanges),
+                posChanges,
                 historyChange,
                 lastHistoryIndex,
-                Set.copyOf(clueEdits)
+                clueEdits
             );
 
             for (PlayboardListener listener : listeners) {
