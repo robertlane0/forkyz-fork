@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.NavigableSet;
 import java.util.Objects;
@@ -181,7 +182,7 @@ public class Playboard {
      *
      * Normally a word will go into one cell. With this mode, the word
      * is split into characters and entered into neighbouring cells in
-     * the clue.
+     * the clue. Spaces in playResponse will be ignored when multichars.
      */
     public void setSplitResponses(boolean splitResponses) {
         this.splitResponses = splitResponses;
@@ -1738,7 +1739,7 @@ public class Playboard {
      * Starts from current pos and enters box-by-box until letters or
      * current word runs out. Calls back so entering action can be
      * customised (e.g. main response or scratch). Returns true if
-     * changed.
+     * changed. Spaces will be ignored.
      *
      * @return previous word
      */
@@ -1761,7 +1762,11 @@ public class Playboard {
 
         boolean foundStart = false;
 
-        while (zoneIdx < zone.size()) {
+        Iterator<Integer> nonSpaceCodePoints = letters.codePoints()
+            .filter(c -> !Character.isWhitespace(c))
+            .iterator();
+
+        while (zoneIdx < zone.size() && nonSpaceCodePoints.hasNext()) {
             Position pos = zone.getPosition(zoneIdx);
             if (pos == null)
                 break;
@@ -1778,15 +1783,11 @@ public class Playboard {
                 break;
 
             // get next letter and try to handle unicode
-            int codePoint = letters.codePointAt(lettersIdx);
+            int codePoint = nonSpaceCodePoints.next();
             String letter = Character.toString(codePoint);
             boolean changed = callback.apply(b, letter);
             if (changed)
                 flagChange(pos);
-
-            lettersIdx = letters.offsetByCodePoints(lettersIdx, 1);
-            if (lettersIdx >= letters.length())
-                break;
         }
 
         zoneIdx = Math.max(0, Math.min(zoneIdx - 1, zone.size() - 1));
