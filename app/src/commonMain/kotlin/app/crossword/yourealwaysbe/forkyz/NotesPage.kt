@@ -87,7 +87,7 @@ import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 import app.crossword.yourealwaysbe.forkyz.util.NativeFrontendUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.addAlpha
-import app.crossword.yourealwaysbe.forkyz.util.letterOrDigitKeyToChar
+import app.crossword.yourealwaysbe.forkyz.util.keyEventToResponse
 import app.crossword.yourealwaysbe.forkyz.view.BoardEditText
 import app.crossword.yourealwaysbe.forkyz.view.BoardEditTextState
 import app.crossword.yourealwaysbe.forkyz.view.BoxInputState
@@ -193,10 +193,10 @@ fun NotesPage(
                 }
             }
 
-            val keyChar = letterOrDigitKeyToChar(event.key)
-            if (keyChar != null) {
+            val response = keyEventToResponse(event)
+            if (response != null) {
                 if (isDown)
-                    viewModel.playLetterToBoard(keyChar)
+                    viewModel.playLetterToBoard(response)
                 return true
             } else {
                 return onKeyEventPuzzlePage(event)

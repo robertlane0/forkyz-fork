@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.Dp
 
 import app.crossword.yourealwaysbe.forkyz.theme.BoardColorScheme
 import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
-import app.crossword.yourealwaysbe.forkyz.util.letterOrDigitKeyToChar
+import app.crossword.yourealwaysbe.forkyz.util.keyEventToResponse
 
 // to avoid using Box.BLANK to keep data away from UI :(
 private val BLANK : Char = ' '
@@ -202,10 +202,10 @@ fun BoardEditText(
             }
         }
 
-        val keyChar = letterOrDigitKeyToChar(event.key)
-        if (keyChar != null) {
+        val response = keyEventToResponse(event)
+        if (response != null) {
             if (isDown)
-                onNewResponse(keyChar.toString())
+                onNewResponse(response)
             return true
         }
 

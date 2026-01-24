@@ -1,53 +1,27 @@
 
 package app.crossword.yourealwaysbe.forkyz.util
 
-import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.utf16CodePoint
+import androidx.compose.ui.input.key.KeyEvent
 
 /**
- * Convert letter/digit key event to uppercase char
+ * Convert key event to response string
  *
- * Or null if not a char key
+ * E.g. key_a to A, or null if not printable char
  */
-fun letterOrDigitKeyToChar(key : Key) : Char?
-    = when (key) {
-        // must be a better way..
-        Key.A -> 'A'
-        Key.B -> 'B'
-        Key.C -> 'C'
-        Key.D -> 'D'
-        Key.E -> 'E'
-        Key.F -> 'F'
-        Key.G -> 'G'
-        Key.H -> 'H'
-        Key.I -> 'I'
-        Key.J -> 'J'
-        Key.K -> 'K'
-        Key.L -> 'L'
-        Key.M -> 'M'
-        Key.N -> 'N'
-        Key.O -> 'O'
-        Key.P -> 'P'
-        Key.Q -> 'Q'
-        Key.R -> 'R'
-        Key.S -> 'S'
-        Key.T -> 'T'
-        Key.U -> 'U'
-        Key.V -> 'V'
-        Key.W -> 'W'
-        Key.X -> 'X'
-        Key.Y -> 'Y'
-        Key.Z -> 'Z'
-        Key.Zero -> '0'
-        Key.One -> '1'
-        Key.Two -> '2'
-        Key.Three -> '3'
-        Key.Four -> '4'
-        Key.Five -> '5'
-        Key.Six -> '6'
-        Key.Seven -> '7'
-        Key.Eight -> '8'
-        Key.Nine -> '9'
-        else -> null
-    }
+fun keyEventToResponse(event : KeyEvent) : String? {
+    val codePoint = event.utf16CodePoint
+    val type = Character.getType(codePoint)
+    val valid = (
+        !Character.isISOControl(codePoint) &&
+        type != Character.UNASSIGNED.toInt() &&
+        type != Character.SURROGATE.toInt()
+    )
+    return if (valid)
+        String(Character.toChars(codePoint)).uppercase()
+    else
+        null
+}
+
 
 
