@@ -59,6 +59,21 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
         private val SUBDIR_REGEX = RegexScrape(STAGE2_URL_RE, 2)
         private val CW_ID_REGEX = RegexScrape(STAGE2_URL_RE, 3)
         private val CW_SET_REGEX = RegexScrape(STAGE2_URL_RE, 4)
+
+        private val STAGE2_URL_ALT_RE = Pattern.compile(
+            "https://(cdn.).amuselabs.com/",
+        )
+        private val CDN_ALT_REGEX = RegexScrape(STAGE2_URL_ALT_RE, 1)
+        // quotey
+        private val CW_ID_ALT_REGEX = RegexScrape(
+            Pattern.compile("data-id=\\\\*\"([^\"\\\\]*)\\\\*\""),
+            1,
+        )
+        private val CW_SET_ALT_REGEX = RegexScrape(
+            Pattern.compile("data-set=\\\\*\"([^\"\\\\]*)\\\\*\""),
+            1,
+        )
+
         private val RAWC_REGEX = RegexScrape(
             Pattern.compile("\"rawc\":\\s*\"([^\"]*)\""),
             1,
@@ -117,14 +132,35 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
             )
             bis.reset()
 
-
             if (results.size == 4) {
                 cdn = results[0]
                 subdir = results[1]
                 cwID = results[2]
                 cwSet = results[3]
-            } else {
-                return bis
+            }
+
+            if (
+                cdn == null
+                || subdir == null
+                || cwID == null
+                || cwSet == null
+            ) {
+                val results = regexScrape(
+                    bis,
+                    arrayOf(
+                        CDN_ALT_REGEX,
+                        CW_ID_ALT_REGEX,
+                        CW_SET_ALT_REGEX,
+                    ),
+                )
+                bis.reset()
+
+                if (results.size == 3) {
+                    cdn = results[0]
+                    subdir = DEFAULT_SUBDIR
+                    cwID = results[1]
+                    cwSet = results[2]
+                }
             }
         }
         if (cdn == null || subdir == null || cwID == null || cwSet == null)
