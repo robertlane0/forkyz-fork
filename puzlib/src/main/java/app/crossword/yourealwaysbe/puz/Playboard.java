@@ -1757,22 +1757,17 @@ public class Playboard {
 
         ClueID curID = getClueID();
         Position startPos = getHighlightLetter();
-        int lettersIdx = 0;
-        int zoneIdx = 0;
 
         boolean foundStart = false;
 
         Iterator<Integer> nonSpaceCodePoints = letters.codePoints()
             .filter(c -> !Character.isWhitespace(c))
             .iterator();
+        Iterator<Position> positions = zone.iterator();
+        Position pos = null;
 
-        while (zoneIdx < zone.size() && nonSpaceCodePoints.hasNext()) {
-            Position pos = zone.getPosition(zoneIdx);
-            if (pos == null)
-                break;
-
-            // don't use zoneIdx again until next round
-            zoneIdx += 1;
+        while (positions.hasNext() && nonSpaceCodePoints.hasNext()) {
+            pos = positions.next();
 
             foundStart |= Objects.equals(pos, startPos);
             if (!foundStart)
@@ -1790,10 +1785,8 @@ public class Playboard {
                 flagChange(pos);
         }
 
-        zoneIdx = Math.max(0, Math.min(zoneIdx - 1, zone.size() - 1));
-        Position endPos = zone.getPosition(zoneIdx);
-        if (endPos != null) {
-            setHighlightLetter(endPos, curID);
+        if (pos != null) {
+            setHighlightLetter(pos, curID);
             // don't clear undo stack as not user requested
             playLetterUndoStack.pushClearDisabled();
             Word next = this.nextLetter();
