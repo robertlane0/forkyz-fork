@@ -145,6 +145,21 @@ class ClueTabsViewModel(
     private val wordEditViewModels : MutableMap<ClueID, WordEditViewModel?>
         = mutableMapOf()
 
+    /**
+     * Will disable playboard change updates while hidden
+     */
+    var isVisible : Boolean = true
+        set (value) {
+            field = value
+            if (value) {
+                viewModelScope.launch {
+                    currentUIState = currentUIState.copy(
+                        pages = getStatePages(),
+                    )
+                }
+            }
+        }
+
     val numPages : Int
         get() { return currentUIState.numPages }
 
@@ -190,13 +205,12 @@ class ClueTabsViewModel(
     }
 
     override fun onPlayboardChange(changes : PlayboardChanges) {
-        val needsRefresh = (
+        val needsRefresh = isVisible && (
             changes.currentWord != changes.previousWord
             || changes.isHistoryChange()
             || !changes.changedClueIDs.isEmpty()
         )
         if (needsRefresh) {
-            println("FORKYZ: refreshing on " + changes)
             viewModelScope.launch {
                 currentUIState = currentUIState.copy(
                     pages = getStatePages(

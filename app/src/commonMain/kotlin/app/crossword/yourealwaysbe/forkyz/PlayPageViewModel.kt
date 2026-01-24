@@ -136,6 +136,7 @@ class PlayPageViewModel(
             { state, playSettings ->
                 val showClueTabs
                     = isAcrostic || playSettings.clueTabsSettings.showClueTabs
+                clueTabsViewModel.isVisible = showClueTabs
                 state.copy(
                     isClueBelowGrid
                         = playSettings.displaySettings.clueBelowGrid,
