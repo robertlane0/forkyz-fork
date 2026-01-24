@@ -73,9 +73,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveAppTheme : Flow<Theme>
         = settingsMap { it.applicationTheme }
 
-    fun getAppTheme(cb : (Theme) -> Unit)
-        = settingsOnce(cb) { it.applicationTheme }
-
     fun setAppTheme(value : Theme) {
         settingsUpdate { settings ->
             settings.copy(applicationTheme = value)
@@ -146,9 +143,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveDownloadAllowRoaming : Flow<Boolean>
         = settingsMap { it.backgroundDownloadAllowRoaming }
 
-    fun getDownloadAllowRoaming(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.backgroundDownloadAllowRoaming }
-
     fun setDownloadAllowRoaming(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(backgroundDownloadAllowRoaming = value)
@@ -157,9 +151,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val liveDownloadAutoDownloaders : Flow<Set<String>>
         = settingsMap { it.autoDownloaders.toSet() }
-
-    fun getDownloadAutoDownloaders(cb : (Set<String>) -> Unit)
-        = settingsOnce(cb) { it.autoDownloaders.toSet() }
 
     fun setDownloadAutoDownloaders(value : Set<String>) {
         settingsUpdate { settings ->
@@ -170,9 +161,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveDownloadDays : Flow<Set<String>>
         = settingsMap { it.backgroundDownloadDays.toSet() }
 
-    fun getDownloadDays(cb : (Set<String>) -> Unit)
-        = settingsOnce(cb) { it.backgroundDownloadDays.toSet() }
-
     fun setDownloadDays(value : Set<String>) {
         settingsUpdate { settings ->
             settings.copy(backgroundDownloadDays = value.toList())
@@ -181,9 +169,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val liveDownloadDaysTime : Flow<Int>
         = settingsMap { it.backgroundDownloadDaysTime }
-
-    fun getDownloadDaysTime(cb : (Int) -> Unit)
-        = settingsOnce(cb) { it.backgroundDownloadDaysTime }
 
     fun setDownloadDaysTime(value : Int) {
         settingsUpdate { settings ->
@@ -194,9 +179,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveDownloadHourly : Flow<Boolean>
         = settingsMap { it.backgroundDownloadHourly }
 
-    fun getDownloadHourly(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.backgroundDownloadHourly }
-
     fun setDownloadHourly(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(backgroundDownloadHourly = value)
@@ -206,9 +188,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveDownloadRequireCharging : Flow<Boolean>
         = settingsMap { it.backgroundDownloadRequireCharging }
 
-    fun getDownloadRequireCharging(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.backgroundDownloadRequireCharging }
-
     fun setDownloadRequireCharging(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(backgroundDownloadRequireCharging = value)
@@ -217,9 +196,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val liveDownloadRequireUnmetered : Flow<Boolean>
         = settingsMap { it.backgroundDownloadRequireUnmetered }
-
-    fun getDownloadRequireUnmetered(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.backgroundDownloadRequireUnmetered }
 
     fun setDownloadRequireUnmetered(value : Boolean) {
         settingsUpdate { settings ->
@@ -242,9 +218,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveBrowseIndicateIfSolution : Flow<Boolean>
         = settingsMap { it.browseIndicateIfSolution }
 
-    fun getBrowseIndicateIfSolution(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.browseIndicateIfSolution }
-
     fun setBrowseIndicateIfSolution(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(browseIndicateIfSolution = value)
@@ -253,9 +226,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val liveBrowseNewPuzzle : Flow<Boolean>
         = settingsMap { it.browseNewPuzzle }
-
-    fun getBrowseNewPuzzle(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.browseNewPuzzle }
 
     fun setBrowseNewPuzzle(value : Boolean) {
         settingsUpdate { settings ->
@@ -266,9 +236,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveBrowseShowPercentageCorrect : Flow<Boolean>
         = settingsMap { it.browseShowPercentageCorrect }
 
-    fun getBrowseShowPercentageCorrect(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.browseShowPercentageCorrect }
-
     fun setBrowseShowPercentageCorrect(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(browseShowPercentageCorrect = value)
@@ -277,9 +244,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val liveVoiceButtonActivatesVoice : Flow<Boolean>
         = settingsMap { it.buttonActivatesVoice }
-
-    fun getVoiceButtonActivatesVoice(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.buttonActivatesVoice }
 
     fun setVoiceButtonActivatesVoice(value : Boolean) {
         settingsUpdate { settings ->
@@ -290,9 +254,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveVoiceButtonAnnounceClue : Flow<Boolean>
         = settingsMap { it.buttonAnnounceClue }
 
-    fun getVoiceButtonAnnounceClue(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.buttonAnnounceClue }
-
     fun setVoiceButtonAnnounceClue(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(buttonAnnounceClue = value)
@@ -302,9 +263,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveExtLLMAgent : Flow<LLMAgent>
         = settingsMap { it.llmAgent }
 
-    fun getExtLLMAgent(cb : (LLMAgent) -> Unit)
-        = settingsOnce(cb) { it.llmAgent }
-
     fun setExtLLMAgent(value : LLMAgent) {
         settingsUpdate { settings ->
             settings.copy(llmAgent = value)
@@ -313,9 +271,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val liveExtLLMAgentAPIKey : Flow<String>
         = settingsMap { it.llmAgentAPIKey }
-
-    fun getExtLLMAgentAPIKey(cb : (String) -> Unit)
-        = settingsOnce(cb) { it.llmAgentAPIKey }
 
     fun setExtLLMAgentAPIKey(value : String) {
         settingsUpdate { settings ->
@@ -338,9 +293,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val livePlayClueBelowGrid : Flow<Boolean>
         = settingsMap { it.clueBelowGrid }
 
-    fun getPlayClueBelowGrid(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.clueBelowGrid }
-
     fun setPlayClueBelowGrid(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(clueBelowGrid = value)
@@ -349,9 +301,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val livePlayClueHighlight : Flow<ClueHighlight>
         = settingsMap { it.clueHighlight }
-
-    fun getPlayClueHighlight(cb : (ClueHighlight) -> Unit)
-        = settingsOnce(cb) { it.clueHighlight }
 
     fun setPlayClueHighlight(value : ClueHighlight) {
         settingsUpdate { settings ->
@@ -362,9 +311,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val livePlayExpandableClueLine : Flow<Boolean>
         = settingsMap { it.expandableClueLine }
 
-    fun getPlayExpandableClueLine(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.expandableClueLine }
-
     fun setPlayExpandableClueLine(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(expandableClueLine = value)
@@ -373,9 +319,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val livePlayClueListNameInClueLine : Flow<ClueListClueLine>
         = settingsMap { it.clueListNameInClueLine }
-
-    fun getPlayClueListNameInClueLine(cb : (ClueListClueLine) -> Unit)
-        = settingsOnce(cb) { it.clueListNameInClueLine }
 
     fun setPlayClueListNameInClueLine(value : ClueListClueLine) {
         settingsUpdate { settings ->
@@ -386,9 +329,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val livePlayDontSnapBoardToBorders : Flow<Boolean>
         = settingsMap { it.dontSnapBoardToBorders }
 
-    fun getPlayDontSnapBoardToBorders(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.dontSnapBoardToBorders }
-
     fun setPlayDontSnapBoardToBorders(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(dontSnapBoardToBorders = value)
@@ -397,9 +337,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val liveClueListClueTabsDouble : Flow<ClueTabsDouble>
         = settingsMap { it.clueTabsDouble }
-
-    fun getClueListClueTabsDouble(cb : (ClueTabsDouble) -> Unit)
-        = settingsOnce(cb) { it.clueTabsDouble }
 
     fun setClueListClueTabsDouble(value : ClueTabsDouble) {
         settingsUpdate { settings ->
@@ -657,9 +594,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveExtCrosswordSolverEnabled : Flow<Boolean>
         = settingsMap { it.crosswordSolverEnabled }
 
-    fun getExtCrosswordSolverEnabled(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.crosswordSolverEnabled }
-
     fun setExtCrosswordSolverEnabled(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(crosswordSolverEnabled = value)
@@ -668,9 +602,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val liveDownloadCustomDailyTitle : Flow<String>
         = settingsMap { it.customDailyTitle }
-
-    fun getDownloadCustomDailyTitle(cb : (String) -> Unit)
-        = settingsOnce(cb) { it.customDailyTitle }
 
     fun setDownloadCustomDailyTitle(value : String) {
         settingsUpdate { settings ->
@@ -681,9 +612,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveDownloadCustomDailyURL : Flow<String>
         = settingsMap { it.customDailyUrl }
 
-    fun getDownloadCustomDailyURL(cb : (String) -> Unit)
-        = settingsOnce(cb) { it.customDailyUrl }
-
     fun setDownloadCustomDailyURL(value : String) {
         settingsUpdate { settings ->
             settings.copy(customDailyUrl = value)
@@ -692,9 +620,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val livePlayCycleUnfilledMode : Flow<CycleUnfilledMode>
         = settingsMap { it.cycleUnfilledMode }
-
-    fun getPlayCycleUnfilledMode(cb : (CycleUnfilledMode) -> Unit)
-        = settingsOnce(cb) { it.cycleUnfilledMode }
 
     fun setPlayCycleUnfilledMode(value : CycleUnfilledMode) {
         settingsUpdate { settings ->
@@ -705,15 +630,8 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val livePlayDeleteCrossingMode : Flow<DeleteCrossingMode>
         = settingsMap(this::makeDeleteCrossingMode)
 
-    fun getPlayDeleteCrossingMode(cb : (DeleteCrossingMode) -> Unit)
-        = settingsOnce(cb, this::makeDeleteCrossingMode)
-
     val livePlayDeleteCrossingModeSetting : Flow<DeleteCrossingModeSetting>
         = settingsMap { it.deleteCrossingMode }
-
-    fun getPlayDeleteCrossingModeSetting(
-        cb : (DeleteCrossingModeSetting) -> Unit
-    ) = settingsOnce(cb) { it.deleteCrossingMode }
 
     fun setPlayDeleteCrossingModeSetting(value : DeleteCrossingModeSetting) {
         settingsUpdate { settings ->
@@ -760,9 +678,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val livePlayScratchDisplay : Flow<Boolean>
         = settingsMap { it.displayScratch }
 
-    fun getPlayScratchDisplay(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.displayScratch }
-
     fun setPlayScratchDisplay(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(displayScratch = value)
@@ -772,9 +687,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val livePlayDisplaySeparators : Flow<DisplaySeparators>
         = settingsMap { it.displaySeparators }
 
-    fun getPlayDisplaySeparators(cb : (DisplaySeparators) -> Unit)
-        = settingsOnce(cb) { it.displaySeparators }
-
     fun setPlayDisplaySeparators(value : DisplaySeparators) {
         settingsUpdate { settings ->
             settings.copy(displaySeparators = value)
@@ -783,9 +695,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val liveBrowseLastDownload : Flow<Long>
         = settingsMap { it.dlLast }
-
-    fun getBrowseLastDownload(cb : (Long) -> Unit)
-        = settingsOnce(cb) { it.dlLast }
 
     fun getBrowseLastDownloadSync() : Long
         = runBlocking { settingsFlow.first().dlLast }
@@ -801,9 +710,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveDownloadOnStartUp : Flow<Boolean>
         = settingsMap { it.dlOnStartup }
 
-    fun getDownloadOnStartUp(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.dlOnStartup }
-
     fun setDownloadOnStartUp(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(dlOnStartup = value)
@@ -814,12 +720,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         = settingsMap { it.doubleTap }
 
     // Consumer for BoardEditViews.java
-    fun getPlayDoubleTapFitBoard(cb : Consumer<Boolean>)
-        = settingsOnce(
-            cb::accept,
-            { it.doubleTap },
-        )
-
     fun setPlayDoubleTapFitBoard(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(doubleTap = value)
@@ -828,9 +728,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val liveDownload20Minutes : Flow<Boolean>
         = settingsMap { it.download20Minutes }
-
-    fun getDownload20Minutes(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.download20Minutes }
 
     fun setDownload20Minutes(value : Boolean) {
         settingsUpdate { settings ->
@@ -841,9 +738,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveDownloadCustomDaily : Flow<Boolean>
         = settingsMap { it.downloadCustomDaily }
 
-    fun getDownloadCustomDaily(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.downloadCustomDaily }
-
     fun setDownloadCustomDaily(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(downloadCustomDaily = value)
@@ -852,9 +746,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val liveDownloadDeStandaard : Flow<Boolean>
         = settingsMap { it.downloadDeStandaard }
-
-    fun getDownloadDeStandaard(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.downloadDeStandaard }
 
     fun setDownloadDeStandaard(value : Boolean) {
         settingsUpdate { settings ->
@@ -865,9 +756,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveDownloadDeTelegraaf : Flow<Boolean>
         = settingsMap { it.downloadDeTelegraaf }
 
-    fun getDownloadDeTelegraaf(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.downloadDeTelegraaf }
-
     fun setDownloadDeTelegraaf(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(downloadDeTelegraaf = value)
@@ -876,9 +764,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val liveDownloadElPaisExperto : Flow<Boolean>
         = settingsMap { it.downloadElPaisExperto }
-
-    fun getDownloadElPaisExperto(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.downloadElPaisExperto }
 
     fun setDownloadElPaisExperto(value : Boolean) {
         settingsUpdate { settings ->
@@ -889,9 +774,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveDownloadGuardianDailyCryptic : Flow<Boolean>
         = settingsMap { it.downloadGuardianDailyCryptic }
 
-    fun getDownloadGuardianDailyCryptic(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.downloadGuardianDailyCryptic }
-
     fun setDownloadGuardianDailyCryptic(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(downloadGuardianDailyCryptic = value)
@@ -900,9 +782,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val liveDownloadGuardianWeeklyQuiptic : Flow<Boolean>
         = settingsMap { it.downloadGuardianWeeklyQuiptic }
-
-    fun getDownloadGuardianWeeklyQuiptic(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.downloadGuardianWeeklyQuiptic }
 
     fun setDownloadGuardianWeeklyQuiptic(value : Boolean) {
         settingsUpdate { settings ->
@@ -913,9 +792,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveDownloadHamAbend : Flow<Boolean>
         = settingsMap { it.downloadHamAbend }
 
-    fun getDownloadHamAbend(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.downloadHamAbend }
-
     fun setDownloadHamAbend(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(downloadHamAbend = value)
@@ -924,9 +800,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val liveDownloadIndependentDailyCryptic : Flow<Boolean>
         = settingsMap { it.downloadIndependentDailyCryptic }
-
-    fun getDownloadIndependentDailyCryptic(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.downloadIndependentDailyCryptic }
 
     fun setDownloadIndependentDailyCryptic(value : Boolean) {
         settingsUpdate { settings ->
@@ -937,9 +810,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveDownloadIrishNewsCryptic : Flow<Boolean>
         = settingsMap { it.downloadIrishNewsCryptic }
 
-    fun getDownloadIrishNewsCryptic(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.downloadIrishNewsCryptic }
-
     fun setDownloadIrishNewsCryptic(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(downloadIrishNewsCryptic = value)
@@ -948,9 +818,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val liveDownloadJonesin : Flow<Boolean>
         = settingsMap { it.downloadJonesin }
-
-    fun getDownloadJonesin(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.downloadJonesin }
 
     fun setDownloadJonesin(value : Boolean) {
         settingsUpdate { settings ->
@@ -961,9 +828,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveDownloadJoseph : Flow<Boolean>
         = settingsMap { it.downloadJoseph }
 
-    fun getDownloadJoseph(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.downloadJoseph }
-
     fun setDownloadJoseph(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(downloadJoseph = value)
@@ -972,9 +836,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val liveDownloadLaCroix : Flow<Boolean>
         = settingsMap { it.downloadLaCroix }
-
-    fun getDownloadLaCroix(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.downloadLaCroix }
 
     fun setDownloadLaCroix(value : Boolean) {
         settingsUpdate { settings ->
@@ -994,9 +855,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveDownloadLeParisienF1 : Flow<Boolean>
         = settingsMap { it.downloadLeParisienF1 }
 
-    fun getDownloadLeParisienF1(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.downloadLeParisienF1 }
-
     fun setDownloadLeParisienF1(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(downloadLeParisienF1 = value)
@@ -1005,9 +863,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val liveDownloadLeParisienF2 : Flow<Boolean>
         = settingsMap { it.downloadLeParisienF2 }
-
-    fun getDownloadLeParisienF2(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.downloadLeParisienF2 }
 
     fun setDownloadLeParisienF2(value : Boolean) {
         settingsUpdate { settings ->
@@ -1018,9 +873,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveDownloadLeParisienF3 : Flow<Boolean>
         = settingsMap { it.downloadLeParisienF3 }
 
-    fun getDownloadLeParisienF3(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.downloadLeParisienF3 }
-
     fun setDownloadLeParisienF3(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(downloadLeParisienF3 = value)
@@ -1029,9 +881,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val liveDownloadLeParisienF4 : Flow<Boolean>
         = settingsMap { it.downloadLeParisienF4 }
-
-    fun getDownloadLeParisienF4(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.downloadLeParisienF4 }
 
     fun setDownloadLeParisienF4(value : Boolean) {
         settingsUpdate { settings ->
@@ -1042,9 +891,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveDownloadMetroCryptic : Flow<Boolean>
         = settingsMap { it.downloadMetroCryptic }
 
-    fun getDownloadMetroCryptic(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.downloadMetroCryptic }
-
     fun setDownloadMetroCryptic(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(downloadMetroCryptic = value)
@@ -1053,9 +899,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val liveDownloadMetroQuick : Flow<Boolean>
         = settingsMap { it.downloadMetroQuick }
-
-    fun getDownloadMetroQuick(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.downloadMetroQuick }
 
     fun setDownloadMetroQuick(value : Boolean) {
         settingsUpdate { settings ->
@@ -1066,9 +909,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveDownloadNewYorkTimesSyndicated : Flow<Boolean>
         = settingsMap { it.downloadNewYorkTimesSyndicated }
 
-    fun getDownloadNewYorkTimesSyndicated(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.downloadNewYorkTimesSyndicated }
-
     fun setDownloadNewYorkTimesSyndicated(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(downloadNewYorkTimesSyndicated = value)
@@ -1077,9 +917,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val liveDownloadNewsday : Flow<Boolean>
         = settingsMap { it.downloadNewsday }
-
-    fun getDownloadNewsday(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.downloadNewsday }
 
     fun setDownloadNewsday(value : Boolean) {
         settingsUpdate { settings ->
@@ -1090,9 +927,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveDownloadNRCInHetMidden : Flow<Boolean>
         = settingsMap { it.downloadNRCInHetMidden }
 
-    fun getDownloadNRCInHetMidden(cb: (Boolean) -> Unit)
-        = settingsOnce(cb) { it.downloadNRCInHetMidden }
-
     fun setDownloadNRCInHetMidden(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(downloadNRCInHetMidden = value)
@@ -1101,9 +935,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val liveDownloadNRCScrypto : Flow<Boolean>
         = settingsMap { it.downloadNRCScrypto }
-
-    fun getDownloadNRCScrypto(cb: (Boolean) -> Unit)
-        = settingsOnce(cb) { it.downloadNRCScrypto }
 
     fun setDownloadNRCScrypto(value : Boolean) {
         settingsUpdate { settings ->
@@ -1114,9 +945,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveDownloadPremier : Flow<Boolean>
         = settingsMap { it.downloadPremier }
 
-    fun getDownloadPremier(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.downloadPremier }
-
     fun setDownloadPremier(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(downloadPremier = value)
@@ -1125,9 +953,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val liveDownloadSheffer : Flow<Boolean>
         = settingsMap { it.downloadSheffer }
-
-    fun getDownloadSheffer(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.downloadSheffer }
 
     fun setDownloadSheffer(value : Boolean) {
         settingsUpdate { settings ->
@@ -1138,9 +963,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveDownloadSudOuestMotsCroises : Flow<Boolean>
         = settingsMap { it.downloadSudOuestMotsCroises }
 
-    fun getDownloadSudOuestMotsCroises(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.downloadSudOuestMotsCroises }
-
     fun setDownloadSudOuestMotsCroises(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(downloadSudOuestMotsCroises = value)
@@ -1149,9 +971,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val liveDownloadSudOuestMotsFleches : Flow<Boolean>
         = settingsMap { it.downloadSudOuestMotsFleches }
-
-    fun getDownloadSudOuestMotsFleches(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.downloadSudOuestMotsFleches }
 
     fun setDownloadSudOuestMotsFleches(value : Boolean) {
         settingsUpdate { settings ->
@@ -1162,9 +981,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveDownloadTF1MotsCroises : Flow<Boolean>
         = settingsMap { it.downloadTF1MotsCroises }
 
-    fun getDownloadTF1MotsCroises(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.downloadTF1MotsCroises }
-
     fun setDownloadTF1MotsCroises(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(downloadTF1MotsCroises = value)
@@ -1173,9 +989,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val liveDownloadTF1MotsFleches : Flow<Boolean>
         = settingsMap { it.downloadTF1MotsFleches }
-
-    fun getDownloadTF1MotsFleches(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.downloadTF1MotsFleches }
 
     fun setDownloadTF1MotsFleches(value : Boolean) {
         settingsUpdate { settings ->
@@ -1198,9 +1011,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveDownloadUSAToday : Flow<Boolean>
         = settingsMap { it.downloadUSAToday }
 
-    fun getDownloadUSAToday(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.downloadUSAToday }
-
     fun setDownloadUSAToday(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(downloadUSAToday = value)
@@ -1209,9 +1019,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val liveDownloadUniversal : Flow<Boolean>
         = settingsMap { it.downloadUniversal }
-
-    fun getDownloadUniversal(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.downloadUniversal }
 
     fun setDownloadUniversal(value : Boolean) {
         settingsUpdate { settings ->
@@ -1222,9 +1029,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveDownloadWaPoSunday : Flow<Boolean>
         = settingsMap { it.downloadWaPoSunday }
 
-    fun getDownloadWaPoSunday(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.downloadWaPoSunday }
-
     fun setDownloadWaPoSunday(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(downloadWaPoSunday = value)
@@ -1234,9 +1038,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveDownloadWsj : Flow<Boolean>
         = settingsMap { it.downloadWsj }
 
-    fun getDownloadWsj(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.downloadWsj }
-
     fun setDownloadWsj(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(downloadWsj = value)
@@ -1245,9 +1046,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val liveExtDuckDuckGoEnabled : Flow<Boolean>
         = settingsMap { it.duckDuckGoEnabled }
-
-    fun getExtDuckDuckGoEnabled(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.duckDuckGoEnabled }
 
     fun setExtDuckDuckGoEnabled(value : Boolean) {
         settingsUpdate { settings ->
@@ -1286,9 +1084,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveVoiceEqualsAnnounceClue : Flow<Boolean>
         = settingsMap { it.equalsAnnounceClue }
 
-    fun getVoiceEqualsAnnounceClue(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.equalsAnnounceClue }
-
     fun setVoiceEqualsAnnounceClue(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(equalsAnnounceClue = value)
@@ -1297,9 +1092,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val liveVoiceLLMVoiceCommands : Flow<Boolean>
         = settingsMap { it.llmVoiceCommands }
-
-    fun getVoiceLLMVoiceCommands(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.llmVoiceCommands }
 
     fun setVoiceLLMVoiceCommands(value : Boolean) {
         settingsUpdate { settings ->
@@ -1322,14 +1114,8 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveExternalToolSettings : Flow<ExternalToolSettings>
         = settingsMap(this::makeExternalToolSettings)
 
-    fun getExternalToolSettings(cb : (ExternalToolSettings) -> Unit)
-        = settingsOnce(cb, this::makeExternalToolSettings)
-
     val liveExtFifteenSquaredEnabled : Flow<Boolean>
         = settingsMap { it.fifteenSquaredEnabled }
-
-    fun getExtFifteenSquaredEnabled(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.fifteenSquaredEnabled }
 
     fun setExtFifteenSquaredEnabled(value : Boolean) {
         settingsUpdate { settings ->
@@ -1394,9 +1180,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val livePlayFullScreen : Flow<Boolean>
         = settingsMap { it.fullScreen }
 
-    fun getPlayFullScreen(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.fullScreen }
-
     fun setPlayFullScreen(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(fullScreen = value)
@@ -1405,9 +1188,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val livePlayGridRatioPortrait : Flow<GridRatio>
         = settingsMap { it.gridRatio }
-
-    fun getPlayGridRatioPortrait(cb : (GridRatio) -> Unit)
-        = settingsOnce(cb) { it.gridRatio }
 
     fun setPlayGridRatioPortrait(value : GridRatio) {
         settingsUpdate { settings ->
@@ -1418,9 +1198,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val livePlayGridRatioLandscape : Flow<GridRatio>
         = settingsMap { it.gridRatioLand }
 
-    fun getPlayGridRatioLandscape(cb : (GridRatio) -> Unit)
-        = settingsOnce(cb) { it.gridRatioLand }
-
     fun setPlayGridRatioLandscape(value : GridRatio) {
         settingsUpdate { settings ->
             settings.copy(gridRatioLand = value)
@@ -1429,9 +1206,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val livePlayIndicateShowErrors : Flow<Boolean>
         = settingsMap { it.indicateShowErrors }
-
-    fun getPlayIndicateShowErrors(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.indicateShowErrors }
 
     fun setPlayIndicateShowErrors(value : Boolean) {
         settingsUpdate { settings ->
@@ -1442,9 +1216,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val livePlayInferSeparators : Flow<Boolean>
         = settingsMap { it.inferSeparators }
 
-    fun getPlayInferSeparators(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.inferSeparators }
-
     fun setPlayInferSeparators(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(inferSeparators = value)
@@ -1453,9 +1224,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val liveKeyboardCompact : Flow<Boolean>
         = settingsMap { it.keyboardCompact }
-
-    fun getKeyboardCompact(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.keyboardCompact }
 
     fun setKeyboardCompact(value : Boolean) {
         settingsUpdate { settings ->
@@ -1466,9 +1234,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveKeyboardForceCaps : Flow<Boolean>
         = settingsMap { it.keyboardForceCaps }
 
-    fun getKeyboardForceCaps(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.keyboardForceCaps }
-
     fun setKeyboardForceCaps(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(keyboardForceCaps = value)
@@ -1477,9 +1242,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val liveKeyboardHaptic : Flow<Boolean>
         = settingsMap { it.keyboardHaptic }
-
-    fun getKeyboardHaptic(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.keyboardHaptic }
 
     fun setKeyboardHaptic(value : Boolean) {
         settingsUpdate { settings ->
@@ -1490,9 +1252,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveKeyboardHideButton : Flow<Boolean>
         = settingsMap { it.keyboardHideButton }
 
-    fun getKeyboardHideButton(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.keyboardHideButton }
-
     fun setKeyboardHideButton(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(keyboardHideButton = value)
@@ -1501,9 +1260,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val liveKeyboardLayout : Flow<KeyboardLayout>
         = settingsMap { it.keyboardLayout }
-
-    fun getKeyboardLayout(cb : (KeyboardLayout) -> Unit)
-        = settingsOnce(cb) { it.keyboardLayout }
 
     fun setKeyboardLayout(value : KeyboardLayout) {
         settingsUpdate { settings ->
@@ -1514,9 +1270,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveKeyboardMode : Flow<KeyboardMode>
         = settingsMap { it.keyboardShowHide }
 
-    fun getKeyboardMode(cb : (KeyboardMode) -> Unit)
-        = settingsOnce(cb) { it.keyboardShowHide }
-
     fun setKeyboardMode(value : KeyboardMode) {
         settingsUpdate { settings ->
             settings.copy(keyboardShowHide = value)
@@ -1526,9 +1279,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveKeyboardRepeatDelay : Flow<Int>
         = settingsMap { it.keyboardRepeatDelay }
 
-    fun getKeyboardRepeatDelay(cb : (Int) -> Unit)
-        = settingsOnce(cb) { it.keyboardRepeatDelay }
-
     fun setKeyboardRepeatDelay(value : Int) {
         settingsUpdate { settings ->
             settings.copy(keyboardRepeatDelay = value)
@@ -1537,9 +1287,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val liveKeyboardRepeatInterval : Flow<Int>
         = settingsMap { it.keyboardRepeatInterval }
-
-    fun getKeyboardRepeatInterval(cb : (Int) -> Unit)
-        = settingsOnce(cb) { it.keyboardRepeatInterval }
 
     fun setKeyboardRepeatInterval(value : Int) {
         settingsUpdate { settings ->
@@ -1565,9 +1312,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveKeyboardUseNative : Flow<Boolean>
         = settingsMap { it.useNativeKeyboard }
 
-    fun getKeyboardUseNative(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.useNativeKeyboard }
-
     fun setKeyboardUseNative(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(useNativeKeyboard = value)
@@ -1576,9 +1320,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val liveBrowseLastSeenVersion : Flow<String>
         = settingsMap { it.lastSeenVersion }
-
-    fun getBrowseLastSeenVersion(cb : (String) -> Unit)
-        = settingsOnce(cb) { it.lastSeenVersion }
 
     fun setBrowseLastSeenVersion(value : String) {
         settingsUpdate { settings ->
@@ -1589,14 +1330,8 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val livePlayMovementStrategy : Flow<MovementStrategy>
         = settingsMap(this::makePlayMovementStrategy)
 
-    fun getPlayMovementStrategy(cb : (MovementStrategy) -> Unit)
-        = settingsOnce(cb, this::makePlayMovementStrategy)
-
     val livePlayMovementStrategySetting : Flow<MovementStrategySetting>
         = settingsMap { it.movementStrategy }
-
-    fun getPlayMovementStrategySetting(cb : (MovementStrategySetting) -> Unit)
-        = settingsOnce(cb) { it.movementStrategy }
 
     fun setPlayMovementStrategySetting(value : MovementStrategySetting) {
         settingsUpdate { settings ->
@@ -1610,17 +1345,10 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val livePlayMovementStrategyClueList : Flow<MovementStrategy>
         = settingsMap(this::makeMovementStrategyClueList)
 
-    fun getPlayMovementStrategyClueList(cb : (MovementStrategy) -> Unit)
-        = settingsOnce(cb, this::makeMovementStrategyClueList)
-
     val livePlayMovementStrategyClueListSetting
         : Flow<MovementStrategySetting> = settingsMap(
             this::makeMovementStrategyClueListSetting,
         )
-
-    fun getPlayMovementStrategyClueListSetting(
-        cb : (MovementStrategySetting) -> Unit
-    ) = settingsOnce(cb, this::makeMovementStrategyClueListSetting)
 
     fun setPlayMovementStrategyClueListSetting(
         value : MovementStrategySetting,
@@ -1636,9 +1364,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveAppOrientationLock : Flow<Orientation>
         = settingsMap { it.orientationLock }
 
-    fun getAppOrientationLock(cb : (Orientation) -> Unit)
-        = settingsOnce(cb) { it.orientationLock }
-
     fun setAppOrientationLock(value : Orientation) {
         settingsUpdate { settings ->
             settings.copy(orientationLock = value)
@@ -1647,9 +1372,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val livePlayPlayLetterUndoEnabled : Flow<Boolean>
         = settingsMap { it.playLetterUndoEnabled }
-
-    fun getPlayPlayLetterUndoEnabled(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.playLetterUndoEnabled }
 
     fun setPlayPlayLetterUndoEnabled(value : Boolean) {
         settingsUpdate { settings ->
@@ -1672,9 +1394,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val livePlayPreserveCorrectLettersInShowErrors : Flow<Boolean>
         = settingsMap { it.preserveCorrectLettersInShowErrors }
 
-    fun getPlayPreserveCorrectLettersInShowErrors(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.preserveCorrectLettersInShowErrors }
-
     fun setPlayPreserveCorrectLettersInShowErrors(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(preserveCorrectLettersInShowErrors = value)
@@ -1683,9 +1402,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val livePlayRandomClueOnShake : Flow<Boolean>
         = settingsMap { it.randomClueOnShake }
-
-    fun getPlayRandomClueOnShake(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.randomClueOnShake }
 
     fun setPlayRandomClueOnShake(value : Boolean) {
         settingsUpdate { settings ->
@@ -1708,49 +1424,25 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveFileHandlerSafArchive : Flow<String>
         = settingsMap { it.safArchiveFolderUri }
 
-    fun getFileHandlerSafArchive(cb : (String) -> Unit)
-        = settingsOnce(cb) { it.safArchiveFolderUri }
-
     val liveFileHandlerSafCrosswords : Flow<String>
         = settingsMap { it.safCrosswordsFolderUri }
-
-    fun getFileHandlerSafCrosswords(cb : (String) -> Unit)
-        = settingsOnce(cb) { it.safCrosswordsFolderUri }
 
     val liveFileHandlerSafRoot : Flow<String>
         = settingsMap { it.safRootUri }
 
-    fun getFileHandlerSafRoot(cb : (String) -> Unit)
-        = settingsOnce(cb) { it.safRootUri }
-
     val liveFileHandlerSafToImportDone : Flow<String>
         = settingsMap { it.safToImportDoneFolderUri }
-
-    fun getFileHandlerSafToImportDone(cb : (String) -> Unit)
-        = settingsOnce(cb) { it.safToImportDoneFolderUri }
 
     val liveFileHandlerSafToImportFailed : Flow<String>
         = settingsMap { it.safToImportFailedFolderUri }
 
-    fun getFileHandlerSafToImportFailed(cb : (String) -> Unit)
-        = settingsOnce(cb) { it.safToImportFailedFolderUri }
-
     val liveFileHandlerSafToImport : Flow<String>
         = settingsMap { it.safToImportFolderUri }
-
-    fun getFileHandlerSafToImport(cb : (String) -> Unit)
-        = settingsOnce(cb) { it.safToImportFolderUri }
 
     val livePlayRenderSettings : Flow<RenderSettings>
         = settingsMap(this::makeRenderSettings)
 
     // Consumer for BoardEditViews.java
-    fun getPlayRenderSettings(cb : Consumer<RenderSettings>)
-        = settingsOnce(
-            cb::accept,
-            this::makeRenderSettings,
-        )
-
     val livePlayScale : Flow<Float>
         = settingsMap { it.scale }
 
@@ -1768,9 +1460,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveScrapeCru : Flow<Boolean>
         = settingsMap { it.scrapeCru }
 
-    fun getScrapeCru(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.scrapeCru }
-
     fun setScrapeCru(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(scrapeCru = value)
@@ -1779,9 +1468,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val liveScrapeGuardianQuick : Flow<Boolean>
         = settingsMap { it.scrapeGuardianQuick }
-
-    fun getScrapeGuardianQuick(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.scrapeGuardianQuick }
 
     fun setScrapeGuardianQuick(value : Boolean) {
         settingsUpdate { settings ->
@@ -1792,9 +1478,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveScrapeKegler : Flow<Boolean>
         = settingsMap { it.scrapeKegler }
 
-    fun getScrapeKegler(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.scrapeKegler }
-
     fun setScrapeKegler(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(scrapeKegler = value)
@@ -1804,9 +1487,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveScrapePrivateEye : Flow<Boolean>
         = settingsMap { it.scrapePrivateEye }
 
-    fun getScrapePrivateEye(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.scrapePrivateEye }
-
     fun setScrapePrivateEye(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(scrapePrivateEye = value)
@@ -1815,9 +1495,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val liveScrapePrzekroj : Flow<Boolean>
         = settingsMap { it.scrapePrzekroj }
-
-    fun getScrapePrzekroj(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.scrapePrzekroj }
 
     fun setScrapePrzekroj(value : Boolean) {
         settingsUpdate { settings ->
@@ -1844,9 +1521,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val livePlayShowClueTabs : Flow<Boolean>
         = settingsMap { it.showCluesOnPlayScreen }
 
-    fun getPlayShowClueTabs(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.showCluesOnPlayScreen }
-
     fun setPlayShowClueTabs(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(showCluesOnPlayScreen = value)
@@ -1855,9 +1529,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val livePlayShowCount : Flow<Boolean>
         = settingsMap { it.showCount }
-
-    fun getPlayShowCount(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.showCount }
 
     fun setPlayShowCount(value : Boolean) {
         settingsUpdate { settings ->
@@ -1868,9 +1539,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val livePlayShowErrorsGrid : Flow<Boolean>
         = settingsMap { it.showErrors }
 
-    fun getPlayShowErrorsGrid(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.showErrors }
-
     fun setPlayShowErrorsGrid(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(showErrors = value)
@@ -1879,9 +1547,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val livePlayShowErrorsClue : Flow<Boolean>
         = settingsMap { it.showErrorsClue }
-
-    fun getPlayShowErrorsClue(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.showErrorsClue }
 
     fun setPlayShowErrorsClue(value : Boolean) {
         settingsUpdate { settings ->
@@ -1892,9 +1557,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val livePlayShowErrorsCursor : Flow<Boolean>
         = settingsMap { it.showErrorsCursor }
 
-    fun getPlayShowErrorsCursor(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.showErrorsCursor }
-
     fun setPlayShowErrorsCursor(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(showErrorsCursor = value)
@@ -1904,9 +1566,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val livePlayShowTimer : Flow<Boolean>
         = settingsMap { it.showTimer }
 
-    fun getPlayShowTimer(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.showTimer }
-
     fun setPlayShowTimer(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(showTimer = value)
@@ -1915,9 +1574,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val liveClueListShowWords : Flow<Boolean>
         = settingsMap { it.showWordsInClueList }
-
-    fun getClueListShowWords(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.showWordsInClueList }
 
     fun setClueListShowWords(value : Boolean) {
         settingsUpdate { settings ->
@@ -1929,12 +1585,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         = settingsMap { it.skipFilled }
 
     // Consumer for BoardEditText.java
-    fun getPlaySkipFilled(cb : Consumer<Boolean>)
-        = settingsOnce(
-            cb::accept,
-            { it.skipFilled },
-        )
-
     fun setPlaySkipFilled(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(skipFilled = value)
@@ -1959,9 +1609,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveBrowseSort : Flow<AccessorSetting>
         = settingsMap { it.sort }
 
-    fun getBrowseSort(cb : (AccessorSetting) -> Unit)
-        = settingsOnce(cb) { it.sort }
-
     fun setBrowseSort(value : AccessorSetting) {
         settingsUpdate { settings ->
             settings.copy(sort = value)
@@ -1983,9 +1630,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val livePlaySuppressHintHighlighting : Flow<Boolean>
         = settingsMap { it.suppressHints }
 
-    fun getPlaySuppressHintHighlighting(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.suppressHints }
-
     fun setPlaySuppressHintHighlighting(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(suppressHints = value)
@@ -1995,9 +1639,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveDownloadSuppressMessages : Flow<Boolean>
         = settingsMap { it.suppressMessages }
 
-    fun getDownloadSuppressIndividualNotifications(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.suppressMessages }
-
     fun setDownloadSuppressMessages(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(suppressMessages = value)
@@ -2006,9 +1647,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val liveDownloadSuppressSummaryMessages : Flow<Boolean>
         = settingsMap { it.suppressSummaryMessages }
-
-    fun getDownloadSuppressSummaryMessages(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.suppressSummaryMessages }
 
     fun setDownloadSuppressSummaryMessages(value : Boolean) {
         settingsUpdate { settings ->
@@ -2035,9 +1673,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val livePlayToggleBeforeMove : Flow<Boolean>
         = settingsMap { it.toggleBeforeMove }
-
-    fun getPlayToggleBeforeMove(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.toggleBeforeMove }
 
     fun setPlayToggleBeforeMove(value : Boolean) {
         settingsUpdate { settings ->
@@ -2071,9 +1706,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     val liveVoiceVolumeActivatesVoice : Flow<Boolean>
         = settingsMap { it.volumeActivatesVoice }
-
-    fun getVoiceVolumeActivatesVoice(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.volumeActivatesVoice }
 
     fun setVoiceVolumeActivatesVoice(value : Boolean) {
         settingsUpdate { settings ->
