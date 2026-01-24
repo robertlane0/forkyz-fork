@@ -190,10 +190,23 @@ class ClueTabsViewModel(
     }
 
     override fun onPlayboardChange(changes : PlayboardChanges) {
-        viewModelScope.launch {
-            currentUIState = currentUIState.copy(pages = getStatePages())
-            if (changes.previousWord != board?.currentWord)
-                snapToClueIfEnabled()
+        val needsRefresh = (
+            changes.currentWord != changes.previousWord
+            || changes.isHistoryChange()
+            || !changes.changedClueIDs.isEmpty()
+        )
+        if (needsRefresh) {
+            println("FORKYZ: refreshing on " + changes)
+            viewModelScope.launch {
+                currentUIState = currentUIState.copy(
+                    pages = getStatePages(
+                        playboardChanges = changes,
+                        currentPages = currentUIState.pages,
+                    )
+                )
+                if (changes.previousWord != board?.currentWord)
+                    snapToClueIfEnabled()
+            }
         }
     }
 
@@ -329,33 +342,110 @@ class ClueTabsViewModel(
         )
     }
 
-    private suspend fun getStatePages() : List<ClueList> {
-        val listPages = (board?.puzzle?.clueListNames?.toList() ?: listOf())
-            .sorted()
-            .map { listName ->
-                ClueList(
-                    listName,
-                    board?.puzzle?.getClues(listName)?.toList()?.map {
+    private suspend fun getStatePages(
+        playboardChanges: PlayboardChanges? = null,
+        currentPages: List<ClueList>? = null,
+    ) : List<ClueList> {
+        if (playboardChanges != null && currentPages != null) {
+            return getStatePagesOptimized(playboardChanges, currentPages)
+        } else {
+            val listPages = (board?.puzzle?.clueListNames?.toList() ?: listOf())
+                .sorted()
+                .map { listName ->
+                    ClueList(
+                        listName,
+                        board?.puzzle?.getClues(listName)?.toList()?.map {
+                            getClueItem(
+                                clue = it,
+                                showDirection = false,
+                            )
+                        } ?: listOf(),
+                    )
+                }
+
+            val historyPage = ClueList(
+                utils.getString(Res.string.clue_tab_history),
+                (board?.puzzle?.history?.toList() ?: listOf())
+                    .map {
                         getClueItem(
-                            clue = it,
-                            showDirection = false,
+                            cid = it,
+                            showDirection = true,
                         )
-                    } ?: listOf(),
-                )
+                    },
+            )
+
+            return listPages + historyPage
+        }
+    }
+
+    private suspend fun getStatePagesOptimized(
+        changes: PlayboardChanges,
+        currentPages: List<ClueList>,
+    ) : List<ClueList> {
+        val historyChange = changes.isHistoryChange()
+        val historyPageNum = currentPages.size - 1
+
+        return currentPages.mapIndexed { pageIndex, page ->
+            val isHistoryPage = pageIndex == historyPageNum
+
+            val updatedClues = if (isHistoryPage && historyChange) {
+                // Reorder history list according to lastHistoryIndex
+                val currentHistory
+                    = board?.puzzle?.history?.toList() ?: listOf()
+                currentHistory.map { cid ->
+                    // Try to find existing clue item
+                    val existingItem = page.clues.find { it.cid == cid }
+
+                    if (existingItem != null) {
+                        // Update selected field if needed
+                        updateClueItemIfNeeded(
+                            cid = cid,
+                            existingItem = existingItem,
+                            changes = changes,
+                            showDirection = true,
+                        )
+                    } else {
+                        // New item in history, calculate it
+                        getClueItem(cid = cid, showDirection = true)
+                    }
+                }
+            } else {
+                // For non-history pages or history without reordering,
+                // just update existing items
+                page.clues.map { clueItem ->
+                    val cid = clueItem.cid
+                    updateClueItemIfNeeded(
+                        cid = cid,
+                        existingItem = clueItem,
+                        changes = changes,
+                        showDirection = isHistoryPage,
+                    )
+                }
             }
 
-        val historyPage = ClueList(
-            utils.getString(Res.string.clue_tab_history),
-            (board?.puzzle?.history?.toList() ?: listOf())
-                .map {
-                    getClueItem(
-                        cid = it,
-                        showDirection = true,
-                    )
-                },
-        )
+            page.copy(clues = updatedClues)
+        }
+    }
 
-        return listPages + historyPage
+    private suspend fun updateClueItemIfNeeded(
+        cid: ClueID,
+        existingItem: ClueItem,
+        changes: PlayboardChanges,
+        showDirection: Boolean,
+    ): ClueItem {
+        val currentWordCid = changes.currentWord?.clueID
+        val previousWordCid = changes.previousWord?.clueID
+        val needsSelectedUpdate
+            = cid == currentWordCid || cid == previousWordCid
+        val needsRecalculation = changes.changedClueIDs.contains(cid)
+
+        return if (needsRecalculation) {
+            getClueItem(cid = cid, showDirection = showDirection)
+        } else if (needsSelectedUpdate) {
+            existingItem.copy(selected = cid == currentWordCid)
+        } else {
+            existingItem
+        }
     }
 
     private suspend fun getClueItem(

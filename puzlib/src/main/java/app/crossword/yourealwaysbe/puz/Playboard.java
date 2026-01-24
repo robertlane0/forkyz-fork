@@ -1875,7 +1875,9 @@ public class Playboard {
             flagNotifying(true);
 
             int lastHistoryIndex = updateHistory();
-            boolean historyChange = (getClueID() != null);
+            // if the current clue was already top of the list, then no
+            // change
+            boolean historyChange = lastHistoryIndex != 0;
 
             Word currentWord = getCurrentWord();
 
@@ -2335,7 +2337,7 @@ public class Playboard {
         /**
          * True if something moved to the top of the history list
          *
-         * See lastHistoryIndex. Note moving top item to top is a change!
+         * See lastHistoryIndex.
          */
         public boolean isHistoryChange() { return historyChange; }
 
