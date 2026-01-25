@@ -161,7 +161,7 @@ public class AmuseLabsJSONIO extends AbstractJSONIO {
             return;
 
         boolean wordLengthsEnabled
-            = json.optBoolean("wordLengthsEnabled", false);
+            = json.optBoolean("wordLengthsEnabled", true);
 
         for (int i = 0; i < entries.length(); i++) {
             JSONObject entry = entries.getJSONObject(i);
