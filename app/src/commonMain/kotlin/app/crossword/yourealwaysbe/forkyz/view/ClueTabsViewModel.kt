@@ -345,11 +345,12 @@ class ClueTabsViewModel(
                 || highlight == ClueHighlight.CH_BOTH
 
         val showCount = clueTabsSettings.displaySettings.showCount
-        val pages = if (isShowCount != showCount)
+        val needsUpdate = (isShowCount != showCount)
+        isShowCount = showCount
+        val pages = if (needsUpdate)
             getStatePages()
         else
             state.pages
-        isShowCount = showCount
 
         return state.copy(
             pages = pages,
