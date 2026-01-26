@@ -31,10 +31,11 @@ public class Clue {
         );
     private static int ENUMERATION_HINT_GRP = 1;
     private static final Pattern ENUMERATION_WHITESPACE_RE
-        = Pattern.compile("^[\\s,]+$");
-    // character that mean special things in IPuz enumerations
+        = Pattern.compile("^[\\s,+]+$");
+    // character that mean special things in IPuz enumerations that are
+    // not fudged to something else for inferring
     private static final Set<Character> ENUMERATION_SPECIAL
-        = Set.of('*', '^', '+');
+        = Set.of('*', '^');
 
     private ClueID clueID;
     // because sometimes numbers are alphabetic
@@ -266,6 +267,7 @@ public class Clue {
      * Looks for (enumeration) at end of clue. Estimation algorithm
      * based on IPuz enumeration specification, with modifications. E.g.
      * comma is interpreted as whitespace (common in most crosswords).
+     * Same for + (see #173)
      */
     private void inferSeparators() {
         inferredSeparators = new TreeMap<>();

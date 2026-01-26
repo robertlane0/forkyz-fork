@@ -119,7 +119,7 @@ public class ClueTest {
     @Test
     public void testSpecial() {
         Clue clue = new Clue(
-            "", 0, "1", "A clue (3*-+4^,5)", new Zone()
+            "", 0, "1", "A clue (3*-4^,5)", new Zone()
         );
 
         assertFalse(clue.hasSeparators());
@@ -151,7 +151,7 @@ public class ClueTest {
     @Test
     public void testBackticks() {
         Clue clue = new Clue(
-            "", 0, "1", "A clue (3`*-`+4`^,5`;4)", new Zone()
+            "", 0, "1", "A clue (3`*-`*4`^,5`;4)", new Zone()
         );
 
         assertFalse(clue.hasSeparators());
@@ -159,7 +159,7 @@ public class ClueTest {
         assertNull(clue.getSeparator(0));
         assertNull(clue.getSeparator(0, true));
         assertNull(clue.getSeparator(3));
-        assertEquals(clue.getSeparator(3, true), "*-+");
+        assertEquals(clue.getSeparator(3, true), "*-*");
         assertNull(clue.getSeparator(6));
         assertNull(clue.getSeparator(6, true));
         assertNull(clue.getSeparator(7));
@@ -175,6 +175,24 @@ public class ClueTest {
         );
         assertFalse(clue.hasSeparators());
         assertFalse(clue.hasSeparators(true));
+    }
+
+    @Test
+    public void testTwoWordsPlus() {
+        Clue clue = new Clue(
+            "", 0, "1", "A clue (4+5)", new Zone()
+        );
+
+        assertFalse(clue.hasSeparators());
+        assertTrue(clue.hasSeparators(true));
+        assertNull(clue.getSeparator(0));
+        assertNull(clue.getSeparator(0, true));
+        assertNull(clue.getSeparator(3));
+        assertNull(clue.getSeparator(3, true));
+        assertNull(clue.getSeparator(4));
+        assertEquals(clue.getSeparator(4, true), " ");
+        assertNull(clue.getSeparator(6));
+        assertNull(clue.getSeparator(6, true));
     }
 }
 
