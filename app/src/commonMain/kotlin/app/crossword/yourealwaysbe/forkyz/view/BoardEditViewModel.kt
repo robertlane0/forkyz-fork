@@ -714,10 +714,18 @@ class BoardEditViewModel(
 
         return (0 until height).map { row ->
             (0 until width).map { col ->
-                val changedBox = changes
-                    ?.cellChanges
-                    ?.contains(Position(row, col))
-                    ?: true
+                val box = puz.checkedGetBox(row, col)
+                val changedBox = (
+                    changes
+                        ?.cellChanges
+                        ?.contains(Position(row, col))
+                        ?: true
+                ) || (
+                    changes
+                        ?.changedClueIDs
+                        ?.any { box?.isPartOf(it) ?: false }
+                        ?: true
+                )
                 if (!changedBox && prevState != null) {
                     prevState.boxes.get(row)?.get(col)
                 } else {
@@ -725,7 +733,7 @@ class BoardEditViewModel(
                         boardEditSettings,
                         row,
                         col,
-                        puz.checkedGetBox(row, col),
+                        box,
                         selectedPositions,
                     )
                 }
