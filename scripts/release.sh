@@ -22,4 +22,6 @@ echo "Ready to commit!"
 echo "Don't forget to git add the new changelog."
 echo "Don't forget to start your runner for the release tag."
 
+echo "WARNING: argostranslate does not work, translate change logs with translateLocally for now"
+
 git status
