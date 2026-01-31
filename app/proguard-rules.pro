@@ -12,6 +12,12 @@
 -keep class app.crossword.yourealwaysbe.forkyz.BuildConfig { *; }
 -keep class app.crossword.yourealwaysbe.forkyz.settings.Settings { *; }
 
+# Ignore intended-to-be-optional re2j classes - only needed if using re2j for
+# jsoup regex jsoup safely falls back to JDK regex if re2j not on classpath,
+# but has concrete re2j refs
+# See: https://github.com/jhy/jsoup/issues/2459
+-dontwarn com.google.re2j.**
+
 # Copyright 2022 Google LLC.
 # SPDX-License-Identifier: Apache-2.0
 -keepclassmembers class * extends androidx.datastore.preferences.protobuf.GeneratedMessageLite {
