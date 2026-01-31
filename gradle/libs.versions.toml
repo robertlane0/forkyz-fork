@@ -23,7 +23,7 @@ sqlite = "2.6.2"
 work = "2.9.1"
 
 # Compose
-compose = "1.10.0"
+compose = "1.11.0-alpha01"
 compose-material = "1.10.0"
 compose-material-icons = "1.7.3"
 compose-material3 = "1.11.0-alpha01"
@@ -73,7 +73,6 @@ junit-platform = "1.11.4"
 mockito-kotlin = "6.2.2"
 
 # Plugins
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 plugin-shadow = "9.3.1"
 plugin-buildconfig = "6.0.7"
 plugin-versions = "0.53.0"
@@ -165,8 +164,10 @@ mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
 buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "plugin-buildconfig" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-plugin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-plugin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }

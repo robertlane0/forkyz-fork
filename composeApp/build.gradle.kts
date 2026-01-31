@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.room)
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.android.library)
     alias(libs.plugins.compose)
     alias(libs.plugins.kotlin.plugin.compose)
     alias(libs.plugins.kotlin.plugin.parcelize)
@@ -16,13 +16,14 @@ plugins {
     alias(libs.plugins.versions)
 }
 
-val appName = "Forkyz"
-val appPackageName = "app.crossword.yourealwaysbe.forkyz"
-val appVersion = 78
+val appName : String by project
+val appPackageName : String by project
+val appVersion : String by project
+val appLibraryNamespace = "$appPackageName.lib"
 
 buildConfig {
     packageName(appPackageName)
-    buildConfigField("APP_VERSION", "$appVersion")
+    buildConfigField("APP_VERSION", appVersion)
 }
 
 kotlin {
@@ -127,23 +128,17 @@ kotlin {
 }
 
 android {
-    namespace = appPackageName
+    namespace = appLibraryNamespace
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = appPackageName
-        versionCode = appVersion * 100000
-        versionName = "$appVersion"
         minSdk = libs.versions.minSdk.get().toInt()
-        targetSdk = libs.versions.targetSdk.get().toInt()
         multiDexEnabled = true
         vectorDrawables {
             useSupportLibrary = true
         }
-    }
 
-    androidResources {
-        generateLocaleConfig = true
+        consumerProguardFiles("proguard-rules.pro")
     }
 
     room {
@@ -162,30 +157,6 @@ android {
         }
     }
 
-    signingConfigs {
-        create("release") {
-            storeFile = getReleaseKeyStoreFile()
-            storePassword = System.getenv("ANDROID_KEYSTORE_PASSWORD")
-            keyAlias = System.getenv("ANDROID_KEY_ALIAS")
-            keyPassword = System.getenv("ANDROID_KEYSTORE_PASSWORD")
-        }
-    }
-
-    buildTypes {
-        getByName("debug") {
-            applicationIdSuffix = ".debug"
-        }
-        getByName("release") {
-            signingConfig = signingConfigs.getByName("release")
-            isMinifyEnabled = true
-            isShrinkResources = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android.txt"),
-                "proguard-rules.pro"
-            )
-        }
-    }
-
     // overrides 4.11 dependency of
     // com.github.jgraham0325:words-to-numbers:8a97d258fd'
     configurations.all {
@@ -198,11 +169,6 @@ android {
             excludes += "META-INF/DEPENDENCIES"
         }
     }
-}
-
-fun getReleaseKeyStoreFile(): File? {
-    val filename = System.getenv("ANDROID_KEY_STOREFILE")
-    return if (filename != null) file(filename) else null
 }
 
 dependencies {
@@ -221,6 +187,8 @@ wire {
 
 compose.resources {
     packageOfResClass = "${appPackageName}.app.generated.resources"
+    publicResClass = true
+    generateResClass = always
 }
 
 compose.desktop {
@@ -229,7 +197,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = appPackageName
-            packageVersion = "${appVersion}.0.0"
+            packageVersion = "$appVersion.0.0"
 
             linux {
                 shortcut = true

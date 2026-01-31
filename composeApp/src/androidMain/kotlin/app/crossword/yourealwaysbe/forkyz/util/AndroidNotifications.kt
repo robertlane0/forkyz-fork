@@ -3,14 +3,11 @@ package app.crossword.yourealwaysbe.forkyz.util
 
 import kotlinx.coroutines.channels.Channel
 
-import android.content.Intent
-import android.app.PendingIntent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import android.annotation.SuppressLint
 import android.content.Context
 
-import app.crossword.yourealwaysbe.forkyz.ForkyzActivity
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 
 class AndroidNotifications(
@@ -57,22 +54,6 @@ class AndroidNotifications(
 
     override fun cancel(notificationID : Int) {
         notificationManager.cancel(notificationID)
-    }
-
-    /**
-     * Make a content intent for a notification
-     */
-    private fun getContentIntent() : PendingIntent {
-        val notificationIntent = Intent(
-            applicationContext,
-            ForkyzActivity::class.java,
-        )
-        return PendingIntent.getActivity(
-            applicationContext,
-            0,
-            notificationIntent,
-            utils.immutablePendingIntentFlag(),
-        )
     }
 }
 

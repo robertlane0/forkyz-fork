@@ -171,17 +171,17 @@ See `./gradlew tasks` for all build commands.
 Translations are welcome. Here is a quick guide to what is needed.
 
 * Most strings are in
-  `app/src/commonMain/composeResources/values/strings.xml`
+  `composeApp/src/commonMain/composeResources/values/strings.xml`
   and need a copy in
-  `app/src/commonMain/composeResources/values-<lang>/strings.xml`.
+  `composeApp/src/commonMain/composeResources/values-<lang>/strings.xml`.
 * Help pages &c. are in
-  `app/src/commonMain/composeResources/files/en/<screen>.html`
+  `compoaseApp/src/commonMain/composeResources/files/en/<screen>.html`
   and need a copy in
-  `app/src/commonMain/composeResources/files/<lang>/<screen>.html`.
+  `composeApp/src/commonMain/composeResources/files/<lang>/<screen>.html`.
 * Android strings are in
-  `app/src/androidMain/res/values/strings.xml`
+  `androidApp/src/main/res/values/strings.xml`
   and need a copy in
-  `app/src/androidMain/res/values-<lang>/strings.xml`.
+  `androidApp/src/main/res/values-<lang>/strings.xml`.
 * The following resources in the `files/en` directory should not be translated
   (do not create a new copy, the one in `files/en` will be used instead).
     * `license.html` -- unless you have an officially translated version.

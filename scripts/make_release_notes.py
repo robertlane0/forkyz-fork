@@ -54,7 +54,7 @@ LANGS = [
     ),
 ]
 
-release_file_fmt = "app/src/commonMain/composeResources/files/{lang}/release.html"
+release_file_fmt = "composeApp/src/commonMain/composeResources/files/{lang}/release.html"
 changelogs_folder_fmt = "fastlane/metadata/android/{folder}/changelogs"
 changes_md = "docs/changes.md"
 
