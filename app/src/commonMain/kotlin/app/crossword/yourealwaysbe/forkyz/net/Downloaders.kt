@@ -425,8 +425,8 @@ class Downloaders(
                 "https://www.rcijeux.fr/drupal_game/lacroix/mcroises1/"
                     +"grids/gary%d.mcj",
                 "'https://www.la-croix.com/mots-croises'",
-                8787,
-                LocalDate.of(2025, 12, 19),
+                8815,
+                LocalDate.of(2026, 1, 30),
                 1,
             ))
         }
