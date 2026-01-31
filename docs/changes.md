@@ -1,5 +1,14 @@
 # Forkyz Changelog
 
+## Version 78
+
+- Add option to split native input responses across cells.
+- Fix file permission bug for external directories.
+- Support non-alphabetic characters on hardware keyboard.
+- Interpret + as space for inferred separators.
+- Fix La Croix downloader and Everyman share import.
+- Optimise state update (fixes lag on desktop).
+
 ## Version 77
 
 - Add Dutch NRC and La Croix crossword sources.

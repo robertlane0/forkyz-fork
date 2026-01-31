@@ -18,7 +18,7 @@ plugins {
 
 val appName = "Forkyz"
 val appPackageName = "app.crossword.yourealwaysbe.forkyz"
-val appVersion = 77
+val appVersion = 78
 
 buildConfig {
     packageName(appPackageName)

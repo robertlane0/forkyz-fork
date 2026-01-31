@@ -1,0 +1,8 @@
+- Ajouter une option pour diviser les réponses natives d'entrée entre les cellules.
+- Corriger le bogue de l'autorisation de fichier pour les répertoires externes.
+- Soutenir les caractères non alphabétiques sur le clavier matériel.
+Interpréter - comme espace pour les séparateurs déduits.
+- Fixer La Croix et l'importation de Everyman partagent l'importation.
+- Optimiser la mise à jour de l'état (fixe lat-sur le bureau).
+
+Changelog traduit automatiquement avec translateLocally.
