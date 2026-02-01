@@ -84,7 +84,7 @@ class ClueListPageViewModel(
     )
 
     fun toggleShowAllWords() {
-        val current = showAllWords.value ?: false
+        val current = showAllWords.value
         settings.setClueListShowWords(!current)
     }
 

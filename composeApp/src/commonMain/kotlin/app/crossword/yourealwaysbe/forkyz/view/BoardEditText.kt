@@ -38,11 +38,11 @@ class BoardEditTextState private constructor(initSelected : Int) {
     internal var boxInputState = BoxInputState()
 
     fun requestFocus() {
-        boxInputState?.requestFocus()
+        boxInputState.requestFocus()
     }
 
     fun setResponse(response : Char) {
-        boxInputState?.setResponse(response.toString())
+        boxInputState.setResponse(response.toString())
     }
 
     companion object {
@@ -245,8 +245,8 @@ fun BoardEditText(
                     response = response.toString(),
                     highlighted = col == state.selected,
                     separators = Separators(
-                        left = if (col == 0) separators?.getOrNull(0) else null,
-                        right = separators?.getOrNull(col + 1),
+                        left = if (col == 0) separators.getOrNull(0) else null,
+                        right = separators.getOrNull(col + 1),
                     ),
                     scratchState = scratchState,
                 )

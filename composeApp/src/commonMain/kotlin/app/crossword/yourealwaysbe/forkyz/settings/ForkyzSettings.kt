@@ -1815,6 +1815,31 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         }
     }
 
+    private fun JSONObject.ifHasBoolean(key : String, cb : (Boolean) -> Unit) {
+        if (has(key))
+            cb(optBoolean(key))
+    }
+
+    private fun JSONObject.ifHasString(key : String, cb : (String) -> Unit) {
+        if (has(key))
+            cb(optString(key))
+    }
+
+    private fun JSONObject.ifHasInt(key : String, cb : (Int) -> Unit) {
+        if (has(key))
+            cb(optInt(key))
+    }
+
+    private fun JSONObject.ifHasLong(key : String, cb : (Long) -> Unit) {
+        if (has(key))
+            cb(optLong(key))
+    }
+
+    private fun JSONObject.ifHasDouble(key : String, cb : (Double) -> Unit) {
+        if (has(key))
+            cb(optDouble(key))
+    }
+
     /**
      * Export or import settings to/from json
      *
@@ -1841,21 +1866,21 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             "alwaysAnnounceBox",
             { s, key -> json.put(key, s.alwaysAnnounceBox) },
             { key ->
-                json.optBoolean(key)?.let { setVoiceAlwaysAnnounceBox(it) }
+                json.ifHasBoolean(key) { setVoiceAlwaysAnnounceBox(it) }
             },
         )
         run(
             "alwaysAnnounceClue",
             { s, key -> json.put(key, s.alwaysAnnounceClue) },
             { key ->
-                json.optBoolean(key)?.let { setVoiceAlwaysAnnounceClue(it) }
+                json.ifHasBoolean(key) { setVoiceAlwaysAnnounceClue(it) }
             },
         )
         run(
             "applicationTheme",
             { s, key -> json.put(key, s.applicationTheme.toString()) },
             { key ->
-               json.optString(key)?.let {
+               json.ifHasString(key) {
                    try {
                        setAppTheme(Theme.valueOf(it))
                    } catch (e : IllegalArgumentException) {
@@ -1868,7 +1893,7 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             "archiveCleanupAge",
             { s, key -> json.put(key, s.archiveCleanupAge) },
             { key ->
-                json.optInt(key)?.let { setBrowseCleanupAgeArchive(it) }
+                json.ifHasInt(key) { setBrowseCleanupAgeArchive(it) }
             },
         )
         run(
@@ -1884,7 +1909,7 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             "backgroundDownloadAllowRoaming",
             { s, key -> json.put(key, s.backgroundDownloadAllowRoaming) },
             { key ->
-                json.optBoolean(key)?.let { setDownloadAllowRoaming(it) }
+                json.ifHasBoolean(key) { setDownloadAllowRoaming(it) }
             },
         )
         run(
@@ -1901,72 +1926,72 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         run(
             "backgroundDownloadDaysTime",
             { s, key -> json.put(key, s.backgroundDownloadDaysTime) },
-            { key -> json.optInt(key)?.let { setDownloadDaysTime(it) } },
+            { key -> json.ifHasInt(key) { setDownloadDaysTime(it) } },
         )
         run(
             "backgroundDownloadHourly",
             { s, key -> json.put(key, s.backgroundDownloadHourly) },
-            { key -> json.optBoolean(key)?.let { setDownloadHourly(it) } },
+            { key -> json.ifHasBoolean(key) { setDownloadHourly(it) } },
         )
         run(
             "backgroundDownloadRequireCharging",
             { s, key -> json.put(key, s.backgroundDownloadRequireCharging) },
             { key ->
-                json.optBoolean(key)?.let { setDownloadRequireCharging(it) }
+                json.ifHasBoolean(key) { setDownloadRequireCharging(it) }
             },
         )
         run(
             "backgroundDownloadRequireUnmetered",
             { s, key -> json.put(key, s.backgroundDownloadRequireUnmetered) },
             { key ->
-                json.optBoolean(key)?.let { setDownloadRequireUnmetered(it) }
+                json.ifHasBoolean(key) { setDownloadRequireUnmetered(it) }
             },
         )
         run(
             "browseAlwaysShowRating",
             { s, key -> json.put(key, s.browseAlwaysShowRating) },
             { key ->
-                json.optBoolean(key)?.let { setBrowseAlwaysShowRating(it) }
+                json.ifHasBoolean(key) { setBrowseAlwaysShowRating(it) }
             },
         )
         run(
             "browseIndicateIfSolution",
             { s, key -> json.put(key, s.browseIndicateIfSolution) },
             { key ->
-                json.optBoolean(key)?.let { setBrowseIndicateIfSolution(it) }
+                json.ifHasBoolean(key) { setBrowseIndicateIfSolution(it) }
             },
         )
         run(
             "browseNewPuzzle",
             { s, key -> json.put(key, s.browseNewPuzzle) },
-            { key -> json.optBoolean(key)?.let { setBrowseNewPuzzle(it) } },
+            { key -> json.ifHasBoolean(key) { setBrowseNewPuzzle(it) } },
         )
         run(
             "browseShowPercentageCorrect",
             { s, key -> json.put(key, s.browseShowPercentageCorrect) },
             { key ->
-                json.optBoolean(key)?.let { setBrowseShowPercentageCorrect(it) }
+                json.ifHasBoolean(key) { setBrowseShowPercentageCorrect(it) }
             },
         )
         run(
             "buttonActivatesVoice",
             { s, key -> json.put(key, s.buttonActivatesVoice) },
             { key ->
-                json.optBoolean(key)?.let { setVoiceButtonActivatesVoice(it) }
+                json.ifHasBoolean(key) { setVoiceButtonActivatesVoice(it) }
             },
         )
         run(
             "buttonAnnounceClue",
             { s, key -> json.put(key, s.buttonAnnounceClue) },
             { key ->
-                json.optBoolean(key)?.let { setVoiceButtonAnnounceClue(it) }
+                json.ifHasBoolean(key) { setVoiceButtonAnnounceClue(it) }
             },
         )
         run(
             "llmAgent",
             { s, key -> json.put(key, s.llmAgent.toString()) },
             { key ->
-               json.optString(key)?.let {
+               json.ifHasString(key) {
                    try {
                        setExtLLMAgent(LLMAgent.valueOf(it))
                    } catch (e : IllegalArgumentException) {
@@ -1978,30 +2003,30 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         run(
             "llmAgentAPIKey",
             { s, key -> json.put(key, s.llmAgentAPIKey) },
-            { key -> json.optString(key)?.let { setExtLLMAgentAPIKey(it) } },
+            { key -> json.ifHasString(key) { setExtLLMAgentAPIKey(it) } },
         )
         run(
             "llmVoiceCommands",
             { s, key -> json.put(key, s.llmVoiceCommands) },
             { key ->
-                json.optBoolean(key)?.let { setVoiceLLMVoiceCommands(it) }
+                json.ifHasBoolean(key) { setVoiceLLMVoiceCommands(it) }
             },
         )
         run(
             "cleanupAge",
             { s, key -> json.put(key, s.cleanupAge) },
-            { key -> json.optInt(key)?.let { setBrowseCleanupAge(it) } },
+            { key -> json.ifHasInt(key) { setBrowseCleanupAge(it) } },
         )
         run(
             "clueBelowGrid",
             { s, key -> json.put(key, s.clueBelowGrid) },
-            { key -> json.optBoolean(key)?.let { setPlayClueBelowGrid(it) } },
+            { key -> json.ifHasBoolean(key) { setPlayClueBelowGrid(it) } },
         )
         run(
             "clueHighlight",
             { s, key -> json.put(key, s.clueHighlight.toString()) },
             { key ->
-               json.optString(key)?.let {
+               json.ifHasString(key) {
                    try {
                        setPlayClueHighlight(ClueHighlight.valueOf(it))
                    } catch (e : IllegalArgumentException) {
@@ -2014,7 +2039,7 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             "clueTabsDouble",
             { s, key -> json.put(key, s.clueTabsDouble.toString()) },
             { key ->
-               json.optString(key)?.let {
+               json.ifHasString(key) {
                    try {
                        setClueListClueTabsDouble(ClueTabsDouble.valueOf(it))
                    } catch (e : IllegalArgumentException) {
@@ -2027,28 +2052,28 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             "crosswordSolverEnabled",
             { s, key -> json.put(key, s.crosswordSolverEnabled) },
             { key ->
-                json.optBoolean(key)?.let { setExtCrosswordSolverEnabled(it) }
+                json.ifHasBoolean(key) { setExtCrosswordSolverEnabled(it) }
             },
         )
         run(
             "customDailyTitle",
             { s, key -> json.put(key, s.customDailyTitle) },
             { key ->
-                json.optString(key)?.let { setDownloadCustomDailyTitle(it) }
+                json.ifHasString(key) { setDownloadCustomDailyTitle(it) }
             },
         )
         run(
             "customDailyUrl",
             { s, key -> json.put(key, s.customDailyUrl) },
             { key ->
-                json.optString(key)?.let { setDownloadCustomDailyURL(it) }
+                json.ifHasString(key) { setDownloadCustomDailyURL(it) }
             },
         )
         run(
             "cycleUnfilledMode",
             { s, key -> json.put(key, s.cycleUnfilledMode.toString()) },
             { key ->
-               json.optString(key)?.let {
+               json.ifHasString(key) {
                    try {
                        setPlayCycleUnfilledMode(CycleUnfilledMode.valueOf(it))
                    } catch (e : IllegalArgumentException) {
@@ -2061,7 +2086,7 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             "deleteCrossingMode",
             { s, key -> json.put(key, s.deleteCrossingMode.toString()) },
             { key ->
-               json.optString(key)?.let {
+               json.ifHasString(key) {
                    try {
                        setPlayDeleteCrossingModeSetting(
                            DeleteCrossingModeSetting.valueOf(it)
@@ -2076,31 +2101,31 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             "deleteOnCleanup",
             { s, key -> json.put(key, s.deleteOnCleanup) },
             { key ->
-                json.optBoolean(key)?.let { setBrowseDeleteOnCleanup(it) }
+                json.ifHasBoolean(key) { setBrowseDeleteOnCleanup(it) }
             },
         )
         run(
             "disableRatings",
             { s, key -> json.put(key, s.disableRatings) },
             { key ->
-                json.optBoolean(key)?.let { setRatingsDisableRatings(it) }
+                json.ifHasBoolean(key) { setRatingsDisableRatings(it) }
             },
         )
         run(
             "disableSwipe",
             { s, key -> json.put(key, s.disableSwipe) },
-            { key -> json.optBoolean(key)?.let { setBrowseDisableSwipe(it) } },
+            { key -> json.ifHasBoolean(key) { setBrowseDisableSwipe(it) } },
         )
         run(
             "displayScratch",
             { s, key -> json.put(key, s.displayScratch) },
-            { key -> json.optBoolean(key)?.let { setPlayScratchDisplay(it) } },
+            { key -> json.ifHasBoolean(key) { setPlayScratchDisplay(it) } },
         )
         run(
             "displaySeparators",
             { s, key -> json.put(key, s.displaySeparators.toString()) },
             { key ->
-               json.optString(key)?.let {
+               json.ifHasString(key) {
                    try {
                        setPlayDisplaySeparators(DisplaySeparators.valueOf(it))
                    } catch (e : IllegalArgumentException) {
@@ -2112,73 +2137,73 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         run(
             "dlLast",
             { s, key -> json.put(key, s.dlLast) },
-            { key -> json.optLong(key)?.let { setBrowseLastDownload(it) } },
+            { key -> json.ifHasLong(key) { setBrowseLastDownload(it) } },
         )
         run(
             "dlOnStartup",
             { s, key -> json.put(key, s.dlOnStartup) },
-            { key -> json.optBoolean(key)?.let { setDownloadOnStartUp(it) } },
+            { key -> json.ifHasBoolean(key) { setDownloadOnStartUp(it) } },
         )
         run(
             "dontConfirmCleanup",
             { s, key -> json.put(key, s.dontConfirmCleanup) },
             { key ->
-                json.optBoolean(key)?.let { setBrowseDontConfirmCleanup(it) }
+                json.ifHasBoolean(key) { setBrowseDontConfirmCleanup(it) }
             },
         )
         run(
             "dontConfirmBrowseDelete",
             { s, key -> json.put(key, s.dontConfirmBrowseDelete) },
             { key ->
-                json.optBoolean(key)?.let { setBrowseDontConfirmDelete(it) }
+                json.ifHasBoolean(key) { setBrowseDontConfirmDelete(it) }
             },
         )
         run(
             "dontSnapBoardToBorders",
             { s, key -> json.put(key, s.dontSnapBoardToBorders) },
             { key ->
-                json.optBoolean(key)?.let { setPlayDontSnapBoardToBorders(it) }
+                json.ifHasBoolean(key) { setPlayDontSnapBoardToBorders(it) }
             },
         )
         run(
             "doubleTap",
             { s, key -> json.put(key, s.doubleTap) },
             { key ->
-                json.optBoolean(key)?.let { setPlayDoubleTapFitBoard(it) }
+                json.ifHasBoolean(key) { setPlayDoubleTapFitBoard(it) }
             },
         )
         run(
             "download20Minutes",
             { s, key -> json.put(key, s.download20Minutes) },
-            { key -> json.optBoolean(key)?.let { setDownload20Minutes(it) } },
+            { key -> json.ifHasBoolean(key) { setDownload20Minutes(it) } },
         )
         run(
             "downloadCustomDaily",
             { s, key -> json.put(key, s.downloadCustomDaily) },
-            { key -> json.optBoolean(key)?.let { setDownloadCustomDaily(it) } },
+            { key -> json.ifHasBoolean(key) { setDownloadCustomDaily(it) } },
         )
         run(
             "downloadDeStandaard",
             { s, key -> json.put(key, s.downloadDeStandaard) },
-            { key -> json.optBoolean(key)?.let { setDownloadDeStandaard(it) } },
+            { key -> json.ifHasBoolean(key) { setDownloadDeStandaard(it) } },
         )
         run(
             "downloadDeTelegraaf",
             { s, key -> json.put(key, s.downloadDeTelegraaf) },
-            { key -> json.optBoolean(key)?.let { setDownloadDeTelegraaf(it) } },
+            { key -> json.ifHasBoolean(key) { setDownloadDeTelegraaf(it) } },
         )
         run(
             "downloadElPaisExperto",
             { s, key -> json.put(key, s.downloadElPaisExperto) },
             { key ->
-                json.optBoolean(key)?.let { setDownloadElPaisExperto(it) }
+                json.ifHasBoolean(key) { setDownloadElPaisExperto(it) }
             },
         )
         run(
             "downloadGuardianDailyCryptic",
             { s, key -> json.put(key, s.downloadGuardianDailyCryptic) },
             { key ->
-                json.optBoolean(key)?.let {
+                json.ifHasBoolean(key) {
                     setDownloadGuardianDailyCryptic(it)
                 }
             },
@@ -2187,7 +2212,7 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             "downloadGuardianWeeklyQuiptic",
             { s, key -> json.put(key, s.downloadGuardianWeeklyQuiptic) },
             { key ->
-                json.optBoolean(key)?.let {
+                json.ifHasBoolean(key) {
                     setDownloadGuardianWeeklyQuiptic(it)
                 }
             },
@@ -2195,13 +2220,13 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         run(
             "downloadHamAbend",
             { s, key -> json.put(key, s.downloadHamAbend) },
-            { key -> json.optBoolean(key)?.let { setDownloadHamAbend(it) } },
+            { key -> json.ifHasBoolean(key) { setDownloadHamAbend(it) } },
         )
         run(
             "downloadIndependentDailyCryptic",
             { s, key -> json.put(key, s.downloadIndependentDailyCryptic) },
             { key ->
-                json.optBoolean(key)?.let {
+                json.ifHasBoolean(key) {
                     setDownloadIndependentDailyCryptic(it)
                 }
             },
@@ -2210,69 +2235,69 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             "downloadIrishNewsCryptic",
             { s, key -> json.put(key, s.downloadIrishNewsCryptic) },
             { key ->
-                json.optBoolean(key)?.let { setDownloadIrishNewsCryptic(it) }
+                json.ifHasBoolean(key) { setDownloadIrishNewsCryptic(it) }
             },
         )
         run(
             "downloadJonesin",
             { s, key -> json.put(key, s.downloadJonesin) },
-            { key -> json.optBoolean(key)?.let { setDownloadJonesin(it) } },
+            { key -> json.ifHasBoolean(key) { setDownloadJonesin(it) } },
         )
         run(
             "downloadJoseph",
             { s, key -> json.put(key, s.downloadJoseph) },
-            { key -> json.optBoolean(key)?.let { setDownloadJoseph(it) } },
+            { key -> json.ifHasBoolean(key) { setDownloadJoseph(it) } },
         )
         run(
             "downloadLaCroix",
             { s, key -> json.put(key, s.downloadLaCroix) },
-            { key -> json.optBoolean(key)?.let { setDownloadLaCroix(it) } },
+            { key -> json.ifHasBoolean(key) { setDownloadLaCroix(it) } },
         )
         run(
             "downloadLeParisienF1",
             { s, key -> json.put(key, s.downloadLeParisienF1) },
             { key ->
-                json.optBoolean(key)?.let { setDownloadLeParisienF1(it) }
+                json.ifHasBoolean(key) { setDownloadLeParisienF1(it) }
             },
         )
         run(
             "downloadLeParisienF2",
             { s, key -> json.put(key, s.downloadLeParisienF2) },
             { key ->
-                json.optBoolean(key)?.let { setDownloadLeParisienF2(it) }
+                json.ifHasBoolean(key) { setDownloadLeParisienF2(it) }
             },
         )
         run(
             "downloadLeParisienF3",
             { s, key -> json.put(key, s.downloadLeParisienF3) },
             { key ->
-                json.optBoolean(key)?.let { setDownloadLeParisienF3(it) }
+                json.ifHasBoolean(key) { setDownloadLeParisienF3(it) }
             },
         )
         run(
             "downloadLeParisienF4",
             { s, key -> json.put(key, s.downloadLeParisienF4) },
             { key ->
-                json.optBoolean(key)?.let { setDownloadLeParisienF4(it) }
+                json.ifHasBoolean(key) { setDownloadLeParisienF4(it) }
             },
         )
         run(
             "downloadMetroCryptic",
             { s, key -> json.put(key, s.downloadMetroCryptic) },
             { key ->
-                json.optBoolean(key)?.let { setDownloadMetroCryptic(it) }
+                json.ifHasBoolean(key) { setDownloadMetroCryptic(it) }
             },
         )
         run(
             "downloadMetroQuick",
             { s, key -> json.put(key, s.downloadMetroQuick) },
-            { key -> json.optBoolean(key)?.let { setDownloadMetroQuick(it) } },
+            { key -> json.ifHasBoolean(key) { setDownloadMetroQuick(it) } },
         )
         run(
             "downloadNewYorkTimesSyndicated",
             { s, key -> json.put(key, s.downloadNewYorkTimesSyndicated) },
             { key ->
-                json.optBoolean(key)?.let {
+                json.ifHasBoolean(key) {
                     setDownloadNewYorkTimesSyndicated(it)
                 }
             },
@@ -2280,119 +2305,119 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         run(
             "downloadNewsday",
             { s, key -> json.put(key, s.downloadNewsday) },
-            { key -> json.optBoolean(key)?.let { setDownloadNewsday(it) } },
+            { key -> json.ifHasBoolean(key) { setDownloadNewsday(it) } },
         )
         run(
             "downloadNRCInHetMidden",
             { s, key -> json.put(key, s.downloadNRCInHetMidden) },
-            { key -> json.optBoolean(key)?.let { setDownloadNRCInHetMidden(it) } },
+            { key -> json.ifHasBoolean(key) { setDownloadNRCInHetMidden(it) } },
         )
         run(
             "downloadNRCScrypto",
             { s, key -> json.put(key, s.downloadNRCScrypto) },
-            { key -> json.optBoolean(key)?.let { setDownloadNRCScrypto(it) } },
+            { key -> json.ifHasBoolean(key) { setDownloadNRCScrypto(it) } },
         )
         run(
             "downloadPremier",
             { s, key -> json.put(key, s.downloadPremier) },
-            { key -> json.optBoolean(key)?.let { setDownloadPremier(it) } },
+            { key -> json.ifHasBoolean(key) { setDownloadPremier(it) } },
         )
         run(
             "downloadSheffer",
             { s, key -> json.put(key, s.downloadSheffer) },
-            { key -> json.optBoolean(key)?.let { setDownloadSheffer(it) } },
+            { key -> json.ifHasBoolean(key) { setDownloadSheffer(it) } },
         )
         run(
             "downloadSudOuestMotsCroises",
             { s, key -> json.put(key, s.downloadSudOuestMotsCroises) },
-            { key -> json.optBoolean(key)?.let {
+            { key -> json.ifHasBoolean(key) {
                 setDownloadSudOuestMotsCroises(it) }
             },
         )
         run(
             "downloadSudOuestMotsFleches",
             { s, key -> json.put(key, s.downloadSudOuestMotsFleches) },
-            { key -> json.optBoolean(key)?.let {
+            { key -> json.ifHasBoolean(key) {
                 setDownloadSudOuestMotsFleches(it) }
             },
         )
         run(
             "downloadTF1MotsCroises",
             { s, key -> json.put(key, s.downloadTF1MotsCroises) },
-            { key -> json.optBoolean(key)?.let {
+            { key -> json.ifHasBoolean(key) {
                 setDownloadTF1MotsCroises(it) }
             },
         )
         run(
             "downloadTF1MotsFleches",
             { s, key -> json.put(key, s.downloadTF1MotsFleches) },
-            { key -> json.optBoolean(key)?.let {
+            { key -> json.ifHasBoolean(key) {
                 setDownloadTF1MotsFleches(it) }
             },
         )
         run(
             "downloadTimeout",
             { s, key -> json.put(key, s.downloadTimeout) },
-            { key -> json.optInt(key)?.let { setDownloadTimeout(it) } },
+            { key -> json.ifHasInt(key) { setDownloadTimeout(it) } },
         )
         run(
             "downloadUSAToday",
             { s, key -> json.put(key, s.downloadUSAToday) },
-            { key -> json.optBoolean(key)?.let { setDownloadUSAToday(it) } },
+            { key -> json.ifHasBoolean(key) { setDownloadUSAToday(it) } },
         )
         run(
             "downloadUniversal",
             { s, key -> json.put(key, s.downloadUniversal) },
-            { key -> json.optBoolean(key)?.let { setDownloadUniversal(it) } },
+            { key -> json.ifHasBoolean(key) { setDownloadUniversal(it) } },
         )
         run(
             "downloadWaPoSunday",
             { s, key -> json.put(key, s.downloadWaPoSunday) },
-            { key -> json.optBoolean(key)?.let { setDownloadWaPoSunday(it) } },
+            { key -> json.ifHasBoolean(key) { setDownloadWaPoSunday(it) } },
         )
         run(
             "downloadWsj",
             { s, key -> json.put(key, s.downloadWsj) },
-            { key -> json.optBoolean(key)?.let { setDownloadWsj(it) } },
+            { key -> json.ifHasBoolean(key) { setDownloadWsj(it) } },
         )
         run(
             "duckDuckGoEnabled",
             { s, key -> json.put(key, s.duckDuckGoEnabled) },
             { key ->
-                json.optBoolean(key)?.let { setExtDuckDuckGoEnabled(it) }
+                json.ifHasBoolean(key) { setExtDuckDuckGoEnabled(it) }
             },
         )
         run(
             "ensureVisible",
             { s, key -> json.put(key, s.ensureVisible) },
-            { key -> json.optBoolean(key)?.let { setPlayEnsureVisible(it) } },
+            { key -> json.ifHasBoolean(key) { setPlayEnsureVisible(it) } },
         )
         run(
             "enterChangesDirection",
             { s, key -> json.put(key, s.enterChangesDirection) },
             { key ->
-                json.optBoolean(key)?.let { setPlayEnterChangesDirection(it) }
+                json.ifHasBoolean(key) { setPlayEnterChangesDirection(it) }
             },
         )
         run(
             "equalsAnnounceClue",
             { s, key -> json.put(key, s.equalsAnnounceClue) },
             { key ->
-                json.optBoolean(key)?.let { setVoiceEqualsAnnounceClue(it) }
+                json.ifHasBoolean(key) { setVoiceEqualsAnnounceClue(it) }
             },
         )
         run(
             "expandableClueLine",
             { s, key -> json.put(key, s.expandableClueLine) },
             { key ->
-                json.optBoolean(key)?.let { setPlayExpandableClueLine(it) }
+                json.ifHasBoolean(key) { setPlayExpandableClueLine(it) }
             },
         )
         run(
             "externalDictionary",
             { s, key -> json.put(key, s.externalDictionary.toString()) },
             { key ->
-               json.optString(key)?.let {
+               json.ifHasString(key) {
                    try {
                        setExtDictionarySetting(
                            ExternalDictionarySetting.valueOf(it)
@@ -2407,14 +2432,14 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             "fifteenSquaredEnabled",
             { s, key -> json.put(key, s.fifteenSquaredEnabled) },
             { key ->
-                json.optBoolean(key)?.let { setExtFifteenSquaredEnabled(it) }
+                json.ifHasBoolean(key) { setExtFifteenSquaredEnabled(it) }
             },
         )
         run(
             "fitToScreenMode",
             { s, key -> json.put(key, s.fitToScreenMode.toString()) },
             { key ->
-               json.optString(key)?.let {
+               json.ifHasString(key) {
                    try {
                        setPlayFitToScreenMode(FitToScreenMode.valueOf(it))
                    } catch (e : IllegalArgumentException) {
@@ -2426,13 +2451,13 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         run(
             "fullScreen",
             { s, key -> json.put(key, s.fullScreen) },
-            { key -> json.optBoolean(key)?.let { setPlayFullScreen(it) } },
+            { key -> json.ifHasBoolean(key) { setPlayFullScreen(it) } },
         )
         run(
             "gridRatio",
             { s, key -> json.put(key, s.gridRatio.toString()) },
             { key ->
-               json.optString(key)?.let {
+               json.ifHasString(key) {
                    try {
                        setPlayGridRatioPortrait(GridRatio.valueOf(it))
                    } catch (e : IllegalArgumentException) {
@@ -2445,7 +2470,7 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             "gridRatioLand",
             { s, key -> json.put(key, s.gridRatioLand.toString()) },
             { key ->
-               json.optString(key)?.let {
+               json.ifHasString(key) {
                    try {
                        setPlayGridRatioLandscape(GridRatio.valueOf(it))
                    } catch (e : IllegalArgumentException) {
@@ -2458,39 +2483,39 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             "indicateShowErrors",
             { s, key -> json.put(key, s.indicateShowErrors) },
             { key ->
-                json.optBoolean(key)?.let { setPlayIndicateShowErrors(it) }
+                json.ifHasBoolean(key) { setPlayIndicateShowErrors(it) }
             },
         )
         run(
             "inferSeparators",
             { s, key -> json.put(key, s.inferSeparators) },
-            { key -> json.optBoolean(key)?.let { setPlayInferSeparators(it) } },
+            { key -> json.ifHasBoolean(key) { setPlayInferSeparators(it) } },
         )
         run(
             "keyboardCompact",
             { s, key -> json.put(key, s.keyboardCompact) },
-            { key -> json.optBoolean(key)?.let { setKeyboardCompact(it) } },
+            { key -> json.ifHasBoolean(key) { setKeyboardCompact(it) } },
         )
         run(
             "keyboardForceCaps",
             { s, key -> json.put(key, s.keyboardForceCaps) },
-            { key -> json.optBoolean(key)?.let { setKeyboardForceCaps(it) } },
+            { key -> json.ifHasBoolean(key) { setKeyboardForceCaps(it) } },
         )
         run(
             "keyboardHaptic",
             { s, key -> json.put(key, s.keyboardHaptic) },
-            { key -> json.optBoolean(key)?.let { setKeyboardHaptic(it) } },
+            { key -> json.ifHasBoolean(key) { setKeyboardHaptic(it) } },
         )
         run(
             "keyboardHideButton",
             { s, key -> json.put(key, s.keyboardHideButton) },
-            { key -> json.optBoolean(key)?.let { setKeyboardHideButton(it) } },
+            { key -> json.ifHasBoolean(key) { setKeyboardHideButton(it) } },
         )
         run(
             "keyboardLayout",
             { s, key -> json.put(key, s.keyboardLayout.toString()) },
             { key ->
-               json.optString(key)?.let {
+               json.ifHasString(key) {
                    try {
                        setKeyboardLayout(KeyboardLayout.valueOf(it))
                    } catch (e : IllegalArgumentException) {
@@ -2502,18 +2527,18 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         run(
             "keyboardRepeatDelay",
             { s, key -> json.put(key, s.keyboardRepeatDelay) },
-            { key -> json.optInt(key)?.let { setKeyboardRepeatDelay(it) } },
+            { key -> json.ifHasInt(key) { setKeyboardRepeatDelay(it) } },
         )
         run(
             "keyboardRepeatInterval",
             { s, key -> json.put(key, s.keyboardRepeatInterval) },
-            { key -> json.optInt(key)?.let { setKeyboardRepeatInterval(it) } },
+            { key -> json.ifHasInt(key) { setKeyboardRepeatInterval(it) } },
         )
         run(
             "keyboardShowHide",
             { s, key -> json.put(key, s.keyboardShowHide.toString()) },
             { key ->
-               json.optString(key)?.let {
+               json.ifHasString(key) {
                    try {
                        setKeyboardMode(KeyboardMode.valueOf(it))
                    } catch (e : IllegalArgumentException) {
@@ -2525,20 +2550,20 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         run(
             "keyboardSplitWords",
             { s, key -> json.put(key, s.keyboardSplitWords) },
-            { key -> json.optBoolean(key)?.let { setKeyboardSplitWords(it) } },
+            { key -> json.ifHasBoolean(key) { setKeyboardSplitWords(it) } },
         )
         run(
             "lastSeenVersion",
             { s, key -> json.put(key, s.lastSeenVersion) },
             { key ->
-                json.optString(key)?.let { setBrowseLastSeenVersion(it) }
+                json.ifHasString(key) { setBrowseLastSeenVersion(it) }
             },
         )
         run(
             "movementStrategy",
             { s, key -> json.put(key, s.movementStrategy.toString()) },
             { key ->
-               json.optString(key)?.let {
+               json.ifHasString(key) {
                    try {
                        setPlayMovementStrategySetting(
                            MovementStrategySetting.valueOf(it)
@@ -2553,7 +2578,7 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             "movementStrategyClueList",
             { s, key -> json.put(key, s.movementStrategyClueList.toString()) },
             { key ->
-               json.optString(key)?.let {
+               json.ifHasString(key) {
                    try {
                         setPlayMovementStrategyClueListSetting(
                             MovementStrategySetting.valueOf(it)
@@ -2568,7 +2593,7 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             "orientationLock",
             { s, key -> json.put(key, s.orientationLock.toString()) },
             { key ->
-               json.optString(key)?.let {
+               json.ifHasString(key) {
                    try {
                        setAppOrientationLock(Orientation.valueOf(it))
                    } catch (e : IllegalArgumentException) {
@@ -2580,32 +2605,32 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         run(
             "playActivityClueTabsPage",
             { s, key -> json.put(key, s.playActivityClueTabsPage) },
-            { key -> json.optInt(key)?.let { setPlayClueTabsPage(0, it) } },
+            { key -> json.ifHasInt(key) { setPlayClueTabsPage(0, it) } },
         )
         run(
             "playActivityClueTabsPage1",
             { s, key -> json.put(key, s.playActivityClueTabsPage1) },
-            { key -> json.optInt(key)?.let { setPlayClueTabsPage(1, it) } },
+            { key -> json.ifHasInt(key) { setPlayClueTabsPage(1, it) } },
         )
         run(
             "playLetterUndoEnabled",
             { s, key -> json.put(key, s.playLetterUndoEnabled) },
             { key ->
-                json.optBoolean(key)?.let { setPlayPlayLetterUndoEnabled(it) }
+                json.ifHasBoolean(key) { setPlayPlayLetterUndoEnabled(it) }
             },
         )
         run(
             "predictAnagramChars",
             { s, key -> json.put(key, s.predictAnagramChars) },
             { key ->
-                json.optBoolean(key)?.let { setPlayPredictAnagramChars(it) }
+                json.ifHasBoolean(key) { setPlayPredictAnagramChars(it) }
             },
         )
         run(
             "preserveCorrectLettersInShowErrors",
             { s, key -> json.put(key, s.preserveCorrectLettersInShowErrors) },
             { key ->
-                json.optBoolean(key)?.let {
+                json.ifHasBoolean(key) {
                     setPlayPreserveCorrectLettersInShowErrors(it)
                 }
             },
@@ -2614,49 +2639,49 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             "randomClueOnShake",
             { s, key -> json.put(key, s.randomClueOnShake) },
             { key ->
-                json.optBoolean(key)?.let { setPlayRandomClueOnShake(it) }
+                json.ifHasBoolean(key) { setPlayRandomClueOnShake(it) }
             },
         )
         run(
             "scale",
             { s, key -> json.put(key, s.scale) },
-            { key -> json.optDouble(key)?.let { setPlayScale(it.toFloat()) } },
+            { key -> json.ifHasDouble(key) { setPlayScale(it.toFloat()) } },
         )
         run(
             "scrapeCru",
             { s, key -> json.put(key, s.scrapeCru) },
-            { key -> json.optBoolean(key)?.let { setScrapeCru(it) } },
+            { key -> json.ifHasBoolean(key) { setScrapeCru(it) } },
         )
         run(
             "scrapeGuardianQuick",
             { s, key -> json.put(key, s.scrapeGuardianQuick) },
-            { key -> json.optBoolean(key)?.let { setScrapeGuardianQuick(it) } },
+            { key -> json.ifHasBoolean(key) { setScrapeGuardianQuick(it) } },
         )
         run(
             "scrapeKegler",
             { s, key -> json.put(key, s.scrapeKegler) },
-            { key -> json.optBoolean(key)?.let { setScrapeKegler(it) } },
+            { key -> json.ifHasBoolean(key) { setScrapeKegler(it) } },
         )
         run(
             "scrapePrivateEye",
             { s, key -> json.put(key, s.scrapePrivateEye) },
-            { key -> json.optBoolean(key)?.let { setScrapePrivateEye(it) } },
+            { key -> json.ifHasBoolean(key) { setScrapePrivateEye(it) } },
         )
         run(
             "scrapePrzekroj",
             { s, key -> json.put(key, s.scrapePrzekroj) },
-            { key -> json.optBoolean(key)?.let { setScrapePrzekroj(it) } },
+            { key -> json.ifHasBoolean(key) { setScrapePrzekroj(it) } },
         )
         run(
             "scratchMode",
             { s, key -> json.put(key, s.scratchMode) },
-            { key -> json.optBoolean(key)?.let { setPlayScratchMode(it) } },
+            { key -> json.ifHasBoolean(key) { setPlayScratchMode(it) } },
         )
         run(
             "clueListNameInClueLine",
             { s, key -> json.put(key, s.clueListNameInClueLine.toString()) },
             { key ->
-               json.optString(key)?.let {
+               json.ifHasString(key) {
                    try {
                        setPlayClueListNameInClueLine(
                            ClueListClueLine.valueOf(it)
@@ -2670,55 +2695,55 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         run(
             "showCluesOnPlayScreen",
             { s, key -> json.put(key, s.showCluesOnPlayScreen) },
-            { key -> json.optBoolean(key)?.let { setPlayShowClueTabs(it) } },
+            { key -> json.ifHasBoolean(key) { setPlayShowClueTabs(it) } },
         )
         run(
             "showCount",
             { s, key -> json.put(key, s.showCount) },
-            { key -> json.optBoolean(key)?.let { setPlayShowCount(it) } },
+            { key -> json.ifHasBoolean(key) { setPlayShowCount(it) } },
         )
         run(
             "showErrors",
             { s, key -> json.put(key, s.showErrors) },
-            { key -> json.optBoolean(key)?.let { setPlayShowErrorsGrid(it) } },
+            { key -> json.ifHasBoolean(key) { setPlayShowErrorsGrid(it) } },
         )
         run(
             "showErrorsClue",
             { s, key -> json.put(key, s.showErrorsClue) },
-            { key -> json.optBoolean(key)?.let { setPlayShowErrorsClue(it) } },
+            { key -> json.ifHasBoolean(key) { setPlayShowErrorsClue(it) } },
         )
         run(
             "showErrorsCursor",
             { s, key -> json.put(key, s.showErrorsCursor) },
             { key ->
-                json.optBoolean(key)?.let { setPlayShowErrorsCursor(it) }
+                json.ifHasBoolean(key) { setPlayShowErrorsCursor(it) }
             },
         )
         run(
             "showTimer",
             { s, key -> json.put(key, s.showTimer) },
-            { key -> json.optBoolean(key)?.let { setPlayShowTimer(it) } },
+            { key -> json.ifHasBoolean(key) { setPlayShowTimer(it) } },
         )
         run(
             "showWordsInClueList",
             { s, key -> json.put(key, s.showWordsInClueList) },
-            { key -> json.optBoolean(key)?.let { setClueListShowWords(it) } },
+            { key -> json.ifHasBoolean(key) { setClueListShowWords(it) } },
         )
         run(
             "skipFilled",
             { s, key -> json.put(key, s.skipFilled) },
-            { key -> json.optBoolean(key)?.let { setPlaySkipFilled(it) } },
+            { key -> json.ifHasBoolean(key) { setPlaySkipFilled(it) } },
         )
         run(
             "snapClue",
             { s, key -> json.put(key, s.snapClue) },
-            { key -> json.optBoolean(key)?.let { setClueListSnapToClue(it) } },
+            { key -> json.ifHasBoolean(key) { setClueListSnapToClue(it) } },
         )
         run(
             "sort",
             { s, key -> json.put(key, s.sort) },
             { key ->
-               json.optString(key)?.let {
+               json.ifHasString(key) {
                    try {
                        setBrowseSort(AccessorSetting.valueOf(it))
                    } catch (e : IllegalArgumentException) {
@@ -2731,14 +2756,14 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             "spaceChangesDirection",
             { s, key -> json.put(key, s.spaceChangesDirection) },
             { key ->
-                json.optBoolean(key)?.let { setPlaySpaceChangesDirection(it) }
+                json.ifHasBoolean(key) { setPlaySpaceChangesDirection(it) }
             },
         )
         run(
             "suppressHints",
             { s, key -> json.put(key, s.suppressHints) },
             { key ->
-                json.optBoolean(key)?.let {
+                json.ifHasBoolean(key) {
                     setPlaySuppressHintHighlighting(it)
                 }
             },
@@ -2747,14 +2772,14 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             "suppressMessages",
             { s, key -> json.put(key, s.suppressMessages) },
             { key ->
-                json.optBoolean(key)?.let { setDownloadSuppressMessages(it) }
+                json.ifHasBoolean(key) { setDownloadSuppressMessages(it) }
             },
         )
         run(
             "suppressSummaryMessages",
             { s, key -> json.put(key, s.suppressSummaryMessages) },
             { key ->
-                json.optBoolean(key)?.let {
+                json.ifHasBoolean(key) {
                     setDownloadSuppressSummaryMessages(it)
                 }
             },
@@ -2763,7 +2788,7 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             "swipeAction",
             { s, key -> json.put(key, s.swipeAction.toString()) },
             { key ->
-               json.optString(key)?.let {
+               json.ifHasString(key) {
                    try {
                        setBrowseSwipeAction(BrowseSwipeAction.valueOf(it))
                    } catch (e : IllegalArgumentException) {
@@ -2776,14 +2801,14 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             "toggleBeforeMove",
             { s, key -> json.put(key, s.toggleBeforeMove) },
             { key ->
-                json.optBoolean(key)?.let { setPlayToggleBeforeMove(it) }
+                json.ifHasBoolean(key) { setPlayToggleBeforeMove(it) }
             },
         )
         run(
             "uiTheme",
             { s, key -> json.put(key, s.uiTheme.toString()) },
             { key ->
-               json.optString(key)?.let {
+               json.ifHasString(key) {
                    try {
                        setAppDayNightMode(DayNightMode.valueOf(it))
                    } catch (e : IllegalArgumentException) {
@@ -2795,32 +2820,32 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         run(
             "useNativeKeyboard",
             { s, key -> json.put(key, s.useNativeKeyboard) },
-            { key -> json.optBoolean(key)?.let { setKeyboardUseNative(it) } },
+            { key -> json.ifHasBoolean(key) { setKeyboardUseNative(it) } },
         )
         run(
             "volumeActivatesVoice",
             { s, key -> json.put(key, s.volumeActivatesVoice) },
             { key ->
-                json.optBoolean(key)?.let { setVoiceVolumeActivatesVoice(it) }
+                json.ifHasBoolean(key) { setVoiceVolumeActivatesVoice(it) }
             },
         )
         run(
             "specialEntryForceCaps",
             { s, key -> json.put(key, s.specialEntryForceCaps) },
             { key ->
-                json.optBoolean(key)?.let { setPlaySpecialEntryForceCaps(it) }
+                json.ifHasBoolean(key) { setPlaySpecialEntryForceCaps(it) }
             },
         )
 
         // bit untidy for file handler settings
         if (settings == null) {
-            json.optString("storageLocation")?.let { location ->
-            json.optString("safRootUri")?.let { root ->
-            json.optString("safCrosswordsFolderUri")?.let { crosswords ->
-            json.optString("safArchiveFolderUri")?.let { archive ->
-            json.optString("safToImportFolderUri")?.let { import ->
-            json.optString("safToImportDoneFolderUri")?.let { importDone ->
-            json.optString("safToImportFailedFolderUri")?.let { importFailed ->
+            json.ifHasString("storageLocation") { location ->
+            json.ifHasString("safRootUri") { root ->
+            json.ifHasString("safCrosswordsFolderUri") { crosswords ->
+            json.ifHasString("safArchiveFolderUri") { archive ->
+            json.ifHasString("safToImportFolderUri") { import ->
+            json.ifHasString("safToImportDoneFolderUri") { importDone ->
+            json.ifHasString("safToImportFailedFolderUri") { importFailed ->
                 try {
                     setFileHandlerSettings(
                         FileHandlerSettings(

@@ -163,14 +163,15 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
                 }
             }
         }
-        if (cdn == null || subdir == null || cwID == null || cwSet == null)
+        if (cdn == null || subdir == null || cwID == null || cwSet == null) {
             return bis
-        else
+        } else {
             return getInputStream(
                 STAGE2_URL_FORMAT.format(cdn, subdir, cwID, cwSet),
-            )?.use {
+            ).use {
                 StreamUtils.makeByteArrayInputStream(it)
-            } ?: bis
+            }
+        }
     }
 
     /**
@@ -188,7 +189,7 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
     private fun getFromRawc(rawc : String) : Puzzle? {
         val read : (String?) -> Puzzle? = AmuseLabsJSONIO::readPuzzle
         return base64Decode(rawc)?.let(read)
-            ?: deobfuscateRawc(rawc)?.let(read)
+            ?: deobfuscateRawc(rawc).let(read)
     }
 
     /**

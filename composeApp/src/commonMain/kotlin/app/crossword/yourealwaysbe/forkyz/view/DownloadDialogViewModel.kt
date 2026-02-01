@@ -131,7 +131,7 @@ class DownloadDialogViewModel(
         val date = newDate ?: state.date
         val downloaders = downloadersSettings
             .getDownloaders()
-            ?.map { downloader ->
+            .map { downloader ->
                 val availableHours
                     = downloader.getUntilAvailable(date)?.toHours()
                 val availableNow = isAvailableNow(
@@ -144,7 +144,7 @@ class DownloadDialogViewModel(
                     availableHours = availableHours,
                     availableNow = availableNow,
                 )
-            } ?: listOf()
+            }
         // if changing from empty downloaders to some, select all
         val selected = if (
             (state.downloaders?.isEmpty() ?: true) && state.selected.isEmpty()

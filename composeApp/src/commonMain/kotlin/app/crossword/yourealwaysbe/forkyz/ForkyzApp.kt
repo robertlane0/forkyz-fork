@@ -132,7 +132,7 @@ private fun ForkyzAppMain(
         },
         openHTMLPage = ::openHTMLPage,
         openURI = { uriHandler.openUri(it.toString()) },
-        openOnlineSources = { uriHandler.openUri(onlineSourcesURL.toString()) },
+        openOnlineSources = { uriHandler.openUri(onlineSourcesURL) },
         openReleaseNotes = { openHTMLPage(HTMLFile.RELEASE_NOTES) },
         openSettingsPage = { navController.navigate(route = Settings) },
         openLogcatPage = { navController.navigate(route = Logcat) },

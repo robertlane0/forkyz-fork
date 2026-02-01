@@ -85,7 +85,7 @@ class AndroidInputConnectionMediator() : InputConnectionMediator {
         // focusRequester.requestFocus()
         // LocalSoftwareKeyboardController.current?.show()/.hide()
         receiver?.let { receiver ->
-            receiver.getView()?.let { view ->
+            receiver.getView().let { view ->
                 val nativeChanged = receiver.setNativeInput(true, forceCaps)
                 if (view.requestFocus()) {
                     getInputMethodManager()?.let { imm ->
@@ -100,7 +100,7 @@ class AndroidInputConnectionMediator() : InputConnectionMediator {
 
     override fun hideNative() {
         receiver?.let { receiver ->
-            receiver.getView()?.let { view ->
+            receiver.getView().let { view ->
                 receiver.setNativeInput(false, false);
                 getInputMethodManager()
                     ?.hideSoftInputFromWindow(view.getWindowToken(), 0)

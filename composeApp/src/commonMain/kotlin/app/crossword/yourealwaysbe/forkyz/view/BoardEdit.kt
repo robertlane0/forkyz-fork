@@ -192,7 +192,7 @@ class BoardEditState private constructor(
     }
 
     fun requestFocus() {
-        boxInputState?.requestFocus()
+        boxInputState.requestFocus()
     }
 
     fun zoomIn() { zoomBy(ZOOM_FACTOR) }

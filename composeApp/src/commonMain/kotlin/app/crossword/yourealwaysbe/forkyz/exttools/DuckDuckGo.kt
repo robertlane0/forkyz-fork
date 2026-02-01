@@ -25,7 +25,7 @@ class DuckDuckGoData(uri : Uri) : HTMLToolData(uri) {
             utils : NativeBackendUtils,
             clue : Clue,
         ) : DuckDuckGoData? {
-            var hint = clue?.getHint()
+            var hint = clue.getHint()
             if (hint == null)
                 return null;
 

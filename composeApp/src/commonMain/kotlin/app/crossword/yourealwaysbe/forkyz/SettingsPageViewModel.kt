@@ -536,7 +536,7 @@ class SettingsTriState(
                 summary,
                 combine(
                     booleans.map { it.value }.toTypedArray().asIterable(),
-                    { booleans.triState { it.value.value ?: false } },
+                    { booleans.triState { it.value.value } },
                 ).stateInSubscribed(
                     scope,
                     booleans.triState { it.value.value },
@@ -580,7 +580,7 @@ open class SettingsDynamicList<T>(
     private val setValue : (T) -> Unit,
 ) : SettingsInputItem(page, title, summary) {
     fun selectItem(index : Int) {
-        entries.value?.let {
+        entries.value.let {
             if (0 <= index && index < it.size)
                 setValue(it[index].value)
         }
@@ -613,7 +613,7 @@ open class SettingsDynamicMultiList<T>(
     errorMsg : StateFlow<String?>? = null,
 ) : SettingsInputItem(page, title, summary, errorMsg) {
     fun selectItems(indices : Set<Int>) {
-        entries.value?.let { entries ->
+        entries.value.let { entries ->
             setValue(
                 indices
                     .filter { 0 <= it && it <= entries.size }

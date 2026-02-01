@@ -126,7 +126,7 @@ private fun getDownloaderEnabled(
     downloaders : List<DownloaderData>,
     index : Int,
 ) : Boolean {
-    return downloaders.get(index)?.let { it.availableNow } ?: false
+    return downloaders.getOrNull(index)?.let { it.availableNow } ?: false
 }
 
 @Composable
@@ -134,7 +134,7 @@ private fun DownloaderLabel(
     downloaders : List<DownloaderData>,
     index : Int
 ) {
-    downloaders.get(index)?.let { downloader ->
+    downloaders.getOrNull(index)?.let { downloader ->
         val displayName = downloader.displayName
         val availableHours = downloader.availableHours
 

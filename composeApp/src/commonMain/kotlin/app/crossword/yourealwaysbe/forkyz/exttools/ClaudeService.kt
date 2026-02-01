@@ -33,7 +33,7 @@ object ClaudeService : LLMService {
         settings : ForkyzSettings,
         query : String,
     ) : String? {
-        val apiKey = settings.liveExtLLMAgentAPIKey.first() ?: return null
+        val apiKey = settings.liveExtLLMAgentAPIKey.first()
         return withContext(Dispatchers.IO) {
             try {
                 val json = getURLJSON(

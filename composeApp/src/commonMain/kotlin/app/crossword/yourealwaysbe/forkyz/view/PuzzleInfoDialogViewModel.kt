@@ -119,11 +119,11 @@ class PuzzleInfoDialogViewModel(
             elapsed = elapsed,
             progress = progress,
             introduction = if (puz?.hasIntroMessage() ?: false)
-                    puz?.introMessage ?: ""
+                    puz.introMessage ?: ""
                 else
                     "",
             notes = if (puz?.hasNotes() ?: false)
-                    puz?.notes ?: ""
+                    puz.notes ?: ""
                 else
                     "",
             showRating = !puzzleInfoSettings.disableRatings,

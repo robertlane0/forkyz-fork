@@ -83,7 +83,7 @@ abstract class FileHandlerJavaFile : FileHandler {
                         val fs = files
                         if (fs == null)
                             return null
-                        while (pos < fs.size ?: 0) {
+                        while (pos < fs.size) {
                             next = fs[pos++]
                             if (next?.isFile() ?: false)
                                 return next
@@ -96,7 +96,7 @@ abstract class FileHandlerJavaFile : FileHandler {
     }
 
     override fun getName(f : FileHandle) : String {
-        return f.getFile().getName()!!
+        return f.getFile().getName()
     }
 
     override fun getFileHandle(uri : Uri) : FileHandle {

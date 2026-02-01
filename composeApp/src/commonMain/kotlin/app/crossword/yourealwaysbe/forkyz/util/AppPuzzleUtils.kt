@@ -80,7 +80,7 @@ object AppPuzzleUtils {
 
         if (filename != null && !filename.isEmpty()) {
             for (fmt in FILE_NAME_FORMATS) {
-                val matcher = fmt!!.regex.matcher(filename)
+                val matcher = fmt.regex.matcher(filename)
                 if (matcher.find()) return matcher.group(fmt.sourceGrp)
             }
         }
@@ -107,7 +107,7 @@ object AppPuzzleUtils {
 
         if (filename != null) {
             for (fmt in FILE_NAME_FORMATS) {
-                val matcher = fmt!!.regex.matcher(filename)
+                val matcher = fmt.regex.matcher(filename)
                 if (matcher.find()) {
                     try {
                         return LocalDate.parse(

@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.room)
-    alias(libs.plugins.android.library)
+    alias(libs.plugins.android.kotlin.multiplatform.library)
     alias(libs.plugins.compose)
     alias(libs.plugins.kotlin.plugin.compose)
     alias(libs.plugins.kotlin.plugin.parcelize)
@@ -27,7 +27,11 @@ buildConfig {
 }
 
 kotlin {
-    androidTarget {
+    androidLibrary {
+        namespace = appLibraryNamespace
+        compileSdk = libs.versions.compileSdk.get().toInt()
+        minSdk = libs.versions.minSdk.get().toInt()
+
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
             // Multiplatform Parcelize from
@@ -37,6 +41,23 @@ kotlin {
                 "plugin:org.jetbrains.kotlin.parcelize:additionalAnnotation=app.crossword.yourealwaysbe.forkyz.util.Parcelize"
             )
         }
+
+        optimization {
+            consumerKeepRules.apply {
+                publish = true
+                file("proguard-rules.pro")
+            }
+        }
+
+        androidResources {
+            enable = true
+        }
+
+        room {
+            schemaDirectory("$projectDir/schemas")
+        }
+
+        withHostTestBuilder {}.configure {}
     }
 
     jvm { }
@@ -92,7 +113,11 @@ kotlin {
             implementation(libs.material)
         }
 
-        androidUnitTest.dependencies {
+        // weird that this works when docs suggest
+        // androidHostTest.dependencies
+        // https://developer.android.com/kotlin/multiplatform/plugin#android-kmp_1
+        // possible AGP 9 issue
+        getByName("androidHostTest").dependencies {
             implementation(libs.androidx.arch.core.testing)
             implementation(libs.kotlinx.coroutines.test)
             implementation(libs.junit4)
@@ -125,50 +150,6 @@ kotlin {
     }
 
     compilerOptions.freeCompilerArgs.add("-Xexpect-actual-classes")
-}
-
-android {
-    namespace = appLibraryNamespace
-    compileSdk = libs.versions.compileSdk.get().toInt()
-
-    defaultConfig {
-        minSdk = libs.versions.minSdk.get().toInt()
-        multiDexEnabled = true
-        vectorDrawables {
-            useSupportLibrary = true
-        }
-
-        consumerProguardFiles("proguard-rules.pro")
-    }
-
-    room {
-        schemaDirectory("$projectDir/schemas")
-    }
-
-    compileOptions {
-        isCoreLibraryDesugaringEnabled = true
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    testOptions {
-        unitTests {
-            isIncludeAndroidResources = true
-        }
-    }
-
-    // overrides 4.11 dependency of
-    // com.github.jgraham0325:words-to-numbers:8a97d258fd'
-    configurations.all {
-        resolutionStrategy.force(libs.junit4)
-    }
-
-    // needed with httpclient5-fluent
-    packaging {
-        resources {
-            excludes += "META-INF/DEPENDENCIES"
-        }
-    }
 }
 
 dependencies {

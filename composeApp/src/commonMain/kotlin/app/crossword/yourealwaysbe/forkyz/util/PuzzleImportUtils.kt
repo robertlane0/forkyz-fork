@@ -59,7 +59,7 @@ suspend fun importPuzzleURI(
     } catch (e : IOException) {
         val url = uri.toString()
         try {
-            return getRemoteInputStream(url, timeout)?.use { inputStream ->
+            return getRemoteInputStream(url, timeout).use { inputStream ->
                 importInputStream(
                     utils,
                     fileHandler,
@@ -88,7 +88,7 @@ suspend fun processPuzzleToImportDirectory(
 
     for (fh in fileHandler.listFiles(toImportDir)) {
         try {
-            fileHandler.getBufferedInputStream(fh)?.use { inputStream ->
+            fileHandler.getBufferedInputStream(fh).use { inputStream ->
                 val ph = importInputStream(
                     utils,
                     fileHandler,

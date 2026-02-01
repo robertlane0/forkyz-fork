@@ -249,7 +249,7 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
 
         val position = Position(row, col)
 
-        val highlighted = (position == board?.highlightLetter)
+        val highlighted = (position == board.highlightLetter)
         val selected = selectedPositions.contains(position)
         val isError = getIsError(boardEditSettings, box, highlighted, selected)
         if (isError)
@@ -481,7 +481,7 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
         separators : Separators,
         allAcross : Boolean,
     ) : Separators {
-        clue?.getSeparator(offset + 1, inferSeparators)?.let { separator ->
+        clue.getSeparator(offset + 1, inferSeparators)?.let { separator ->
             val cid = clue.clueID
             val zone = clue.zone
             if (!(zone?.isEmpty() ?: false)) {
@@ -528,7 +528,7 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
         allAcross : Boolean = false,
     ) : Separators {
         var result = separators
-        if (clue?.hasSeparators(inferSeparators) ?: false) {
+        if (clue.hasSeparators(inferSeparators)) {
             val offset = clue.getZone().indexOf(position)
             result = addSeparator(
                 clue,
@@ -589,7 +589,7 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
         }
 
         // current clue takes precedence
-        val currentCID = clueID ?: board?.currentWord?.clueID
+        val currentCID = clueID ?: board.currentWord?.clueID
         if (currentCID != null && box.isPartOf(currentCID)) {
             separators = addSeparators(
                 clue = puz.getClue(currentCID),
@@ -625,8 +625,8 @@ class BoardEditViewModel(
         get() {
             return if (board?.puzzle?.hasPinnedClueID() ?: false) {
                 1 + (
-                    (board?.puzzle?.pinnedClue?.zone?.size() ?: 0) / width
-                ).toInt()
+                    (board.puzzle?.pinnedClue?.zone?.size() ?: 0) / width
+                )
             } else 0
         }
 
@@ -680,7 +680,7 @@ class BoardEditViewModel(
 
         val selectedPositions = board.currentWord.zone.toSet()
 
-        val images = board?.puzzle?.images?.map {
+        val images = board.puzzle?.images?.map {
             Image(
                 row = it.row,
                 col = it.col,
@@ -722,12 +722,12 @@ class BoardEditViewModel(
                         ?: true
                 ) || (
                     changes
-                        ?.changedClueIDs
+                        .changedClueIDs
                         ?.any { box?.isPartOf(it) ?: false }
                         ?: true
                 )
                 if (!changedBox && prevState != null) {
-                    prevState.boxes.get(row)?.get(col)
+                    prevState.boxes.getOrNull(row)?.getOrNull(col)
                 } else {
                     getBoxState(
                         boardEditSettings,
@@ -795,7 +795,7 @@ class BoardEditViewModel(
         if (board == null || !boardEditSettings.ensureVisible)
             return null
 
-        val cursor = board?.highlightLetter
+        val cursor = board.highlightLetter
         if (cursor == null)
             return null
 
@@ -870,7 +870,7 @@ class WordEditViewModel(
                         pos.col,
                         puz.checkedGetBox(pos),
                         setOf(),
-                        shownWord?.clueID,
+                        shownWord.clueID,
                         showOwnScratch,
                     )
                 }

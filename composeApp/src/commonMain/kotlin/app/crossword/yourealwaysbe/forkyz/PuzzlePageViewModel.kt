@@ -1278,7 +1278,7 @@ open class PuzzlePageViewModel(
 
     private fun handleChangeMenu(changes : PlayboardChanges) {
         getBoard()?.let { board ->
-            val box = board?.getCurrentBox();
+            val box = board.getCurrentBox();
             val canRevealInitialBoxLetter
                 = !Box.isBlock(box) && box?.hasInitialValue() ?: false
 

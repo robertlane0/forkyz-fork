@@ -148,7 +148,7 @@ class KingDigitalLoginDownloader(
             data = loginJson,
         )
 
-        return keys?.getString("key")
+        return keys.getString("key")
     }
 
     private fun getPuzzleAssets(
@@ -174,7 +174,7 @@ class KingDigitalLoginDownloader(
             data = getPuzUrlJson
         )
 
-        return puzUrlResponse?.getJSONArray("assets")
+        return puzUrlResponse.getJSONArray("assets")
     }
 
     private fun getPuzURLForDate(
@@ -185,15 +185,15 @@ class KingDigitalLoginDownloader(
             val asset = assets.getJSONObject(i)
             if (asset.optString("FILEEXT") == "jpz") {
                 try {
-                    asset.optString("PUBDATE")?.let { assetDate ->
-                        LocalDate.parse(
+                    val assetDate = asset.optString("PUBDATE")
+                    if (!assetDate.isEmpty()) {
+                        val parsedDate = LocalDate.parse(
                             assetDate,
                             DateTimeFormatter.ISO_LOCAL_DATE_TIME,
                         )
-                    }?.let { assetDate ->
-                        if (assetDate == date) {
+                        if (parsedDate == date) {
                             val url = asset.optString("ASSETLINK")
-                            if (url != null)
+                            if (!url.isEmpty())
                                 return url
                         }
                     }

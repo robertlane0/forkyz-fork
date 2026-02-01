@@ -310,7 +310,7 @@ fun NotesPage(
                     } else {
                         ClueText(
                             modifier = Modifier.fillMaxWidth(),
-                            clueText = state?.clueText,
+                            clueText = state.clueText,
                         )
                     }
                 },

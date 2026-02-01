@@ -281,7 +281,7 @@ class ClueTabsViewModel(
             return -1
 
         val historyPageNum = currentUIState.historyPageNum
-        val historyIndex = currentUIState.getHistoryIndex(cid) ?: -1
+        val historyIndex = currentUIState.getHistoryIndex(cid)
 
         val pageNum = if (showPageNum == historyPageNum  && historyIndex >= 0)
             historyPageNum

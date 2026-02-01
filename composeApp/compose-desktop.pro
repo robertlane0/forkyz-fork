@@ -76,6 +76,12 @@
 # Build config
 -keep class app.crossword.yourealwaysbe.forkyz.BuildConfig { *; }
 
+# Ignore intended-to-be-optional re2j classes - only needed if using re2j for
+# jsoup regex jsoup safely falls back to JDK regex if re2j not on classpath,
+# but has concrete re2j refs
+# See: https://github.com/jhy/jsoup/issues/2459
+-dontwarn com.google.re2j.**
+
 # Missing entry points and notes
 -dontnote META-INF**
 -dontnote module-info

@@ -106,7 +106,7 @@ fun PlayPage(
         pageOpener = pageOpener,
     ) {
         fun toggleShowClueTabs() {
-            val isShowing = viewModel.playUIState.value?.showClueTabs ?: false
+            val isShowing = viewModel.playUIState.value.showClueTabs
             if (isShowing)
                 viewModel.hideClueTabs()
             else

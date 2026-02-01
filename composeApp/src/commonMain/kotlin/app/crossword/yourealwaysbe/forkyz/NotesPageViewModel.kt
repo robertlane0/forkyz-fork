@@ -653,9 +653,9 @@ class NotesPageViewModel(
         if (isPuzzleNotes || !(clue?.hasZone() ?: false))
             return persistentListOf()
 
-        val len = clue?.zone?.size() ?: -1
+        val len = clue.zone?.size() ?: -1
         return (0..len).map { i ->
-            clue?.getSeparator(i, inferSeparators)
+            clue.getSeparator(i, inferSeparators)
         }.toImmutableList()
     }
 

@@ -46,20 +46,23 @@ class LATimesDownloader(
 ) {
     override fun getSourceUrl(date : LocalDate) : String? {
         val url = date.format(PUZZLES_FEED_FORMAT)
-        return getInputStream(URI(url).toURL(), null)?.use { input ->
+        return getInputStream(URI(url).toURL(), null).use { input ->
             val puzzles = JSONUtils.streamToJSONArray(input)
             (0 until puzzles.length()).forEach {
                 val puzzle = puzzles.getJSONObject(it)
-                puzzle.optString("date")?.let { dateStr ->
+                val dateStr = puzzle.optString("date")
+                if (!dateStr.isEmpty()) {
                     try {
                         val puzzleDate = LocalDate.parse(
                             dateStr,
                             PUZZLES_FEED_DATE_FORMAT,
                         )
                         if (puzzleDate == date) {
-                            puzzle.optString("feedUrl")?.let { puzURL ->
+                            val puzURL = puzzle.optString("feedUrl")
+                            if (puzURL.isEmpty())
+                                return null
+                            else
                                 return puzURL
-                            }
                         }
                     } catch (e : DateTimeParseException) {
                         // ignore

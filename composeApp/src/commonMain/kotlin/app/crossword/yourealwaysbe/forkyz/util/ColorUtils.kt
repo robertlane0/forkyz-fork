@@ -5,7 +5,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 
 private val ADD_ALPHA : Int = 0xff000000.toInt()
-private val DEL_ALPHA : Int = 0x00ffffff.toInt()
+private val DEL_ALPHA : Int = 0x00ffffff
 
 /**
  * Add ff alpha channel

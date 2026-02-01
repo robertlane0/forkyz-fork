@@ -92,13 +92,17 @@ class MetaCache(private val utils : NativeBackendUtils) {
         var author : String?,
 
         // from db version 3
-        @ColumnInfo
-        var rating : Char,
+        @ColumnInfo(name = "rating")
+        var ratingCode : Int,
 
         // from db version 4
         @ColumnInfo
         var hasSolution : Boolean
-    )
+    ) {
+        var rating : Char
+            get() = ratingCode.toChar()
+            set(value) { ratingCode = value.code }
+    }
 
     @Dao
     @TypeConverters(Converters::class)
@@ -288,7 +292,7 @@ class MetaCache(private val utils : NativeBackendUtils) {
             source = puz.getSource(),
             title = puz.getTitle(),
             author = puz.getAuthor(),
-            rating = puz.getRating(),
+            ratingCode = puz.getRating().code,
             hasSolution = puz.hasSolution()
         )
 

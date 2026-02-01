@@ -84,11 +84,10 @@ class VoiceCommands {
         if (llmService == null) {
             dispatch(commandAlternatives)
         } else {
-            getLLMPrompt(utils, commandAlternatives, puz)?.let { prompt ->
-                llmService.makeRequest(settings, prompt)?.let { response ->
-                    response.split("\n").forEach {
-                        dispatch(listOf(it))
-                    }
+            val prompt = getLLMPrompt(utils, commandAlternatives, puz)
+            llmService.makeRequest(settings, prompt)?.let { response ->
+                response.split("\n").forEach {
+                    dispatch(listOf(it))
                 }
             }
         }
