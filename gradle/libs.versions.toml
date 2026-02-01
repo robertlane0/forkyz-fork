@@ -2,7 +2,7 @@
 # Core
 kotlin = "2.2.20"
 ksp = "2.3.4"
-agp = "8.13.2"
+agp = "9.0.0"
 
 # Android
 compileSdk = "36"
@@ -168,7 +168,6 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 android-kotlin-multiplatform-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "plugin-buildconfig" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-plugin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-plugin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "plugin-kotlin-parcelize" }

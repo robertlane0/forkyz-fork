@@ -8,6 +8,8 @@
 -dontwarn org.apache.commons.compress.compressors.CompressorOutputStream
 -dontwarn org.apache.commons.compress.compressors.CompressorStreamFactory
 -dontwarn org.slf4j.impl.StaticLoggerBinder
+# Thinking this is ok since it's an annotation..
+-dontwarn kotlinx.parcelize.Parcelize
 -keep class app.crossword.yourealwaysbe.forkyz.**
 -keep class app.crossword.yourealwaysbe.forkyz.BuildConfig { *; }
 -keep class app.crossword.yourealwaysbe.forkyz.settings.Settings { *; }

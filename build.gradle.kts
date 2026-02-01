@@ -14,7 +14,6 @@ plugins {
     alias(libs.plugins.wire) apply false
     alias(libs.plugins.shadow) apply false
     alias(libs.plugins.compose) apply false
-    alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.kotlin.multiplatform) apply false
     alias(libs.plugins.kotlin.plugin.compose) apply false
     alias(libs.plugins.kotlin.plugin.parcelize) apply false
