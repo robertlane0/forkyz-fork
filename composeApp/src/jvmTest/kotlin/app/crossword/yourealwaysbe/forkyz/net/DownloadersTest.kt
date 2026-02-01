@@ -4,7 +4,6 @@ package app.crossword.yourealwaysbe.forkyz.net
 import java.time.LocalDate
 import java.util.AbstractList
 import java.util.Collections
-import java.util.List
 import kotlinx.coroutines.runBlocking
 
 import org.junit.Test

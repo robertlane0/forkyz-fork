@@ -175,7 +175,7 @@ class PuzzleImporterTest {
         if (fileHandler == null) {
             val metaCache = mock(MetaCache::class.java)
             stubbing(metaCache) {
-                onBlocking {
+                on {
                     metaCache.addRecord(
                         MockitoHelper.anyObject(),
                         MockitoHelper.anyObject(),
@@ -194,17 +194,17 @@ class PuzzleImporterTest {
                             source = null,
                             title = null,
                             author = null,
-                            rating = 0.toChar(),
+                            ratingCode = 0,
                             hasSolution = false,
                         )
                     )
-                onBlocking {
+                on {
                     metaCache.getDirCache(
                         MockitoHelper.anyObject(),
                         MockitoHelper.anyObject(),
                     )
                 } doReturn emptyMap()
-                onBlocking {
+                on {
                     metaCache.cleanupCache(
                         MockitoHelper.anyObject(),
                         MockitoHelper.anyObject(),
