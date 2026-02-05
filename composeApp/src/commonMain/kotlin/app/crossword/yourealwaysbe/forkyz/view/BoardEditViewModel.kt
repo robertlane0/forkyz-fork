@@ -225,6 +225,32 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
     ) : BaseBoardState
 
     /**
+     * Check if a box has changed based on PlayboardChanges
+     *
+     * @param position the position of the box to check
+     * @param box the box at that position
+     * @param changes the changes from the playboard, null means assume changed
+     * @return true if the box has changed, false if it can be reused from previous state
+     */
+    protected fun hasBoxChanged(
+        position : Position,
+        box : Box?,
+        changes : PlayboardChanges?,
+    ) : Boolean {
+        return (
+            changes
+                ?.cellChanges
+                ?.contains(position)
+                ?: true
+        ) || (
+            changes
+                .changedClueIDs
+                ?.any { box?.isPartOf(it) ?: false }
+                ?: true
+        )
+    }
+
+    /**
      * Get state of a box
      *
      * @param selectedPositions to be highlighted as selected (not
@@ -714,18 +740,9 @@ class BoardEditViewModel(
 
         return (0 until height).map { row ->
             (0 until width).map { col ->
-                val box = puz.checkedGetBox(row, col)
-                val changedBox = (
-                    changes
-                        ?.cellChanges
-                        ?.contains(Position(row, col))
-                        ?: true
-                ) || (
-                    changes
-                        .changedClueIDs
-                        ?.any { box?.isPartOf(it) ?: false }
-                        ?: true
-                )
+                val position = Position(row, col)
+                val box = puz.checkedGetBox(position)
+                val changedBox = hasBoxChanged(position, box, changes)
                 if (!changedBox && prevState != null) {
                     prevState.boxes.getOrNull(row)?.getOrNull(col)
                 } else {
@@ -852,7 +869,6 @@ class WordEditViewModel(
         changes : PlayboardChanges?,
         prevState : WordState?,
     ) : WordState {
-        // TODO: use changes
         val puz = board?.puzzle
         val shownWord = word ?: board?.currentWord
         val zone = shownWord?.zone
@@ -860,19 +876,25 @@ class WordEditViewModel(
             return WordState()
 
         return WordState(
-            boxes = zone.map { pos ->
+            boxes = zone.mapIndexed { index, pos ->
                 if (pos == null) {
                     null
                 } else {
-                    getBoxState(
-                        boardEditSettings,
-                        pos.row,
-                        pos.col,
-                        puz.checkedGetBox(pos),
-                        setOf(),
-                        shownWord.clueID,
-                        showOwnScratch,
-                    )
+                    val box = puz.checkedGetBox(pos)
+                    val changedBox = hasBoxChanged(pos, box, changes)
+                    if (!changedBox && prevState != null) {
+                        prevState.boxes.getOrNull(index)
+                    } else {
+                        getBoxState(
+                            boardEditSettings,
+                            pos.row,
+                            pos.col,
+                            box,
+                            setOf(),
+                            shownWord.clueID,
+                            showOwnScratch,
+                        )
+                    }
                 }
             }.toImmutableList(),
         )
