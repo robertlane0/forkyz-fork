@@ -240,6 +240,7 @@ class BoardEditState private constructor(
         if (fitScale > 0) {
             x = 0f
             y = 0f
+            markOffset()
             scale = checkScale(fitScale)
         } else {
             pendingFit = true

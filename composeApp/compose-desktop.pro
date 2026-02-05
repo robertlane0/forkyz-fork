@@ -129,6 +129,7 @@
 -dontnote org.junit.runners.parameterized.BlockJUnit4ClassRunnerWithParameters
 -dontnote org.slf4j.LoggerFactory
 -dontnote org.slf4j.helpers.SubstituteLogger
+-dontnote org.junit.runners.Parameterized$TestClassRunnerForParameters
 
 # Can't find dynamically referenced classes
 -dontnote dev.dirs.Util
@@ -141,6 +142,7 @@
 -dontnote org.apache.hc.client5.http.ssl.ConscryptClientTlsStrategy
 -dontnote org.jsoup.helper.AuthenticationHandler
 -dontnote org.jsoup.helper.RequestDispatch
+-dontnote com.google.re2j.Pattern
 
 # Keep descriptor classes
 -keep class io.github.vinceglb.filekit.PlatformFile
