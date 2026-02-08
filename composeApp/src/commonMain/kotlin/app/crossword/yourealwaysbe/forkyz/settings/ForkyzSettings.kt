@@ -110,6 +110,15 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         }
     }
 
+    val liveBrowseCollapseHeadings : Flow<Boolean>
+        = settingsMap { it.collapseBrowseHeadings }
+
+    fun setBrowseCollapseHeadings(value : Boolean) {
+        settingsUpdate { settings ->
+            settings.copy(collapseBrowseHeadings = value)
+        }
+    }
+
     val liveBrowseDontConfirmCleanup : Flow<Boolean>
         = settingsMap { it.dontConfirmCleanup }
 
@@ -2046,6 +2055,13 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
                        // ignore
                    }
                }
+            },
+        )
+        run(
+            "collapseBrowseHeadings",
+            { s, key -> json.put(key, s.collapseBrowseHeadings) },
+            { key ->
+                json.ifHasBoolean(key) { setBrowseCollapseHeadings(it) }
             },
         )
         run(

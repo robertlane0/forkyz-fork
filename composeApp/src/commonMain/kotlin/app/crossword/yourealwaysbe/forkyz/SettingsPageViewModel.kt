@@ -117,6 +117,8 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_tabs_doub
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_tabs_double_landscape
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_tabs_double_never
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_tabs_double_wide
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.collapse_headings
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.collapse_headings_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.crossword_solver_enabled
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.crossword_solver_enabled_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.cru_puzzle_workshop
@@ -1552,6 +1554,13 @@ class SettingsPageViewModel(
             Res.string.browse_indicate_if_solution_desc,
             settings.liveBrowseIndicateIfSolution.stateInHere(),
             settings::setBrowseIndicateIfSolution,
+        ),
+        SettingsBoolean(
+            SettingsPage.BROWSER,
+            Res.string.collapse_headings,
+            Res.string.collapse_headings_desc,
+            settings.liveBrowseCollapseHeadings.stateInHere(),
+            settings::setBrowseCollapseHeadings,
         ),
 
         // Display

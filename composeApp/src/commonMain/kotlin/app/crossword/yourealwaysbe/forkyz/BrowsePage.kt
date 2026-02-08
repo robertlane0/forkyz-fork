@@ -25,6 +25,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
@@ -99,6 +100,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.by_date_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.by_source
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.cleanup
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.close
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.collapse
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.confirm_cleanup
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.confirm_cleanup_msg
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.confirm_delete
@@ -109,6 +111,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.delete_selecte
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.disable_notifications
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.disable_notifications_button
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.download_puzzles
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.expand
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.filter_puzzles
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.filter_puzzles_hint
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.has_solution_desc
@@ -620,15 +623,46 @@ fun BrowsePage(
     }
 
     @Composable
-    fun PuzzleListHeader(header : String) {
-        Text(
+    fun PuzzleListHeader(
+        group : PuzGroup,
+        isCollapsible : Boolean = false,
+        isCollapsed : Boolean = false,
+        onClick : () -> Unit = {},
+    ) {
+        val header = group.header
+        Row(
             modifier = Modifier.fillMaxWidth()
                 .background(MaterialTheme.colorScheme.background)
-                .padding(horizontal=HORIZONTAL_PADDING)
-                .padding(top=4.dp, bottom=4.dp),
-            text = remember (header) { htmlToAnnotatedString(header) },
-            color = MaterialTheme.colorScheme.onBackground,
-        )
+                .then(
+                    if (isCollapsible)
+                        Modifier.clickable(onClick = onClick)
+                            // min for clickable elements in Material
+                            .heightIn(min=48.dp)
+                            .padding(horizontal=HORIZONTAL_PADDING)
+                            .padding(vertical=8.dp)
+                    else
+                        Modifier.padding(horizontal=HORIZONTAL_PADDING)
+                            .padding(top=4.dp, bottom=4.dp)
+                ),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                modifier = Modifier.weight(1.0F),
+                text = remember (header) { htmlToAnnotatedString(header) },
+                color = MaterialTheme.colorScheme.onBackground,
+            )
+            if (isCollapsible) {
+                Icon(
+                    modifier = Modifier.rotate(if (isCollapsed) -90f else 0f),
+                    imageVector = Icons.Default.ExpandMore,
+                    contentDescription = if (isCollapsed)
+                        stringResource(Res.string.expand)
+                    else
+                        stringResource(Res.string.collapse),
+                    tint = MaterialTheme.colorScheme.onBackground,
+                )
+            }
+        }
     }
 
     @Composable
@@ -866,21 +900,40 @@ fun BrowsePage(
             onRefresh = viewModel::swipeRefreshPuzzleList,
             state = refreshState,
         ) {
+            val isCollapseHeadings by remember {
+                derivedStateOf { state.isCollapseHeadings }
+            }
+            val expandedHeadingIDs by remember {
+                derivedStateOf { state.expandedHeadingIDs }
+            }
             LazyColumn(
                 modifier = Modifier.fillMaxWidth().fillMaxHeight(),
                 state = listState,
             ) {
                 puzzles.forEach { puzGroup ->
+                    val isCollapsed = (
+                        isCollapseHeadings
+                        && !expandedHeadingIDs.contains(puzGroup.id)
+                    )
                     stickyHeader {
                         key(puzGroup.header) {
-                            PuzzleListHeader(puzGroup.header)
+                            PuzzleListHeader(
+                                group = puzGroup,
+                                isCollapsible = isCollapseHeadings,
+                                isCollapsed = isCollapsed,
+                                onClick = {
+                                    viewModel.toggleCollapseHeading(puzGroup)
+                                },
+                            )
                         }
                     }
-                    items(
-                        items = puzGroup.puzzles,
-                        key = { pe -> pe },
-                    ) { pe ->
-                        Puzzle(pe)
+                    if (!isCollapsed) {
+                        items(
+                            items = puzGroup.puzzles,
+                            key = { pe -> pe },
+                        ) { pe ->
+                            Puzzle(pe)
+                        }
                     }
                 }
             }

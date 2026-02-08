@@ -113,6 +113,10 @@
     </plurals>
     <string name="no_downloaders_enabled">Aucun téléchargeur activé</string>
     <string name="no_downloaders_enabled_msg">Pour télécharger des puzzles, veuillez activer certains téléchargeurs dans les paramètres Puzzle Sources.</string>
+    <string name="collapse_headings">Collapser Rubriques</string>
+    <string name="collapse_headings_desc">Afficher les titres uniquement dans la liste des casse-têtes sauf en expansion.</string>
+    <string name="expand">Expansion</string>
+    <string name="collapse">Collapse</string>
 
     <!-- play page -->
     <string name="open_clue_list">Ouvrir la liste des indices</string>

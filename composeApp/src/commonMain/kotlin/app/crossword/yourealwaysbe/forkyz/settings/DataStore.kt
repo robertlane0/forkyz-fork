@@ -35,6 +35,7 @@ val DEFAULT_SETTINGS : Settings = Settings(
     clueBelowGrid = false,
     clueHighlight = ClueHighlight.CH_RADIO_BUTTON,
     clueTabsDouble = ClueTabsDouble.CTD_NEVER,
+    collapseBrowseHeadings = false,
     crosswordSolverEnabled = true,
     customDailyTitle = "",
     customDailyUrl = "",

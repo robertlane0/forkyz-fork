@@ -271,4 +271,5 @@ message Settings {
     bool downloadLaCroix = 141;
     bool llmVoiceCommands = 142;
     bool keyboardSplitWords = 143;
+    bool collapseBrowseHeadings = 144;
 }

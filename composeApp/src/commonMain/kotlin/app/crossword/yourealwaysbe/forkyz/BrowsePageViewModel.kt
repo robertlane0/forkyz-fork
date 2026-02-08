@@ -12,6 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -108,6 +109,10 @@ enum class BrowseDialog {
  * @param selectedPuzzleIDs set of selected puzzle ids
  * @param isSwipeRefreshing true if a swipe refresh is in progress
  * @param showDialog which dialog to show (or NONE)
+ * @param isCollapseHeadings if only puzzle headings should be shown
+ * except those with id in expandedHeadingIDs
+ * @param expandedHeadingIDs the ids of the PuzGroups that are currently
+ * expanded if isCollapseHeadings is true
  */
 data class UIState(
     val isViewArchive : Boolean = false,
@@ -130,6 +135,8 @@ data class UIState(
     val selectedPuzzleIDs : Set<String> = setOf(),
     val isSwipeRefreshing : Boolean = false,
     val showDialog : BrowseDialog = BrowseDialog.NONE,
+    val isCollapseHeadings : Boolean = false,
+    val expandedHeadingIDs : Set<String> = setOf(),
 ) {
     val displayNoPuzzlesMessage : Boolean = puzzleList.isEmpty()
     val isSelecting : Boolean = !selectedPuzzleIDs.isEmpty()
@@ -160,7 +167,9 @@ data class PuzEntry(
 data class PuzGroup (
     val header : String,
     val puzzles : List<PuzEntry>,
-)
+) {
+    val id : String = header
+}
 
 /**
  * Import and post result data
@@ -877,6 +886,18 @@ class BrowsePageViewModel(
         }
     }
 
+    fun toggleCollapseHeading(group : PuzGroup) {
+        val id = group.id
+        val expandedHeadingIDs = currentUIState.expandedHeadingIDs
+        val newExpandedHeadingIDs = if (expandedHeadingIDs.contains(id))
+            expandedHeadingIDs - id
+        else
+            expandedHeadingIDs + id
+        currentUIState = currentUIState.copy(
+            expandedHeadingIDs = newExpandedHeadingIDs,
+        )
+    }
+
     private fun getMaxAge(preferenceValue : Int) : LocalDate? {
         val cleanupValue = preferenceValue + 1
         if (cleanupValue > 0)
@@ -949,42 +970,45 @@ class BrowsePageViewModel(
         isNewPuzzleList : Boolean = false,
         puzzleFilter : String? = currentUIState.puzzleFilter,
     ) {
-        settings.getRatingsDisableRatings { disableRatings ->
-            settings.getBrowseAlwaysShowRating { alwaysShowRating ->
-                val state = currentUIState
-                val sortOrder = state.sortOrder
-                var newPuzzleList : List<PuzGroup> = state.puzzleList
-                if (
-                    isNewPuzzleList
-                    || puzzleFilter != currentUIState.puzzleFilter
-                ) {
-                    newPuzzleList = getPuzzleList(puzzleFilter, state.sortOrder)
-                }
+        viewModelScope.launch {
+            val disableRatings = settings.liveRatingsDisableRatings.first()
+            val alwaysShowRating = settings.liveBrowseAlwaysShowRating.first()
+            val isCollapseHeadings = settings.liveBrowseCollapseHeadings.first()
 
-                val displayInternalStorageMessage = (
-                    currentUIState.displayInternalStorageMessage
-                    && puzzles.isEmpty()
-                    && !isArchive
-                )
-
-                val showRatings = !disableRatings && (
-                    alwaysShowRating || isArchive
-                )
-
-                // reset to false when new puzzle list
-                val isSwipeRefreshing
-                    = !isNewPuzzleList && state.isSwipeRefreshing
-
-                currentUIState = state.copy(
-                    isViewArchive = isArchive,
-                    puzzleFilter = puzzleFilter,
-                    puzzleList = newPuzzleList,
-                    displayInternalStorageMessage
-                        = displayInternalStorageMessage,
-                    showRatings = showRatings,
-                    isSwipeRefreshing = isSwipeRefreshing,
-                )
+            val state = currentUIState
+            val sortOrder = state.sortOrder
+            var newPuzzleList : List<PuzGroup> = state.puzzleList
+            if (
+                isNewPuzzleList
+                || puzzleFilter != currentUIState.puzzleFilter
+            ) {
+                newPuzzleList = getPuzzleList(puzzleFilter, state.sortOrder)
             }
+
+            val displayInternalStorageMessage = (
+                currentUIState.displayInternalStorageMessage
+                && puzzles.isEmpty()
+                && !isArchive
+            )
+
+            val showRatings = !disableRatings && (
+                alwaysShowRating || isArchive
+            )
+
+            // reset to false when new puzzle list
+            val isSwipeRefreshing
+                = !isNewPuzzleList && state.isSwipeRefreshing
+
+            currentUIState = state.copy(
+                isViewArchive = isArchive,
+                puzzleFilter = puzzleFilter,
+                puzzleList = newPuzzleList,
+                displayInternalStorageMessage
+                    = displayInternalStorageMessage,
+                showRatings = showRatings,
+                isSwipeRefreshing = isSwipeRefreshing,
+                isCollapseHeadings = isCollapseHeadings,
+            )
         }
     }
 

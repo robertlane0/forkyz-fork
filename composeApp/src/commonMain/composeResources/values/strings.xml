@@ -109,6 +109,10 @@
     </plurals>
     <string name="no_downloaders_enabled">No Downloaders Enabled</string>
     <string name="no_downloaders_enabled_msg">To download puzzles, please enable some downloaders in the Puzzle Sources settings.</string>
+    <string name="collapse_headings">Collapse Headings</string>
+    <string name="collapse_headings_desc">Show headings only in the puzzle list unless expanded.</string>
+    <string name="expand">Expand</string>
+    <string name="collapse">Collapse</string>
 
     <!-- play page -->
     <string name="open_clue_list">Open clue list</string>
