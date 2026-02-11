@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 import app.crossword.yourealwaysbe.puz.Box;
@@ -29,6 +30,11 @@ public class FortyTwoPuzzlesIO extends AbstractJSONIO {
     private JSONObject srcPuzzle;
     private int width;
     private int height;
+
+    private final String[] DATE_FORMATS = {
+        "dd-MM-yyyy",
+        "yyyy-MM-dd"
+    };
 
     @Override
     public Puzzle parseInput(InputStream is) throws Exception {
@@ -93,7 +99,7 @@ public class FortyTwoPuzzlesIO extends AbstractJSONIO {
         // highlighted. This mark is prepended to whatever else is in the value
         // string, so it needs to be cut off for further processing.
         boolean isHighlighted = false;
-        if (value.startsWith("#")) {
+        if (value.contains("#")) {
             isHighlighted = true;
             value = value.replace("#", "");
         }
@@ -155,10 +161,17 @@ public class FortyTwoPuzzlesIO extends AbstractJSONIO {
     protected void setMetadata(PuzzleBuilder builder) {
         String dateStr = srcPuzzle.optString("date");
         if (dateStr != null) {
-            LocalDate date = LocalDate.parse(
-                dateStr, DateTimeFormatter.ofPattern("dd-MM-yyyy")
-            );
-            builder.setDate(date);
+            for (String dateFormat : DATE_FORMATS) {
+                try {
+                    LocalDate date = LocalDate.parse(
+                        dateStr, DateTimeFormatter.ofPattern("dd-MM-yyyy")
+                    );
+                    builder.setDate(date);
+                    break;
+                } catch (DateTimeParseException e) {
+                    // try next
+                }
+            }
         }
     }
 }
