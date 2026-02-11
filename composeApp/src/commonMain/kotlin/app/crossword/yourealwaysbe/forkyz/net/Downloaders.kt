@@ -295,13 +295,13 @@ class Downloaders(
             downloaders.add(AbstractDateDownloader(
                 "detelegraaf",
                 utils.getString(Res.string.de_telegraaf),
-                AbstractDateDownloader.DAYS_SATURDAY,
+                AbstractDateDownloader.DAYS_SUNDAY,
                 Duration.ofHours(-1), // midnight, tested
-                "https://www.telegraaf.nl/abonnement/telegraaf/abonnement-bestellen/",
-                BrainsOnlyIO(),
-                "'https://pzzl.net/servlet/MH_kruis/netcrossword?date='"
-                    + "yyMMdd",
-                "'https://www.telegraaf.nl/puzzels/kruiswoord'",
+                "https://abonnement.telegraaf.nl/abonnement-bestellen",
+                FortyTwoPuzzlesIO(),
+                "'https://api.42puzzles.com/player/mediahuis/"
+                    +"dHuRm50UEnli8iLLiZPL?date='yyyy-MM-dd",
+                "'https://www.telegraaf.nl/puzzels/kruiskop'",
             ))
         }
 
