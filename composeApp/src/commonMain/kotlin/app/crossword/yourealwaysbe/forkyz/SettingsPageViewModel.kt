@@ -419,6 +419,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.washington_pos
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.weekly_crosswords
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.weekly_crosswords_desc
 import app.crossword.yourealwaysbe.forkyz.net.Downloader
+import app.crossword.yourealwaysbe.forkyz.net.DownloaderID
 import app.crossword.yourealwaysbe.forkyz.net.DownloadersProvider
 import app.crossword.yourealwaysbe.forkyz.settings.BrowseSwipeAction
 import app.crossword.yourealwaysbe.forkyz.settings.ClueHighlight
@@ -737,6 +738,16 @@ data class SettingsPageViewState(
         get() = currentPage == SettingsPage.SEARCH
 }
 
+/**
+ * Represents a downloader that will need settings generated for it
+ */
+private data class DownloaderSettingsData(
+    val downloaderID : DownloaderID,
+    val page : SettingsPage,
+    val title : StringResource,
+    val summary : StringResource? = null
+)
+
 class SettingsPageViewModel(
     private val settings : ForkyzSettings,
     private val utils : NativeBackendUtils,
@@ -796,9 +807,9 @@ class SettingsPageViewModel(
             dls.getDownloaders()
         }
 
-    private val liveDownloadersInternalNames : Flow<List<String>>
+    private val liveDownloaderIDs : Flow<List<DownloaderID>>
         = downloadersProvider.liveDownloaders.filterNotNull().map { dls ->
-            dls.getDownloaders().map { it.internalName }
+            dls.getDownloaders().map { it.downloaderID }
         }
 
     private val downloadAutoDownloadersStateFlow
@@ -807,17 +818,17 @@ class SettingsPageViewModel(
                 downloaders.map { downloader ->
                     SettingsListEntry(
                         downloader.name,
-                        downloader.internalName,
+                        downloader.downloaderID.id,
                     )
                 }
             }.stateInSubscribed(viewModelScope, listOf())
 
     private val areEnabledAutoDownloadersFlow : Flow<Boolean>
         = combine(
-            settings.liveDownloadAutoDownloaders,
-            liveDownloadersInternalNames,
-        ) { enabledDownloaders, autoDownloaders ->
-            !enabledDownloaders.intersect(autoDownloaders).isEmpty()
+            settings.liveDownloadersSettings,
+            liveDownloaderIDs,
+        ) { downloadersSettings, autoDownloaders ->
+            autoDownloaders.any { downloadersSettings.enabledAuto(it) }
         }
 
     private val downloadOnStartUpErrorMsg : StateFlow<String?>
@@ -858,7 +869,7 @@ class SettingsPageViewModel(
 
     private val downloadCustomDailyURLErrorMsg : StateFlow<String?>
         = combine(
-            settings.liveDownloadCustomDaily,
+            settings.liveDownloadEnabledDownloader(DownloaderID.CUSTOM),
             settings.liveDownloadCustomDailyURL,
         ) { enabled, url ->
             if (enabled) {
@@ -877,293 +888,266 @@ class SettingsPageViewModel(
             }
         }.stateInSubscribed(viewModelScope, null)
 
-    private val downloadersTogglesDaily = listOf(
-        SettingsBoolean(
+    private val downloadersDaily = listOf(
+        DownloaderSettingsData(
+            DownloaderID.DE_STANDAARD,
             SettingsPage.PUZZLE_SOURCES_DAILY,
             Res.string.de_standaard,
             Res.string.de_standaard_desc,
-            settings.liveDownloadDeStandaard.stateInHere(),
-            settings::setDownloadDeStandaard,
         ),
-        SettingsBoolean(
+        DownloaderSettingsData(
+            DownloaderID.EL_PAIS_EXPERTO,
             SettingsPage.PUZZLE_SOURCES_DAILY,
             Res.string.elpais_experto,
             Res.string.elpais_experto_desc,
-            settings.liveDownloadElPaisExperto.stateInHere(),
-            settings::setDownloadElPaisExperto,
         ),
-        SettingsBoolean(
+        DownloaderSettingsData(
+            DownloaderID.GUARDIAN_DAILY_CRYPTIC,
             SettingsPage.PUZZLE_SOURCES_DAILY,
             Res.string.guardian_daily,
             Res.string.updates_mon_fri,
-            settings.liveDownloadGuardianDailyCryptic.stateInHere(),
-            settings::setDownloadGuardianDailyCryptic,
         ),
-        SettingsBoolean(
+        DownloaderSettingsData(
+            DownloaderID.HAM_ABEND,
             SettingsPage.PUZZLE_SOURCES_DAILY,
             Res.string.hamburger_abendblatt_daily,
             Res.string.hamburger_abendblatt_daily_desc,
-            settings.liveDownloadHamAbend.stateInHere(),
-            settings::setDownloadHamAbend,
         ),
-        SettingsBoolean(
+        DownloaderSettingsData(
+            DownloaderID.INDEPENDENT_DAILY_CRYPTIC,
             SettingsPage.PUZZLE_SOURCES_DAILY,
             Res.string.independent_daily,
-            null,
-            settings.liveDownloadIndependentDailyCryptic.stateInHere(),
-            settings::setDownloadIndependentDailyCryptic,
         ),
-        SettingsBoolean(
+        DownloaderSettingsData(
+            DownloaderID.IRISH_NEWS_CRYPTIC,
             SettingsPage.PUZZLE_SOURCES_DAILY,
             Res.string.irish_news_cryptic,
             Res.string.updates_mon_fri,
-            settings.liveDownloadIrishNewsCryptic.stateInHere(),
-            settings::setDownloadIrishNewsCryptic,
         ),
-        SettingsBoolean(
+        DownloaderSettingsData(
+            DownloaderID.JOSEPH,
             SettingsPage.PUZZLE_SOURCES_DAILY,
             Res.string.joseph_crossword,
             Res.string.updates_mon_sat,
-            settings.liveDownloadJoseph.stateInHere(),
-            settings::setDownloadJoseph,
         ),
-        SettingsBoolean(
+        DownloaderSettingsData(
+            DownloaderID.TWENTY_MINUTES,
             SettingsPage.PUZZLE_SOURCES_DAILY,
             Res.string.vingminutes,
             Res.string.vingminutes_desc,
-            settings.liveDownload20Minutes.stateInHere(),
-            settings::setDownload20Minutes,
         ),
-        SettingsBoolean(
+        DownloaderSettingsData(
+            DownloaderID.LA_CROIX,
             SettingsPage.PUZZLE_SOURCES_DAILY,
             Res.string.la_croix,
             Res.string.updates_mon_fri,
-            settings.liveDownloadLaCroix.stateInHere(),
-            settings::setDownloadLaCroix,
         ),
-        SettingsBoolean(
+        DownloaderSettingsData(
+            DownloaderID.LA_TIMES,
             SettingsPage.PUZZLE_SOURCES_DAILY,
             Res.string.la_times,
             Res.string.la_times_desc,
-            settings.liveDownloadLATimes.stateInHere(),
-            settings::setDownloadLATimes,
         ),
-        SettingsBoolean(
+        DownloaderSettingsData(
+            DownloaderID.LE_PARISIEN_F1,
             SettingsPage.PUZZLE_SOURCES_DAILY,
             Res.string.le_parisien_daily_f1,
             Res.string.le_parisien_daily_f1_desc,
-            settings.liveDownloadLeParisienF1.stateInHere(),
-            settings::setDownloadLeParisienF1,
         ),
-        SettingsBoolean(
+        DownloaderSettingsData(
+            DownloaderID.LE_PARISIEN_F2,
             SettingsPage.PUZZLE_SOURCES_DAILY,
             Res.string.le_parisien_daily_f2,
             Res.string.le_parisien_daily_f2_desc,
-            settings.liveDownloadLeParisienF2.stateInHere(),
-            settings::setDownloadLeParisienF2,
         ),
-        SettingsBoolean(
+        DownloaderSettingsData(
+            DownloaderID.LE_PARISIEN_F3,
             SettingsPage.PUZZLE_SOURCES_DAILY,
             Res.string.le_parisien_daily_f3,
             Res.string.le_parisien_daily_f3_desc,
-            settings.liveDownloadLeParisienF3.stateInHere(),
-            settings::setDownloadLeParisienF3,
         ),
-        SettingsBoolean(
+        DownloaderSettingsData(
+            DownloaderID.LE_PARISIEN_F4,
             SettingsPage.PUZZLE_SOURCES_DAILY,
             Res.string.le_parisien_daily_f4,
             Res.string.le_parisien_daily_f4_desc,
-            settings.liveDownloadLeParisienF4.stateInHere(),
-            settings::setDownloadLeParisienF4,
         ),
-        SettingsBoolean(
+        DownloaderSettingsData(
+            DownloaderID.METRO_CRYPTIC,
             SettingsPage.PUZZLE_SOURCES_DAILY,
             Res.string.metro_cryptic,
             Res.string.updates_mon_sat,
-            settings.liveDownloadMetroCryptic.stateInHere(),
-            settings::setDownloadMetroCryptic,
         ),
-        SettingsBoolean(
+        DownloaderSettingsData(
+            DownloaderID.METRO_QUICK,
             SettingsPage.PUZZLE_SOURCES_DAILY,
             Res.string.metro_quick,
             Res.string.updates_mon_sat,
-            settings.liveDownloadMetroQuick.stateInHere(),
-            settings::setDownloadMetroQuick,
         ),
-        SettingsBoolean(
+        DownloaderSettingsData(
+            DownloaderID.NEWSDAY,
             SettingsPage.PUZZLE_SOURCES_DAILY,
             Res.string.newsday,
-            null,
-            settings.liveDownloadNewsday.stateInHere(),
-            settings::setDownloadNewsday,
         ),
-        SettingsBoolean(
+        DownloaderSettingsData(
+            DownloaderID.NYT_SYNDICATED,
             SettingsPage.PUZZLE_SOURCES_DAILY,
             Res.string.new_york_times_syndicated,
-            null,
-            settings.liveDownloadNewYorkTimesSyndicated.stateInHere(),
-            settings::setDownloadNewYorkTimesSyndicated,
         ),
-        SettingsBoolean(
+        DownloaderSettingsData(
+            DownloaderID.NRC_IN_HET_MIDDEN,
             SettingsPage.PUZZLE_SOURCES_DAILY,
             Res.string.nrc_in_het_midden,
             Res.string.nrc_in_het_midden_desc,
-            settings.liveDownloadNRCInHetMidden.stateInHere(),
-            settings::setDownloadNRCInHetMidden,
         ),
-        SettingsBoolean(
+        DownloaderSettingsData(
+            DownloaderID.SHEFFER,
             SettingsPage.PUZZLE_SOURCES_DAILY,
             Res.string.sheffer_crossword,
             Res.string.updates_mon_sat,
-            settings.liveDownloadSheffer.stateInHere(),
-            settings::setDownloadSheffer,
         ),
-        SettingsBoolean(
+        DownloaderSettingsData(
+            DownloaderID.SUD_OUEST_MOTS_CROISES,
             SettingsPage.PUZZLE_SOURCES_DAILY,
             Res.string.sud_ouest_mots_croises,
             Res.string.updates_daily,
-            settings.liveDownloadSudOuestMotsCroises.stateInHere(),
-            settings::setDownloadSudOuestMotsCroises,
         ),
-        SettingsBoolean(
+        DownloaderSettingsData(
+            DownloaderID.SUD_OUEST_MOTS_FLECHES,
             SettingsPage.PUZZLE_SOURCES_DAILY,
             Res.string.sud_ouest_mots_fleches,
             Res.string.updates_daily,
-            settings.liveDownloadSudOuestMotsFleches.stateInHere(),
-            settings::setDownloadSudOuestMotsFleches,
         ),
-        SettingsBoolean(
+        DownloaderSettingsData(
+            DownloaderID.TF1_MOTS_CROISES,
             SettingsPage.PUZZLE_SOURCES_DAILY,
             Res.string.tf1_mots_croises,
             Res.string.updates_daily,
-            settings.liveDownloadTF1MotsCroises.stateInHere(),
-            settings::setDownloadTF1MotsCroises,
         ),
-        SettingsBoolean(
+        DownloaderSettingsData(
+            DownloaderID.TF1_MOTS_FLECHES,
             SettingsPage.PUZZLE_SOURCES_DAILY,
             Res.string.tf1_mots_fleches,
             Res.string.updates_daily,
-            settings.liveDownloadTF1MotsFleches.stateInHere(),
-            settings::setDownloadTF1MotsFleches,
         ),
-        SettingsBoolean(
+        DownloaderSettingsData(
+            DownloaderID.UNIVERSAL,
             SettingsPage.PUZZLE_SOURCES_DAILY,
             Res.string.universal_crossword,
             Res.string.updates_mon_sat,
-            settings.liveDownloadUniversal.stateInHere(),
-            settings::setDownloadUniversal,
         ),
-        SettingsBoolean(
+        DownloaderSettingsData(
+            DownloaderID.USA_TODAY,
             SettingsPage.PUZZLE_SOURCES_DAILY,
             Res.string.usa_today,
             Res.string.updates_daily,
-            settings.liveDownloadUSAToday.stateInHere(),
-            settings::setDownloadUSAToday,
         ),
-        SettingsBoolean(
+        DownloaderSettingsData(
+            DownloaderID.WSJ,
             SettingsPage.PUZZLE_SOURCES_DAILY,
             Res.string.wall_street_journal,
             Res.string.updates_mon_sat,
-            settings.liveDownloadWsj.stateInHere(),
-            settings::setDownloadWsj,
         ),
     )
 
-    val downloadersTogglesCustomDaily = listOf(
-        SettingsBoolean(
+    private val downloadersCustomDaily = listOf(
+        DownloaderSettingsData(
+            DownloaderID.CUSTOM,
             SettingsPage.PUZZLE_SOURCES_DAILY,
             Res.string.custom,
             Res.string.custom_desc,
-            settings.liveDownloadCustomDaily.stateInHere(),
-            settings::setDownloadCustomDaily,
         )
     )
 
-    val downloadersTogglesWeeklyRegular = listOf(
-        SettingsBoolean(
+    private val downloadersWeeklyRegular = listOf(
+        DownloaderSettingsData(
+            DownloaderID.DE_TELEGRAAF,
             SettingsPage.PUZZLE_SOURCES_WEEKLY,
             Res.string.de_telegraaf,
             Res.string.de_telegraaf_desc,
-            settings.liveDownloadDeTelegraaf.stateInHere(),
-            settings::setDownloadDeTelegraaf,
         ),
-        SettingsBoolean(
+        DownloaderSettingsData(
+            DownloaderID.JONESIN,
             SettingsPage.PUZZLE_SOURCES_WEEKLY,
             Res.string.jonesin_crosswords,
             Res.string.updates_thursdays,
-            settings.liveDownloadJonesin.stateInHere(),
-            settings::setDownloadJonesin,
         ),
-        SettingsBoolean(
+        DownloaderSettingsData(
+            DownloaderID.GUARDIAN_WEEKLY_QUIPTIC,
             SettingsPage.PUZZLE_SOURCES_WEEKLY,
             Res.string.guardian_quiptic,
             Res.string.updates_sundays,
-            settings.liveDownloadGuardianWeeklyQuiptic.stateInHere(),
-            settings::setDownloadGuardianWeeklyQuiptic,
         ),
-        SettingsBoolean(
+        DownloaderSettingsData(
+            DownloaderID.NRC_SCRYPTO,
             SettingsPage.PUZZLE_SOURCES_WEEKLY,
             Res.string.nrc_scrypto,
             Res.string.nrc_scrypto_desc,
-            settings.liveDownloadNRCScrypto.stateInHere(),
-            settings::setDownloadNRCScrypto,
         )
     )
 
-    val downloadersTogglesWeeklyLarge = listOf(
-        SettingsBoolean(
+    private val downloadersWeeklyLarge = listOf(
+        DownloaderSettingsData(
+            DownloaderID.PREMIER,
             SettingsPage.PUZZLE_SOURCES_WEEKLY,
             Res.string.premier_crossword,
             Res.string.updates_sundays,
-            settings.liveDownloadPremier.stateInHere(),
-            settings::setDownloadPremier,
         ),
-        SettingsBoolean(
+        DownloaderSettingsData(
+            DownloaderID.WAPO_SUNDAY,
             SettingsPage.PUZZLE_SOURCES_WEEKLY,
             Res.string.washington_post_sunday,
             Res.string.updates_sundays,
-            settings.liveDownloadWaPoSunday.stateInHere(),
-            settings::setDownloadWaPoSunday,
         ),
     )
 
-    val downloadersTogglesScrapers = listOf(
-        SettingsBoolean(
+    private val downloadersScrapers = listOf(
+        DownloaderSettingsData(
+            DownloaderID.CRYPTIC_CRU,
             SettingsPage.PUZZLE_SOURCES_SCRAPERS,
             Res.string.cru_puzzle_workshop,
             Res.string.cru_puzzle_workshop_desc,
-            settings.liveScrapeCru.stateInHere(),
-            settings::setScrapeCru,
         ),
-        SettingsBoolean(
+        DownloaderSettingsData(
+            DownloaderID.GUARDIAN_QUICK,
             SettingsPage.PUZZLE_SOURCES_SCRAPERS,
             Res.string.guardian_quick,
             Res.string.guardian_quick_desc,
-            settings.liveScrapeGuardianQuick.stateInHere(),
-            settings::setScrapeGuardianQuick,
         ),
-        SettingsBoolean(
+        DownloaderSettingsData(
+            DownloaderID.KEGLAR,
             SettingsPage.PUZZLE_SOURCES_SCRAPERS,
             Res.string.keglars_cryptics,
             Res.string.keglars_cryptics_desc,
-            settings.liveScrapeKegler.stateInHere(),
-            settings::setScrapeKegler,
         ),
-        SettingsBoolean(
+        DownloaderSettingsData(
+            DownloaderID.PRIVATE_EYE,
             SettingsPage.PUZZLE_SOURCES_SCRAPERS,
             Res.string.private_eye,
             Res.string.private_eye_desc,
-            settings.liveScrapePrivateEye.stateInHere(),
-            settings::setScrapePrivateEye,
         ),
-        SettingsBoolean(
+        DownloaderSettingsData(
+            DownloaderID.PRZEKROJ,
             SettingsPage.PUZZLE_SOURCES_SCRAPERS,
             Res.string.przekroj,
             Res.string.przekroj_desc,
-            settings.liveScrapePrzekroj.stateInHere(),
-            settings::setScrapePrzekroj,
         ),
     )
+
+    private val downloadersTogglesDaily
+        = downloadersDaily.map(this::makeDownloaderToggle)
+
+    val downloadersTogglesCustomDaily
+        = downloadersCustomDaily.map(this::makeDownloaderToggle)
+
+    val downloadersTogglesWeeklyRegular
+        = downloadersWeeklyRegular.map(this::makeDownloaderToggle)
+
+    val downloadersTogglesWeeklyLarge
+        = downloadersWeeklyLarge.map(this::makeDownloaderToggle)
+
+    val downloadersTogglesScrapers
+        = downloadersScrapers.map(this::makeDownloaderToggle)
 
     private val settingsItemsList : List<SettingsItem> = listOf(
         SettingsDynamicList<StorageLocation>(
@@ -2584,6 +2568,27 @@ class SettingsPageViewModel(
     @JvmName("stateInHereStringSet")
     private fun <T> Flow<Set<T>>.stateInHere() : StateFlow<Set<T>> {
         return this.stateInHere(setOf())
+    }
+
+    /**
+     * Make the toggle button settings entry for a downloader
+     */
+    private fun makeDownloaderToggle(
+        settingsData : DownloaderSettingsData,
+    ) : SettingsBoolean {
+        return SettingsBoolean(
+            settingsData.page,
+            settingsData.title,
+            settingsData.summary,
+            settings.liveDownloadEnabledDownloader(settingsData.downloaderID)
+                .stateInHere(),
+            { enabled ->
+                settings.setDownloadEnableDownloader(
+                    settingsData.downloaderID,
+                    enabled,
+                )
+            },
+        )
     }
 }
 

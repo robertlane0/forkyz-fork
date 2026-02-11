@@ -27,7 +27,7 @@ import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 
-import app.crossword.yourealwaysbe.forkyz.net.Downloaders
+import app.crossword.yourealwaysbe.forkyz.net.DownloaderID
 import app.crossword.yourealwaysbe.forkyz.util.JSONUtils
 import app.crossword.yourealwaysbe.forkyz.util.getOnce
 import app.crossword.yourealwaysbe.puz.MovementStrategy
@@ -182,6 +182,35 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     fun setDownloadDaysTime(value : Int) {
         settingsUpdate { settings ->
             settings.copy(backgroundDownloadDaysTime = value)
+        }
+    }
+
+    fun liveDownloadEnabledDownloader(
+        downloaderID : DownloaderID,
+    ) : Flow<Boolean> {
+        return settingsMap { downloaderID.id !in it.disabledDownloaders }
+    }
+
+    private fun setDownloadDisabledDownloaders(value : Set<String>) {
+        settingsUpdate { settings ->
+            settings.copy(disabledDownloaders = value.toList())
+        }
+    }
+
+    /**
+     * Set enabled/disabled for a given downloader
+     */
+    fun setDownloadEnableDownloader(
+        downloaderID : DownloaderID,
+        enabled : Boolean,
+    ) {
+        settingsUpdate { settings ->
+            val disabledDownloaders = if (enabled) {
+                settings.disabledDownloaders - downloaderID.id
+            } else {
+                settings.disabledDownloaders + downloaderID.id
+            }.toSet().toList()
+            settings.copy(disabledDownloaders = disabledDownloaders)
         }
     }
 
@@ -370,45 +399,7 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         settings : Settings,
     ) : DownloadersSettings {
         return DownloadersSettings(
-            settings.downloadDeStandaard,
-            settings.downloadDeTelegraaf,
-            settings.downloadElPaisExperto,
-            settings.downloadGuardianDailyCryptic,
-            settings.downloadGuardianWeeklyQuiptic,
-            settings.downloadHamAbend,
-            settings.downloadIndependentDailyCryptic,
-            settings.downloadIrishNewsCryptic,
-            settings.downloadJonesin,
-            settings.downloadJoseph,
-            settings.download20Minutes,
-            settings.downloadLaCroix,
-            settings.downloadLATimes,
-            settings.downloadLeParisienF1,
-            settings.downloadLeParisienF2,
-            settings.downloadLeParisienF3,
-            settings.downloadLeParisienF4,
-            settings.downloadMetroCryptic,
-            settings.downloadMetroQuick,
-            settings.downloadNewsday,
-            settings.downloadNewYorkTimesSyndicated,
-            settings.downloadNRCInHetMidden,
-            settings.downloadNRCScrypto,
-            settings.downloadPremier,
-            settings.downloadSheffer,
-            settings.downloadSudOuestMotsCroises,
-            settings.downloadSudOuestMotsFleches,
-            settings.downloadTF1MotsCroises,
-            settings.downloadTF1MotsFleches,
-            settings.downloadUniversal,
-            settings.downloadUSAToday,
-            settings.downloadWaPoSunday,
-            settings.downloadWsj,
-            settings.scrapeCru,
-            settings.scrapeGuardianQuick,
-            settings.scrapeKegler,
-            settings.scrapePrivateEye,
-            settings.scrapePrzekroj,
-            settings.downloadCustomDaily,
+            settings.disabledDownloaders.toSet(),
             settings.customDailyTitle,
             settings.customDailyUrl,
             settings.suppressSummaryMessages,
@@ -735,276 +726,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         }
     }
 
-    val liveDownload20Minutes : Flow<Boolean>
-        = settingsMap { it.download20Minutes }
-
-    fun setDownload20Minutes(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(download20Minutes = value)
-        }
-    }
-
-    val liveDownloadCustomDaily : Flow<Boolean>
-        = settingsMap { it.downloadCustomDaily }
-
-    fun setDownloadCustomDaily(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(downloadCustomDaily = value)
-        }
-    }
-
-    val liveDownloadDeStandaard : Flow<Boolean>
-        = settingsMap { it.downloadDeStandaard }
-
-    fun setDownloadDeStandaard(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(downloadDeStandaard = value)
-        }
-    }
-
-    val liveDownloadDeTelegraaf : Flow<Boolean>
-        = settingsMap { it.downloadDeTelegraaf }
-
-    fun setDownloadDeTelegraaf(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(downloadDeTelegraaf = value)
-        }
-    }
-
-    val liveDownloadElPaisExperto : Flow<Boolean>
-        = settingsMap { it.downloadElPaisExperto }
-
-    fun setDownloadElPaisExperto(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(downloadElPaisExperto = value)
-        }
-    }
-
-    val liveDownloadGuardianDailyCryptic : Flow<Boolean>
-        = settingsMap { it.downloadGuardianDailyCryptic }
-
-    fun setDownloadGuardianDailyCryptic(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(downloadGuardianDailyCryptic = value)
-        }
-    }
-
-    val liveDownloadGuardianWeeklyQuiptic : Flow<Boolean>
-        = settingsMap { it.downloadGuardianWeeklyQuiptic }
-
-    fun setDownloadGuardianWeeklyQuiptic(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(downloadGuardianWeeklyQuiptic = value)
-        }
-    }
-
-    val liveDownloadHamAbend : Flow<Boolean>
-        = settingsMap { it.downloadHamAbend }
-
-    fun setDownloadHamAbend(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(downloadHamAbend = value)
-        }
-    }
-
-    val liveDownloadIndependentDailyCryptic : Flow<Boolean>
-        = settingsMap { it.downloadIndependentDailyCryptic }
-
-    fun setDownloadIndependentDailyCryptic(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(downloadIndependentDailyCryptic = value)
-        }
-    }
-
-    val liveDownloadIrishNewsCryptic : Flow<Boolean>
-        = settingsMap { it.downloadIrishNewsCryptic }
-
-    fun setDownloadIrishNewsCryptic(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(downloadIrishNewsCryptic = value)
-        }
-    }
-
-    val liveDownloadJonesin : Flow<Boolean>
-        = settingsMap { it.downloadJonesin }
-
-    fun setDownloadJonesin(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(downloadJonesin = value)
-        }
-    }
-
-    val liveDownloadJoseph : Flow<Boolean>
-        = settingsMap { it.downloadJoseph }
-
-    fun setDownloadJoseph(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(downloadJoseph = value)
-        }
-    }
-
-    val liveDownloadLaCroix : Flow<Boolean>
-        = settingsMap { it.downloadLaCroix }
-
-    fun setDownloadLaCroix(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(downloadLaCroix = value)
-        }
-    }
-
-    val liveDownloadLATimes : Flow<Boolean>
-        = settingsMap { it.downloadLATimes }
-
-    fun setDownloadLATimes(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(downloadLATimes = value)
-        }
-    }
-
-    val liveDownloadLeParisienF1 : Flow<Boolean>
-        = settingsMap { it.downloadLeParisienF1 }
-
-    fun setDownloadLeParisienF1(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(downloadLeParisienF1 = value)
-        }
-    }
-
-    val liveDownloadLeParisienF2 : Flow<Boolean>
-        = settingsMap { it.downloadLeParisienF2 }
-
-    fun setDownloadLeParisienF2(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(downloadLeParisienF2 = value)
-        }
-    }
-
-    val liveDownloadLeParisienF3 : Flow<Boolean>
-        = settingsMap { it.downloadLeParisienF3 }
-
-    fun setDownloadLeParisienF3(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(downloadLeParisienF3 = value)
-        }
-    }
-
-    val liveDownloadLeParisienF4 : Flow<Boolean>
-        = settingsMap { it.downloadLeParisienF4 }
-
-    fun setDownloadLeParisienF4(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(downloadLeParisienF4 = value)
-        }
-    }
-
-    val liveDownloadMetroCryptic : Flow<Boolean>
-        = settingsMap { it.downloadMetroCryptic }
-
-    fun setDownloadMetroCryptic(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(downloadMetroCryptic = value)
-        }
-    }
-
-    val liveDownloadMetroQuick : Flow<Boolean>
-        = settingsMap { it.downloadMetroQuick }
-
-    fun setDownloadMetroQuick(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(downloadMetroQuick = value)
-        }
-    }
-
-    val liveDownloadNewYorkTimesSyndicated : Flow<Boolean>
-        = settingsMap { it.downloadNewYorkTimesSyndicated }
-
-    fun setDownloadNewYorkTimesSyndicated(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(downloadNewYorkTimesSyndicated = value)
-        }
-    }
-
-    val liveDownloadNewsday : Flow<Boolean>
-        = settingsMap { it.downloadNewsday }
-
-    fun setDownloadNewsday(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(downloadNewsday = value)
-        }
-    }
-
-    val liveDownloadNRCInHetMidden : Flow<Boolean>
-        = settingsMap { it.downloadNRCInHetMidden }
-
-    fun setDownloadNRCInHetMidden(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(downloadNRCInHetMidden = value)
-        }
-    }
-
-    val liveDownloadNRCScrypto : Flow<Boolean>
-        = settingsMap { it.downloadNRCScrypto }
-
-    fun setDownloadNRCScrypto(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(downloadNRCScrypto = value)
-        }
-    }
-
-    val liveDownloadPremier : Flow<Boolean>
-        = settingsMap { it.downloadPremier }
-
-    fun setDownloadPremier(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(downloadPremier = value)
-        }
-    }
-
-    val liveDownloadSheffer : Flow<Boolean>
-        = settingsMap { it.downloadSheffer }
-
-    fun setDownloadSheffer(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(downloadSheffer = value)
-        }
-    }
-
-    val liveDownloadSudOuestMotsCroises : Flow<Boolean>
-        = settingsMap { it.downloadSudOuestMotsCroises }
-
-    fun setDownloadSudOuestMotsCroises(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(downloadSudOuestMotsCroises = value)
-        }
-    }
-
-    val liveDownloadSudOuestMotsFleches : Flow<Boolean>
-        = settingsMap { it.downloadSudOuestMotsFleches }
-
-    fun setDownloadSudOuestMotsFleches(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(downloadSudOuestMotsFleches = value)
-        }
-    }
-
-    val liveDownloadTF1MotsCroises : Flow<Boolean>
-        = settingsMap { it.downloadTF1MotsCroises }
-
-    fun setDownloadTF1MotsCroises(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(downloadTF1MotsCroises = value)
-        }
-    }
-
-    val liveDownloadTF1MotsFleches : Flow<Boolean>
-        = settingsMap { it.downloadTF1MotsFleches }
-
-    fun setDownloadTF1MotsFleches(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(downloadTF1MotsFleches = value)
-        }
-    }
-
     val liveDownloadTimeout : Flow<Int>
         = settingsMap { it.downloadTimeout }
 
@@ -1014,42 +735,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     fun setDownloadTimeout(value : Int) {
         settingsUpdate { settings ->
             settings.copy(downloadTimeout = value)
-        }
-    }
-
-    val liveDownloadUSAToday : Flow<Boolean>
-        = settingsMap { it.downloadUSAToday }
-
-    fun setDownloadUSAToday(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(downloadUSAToday = value)
-        }
-    }
-
-    val liveDownloadUniversal : Flow<Boolean>
-        = settingsMap { it.downloadUniversal }
-
-    fun setDownloadUniversal(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(downloadUniversal = value)
-        }
-    }
-
-    val liveDownloadWaPoSunday : Flow<Boolean>
-        = settingsMap { it.downloadWaPoSunday }
-
-    fun setDownloadWaPoSunday(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(downloadWaPoSunday = value)
-        }
-    }
-
-    val liveDownloadWsj : Flow<Boolean>
-        = settingsMap { it.downloadWsj }
-
-    fun setDownloadWsj(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(downloadWsj = value)
         }
     }
 
@@ -1462,52 +1147,7 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         if (0 <= value) {
             settingsUpdate { settings ->
                 settings.copy(scale = value)
-        }
-        }
-    }
-
-    val liveScrapeCru : Flow<Boolean>
-        = settingsMap { it.scrapeCru }
-
-    fun setScrapeCru(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(scrapeCru = value)
-        }
-    }
-
-    val liveScrapeGuardianQuick : Flow<Boolean>
-        = settingsMap { it.scrapeGuardianQuick }
-
-    fun setScrapeGuardianQuick(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(scrapeGuardianQuick = value)
-        }
-    }
-
-    val liveScrapeKegler : Flow<Boolean>
-        = settingsMap { it.scrapeKegler }
-
-    fun setScrapeKegler(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(scrapeKegler = value)
-        }
-    }
-
-    val liveScrapePrivateEye : Flow<Boolean>
-        = settingsMap { it.scrapePrivateEye }
-
-    fun setScrapePrivateEye(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(scrapePrivateEye = value)
-        }
-    }
-
-    val liveScrapePrzekroj : Flow<Boolean>
-        = settingsMap { it.scrapePrzekroj }
-
-    fun setScrapePrzekroj(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(scrapePrzekroj = value)
+            }
         }
     }
 
@@ -2121,6 +1761,15 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             },
         )
         run(
+            "disabledDownloaders",
+            { s, key -> addListToJSON(json, key, s.disabledDownloaders) },
+            { key ->
+                getStringSetFromJSON(
+                    json, key, this::setDownloadDisabledDownloaders,
+                )
+            },
+        )
+        run(
             "disableRatings",
             { s, key -> json.put(key, s.disableRatings) },
             { key ->
@@ -2189,212 +1838,9 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             },
         )
         run(
-            "download20Minutes",
-            { s, key -> json.put(key, s.download20Minutes) },
-            { key -> json.ifHasBoolean(key) { setDownload20Minutes(it) } },
-        )
-        run(
-            "downloadCustomDaily",
-            { s, key -> json.put(key, s.downloadCustomDaily) },
-            { key -> json.ifHasBoolean(key) { setDownloadCustomDaily(it) } },
-        )
-        run(
-            "downloadDeStandaard",
-            { s, key -> json.put(key, s.downloadDeStandaard) },
-            { key -> json.ifHasBoolean(key) { setDownloadDeStandaard(it) } },
-        )
-        run(
-            "downloadDeTelegraaf",
-            { s, key -> json.put(key, s.downloadDeTelegraaf) },
-            { key -> json.ifHasBoolean(key) { setDownloadDeTelegraaf(it) } },
-        )
-        run(
-            "downloadElPaisExperto",
-            { s, key -> json.put(key, s.downloadElPaisExperto) },
-            { key ->
-                json.ifHasBoolean(key) { setDownloadElPaisExperto(it) }
-            },
-        )
-        run(
-            "downloadGuardianDailyCryptic",
-            { s, key -> json.put(key, s.downloadGuardianDailyCryptic) },
-            { key ->
-                json.ifHasBoolean(key) {
-                    setDownloadGuardianDailyCryptic(it)
-                }
-            },
-        )
-        run(
-            "downloadGuardianWeeklyQuiptic",
-            { s, key -> json.put(key, s.downloadGuardianWeeklyQuiptic) },
-            { key ->
-                json.ifHasBoolean(key) {
-                    setDownloadGuardianWeeklyQuiptic(it)
-                }
-            },
-        )
-        run(
-            "downloadHamAbend",
-            { s, key -> json.put(key, s.downloadHamAbend) },
-            { key -> json.ifHasBoolean(key) { setDownloadHamAbend(it) } },
-        )
-        run(
-            "downloadIndependentDailyCryptic",
-            { s, key -> json.put(key, s.downloadIndependentDailyCryptic) },
-            { key ->
-                json.ifHasBoolean(key) {
-                    setDownloadIndependentDailyCryptic(it)
-                }
-            },
-        )
-        run(
-            "downloadIrishNewsCryptic",
-            { s, key -> json.put(key, s.downloadIrishNewsCryptic) },
-            { key ->
-                json.ifHasBoolean(key) { setDownloadIrishNewsCryptic(it) }
-            },
-        )
-        run(
-            "downloadJonesin",
-            { s, key -> json.put(key, s.downloadJonesin) },
-            { key -> json.ifHasBoolean(key) { setDownloadJonesin(it) } },
-        )
-        run(
-            "downloadJoseph",
-            { s, key -> json.put(key, s.downloadJoseph) },
-            { key -> json.ifHasBoolean(key) { setDownloadJoseph(it) } },
-        )
-        run(
-            "downloadLaCroix",
-            { s, key -> json.put(key, s.downloadLaCroix) },
-            { key -> json.ifHasBoolean(key) { setDownloadLaCroix(it) } },
-        )
-        run(
-            "downloadLeParisienF1",
-            { s, key -> json.put(key, s.downloadLeParisienF1) },
-            { key ->
-                json.ifHasBoolean(key) { setDownloadLeParisienF1(it) }
-            },
-        )
-        run(
-            "downloadLeParisienF2",
-            { s, key -> json.put(key, s.downloadLeParisienF2) },
-            { key ->
-                json.ifHasBoolean(key) { setDownloadLeParisienF2(it) }
-            },
-        )
-        run(
-            "downloadLeParisienF3",
-            { s, key -> json.put(key, s.downloadLeParisienF3) },
-            { key ->
-                json.ifHasBoolean(key) { setDownloadLeParisienF3(it) }
-            },
-        )
-        run(
-            "downloadLeParisienF4",
-            { s, key -> json.put(key, s.downloadLeParisienF4) },
-            { key ->
-                json.ifHasBoolean(key) { setDownloadLeParisienF4(it) }
-            },
-        )
-        run(
-            "downloadMetroCryptic",
-            { s, key -> json.put(key, s.downloadMetroCryptic) },
-            { key ->
-                json.ifHasBoolean(key) { setDownloadMetroCryptic(it) }
-            },
-        )
-        run(
-            "downloadMetroQuick",
-            { s, key -> json.put(key, s.downloadMetroQuick) },
-            { key -> json.ifHasBoolean(key) { setDownloadMetroQuick(it) } },
-        )
-        run(
-            "downloadNewYorkTimesSyndicated",
-            { s, key -> json.put(key, s.downloadNewYorkTimesSyndicated) },
-            { key ->
-                json.ifHasBoolean(key) {
-                    setDownloadNewYorkTimesSyndicated(it)
-                }
-            },
-        )
-        run(
-            "downloadNewsday",
-            { s, key -> json.put(key, s.downloadNewsday) },
-            { key -> json.ifHasBoolean(key) { setDownloadNewsday(it) } },
-        )
-        run(
-            "downloadNRCInHetMidden",
-            { s, key -> json.put(key, s.downloadNRCInHetMidden) },
-            { key -> json.ifHasBoolean(key) { setDownloadNRCInHetMidden(it) } },
-        )
-        run(
-            "downloadNRCScrypto",
-            { s, key -> json.put(key, s.downloadNRCScrypto) },
-            { key -> json.ifHasBoolean(key) { setDownloadNRCScrypto(it) } },
-        )
-        run(
-            "downloadPremier",
-            { s, key -> json.put(key, s.downloadPremier) },
-            { key -> json.ifHasBoolean(key) { setDownloadPremier(it) } },
-        )
-        run(
-            "downloadSheffer",
-            { s, key -> json.put(key, s.downloadSheffer) },
-            { key -> json.ifHasBoolean(key) { setDownloadSheffer(it) } },
-        )
-        run(
-            "downloadSudOuestMotsCroises",
-            { s, key -> json.put(key, s.downloadSudOuestMotsCroises) },
-            { key -> json.ifHasBoolean(key) {
-                setDownloadSudOuestMotsCroises(it) }
-            },
-        )
-        run(
-            "downloadSudOuestMotsFleches",
-            { s, key -> json.put(key, s.downloadSudOuestMotsFleches) },
-            { key -> json.ifHasBoolean(key) {
-                setDownloadSudOuestMotsFleches(it) }
-            },
-        )
-        run(
-            "downloadTF1MotsCroises",
-            { s, key -> json.put(key, s.downloadTF1MotsCroises) },
-            { key -> json.ifHasBoolean(key) {
-                setDownloadTF1MotsCroises(it) }
-            },
-        )
-        run(
-            "downloadTF1MotsFleches",
-            { s, key -> json.put(key, s.downloadTF1MotsFleches) },
-            { key -> json.ifHasBoolean(key) {
-                setDownloadTF1MotsFleches(it) }
-            },
-        )
-        run(
             "downloadTimeout",
             { s, key -> json.put(key, s.downloadTimeout) },
             { key -> json.ifHasInt(key) { setDownloadTimeout(it) } },
-        )
-        run(
-            "downloadUSAToday",
-            { s, key -> json.put(key, s.downloadUSAToday) },
-            { key -> json.ifHasBoolean(key) { setDownloadUSAToday(it) } },
-        )
-        run(
-            "downloadUniversal",
-            { s, key -> json.put(key, s.downloadUniversal) },
-            { key -> json.ifHasBoolean(key) { setDownloadUniversal(it) } },
-        )
-        run(
-            "downloadWaPoSunday",
-            { s, key -> json.put(key, s.downloadWaPoSunday) },
-            { key -> json.ifHasBoolean(key) { setDownloadWaPoSunday(it) } },
-        )
-        run(
-            "downloadWsj",
-            { s, key -> json.put(key, s.downloadWsj) },
-            { key -> json.ifHasBoolean(key) { setDownloadWsj(it) } },
         )
         run(
             "duckDuckGoEnabled",
@@ -2662,31 +2108,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             "scale",
             { s, key -> json.put(key, s.scale) },
             { key -> json.ifHasDouble(key) { setPlayScale(it.toFloat()) } },
-        )
-        run(
-            "scrapeCru",
-            { s, key -> json.put(key, s.scrapeCru) },
-            { key -> json.ifHasBoolean(key) { setScrapeCru(it) } },
-        )
-        run(
-            "scrapeGuardianQuick",
-            { s, key -> json.put(key, s.scrapeGuardianQuick) },
-            { key -> json.ifHasBoolean(key) { setScrapeGuardianQuick(it) } },
-        )
-        run(
-            "scrapeKegler",
-            { s, key -> json.put(key, s.scrapeKegler) },
-            { key -> json.ifHasBoolean(key) { setScrapeKegler(it) } },
-        )
-        run(
-            "scrapePrivateEye",
-            { s, key -> json.put(key, s.scrapePrivateEye) },
-            { key -> json.ifHasBoolean(key) { setScrapePrivateEye(it) } },
-        )
-        run(
-            "scrapePrzekroj",
-            { s, key -> json.put(key, s.scrapePrzekroj) },
-            { key -> json.ifHasBoolean(key) { setScrapePrzekroj(it) } },
         )
         run(
             "scratchMode",

@@ -10,10 +10,10 @@ import app.crossword.yourealwaysbe.puz.io.SmartGamesJSONIO
 import app.crossword.yourealwaysbe.puz.Puzzle
 
 class ElPaisExpertoDownloader(
-    internalName : String,
+    downloaderID : DownloaderID,
     name : String,
 ) : AbstractDateDownloader(
-    internalName,
+    downloaderID,
     name,
     AbstractDateDownloader.DAYS_DAILY,
     Duration.ofHours(-1), // midnight, guessed

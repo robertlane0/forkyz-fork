@@ -72,6 +72,48 @@ import app.crossword.yourealwaysbe.puz.io.RCIJeuxMFJIO
 private val TAG = "ForkyzDownloaders"
 private val NUM_DOWNLOAD_THREADS = 3
 
+enum class DownloaderID(val id : String) {
+    DE_STANDAARD("destandaard"),
+    DE_TELEGRAAF("detelegraaf"),
+    EL_PAIS_EXPERTO("elpaisexperto"),
+    GUARDIAN_DAILY_CRYPTIC("guardian"),
+    GUARDIAN_WEEKLY_QUIPTIC("guardianQuiptic"),
+    HAM_ABEND("hamabend"),
+    INDEPENDENT_DAILY_CRYPTIC("independent"),
+    IRISH_NEWS_CRYPTIC("irishnewscryptic"),
+    JONESIN("jonesin"),
+    JOSEPH("Joseph"),
+    TWENTY_MINUTES("20minutes"),
+    LA_CROIX("lacroix"),
+    LA_TIMES("latimes"),
+    LE_PARISIEN_F1("leparisienf1"),
+    LE_PARISIEN_F2("leparisienf2"),
+    LE_PARISIEN_F3("leparisienf3"),
+    LE_PARISIEN_F4("leparisienf4"),
+    METRO_CRYPTIC("metrocryptic"),
+    METRO_QUICK("metroquick"),
+    NEWSDAY("newsday"),
+    NYT_SYNDICATED("nytsyndicated"),
+    NRC_IN_HET_MIDDEN("nrc_inhetmidden"),
+    NRC_SCRYPTO("nrc_scrypto"),
+    PREMIER("Premier"),
+    SHEFFER("Sheffer"),
+    SUD_OUEST_MOTS_CROISES("sudouestmotcroises"),
+    SUD_OUEST_MOTS_FLECHES("sudouestmotfleches"),
+    TF1_MOTS_CROISES("tf1motcroises"),
+    TF1_MOTS_FLECHES("tf1motfleches"),
+    UNIVERSAL("universal"),
+    USA_TODAY("usatoday"),
+    WAPO_SUNDAY("waposunday"),
+    WSJ("wsj"),
+    CRYPTIC_CRU("crypticcru"),
+    GUARDIAN_QUICK("guardianQuick"),
+    KEGLAR("keglar"),
+    PRIVATE_EYE("privateeye"),
+    PRZEKROJ("przekroj"),
+    CUSTOM("custom"),
+}
+
 interface DownloadersListener {
     /**
      * Called if no internet connection for download
@@ -155,7 +197,7 @@ class Downloaders(
 
     suspend fun getAutoDownloaders() : List<Downloader> {
         return getDownloaders().filter {
-            settings.autoDownloaders.contains(it.internalName)
+            settings.enabledAuto(it.downloaderID)
         }
     }
 
@@ -278,9 +320,9 @@ class Downloaders(
     suspend fun getDownloaders() : List<Downloader> {
         val downloaders : MutableList<Downloader> = mutableListOf()
 
-        if (settings.downloadDeStandaard) {
+        if (settings.enabled(DownloaderID.DE_STANDAARD)) {
             downloaders.add(KeesingDownloader(
-                "destandaard",
+                DownloaderID.DE_STANDAARD,
                 utils.getString(Res.string.de_standaard),
                 AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofHours(-1), // midnight, tested
@@ -291,9 +333,9 @@ class Downloaders(
             ))
         }
 
-        if (settings.downloadDeTelegraaf) {
+        if (settings.enabled(DownloaderID.DE_TELEGRAAF)) {
             downloaders.add(AbstractDateDownloader(
-                "detelegraaf",
+                DownloaderID.DE_TELEGRAAF,
                 utils.getString(Res.string.de_telegraaf),
                 AbstractDateDownloader.DAYS_SUNDAY,
                 Duration.ofHours(-1), // midnight, tested
@@ -305,30 +347,30 @@ class Downloaders(
             ))
         }
 
-        if (settings.downloadElPaisExperto) {
+        if (settings.enabled(DownloaderID.EL_PAIS_EXPERTO)) {
             downloaders.add(ElPaisExpertoDownloader(
-                "elpaisexperto",
+                DownloaderID.EL_PAIS_EXPERTO,
                 utils.getString(Res.string.elpais_experto),
             ))
         }
 
-        if (settings.downloadGuardianDailyCryptic) {
+        if (settings.enabled(DownloaderID.GUARDIAN_DAILY_CRYPTIC)) {
             downloaders.add(GuardianDailyCrypticDownloader(
-                "guardian",
+                DownloaderID.GUARDIAN_DAILY_CRYPTIC,
                 utils.getString(Res.string.guardian_daily),
             ))
         }
 
-        if (settings.downloadGuardianWeeklyQuiptic) {
+        if (settings.enabled(DownloaderID.GUARDIAN_WEEKLY_QUIPTIC)) {
             downloaders.add(GuardianWeeklyQuipticDownloader(
-                "guardianQuiptic",
+                DownloaderID.GUARDIAN_WEEKLY_QUIPTIC,
                 utils.getString(Res.string.guardian_quiptic),
             ))
         }
 
-        if (settings.downloadHamAbend) {
+        if (settings.enabled(DownloaderID.HAM_ABEND)) {
             downloaders.add(RaetselZentraleSchwedenDownloader(
-                "hamabend",
+                DownloaderID.HAM_ABEND,
                 utils.getString(Res.string.hamburger_abendblatt_daily),
                 "hhab",
                 AbstractDateDownloader.DAYS_DAILY,
@@ -340,9 +382,9 @@ class Downloaders(
             ))
         }
 
-        if (settings.downloadIndependentDailyCryptic) {
+        if (settings.enabled(DownloaderID.INDEPENDENT_DAILY_CRYPTIC)) {
             downloaders.add(AbstractDateDownloader(
-                "independent",
+                DownloaderID.INDEPENDENT_DAILY_CRYPTIC,
                 utils.getString(Res.string.independent_daily),
                 AbstractDateDownloader.DAYS_DAILY,
                 Duration.ZERO, // midnight UK (actually further in advance)
@@ -355,9 +397,9 @@ class Downloaders(
             ))
         }
 
-        if (settings.downloadIrishNewsCryptic) {
+        if (settings.enabled(DownloaderID.IRISH_NEWS_CRYPTIC)) {
             downloaders.add(AbstractDateDownloader(
-                "irishnewscryptic",
+                DownloaderID.IRISH_NEWS_CRYPTIC,
                 utils.getString(Res.string.irish_news_cryptic),
                 AbstractDateDownloader.DAYS_WEEKDAY,
                 Duration.ZERO,
@@ -369,9 +411,9 @@ class Downloaders(
              ))
         }
 
-        if (settings.downloadJonesin) {
+        if (settings.enabled(DownloaderID.JONESIN)) {
             downloaders.add(AbstractDateDownloader(
-                "jonesin",
+                DownloaderID.JONESIN,
                 utils.getString(Res.string.jonesin_crosswords),
                 AbstractDateDownloader.DAYS_THURSDAY,
                 Duration.ofDays(-2), // by experiment
@@ -383,12 +425,12 @@ class Downloaders(
             ))
         }
 
-        if (settings.downloadJoseph) {
+        if (settings.enabled(DownloaderID.JOSEPH)) {
             val arkadiumUrl = "https://www.arkadium.com/games/" +
                 "joseph-crossword-kingsfeatures/"
             downloaders.add(KingDigitalLoginDownloader(
                 "Joseph",
-                "Joseph",
+                DownloaderID.JOSEPH,
                 utils.getString(Res.string.joseph_crossword),
                 AbstractDateDownloader.DAYS_NO_SUNDAY,
                 Duration.ofDays(-20), // by experiment
@@ -402,9 +444,9 @@ class Downloaders(
             ))
         }
 
-        if (settings.download20Minutes) {
+        if (settings.enabled(DownloaderID.TWENTY_MINUTES)) {
             downloaders.add(AbstractDateDownloader(
-                "20minutes",
+                DownloaderID.TWENTY_MINUTES,
                 utils.getString(Res.string.vingminutes),
                 AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofHours(1), // by experiment
@@ -415,9 +457,9 @@ class Downloaders(
             ))
         }
 
-        if (settings.downloadLaCroix) {
+        if (settings.enabled(DownloaderID.LA_CROIX)) {
             downloaders.add(AbstractRCIJeuxMXJDateDownloader.buildMCJ(
-                "lacroix",
+                DownloaderID.LA_CROIX,
                 utils.getString(Res.string.la_croix),
                 AbstractDateDownloader.DAYS_WEEKDAY,
                 Duration.ofHours(1),
@@ -431,16 +473,16 @@ class Downloaders(
             ))
         }
 
-        if (settings.downloadLATimes) {
+        if (settings.enabled(DownloaderID.LA_TIMES)) {
             downloaders.add(LATimesDownloader(
-                "latimes",
+                DownloaderID.LA_TIMES,
                 utils.getString(Res.string.la_times),
             ))
         }
 
-        if (settings.downloadLeParisienF1) {
+        if (settings.enabled(DownloaderID.LE_PARISIEN_F1)) {
             downloaders.add(AbstractRCIJeuxMXJDateDownloader.buildMFJ(
-                "leparisienf1",
+                DownloaderID.LE_PARISIEN_F1,
                 utils.getString((Res.string.le_parisien_daily_f1)),
                 AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofHours(1),
@@ -454,9 +496,9 @@ class Downloaders(
             ))
         }
 
-        if (settings.downloadLeParisienF2) {
+        if (settings.enabled(DownloaderID.LE_PARISIEN_F2)) {
             downloaders.add(AbstractRCIJeuxMXJDateDownloader.buildMFJ(
-                "leparisienf2",
+                DownloaderID.LE_PARISIEN_F2,
                 utils.getString((Res.string.le_parisien_daily_f2)),
                 AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofHours(1),
@@ -470,9 +512,9 @@ class Downloaders(
             ))
         }
 
-        if (settings.downloadLeParisienF3) {
+        if (settings.enabled(DownloaderID.LE_PARISIEN_F3)) {
             downloaders.add(AbstractRCIJeuxMXJDateDownloader.buildMFJ(
-                "leparisienf3",
+                DownloaderID.LE_PARISIEN_F3,
                 utils.getString((Res.string.le_parisien_daily_f3)),
                 AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofHours(1),
@@ -486,9 +528,9 @@ class Downloaders(
             ))
         }
 
-        if (settings.downloadLeParisienF4) {
+        if (settings.enabled(DownloaderID.LE_PARISIEN_F4)) {
             downloaders.add(AbstractRCIJeuxMXJDateDownloader.buildMFJ(
-                "leparisienf4",
+                DownloaderID.LE_PARISIEN_F4,
                 utils.getString((Res.string.le_parisien_daily_f4)),
                 AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofHours(1),
@@ -502,9 +544,9 @@ class Downloaders(
             ))
         }
 
-        if (settings.downloadMetroCryptic) {
+        if (settings.enabled(DownloaderID.METRO_CRYPTIC)) {
             downloaders.add(AbstractDateDownloader(
-                "metrocryptic",
+                DownloaderID.METRO_CRYPTIC,
                 utils.getString(Res.string.metro_cryptic),
                 AbstractDateDownloader.DAYS_NO_SUNDAY,
                 Duration.ZERO,
@@ -516,9 +558,9 @@ class Downloaders(
             ))
         }
 
-        if (settings.downloadMetroQuick) {
+        if (settings.enabled(DownloaderID.METRO_QUICK)) {
             downloaders.add(AbstractDateDownloader(
-                "metroquick",
+                DownloaderID.METRO_QUICK,
                 utils.getString(Res.string.metro_quick),
                 AbstractDateDownloader.DAYS_NO_SUNDAY,
                 Duration.ZERO,
@@ -530,9 +572,9 @@ class Downloaders(
             ))
         }
 
-        if (settings.downloadNewsday) {
+        if (settings.enabled(DownloaderID.NEWSDAY)) {
             downloaders.add(AbstractDateDownloader(
-                "newsday",
+                DownloaderID.NEWSDAY,
                 utils.getString(Res.string.newsday),
                 AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofHours(5), // midnight US? (by experiment)
@@ -546,9 +588,9 @@ class Downloaders(
             ))
         }
 
-        if (settings.downloadNewYorkTimesSyndicated) {
+        if (settings.enabled(DownloaderID.NYT_SYNDICATED)) {
             downloaders.add(AbstractDateDownloader(
-                "nytsyndicated",
+                DownloaderID.NYT_SYNDICATED,
                 utils.getString(Res.string.new_york_times_syndicated),
                 AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofHours(5), // guess midnight NY
@@ -563,9 +605,9 @@ class Downloaders(
             ))
         }
 
-        if (settings.downloadNRCInHetMidden) {
+        if (settings.enabled(DownloaderID.NRC_IN_HET_MIDDEN)) {
             downloaders.add(WithMetaDataDownloader(
-                "nrc_inhetmidden",
+                DownloaderID.NRC_IN_HET_MIDDEN,
                 utils.getString(Res.string.nrc_in_het_midden),
                 AbstractDateDownloader.DAYS_WEEKDAY,
                 Duration.ofHours(1), // Wild guess
@@ -579,9 +621,9 @@ class Downloaders(
             ))
         }
 
-        if (settings.downloadNRCScrypto) {
+        if (settings.enabled(DownloaderID.NRC_SCRYPTO)) {
             downloaders.add(WithMetaDataDownloader(
-                "nrc_scrypto",
+                DownloaderID.NRC_SCRYPTO,
                 utils.getString(Res.string.nrc_scrypto),
                 AbstractDateDownloader.DAYS_SATURDAY,
                 Duration.ofHours(1), // Wild guess
@@ -595,12 +637,12 @@ class Downloaders(
             ))
         }
 
-        if (settings.downloadPremier) {
+        if (settings.enabled(DownloaderID.PREMIER)) {
             val arkadiumUrl = "https://www.arkadium.com/games/" +
                 "premier-crossword-kingsfeatures/"
             downloaders.add(KingDigitalLoginDownloader(
                 "Premier",
-                "Premier",
+                DownloaderID.PREMIER,
                 utils.getString(Res.string.premier_crossword),
                 AbstractDateDownloader.DAYS_SUNDAY,
                 Duration.ofHours(0), // guess midnight NY
@@ -614,12 +656,12 @@ class Downloaders(
             ))
         }
 
-        if (settings.downloadSheffer) {
+        if (settings.enabled(DownloaderID.SHEFFER)) {
             val arkadiumUrl = "'https://www.arkadium.com/games/" +
                 "sheffer-crossword-kingsfeatures/'"
             downloaders.add(KingDigitalLoginDownloader(
                 "Sheffer",
-                "Sheffer",
+                DownloaderID.SHEFFER,
                 utils.getString(Res.string.sheffer_crossword),
                 AbstractDateDownloader.DAYS_NO_SUNDAY,
                 Duration.ofDays(-20), // from full puzzle list during login
@@ -633,9 +675,9 @@ class Downloaders(
             ))
         }
 
-        if (settings.downloadSudOuestMotsCroises) {
+        if (settings.enabled(DownloaderID.SUD_OUEST_MOTS_CROISES)) {
             downloaders.add(AbstractRCIJeuxMXJDateDownloader.buildMCJ(
-                "sudouestmotcroises",
+                DownloaderID.SUD_OUEST_MOTS_CROISES,
                 utils.getString((Res.string.sud_ouest_mots_croises)),
                 AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofHours(1),
@@ -648,9 +690,9 @@ class Downloaders(
             ))
         }
 
-        if (settings.downloadSudOuestMotsFleches) {
+        if (settings.enabled(DownloaderID.SUD_OUEST_MOTS_FLECHES)) {
             downloaders.add(AbstractRCIJeuxMXJDateDownloader.buildMFJ(
-                "sudouestmotfleches",
+                DownloaderID.SUD_OUEST_MOTS_FLECHES,
                 utils.getString((Res.string.sud_ouest_mots_fleches)),
                 AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofHours(1),
@@ -663,9 +705,9 @@ class Downloaders(
             ))
         }
 
-        if (settings.downloadTF1MotsCroises) {
+        if (settings.enabled(DownloaderID.TF1_MOTS_CROISES)) {
             downloaders.add(AbstractRCIJeuxMXJDateDownloader.buildMCJ(
-                "tf1motcroises",
+                DownloaderID.TF1_MOTS_CROISES,
                 utils.getString((Res.string.tf1_mots_croises)),
                 AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofHours(1),
@@ -678,9 +720,9 @@ class Downloaders(
             ))
         }
 
-        if (settings.downloadTF1MotsFleches) {
+        if (settings.enabled(DownloaderID.TF1_MOTS_FLECHES)) {
             downloaders.add(AbstractRCIJeuxMXJDateDownloader.buildMFJ(
-                "tf1motfleches",
+                DownloaderID.TF1_MOTS_FLECHES,
                 utils.getString((Res.string.tf1_mots_fleches)),
                 AbstractDateDownloader.DAYS_DAILY,
                 Duration.ofHours(1),
@@ -693,9 +735,9 @@ class Downloaders(
             ))
         }
 
-        if (settings.downloadUniversal) {
+        if (settings.enabled(DownloaderID.UNIVERSAL)) {
             downloaders.add(UclickDownloader(
-                "universal",
+                DownloaderID.UNIVERSAL,
                 "fcx",
                 utils.getString(Res.string.universal_crossword),
                 utils.getString(Res.string.uclick_copyright),
@@ -706,9 +748,9 @@ class Downloaders(
             ))
         }
 
-        if (settings.downloadUSAToday) {
+        if (settings.enabled(DownloaderID.USA_TODAY)) {
             downloaders.add(UclickDownloader(
-                "usatoday",
+                DownloaderID.USA_TODAY,
                 "usaon",
                 utils.getString(Res.string.usa_today),
                 utils.getString(Res.string.usa_today),
@@ -719,9 +761,9 @@ class Downloaders(
             ))
         }
 
-        if (settings.downloadWaPoSunday) {
+        if (settings.enabled(DownloaderID.WAPO_SUNDAY)) {
             downloaders.add(AbstractDateDownloader(
-                "waposunday",
+                DownloaderID.WAPO_SUNDAY,
                 utils.getString(Res.string.washington_post_sunday),
                 AbstractDateDownloader.DAYS_SUNDAY,
                 Duration.ofHours(-1), // by experiment
@@ -732,9 +774,9 @@ class Downloaders(
             ))
         }
 
-        if (settings.downloadWsj) {
+        if (settings.enabled(DownloaderID.WSJ)) {
             downloaders.add(AbstractDateDownloader(
-                "wsj",
+                DownloaderID.WSJ,
                 utils.getString(Res.string.wall_street_journal),
                 AbstractDateDownloader.DAYS_NO_SUNDAY,
                 Duration.ofHours(-3), // by experiment
@@ -747,42 +789,42 @@ class Downloaders(
 
         addCustomDownloaders(downloaders)
 
-        if (settings.scrapeCru) {
+        if (settings.enabled(DownloaderID.CRYPTIC_CRU)) {
             downloaders.add(PageScraper.Puz(
                 // certificate doesn't seem to work for me
                 // "https://theworld.com/~wij/puzzles/cru/index.html",
                 "https://archive.nytimes.com/www.nytimes.com/premium/xword/cryptic-archive.html",
-                "crypticcru",
+                DownloaderID.CRYPTIC_CRU,
                 utils.getString(Res.string.cru_puzzle_workshop),
                 "https://archive.nytimes.com/www.nytimes.com/premium/xword/cryptic-archive.html",
             ))
         }
 
-        if (settings.scrapeKegler) {
+        if (settings.enabled(DownloaderID.KEGLAR)) {
             downloaders.add(PageScraper.Puz(
                 "https://kegler.gitlab.io/Block_style/index.html",
-                "keglar",
+                DownloaderID.KEGLAR,
                 utils.getString(Res.string.keglars_cryptics),
                 "https://kegler.gitlab.io/",
             ))
         }
 
-        if (settings.scrapePrivateEye) {
+        if (settings.enabled(DownloaderID.PRIVATE_EYE)) {
             downloaders.add(PageScraper.Puz(
                 "https://www.private-eye.co.uk/pictures/crossword/download/",
-                "privateeye",
+                DownloaderID.PRIVATE_EYE,
                 utils.getString(Res.string.private_eye),
                 "https://shop.private-eye.co.uk",
                 true, // download from end of page
             ))
         }
 
-        if (settings.scrapePrzekroj) {
+        if (settings.enabled(DownloaderID.PRZEKROJ)) {
             downloaders.add(PageScraper(
                 "https://przekroj.org/krzyzowki/.*",
                 PrzekrojIO(),
                 "https://przekroj.org/humor-rozmaitosci/krzyzowki/",
-                "przekroj",
+                DownloaderID.PRZEKROJ,
                 utils.getString(Res.string.przekroj),
                 "https://przekroj.pl/sklep",
                 true, // share file url
@@ -790,12 +832,12 @@ class Downloaders(
             ))
         }
 
-        if (settings.scrapeGuardianQuick) {
+        if (settings.enabled(DownloaderID.GUARDIAN_QUICK)) {
             downloaders.add(PageScraper(
                 "https://www.theguardian.com/crosswords/quick/\\d*",
                 GuardianJSONIO(),
                 "https://www.theguardian.com/crosswords/series/quick",
-                "guardianQuick",
+                DownloaderID.GUARDIAN_QUICK,
                 utils.getString(Res.string.guardian_quick),
                 "https://support.theguardian.com",
                 true, // share file url
@@ -811,7 +853,7 @@ class Downloaders(
     private suspend fun addCustomDownloaders(
         downloaders : MutableList<Downloader>,
     ) {
-        if (settings.downloadCustomDaily) {
+        if (settings.enabled(DownloaderID.CUSTOM)) {
             var title = settings.customDailyTitle
             if (title.trim().isEmpty())
                 title = utils.getString(Res.string.custom_daily_title)
@@ -820,7 +862,11 @@ class Downloaders(
 
             if (!urlDateFormatPattern.trim().isEmpty()) {
                 downloaders.add(
-                    CustomDailyDownloader("custom", title, urlDateFormatPattern),
+                    CustomDailyDownloader(
+                        DownloaderID.CUSTOM,
+                        title,
+                        urlDateFormatPattern,
+                    ),
                 )
             }
         }

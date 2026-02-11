@@ -20,7 +20,7 @@ private const val TAG = "WithMetaDataDownloader"
  * Provide non-null meta data and will be used to override IO output.
  */
 class WithMetaDataDownloader(
-    internalName : String,
+    downloaderID : DownloaderID,
     downloaderName : String,
     days : Array<DayOfWeek>,
     utcAvailabilityOffset : Duration,
@@ -31,7 +31,7 @@ class WithMetaDataDownloader(
     private val title : String? = null,
     private val author : String? = null,
 ) : AbstractDateDownloader(
-    internalName,
+    downloaderID,
     downloaderName,
     days,
     utcAvailabilityOffset,

@@ -45,7 +45,7 @@ import app.crossword.yourealwaysbe.puz.io.JPZIO
  */
 class KingDigitalLoginDownloader(
     crosswordSet : String,
-    internalName : String,
+    downloaderID : DownloaderID,
     downloaderName : String,
     days : Array<DayOfWeek>,
     utcAvailabilityOffset : Duration,
@@ -57,7 +57,7 @@ class KingDigitalLoginDownloader(
     private val requestSourcePrefix : String,
     private val q : String,
 ) : AbstractDateDownloader(
-    internalName,
+    downloaderID,
     downloaderName,
     days,
     utcAvailabilityOffset,

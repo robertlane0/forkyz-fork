@@ -15,7 +15,7 @@ import app.crossword.yourealwaysbe.puz.io.KeesingXMLIO
  * Assuming that archives are not available.
  */
 class KeesingDownloader(
-    internalName : String,
+    downloaderID : DownloaderID,
     name : String,
     days : Array<DayOfWeek>,
     utcAvailabilityOffset : Duration,
@@ -24,7 +24,7 @@ class KeesingDownloader(
     private val clientID : String,
     private val puzzleSetID : String,
 ) : AbstractDateDownloader(
-    internalName,
+    downloaderID,
     name,
     days,
     utcAvailabilityOffset,

@@ -60,7 +60,7 @@ fun DownloadDialog(
         // do nothing yet
         if (downloaders.size > 0) {
             val selected = (0 until downloaders.size).filter {
-                state.selected.contains(downloaders.get(it).internalName)
+                state.selected.contains(downloaders.get(it).downloaderID)
             }.toSet()
 
             MultiListDialog(
@@ -77,7 +77,7 @@ fun DownloadDialog(
                 onSelectionChange = { newSelection ->
                     viewModel.setSelection(
                         newSelection.filter { 0 <= it && it < downloaders.size }
-                            .map { downloaders[it].internalName }
+                            .map { downloaders[it].downloaderID }
                             .toSet()
                     )
                 },

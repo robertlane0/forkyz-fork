@@ -37,9 +37,9 @@ interface Downloader {
     }
 
     /**
-     * Constant internal name (for e.g. storing in prefs)
+     * Constant internal identifier (for e.g. storing in prefs)
      */
-    val internalName : String
+    val downloaderID : DownloaderID
 
     /**
      * Human readable / local configurable name

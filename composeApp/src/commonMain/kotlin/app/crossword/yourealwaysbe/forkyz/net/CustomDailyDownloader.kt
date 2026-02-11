@@ -16,11 +16,11 @@ import app.crossword.yourealwaysbe.puz.io.PuzzleStreamReader
  * @param urlDateFormatPattern java date format string for creating URL
  */
 class CustomDailyDownloader(
-    internalName : String,
+    downloaderID : DownloaderID,
     title : String,
     urlDateFormatPattern : String?,
 ) : AbstractDateDownloader(
-    internalName,
+    downloaderID,
     title,
     DAYS_DAILY,  // Currently no option to configure availability time
     Duration.ZERO,

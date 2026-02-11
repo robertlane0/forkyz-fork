@@ -28,45 +28,7 @@ class DownloadersTest(
 ) {
     companion object {
         private val settings = DownloadersSettings(
-            true, // downloadDeStandaard
-            true, // downloadDeTelegraaf
-            true, // downloadElPaisExperto
-            true, // downloadGuardianDailyCryptic
-            true, // downloadGuardianWeeklyQuiptic
-            true, // downloadHamAbend
-            true, // downloadIndependentDailyCryptic
-            true, // downloadIrishNewsCryptic
-            true, // downloadJonesin
-            true, // downloadJoseph
-            true, // download20Minutes
-            true, // downloadLaCroix
-            true, // downloadLATimes
-            true, // downloadLeParisienF1
-            true, // downloadLeParisienF2
-            true, // downloadLeParisienF3
-            true, // downloadLeParisienF4
-            true, // downloadMetroCryptic
-            true, // downloadMetroQuick
-            true, // downloadNewsday
-            true, // downloadNewYorkTimesSyndicated
-            true, // downloadNRCInHetMidden
-            true, // downloadNRCScrypto
-            true, // downloadPremier
-            true, // downloadSheffer
-            true, // downloadSudOuestMotsCroises
-            true, // downloadSudOuestMotsFleches
-            true, // downloadTF1MotsCroises
-            true, // downloadTF1MotsFleches
-            true, // downloadUniversal
-            true, // downloadUSAToday
-            true, // downloadWaPoSunday
-            true, // downloadWsj
-            true, // scrapeCru
-            true, // scrapeGuardianQuick
-            true, // scrapeKegler
-            true, // scrapePrivateEye
-            true, // scrapePrzekroj
-            false, // downloadCustomDaily
+            setOf(DownloaderID.CUSTOM.id), // disabledDownloaders (custom daily disabled)
             "", // customDailyTitle,
             "", // customDailyUrl,
             true, // suppressSummaryNotifications,
@@ -80,7 +42,7 @@ class DownloadersTest(
          * Parameters are the list of downloaders
          *
          * Gotten from the Downloaders class. Returned as a list of pairs:
-         * (internalName, downloader).
+         * (downloaderID, downloader).
          */
         @Parameters(name = "Downloader {0}")
         @JvmStatic
@@ -97,7 +59,7 @@ class DownloadersTest(
 
                 override fun get(i : Int) : Array<Any> {
                     val d = downloaders.get(i)
-                    return arrayOf(d.internalName, d)
+                    return arrayOf(d.downloaderID.id, d)
                 }
             }
         }

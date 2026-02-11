@@ -17,10 +17,10 @@ import app.crossword.yourealwaysbe.puz.io.GuardianJSONIO
  * Date = Daily
  */
 class GuardianDailyCrypticDownloader(
-    internalName : String,
+    downloaderID : DownloaderID,
     name : String,
 ) : AbstractDateDownloader(
-    internalName,
+    downloaderID,
     name,
     DAYS_WEEKDAY,
     Duration.ZERO,  // TODO: availability time

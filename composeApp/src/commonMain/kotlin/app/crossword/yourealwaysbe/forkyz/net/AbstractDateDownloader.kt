@@ -23,7 +23,7 @@ import app.crossword.yourealwaysbe.puz.io.PuzzleParser
  * For downloads from sites that published puzzles on a given date. Each
  * date has one unique puzzle.
  *
- * @param internalName the name used to identify the downloader in
+ * @param downloaderID the identifier used to identify the downloader in
  * backend settings (should be constant).
  * @param name the human-readable name (can change based
  * on e.g. language settings).
@@ -49,7 +49,7 @@ import app.crossword.yourealwaysbe.puz.io.PuzzleParser
  * override getGoodFrom. Epoch 0 by default.
  */
 open class AbstractDateDownloader constructor(
-    override val internalName : String,
+    override val downloaderID : DownloaderID,
     override val name : String,
     private val days : Array<DayOfWeek>,
     protected val utcAvailabilityOffset : Duration,

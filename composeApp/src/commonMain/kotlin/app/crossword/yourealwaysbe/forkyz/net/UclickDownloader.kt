@@ -16,7 +16,7 @@ import app.crossword.yourealwaysbe.puz.io.UclickXMLIO
  * fcx (Universal) = Daily
  */
 class UclickDownloader(
-    internalName : String,
+    downloaderID : DownloaderID,
     shortName : String,
     fullName : String,
     private val copyright : String?,
@@ -25,7 +25,7 @@ class UclickDownloader(
     utcAvailabilityOffset : Duration,
     shareUrlPattern : String?,
 ) : AbstractDateDownloader(
-    internalName,
+    downloaderID,
     fullName,
     days,
     utcAvailabilityOffset,

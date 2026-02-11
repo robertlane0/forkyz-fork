@@ -25,7 +25,7 @@ import app.crossword.yourealwaysbe.puz.io.RCIJeuxMFJIO
  * 14 for fortnightly)
  */
 class AbstractRCIJeuxMXJDateDownloader private constructor(
-    internalName : String,
+    downloaderID : DownloaderID,
     downloaderName : String,
     days : Array<DayOfWeek>,
     utcAvailabilityOffset : Duration,
@@ -37,7 +37,7 @@ class AbstractRCIJeuxMXJDateDownloader private constructor(
     private val baseDate : LocalDate,
     private val daysBetween : Int
 ) : AbstractDateDownloader(
-    internalName,
+    downloaderID,
     downloaderName,
     days,
     utcAvailabilityOffset,
@@ -103,7 +103,7 @@ class AbstractRCIJeuxMXJDateDownloader private constructor(
             = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
         fun buildMFJ(
-            internalName : String,
+            downloaderID : DownloaderID,
             downloaderName : String,
             days : Array<DayOfWeek>,
             utcAvailabilityOffset : Duration,
@@ -115,7 +115,7 @@ class AbstractRCIJeuxMXJDateDownloader private constructor(
             daysBetween : Int
         ) : AbstractRCIJeuxMXJDateDownloader {
             return AbstractRCIJeuxMXJDateDownloader(
-                internalName,
+                downloaderID,
                 downloaderName,
                 days,
                 utcAvailabilityOffset,
@@ -130,7 +130,7 @@ class AbstractRCIJeuxMXJDateDownloader private constructor(
         }
 
         fun buildMCJ(
-            internalName : String,
+            downloaderID : DownloaderID,
             downloaderName : String,
             days : Array<DayOfWeek>,
             utcAvailabilityOffset : Duration,
@@ -142,7 +142,7 @@ class AbstractRCIJeuxMXJDateDownloader private constructor(
             daysBetween : Int
         ) : AbstractRCIJeuxMXJDateDownloader {
             return AbstractRCIJeuxMXJDateDownloader(
-                internalName,
+                downloaderID,
                 downloaderName,
                 days,
                 utcAvailabilityOffset,

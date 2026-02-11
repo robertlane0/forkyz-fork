@@ -14,14 +14,14 @@ import app.crossword.yourealwaysbe.puz.io.JPZIO
  */
 class KingDigitalDownloader(
     crosswordSet : String,
-    internalName : String,
+    downloaderID : DownloaderID,
     downloaderName : String,
     days : Array<DayOfWeek>,
     utcAvailabilityOffset : Duration,
     supportUrl : String?,
     shareUrlPattern : String?
 ) : AbstractDateDownloader(
-    internalName,
+    downloaderID,
     downloaderName,
     days,
     utcAvailabilityOffset,

@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
 import app.crossword.yourealwaysbe.forkyz.net.Downloader
+import app.crossword.yourealwaysbe.forkyz.net.DownloaderID
 import app.crossword.yourealwaysbe.forkyz.net.Downloaders
 import app.crossword.yourealwaysbe.forkyz.net.DownloadersProvider
 import app.crossword.yourealwaysbe.forkyz.util.MediatedStateWithFlow
@@ -29,7 +30,7 @@ fun isAvailableNow(availableHours : Long?, available : Boolean) : Boolean {
 /**
  * Info on a downloader to display
  *
- * @param downloaderId the internal name (id) of the downloader
+ * @param downloaderID the internal name (id) of the downloader
  * @param displayName the resource string of the name to display the
  * downloader with
  * @param availableHours how many hours until the downloader is
@@ -37,7 +38,7 @@ fun isAvailableNow(availableHours : Long?, available : Boolean) : Boolean {
  * @param availableNow if available now
  */
 data class DownloaderData(
-    val internalName : String,
+    val downloaderID : DownloaderID,
     val displayName : String,
     val availableHours : Long?,
     val availableNow : Boolean,
@@ -53,7 +54,7 @@ data class DownloaderData(
 data class DownloaderDialogUIState (
     val date : LocalDate = LocalDate.now(),
     val downloaders : List<DownloaderData>? = null,
-    val selected : Set<String> = setOf(),
+    val selected : Set<DownloaderID> = setOf(),
 )
 
 class DownloadDialogViewModel(
@@ -84,7 +85,7 @@ class DownloadDialogViewModel(
             viewModelScope.launch {
                 cb(
                     downloaders.getDownloaders().filter { downloader ->
-                        if (downloader.internalName in state.selected) {
+                        if (downloader.downloaderID in state.selected) {
                             isAvailableNow(
                                 downloader.getUntilAvailable(date)?.toHours(),
                                 downloader.isAvailable(date),
@@ -115,7 +116,7 @@ class DownloadDialogViewModel(
     /**
      * Set selection to set of internal ids
      */
-    fun setSelection(newSelection : Set<String>) {
+    fun setSelection(newSelection : Set<DownloaderID>) {
         mediatedUIState.current = mediatedUIState.current
             .copy(selected = newSelection)
     }
@@ -139,7 +140,7 @@ class DownloadDialogViewModel(
                     downloader.isAvailable(date),
                 )
                 DownloaderData(
-                    internalName = downloader.internalName,
+                    downloaderID = downloader.downloaderID,
                     displayName = downloader.name,
                     availableHours = availableHours,
                     availableNow = availableNow,
@@ -149,7 +150,7 @@ class DownloadDialogViewModel(
         val selected = if (
             (state.downloaders?.isEmpty() ?: true) && state.selected.isEmpty()
         ) {
-            downloaders.map { it.internalName }.toSet()
+            downloaders.map { it.downloaderID }.toSet()
         } else {
             state.selected
         }

@@ -32,7 +32,7 @@ open class PageScraper(
     regexFile : String,
     private val parser : PuzzleParser,
     private val scrapeUrl : String,
-    override val internalName : String,
+    override val downloaderID : DownloaderID,
     override val name : String,
     override val supportUrl : String?,
     private val shareFileUrl : Boolean,
@@ -42,7 +42,7 @@ open class PageScraper(
 
     class Puz(
         scrapeUrl : String,
-        internalName : String,
+        downloaderID : DownloaderID,
         name : String,
         supportUrl : String?,
         readReverse : Boolean,
@@ -50,7 +50,7 @@ open class PageScraper(
         REGEX_PUZ,
         IO(),
         scrapeUrl,
-        internalName,
+        downloaderID,
         name,
         supportUrl,
         false,
@@ -58,10 +58,10 @@ open class PageScraper(
     ) {
         constructor(
             scrapeUrl : String,
-            internalName : String,
+            downloaderID : DownloaderID,
             name : String,
             supportUrl : String?,
-        ) : this(scrapeUrl, internalName, name, supportUrl, false)
+        ) : this(scrapeUrl, downloaderID, name, supportUrl, false)
     }
 
     override fun toString() : String {

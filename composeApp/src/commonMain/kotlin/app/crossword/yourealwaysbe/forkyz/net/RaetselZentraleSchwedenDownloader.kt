@@ -28,7 +28,7 @@ import app.crossword.yourealwaysbe.puz.io.RaetselZentraleSchwedenJSONIO
  * https://raetsel.raetselzentrale.de/api/r/<idnumber>
  */
 class RaetselZentraleSchwedenDownloader(
-    internalName : String,
+    downloaderID : DownloaderID,
     name : String,
     shortName : String,
     days : Array<DayOfWeek>,
@@ -36,7 +36,7 @@ class RaetselZentraleSchwedenDownloader(
     supportUrl : String?,
     shareUrlPattern : String?
 ) : AbstractDateDownloader(
-    internalName,
+    downloaderID,
     name,
     days,
     utcAvailabilityOffset,

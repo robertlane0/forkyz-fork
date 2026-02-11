@@ -17,10 +17,10 @@ import app.crossword.yourealwaysbe.puz.io.GuardianJSONIO
  * Date = Weekly on Sundays
  */
 class GuardianWeeklyQuipticDownloader(
-    internalName : String,
+    downloaderID : DownloaderID,
     name : String,
 ) : AbstractDateDownloader(
-    internalName,
+    downloaderID,
     name,
     DAYS_SUNDAY,  // see isPublishedOnDay for logic over time
     Duration.ZERO,  // TODO: availability time

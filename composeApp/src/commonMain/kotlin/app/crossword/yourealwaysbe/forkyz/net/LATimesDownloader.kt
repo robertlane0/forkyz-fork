@@ -32,10 +32,10 @@ private val PUZZLES_FEED_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd")
  * Stage 2: get json from feedUrl and parse as TCA JSON
  */
 class LATimesDownloader(
-    internalName : String,
+    downloaderID : DownloaderID,
     downloaderName : String,
 ) : AbstractDateDownloader(
-    internalName,
+    downloaderID,
     downloaderName,
     DAYS_DAILY,
     Duration.ofDays(-5), // was 7 days ahead when checked

@@ -4,6 +4,8 @@ package app.crossword.yourealwaysbe.forkyz.settings
 import android.content.SharedPreferences
 import androidx.core.content.edit
 
+import app.crossword.yourealwaysbe.forkyz.net.DownloaderID
+
 /**
  * Migrate shared preferences to new settings
  */
@@ -194,67 +196,130 @@ fun migratePreferences(
         settings.setPlayDoubleTapFitBoard(it)
     }
     getBoolean(prefs, "download20Minutes")?.let {
-        settings.setDownload20Minutes(it)
+        settings.setDownloadEnableDownloader(
+            DownloaderID.TWENTY_MINUTES,
+            it,
+        )
     }
     getBoolean(prefs, "downloadCustomDaily")?.let {
-        settings.setDownloadCustomDaily(it)
+        settings.setDownloadEnableDownloader(
+            DownloaderID.CUSTOM,
+            it,
+        )
     }
     getBoolean(prefs, "downloadDeStandaard")?.let {
-        settings.setDownloadDeStandaard(it)
+        settings.setDownloadEnableDownloader(
+            DownloaderID.DE_STANDAARD,
+            it,
+        )
     }
     getBoolean(prefs, "downloadDeTelegraaf")?.let {
-        settings.setDownloadDeTelegraaf(it)
+        settings.setDownloadEnableDownloader(
+            DownloaderID.DE_TELEGRAAF,
+            it,
+        )
     }
     getBoolean(prefs, "downloadGuardianDailyCryptic")?.let {
-        settings.setDownloadGuardianDailyCryptic(it)
+        settings.setDownloadEnableDownloader(
+            DownloaderID.GUARDIAN_DAILY_CRYPTIC,
+            it,
+        )
     }
     getBoolean(prefs, "downloadGuardianWeeklyQuiptic")?.let {
-        settings.setDownloadGuardianWeeklyQuiptic(it)
+        settings.setDownloadEnableDownloader(
+            DownloaderID.GUARDIAN_WEEKLY_QUIPTIC,
+            it,
+        )
     }
     getBoolean(prefs, "downloadHamAbend")?.let {
-        settings.setDownloadHamAbend(it)
+        settings.setDownloadEnableDownloader(
+            DownloaderID.HAM_ABEND,
+            it,
+        )
     }
     getBoolean(prefs, "downloadIndependentDailyCryptic")?.let {
-        settings.setDownloadIndependentDailyCryptic(it)
+        settings.setDownloadEnableDownloader(
+            DownloaderID.INDEPENDENT_DAILY_CRYPTIC,
+            it,
+        )
     }
     getBoolean(prefs, "downloadIrishNewsCryptic")?.let {
-        settings.setDownloadIrishNewsCryptic(it)
+        settings.setDownloadEnableDownloader(
+            DownloaderID.IRISH_NEWS_CRYPTIC,
+            it,
+        )
     }
     getBoolean(prefs, "downloadJonesin")?.let {
-        settings.setDownloadJonesin(it)
+        settings.setDownloadEnableDownloader(
+            DownloaderID.JONESIN,
+            it,
+        )
     }
     getBoolean(prefs, "downloadJoseph")?.let {
-        settings.setDownloadJoseph(it)
+        settings.setDownloadEnableDownloader(
+            DownloaderID.JOSEPH,
+            it,
+        )
     }
     getBoolean(prefs, "downloadLeParisienF1")?.let {
-        settings.setDownloadLeParisienF1(it)
+        settings.setDownloadEnableDownloader(
+            DownloaderID.LE_PARISIEN_F1,
+            it,
+        )
     }
     getBoolean(prefs, "downloadLeParisienF2")?.let {
-        settings.setDownloadLeParisienF2(it)
+        settings.setDownloadEnableDownloader(
+            DownloaderID.LE_PARISIEN_F2,
+            it,
+        )
     }
     getBoolean(prefs, "downloadLeParisienF3")?.let {
-        settings.setDownloadLeParisienF3(it)
+        settings.setDownloadEnableDownloader(
+            DownloaderID.LE_PARISIEN_F3,
+            it,
+        )
     }
     getBoolean(prefs, "downloadLeParisienF4")?.let {
-        settings.setDownloadLeParisienF4(it)
+        settings.setDownloadEnableDownloader(
+            DownloaderID.LE_PARISIEN_F4,
+            it,
+        )
     }
     getBoolean(prefs, "downloadMetroCryptic")?.let {
-        settings.setDownloadMetroCryptic(it)
+        settings.setDownloadEnableDownloader(
+            DownloaderID.METRO_CRYPTIC,
+            it,
+        )
     }
     getBoolean(prefs, "downloadMetroQuick")?.let {
-        settings.setDownloadMetroQuick(it)
+        settings.setDownloadEnableDownloader(
+            DownloaderID.METRO_QUICK,
+            it,
+        )
     }
     getBoolean(prefs, "downloadNewYorkTimesSyndicated")?.let {
-        settings.setDownloadNewYorkTimesSyndicated(it)
+        settings.setDownloadEnableDownloader(
+            DownloaderID.NYT_SYNDICATED,
+            it,
+        )
     }
     getBoolean(prefs, "downloadNewsday")?.let {
-        settings.setDownloadNewsday(it)
+        settings.setDownloadEnableDownloader(
+            DownloaderID.NEWSDAY,
+            it,
+        )
     }
     getBoolean(prefs, "downloadPremier")?.let {
-        settings.setDownloadPremier(it)
+        settings.setDownloadEnableDownloader(
+            DownloaderID.PREMIER,
+            it,
+        )
     }
     getBoolean(prefs, "downloadSheffer")?.let {
-        settings.setDownloadSheffer(it)
+        settings.setDownloadEnableDownloader(
+            DownloaderID.SHEFFER,
+            it,
+        )
     }
     getString(prefs, "downloadTimeout")?.let {
         try {
@@ -264,16 +329,28 @@ fun migratePreferences(
         }
     }
     getBoolean(prefs, "downloadUSAToday")?.let {
-        settings.setDownloadUSAToday(it)
+        settings.setDownloadEnableDownloader(
+            DownloaderID.USA_TODAY,
+            it,
+        )
     }
     getBoolean(prefs, "downloadUniversal")?.let {
-        settings.setDownloadUniversal(it)
+        settings.setDownloadEnableDownloader(
+            DownloaderID.UNIVERSAL,
+            it,
+        )
     }
     getBoolean(prefs, "downloadWaPoSunday")?.let {
-        settings.setDownloadWaPoSunday(it)
+        settings.setDownloadEnableDownloader(
+            DownloaderID.WAPO_SUNDAY,
+            it,
+        )
     }
     getBoolean(prefs, "downloadWsj")?.let {
-        settings.setDownloadWsj(it)
+        settings.setDownloadEnableDownloader(
+            DownloaderID.WSJ,
+            it,
+        )
     }
     getBoolean(prefs, "duckDuckGoEnabled")?.let {
         settings.setExtDuckDuckGoEnabled(it)
@@ -426,19 +503,34 @@ fun migratePreferences(
         settings.setPlayScale(it)
     }
     getBoolean(prefs, "scrapeCru")?.let {
-        settings.setScrapeCru(it)
+        settings.setDownloadEnableDownloader(
+            DownloaderID.CRYPTIC_CRU,
+            it,
+        )
     }
     getBoolean(prefs, "scrapeGuardianQuick")?.let {
-        settings.setScrapeGuardianQuick(it)
+        settings.setDownloadEnableDownloader(
+            DownloaderID.GUARDIAN_QUICK,
+            it,
+        )
     }
     getBoolean(prefs, "scrapeKegler")?.let {
-        settings.setScrapeKegler(it)
+        settings.setDownloadEnableDownloader(
+            DownloaderID.KEGLAR,
+            it,
+        )
     }
     getBoolean(prefs, "scrapePrivateEye")?.let {
-        settings.setScrapePrivateEye(it)
+        settings.setDownloadEnableDownloader(
+            DownloaderID.PRIVATE_EYE,
+            it,
+        )
     }
     getBoolean(prefs, "scrapePrzekroj")?.let {
-        settings.setScrapePrzekroj(it)
+        settings.setDownloadEnableDownloader(
+            DownloaderID.PRZEKROJ,
+            it,
+        )
     }
     getBoolean(prefs, "scratchMode")?.let {
         settings.setPlayScratchMode(it)

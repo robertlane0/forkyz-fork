@@ -154,6 +154,8 @@ val DEFAULT_SETTINGS : Settings = Settings(
     downloadSudOuestMotsCroises = true,
     downloadTF1MotsCroises = true,
     dontSnapBoardToBorders = false,
+    disabledDownloaders = listOf(),
+    settingsVersion = DownloaderBooleanToSetMigration.MIGRATION_VERSION,
 )
 
 fun createDataStore(
@@ -166,5 +168,6 @@ fun createDataStore(
         producePath = producePath,
         serializer = SettingsSerializer(defaultSettings),
     ),
+    migrations = listOf(DownloaderBooleanToSetMigration()),
 )
 
