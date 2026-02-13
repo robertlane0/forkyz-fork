@@ -418,6 +418,20 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.wall_street_jo
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.washington_post_sunday
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.weekly_crosswords
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.weekly_crosswords_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_fri
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_fri_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_mon
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_mon_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_sat
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_sat_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_sun
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_sun_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_thu
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_thu_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_tue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_tue_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_wed
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_wed_desc
 import app.crossword.yourealwaysbe.forkyz.net.Downloader
 import app.crossword.yourealwaysbe.forkyz.net.DownloaderID
 import app.crossword.yourealwaysbe.forkyz.net.DownloadersProvider
@@ -445,22 +459,24 @@ import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.mediate
 import app.crossword.yourealwaysbe.forkyz.util.stateInSubscribed
 
-enum class SettingsPage(val title : StringResource) {
-    ROOT(Res.string.settings_label),
-    PUZZLE_SOURCES(Res.string.select_sources),
-    PUZZLE_SOURCES_DAILY(Res.string.daily_crosswords),
-    PUZZLE_SOURCES_WEEKLY(Res.string.weekly_crosswords),
-    PUZZLE_SOURCES_SCRAPERS(Res.string.scraper_sources),
-    DOWNLOAD(Res.string.download_settings),
-    DOWNLOAD_BACKGROUND(Res.string.background_download_opts),
-    BROWSER(Res.string.browser_settings),
-    DISPLAY(Res.string.display_settings),
-    INTERACTION(Res.string.interaction_settings),
-    KEYBOARD(Res.string.keyboard_settings),
-    VOICE_ACCESSIBILITY(Res.string.voice_settings),
-    EXTERNAL_TOOLS(Res.string.external_tools_settings),
-    EXPORT_IMPORT(Res.string.preferences_export_import),
-    SEARCH(Res.string.filter_settings_title),
+data class SettingsPage(val title : StringResource) {
+    companion object {
+        val ROOT = SettingsPage(Res.string.settings_label)
+        val PUZZLE_SOURCES = SettingsPage(Res.string.select_sources)
+        val PUZZLE_SOURCES_DAILY = SettingsPage(Res.string.daily_crosswords)
+        val PUZZLE_SOURCES_WEEKLY = SettingsPage(Res.string.weekly_crosswords)
+        val PUZZLE_SOURCES_SCRAPERS = SettingsPage(Res.string.scraper_sources)
+        val DOWNLOAD = SettingsPage(Res.string.download_settings)
+        val DOWNLOAD_BACKGROUND = SettingsPage(Res.string.background_download_opts)
+        val BROWSER = SettingsPage(Res.string.browser_settings)
+        val DISPLAY = SettingsPage(Res.string.display_settings)
+        val INTERACTION = SettingsPage(Res.string.interaction_settings)
+        val KEYBOARD = SettingsPage(Res.string.keyboard_settings)
+        val VOICE_ACCESSIBILITY = SettingsPage(Res.string.voice_settings)
+        val EXTERNAL_TOOLS = SettingsPage(Res.string.external_tools_settings)
+        val EXPORT_IMPORT = SettingsPage(Res.string.preferences_export_import)
+        val SEARCH = SettingsPage(Res.string.filter_settings_title)
+    }
 }
 
 /**
@@ -511,7 +527,8 @@ class SettingsBoolean(
     summary : StringResource?,
     val value : StateFlow<Boolean>,
     val setValue : (Boolean) -> Unit,
-    errorMsg : StateFlow<String?>? = null
+    errorMsg : StateFlow<String?>? = null,
+    val extraSettingsPage : SettingsPage? = null,
 ) : SettingsNamedItem(page, title, summary, errorMsg)
 
 enum class TriState {
@@ -1137,17 +1154,32 @@ class SettingsPageViewModel(
     private val downloadersTogglesDaily
         = downloadersDaily.map(this::makeDownloaderToggle)
 
+    private val downloadersExtraDaily
+        = downloadersDaily.flatMap(this::makeDownloaderExtraSettings)
+
     val downloadersTogglesCustomDaily
         = downloadersCustomDaily.map(this::makeDownloaderToggle)
+
+    private val downloadersExtraCustomDaily
+        = downloadersCustomDaily.flatMap(this::makeDownloaderExtraSettings)
 
     val downloadersTogglesWeeklyRegular
         = downloadersWeeklyRegular.map(this::makeDownloaderToggle)
 
+    private val downloadersExtraWeeklyRegular
+        = downloadersWeeklyRegular.flatMap(this::makeDownloaderExtraSettings)
+
     val downloadersTogglesWeeklyLarge
         = downloadersWeeklyLarge.map(this::makeDownloaderToggle)
 
+    private val downloadersExtraWeeklyLarge
+        = downloadersWeeklyLarge.flatMap(this::makeDownloaderExtraSettings)
+
     val downloadersTogglesScrapers
         = downloadersScrapers.map(this::makeDownloaderToggle)
+
+    private val downloadersExtraScrapers
+        = downloadersScrapers.flatMap(this::makeDownloaderExtraSettings)
 
     private val settingsItemsList : List<SettingsItem> = listOf(
         SettingsDynamicList<StorageLocation>(
@@ -1247,12 +1279,12 @@ class SettingsPageViewModel(
             Res.string.toggle_all_daily_sources_desc,
             downloadersTogglesDaily + downloadersTogglesCustomDaily,
         ),
-    ) + downloadersTogglesDaily + listOf(
+    ) + downloadersTogglesDaily + downloadersExtraDaily + listOf(
         SettingsHeading(
             SettingsPage.PUZZLE_SOURCES_DAILY,
             Res.string.custom_daily,
         ),
-    ) + downloadersTogglesCustomDaily + listOf(
+    ) + downloadersTogglesCustomDaily + downloadersExtraCustomDaily + listOf(
         SettingsString(
             SettingsPage.PUZZLE_SOURCES_DAILY,
             Res.string.custom_title,
@@ -1282,13 +1314,13 @@ class SettingsPageViewModel(
             Res.string.regular_sized,
             null,
         ),
-    ) + downloadersTogglesWeeklyRegular + listOf(
+    ) + downloadersTogglesWeeklyRegular + downloadersExtraWeeklyRegular + listOf(
         SettingsHeading(
             SettingsPage.PUZZLE_SOURCES_WEEKLY,
             Res.string.large_sized,
             null,
         ),
-    ) + downloadersTogglesWeeklyLarge + listOf(
+    ) + downloadersTogglesWeeklyLarge + downloadersExtraWeeklyLarge + listOf(
         SettingsTriState.build(
             viewModelScope,
             SettingsPage.PUZZLE_SOURCES_SCRAPERS,
@@ -1296,7 +1328,7 @@ class SettingsPageViewModel(
             Res.string.toggle_all_scrapers_desc,
             downloadersTogglesScrapers,
         ),
-    ) + downloadersTogglesScrapers + listOf(
+    ) + downloadersTogglesScrapers + downloadersExtraScrapers + listOf(
         SettingsDivider(SettingsPage.PUZZLE_SOURCES_SCRAPERS),
         SettingsHTMLPage(
             SettingsPage.PUZZLE_SOURCES_SCRAPERS,
@@ -2588,6 +2620,68 @@ class SettingsPageViewModel(
                     enabled,
                 )
             },
+            extraSettingsPage = SettingsPage(settingsData.title),
+        )
+    }
+
+    /**
+     * Make the toggle button settings entry for a downloader
+     */
+    private fun makeDownloaderExtraSettings(
+        settingsData : DownloaderSettingsData,
+    ) : List<SettingsItem> {
+        val settingsPage = SettingsPage(settingsData.title)
+        val did = settingsData.downloaderID
+        return listOf(
+            SettingsBoolean(
+                settingsPage,
+                Res.string.block_auto_mon,
+                Res.string.block_auto_mon_desc,
+                settings.liveDownloadAutoDownloaderBlockMon(did).stateInHere(),
+                { settings.setDownloadAutoDownloaderBlockMon(did, it) }
+            ),
+            SettingsBoolean(
+                settingsPage,
+                Res.string.block_auto_tue,
+                Res.string.block_auto_tue_desc,
+                settings.liveDownloadAutoDownloaderBlockTue(did).stateInHere(),
+                { settings.setDownloadAutoDownloaderBlockTue(did, it) }
+            ),
+            SettingsBoolean(
+                settingsPage,
+                Res.string.block_auto_wed,
+                Res.string.block_auto_wed_desc,
+                settings.liveDownloadAutoDownloaderBlockWed(did).stateInHere(),
+                { settings.setDownloadAutoDownloaderBlockWed(did, it) }
+            ),
+            SettingsBoolean(
+                settingsPage,
+                Res.string.block_auto_thu,
+                Res.string.block_auto_thu_desc,
+                settings.liveDownloadAutoDownloaderBlockThu(did).stateInHere(),
+                { settings.setDownloadAutoDownloaderBlockThu(did, it) }
+            ),
+            SettingsBoolean(
+                settingsPage,
+                Res.string.block_auto_fri,
+                Res.string.block_auto_fri_desc,
+                settings.liveDownloadAutoDownloaderBlockFri(did).stateInHere(),
+                { settings.setDownloadAutoDownloaderBlockFri(did, it) }
+            ),
+            SettingsBoolean(
+                settingsPage,
+                Res.string.block_auto_sat,
+                Res.string.block_auto_sat_desc,
+                settings.liveDownloadAutoDownloaderBlockSat(did).stateInHere(),
+                { settings.setDownloadAutoDownloaderBlockSat(did, it) }
+            ),
+            SettingsBoolean(
+                settingsPage,
+                Res.string.block_auto_sun,
+                Res.string.block_auto_sun_desc,
+                settings.liveDownloadAutoDownloaderBlockSun(did).stateInHere(),
+                { settings.setDownloadAutoDownloaderBlockSun(did, it) }
+            ),
         )
     }
 }
@@ -2611,5 +2705,4 @@ private fun <T> List<T>.triState(predicate : (T) -> Boolean) : TriState {
     else
         return TriState.OFF
 }
-
 

@@ -167,6 +167,146 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         }
     }
 
+    fun liveDownloadAutoDownloaderBlockMon(
+        downloaderID : DownloaderID,
+    ) : Flow<Boolean>
+        = settingsMap { downloaderID.id in it.autoDownloadersBlockMon }
+
+    fun setDownloadAutoDownloaderBlockMon(
+        downloaderID : DownloaderID,
+        blocked : Boolean,
+    ) {
+        settingsUpdate { settings ->
+            settings.copy(
+                autoDownloadersBlockMon = toggleStringSet(
+                    settings.autoDownloadersBlockMon,
+                    downloaderID.id,
+                    blocked,
+                ),
+            )
+        }
+    }
+
+    fun liveDownloadAutoDownloaderBlockTue(
+        downloaderID : DownloaderID,
+    ) : Flow<Boolean>
+        = settingsMap { downloaderID.id in it.autoDownloadersBlockTue }
+
+    fun setDownloadAutoDownloaderBlockTue(
+        downloaderID : DownloaderID,
+        blocked : Boolean,
+    ) {
+        settingsUpdate { settings ->
+            settings.copy(
+                autoDownloadersBlockTue = toggleStringSet(
+                    settings.autoDownloadersBlockTue,
+                    downloaderID.id,
+                    blocked,
+                ),
+            )
+        }
+    }
+
+    fun liveDownloadAutoDownloaderBlockWed(
+        downloaderID : DownloaderID,
+    ) : Flow<Boolean>
+        = settingsMap { downloaderID.id in it.autoDownloadersBlockWed }
+
+    fun setDownloadAutoDownloaderBlockWed(
+        downloaderID : DownloaderID,
+        blocked : Boolean,
+    ) {
+        settingsUpdate { settings ->
+            settings.copy(
+                autoDownloadersBlockWed = toggleStringSet(
+                    settings.autoDownloadersBlockWed,
+                    downloaderID.id,
+                    blocked,
+                ),
+            )
+        }
+    }
+
+    fun liveDownloadAutoDownloaderBlockThu(
+        downloaderID : DownloaderID,
+    ) : Flow<Boolean>
+        = settingsMap { downloaderID.id in it.autoDownloadersBlockThu }
+
+    fun setDownloadAutoDownloaderBlockThu(
+        downloaderID : DownloaderID,
+        blocked : Boolean,
+    ) {
+        settingsUpdate { settings ->
+            settings.copy(
+                autoDownloadersBlockThu = toggleStringSet(
+                    settings.autoDownloadersBlockThu,
+                    downloaderID.id,
+                    blocked,
+                ),
+            )
+        }
+    }
+
+    fun liveDownloadAutoDownloaderBlockFri(
+        downloaderID : DownloaderID,
+    ) : Flow<Boolean>
+        = settingsMap { downloaderID.id in it.autoDownloadersBlockFri }
+
+    fun setDownloadAutoDownloaderBlockFri(
+        downloaderID : DownloaderID,
+        blocked : Boolean,
+    ) {
+        settingsUpdate { settings ->
+            settings.copy(
+                autoDownloadersBlockFri = toggleStringSet(
+                    settings.autoDownloadersBlockFri,
+                    downloaderID.id,
+                    blocked,
+                ),
+            )
+        }
+    }
+
+    fun liveDownloadAutoDownloaderBlockSat(
+        downloaderID : DownloaderID,
+    ) : Flow<Boolean>
+        = settingsMap { downloaderID.id in it.autoDownloadersBlockSat }
+
+    fun setDownloadAutoDownloaderBlockSat(
+        downloaderID : DownloaderID,
+        blocked : Boolean,
+    ) {
+        settingsUpdate { settings ->
+            settings.copy(
+                autoDownloadersBlockSat = toggleStringSet(
+                    settings.autoDownloadersBlockSat,
+                    downloaderID.id,
+                    blocked,
+                ),
+            )
+        }
+    }
+
+    fun liveDownloadAutoDownloaderBlockSun(
+        downloaderID : DownloaderID,
+    ) : Flow<Boolean>
+        = settingsMap { downloaderID.id in it.autoDownloadersBlockSun }
+
+    fun setDownloadAutoDownloaderBlockSun(
+        downloaderID : DownloaderID,
+        blocked : Boolean,
+    ) {
+        settingsUpdate { settings ->
+            settings.copy(
+                autoDownloadersBlockSun = toggleStringSet(
+                    settings.autoDownloadersBlockSun,
+                    downloaderID.id,
+                    blocked,
+                ),
+            )
+        }
+    }
+
     val liveDownloadDays : Flow<Set<String>>
         = settingsMap { it.backgroundDownloadDays.toSet() }
 
@@ -205,12 +345,13 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         enabled : Boolean,
     ) {
         settingsUpdate { settings ->
-            val disabledDownloaders = if (enabled) {
-                settings.disabledDownloaders - downloaderID.id
-            } else {
-                settings.disabledDownloaders + downloaderID.id
-            }.toSet().toList()
-            settings.copy(disabledDownloaders = disabledDownloaders)
+            settings.copy(
+                disabledDownloaders = toggleStringSet(
+                    settings.disabledDownloaders,
+                    downloaderID.id,
+                    !enabled,
+                ),
+            )
         }
     }
 
@@ -1487,6 +1628,15 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     private fun JSONObject.ifHasDouble(key : String, cb : (Double) -> Unit) {
         if (has(key))
             cb(optDouble(key))
+    }
+
+    private fun toggleStringSet(
+        stringSet : List<String>,
+        s : String,
+        contained : Boolean,
+    ) : List<String> {
+        return if (contained) { stringSet + s } else { stringSet - s }
+            .toSet().toList()
     }
 
     /**

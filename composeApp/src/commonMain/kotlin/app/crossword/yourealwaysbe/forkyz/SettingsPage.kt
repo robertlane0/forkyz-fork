@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -112,6 +113,8 @@ private fun SettingsBoolean(
     errorMsg : String?,
     value : Boolean,
     onValueChange : (Boolean) -> Unit,
+    extraSettingsPage : SettingsPage? = null,
+    setCurrentPage : (SettingsPage) -> Unit = {},
 ) {
     Row(
         modifier = Modifier
@@ -125,6 +128,16 @@ private fun SettingsBoolean(
             summary = summary,
             errorMsg = errorMsg,
         )
+        extraSettingsPage?.let { page ->
+            IconButton(
+                onClick = { setCurrentPage(page) }
+            ) {
+                Icon(
+                    Icons.Filled.Settings,
+                    contentDescription = null,
+                )
+            }
+        }
         Switch(
             modifier = Modifier.padding(start = SWITCH_PADDING),
             checked = value,
@@ -400,6 +413,8 @@ fun SettingsPage(
                             summary = summary,
                             value = state,
                             onValueChange = item.setValue,
+                            extraSettingsPage = item.extraSettingsPage,
+                            setCurrentPage = viewModel::setCurrentPage,
                         )
                     }
                     is SettingsTriState -> {

@@ -277,6 +277,22 @@
     <string name="sud_ouest_mots_croises">Sud Ouest Mots Croisés</string>
     <string name="la_croix">(FR) La Croix</string>
 
+    <!-- preferences extra downloader -->
+    <string name="block_auto_mon">Bloquer le téléchargement automatique le lundi</string>
+    <string name="block_auto_mon_desc">Si le téléchargement automatique est activé, ne téléchargez pas ce puzzle le lundi.</string>
+    <string name="block_auto_tue">Bloquer le téléchargement automatique le mardi</string>
+    <string name="block_auto_tue_desc">Si le téléchargement automatique est activé, ne téléchargez pas ce puzzle le mardi.</string>
+    <string name="block_auto_wed">Bloquer le téléchargement automatique le mercredi</string>
+    <string name="block_auto_wed_desc">Si le téléchargement automatique est activé, ne téléchargez pas ce puzzle le mercredi.</string>
+    <string name="block_auto_thu">Bloquer le téléchargement automatique le jeudi</string>
+    <string name="block_auto_thu_desc">Si le téléchargement automatique est activé, ne téléchargez pas ce puzzle le jeudi.</string>
+    <string name="block_auto_fri">Bloquer le téléchargement automatique le vendredi</string>
+    <string name="block_auto_fri_desc">Si le téléchargement automatique est activé, ne téléchargez pas ce puzzle le vendredi.</string>
+    <string name="block_auto_sat">Bloquer le téléchargement automatique le samedi</string>
+    <string name="block_auto_sat_desc">Si le téléchargement automatique est activé, ne téléchargez pas ce puzzle le samedi.</string>
+    <string name="block_auto_sun">Bloquer le téléchargement automatique le dimanche</string>
+    <string name="block_auto_sun_desc">Si le téléchargement automatique est activé, ne téléchargez pas ce puzzle le dimanche.</string>
+
     <!-- preferences display -->
     <string name="clue_below_grid">Indice sous la grille</string>
     <string name="clue_below_grid_desc">Affichez l'indice sélectionné sous la grille au lieu de dans la barre de titre de l'application.</string>

@@ -279,6 +279,22 @@
     <string name="sud_ouest_mots_croises">(FR) Sud Ouest Mots Croisés</string>
     <string name="la_croix">(FR) La Croix</string>
 
+    <!-- preferences extra downloader -->
+    <string name="block_auto_mon">Block Auto-Download Monday</string>
+    <string name="block_auto_mon_desc">If auto-download enabled, don't download this puzzle on Mondays.</string>
+    <string name="block_auto_tue">Block Auto-Download Tuesday</string>
+    <string name="block_auto_tue_desc">If auto-download enabled, don't download this puzzle on Tuesdays.</string>
+    <string name="block_auto_wed">Block Auto-Download Wednesday</string>
+    <string name="block_auto_wed_desc">If auto-download enabled, don't download this puzzle on Wednesdays.</string>
+    <string name="block_auto_thu">Block Auto-Download Thursday</string>
+    <string name="block_auto_thu_desc">If auto-download enabled, don't download this puzzle on Thursdays.</string>
+    <string name="block_auto_fri">Block Auto-Download Friday</string>
+    <string name="block_auto_fri_desc">If auto-download enabled, don't download this puzzle on Fridays.</string>
+    <string name="block_auto_sat">Block Auto-Download Saturday</string>
+    <string name="block_auto_sat_desc">If auto-download enabled, don't download this puzzle on Saturdays.</string>
+    <string name="block_auto_sun">Block Auto-Download Sunday</string>
+    <string name="block_auto_sun_desc">If auto-download enabled, don't download this puzzle on Sundays.</string>
+
     <!-- preferences display -->
     <string name="clue_below_grid">Clue Below Grid</string>
     <string name="clue_below_grid_desc">Display the selected clue below the grid instead of in the app title bar.</string>

@@ -235,6 +235,13 @@ message Settings {
     bool collapseBrowseHeadings = 144;
     repeated string disabledDownloaders = 145;
     int32 settingsVersion = 146;
+    repeated string autoDownloadersBlockMon = 147;
+    repeated string autoDownloadersBlockTue = 148;
+    repeated string autoDownloadersBlockWed = 149;
+    repeated string autoDownloadersBlockThu = 150;
+    repeated string autoDownloadersBlockFri = 151;
+    repeated string autoDownloadersBlockSat = 152;
+    repeated string autoDownloadersBlockSun = 153;
 
     // defunct settings
     bool download20Minutes = 36;
