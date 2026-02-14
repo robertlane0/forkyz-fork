@@ -3,6 +3,7 @@ package app.crossword.yourealwaysbe.forkyz
 
 import kotlinx.coroutines.launch
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
@@ -220,9 +222,9 @@ private fun SettingsDescription(
 private fun SettingsHeading(
     modifier : Modifier,
     title : String,
-    summary : String?,
-    errorMsg : String?,
-    withRule : Boolean,
+    summary : String? = null,
+    errorMsg : String? = null,
+    withRule : Boolean = false,
 ) {
     Column(modifier = modifier) {
         if (withRule) {
@@ -483,6 +485,53 @@ fun SettingsPage(
     }
 
     @Composable
+    fun SettingsItemsList(
+        inSearchMode : Boolean,
+        settingsItems : List<SettingsItem>,
+        listState : LazyListState,
+    ) {
+        val modifier = Modifier.fillMaxWidth()
+            .background(MaterialTheme.colorScheme.background)
+            .padding(
+                vertical = SETTINGS_VERTICAL_PADDING,
+                horizontal = SETTINGS_HORIZONTAL_PADDING,
+            )
+
+        LazyColumn(
+            modifier = Modifier.fillMaxWidth(),
+            state = listState,
+        ) {
+            settingsItems.forEachIndexed { index, item ->
+                val previousPage = if (index > 0)
+                    settingsItems[index - 1].page
+                else
+                    null
+                val currentPage = item.page
+
+                // Use sticky headers to let user know which page a
+                // search result is from
+                if (inSearchMode && currentPage != previousPage) {
+                    stickyHeader {
+                        SettingsHeading(
+                            modifier = modifier,
+                            title = stringResource(currentPage.title),
+                            withRule = false,
+                        )
+                    }
+                }
+
+                item {
+                    SettingsItem(
+                        modifier = modifier,
+                        item = item,
+                        isFirst = (index == 0),
+                    )
+                }
+            }
+        }
+    }
+
+    @Composable
     fun StorageChangedAppExitDialog() {
         AlertDialog(
             title = { Text(stringResource(Res.string.storage_changed_title)) },
@@ -660,26 +709,14 @@ fun SettingsPage(
                 onClose = viewModel::endSearch,
                 hint = stringResource(Res.string.filter_settings_hint),
             )
-
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth(),
-                state = listState,
-            ) {
-                itemsIndexed(settingsItems) { index, item ->
-                    SettingsItem(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(
-                                vertical = SETTINGS_VERTICAL_PADDING,
-                                horizontal = SETTINGS_HORIZONTAL_PADDING,
-                            ),
-                        item = item,
-                        isFirst = (index == 0),
-                    )
-                }
-            }
+            SettingsItemsList(
+                inSearchMode = inSearchMode,
+                settingsItems = settingsItems,
+                listState = listState,
+            )
         }
 
         DisplayDialogs()
     }
 }
+
