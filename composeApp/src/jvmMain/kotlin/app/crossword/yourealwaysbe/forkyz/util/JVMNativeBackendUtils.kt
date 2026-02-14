@@ -20,6 +20,7 @@ import dev.dirs.ProjectDirectories
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation
+import app.crossword.yourealwaysbe.forkyz.util.AppStrings
 import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerJVMSAF
@@ -41,19 +42,18 @@ val XDG_DATA_DIR : File = File(
     ).dataDir,
 )
 
-class JVMNativeBackendUtils : NativeBackendUtils {
+class JVMNativeBackendUtils(
+    private val strings : AppStrings,
+) : NativeBackendUtils {
     override suspend fun getString(resourceID : StringResource) : String {
-        return org.jetbrains.compose.resources.getString(resourceID)
+        return strings.getString(resourceID)
     }
 
     override suspend fun getString(
         resourceID : StringResource,
         vararg formatArgs: Any,
     ) : String {
-        return org.jetbrains.compose.resources.getString(
-            resourceID,
-            *formatArgs,
-        )
+        return strings.getString(resourceID, *formatArgs)
     }
 
     override suspend fun getQuantityString(
@@ -61,11 +61,7 @@ class JVMNativeBackendUtils : NativeBackendUtils {
         quantity : Int,
         vararg formatArgs: Any,
     ) : String {
-        return org.jetbrains.compose.resources.getPluralString(
-            resourceID,
-            quantity,
-            *formatArgs,
-        )
+        return strings.getPluralString(resourceID, quantity, *formatArgs)
     }
 
     override fun hasNetworkConnection() : Boolean {

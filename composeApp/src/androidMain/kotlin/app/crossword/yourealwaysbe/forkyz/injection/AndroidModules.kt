@@ -60,7 +60,7 @@ val androidModules = module {
         )
     }
     single<NativeBackendUtils> {
-        AndroidNativeBackendUtils(androidContext(), get())
+        AndroidNativeBackendUtils(androidContext(), get(), get())
     }
     single<Notifications> {
         AndroidNotifications(androidContext(), get())
