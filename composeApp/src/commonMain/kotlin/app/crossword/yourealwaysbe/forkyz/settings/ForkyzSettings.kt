@@ -158,19 +158,16 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         }
     }
 
-    val liveDownloadAutoDownloaders : Flow<Set<String>>
-        = settingsMap { it.autoDownloaders.toSet() }
-
-    fun setDownloadAutoDownloaders(value : Set<String>) {
-        settingsUpdate { settings ->
-            settings.copy(autoDownloaders = value.toList())
-        }
-    }
-
     fun liveDownloadAutoDownloaderBlockMon(
         downloaderID : DownloaderID,
     ) : Flow<Boolean>
         = settingsMap { downloaderID.id in it.autoDownloadersBlockMon }
+
+    private fun setDownloadAutoDownloadersBlockMon(value : Set<String>) {
+        settingsUpdate { settings ->
+            settings.copy(autoDownloadersBlockMon = value.toList())
+        }
+    }
 
     fun setDownloadAutoDownloaderBlockMon(
         downloaderID : DownloaderID,
@@ -192,6 +189,12 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     ) : Flow<Boolean>
         = settingsMap { downloaderID.id in it.autoDownloadersBlockTue }
 
+    private fun setDownloadAutoDownloadersBlockTue(value : Set<String>) {
+        settingsUpdate { settings ->
+            settings.copy(autoDownloadersBlockTue = value.toList())
+        }
+    }
+
     fun setDownloadAutoDownloaderBlockTue(
         downloaderID : DownloaderID,
         blocked : Boolean,
@@ -211,6 +214,12 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         downloaderID : DownloaderID,
     ) : Flow<Boolean>
         = settingsMap { downloaderID.id in it.autoDownloadersBlockWed }
+
+    private fun setDownloadAutoDownloadersBlockWed(value : Set<String>) {
+        settingsUpdate { settings ->
+            settings.copy(autoDownloadersBlockWed = value.toList())
+        }
+    }
 
     fun setDownloadAutoDownloaderBlockWed(
         downloaderID : DownloaderID,
@@ -232,6 +241,12 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     ) : Flow<Boolean>
         = settingsMap { downloaderID.id in it.autoDownloadersBlockThu }
 
+    private fun setDownloadAutoDownloadersBlockThu(value : Set<String>) {
+        settingsUpdate { settings ->
+            settings.copy(autoDownloadersBlockThu = value.toList())
+        }
+    }
+
     fun setDownloadAutoDownloaderBlockThu(
         downloaderID : DownloaderID,
         blocked : Boolean,
@@ -251,6 +266,12 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         downloaderID : DownloaderID,
     ) : Flow<Boolean>
         = settingsMap { downloaderID.id in it.autoDownloadersBlockFri }
+
+    private fun setDownloadAutoDownloadersBlockFri(value : Set<String>) {
+        settingsUpdate { settings ->
+            settings.copy(autoDownloadersBlockFri = value.toList())
+        }
+    }
 
     fun setDownloadAutoDownloaderBlockFri(
         downloaderID : DownloaderID,
@@ -272,6 +293,12 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     ) : Flow<Boolean>
         = settingsMap { downloaderID.id in it.autoDownloadersBlockSat }
 
+    private fun setDownloadAutoDownloadersBlockSat(value : Set<String>) {
+        settingsUpdate { settings ->
+            settings.copy(autoDownloadersBlockSat = value.toList())
+        }
+    }
+
     fun setDownloadAutoDownloaderBlockSat(
         downloaderID : DownloaderID,
         blocked : Boolean,
@@ -291,6 +318,12 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         downloaderID : DownloaderID,
     ) : Flow<Boolean>
         = settingsMap { downloaderID.id in it.autoDownloadersBlockSun }
+
+    private fun setDownloadAutoDownloadersBlockSun(value : Set<String>) {
+        settingsUpdate { settings ->
+            settings.copy(autoDownloadersBlockSun = value.toList())
+        }
+    }
 
     fun setDownloadAutoDownloaderBlockSun(
         downloaderID : DownloaderID,
@@ -545,9 +578,15 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             settings.customDailyUrl,
             settings.suppressSummaryMessages,
             settings.suppressMessages,
-            settings.autoDownloaders.toSet(),
             settings.downloadTimeout,
             settings.dlOnStartup,
+            settings.autoDownloadersBlockMon.toSet(),
+            settings.autoDownloadersBlockTue.toSet(),
+            settings.autoDownloadersBlockWed.toSet(),
+            settings.autoDownloadersBlockThu.toSet(),
+            settings.autoDownloadersBlockFri.toSet(),
+            settings.autoDownloadersBlockSat.toSet(),
+            settings.autoDownloadersBlockSun.toSet(),
         )
     }
 
@@ -1696,11 +1735,65 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             },
         )
         run(
-            "autoDownloaders",
-            { s, key -> addListToJSON(json, key, s.autoDownloaders) },
+            "autoDownloadersBlockMon",
+            { s, key -> addListToJSON(json, key, s.autoDownloadersBlockMon) },
             { key ->
                 getStringSetFromJSON(
-                    json, key, this::setDownloadAutoDownloaders,
+                    json, key, this::setDownloadAutoDownloadersBlockMon,
+                )
+            },
+        )
+        run(
+            "autoDownloadersBlockTue",
+            { s, key -> addListToJSON(json, key, s.autoDownloadersBlockTue) },
+            { key ->
+                getStringSetFromJSON(
+                    json, key, this::setDownloadAutoDownloadersBlockTue,
+                )
+            },
+        )
+        run(
+            "autoDownloadersBlockWed",
+            { s, key -> addListToJSON(json, key, s.autoDownloadersBlockWed) },
+            { key ->
+                getStringSetFromJSON(
+                    json, key, this::setDownloadAutoDownloadersBlockWed,
+                )
+            },
+        )
+        run(
+            "autoDownloadersBlockThu",
+            { s, key -> addListToJSON(json, key, s.autoDownloadersBlockThu) },
+            { key ->
+                getStringSetFromJSON(
+                    json, key, this::setDownloadAutoDownloadersBlockThu,
+                )
+            },
+        )
+        run(
+            "autoDownloadersBlockFri",
+            { s, key -> addListToJSON(json, key, s.autoDownloadersBlockFri) },
+            { key ->
+                getStringSetFromJSON(
+                    json, key, this::setDownloadAutoDownloadersBlockFri,
+                )
+            },
+        )
+        run(
+            "autoDownloadersBlockSat",
+            { s, key -> addListToJSON(json, key, s.autoDownloadersBlockSat) },
+            { key ->
+                getStringSetFromJSON(
+                    json, key, this::setDownloadAutoDownloadersBlockSat,
+                )
+            },
+        )
+        run(
+            "autoDownloadersBlockSun",
+            { s, key -> addListToJSON(json, key, s.autoDownloadersBlockSun) },
+            { key ->
+                getStringSetFromJSON(
+                    json, key, this::setDownloadAutoDownloadersBlockSun,
                 )
             },
         )

@@ -57,7 +57,13 @@ class ForkyzSettingsTest {
         alwaysAnnounceClue = false,
         applicationTheme = Theme.T_STANDARD,
         archiveCleanupAge = -1,
-        autoDownloaders = listOf(),
+        autoDownloadersBlockMon = listOf(),
+        autoDownloadersBlockTue = listOf(),
+        autoDownloadersBlockWed = listOf(),
+        autoDownloadersBlockThu = listOf(),
+        autoDownloadersBlockFri = listOf(),
+        autoDownloadersBlockSat = listOf(),
+        autoDownloadersBlockSun = listOf(),
         backgroundDownloadAllowRoaming = false,
         backgroundDownloadDays = listOf(),
         backgroundDownloadDaysTime = 8,
@@ -192,7 +198,13 @@ class ForkyzSettingsTest {
         alwaysAnnounceClue = true,
         applicationTheme = Theme.T_DYNAMIC,
         archiveCleanupAge = 10,
-        autoDownloaders = listOf("autos"),
+        autoDownloadersBlockMon = listOf("mon"),
+        autoDownloadersBlockTue = listOf("tue"),
+        autoDownloadersBlockWed = listOf("wed"),
+        autoDownloadersBlockThu = listOf("thu"),
+        autoDownloadersBlockFri = listOf("fri"),
+        autoDownloadersBlockSat = listOf("sat"),
+        autoDownloadersBlockSun = listOf("sun"),
         backgroundDownloadAllowRoaming = true,
         backgroundDownloadDays = listOf("1"),
         backgroundDownloadDaysTime = 9,
@@ -364,8 +376,6 @@ class ForkyzSettingsTest {
             .thenReturn("D")
         `when`(prefs.getInt(eq("archiveCleanupAge"), anyInt()))
             .thenReturn(10)
-        `when`(prefs.getStringSet(eq("autoDownloaders"), eq(null)))
-            .thenReturn(setOf("autos"))
         `when`(prefs.getBoolean(eq("backgroundDownloadAllowRoaming"), anyBoolean()))
             .thenReturn(true)
         `when`(prefs.getStringSet(eq("backgroundDownloadDays"), eq(null)))

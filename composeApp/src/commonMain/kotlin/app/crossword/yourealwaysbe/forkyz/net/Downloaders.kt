@@ -195,9 +195,9 @@ class Downloaders(
         download(puzzlesToDownload)
     }
 
-    suspend fun getAutoDownloaders() : List<Downloader> {
+    suspend fun getAutoDownloaders(date : LocalDate) : List<Downloader> {
         return getDownloaders().filter {
-            settings.enabledAuto(it.downloaderID)
+            settings.enabledAuto(it.downloaderID, date)
         }
     }
 

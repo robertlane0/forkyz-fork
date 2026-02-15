@@ -133,7 +133,6 @@ message Settings {
     bool alwaysAnnounceClue = 2;
     Theme applicationTheme = 3;
     int32 archiveCleanupAge = 4;
-    repeated string autoDownloaders = 5;
     bool backgroundDownloadAllowRoaming = 6;
     repeated string backgroundDownloadDays = 7;
     int32 backgroundDownloadDaysTime = 8;
@@ -244,6 +243,7 @@ message Settings {
     repeated string autoDownloadersBlockSun = 153;
 
     // defunct settings
+    repeated string autoDownloaders = 5;
     bool download20Minutes = 36;
     bool downloadCustomDaily = 37;
     bool downloadDeStandaard = 38;

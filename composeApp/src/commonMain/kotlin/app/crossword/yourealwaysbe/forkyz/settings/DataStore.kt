@@ -15,7 +15,6 @@ val DEFAULT_SETTINGS : Settings = Settings(
     alwaysAnnounceClue = false,
     applicationTheme = Theme.T_STANDARD,
     archiveCleanupAge = -1,
-    autoDownloaders = listOf(),
     autoDownloadersBlockMon = listOf(),
     autoDownloadersBlockTue = listOf(),
     autoDownloadersBlockWed = listOf(),
@@ -162,7 +161,7 @@ val DEFAULT_SETTINGS : Settings = Settings(
     downloadTF1MotsCroises = true,
     dontSnapBoardToBorders = false,
     disabledDownloaders = listOf(),
-    settingsVersion = DownloaderBooleanToSetMigration.MIGRATION_VERSION,
+    settingsVersion = CURRENT_SETTINGS_VERSION,
 )
 
 fun createDataStore(
@@ -175,6 +174,9 @@ fun createDataStore(
         producePath = producePath,
         serializer = SettingsSerializer(defaultSettings),
     ),
-    migrations = listOf(DownloaderBooleanToSetMigration()),
+    migrations = listOf(
+        DownloaderBooleanToSetMigration(),
+        AutoDownloadersToDayBlocksMigration(),
+    ),
 )
 

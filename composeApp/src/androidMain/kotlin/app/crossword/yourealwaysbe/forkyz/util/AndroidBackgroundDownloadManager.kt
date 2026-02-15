@@ -227,7 +227,7 @@ abstract class BaseDownloadWorker(
                 try {
                     val now = LocalDate.now()
                     dls.downloadLatestInRange(
-                        now, now, dls.getAutoDownloaders()
+                        now, now, dls.getAutoDownloaders(now)
                     )
 
                     completer.set(ListenableWorker.Result.success())

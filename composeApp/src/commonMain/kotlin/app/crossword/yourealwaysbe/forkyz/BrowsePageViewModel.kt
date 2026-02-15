@@ -674,7 +674,8 @@ class BrowsePageViewModel(
                     settings.setBrowseLastDownload(
                         System.currentTimeMillis()
                     )
-                    download(LocalDate.now(), dls.getAutoDownloaders())
+                    val now = LocalDate.now()
+                    download(now, dls.getAutoDownloaders(now))
                 }
             }
         }}

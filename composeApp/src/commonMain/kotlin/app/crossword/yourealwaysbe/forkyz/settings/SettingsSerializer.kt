@@ -30,6 +30,8 @@ class SettingsSerializer(
     }
 }
 
+val CURRENT_SETTINGS_VERSION = 2
+
 /**
  * Migration to convert downloadX and scrapeX booleans to disabledDownloaders set
  */
@@ -169,6 +171,58 @@ class DownloaderBooleanToSetMigration : DataMigration<Settings> {
             scrapeKegler = false,
             scrapePrivateEye = false,
             scrapePrzekroj = false,
+        )
+    }
+
+    override suspend fun cleanUp() {
+        // Nothing to do
+    }
+}
+
+/**
+ * Migration to convert autoDownloaders to autoDownloadersBlock<Day>
+ */
+class AutoDownloadersToDayBlocksMigration : DataMigration<Settings> {
+    companion object {
+        const val MIGRATION_VERSION = 2
+    }
+
+    override suspend fun shouldMigrate(currentData: Settings): Boolean {
+        return currentData.settingsVersion < MIGRATION_VERSION
+    }
+
+    override suspend fun migrate(currentData: Settings): Settings {
+        val block = mutableSetOf<String>()
+
+        val isAutoDownloadEnabled = (
+            currentData.backgroundDownloadHourly
+            || currentData.dlOnStartup
+            || currentData.backgroundDownloadDays.size > 0
+        )
+
+        if (isAutoDownloadEnabled) {
+            for (downloaderID in DownloaderID.values()) {
+                val id = downloaderID.id
+                if (
+                    id !in currentData.disabledDownloaders
+                    && id !in currentData.autoDownloaders
+                ) {
+                    block.add(id)
+                }
+            }
+        }
+
+        // Clear autoDownloaders, setup blocks
+        return currentData.copy(
+            autoDownloaders = listOf(),
+            autoDownloadersBlockMon = block.toList(),
+            autoDownloadersBlockTue = block.toList(),
+            autoDownloadersBlockWed = block.toList(),
+            autoDownloadersBlockThu = block.toList(),
+            autoDownloadersBlockFri = block.toList(),
+            autoDownloadersBlockSat = block.toList(),
+            autoDownloadersBlockSun = block.toList(),
+            settingsVersion = MIGRATION_VERSION,
         )
     }
 

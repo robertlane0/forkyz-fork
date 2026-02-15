@@ -66,9 +66,6 @@ fun migratePreferences(
     getInt(prefs, "archiveCleanupAge")?.let {
         settings.setBrowseCleanupAgeArchive(it)
     }
-    getStringSet(prefs, "autoDownloaders")?.let {
-        settings.setDownloadAutoDownloaders(it)
-    }
     getBoolean(prefs, "backgroundDownloadAllowRoaming")?.let {
         settings.setDownloadAllowRoaming(it)
     }

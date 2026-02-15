@@ -829,61 +829,6 @@ class SettingsPageViewModel(
             dls.getDownloaders().map { it.downloaderID }
         }
 
-    private val downloadAutoDownloadersStateFlow
-        : StateFlow<List<SettingsListEntry<String>>>
-            = liveDownloaders.map { downloaders ->
-                downloaders.map { downloader ->
-                    SettingsListEntry(
-                        downloader.name,
-                        downloader.downloaderID.id,
-                    )
-                }
-            }.stateInSubscribed(viewModelScope, listOf())
-
-    private val areEnabledAutoDownloadersFlow : Flow<Boolean>
-        = combine(
-            settings.liveDownloadersSettings,
-            liveDownloaderIDs,
-        ) { downloadersSettings, autoDownloaders ->
-            autoDownloaders.any { downloadersSettings.enabledAuto(it) }
-        }
-
-    private val downloadOnStartUpErrorMsg : StateFlow<String?>
-        = combine(
-            settings.liveDownloadOnStartUp,
-            areEnabledAutoDownloadersFlow,
-        ) { autoDownload, areEnabled ->
-            if (autoDownload && !areEnabled) {
-                utils.getString(Res.string.enable_auto_downloaders)
-            } else {
-                null
-            }
-        }.stateInSubscribed(viewModelScope, null)
-
-    private val downloadHourlyErrorMsg : StateFlow<String?>
-        = combine(
-            settings.liveDownloadHourly,
-            areEnabledAutoDownloadersFlow,
-        ) { isHourly, areEnabled ->
-            if (isHourly && !areEnabled) {
-                utils.getString(Res.string.enable_auto_downloaders)
-            } else {
-                null
-            }
-        }.stateInSubscribed(viewModelScope, null)
-
-    private val downloadDaysErrorMsg : StateFlow<String?>
-        = combine(
-            settings.liveDownloadDays,
-            areEnabledAutoDownloadersFlow,
-        ) { days, areEnabled ->
-            if (!days.isEmpty() && !areEnabled) {
-                utils.getString(Res.string.enable_auto_downloaders)
-            } else {
-                null
-            }
-        }.stateInSubscribed(viewModelScope, null)
-
     private val downloadCustomDailyURLErrorMsg : StateFlow<String?>
         = combine(
             settings.liveDownloadEnabledDownloader(DownloaderID.CUSTOM),
@@ -1343,20 +1288,11 @@ class SettingsPageViewModel(
             Res.string.automatic_download_desc,
             settings.liveDownloadOnStartUp.stateInHere(),
             settings::setDownloadOnStartUp,
-            downloadOnStartUpErrorMsg,
         ),
         SettingsSubPage(
             SettingsPage.DOWNLOAD,
             Res.string.background_download_opts_desc,
             SettingsPage.DOWNLOAD_BACKGROUND,
-        ),
-        SettingsDynamicMultiList<String>(
-            SettingsPage.DOWNLOAD,
-            Res.string.auto_downloaders,
-            Res.string.auto_downloaders_desc,
-            downloadAutoDownloadersStateFlow,
-            settings.liveDownloadAutoDownloaders.stateInHere(),
-            settings::setDownloadAutoDownloaders,
         ),
         SettingsBoolean(
             SettingsPage.DOWNLOAD,
@@ -1397,7 +1333,6 @@ class SettingsPageViewModel(
             Res.string.background_download_hourly_desc,
             settings.liveDownloadHourly.stateInHere(),
             { value -> settings.setDownloadHourly(value) },
-            downloadHourlyErrorMsg,
         ),
         SettingsMultiList(
             SettingsPage.DOWNLOAD_BACKGROUND,
@@ -1415,7 +1350,6 @@ class SettingsPageViewModel(
             ),
             settings.liveDownloadDays.stateInHere(),
             { value -> settings.setDownloadDays(value) },
-            downloadDaysErrorMsg,
         ),
         SettingsList<Int>(
             SettingsPage.DOWNLOAD_BACKGROUND,
