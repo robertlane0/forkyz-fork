@@ -689,6 +689,11 @@ fun BrowsePage(
                     pe.percentFilled
             }
         }
+        val percentHinted by remember {
+            derivedStateOf {
+                if (state.suppressHintHighlighting) 0 else pe.percentHinted
+            }
+        }
         val isSelected by remember {
             derivedStateOf { pe.id in state.selectedPuzzleIDs }
         }
@@ -743,6 +748,7 @@ fun BrowsePage(
                 colors = progressColors,
                 complete = pe.percentComplete == 100,
                 percentFilled = percentFilled,
+                percentHinted = percentHinted,
             )
             Column(Modifier.weight(1.0F).fillMaxWidth()) {
                 Row(Modifier.fillMaxWidth()) {

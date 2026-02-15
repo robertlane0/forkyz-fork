@@ -25,12 +25,16 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_done
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_play
 import app.crossword.yourealwaysbe.forkyz.theme.CircleProgressBarColorScheme
 
+// else 1 hinted box is not visible
+private val MIN_HINTED_SWEEP = 10F
+
 @Composable
 fun CircleProgressBar(
     modifier : Modifier = Modifier,
     colors : CircleProgressBarColorScheme,
     complete : Boolean,
     percentFilled : Int,
+    percentHinted : Int,
 ) {
     val icPlay = painterResource(Res.drawable.ic_play)
     val icDone = painterResource(Res.drawable.ic_done)
@@ -43,6 +47,11 @@ fun CircleProgressBar(
         val circleFine = density * 2f
         val halfWidth = size.width / 2
         val halfStroke = circleStroke / 2
+        val arcOffset = Offset(0 + circleStroke, 0 + circleStroke)
+        val arcSize = Size(
+            size.width - 2 * circleStroke,
+            size.width - 2 * circleStroke,
+        )
 
         fun Text(
             text : String,
@@ -112,11 +121,6 @@ fun CircleProgressBar(
                 style =  Stroke(width = circleFine),
             )
 
-            val arcOffset = Offset(0 + circleStroke, 0 + circleStroke)
-            val arcSize = Size(
-                size.width - 2 * circleStroke,
-                size.width - 2 * circleStroke,
-            )
             drawArc(
                 color = colors.progressInProgress,
                 startAngle = -90f,
@@ -130,6 +134,19 @@ fun CircleProgressBar(
             Text(
                 text = percentFilled.toString() + "%",
                 color = colors.progressInProgress,
+            )
+        }
+
+        if (percentFilled >= 0 && percentHinted > 0) {
+            val sweep = Math.max(360F * percentHinted / 100F, MIN_HINTED_SWEEP)
+            drawArc(
+                color = colors.progressHinted,
+                startAngle = -90f,
+                sweepAngle = sweep,
+                useCenter = false,
+                topLeft = arcOffset,
+                size = arcSize,
+                style = Stroke(width = circleStroke)
             )
         }
     }

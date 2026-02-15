@@ -52,6 +52,7 @@ data class CircleProgressBarColorScheme(
     val progressInProgress : Color,
     val progressDone : Color,
     val progressError : Color,
+    val progressHinted : Color,
 )
 
 internal val lightScheme = lightColorScheme(
@@ -401,6 +402,7 @@ private val lightCircleProgressBarColorScheme = CircleProgressBarColorScheme(
     progressInProgress = progressInProgressLight,
     progressDone = progressDoneLight,
     progressError = progressErrorLight,
+    progressHinted = cheatedColorLight,
 )
 
 private val darkCircleProgressBarColorScheme = CircleProgressBarColorScheme(
@@ -408,6 +410,7 @@ private val darkCircleProgressBarColorScheme = CircleProgressBarColorScheme(
     progressInProgress = progressInProgressDark,
     progressDone = progressDoneDark,
     progressError = progressErrorDark,
+    progressHinted = cheatedColorDark,
 )
 
 @Composable

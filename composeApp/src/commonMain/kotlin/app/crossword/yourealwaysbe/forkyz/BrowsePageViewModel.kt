@@ -137,6 +137,7 @@ data class UIState(
     val showDialog : BrowseDialog = BrowseDialog.NONE,
     val isCollapseHeadings : Boolean = false,
     val expandedHeadingIDs : Set<String> = setOf(),
+    val suppressHintHighlighting : Boolean = false,
 ) {
     val displayNoPuzzlesMessage : Boolean = puzzleList.isEmpty()
     val isSelecting : Boolean = !selectedPuzzleIDs.isEmpty()
@@ -154,6 +155,7 @@ data class PuzEntry(
     val date : LocalDate,
     val percentComplete : Int,
     val percentFilled : Int,
+    val percentHinted : Int,
     val rating : Char,
     val hasSolution : Boolean,
     val source : String,
@@ -204,10 +206,14 @@ private data class BrowseActionSettings(
 
 private data class BrowseDisplaySettings(
     val sortOrder : AccessorSetting,
+    val appDayNightMode : DayNightMode,
+)
+
+private data class BrowsePuzzleDisplaySettings(
     val showPercentageCorrect : Boolean,
     val ratingsSettings : RatingsSettings,
     val indicateIfSolution : Boolean,
-    val appDayNightMode : DayNightMode,
+    val suppressHintHighlighting : Boolean,
 )
 
 private data class BrowseExternalSettings(
@@ -225,6 +231,7 @@ private data class BrowseDownloaderSettings(
 private data class BrowseSettings(
     val actionSettings : BrowseActionSettings,
     val displaySettings : BrowseDisplaySettings,
+    val puzzleDisplaySettings : BrowsePuzzleDisplaySettings,
     val externalSettings : BrowseExternalSettings,
     val downloaderSettings : BrowseDownloaderSettings,
 )
@@ -262,11 +269,15 @@ class BrowsePageViewModel(
             ),
             combine(
                 settings.liveBrowseSort,
+                settings.liveAppDayNightMode,
+                ::BrowseDisplaySettings,
+            ),
+            combine(
                 settings.liveBrowseShowPercentageCorrect,
                 settings.liveRatingsSettings,
                 settings.liveBrowseIndicateIfSolution,
-                settings.liveAppDayNightMode,
-                ::BrowseDisplaySettings,
+                settings.livePlaySuppressHintHighlighting,
+                ::BrowsePuzzleDisplaySettings,
             ),
             combine(
                 settings.liveFileHandlerStorageLocation,
@@ -1035,8 +1046,8 @@ class BrowsePageViewModel(
         }
 
         val showPercentageCorrect
-            = browseSettings.displaySettings.showPercentageCorrect
-        val showRatings = browseSettings.displaySettings
+            = browseSettings.puzzleDisplaySettings.showPercentageCorrect
+        val showRatings = browseSettings.puzzleDisplaySettings
             .ratingsSettings
             .let { rs ->
                 !rs.disableRatings && (
@@ -1044,7 +1055,7 @@ class BrowsePageViewModel(
                 )
             }
 
-        val indicateIfSolution = browseSettings.displaySettings
+        val indicateIfSolution = browseSettings.puzzleDisplaySettings
             .indicateIfSolution
         val dayNightMode = browseSettings.displaySettings.appDayNightMode
         // note, uses unfiltered puzzle list to detect if empty
@@ -1091,6 +1102,8 @@ class BrowsePageViewModel(
             isDownloadOnStartUp = isDownloadOnStartUp,
             currentVersion = currentVersion,
             showDialog = showDialog,
+            suppressHintHighlighting
+                = browseSettings.puzzleDisplaySettings.suppressHintHighlighting,
         )
     }
 
@@ -1137,6 +1150,7 @@ class BrowsePageViewModel(
             date = getDate(pm),
             percentComplete = pm.complete,
             percentFilled = pm.filled,
+            percentHinted = pm.hinted,
             rating = pm.rating,
             hasSolution = pm.hasSolution,
             source = getSource(pm)

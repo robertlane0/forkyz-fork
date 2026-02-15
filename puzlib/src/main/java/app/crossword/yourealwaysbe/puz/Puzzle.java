@@ -476,6 +476,28 @@ public class Puzzle {
         return (filled * 100) / (total);
     }
 
+    /**
+     * Percent of boxes hinted, rounded up to 1 if below 0%
+     */
+    public int getPercentHinted() {
+        int total = 0;
+        int cheated = 0;
+
+        for (int x = 0; x < boxes.length; x++) {
+            for (int y = 0; y < boxes[x].length; y++) {
+                if (!Box.isBlock(boxes[x][y])) {
+                    total++;
+                    if (boxes[x][y].isCheated()) {
+                        cheated++;
+                    }
+                }
+            }
+        }
+
+        int pcnt = (cheated * 100) / (total);
+        return (cheated > 0 &&  pcnt == 0) ? 1 : pcnt;
+    }
+
     public void setSource(String source) {
         this.source = source;
     }

@@ -82,6 +82,9 @@ class MetaCache(private val utils : NativeBackendUtils) {
         var percentFilled : Int,
 
         @ColumnInfo
+        var percentHinted : Int,
+
+        @ColumnInfo
         var source : String?,
 
         @ColumnInfo
@@ -149,7 +152,7 @@ class MetaCache(private val utils : NativeBackendUtils) {
         }
     }
 
-    @Database(entities = [CachedMeta::class], version = 4)
+    @Database(entities = [CachedMeta::class], version = 5)
     abstract class CachedMetaDB : RoomDatabase() {
         abstract fun cachedMetaDao() : CachedMetaDao
 
@@ -188,12 +191,22 @@ class MetaCache(private val utils : NativeBackendUtils) {
                 }
             }
 
+            private val MIGRATION_4_5 = object : Migration(4, 5) {
+                override fun migrate(connection : SQLiteConnection) {
+                    connection.execSQL(
+                        "ALTER TABLE cachedMeta "
+                        + "ADD COLUMN percentHinted INTEGER NOT NULL DEFAULT 0",
+                    )
+                }
+            }
+
             fun getInstance(utils : NativeBackendUtils) : CachedMetaDB {
                 val inst = instance ?: utils.getCachedMetaDBBuilder()
                     .addMigrations(
                         MIGRATION_l_2,
                         MIGRATION_2_3,
                         MIGRATION_3_4,
+                        MIGRATION_4_5,
                     ).build()
                 instance = inst
                 return inst
@@ -213,6 +226,8 @@ class MetaCache(private val utils : NativeBackendUtils) {
             get() = dbRow.percentComplete
         val percentFilled : Int
             get() = dbRow.percentFilled
+        val percentHinted : Int
+            get() = dbRow.percentHinted
         val source : String?
             get() = dbRow.source
         val title : String?
@@ -289,6 +304,7 @@ class MetaCache(private val utils : NativeBackendUtils) {
             date = date,
             percentComplete = puz.getPercentComplete(),
             percentFilled = puz.getPercentFilled(),
+            percentHinted = puz.getPercentHinted(),
             source = puz.getSource(),
             title = puz.getTitle(),
             author = puz.getAuthor(),

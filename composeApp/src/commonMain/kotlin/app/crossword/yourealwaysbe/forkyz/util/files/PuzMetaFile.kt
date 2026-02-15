@@ -40,6 +40,9 @@ class PuzMetaFile internal constructor(
     val filled : Int
         get() = meta.percentFilled
 
+    val hinted : Int
+        get() = meta.percentHinted
+
     val rating : Char
         get() = meta.rating
 
