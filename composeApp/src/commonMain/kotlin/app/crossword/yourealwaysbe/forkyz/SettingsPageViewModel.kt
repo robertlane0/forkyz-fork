@@ -81,6 +81,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_dow
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_time_config
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_tue
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_wed
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_downloads
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_fri
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_fri_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_mon
@@ -1232,23 +1233,6 @@ class SettingsPageViewModel(
             Res.string.custom_daily,
         ),
     ) + downloadersTogglesCustomDaily + downloadersExtraCustomDaily + listOf(
-        SettingsString(
-            SettingsPage.PUZZLE_SOURCES_DAILY,
-            Res.string.custom_title,
-            Res.string.custom_title_desc,
-            Res.string.custom_title_hint,
-            settings.liveDownloadCustomDailyTitle.stateInHere(),
-            settings::setDownloadCustomDailyTitle,
-        ),
-        SettingsString(
-            SettingsPage.PUZZLE_SOURCES_DAILY,
-            Res.string.custom_url,
-            Res.string.custom_url_desc,
-            Res.string.custom_url_hint,
-            settings.liveDownloadCustomDailyURL.stateInHere(),
-            settings::setDownloadCustomDailyURL,
-            downloadCustomDailyURLErrorMsg,
-        ),
         SettingsTriState.build(
             viewModelScope,
             SettingsPage.PUZZLE_SOURCES_WEEKLY,
@@ -2544,6 +2528,11 @@ class SettingsPageViewModel(
     private fun makeDownloaderToggle(
         settingsData : DownloaderSettingsData,
     ) : SettingsBoolean {
+        val errorMsg = if (settingsData.downloaderID == DownloaderID.CUSTOM)
+            downloadCustomDailyURLErrorMsg
+        else
+            null
+
         return SettingsBoolean(
             settingsData.page,
             settingsData.title,
@@ -2556,6 +2545,7 @@ class SettingsPageViewModel(
                     enabled,
                 )
             },
+            errorMsg = errorMsg,
             extraSettingsPage = SettingsPage(settingsData.title),
         )
     }
@@ -2568,6 +2558,36 @@ class SettingsPageViewModel(
     ) : List<SettingsItem> {
         val settingsPage = SettingsPage(settingsData.title)
         val did = settingsData.downloaderID
+
+        val customSettings = if (did == DownloaderID.CUSTOM) {
+            listOf(
+                SettingsString(
+                    settingsPage,
+                    Res.string.custom_title,
+                    Res.string.custom_title_desc,
+                    Res.string.custom_title_hint,
+                    settings.liveDownloadCustomDailyTitle.stateInHere(),
+                    settings::setDownloadCustomDailyTitle,
+                ),
+                SettingsString(
+                    settingsPage,
+                    Res.string.custom_url,
+                    Res.string.custom_url_desc,
+                    Res.string.custom_url_hint,
+                    settings.liveDownloadCustomDailyURL.stateInHere(),
+                    settings::setDownloadCustomDailyURL,
+                    downloadCustomDailyURLErrorMsg,
+                ),
+            )
+        } else {
+            listOf()
+        }
+
+        val heading = SettingsHeading(
+            settingsPage,
+            Res.string.block_auto_downloads,
+        )
+
         val dayToggles = listOf(
             SettingsBoolean(
                 settingsPage,
@@ -2619,6 +2639,7 @@ class SettingsPageViewModel(
                 { settings.setDownloadAutoDownloaderBlockSun(did, it) }
             ),
         )
+
         val toggle = SettingsTriState.build(
             viewModelScope,
             settingsPage,
@@ -2626,7 +2647,8 @@ class SettingsPageViewModel(
             Res.string.toggle_all_auto_download_blocks_desc,
             dayToggles,
         )
-        return listOf(toggle) + dayToggles
+
+        return customSettings + listOf(heading, toggle) + dayToggles
     }
 }
 

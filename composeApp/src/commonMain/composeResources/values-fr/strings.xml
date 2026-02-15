@@ -222,7 +222,7 @@
     <string name="custom_daily">Source quotidienne de Puzzle personnalisée</string>
     <string name="custom_daily_title">Personnalisé quotidiennement</string>
     <string name="custom">Utiliser une source personnalisée</string>
-    <string name="custom_desc">Spécifiez l'URL source ci-dessous.</string>
+    <string name="custom_desc">Spécifiez l'URL source dans les paramètres supplémentaires.</string>
     <string name="custom_title">Nom de Puzzle personnalisé</string>
     <string name="custom_title_desc">Entrer le titre pour la liste de puzzles.</string>
     <string name="custom_title_hint">Nom du puzzle</string>
@@ -294,6 +294,7 @@
     <string name="block_auto_sun_desc">Si le téléchargement automatique est activé, ne téléchargez pas ce puzzle le dimanche.</string>
     <string name="toggle_all_auto_download_blocks">Tous les blocs</string>
     <string name="toggle_all_auto_download_blocks_desc">Activer/désactiver le téléchargement automatique de tous les blocs.</string>
+    <string name="block_auto_downloads">Bloquer les téléchargements automatiques</string>
 
     <!-- preferences display -->
     <string name="clue_below_grid">Indice sous la grille</string>

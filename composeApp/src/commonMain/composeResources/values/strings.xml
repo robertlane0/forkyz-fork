@@ -219,7 +219,7 @@
     <string name="custom_daily">Custom Daily Puzzle Source</string>
     <string name="custom_daily_title">Custom daily</string>
     <string name="custom">Use Custom Source</string>
-    <string name="custom_desc">Specify source URL below.</string>
+    <string name="custom_desc">Specify source URL in extra settings.</string>
     <string name="custom_title">Custom Puzzle Name</string>
     <string name="custom_title_desc">Enter title for puzzle list.</string>
     <string name="custom_title_hint">Puzzle Name</string>
@@ -296,6 +296,7 @@
     <string name="block_auto_sun_desc">If auto-download enabled, don't download this puzzle on Sundays.</string>
     <string name="toggle_all_auto_download_blocks">All Blocks</string>
     <string name="toggle_all_auto_download_blocks_desc">Toggle all auto-download blocks.</string>
+    <string name="block_auto_downloads">Block Auto Downloads</string>
 
     <!-- preferences display -->
     <string name="clue_below_grid">Clue Below Grid</string>
