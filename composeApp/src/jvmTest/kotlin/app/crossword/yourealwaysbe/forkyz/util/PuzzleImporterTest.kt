@@ -18,6 +18,7 @@ import org.mockito.kotlin.stubbing
 
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation
+import app.crossword.yourealwaysbe.forkyz.util.AppStrings
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerJavaFile
 import app.crossword.yourealwaysbe.forkyz.util.files.MetaCache
@@ -42,7 +43,7 @@ class PuzzleImporterTest {
     @get:Rule
     val folder = TemporaryFolder()
 
-    private val utils = JVMNativeBackendUtils()
+    private val utils = JVMNativeBackendUtils(AppStrings())
     private var fileHandler : FileHandler? = null
 
     @Test
@@ -196,6 +197,7 @@ class PuzzleImporterTest {
                             author = null,
                             ratingCode = 0,
                             hasSolution = false,
+                            percentHinted = 0,
                         )
                     )
                 on {

@@ -33,6 +33,8 @@ import org.mockito.Mockito.anyString
 import org.mockito.Mockito.eq
 import org.mockito.Mockito.mock
 
+import app.crossword.yourealwaysbe.forkyz.net.DownloaderID
+
 class TestDataStore(initialDataStoreSettings : Settings) : DataStore<Settings> {
     private var currentDataStoreSettings = initialDataStoreSettings
 
@@ -242,33 +244,33 @@ class ForkyzSettingsTest {
         dontConfirmBrowseDelete = true,
         dontSnapBoardToBorders = true,
         doubleTap = true,
-        download20Minutes = false,
-        downloadCustomDaily = true,
-        downloadDeStandaard = false,
-        downloadDeTelegraaf = false,
-        downloadGuardianDailyCryptic = false,
-        downloadGuardianWeeklyQuiptic = false,
-        downloadHamAbend = false,
-        downloadIndependentDailyCryptic = false,
-        downloadIrishNewsCryptic = false,
-        downloadJonesin = false,
-        downloadJoseph = false,
-        downloadLaCroix = false,
-        downloadLeParisienF1 = false,
-        downloadLeParisienF2 = false,
-        downloadLeParisienF3 = false,
-        downloadLeParisienF4 = false,
-        downloadMetroCryptic = false,
-        downloadMetroQuick = false,
-        downloadNewYorkTimesSyndicated = false,
-        downloadNewsday = false,
-        downloadPremier = false,
-        downloadSheffer = false,
+        download20Minutes = true,
+        downloadCustomDaily = false,
+        downloadDeStandaard = true,
+        downloadDeTelegraaf = true,
+        downloadGuardianDailyCryptic = true,
+        downloadGuardianWeeklyQuiptic = true,
+        downloadHamAbend = true,
+        downloadIndependentDailyCryptic = true,
+        downloadIrishNewsCryptic = true,
+        downloadJonesin = true,
+        downloadJoseph = true,
+        downloadLaCroix = true,
+        downloadLeParisienF1 = true,
+        downloadLeParisienF2 = true,
+        downloadLeParisienF3 = true,
+        downloadLeParisienF4 = true,
+        downloadMetroCryptic = true,
+        downloadMetroQuick = true,
+        downloadNewYorkTimesSyndicated = true,
+        downloadNewsday = true,
+        downloadPremier = true,
+        downloadSheffer = true,
         downloadTimeout = 40000,
-        downloadUSAToday = false,
-        downloadUniversal = false,
-        downloadWaPoSunday = false,
-        downloadWsj = false,
+        downloadUSAToday = true,
+        downloadUniversal = true,
+        downloadWaPoSunday = true,
+        downloadWsj = true,
         duckDuckGoEnabled = false,
         ensureVisible = false,
         enterChangesDirection = false,
@@ -307,11 +309,11 @@ class ForkyzSettingsTest {
         safToImportFailedFolderUri = "xx",
         safToImportFolderUri = "xx",
         scale = 1.2F,
-        scrapeCru = false,
-        scrapeGuardianQuick = false,
-        scrapeKegler = false,
-        scrapePrivateEye = false,
-        scrapePrzekroj = false,
+        scrapeCru = true,
+        scrapeGuardianQuick = true,
+        scrapeKegler = true,
+        scrapePrivateEye = true,
+        scrapePrzekroj = true,
         scratchMode = true,
         showCluesOnPlayScreen = false,
         showCount = true,
@@ -344,6 +346,46 @@ class ForkyzSettingsTest {
         expandableClueLine = false,
         llmVoiceCommands = false,
         movementStrategyClueList = MovementStrategySetting.MSS_MOVE_NEXT_CLUE,
+        autoDownloadersBlockMon = listOf(),
+        autoDownloadersBlockTue = listOf(),
+        autoDownloadersBlockWed = listOf(),
+        autoDownloadersBlockThu = listOf(),
+        autoDownloadersBlockFri = listOf(),
+        autoDownloadersBlockSat = listOf(),
+        autoDownloadersBlockSun = listOf(),
+        // these were available when migration from shared prefs
+        // happened
+        disabledDownloaders = listOf(
+            DownloaderID.TWENTY_MINUTES.id,
+            DownloaderID.JOSEPH.id,
+            DownloaderID.PREMIER.id,
+            DownloaderID.SHEFFER.id,
+            DownloaderID.CRYPTIC_CRU.id,
+            DownloaderID.DE_STANDAARD.id,
+            DownloaderID.DE_TELEGRAAF.id,
+            DownloaderID.GUARDIAN_DAILY_CRYPTIC.id,
+            DownloaderID.GUARDIAN_QUICK.id,
+            DownloaderID.GUARDIAN_WEEKLY_QUIPTIC.id,
+            DownloaderID.HAM_ABEND.id,
+            DownloaderID.INDEPENDENT_DAILY_CRYPTIC.id,
+            DownloaderID.IRISH_NEWS_CRYPTIC.id,
+            DownloaderID.JONESIN.id,
+            DownloaderID.KEGLAR.id,
+            DownloaderID.LE_PARISIEN_F1.id,
+            DownloaderID.LE_PARISIEN_F2.id,
+            DownloaderID.LE_PARISIEN_F3.id,
+            DownloaderID.LE_PARISIEN_F4.id,
+            DownloaderID.METRO_CRYPTIC.id,
+            DownloaderID.METRO_QUICK.id,
+            DownloaderID.NEWSDAY.id,
+            DownloaderID.NYT_SYNDICATED.id,
+            DownloaderID.PRIVATE_EYE.id,
+            DownloaderID.PRZEKROJ.id,
+            DownloaderID.UNIVERSAL.id,
+            DownloaderID.USA_TODAY.id,
+            DownloaderID.WAPO_SUNDAY.id,
+            DownloaderID.WSJ.id,
+        ),
     )
 
     @ExperimentalCoroutinesApi
@@ -660,7 +702,12 @@ class ForkyzSettingsTest {
 
         migratePreferences(prefs, settings)
 
-        val migratedSettings = runBlocking { datastore.data.first() }
+        val migratedSettingsUnsorted = runBlocking { datastore.data.first() }
+        val migratedSettings = migratedSettingsUnsorted.copy(
+            disabledDownloaders
+                = migratedSettingsUnsorted.disabledDownloaders.sorted()
+        )
+
         assertEquals(migratedSettings, settingsValue3)
     }
 

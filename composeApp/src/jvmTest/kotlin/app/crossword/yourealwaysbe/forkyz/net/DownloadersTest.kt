@@ -12,6 +12,7 @@ import org.junit.runners.Parameterized.Parameters
 import org.junit.runners.Parameterized
 
 import app.crossword.yourealwaysbe.forkyz.settings.DownloadersSettings
+import app.crossword.yourealwaysbe.forkyz.util.AppStrings
 import app.crossword.yourealwaysbe.forkyz.util.JVMNativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.files.NoopFileHandler
 
@@ -33,9 +34,15 @@ class DownloadersTest(
             "", // customDailyUrl,
             true, // suppressSummaryNotifications,
             true, // suppressIndividualNotifications,
-            Collections.emptySet(), // autoDownloaders,
             30000, // downloadTimeout,
             false, // downloadOnStartup
+            Collections.emptySet(), // autoDownloadersBlockMon,
+            Collections.emptySet(), // autoDownloadersBlockTue,
+            Collections.emptySet(), // autoDownloadersBlockWed,
+            Collections.emptySet(), // autoDownloadersBlockThu,
+            Collections.emptySet(), // autoDownloadersBlockFri,
+            Collections.emptySet(), // autoDownloadersBlockSat,
+            Collections.emptySet(), // autoDownloadersBlockSun,
         )
 
         /**
@@ -47,7 +54,8 @@ class DownloadersTest(
         @Parameters(name = "Downloader {0}")
         @JvmStatic
         fun downloaders() : Iterable<Array<Any>>? {
-            val utils = JVMNativeBackendUtils()
+            val strings = AppStrings()
+            val utils = JVMNativeBackendUtils(strings)
             val dls = Downloaders(
                 utils,
                 NoopFileHandler(utils),
