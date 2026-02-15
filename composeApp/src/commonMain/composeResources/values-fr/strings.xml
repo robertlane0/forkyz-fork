@@ -292,6 +292,8 @@
     <string name="block_auto_sat_desc">Si le téléchargement automatique est activé, ne téléchargez pas ce puzzle le samedi.</string>
     <string name="block_auto_sun">Bloquer le téléchargement automatique le dimanche</string>
     <string name="block_auto_sun_desc">Si le téléchargement automatique est activé, ne téléchargez pas ce puzzle le dimanche.</string>
+    <string name="toggle_all_auto_download_blocks">Tous les blocs</string>
+    <string name="toggle_all_auto_download_blocks_desc">Activer/désactiver le téléchargement automatique de tous les blocs.</string>
 
     <!-- preferences display -->
     <string name="clue_below_grid">Indice sous la grille</string>

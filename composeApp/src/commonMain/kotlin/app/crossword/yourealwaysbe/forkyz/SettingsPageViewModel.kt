@@ -81,6 +81,20 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_dow
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_time_config
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_tue
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_download_wed
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_fri
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_fri_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_mon
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_mon_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_sat
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_sat_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_sun
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_sun_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_thu
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_thu_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_tue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_tue_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_wed
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_wed_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.blue_theme
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.browse_always_show_rating
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.browse_always_show_rating_desc
@@ -391,6 +405,8 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.tf1_mots_flech
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.theme_preference
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.theme_preference_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.thirty_seconds
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.toggle_all_auto_download_blocks
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.toggle_all_auto_download_blocks_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.toggle_all_daily_sources
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.toggle_all_daily_sources_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.toggle_all_scrapers
@@ -418,20 +434,6 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.wall_street_jo
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.washington_post_sunday
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.weekly_crosswords
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.weekly_crosswords_desc
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_fri
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_fri_desc
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_mon
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_mon_desc
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_sat
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_sat_desc
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_sun
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_sun_desc
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_thu
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_thu_desc
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_tue
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_tue_desc
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_wed
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.block_auto_wed_desc
 import app.crossword.yourealwaysbe.forkyz.net.Downloader
 import app.crossword.yourealwaysbe.forkyz.net.DownloaderID
 import app.crossword.yourealwaysbe.forkyz.net.DownloadersProvider
@@ -2566,7 +2568,7 @@ class SettingsPageViewModel(
     ) : List<SettingsItem> {
         val settingsPage = SettingsPage(settingsData.title)
         val did = settingsData.downloaderID
-        return listOf(
+        val dayToggles = listOf(
             SettingsBoolean(
                 settingsPage,
                 Res.string.block_auto_mon,
@@ -2617,6 +2619,14 @@ class SettingsPageViewModel(
                 { settings.setDownloadAutoDownloaderBlockSun(did, it) }
             ),
         )
+        val toggle = SettingsTriState.build(
+            viewModelScope,
+            settingsPage,
+            Res.string.toggle_all_auto_download_blocks,
+            Res.string.toggle_all_auto_download_blocks_desc,
+            dayToggles,
+        )
+        return listOf(toggle) + dayToggles
     }
 }
 

@@ -294,6 +294,8 @@
     <string name="block_auto_sat_desc">If auto-download enabled, don't download this puzzle on Saturdays.</string>
     <string name="block_auto_sun">Block Auto-Download Sunday</string>
     <string name="block_auto_sun_desc">If auto-download enabled, don't download this puzzle on Sundays.</string>
+    <string name="toggle_all_auto_download_blocks">All Blocks</string>
+    <string name="toggle_all_auto_download_blocks_desc">Toggle all auto-download blocks.</string>
 
     <!-- preferences display -->
     <string name="clue_below_grid">Clue Below Grid</string>
