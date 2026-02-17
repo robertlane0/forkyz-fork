@@ -210,22 +210,15 @@ class ClueTabsViewModel(
     }
 
     override fun onPlayboardChange(changes : PlayboardChanges) {
-        val needsRefresh = isVisible && (
-            changes.currentWord != changes.previousWord
-            || changes.isHistoryChange()
-            || !changes.changedClueIDs.isEmpty()
-        )
-        if (needsRefresh) {
-            viewModelScope.launch {
-                currentUIState = currentUIState.copy(
-                    pages = getStatePages(
-                        playboardChanges = changes,
-                        currentPages = currentUIState.pages,
-                    )
+        viewModelScope.launch {
+            currentUIState = currentUIState.copy(
+                pages = getStatePages(
+                    playboardChanges = changes,
+                    currentPages = currentUIState.pages,
                 )
-                if (changes.previousWord != board?.currentWord)
-                    snapToClueIfEnabled()
-            }
+            )
+            if (changes.previousWord != board?.currentWord)
+                snapToClueIfEnabled()
         }
     }
 
@@ -363,8 +356,8 @@ class ClueTabsViewModel(
     }
 
     private suspend fun getStatePages(
-        playboardChanges: PlayboardChanges? = null,
-        currentPages: List<ClueList>? = null,
+        playboardChanges : PlayboardChanges? = null,
+        currentPages : List<ClueList>? = null,
     ) : List<ClueList> {
         if (playboardChanges != null && currentPages != null) {
             return getStatePagesOptimized(playboardChanges, currentPages)
@@ -399,11 +392,19 @@ class ClueTabsViewModel(
     }
 
     private suspend fun getStatePagesOptimized(
-        changes: PlayboardChanges,
-        currentPages: List<ClueList>,
+        changes : PlayboardChanges,
+        currentPages : List<ClueList>,
     ) : List<ClueList> {
         val historyChange = changes.isHistoryChange()
         val historyPageNum = currentPages.size - 1
+        // need to calculate this as some clues might be filled due to
+        // box changes
+        val changedClueIDs = (
+            changes.changedClueIDs.toSet()
+            + changes.cellChanges.flatMap {
+                board?.puzzle?.checkedGetBox(it)?.getIsPartOfClues() ?: setOf()
+            }.toSet()
+        )
 
         return currentPages.mapIndexed { pageIndex, page ->
             val isHistoryPage = pageIndex == historyPageNum
@@ -422,6 +423,7 @@ class ClueTabsViewModel(
                             cid = cid,
                             existingItem = existingItem,
                             changes = changes,
+                            changedClueIDs = changedClueIDs,
                             showDirection = true,
                         )
                     } else {
@@ -438,6 +440,7 @@ class ClueTabsViewModel(
                         cid = cid,
                         existingItem = clueItem,
                         changes = changes,
+                        changedClueIDs = changedClueIDs,
                         showDirection = isHistoryPage,
                     )
                 }
@@ -449,15 +452,16 @@ class ClueTabsViewModel(
 
     private suspend fun updateClueItemIfNeeded(
         cid: ClueID,
-        existingItem: ClueItem,
-        changes: PlayboardChanges,
-        showDirection: Boolean,
+        existingItem : ClueItem,
+        changes : PlayboardChanges,
+        changedClueIDs : Set<ClueID>,
+        showDirection : Boolean,
     ): ClueItem {
         val currentWordCid = changes.currentWord?.clueID
         val previousWordCid = changes.previousWord?.clueID
         val needsSelectedUpdate
             = cid == currentWordCid || cid == previousWordCid
-        val needsRecalculation = changes.changedClueIDs.contains(cid)
+        val needsRecalculation = changedClueIDs.contains(cid)
 
         return if (needsRecalculation) {
             getClueItem(cid = cid, showDirection = showDirection)
