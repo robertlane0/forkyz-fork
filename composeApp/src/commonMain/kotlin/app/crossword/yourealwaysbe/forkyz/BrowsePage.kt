@@ -571,6 +571,7 @@ fun BrowsePage(
                     ThemeButton()
                     OverflowMenu()
                 },
+                onExit = if (utils.hasExitButton) utils::onExit else null,
             )
         }
     }

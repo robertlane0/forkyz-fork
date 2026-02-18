@@ -336,6 +336,7 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
         // exit after pending imports to avoid multiple copies of the app
         // running, which is hella confusing
         override val isExitAfterPendingImports : Boolean = true
+        override val hasExitButton : Boolean = false
 
         override fun onFinish() { finish() }
 

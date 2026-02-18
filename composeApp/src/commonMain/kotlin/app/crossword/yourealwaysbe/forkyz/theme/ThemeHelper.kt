@@ -69,6 +69,7 @@ class ThemeHelper(val settings : ForkyzSettings) {
         title : @Composable () -> Unit,
         actions : @Composable RowScope.() -> Unit = { },
         onBack : (() -> Unit)? = null,
+        onExit : (() -> Unit)? = null,
         scrollBehavior : TopAppBarScrollBehavior? = null,
     ) {
         val dayNightMode by getAppDayNightModeState()
@@ -80,6 +81,7 @@ class ThemeHelper(val settings : ForkyzSettings) {
             title = title,
             actions = actions,
             onBack = onBack,
+            onExit = onExit,
             scrollBehavior = scrollBehavior,
         )
     }
