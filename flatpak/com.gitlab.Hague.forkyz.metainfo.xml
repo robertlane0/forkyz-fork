@@ -22,6 +22,11 @@
         formats de fichiers, ou téléchargés à partir de divers points de vente en utilisant l' intégré
         téléchargeurs.
     </p>
+    <p xml:lang="nl">
+        Forkyz is een niet-officiële splitsing van de Shortyz Android kruiswoord-app.
+        Puzzels kunnen geïmporteerd worden vanuit een groot aantal ondersteunde bestandsformaten,
+        of kunnen door middel van de ingebouwde downloaders via verschillende publiceerders opgehaald worden.
+    </p>
   </description>
 
   <launchable type="desktop-id">com.gitlab.Hague.forkyz.desktop</launchable>

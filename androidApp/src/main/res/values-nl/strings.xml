@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources
+    xmlns:tools="http://schemas.android.com/tools"
+>
+    <!-- permissions -->
+    <string name="perm_internet_desc">Vereist om puzzels van het internet op te halen.</string>
+    <string name="perm_access_network_state_desc">Vereist om achtergronddownloads te begrenzen wanneer mobiel netwerk of wifi is ingeschakeld.</string>
+    <string name="perm_boot_desc">Vereist om (optioneel) periodiek puzzels op te halen op de achtergrond.</string>
+    <string name="vibrate_desc">Vereist voor trilling van ingebouwd toetsenbord.</string>
+    <string name="wake_lock_desc">Alleen gebruikt voor automatisch ophalen van puzzels op oudere versies van Android.</string>
+    <string name="notification_permission_desc">Gebruikt voor meldingen over het ophalen van puzzels (wanneer niet uitgeschakeld in de instellingen).</string>
+    <string name="foreground_service_desc">Gebruikt om puzzels op een betrouwbare manier op te slaan.</string>
+    <string name="foreground_service_data_sync_desc">Gebruikt voor het exporteren van puzzels naar een externe opslag.</string>
+
+    <!-- manifest -->
+    <string name="app_name">Forkyz</string>
+</resources>

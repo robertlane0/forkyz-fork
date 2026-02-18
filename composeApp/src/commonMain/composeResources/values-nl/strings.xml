@@ -1,0 +1,813 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources
+    xmlns:tools="http://schemas.android.com/tools"
+>
+    <string name="app_name">Forkyz</string>
+    <string name="reveal_puzzle">Hele puzzel onthullen</string>
+    <string name="are_you_sure">Weet je het zeker?</string>
+    <string name="close">Sluiten</string>
+    <string name="exit">Afsluiten</string>
+    <string name="elapsed_time">Verlopen tijd: %1$s</string>
+    <string name="general_clue_notes">Vrije notities over omschrijving</string>
+    <string name="general_puzzle_notes">Vrije notities over puzzel</string>
+    <string name="unknown_hint">(Geen expliciete omschrijving)</string>
+    <string name="no_orientation_lock">Excuses, oriëntatievergrendeling wordt niet meer ondersteund zonder volledig scherm-modus vanwege een wijziging in Android."</string>
+    <string name="back">Terug</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Annuleer</string>
+    <string name="feature_not_implemented">Functie niet geïmplementeerd.</string>
+    <string name="announce_not_implemented">Aankondigen niet geïmplementeerd, schakel uit in spraakinstellingen.</string>
+
+    <!-- notifications -->
+    <string name="download_notification_channel_name">Downloads</string>
+    <string name="download_notification_channel_desc">Meldingen over opgehaalde puzzels</string>
+    <string name="save_notification_channel_name">Puzzel opslaan</string>
+    <string name="save_notification_channel_desc">Melding wanneer puzzel wordt opgeslagen.</string>
+    <string name="saving_puzzle">Puzzel opslaan.</string>
+    <string name="export_notification_channel_name">Puzzels exporteren</string>
+    <string name="export_notification_channel_desc">Melding wanneer puzzels worden geëxporteerd.</string>
+    <string name="exporting_puzzles">Puzzels exporteren</string>
+
+    <!-- downloading -->
+    <string name="download">Download</string>
+    <string name="puzzles_downloading">Puzzels ophalen</string>
+    <string name="puzzles_downloading_from">Puzzels ophalen uit %s</string>
+    <string name="puzzles_downloaded_all">Nieuwe puzzels opgehaald</string>
+    <string name="puzzles_downloaded_some">Sommige puzzels opgehaald en sommige mislukt</string>
+    <string name="puzzles_downloaded_none">Puzzels ophalen mislukt</string>
+    <string name="puzzle_downloaded">Opgehaald %1$s</string>
+    <string name="puzzle_download_failed">Ophalen uit %1$s mislukt</string>
+    <string name="puzzle_download_no_connection">Geen puzzels opgehaald omdat er geen netwerkverbinding is.</string>
+
+    <!-- imports -->
+    <string name="import_fallback_source">Importeren</string>
+    <string name="imports_title">Geïmporteerd</string>
+    <string name="import_success">Puzzel(s) geïmporteerd</string>
+    <string name="import_failure">Sommige puzzels niet geïmporteerd</string>
+    <string name="import_success_long">De geselecteerde puzzels waren geïmporteerd.</string>
+    <string name="import_failure_long">Sommige puzzels waren niet geïmporteerd.</string>
+    <string name="select_puzzle_files">Selecteer puzzelbestanden</string>
+
+    <!-- Browse -->
+    <string name="unknown_source">Onbekende bron</string>
+    <plurals name="num_selected">
+        <item quantity="other">%d Geselecteerd</item>
+    </plurals>
+    <string name="delete">Verwijderen</string>
+    <string name="archive">Archiveren</string>
+    <string name="delete_selected">Verwijderen</string>
+    <string name="toggle_archive_selected">Archiveren of terugzetten</string>
+    <string name="toggle_archive">Archiveren of terugzetten</string>
+    <string name="add_puzzle">Puzzel toevoegen</string>
+    <string name="online_sources">Online bronnen</string>
+    <string name="online_sources_url">https://hague.gitlab.io/forkyz</string>
+    <string name="import_puzzle">Puzzel importeren</string>
+    <string name="download_puzzles">Puzzles ophalen</string>
+    <string name="no_puzzles_download_or_configure_storage">Geen puzzels gevonden. Haal puzzels op met de knop hieronder of configureer een opslag in de instellingen.</string>
+    <string name="no_puzzles">Geen puzzels gevonden.</string>
+    <string name="unable_to_read_file">Kan bestand niet lezen %1$s</string>
+    <string name="please_wait">Wachten a.u.b.&#8230;</string>
+    <string name="internal_storage_description">Interne opslag momenteel in gebruikt. Puzzels zullen verwijderd worden als Forkyz gedeïnstalleerd wordt.</string>
+    <string name="title_view_archives">Archief</string>
+    <string name="title_view_crosswords">Kruiswoord</string>
+    <string name="puzzle_caption_with_author">%1$s door %2$s</string>
+    <string name="download_but_no_active_network">Schakel a.u.b. een netwerkverbinding in voor het ophalen van puzzels.</string>
+    <string name="downloader_available_soon">(over &lt;1 uur)</string>
+    <plurals name="downloader_available_hours">
+        <item quantity="one">(Over ~%1$d uur)</item>
+        <item quantity="other">(Over ~%1$d uur)</item>
+    </plurals>
+    <string name="downloader_available_future">(Nog niet beschikbaar)</string>
+    <string name="downloader_not_available">(Niet beschikbaar)</string>
+    <string name="notifications_request_rationale">Meldingen voor het ophalen van puzzels ingeschakeld. Toestaan of uitschakelen in de ophaalinstellingen.</string>
+    <string name="disable_notifications">Meldingen uitschakelen?</string>
+    <string name="notifications_denied_msg">Meldingen voor het ophalen van puzzels zijn geweigerd in de Android-instellingen. Wil je de ophaalmeldingen uitschakelen in de Forkyz-instellingen? Als je meldingen wilt behouden, schakel meldingen in voor Forkyz in de Android-instellingen.</string>
+    <string name="disable_notifications_button">Uitschakelen</string>
+    <string name="android_app_settings_button">Instellingen</string>
+    <string name="new_version_title">Welkom bij Forkyz versie %1$s</string>
+    <string name="new_version_message">Een lijst met wijzigingen is beschikbaar in de publicatieopmerkingen in de instellingen.</string>
+    <string name="view_release_notes">Wijzigingen bekijken</string>
+    <string name="filter_puzzles_hint">Tekst filteren</string>
+    <string name="filter_puzzles">Puzzels filteren</string>
+    <string name="has_solution_desc">Puzzel heeft oplossing</string>
+    <string name="cleanup_age_two_days">Twee dagen</string>
+    <string name="cleanup_age_one_week">Een week</string>
+    <string name="cleanup_age_thirty_days">Dertig dagen</string>
+    <string name="cleanup_age_never">Nooit</string>
+    <string name="dont_confirm_cleanup">Opruimen niet bevestigen</string>
+    <string name="dont_confirm_cleanup_desc">Geen bevestigingsvenster weergeven voor het opruimen.</string>
+    <string name="dont_confirm_browse_delete">Puzzel verwijderen niet bevestigen</string>
+    <string name="dont_confirm_browse_delete_desc">Geen bevestigingsvenster weergeven voor het verwijderen van puzzels.</string>
+    <string name="confirm_cleanup">Opruimen bevestigen</string>
+    <string name="confirm_cleanup_msg">Weet je zeker dat je oude puzzels wilt opruimen?</string>
+    <string name="no_cleanup_action">Geen opruimactie</string>
+    <string name="no_cleanup_action_msg">Opruimen zal niet gebeuren omdat de opruimtijd in de Lijst-instellingen op "Nooit" staat.</string>
+    <string name="confirm_delete">Verwijderen bevestigen</string>
+    <plurals name="confirm_delete_msg">
+        <item quantity="one">Geselecteerde puzzel verwijderen?</item>
+        <item quantity="other">Geselecteerde puzzels verwijderen?</item>
+    </plurals>
+    <string name="no_downloaders_enabled">Geen bronnen ingeschakeld</string>
+    <string name="no_downloaders_enabled_msg">Schakel een aantal puzzelbronnen in via de instellingen om puzzels op te halen.</string>
+
+    <!-- play page -->
+    <string name="open_clue_list">Lijst met omschrijvingen openen</string>
+    <string name="toggle_clue_tabs">Toon/verberg omschrijvingen onder raster</string>
+    <string name="open_clue_notes">Pagina met omschrijvingsnotities openen</string>
+    <string name="select_clue">Omschrijving selecteren</string>
+
+    <!-- clues list -->
+    <string name="clues_list_label">Omschrijvingen</string>
+    <string name="current_word">Huidig woord</string>
+    <string name="clue_word">Het rasterwoord voor de omschrijving</string>
+    <string name="clue_hint">Omschrijvingshint</string>
+    <string name="edit_clue">Omschrijving bewerken</string>
+
+    <!-- notes page -->
+    <string name="anagram_source_lab">Overige anagramletters</string>
+    <string name="anagram_solution_lab">Oplossing anagram</string>
+    <string name="board_lab">Plank</string>
+    <string name="scratch_lab">Krabbels</string>
+    <string name="notes_lab">Notities</string>
+    <string name="copy_conflict">Conflict kopiëren</string>
+    <string name="transfer_overwrite_warning">Het overzetten van het antwoord levert een conflict op met bestaande vermeldingen. Toch overschrijven?</string>
+    <string name="flag_clue">Omschrijving markeren</string>
+    <string name="transfer_board_to_focussed_view">Plank overbrengen naar de huidige geselecteerde weergave</string>
+    <string name="transfer_scratch_to_focussed_view">Krabbels overbrengen naar de huidige geselecteerde weergave</string>
+    <string name="shuffle_anagram_source">Hussel bronletters van het anagram</string>
+    <string name="transfer_anagram_solution_to_focussed_view">Anagram-oplossing overbrengen naar de huidige geselecteerde weergave</string>
+    <string name="flag_color_title">Markeerkleur selecteren</string>
+    <string name="choose_flag_color">Markeerkleur kiezen.</string>
+
+    <!-- clue formats -->
+    <string name="clue_format_short_no_dir">%1$s. %2$s</string>
+    <string name="clue_format_short_no_dir_with_count">%1$s. %2$s [%3$d]</string>
+    <string name="clue_format_short">%1$s%2$s. %3$s</string>
+    <string name="clue_format_short_with_count">%1$s%2$s. %3$s [%4$d]</string>
+    <string name="clue_format_long">(%1$s) %2$s. %3$s</string>
+    <string name="clue_format_long_with_count">(%1$s) %2$s. %3$s [%4$d]</string>
+    <string name="clue_format_long_no_num">(%1$s) %2$s</string>
+    <string name="clue_format_long_no_num_with_count">(%1$s) %2$s [%3$d]</string>
+    <string name="clue_format_short_no_num">%1$s. %2$s</string>
+    <string name="clue_format_short_no_num_with_count">%1$s. %2$s [%3$d]</string>
+    <string name="clue_format_short_no_num_no_dir">%1$s</string>
+    <string name="clue_format_short_no_num_no_dir_with_count">%1$s [%2$d]</string>
+
+    <!-- Puzzle Info Dialog -->
+    <string name="introduction">Introductie</string>
+    <string name="notes">Notities</string>
+    <string name="completed">Voltooid</string>
+
+    <!-- preferences -->
+    <string name="settings_label">Instellingen</string>
+    <string name="storage_location">Opslaglocatie</string>
+    <string name="storage_location_desc">Configureer waar Forkyz bestanden opslaat/vind. Herstart app na wijzigen.</string>
+    <string name="internal_storage">Interne app-opslag</string>
+    <string name="external_storage_saf">Externe opslag</string>
+    <string name="external_storage_saf_current_uri">(Current: %1$s)</string>
+    <string name="external_storage_saf_none_selected">geen opslag geselecteerd</string>
+    <string name="storage_changed_title">Opslag verandert</string>
+    <string name="storage_changed_please_restart">Start Forkyz a.u.b. opnieuw op om de wijziging toe te passen.</string>
+    <string name="failed_to_initialise_saf">Kon externe opslag niet initialiseren.</string>
+    <string name="storage_problem_falling_back_internal">Fout bij toegang tot geconfigureerde opslag, terugvallen op interne opslag.</string>
+    <string name="storage_full_warning">Waarschuwing, er is weinig opslagruimte beschikbaar. De app werkt mogelijk niet correct.</string>
+    <string name="storage_select_saf_info">Maak of selecteer een map voor kruiswoordpuzzels.</string>
+    <string name="select_sources">Puzzelbronnen</string>
+    <string name="select_sources_desc">Bronnen voor het ophalen van puzzels in/uitschakelen.</string>
+    <string name="browser_settings">Lijst</string>
+    <string name="browser_settings_desc">Gedrag en uiterlijk van de lijst met puzzels.</string>
+    <string name="interaction_settings">Interactie</string>
+    <string name="interaction_settings_desc">Gedrag and besturing van het puzzelraster tijdens het oplossen.</string>
+    <string name="voice_settings">Spraak en toegankelijkheid</string>
+    <string name="voice_settings_desc">Configureer het gebruik van spraakbesturing en voorlezen.</string>
+    <string name="keyboard_settings">Toetsenbord</string>
+    <string name="keyboard_settings_desc">Uiterlijk, gedrag, en type toetsenbord dat gebruikt wordt tijdens het invullen van tekst.</string>
+    <string name="display_settings">Weergave</string>
+    <string name="display_settings_desc">Uiterlijk van de app en weergegeven puzzelraster.</string>
+    <string name="download_settings">Puzzels ophalen</string>
+    <string name="download_settings_desc">Opties voor het ophalen van puzzels.</string>
+    <string name="about_forkyz">Over Forkyz</string>
+    <string name="release_notes">Publicatieopmerkingen</string>
+    <string name="license">Licentie</string>
+    <string name="filter_settings_title">Instellingen zoeken</string>
+    <string name="filter_settings_hint">Instellingen zoeken</string>
+    <string name="filter_settings_close">Zoeken annuleren</string>
+
+    <!-- preferences browse -->
+    <string name="browse_always_show_rating">Altijd beoordeling weergeven</string>
+    <string name="browse_always_show_rating_desc">Puzzelbeoordeling op alle lijsten weergeven, niet alleen de archieven.</string>
+    <string name="browse_show_percentage_correct">Percentage correct weergeven</string>
+    <string name="browse_show_percentage_correct_desc">Percentage van juiste vakjes weergeven, in plaats van percentage ingevulde vakjes (zoals Shortyz).</string>
+    <string name="cleanup_archives">Archieven opruimen</string>
+    <string name="cleanup_archives_desc">Bepaalt hoe oud een gearchiveerde puzzel moet zijn voordat het verwijderd wordt.</string>
+    <string name="cleanup_unfinished">Opruimen onvoltooid</string>
+    <string name="cleanup_unfinished_desc">Bepaalt hoe oud een onvoltooide puzzel moet zijn voordat het gearchiveerd/verwijderd wordt.</string>
+    <string name="delete_on_cleanup">Verwijderen bij opruimen</string>
+    <string name="delete_on_cleanup_desc">Oude puzzels liever verwijderen dan archiveren.</string>
+    <string name="disable_swipe">Vegen uitschakelen</string>
+    <string name="disable_swipe_desc">Schakelt vegen om te verwijderen uit op de lijstweergave.</string>
+    <string name="swipe_action">Veegactie</string>
+    <string name="swipe_action_desc">Bij vegen verwijderen of archiveren selecteren.</string>
+    <string name="browse_indicate_if_solution">Aangeven of puzzel een oplossing heeft</string>
+    <string name="browse_indicate_if_solution_desc">Een gloeilampje weergeven als de puzzel antwoorden heeft die onthuld kunnen worden, wordt gebruikt om fouten te controleren en om voltooide puzzels te detecteren.</string>
+
+    <!-- preferences custom -->
+    <string name="custom_daily">Aangepaste dagelijkse puzzelbron</string>
+    <string name="custom_daily_title">Aangepast dagelijks</string>
+    <string name="custom">Aangepaste bron gebruiken</string>
+    <string name="custom_desc">Geef hieronder de bron-URL op.</string>
+    <string name="custom_title">Aangepaste puzzelnaam</string>
+    <string name="custom_title_desc">Titel voor puzzellijst.</string>
+    <string name="custom_title_hint">Puzzelnaam</string>
+    <string name="custom_url">Aangepaste bron-URL</string>
+    <string name="custom_url_desc">Voer een URL in die is geformatteerd volgens Java's DateTimeFormatter. De puzzel kan in elk ondersteund formaat zijn.</string>
+    <string name="custom_url_hint">Bron-URL</string>
+    <string name="custom_url_missing">Voer een URL in voor de aangepaste puzzel.</string>
+
+    <!-- preferences daily -->
+    <string name="updates_mon_fri">Publiceert maandag-vrijdag.</string>
+    <string name="updates_mon_sat">Publiceert maandag-zaterdag.</string>
+    <string name="updates_daily">Publiceert dagelijks.</string>
+    <string name="hamburger_abendblatt_daily">(DE) Hamburger Abendblatt</string>
+    <string name="hamburger_abendblatt_daily_desc">Dagelijkse kruiswoord in het Duits.</string>
+    <string name="vingminutes">(FR) 20 Minutes</string>
+    <string name="vingminutes_desc">Dagelijkse kruiswoord in het Frans, niveau 2.</string>
+    <string name="la_times">LA Times Daily</string>
+    <string name="la_times_desc">Publiceert dagelijks. Via de Chicago Tribune.</string>
+    <string name="le_parisien_daily_f1">(FR) Legacy Le Parisien Force 1</string>
+    <string name="le_parisien_daily_f1_desc">Dagelijkse kruiswoord in het Frans, niveau 1. Komt niet meer overeen met huidige website, maar puzzels blijven beschikbaar.</string>
+    <string name="le_parisien_daily_f2">(FR) Legacy Le Parisien Force 2</string>
+    <string name="le_parisien_daily_f2_desc">Dagelijkse kruiswoord in het Frans, niveau 2. Komt niet meer overeen met huidige website, maar puzzels blijven beschikbaar.</string>
+    <string name="le_parisien_daily_f3">(FR) Legacy Le Parisien Force 3</string>
+    <string name="le_parisien_daily_f3_desc">Dagelijkse kruiswoord in het Frans, niveau 3. Komt niet meer overeen met huidige website, maar puzzels blijven beschikbaar.</string>
+    <string name="le_parisien_daily_f4">(FR) Legacy Le Parisien Force 4</string>
+    <string name="le_parisien_daily_f4_desc">Dagelijkse kruiswoord in het Frans, niveau 4. Komt niet meer overeen met huidige website, maar puzzels blijven beschikbaar..</string>
+    <string name="nrc_in_het_midden">(NL) NRC In Het Midden</string>
+    <string name="nrc_in_het_midden_desc">Publiceert maandag-vrijdag, in het Nederlands.</string>
+    <string name="nrc_scrypto">(NL) NRC Scrypto</string>
+    <string name="nrc_scrypto_desc">Publiceert op zaterdag, in het Nederlands.</string>
+    <string name="guardian_daily">Guardian Daily Cryptic</string>
+    <string name="guardian_quiptic">Guardian Weekly Quiptic</string>
+    <string name="independent_daily">Independent Daily Cryptic</string>
+    <string name="newsday">Newsday</string>
+    <string name="new_york_times_syndicated">New York Times Syndicated</string>
+    <string name="joseph_crossword">Thomas Joseph Crossword</string>
+    <string name="sheffer_crossword">Sheffer Crossword</string>
+    <string name="universal_crossword">Universal Crossword</string>
+    <string name="usa_today">USA Today</string>
+    <string name="uclick_copyright">uclick LLC</string>
+    <string name="de_standaard">(FL) De Standaard</string>
+    <string name="de_standaard_desc">Dagelijkse kruiswoord in het Vlaams.</string>
+    <string name="metro_cryptic">Metro Cryptic</string>
+    <string name="metro_quick">Metro Quick</string>
+    <string name="irish_news_cryptic">Irish News Cryptic</string>
+    <string name="toggle_all_daily_sources">Alle dagelijkse bronnen</string>
+    <string name="toggle_all_daily_sources_desc">Schakel alle dagelijkse bronnen in.</string>
+    <string name="toggle_all_weekly_sources">Alle wekelijkse bronnen</string>
+    <string name="toggle_all_weekly_sources_desc">Schakel alle wekelijkse bronnen in.</string>
+    <string name="toggle_all_scrapers">Alle scrapers</string>
+    <string name="toggle_all_scrapers_desc">Schakel alle scrapers in.</string>
+    <string name="elpais_experto">(ES) El País Experto</string>
+    <string name="elpais_experto_desc">Publiceert dagelijks</string>
+    <string name="tf1_mots_croises" tools:ignore="Typos">(FR) TF1 Mots Croisés</string>
+    <string name="tf1_mots_fleches" tools:ignore="Typos">(FR) TF1 Mots Fléchés</string>
+    <string name="sud_ouest_mots_fleches">(FR) Sud Ouest Mots Fléchés</string>
+    <string name="sud_ouest_mots_croises">(FR) Sud Ouest Mots Croisés</string>
+    <string name="la_croix">(FR) La Croix</string>
+
+    <!-- preferences display -->
+    <string name="clue_below_grid">Omschrijving onder raster</string>
+    <string name="clue_below_grid_desc">De geselecteerde omschrijving onder het raster weergeven, in plaats van in de titelbalk.</string>
+    <string name="display_scratch">Krabbels weergeven</string>
+    <string name="display_scratch_desc">Krabbels op het raster weergeven.</string>
+    <string name="fit_to_screen_mode">Aanpassen aan scherm</string>
+    <string name="fit_to_screen_mode_desc">Of/hoe de puzzel automastisch van formaat wijzigd om zich aan het scherm aan te passen.</string>
+    <string name="fit_to_screen_mode_never">Nooit</string>
+    <string name="fit_to_screen_mode_start">Start puzzel</string>
+    <string name="fit_to_screen_mode_locked">Vergrendeld</string>
+    <string name="full_screen">Volledig scherm</string>
+    <string name="full_screen_desc">Verbergt de statusbalk.\nVerlaat en open de puzzel opnieuw om toe te passen.</string>
+    <string name="grid_ratio_portrait">Rasterformaat portret</string>
+    <string name="grid_ratio_portrait_desc">Formaat van het raster in portretmodus, als omschrijvingstabbladen worden weergegeven.</string>
+    <string name="grid_ratio_landscape">Rasterformaat landschap</string>
+    <string name="grid_ratio_landscape_desc">Formaat van het raster in landschapsmodus, als omschrijvingstabbladen worden weergegeven.</string>
+    <string name="grid_ratio_fifty_pcnt">50% weergave</string>
+    <string name="grid_ratio_forty_pcnt">40% weergave</string>
+    <string name="grid_ratio_one_to_one">Vierkant</string>
+    <string name="grid_ratio_puzzle">Aanpassen aan puzzelvorm</string>
+    <string name="grid_ratio_sixty_pcnt">60% weergave</string>
+    <string name="grid_ratio_thirty_pcnt">30% weergave</string>
+    <string name="indicate_show_errors">Fouten onthullen aangeven</string>
+    <string name="indicate_show_errors_desc">Kleur van statusbalk veranderen als fouten onthullen is ingeschakeld.</string>
+    <string name="no_hint_highlighting">Geen hintmarkering</string>
+    <string name="no_hint_highlighting_desc">Voorkomt dat 'hints' roze vakjes aangeven in de vorm van onthullingen of fouten.</string>
+    <string name="orientation_lock">Oriëntatievergrendeling</string>
+    <string name="orientation_lock_desc">Vergrendeld de schermoriëntatie.</string>
+    <string name="show_length">Lengte weergeven</string>
+    <string name="show_length_desc">Geeft het aantal letters van het antwoord weer in de omschrijving.</string>
+    <string name="show_timer">Klok weergeven</string>
+    <string name="show_timer_desc">Geeft je puzzeltijd weer.\nVerlaat en open de puzzel opnieuw om toe te passen.</string>
+    <string name="theme_preference">Thema</string>
+    <string name="theme_preference_desc">Applicatiethema selecteren.</string>
+    <string name="clue_tabs_double">Dubbele omschrijvingstabbladen</string>
+    <string name="clue_tabs_double_desc">Wanneer twee tabbladen met omschrijvingen naast elkaar weer te geven.</string>
+    <string name="clue_tabs_double_never">Nooit</string>
+    <string name="clue_tabs_double_landscape">Landschapsoriëntatie</string>
+    <string name="clue_tabs_double_wide">Meer dan 3 inch breed</string>
+    <string name="clue_tabs_double_always">Altijd</string>
+    <string name="clue_highlight_none">Geen</string>
+    <string name="clue_highlight_radio_button">Radioknop</string>
+    <string name="clue_highlight_background">Achtergrond</string>
+    <string name="clue_highlight_both">Beide</string>
+    <string name="clue_highlight">Omschrijvingsmarkering</string>
+    <string name="clue_highlight_desc">De stijl die wordt gebruikt om de huidige omschrijving te markeren in de omschrijvingslijsten.</string>
+    <string name="display_separators">Weergave scheidingstekens</string>
+    <string name="display_separators_desc">Spaties/interpunctie aangeven tussen puzzelvakjes indien bekend.</string>
+    <string name="display_separators_never">Nooit</string>
+    <string name="display_separators_selected">Geselecteerde omschrijving</string>
+    <string name="display_separators_always">Altijd</string>
+    <string name="infer_separators">Scheidingstekens afleiden</string>
+    <string name="infer_separators_desc">Scheidingstekens weergeven door te schatten aan de hand van de opsomming aan het einde van omschrijvingen.</string>
+    <string name="orientation_lock_portrait">Portret</string>
+    <string name="orientation_lock_landscape">Landschap</string>
+    <string name="orientation_lock_unlocked">Ontgrendeld</string>
+    <string name="expandable_clue_line">Uitbreidbare omschrijvingsbalk</string>
+    <string name="expandable_clue_line_desc">De omschrijvingsbalk wordt groter bij langere omschrijvingen, om kleine tekst te voorkomen.</string>
+    <string name="clue_list_name_in_clue_line">Omschrijvingslijst in omschrijvingsbalk</string>
+    <string name="clue_list_name_in_clue_line_desc">Hoe de naam van de lijst met omschrijvingen weergegeven wordt in de omschrijvingsbalk.</string>
+    <string name="clue_list_clue_line_full">Volledig</string>
+    <string name="clue_list_clue_line_abbreviated">Verkort</string>
+    <string name="clue_list_clue_line_none">Geen</string>
+
+    <!-- preferences download -->
+    <string name="auto_downloaders">Bronnen automatisch ophalen</string>
+    <string name="auto_downloaders_desc">Welke van de ingeschakelde bronnen gebruikt worden voor het automatisch ophalen van puzzels.</string>
+    <string name="automatic_download">Automatisch ophalen</string>
+    <string name="automatic_download_desc">Puzzels van vandaag ophalen tijdens het opstarten van de applicatie.</string>
+    <string name="background_download_0">00:00</string>
+    <string name="background_download_1">01:00</string>
+    <string name="background_download_10">10:00</string>
+    <string name="background_download_11">11:00</string>
+    <string name="background_download_12">12:00</string>
+    <string name="background_download_13">13:00</string>
+    <string name="background_download_14">14:00</string>
+    <string name="background_download_15">15:00</string>
+    <string name="background_download_16">16:00</string>
+    <string name="background_download_17">17:00</string>
+    <string name="background_download_18">18:00</string>
+    <string name="background_download_19">19:00</string>
+    <string name="background_download_2">02:00</string>
+    <string name="background_download_20">20:00</string>
+    <string name="background_download_21">21:00</string>
+    <string name="background_download_22">22:00</string>
+    <string name="background_download_23">23:00</string>
+    <string name="background_download_3">03:00</string>
+    <string name="background_download_4">04:00</string>
+    <string name="background_download_5">05:00</string>
+    <string name="background_download_6">06:00</string>
+    <string name="background_download_7">07:00</string>
+    <string name="background_download_8">08:00</string>
+    <string name="background_download_9">09:00</string>
+    <string name="background_download_constraints_config">Ophaalbeperkingen</string>
+    <string name="background_download_days">Puzzels ophalen op de dagen</string>
+    <string name="background_download_days_desc">Puzzels op de achtergrond ophalen op de geselecteerde dagen.</string>
+    <string name="background_download_days_time">Dagelijkse ophaaltijd</string>
+    <string name="background_download_days_time_desc">Selecteer ophaaltijd wanneer er op de geselecteerde dagen opgehaald wordt (exacte tijd hangt af van beperkingen en telefoonoptimisaties).</string>
+    <string name="background_download_fri">Vrijdag</string>
+    <string name="background_download_hourly">Puzzles uurlijks ophalen</string>
+    <string name="background_download_hourly_desc">Puzzels eens per uur op de achtergrond ophalen.</string>
+    <string name="background_download_mon">Maandag</string>
+    <string name="background_download_opts">Ophalen op de achtergrond</string>
+    <string name="background_download_opts_desc">Puzzels op de achtergrond ophalen configureren.</string>
+    <string name="background_download_sat">Zaterdag</string>
+    <string name="background_download_sun">Zondag</string>
+    <string name="background_download_thu">Donderdag</string>
+    <string name="background_download_time_config">Ophaaltijden</string>
+    <string name="background_download_tue">Dinsdag</string>
+    <string name="background_download_wed">Woensdag</string>
+    <string name="download_charging">Alleen ophalen tijdens het opladen</string>
+    <string name="download_charging_desc">Alleen puzzels op de achtergrond ophalen tijdens het opladen.</string>
+    <string name="download_roaming">Ophalen tijdens roaming</string>
+    <string name="download_roaming_desc">Puzzel op de achtergrond ophalen, zelfs tijdens het roamen.</string>
+    <string name="download_timeout">Ophaalwachttijd</string>
+    <string name="download_timeout_desc">Hoe lang een puzzel proberen op te halen voor het opgeven.</string>
+    <string name="download_wifi_only">Alleen ophalen via Wifi </string>
+    <string name="download_wifi_only_desc">Alleen puzzels op de achtergrond ophalen als Wifi beschikbaar is.</string>
+    <string name="fifteen_seconds">15 seconden</string>
+    <string name="forty_five_seconds">45 seconden</string>
+    <string name="no_puzzle_download_notifs">Geen individuele ophaalmeldingen</string>
+    <string name="no_puzzle_download_notifs_desc">Voorkomt dat een melding voor iedere opgehaalde puzzel in de lijst met meldingen verschijnt.</string>
+    <string name="no_summary_download_notifs">Geen samengevatte ophaalmelding</string>
+    <string name="no_summary_download_notifs_desc">Voorkomt dat een samengevatte ophaalmelding in de lijst met meldingen verschijnt.</string>
+    <string name="sixty_seconds">1 minuut</string>
+    <string name="thirty_seconds">30 seconden</string>
+    <string name="background_downloads_not_available">Ophalen op de achtergrond niet beschikbaar</string>
+    <string name="background_downloads_not_available_desc">Schakel uit in de ophaalinstellingen.</string>
+    <string name="enable_auto_downloaders">Schakel via de instellingen een paar bronnen in om automatisch op te halen.</string>
+
+    <!-- preferences export/import -->
+    <string name="preferences_export_import">Exporteren/importeren</string>
+    <string name="preferences_export_import_desc">Exporteer puzzels of bewaar/herstel instellingen met een extern bestand.</string>
+    <string name="preferences_export">Instellingen exporteren</string>
+    <string name="preferences_export_desc">Bewaar instellingen op een extern bestand.</string>
+    <string name="preferences_import">Instellingen importeren</string>
+    <string name="preferences_import_desc">Herstel instellingen vanaf een extern bestand. Let op, Instellingen kunnen in de loop van de tijd veranderen. Gedateerde of onbekende instellingswaarden in een bestand zullen genegeerd worden.</string>
+    <string name="preferences_imported">Instellingen geïmporteerd.</string>
+    <string name="preferences_import_failed">Instellingen importeren mislukt.</string>
+    <string name="preferences_exported">Instellingen geëxporteerd.</string>
+    <string name="preferences_export_failed">Instellingen exporteren mislukt.</string>
+    <string name="puzzles_export">Puzzels exporteren</string>
+    <string name="puzzles_export_desc">Exporteer puzzels naar een externe opslag.</string>
+    <string name="puzzles_exported">Puzzels geëxporteerd.</string>
+    <string name="puzzles_export_failed">Puzzels exporteren mislukt.</string>
+
+    <!-- preferences external -->
+    <string name="external_dictionary">Extern woordenboek</string>
+    <string name="external_dictionary_desc">Extern woordenboek om ingevulde woorden op te zoeken.</string>
+    <string name="external_tools_settings">Externe hulpmiddelen</string>
+    <string name="external_tools_settings_desc">Opties voor integratie met externe apps.</string>
+    <string name="crossword_solver_enabled">Kruiswoordoplosser</string>
+    <string name="crossword_solver_enabled_desc">Verzoeken inschakelen naar billthefarmer's Crossword solver app.</string>
+    <string name="fifteen_squared">Fifteen Squared</string>
+    <string name="fifteen_squared_desc">Doorzoek fifteensquared.net voor de huidige puzzel. Voornamelijk Britse cryptogrammen.</string>
+    <!-- takes source as first string arg, puzzle title as second -->
+    <string name="search_fifteen_squared_url">https://www.fifteensquared.net/?s=%1$s %2$s</string>
+    <string name="duckduckgo">DuckDuckGo</string>
+    <string name="duckduckgo_desc">Omschrijving opzoeken op DuckDuckGo.</string>
+    <!-- takes clue formatted without punctuation and - instead of spaces -->
+    <string name="duckduckgo_search_url">https://duckduckgo.com/?q=%1$s</string>
+
+    <!-- preferences keyboard -->
+    <string name="keyboard_showhide">Intern toetsenbord weergeven/verbergen</string>
+    <string name="keyboard_showhide_desc">Hoe het interne toetsenbord wordt weergegeven/verborgen.</string>
+    <string name="keyboard_layout">Opmaak toetsenbord</string>
+    <string name="keyboard_layout_desc">De opmaak van het ingebouwde toetsenbord.</string>
+    <string name="keyboard_hide_button">Verbergknop toetsenbord</string>
+    <string name="keyboard_hide_button_desc">Knop weergeven om het toetsenbord te verbergen, in plaats van de terugknop te gebruiken.</string>
+    <string name="keyboard_haptic">Haptisch toetsenbord</string>
+    <string name="keyboard_haptic_desc">Vibratie bij invullen.</string>
+    <string name="keyboard_use_native">Systeemtoetsenbord gebruiken</string>
+    <string name="keyboard_use_native_desc">Systeeminvoermethode gebruiken. Nog een beetje experimenteel.</string>
+    <string name="keyboard_compact">Compact Forkyz-Toetsenbord</string>
+    <string name="keyboard_compact_desc">Verticale ruimte van het ingebouwde Forkyz-toetsenbord verminderen.</string>
+    <string name="keyboard_repeat_delay">Toetsherhalingsvertraging</string>
+    <string name="keyboard_repeat_delay_desc">Vertraging in milliseconden voordat een ingedrukte toets begint met herhalen. Nul betekent geen herhaling.</string>
+    <string name="keyboard_repeat_delay_hint">Toetsherhalingsvertraging (ms)</string>
+    <string name="keyboard_repeat_interval">Toetsherhalingsinterval</string>
+    <string name="keyboard_repeat_interval_desc">Vertraging in milliseconden tussen ingedrukte toetsherhalingen. Nul betekent geen herhaling.</string>
+    <string name="keyboard_repeat_interval_hint">Toetsherhalingsinterval (ms)</string>
+    <string name="keyboard_force_caps">Hoofdletters forceren</string>
+    <string name="keyboard_force_caps_desc">De meeste kruiswoordoplossingen gebruiken hoofdletters. Ingeschakeld wordt alle systeemtoetsenbordinvoer omgezet in hoofdletters.</string>
+    <string name="keyboard_built_in">Ingebouwd Forkyz-toetsenbord </string>
+    <string name="keyboard_native">Android Systeemtoetsenbord</string>
+    <string name="keyboard_split_words">Woorden opsplitsen</string>
+    <string name="keyboard_split_words_desc">Splits antwoorden van de systeeminvoermethode in afzonderlijke tekens in plaats van het volledige woord in één vakje in te voeren.</string>
+
+    <!-- preferences interaction -->
+    <string name="cycle_unfilled">Herhalen bij oningevulde woorden </string>
+    <string name="cycle_unfilled_desc">Wanneer het einde van een woord is bereikt, keer dan terug naar het begin als het woord niet compleet is.</string>
+    <string name="cycle_unfilled_never">Nooit</string>
+    <string name="cycle_unfilled_forwards">Voorwaarts</string>
+    <string name="cycle_unfilled_always">Altijd</string>
+    <string name="delete_crossing_delete">Alle vakjes wissen</string>
+    <string name="delete_crossing_preserve_filled_cells">Geen kruisende, deels ingevulde woorden wissen.</string>
+    <string name="delete_crossing_preserve_filled_words">Geen kruisende, ingevulde woorden wissen.</string>
+    <string name="disable_ratings">Beoordelingen uitschakelen</string>
+    <string name="disable_ratings_desc">Nergens beoordelingen weergeven.</string>
+    <string name="dont_delete_crossing">Kruisende woorden niet wissen</string>
+    <string name="dont_delete_crossing_desc">Geen letters wissen tijdens het verwijderen als het deel uitmaakt van een kruisend woord.</string>
+    <string name="double_tap_zoom">Dubbeltikken maakt scherm passend</string>
+    <string name="double_tap_zoom_desc">Dubbeltikken verandert het zoomniveau om het raster aan het scherm aan te passen.</string>
+    <string name="enter_changes_direction">Enter verandert richting</string>
+    <string name="enter_changes_direction_desc">Enter verandert de richting in plaats van dat het naar de volgende omschrijving gaat.</string>
+    <string name="movement_style">Bewegingswijze</string>
+    <string name="movement_style_desc">Selecteer wat er gebeurt als je voorbij het einde van een woord typt.</string>
+    <string name="movement_style_clue_list">Bewegingswijze omschrijvingslijst</string>
+    <string name="movement_style_clue_list_desc">Selecteer wat er gebeurt als je voorbij het einde van een woord typt op het scherm met de omschrijvingslijst.</string>
+    <string name="dont_snap_board_to_borders">Raster niet vastklikken op randen</string>
+    <string name="dont_snap_board_to_borders_desc">Rasterranden niet vastklikken op de randen van het scherm.</string>
+
+    <string name="play_letter_undo">Ingevulde letters ongedaan maken</string>
+    <string name="play_letter_undo_desc">Verwijderen maakt recent ingevulde letters ongedaan of verwijdert als er geen recente letters zijn om ongedaan te maken.</string>
+    <string name="predict_anagram_chars">Anagramletters voorspellen</string>
+    <string name="predict_anagram_chars_desc">Voorspel anagrambron in notities door deze te vergelijken met de huidige omschrijving. Spatie accepteert een voorspelling.</string>
+    <string name="preserve_correct">Correcte vakjes behouden bij het tonen van fouten</string>
+    <string name="preserve_correct_desc">Voorkomt dat juist ingevulde vakjes overschreven worden als 'Fouten tonen' is ingeschakeld.</string>
+    <string name="random_clue_on_shake">Willekeurige omschrijving bij schudden</string>
+    <string name="random_clue_on_shake_desc">Springt naar een willekeurige oningevulde omschrijving wanneer schudden wordt gedetecteerd tijdens het oplossen.</string>
+    <string name="scroll_to_clue">Naar omschrijving scrollen</string>
+    <string name="scroll_to_clue_desc">Schakelt automatisch scrollen in naar de geselecteerde omschrijving in de omschrijvingslijst. (Werkt zoals Shortyz 1).</string>
+    <string name="skip_filled">Ingevulde vakjes overslaan</string>
+    <string name="skip_filled_desc">Schakelt het overslaan van ingevulde vakjes in als je een nieuwe letter invult.</string>
+    <string name="snap_current">Vastklikken op huidig ​​woord</string>
+    <string name="snap_current_desc">Schakelt automatisch scrollen in naar het huidige woord.</string>
+    <string name="space_change_dir">Spatiebalk verandert richting</string>
+    <string name="space_change_dir_desc">Spatiebalk verandert de richting in plaats van dat het een vakje leeg houdt.</string>
+    <string name="toggle_before_move">Richting veranderen vóór beweging</string>
+    <string name="toggle_before_move_desc">Als een D-pad/pijltjestoets-beweging de huidige omschrijving verandert, verander de omschrijving vóór het bewegen.</string>
+    <string name="movement_strategy_next_word">Volgende woord in rij</string>
+    <string name="movement_strategy_stop_end">Stoppen aan het einde</string>
+    <string name="movement_strategy_next_clue">Volgende omschrijving</string>
+    <string name="movement_strategy_next_parallel_clue">Volgende parallele omschrijving</string>
+
+    <!-- preferences voice -->
+    <string name="about_voice_commands">Over spraakopdrachten</string>
+    <string name="announce_box_always">Vakjes aankondigen</string>
+    <string name="announce_box_always_desc">Inhoud van vakjes aankondigen bij wijziging.</string>
+    <string name="announce_clue_always">Omschrijvingen aankondigen</string>
+    <string name="announce_clue_always_desc">Omschrijvingen aankondigen bij wijziging.</string>
+    <string name="announce_clue_button">Knop weergegeven om omschrijving aan te kondigen.</string>
+    <string name="announce_clue_button_desc">Knop op het scherm toevoegen om huidige omschrijving en andere woordinhoud aan te kondigen.</string>
+    <string name="announce_clue_equals">Omschrijving aankondigen met de gelijktekentoets</string>
+    <string name="announce_clue_equals_desc">Druk op de gelijktekentoets om huidige omschrijving en woord aan te kondigen.</string>
+    <string name="voice_with_button">Knop weergegeven om spraak te activeren</string>
+    <string name="voice_with_button_desc">Knop op het scherm toevoegen om spraakopdracht te activeren.</string>
+    <string name="voice_with_volume">Volume-omlaagknop om spraak te activeren</string>
+    <string name="voice_with_volume_desc">Gebruik de volume-omlaagknop om spraakopdracht te activeren tijdens het oplossen.</string>
+    <string name="llm_voice_commands">LLM Verbeterde spraakbesturing</string>
+    <string name="llm_voice_commands_desc">LLM moet geconfigureerd worden in de externe hulpmiddelen. Gebruik LLM om de interpretatie van spraakopdrachten te verbeteren en natuurlijke taalcommunicatie mogelijk te maken.</string>
+
+    <!-- preferences weekly -->
+    <string name="updates_thursdays">Publiceert op donderdag.</string>
+    <string name="updates_sundays">Publiceert op zondag.</string>
+    <string name="regular_sized">Regulier formaat</string>
+    <string name="large_sized">Groot formaat</string>
+    <string name="jonesin_crosswords">Jonesin' Crosswords</string>
+    <string name="premier_crossword">Premier Crossword</string>
+    <string name="wall_street_journal">The Wall Street Journal</string>
+    <string name="washington_post_sunday">The Washington Post Sunday</string>
+    <string name="de_telegraaf">(NL) De Telegraaf</string>
+    <string name="de_telegraaf_desc">Publiceert op zondag, in het Nederlands.</string>
+
+    <!--  preferences scrapers -->
+    <string name="cru_puzzle_workshop">Cryptic Cru Workshop Archive</string>
+    <string name="cru_puzzle_workshop_desc">NYT Cru cryptogrammen van fans\nhttps://archive.nytimes.com/www.nytimes.com/premium/xword/cryptic-archive.html</string>
+    <string name="keglars_cryptics">Kegler's Kryptics</string>
+    <string name="keglars_cryptics_desc">Ron &quot;Kegler&quot; Sweet's Archief met cryptogrammen\nhttps://kegler.gitlab.io/Block_style/index.html</string>
+    <string name="private_eye">Private Eye</string>
+    <string name="private_eye_desc">Kruiswoordarchief van Private Eye. Nieuwe puzzel ongeveer iedere twee weken.</string>
+    <string name="przekroj">(PO) Przekrój</string>
+    <string name="przekroj_desc">Puzzels van Przekrój magazine, in het Pools.</string>
+    <string name="about_scrapes">Over deze bronnen</string>
+    <string name="guardian_quick">Guardian Quick Crossword</string>
+    <string name="guardian_quick_desc">Dagelijkse, snelle kruiswoord.</string>
+
+    <!-- preferences sources -->
+    <string name="daily_crosswords">Dagelijkse kruiswoordpuzzels</string>
+    <string name="daily_crosswords_desc">Puzzels die dagelijks worden gepubliceerd.</string>
+    <string name="scraper_sources">Pagina-scrapers</string>
+    <string name="scraper_sources_desc">Online puzzelarchieven.</string>
+    <string name="weekly_crosswords">Wekelijkse kruiswoordpuzzels</string>
+    <string name="weekly_crosswords_desc">Puzzels die wekelijks worden gepubliceerd.</string>
+
+    <!-- menus general -->
+    <string name="help">Help</string>
+    <string name="settings">Instellingen</string>
+    <string name="share">Delen</string>
+    <string name="share_clue">Omschrijving</string>
+    <string name="share_clue_response">Omschrijving met raster</string>
+    <string name="share_puzzle_full">Huidige puzzel</string>
+    <string name="share_puzzle_without_extensions">Puzzle zonder IPuz-extensies</string>
+    <string name="share_puzzle_orig">Lege puzzel</string>
+    <string name="share_puzzle_open_share_url">Deel-URL openen</string>
+    <string name="menu_flag_cell_toggle">Vakjesmarkering</string>
+    <string name="menu_notes_clue">Omschrijvingsnotities</string>
+    <string name="menu_notes_puzzle">Puzzelnotities</string>
+    <string name="menu_flag_clue_toggle">Omschrijvingsmarkering</string>
+    <string name="overflow">Meer opties</string>
+
+    <!-- clue list menu -->
+    <string name="show_all_words_clue_list">Alle woorden tonen</string>
+
+    <!-- play menu -->
+    <string name="special_entry">Speciaal invoeren</string>
+    <string name="clues">Omschrijvingen </string>
+    <string name="zoom">Zoomen</string>
+    <string name="zoom_in">Inzoomen</string>
+    <string name="zoom_in_max">Maximale zoom</string>
+    <string name="zoom_out">Uitzoomen</string>
+    <string name="fit_to_screen">Aanpassen aan scherm</string>
+    <string name="zoom_reset">Zoom terugzetten</string>
+    <string name="show_errors">Fouten tonen</string>
+    <string name="showing_errors">Fouten worden getoond</string>
+    <string name="show_errors_full_grid">Raster</string>
+    <string name="show_errors_cursor">Aanwijzer</string>
+    <string name="show_errors_clue">Ingevuld woord</string>
+    <string name="scratch_mode">Krabbelmodus</string>
+    <string name="reveal">Onthullen</string>
+    <string name="initial_letter">Eerste letter</string>
+    <string name="initial_letters">Eerste letters</string>
+    <string name="letter">Letter</string>
+    <string name="word">Woord</string>
+    <string name="errors">Fouten</string>
+    <string name="puzzle">Puzzel</string>
+    <string name="info">Info</string>
+    <string name="support_puzzle_source">Puzzelbron steunen</string>
+    <string name="menu_notes">Notities</string>
+    <string name="external_tools">Hulpmiddelen</string>
+    <string name="help_external_dictionary">Woordenboek</string>
+    <string name="help_duckduckgo">DuckDuckGo Clue</string>
+    <string name="help_crossword_solver">Kruiswoordoplosser</string>
+    <string name="help_crossword_solver_anagram">Anagramoplosser </string>
+    <string name="help_fifteen_squared">Fifteen Squared doorzoeken</string>
+
+    <!-- Clue Tabs -->
+    <string name="clue_tab_history">Geschiedenis</string>
+
+    <!-- playboard -->
+    <string name="cur_box_blank">leeg</string>
+    <string name="word_all_blank">alles leeg</string>
+    <!-- %1$s is clue announce, %2$s is word announce as below -->
+    <string name="announce_clue_word_response">%1$s %2$s</string>
+    <string name="announce_clue">Omschrijving %1$s.</string>
+    <string name="announce_word_response">Woord %1$s.</string>
+    <string name="announce_box_response">Vakje %1$s.</string>
+    <string name="announce_first_box_response">Eerste vakje van omschrijving %1$s.</string>
+    <string name="announce_last_box_response">Laatste vakje van omschrijving %1$s.</string>
+    <string name="announce_only_box_response">Enig vakje van omschrijving %1$s.</string>
+    <string name="board_description">De kruiswoordpuzzel.</string>
+
+    <!-- browse menu -->
+    <string name="sort">Sorteren</string>
+    <string name="by_date_desc">Op datum (aflopend)</string>
+    <string name="by_date_asc">Op datum (oplopend)</string>
+    <string name="by_source">Op bron</string>
+    <string name="cleanup">Opruimen</string>
+
+    <!-- puzzle info dialog -->
+    <string name="puzzle_info">Puzzelinformatie</string>
+
+    <!-- completed -->
+    <string name="puzzle_finished_title">Puzzel opgelost</string>
+    <string name="completed_in">Voltooid in</string>
+    <string name="total_clues">Aantal omschrijvingen</string>
+    <string name="total_boxes">Aantal vakjes</string>
+    <string name="hinted_boxes">Gehinte vakjes</string>
+    <string name="done">Klaar</string>
+    <string name="num_hinted_boxes">%1$d (%2$d%%)</string>
+    <string name="share_your_time">Deel je tijd</string>
+    <plurals name="share_message_with_date">
+        <item quantity="one">Ik heb de %1$s kruiswoord van %2$s opgelost in #Forkyz met %3$d hint!\nIk heb de kruiswoord voltooid in %4$s.</item>
+        <item quantity="other">Ik heb de %1$s kruiswoord van %2$s opgelost in #Forkyz met %3$d hints!\nIk heb de kruiswoord voltooid in %4$s.</item>
+    </plurals>
+    <plurals name="share_message_no_date">
+        <item quantity="one">Ik heb de %1$s kruiswoord opgelost in #Forkyz met %2$d hint!\nIk heb de kruiswoord voltooid in %3$s.</item>
+        <item quantity="other">Ik heb de %1$s kruiswoord opgelost in #Forkyz met %2$d hints!\nIk heb de kruiswoord voltooid in %3$s.</item>
+    </plurals>
+
+    <!-- keyboard -->
+    <string name="key_special_entry">à</string>
+    <string name="key_a">a</string>
+    <string name="key_b">b</string>
+    <string name="key_c">c</string>
+    <string name="key_d">d</string>
+    <string name="key_e">e</string>
+    <string name="key_f">f</string>
+    <string name="key_g">g</string>
+    <string name="key_h">h</string>
+    <string name="key_i">i</string>
+    <string name="key_j">j</string>
+    <string name="key_k">k</string>
+    <string name="key_l">l</string>
+    <string name="key_m">m</string>
+    <string name="key_n">n</string>
+    <string name="key_o">o</string>
+    <string name="key_p">p</string>
+    <string name="key_q">q</string>
+    <string name="key_r">r</string>
+    <string name="key_s">s</string>
+    <string name="key_t">t</string>
+    <string name="key_u">u</string>
+    <string name="key_v">v</string>
+    <string name="key_w">w</string>
+    <string name="key_x">x</string>
+    <string name="key_y">y</string>
+    <string name="key_z">z</string>
+    <string name="key_space">spatie</string>
+    <string name="key_delete">verwijderen</string>
+    <string name="key_up">omhoog</string>
+    <string name="key_down">omlaag</string>
+    <string name="key_left">links</string>
+    <string name="key_right">rechts</string>
+    <string name="change_direction">Omschrijvingsrichting veranderen</string>
+    <string name="next_clue">Volgende omschrijving</string>
+    <string name="prev_clue">Vorige omschrijving</string>
+    <string name="hide_keyboard">Toetsenbord verbergen</string>
+
+    <string name="keyboard_always_show">Altijd weergeven</string>
+    <string name="keyboard_hide_manual">Toetsenbord handmatig verbergen</string>
+    <string name="keyboard_show_sparingly_desc">Toetsenbord verbergen bij omschrijvingswijziging</string>
+    <string name="keyboard_never_show">Nooit weergeven</string>
+
+    <string name="keyboard_qwerty">QWERTY</string>
+    <string name="keyboard_qwertz">QWERTZ</string>
+    <string name="keyboard_azerty">AZERTY</string>
+    <string name="keyboard_dvorak">Dvorak</string>
+    <string name="keyboard_colemak">Colemak</string>
+
+    <!-- special entry -->
+    <string name="special_character">Speciaal teken</string>
+    <string name="enter_special_desc">Voer het antwoord in het onderstaande vak in. Tekens zullen als zodanig in het raster ingevoerd worden. kleine letters zullen bijvoorbeeld niet in hoofdletters worden omgezet. Meerdere en speciale tekens zijn toegestaan.</string>
+    <string name="special_entry_force_caps">Hoofdletters forceren</string>
+
+    <!-- share clue -->
+    <string name="share_clue_title">Omschrijving</string>
+    <string name="share_puzzle_title">Omschrijving</string>
+    <string name="share_clue_blank_box">?</string>
+    <string name="share_clue_text">%1$s\n%2$s</string>
+    <string name="share_clue_response_text">%1$s\nHint: %2$s\n%3$s.</string>
+    <string name="share_puzzle_details_author_no_url">%1$s, %2$s by %3$s</string>
+    <string name="share_puzzle_details_no_author_no_url">%1$s, %2$s</string>
+    <string name="share_puzzle_details_author_url">%1$s, %2$s by %3$s\n%4$s</string>
+    <string name="share_puzzle_details_no_author_url">%1$s, %2$s\n%3$s</string>
+
+    <!-- themes -->
+    <string name="standard_theme">Standaardthema</string>
+    <string name="dynamic_theme">Material You dynamisch thema</string>
+    <string name="legacy_like_theme">Verouderd thema</string>
+    <string name="green_theme">Material Groen</string>
+    <string name="blue_theme">Material Blauw</string>
+    <string name="orange_theme">Material Oranje</string>
+
+    <!-- voice commands -->
+    <!-- make sure app/src/main/assets/.. help files match commands here -->
+    <!-- help files should really be in a resources file where they can be
+    overridden for different languages -->
+    <string name="no_speech_recognition_available">Geen spraakinvoer beschikbaar op het systeem, controleer a.u.b. Android-invoerinstellingen.</string>
+    <string name="command_letter">Letter</string>
+    <string name="command_answer">Oplossing</string>
+    <string name="command_answer_alt">Invoer</string>
+    <string name="command_toggle">Schakelen</string>
+    <string name="command_number">Nummer</string>
+    <string name="command_next">Volgende</string>
+    <string name="command_previous">Vorige</string>
+    <string name="command_left">Links</string>
+    <string name="command_right">Rechts</string>
+    <string name="command_up">Omhoog</string>
+    <string name="command_down">Omlaag</string>
+    <string name="command_delete">Verwijderen</string>
+    <string name="command_clear">Wissen</string>
+    <string name="command_back">Terug</string>
+    <string name="command_clues">Omschrijvingen</string>
+    <string name="command_notes">Notities</string>
+    <string name="command_scratch">Krabbels</string>
+    <string name="command_flag">Markering</string>
+    <string name="command_announce_clue">Announce</string>
+    <string name="command_current_clue_help">Help</string>
+    <string name="command_jump_random">Springen</string>
+    <string name="speech_not_ready">Spraakdienst niet beschikbaar</string>
+    <string name="voice_command">Spraakopdracht</string>
+    <string name="announce_clue_label">Omschrijving aankondigen</string>
+
+    <!-- Ask AI for Help -->
+    <string name="help_query_solution_and_response">Geef mij een hint voor de kruiswoordomschrijving "%1$s". Tot dusver is mijn antwoord "%2$s". De oplossing is "%3$s", maar vertel mij dat niet.</string>
+    <string name="help_query_just_response"> Geef mij een hint voor de kruiswoordomschrijving "%1$s". Tot zo ver is mijn antwoord "%2$s".</string>
+    <string name="help_query_just_solution">Geef mij een hint voor de kruiswoordomschrijving "%1$s". De oplossing is "%2$s", maar vertel mij dat niet.</string>
+    <string name="help_query_just_clue">Geef mij een hint voor de kruiswoordomschrijving "%1$s".</string>
+    <string name="help_no_clue_to_query">Selecteer a.u.b een omschrijving om hulp voor te vragen.</string>
+    <string name="help_query_failed">Hulpvraag mislukt. Controleer de netwerkverbinding en API-sleutel in de instellingen.</string>
+    <string name="help_query_response_title">LLM hulp antwoord</string>
+    <string name="help_query_llm_agent">Vraag LLM om hulp"</string>
+    <string name="llm_query_but_no_active_network">Schakel een netwerkverbinding in om contact op te nemen met LLM.</string>
+    <string name="llm_agent_api_key">LLM API-sleutel</string>
+    <string name="llm_agent_api_key_desc">Je hebt een API-sleutel nodig om LLM's te gebruiken. Je kunt een API-sleutel krijgen via je LLM-accountinstellingen.</string>
+    <string name="llm_agent_api_key_message">LLM's zijn externe netwerkdiensten van externe bedrijven en vereisen een netwerkverbinding. De antwoorden worden niet gefilterd door Forkyz en kunnen misleidend zijn, het antwoord geven, of anderszins problematisch zijn. Gebruik op eigen risico.</string>
+    <string name="llm_agent">LLM</string>
+    <string name="llm_agent_desc">Welke LLM om te gebruiken, indien van toepassing.</string>
+    <string name="llm_agent_none">Geen</string>
+    <string name="llm_agent_chat_gpt">ChatGPT</string>
+    <string name="llm_agent_claude">Claude</string>
+    <string name="llm_agent_voice_command_prompt">You are translating between human spoken input and a list of commands to control a crossword application. The list of commands available and their help descriptions are given at the end of this message. The spoken words were translated by an AI into text. It returned the following list of possibilities: %1$s. Translate this into a list of commands, one per line, from the available commands below. Format your response as the list of commands only, separated by a newline character. Do not include any other information in your response.\nThe available commands are: %2$s.\nThe help documentation is%3$s. The puzzle contains %4$s. The currently selected clue is %5$s.</string>
+    <!-- clue list, clue numbers (num letters) -->
+    <string name="llm_agent_voice_command_prompt_no_clue">geen</string>
+    <string name="llm_agent_voice_command_prompt_clue_no_zone">%1$s %2$s</string>
+    <plurals name="llm_agent_voice_command_prompt_clue">
+        <item quantity="one">%1$s %2$s (%3$d letter)</item>
+        <item quantity="other">%1$s %2$s (%3$d letters)</item>
+    </plurals>
+
+    <!-- external apps -->
+    <string name="crossword_solver">Crossword Solver</string>
+    <string name="quick_dic">QuickDic</string>
+    <string name="aard2">Aard2/OSS-Dict</string>
+    <string name="dictionary_none">Geen</string>
+    <string name="free_dictionary">The Free Dictionary (Web)</string>
+    <string name="external_app_not_installed">%1$s Niet geïnstalleerd</string>
+    <string name="external_app_install_msg">Installeer %1$s a.u.b. of schakel dit hulpmiddel uit in de instellingen.</string>
+    <string name="website">Website</string>
+
+    <!-- HTML activity -->
+    <string name="asset_not_found">Fout: kon geen pagina vinden om weer te geven. Dit is een programmafout die alleen opgelost kan worden door het de ontwikkelaars te melden.</string>
+    <string name="html_file_full_path">files/nl/%1$s</string>
+
+    <!-- Logcat activity -->
+    <string name="could_not_load_logcat">Kon logcat niet laden: %1$s.</string>
+    <string name="jump_to_end">Naar einde springen</string>
+    <string name="logcat">Logcat</string>
+    <string name="share_logcat">Logcat delen</string>
+
+    <!-- downloaders -->
+    <string name="nrc">NRC</string>
+    <string name="nrc_scrypto_title">Scrypto</string>
+    <string name="nrc_in_het_midden_title">In Het Midden</string>
+</resources>

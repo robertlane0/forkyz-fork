@@ -1,0 +1,3 @@
+Forkyz is een niet-officiële splitsing van de Shortyz kruiswoordpuzzel-app met een aantal nieuwe functies en compatibel met recente Androidversies.
+
+Een verscheidenheid aan soorten kruiswoordpuzzels kunnen opgehaald of geïmporteerd worden vanuit bestanden om ze op te lossen. Geïmporteerde puzzels ondersteunen een groot aantal bestandsformaten, inclusief: AcrossLite (.puz), JPZ, en IPuz. Er is een lijst met links naar online puzzelmakers. Puzzels kunnen ook direct worden opgehaald door middel van de ingebouwde downloaders.
