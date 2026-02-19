@@ -85,10 +85,7 @@ fun main(args : Array<String>) = application {
     val currentPuzzleHolder : CurrentPuzzleHolder
         by inject(CurrentPuzzleHolder::class.java)
 
-    val windowState = rememberWindowState(
-        width = 600.dp,
-        height = 1000.dp,
-    )
+    val windowState = rememberWindowState()
     val activeToasts = remember { mutableStateListOf<String>() }
     var onImportComplete : ((Boolean) -> Unit)? = null
 
@@ -327,7 +324,7 @@ fun main(args : Array<String>) = application {
         onCloseRequest = ::doExitApplication,
         title = stringResource(Res.string.app_name),
         state = windowState,
-        undecorated = true,
+        undecorated = false,
         resizable = true,
     ) {
         Box() {
