@@ -117,7 +117,6 @@ fun main(args : Array<String>) = application {
             get() { return displayWidth < displayHeight }
 
         override val isExitAfterPendingImports : Boolean = false
-        override val hasExitButton : Boolean = true
 
         override fun onFinish() {
             doExitApplication()
