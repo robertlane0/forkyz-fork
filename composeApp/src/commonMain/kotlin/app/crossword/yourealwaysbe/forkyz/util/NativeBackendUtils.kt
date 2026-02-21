@@ -11,6 +11,7 @@ import androidx.room.RoomDatabase
 import org.jetbrains.compose.resources.PluralStringResource
 import org.jetbrains.compose.resources.StringResource
 
+import app.crossword.yourealwaysbe.forkyz.SettingsItem
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.util.Uri
@@ -56,5 +57,6 @@ interface NativeBackendUtils {
     fun getTargetFileHandler(uri : Uri) : FileHandler?
     fun getLogcat() : List<String>?
     val isDynamicColorAvailable : Boolean
+    fun filterSettings(settings : List<SettingsItem>) : List<SettingsItem>
 }
 

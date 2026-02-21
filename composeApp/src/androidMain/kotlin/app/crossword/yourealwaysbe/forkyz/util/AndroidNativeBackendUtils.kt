@@ -17,6 +17,7 @@ import com.google.android.material.color.DynamicColors
 import org.jetbrains.compose.resources.PluralStringResource
 import org.jetbrains.compose.resources.StringResource
 
+import app.crossword.yourealwaysbe.forkyz.SettingsItem
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.util.AppStrings
@@ -172,5 +173,11 @@ class AndroidNativeBackendUtils(
         get() {
             return DynamicColors.isDynamicColorAvailable()
         }
+
+    override fun filterSettings(
+        settings : List<SettingsItem>,
+    ) : List<SettingsItem> {
+        return settings
+    }
 }
 

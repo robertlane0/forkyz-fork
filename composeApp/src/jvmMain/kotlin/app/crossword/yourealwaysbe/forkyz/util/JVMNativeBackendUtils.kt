@@ -17,6 +17,14 @@ import org.jetbrains.compose.resources.StringResource
 
 import dev.dirs.ProjectDirectories
 
+import app.crossword.yourealwaysbe.forkyz.SettingsItem
+import app.crossword.yourealwaysbe.forkyz.SettingsLogcat
+import app.crossword.yourealwaysbe.forkyz.SettingsNamedItem
+import app.crossword.yourealwaysbe.forkyz.SettingsPage
+import app.crossword.yourealwaysbe.forkyz.SettingsSubPage
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.crossword_solver_enabled
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.external_dictionary
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation
@@ -168,5 +176,38 @@ class JVMNativeBackendUtils(
     }
 
     override val isDynamicColorAvailable : Boolean = false
+
+    override fun filterSettings(
+        settings : List<SettingsItem>,
+    ) : List<SettingsItem> {
+        return settings.filter { item ->
+            val badPage = item.page in listOf(
+                SettingsPage.DOWNLOAD_BACKGROUND,
+                SettingsPage.KEYBOARD,
+                SettingsPage.VOICE_ACCESSIBILITY,
+            )
+            if (badPage) {
+                false
+            } else {
+                when (item) {
+                    is SettingsSubPage -> {
+                        item.subpage !in listOf(
+                            SettingsPage.DOWNLOAD_BACKGROUND,
+                            SettingsPage.KEYBOARD,
+                            SettingsPage.VOICE_ACCESSIBILITY,
+                        )
+                    }
+                    is SettingsLogcat -> false
+                    is SettingsNamedItem -> {
+                        item.title !in listOf(
+                            Res.string.external_dictionary,
+                            Res.string.crossword_solver_enabled,
+                        )
+                    }
+                    else -> true
+                }
+            }
+        }
+    }
 }
 

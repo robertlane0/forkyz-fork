@@ -1129,1129 +1129,1131 @@ class SettingsPageViewModel(
     private val downloadersExtraScrapers
         = downloadersScrapers.flatMap(this::makeDownloaderExtraSettings)
 
-    private val settingsItemsList : List<SettingsItem> = listOf(
-        SettingsDynamicList<StorageLocation>(
-            SettingsPage.ROOT,
-            Res.string.storage_location,
-            Res.string.storage_location_desc,
-            storageLocationsStateFlow,
-            settings.liveFileHandlerStorageLocation.stateInHere(
-                StorageLocation.SL_INTERNAL,
-            ),
-            this::onStorageLocationChange,
-        ),
-        SettingsSubPage(
-            SettingsPage.ROOT,
-            Res.string.select_sources_desc,
-            SettingsPage.PUZZLE_SOURCES,
-        ),
-        SettingsSubPage(
-            SettingsPage.ROOT,
-            Res.string.download_settings_desc,
-            SettingsPage.DOWNLOAD,
-        ),
-        SettingsSubPage(
-            SettingsPage.ROOT,
-            Res.string.browser_settings_desc,
-            SettingsPage.BROWSER,
-        ),
-        SettingsSubPage(
-            SettingsPage.ROOT,
-            Res.string.display_settings_desc,
-            SettingsPage.DISPLAY,
-        ),
-        SettingsSubPage(
-            SettingsPage.ROOT,
-            Res.string.interaction_settings_desc,
-            SettingsPage.INTERACTION,
-        ),
-        SettingsSubPage(
-            SettingsPage.ROOT,
-            Res.string.keyboard_settings_desc,
-            SettingsPage.KEYBOARD,
-        ),
-        SettingsSubPage(
-            SettingsPage.ROOT,
-            Res.string.voice_settings_desc,
-            SettingsPage.VOICE_ACCESSIBILITY,
-        ),
-        SettingsSubPage(
-            SettingsPage.ROOT,
-            Res.string.external_tools_settings_desc,
-            SettingsPage.EXTERNAL_TOOLS,
-        ),
-        SettingsSubPage(
-            SettingsPage.ROOT,
-            Res.string.preferences_export_import_desc,
-            SettingsPage.EXPORT_IMPORT,
-        ),
-        SettingsHeading(
-            SettingsPage.ROOT,
-            Res.string.about_forkyz,
-        ),
-        SettingsHTMLPage(
-            SettingsPage.ROOT,
-            Res.string.release_notes,
-            HTMLFile.RELEASE_NOTES,
-        ),
-        SettingsHTMLPage(
-            SettingsPage.ROOT,
-            Res.string.license,
-            HTMLFile.LICENSE,
-        ),
-        SettingsLogcat(
-            SettingsPage.ROOT,
-            Res.string.logcat,
-        ),
-
-        // Sources
-        SettingsSubPage(
-            SettingsPage.PUZZLE_SOURCES,
-            Res.string.daily_crosswords_desc,
-            SettingsPage.PUZZLE_SOURCES_DAILY,
-        ),
-        SettingsSubPage(
-            SettingsPage.PUZZLE_SOURCES,
-            Res.string.weekly_crosswords_desc,
-            SettingsPage.PUZZLE_SOURCES_WEEKLY,
-        ),
-        SettingsSubPage(
-            SettingsPage.PUZZLE_SOURCES,
-            Res.string.scraper_sources_desc,
-            SettingsPage.PUZZLE_SOURCES_SCRAPERS,
-        ),
-        SettingsTriState.build(
-            viewModelScope,
-            SettingsPage.PUZZLE_SOURCES_DAILY,
-            Res.string.toggle_all_daily_sources,
-            Res.string.toggle_all_daily_sources_desc,
-            downloadersTogglesDaily + downloadersTogglesCustomDaily,
-        ),
-    ) + downloadersTogglesDaily + downloadersExtraDaily + listOf(
-        SettingsHeading(
-            SettingsPage.PUZZLE_SOURCES_DAILY,
-            Res.string.custom_daily,
-        ),
-    ) + downloadersTogglesCustomDaily + downloadersExtraCustomDaily + listOf(
-        SettingsTriState.build(
-            viewModelScope,
-            SettingsPage.PUZZLE_SOURCES_WEEKLY,
-            Res.string.toggle_all_weekly_sources,
-            Res.string.toggle_all_weekly_sources_desc,
-            downloadersTogglesWeeklyRegular + downloadersTogglesWeeklyLarge,
-        ),
-        SettingsHeading(
-            SettingsPage.PUZZLE_SOURCES_WEEKLY,
-            Res.string.regular_sized,
-            null,
-        ),
-    ) + downloadersTogglesWeeklyRegular + downloadersExtraWeeklyRegular + listOf(
-        SettingsHeading(
-            SettingsPage.PUZZLE_SOURCES_WEEKLY,
-            Res.string.large_sized,
-            null,
-        ),
-    ) + downloadersTogglesWeeklyLarge + downloadersExtraWeeklyLarge + listOf(
-        SettingsTriState.build(
-            viewModelScope,
-            SettingsPage.PUZZLE_SOURCES_SCRAPERS,
-            Res.string.toggle_all_scrapers,
-            Res.string.toggle_all_scrapers_desc,
-            downloadersTogglesScrapers,
-        ),
-    ) + downloadersTogglesScrapers + downloadersExtraScrapers + listOf(
-        SettingsDivider(SettingsPage.PUZZLE_SOURCES_SCRAPERS),
-        SettingsHTMLPage(
-            SettingsPage.PUZZLE_SOURCES_SCRAPERS,
-            Res.string.about_scrapes,
-            HTMLFile.SCRAPERS_HELP,
-        ),
-
-        // Download
-        SettingsBoolean(
-            SettingsPage.DOWNLOAD,
-            Res.string.automatic_download,
-            Res.string.automatic_download_desc,
-            settings.liveDownloadOnStartUp.stateInHere(),
-            settings::setDownloadOnStartUp,
-        ),
-        SettingsSubPage(
-            SettingsPage.DOWNLOAD,
-            Res.string.background_download_opts_desc,
-            SettingsPage.DOWNLOAD_BACKGROUND,
-        ),
-        SettingsBoolean(
-            SettingsPage.DOWNLOAD,
-            Res.string.no_summary_download_notifs,
-            Res.string.no_summary_download_notifs_desc,
-            settings.liveDownloadSuppressSummaryMessages.stateInHere(),
-            settings::setDownloadSuppressSummaryMessages,
-        ),
-        SettingsBoolean(
-            SettingsPage.DOWNLOAD,
-            Res.string.no_puzzle_download_notifs,
-            Res.string.no_puzzle_download_notifs_desc,
-            settings.liveDownloadSuppressMessages.stateInHere(),
-            settings::setDownloadSuppressMessages,
-        ),
-        SettingsList<Int>(
-            SettingsPage.DOWNLOAD,
-            Res.string.download_timeout,
-            Res.string.download_timeout_desc,
-            listOf(
-                SettingsListEntry(Res.string.fifteen_seconds, 15000),
-                SettingsListEntry(Res.string.thirty_seconds, 30000),
-                SettingsListEntry(Res.string.forty_five_seconds, 45000),
-                SettingsListEntry(Res.string.sixty_seconds, 60000),
-            ),
-            settings.liveDownloadTimeout.stateInHere(),
-            settings::setDownloadTimeout,
-        ),
-
-        // Background Download
-        SettingsHeading(
-            SettingsPage.DOWNLOAD_BACKGROUND,
-            Res.string.background_download_time_config,
-        ),
-        SettingsBoolean(
-            SettingsPage.DOWNLOAD_BACKGROUND,
-            Res.string.background_download_hourly,
-            Res.string.background_download_hourly_desc,
-            settings.liveDownloadHourly.stateInHere(),
-            { value -> settings.setDownloadHourly(value) },
-        ),
-        SettingsMultiList(
-            SettingsPage.DOWNLOAD_BACKGROUND,
-            Res.string.background_download_days,
-            Res.string.background_download_days_desc,
-            listOf(
-                // matches Java DayOfWeek
-                SettingsListEntry(Res.string.background_download_mon, "1"),
-                SettingsListEntry(Res.string.background_download_tue, "2"),
-                SettingsListEntry(Res.string.background_download_wed, "3"),
-                SettingsListEntry(Res.string.background_download_thu, "4"),
-                SettingsListEntry(Res.string.background_download_fri, "5"),
-                SettingsListEntry(Res.string.background_download_sat, "6"),
-                SettingsListEntry(Res.string.background_download_sun, "7"),
-            ),
-            settings.liveDownloadDays.stateInHere(),
-            { value -> settings.setDownloadDays(value) },
-        ),
-        SettingsList<Int>(
-            SettingsPage.DOWNLOAD_BACKGROUND,
-            Res.string.background_download_days_time,
-            Res.string.background_download_days_time_desc,
-            listOf(
-                SettingsListEntry(Res.string.background_download_0, 0),
-                SettingsListEntry(Res.string.background_download_1, 1),
-                SettingsListEntry(Res.string.background_download_2, 2),
-                SettingsListEntry(Res.string.background_download_3, 3),
-                SettingsListEntry(Res.string.background_download_4, 4),
-                SettingsListEntry(Res.string.background_download_5, 5),
-                SettingsListEntry(Res.string.background_download_6, 6),
-                SettingsListEntry(Res.string.background_download_7, 7),
-                SettingsListEntry(Res.string.background_download_8, 8),
-                SettingsListEntry(Res.string.background_download_9, 9),
-                SettingsListEntry(Res.string.background_download_10, 10),
-                SettingsListEntry(Res.string.background_download_11, 11),
-                SettingsListEntry(Res.string.background_download_12, 12),
-                SettingsListEntry(Res.string.background_download_13, 13),
-                SettingsListEntry(Res.string.background_download_14, 14),
-                SettingsListEntry(Res.string.background_download_15, 15),
-                SettingsListEntry(Res.string.background_download_16, 16),
-                SettingsListEntry(Res.string.background_download_17, 17),
-                SettingsListEntry(Res.string.background_download_18, 18),
-                SettingsListEntry(Res.string.background_download_19, 19),
-                SettingsListEntry(Res.string.background_download_20, 20),
-                SettingsListEntry(Res.string.background_download_21, 21),
-                SettingsListEntry(Res.string.background_download_22, 22),
-                SettingsListEntry(Res.string.background_download_23, 23),
-            ),
-            settings.liveDownloadDaysTime.stateInHere(),
-            { value -> settings.setDownloadDaysTime(value) },
-        ),
-        SettingsHeading(
-            SettingsPage.DOWNLOAD_BACKGROUND,
-            Res.string.background_download_constraints_config,
-        ),
-        SettingsBoolean(
-            SettingsPage.DOWNLOAD_BACKGROUND,
-            Res.string.download_wifi_only,
-            Res.string.download_wifi_only_desc,
-            settings.liveDownloadRequireUnmetered.stateInHere(),
-            { value -> settings.setDownloadRequireUnmetered(value) },
-        ),
-        SettingsBoolean(
-            SettingsPage.DOWNLOAD_BACKGROUND,
-            Res.string.download_roaming,
-            Res.string.download_roaming_desc,
-            settings.liveDownloadAllowRoaming.stateInHere(),
-            { value -> settings.setDownloadAllowRoaming(value) },
-        ),
-        SettingsBoolean(
-            SettingsPage.DOWNLOAD_BACKGROUND,
-            Res.string.download_charging,
-            Res.string.download_charging_desc,
-            settings.liveDownloadRequireCharging.stateInHere(),
-            { value -> settings.setDownloadRequireCharging(value) },
-        ),
-
-        // Browser
-        SettingsBoolean(
-            SettingsPage.BROWSER,
-            Res.string.dont_confirm_cleanup,
-            Res.string.dont_confirm_cleanup_desc,
-            settings.liveBrowseDontConfirmCleanup.stateInHere(),
-            settings::setBrowseDontConfirmCleanup,
-        ),
-        SettingsBoolean(
-            SettingsPage.BROWSER,
-            Res.string.delete_on_cleanup,
-            Res.string.delete_on_cleanup_desc,
-            settings.liveBrowseDeleteOnCleanup.stateInHere(),
-            settings::setBrowseDeleteOnCleanup,
-        ),
-        SettingsList<Int>(
-            SettingsPage.BROWSER,
-            Res.string.cleanup_unfinished,
-            Res.string.cleanup_unfinished_desc,
-            listOf(
-                SettingsListEntry(Res.string.cleanup_age_two_days, 2),
-                SettingsListEntry(Res.string.cleanup_age_one_week, 7),
-                SettingsListEntry(Res.string.cleanup_age_thirty_days, 30),
-                SettingsListEntry(Res.string.cleanup_age_never, -1),
-            ),
-            settings.liveBrowseCleanupAge.stateInHere(),
-            settings::setBrowseCleanupAge,
-        ),
-        SettingsList<Int>(
-            SettingsPage.BROWSER,
-            Res.string.cleanup_archives,
-            Res.string.cleanup_archives_desc,
-            listOf(
-                SettingsListEntry(Res.string.cleanup_age_two_days, 2),
-                SettingsListEntry(Res.string.cleanup_age_one_week, 7),
-                SettingsListEntry(Res.string.cleanup_age_thirty_days, 30),
-                SettingsListEntry(Res.string.cleanup_age_never, -1),
-            ),
-            settings.liveBrowseCleanupAgeArchive.stateInHere(),
-            settings::setBrowseCleanupAgeArchive,
-        ),
-        SettingsBoolean(
-            SettingsPage.BROWSER,
-            Res.string.disable_swipe,
-            Res.string.disable_swipe_desc,
-            settings.liveBrowseDisableSwipe.stateInHere(),
-            settings::setBrowseDisableSwipe,
-        ),
-        SettingsList<BrowseSwipeAction>(
-            SettingsPage.BROWSER,
-            Res.string.swipe_action,
-            Res.string.swipe_action_desc,
-            listOf(
-                SettingsListEntry(
-                    Res.string.delete,
-                    BrowseSwipeAction.BSA_DELETE
+    private val settingsItemsList : List<SettingsItem> = utils.filterSettings(
+        listOf(
+            SettingsDynamicList<StorageLocation>(
+                SettingsPage.ROOT,
+                Res.string.storage_location,
+                Res.string.storage_location_desc,
+                storageLocationsStateFlow,
+                settings.liveFileHandlerStorageLocation.stateInHere(
+                    StorageLocation.SL_INTERNAL,
                 ),
-                SettingsListEntry(
-                    Res.string.archive,
-                    BrowseSwipeAction.BSA_ARCHIVE
-                ),
+                this::onStorageLocationChange,
             ),
-            settings.liveBrowseSwipeAction.stateInHere(
-                BrowseSwipeAction.BSA_ARCHIVE,
+            SettingsSubPage(
+                SettingsPage.ROOT,
+                Res.string.select_sources_desc,
+                SettingsPage.PUZZLE_SOURCES,
             ),
-            settings::setBrowseSwipeAction,
-        ),
-        SettingsBoolean(
-            SettingsPage.BROWSER,
-            Res.string.dont_confirm_browse_delete,
-            Res.string.dont_confirm_browse_delete_desc,
-            settings.liveBrowseDontConfirmDelete.stateInHere(),
-            settings::setBrowseDontConfirmDelete,
-        ),
-        SettingsBoolean(
-            SettingsPage.BROWSER,
-            Res.string.browse_show_percentage_correct,
-            Res.string.browse_show_percentage_correct_desc,
-            settings.liveBrowseShowPercentageCorrect.stateInHere(),
-            settings::setBrowseShowPercentageCorrect,
-        ),
-        SettingsBoolean(
-            SettingsPage.BROWSER,
-            Res.string.browse_always_show_rating,
-            Res.string.browse_always_show_rating_desc,
-            settings.liveBrowseAlwaysShowRating.stateInHere(),
-            settings::setBrowseAlwaysShowRating,
-        ),
-        SettingsBoolean(
-            SettingsPage.BROWSER,
-            Res.string.browse_indicate_if_solution,
-            Res.string.browse_indicate_if_solution_desc,
-            settings.liveBrowseIndicateIfSolution.stateInHere(),
-            settings::setBrowseIndicateIfSolution,
-        ),
-        SettingsBoolean(
-            SettingsPage.BROWSER,
-            Res.string.collapse_headings,
-            Res.string.collapse_headings_desc,
-            settings.liveBrowseCollapseHeadings.stateInHere(),
-            settings::setBrowseCollapseHeadings,
-        ),
+            SettingsSubPage(
+                SettingsPage.ROOT,
+                Res.string.download_settings_desc,
+                SettingsPage.DOWNLOAD,
+            ),
+            SettingsSubPage(
+                SettingsPage.ROOT,
+                Res.string.browser_settings_desc,
+                SettingsPage.BROWSER,
+            ),
+            SettingsSubPage(
+                SettingsPage.ROOT,
+                Res.string.display_settings_desc,
+                SettingsPage.DISPLAY,
+            ),
+            SettingsSubPage(
+                SettingsPage.ROOT,
+                Res.string.interaction_settings_desc,
+                SettingsPage.INTERACTION,
+            ),
+            SettingsSubPage(
+                SettingsPage.ROOT,
+                Res.string.keyboard_settings_desc,
+                SettingsPage.KEYBOARD,
+            ),
+            SettingsSubPage(
+                SettingsPage.ROOT,
+                Res.string.voice_settings_desc,
+                SettingsPage.VOICE_ACCESSIBILITY,
+            ),
+            SettingsSubPage(
+                SettingsPage.ROOT,
+                Res.string.external_tools_settings_desc,
+                SettingsPage.EXTERNAL_TOOLS,
+            ),
+            SettingsSubPage(
+                SettingsPage.ROOT,
+                Res.string.preferences_export_import_desc,
+                SettingsPage.EXPORT_IMPORT,
+            ),
+            SettingsHeading(
+                SettingsPage.ROOT,
+                Res.string.about_forkyz,
+            ),
+            SettingsHTMLPage(
+                SettingsPage.ROOT,
+                Res.string.release_notes,
+                HTMLFile.RELEASE_NOTES,
+            ),
+            SettingsHTMLPage(
+                SettingsPage.ROOT,
+                Res.string.license,
+                HTMLFile.LICENSE,
+            ),
+            SettingsLogcat(
+                SettingsPage.ROOT,
+                Res.string.logcat,
+            ),
 
-        // Display
-        SettingsList<Theme>(
-            SettingsPage.DISPLAY,
-            Res.string.theme_preference,
-            Res.string.theme_preference_desc,
-            availableThemeSettings,
-            settings.liveAppTheme.stateInHere(Theme.T_STANDARD),
-            settings::setAppTheme,
-        ),
-        SettingsBoolean(
-            SettingsPage.DISPLAY,
-            Res.string.clue_below_grid,
-            Res.string.clue_below_grid_desc,
-            settings.livePlayClueBelowGrid.stateInHere(),
-            settings::setPlayClueBelowGrid,
-        ),
-        SettingsBoolean(
-            SettingsPage.DISPLAY,
-            Res.string.expandable_clue_line,
-            Res.string.expandable_clue_line_desc,
-            settings.livePlayExpandableClueLine.stateInHere(),
-            settings::setPlayExpandableClueLine,
-        ),
-        SettingsList<ClueListClueLine>(
-            SettingsPage.DISPLAY,
-            Res.string.clue_list_name_in_clue_line,
-            Res.string.clue_list_name_in_clue_line_desc,
-            listOf(
-                SettingsListEntry(
-                    Res.string.clue_list_clue_line_full,
+            // Sources
+            SettingsSubPage(
+                SettingsPage.PUZZLE_SOURCES,
+                Res.string.daily_crosswords_desc,
+                SettingsPage.PUZZLE_SOURCES_DAILY,
+            ),
+            SettingsSubPage(
+                SettingsPage.PUZZLE_SOURCES,
+                Res.string.weekly_crosswords_desc,
+                SettingsPage.PUZZLE_SOURCES_WEEKLY,
+            ),
+            SettingsSubPage(
+                SettingsPage.PUZZLE_SOURCES,
+                Res.string.scraper_sources_desc,
+                SettingsPage.PUZZLE_SOURCES_SCRAPERS,
+            ),
+            SettingsTriState.build(
+                viewModelScope,
+                SettingsPage.PUZZLE_SOURCES_DAILY,
+                Res.string.toggle_all_daily_sources,
+                Res.string.toggle_all_daily_sources_desc,
+                downloadersTogglesDaily + downloadersTogglesCustomDaily,
+            ),
+        ) + downloadersTogglesDaily + downloadersExtraDaily + listOf(
+            SettingsHeading(
+                SettingsPage.PUZZLE_SOURCES_DAILY,
+                Res.string.custom_daily,
+            ),
+        ) + downloadersTogglesCustomDaily + downloadersExtraCustomDaily + listOf(
+            SettingsTriState.build(
+                viewModelScope,
+                SettingsPage.PUZZLE_SOURCES_WEEKLY,
+                Res.string.toggle_all_weekly_sources,
+                Res.string.toggle_all_weekly_sources_desc,
+                downloadersTogglesWeeklyRegular + downloadersTogglesWeeklyLarge,
+            ),
+            SettingsHeading(
+                SettingsPage.PUZZLE_SOURCES_WEEKLY,
+                Res.string.regular_sized,
+                null,
+            ),
+        ) + downloadersTogglesWeeklyRegular + downloadersExtraWeeklyRegular + listOf(
+            SettingsHeading(
+                SettingsPage.PUZZLE_SOURCES_WEEKLY,
+                Res.string.large_sized,
+                null,
+            ),
+        ) + downloadersTogglesWeeklyLarge + downloadersExtraWeeklyLarge + listOf(
+            SettingsTriState.build(
+                viewModelScope,
+                SettingsPage.PUZZLE_SOURCES_SCRAPERS,
+                Res.string.toggle_all_scrapers,
+                Res.string.toggle_all_scrapers_desc,
+                downloadersTogglesScrapers,
+            ),
+        ) + downloadersTogglesScrapers + downloadersExtraScrapers + listOf(
+            SettingsDivider(SettingsPage.PUZZLE_SOURCES_SCRAPERS),
+            SettingsHTMLPage(
+                SettingsPage.PUZZLE_SOURCES_SCRAPERS,
+                Res.string.about_scrapes,
+                HTMLFile.SCRAPERS_HELP,
+            ),
+
+            // Download
+            SettingsBoolean(
+                SettingsPage.DOWNLOAD,
+                Res.string.automatic_download,
+                Res.string.automatic_download_desc,
+                settings.liveDownloadOnStartUp.stateInHere(),
+                settings::setDownloadOnStartUp,
+            ),
+            SettingsSubPage(
+                SettingsPage.DOWNLOAD,
+                Res.string.background_download_opts_desc,
+                SettingsPage.DOWNLOAD_BACKGROUND,
+            ),
+            SettingsBoolean(
+                SettingsPage.DOWNLOAD,
+                Res.string.no_summary_download_notifs,
+                Res.string.no_summary_download_notifs_desc,
+                settings.liveDownloadSuppressSummaryMessages.stateInHere(),
+                settings::setDownloadSuppressSummaryMessages,
+            ),
+            SettingsBoolean(
+                SettingsPage.DOWNLOAD,
+                Res.string.no_puzzle_download_notifs,
+                Res.string.no_puzzle_download_notifs_desc,
+                settings.liveDownloadSuppressMessages.stateInHere(),
+                settings::setDownloadSuppressMessages,
+            ),
+            SettingsList<Int>(
+                SettingsPage.DOWNLOAD,
+                Res.string.download_timeout,
+                Res.string.download_timeout_desc,
+                listOf(
+                    SettingsListEntry(Res.string.fifteen_seconds, 15000),
+                    SettingsListEntry(Res.string.thirty_seconds, 30000),
+                    SettingsListEntry(Res.string.forty_five_seconds, 45000),
+                    SettingsListEntry(Res.string.sixty_seconds, 60000),
+                ),
+                settings.liveDownloadTimeout.stateInHere(),
+                settings::setDownloadTimeout,
+            ),
+
+            // Background Download
+            SettingsHeading(
+                SettingsPage.DOWNLOAD_BACKGROUND,
+                Res.string.background_download_time_config,
+            ),
+            SettingsBoolean(
+                SettingsPage.DOWNLOAD_BACKGROUND,
+                Res.string.background_download_hourly,
+                Res.string.background_download_hourly_desc,
+                settings.liveDownloadHourly.stateInHere(),
+                { value -> settings.setDownloadHourly(value) },
+            ),
+            SettingsMultiList(
+                SettingsPage.DOWNLOAD_BACKGROUND,
+                Res.string.background_download_days,
+                Res.string.background_download_days_desc,
+                listOf(
+                    // matches Java DayOfWeek
+                    SettingsListEntry(Res.string.background_download_mon, "1"),
+                    SettingsListEntry(Res.string.background_download_tue, "2"),
+                    SettingsListEntry(Res.string.background_download_wed, "3"),
+                    SettingsListEntry(Res.string.background_download_thu, "4"),
+                    SettingsListEntry(Res.string.background_download_fri, "5"),
+                    SettingsListEntry(Res.string.background_download_sat, "6"),
+                    SettingsListEntry(Res.string.background_download_sun, "7"),
+                ),
+                settings.liveDownloadDays.stateInHere(),
+                { value -> settings.setDownloadDays(value) },
+            ),
+            SettingsList<Int>(
+                SettingsPage.DOWNLOAD_BACKGROUND,
+                Res.string.background_download_days_time,
+                Res.string.background_download_days_time_desc,
+                listOf(
+                    SettingsListEntry(Res.string.background_download_0, 0),
+                    SettingsListEntry(Res.string.background_download_1, 1),
+                    SettingsListEntry(Res.string.background_download_2, 2),
+                    SettingsListEntry(Res.string.background_download_3, 3),
+                    SettingsListEntry(Res.string.background_download_4, 4),
+                    SettingsListEntry(Res.string.background_download_5, 5),
+                    SettingsListEntry(Res.string.background_download_6, 6),
+                    SettingsListEntry(Res.string.background_download_7, 7),
+                    SettingsListEntry(Res.string.background_download_8, 8),
+                    SettingsListEntry(Res.string.background_download_9, 9),
+                    SettingsListEntry(Res.string.background_download_10, 10),
+                    SettingsListEntry(Res.string.background_download_11, 11),
+                    SettingsListEntry(Res.string.background_download_12, 12),
+                    SettingsListEntry(Res.string.background_download_13, 13),
+                    SettingsListEntry(Res.string.background_download_14, 14),
+                    SettingsListEntry(Res.string.background_download_15, 15),
+                    SettingsListEntry(Res.string.background_download_16, 16),
+                    SettingsListEntry(Res.string.background_download_17, 17),
+                    SettingsListEntry(Res.string.background_download_18, 18),
+                    SettingsListEntry(Res.string.background_download_19, 19),
+                    SettingsListEntry(Res.string.background_download_20, 20),
+                    SettingsListEntry(Res.string.background_download_21, 21),
+                    SettingsListEntry(Res.string.background_download_22, 22),
+                    SettingsListEntry(Res.string.background_download_23, 23),
+                ),
+                settings.liveDownloadDaysTime.stateInHere(),
+                { value -> settings.setDownloadDaysTime(value) },
+            ),
+            SettingsHeading(
+                SettingsPage.DOWNLOAD_BACKGROUND,
+                Res.string.background_download_constraints_config,
+            ),
+            SettingsBoolean(
+                SettingsPage.DOWNLOAD_BACKGROUND,
+                Res.string.download_wifi_only,
+                Res.string.download_wifi_only_desc,
+                settings.liveDownloadRequireUnmetered.stateInHere(),
+                { value -> settings.setDownloadRequireUnmetered(value) },
+            ),
+            SettingsBoolean(
+                SettingsPage.DOWNLOAD_BACKGROUND,
+                Res.string.download_roaming,
+                Res.string.download_roaming_desc,
+                settings.liveDownloadAllowRoaming.stateInHere(),
+                { value -> settings.setDownloadAllowRoaming(value) },
+            ),
+            SettingsBoolean(
+                SettingsPage.DOWNLOAD_BACKGROUND,
+                Res.string.download_charging,
+                Res.string.download_charging_desc,
+                settings.liveDownloadRequireCharging.stateInHere(),
+                { value -> settings.setDownloadRequireCharging(value) },
+            ),
+
+            // Browser
+            SettingsBoolean(
+                SettingsPage.BROWSER,
+                Res.string.dont_confirm_cleanup,
+                Res.string.dont_confirm_cleanup_desc,
+                settings.liveBrowseDontConfirmCleanup.stateInHere(),
+                settings::setBrowseDontConfirmCleanup,
+            ),
+            SettingsBoolean(
+                SettingsPage.BROWSER,
+                Res.string.delete_on_cleanup,
+                Res.string.delete_on_cleanup_desc,
+                settings.liveBrowseDeleteOnCleanup.stateInHere(),
+                settings::setBrowseDeleteOnCleanup,
+            ),
+            SettingsList<Int>(
+                SettingsPage.BROWSER,
+                Res.string.cleanup_unfinished,
+                Res.string.cleanup_unfinished_desc,
+                listOf(
+                    SettingsListEntry(Res.string.cleanup_age_two_days, 2),
+                    SettingsListEntry(Res.string.cleanup_age_one_week, 7),
+                    SettingsListEntry(Res.string.cleanup_age_thirty_days, 30),
+                    SettingsListEntry(Res.string.cleanup_age_never, -1),
+                ),
+                settings.liveBrowseCleanupAge.stateInHere(),
+                settings::setBrowseCleanupAge,
+            ),
+            SettingsList<Int>(
+                SettingsPage.BROWSER,
+                Res.string.cleanup_archives,
+                Res.string.cleanup_archives_desc,
+                listOf(
+                    SettingsListEntry(Res.string.cleanup_age_two_days, 2),
+                    SettingsListEntry(Res.string.cleanup_age_one_week, 7),
+                    SettingsListEntry(Res.string.cleanup_age_thirty_days, 30),
+                    SettingsListEntry(Res.string.cleanup_age_never, -1),
+                ),
+                settings.liveBrowseCleanupAgeArchive.stateInHere(),
+                settings::setBrowseCleanupAgeArchive,
+            ),
+            SettingsBoolean(
+                SettingsPage.BROWSER,
+                Res.string.disable_swipe,
+                Res.string.disable_swipe_desc,
+                settings.liveBrowseDisableSwipe.stateInHere(),
+                settings::setBrowseDisableSwipe,
+            ),
+            SettingsList<BrowseSwipeAction>(
+                SettingsPage.BROWSER,
+                Res.string.swipe_action,
+                Res.string.swipe_action_desc,
+                listOf(
+                    SettingsListEntry(
+                        Res.string.delete,
+                        BrowseSwipeAction.BSA_DELETE
+                    ),
+                    SettingsListEntry(
+                        Res.string.archive,
+                        BrowseSwipeAction.BSA_ARCHIVE
+                    ),
+                ),
+                settings.liveBrowseSwipeAction.stateInHere(
+                    BrowseSwipeAction.BSA_ARCHIVE,
+                ),
+                settings::setBrowseSwipeAction,
+            ),
+            SettingsBoolean(
+                SettingsPage.BROWSER,
+                Res.string.dont_confirm_browse_delete,
+                Res.string.dont_confirm_browse_delete_desc,
+                settings.liveBrowseDontConfirmDelete.stateInHere(),
+                settings::setBrowseDontConfirmDelete,
+            ),
+            SettingsBoolean(
+                SettingsPage.BROWSER,
+                Res.string.browse_show_percentage_correct,
+                Res.string.browse_show_percentage_correct_desc,
+                settings.liveBrowseShowPercentageCorrect.stateInHere(),
+                settings::setBrowseShowPercentageCorrect,
+            ),
+            SettingsBoolean(
+                SettingsPage.BROWSER,
+                Res.string.browse_always_show_rating,
+                Res.string.browse_always_show_rating_desc,
+                settings.liveBrowseAlwaysShowRating.stateInHere(),
+                settings::setBrowseAlwaysShowRating,
+            ),
+            SettingsBoolean(
+                SettingsPage.BROWSER,
+                Res.string.browse_indicate_if_solution,
+                Res.string.browse_indicate_if_solution_desc,
+                settings.liveBrowseIndicateIfSolution.stateInHere(),
+                settings::setBrowseIndicateIfSolution,
+            ),
+            SettingsBoolean(
+                SettingsPage.BROWSER,
+                Res.string.collapse_headings,
+                Res.string.collapse_headings_desc,
+                settings.liveBrowseCollapseHeadings.stateInHere(),
+                settings::setBrowseCollapseHeadings,
+            ),
+
+            // Display
+            SettingsList<Theme>(
+                SettingsPage.DISPLAY,
+                Res.string.theme_preference,
+                Res.string.theme_preference_desc,
+                availableThemeSettings,
+                settings.liveAppTheme.stateInHere(Theme.T_STANDARD),
+                settings::setAppTheme,
+            ),
+            SettingsBoolean(
+                SettingsPage.DISPLAY,
+                Res.string.clue_below_grid,
+                Res.string.clue_below_grid_desc,
+                settings.livePlayClueBelowGrid.stateInHere(),
+                settings::setPlayClueBelowGrid,
+            ),
+            SettingsBoolean(
+                SettingsPage.DISPLAY,
+                Res.string.expandable_clue_line,
+                Res.string.expandable_clue_line_desc,
+                settings.livePlayExpandableClueLine.stateInHere(),
+                settings::setPlayExpandableClueLine,
+            ),
+            SettingsList<ClueListClueLine>(
+                SettingsPage.DISPLAY,
+                Res.string.clue_list_name_in_clue_line,
+                Res.string.clue_list_name_in_clue_line_desc,
+                listOf(
+                    SettingsListEntry(
+                        Res.string.clue_list_clue_line_full,
+                        ClueListClueLine.CLCL_FULL,
+                    ),
+                    SettingsListEntry(
+                        Res.string.clue_list_clue_line_abbreviated,
+                        ClueListClueLine.CLCL_ABBREVIATED,
+                    ),
+                    SettingsListEntry(
+                        Res.string.clue_list_clue_line_none,
+                        ClueListClueLine.CLCL_NONE,
+                    ),
+                ),
+                settings.livePlayClueListNameInClueLine.stateInHere(
                     ClueListClueLine.CLCL_FULL,
                 ),
-                SettingsListEntry(
-                    Res.string.clue_list_clue_line_abbreviated,
-                    ClueListClueLine.CLCL_ABBREVIATED,
-                ),
-                SettingsListEntry(
-                    Res.string.clue_list_clue_line_none,
-                    ClueListClueLine.CLCL_NONE,
-                ),
+                settings::setPlayClueListNameInClueLine,
             ),
-            settings.livePlayClueListNameInClueLine.stateInHere(
-                ClueListClueLine.CLCL_FULL,
+            SettingsBoolean(
+                SettingsPage.DISPLAY,
+                Res.string.show_length,
+                Res.string.show_length_desc,
+                settings.livePlayShowCount.stateInHere(),
+                settings::setPlayShowCount,
             ),
-            settings::setPlayClueListNameInClueLine,
-        ),
-        SettingsBoolean(
-            SettingsPage.DISPLAY,
-            Res.string.show_length,
-            Res.string.show_length_desc,
-            settings.livePlayShowCount.stateInHere(),
-            settings::setPlayShowCount,
-        ),
-        SettingsList<FitToScreenMode>(
-            SettingsPage.DISPLAY,
-            Res.string.fit_to_screen_mode,
-            Res.string.fit_to_screen_mode_desc,
-            listOf(
-                SettingsListEntry(
-                    Res.string.fit_to_screen_mode_never,
+            SettingsList<FitToScreenMode>(
+                SettingsPage.DISPLAY,
+                Res.string.fit_to_screen_mode,
+                Res.string.fit_to_screen_mode_desc,
+                listOf(
+                    SettingsListEntry(
+                        Res.string.fit_to_screen_mode_never,
+                        FitToScreenMode.FTSM_NEVER,
+                    ),
+                    SettingsListEntry(
+                        Res.string.fit_to_screen_mode_start,
+                        FitToScreenMode.FTSM_START,
+                    ),
+                    SettingsListEntry(
+                        Res.string.fit_to_screen_mode_locked,
+                        FitToScreenMode.FTSM_LOCKED,
+                    ),
+                ),
+                settings.livePlayFitToScreenMode.stateInHere(
                     FitToScreenMode.FTSM_NEVER,
                 ),
-                SettingsListEntry(
-                    Res.string.fit_to_screen_mode_start,
-                    FitToScreenMode.FTSM_START,
-                ),
-                SettingsListEntry(
-                    Res.string.fit_to_screen_mode_locked,
-                    FitToScreenMode.FTSM_LOCKED,
-                ),
+                settings::setPlayFitToScreenMode,
             ),
-            settings.livePlayFitToScreenMode.stateInHere(
-                FitToScreenMode.FTSM_NEVER,
+            SettingsBoolean(
+                SettingsPage.DISPLAY,
+                Res.string.display_scratch,
+                Res.string.display_scratch_desc,
+                settings.livePlayScratchDisplay.stateInHere(),
+                settings::setPlayScratchDisplay,
             ),
-            settings::setPlayFitToScreenMode,
-        ),
-        SettingsBoolean(
-            SettingsPage.DISPLAY,
-            Res.string.display_scratch,
-            Res.string.display_scratch_desc,
-            settings.livePlayScratchDisplay.stateInHere(),
-            settings::setPlayScratchDisplay,
-        ),
-        SettingsBoolean(
-            SettingsPage.DISPLAY,
-            Res.string.no_hint_highlighting,
-            Res.string.no_hint_highlighting_desc,
-            settings.livePlaySuppressHintHighlighting.stateInHere(),
-            settings::setPlaySuppressHintHighlighting,
-        ),
-        SettingsList<DisplaySeparators>(
-            SettingsPage.DISPLAY,
-            Res.string.display_separators,
-            Res.string.display_separators_desc,
-            listOf(
-                SettingsListEntry(
-                    Res.string.display_separators_never,
-                    DisplaySeparators.DS_NEVER,
+            SettingsBoolean(
+                SettingsPage.DISPLAY,
+                Res.string.no_hint_highlighting,
+                Res.string.no_hint_highlighting_desc,
+                settings.livePlaySuppressHintHighlighting.stateInHere(),
+                settings::setPlaySuppressHintHighlighting,
+            ),
+            SettingsList<DisplaySeparators>(
+                SettingsPage.DISPLAY,
+                Res.string.display_separators,
+                Res.string.display_separators_desc,
+                listOf(
+                    SettingsListEntry(
+                        Res.string.display_separators_never,
+                        DisplaySeparators.DS_NEVER,
+                    ),
+                    SettingsListEntry(
+                        Res.string.display_separators_selected,
+                        DisplaySeparators.DS_SELECTED,
+                    ),
+                    SettingsListEntry(
+                        Res.string.display_separators_always,
+                        DisplaySeparators.DS_ALWAYS,
+                    ),
                 ),
-                SettingsListEntry(
-                    Res.string.display_separators_selected,
-                    DisplaySeparators.DS_SELECTED,
-                ),
-                SettingsListEntry(
-                    Res.string.display_separators_always,
+                settings.livePlayDisplaySeparators.stateInHere(
                     DisplaySeparators.DS_ALWAYS,
                 ),
+                settings::setPlayDisplaySeparators,
             ),
-            settings.livePlayDisplaySeparators.stateInHere(
-                DisplaySeparators.DS_ALWAYS,
+            SettingsBoolean(
+                SettingsPage.DISPLAY,
+                Res.string.infer_separators,
+                Res.string.infer_separators_desc,
+                settings.livePlayInferSeparators.stateInHere(),
+                settings::setPlayInferSeparators,
             ),
-            settings::setPlayDisplaySeparators,
-        ),
-        SettingsBoolean(
-            SettingsPage.DISPLAY,
-            Res.string.infer_separators,
-            Res.string.infer_separators_desc,
-            settings.livePlayInferSeparators.stateInHere(),
-            settings::setPlayInferSeparators,
-        ),
-        SettingsBoolean(
-            SettingsPage.DISPLAY,
-            Res.string.indicate_show_errors,
-            Res.string.indicate_show_errors_desc,
-            settings.livePlayIndicateShowErrors.stateInHere(),
-            settings::setPlayIndicateShowErrors,
-        ),
-        SettingsBoolean(
-            SettingsPage.DISPLAY,
-            Res.string.show_timer,
-            Res.string.show_timer_desc,
-            settings.livePlayShowTimer.stateInHere(),
-            settings::setPlayShowTimer,
-        ),
-        SettingsBoolean(
-            SettingsPage.DISPLAY,
-            Res.string.full_screen,
-            Res.string.full_screen_desc,
-            settings.livePlayFullScreen.stateInHere(),
-            settings::setPlayFullScreen,
-        ),
-        SettingsList<Orientation>(
-            SettingsPage.DISPLAY,
-            Res.string.orientation_lock,
-            Res.string.orientation_lock_desc,
-            listOf(
-                SettingsListEntry(
-                    Res.string.orientation_lock_unlocked,
+            SettingsBoolean(
+                SettingsPage.DISPLAY,
+                Res.string.indicate_show_errors,
+                Res.string.indicate_show_errors_desc,
+                settings.livePlayIndicateShowErrors.stateInHere(),
+                settings::setPlayIndicateShowErrors,
+            ),
+            SettingsBoolean(
+                SettingsPage.DISPLAY,
+                Res.string.show_timer,
+                Res.string.show_timer_desc,
+                settings.livePlayShowTimer.stateInHere(),
+                settings::setPlayShowTimer,
+            ),
+            SettingsBoolean(
+                SettingsPage.DISPLAY,
+                Res.string.full_screen,
+                Res.string.full_screen_desc,
+                settings.livePlayFullScreen.stateInHere(),
+                settings::setPlayFullScreen,
+            ),
+            SettingsList<Orientation>(
+                SettingsPage.DISPLAY,
+                Res.string.orientation_lock,
+                Res.string.orientation_lock_desc,
+                listOf(
+                    SettingsListEntry(
+                        Res.string.orientation_lock_unlocked,
+                        Orientation.O_UNLOCKED,
+                    ),
+                    SettingsListEntry(
+                        Res.string.orientation_lock_portrait,
+                        Orientation.O_PORTRAIT,
+                    ),
+                    SettingsListEntry(
+                        Res.string.orientation_lock_landscape,
+                        Orientation.O_LANDSCAPE,
+                    ),
+                ),
+                settings.liveAppOrientationLock.stateInHere(
                     Orientation.O_UNLOCKED,
                 ),
-                SettingsListEntry(
-                    Res.string.orientation_lock_portrait,
-                    Orientation.O_PORTRAIT,
-                ),
-                SettingsListEntry(
-                    Res.string.orientation_lock_landscape,
-                    Orientation.O_LANDSCAPE,
-                ),
+                settings::setAppOrientationLock,
             ),
-            settings.liveAppOrientationLock.stateInHere(
-                Orientation.O_UNLOCKED,
-            ),
-            settings::setAppOrientationLock,
-        ),
-        SettingsList<GridRatio>(
-            SettingsPage.DISPLAY,
-            Res.string.grid_ratio_portrait,
-            Res.string.grid_ratio_portrait_desc,
-            listOf(
-                SettingsListEntry(
-                    Res.string.grid_ratio_puzzle,
+            SettingsList<GridRatio>(
+                SettingsPage.DISPLAY,
+                Res.string.grid_ratio_portrait,
+                Res.string.grid_ratio_portrait_desc,
+                listOf(
+                    SettingsListEntry(
+                        Res.string.grid_ratio_puzzle,
+                        GridRatio.GR_PUZZLE_SHAPE,
+                    ),
+                    SettingsListEntry(
+                        Res.string.grid_ratio_one_to_one,
+                        GridRatio.GR_ONE_TO_ONE,
+                    ),
+                    SettingsListEntry(
+                        Res.string.grid_ratio_thirty_pcnt,
+                        GridRatio.GR_THIRTY_PCNT,
+                    ),
+                    SettingsListEntry(
+                        Res.string.grid_ratio_forty_pcnt,
+                        GridRatio.GR_FORTY_PCNT,
+                    ),
+                    SettingsListEntry(
+                        Res.string.grid_ratio_fifty_pcnt,
+                        GridRatio.GR_FIFTY_PCNT,
+                    ),
+                    SettingsListEntry(
+                        Res.string.grid_ratio_sixty_pcnt,
+                        GridRatio.GR_SIXTY_PCNT,
+                    ),
+                ),
+                settings.livePlayGridRatioPortrait.stateInHere(
                     GridRatio.GR_PUZZLE_SHAPE,
                 ),
-                SettingsListEntry(
-                    Res.string.grid_ratio_one_to_one,
-                    GridRatio.GR_ONE_TO_ONE,
-                ),
-                SettingsListEntry(
-                    Res.string.grid_ratio_thirty_pcnt,
-                    GridRatio.GR_THIRTY_PCNT,
-                ),
-                SettingsListEntry(
-                    Res.string.grid_ratio_forty_pcnt,
-                    GridRatio.GR_FORTY_PCNT,
-                ),
-                SettingsListEntry(
-                    Res.string.grid_ratio_fifty_pcnt,
-                    GridRatio.GR_FIFTY_PCNT,
-                ),
-                SettingsListEntry(
-                    Res.string.grid_ratio_sixty_pcnt,
-                    GridRatio.GR_SIXTY_PCNT,
-                ),
+                settings::setPlayGridRatioPortrait,
             ),
-            settings.livePlayGridRatioPortrait.stateInHere(
-                GridRatio.GR_PUZZLE_SHAPE,
-            ),
-            settings::setPlayGridRatioPortrait,
-        ),
-        SettingsList<GridRatio>(
-            SettingsPage.DISPLAY,
-            Res.string.grid_ratio_landscape,
-            Res.string.grid_ratio_landscape_desc,
-            listOf(
-                SettingsListEntry(
-                    Res.string.grid_ratio_puzzle,
+            SettingsList<GridRatio>(
+                SettingsPage.DISPLAY,
+                Res.string.grid_ratio_landscape,
+                Res.string.grid_ratio_landscape_desc,
+                listOf(
+                    SettingsListEntry(
+                        Res.string.grid_ratio_puzzle,
+                        GridRatio.GR_PUZZLE_SHAPE,
+                    ),
+                    SettingsListEntry(
+                        Res.string.grid_ratio_one_to_one,
+                        GridRatio.GR_ONE_TO_ONE,
+                    ),
+                    SettingsListEntry(
+                        Res.string.grid_ratio_thirty_pcnt,
+                        GridRatio.GR_THIRTY_PCNT,
+                    ),
+                    SettingsListEntry(
+                        Res.string.grid_ratio_forty_pcnt,
+                        GridRatio.GR_FORTY_PCNT,
+                    ),
+                    SettingsListEntry(
+                        Res.string.grid_ratio_fifty_pcnt,
+                        GridRatio.GR_FIFTY_PCNT,
+                    ),
+                    SettingsListEntry(
+                        Res.string.grid_ratio_sixty_pcnt,
+                        GridRatio.GR_SIXTY_PCNT,
+                    ),
+                ),
+                settings.livePlayGridRatioLandscape.stateInHere(
                     GridRatio.GR_PUZZLE_SHAPE,
                 ),
-                SettingsListEntry(
-                    Res.string.grid_ratio_one_to_one,
-                    GridRatio.GR_ONE_TO_ONE,
-                ),
-                SettingsListEntry(
-                    Res.string.grid_ratio_thirty_pcnt,
-                    GridRatio.GR_THIRTY_PCNT,
-                ),
-                SettingsListEntry(
-                    Res.string.grid_ratio_forty_pcnt,
-                    GridRatio.GR_FORTY_PCNT,
-                ),
-                SettingsListEntry(
-                    Res.string.grid_ratio_fifty_pcnt,
-                    GridRatio.GR_FIFTY_PCNT,
-                ),
-                SettingsListEntry(
-                    Res.string.grid_ratio_sixty_pcnt,
-                    GridRatio.GR_SIXTY_PCNT,
-                ),
+                settings::setPlayGridRatioLandscape,
             ),
-            settings.livePlayGridRatioLandscape.stateInHere(
-                GridRatio.GR_PUZZLE_SHAPE,
-            ),
-            settings::setPlayGridRatioLandscape,
-        ),
-        SettingsList<ClueTabsDouble>(
-            SettingsPage.DISPLAY,
-            Res.string.clue_tabs_double,
-            Res.string.clue_tabs_double_desc,
-            listOf(
-                SettingsListEntry(
-                    Res.string.clue_tabs_double_never,
+            SettingsList<ClueTabsDouble>(
+                SettingsPage.DISPLAY,
+                Res.string.clue_tabs_double,
+                Res.string.clue_tabs_double_desc,
+                listOf(
+                    SettingsListEntry(
+                        Res.string.clue_tabs_double_never,
+                        ClueTabsDouble.CTD_NEVER,
+                    ),
+                    SettingsListEntry(
+                        Res.string.clue_tabs_double_landscape,
+                        ClueTabsDouble.CTD_LANDSCAPE,
+                    ),
+                    SettingsListEntry(
+                        Res.string.clue_tabs_double_wide,
+                        ClueTabsDouble.CTD_WIDE,
+                    ),
+                    SettingsListEntry(
+                        Res.string.clue_tabs_double_always,
+                        ClueTabsDouble.CTD_ALWAYS,
+                    ),
+                ),
+                settings.liveClueListClueTabsDouble.stateInHere(
                     ClueTabsDouble.CTD_NEVER,
                 ),
-                SettingsListEntry(
-                    Res.string.clue_tabs_double_landscape,
-                    ClueTabsDouble.CTD_LANDSCAPE,
-                ),
-                SettingsListEntry(
-                    Res.string.clue_tabs_double_wide,
-                    ClueTabsDouble.CTD_WIDE,
-                ),
-                SettingsListEntry(
-                    Res.string.clue_tabs_double_always,
-                    ClueTabsDouble.CTD_ALWAYS,
-                ),
+                settings::setClueListClueTabsDouble,
             ),
-            settings.liveClueListClueTabsDouble.stateInHere(
-                ClueTabsDouble.CTD_NEVER,
-            ),
-            settings::setClueListClueTabsDouble,
-        ),
-        SettingsList<ClueHighlight>(
-            SettingsPage.DISPLAY,
-            Res.string.clue_highlight,
-            Res.string.clue_highlight_desc,
-            listOf(
-                SettingsListEntry(
-                    Res.string.clue_highlight_none,
-                    ClueHighlight.CH_NONE,
+            SettingsList<ClueHighlight>(
+                SettingsPage.DISPLAY,
+                Res.string.clue_highlight,
+                Res.string.clue_highlight_desc,
+                listOf(
+                    SettingsListEntry(
+                        Res.string.clue_highlight_none,
+                        ClueHighlight.CH_NONE,
+                    ),
+                    SettingsListEntry(
+                        Res.string.clue_highlight_radio_button,
+                        ClueHighlight.CH_RADIO_BUTTON,
+                    ),
+                    SettingsListEntry(
+                        Res.string.clue_highlight_background,
+                        ClueHighlight.CH_BACKGROUND,
+                    ),
+                    SettingsListEntry(
+                        Res.string.clue_highlight_both,
+                        ClueHighlight.CH_BOTH,
+                    ),
                 ),
-                SettingsListEntry(
-                    Res.string.clue_highlight_radio_button,
+                settings.livePlayClueHighlight.stateInHere(
                     ClueHighlight.CH_RADIO_BUTTON,
                 ),
-                SettingsListEntry(
-                    Res.string.clue_highlight_background,
-                    ClueHighlight.CH_BACKGROUND,
-                ),
-                SettingsListEntry(
-                    Res.string.clue_highlight_both,
-                    ClueHighlight.CH_BOTH,
-                ),
+                settings::setPlayClueHighlight,
             ),
-            settings.livePlayClueHighlight.stateInHere(
-                ClueHighlight.CH_RADIO_BUTTON,
-            ),
-            settings::setPlayClueHighlight,
-        ),
 
-        // Keyboard
-        SettingsList<KeyboardMode>(
-            SettingsPage.KEYBOARD,
-            Res.string.keyboard_showhide,
-            Res.string.keyboard_showhide_desc,
-            listOf(
-                SettingsListEntry(
-                    Res.string.keyboard_always_show,
+            // Keyboard
+            SettingsList<KeyboardMode>(
+                SettingsPage.KEYBOARD,
+                Res.string.keyboard_showhide,
+                Res.string.keyboard_showhide_desc,
+                listOf(
+                    SettingsListEntry(
+                        Res.string.keyboard_always_show,
+                        KeyboardMode.KM_ALWAYS_SHOW,
+                    ),
+                    SettingsListEntry(
+                        Res.string.keyboard_hide_manual,
+                        KeyboardMode.KM_HIDE_MANUAL,
+                    ),
+                    SettingsListEntry(
+                        Res.string.keyboard_show_sparingly_desc,
+                        KeyboardMode.KM_SHOW_SPARINGLY,
+                    ),
+                    SettingsListEntry(
+                        Res.string.keyboard_never_show,
+                        KeyboardMode.KM_NEVER_SHOW,
+                    ),
+                ),
+                settings.liveKeyboardMode.stateInHere(
                     KeyboardMode.KM_ALWAYS_SHOW,
                 ),
-                SettingsListEntry(
-                    Res.string.keyboard_hide_manual,
-                    KeyboardMode.KM_HIDE_MANUAL,
-                ),
-                SettingsListEntry(
-                    Res.string.keyboard_show_sparingly_desc,
-                    KeyboardMode.KM_SHOW_SPARINGLY,
-                ),
-                SettingsListEntry(
-                    Res.string.keyboard_never_show,
-                    KeyboardMode.KM_NEVER_SHOW,
-                ),
+                settings::setKeyboardMode,
             ),
-            settings.liveKeyboardMode.stateInHere(
-                KeyboardMode.KM_ALWAYS_SHOW,
+            SettingsBoolean(
+                SettingsPage.KEYBOARD,
+                Res.string.keyboard_use_native,
+                Res.string.keyboard_use_native_desc,
+                settings.liveKeyboardUseNative.stateInHere(),
+                settings::setKeyboardUseNative,
             ),
-            settings::setKeyboardMode,
-        ),
-        SettingsBoolean(
-            SettingsPage.KEYBOARD,
-            Res.string.keyboard_use_native,
-            Res.string.keyboard_use_native_desc,
-            settings.liveKeyboardUseNative.stateInHere(),
-            settings::setKeyboardUseNative,
-        ),
-        SettingsHeading(
-            SettingsPage.KEYBOARD,
-            Res.string.keyboard_built_in,
-        ),
-        SettingsList<KeyboardLayout>(
-            SettingsPage.KEYBOARD,
-            Res.string.keyboard_layout,
-            Res.string.keyboard_layout_desc,
-            listOf(
-                SettingsListEntry(
-                    Res.string.keyboard_qwerty,
+            SettingsHeading(
+                SettingsPage.KEYBOARD,
+                Res.string.keyboard_built_in,
+            ),
+            SettingsList<KeyboardLayout>(
+                SettingsPage.KEYBOARD,
+                Res.string.keyboard_layout,
+                Res.string.keyboard_layout_desc,
+                listOf(
+                    SettingsListEntry(
+                        Res.string.keyboard_qwerty,
+                        KeyboardLayout.KL_QWERTY,
+                    ),
+                    SettingsListEntry(
+                        Res.string.keyboard_qwertz,
+                        KeyboardLayout.KL_QWERTZ,
+                    ),
+                    SettingsListEntry(
+                        Res.string.keyboard_azerty,
+                        KeyboardLayout.KL_AZERTY,
+                    ),
+                    SettingsListEntry(
+                        Res.string.keyboard_dvorak,
+                        KeyboardLayout.KL_DVORAK,
+                    ),
+                    SettingsListEntry(
+                        Res.string.keyboard_colemak,
+                        KeyboardLayout.KL_COLEMAK,
+                    ),
+                ),
+                settings.liveKeyboardLayout.stateInHere(
                     KeyboardLayout.KL_QWERTY,
                 ),
-                SettingsListEntry(
-                    Res.string.keyboard_qwertz,
-                    KeyboardLayout.KL_QWERTZ,
-                ),
-                SettingsListEntry(
-                    Res.string.keyboard_azerty,
-                    KeyboardLayout.KL_AZERTY,
-                ),
-                SettingsListEntry(
-                    Res.string.keyboard_dvorak,
-                    KeyboardLayout.KL_DVORAK,
-                ),
-                SettingsListEntry(
-                    Res.string.keyboard_colemak,
-                    KeyboardLayout.KL_COLEMAK,
-                ),
+                settings::setKeyboardLayout,
             ),
-            settings.liveKeyboardLayout.stateInHere(
-                KeyboardLayout.KL_QWERTY,
+            SettingsBoolean(
+                SettingsPage.KEYBOARD,
+                Res.string.keyboard_hide_button,
+                Res.string.keyboard_hide_button_desc,
+                settings.liveKeyboardHideButton.stateInHere(),
+                settings::setKeyboardHideButton,
             ),
-            settings::setKeyboardLayout,
-        ),
-        SettingsBoolean(
-            SettingsPage.KEYBOARD,
-            Res.string.keyboard_hide_button,
-            Res.string.keyboard_hide_button_desc,
-            settings.liveKeyboardHideButton.stateInHere(),
-            settings::setKeyboardHideButton,
-        ),
-        SettingsBoolean(
-            SettingsPage.KEYBOARD,
-            Res.string.keyboard_compact,
-            Res.string.keyboard_compact_desc,
-            settings.liveKeyboardCompact.stateInHere(),
-            settings::setKeyboardCompact,
-        ),
-        SettingsBoolean(
-            SettingsPage.KEYBOARD,
-            Res.string.keyboard_haptic,
-            Res.string.keyboard_haptic_desc,
-            settings.liveKeyboardHaptic.stateInHere(),
-            settings::setKeyboardHaptic,
-        ),
-        SettingsInteger(
-            SettingsPage.KEYBOARD,
-            Res.string.keyboard_repeat_delay,
-            Res.string.keyboard_repeat_delay_desc,
-            Res.string.keyboard_repeat_delay_hint,
-            settings.liveKeyboardRepeatDelay.stateInHere(),
-            settings::setKeyboardRepeatDelay,
-        ),
-        SettingsInteger(
-            SettingsPage.KEYBOARD,
-            Res.string.keyboard_repeat_interval,
-            Res.string.keyboard_repeat_interval_desc,
-            Res.string.keyboard_repeat_interval_hint,
-            settings.liveKeyboardRepeatInterval.stateInHere(),
-            settings::setKeyboardRepeatInterval,
-        ),
-        SettingsHeading(
-            SettingsPage.KEYBOARD,
-            Res.string.keyboard_native,
-        ),
-        SettingsBoolean(
-            SettingsPage.KEYBOARD,
-            Res.string.keyboard_force_caps,
-            Res.string.keyboard_force_caps_desc,
-            settings.liveKeyboardForceCaps.stateInHere(),
-            settings::setKeyboardForceCaps,
-        ),
-        SettingsBoolean(
-            SettingsPage.KEYBOARD,
-            Res.string.keyboard_split_words,
-            Res.string.keyboard_split_words_desc,
-            settings.liveKeyboardSplitWords.stateInHere(),
-            settings::setKeyboardSplitWords,
-        ),
+            SettingsBoolean(
+                SettingsPage.KEYBOARD,
+                Res.string.keyboard_compact,
+                Res.string.keyboard_compact_desc,
+                settings.liveKeyboardCompact.stateInHere(),
+                settings::setKeyboardCompact,
+            ),
+            SettingsBoolean(
+                SettingsPage.KEYBOARD,
+                Res.string.keyboard_haptic,
+                Res.string.keyboard_haptic_desc,
+                settings.liveKeyboardHaptic.stateInHere(),
+                settings::setKeyboardHaptic,
+            ),
+            SettingsInteger(
+                SettingsPage.KEYBOARD,
+                Res.string.keyboard_repeat_delay,
+                Res.string.keyboard_repeat_delay_desc,
+                Res.string.keyboard_repeat_delay_hint,
+                settings.liveKeyboardRepeatDelay.stateInHere(),
+                settings::setKeyboardRepeatDelay,
+            ),
+            SettingsInteger(
+                SettingsPage.KEYBOARD,
+                Res.string.keyboard_repeat_interval,
+                Res.string.keyboard_repeat_interval_desc,
+                Res.string.keyboard_repeat_interval_hint,
+                settings.liveKeyboardRepeatInterval.stateInHere(),
+                settings::setKeyboardRepeatInterval,
+            ),
+            SettingsHeading(
+                SettingsPage.KEYBOARD,
+                Res.string.keyboard_native,
+            ),
+            SettingsBoolean(
+                SettingsPage.KEYBOARD,
+                Res.string.keyboard_force_caps,
+                Res.string.keyboard_force_caps_desc,
+                settings.liveKeyboardForceCaps.stateInHere(),
+                settings::setKeyboardForceCaps,
+            ),
+            SettingsBoolean(
+                SettingsPage.KEYBOARD,
+                Res.string.keyboard_split_words,
+                Res.string.keyboard_split_words_desc,
+                settings.liveKeyboardSplitWords.stateInHere(),
+                settings::setKeyboardSplitWords,
+            ),
 
-        // Interaction
-        SettingsBoolean(
-            SettingsPage.INTERACTION,
-            Res.string.snap_current,
-            Res.string.snap_current_desc,
-            settings.livePlayEnsureVisible.stateInHere(),
-            settings::setPlayEnsureVisible,
-        ),
-        SettingsBoolean(
-            SettingsPage.INTERACTION,
-            Res.string.scroll_to_clue,
-            Res.string.scroll_to_clue_desc,
-            settings.liveClueListSnapToClue.stateInHere(),
-            settings::setClueListSnapToClue,
-        ),
-        SettingsList<MovementStrategySetting>(
-            SettingsPage.INTERACTION,
-            Res.string.movement_style,
-            Res.string.movement_style_desc,
-            listOf(
-                SettingsListEntry(
-                    Res.string.movement_strategy_next_word,
+            // Interaction
+            SettingsBoolean(
+                SettingsPage.INTERACTION,
+                Res.string.snap_current,
+                Res.string.snap_current_desc,
+                settings.livePlayEnsureVisible.stateInHere(),
+                settings::setPlayEnsureVisible,
+            ),
+            SettingsBoolean(
+                SettingsPage.INTERACTION,
+                Res.string.scroll_to_clue,
+                Res.string.scroll_to_clue_desc,
+                settings.liveClueListSnapToClue.stateInHere(),
+                settings::setClueListSnapToClue,
+            ),
+            SettingsList<MovementStrategySetting>(
+                SettingsPage.INTERACTION,
+                Res.string.movement_style,
+                Res.string.movement_style_desc,
+                listOf(
+                    SettingsListEntry(
+                        Res.string.movement_strategy_next_word,
+                        MovementStrategySetting.MSS_MOVE_NEXT_ON_AXIS,
+                    ),
+                    SettingsListEntry(
+                        Res.string.movement_strategy_stop_end,
+                        MovementStrategySetting.MSS_STOP_ON_END,
+                    ),
+                    SettingsListEntry(
+                        Res.string.movement_strategy_next_clue,
+                        MovementStrategySetting.MSS_MOVE_NEXT_CLUE,
+                    ),
+                    SettingsListEntry(
+                        Res.string.movement_strategy_next_parallel_clue,
+                        MovementStrategySetting.MSS_MOVE_PARALLEL_WORD,
+                    ),
+                ),
+                settings.livePlayMovementStrategySetting.stateInHere(
                     MovementStrategySetting.MSS_MOVE_NEXT_ON_AXIS,
                 ),
-                SettingsListEntry(
-                    Res.string.movement_strategy_stop_end,
-                    MovementStrategySetting.MSS_STOP_ON_END,
+                settings::setPlayMovementStrategySetting,
+            ),
+            SettingsList<MovementStrategySetting>(
+                SettingsPage.INTERACTION,
+                Res.string.movement_style_clue_list,
+                Res.string.movement_style_clue_list_desc,
+                listOf(
+                    SettingsListEntry(
+                        Res.string.movement_strategy_stop_end,
+                        MovementStrategySetting.MSS_STOP_ON_END,
+                    ),
+                    SettingsListEntry(
+                        Res.string.movement_strategy_next_clue,
+                        MovementStrategySetting.MSS_MOVE_NEXT_CLUE,
+                    ),
                 ),
-                SettingsListEntry(
-                    Res.string.movement_strategy_next_clue,
+                settings.livePlayMovementStrategyClueListSetting.stateInHere(
                     MovementStrategySetting.MSS_MOVE_NEXT_CLUE,
                 ),
-                SettingsListEntry(
-                    Res.string.movement_strategy_next_parallel_clue,
-                    MovementStrategySetting.MSS_MOVE_PARALLEL_WORD,
+                settings::setPlayMovementStrategyClueListSetting,
+            ),
+            SettingsBoolean(
+                SettingsPage.INTERACTION,
+                Res.string.skip_filled,
+                Res.string.skip_filled_desc,
+                settings.livePlaySkipFilled.stateInHere(),
+                settings::setPlaySkipFilled,
+            ),
+            SettingsList<CycleUnfilledMode>(
+                SettingsPage.INTERACTION,
+                Res.string.cycle_unfilled,
+                Res.string.cycle_unfilled_desc,
+                listOf(
+                    SettingsListEntry(
+                        Res.string.cycle_unfilled_never,
+                        CycleUnfilledMode.CU_NEVER,
+                    ),
+                    SettingsListEntry(
+                        Res.string.cycle_unfilled_forwards,
+                        CycleUnfilledMode.CU_FORWARDS,
+                    ),
+                    SettingsListEntry(
+                        Res.string.cycle_unfilled_always,
+                        CycleUnfilledMode.CU_ALWAYS,
+                    ),
                 ),
-            ),
-            settings.livePlayMovementStrategySetting.stateInHere(
-                MovementStrategySetting.MSS_MOVE_NEXT_ON_AXIS,
-            ),
-            settings::setPlayMovementStrategySetting,
-        ),
-        SettingsList<MovementStrategySetting>(
-            SettingsPage.INTERACTION,
-            Res.string.movement_style_clue_list,
-            Res.string.movement_style_clue_list_desc,
-            listOf(
-                SettingsListEntry(
-                    Res.string.movement_strategy_stop_end,
-                    MovementStrategySetting.MSS_STOP_ON_END,
-                ),
-                SettingsListEntry(
-                    Res.string.movement_strategy_next_clue,
-                    MovementStrategySetting.MSS_MOVE_NEXT_CLUE,
-                ),
-            ),
-            settings.livePlayMovementStrategyClueListSetting.stateInHere(
-                MovementStrategySetting.MSS_MOVE_NEXT_CLUE,
-            ),
-            settings::setPlayMovementStrategyClueListSetting,
-        ),
-        SettingsBoolean(
-            SettingsPage.INTERACTION,
-            Res.string.skip_filled,
-            Res.string.skip_filled_desc,
-            settings.livePlaySkipFilled.stateInHere(),
-            settings::setPlaySkipFilled,
-        ),
-        SettingsList<CycleUnfilledMode>(
-            SettingsPage.INTERACTION,
-            Res.string.cycle_unfilled,
-            Res.string.cycle_unfilled_desc,
-            listOf(
-                SettingsListEntry(
-                    Res.string.cycle_unfilled_never,
+                settings.livePlayCycleUnfilledMode.stateInHere(
                     CycleUnfilledMode.CU_NEVER,
                 ),
-                SettingsListEntry(
-                    Res.string.cycle_unfilled_forwards,
-                    CycleUnfilledMode.CU_FORWARDS,
-                ),
-                SettingsListEntry(
-                    Res.string.cycle_unfilled_always,
-                    CycleUnfilledMode.CU_ALWAYS,
-                ),
+                settings::setPlayCycleUnfilledMode,
             ),
-            settings.livePlayCycleUnfilledMode.stateInHere(
-                CycleUnfilledMode.CU_NEVER,
+            SettingsBoolean(
+                SettingsPage.INTERACTION,
+                Res.string.double_tap_zoom,
+                Res.string.double_tap_zoom_desc,
+                settings.livePlayDoubleTapFitBoard.stateInHere(),
+                settings::setPlayDoubleTapFitBoard,
             ),
-            settings::setPlayCycleUnfilledMode,
-        ),
-        SettingsBoolean(
-            SettingsPage.INTERACTION,
-            Res.string.double_tap_zoom,
-            Res.string.double_tap_zoom_desc,
-            settings.livePlayDoubleTapFitBoard.stateInHere(),
-            settings::setPlayDoubleTapFitBoard,
-        ),
-        SettingsBoolean(
-            SettingsPage.INTERACTION,
-            Res.string.dont_snap_board_to_borders,
-            Res.string.dont_snap_board_to_borders_desc,
-            settings.livePlayDontSnapBoardToBorders.stateInHere(),
-            settings::setPlayDontSnapBoardToBorders,
-        ),
-        SettingsList<DeleteCrossingModeSetting>(
-            SettingsPage.INTERACTION,
-            Res.string.dont_delete_crossing,
-            Res.string.dont_delete_crossing_desc,
-            listOf(
-                SettingsListEntry(
-                    Res.string.delete_crossing_delete,
+            SettingsBoolean(
+                SettingsPage.INTERACTION,
+                Res.string.dont_snap_board_to_borders,
+                Res.string.dont_snap_board_to_borders_desc,
+                settings.livePlayDontSnapBoardToBorders.stateInHere(),
+                settings::setPlayDontSnapBoardToBorders,
+            ),
+            SettingsList<DeleteCrossingModeSetting>(
+                SettingsPage.INTERACTION,
+                Res.string.dont_delete_crossing,
+                Res.string.dont_delete_crossing_desc,
+                listOf(
+                    SettingsListEntry(
+                        Res.string.delete_crossing_delete,
+                        DeleteCrossingModeSetting.DCMS_DELETE,
+                    ),
+                    SettingsListEntry(
+                        Res.string.delete_crossing_preserve_filled_words,
+                        DeleteCrossingModeSetting.DCMS_PRESERVE_FILLED_WORDS,
+                    ),
+                    SettingsListEntry(
+                        Res.string.delete_crossing_preserve_filled_cells,
+                        DeleteCrossingModeSetting.DCMS_PRESERVE_FILLED_CELLS,
+                    ),
+                ),
+                settings.livePlayDeleteCrossingModeSetting.stateInHere(
                     DeleteCrossingModeSetting.DCMS_DELETE,
                 ),
-                SettingsListEntry(
-                    Res.string.delete_crossing_preserve_filled_words,
-                    DeleteCrossingModeSetting.DCMS_PRESERVE_FILLED_WORDS,
-                ),
-                SettingsListEntry(
-                    Res.string.delete_crossing_preserve_filled_cells,
-                    DeleteCrossingModeSetting.DCMS_PRESERVE_FILLED_CELLS,
-                ),
+                settings::setPlayDeleteCrossingModeSetting,
             ),
-            settings.livePlayDeleteCrossingModeSetting.stateInHere(
-                DeleteCrossingModeSetting.DCMS_DELETE,
+            SettingsBoolean(
+                SettingsPage.INTERACTION,
+                Res.string.preserve_correct,
+                Res.string.preserve_correct_desc,
+                settings.livePlayPreserveCorrectLettersInShowErrors.stateInHere(),
+                settings::setPlayPreserveCorrectLettersInShowErrors,
             ),
-            settings::setPlayDeleteCrossingModeSetting,
-        ),
-        SettingsBoolean(
-            SettingsPage.INTERACTION,
-            Res.string.preserve_correct,
-            Res.string.preserve_correct_desc,
-            settings.livePlayPreserveCorrectLettersInShowErrors.stateInHere(),
-            settings::setPlayPreserveCorrectLettersInShowErrors,
-        ),
-        SettingsBoolean(
-            SettingsPage.INTERACTION,
-            Res.string.play_letter_undo,
-            Res.string.play_letter_undo_desc,
-            settings.livePlayPlayLetterUndoEnabled.stateInHere(),
-            settings::setPlayPlayLetterUndoEnabled,
-        ),
-        SettingsBoolean(
-            SettingsPage.INTERACTION,
-            Res.string.space_change_dir,
-            Res.string.space_change_dir_desc,
-            settings.livePlaySpaceChangesDirection.stateInHere(),
-            settings::setPlaySpaceChangesDirection,
-        ),
-        SettingsBoolean(
-            SettingsPage.INTERACTION,
-            Res.string.enter_changes_direction,
-            Res.string.enter_changes_direction_desc,
-            settings.livePlayEnterChangesDirection.stateInHere(),
-            settings::setPlayEnterChangesDirection,
-        ),
-        SettingsBoolean(
-            SettingsPage.INTERACTION,
-            Res.string.toggle_before_move,
-            Res.string.toggle_before_move_desc,
-            settings.livePlayToggleBeforeMove.stateInHere(),
-            settings::setPlayToggleBeforeMove,
-        ),
-        SettingsBoolean(
-            SettingsPage.INTERACTION,
-            Res.string.random_clue_on_shake,
-            Res.string.random_clue_on_shake_desc,
-            settings.livePlayRandomClueOnShake.stateInHere(),
-            settings::setPlayRandomClueOnShake,
-        ),
-        SettingsBoolean(
-            SettingsPage.INTERACTION,
-            Res.string.predict_anagram_chars,
-            Res.string.predict_anagram_chars_desc,
-            settings.livePlayPredictAnagramChars.stateInHere(),
-            settings::setPlayPredictAnagramChars,
-        ),
-        SettingsBoolean(
-            SettingsPage.INTERACTION,
-            Res.string.disable_ratings,
-            Res.string.disable_ratings_desc,
-            settings.liveRatingsDisableRatings.stateInHere(),
-            settings::setRatingsDisableRatings,
-        ),
+            SettingsBoolean(
+                SettingsPage.INTERACTION,
+                Res.string.play_letter_undo,
+                Res.string.play_letter_undo_desc,
+                settings.livePlayPlayLetterUndoEnabled.stateInHere(),
+                settings::setPlayPlayLetterUndoEnabled,
+            ),
+            SettingsBoolean(
+                SettingsPage.INTERACTION,
+                Res.string.space_change_dir,
+                Res.string.space_change_dir_desc,
+                settings.livePlaySpaceChangesDirection.stateInHere(),
+                settings::setPlaySpaceChangesDirection,
+            ),
+            SettingsBoolean(
+                SettingsPage.INTERACTION,
+                Res.string.enter_changes_direction,
+                Res.string.enter_changes_direction_desc,
+                settings.livePlayEnterChangesDirection.stateInHere(),
+                settings::setPlayEnterChangesDirection,
+            ),
+            SettingsBoolean(
+                SettingsPage.INTERACTION,
+                Res.string.toggle_before_move,
+                Res.string.toggle_before_move_desc,
+                settings.livePlayToggleBeforeMove.stateInHere(),
+                settings::setPlayToggleBeforeMove,
+            ),
+            SettingsBoolean(
+                SettingsPage.INTERACTION,
+                Res.string.random_clue_on_shake,
+                Res.string.random_clue_on_shake_desc,
+                settings.livePlayRandomClueOnShake.stateInHere(),
+                settings::setPlayRandomClueOnShake,
+            ),
+            SettingsBoolean(
+                SettingsPage.INTERACTION,
+                Res.string.predict_anagram_chars,
+                Res.string.predict_anagram_chars_desc,
+                settings.livePlayPredictAnagramChars.stateInHere(),
+                settings::setPlayPredictAnagramChars,
+            ),
+            SettingsBoolean(
+                SettingsPage.INTERACTION,
+                Res.string.disable_ratings,
+                Res.string.disable_ratings_desc,
+                settings.liveRatingsDisableRatings.stateInHere(),
+                settings::setRatingsDisableRatings,
+            ),
 
-        // Voice & Accessibility
-        SettingsBoolean(
-            SettingsPage.VOICE_ACCESSIBILITY,
-            Res.string.voice_with_volume,
-            Res.string.voice_with_volume_desc,
-            settings.liveVoiceVolumeActivatesVoice.stateInHere(),
-            settings::setVoiceVolumeActivatesVoice,
-        ),
-        SettingsBoolean(
-            SettingsPage.VOICE_ACCESSIBILITY,
-            Res.string.voice_with_button,
-            Res.string.voice_with_button_desc,
-            settings.liveVoiceButtonActivatesVoice.stateInHere(),
-            settings::setVoiceButtonActivatesVoice,
-        ),
-        SettingsBoolean(
-            SettingsPage.VOICE_ACCESSIBILITY,
-            Res.string.llm_voice_commands,
-            Res.string.llm_voice_commands_desc,
-            settings.liveVoiceLLMVoiceCommands.stateInHere(),
-            settings::setVoiceLLMVoiceCommands,
-        ),
-        SettingsBoolean(
-            SettingsPage.VOICE_ACCESSIBILITY,
-            Res.string.announce_clue_button,
-            Res.string.announce_clue_button_desc,
-            settings.liveVoiceButtonAnnounceClue.stateInHere(),
-            settings::setVoiceButtonAnnounceClue,
-        ),
-        SettingsBoolean(
-            SettingsPage.VOICE_ACCESSIBILITY,
-            Res.string.announce_clue_equals,
-            Res.string.announce_clue_equals_desc,
-            settings.liveVoiceEqualsAnnounceClue.stateInHere(),
-            settings::setVoiceEqualsAnnounceClue,
-        ),
-        SettingsBoolean(
-            SettingsPage.VOICE_ACCESSIBILITY,
-            Res.string.announce_clue_always,
-            Res.string.announce_clue_always_desc,
-            settings.liveVoiceAlwaysAnnounceClue.stateInHere(),
-            settings::setVoiceAlwaysAnnounceClue,
-        ),
-        SettingsBoolean(
-            SettingsPage.VOICE_ACCESSIBILITY,
-            Res.string.announce_box_always,
-            Res.string.announce_box_always_desc,
-            settings.liveVoiceAlwaysAnnounceBox.stateInHere(),
-            settings::setVoiceAlwaysAnnounceBox,
-        ),
-        SettingsDivider(SettingsPage.VOICE_ACCESSIBILITY),
-        SettingsHTMLPage(
-            SettingsPage.VOICE_ACCESSIBILITY,
-            Res.string.about_voice_commands,
-            HTMLFile.VOICE_COMMANDS_HELP,
-        ),
+            // Voice & Accessibility
+            SettingsBoolean(
+                SettingsPage.VOICE_ACCESSIBILITY,
+                Res.string.voice_with_volume,
+                Res.string.voice_with_volume_desc,
+                settings.liveVoiceVolumeActivatesVoice.stateInHere(),
+                settings::setVoiceVolumeActivatesVoice,
+            ),
+            SettingsBoolean(
+                SettingsPage.VOICE_ACCESSIBILITY,
+                Res.string.voice_with_button,
+                Res.string.voice_with_button_desc,
+                settings.liveVoiceButtonActivatesVoice.stateInHere(),
+                settings::setVoiceButtonActivatesVoice,
+            ),
+            SettingsBoolean(
+                SettingsPage.VOICE_ACCESSIBILITY,
+                Res.string.llm_voice_commands,
+                Res.string.llm_voice_commands_desc,
+                settings.liveVoiceLLMVoiceCommands.stateInHere(),
+                settings::setVoiceLLMVoiceCommands,
+            ),
+            SettingsBoolean(
+                SettingsPage.VOICE_ACCESSIBILITY,
+                Res.string.announce_clue_button,
+                Res.string.announce_clue_button_desc,
+                settings.liveVoiceButtonAnnounceClue.stateInHere(),
+                settings::setVoiceButtonAnnounceClue,
+            ),
+            SettingsBoolean(
+                SettingsPage.VOICE_ACCESSIBILITY,
+                Res.string.announce_clue_equals,
+                Res.string.announce_clue_equals_desc,
+                settings.liveVoiceEqualsAnnounceClue.stateInHere(),
+                settings::setVoiceEqualsAnnounceClue,
+            ),
+            SettingsBoolean(
+                SettingsPage.VOICE_ACCESSIBILITY,
+                Res.string.announce_clue_always,
+                Res.string.announce_clue_always_desc,
+                settings.liveVoiceAlwaysAnnounceClue.stateInHere(),
+                settings::setVoiceAlwaysAnnounceClue,
+            ),
+            SettingsBoolean(
+                SettingsPage.VOICE_ACCESSIBILITY,
+                Res.string.announce_box_always,
+                Res.string.announce_box_always_desc,
+                settings.liveVoiceAlwaysAnnounceBox.stateInHere(),
+                settings::setVoiceAlwaysAnnounceBox,
+            ),
+            SettingsDivider(SettingsPage.VOICE_ACCESSIBILITY),
+            SettingsHTMLPage(
+                SettingsPage.VOICE_ACCESSIBILITY,
+                Res.string.about_voice_commands,
+                HTMLFile.VOICE_COMMANDS_HELP,
+            ),
 
-        // External Tools
-        SettingsList<ExternalDictionarySetting>(
-            SettingsPage.EXTERNAL_TOOLS,
-            Res.string.external_dictionary,
-            Res.string.external_dictionary_desc,
-            listOf(
-                SettingsListEntry(
-                    Res.string.dictionary_none,
+            // External Tools
+            SettingsList<ExternalDictionarySetting>(
+                SettingsPage.EXTERNAL_TOOLS,
+                Res.string.external_dictionary,
+                Res.string.external_dictionary_desc,
+                listOf(
+                    SettingsListEntry(
+                        Res.string.dictionary_none,
+                        ExternalDictionarySetting.EDS_NONE,
+                    ),
+                    SettingsListEntry(
+                        Res.string.free_dictionary,
+                        ExternalDictionarySetting.EDS_FREE,
+                    ),
+                    SettingsListEntry(
+                        Res.string.quick_dic,
+                        ExternalDictionarySetting.EDS_QUICK,
+                    ),
+                    SettingsListEntry(
+                        Res.string.aard2,
+                        ExternalDictionarySetting.EDS_AARD2,
+                    ),
+                ),
+                settings.liveExtDictionarySetting.stateInHere(
                     ExternalDictionarySetting.EDS_NONE,
                 ),
-                SettingsListEntry(
-                    Res.string.free_dictionary,
-                    ExternalDictionarySetting.EDS_FREE,
-                ),
-                SettingsListEntry(
-                    Res.string.quick_dic,
-                    ExternalDictionarySetting.EDS_QUICK,
-                ),
-                SettingsListEntry(
-                    Res.string.aard2,
-                    ExternalDictionarySetting.EDS_AARD2,
-                ),
+                settings::setExtDictionarySetting,
             ),
-            settings.liveExtDictionarySetting.stateInHere(
-                ExternalDictionarySetting.EDS_NONE,
+            SettingsBoolean(
+                SettingsPage.EXTERNAL_TOOLS,
+                Res.string.crossword_solver_enabled,
+                Res.string.crossword_solver_enabled_desc,
+                settings.liveExtCrosswordSolverEnabled.stateInHere(),
+                settings::setExtCrosswordSolverEnabled,
             ),
-            settings::setExtDictionarySetting,
-        ),
-        SettingsBoolean(
-            SettingsPage.EXTERNAL_TOOLS,
-            Res.string.crossword_solver_enabled,
-            Res.string.crossword_solver_enabled_desc,
-            settings.liveExtCrosswordSolverEnabled.stateInHere(),
-            settings::setExtCrosswordSolverEnabled,
-        ),
-        SettingsList<LLMAgent>(
-            SettingsPage.EXTERNAL_TOOLS,
-            Res.string.llm_agent,
-            Res.string.llm_agent_desc,
-            listOf(
-                SettingsListEntry(Res.string.llm_agent_none, LLMAgent.LA_NONE),
-                SettingsListEntry(
-                    Res.string.llm_agent_chat_gpt,
-                    LLMAgent.LA_CHATGPT,
+            SettingsList<LLMAgent>(
+                SettingsPage.EXTERNAL_TOOLS,
+                Res.string.llm_agent,
+                Res.string.llm_agent_desc,
+                listOf(
+                    SettingsListEntry(Res.string.llm_agent_none, LLMAgent.LA_NONE),
+                    SettingsListEntry(
+                        Res.string.llm_agent_chat_gpt,
+                        LLMAgent.LA_CHATGPT,
+                    ),
+                    SettingsListEntry(
+                        Res.string.llm_agent_claude,
+                        LLMAgent.LA_CLAUDE,
+                    ),
                 ),
-                SettingsListEntry(
-                    Res.string.llm_agent_claude,
-                    LLMAgent.LA_CLAUDE,
-                ),
+                settings.liveExtLLMAgent.stateInHere(LLMAgent.LA_NONE),
+                settings::setExtLLMAgent,
             ),
-            settings.liveExtLLMAgent.stateInHere(LLMAgent.LA_NONE),
-            settings::setExtLLMAgent,
-        ),
-        SettingsString(
-            SettingsPage.EXTERNAL_TOOLS,
-            Res.string.llm_agent_api_key,
-            Res.string.llm_agent_api_key_desc,
-            Res.string.llm_agent_api_key,
-            settings.liveExtLLMAgentAPIKey.stateInHere(),
-            settings::setExtLLMAgentAPIKey,
-            dialogMsg = Res.string.llm_agent_api_key_message,
-        ),
-        SettingsBoolean(
-            SettingsPage.EXTERNAL_TOOLS,
-            Res.string.duckduckgo,
-            Res.string.duckduckgo_desc,
-            settings.liveExtDuckDuckGoEnabled.stateInHere(),
-            settings::setExtDuckDuckGoEnabled,
-        ),
-        SettingsBoolean(
-            SettingsPage.EXTERNAL_TOOLS,
-            Res.string.fifteen_squared,
-            Res.string.fifteen_squared_desc,
-            settings.liveExtFifteenSquaredEnabled.stateInHere(),
-            settings::setExtFifteenSquaredEnabled,
-        ),
+            SettingsString(
+                SettingsPage.EXTERNAL_TOOLS,
+                Res.string.llm_agent_api_key,
+                Res.string.llm_agent_api_key_desc,
+                Res.string.llm_agent_api_key,
+                settings.liveExtLLMAgentAPIKey.stateInHere(),
+                settings::setExtLLMAgentAPIKey,
+                dialogMsg = Res.string.llm_agent_api_key_message,
+            ),
+            SettingsBoolean(
+                SettingsPage.EXTERNAL_TOOLS,
+                Res.string.duckduckgo,
+                Res.string.duckduckgo_desc,
+                settings.liveExtDuckDuckGoEnabled.stateInHere(),
+                settings::setExtDuckDuckGoEnabled,
+            ),
+            SettingsBoolean(
+                SettingsPage.EXTERNAL_TOOLS,
+                Res.string.fifteen_squared,
+                Res.string.fifteen_squared_desc,
+                settings.liveExtFifteenSquaredEnabled.stateInHere(),
+                settings::setExtFifteenSquaredEnabled,
+            ),
 
-        // Export/Import
-        SettingsAction(
-            SettingsPage.EXPORT_IMPORT,
-            Res.string.preferences_export,
-            Res.string.preferences_export_desc,
-            this::startSettingsExport,
-        ),
-        SettingsAction(
-            SettingsPage.EXPORT_IMPORT,
-            Res.string.preferences_import,
-            Res.string.preferences_import_desc,
-            this::startSettingsImport,
-        ),
-        SettingsAction(
-            SettingsPage.EXPORT_IMPORT,
-            Res.string.puzzles_export,
-            Res.string.puzzles_export_desc,
-            this::startPuzzlesExport,
-        ),
+            // Export/Import
+            SettingsAction(
+                SettingsPage.EXPORT_IMPORT,
+                Res.string.preferences_export,
+                Res.string.preferences_export_desc,
+                this::startSettingsExport,
+            ),
+            SettingsAction(
+                SettingsPage.EXPORT_IMPORT,
+                Res.string.preferences_import,
+                Res.string.preferences_import_desc,
+                this::startSettingsImport,
+            ),
+            SettingsAction(
+                SettingsPage.EXPORT_IMPORT,
+                Res.string.puzzles_export,
+                Res.string.puzzles_export_desc,
+                this::startPuzzlesExport,
+            ),
+        )
     )
 
     private val rootState = settingsPageState(SettingsPage.ROOT, false)
