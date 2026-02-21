@@ -11,6 +11,7 @@ import okio.Path.Companion.toPath
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
+import app.crossword.yourealwaysbe.forkyz.JVMAppViewModel
 import app.crossword.yourealwaysbe.forkyz.settings.ClueTabsDouble
 import app.crossword.yourealwaysbe.forkyz.settings.DEFAULT_SETTINGS
 import app.crossword.yourealwaysbe.forkyz.settings.FitToScreenMode
@@ -51,5 +52,6 @@ val jvmModules = module {
     single<NativeBackendUtils> { JVMNativeBackendUtils(get()) }
     single<Notifications> { JVMNotifications() }
     single<PuzzleSaveServiceCaller> { JVMPuzzleSaveServiceCaller() }
+    singleOf(::JVMAppViewModel)
 }
 

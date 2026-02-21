@@ -87,6 +87,13 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         }
     }
 
+    val liveAppUndecorated : Flow<Boolean>
+        = settingsMap { it.undecorated }
+
+    fun setAppUndecorated(value : Boolean) {
+        settingsUpdate { settings -> settings.copy(undecorated = value) }
+    }
+
     val liveBackgroundDownloadSettings : Flow<BackgroundDownloadSettings>
         = settingsMap(this::makeBackgroundDownloadSettings)
 
@@ -2495,6 +2502,13 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
                        // ignore
                    }
                }
+            },
+        )
+        run(
+            "undecorated",
+            { s, key -> json.put(key, s.undecorated) },
+            { key ->
+                json.ifHasBoolean(key) { setAppUndecorated(it) }
             },
         )
         run(

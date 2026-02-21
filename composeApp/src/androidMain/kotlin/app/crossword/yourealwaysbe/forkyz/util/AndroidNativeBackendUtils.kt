@@ -18,6 +18,8 @@ import org.jetbrains.compose.resources.PluralStringResource
 import org.jetbrains.compose.resources.StringResource
 
 import app.crossword.yourealwaysbe.forkyz.SettingsItem
+import app.crossword.yourealwaysbe.forkyz.SettingsPage
+import app.crossword.yourealwaysbe.forkyz.SettingsSubPage
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.util.AppStrings
@@ -177,7 +179,21 @@ class AndroidNativeBackendUtils(
     override fun filterSettings(
         settings : List<SettingsItem>,
     ) : List<SettingsItem> {
-        return settings
+        return settings.filter { item ->
+            val badPage = item.page in listOf(SettingsPage.DESKTOP)
+            if (badPage) {
+                false
+            } else {
+                when (item) {
+                    is SettingsSubPage -> {
+                        item.subpage !in listOf(
+                            SettingsPage.DESKTOP,
+                        )
+                    }
+                    else -> true
+                }
+            }
+        }
     }
 }
 

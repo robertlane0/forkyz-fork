@@ -17,6 +17,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateListOf
@@ -75,6 +77,21 @@ val TOAST_DURATION = 5000L // ms
 fun main(args : Array<String>) = application {
     FileKit.init(appId = "forkyz")
 
+    startKoin {
+        modules(sharedModules, jvmModules)
+    }
+
+    MainWindow(
+        args = args,
+        exitApplication = { exitApplication() },
+    )
+}
+
+@Composable
+private fun MainWindow(
+    args : Array<String>,
+    exitApplication : () -> Unit,
+) {
     val themeHelper : ThemeHelper by inject(ThemeHelper::class.java)
     val fileHandlerProvider : FileHandlerProvider
         by inject(FileHandlerProvider::class.java)
@@ -315,15 +332,12 @@ fun main(args : Array<String>) = application {
         }
     }
 
-    startKoin {
-        modules(sharedModules, jvmModules)
-    }
-
+    val viewModel : JVMAppViewModel by inject(JVMAppViewModel::class.java)
     Window(
         onCloseRequest = ::doExitApplication,
         title = stringResource(Res.string.app_name),
         state = windowState,
-        undecorated = false,
+        undecorated = viewModel.undecorated,
         resizable = true,
     ) {
         Box() {
@@ -340,4 +354,3 @@ fun main(args : Array<String>) = application {
         }
     }
 }
-

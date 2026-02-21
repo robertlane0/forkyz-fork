@@ -165,6 +165,8 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.delete_crossin
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.delete_crossing_preserve_filled_words
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.delete_on_cleanup
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.delete_on_cleanup_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.desktop_settings
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.desktop_settings_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.dictionary_none
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.disable_ratings
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.disable_ratings_desc
@@ -416,6 +418,9 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.toggle_all_wee
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.toggle_all_weekly_sources_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.toggle_before_move
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.toggle_before_move_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.undecorated
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.undecorated_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.undecorated_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.universal_crossword
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.updates_daily
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.updates_mon_fri
@@ -479,6 +484,7 @@ data class SettingsPage(val title : StringResource) {
         val EXTERNAL_TOOLS = SettingsPage(Res.string.external_tools_settings)
         val EXPORT_IMPORT = SettingsPage(Res.string.preferences_export_import)
         val SEARCH = SettingsPage(Res.string.filter_settings_title)
+        val DESKTOP = SettingsPage(Res.string.desktop_settings)
     }
 }
 
@@ -1185,6 +1191,11 @@ class SettingsPageViewModel(
                 SettingsPage.ROOT,
                 Res.string.preferences_export_import_desc,
                 SettingsPage.EXPORT_IMPORT,
+            ),
+            SettingsSubPage(
+                SettingsPage.ROOT,
+                Res.string.desktop_settings_desc,
+                SettingsPage.DESKTOP,
             ),
             SettingsHeading(
                 SettingsPage.ROOT,
@@ -2252,6 +2263,15 @@ class SettingsPageViewModel(
                 Res.string.puzzles_export,
                 Res.string.puzzles_export_desc,
                 this::startPuzzlesExport,
+            ),
+
+            // Desktop
+            SettingsBoolean(
+                SettingsPage.DESKTOP,
+                Res.string.undecorated,
+                Res.string.undecorated_desc,
+                settings.liveAppUndecorated.stateInHere(),
+                settings::setAppUndecorated,
             ),
         )
     )

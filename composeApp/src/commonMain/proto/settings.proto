@@ -241,6 +241,7 @@ message Settings {
     repeated string autoDownloadersBlockFri = 151;
     repeated string autoDownloadersBlockSat = 152;
     repeated string autoDownloadersBlockSun = 153;
+    bool undecorated = 154;
 
     // defunct settings
     repeated string autoDownloaders = 5;

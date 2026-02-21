@@ -509,7 +509,6 @@
     <string name="movement_style_clue_list_desc">Select what happens when you type past the end of a word on the clue list screen.</string>
     <string name="dont_snap_board_to_borders">Don't Snap Grid to Borders</string>
     <string name="dont_snap_board_to_borders_desc">Don't snap grid edges to the edges of the screen.</string>
-
     <string name="play_letter_undo">Played Letter Undo Stack</string>
     <string name="play_letter_undo_desc">Delete undoes recently played letters or deletes if no recent letters to undo.</string>
     <string name="predict_anagram_chars">Predict Anagram Characters</string>
@@ -582,6 +581,12 @@
     <string name="scraper_sources_desc">Online puzzle archives.</string>
     <string name="weekly_crosswords">Weekly Crosswords</string>
     <string name="weekly_crosswords_desc">Puzzles which update weekly.</string>
+
+    <!-- preferences desktop -->
+    <string name="desktop_settings">Desktop Settings</string>
+    <string name="desktop_settings_desc">Settings specific to the desktop environment.</string>
+    <string name="undecorated">Undecorated Window</string>
+    <string name="undecorated_desc">Create an undecorated app window (may work better with tiling window managers in place of wmname LG3D or _JAVA_AWT_WM_NONREPARENTING=1). Requires restart.</string>
 
     <!-- menus general -->
     <string name="help">Help</string>

@@ -162,6 +162,7 @@ val DEFAULT_SETTINGS : Settings = Settings(
     dontSnapBoardToBorders = false,
     disabledDownloaders = listOf(),
     settingsVersion = CURRENT_SETTINGS_VERSION,
+    undecorated = false,
 )
 
 fun createDataStore(

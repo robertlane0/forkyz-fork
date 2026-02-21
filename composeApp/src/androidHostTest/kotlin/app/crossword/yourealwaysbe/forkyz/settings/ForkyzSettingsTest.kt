@@ -191,6 +191,7 @@ class ForkyzSettingsTest {
         swipeAction = BrowseSwipeAction.BSA_DELETE,
         toggleBeforeMove = false,
         uiTheme = DayNightMode.DNM_DAY,
+        undecorated = false,
         useNativeKeyboard = false,
         volumeActivatesVoice = false,
     )
@@ -333,6 +334,7 @@ class ForkyzSettingsTest {
         swipeAction = BrowseSwipeAction.BSA_ARCHIVE,
         toggleBeforeMove = true,
         uiTheme = DayNightMode.DNM_NIGHT,
+        undecorated = true,
         useNativeKeyboard = true,
         volumeActivatesVoice = true,
     )
@@ -386,6 +388,7 @@ class ForkyzSettingsTest {
             DownloaderID.WAPO_SUNDAY.id,
             DownloaderID.WSJ.id,
         ),
+        undecorated = false,
     )
 
     @ExperimentalCoroutinesApi
