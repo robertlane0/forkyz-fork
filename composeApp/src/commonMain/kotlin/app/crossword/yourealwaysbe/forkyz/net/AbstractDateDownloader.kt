@@ -133,7 +133,8 @@ open class AbstractDateDownloader constructor(
                 getInputStream(url, headers).use { inputStream ->
                     val puz = puzzleParser.parseInput(inputStream)
                     if (puz != null) {
-                        puz.setDate(date)
+                        // don't override existing date
+                        puz.date = puz.date ?: date
                         puz.setSource(name)
                         puz.setSourceUrl(sourceUrl)
                         puz.setSupportUrl(supportUrl)
