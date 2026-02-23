@@ -139,10 +139,14 @@ class Downloaders(
     private val settings : DownloadersSettings,
     private val downloadersListener : DownloadersListener? = null,
 ) {
-    // In the main download method, lock all other downloaders so that
-    // the list of existing files does not change externally. I.e. two
-    // separate downloaders don't cause duplicate downloads.
-    private val puzzleDirLock = Semaphore(1)
+    companion object {
+        // In the main download method, lock all other downloaders so that
+        // the list of existing files does not change externally. I.e. two
+        // separate downloaders don't cause duplicate downloads.
+        // needs to be static as there may be multiple Downloaders
+        // instances
+        private val puzzleDirLock = Semaphore(1)
+    }
 
     suspend fun getDownloaders(date : LocalDate) : List<Downloader> {
         return getDownloaders().filter { it.isAvailable(date) }
