@@ -54,4 +54,5 @@ interface NativeFrontendUtils {
     fun stopShakeDetector() { }
     fun resumeShakeDetector() { }
     fun pauseShakeDetector() { }
+    val canShareFiles : Boolean
 }

@@ -875,10 +875,12 @@ class PuzzlePageScope(
 
     @Composable
     fun MenuShare() {
-        MenuSubEntry(
-            text = { MenuText(stringResource(Res.string.share)) },
-            onClick = { viewModel.expandMenu(PuzzleSubMenu.SHARE) },
-        )
+        if (utils.canShareFiles) {
+            MenuSubEntry(
+                text = { MenuText(stringResource(Res.string.share)) },
+                onClick = { viewModel.expandMenu(PuzzleSubMenu.SHARE) },
+            )
+        }
     }
 
     @Composable

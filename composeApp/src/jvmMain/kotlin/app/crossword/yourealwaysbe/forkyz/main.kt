@@ -294,6 +294,8 @@ private fun MainWindow(
             // noop, no plans to implement on desktop
         }
 
+        override val canShareFiles : Boolean = false
+
         private fun notifyFeatureNotImplemented() {
             toast(featureNotImplemented)
         }

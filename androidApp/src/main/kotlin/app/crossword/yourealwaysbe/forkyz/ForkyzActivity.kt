@@ -570,6 +570,8 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
             shakeDetector = null
             onHearShake = null
         }
+
+        override val canShareFiles : Boolean = true
     }
 }
 
