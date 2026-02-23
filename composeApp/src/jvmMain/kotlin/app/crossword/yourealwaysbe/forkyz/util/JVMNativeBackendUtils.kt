@@ -25,6 +25,7 @@ import app.crossword.yourealwaysbe.forkyz.SettingsSubPage
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.crossword_solver_enabled
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.external_dictionary
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.random_clue_on_shake
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation
@@ -202,6 +203,7 @@ class JVMNativeBackendUtils(
                         item.title !in listOf(
                             Res.string.external_dictionary,
                             Res.string.crossword_solver_enabled,
+                            Res.string.random_clue_on_shake,
                         )
                     }
                     else -> true
