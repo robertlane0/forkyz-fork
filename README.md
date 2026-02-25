@@ -203,6 +203,8 @@ Translations are welcome. Here is a quick guide to what is needed.
 
 The last bullet is a file of clue list names. These have a strange status. Some input formats include the list name as part of the file (which will be used instead of any translations). Some don't encode the list name, but are kind of tied to a particular country. Hardcoded strings are used for these. The properties file will be used for formats that don't specify the list name, but aren't tied to a country. Note, the list names are decided on import, so the translation won't apply to previously downloaded/imported puzzles.
 
+Strings without translations are given [on this page][missingtranslations].
+
 ## Thanks
 
 Jonathan Blandford of [GNOME Crosswords][gnome-crosswords] for discussion on acrostics and the IPuz file on which the acrostic screenshot is based.
@@ -223,3 +225,5 @@ The IPuz spec is reproduced [here][ipuz-spec].
 [ipuz-spec]: https://hague.gitlab.io/forkyz/ipuz.html
 [releases]: https://gitlab.com/Hague/forkyz/-/releases
 [argostranslate]: https://github.com/argosopentech/argos-translate
+[missingtranslations]: https://hague.gitlab.io/forkyz/missing_translations.html
+

@@ -11,3 +11,5 @@ do
     ../node_modules/showdown/bin/showdown.js makehtml -m -i $file >> $target
     cat footer.html >> $target
 done
+
+python3 ../scripts/check-translations.py > ../public/missing_translations.html
