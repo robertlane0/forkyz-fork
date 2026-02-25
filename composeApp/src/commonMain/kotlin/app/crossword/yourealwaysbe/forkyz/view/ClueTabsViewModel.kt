@@ -400,10 +400,10 @@ class ClueTabsViewModel(
         // need to calculate this as some clues might be filled due to
         // box changes
         val changedClueIDs = (
-            changes.changedClueIDs.toSet()
-            + changes.cellChanges.flatMap {
+            (changes.changedClueIDs?.toSet() ?: setOf())
+            + (changes.cellChanges?.flatMap {
                 board?.puzzle?.checkedGetBox(it)?.getIsPartOfClues() ?: setOf()
-            }.toSet()
+            }?.toSet() ?: setOf())
         )
 
         return currentPages.mapIndexed { pageIndex, page ->
