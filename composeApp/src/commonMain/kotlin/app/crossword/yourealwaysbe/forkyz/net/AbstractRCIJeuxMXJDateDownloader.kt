@@ -20,9 +20,6 @@ import app.crossword.yourealwaysbe.puz.io.RCIJeuxMFJIO
  *
  * Note, sourceUrlFormat is not a date format pattern, it should
  * have a %d for the crossword number.
- *
- * daysBetween is the number of days between each puzzle (e.g. 1 for daily,
- * 14 for fortnightly)
  */
 class AbstractRCIJeuxMXJDateDownloader private constructor(
     downloaderID : DownloaderID,
@@ -35,7 +32,6 @@ class AbstractRCIJeuxMXJDateDownloader private constructor(
     puzzleParser : PuzzleParser,
     private val baseCWNumber : Int,
     private val baseDate : LocalDate,
-    private val daysBetween : Int
 ) : AbstractDateDownloader(
     downloaderID,
     downloaderName,
@@ -47,22 +43,10 @@ class AbstractRCIJeuxMXJDateDownloader private constructor(
     shareUrlFormatPattern,
     LocalDate.now().minusDays(ARCHIVE_LENGTH_DAYS.toLong()),
 ) {
-    override protected val latestDateWindow : Int
-        get() = max(super.latestDateWindow, daysBetween)
-
     override fun getSourceUrl(date : LocalDate) : String? {
         val cwNumber = getCrosswordNumber(date)
         return String.format(Locale.US, this.sourceUrlFormat, cwNumber)
     }
-
-    public override fun isAvailable(date : LocalDate) : Boolean {
-        if (!super.isAvailable(date))
-            return false
-
-        // only available on daysBetween days since base date
-        return getDaysDelta(date) % daysBetween == 0L
-    }
-
 
     override fun download(
         date : LocalDate,
@@ -74,8 +58,19 @@ class AbstractRCIJeuxMXJDateDownloader private constructor(
     }
 
     private fun getCrosswordNumber(date : LocalDate) : Long {
-        val delta = Math.floorDiv(getDaysDelta(date), daysBetween)
-        return this.baseCWNumber + delta
+        val daysDelta = getDaysDelta(date)
+        val startDay = baseDate.dayOfWeek.value
+
+        val trueDelta = days.map { weekday ->
+            val offset = (7 + (weekday.value - startDay)) % 7
+            val deltaFromDay = daysDelta - offset
+            if (deltaFromDay > 0)
+                1 + (deltaFromDay - 1) / 7
+            else
+                0
+        }.sum()
+
+        return this.baseCWNumber + trueDelta
     }
 
     /**
@@ -112,7 +107,6 @@ class AbstractRCIJeuxMXJDateDownloader private constructor(
             shareUrlFormatPattern : String?,
             baseCWNumber : Int,
             baseDate : LocalDate,
-            daysBetween : Int
         ) : AbstractRCIJeuxMXJDateDownloader {
             return AbstractRCIJeuxMXJDateDownloader(
                 downloaderID,
@@ -125,7 +119,6 @@ class AbstractRCIJeuxMXJDateDownloader private constructor(
                 RCIJeuxMFJIO(),
                 baseCWNumber,
                 baseDate,
-                daysBetween
             )
         }
 
@@ -139,7 +132,6 @@ class AbstractRCIJeuxMXJDateDownloader private constructor(
             shareUrlFormatPattern : String?,
             baseCWNumber : Int,
             baseDate : LocalDate,
-            daysBetween : Int
         ) : AbstractRCIJeuxMXJDateDownloader {
             return AbstractRCIJeuxMXJDateDownloader(
                 downloaderID,
@@ -152,7 +144,6 @@ class AbstractRCIJeuxMXJDateDownloader private constructor(
                 RCIJeuxMCJIO(),
                 baseCWNumber,
                 baseDate,
-                daysBetween
             )
         }
     }

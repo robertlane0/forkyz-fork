@@ -51,7 +51,7 @@ import app.crossword.yourealwaysbe.puz.io.PuzzleParser
 open class AbstractDateDownloader constructor(
     override val downloaderID : DownloaderID,
     override val name : String,
-    private val days : Array<DayOfWeek>,
+    protected val days : Array<DayOfWeek>,
     protected val utcAvailabilityOffset : Duration,
     override val supportUrl : String?,
     protected var puzzleParser : PuzzleParser,

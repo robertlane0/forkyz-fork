@@ -473,7 +473,6 @@ class Downloaders(
                 "'https://www.la-croix.com/mots-croises'",
                 8815,
                 LocalDate.of(2026, 1, 30),
-                1,
             ))
         }
 
@@ -496,7 +495,6 @@ class Downloaders(
                 "'https://www.leparisien.fr/jeux/mots-fleches/'",
                 2536,
                 LocalDate.of(2022, 6, 21),
-                1,
             ))
         }
 
@@ -512,7 +510,6 @@ class Downloaders(
                 "'https://www.leparisien.fr/jeux/mots-fleches/force-2/'",
                 2536,
                 LocalDate.of(2022, 6, 21),
-                1,
             ))
         }
 
@@ -528,7 +525,6 @@ class Downloaders(
                 "'https://www.leparisien.fr/jeux/mots-fleches/force-3/'",
                 300,
                 LocalDate.of(2023, 3, 4),
-                1,
             ))
         }
 
@@ -544,7 +540,6 @@ class Downloaders(
                 "'https://www.leparisien.fr/jeux/mots-fleches/force-4/'",
                 300,
                 LocalDate.of(2023, 3, 4),
-                1,
             ))
         }
 
@@ -690,7 +685,6 @@ class Downloaders(
                 "'https://www.sudouest.fr/jeux/mots-croises/'",
                 1992,
                 LocalDate.of(2025, 10, 26),
-                1,
             ))
         }
 
@@ -705,7 +699,6 @@ class Downloaders(
                 "'https://www.sudouest.fr/jeux/mots-fleches/'",
                 1988,
                 LocalDate.of(2025, 10, 22),
-                1,
             ))
         }
 
@@ -720,7 +713,6 @@ class Downloaders(
                 "'https://www.tf1info.fr/jeux/mots-croises/'",
                 4739,
                 LocalDate.of(2025, 10, 26),
-                1,
             ))
         }
 
@@ -735,7 +727,6 @@ class Downloaders(
                 "'https://www.tf1info.fr/jeux/mots-fleches/'",
                 5395,
                 LocalDate.of(2025, 10, 26),
-                1,
             ))
         }
 
