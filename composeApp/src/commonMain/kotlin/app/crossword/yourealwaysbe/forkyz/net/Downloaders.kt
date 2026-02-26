@@ -449,15 +449,15 @@ class Downloaders(
         }
 
         if (settings.enabled(DownloaderID.TWENTY_MINUTES)) {
-            downloaders.add(AbstractDateDownloader(
+            downloaders.add(KeesingDownloader(
                 DownloaderID.TWENTY_MINUTES,
                 utils.getString(Res.string.vingminutes),
                 AbstractDateDownloader.DAYS_DAILY,
-                Duration.ofHours(1), // by experiment
+                Duration.ofHours(0), // guess-ish
                 "https://www.20minutes.fr",
-                RCIJeuxMFJIO(),
-                "'https://www.rcijeux.fr/drupal_game/20minutes/grids/'ddMMyy'.mfj'",
                 "'https://www.20minutes.fr/services/mots-fleches'",
+                "20minutes",
+                "arrowword_plus_today_"
             ))
         }
 
