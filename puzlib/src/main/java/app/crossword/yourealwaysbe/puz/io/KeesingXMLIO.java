@@ -279,6 +279,7 @@ public class KeesingXMLIO implements PuzzleParser {
             private String inClueGroupIndex = null;
             private String inClueWordIndex = null;
             private StringBuilder charBuffer = new StringBuilder();
+            private Box inBox = null;
 
             @Override
             public void startElement(String nsURI,
@@ -295,6 +296,16 @@ public class KeesingXMLIO implements PuzzleParser {
                     inClueGroupIndex = attributes.getValue("groupindex");
                     inClueWordIndex = attributes.getValue("wordindex");
                     charBuffer.delete(0, charBuffer.length());
+                } else if (name.equalsIgnoreCase("border") && inBox != null) {
+                    String position = attributes.getValue("position");
+                    if ("top".equalsIgnoreCase(position))
+                        inBox.setBarTop(Box.Bar.DASHED);
+                    else if ("bottom".equalsIgnoreCase(position))
+                        inBox.setBarBottom(Box.Bar.DASHED);
+                    else if ("left".equalsIgnoreCase(position))
+                        inBox.setBarLeft(Box.Bar.DASHED);
+                    else if ("right".equalsIgnoreCase(position))
+                        inBox.setBarRight(Box.Bar.DASHED);
                 }
             }
 
@@ -315,6 +326,8 @@ public class KeesingXMLIO implements PuzzleParser {
 
                 if (name.equalsIgnoreCase("clue")) {
                     endClue();
+                } else if (name.equalsIgnoreCase("cell")) {
+                    inBox = null;
                 }
             }
 
@@ -352,6 +365,7 @@ public class KeesingXMLIO implements PuzzleParser {
                     }
 
                     boxes[y][x] = box;
+                    inBox = box;
                 }
             }
 
