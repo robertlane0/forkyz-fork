@@ -52,6 +52,21 @@ LANGS = [
         "Version {version}",
         "fr",
     ),
+    Lang(
+        "nl",
+        "du-NL",
+        """
+            <h1>Forkyz</h1>
+            <p>
+                Dit is een niet-officiële splitsing van de Shortyz
+                kruiswoord-app. Deze implementeert een aantal nieuwe
+                functies en verwijdert enkele niet-open
+                bibliotheken/trackers.
+            </p>
+        """,
+        "Version {version}",
+        "nl",
+    )
 ]
 
 release_file_fmt = "composeApp/src/commonMain/composeResources/files/{lang}/release.html"
