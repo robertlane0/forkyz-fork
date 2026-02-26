@@ -22,6 +22,10 @@ public class KeesingXMLIOTest {
         return KeesingXMLIOTest.class.getResourceAsStream("/keesing.xml");
     }
 
+    public static InputStream getTestPuzzle2InputStream() {
+        return KeesingXMLIOTest.class.getResourceAsStream("/keesingarrow.xml");
+    }
+
     public static void assertIsTestPuzzle1(Puzzle puz) {
         String ACROSS_CLUES = "Across";
         String DOWN_CLUES = "Down";
@@ -66,6 +70,44 @@ public class KeesingXMLIOTest {
         );
     }
 
+    public static void assertIsTestPuzzle2(Puzzle puz) {
+        String ACROSS_CLUES = "Across";
+        String DOWN_CLUES = "Down";
+
+        assertEquals("Test Arrowword", puz.getTitle());
+
+        Box[][] boxes = puz.getBoxes();
+
+        assertEquals(12, boxes.length);
+        assertEquals(12, boxes[0].length);
+        assertEquals("1", boxes[0][1].getClueNumber());
+
+        assertEquals(boxes[2][1].getSolution(), "A");
+        assertEquals(boxes[3][3].getSolution(), "Z");
+        assertTrue(Box.isBlock(boxes[2][0]));
+        assertTrue(Box.isBlock(boxes[3][6]));
+
+        ClueList acrossClues = puz.getClues(ACROSS_CLUES);
+        ClueList downClues = puz.getClues(DOWN_CLUES);
+
+        assertEquals(
+            acrossClues.getClueByNumber("7").getHint(),
+            "Clue 2"
+        );
+        assertEquals(
+            acrossClues.getClueByNumber("13").getHint(),
+            "Clue 4"
+        );
+        assertEquals(
+            downClues.getClueByNumber("1").getHint(),
+            "Clue 1"
+        );
+        assertEquals(
+            downClues.getClueByNumber("4").getHint(),
+            "Clue 3"
+        );
+    }
+
     @Test
     public void testKeesingXML() throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -74,5 +116,15 @@ public class KeesingXMLIOTest {
             new ByteArrayInputStream(baos.toByteArray())
         );
         assertIsTestPuzzle1(puz);
+    }
+
+    @Test
+    public void testKeesingXMLArrow() throws Exception {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        StreamUtils.copyStream(getTestPuzzle2InputStream(), baos);
+        Puzzle puz = KeesingXMLIO.readPuzzle(
+            new ByteArrayInputStream(baos.toByteArray())
+        );
+        assertIsTestPuzzle2(puz);
     }
 }

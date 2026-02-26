@@ -22,9 +22,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.SAXParser;
@@ -39,7 +40,7 @@ import javax.xml.parsers.SAXParserFactory;
  * The (supported) XML format is:
  *
  * <puzzle
- *  type="Crossword"
+ *  type="Crossword" | type="Arrowword"
  *  width="[n]"
  *  height="[n]"
  *  ...
@@ -53,7 +54,10 @@ import javax.xml.parsers.SAXParserFactory;
  *             content="[solution letter]"
  *             giveaway="[1/0]" (display solution)
  *             fillable="[1/0]" (blocks have 0)
- *        />
+ *        >
+ *          // for arrow words
+ *          <clue arrow="arrowrightdowntop" wordindex="i">Clue</clue>
+ *        </cell>
  *        ...
  *     </cells>
  *   </grid>
@@ -84,10 +88,24 @@ public class KeesingXMLIO implements PuzzleParser {
         KeesingXMLIO.class.getCanonicalName()
     );
 
+    private static final String CROSSWORD_TYPE = "Crossword";
+    private static final String ARROWWORD_TYPE = "Arrowword";
+
     public static class KeesingXMLParserException extends Exception {
         private static final long serialVersionUID = 1083227738212688481L;
         public KeesingXMLParserException(String msg) {
             super(msg);
+        }
+    }
+
+    private static record ClueIndex(
+        String group,
+        String index
+    ) implements Comparable<ClueIndex> {
+        @Override
+        public int compareTo(ClueIndex other) {
+            int gdiff = compareStringNums(group, other.group);
+            return gdiff == 0 ? compareStringNums(index, other.index) : gdiff;
         }
     }
 
@@ -112,8 +130,20 @@ public class KeesingXMLIO implements PuzzleParser {
         public String getHint() { return hint; }
         public Zone getZone() { return zone; }
 
+        public void setListName(String listName) {
+            this.listName = listName;
+        }
+
         public void setClueNumber(String clueNumber) {
             this.clueNumber = clueNumber;
+        }
+
+        public void setHint(String hint) {
+            this.hint = hint;
+        }
+
+        public void setZone(Zone zone) {
+            this.zone = zone;
         }
     }
 
@@ -123,7 +153,8 @@ public class KeesingXMLIO implements PuzzleParser {
         private int width;
         private int height;
         private Box[][] boxes;
-        private List<ClueInfo> clues = new LinkedList<>();
+        private List<ClueInfo> clues = new ArrayList<>();
+        private Map<ClueIndex, ClueInfo> indexedClues = new HashMap<>();
         private StringBuilder charBuffer = new StringBuilder();
 
         // sanity checks
@@ -140,12 +171,58 @@ public class KeesingXMLIO implements PuzzleParser {
          * Best assessment of whether read succeeded
          */
         public boolean isSuccessfulRead() {
-            return "Crossword".equalsIgnoreCase(type)
-                && hasGridEle
+            return (
+                CROSSWORD_TYPE.equalsIgnoreCase(type)
+                || ARROWWORD_TYPE.equalsIgnoreCase(type)
+            ) && hasGridEle
                 && hasWordGroupsEle
                 && getWidth() > 0
                 && getHeight() > 0
                 && getClues().size() > 0;
+        }
+
+        private boolean isArrowWord() {
+            return ARROWWORD_TYPE.equals(type);
+        }
+
+        private String cleanHint(String hint) {
+            // in arrow word \ splits clue across lines
+            if (isArrowWord())
+                return hint.replace("\\", "");
+            else
+                return hint;
+        }
+
+        /**
+         * Add clue to clues
+         *
+         * If index info not use will be used to update existing clues
+         */
+        private void addClue(
+            String groupIndex,
+            String wordIndex,
+            ClueInfo info
+        ) {
+            ClueIndex clueIndex = groupIndex == null || wordIndex == null
+                ? null
+                : new ClueIndex(groupIndex, wordIndex);
+            ClueInfo existing = clueIndex == null
+                ? null
+                : indexedClues.get(clueIndex);
+            if (existing == null) {
+                clues.add(info);
+                if (clueIndex != null)
+                    indexedClues.put(clueIndex, info);
+            } else {
+                if (info.getListName() != null)
+                    existing.setListName(info.getListName());
+                if (info.getClueNumber() != null)
+                    existing.setClueNumber(info.getClueNumber());
+                if (info.getHint() != null)
+                    existing.setHint(info.getHint());
+                if (info.getZone() != null)
+                    existing.setZone(info.getZone());
+            }
         }
 
         // Use several handlers to maintain three different modes:
@@ -199,6 +276,10 @@ public class KeesingXMLIO implements PuzzleParser {
         };
 
         private DefaultHandler inGrid = new DefaultHandler() {
+            private String inClueGroupIndex = null;
+            private String inClueWordIndex = null;
+            private StringBuilder charBuffer = new StringBuilder();
+
             @Override
             public void startElement(String nsURI,
                                      String strippedName,
@@ -210,7 +291,46 @@ public class KeesingXMLIO implements PuzzleParser {
 
                 if (name.equalsIgnoreCase("cell")) {
                     parseCell(attributes);
+                } else if (name.equalsIgnoreCase("clue")) {
+                    inClueGroupIndex = attributes.getValue("groupindex");
+                    inClueWordIndex = attributes.getValue("wordindex");
+                    charBuffer.delete(0, charBuffer.length());
                 }
+            }
+
+            @Override
+            public void characters(char[] ch, int start, int length)
+                    throws SAXException {
+                charBuffer.append(ch, start, length);
+            }
+
+            @Override
+            public void endElement(String nsURI,
+                                   String strippedName,
+                                   String tagName) throws SAXException {
+                strippedName = strippedName.trim();
+                String name = strippedName.length() == 0
+                    ? tagName.trim()
+                    : strippedName;
+
+                if (name.equalsIgnoreCase("clue")) {
+                    endClue();
+                }
+            }
+
+            private void endClue() {
+                String hint = cleanHint(charBuffer.toString());
+
+                if (inClueGroupIndex != null && inClueWordIndex != null) {
+                    addClue(
+                        inClueGroupIndex,
+                        inClueWordIndex,
+                        new ClueInfo(null, null, hint, null)
+                    );
+                }
+
+                inClueGroupIndex = null;
+                inClueWordIndex = null;
             }
 
             private void parseCell(Attributes attributes) {
@@ -250,7 +370,10 @@ public class KeesingXMLIO implements PuzzleParser {
         private DefaultHandler inClues = new DefaultHandler() {
             private String inListName = null;
             private String inClueNumber = null;
+            private String inClueHint = null;
             private Zone inClueZone = null;
+            private String inGroupIndex = null;
+            private String inWordIndex = null;
 
             private StringBuilder charBuffer = new StringBuilder();
 
@@ -267,10 +390,13 @@ public class KeesingXMLIO implements PuzzleParser {
                 try {
                     if (name.equalsIgnoreCase("wordgroup")) {
                         charBuffer.delete(0, charBuffer.length());
+                        inGroupIndex = attributes.getValue("index");
                     } else if (name.equalsIgnoreCase("header")) {
                         charBuffer.delete(0, charBuffer.length());
                     } else if (name.equalsIgnoreCase("word")) {
                         charBuffer.delete(0, charBuffer.length());
+
+                        inWordIndex = attributes.getValue("index");
 
                         inClueNumber = attributes.getValue("number");
                         if ("0".equals(inClueNumber))
@@ -308,19 +434,32 @@ public class KeesingXMLIO implements PuzzleParser {
                     ? tagName.trim()
                     : strippedName;
 
-                if (name.equalsIgnoreCase("header")) {
+                if (name.equalsIgnoreCase("wordgroup")) {
+                    inWordIndex = null;
+                } else if (name.equalsIgnoreCase("header")) {
                     inListName = HtmlUtil.unHtmlString(charBuffer.toString());
                 } else if (name.equalsIgnoreCase("clue")) {
-                    String clue = charBuffer.toString();
+                    inClueHint = cleanHint(charBuffer.toString());
+                } else if (name.equalsIgnoreCase("word")) {
+                    if (inGroupIndex != null && inListName != null) {
+                        addClue(
+                            inGroupIndex,
+                            inWordIndex,
+                            new ClueInfo(
+                                inListName,
+                                inClueNumber,
+                                inClueHint,
+                                inClueZone
+                            )
+                        );
+                    }
 
-                    clues.add(new ClueInfo(
-                        inListName, inClueNumber, clue, inClueZone
-                    ));
-
+                    inWordIndex = null;
                     inClueNumber = null;
                     inClueZone = null;
                 } else if (name.equalsIgnoreCase("wordgroup")) {
                     inListName = null;
+                    inGroupIndex = null;
                 } else {
                     charBuffer.append("</" + tagName + ">");
                 }
@@ -390,11 +529,11 @@ public class KeesingXMLIO implements PuzzleParser {
             return null;
 
         PuzzleBuilder builder = new PuzzleBuilder(handler.getBoxes());
-        builder.setTitle(handler.getTitle())
-            .autoNumberBoxes();
+        builder.setTitle(handler.getTitle());
 
+        numberBoxes(handler.getClues(), builder);
 
-        Map<String, List<ClueInfo>> clues = getSortedClues(
+        Map<String, List<ClueInfo>> clues = getNumberedClues(
             handler.getClues(), builder.getPuzzle()
         );
         for (String listName : clues.keySet()) {
@@ -419,25 +558,61 @@ public class KeesingXMLIO implements PuzzleParser {
             IO.saveNative(puz, os);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
             LOG.severe("Unable to convert Keesing XML file: " + e.getMessage());
             return false;
         }
     }
 
     /**
-     * Fill in clue numbers and sort by them
+     * Auto number boxes by clue starts
+     */
+    private static void numberBoxes(
+        List<ClueInfo> clues,
+        PuzzleBuilder builder
+    ) {
+        Set<Position> clueStarts = new HashSet<>();
+        for (ClueInfo info : clues) {
+            Zone zone = info.getZone();
+            Position start = zone == null || zone.isEmpty()
+                ? null
+                : zone.getPosition(0);
+            if (start != null)
+                clueStarts.add(start);
+        }
+
+        int clueCount = 1;
+
+        for (int row = 0; row < builder.getHeight(); row++) {
+            for (int col = 0; col < builder.getWidth(); col++) {
+                Position pos = new Position(row, col);
+                Box box = builder.getBox(pos);
+
+                if (Box.isBlock(box)) {
+                    continue;
+                }
+
+                boolean isStart = clueStarts.contains(pos);
+
+                if (isStart) {
+                    String autoNumber = String.valueOf(clueCount);
+                    box.setClueNumber(autoNumber);
+                    clueCount++;
+                }
+            }
+        }
+    }
+
+    /**
+     * Fill in clue numbers and split ClueInfo into lists
      *
      * @return map from list name to clue info with clue number
      */
-    private static Map<String, List<ClueInfo>> getSortedClues(
+    private static Map<String, List<ClueInfo>> getNumberedClues(
         List<ClueInfo> clues, Puzzle puz
     ) throws KeesingXMLParserException {
         Map<String, List<ClueInfo>> sortedClues = new HashMap<>();
 
-        for (int i = 0; i < clues.size(); i++) {
-            ClueInfo clue = clues.get(i);
-
+        for (ClueInfo clue : clues) {
             String listName = clue.getListName();
             if (listName == null)
                 listName = "No list";
@@ -447,16 +622,19 @@ public class KeesingXMLIO implements PuzzleParser {
 
             List<ClueInfo> clueList = sortedClues.get(listName);
 
-            Zone zone = clue.getZone();
-            if (zone != null && !zone.isEmpty()) {
-                Box start
-                    = puz.checkedGetBox(zone.getPosition(0));
-                if (Box.isBlock(start)) {
-                    throw new KeesingXMLParserException(
-                        "Clue starts at block box " + zone.getPosition(0)
-                    );
+            if (clue.getClueNumber() == null) {
+                Zone zone = clue.getZone();
+                if (zone != null && !zone.isEmpty()) {
+                    Box start
+                        = puz.checkedGetBox(zone.getPosition(0));
+                    if (Box.isBlock(start)) {
+                        throw new KeesingXMLParserException(
+                            "Clue starts at block box " + zone.getPosition(0)
+                        );
+                    }
+
+                    clue.setClueNumber(start.getClueNumber());
                 }
-                clue.setClueNumber(start.getClueNumber());
             }
 
             clueList.add(clue);
@@ -472,25 +650,30 @@ public class KeesingXMLIO implements PuzzleParser {
     private static void sortClueList(List<ClueInfo> clues) {
         Collections.sort(clues, new Comparator<ClueInfo> () {
             public int compare(ClueInfo ci1, ClueInfo ci2) {
-                String num1 = ci1.getClueNumber();
-                String num2 = ci2.getClueNumber();
-
-                if (num1 == null && num2 == null)
-                    return 0;
-                else if (num1 == null)
-                    return -1;
-                else if (num2 == null)
-                    return 1;
-
-                try {
-                    return Integer.compare(
-                        Integer.parseInt(num1),
-                        Integer.parseInt(num2)
-                    );
-                } catch (NumberFormatException e) {
-                    return num1.compareTo(num2);
-                }
+                return compareStringNums(
+                    ci1.getClueNumber(),
+                    ci2.getClueNumber()
+                );
             }
         });
     }
+
+    private static int compareStringNums(String num1, String num2) {
+        if (num1 == null && num2 == null)
+            return 0;
+        else if (num1 == null)
+            return -1;
+        else if (num2 == null)
+            return 1;
+
+        try {
+            return Integer.compare(
+                Integer.parseInt(num1),
+                Integer.parseInt(num2)
+            );
+        } catch (NumberFormatException e) {
+            return num1.compareTo(num2);
+        }
+    }
 }
+
