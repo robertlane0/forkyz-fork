@@ -6,13 +6,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 import app.crossword.yourealwaysbe.forkyz.net.Downloader
 import app.crossword.yourealwaysbe.forkyz.net.DownloaderID
 import app.crossword.yourealwaysbe.forkyz.net.Downloaders
 import app.crossword.yourealwaysbe.forkyz.net.DownloadersProvider
+import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.util.MediatedStateWithFlow
 import app.crossword.yourealwaysbe.forkyz.util.getOnce
 import app.crossword.yourealwaysbe.forkyz.util.stateInSubscribed
@@ -60,6 +61,7 @@ data class DownloaderDialogUIState (
 class DownloadDialogViewModel(
     private val viewModelScope : CoroutineScope,
     private val downloadersProvider : DownloadersProvider,
+    private val settings : ForkyzSettings,
 ) {
     // use to cache an up to date downloaders object
     private val downloadersState : StateFlow<Downloaders?>
@@ -75,6 +77,17 @@ class DownloadDialogViewModel(
             downloadersState.filterNotNull(),
         )
     val uiState : StateFlow<DownloaderDialogUIState> = mediatedUIState.stateFlow
+
+    init {
+        viewModelScope.launch {
+            if (settings.liveDownloadRememberDate.first()) {
+                settings.liveDownloadLastSelectedDate.first()?.let {
+                    mediatedUIState.current = mediatedUIState.current
+                        .copy(date = it)
+                }
+            }
+        }
+    }
 
     /**
      * Get list of internal names of selected available downloaders
@@ -109,6 +122,8 @@ class DownloadDialogViewModel(
                         downloadersSettings,
                         value,
                     )
+                    if (settings.liveDownloadRememberDate.first())
+                        settings.setDownloadLastSelectedDate(value)
                 }
             }
         }

@@ -193,6 +193,8 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.double_tap_zoo
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.double_tap_zoom_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.download_charging
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.download_charging_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.download_remember_date
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.download_remember_date_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.download_roaming
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.download_roaming_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.download_settings
@@ -1280,6 +1282,13 @@ class SettingsPageViewModel(
             ),
 
             // Download
+            SettingsBoolean(
+                SettingsPage.DOWNLOAD,
+                Res.string.download_remember_date,
+                Res.string.download_remember_date_desc,
+                settings.liveDownloadRememberDate.stateInHere(),
+                settings::setDownloadRememberDate,
+            ),
             SettingsBoolean(
                 SettingsPage.DOWNLOAD,
                 Res.string.automatic_download,

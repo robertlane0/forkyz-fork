@@ -242,6 +242,8 @@ message Settings {
     repeated string autoDownloadersBlockSat = 152;
     repeated string autoDownloadersBlockSun = 153;
     bool undecorated = 154;
+    bool downloadRememberDate = 155;
+    string downloadLastSelectedDate = 156;
 
     // defunct settings
     repeated string autoDownloaders = 5;

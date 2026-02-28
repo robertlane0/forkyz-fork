@@ -410,6 +410,8 @@
     <string name="background_download_wed">Wednesday</string>
     <string name="download_charging">Download while charging only</string>
     <string name="download_charging_desc">Only schedule background downloads when charging</string>
+    <string name="download_remember_date">Remember Last Date</string>
+    <string name="download_remember_date_desc">Remember the last selected date in the download dialog.</string>
     <string name="download_roaming">Download when roaming</string>
     <string name="download_roaming_desc">Schedule background downloads even when roaming</string>
     <string name="download_timeout">Download Timeout</string>

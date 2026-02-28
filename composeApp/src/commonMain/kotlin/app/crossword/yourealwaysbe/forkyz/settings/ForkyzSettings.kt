@@ -2,6 +2,7 @@
 package app.crossword.yourealwaysbe.forkyz.settings
 
 import java.io.BufferedWriter
+import java.time.LocalDate
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
@@ -900,6 +901,28 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     fun setDownloadOnStartUp(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(dlOnStartup = value)
+        }
+    }
+
+    val liveDownloadLastSelectedDate : Flow<LocalDate?>
+        = settingsMap { settings ->
+            settings.downloadLastSelectedDate
+                .takeIf { it.isNotEmpty() }
+                ?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
+        }
+
+    fun setDownloadLastSelectedDate(value : LocalDate?) {
+        settingsUpdate { settings ->
+            settings.copy(downloadLastSelectedDate = value?.toString() ?: "")
+        }
+    }
+
+    val liveDownloadRememberDate : Flow<Boolean>
+        = settingsMap { it.downloadRememberDate }
+
+    fun setDownloadRememberDate(value : Boolean) {
+        settingsUpdate { settings ->
+            settings.copy(downloadRememberDate = value)
         }
     }
 
@@ -2085,6 +2108,13 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             { s, key -> json.put(key, s.doubleTap) },
             { key ->
                 json.ifHasBoolean(key) { setPlayDoubleTapFitBoard(it) }
+            },
+        )
+        run(
+            "downloadRememberDate",
+            { s, key -> json.put(key, s.downloadRememberDate) },
+            { key ->
+                json.ifHasBoolean(key) { setDownloadRememberDate(it) }
             },
         )
         run(

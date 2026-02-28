@@ -791,6 +791,7 @@ class BrowsePageViewModel(
         _downloadDialog.value = DownloadDialogViewModel(
             viewModelScope,
             downloadersProvider,
+            settings,
         )
     }
 
