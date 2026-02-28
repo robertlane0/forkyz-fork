@@ -5,7 +5,8 @@
 - Ajouter des pages "avancées" de sources de puzzle.
 - Remplacer l'option "téléchargeurs automatiques" par "bloquer le téléchargement automatique le jour" (réglages avancés de source de puzzle).
 - Mettre les en-têtes de page dans les résultats de recherche des paramètres.
-- Ajout d'une option pour effondrer les rubriques de la page de liste de puzzles (paramètres de navigation).- Cacher certaines options inutilisables sur le bureau.
+- Ajout d'une option pour effondrer les rubriques de la page de liste de puzzles (paramètres de navigation).
+- Cacher certaines options inutilisables sur le bureau.
 - Ajoutez des décorations et un réglage non décoré sur le bureau (réglages de bureau).
 
 Changelog traduit automatiquement avec Argos Translate.

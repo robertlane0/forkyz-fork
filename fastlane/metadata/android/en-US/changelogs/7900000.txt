@@ -5,5 +5,6 @@
 - Add "advanced" puzzle source options pages.
 - Replace "auto downloaders" option with "block auto download on day" (advanced puzzle source settings).
 - Put page headings in settings search results.
-- Add option to collapse headings on puzzle list page (browse settings).- Hide some unusable options on Desktop.
+- Add option to collapse headings on puzzle list page (browse settings).
+- Hide some unusable options on Desktop.
 - Add decorations and undecorated setting on Desktop (desktop settings).

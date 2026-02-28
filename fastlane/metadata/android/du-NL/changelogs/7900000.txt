@@ -5,7 +5,8 @@
 - Voeg "geavanceerde" puzzel bron opties pagina's.
 - Vervang "auto downloaders" optie door "blok automatisch downloaden op dag" (geavanceerde puzzel bron instellingen).
 - Plaats paginakoppen in instellingen zoekresultaten.
-- Voeg optie toe om rubrieken in te storten op de puzzellijstpagina (instellingen doorbladeren).- Verberg enkele onbruikbaar opties op het bureaublad.
+- Voeg optie toe om rubrieken in te storten op de puzzellijstpagina (instellingen doorbladeren).
+- Verberg enkele onbruikbaar opties op het bureaublad.
 - Voeg decoraties en niet gedecoreerde instellingen toe op Bureaublad (desktopinstellingen).
 
 Changelog automatisch vertaald met Argos Vertalen.
