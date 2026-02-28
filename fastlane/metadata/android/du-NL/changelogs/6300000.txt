@@ -1,0 +1,6 @@
+Maak achtergronddownloads.
+- Fix aanwijzingslijst bevriezen wanneer show fouten geactiveerd.
+- Verbeteren puzzel save betrouwbaarheid.
+- Beginwaarde in het dialoogvenster voor speciale items herstellen.
+
+Changelog automatisch vertaald met Argos Vertalen.

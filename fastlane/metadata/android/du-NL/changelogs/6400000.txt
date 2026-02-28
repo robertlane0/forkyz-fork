@@ -1,0 +1,9 @@
+- Herschrijf notities pagina in Compose.
+- Logweergave toevoegen in instellingen.
+- Puzzels exporteren in instellingen toevoegen.
+Fix Guardian downloads.
+- Het toetsenbord in Clues List.
+- Regel de puzzeltijd in Info Dialoog.
+- Fix crash tijdens het opslaan als de telefoon wakker wordt.
+
+Changelog automatisch vertaald met Argos Vertalen.

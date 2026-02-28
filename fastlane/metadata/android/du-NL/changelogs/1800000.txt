@@ -1,0 +1,4 @@
+- Verwijder LA Times en Washington Post Classic downloads.
+- Laat het importeren van meerdere bestanden tegelijkertijd.
+
+Changelog automatisch vertaald met Argos Vertalen.

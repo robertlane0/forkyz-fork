@@ -1,0 +1,7 @@
+- Voeg force caps optie toe aan speciale invoer dialoog.
+- Fix Irish News Cryptic Downloader.
+- Fix stop-on-end gedrag op de lijst en notities pagina.
+- Verplaats instellingen naar datastore (eist exportinstellingen om opnieuw uit te voeren).
+- Reimplement Clue List in Compose (hopelijk onzichtbaar behalve menu positionering).
+
+Changelog automatisch vertaald met Argos Vertalen.

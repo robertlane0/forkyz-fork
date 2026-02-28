@@ -1,0 +1,11 @@
+- Voeg Nederlandse vertaling toe (bedankt @ojppe).
+- Fix La Croix downloads (was het plukken van verkeerde puzzel voor de datum).
+- Verplaats 20 Minuten downloader naar nieuwe Keesing bron en Telegraaf naar FortyTwoPuzzles.
+- Ondersteuning pijl woorden en celgrenzen in Keesing IO formaat.
+- Voeg "geavanceerde" puzzel bron opties pagina's.
+- Vervang "auto downloaders" optie door "blok automatisch downloaden op dag" (geavanceerde puzzel bron instellingen).
+- Plaats paginakoppen in instellingen zoekresultaten.
+- Voeg optie toe om rubrieken in te storten op de puzzellijstpagina (instellingen doorbladeren).- Verberg enkele onbruikbaar opties op het bureaublad.
+- Voeg decoraties en niet gedecoreerde instellingen toe op Bureaublad (desktopinstellingen).
+
+Changelog automatisch vertaald met Argos Vertalen.

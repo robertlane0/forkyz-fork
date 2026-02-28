@@ -1,0 +1,3 @@
+- Repareer crash op show fouten.
+
+Changelog automatisch vertaald met Argos Vertalen.

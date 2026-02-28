@@ -1,0 +1,8 @@
+- Experimentele bronnen zijn nu schrapers, zichtbaar in download dialoog.
+- Private Eye toevoegen als downloadbare bron.
+- Steun verdeelde aanwijzingen in Guardian puzzels.
+- Speciale tekens toevoegen functie.
+Vernieuw de lijst met online bronnen.
+- Verwijder Washington Postbron: AmuseLabs nu verduisteren hun gegevens, ik neem aan om te voorkomen dat derden downloads.
+
+Changelog automatisch vertaald met Argos Vertalen.

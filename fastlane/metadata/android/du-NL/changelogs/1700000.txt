@@ -1,0 +1,3 @@
+- Fix crashes wanneer het eerste vak leeg is, en wanneer kruiswoordpuzzel mappen zijn verwijderd.
+
+Changelog automatisch vertaald met Argos Vertalen.

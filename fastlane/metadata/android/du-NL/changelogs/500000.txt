@@ -1,0 +1,8 @@
+Compatibel met Android 11.
+- Bijgewerkte downloadbare puzzels.
+Thema en UI aanpassingen.
+- Notes/anagram oplossen scherm.
+- Verwijder Google integratie.
+- Verwijder Crashlytics.
+
+Changelog automatisch vertaald met Argos Vertalen.

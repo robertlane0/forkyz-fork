@@ -1,0 +1,7 @@
+- Bijgewerkte lijst van online puzzelbronnen.
+- Voeg show fouten onder cursor optie.
+- Amuse Labs en King Digital downloads ondersteund: omcirkelde dozen werken nu voor LA Times puzzels, terug te brengen Washington Post, LAT zondag, Joseph, Sheffer, en Premier kruiswoordpuzzels.
+- Omcirkelde dozen opnieuw ingeschakeld in JPZ puzzels.
+- Verbeterde foutmarkering in nachtkleuren.
+
+Changelog automatisch vertaald met Argos Vertalen.

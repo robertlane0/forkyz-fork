@@ -1,0 +1,7 @@
+- Update Joseph, Metro, Premier en Sheffer downloaders.
+- Verwijder Everyman downloader sinds de verhuizing van Guardian. Experimentele ondersteuning door het delen van de Observer Everyman URL met Forkyz, waarschijnlijk binnenkort breken.
+- Mark Le Parisien downloader omdat het niet de echte puzzels downloadt.
+- Reparatie per uur achtergrond downloads en beschermen tegen gelijktijdige downloads.
+- Verplaats het hoofdscherm naar Samenstellen.
+
+Changelog automatisch vertaald met Argos Vertalen.

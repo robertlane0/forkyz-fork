@@ -1,0 +1,5 @@
+- Steunvormen in TCA puz formaat (LA Times).
+- Fix ingebouwde toetsenbord keypress bug (bedankt @MIC132MIC).
+- Juist stoppen met schudden detectie indien ingeschakeld wanneer app op de achtergrond.
+
+Changelog automatisch vertaald met Argos Vertalen.

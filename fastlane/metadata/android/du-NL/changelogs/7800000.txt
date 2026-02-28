@@ -1,0 +1,8 @@
+- Toevoegen optie om native input antwoorden te splitsen over cellen.
+- Fix bestandstoestemming fout voor externe mappen.
+- Steun niet-alfabetische karakters op hardware toetsenbord.
+- Tolk + als ruimte voor afgeleide scheidingstekens.
+- Fix La Croix downloader en Everyman delen import.
+- Optimaliseer statusupdate (fixeert vertraging op bureaublad).
+
+Changelog automatisch vertaald met Argos Vertalen.

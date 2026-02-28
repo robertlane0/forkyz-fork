@@ -1,0 +1,6 @@
+- Configureer ingebouwde toetsenbord herhaling (toetsenbordinstellingen).
+- Wacht tot internet beschikbaar is voordat u automatisch downloadt.
+- Min Android versie stootte naar 5 (SDK21, bibliotheek updates).
+- Fix crash bij zoomen in maximum.
+
+Changelog automatisch vertaald met Argos Vertalen.

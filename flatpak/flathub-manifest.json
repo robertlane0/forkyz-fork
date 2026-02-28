@@ -28,7 +28,7 @@
         "sed -i 's|distributionUrl=.*|distributionUrl=file\\:///run/build/forkyz/gradle-9.2.1-bin.zip|g' gradle/wrapper/gradle-wrapper.properties",
         "cat > settings.gradle.kts << 'SETTINGSEOF'\npluginManagement {\n    repositories {\n        maven { url = uri(\"/run/build/forkyz/dependencies\") }\n    }\n}\n\ndependencyResolutionManagement {\n    repositories {\n        maven { url = uri(\"/run/build/forkyz/dependencies\") }\n    }\n}\n\ninclude(\":app\", \":puzlib\")\nSETTINGSEOF\n",
         "./gradlew --offline --no-daemon packageReleaseUberJarForCurrentOS",
-        "install -D app/build/compose/jars/app.crossword.yourealwaysbe.forkyz-*-release.jar /app/lib/com.gitlab.Hague.forkyz.jar",
+        "install -D composeApp/build/compose/jars/app.crossword.yourealwaysbe.forkyz-*-release.jar /app/lib/com.gitlab.Hague.forkyz.jar",
         "install -Dm755 flatpak/forkyz.sh /app/bin/forkyz.sh",
         "install -Dm644 flatpak/com.gitlab.Hague.forkyz.desktop /app/share/applications/com.gitlab.Hague.forkyz.desktop",
         "install -Dm644 flatpak/com.gitlab.Hague.forkyz.svg /app/share/icons/hicolor/scalable/apps/com.gitlab.Hague.forkyz.svg",

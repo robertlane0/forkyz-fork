@@ -1,0 +1,5 @@
+- Voeg deel aanwijzing/bord functie toe.
+- Ondersteuning notities op alle aanwijzingen, cellen met getallen in verschillende posities, en het invoeren van meerdere tekens in een cel.
+- Schakel automatische aanwijzing tekstgrootte schalen voor oudere apparaten, verwijder aanwijzing tekstgrootte menu optie.
+
+Changelog automatisch vertaald met Argos Vertalen.

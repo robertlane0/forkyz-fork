@@ -1,0 +1,4 @@
+- Ondersteuning voor QWERTZ, Colemak en Dvorak toetsenbord indelingen.
+- Aangepaste dagelijkse .puz bron toegevoegd aan downloads.
+
+Changelog automatisch vertaald met Argos Vertalen.

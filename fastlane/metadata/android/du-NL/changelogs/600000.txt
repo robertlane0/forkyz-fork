@@ -1,0 +1,7 @@
+- Cache meta data om het browsen te versnellen (na eerste weergave).
+- Zoom/scroll gedrag opruimen.
+- Voeg menu optie link toe om puzzelbronnen te ondersteunen.
+- Verbeter pijltoets navigatie (incl. bug fixes).
+- Fix crash in surfen toen de laatste puzzel werd verwijderd.
+
+Changelog automatisch vertaald met Argos Vertalen.

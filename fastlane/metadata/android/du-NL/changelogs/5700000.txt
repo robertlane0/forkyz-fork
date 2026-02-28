@@ -1,0 +1,6 @@
+- Render puzzel in (op het scherm) tegels (voor grote roosters en hoge zoomen).
+- Optie om in de puzzellijst aan te geven of puzzel een oplossing heeft (browserinstellingen).
+- Consistentie verbeteringen in statusbalk tonen fouten indicatie.
+- Voeg volledige reeks van opties toe om lijst en notities pagina's aan te geven.
+
+Changelog automatisch vertaald met Argos Vertalen.

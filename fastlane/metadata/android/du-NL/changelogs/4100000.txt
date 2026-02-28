@@ -1,0 +1,5 @@
+- Ondersteuning van achtergrondvormen in IPuz spec (zowel IPuz als JPZ import).
+- Spring naar willekeurige aanwijzing via shake (interactie-instellingen) of stem ("spring").
+- Verwijder Notre Temps Geant Force 2 downloader (geen gewone puzzel).
+
+Changelog automatisch vertaald met Argos Vertalen.

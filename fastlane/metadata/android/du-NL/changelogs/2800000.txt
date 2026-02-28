@@ -1,0 +1,3 @@
+- Fix crash in landschapsmodus.
+
+Changelog automatisch vertaald met Argos Vertalen.

@@ -1,0 +1,7 @@
+- Voeg externe tools menu en instellingen (billthefarer's Crossword solver, woordenboeken, ChatGPT).
+- Voorspel anagramletters in noten (interactie-instellingen).
+- Fix voert wijzigingen richting, Przekroj downloaden, en lezen van de oude datum metadata.
+- Maak het ontleden van sommige puzzelbestanden (JSON) milder.
+- Lege secties wissen bij het verplaatsen/verwijderen van puzzels.
+
+Changelog automatisch vertaald met Argos Vertalen.

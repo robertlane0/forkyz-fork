@@ -1,0 +1,7 @@
+- Reparatie downloaden voor Android 12
+- Notes pagina: lang persbord terwijl anagram bron geselecteerd nu kopieert board naar anagram oplossing.
+- gecorrigeerd snap-to-clue gedrag
+- Onevenheden in tabbladen
+
+
+Changelog automatisch vertaald met Argos Vertalen.

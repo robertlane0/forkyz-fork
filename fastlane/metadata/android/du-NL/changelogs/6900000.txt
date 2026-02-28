@@ -1,0 +1,7 @@
+- Nieuwe downloader dialoog.
+- Zet alle puzzels in de instellingen aan/uit.
+- Volledige overgang van de uiteindelijke app widgets om samen te stellen.
+Fix Everyman delen.
+- Kleine fouten en nieuwe fouten.
+
+Changelog automatisch vertaald met Argos Vertalen.

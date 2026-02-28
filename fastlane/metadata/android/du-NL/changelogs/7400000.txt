@@ -1,0 +1,9 @@
+- Nieuwe downloaders: TF1/Sud Ouest Mots Felches/Croises.
+- Opties voor het tonen van aanwijzingenlijsten/nummers in het display (weergave-instellingen).
+- Laat aanwijzingslijn uit te breiden met aanwijzingsgrootte (weergave instellingen).
+- Lenen Kotwords/xword-dl's slimme deobfuscation voor Everyman decodering.
+- Herschrijf board rendering code in Compose (rapporteer bugs).
+- Kleine fouten en nieuwe fouten.
+- Doel Android 16.
+
+Changelog automatisch vertaald met Argos Vertalen.

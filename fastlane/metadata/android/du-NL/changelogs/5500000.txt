@@ -1,0 +1,6 @@
+- Verander long-press gedrag op de notitiepagina (lang drukken van een widget kopieën naar de momenteel gefocuste widget).
+- Fix UI overlapping die plaatsvond op sommige Android-versies.
+- Fix to-import crash op dubbele bestandsnamen.
+- Voorspel ook anagram tekens als de aanwijzing niet op het bord staat.
+
+Changelog automatisch vertaald met Argos Vertalen.

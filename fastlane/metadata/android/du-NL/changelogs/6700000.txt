@@ -1,0 +1,8 @@
+Beweeg Bladeractiviteit om te componeren.
+- Voeg bevestigingen toe en wijzig standaardwaarden voor swipes op Bladeren.
+- Correcte positionering/rendering van toetsenbord met grotere lettertypen.
+Repareer Everyman schraper.
+- Andere kleinigheden en nieuwe insecten.
+
+
+Changelog automatisch vertaald met Argos Vertalen.

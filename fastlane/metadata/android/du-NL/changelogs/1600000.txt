@@ -1,0 +1,7 @@
+- Eerste ondersteuning voor bar puzzels in IPuz formaat (alleen getest op Square Chase puzzels).
+- Voeg "vlag aanwijzing" functie toe.
+- Voeg hide knop optie voor toetsenbord (goed voor gebarennavigatie).
+- Toon het aantal woorden in de lijst met aanwijzingen wanneer de optie is ingesteld.
+Hercodeer parallelle bewegingsstrategie.
+
+Changelog automatisch vertaald met Argos Vertalen.

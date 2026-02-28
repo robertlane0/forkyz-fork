@@ -1,0 +1,3 @@
+Verwijder "mislukte" melding bij het downloaden van een bestaande puzzel.
+
+Changelog automatisch vertaald met Argos Vertalen.

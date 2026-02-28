@@ -1,16 +1,20 @@
-#!/bin/python
+#!/usr/bin/env -S uv run
+# /// script
+# requires-python = "==3.13.*"
+# dependencies = [
+#   "argostranslate",
+# ]
+# ///
 
 # Convencience script for generating release.html and changes.md from fastlane
 # changelogs.
 #
 # To be run from project root.
 
-import requests
-
 from dataclasses import dataclass
 from pathlib import Path
-#import argostranslate.package
-#import argostranslate.translate
+import argostranslate.package
+import argostranslate.translate
 
 @dataclass
 class Lang:
@@ -91,27 +95,27 @@ def translate_file(
     from_code = source_lang.translate_lang
     to_code = target_lang.translate_lang
 
-    #argostranslate.package.update_package_index()
-    #available_packages = argostranslate.package.get_available_packages()
-    #package_to_install = next(
-    #    filter(
-    #        lambda x: (
-    #            x.from_code == from_code
-    #            and x.to_code == to_code
-    #        ),
-    #        available_packages,
-    #    )
-    #)
-    #argostranslate.package.install_from_path(package_to_install.download())
+    argostranslate.package.update_package_index()
+    available_packages = argostranslate.package.get_available_packages()
+    package_to_install = next(
+        filter(
+            lambda x: (
+                x.from_code == from_code
+                and x.to_code == to_code
+            ),
+            available_packages,
+        )
+    )
+    argostranslate.package.install_from_path(package_to_install.download())
 
-    #translation = argostranslate.translate.translate(
-    #    source_text,
-    #    from_code,
-    #    to_code,
-    #)
+    translation = argostranslate.translate.translate(
+        source_text,
+        from_code,
+        to_code,
+    )
 
-    #with open(target_file, "w") as f:
-    #    f.write(translation)
+    with open(target_file, "w") as f:
+        f.write(translation)
 
 def translate_changelogs():
     for lang in LANGS:

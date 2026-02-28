@@ -1,0 +1,4 @@
+- Iets fijnere controle van meldingen in instellingen.
+Bericht over mislukte downloads.
+
+Changelog automatisch vertaald met Argos Vertalen.

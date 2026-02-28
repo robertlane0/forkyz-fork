@@ -1,0 +1,10 @@
+- Nieuwe puzzels: delen van mycrossword.co.uk, schrapen Guardian Everyman en Quick.
+- Voeg puzzelvorm als standaard rastergrootte toe in het afspeelscherm (weergave-instellingen).
+- Voeg dezelfde rastergrootte opties toe voor landschap als portret (weergave instellingen).
+- Voeg opties toe voor het tonen van twee lijstjes naast elkaar (afspelen instellingen).
+- Toevoegen optie om niet-gevulde cyclus alleen bij vooruit bewegen (interactie-instellingen).
+- Toevoegen optie om richting te veranderen voordat u met pijltjestoetsen (interactie-instellingen).
+- Instellingen importeren/exporteren toevoegen.
+- Verwijder focus indicator van boord op het afspeelscherm bij het gebruik van hardwaretoetsen.
+
+Changelog automatisch vertaald met Argos Vertalen.

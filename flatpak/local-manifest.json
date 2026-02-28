@@ -27,7 +27,7 @@
       "build-commands": [
         "./gradlew clean",
         "./gradlew packageReleaseUberJarForCurrentOS",
-        "install -Dm644 app/build/compose/jars/app.crossword.yourealwaysbe.forkyz-*-release.jar /app/lib/com.gitlab.Hague.forkyz.jar",
+        "install -Dm644 composeApp/build/compose/jars/app.crossword.yourealwaysbe.forkyz-*-release.jar /app/lib/com.gitlab.Hague.forkyz.jar",
         "install -Dm755 flatpak/forkyz.sh /app/bin/forkyz.sh",
         "install -Dm644 flatpak/com.gitlab.Hague.forkyz.desktop /app/share/applications/com.gitlab.Hague.forkyz.desktop",
         "install -Dm644 flatpak/com.gitlab.Hague.forkyz.svg /app/share/icons/hicolor/scalable/apps/com.gitlab.Hague.forkyz.svg",

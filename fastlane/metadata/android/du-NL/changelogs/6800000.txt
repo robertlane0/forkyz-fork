@@ -1,0 +1,6 @@
+- Verwijderdialoog toevoegen.
+- Fix tonen fouten status-bar indicator op oudere Android-versies.
+Reparatie Metro downloads.
+- Beweeg het widget van de lijst om samen te stellen.
+
+Changelog automatisch vertaald met Argos Vertalen.

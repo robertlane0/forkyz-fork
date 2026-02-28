@@ -1,0 +1,3 @@
+- Crash repareren bij starten op sommige apparaten.
+
+Changelog automatisch vertaald met Argos Vertalen.

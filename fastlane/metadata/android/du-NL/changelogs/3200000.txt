@@ -1,0 +1,5 @@
+- Schakel over op Materiaal 3 Thema.
+- Activeer dynamische (Materiaal U) kleuren in instellingen.
+- Revamp instellingen scherm in sub-schermen.
+
+Changelog automatisch vertaald met Argos Vertalen.

@@ -1,0 +1,8 @@
+- AZERTY toetsenbordindeling toevoegen (bedankt Patrik Herbeuval).
+- Voeg TCA JSON parser en LA Times downloader (via Chicago Tribune).
+- Voeg optie voor beweging gedrag aan het einde van de aanwijzing in Clue List.
+- Voeg optie toe om bevestigingsdialoog verwijderen te onderdrukken.
+- Fix Everyman import via share (alweer).
+Krachtdopjes voor native toetsenbord.
+
+Changelog automatisch vertaald met Argos Vertalen.

@@ -1,0 +1,5 @@
+- Fix gebroken autodownloads
+- Add edit clue to notes pagina menu
+- Schuif naar hint gedrag
+
+Changelog automatisch vertaald met Argos Vertalen.

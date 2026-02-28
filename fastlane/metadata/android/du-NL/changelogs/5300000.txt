@@ -1,0 +1,8 @@
+- Update ChatGPT model (bedankt Adam Cole).
+- Voeg "play letter undo stack" (interactie-instellingen, bedankt @jimmylord).
+- Maak vorige aanwijzing respect "Skip complete letters."
+- Wijzig "show errors clue" om alleen verkeerde letters te tonen zoals aangegeven.
+- Verfijn "niet verwijderen kruising" opties (interactie-instellingen).
+- Maak thema een beetje meer "Materiaal 3."
+
+Changelog automatisch vertaald met Argos Vertalen.

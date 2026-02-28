@@ -14,7 +14,7 @@ set changelog-fr fastlane/metadata/android/fr-FR/changelogs/{$forkyz_version}000
 
 nvim $changelog
 git add $changelog
-python scripts/make_release_notes.py
+uv run scripts/make_release_notes.py
 git add $changelog-fr
 nvim gradle.properties
 

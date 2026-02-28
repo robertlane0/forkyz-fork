@@ -1,0 +1,6 @@
+- Filter toevoegen aan puzzellijst
+- Bestanden automatisch importeren uit de map "tot importeren"
+- Infereer enkele metadata uit bestandsnaam indien nodig (ondersteunt standaard xword-dl en Forkyz conventies)
+- Rapporteer ChatGPT foutmeldingen in antwoord
+
+Changelog automatisch vertaald met Argos Vertalen.

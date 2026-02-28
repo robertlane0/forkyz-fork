@@ -1,0 +1,8 @@
+- Import van IPuz-bestanden
+- Gebruik IPuz als backend bestandsformaat in plaats van Across Lite
+- Verwijder HTTP/download systeem acties ten gunste van "open met"
+- Voorkom meerdere gelijktijdige browse activiteiten
+- Vermijd herladen puzzellijst in browse activiteit op verwijderen / verplaatsen, en verlies scroll positie
+- Friendlier import bestandsnamen
+
+Changelog automatisch vertaald met Argos Vertalen.

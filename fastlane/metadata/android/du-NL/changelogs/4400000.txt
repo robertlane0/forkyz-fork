@@ -1,0 +1,4 @@
+- Voeg cyclus op niet-gevulde woorden optie in instellingen.
+- Meerkleurige vlaggen toevoegen (lange persvlag hint op notities of gebruik menu).
+
+Changelog automatisch vertaald met Argos Vertalen.

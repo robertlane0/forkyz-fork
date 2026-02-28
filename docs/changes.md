@@ -1,5 +1,17 @@
 # Forkyz Changelog
 
+## Version 79
+
+- Add Dutch translation (thanks @ojppe).
+- Fix La Croix downloads (was picking wrong puzzle for the date).
+- Move 20 Minutes downloader to new Keesing source and Telegraaf to FortyTwoPuzzles.
+- Support arrow words and cell borders in Keesing IO format.
+- Add "advanced" puzzle source options pages.
+- Replace "auto downloaders" option with "block auto download on day" (advanced puzzle source settings).
+- Put page headings in settings search results.
+- Add option to collapse headings on puzzle list page (browse settings).- Hide some unusable options on Desktop.
+- Add decorations and undecorated setting on Desktop (desktop settings).
+
 ## Version 78
 
 - Add option to split native input responses across cells.

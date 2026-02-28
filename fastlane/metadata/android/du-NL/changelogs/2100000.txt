@@ -1,0 +1,5 @@
+- Laat het aanpassen van automatische downloads, en ondersteuning van oudere apparaten.
+- Breng het eigen toetsenbord terug (uw kilometers kunnen variëren).
+- Wrap terugzetten naar de volgende lijst gedrag voor volgende aanwijzing beweging strategie.
+
+Changelog automatisch vertaald met Argos Vertalen.

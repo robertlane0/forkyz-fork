@@ -1,0 +1,7 @@
+- Voeg compacte optie voor Forkyz toetsenbord (toetsenbordinstellingen).
+- Voeg raster/clue ratio optie voor scherm afspelen (afspelen instellingen).
+- Optionele aanwijzingslijn onder raster toevoegen (afspelen instellingen).
+- Voeg NYT Syndicated downloader en Pzzl.com share-import toe.
+- Doel Android 14, update libs, min versie KitKat nu.
+
+Changelog automatisch vertaald met Argos Vertalen.

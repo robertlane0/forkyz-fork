@@ -1,0 +1,9 @@
+- Steun gekleurde cellen in JPZ en IPuz
+- Ondersteuning bars in JPZ evenals IPuz
+- Ondersteuning HTML in hint/title/etc tekst
+- Speler noten voor hele puzzel evenals gewoon aanwijzing
+- Beperkte ondersteuning voor extra lijstjes (niet alleen over/onder)
+- Sta toe dat cellen die meestal genummerd zijn niet genummerd worden
+
+
+Changelog automatisch vertaald met Argos Vertalen.

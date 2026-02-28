@@ -1,0 +1,3 @@
+- Repareren ongewenste aankondigingen (moet nu expliciet worden ingeschakeld in instellingen).
+
+Changelog automatisch vertaald met Argos Vertalen.

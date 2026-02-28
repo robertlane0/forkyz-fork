@@ -1,0 +1,6 @@
+- Toevoegen "vraag Chat GPT voor hulp" (configureren in interactie-instellingen).
+- Welkom gebruikers van nieuwe versies, met link naar release notes.
+- Voor cellen die niet aan aanwijzingen zijn bevestigd, schakel tussen het selecteren van de cel en alle losse cellen.
+- Voeg Nathan Curtis en Luckystreak XWords toe aan online bronnen pagina.
+
+Changelog automatisch vertaald met Argos Vertalen.

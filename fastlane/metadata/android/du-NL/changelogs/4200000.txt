@@ -1,0 +1,13 @@
+- Nieuwe Forkyz Scanner app ingediend bij FDroid (scant foto's, afbeeldingen, PDF).
+- Voeg show fouten voor voltooide aanwijzingen optie.
+- Add edit hint feature uit het menu van de lijstweergave.
+Haal de download van Hamburger Abendblatt.
+- Verberg show fouten en onthul opties wanneer puzzel heeft geen opgeslagen oplossing.
+- Brighten standaard thema grijs een beetje.
+- Vereenvoudig help / release notes screens met betere thema ondersteuning.
+- Gebruik Materiaal tekst ingangen op plaatsen.
+- Sluiten na externe import om launcher rariteit te voorkomen.
+- Open gedeelde bestanden en toepassing/json.
+- Inheemse toetsenbord verbeteringen moeten werken op meer apparaten.
+
+Changelog automatisch vertaald met Argos Vertalen.

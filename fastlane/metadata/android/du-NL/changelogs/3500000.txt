@@ -1,0 +1,5 @@
+Waarschuw als er geen verbinding is bij het downloaden.
+- Voeg legacy-achtige thema optie.
+- Auto/achtergronddownloaders toestaan om een subselectie te zijn van actieve downloaders.
+
+Changelog automatisch vertaald met Argos Vertalen.

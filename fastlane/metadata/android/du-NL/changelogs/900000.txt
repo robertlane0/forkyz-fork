@@ -1,0 +1,3 @@
+- Bug fix: stel bron en ondersteuning URL goed voor Guardian downloads.
+
+Changelog automatisch vertaald met Argos Vertalen.

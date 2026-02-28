@@ -1,0 +1,8 @@
+- Voeg Franse vertaling toe (bedankt Clem0908).
+- Speciale ingangstoets toevoegen aan ingebouwd toetsenbord.
+- Voeg de instelling toe om board snapping aan de schermrand te draaien (interactie-instellingen).
+- Haal Everyman terug.
+- Repareer kleine UI bugs en verminder board snap hoeveelheid.
+- Backend refactoring, meld insecten.
+
+Changelog automatisch vertaald met Argos Vertalen.

@@ -1,0 +1,6 @@
+- Voeg configureerbare timeout toe aan puzzeldownload.
+- Parallelise downloads.
+- Ondersteuning rebus cellen in AcrossLite (.puz) bestanden.
+- Ondersteuning puzzel intro berichten (in "info") en voltooiing berichten (in volledige dialoog).
+
+Changelog automatisch vertaald met Argos Vertalen.

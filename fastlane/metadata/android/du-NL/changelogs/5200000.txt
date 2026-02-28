@@ -1,0 +1,7 @@
+Maak de volgende aanwijzingsknop.
+- Repareer crash op belasting op Android 7.
+- Fix crash in anagram helper op Android 9 en voorspelling instelling.
+- Fix crash op externe puzzel import.
+- Lees datum en volledige titel in Brains Only formaat.
+
+Changelog automatisch vertaald met Argos Vertalen.

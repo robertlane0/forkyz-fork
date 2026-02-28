@@ -1,0 +1,6 @@
+- Voeg El Pais Experto downloader.
+- Voeg aanvulling deel en voltooiingstijd in millis (bedankt @develinthedetails).
+- Terug pijl toevoegen aan submenu's (bedankt @develsinthedetails).
+- Wijzigingen in backendinstellingenbeheer (rapporteer bugs).
+
+Changelog automatisch vertaald met Argos Vertalen.

@@ -1,0 +1,11 @@
+- Nieuwe dagelijkse download: Hamburger Abendblatt (Duits).
+- Nieuwe dagelijkse download: Le Parisien (Frans).
+- Nieuwe schraper: Przekroj Magazine (Pools), met foto's!
+- Poging om native toetsenbord goed te hanteren (kan nu diacritica en emoji's invoeren).
+- Laat aangepaste download bron in elk ondersteund formaat, niet alleen .puz.
+- Nieuwe ondersteunde importformaten: Raetselzentrale Schwedenratsel JSON, RCI Jeux Mots Fleches JSON, Guardian HTML, Przekroj HTML en JSON.
+- Vernieuwen van online puzzel bronnen lijst.
+- Correcte tekenset voor Across Lite (.puz) versie 2.0 en hoger.
+Delen-URL toevoegen. Zichtbaar bij het delen van aanwijzingen, en kan worden geopend vanuit share menu.
+
+Changelog automatisch vertaald met Argos Vertalen.

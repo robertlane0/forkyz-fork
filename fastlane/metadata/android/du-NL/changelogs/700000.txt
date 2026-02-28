@@ -1,0 +1,7 @@
+- Bestanden importeren uit de opslagruimte.
+- Bijgewerkte hulppagina's, inclusief notities helpen.
+- Lijst van externe bronnen waar puzzels kunnen worden gedownload.
+- Nieuwe standaard toetsenbordmodus verbergt alleen met de achterknop.
+- Aanpassing van zoom/snapgedrag op speelbord.
+
+Changelog automatisch vertaald met Argos Vertalen.

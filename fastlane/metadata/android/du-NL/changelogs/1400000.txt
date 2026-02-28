@@ -1,0 +1,3 @@
+- Bugfixes en bibliotheek updates.
+
+Changelog automatisch vertaald met Argos Vertalen.

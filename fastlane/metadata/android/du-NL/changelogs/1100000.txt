@@ -1,0 +1,4 @@
+- Voeg aanwijzingen en richtingknoppen toe aan het toetsenbord.
+- De auteur van de puzzel tonen op het scherm.
+
+Changelog automatisch vertaald met Argos Vertalen.

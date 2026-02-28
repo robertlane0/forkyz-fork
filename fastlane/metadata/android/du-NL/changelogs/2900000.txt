@@ -1,0 +1,4 @@
+- Dagelijkse downloads van WSJ
+- Washington Post Sunday download (van Martin Herbach)
+
+Changelog automatisch vertaald met Argos Vertalen.

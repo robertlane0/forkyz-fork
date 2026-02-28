@@ -1,0 +1,4 @@
+- Grote back-end rework naar instellingen management en andere delen (rapporteer kwesties).
+- Kleine bug fixes, consistentie verbeteringen, en lichte thema verandering.
+
+Changelog automatisch vertaald met Argos Vertalen.

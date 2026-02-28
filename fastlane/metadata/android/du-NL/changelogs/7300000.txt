@@ -1,0 +1,5 @@
+- Gebruik Compose Navigation voor het verplaatsen tussen pagina's (rapporteer bugs).
+- Repareer crash op Android 10 en lager.
+- Bug fixes (anagrams, jump-to-clue, puzzel zoeken, status bar kleur) en nieuwe bugs.
+
+Changelog automatisch vertaald met Argos Vertalen.

@@ -1,0 +1,4 @@
+- "Pinned" oplossing woord in Hamburger Abendblatt puzzels.
+- Verplaats de optie "Alle woorden tonen" in de lijst naar het menu van de lijst.
+
+Changelog automatisch vertaald met Argos Vertalen.

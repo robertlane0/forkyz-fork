@@ -1,0 +1,13 @@
+- New De Telegraaf en De Standaard downloaders.
+- Nieuw speelscherm voor acrostic puzzels.
+- Streamline board rendering (rapporteer bugs).
+- Wrap long board views in hint lijst en notities.
+- Nieuwe Keesing XML parser.
+- Extra functies BrainsAlleen: omcirkelde dozen, rebus vierkant, puzzel informatie.
+- Aanvullende kenmerken IPuz: aanwijzing labels, elke kruiswoordraadsel soort, acrostisch, "slim" cel indexeren (standaard 0-gebaseerd nu).
+- Aanvullende functies JPZ: steun Alex Boisvert's acrostic extensies.
+- Groepscellen zonder aanknopingspunt om gemakkelijker binnen te komen.
+- Remake app pictogram met Android 13 thema pictogram ondersteuning.
+- Fix scratch mode in hoofdbord weergave en andere bugs.
+
+Changelog automatisch vertaald met Argos Vertalen.

@@ -1,0 +1,10 @@
+- Verbeterde toegankelijkheid: hint/box aankondigingen via TalkBack of text-to-speech.
+- Steun meer puzzel styling (kleuren, stippen/dashes, blokken).
+- Steun meer IPuz stijl functies (plus enkele ontspanningen zoals HTML kleuren).
+- Ondersteuning JPZ "clue" cellen, verplaatsen citaten naar voltooiing bericht.
+- Ondersteuning gestreepte bars in RCI Jeux import, plus meer Franse puzzels (bedankt slock83).
+- Repareer opruimbug voor voltooide puzzels.
+- Display intro op de eerste run, voeg aanvullingsgegevens aan puzzel informatie.
+- Changelog in release notes in help.
+
+Changelog automatisch vertaald met Argos Vertalen.

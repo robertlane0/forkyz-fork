@@ -34,12 +34,8 @@
   <developer_name>Matthew Hague</developer_name>
 
   <releases>
-    <release version="76.0.0" date="2026-01-05">
+    <release version="79.0.0" date="2026-02-28">
       <url type="details">https://hague.gitlab.io/forkyz/changes.html</url>
-      <description>
-        <p>First release of desktop version.</p>
-        <p xml:lang="fr">Première version de la version de bureau.</p>
-      </description>
     </release>
   </releases>
 </component>

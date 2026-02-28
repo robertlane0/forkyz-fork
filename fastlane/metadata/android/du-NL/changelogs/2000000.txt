@@ -1,0 +1,4 @@
+- Verplaats naar puzzel "zones" in plaats van alleen over / neer aanwijzingen, en laat niet-standaard aanwijzing nummers. Ondersteunt bijvoorbeeld spiralen en rijen tuinen in IPuz en JPZ.
+- Haptische feedback optie op het toetsenbord.
+
+Changelog automatisch vertaald met Argos Vertalen.

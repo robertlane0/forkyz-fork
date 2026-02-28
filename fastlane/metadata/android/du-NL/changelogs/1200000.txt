@@ -1,0 +1,3 @@
+- Fix Newsday downloads.
+
+Changelog automatisch vertaald met Argos Vertalen.

@@ -1,0 +1,15 @@
+- Voeg Nederlandse NRC en La Croix kruiswoordpuzzelbronnen toe.
+- Ondersteuning delen import van Crossweird webpagina's.
+- Ondersteuning Claude en Chat GPT voor LLM gebruik (moet opnieuw configureren).
+- Voice commando's optie om de interpretatie met LLM's te verbeteren.
+- Voeg Materiaal groen, blauw en oranje thema's.
+- Toon fouten met een rode doos in plaats van wisselende achtergrond/lettertype kleurveranderingen.
+- Ingebouwd toetsenbord: beweeg speciale ingangstoets naar long-press op veranderingsrichting.
+- Hardware/ingebouwd toetsenbord: act on key down in plaats van up.
+- Verplaats naar het nieuwe menu Materiaal 3 actieknop.
+- Ondersteuning per-app taalinstellingen.
+- Verfijning van de Franse vertaling (bedankt @d-faure, @Clem0908, @Ash Crow)
+- Meer backend herschrijven, fouten herstellen, nieuwe bugs.
+- Oorspronkelijke desktopversie beschikbaar: https://gitlab.com/Hague/forkyz/-/releases
+
+Changelog automatisch vertaald met Argos Vertalen.

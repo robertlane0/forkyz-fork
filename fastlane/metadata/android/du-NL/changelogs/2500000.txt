@@ -1,0 +1,3 @@
+Bugfix release.
+
+Changelog automatisch vertaald met Argos Vertalen.

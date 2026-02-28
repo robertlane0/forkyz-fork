@@ -1,0 +1,6 @@
+- Voicecommando's toevoegen aan puzzelactiviteiten.
+- Downloaders setup nu op de hoogte van verwachte beschikbaarheid tijd van puzzel bronnen.
+- Doel Android 13.
+- Minor UI tweaks.
+
+Changelog automatisch vertaald met Argos Vertalen.

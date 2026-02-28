@@ -1,0 +1,6 @@
+- Toevoegen puzzel ratings functie via puzzel info dialoog.
+- Geef in statusbalk aan wanneer de showfouten actief zijn.
+- Steun de meest recente Hamburger Abendblatt puzzels.
+- Voeg toetsenbordpauze toe aan het einde van undo stack.
+
+Changelog automatisch vertaald met Argos Vertalen.

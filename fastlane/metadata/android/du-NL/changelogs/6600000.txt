@@ -1,0 +1,4 @@
+- Repareer de delete toets op ingebouwde toetsenbord.
+- Proef een robuustere Everyman import van gedeelde URL.
+
+Changelog automatisch vertaald met Argos Vertalen.

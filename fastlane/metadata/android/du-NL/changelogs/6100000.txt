@@ -1,0 +1,10 @@
+- Doel Android 15.
+Metro Quick downloader toevoegen.
+- Herschrijven van instellingen scherm.
+- Toevoegen optie om native invoer te forceren naar bovenste instantie (toetsenbordinstellingen).
+- Toevoegen "gesloten" fit aan het scherm (afspelen instellingen).
+- Long-press to move anagram solution back to source on Notes pagina (focus source first).
+- Tweaks to separators display on board.
+- Kleine fouten en nieuwe fouten.
+
+Changelog automatisch vertaald met Argos Vertalen.

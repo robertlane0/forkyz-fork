@@ -1,0 +1,7 @@
+- Skip letters die niet worden verwijderd bij backspacing
+- Wanneer cyclus ongevulde woorden is ingeschakeld, fiets zowel achteruit als vooruit
+- Detecteer .puz bestanden met "geen oplossing" (d.w.z. alle antwoorden X of alle D)
+- Helderde standaard vlagkleur in nachtmodus
+- Zet de drijvende actieknop op sommige apparaten
+
+Changelog automatisch vertaald met Argos Vertalen.

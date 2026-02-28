@@ -1,0 +1,8 @@
+- PML toevoegen als ondersteund puzzel/share formaat en repareren Metro download.
+- Voeg Irish Times en Guardian Quiptic (bedankt winkelnp) downloaders.
+- Toon geselecteerde aanwijzing in lijst door highlight of radioknop (afspelen instellingen).
+- Display word separators op raster (display instellingen).
+- Voeg 15 squared.net (puzzel) en DuckDuckGo (clue) zoekopdrachten toe aan externe tools.
+
+
+Changelog automatisch vertaald met Argos Vertalen.
