@@ -26,10 +26,10 @@ class SpecialEntryDialogViewModel(
 
     init {
         getBoard()?.getCurrentBox()?.let { box ->
-            if (box.isBlank)
+            if (box.isBlank())
                 _response.value = ""
             else
-                _response.value = box.getResponse()
+                _response.value = box.response
         }
     }
 

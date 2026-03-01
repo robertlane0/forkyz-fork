@@ -513,7 +513,7 @@ open class PuzzlePageViewModel(
             getPuzzle()?.let { puz ->
                 board.getHighlightLetter()?.let { pos ->
                     puz.checkedGetBox(pos)?.let { box ->
-                        if (box.isFlagged())
+                        if (box.isFlagged)
                             board.flagPosition(pos, false)
                         else
                             showFlagCellDialog(pos)

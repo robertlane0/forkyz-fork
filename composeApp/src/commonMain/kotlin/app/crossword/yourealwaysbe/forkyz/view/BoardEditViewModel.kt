@@ -279,13 +279,13 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
         val selected = selectedPositions.contains(position)
         val isError = getIsError(boardEditSettings, box, highlighted, selected)
         if (isError)
-            box.setCheated(true)
+            box.isCheated = true
         val cheated = (
             box.isCheated
             && !boardEditSettings.renderSettings.suppressHintHighlighting
         )
         val marks = if (box.hasMarks()) {
-            box.marks.map { it.toImmutableList() }.toImmutableList()
+            box.marks?.map { it.toImmutableList() }?.toImmutableList()
         } else null
 
         return BoxState(
@@ -294,7 +294,7 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
             isBlock = Box.isBlock(box),
             isBlank = box.isBlank(),
             clueNumber = if (box.hasClueNumber()) box.clueNumber else null,
-            response = box.response ?: Box.BLANK,
+            response = box.response,
             boxColor = if (box.hasColor()) colorFromInt(box.color) else null,
             // bars don't make sense if showing a horizontal clue
             barState = if (clueID == null) getBarState(box) else null,
@@ -311,7 +311,7 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
             ),
             textColor
                 = if (box.hasTextColor()) colorFromInt(box.textColor) else null,
-            shape = if (box.hasShape()) getShape(box.shape) else null,
+            shape = getShape(box),
             isError = isError,
             separators = getSeparators(boardEditSettings, position, clueID),
         )
@@ -328,10 +328,10 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
 
     private fun getBarState(box : Box) : BarState {
         return BarState(
-            top = getBar(box.getBarTop()),
-            bottom = getBar(box.getBarBottom()),
-            left = getBar(box.getBarLeft()),
-            right = getBar(box.getBarRight()),
+            top = getBar(box.barTop),
+            bottom = getBar(box.barBottom),
+            left = getBar(box.barLeft),
+            right = getBar(box.barRight),
             color = if (box.hasBarColor()) colorFromInt(box.barColor) else null,
         )
     }
@@ -427,7 +427,7 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
                 break
         }
 
-        val flagCell = box.isFlagged()
+        val flagCell = box.isFlagged
         val flagCellColor = if (box.isDefaultFlagColor())
             null
         else
@@ -443,8 +443,11 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
         )
     }
 
-    private fun getShape(shape : Box.Shape) : Shape {
-        return when (shape) {
+    private fun getShape(box: Box) : Shape? {
+        if (!box.hasShape())
+            return null
+
+        return when (box.shape) {
             Box.Shape.CIRCLE -> Shape.CIRCLE
             Box.Shape.ARROW_LEFT -> Shape.ARROW_LEFT
             Box.Shape.ARROW_RIGHT -> Shape.ARROW_RIGHT
@@ -464,6 +467,7 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
             Box.Shape.FORWARD_SLASH -> Shape.FORWARD_SLASH
             Box.Shape.BACK_SLASH -> Shape.BACK_SLASH
             Box.Shape.X -> Shape.X
+            else -> null
         }
     }
 
@@ -476,7 +480,7 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
         if (board == null || box.isBlank() || !box.hasSolution())
             return false
 
-        val correct = box.getSolution() == box.getResponse()
+        val correct = box.solution == box.response
         if (correct)
             return false;
 

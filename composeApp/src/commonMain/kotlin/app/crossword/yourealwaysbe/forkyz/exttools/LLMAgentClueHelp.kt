@@ -78,14 +78,14 @@ class LLMClueHelpRequester(
                 if (box != null) {
                     if (!box.isBlank()) {
                         hasResponse = true
-                        responseBuilder.append(box.getResponse())
+                        responseBuilder.append(box.response)
                     } else {
                         responseBuilder.append(blank)
                     }
 
                     if (box.hasSolution()) {
                         hasSolution = true
-                        solutionBuilder.append(box.getSolution())
+                        solutionBuilder.append(box.solution)
                     } else {
                         solutionBuilder.append(blank)
                     }

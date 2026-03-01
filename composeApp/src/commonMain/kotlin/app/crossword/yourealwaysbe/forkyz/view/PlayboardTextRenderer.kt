@@ -304,13 +304,13 @@ object PlayboardTextRenderer {
     ) : String {
         return when {
             box == null -> blankText
-            box.isBlank -> blankText
+            box.isBlank() -> blankText
             else -> box.response
         }
     }
 
     private fun isAllBlank(boxes : Array<Box>) : Boolean {
-        return boxes.all { box -> Box.isBlock(box) || box.isBlank }
+        return boxes.all { box -> Box.isBlock(box) || box.isBlank() }
     }
 
     private fun getShortListName(clue : Clue?) : String {

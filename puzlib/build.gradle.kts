@@ -1,7 +1,7 @@
 
 plugins {
     checkstyle
-    java
+    alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.shadow)
     alias(libs.plugins.versions)
 }
@@ -26,6 +26,12 @@ tasks.test {
 
 tasks.shadowJar {
     relocate("org.json", "app.crossword.yourealwaysbe.org.json")
+    exclude("kotlin/**")
+    exclude("META-INF/kotlin*")
+}
+
+kotlin {
+    jvmToolchain(JavaVersion.VERSION_17.majorVersion.toInt())
 }
 
 tasks.compileJava {

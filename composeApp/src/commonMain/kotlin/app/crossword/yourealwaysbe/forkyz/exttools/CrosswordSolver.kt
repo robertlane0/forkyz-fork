@@ -34,7 +34,7 @@ class CrosswordSolverData(
             for (pos in zone) {
                 val box = puz.checkedGetBox(pos)
                 if (!Box.isBlock(box) && !box.isBlank()) {
-                    request.append(box.getResponse())
+                    request.append(box.response)
                 } else {
                     request.append(".");
                 }

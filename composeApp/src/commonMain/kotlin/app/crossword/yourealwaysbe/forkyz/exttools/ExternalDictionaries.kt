@@ -51,7 +51,7 @@ class ExternalDictionaries {
             val request = StringBuilder()
             for (pos in zone) {
                 puz.checkedGetBox(pos)?.let {
-                    request.append(it.getResponse())
+                    request.append(it.response)
                 }
             }
 

@@ -134,7 +134,7 @@ open class ShareTextData(
                         utils.getString(Res.string.share_clue_blank_box),
                     )
                 } else {
-                    responseText.append(box.getResponse())
+                    responseText.append(box.response)
                 }
             }
             return responseText.toString()
