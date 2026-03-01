@@ -1900,7 +1900,9 @@ public class Playboard {
             Collection<Position> posChanges
                 = wholeBoard ? null : Set.copyOf(getPositionChanges());
             Collection<ClueID> clueEdits = Set.copyOf(getChangedClueIDs());
-            Collection<Object> tags = Collections.singleton(tag);
+            Collection<Object> tags = tag == null
+                ? Collections.emptySet()
+                : Collections.singleton(tag);
 
             PlayboardChanges notificationChanges = new PlayboardChanges(
                 currentWord,
