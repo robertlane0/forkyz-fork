@@ -91,13 +91,17 @@ class ClueListPageViewModel(
     /**
      * General method for any part of a clue tab click
      */
-    fun clueClick(cid : ClueID) {
+    fun clickClueTabs(cid : ClueID) {
         getBoard()?.let { board ->
             board.puzzle.getClue(cid)?.let { clue ->
                 if (clue.hasZone()) {
                     val oldWord = board.getCurrentWord()
-                    if (cid != board.clueID)
-                        board.jumpToClue(clue)
+                    if (cid != board.clueID) {
+                        board.jumpToClue(
+                            clue,
+                            ClueTabsPlayboardTag.NO_SNAP_TO_CLUE,
+                        )
+                    }
                     displayKeyboard(oldWord)
                 }
             }

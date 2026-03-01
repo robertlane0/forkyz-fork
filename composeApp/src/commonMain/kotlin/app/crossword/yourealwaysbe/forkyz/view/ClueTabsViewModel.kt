@@ -26,6 +26,16 @@ import app.crossword.yourealwaysbe.puz.Playboard.Word
 import app.crossword.yourealwaysbe.puz.Position
 
 /**
+ * Tags to attach to Playboard actions to control ClueTab behaviour
+ */
+enum class ClueTabsPlayboardTag {
+    /**
+     * A change that should not result in snapping to a clue
+     */
+    NO_SNAP_TO_CLUE,
+}
+
+/**
  * Indicates that panel should skip to clue on page
  */
 data class SnapToClueEvent(
@@ -217,7 +227,11 @@ class ClueTabsViewModel(
                     currentPages = currentUIState.pages,
                 )
             )
-            if (changes.previousWord != board?.currentWord)
+            val isSnap = (
+                changes.previousWord != board?.currentWord
+                && ClueTabsPlayboardTag.NO_SNAP_TO_CLUE !in changes.tags
+            )
+            if (isSnap)
                 snapToClueIfEnabled()
         }
     }

@@ -32,6 +32,7 @@ import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.view.BoardEditViewModel
+import app.crossword.yourealwaysbe.forkyz.view.ClueTabsPlayboardTag
 import app.crossword.yourealwaysbe.forkyz.view.ClueTabsViewModel
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.ClueID
@@ -280,15 +281,17 @@ class PlayPageViewModel(
             settings.setPlayShowClueTabs(false)
     }
 
-    fun clickClue(cid : ClueID?, previousWord : Word? = null) {
+    fun clickClueTabs(cid : ClueID?, previousWord : Word? = null) {
         if (cid == null)
             return
 
         getBoard()?.let { board ->
             board.puzzle.getClue(cid)?.let { clue ->
                 val word = previousWord ?: board.currentWord
+                // don't snap to a(nother) clue because the user just
+                // clicked on one
                 if (clue.hasZone() && clue.clueID != board.clueID)
-                    board.jumpToClue(clue)
+                    board.jumpToClue(clue, ClueTabsPlayboardTag.NO_SNAP_TO_CLUE)
                 displayKeyboard(word)
             }
         }

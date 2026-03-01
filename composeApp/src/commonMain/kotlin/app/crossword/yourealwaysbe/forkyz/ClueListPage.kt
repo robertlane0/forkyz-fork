@@ -199,7 +199,7 @@ fun ClueListPage(
                 isPortrait = utils.isPortrait,
                 onClueClick = { cid ->
                     boxInputState.requestFocus()
-                    viewModel.clueClick(cid)
+                    viewModel.clickClueTabs(cid)
                 },
                 onClueClickDescription = stringResource(Res.string.select_clue),
                 onClueLongClick = { cid ->
@@ -210,7 +210,7 @@ fun ClueListPage(
                     = stringResource(Res.string.open_clue_notes),
                 onClueBoardClick = { cid ->
                     boxInputState.requestFocus()
-                    viewModel.clueClick(cid)
+                    viewModel.clickClueTabs(cid)
                 },
                 onClueBoardClickDescription
                     = stringResource(Res.string.select_clue),
