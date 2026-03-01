@@ -799,10 +799,14 @@ public class Playboard {
         return false;
     }
 
+    public void jumpToClue(ClueID clueID) {
+        jumpToClue(clueID, null);
+    }
+
     /**
      * Ignored if clue not on board
      */
-    public void jumpToClue(ClueID clueID) {
+    public void jumpToClue(ClueID clueID, Object tag) {
         if (clueID == null)
             return;
 
@@ -820,13 +824,17 @@ public class Playboard {
         if (pos != null) {
             // no need to flag changed words, notifyChange will take
             // care of that
-            notifyChange();
+            notifyChange(tag);
         }
     }
 
     public void jumpToClue(Clue clue) {
+        jumpToClue(clue, null);
+    }
+
+    public void jumpToClue(Clue clue, Object tag) {
         if (clue != null)
-            jumpToClue(clue.getClueID());
+            jumpToClue(clue.getClueID(), tag);
     }
 
     /**
@@ -1868,9 +1876,11 @@ public class Playboard {
         pendingListenerAdditions.add(listener);
     }
 
-    private void notifyChange() { notifyChange(false); }
+    private void notifyChange() { notifyChange(null); }
 
-    private void notifyChange(boolean wholeBoard) {
+    private void notifyChange(Object tag) { notifyChange(false, tag); }
+
+    private void notifyChange(boolean wholeBoard, Object tag) {
         if (notificationDisabledDepth == 0) {
             flagNotifying(true);
 
@@ -1890,6 +1900,7 @@ public class Playboard {
             Collection<Position> posChanges
                 = wholeBoard ? null : Set.copyOf(getPositionChanges());
             Collection<ClueID> clueEdits = Set.copyOf(getChangedClueIDs());
+            Collection<Object> tags = Collections.singleton(tag);
 
             PlayboardChanges notificationChanges = new PlayboardChanges(
                 currentWord,
@@ -1898,7 +1909,8 @@ public class Playboard {
                 posChanges,
                 historyChange,
                 lastHistoryIndex,
-                clueEdits
+                clueEdits,
+                tags
             );
 
             for (PlayboardListener listener : listeners) {
@@ -2293,6 +2305,7 @@ public class Playboard {
         private boolean historyChange;
         private int lastHistoryIndex;
         private Collection<ClueID> changedClueIDs;
+        private Collection<Object> tags;
 
         public PlayboardChanges(
             Word currentWord,
@@ -2301,7 +2314,8 @@ public class Playboard {
             Collection<Position> cellChanges,
             boolean historyChange,
             int lastHistoryIndex,
-            Collection<ClueID> changedClueIDs
+            Collection<ClueID> changedClueIDs,
+            Collection<Object> tags
         ) {
             this.currentWord = currentWord;
             this.previousWord = previousWord;
@@ -2310,6 +2324,7 @@ public class Playboard {
             this.historyChange = historyChange;
             this.lastHistoryIndex = lastHistoryIndex;
             this.changedClueIDs = changedClueIDs;
+            this.tags = tags;
         }
 
         /**
@@ -2354,6 +2369,15 @@ public class Playboard {
          */
         public Collection<ClueID> getChangedClueIDs() { return changedClueIDs; }
 
+        /**
+         * Tags added by external callers of Playboard methods
+         *
+         * To identify which updates were triggered by types of external
+         * calls. Useful in some cases. E.g. so a clue list widget won't
+         * scroll away from a clue that has just been clicked.
+         */
+        public Collection<Object> getTags() { return tags; }
+
         @Override
         public String toString() {
             return "currentWord = " + currentWord
@@ -2362,7 +2386,8 @@ public class Playboard {
                 + ", cellChanges = " + cellChanges
                 + ", historyChange = " + historyChange
                 + ", lastHistoryIndex = " + lastHistoryIndex
-                + ", changedClueIDs = " + changedClueIDs;
+                + ", changedClueIDs = " + changedClueIDs
+                + ", tags = " + tags;
         }
     }
 
