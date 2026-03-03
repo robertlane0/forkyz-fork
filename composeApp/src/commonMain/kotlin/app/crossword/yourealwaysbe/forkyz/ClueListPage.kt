@@ -65,6 +65,7 @@ fun ClueListPage(
     themeHelper : ThemeHelper,
     utils : NativeFrontendUtils,
     pageOpener : PageOpener,
+    isTop : Boolean,
 ) {
     PuzzlePage(
         viewModel = viewModel,
@@ -254,8 +255,9 @@ fun ClueListPage(
                     VoiceButtons()
                     Keyboard()
 
-                    LaunchedEffect(Unit) {
-                        boxInputState.requestFocus()
+                    LaunchedEffect(isTop) {
+                        if (isTop)
+                            boxInputState.requestFocus()
                     }
                 }
             }

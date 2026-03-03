@@ -109,6 +109,7 @@ fun NotesPage(
     themeHelper : ThemeHelper,
     utils : NativeFrontendUtils,
     pageOpener : PageOpener,
+    isTop : Boolean,
 ) {
     PuzzlePage(
         viewModel = viewModel,
@@ -359,9 +360,11 @@ fun NotesPage(
                     = stringResource(Res.string.transfer_board_to_focussed_view),
             )
 
-            LaunchedEffect(Unit) {
-                boxInputState.requestFocus()
-                setFocussedEntry(NoteEntry.BOARD, true)
+            LaunchedEffect(isTop) {
+                if (isTop) {
+                    boxInputState.requestFocus()
+                    setFocussedEntry(NoteEntry.BOARD, true)
+                }
             }
         }
 

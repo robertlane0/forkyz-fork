@@ -191,6 +191,7 @@ fun BrowsePage(
     themeHelper : ThemeHelper,
     utils : NativeFrontendUtils,
     pageOpener : PageOpener,
+    isTop : Boolean,
 ) {
     fun startLoadPuzzleList(archive : Boolean) {
         viewModel.startLoadPuzzleList(archive)
@@ -973,8 +974,9 @@ fun BrowsePage(
         puzzleListState : LazyListState,
     ) {
         val requester = remember { FocusRequester() }
-        LaunchedEffect(Unit) {
-            requester.requestFocus()
+        LaunchedEffect(isTop) {
+            if (isTop)
+                requester.requestFocus()
         }
         Box(modifier) {
             Column(Modifier.fillMaxWidth().fillMaxHeight()) {

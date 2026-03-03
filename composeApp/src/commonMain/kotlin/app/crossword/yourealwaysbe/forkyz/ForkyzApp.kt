@@ -8,13 +8,21 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 import org.jetbrains.compose.resources.stringResource
 
@@ -29,6 +37,7 @@ import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
 import app.crossword.yourealwaysbe.forkyz.util.NativeFrontendUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
+import app.crossword.yourealwaysbe.forkyz.util.stateInSubscribed
 import app.crossword.yourealwaysbe.forkyz.util.toUri
 import app.crossword.yourealwaysbe.puz.ClueID
 
@@ -104,6 +113,15 @@ fun ForkyzApp(
 }
 
 @Composable
+inline fun <reified T : Any> isTopState(
+    navController : NavController,
+) : Flow<Boolean> {
+    return navController.currentBackStackEntryFlow.map { entry ->
+        entry.destination.hasRoute(T::class)
+    }
+}
+
+@Composable
 private fun ForkyzAppMain(
     themeHelper : ThemeHelper,
     utils : NativeFrontendUtils,
@@ -142,29 +160,38 @@ private fun ForkyzAppMain(
     NavHost(navController, startDestination = Browse) {
         composable<Browse> {
             val viewModel = koinViewModel<BrowsePageViewModel>()
+            val isTop by isTopState<Browse>(navController)
+                .collectAsStateWithLifecycle(false)
             BrowsePage(
                 viewModel = viewModel,
                 themeHelper = themeHelper,
                 utils = utils,
                 pageOpener = pageOpener,
+                isTop = true,
             )
         }
         composable<Play> {
             val viewModel = koinViewModel<PlayPageViewModel>()
+            val isTop by isTopState<Play>(navController)
+                .collectAsStateWithLifecycle(false)
             PlayPage(
                 viewModel = viewModel,
                 themeHelper = themeHelper,
                 utils = utils,
                 pageOpener = pageOpener,
+                isTop = isTop,
             )
         }
         composable<ClueList> {
             val viewModel = koinViewModel<ClueListPageViewModel>()
+            val isTop by isTopState<ClueList>(navController)
+                .collectAsStateWithLifecycle(false)
             ClueListPage(
                 viewModel = viewModel,
                 themeHelper = themeHelper,
                 utils = utils,
                 pageOpener = pageOpener,
+                isTop = isTop,
             )
         }
         composable<Notes> { backStackEntry ->
@@ -176,11 +203,14 @@ private fun ForkyzAppMain(
             val viewModel = koinViewModel<NotesPageViewModel>(
                 parameters = { parametersOf(cid) }
             )
+            val isTop by isTopState<Notes>(navController)
+                .collectAsStateWithLifecycle(false)
             NotesPage(
                 viewModel = viewModel,
                 themeHelper = themeHelper,
                 utils = utils,
                 pageOpener = pageOpener,
+                isTop = isTop,
             )
         }
         composable<Settings> {

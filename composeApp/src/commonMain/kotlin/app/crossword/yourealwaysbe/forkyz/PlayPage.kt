@@ -96,6 +96,7 @@ fun PlayPage(
     themeHelper : ThemeHelper,
     utils : NativeFrontendUtils,
     pageOpener : PageOpener,
+    isTop : Boolean,
 ) {
     val boardEditState = rememberBoardEditState()
 
@@ -407,8 +408,9 @@ fun PlayPage(
                     = stringResource(Res.string.open_clue_notes),
             )
 
-            LaunchedEffect(Unit) {
-                boardEditState.requestFocus()
+            LaunchedEffect(isTop) {
+                if (isTop)
+                    boardEditState.requestFocus()
             }
         }
 
