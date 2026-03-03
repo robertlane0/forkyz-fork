@@ -1453,15 +1453,27 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveRatingsSettings : Flow<RatingsSettings>
         = settingsMap(this::makeRatingSettings)
 
-    val liveClueListSnapToClue : Flow<Boolean>
-        = settingsMap { it.snapClue }
+    val liveClueListSnapClueMode : Flow<SnapClueMode>
+        = settingsMap { it.snapClueMode }
 
-    fun getClueListSnapToClue(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.snapClue }
+    fun getClueListSnapClueMode(cb : (SnapClueMode) -> Unit)
+        = settingsOnce(cb) { it.snapClueMode }
 
-    fun setClueListSnapToClue(value : Boolean) {
+    fun setClueListSnapClueMode(value : SnapClueMode) {
         settingsUpdate { settings ->
-            settings.copy(snapClue = value)
+            settings.copy(snapClueMode = value)
+        }
+    }
+
+    val liveHighlightCrossingClue : Flow<Boolean>
+        = settingsMap { it.highlightCrossingClue }
+
+    fun getHighlightCrossingClue(cb : (Boolean) -> Unit)
+        = settingsOnce(cb) { it.highlightCrossingClue }
+
+    fun setHighlightCrossingClue(value : Boolean) {
+        settingsUpdate { settings ->
+            settings.copy(highlightCrossingClue = value)
         }
     }
 
@@ -2453,8 +2465,40 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         )
         run(
             "snapClue",
-            { s, key -> json.put(key, s.snapClue) },
-            { key -> json.ifHasBoolean(key) { setClueListSnapToClue(it) } },
+            { _, _ -> },
+            { key ->
+                json.ifHasBoolean(key) {
+                    if (it) {
+                        setClueListSnapClueMode(SnapClueMode.SCM_CLUE)
+                    }
+                }
+            },
+        )
+        run(
+            "snapClueMode",
+            { s, key -> json.put(key, s.snapClueMode.toString()) },
+            { key ->
+               json.ifHasString(key) {
+                   try {
+                       setClueListSnapClueMode(
+                           SnapClueMode.valueOf(it),
+                       )
+                   } catch (e : IllegalArgumentException) {
+                       // ignore
+                   }
+               }
+            },
+        )
+        run(
+            "highlightCrossingClue",
+            { s, key ->
+                json.put(key, s.highlightCrossingClue)
+            },
+            { key ->
+                json.ifHasBoolean(key) {
+                    setHighlightCrossingClue(it)
+                }
+            },
         )
         run(
             "sort",
