@@ -118,24 +118,45 @@ fun ClueTabs(
     onPageChange : (Int, Int) -> Unit = { _, _ -> },
 ) {
     @Composable
-    fun Modifier.clueItemBackground(clueSelected : Boolean) : Modifier {
+    fun Modifier.clueItemBackground(
+        clueSelected : Boolean,
+        crossingSelected : Boolean,
+    ) : Modifier {
         val state by viewModel.uiState.collectAsStateWithLifecycle()
         val highlightSelectedBackground by remember {
             derivedStateOf { state.highlightSelectedBackground }
         }
+        val highlightCrossingClue by remember {
+            derivedStateOf { state.highlightCrossingClue }
+        }
         if (highlightSelectedBackground && clueSelected)
             return this.background(MaterialTheme.colorScheme.secondaryContainer)
+        else if (highlightSelectedBackground && highlightCrossingClue
+            && crossingSelected
+        )
+            return this.background(
+                MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5F)
+            )
         else
             return this
     }
 
     @Composable
-    fun clueItemForeground(clueSelected : Boolean) : Color {
+    fun clueItemForeground(
+        clueSelected : Boolean,
+        crossingSelected : Boolean,
+    ) : Color {
         val state by viewModel.uiState.collectAsStateWithLifecycle()
         val highlightSelectedBackground by remember {
             derivedStateOf { state.highlightSelectedBackground }
         }
-        if (highlightSelectedBackground && clueSelected)
+        val highlightCrossingClue by remember {
+            derivedStateOf { state.highlightCrossingClue }
+        }
+        val isCrossingHighlighted = highlightCrossingClue && crossingSelected
+        if (highlightSelectedBackground
+            && (clueSelected || isCrossingHighlighted)
+        )
             return MaterialTheme.colorScheme.onSecondaryContainer
         else
             return MaterialTheme.colorScheme.onSurface
@@ -152,7 +173,7 @@ fun ClueTabs(
                     onClickLabel = onClueClickDescription,
                     onLongClick = { onClueLongClick(clue.cid) },
                     onLongClickLabel = onClueLongClickDescription,
-                ).clueItemBackground(clue.selected)
+                ).clueItemBackground(clue.selected, clue.crossingSelected)
         ) {
             with (LocalDensity.current) {
                 Box(
@@ -195,7 +216,9 @@ fun ClueTabs(
                             text = remember(clue.text) {
                                 htmlToAnnotatedString(clue.text)
                             },
-                            color = clueItemForeground(clue.selected),
+                            color = clueItemForeground(
+                                clue.selected, clue.crossingSelected,
+                            ),
                         )
 
                         val state by viewModel.uiState

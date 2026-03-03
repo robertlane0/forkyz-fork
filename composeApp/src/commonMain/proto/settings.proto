@@ -52,6 +52,12 @@ enum DisplaySeparators {
     DS_SELECTED = 2;
 }
 
+enum SnapClueMode {
+    SCM_OFF = 0;
+    SCM_CLUE = 1;
+    SCM_CROSSING = 2;
+}
+
 enum ExternalDictionarySetting {
     EDS_FREE = 0;
     EDS_NONE = 1;
@@ -209,7 +215,7 @@ message Settings {
     bool showTimer = 110;
     bool showWordsInClueList = 111;
     bool skipFilled = 112;
-    bool snapClue = 113;
+    SnapClueMode snapClueMode = 113;
     AccessorSetting sort = 114;
     bool spaceChangesDirection = 115;
     StorageLocation storageLocation = 116;
@@ -244,6 +250,7 @@ message Settings {
     bool undecorated = 154;
     bool downloadRememberDate = 155;
     string downloadLastSelectedDate = 156;
+    bool highlightCrossingClue = 157;
 
     // defunct settings
     repeated string autoDownloaders = 5;

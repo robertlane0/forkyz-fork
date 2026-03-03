@@ -381,8 +381,13 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.regular_sized
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.release_notes
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.scraper_sources
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.scraper_sources_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.highlight_crossing_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.highlight_crossing_clue_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.scroll_to_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.scroll_to_clue_crossing
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.scroll_to_clue_current
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.scroll_to_clue_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.scroll_to_clue_off
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.select_sources
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.select_sources_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.settings_label
@@ -461,6 +466,7 @@ import app.crossword.yourealwaysbe.forkyz.settings.KeyboardLayout
 import app.crossword.yourealwaysbe.forkyz.settings.KeyboardMode
 import app.crossword.yourealwaysbe.forkyz.settings.LLMAgent
 import app.crossword.yourealwaysbe.forkyz.settings.MovementStrategySetting
+import app.crossword.yourealwaysbe.forkyz.settings.SnapClueMode
 import app.crossword.yourealwaysbe.forkyz.settings.Orientation
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation
 import app.crossword.yourealwaysbe.forkyz.settings.Theme
@@ -1943,12 +1949,35 @@ class SettingsPageViewModel(
                 settings.livePlayEnsureVisible.stateInHere(),
                 settings::setPlayEnsureVisible,
             ),
-            SettingsBoolean(
+            SettingsList<SnapClueMode>(
                 SettingsPage.INTERACTION,
                 Res.string.scroll_to_clue,
                 Res.string.scroll_to_clue_desc,
-                settings.liveClueListSnapToClue.stateInHere(),
-                settings::setClueListSnapToClue,
+                listOf(
+                    SettingsListEntry(
+                        Res.string.scroll_to_clue_off,
+                        SnapClueMode.SCM_OFF,
+                    ),
+                    SettingsListEntry(
+                        Res.string.scroll_to_clue_current,
+                        SnapClueMode.SCM_CLUE,
+                    ),
+                    SettingsListEntry(
+                        Res.string.scroll_to_clue_crossing,
+                        SnapClueMode.SCM_CROSSING,
+                    ),
+                ),
+                settings.liveClueListSnapClueMode.stateInHere(
+                    SnapClueMode.SCM_OFF,
+                ),
+                settings::setClueListSnapClueMode,
+            ),
+            SettingsBoolean(
+                SettingsPage.INTERACTION,
+                Res.string.highlight_crossing_clue,
+                Res.string.highlight_crossing_clue_desc,
+                settings.liveHighlightCrossingClue.stateInHere(),
+                settings::setHighlightCrossingClue,
             ),
             SettingsList<MovementStrategySetting>(
                 SettingsPage.INTERACTION,

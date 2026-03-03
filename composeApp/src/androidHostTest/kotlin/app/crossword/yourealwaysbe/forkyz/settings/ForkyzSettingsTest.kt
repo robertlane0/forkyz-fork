@@ -183,7 +183,8 @@ class ForkyzSettingsTest {
         showTimer = false,
         showWordsInClueList = false,
         skipFilled = false,
-        snapClue = false,
+        snapClueMode = SnapClueMode.SCM_OFF,
+        highlightCrossingClue = false,
         sort = AccessorSetting.AS_DATE_DESC,
         spaceChangesDirection = true,
         storageLocation = StorageLocation.SL_INTERNAL,
@@ -328,7 +329,8 @@ class ForkyzSettingsTest {
         showTimer = true,
         showWordsInClueList = true,
         skipFilled = true,
-        snapClue = true,
+        snapClueMode = SnapClueMode.SCM_CROSSING,
+        highlightCrossingClue = true,
         sort = AccessorSetting.AS_DATE_ASC,
         spaceChangesDirection = false,
         storageLocation = StorageLocation.SL_EXTERNAL_SAF,
@@ -395,6 +397,8 @@ class ForkyzSettingsTest {
         downloadLastSelectedDate = "",
         downloadRememberDate = false,
         undecorated = false,
+        snapClueMode = SnapClueMode.SCM_CLUE,
+        highlightCrossingClue = false,
     )
 
     @ExperimentalCoroutinesApi

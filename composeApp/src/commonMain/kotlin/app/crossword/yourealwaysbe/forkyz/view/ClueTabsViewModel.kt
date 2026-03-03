@@ -14,6 +14,7 @@ import app.crossword.yourealwaysbe.forkyz.settings.ClueHighlight
 import app.crossword.yourealwaysbe.forkyz.settings.ClueTabsDouble
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.RenderSettings
+import app.crossword.yourealwaysbe.forkyz.settings.SnapClueMode
 import app.crossword.yourealwaysbe.forkyz.util.MediatedStateWithFlow
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.addAlpha
@@ -57,6 +58,7 @@ data class ClueItem(
     val flagColor : Int?,
     val filled : Boolean,
     val selected : Boolean,
+    val crossingSelected : Boolean,
     val word : Word?,
 )
 
@@ -86,6 +88,7 @@ data class ClueTabsState(
     val panePages : List<Int> = listOf(0, 1),
     val highlightSelectedRadio : Boolean = true,
     val highlightSelectedBackground : Boolean = false,
+    val highlightCrossingClue : Boolean = false,
     val snapToClueEvent : SnapToClueEvent? = null,
     val renderSettings : RenderSettings = RenderSettings(),
     val scratchMode : Boolean = false,
@@ -113,6 +116,7 @@ private data class ClueTabsDisplaySettings(
     val clueTabsDouble : ClueTabsDouble,
     val showWords : Boolean,
     val clueHighlight : ClueHighlight,
+    val highlightCrossingClue : Boolean,
     val renderSettings : RenderSettings,
     val showCount : Boolean,
 )
@@ -140,13 +144,22 @@ class ClueTabsViewModel(
                     settings.liveClueListClueTabsDouble,
                     settings.liveClueListShowWords,
                     settings.livePlayClueHighlight,
+                    settings.liveHighlightCrossingClue,
                     settings.livePlayRenderSettings,
-                    settings.livePlayShowCount,
-                    ::ClueTabsDisplaySettings,
-                ),
+                ) { double, words, highlight, crossingHL, render ->
+                    ClueTabsDisplaySettings(
+                        double, words, highlight, crossingHL, render,
+                        false,
+                    )
+                },
+                settings.livePlayShowCount,
                 settings.livePlayScratchMode,
-                ::ClueTabsSettings,
-            ),
+            ) { display, showCount, scratchMode ->
+                ClueTabsSettings(
+                    display.copy(showCount = showCount),
+                    scratchMode,
+                )
+            },
         )
     val uiState : StateFlow<ClueTabsState> = mediatedUIState.stateFlow
 
@@ -227,8 +240,11 @@ class ClueTabsViewModel(
                     currentPages = currentUIState.pages,
                 )
             )
+            val positionChanged
+                = changes.previousPosition != board?.highlightLetter
             val isSnap = (
-                changes.previousWord != board?.currentWord
+                (changes.previousWord != board?.currentWord
+                    || positionChanged)
                 && ClueTabsPlayboardTag.NO_SNAP_TO_CLUE !in changes.tags
             )
             if (isSnap)
@@ -279,10 +295,23 @@ class ClueTabsViewModel(
      * @return page number snapped to or -1 if no change
      */
     fun snapToClue(showPageNum : Int = -1, replacePageNum : Int = -1) : Int {
-        val cid = board?.clueID
-        if (cid == null)
-            return -1
+        return snapToClueId(
+            board?.clueID ?: return -1,
+            showPageNum,
+            replacePageNum,
+        )
+    }
 
+    /**
+     * Snap to a specific clue by ID
+     *
+     * @return page number snapped to or -1 if no change
+     */
+    private fun snapToClueId(
+        cid : ClueID,
+        showPageNum : Int = -1,
+        replacePageNum : Int = -1,
+    ) : Int {
         val listName = cid.listName
         if (listName == null)
             return -1
@@ -310,12 +339,13 @@ class ClueTabsViewModel(
         val listShown1
             = isDouble && (curPage1 == pageNum || curPage1 == historyPageNum)
 
-        var isHistory = curPage0 == historyPageNum || curPage1 == historyPageNum
+        var isHistory = historyIndex >= 0
+            && (curPage0 == historyPageNum || curPage1 == historyPageNum)
 
         if (!listShown0 && !listShown1) {
             setPage(0, pageNum)
             listShown0 = true
-            isHistory = pageNum == historyPageNum
+            isHistory = historyIndex >= 0 && pageNum == historyPageNum
         }
 
         currentUIState = currentUIState.copy(
@@ -364,6 +394,8 @@ class ClueTabsViewModel(
             doubleMode = clueTabsSettings.displaySettings.clueTabsDouble,
             highlightSelectedRadio = highlightSelectedRadio,
             highlightSelectedBackground = highlightSelectedBackground,
+            highlightCrossingClue
+                = clueTabsSettings.displaySettings.highlightCrossingClue,
             renderSettings = clueTabsSettings.displaySettings.renderSettings,
             scratchMode = clueTabsSettings.scratchMode,
         )
@@ -464,6 +496,20 @@ class ClueTabsViewModel(
         }
     }
 
+    /**
+     * Get the crossing clue ID for the current board position
+     *
+     * Returns the first clue at the current cell that is not the
+     * currently selected clue, or null if there is no crossing clue.
+     */
+    private fun getCrossingClueID() : ClueID? {
+        val board = board ?: return null
+        val currentCid = board.clueID ?: return null
+        val box = board.currentBox ?: return null
+        return box.getIsPartOfClues()
+            .firstOrNull { it != currentCid }
+    }
+
     private suspend fun updateClueItemIfNeeded(
         cid: ClueID,
         existingItem : ClueItem,
@@ -473,14 +519,20 @@ class ClueTabsViewModel(
     ): ClueItem {
         val currentWordCid = changes.currentWord?.clueID
         val previousWordCid = changes.previousWord?.clueID
+        val crossingCid = getCrossingClueID()
         val needsSelectedUpdate
             = cid == currentWordCid || cid == previousWordCid
+        val needsCrossingUpdate
+            = cid == crossingCid || existingItem.crossingSelected
         val needsRecalculation = changedClueIDs.contains(cid)
 
         return if (needsRecalculation) {
             getClueItem(cid = cid, showDirection = showDirection)
-        } else if (needsSelectedUpdate) {
-            existingItem.copy(selected = cid == currentWordCid)
+        } else if (needsSelectedUpdate || needsCrossingUpdate) {
+            existingItem.copy(
+                selected = cid == currentWordCid,
+                crossingSelected = cid == crossingCid,
+            )
         } else {
             existingItem
         }
@@ -499,6 +551,7 @@ class ClueTabsViewModel(
             flagColor = null,
             filled = false,
             selected = false,
+            crossingSelected = false,
             word = null,
         )
     }
@@ -527,6 +580,7 @@ class ClueTabsViewModel(
             flagColor = flagColor,
             filled = board?.isFilledClueID(clue.clueID) ?: false,
             selected = clue.clueID == board?.puzzle?.currentClueID,
+            crossingSelected = clue.clueID == getCrossingClueID(),
             word = board?.getClueWord(clue.clueID),
         )
     }
@@ -564,9 +618,19 @@ class ClueTabsViewModel(
      * Snap to clue if settings ask for it
      */
     private fun snapToClueIfEnabled() {
-        settings.getClueListSnapToClue { snapToClue ->
-            if (snapToClue)
-                snapToClue()
+        settings.getClueListSnapClueMode { mode ->
+            when (mode) {
+                SnapClueMode.SCM_OFF -> { }
+                SnapClueMode.SCM_CLUE -> snapToClue()
+                SnapClueMode.SCM_CROSSING -> {
+                    val crossingCid = getCrossingClueID()
+                    if (crossingCid != null) {
+                        snapToClueId(crossingCid)
+                    } else {
+                        snapToClue()
+                    }
+                }
+            }
         }
     }
 

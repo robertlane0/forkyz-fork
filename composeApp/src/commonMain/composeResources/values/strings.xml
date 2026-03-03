@@ -520,7 +520,12 @@
     <string name="random_clue_on_shake">Random Clue on Shake</string>
     <string name="random_clue_on_shake_desc">Jump to a random unfilled clue when shake detected in main puzzle activity.</string>
     <string name="scroll_to_clue">Scroll To Clue</string>
-    <string name="scroll_to_clue_desc">Toggles auto-scrolling to the selected clue in the clues list. (Works like Shortyz 1.)</string>
+    <string name="scroll_to_clue_desc">Auto-scroll the clue list when the selected word changes.</string>
+    <string name="scroll_to_clue_off">Off</string>
+    <string name="scroll_to_clue_current">Current clue</string>
+    <string name="scroll_to_clue_crossing">Crossing clue</string>
+    <string name="highlight_crossing_clue">Highlight Crossing Clue</string>
+    <string name="highlight_crossing_clue_desc">Highlight the crossing clue in the clue list with a background color.</string>
     <string name="skip_filled">Skip Filled Boxes</string>
     <string name="skip_filled_desc">Toggles the skipping of filled boxes when you enter a new letter.</string>
     <string name="snap_current">Snap to Current Word</string>

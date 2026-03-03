@@ -557,7 +557,9 @@ fun migratePreferences(
         settings.setPlaySkipFilled(it)
     }
     getBoolean(prefs, "snapClue")?.let {
-        settings.setClueListSnapToClue(it)
+        if (it) {
+            settings.setClueListSnapClueMode(SnapClueMode.SCM_CLUE)
+        }
     }
     getInt(prefs, "sort")?.let {
         settings.setBrowseSort(
