@@ -1465,13 +1465,10 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         }
     }
 
-    val liveHighlightCrossingClue : Flow<Boolean>
+    val liveClueListHighlightCrossingClue : Flow<Boolean>
         = settingsMap { it.highlightCrossingClue }
 
-    fun getHighlightCrossingClue(cb : (Boolean) -> Unit)
-        = settingsOnce(cb) { it.highlightCrossingClue }
-
-    fun setHighlightCrossingClue(value : Boolean) {
+    fun setClueListHighlightCrossingClue(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(highlightCrossingClue = value)
         }
@@ -2234,6 +2231,15 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             },
         )
         run(
+            "highlightCrossingClue",
+            { s, key -> json.put(key, s.highlightCrossingClue) },
+            { key ->
+                json.ifHasBoolean(key) {
+                    setClueListHighlightCrossingClue(it)
+                }
+            },
+        )
+        run(
             "indicateShowErrors",
             { s, key -> json.put(key, s.indicateShowErrors) },
             { key ->
@@ -2480,24 +2486,11 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             { key ->
                json.ifHasString(key) {
                    try {
-                       setClueListSnapClueMode(
-                           SnapClueMode.valueOf(it),
-                       )
+                       setClueListSnapClueMode(SnapClueMode.valueOf(it))
                    } catch (e : IllegalArgumentException) {
                        // ignore
                    }
                }
-            },
-        )
-        run(
-            "highlightCrossingClue",
-            { s, key ->
-                json.put(key, s.highlightCrossingClue)
-            },
-            { key ->
-                json.ifHasBoolean(key) {
-                    setHighlightCrossingClue(it)
-                }
             },
         )
         run(

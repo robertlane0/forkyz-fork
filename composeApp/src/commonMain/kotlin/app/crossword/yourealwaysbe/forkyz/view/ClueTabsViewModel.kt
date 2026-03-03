@@ -144,7 +144,7 @@ class ClueTabsViewModel(
                     settings.liveClueListClueTabsDouble,
                     settings.liveClueListShowWords,
                     settings.livePlayClueHighlight,
-                    settings.liveHighlightCrossingClue,
+                    settings.liveClueListHighlightCrossingClue,
                     settings.livePlayRenderSettings,
                 ) { double, words, highlight, crossingHL, render ->
                     ClueTabsDisplaySettings(
@@ -243,8 +243,7 @@ class ClueTabsViewModel(
             val positionChanged
                 = changes.previousPosition != board?.highlightLetter
             val isSnap = (
-                (changes.previousWord != board?.currentWord
-                    || positionChanged)
+                (changes.previousWord != board?.currentWord || positionChanged)
                 && ClueTabsPlayboardTag.NO_SNAP_TO_CLUE !in changes.tags
             )
             if (isSnap)

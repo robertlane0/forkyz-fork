@@ -129,23 +129,19 @@ fun ClueTabs(
         val highlightCrossingClue by remember {
             derivedStateOf { state.highlightCrossingClue }
         }
-        if (highlightSelectedBackground && clueSelected)
+        if (highlightSelectedBackground && clueSelected) {
             return this.background(MaterialTheme.colorScheme.secondaryContainer)
-        else if (highlightSelectedBackground && highlightCrossingClue
-            && crossingSelected
-        )
+        } else if (highlightCrossingClue && crossingSelected) {
             return this.background(
-                MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5F)
+                MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5F),
             )
-        else
+        } else {
             return this
+        }
     }
 
     @Composable
-    fun clueItemForeground(
-        clueSelected : Boolean,
-        crossingSelected : Boolean,
-    ) : Color {
+    fun clueItemForeground(clue : ClueItem) : Color {
         val state by viewModel.uiState.collectAsStateWithLifecycle()
         val highlightSelectedBackground by remember {
             derivedStateOf { state.highlightSelectedBackground }
@@ -153,13 +149,16 @@ fun ClueTabs(
         val highlightCrossingClue by remember {
             derivedStateOf { state.highlightCrossingClue }
         }
-        val isCrossingHighlighted = highlightCrossingClue && crossingSelected
-        if (highlightSelectedBackground
-            && (clueSelected || isCrossingHighlighted)
-        )
+        val isCrossingHighlighted
+            = highlightCrossingClue && clue.crossingSelected
+        if (
+            (highlightSelectedBackground && clue.selected)
+            || isCrossingHighlighted
+        ) {
             return MaterialTheme.colorScheme.onSecondaryContainer
-        else
+        } else {
             return MaterialTheme.colorScheme.onSurface
+        }
     }
 
     @Composable
@@ -216,9 +215,7 @@ fun ClueTabs(
                             text = remember(clue.text) {
                                 htmlToAnnotatedString(clue.text)
                             },
-                            color = clueItemForeground(
-                                clue.selected, clue.crossingSelected,
-                            ),
+                            color = clueItemForeground(clue)
                         )
 
                         val state by viewModel.uiState

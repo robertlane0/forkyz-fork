@@ -1814,6 +1814,13 @@ class SettingsPageViewModel(
                 ),
                 settings::setPlayClueHighlight,
             ),
+            SettingsBoolean(
+                SettingsPage.DISPLAY,
+                Res.string.highlight_crossing_clue,
+                Res.string.highlight_crossing_clue_desc,
+                settings.liveClueListHighlightCrossingClue.stateInHere(),
+                settings::setClueListHighlightCrossingClue,
+            ),
 
             // Keyboard
             SettingsList<KeyboardMode>(
@@ -1971,13 +1978,6 @@ class SettingsPageViewModel(
                     SnapClueMode.SCM_OFF,
                 ),
                 settings::setClueListSnapClueMode,
-            ),
-            SettingsBoolean(
-                SettingsPage.INTERACTION,
-                Res.string.highlight_crossing_clue,
-                Res.string.highlight_crossing_clue_desc,
-                settings.liveHighlightCrossingClue.stateInHere(),
-                settings::setHighlightCrossingClue,
             ),
             SettingsList<MovementStrategySetting>(
                 SettingsPage.INTERACTION,
