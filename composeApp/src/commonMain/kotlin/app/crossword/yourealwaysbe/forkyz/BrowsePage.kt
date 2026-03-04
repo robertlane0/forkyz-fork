@@ -157,6 +157,7 @@ import app.crossword.yourealwaysbe.forkyz.settings.AccessorSetting
 import app.crossword.yourealwaysbe.forkyz.settings.BrowseSwipeAction
 import app.crossword.yourealwaysbe.forkyz.settings.DayNightMode
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
+import app.crossword.yourealwaysbe.forkyz.util.MATERIAL_MIN_CLICKABLE_DP
 import app.crossword.yourealwaysbe.forkyz.util.NativeFrontendUtils
 import app.crossword.yourealwaysbe.forkyz.util.NativeImportFinishedResult
 import app.crossword.yourealwaysbe.forkyz.util.Uri
@@ -638,7 +639,7 @@ fun BrowsePage(
                     if (isCollapsible)
                         Modifier.clickable(onClick = onClick)
                             // min for clickable elements in Material
-                            .heightIn(min=48.dp)
+                            .heightIn(min=MATERIAL_MIN_CLICKABLE_DP)
                             .padding(horizontal=HORIZONTAL_PADDING)
                             .padding(vertical=8.dp)
                     else

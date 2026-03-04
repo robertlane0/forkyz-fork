@@ -6,6 +6,7 @@ import kotlinx.coroutines.launch
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -58,6 +59,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_word
 import app.crossword.yourealwaysbe.forkyz.settings.ClueTabsDouble
 import app.crossword.yourealwaysbe.forkyz.theme.BoardColorScheme
+import app.crossword.yourealwaysbe.forkyz.util.MATERIAL_MIN_CLICKABLE_DP
 import app.crossword.yourealwaysbe.puz.ClueID
 import app.crossword.yourealwaysbe.puz.Playboard.Word
 import app.crossword.yourealwaysbe.puz.Position
@@ -167,12 +169,14 @@ fun ClueTabs(
         // are visible..
         Column(
             modifier = Modifier.fillMaxWidth()
+                .heightIn(min = MATERIAL_MIN_CLICKABLE_DP)
                 .combinedClickable(
                     onClick = { onClueClick(clue.cid) },
                     onClickLabel = onClueClickDescription,
                     onLongClick = { onClueLongClick(clue.cid) },
                     onLongClickLabel = onClueLongClickDescription,
-                ).clueItemBackground(clue.selected, clue.crossingSelected)
+                ).clueItemBackground(clue.selected, clue.crossingSelected),
+            verticalArrangement = Arrangement.Center,
         ) {
             with (LocalDensity.current) {
                 Box(
