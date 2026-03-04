@@ -47,6 +47,9 @@ import app.crossword.yourealwaysbe.puz.io.PuzzleParser
  * getShareUrl can be overridden if more complex logic is needed.
  * @param goodFrom the first date the source is available. Can also
  * override getGoodFrom. Epoch 0 by default.
+ * @param overrideEmbeddedDate always override the date embedded in the
+ * puzzle download with the date provided to the download method (the
+ * argument date is always used if there is no embedded date)
  */
 open class AbstractDateDownloader constructor(
     override val downloaderID : DownloaderID,
@@ -58,6 +61,7 @@ open class AbstractDateDownloader constructor(
     sourceUrlFormatPattern : String? = null,
     shareUrlFormatPattern : String? = null,
     val goodFrom : LocalDate = LocalDate.ofEpochDay(0L),
+    private val overrideEmbeddedDate : Boolean = true,
 ) : AbstractDownloader() {
     private val sourceUrlFormat : DateTimeFormatter?
     private val shareUrlFormat : DateTimeFormatter?
@@ -133,8 +137,10 @@ open class AbstractDateDownloader constructor(
                 getInputStream(url, headers).use { inputStream ->
                     val puz = puzzleParser.parseInput(inputStream)
                     if (puz != null) {
-                        // don't override existing date
-                        puz.date = puz.date ?: date
+                        puz.date = if (overrideEmbeddedDate || puz.date == null)
+                            puz.date
+                        else
+                            date
                         puz.setSource(name)
                         puz.setSourceUrl(sourceUrl)
                         puz.setSupportUrl(supportUrl)

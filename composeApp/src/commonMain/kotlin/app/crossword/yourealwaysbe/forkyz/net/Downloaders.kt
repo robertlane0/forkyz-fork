@@ -554,6 +554,7 @@ class Downloaders(
                 "'https://metro.co.uk/puzzles/cryptic-crossword'",
                 "'https://metro.co.uk/puzzles/cryptic-crossword'",
                 ZonedDateTime.now(ZoneId.of("Europe/London")).toLocalDate(),
+                overrideEmbeddedDate = false,
             ))
         }
 
@@ -568,6 +569,7 @@ class Downloaders(
                 "'https://metro.co.uk/puzzles/quick-crossword'",
                 "'https://metro.co.uk/puzzles/quick-crossword'",
                 ZonedDateTime.now(ZoneId.of("Europe/London")).toLocalDate(),
+                overrideEmbeddedDate = false,
             ))
         }
 
