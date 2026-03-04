@@ -66,7 +66,8 @@ private val DEFAULT_DAY_NIGHT_MODE = DayNightMode.fromValue(0)
  *
  * Confirm Cleanup -- OK/Cancel when cleanup about to happen
  * New Version -- new version message
- * No Cleanup Action -- all cleanup options set to never so nothing will happen
+ * No Cleanup Action -- shown on archive screen when all cleanup options
+ * set to never so nothing will happen
  * Notifications Permission -- dialog to show after notification permission
  * denied
  * Confirm Delete Selected -- confirm whether to delete the selected files
@@ -539,7 +540,8 @@ class BrowsePageViewModel(
         settings.getBrowseCleanupAgeArchive { archiveMaxAgeSetting ->
         settings.getBrowseDontConfirmCleanup { dontConfirm ->
             if (
-                getMaxAge(maxAgeSetting) == null
+                isViewArchive
+                && getMaxAge(maxAgeSetting) == null
                 && getMaxAge(archiveMaxAgeSetting) == null
             ) {
                 showDialog(BrowseDialog.NO_CLEANUP_ACTION)
@@ -573,40 +575,38 @@ class BrowsePageViewModel(
                 val maxAge = getMaxAge(maxAgeSetting)
                 val archiveMaxAge = getMaxAge(archiveMaxAgeSetting)
 
-                if (maxAge != null || archiveMaxAge != null) {
-                    val crosswords = fileHandler.crosswordsDirectory
-                    val archive = fileHandler.archiveDirectory
+                val crosswords = fileHandler.crosswordsDirectory
+                val archive = fileHandler.archiveDirectory
 
-                    val toArchive = ArrayList<PuzHandle>()
-                    val toDelete = ArrayList<PuzHandle>()
+                val toArchive = ArrayList<PuzHandle>()
+                val toDelete = ArrayList<PuzHandle>()
 
-                    fileHandler.getPuzMetas(crosswords).forEach { pm ->
-                        val doClean
-                            = pm.complete == 100
-                            || (maxAge != null && getDate(pm).isBefore(maxAge))
+                fileHandler.getPuzMetas(crosswords).forEach { pm ->
+                    val doClean
+                        = pm.complete == 100
+                        || (maxAge != null && getDate(pm).isBefore(maxAge))
 
-                        if (doClean) {
-                            if (deleteOnCleanup) {
-                                toDelete.add(pm.puzHandle)
-                            } else {
-                                toArchive.add(pm.puzHandle)
-                            }
+                    if (doClean) {
+                        if (deleteOnCleanup) {
+                            toDelete.add(pm.puzHandle)
+                        } else {
+                            toArchive.add(pm.puzHandle)
                         }
                     }
-
-                    if (archiveMaxAge != null) {
-                       fileHandler.getPuzMetas(archive).forEach { pm ->
-                            if (getDate(pm).isBefore(archiveMaxAge)) {
-                                toDelete.add(pm.puzHandle)
-                            }
-                        }
-                    }
-
-                    toDelete.forEach { fileHandler.delete(it) }
-                    toArchive.forEach { fileHandler.moveTo(it, archive) }
-
-                    runMain { startLoadPuzzleList() }
                 }
+
+                if (archiveMaxAge != null) {
+                   fileHandler.getPuzMetas(archive).forEach { pm ->
+                        if (getDate(pm).isBefore(archiveMaxAge)) {
+                            toDelete.add(pm.puzHandle)
+                        }
+                    }
+                }
+
+                toDelete.forEach { fileHandler.delete(it) }
+                toArchive.forEach { fileHandler.moveTo(it, archive) }
+
+                runMain { startLoadPuzzleList() }
             }
         }}}}
     }
