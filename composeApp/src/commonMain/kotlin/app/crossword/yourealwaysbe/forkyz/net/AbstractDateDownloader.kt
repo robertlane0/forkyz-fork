@@ -138,9 +138,9 @@ open class AbstractDateDownloader constructor(
                     val puz = puzzleParser.parseInput(inputStream)
                     if (puz != null) {
                         puz.date = if (overrideEmbeddedDate || puz.date == null)
-                            puz.date
-                        else
                             date
+                        else
+                            puz.date
                         puz.setSource(name)
                         puz.setSourceUrl(sourceUrl)
                         puz.setSupportUrl(supportUrl)
