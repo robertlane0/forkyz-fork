@@ -403,10 +403,10 @@ public class IPuzIOTest {
             Clue clueA1 = across.getClueByNumber("1");
             Clue clueA3 = across.getClueByNumber("3");
             Clue clueV1 = vertical.getClueByNumber("1");
-            ClueID cidA1 = clueA1.getClueID();
-            ClueID cidA3 = clueA3.getClueID();
-            ClueID cidV1 = clueV1.getClueID();
-            ClueID cidV2 = vertical.getClueByNumber("2").getClueID();
+            ClueID cidA1 = clueA1.clueID;
+            ClueID cidA3 = clueA3.clueID;
+            ClueID cidV1 = clueV1.clueID;
+            ClueID cidV2 = vertical.getClueByNumber("2").clueID;
 
             puz.setSupportUrl("http://test.url");
             puz.setShareUrl("http://testshare.url");
@@ -427,7 +427,7 @@ public class IPuzIOTest {
             );
             clueA3.setFlagged(true);
             clueV1.setFlagged(true);
-            clueV1.setFlagColor(0x0000ff00);
+            clueV1.flagColor = 0x0000ff00;
 
             puz.setPlayerNote(
                 new Note("scratch", "a note", "anagsrc", "anagsol")
@@ -482,7 +482,7 @@ public class IPuzIOTest {
             assertEquals(boxes[1][0].getFlagColor(), 0x0000ff00);
             assertTrue(clueV1.isFlagged());
             assertFalse(clueV1.isDefaultFlagColor());
-            assertEquals(clueV1.getFlagColor(), 0x0000ff00);
+            assertEquals(clueV1.flagColor, 0x0000ff00);
             assertTrue(clueA3.isFlagged());
             assertTrue(clueA3.isDefaultFlagColor());
             assertFalse(clueA1.isFlagged());
@@ -538,10 +538,10 @@ public class IPuzIOTest {
             ClueList across = puz.getClues("Across");
             ClueList down = puz.getClues("Down");
 
-            ClueID cidD2 = down.getClueByNumber("2").getClueID();
-            ClueID cidD3 = down.getClueByNumber("3").getClueID();
-            ClueID cidD12 = down.getClueByNumber("12").getClueID();
-            ClueID cidA1 = across.getClueByNumber("1").getClueID();
+            ClueID cidD2 = down.getClueByNumber("2").clueID;
+            ClueID cidD3 = down.getClueByNumber("3").clueID;
+            ClueID cidD12 = down.getClueByNumber("12").clueID;
+            ClueID cidA1 = across.getClueByNumber("1").clueID;
 
             puz.setSupportUrl("http://test.url");
             puz.setTime(1234L);

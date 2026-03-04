@@ -144,7 +144,7 @@ public class Playboard {
         if (clue == null || !clue.hasZone()) {
             previousWord  = new Word(getDetachedCellsZone(puzzle));
         } else {
-            previousWord = new Word(clue.getZone(), clue.getClueID());
+            previousWord = new Word(clue.getZone(), clue.clueID);
         }
     }
 
@@ -244,12 +244,12 @@ public class Playboard {
      */
     public int getCurrentClueIndex() {
         Clue clue = getClue();
-        return clue == null ? -1 : clue.getClueID().getIndex();
+        return clue == null ? -1 : clue.clueID.getIndex();
     }
 
     public Note getNote() {
         Clue c = this.getClue();
-        return (c == null) ? null : this.puzzle.getNote(c.getClueID());
+        return (c == null) ? null : this.puzzle.getNote(c.clueID);
     }
 
     public Box getCurrentBox() {
@@ -300,7 +300,7 @@ public class Playboard {
         if (clue == null || !clue.hasZone()) {
             return null;
         } else {
-            return new Word(clue.getZone(), clue.getClueID());
+            return new Word(clue.getZone(), clue.clueID);
         }
     }
 
@@ -834,7 +834,7 @@ public class Playboard {
 
     public void jumpToClue(Clue clue, Object tag) {
         if (clue != null)
-            jumpToClue(clue.getClueID(), tag);
+            jumpToClue(clue.clueID, tag);
     }
 
     /**
@@ -887,7 +887,7 @@ public class Playboard {
 
     public void jumpToClueEnd(Clue clue) {
         if (clue != null)
-            jumpToClueEnd(clue.getClueID());
+            jumpToClueEnd(clue.clueID);
     }
 
     /**
@@ -1711,7 +1711,7 @@ public class Playboard {
      */
     public void setFlagColor(Clue clue, int color) {
         if (clue != null) {
-            clue.setFlagColor(color);
+            clue.flagColor = color;
             flagClueChange(clue);
             notifyChange();
         }
@@ -1975,7 +1975,7 @@ public class Playboard {
         for (Clue clue : puzzle.getAllClues()) {
             if (clue.hasZone()) {
                 puzzle.setPosition(clue.getZone().getPosition(0));
-                puzzle.setCurrentClueID(clue.getClueID());
+                puzzle.setCurrentClueID(clue.clueID);
                 return;
             }
         }
@@ -2059,7 +2059,7 @@ public class Playboard {
     }
 
     private void flagClueChange(Clue clue) {
-        flagClueChange(clue.getClueID());
+        flagClueChange(clue.clueID);
     }
 
     private void flagClueChange(ClueID cid) {

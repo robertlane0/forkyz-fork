@@ -70,7 +70,7 @@ public class RaetselZentraleSchwedenJSONIOTest {
         assertEquals(winwordZone.getPosition(4), new Position(13, 5));
 
         assertTrue(puz.hasPinnedClueID());
-        assertEquals(puz.getPinnedClueID(), winword.getClueID());
+        assertEquals(puz.getPinnedClueID(), winword.clueID);
     }
 
     @Test

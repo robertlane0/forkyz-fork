@@ -489,7 +489,7 @@ open class PuzzlePageViewModel(
 
     fun toggleClueFlag() {
         getBoard()?.getClue()?.let { clue ->
-            if (clue.isFlagged())
+            if (clue.isFlagged)
                 getBoard()?.flagClue(clue, false);
             else
                 showFlagClueDialog(clue.clueID)
@@ -706,7 +706,7 @@ open class PuzzlePageViewModel(
     }
 
     fun launchClueNotes(clue : Clue?) {
-        launchClueNotes(clue?.getClueID())
+        launchClueNotes(clue?.clueID)
     }
 
     fun launchClueNotes(cid : ClueID?) {

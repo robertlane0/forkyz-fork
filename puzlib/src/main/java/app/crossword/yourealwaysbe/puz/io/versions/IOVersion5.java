@@ -32,7 +32,7 @@ public class IOVersion5 extends IOVersion4 {
             String number = String.valueOf(ln.getNumber());
             Clue clue = puz.getClues(listName).getClueByNumber(number);
             if (clue != null)
-                cidHistory.add(clue.getClueID());
+                cidHistory.add(clue.clueID);
         }
         puz.setHistory(cidHistory);
     }

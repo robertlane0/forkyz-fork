@@ -347,7 +347,7 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
             return true
 
         val clue = puz.getClue(cid)
-        val zone = clue?.getZone();
+        val zone = clue?.zone
         if (zone == null || zone.size() <= 1)
             return true
 
@@ -407,8 +407,8 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
         for (cid in box.getIsPartOfClues()) {
             if (box.isStartOf(cid)) {
                 puz.getClue(cid)?.let { clue ->
-                    if (clue.isFlagged()) {
-                        val color = if (clue.isDefaultFlagColor())
+                    if (clue.isFlagged) {
+                        val color = if (clue.isDefaultFlagColor)
                             null
                         else
                             colorFromInt(clue.flagColor)
@@ -514,8 +514,7 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
         clue.getSeparator(offset + 1, inferSeparators)?.let { separator ->
             val cid = clue.clueID
             val zone = clue.zone
-            if (!(zone?.isEmpty() ?: false)) {
-
+            if (!zone.isEmpty()) {
                 var dir = Zone.Direction.RIGHT
 
                 if (!allAcross) {
@@ -559,7 +558,7 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
     ) : Separators {
         var result = separators
         if (clue.hasSeparators(inferSeparators)) {
-            val offset = clue.getZone().indexOf(position)
+            val offset = clue.zone.indexOf(position)
             result = addSeparator(
                 clue,
                 inferSeparators,

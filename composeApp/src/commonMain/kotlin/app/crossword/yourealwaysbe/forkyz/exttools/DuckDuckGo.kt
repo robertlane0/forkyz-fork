@@ -25,21 +25,19 @@ class DuckDuckGoData(uri : Uri) : HTMLToolData(uri) {
             utils : NativeBackendUtils,
             clue : Clue,
         ) : DuckDuckGoData? {
-            var hint = clue.getHint()
-            if (hint == null)
-                return null;
+            var hint = clue.hint
 
             ENUMERATION_HINT_RE.matchEntire(hint)?.let {
-                hint = it.groups[ENUMERATION_HINT_GRP]?.value
+                hint = it.groups[ENUMERATION_HINT_GRP]?.value ?: ""
             }
 
             // remove entities, tags, and non-alphanumeric (keep -)
-            hint = hint?.replace("<[^>]*>".toRegex(), "")
-            hint = hint?.replace("&[A-Za-z\\d#]+;".toRegex(), "")
-            hint = hint?.replace("[^-A-Za-z\\s\\d]".toRegex(), "")
+            hint = hint.replace("<[^>]*>".toRegex(), "")
+            hint = hint.replace("&[A-Za-z\\d#]+;".toRegex(), "")
+            hint = hint.replace("[^-A-Za-z\\s\\d]".toRegex(), "")
 
             val uri = utils
-                .getString(Res.string.duckduckgo_search_url, hint ?: "")
+                .getString(Res.string.duckduckgo_search_url, hint)
                 .toUri()
 
             return DuckDuckGoData(uri)

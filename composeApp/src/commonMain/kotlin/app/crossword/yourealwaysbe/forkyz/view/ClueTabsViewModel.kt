@@ -559,13 +559,11 @@ class ClueTabsViewModel(
         clue : Clue,
         showDirection : Boolean,
     ) : ClueItem {
-        val flagColor = if (
-            clue.isFlagged && !clue.isDefaultFlagColor()
-        ) {
+        val flagColor = if (clue.isFlagged && !clue.isDefaultFlagColor)
             addAlpha(clue.flagColor)
-        } else {
+        else
             null
-        }
+
         return ClueItem(
             cid = clue.clueID,
             text = PlayboardTextRenderer.getShortClueText(

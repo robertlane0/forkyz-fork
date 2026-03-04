@@ -2400,7 +2400,7 @@ public class IPuzIO extends AbstractJSONIO {
 
         for (String listName : listNames) {
             for (Clue clue : puz.getClues(listName)) {
-                ClueID cid = clue.getClueID();
+                ClueID cid = clue.clueID;
                 Note note = puz.getNote(cid);
                 if (note != null && !note.isEmpty()) {
                     writer.indent(2)
@@ -2488,17 +2488,17 @@ public class IPuzIO extends AbstractJSONIO {
                 clues.add(clue);
         }
         Collections.sort(clues, (clue1, clue2) -> {
-            return clue1.getClueID().compareTo(clue2.getClueID());
+            return clue1.clueID.compareTo(clue2.clueID);
         });
 
         for (Clue clue : clues) {
-            ClueID cid = clue.getClueID();
+            ClueID cid = clue.clueID;
             writer.indent(2);
 
             writer.object();
             writeClueIDFields(cid, writer);
             if (!clue.isDefaultFlagColor()) {
-                writer.key(FIELD_COLOR).value(colorToHex(clue.getFlagColor()));
+                writer.key(FIELD_COLOR).value(colorToHex(clue.flagColor));
             }
             writer.endObject();
 
@@ -2573,7 +2573,7 @@ public class IPuzIO extends AbstractJSONIO {
 
         writer.indent(indent + 1)
             .key(FIELD_CLUEID);
-        writeClueID(clue.getClueID(), writer);
+        writeClueID(clue.clueID, writer);
         writer.newLine();
 
         writer.indent(indent + 1)

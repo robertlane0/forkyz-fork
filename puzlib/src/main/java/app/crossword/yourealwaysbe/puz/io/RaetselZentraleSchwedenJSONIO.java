@@ -223,7 +223,7 @@ public class RaetselZentraleSchwedenJSONIO extends AbstractJSONIO {
 
         Clue winWordClue = new Clue(WINWORD_LIST, 0, null, WINWORD_HINT, zone);
         builder.addClue(winWordClue);
-        builder.setPinnedClueID(winWordClue.getClueID());
+        builder.setPinnedClueID(winWordClue.clueID);
     }
 
     private static Map<Position, List<ClueInfo>> getClueInfos(JSONObject json)

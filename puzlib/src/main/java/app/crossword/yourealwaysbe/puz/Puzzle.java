@@ -68,7 +68,7 @@ public class Puzzle {
     public byte[] unscrambleBuf;
 
     public void addClue(Clue clue) {
-        String listName = clue.getClueID().getListName();
+        String listName = clue.clueID.getListName();
         if (!clueLists.containsKey(listName))
             clueLists.put(listName, new MutableClueList());
         clueLists.get(listName).addClue(clue);
@@ -283,7 +283,7 @@ public class Puzzle {
                         ClueList curList = getCurrentClueList();
                         // not be null by moveToNext
                         Clue curClue = curList.getClueByNumber(number);
-                        ClueID result = curClue.getClueID();
+                        ClueID result = curClue.clueID;
                         moveOneStep();
                         moveToNext();
                         return result;
@@ -623,7 +623,7 @@ public class Puzzle {
     }
 
     public Note getNote(Clue clue) {
-        return clue == null ? null : getNote(clue.getClueID());
+        return clue == null ? null : getNote(clue.clueID);
     }
 
     /**
@@ -637,7 +637,7 @@ public class Puzzle {
 
     public void setNote(Clue clue, Note note) {
         if (clue != null)
-            setNote(clue.getClueID(), note);
+            setNote(clue.clueID, note);
     }
 
     public Note getPlayerNote() {
@@ -1025,14 +1025,14 @@ public class Puzzle {
             Box box = checkedGetBox(pos);
             if (Box.isBlock(box)) {
                 throw new IllegalArgumentException(
-                    "Clue " + number + " " + clue.getClueID().getListName()
+                    "Clue " + number + " " + clue.clueID.getListName()
                     + " zone has a block box at position " + pos
                 );
             }
 
             // prefer earlier positions if multiple
-            if (!box.hasCluePosition(clue.getClueID()))
-                box.setCluePosition(clue.getClueID(), offset);
+            if (!box.hasCluePosition(clue.clueID))
+                box.setCluePosition(clue.clueID, offset);
         }
     }
 }

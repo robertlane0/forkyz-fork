@@ -150,7 +150,7 @@ open class ShareTextData(
                 return utils.getString(Res.string.unknown_hint)
             } else {
                 val wordLen = if (clue.hasZone())
-                    clue.getZone().size()
+                    clue.zone.size()
                 else
                     -1
 
@@ -158,11 +158,11 @@ open class ShareTextData(
                     return utils.getString(
                         Res.string
                             .clue_format_short_no_num_no_dir_with_count,
-                        clue.getHint(),
+                        clue.hint,
                         wordLen,
                     )
                 } else {
-                    return clue.getHint()
+                    return clue.hint
                 }
             }
         }

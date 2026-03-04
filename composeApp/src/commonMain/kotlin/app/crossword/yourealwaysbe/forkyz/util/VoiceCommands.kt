@@ -144,14 +144,14 @@ class VoiceCommands {
                 Res.plurals.llm_agent_voice_command_prompt_clue,
                 numLetters,
                 clue.clueID.listName,
-                clue.clueNumber,
+                clue.clueNumber ?: "",
                 numLetters,
             )
         } else {
             utils.getString(
                 Res.string.llm_agent_voice_command_prompt_clue_no_zone,
                 clue.clueID.listName,
-                clue.clueNumber,
+                clue.clueNumber ?: "",
             )
         }
     }

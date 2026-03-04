@@ -62,41 +62,39 @@ class LLMClueHelpRequester(
         val puz = board.getPuzzle() ?: return null
         val clue = board.getClue() ?: return null
 
-        val hint = clue.getHint()
+        val hint = clue.hint
         var response : String? = null
         var solution : String? = null
 
-        val zone = clue.getZone()
-        if (zone != null) {
-            var hasResponse = false
-            val responseBuilder = StringBuilder()
-            var hasSolution = false
-            val solutionBuilder = StringBuilder()
+        val zone = clue.zone
+        var hasResponse = false
+        val responseBuilder = StringBuilder()
+        var hasSolution = false
+        val solutionBuilder = StringBuilder()
 
-            for (pos in zone) {
-                val box = puz.checkedGetBox(pos)
-                if (box != null) {
-                    if (!box.isBlank()) {
-                        hasResponse = true
-                        responseBuilder.append(box.response)
-                    } else {
-                        responseBuilder.append(blank)
-                    }
+        for (pos in zone) {
+            val box = puz.checkedGetBox(pos)
+            if (box != null) {
+                if (!box.isBlank()) {
+                    hasResponse = true
+                    responseBuilder.append(box.response)
+                } else {
+                    responseBuilder.append(blank)
+                }
 
-                    if (box.hasSolution()) {
-                        hasSolution = true
-                        solutionBuilder.append(box.solution)
-                    } else {
-                        solutionBuilder.append(blank)
-                    }
+                if (box.hasSolution()) {
+                    hasSolution = true
+                    solutionBuilder.append(box.solution)
+                } else {
+                    solutionBuilder.append(blank)
                 }
             }
-
-            if (hasSolution)
-                solution = solutionBuilder.toString()
-            if (hasResponse)
-                response = responseBuilder.toString()
         }
+
+        if (hasSolution)
+            solution = solutionBuilder.toString()
+        if (hasResponse)
+            response = responseBuilder.toString()
 
         return when {
             response != null && solution != null -> {

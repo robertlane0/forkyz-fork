@@ -16,7 +16,7 @@ class MutableClueList implements ClueList {
      * Clues must be added in contiguous index order.
      */
     public void addClue(Clue clue) {
-        int index = clue.getClueID().getIndex();
+        int index = clue.clueID.getIndex();
         if (index < size()) {
             throw new IllegalArgumentException(
                 "Clue has same index as existing clue: " + clue
@@ -94,7 +94,7 @@ class MutableClueList implements ClueList {
     @Override
     public int getClueIndex(String number) {
         Clue clue = getClueByNumber(number);
-        return (clue ==  null) ? -1 : clue.getClueID().getIndex();
+        return (clue ==  null) ? -1 : clue.clueID.getIndex();
     }
 
     @Override

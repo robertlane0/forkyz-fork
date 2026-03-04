@@ -258,7 +258,7 @@ class NotesPageViewModel(
     val boardNotesValue : String
         get() {
             return getBoard()?.let { board ->
-                val zone = notesClue?.getZone() ?: board.currentWord.zone
+                val zone = notesClue?.zone ?: board.currentWord.zone
                 return String(
                     zone.map { pos ->
                         val box = board.puzzle?.checkedGetBox(pos)
@@ -440,7 +440,7 @@ class NotesPageViewModel(
         notesClue?.let { clue ->
             getBoard()?.flagClue(
                 notesClue,
-                !clue.isFlagged(),
+                !clue.isFlagged,
             )
         }
     }
@@ -604,7 +604,7 @@ class NotesPageViewModel(
                     anagramSourceValue = newAnagramSource,
                     anagramSolutionValue = note?.anagramSolution ?: "",
                     anagramPrediction = null,
-                    clueFlagged = clue.isFlagged(),
+                    clueFlagged = clue.isFlagged,
                     clueFlagColor = clue.flagColor,
                 )
 
@@ -653,7 +653,7 @@ class NotesPageViewModel(
         if (isPuzzleNotes || !(clue?.hasZone() ?: false))
             return persistentListOf()
 
-        val len = clue.zone?.size() ?: -1
+        val len = clue.zone.size()
         return (0..len).map { i ->
             clue.getSeparator(i, inferSeparators)
         }.toImmutableList()
@@ -814,7 +814,7 @@ class NotesPageViewModel(
             return
         }
 
-        val hint = notesClue?.getHint()
+        val hint = notesClue?.hint
         if (hint == null) {
             setAnagramPrediction(null)
             return

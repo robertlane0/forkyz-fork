@@ -47,7 +47,7 @@ object PlayboardTextRenderer {
                 utils.getString(
                     Res.string.clue_format_long_with_count,
                     clue.clueID.listName,
-                    clue.clueNumber,
+                    clue.clueNumber ?: "",
                     clue.hint,
                     wordLen
                 )
@@ -64,7 +64,7 @@ object PlayboardTextRenderer {
                 utils.getString(
                     Res.string.clue_format_long,
                     clue.clueID.listName,
-                    clue.clueNumber,
+                    clue.clueNumber ?: "",
                     clue.hint
                 )
             } else {

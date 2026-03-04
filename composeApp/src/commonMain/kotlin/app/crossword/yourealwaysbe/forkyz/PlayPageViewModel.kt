@@ -364,7 +364,7 @@ class PlayPageViewModel(
         val currentID = board.getClueID()
 
         val unfilledClues = puz.getAllClues().filter { clue ->
-            val cid = clue.getClueID()
+            val cid = clue.clueID
             cid != currentID && !board.isFilledClueID(clue.clueID)
         }
 

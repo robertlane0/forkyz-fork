@@ -523,7 +523,7 @@ public interface MovementStrategy {
                     clue == null
                     || puz == null
                     || clue.getZone().isEmpty()
-                    || board.isFilledClueID(clue.getClueID())
+                    || board.isFilledClueID(clue.clueID)
                     || !cycleForwards
                 ) {
                     word = innerStrategy.move(board, skipCompletedLetters);
@@ -536,7 +536,7 @@ public interface MovementStrategy {
                         next = board.findNextZone(start, skipCompletedLetters);
 
                     if (next != null)
-                        board.setHighlightLetter(next, clue.getClueID());
+                        board.setHighlightLetter(next, clue.clueID);
                 }
             }
 
@@ -556,7 +556,7 @@ public interface MovementStrategy {
                     clue == null
                     || puz == null
                     || clue.getZone().isEmpty()
-                    || board.isFilledClueID(clue.getClueID())
+                    || board.isFilledClueID(clue.clueID)
                     || !cycleBackwards
                 ) {
                     word = innerStrategy.back(board);
@@ -566,7 +566,7 @@ public interface MovementStrategy {
                     Box box = puz.checkedGetBox(end);
 
                     if (box != null)
-                        board.setHighlightLetter(end, clue.getClueID());
+                        board.setHighlightLetter(end, clue.clueID);
                 }
             }
 

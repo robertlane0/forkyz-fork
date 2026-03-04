@@ -117,8 +117,8 @@ public class PuzzleBuilder {
                     newZone.addPosition(pos);
             }
             return new Clue(
-                clue.getClueID().getListName(),
-                clue.getClueID().getIndex(),
+                clue.clueID.getListName(),
+                clue.clueID.getIndex(),
                 clue.getClueNumber(),
                 clue.getLabel(),
                 clue.getHint(),
@@ -223,7 +223,7 @@ public class PuzzleBuilder {
         Clue clue = clueId == null ? null : puzzle.getClue(clueId);
         if (clue != null) {
             clue.setFlagged(flag);
-            clue.setFlagColor(flagColor);
+            clue.flagColor = flagColor;
         }
         return this;
     }

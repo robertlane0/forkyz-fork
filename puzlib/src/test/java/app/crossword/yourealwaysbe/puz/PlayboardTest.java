@@ -973,7 +973,7 @@ public class PlayboardTest {
 
     private void assertClue(Playboard board, String listName, String number) {
         Clue clue = board.getClue();
-        assertEquals(clue.getClueID().getListName(), listName);
+        assertEquals(clue.clueID.getListName(), listName);
         assertEquals(clue.getClueNumber(), number);
     }
 
