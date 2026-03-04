@@ -120,10 +120,7 @@ fun ClueTabs(
     onPageChange : (Int, Int) -> Unit = { _, _ -> },
 ) {
     @Composable
-    fun Modifier.clueItemBackground(
-        clueSelected : Boolean,
-        crossingSelected : Boolean,
-    ) : Modifier {
+    fun Modifier.clueItemBackground(clue : ClueItem) : Modifier {
         val state by viewModel.uiState.collectAsStateWithLifecycle()
         val highlightSelectedBackground by remember {
             derivedStateOf { state.highlightSelectedBackground }
@@ -131,9 +128,9 @@ fun ClueTabs(
         val highlightCrossingClue by remember {
             derivedStateOf { state.highlightCrossingClue }
         }
-        if (highlightSelectedBackground && clueSelected) {
+        if (highlightSelectedBackground && clue.selected) {
             return this.background(MaterialTheme.colorScheme.secondaryContainer)
-        } else if (highlightCrossingClue && crossingSelected) {
+        } else if (highlightCrossingClue && clue.crossingSelected) {
             return this.background(
                 MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5F),
             )
@@ -175,7 +172,7 @@ fun ClueTabs(
                     onClickLabel = onClueClickDescription,
                     onLongClick = { onClueLongClick(clue.cid) },
                     onLongClickLabel = onClueLongClickDescription,
-                ).clueItemBackground(clue.selected, clue.crossingSelected),
+                ).clueItemBackground(clue),
             verticalArrangement = Arrangement.Center,
         ) {
             with (LocalDensity.current) {
