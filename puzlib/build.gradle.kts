@@ -28,6 +28,8 @@ tasks.shadowJar {
     relocate("org.json", "app.crossword.yourealwaysbe.org.json")
     exclude("kotlin/**")
     exclude("META-INF/kotlin*")
+    exclude("org/intellij/**")
+    exclude("org/jetbrains/annotations/**")
 }
 
 kotlin {
