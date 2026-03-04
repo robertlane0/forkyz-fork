@@ -690,7 +690,7 @@ class ForkyzSettingsTest {
     fun testExportImport() {
         // export settingsValue2 to a buffer
         // import it to a second data store
-        // check end up with same values
+        // check end up with same values except those not exported
 
         val datastore1 = TestDataStore(settingsValue1)
         val settings1 = ForkyzSettings(datastore1)
@@ -705,7 +705,11 @@ class ForkyzSettingsTest {
         bais.close()
 
         val importedSettings = runBlocking { datastore1.data.first() }
-        assertEquals(importedSettings, settingsValue2)
+
+        val expected = settingsValue2.copy(
+            downloadLastSelectedDate = "",
+        )
+        assertEquals(importedSettings, expected)
     }
 
     @Test
