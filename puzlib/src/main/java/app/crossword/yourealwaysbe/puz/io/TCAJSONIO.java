@@ -64,7 +64,7 @@ public class TCAJSONIO extends AbstractJSONIO {
     private static final DateTimeFormatter DATE_META_FORMATTER
         = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final DateTimeFormatter DATE_DATA_FORMATTER
-        = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        = DateTimeFormatter.ofPattern("MM/dd/yyyy");
 
     private static final String ACROSS_LIST = DefaultListNames.ACROSS_LIST;
     private static final String DOWN_LIST = DefaultListNames.DOWN_LIST;
