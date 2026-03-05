@@ -168,8 +168,8 @@ class ClueListPageViewModel(
             getBoard()?.let { board ->
                 getPuzzle()?.let { puz ->
                     val cid = board.getClueID()
-                    val curList = cid?.getListName()
-                    val curClueIndex = cid?.getIndex() ?: -1
+                    val curList = cid?.listName
+                    val curClueIndex = cid?.index ?: -1
 
                     if (curList != null && curClueIndex >= 0) {
                         val prev = puz.getClues(curList)
@@ -200,8 +200,8 @@ class ClueListPageViewModel(
             getBoard()?.let { board ->
                 getPuzzle()?.let { puz ->
                     val cid = board.getClueID()
-                    val curList = cid?.getListName()
-                    val curClueIndex = cid?.getIndex() ?: -1
+                    val curList = cid?.listName
+                    val curClueIndex = cid?.index ?: -1
 
                     if (curList != null && curClueIndex >= 0) {
                         val next = puz.getClues(curList)

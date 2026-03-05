@@ -312,9 +312,6 @@ class ClueTabsViewModel(
         replacePageNum : Int = -1,
     ) : Int {
         val listName = cid.listName
-        if (listName == null)
-            return -1
-
         val historyPageNum = currentUIState.historyPageNum
         val historyIndex = currentUIState.getHistoryIndex(cid)
 

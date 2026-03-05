@@ -314,7 +314,7 @@ object PlayboardTextRenderer {
     }
 
     private fun getShortListName(clue : Clue?) : String {
-        val listName = clue?.clueID?.listName()
+        val listName = clue?.clueID?.listName
         return if (listName.isNullOrEmpty())
             ""
         else
