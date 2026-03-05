@@ -178,6 +178,52 @@ public class ClueTest {
     }
 
     @Test
+    public void testThreeWordsNoSpaces() {
+        Clue clue = new Clue(
+            "", 0, "1", "A clue (2,1,4)", new Zone()
+        );
+
+        assertFalse(clue.hasSeparators());
+        assertTrue(clue.hasSeparators(true));
+        assertNull(clue.getSeparator(2));
+        assertEquals(clue.getSeparator(2, true), " ");
+        assertNull(clue.getSeparator(3));
+        assertEquals(clue.getSeparator(3, true), " ");
+    }
+
+    @Test
+    public void testThreeWordsTrailingSpace() {
+        // clues from some sources have a trailing space
+        Clue clue = new Clue(
+            "", 0, "1", "A clue (2,1,4) ", new Zone()
+        );
+
+        assertFalse(clue.hasSeparators());
+        assertTrue(clue.hasSeparators(true));
+        assertNull(clue.getSeparator(2));
+        assertEquals(clue.getSeparator(2, true), " ");
+        assertNull(clue.getSeparator(3));
+        assertEquals(clue.getSeparator(3, true), " ");
+    }
+
+    @Test
+    public void testHtmlWrapped() {
+        // clues from some sources wrap hints in HTML spans
+        Clue clue = new Clue(
+            "", 0, "1",
+            "<span>I begin to grasp one conceptualist question (2,2,3)</span>",
+            new Zone()
+        );
+
+        assertFalse(clue.hasSeparators());
+        assertTrue(clue.hasSeparators(true));
+        assertNull(clue.getSeparator(2));
+        assertEquals(clue.getSeparator(2, true), " ");
+        assertNull(clue.getSeparator(4));
+        assertEquals(clue.getSeparator(4, true), " ");
+    }
+
+    @Test
     public void testTwoWordsPlus() {
         Clue clue = new Clue(
             "", 0, "1", "A clue (4+5)", new Zone()
