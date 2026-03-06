@@ -437,12 +437,12 @@ class ClueTabsViewModel(
         changes : PlayboardChanges,
         currentPages : List<ClueList>,
     ) : List<ClueList> {
-        val historyChange = changes.isHistoryChange()
+        val historyChange = changes.isHistoryChange
         val historyPageNum = currentPages.size - 1
         // need to calculate this as some clues might be filled due to
         // box changes
         val changedClueIDs = (
-            (changes.changedClueIDs?.toSet() ?: setOf())
+            (changes.changedClueIDs.toSet())
             + (changes.cellChanges?.flatMap {
                 board?.puzzle?.checkedGetBox(it)?.getIsPartOfClues() ?: setOf()
             }?.toSet() ?: setOf())
@@ -513,7 +513,7 @@ class ClueTabsViewModel(
         changedClueIDs : Set<ClueID>,
         showDirection : Boolean,
     ): ClueItem {
-        val currentWordCid = changes.currentWord?.clueID
+        val currentWordCid = changes.currentWord.clueID
         val previousWordCid = changes.previousWord?.clueID
         val crossingCid = getCrossingClueID()
         val needsSelectedUpdate

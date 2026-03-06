@@ -40,13 +40,11 @@ class ExternalDictionaries {
             board : Playboard,
             cb : (ExternalDictionaryData) -> Unit,
         ) {
-            val zone = board.getCurrentZone()
+            val zone = board.currentZone
             if (zone == null)
                 return
 
-            val puz = board.getPuzzle()
-            if (puz == null)
-                return
+            val puz = board.puzzle
 
             val request = StringBuilder()
             for (pos in zone) {

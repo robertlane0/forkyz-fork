@@ -264,14 +264,13 @@ object PlayboardTextRenderer {
         if (word == null || board == null)
             return null
 
-        return board.getWordBoxes(word)?.let { boxes ->
-            getAccessibleBoxesDescription(utils, boxes)
-        }
+        val boxes = board.getWordBoxes(word)
+        return getAccessibleBoxesDescription(utils, boxes)
     }
 
     suspend fun getAccessibleBoxesDescription(
         utils : NativeBackendUtils,
-        boxes : Array<Box>?,
+        boxes : List<Box>?,
     ) : CharSequence? {
         if (boxes == null)
             return null
@@ -286,7 +285,7 @@ object PlayboardTextRenderer {
 
     private suspend fun getAccessibleBoxesResponseText(
         utils : NativeBackendUtils,
-        boxes : Array<Box>?,
+        boxes : List<Box>?,
     ) : String {
         val blank = utils.getString(Res.string.cur_box_blank)
         return buildString {
@@ -309,7 +308,7 @@ object PlayboardTextRenderer {
         }
     }
 
-    private fun isAllBlank(boxes : Array<Box>) : Boolean {
+    private fun isAllBlank(boxes : List<Box>) : Boolean {
         return boxes.all { box -> Box.isBlock(box) || box.isBlank() }
     }
 

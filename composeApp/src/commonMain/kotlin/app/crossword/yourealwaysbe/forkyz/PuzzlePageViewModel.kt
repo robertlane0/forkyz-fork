@@ -430,7 +430,7 @@ open class PuzzlePageViewModel(
 
     // needed public to send to non-compose views
     fun getBoard() : Playboard? = currentPuzzleHolder.board
-    fun getPuzzle() : Puzzle? = getBoard()?.getPuzzle()
+    fun getPuzzle() : Puzzle? = getBoard()?.puzzle
 
     fun saveBoard() {
         currentPuzzleHolder.saveBoard()
@@ -488,7 +488,7 @@ open class PuzzlePageViewModel(
     }
 
     fun toggleClueFlag() {
-        getBoard()?.getClue()?.let { clue ->
+        getBoard()?.clue?.let { clue ->
             if (clue.isFlagged)
                 getBoard()?.flagClue(clue, false);
             else
@@ -511,7 +511,7 @@ open class PuzzlePageViewModel(
     fun toggleCellFlag() {
         getBoard()?.let { board ->
             getPuzzle()?.let { puz ->
-                board.getHighlightLetter()?.let { pos ->
+                board.highlightLetter.let { pos ->
                     puz.checkedGetBox(pos)?.let { box ->
                         if (box.isFlagged)
                             board.flagPosition(pos, false)
@@ -624,7 +624,7 @@ open class PuzzlePageViewModel(
     fun shareClue(withResponse : Boolean) {
         viewModelScope.launch {
             getBoard()?.let { board ->
-                board.getClue()?.let { clue ->
+                board.clue?.let { clue ->
                     ShareTextData.buildShareClue(
                         utils,
                         settings,
@@ -671,7 +671,7 @@ open class PuzzlePageViewModel(
      * Handles user request to edit currently selected clue
      */
     fun editClue() {
-        getBoard()?.getClueID()?.let { editClue(it) }
+        getBoard()?.clueID?.let { editClue(it) }
     }
 
     fun editClue(cid : ClueID?) {
@@ -701,7 +701,7 @@ open class PuzzlePageViewModel(
 
     fun launchCurrentClueNotes() {
         getBoard()?.let { board ->
-            launchClueNotes(board.getClueID())
+            launchClueNotes(board.clueID)
         }
     }
 
@@ -714,7 +714,7 @@ open class PuzzlePageViewModel(
             launchPuzzleNotes()
         } else {
             getBoard()?.let { board ->
-                if (cid != board.getClueID())
+                if (cid != board.clueID)
                     board.jumpToClue(cid)
             }
             _openNotesEvent.value = ClueNotesData(cid)
@@ -776,7 +776,7 @@ open class PuzzlePageViewModel(
             val newPos = Position(row, col)
             val clueID = if (fixClue) board.clueID else null
             val previousWord = board.setHighlightLetter(newPos, clueID)
-            if (previousWord?.checkInWord(newPos.row, newPos.col) ?: false) {
+            if (previousWord.checkInWord(newPos.row, newPos.col)) {
                 showKeyboard()
             } else {
                 hideKeyboard()
@@ -829,7 +829,7 @@ open class PuzzlePageViewModel(
     }
 
     fun callCrosswordSolver() {
-        val zone = getBoard()?.getCurrentZone()
+        val zone = getBoard()?.currentZone
         if (zone == null)
             return
 
@@ -845,7 +845,7 @@ open class PuzzlePageViewModel(
 
     fun searchDuckDuckGo() {
         viewModelScope.launch {
-            getBoard()?.getClue()
+            getBoard()?.clue
                 ?.let { DuckDuckGoData.build(utils, it) }
                 ?.let { _externalToolEvent.value = it }
             }
@@ -946,7 +946,7 @@ open class PuzzlePageViewModel(
     fun selectClue(cid : ClueID?) {
         getBoard()?.let { board ->
             cid?.let { cid ->
-                if (cid != board.getClueID())
+                if (cid != board.clueID)
                     board.jumpToClue(cid)
             }
         }
@@ -1201,7 +1201,7 @@ open class PuzzlePageViewModel(
         val hasSupportURL = puz?.getSupportUrl() != null
         val canReveal = puz?.hasSolution() ?: false
 
-        val box = board?.getCurrentBox();
+        val box = board?.currentBox
 
         val canRevealInitialLetters = puz?.hasInitialValueCells() ?: false
         val canRevealInitialBoxLetter
@@ -1263,10 +1263,10 @@ open class PuzzlePageViewModel(
             val board = getBoard()
 
             if (board != null && (announceClue || announceBox)) {
-                val newPos = board.getHighlightLetter()
+                val newPos = board.highlightLetter
                 val isNewWord
-                    = changes.getPreviousWord() != changes.getCurrentWord()
-                val isNewPosition = changes.getPreviousPosition() != newPos
+                    = changes.previousWord != changes.currentWord
+                val isNewPosition = changes.previousPosition != newPos
 
                 if (isNewWord && announceClue)
                     announceClue()
@@ -1278,7 +1278,7 @@ open class PuzzlePageViewModel(
 
     private fun handleChangeMenu(changes : PlayboardChanges) {
         getBoard()?.let { board ->
-            val box = board.getCurrentBox();
+            val box = board.currentBox
             val canRevealInitialBoxLetter
                 = !Box.isBlock(box) && box?.hasInitialValue() ?: false
 

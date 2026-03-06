@@ -243,10 +243,8 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
                 ?.contains(position)
                 ?: true
         ) || (
-            changes
-                .changedClueIDs
-                ?.any { box?.isPartOf(it) ?: false }
-                ?: true
+            changes.changedClueIDs
+                .any { box?.isPartOf(it) ?: false }
         )
     }
 
@@ -618,7 +616,7 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
         }
 
         // current clue takes precedence
-        val currentCID = clueID ?: board.currentWord?.clueID
+        val currentCID = clueID ?: board.currentWord.clueID
         if (currentCID != null && box.isPartOf(currentCID)) {
             separators = addSeparators(
                 clue = puz.getClue(currentCID),
@@ -654,7 +652,7 @@ class BoardEditViewModel(
         get() {
             return if (board?.puzzle?.hasPinnedClueID() ?: false) {
                 1 + (
-                    (board.puzzle?.pinnedClue?.zone?.size() ?: 0) / width
+                    (board.puzzle.pinnedClue?.zone?.size() ?: 0) / width
                 )
             } else 0
         }
@@ -709,7 +707,7 @@ class BoardEditViewModel(
 
         val selectedPositions = board.currentWord.zone.toSet()
 
-        val images = board.puzzle?.images?.map {
+        val images = board.puzzle.images?.map {
             Image(
                 row = it.row,
                 col = it.col,
@@ -816,8 +814,6 @@ class BoardEditViewModel(
             return null
 
         val cursor = board.highlightLetter
-        if (cursor == null)
-            return null
 
         val selectedPositions = board.currentWord.zone
         if (selectedPositions.isEmpty)

@@ -25,7 +25,7 @@ class SpecialEntryDialogViewModel(
         )
 
     init {
-        getBoard()?.getCurrentBox()?.let { box ->
+        getBoard()?.currentBox?.let { box ->
             if (box.isBlank())
                 _response.value = ""
             else

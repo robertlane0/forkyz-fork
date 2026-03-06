@@ -229,7 +229,7 @@ public class PlayboardTest {
 
          Playboard board = new Playboard(puz);
          board.setShowErrorsGrid(true);
-         board.setMovementStrategy(MovementStrategy.MOVE_NEXT_CLUE);
+         board.movementStrategy = MovementStrategy.MOVE_NEXT_CLUE;
 
          // Reveal full puzzle, but make one letter wrong
          //
@@ -261,7 +261,7 @@ public class PlayboardTest {
          board.deleteOrUndoLetter();
          assertPosition(board, 1, 1);
 
-         board.setMovementStrategy(MovementStrategy.STOP_ON_END);
+         board.movementStrategy = MovementStrategy.STOP_ON_END;
          board.deleteOrUndoLetter();
          assertPosition(board, 1, 0);
          board.deleteOrUndoLetter();
@@ -272,7 +272,7 @@ public class PlayboardTest {
     public void testMoveNextOnAxis(boolean blockObjects) throws Exception {
         Puzzle puz = loadTestPuz(blockObjects);
         Playboard board = new Playboard(puz);
-        board.setMovementStrategy(MovementStrategy.MOVE_NEXT_ON_AXIS);
+        board.movementStrategy = MovementStrategy.MOVE_NEXT_ON_AXIS;
 
         // Across
         for (int i = 0; i < 4; i++)
@@ -319,7 +319,7 @@ public class PlayboardTest {
     public void testMoveStopEnd(boolean blockObjects) throws Exception {
         Puzzle puz = loadTestPuz(blockObjects);
         Playboard board = new Playboard(puz);
-        board.setMovementStrategy(MovementStrategy.STOP_ON_END);
+        board.movementStrategy = MovementStrategy.STOP_ON_END;
 
         // Across
         for (int i = 0; i < 4; i++)
@@ -355,7 +355,7 @@ public class PlayboardTest {
     public void testMoveNextClue(boolean blockObjects) throws Exception {
         Puzzle puz = loadTestPuz(blockObjects);
         Playboard board = new Playboard(puz);
-        board.setMovementStrategy(MovementStrategy.MOVE_NEXT_CLUE);
+        board.movementStrategy = MovementStrategy.MOVE_NEXT_CLUE;
 
         // Across
         for (int i = 0; i < 4; i++)
@@ -414,7 +414,7 @@ public class PlayboardTest {
     public void testMoveParallel(boolean blockObjects) throws Exception {
         Puzzle puz = loadTestPuz(blockObjects);
         Playboard board = new Playboard(puz);
-        board.setMovementStrategy(MovementStrategy.MOVE_PARALLEL_WORD);
+        board.movementStrategy = MovementStrategy.MOVE_PARALLEL_WORD;
 
         // Across
         for (int i = 0; i < 4; i++)
@@ -463,10 +463,8 @@ public class PlayboardTest {
         Puzzle puz = loadTestPuz(blockObjects);
         Playboard board = new Playboard(puz);
         board.setSkipCompletedLetters(true);
-        board.setMovementStrategy(
-            new MovementStrategy.CycleUnfilled(
-                MovementStrategy.MOVE_NEXT_ON_AXIS, true, true
-            )
+        board.movementStrategy = new MovementStrategy.CycleUnfilled(
+            MovementStrategy.MOVE_NEXT_ON_AXIS, true, true
         );
 
         // Across
@@ -691,7 +689,7 @@ public class PlayboardTest {
 
         final AtomicBoolean notified = new AtomicBoolean(false);
         Playboard.PlayboardListener listener = (changes) -> {
-            Collection<ClueID> changedClues = changes.getChangedClueIDs();
+            Collection<ClueID> changedClues = changes.changedClueIDs;
             assertEquals(changedClues.size(), 1);
             assertTrue(changedClues.contains(cid));
             notified.set(true);
@@ -716,7 +714,7 @@ public class PlayboardTest {
 
         final AtomicBoolean notified = new AtomicBoolean(false);
         Playboard.PlayboardListener listener = (changes) -> {
-            Collection<ClueID> changedClues = changes.getChangedClueIDs();
+            Collection<ClueID> changedClues = changes.changedClueIDs;
             assertEquals(changedClues.size(), 1);
             assertTrue(changedClues.contains(cid));
             notified.set(true);
@@ -926,7 +924,7 @@ public class PlayboardTest {
         Box[][] boxes = puz.getBoxes();
 
         Playboard board = new Playboard(puz);
-        board.setMovementStrategy(moveStrat);
+        board.movementStrategy = moveStrat;
         board.setSkipCompletedLetters(true);
 
         Position checkPos = null;

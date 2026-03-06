@@ -59,8 +59,8 @@ class LLMClueHelpRequester(
     private suspend fun makeQuery(board : Playboard) : String? {
         val blank = utils.getString(Res.string.share_clue_blank_box)
 
-        val puz = board.getPuzzle() ?: return null
-        val clue = board.getClue() ?: return null
+        val puz = board.puzzle
+        val clue = board.clue ?: return null
 
         val hint = clue.hint
         var response : String? = null

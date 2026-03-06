@@ -96,7 +96,7 @@ class ClueListPageViewModel(
         getBoard()?.let { board ->
             board.puzzle.getClue(cid)?.let { clue ->
                 if (clue.hasZone()) {
-                    val oldWord = board.getCurrentWord()
+                    val oldWord = board.currentWord
                     if (cid != board.clueID) {
                         board.jumpToClue(
                             clue,
@@ -112,10 +112,10 @@ class ClueListPageViewModel(
     fun deleteResponse() {
         getBoard()?.let { board ->
             movementStrategyFlow.getOnce { movementStrategy ->
-                val oldMovementStrategy = board.getMovementStrategy()
-                board.setMovementStrategy(movementStrategy)
+                val oldMovementStrategy = board.movementStrategy
+                board.movementStrategy = movementStrategy
                 board.deleteOrUndoResponse()
-                board.setMovementStrategy(oldMovementStrategy)
+                board.movementStrategy = oldMovementStrategy
             }
         }
     }
@@ -131,10 +131,10 @@ class ClueListPageViewModel(
     fun playResponse(c : String) {
         getBoard()?.let { board ->
             movementStrategyFlow.getOnce { movementStrategy ->
-                val oldMovementStrategy = board.getMovementStrategy()
-                board.setMovementStrategy(movementStrategy)
+                val oldMovementStrategy = board.movementStrategy
+                board.movementStrategy = movementStrategy
                 board.playResponse(c)
-                board.setMovementStrategy(oldMovementStrategy)
+                board.movementStrategy = oldMovementStrategy
             }
         }
     }
@@ -142,7 +142,7 @@ class ClueListPageViewModel(
     fun moveLeft() {
         getBoard()?.let { board ->
             val first = getCurrentFirstPosition()
-            if (!board.getHighlightLetter().equals(first)) {
+            if (board.highlightLetter != first) {
                 board.moveZoneBack(false)
                 snapToClue()
             } else {
@@ -154,7 +154,7 @@ class ClueListPageViewModel(
     fun moveRight() {
         getBoard()?.let { board ->
             val last = getCurrentLastPosition()
-            if (!board.getHighlightLetter().equals(last)) {
+            if (board.highlightLetter != last) {
                 board.moveZoneForward(false)
                 snapToClue()
             } else {
@@ -167,7 +167,7 @@ class ClueListPageViewModel(
         if (!isCurrentPageHistory) {
             getBoard()?.let { board ->
                 getPuzzle()?.let { puz ->
-                    val cid = board.getClueID()
+                    val cid = board.clueID
                     val curList = cid?.listName
                     val curClueIndex = cid?.index ?: -1
 
@@ -199,7 +199,7 @@ class ClueListPageViewModel(
         } else {
             getBoard()?.let { board ->
                 getPuzzle()?.let { puz ->
-                    val cid = board.getClueID()
+                    val cid = board.clueID
                     val curList = cid?.listName
                     val curClueIndex = cid?.index ?: -1
 
@@ -226,7 +226,7 @@ class ClueListPageViewModel(
         // only show keyboard if double click a word
         // else hide
         getBoard()?.let { board ->
-            val newPos = board.getHighlightLetter()
+            val newPos = board.highlightLetter
             if (
                 previousWord != null
                 && previousWord.checkInWord(newPos.row, newPos.col)
@@ -342,7 +342,7 @@ class ClueListPageViewModel(
      * First position of current word or null
      */
     private fun getCurrentFirstPosition() : Position? {
-        val zone = getBoard()?.getCurrentWord()?.getZone()
+        val zone = getBoard()?.currentWord?.zone
         if (zone != null && !zone.isEmpty())
             return zone.getPosition(0)
         else
@@ -353,7 +353,7 @@ class ClueListPageViewModel(
      * Last position of current word or null
      */
     private fun getCurrentLastPosition() : Position? {
-        val zone = getBoard()?.getCurrentWord()?.getZone()
+        val zone = getBoard()?.currentWord?.zone
         if (zone != null && !zone.isEmpty())
             return zone.getPosition(zone.size() - 1)
         else

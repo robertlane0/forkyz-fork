@@ -24,7 +24,7 @@ interface MovementStrategy {
                     var drow = 0
                     var dcol = 1
                     val zone = word.zone
-                    if (zone != null && zone.size() >= 2) {
+                    if (zone.size() >= 2) {
                         val last = zone.getPosition(zone.size() - 1)
                         val penultimate = zone.getPosition(zone.size() - 2)
                         drow = getDirection(penultimate.row, last.row)
@@ -55,7 +55,7 @@ interface MovementStrategy {
                     var drow = 0
                     var dcol = -1
                     val zone = word.zone
-                    if (zone != null && zone.size() >= 2) {
+                    if (zone.size() >= 2) {
                         val first = zone.getPosition(0)
                         val second = zone.getPosition(1)
                         drow = getDirection(second.row, first.row)
@@ -307,7 +307,7 @@ interface MovementStrategy {
                 val across = getWordDirection(w)
                 val zone = w.zone
 
-                if (zone == null || zone.size() == 0)
+                if (zone.size() == 0)
                     return w
 
                 val start = zone.getPosition(0)
@@ -384,7 +384,7 @@ interface MovementStrategy {
                 val across = getWordDirection(w)
                 val zone = w.zone
 
-                if (zone == null || zone.size() == 0)
+                if (zone.size() == 0)
                     return true
 
                 val start = zone.getPosition(0)
@@ -421,7 +421,7 @@ interface MovementStrategy {
                 val across = getWordDirection(w)
                 val zone = w.zone
 
-                if (zone == null || zone.size() == 0)
+                if (zone.size() == 0)
                     return w
 
                 val start = zone.getPosition(0)
@@ -489,7 +489,7 @@ interface MovementStrategy {
              */
             private fun getWordDirection(word : Word) : Boolean {
                 val zone = word.zone
-                if (zone != null && zone.size() >= 2) {
+                if (zone.size() >= 2) {
                     val pos0 = zone.getPosition(0)
                     val pos1 = zone.getPosition(1)
                     if (pos0.col == pos1.col)
@@ -529,7 +529,6 @@ interface MovementStrategy {
 
                 if (
                     clue == null
-                    || puz == null
                     || clue.zone.isEmpty()
                     || board.isFilledClueID(clue.clueID)
                     || !cycleForwards
@@ -562,7 +561,6 @@ interface MovementStrategy {
 
                 if (
                     clue == null
-                    || puz == null
                     || clue.zone.isEmpty()
                     || board.isFilledClueID(clue.clueID)
                     || !cycleBackwards

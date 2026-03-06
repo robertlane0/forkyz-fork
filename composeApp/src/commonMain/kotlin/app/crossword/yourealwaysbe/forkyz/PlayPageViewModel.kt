@@ -263,7 +263,7 @@ class PlayPageViewModel(
         getBoard()?.let { board ->
             val position = Position(row, col)
             board.setHighlightLetter(position)
-            launchClueNotes(board.getClueID())
+            launchClueNotes(board.clueID)
         }
     }
 
@@ -361,7 +361,7 @@ class PlayPageViewModel(
         if (board == null || puz == null)
             return
 
-        val currentID = board.getClueID()
+        val currentID = board.clueID
 
         val unfilledClues = puz.getAllClues().filter { clue ->
             val cid = clue.clueID
@@ -492,7 +492,7 @@ class PlayPageViewModel(
         // only show keyboard if double click a word
         // hide if it's a new word
         getBoard()?.let { board ->
-            val newPos = board.getHighlightLetter()
+            val newPos = board.highlightLetter
             if (previous.checkInWord(newPos.row, newPos.col)) {
                 showKeyboard()
             } else {

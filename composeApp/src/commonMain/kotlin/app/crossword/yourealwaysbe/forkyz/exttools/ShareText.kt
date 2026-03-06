@@ -42,21 +42,19 @@ open class ShareTextData(
             clue : Clue,
             withResponse : Boolean,
         ) : ShareTextData? {
-            return board.getPuzzle()?.let { puz ->
-                val response = board.getCurrentWordBoxes()
-                val shareMessage = getShareClueMessage(
-                    utils,
-                    settings,
-                    puz,
-                    clue,
-                    response,
-                    withResponse,
-                )
-                return ShareTextData(
-                    utils.getString(Res.string.share_clue_title),
-                    shareMessage,
-                )
-            }
+            val response = board.currentWordBoxes
+            val shareMessage = getShareClueMessage(
+                utils,
+                settings,
+                board.puzzle,
+                clue,
+                response,
+                withResponse,
+            )
+            return ShareTextData(
+                utils.getString(Res.string.share_clue_title),
+                shareMessage,
+            )
         }
 
         suspend fun buildShareCompletion(
@@ -100,7 +98,7 @@ open class ShareTextData(
             settings : ForkyzSettings,
             puz : Puzzle,
             clue : Clue,
-            response : Array<Box>,
+            response : List<Box>,
             withResponse : Boolean,
         ) : String {
             val clueText = getShareClueText(utils, settings, clue)
@@ -125,7 +123,7 @@ open class ShareTextData(
 
         private suspend fun getShareResponseText(
             utils : NativeBackendUtils,
-            boxes : Array<Box>
+            boxes : List<Box>
         ) : String {
             val responseText = StringBuilder()
             for (box in boxes) {

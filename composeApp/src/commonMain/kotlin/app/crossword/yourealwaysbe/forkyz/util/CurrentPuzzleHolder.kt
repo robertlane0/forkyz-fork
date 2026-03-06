@@ -155,7 +155,7 @@ public class CurrentPuzzleHolder(
 
     @MainThread
     fun getFreshCurrentPuzzleMeta(cb : Consumer<PuzMetaFile?>) {
-        val puz = board?.getPuzzle()
+        val puz = board?.puzzle
         val curHandle = puzHandle
         if (curHandle == null || puz == null)
             return
@@ -191,7 +191,7 @@ public class CurrentPuzzleHolder(
         cb : suspend () -> Unit = { },
         cbWithLock : suspend () -> Unit = { }
     ) {
-        val puz = board?.getPuzzle()
+        val puz = board?.puzzle
         val curHandle = puzHandle
         if (puz == null || curHandle == null) {
             AppLogger.i(TAG, "No puzzle currently loaded to save.")
@@ -249,10 +249,10 @@ public class CurrentPuzzleHolder(
             board?.setToggleBeforeMove(it)
         }
         settings.livePlayMovementStrategy.observeForeverWithProcessLifecycle() {
-            board?.setMovementStrategy(it)
+            board?.movementStrategy = it
         }
         settings.livePlaySkipFilled.observeForeverWithProcessLifecycle {
-            board?.setSkipCompletedLetters(it)
+            board?.isSkipCompletedLetters = it
         }
         settings.livePlayPlayLetterUndoEnabled
             .observeForeverWithProcessLifecycle {

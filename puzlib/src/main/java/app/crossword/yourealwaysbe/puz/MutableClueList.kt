@@ -80,10 +80,10 @@ internal class MutableClueList : ClueList {
         return clues.hashCode()
     }
 
-    override fun equals(o : Any?) : Boolean {
-        if (o !is MutableClueList)
+    override fun equals(other : Any?) : Boolean {
+        if (other !is MutableClueList)
             return false
-        return getClues() == o.getClues()
+        return getClues() == other.getClues()
     }
 
     override fun toString() : String {

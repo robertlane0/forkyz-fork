@@ -261,7 +261,7 @@ class NotesPageViewModel(
                 val zone = notesClue?.zone ?: board.currentWord.zone
                 return String(
                     zone.map { pos ->
-                        val box = board.puzzle?.checkedGetBox(pos)
+                        val box = board.puzzle.checkedGetBox(pos)
                         if (box?.isBlank() ?: true)
                             BLANK_CHAR
                         else
@@ -303,11 +303,11 @@ class NotesPageViewModel(
 
     fun playLetterToBoard(c : String) {
         getBoard()?.let { board ->
-            val oldMovementStrategy = board.getMovementStrategy()
+            val oldMovementStrategy = board.movementStrategy
             movementStrategyFlow.getOnce { movementStrategy ->
-                board.setMovementStrategy(movementStrategy)
+                board.movementStrategy = movementStrategy
                 board.playCellResponse(c)
-                board.setMovementStrategy(oldMovementStrategy)
+                board.movementStrategy = oldMovementStrategy
             }
         }
     }
@@ -315,10 +315,10 @@ class NotesPageViewModel(
     fun deleteLetterFromBoard() {
         getBoard()?.let { board ->
             movementStrategyFlow.getOnce { movementStrategy ->
-                val oldMovementStrategy = board.getMovementStrategy()
-                board.setMovementStrategy(movementStrategy)
+                val oldMovementStrategy = board.movementStrategy
+                board.movementStrategy = movementStrategy
                 board.deleteOrUndoLetter()
-                board.setMovementStrategy(oldMovementStrategy)
+                board.movementStrategy = oldMovementStrategy
             }
         }
     }
