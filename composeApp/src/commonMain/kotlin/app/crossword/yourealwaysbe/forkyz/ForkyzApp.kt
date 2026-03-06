@@ -170,7 +170,7 @@ private fun ForkyzAppMain(
                 themeHelper = themeHelper,
                 utils = utils,
                 pageOpener = pageOpener,
-                isTop = true,
+                isTop = isTop,
             )
         }
         composable<Play> {
