@@ -446,7 +446,7 @@ public class PuzzleBuilder {
 
     public static void resolveImages(Puzzle puz, String relativeUrl) {
         for (PuzImage image : puz.getImages()) {
-            String imgUrl = image.getURL();
+            String imgUrl = image.getUrl();
             if (imgUrl == null)
                 continue;
             if (
@@ -466,7 +466,7 @@ public class PuzzleBuilder {
                 ) {
                     byte[] bytes = StreamUtils.getStreamBytes(is);
                     String type = connection.getContentType();
-                    image.setURL(
+                    image.setUrl(
                         "data:" + type + ";base64," + Base64.encodeBytes(bytes)
                     );
                 }

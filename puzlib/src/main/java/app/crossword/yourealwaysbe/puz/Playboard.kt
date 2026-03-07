@@ -271,8 +271,8 @@ class Playboard(puzzle : Puzzle) {
         offsetDown : Int,
     ) : Box? {
         val currentPos = highlightLetter
-        val offAcross = currentPos.getCol() + offsetAcross
-        val offDown = currentPos.getRow() + offsetDown
+        val offAcross = currentPos.col + offsetAcross
+        val offDown = currentPos.row + offsetDown
         return puzzle.checkedGetBox(offDown, offAcross)
     }
 
@@ -891,15 +891,15 @@ class Playboard(puzzle : Puzzle) {
         dcol : Int,
     ) : Position? {
         val next = Position(
-            original.getRow() + drow,
-            original.getCol() + dcol,
+            original.row + drow,
+            original.col + dcol,
         )
 
         if (
-            next.getCol() < 0
-            || next.getRow() < 0
-            || next.getCol() >= puzzle.getWidth()
-            || next.getRow() >= puzzle.getHeight()
+            next.col < 0
+            || next.row < 0
+            || next.col >= puzzle.getWidth()
+            || next.row >= puzzle.getHeight()
         ) {
             return null
         }

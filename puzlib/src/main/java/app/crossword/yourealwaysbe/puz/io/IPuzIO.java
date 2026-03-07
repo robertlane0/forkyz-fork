@@ -2368,7 +2368,7 @@ public class IPuzIO extends AbstractJSONIO {
 
             for (PuzImage image : images) {
                 writer.object();
-                writer.keyValueNonNull(1, FIELD_EXT_IMAGE_URL, image.getURL())
+                writer.keyValueNonNull(1, FIELD_EXT_IMAGE_URL, image.getUrl())
                     .keyValueNonNull(1, FIELD_EXT_IMAGE_ROW, image.getRow())
                     .keyValueNonNull(1, FIELD_EXT_IMAGE_COL, image.getCol())
                     .keyValueNonNull(1, FIELD_EXT_IMAGE_WIDTH, image.getWidth())
