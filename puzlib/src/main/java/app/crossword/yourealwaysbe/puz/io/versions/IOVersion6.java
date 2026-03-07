@@ -1,17 +1,19 @@
 package app.crossword.yourealwaysbe.puz.io.versions;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.logging.Logger;
+
 import app.crossword.yourealwaysbe.puz.io.IO;
 import app.crossword.yourealwaysbe.puz.ClueID;
 import app.crossword.yourealwaysbe.puz.Note;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.PuzzleMeta;
 import app.crossword.yourealwaysbe.puz.util.PuzzleUtils;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.Objects;
-import java.util.logging.Logger;
 
 // Moves clue notes out of the puz file and into meta
 // i don't really think they were allowed in the puz file format
@@ -23,8 +25,8 @@ public class IOVersion6 extends IOVersion5 {
     @Override
     protected void applyMeta(Puzzle puz, PuzzleMeta meta){
         super.applyMeta(puz, meta);
-        applyNotes(puz, meta.acrossNotes, true);
-        applyNotes(puz, meta.downNotes, false);
+        applyNotes(puz, meta.getAcrossNotes(), true);
+        applyNotes(puz, meta.getDownNotes(), false);
     }
 
     @Override
@@ -54,16 +56,16 @@ public class IOVersion6 extends IOVersion5 {
 
         int numNotes = input.readInt();
 
-        Note[] notes = new Note[numNotes];
+        List<Note> notes = new ArrayList<>(numNotes);
 
         for (int x = 0; x < numNotes; x++) {
-            notes[x] = readNote(input);
+            notes.add(readNote(input));
         }
 
         if (isAcross)
-            meta.acrossNotes = notes;
+            meta.setAcrossNotes(notes);
         else
-            meta.downNotes = notes;
+            meta.setDownNotes(notes);
     }
 
     protected Note readNote(DataInputStream dis) throws IOException {
@@ -126,7 +128,7 @@ public class IOVersion6 extends IOVersion5 {
         IO.writeNullTerminatedString(dos, anagramSol, getCharset());
     }
 
-    private void applyNotes(Puzzle puz, Note[] notes, boolean isAcross) {
+    private void applyNotes(Puzzle puz, List<Note> notes, boolean isAcross) {
         if (notes != null) {
             String desiredList = isAcross
                 ? PuzzleUtils.getAcrossListName(puz)
@@ -135,8 +137,8 @@ public class IOVersion6 extends IOVersion5 {
             int idx = 0;
             for (ClueID cid : puz.getBoardClueIDs()) {
                 if (Objects.equals(desiredList, cid.getListName())) {
-                    if (idx < notes.length) {
-                        Note n = notes[idx];
+                    if (idx < notes.size()) {
+                        Note n = notes.get(idx);
                         if (n != null)
                             puz.setNote(cid, n);
                         idx += 1;

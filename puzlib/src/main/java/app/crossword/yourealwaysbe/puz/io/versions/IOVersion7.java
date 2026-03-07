@@ -18,13 +18,13 @@ public class IOVersion7 extends IOVersion6 {
     @Override
     protected void applyMeta(Puzzle puz, PuzzleMeta meta){
         super.applyMeta(puz, meta);
-        puz.setSupportUrl(meta.supportUrl);
+        puz.setSupportUrl(meta.getSupportUrl());
     }
 
     @Override
     public PuzzleMeta readMeta(DataInputStream dis) throws IOException {
         PuzzleMeta meta = super.readMeta(dis);
-        meta.supportUrl = IO.readNullTerminatedString(dis, getCharset());
+        meta.setSupportUrl(IO.readNullTerminatedString(dis, getCharset()));
         return meta;
     }
 

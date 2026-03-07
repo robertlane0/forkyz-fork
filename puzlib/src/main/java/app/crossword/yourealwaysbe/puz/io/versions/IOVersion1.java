@@ -40,26 +40,28 @@ public class IOVersion1 implements IOVersion {
     }
 
     protected void applyMeta(Puzzle puz, PuzzleMeta meta){
-        puz.setSource(meta.source);
-        puz.setDate(meta.date);
+        puz.setSource(meta.getSource());
+        puz.setDate(meta.getDate());
     }
 
     public PuzzleMeta readMeta(DataInputStream dis) throws IOException {
         PuzzleMeta meta = new PuzzleMeta();
 
-        meta.author = IO.readNullTerminatedString(dis, getCharset());
-        meta.source = IO.readNullTerminatedString(dis, getCharset());
-        meta.title = IO.readNullTerminatedString(dis, getCharset());
+        meta.setAuthor(IO.readNullTerminatedString(dis, getCharset()));
+        meta.setSource(IO.readNullTerminatedString(dis, getCharset()));
+        meta.setTitle(IO.readNullTerminatedString(dis, getCharset()));
 
         long dateEpoch = dis.readLong();
-        meta.date = (dateEpoch == 0)
-            ? null
-            : Instant.ofEpochMilli(dateEpoch)
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate();
+        meta.setDate(
+            (dateEpoch == 0)
+                ? null
+                : Instant.ofEpochMilli(dateEpoch)
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate()
+        );
 
-        meta.percentComplete = dis.readInt();
-        meta.percentFilled = meta.percentComplete;
+        meta.setPercentComplete(dis.readInt());
+        meta.setPercentFilled(meta.getPercentComplete());
 
         return meta;
     }

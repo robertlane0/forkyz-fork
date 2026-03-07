@@ -20,10 +20,10 @@ public class IOVersion3 extends IOVersion2 {
     @Override
     protected void applyMeta(Puzzle puz, PuzzleMeta meta){
         super.applyMeta(puz, meta);
-        puz.setPosition(meta.position);
-        Box box = puz.checkedGetBox(meta.position);
+        puz.setPosition(meta.getPosition());
+        Box box = puz.checkedGetBox(meta.getPosition());
         if (!Box.isBlock(box)) {
-            String desiredList = meta.across
+            String desiredList = meta.getAcross()
                 ? PuzzleUtils.getAcrossListName(puz)
                 : PuzzleUtils.getDownListName(puz);
             ClueID curCid = box.getIsPartOfClue(desiredList);
@@ -36,8 +36,8 @@ public class IOVersion3 extends IOVersion2 {
         PuzzleMeta meta = super.readMeta(dis);
         int x = dis.readInt();
         int y = dis.readInt();
-        meta.position = new Position(y, x);
-        meta.across = dis.read() == 1;
+        meta.setPosition(new Position(y, x));
+        meta.setAcross(dis.read() == 1);
         return meta;
     }
 

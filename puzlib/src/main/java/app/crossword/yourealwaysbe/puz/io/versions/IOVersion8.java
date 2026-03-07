@@ -18,13 +18,13 @@ public class IOVersion8 extends IOVersion7 {
     @Override
     protected void applyMeta(Puzzle puz, PuzzleMeta meta){
         super.applyMeta(puz, meta);
-        puz.setPlayerNote(meta.playerNote);
+        puz.setPlayerNote(meta.getPlayerNote());
     }
 
     @Override
     public PuzzleMeta readMeta(DataInputStream dis) throws IOException {
         PuzzleMeta meta = super.readMeta(dis);
-        meta.playerNote = readNote(dis);
+        meta.setPlayerNote(readNote(dis));
         return meta;
     }
 

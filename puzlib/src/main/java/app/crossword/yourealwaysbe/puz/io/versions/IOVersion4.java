@@ -15,7 +15,7 @@ public class IOVersion4 extends IOVersion3 {
     @Override
     public PuzzleMeta readMeta(DataInputStream dis) throws IOException {
         PuzzleMeta meta = super.readMeta(dis);
-        meta.percentFilled = dis.readInt();
+        meta.setPercentFilled(dis.readInt());
         return meta;
     }
 

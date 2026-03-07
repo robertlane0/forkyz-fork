@@ -1,12 +1,5 @@
 package app.crossword.yourealwaysbe.puz.io.versions;
 
-import app.crossword.yourealwaysbe.puz.io.IO;
-import app.crossword.yourealwaysbe.puz.Clue;
-import app.crossword.yourealwaysbe.puz.ClueID;
-import app.crossword.yourealwaysbe.puz.Puzzle;
-import app.crossword.yourealwaysbe.puz.PuzzleMeta;
-import app.crossword.yourealwaysbe.puz.util.PuzzleUtils;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -15,6 +8,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Logger;
+
+import app.crossword.yourealwaysbe.puz.Clue;
+import app.crossword.yourealwaysbe.puz.ClueID;
+import app.crossword.yourealwaysbe.puz.ListNum;
+import app.crossword.yourealwaysbe.puz.Puzzle;
+import app.crossword.yourealwaysbe.puz.PuzzleMeta;
+import app.crossword.yourealwaysbe.puz.io.IO;
+import app.crossword.yourealwaysbe.puz.util.PuzzleUtils;
 
 // Adds history list in format
 // int length (int clue boolean across)*
@@ -26,8 +27,8 @@ public class IOVersion5 extends IOVersion4 {
     protected void applyMeta(Puzzle puz, PuzzleMeta meta){
         super.applyMeta(puz, meta);
 
-        List<ClueID> cidHistory = new ArrayList<>(meta.historyList.size());
-        for (PuzzleMeta.ListNum ln : meta.historyList) {
+        List<ClueID> cidHistory = new ArrayList<>(meta.getHistoryList().size());
+        for (ListNum ln : meta.getHistoryList()) {
             String listName = ln.getListName();
             String number = String.valueOf(ln.getNumber());
             Clue clue = puz.getClues(listName).getClueByNumber(number);
@@ -41,7 +42,7 @@ public class IOVersion5 extends IOVersion4 {
     public PuzzleMeta readMeta(DataInputStream dis) throws IOException {
         PuzzleMeta meta = super.readMeta(dis);
 
-        meta.historyList = new LinkedList<PuzzleMeta.ListNum>();
+        meta.setHistoryList(new LinkedList<ListNum>());
 
         int length = dis.readInt();
         for (int i = 0; i < length; i++) {
@@ -49,7 +50,7 @@ public class IOVersion5 extends IOVersion4 {
             boolean across = dis.readBoolean();
             String listName = across ? IO.ACROSS_LIST : IO.DOWN_LIST;
 
-            meta.historyList.add(new PuzzleMeta.ListNum(listName, number));
+            meta.getHistoryList().add(new ListNum(listName, number));
         }
 
         return meta;
