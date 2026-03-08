@@ -126,7 +126,7 @@ class VoiceCommands {
         utils : NativeBackendUtils,
         puz : Puzzle,
     ) : String {
-        return puz.getAllClues()
+        return puz.allClues
             .map { clue -> getLLMPromptClueDescription(utils, clue) }
             .filterNotNull()
             .joinToString(", ")

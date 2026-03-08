@@ -118,11 +118,11 @@ class PuzzleInfoDialogViewModel(
             copyright = puz?.copyright ?: "",
             elapsed = elapsed,
             progress = progress,
-            introduction = if (puz?.hasIntroMessage() ?: false)
+            introduction = if (puz?.hasIntroMessage ?: false)
                     puz.introMessage ?: ""
                 else
                     "",
-            notes = if (puz?.hasNotes() ?: false)
+            notes = if (puz?.hasNotes ?: false)
                     puz.notes ?: ""
                 else
                     "",

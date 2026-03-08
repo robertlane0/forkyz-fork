@@ -322,8 +322,8 @@ abstract class FileHandler {
             }
             // if the puzzle doesn't have its own date, use the detected
             // one
-            if (puz.getDate() == null)
-                puz.setDate(mr.date)
+            if (puz.date == null)
+                puz.date = mr.date
         }
 
         return puz

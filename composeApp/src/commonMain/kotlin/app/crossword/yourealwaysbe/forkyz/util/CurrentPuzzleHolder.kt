@@ -98,7 +98,7 @@ public class CurrentPuzzleHolder(
                     ioScope.launch {
                         try {
                             val puz = fileHandler.load(puzHandle);
-                            if (puz == null || puz.getBoxes() == null) {
+                            if (puz == null) {
                                 throw IOException(
                                     "Puzzle is null or contains no boxes."
                                 )

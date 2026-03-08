@@ -32,15 +32,15 @@ public class ExolveIOTest {
         assertEquals(puz.getAuthor(), "Test author");
         assertEquals(puz.getCopyright(), "Test copyright");
         assertEquals(
-            puz.getIntroMessage(),
+                puz.getIntroMessage(),
             "Test preamble<br/>Multiple lines<br/><br/>Test prelude"
         );
         assertEquals(
-            puz.getNotes(),
+                puz.getNotes(),
             "test@email.com<br/><br/>Tester: test<br/>Tester 2: test2"
         );
         assertEquals(
-            puz.getCompletionMessage(),
+                puz.getCompletionMessage(),
             "Everything is explained."
             + "<h2>Across</h2>"
             + "<p>1. ANNOT1a</p>"

@@ -17,11 +17,11 @@ class FifteenSquaredData(uri : Uri) : HTMLToolData(uri) {
             utils : NativeBackendUtils,
             puz : Puzzle,
         ) : FifteenSquaredData {
-            var source = puz.getSource()
+            var source = puz.source
             if (source == null)
                 source = ""
 
-            var title = puz.getTitle()
+            var title = puz.title
             if (title == null)
                 title = ""
 

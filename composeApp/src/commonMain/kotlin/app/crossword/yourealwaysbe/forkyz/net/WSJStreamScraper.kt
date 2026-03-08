@@ -33,7 +33,7 @@ class WSJStreamScraper : AbstractStreamScraper() {
         try {
             apacheGetURLInputStream(jsonURL, timeout).use { jsonIS ->
                 val puz = WallStreetJournalJSONIO.readPuzzle(jsonIS)
-                puz?.setSource(DEFAULT_SOURCE)
+                puz?.source = DEFAULT_SOURCE
                 return puz
             }
         } catch (e : Exception) {

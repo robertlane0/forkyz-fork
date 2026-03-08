@@ -120,17 +120,15 @@ open class PageScraper(
                     try {
                         val puz = downloadPuzzle(url)
                         if (puz != null) {
-                            puz.setSource(name)
-                            puz.setSourceUrl(url)
-                            puz.setSupportUrl(supportUrl)
-                            puz.setShareUrl(
-                                if (shareFileUrl) url else scrapeUrl,
-                            )
-                            puz.setDate(LocalDate.now())
+                            puz.source = name
+                            puz.sourceUrl = url
+                            puz.supportUrl = supportUrl
+                            puz.shareUrl = if (shareFileUrl) url else scrapeUrl
+                            puz.date = LocalDate.now()
 
-                            val title = puz.getTitle()
+                            val title = puz.title
                             if (title == null || title.isEmpty())
-                                puz.setTitle(remoteFileName)
+                                puz.title = remoteFileName
 
                             PuzzleBuilder.resolveImages(puz, url)
 

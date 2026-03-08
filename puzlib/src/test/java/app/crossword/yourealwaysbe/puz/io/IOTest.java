@@ -237,7 +237,7 @@ public class IOTest {
             System.out.println();
             try{
                 assertTrue(IO.tryUnscramble(
-                    puz, 2465, puz.initializeUnscrambleData())
+                    puz, 2465, IO.initializeUnscrambleData(puz))
                 );
                 for(Box b :  puz.getBoxesList()){
                     if(!Box.isBlock(b))

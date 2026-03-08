@@ -41,7 +41,7 @@ public class JPZIOTest {
                 + "<h1>Down</h1>"
                 + "<p>22: Shower Heads v7</p>"
                 + "<p>61: I'm NOT going to ATTEND it / I'm going to SKIP it</p>",
-            puz.getCompletionMessage()
+                puz.getCompletionMessage()
         );
 
         Box[][] boxes = puz.getBoxes();

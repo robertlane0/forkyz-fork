@@ -93,8 +93,8 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
             return getRawc(is2)?.let(this::getFromRawc)
                 ?.let { puz ->
                     with (puz) {
-                        if (getSource() == null)
-                            setSource(DEFAULT_SOURCE)
+                        if (source == null)
+                            source = DEFAULT_SOURCE
                     }
                     return puz
                 }

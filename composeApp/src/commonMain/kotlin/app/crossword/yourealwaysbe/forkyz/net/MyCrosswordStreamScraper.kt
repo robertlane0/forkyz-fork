@@ -62,8 +62,8 @@ class MyCrosswordStreamScraper : AbstractStreamScraper() {
                 // need to bridge between competing json libraries :/
                 val puz = GuardianJSONIO.readPuzzle(data.toString())
                 if (puz != null) {
-                    if (puz.getSource() == null)
-                        puz.setSource(DEFAULT_SOURCE)
+                    if (puz.source == null)
+                        puz.source = DEFAULT_SOURCE
                     return puz
                 }
             }

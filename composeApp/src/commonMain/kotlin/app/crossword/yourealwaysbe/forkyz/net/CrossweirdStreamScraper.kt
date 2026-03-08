@@ -32,7 +32,7 @@ class CrossweirdStreamScraper : AbstractStreamScraper() {
         try {
             getInputStream(puzURL).use { puzIS ->
                 val puz = PuzzleStreamReader.parseInputStatic(puzIS)
-                puz?.setSource(DEFAULT_SOURCE)
+                puz?.source = DEFAULT_SOURCE
                 return puz
             }
         } catch (e : Exception) {

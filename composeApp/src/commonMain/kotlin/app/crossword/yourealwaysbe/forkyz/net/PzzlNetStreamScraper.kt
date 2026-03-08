@@ -28,7 +28,7 @@ class PzzlNetStreamScraper : AbstractStreamScraper() {
         try {
             getInputStream(txtURL).use { txtIS ->
                 val puz = BrainsOnlyIO.parse(txtIS)
-                puz?.setSource(DEFAULT_SOURCE)
+                puz?.source = DEFAULT_SOURCE
                 return puz
             }
         } catch (e : Exception) {

@@ -110,19 +110,23 @@ interface MovementStrategy {
                         val puz = board.puzzle
                         val listName = clueID.listName
                         val curIndex = clueID.index
-                        val clues = puz.getClues(listName)
-
-                        // Move to prev clue or wrap to end of prev list
-                        val firstIndex = clues.getFirstZonedIndex()
-                        if (curIndex == firstIndex) {
-                            val prevList = getPrevList(puz, listName)
-                            val prevClues = puz.getClues(prevList)
-                            val lastIndex = prevClues.getLastZonedIndex()
-                            board.jumpToClueEnd(ClueID(prevList, lastIndex))
-                        } else {
-                            val prevIndex =
-                                clues.getPreviousZonedIndex(curIndex, true)
-                            board.jumpToClueEnd(ClueID(listName, prevIndex))
+                        puz.getClues(listName)?.let { clues ->
+                            // Move to prev clue or wrap to end of prev list
+                            val firstIndex = clues.getFirstZonedIndex()
+                            if (curIndex == firstIndex) {
+                                val prevList = getPrevList(puz, listName)
+                                puz.getClues(prevList)?.let { prevClues ->
+                                    val lastIndex
+                                        = prevClues.getLastZonedIndex()
+                                    board.jumpToClueEnd(
+                                        ClueID(prevList, lastIndex),
+                                    )
+                                }
+                            } else {
+                                val prevIndex =
+                                    clues.getPreviousZonedIndex(curIndex, true)
+                                board.jumpToClueEnd(ClueID(listName, prevIndex))
+                            }
                         }
                     }
                 }
@@ -162,19 +166,23 @@ interface MovementStrategy {
                         val puz = board.puzzle
                         val listName = clueID.listName
                         val curIndex = clueID.index
-                        val clues = puz.getClues(listName)
-
-                        // Move to next clue or wrap to start of next list
-                        val lastIndex = clues.getLastZonedIndex()
-                        if (curIndex == lastIndex) {
-                            val nextList = getNextList(puz, listName)
-                            val nextClues = puz.getClues(nextList)
-                            val firstIndex = nextClues.getFirstZonedIndex()
-                            board.jumpToClue(ClueID(nextList, firstIndex))
-                        } else {
-                            val nextIndex =
-                                clues.getNextZonedIndex(curIndex, true)
-                            board.jumpToClue(ClueID(listName, nextIndex))
+                        puz.getClues(listName)?.let { clues ->
+                            // Move to next clue or wrap to start of next list
+                            val lastIndex = clues.getLastZonedIndex()
+                            if (curIndex == lastIndex) {
+                                val nextList = getNextList(puz, listName)
+                                puz.getClues(nextList)?.let { nextClues ->
+                                    val firstIndex
+                                        = nextClues.getFirstZonedIndex()
+                                    board.jumpToClue(
+                                        ClueID(nextList, firstIndex),
+                                    )
+                                }
+                            } else {
+                                val nextIndex =
+                                    clues.getNextZonedIndex(curIndex, true)
+                                board.jumpToClue(ClueID(listName, nextIndex))
+                            }
                         }
 
                         // Check if we should skip

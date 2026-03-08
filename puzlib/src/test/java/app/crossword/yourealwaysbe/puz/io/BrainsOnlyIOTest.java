@@ -26,7 +26,7 @@ public class BrainsOnlyIOTest  {
         assertEquals("02/07/14 SODA SPEAK", puz.getTitle());
         assertEquals(
             "S.N. &amp; Robert Francis, edited by Stanley Newman",
-            puz.getAuthor()
+                puz.getAuthor()
         );
         assertEquals("Test note", puz.getNotes());
         assertEquals(LocalDate.of(2014, 2, 7), puz.getDate());
@@ -80,7 +80,7 @@ public class BrainsOnlyIOTest  {
 
         Puzzle puz = BrainsOnlyIO.parse(BrainsOnlyIOTest.class.getResourceAsStream("/brainsonly2.txt"));
         assertEquals(
-            puz.getTitle(),
+                puz.getTitle(),
             "02/09/14 OCCUPIED NATIONS: Surrounding the long answers"
         );
         ClueList acrossClues = puz.getClues("Across");

@@ -67,11 +67,11 @@ class PzzlComStreamScraper : AbstractStreamScraper() {
             getInputStream(makePuzzleURL(mainInfo, date)).use { puzIS ->
                 val puz = BrainsOnlyIO.parse(puzIS)
                 if (puz != null) {
-                    if (puz.getSource() == null)
-                        puz.setSource(DEFAULT_SOURCE)
-                    if (puz.getDate() == null) {
+                    if (puz.source == null)
+                        puz.source = DEFAULT_SOURCE
+                    if (puz.date == null) {
                         try {
-                            puz.setDate(LocalDate.parse(date, DATE_FORMATTER))
+                            puz.date = LocalDate.parse(date, DATE_FORMATTER)
                         } catch (e : DateTimeParseException) {
                             // oh well, we tried
                         }

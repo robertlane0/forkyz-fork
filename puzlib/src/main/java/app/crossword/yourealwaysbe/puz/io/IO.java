@@ -500,7 +500,9 @@ public class IO implements PuzzleParser {
             writeNullTerminatedString(tmpDos, unHtmlString(clue), CHARSET);
         }
 
-        writeNullTerminatedString(tmpDos, unHtmlString(puz.getNotes()), CHARSET);
+        writeNullTerminatedString(
+            tmpDos, unHtmlString(puz.getNotes()), CHARSET
+        );
 
         writeGEXT(tmpDos, puz);
         writeRebus(tmpDos, puz, CHARSET);
@@ -550,19 +552,24 @@ public class IO implements PuzzleParser {
      * checksum is valid.
      */
     public static boolean tryUnscramble(Puzzle p, int key_int, byte[] solution) {
-        p.unscrambleKey[0] = (key_int / 1000) % 10;
-        p.unscrambleKey[1] = (key_int / 100) % 10;
-        p.unscrambleKey[2] = (key_int / 10) % 10;
-        p.unscrambleKey[3] = (key_int / 1) % 10;
+        int[] unscrambleKey = new int[4];
+        byte[] unscrambleBuf = new byte[solution.length];
+        byte[] unscrambleTmp = new byte[9];
+
+        unscrambleKey[0] = (key_int / 1000) % 10;
+        unscrambleKey[1] = (key_int / 100) % 10;
+        unscrambleKey[2] = (key_int / 10) % 10;
+        unscrambleKey[3] = (key_int / 1) % 10;
 
         for (int i = 3; i >= 0; i--) {
-            unscrambleString(p, solution);
-            System.arraycopy(p.unscrambleBuf, 0, solution, 0,
-                    p.unscrambleBuf.length);
-            unshiftString(p, solution, p.unscrambleKey[i]);
+            unscrambleString(unscrambleBuf, solution);
+            System.arraycopy(
+                unscrambleBuf, 0, solution, 0, unscrambleBuf.length
+            );
+            unshiftString(unscrambleTmp, solution, unscrambleKey[i]);
 
             for (int j = 0; j < solution.length; j++) {
-                int letter = (solution[j] & 0xFF) - p.unscrambleKey[j % 4];
+                int letter = (solution[j] & 0xFF) - unscrambleKey[j % 4];
 
                 if (letter < 65) {
                     letter += 26;
@@ -572,7 +579,7 @@ public class IO implements PuzzleParser {
             }
         }
 
-        if (p.solutionChecksum == (short) IO.cksum_region(solution, 0,
+        if (p.getSolutionChecksum() == (short) IO.cksum_region(solution, 0,
                 solution.length, 0)) {
             int s = 0;
             for (int i = 0; i < p.getBoxesList().length; i++) {
@@ -595,7 +602,7 @@ public class IO implements PuzzleParser {
 
     public static boolean crack(Puzzle puz) {
         for (int a = 0; a < 10000; a++) {
-            if (tryUnscramble(puz, a, puz.initializeUnscrambleData())) {
+            if (tryUnscramble(puz, a, initializeUnscrambleData(puz))) {
                 return true;
             }
         }
@@ -613,23 +620,38 @@ public class IO implements PuzzleParser {
         os.write(0);
     }
 
-    public static void unscrambleString(Puzzle p, byte[] str) {
+    public static void unscrambleString(byte[] unscrambleBuf, byte[] str) {
         int oddIndex = 0;
         int evenIndex = str.length / 2;
 
         for (int i = 0; i < str.length; i++) {
             if ((i % 2) == 0) {
-                p.unscrambleBuf[evenIndex++] = str[i];
+                unscrambleBuf[evenIndex++] = str[i];
             } else {
-                p.unscrambleBuf[oddIndex++] = str[i];
+                unscrambleBuf[oddIndex++] = str[i];
             }
         }
     }
 
-    public static void unshiftString(Puzzle p, byte[] str, int keynum) {
-        System.arraycopy(str, str.length - keynum, p.unscrambleTmp, 0, keynum);
+    public static void unshiftString(
+        byte[] unscrambleTmp, byte[] str, int keynum
+    ) {
+        System.arraycopy(str, str.length - keynum, unscrambleTmp, 0, keynum);
         System.arraycopy(str, 0, str, keynum, str.length - keynum);
-        System.arraycopy(p.unscrambleTmp, 0, str, 0, keynum);
+        System.arraycopy(unscrambleTmp, 0, str, 0, keynum);
+    }
+
+    static byte[] initializeUnscrambleData(Puzzle puz) {
+        StringBuilder ans = new StringBuilder();
+        for (int x = 0; x < puz.getWidth(); x++) {
+            for (int y = 0; y < puz.getHeight(); y++) {
+                Box box = puz.checkedGetBox(y, x);
+                if (box != null && !Box.isBlock(box)) {
+                    ans.append(box.getSolution());
+                }
+            }
+        }
+        return ans.toString().getBytes();
     }
 
     private static int cksum_cib(byte[] puzByteArray, int cksum) {

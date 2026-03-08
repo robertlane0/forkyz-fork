@@ -53,7 +53,7 @@ class RaetselZentraleSchwedenStreamScraper : AbstractStreamScraper() {
             puz = secondStage.parseInput(bis)
         }
 
-        puz?.setSource(DEFAULT_SOURCE)
+        puz?.source = DEFAULT_SOURCE
 
         return puz
     }

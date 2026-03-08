@@ -44,9 +44,7 @@ class UclickDownloader(
     ) : DownloadResult {
         val res : DownloadResult = super.download(date, existingFileNames)
         if (res.isSuccess) {
-            res.puzzle?.setCopyright(
-                "\u00a9 " + date.getYear() + " " + copyright
-            )
+            res.puzzle?.copyright = "\u00a9 " + date.getYear() + " " + copyright
         }
         return res
     }

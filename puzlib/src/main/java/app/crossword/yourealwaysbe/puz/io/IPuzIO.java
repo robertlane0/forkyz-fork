@@ -36,10 +36,11 @@ import app.crossword.yourealwaysbe.puz.Position;
 import app.crossword.yourealwaysbe.puz.PuzImage;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.PuzzleBuilder;
+import app.crossword.yourealwaysbe.puz.PuzzleKind;
 import app.crossword.yourealwaysbe.puz.Zone;
 import app.crossword.yourealwaysbe.puz.util.HtmlUtil;
-import app.crossword.yourealwaysbe.puz.util.PuzzleUtils;
 import app.crossword.yourealwaysbe.puz.util.JSONParser;
+import app.crossword.yourealwaysbe.puz.util.PuzzleUtils;
 
 import static app.crossword.yourealwaysbe.puz.util.HtmlUtil.htmlString;
 import static app.crossword.yourealwaysbe.puz.util.HtmlUtil.unHtmlString;
@@ -357,7 +358,7 @@ public class IPuzIO extends AbstractJSONIO {
             JSONObject json = JSONParser.parse(is);
 
             checkIPuzVersion(json);
-            Puzzle.Kind kind = getPuzKind(json);
+            PuzzleKind kind = getPuzKind(json);
 
             PuzzleBuilder builder = new PuzzleBuilder(readBoxes(json));
 
@@ -368,7 +369,7 @@ public class IPuzIO extends AbstractJSONIO {
             readClues(json, builder);
             readExtensions(json, builder);
 
-            if (Puzzle.Kind.ACROSTIC.equals(kind))
+            if (PuzzleKind.ACROSTIC.equals(kind))
                 ensureBoardClue(builder);
 
             return builder.getPuzzle();
@@ -393,11 +394,11 @@ public class IPuzIO extends AbstractJSONIO {
     /**
      * Checks recognized ipuz kind
      *
-     * @return Puzzle.Kind the ipuz kind matches
+     * @return PuzzleKind the ipuz kind matches
      */
-    private static Puzzle.Kind getPuzKind(JSONObject puzJson)
+    private static PuzzleKind getPuzKind(JSONObject puzJson)
             throws IPuzFormatException {
-        Puzzle.Kind puzKind = null;
+        PuzzleKind puzKind = null;
 
         // Either acrostic or crossword. If we find acrostic, we're
         // done. Otherwise, assume crossword unless acrostic comes up
@@ -408,11 +409,11 @@ public class IPuzIO extends AbstractJSONIO {
             String kind = kinds.getString(i).toLowerCase();
 
             if (kind.startsWith(ACROSTIC_PREFIX))
-                return Puzzle.Kind.ACROSTIC;
+                return PuzzleKind.ACROSTIC;
 
             for (String supportedKindPrefix : SUPPORTED_KIND_PREFIXES) {
                 if (kind.startsWith(supportedKindPrefix)) {
-                    puzKind = Puzzle.Kind.CROSSWORD;
+                    puzKind = PuzzleKind.CROSSWORD;
                 }
             }
         }
@@ -2324,7 +2325,7 @@ public class IPuzIO extends AbstractJSONIO {
         writer.keyValueNonNull(FIELD_EXT_SUPPORT_URL, puz.getSupportUrl());
         writer.keyValueNonNull(FIELD_EXT_SHARE_URL, puz.getShareUrl());
 
-        if (puz.hasPinnedClueID()) {
+        if (puz.getHasPinnedClueID()) {
             writer.key(FIELD_EXT_PINNED_CLUE_ID);
             writeClueID(puz.getPinnedClueID(), writer);
             writer.newLine();

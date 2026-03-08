@@ -172,10 +172,13 @@ class ClueListPageViewModel(
                     val curClueIndex = cid?.index ?: -1
 
                     if (curList != null && curClueIndex >= 0) {
-                        val prev = puz.getClues(curList)
-                            .getPreviousZonedIndex(curClueIndex, true)
-                        board.jumpToClue(ClueID(curList, prev))
-                        snapToClue()
+                        puz.getClues(curList)?.getPreviousZonedIndex(
+                            curClueIndex,
+                            true,
+                        )?.let { prev ->
+                            board.jumpToClue(ClueID(curList, prev))
+                            snapToClue()
+                        }
                     } else {
                         selectFirstSelectableClue(currentPageNum, false)
                     }
@@ -188,7 +191,7 @@ class ClueListPageViewModel(
         if (isCurrentPageHistory) {
             getBoard()?.let { board ->
                 getPuzzle()?.let { puz ->
-                    val history = puz.getHistory()
+                    val history = puz.history
                     if (history.size > 2) {
                         // always at top of history
                         board.jumpToClue(history.get(1))
@@ -204,10 +207,13 @@ class ClueListPageViewModel(
                     val curClueIndex = cid?.index ?: -1
 
                     if (curList != null && curClueIndex >= 0) {
-                        val next = puz.getClues(curList)
-                            .getNextZonedIndex(curClueIndex, true)
-                        board.jumpToClue(ClueID(curList, next))
-                        snapToClue()
+                        puz.getClues(curList)?.getNextZonedIndex(
+                            curClueIndex,
+                            true,
+                        )?.let { next ->
+                            board.jumpToClue(ClueID(curList, next))
+                            snapToClue()
+                        }
                     } else {
                         selectFirstSelectableClue(currentPageNum, true)
                     }
@@ -400,7 +406,7 @@ class ClueListPageViewModel(
             pageNum
 
         if (clueTabsViewModel.isHistoryPage(pageNum)) {
-            for (cid in puz.getHistory()) {
+            for (cid in puz.history) {
                 val clue = puz.getClue(cid)
                 if (clue?.hasZone() ?: false) {
                     board.jumpToClue(clue)
@@ -412,12 +418,14 @@ class ClueListPageViewModel(
             val pages = clueTabsViewModel.pages
             if (0 <= pageNum && pageNum <= pages.size - 1) {
                 val listName = pages[pageNum].listName
-                val firstClue = puz.getClues(listName).getFirstZonedIndex()
-                if (firstClue >= 0) {
-                    board.jumpToClue(ClueID(listName, firstClue))
-                    snapToClue(showPageNum)
-                    return true
-                }
+                puz.getClues(listName)
+                    ?.getFirstZonedIndex()?.let { firstClue ->
+                        if (firstClue >= 0) {
+                            board.jumpToClue(ClueID(listName, firstClue))
+                            snapToClue(showPageNum)
+                            return true
+                        }
+                    }
             }
         }
         return false

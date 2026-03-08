@@ -25,28 +25,28 @@ class CrosswordNexusStreamScraper : AbstractStreamScraper() {
                 PUZZLE_URL_RE, PUZZLE_URL_EXTRACT,
                 PuzzleStreamReader(),
             )?.also { puz ->
-                if (!isThere(puz.getTitle())) {
+                if (!isThere(puz.title)) {
                     doc.selectFirst("cw-title")?.let {
-                        puz.setTitle(it.text().trim())
+                        puz.title = it.text().trim()
                     }
                 }
 
-                if (!isThere(puz.getAuthor())) {
+                if (!isThere(puz.author)) {
                     doc.selectFirst("cw-author")?.let {
-                        puz.setAuthor(it.text().trim())
+                        puz.author = it.text().trim()
                     }
                 }
 
-                if (!isThere(puz.getSource())) {
-                    if (isThere(puz.getAuthor()))
-                        puz.setSource(puz.getAuthor())
+                if (!isThere(puz.source)) {
+                    if (isThere(puz.author))
+                        puz.source = puz.author
                     else
-                        puz.setSource(DEFAULT_SOURCE)
+                        puz.source = DEFAULT_SOURCE
                 }
 
-                if (!isThere(puz.getCopyright())) {
+                if (!isThere(puz.copyright)) {
                     doc.selectFirst("cw-copyright")?.let {
-                        puz.setCopyright(it.text().trim())
+                        puz.copyright = it.text().trim()
                     }
                 }
             }

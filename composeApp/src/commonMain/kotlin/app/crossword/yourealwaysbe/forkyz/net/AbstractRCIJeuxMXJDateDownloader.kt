@@ -53,7 +53,7 @@ class AbstractRCIJeuxMXJDateDownloader private constructor(
         headers : Map<String, String>?,
     ) : Puzzle? {
         return super.download(date, headers)?.also {
-            it.setTitle(getCrosswordTitle(date))
+            it.title = getCrosswordTitle(date)
         }
     }
 

@@ -106,11 +106,11 @@ class KingDigitalLoginDownloader(
                 headers = headers,
             ).use(JPZIO::readPuzzle)?.let { puz ->
                 with (puz) {
-                    setDate(date)
-                    setSource(name)
-                    setSourceUrl(url)
-                    setSupportUrl(getSupportUrl())
-                    setShareUrl(getShareUrl(date))
+                    this.date = date
+                    this.source = name
+                    this.sourceUrl = url
+                    this.supportUrl = supportUrl
+                    this.shareUrl = getShareUrl(date)
                 }
                 puz
             }

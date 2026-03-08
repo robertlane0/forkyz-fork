@@ -41,21 +41,17 @@ public class XDIOTest {
         assertEquals(puz.getTitle(), "Test <b>title</b>");
         assertEquals(puz.getAuthor(), "Test <i>author</i>");
         assertEquals(
-            puz.getCopyright(),
-            "This is <u>the</u> <strike>copyright</strike>"
-        );
-        assertEquals(
-            puz.getCopyright(),
+                puz.getCopyright(),
             "This is <u>the</u> <strike>copyright</strike>"
         );
 
         if (simpleNotes) {
             assertEquals(
-                puz.getNotes(), "Test notes<br/><br/>Test line more notes"
+                    puz.getNotes(), "Test notes<br/><br/>Test line more notes"
             );
         } else {
             assertEquals(
-                puz.getNotes(),
+                    puz.getNotes(),
                 "<p>description</p><p>notes</p><p>Free form<br/><br/>notes</p>"
             );
         }

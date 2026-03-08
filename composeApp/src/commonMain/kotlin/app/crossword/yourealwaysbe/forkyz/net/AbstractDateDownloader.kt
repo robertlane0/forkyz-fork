@@ -141,10 +141,10 @@ open class AbstractDateDownloader constructor(
                             date
                         else
                             puz.date
-                        puz.setSource(name)
-                        puz.setSourceUrl(sourceUrl)
-                        puz.setSupportUrl(supportUrl)
-                        puz.setShareUrl(getShareUrl(date))
+                        puz.source = name
+                        puz.sourceUrl = sourceUrl
+                        puz.supportUrl = supportUrl
+                        puz.shareUrl = getShareUrl(date)
 
                         return puz
                     }

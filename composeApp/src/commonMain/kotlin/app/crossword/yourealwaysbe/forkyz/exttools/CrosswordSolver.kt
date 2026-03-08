@@ -32,11 +32,12 @@ class CrosswordSolverData(
             val request = StringBuilder()
 
             for (pos in zone) {
-                val box = puz.checkedGetBox(pos)
-                if (!Box.isBlock(box) && !box.isBlank()) {
-                    request.append(box.response)
-                } else {
-                    request.append(".");
+                puz.checkedGetBox(pos)?.let { box ->
+                    if (!Box.isBlock(box) && !box.isBlank()) {
+                        request.append(box.response)
+                    } else {
+                        request.append(".");
+                    }
                 }
             }
 

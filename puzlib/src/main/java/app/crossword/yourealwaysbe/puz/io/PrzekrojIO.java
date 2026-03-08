@@ -78,7 +78,7 @@ public class PrzekrojIO implements PuzzleParser {
 
                 puz = readPuzzleFromJSON(JSONParser.parse(cwJson));
                 if (title != null)
-                    puz.setTitle(title);;
+                    puz.setTitle(title);
             }
 
             String source = puz.getSource();

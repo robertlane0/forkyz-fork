@@ -416,15 +416,15 @@ open class PuzzlePageViewModel(
         getPuzzle()?.hasInitialValueCells() ?: false
     }
     val isFirstPlay : Boolean
-        get() = getPuzzle()?.getTime() == 0.toLong()
+        get() = getPuzzle()?.time == 0.toLong()
     val canResume : Boolean
         get() { return getPuzzle() != null }
     val isTimerRunning : Boolean
         get() { return timer != null }
     val supportURL : String?
-        get() { return getPuzzle()?.getSupportUrl() }
+        get() { return getPuzzle()?.supportUrl }
     val shareURL : String?
-        get() { return getPuzzle()?.getShareUrl() }
+        get() { return getPuzzle()?.shareUrl }
 
     private val voiceCommandDispatcher = VoiceCommands()
 
@@ -450,8 +450,8 @@ open class PuzzlePageViewModel(
 
     fun startTimer() {
         val puz = getPuzzle()
-        if (puz != null && puz.getPercentComplete() != 100) {
-                val time = puz.getTime()
+        if (puz != null && puz.percentComplete != 100) {
+                val time = puz.time
                 timer = ImaginaryTimer(time);
                 timer?.start();
         }
@@ -473,8 +473,8 @@ open class PuzzlePageViewModel(
         getPuzzle()?.let { puz ->
             timer?.let { timer ->
                 timer.stop();
-                if (forceOverwriteTime || puz.getPercentComplete() != 100) {
-                    puz.setTime(timer.getElapsed());
+                if (forceOverwriteTime || puz.percentComplete != 100) {
+                    puz.time = timer.getElapsed()
                 }
             }
         }
@@ -1197,8 +1197,8 @@ open class PuzzlePageViewModel(
         val board = getBoard()
         val puz = getPuzzle()
 
-        val hasShareURL = puz?.getShareUrl() != null
-        val hasSupportURL = puz?.getSupportUrl() != null
+        val hasShareURL = puz?.shareUrl != null
+        val hasSupportURL = puz?.supportUrl != null
         val canReveal = puz?.hasSolution() ?: false
 
         val box = board?.currentBox
@@ -1245,7 +1245,7 @@ open class PuzzlePageViewModel(
 
     private fun handleChangeTimer() {
         val puz = getPuzzle()
-        if (puz != null && puz.getPercentComplete() == 100) {
+        if (puz != null && puz.percentComplete == 100) {
             if (isTimerRunning) {
                 stopTimer(true)
                 showFinishedDialog()

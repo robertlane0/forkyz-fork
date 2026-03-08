@@ -16,6 +16,7 @@ import app.crossword.yourealwaysbe.puz.Note;
 import app.crossword.yourealwaysbe.puz.Position;
 import app.crossword.yourealwaysbe.puz.PuzImage;
 import app.crossword.yourealwaysbe.puz.Puzzle;
+import app.crossword.yourealwaysbe.puz.PuzzleKind;
 import app.crossword.yourealwaysbe.puz.Zone;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -63,9 +64,8 @@ public class IPuzIOTest {
     }
 
     public static void assertIsTestPuzzle1(Puzzle puz) throws Exception {
-        assertEquals(puz.getKind(), Puzzle.Kind.CROSSWORD);
+        assertEquals(puz.getKind(), PuzzleKind.CROSSWORD);
 
-        System.out.println(puz.getTitle());
         assertEquals(puz.getTitle(), "Test &amp; puzzle ‘");
         assertEquals(puz.getAuthor(), "Test author");
         assertEquals(puz.getCopyright(), "Test copyright");
@@ -159,7 +159,7 @@ public class IPuzIOTest {
 
     public static void assertIsTestPuzzleExtras(Puzzle puz) throws Exception {
         assertEquals(
-            puz.getIntroMessage(),
+                puz.getIntroMessage(),
             "Weird features: unnumbered words, clues "
                 +  "in non-standards lists, colors, etc"
         );
@@ -268,7 +268,7 @@ public class IPuzIOTest {
     }
 
     public static void assertIsTestPuzzleAcrostic(Puzzle puz) throws Exception {
-        assertEquals(puz.getKind(), Puzzle.Kind.ACROSTIC);
+        assertEquals(puz.getKind(), PuzzleKind.ACROSTIC);
 
         ClueList words = puz.getClues("Clues");
         ClueList quote = puz.getClues("Quote");
@@ -348,10 +348,10 @@ public class IPuzIOTest {
     public static void assertIsTestPuzzleHTML(Puzzle puz) throws Exception {
         assertEquals(puz.getTitle(), "<b>Test</b> &amp; puzzle<br>For testing");
         assertEquals(
-            puz.getAuthor(), "Test author<br><b>For<sup>Test</sup></b>"
+                puz.getAuthor(), "Test author<br><b>For<sup>Test</sup></b>"
         );
         assertEquals(
-            puz.getSource(), "Test &nbsp;&nbsp;publisher<br>test<i>test</i>"
+                puz.getSource(), "Test &nbsp;&nbsp;publisher<br>test<i>test</i>"
         );
 
         ClueList acrossClues = puz.getClues("Across");

@@ -1,7 +1,7 @@
 
 package app.crossword.yourealwaysbe.puz
 
-internal class MutableClueList : ClueList {
+class MutableClueList : ClueList {
     private var clues : MutableList<Clue> = mutableListOf<Clue>()
     private var numberedClueMap : MutableMap<String, Clue>
         = mutableMapOf<String, Clue>()

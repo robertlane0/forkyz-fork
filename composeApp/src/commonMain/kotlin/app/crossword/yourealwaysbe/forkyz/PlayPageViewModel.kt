@@ -40,6 +40,7 @@ import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges
 import app.crossword.yourealwaysbe.puz.Playboard.Word
 import app.crossword.yourealwaysbe.puz.Position
 import app.crossword.yourealwaysbe.puz.Puzzle
+import app.crossword.yourealwaysbe.puz.PuzzleKind
 
 /**
  * UI State for play
@@ -225,7 +226,7 @@ class PlayPageViewModel(
 
     public val isAcrostic : Boolean
         get() {
-            return getPuzzle()?.let { it.kind == Puzzle.Kind.ACROSTIC } ?: false
+            return getPuzzle()?.let { it.kind == PuzzleKind.ACROSTIC } ?: false
         }
 
     init {
@@ -363,7 +364,7 @@ class PlayPageViewModel(
 
         val currentID = board.clueID
 
-        val unfilledClues = puz.getAllClues().filter { clue ->
+        val unfilledClues = puz.allClues.filter { clue ->
             val cid = clue.clueID
             cid != currentID && !board.isFilledClueID(clue.clueID)
         }
@@ -466,9 +467,9 @@ class PlayPageViewModel(
                     val firstPlayMessage = if (
                         isFirstPlay
                         && !firstPlayCleared
-                        && puz.hasIntroMessage()
+                        && puz.hasIntroMessage
                     ) {
-                        puz.getIntroMessage()
+                        puz.introMessage
                     } else {
                         null
                     }

@@ -132,22 +132,22 @@ private suspend fun ensurePuzSource(
     fileName : String?,
 ) {
     var source = AppPuzzleUtils.deriveSource(
-        puz.getSource(),
+        puz.source,
         fileName,
-        puz.getAuthor(),
-        puz.getTitle()
+        puz.author,
+        puz.title
     )
 
     if (source == null || source.isEmpty())
         source = utils.getString(Res.string.import_fallback_source)
 
-    puz.setSource(source)
+    puz.source = source
 }
 
 private fun ensurePuzDate(puz : Puzzle, fileName : String?) {
     val date
-        = AppPuzzleUtils.deriveDate(puz.getDate(), fileName) ?: LocalDate.now()
-    puz.setDate(date)
+        = AppPuzzleUtils.deriveDate(puz.date, fileName) ?: LocalDate.now()
+    puz.date = date
 }
 
 private fun getFileName(uri : Uri?) : String? {

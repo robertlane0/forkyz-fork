@@ -38,16 +38,17 @@ object AppPuzzleUtils {
      * Generate a file name for the given puzzle
      */
     fun generateFileName(puzzle : Puzzle) : String {
-        var name = puzzle.getSource()
+        var name = puzzle.source
         if (name == null || name.isEmpty())
-            name = puzzle.getAuthor()
+            name = puzzle.author
         if (name == null || name.isEmpty())
-            name = puzzle.getTitle()
+            name = puzzle.title
         if (name == null)
             name = ""
 
-        var date = puzzle.getDate()
-        if (date == null) date = LocalDate.now()
+        var date = puzzle.date
+        if (date == null)
+            date = LocalDate.now()
 
         val normalizedName = Normalizer.normalize(name, Normalizer.Form.NFD)
             .replace(FILE_NAME_REMOVE_CHARS.toRegex(), "")

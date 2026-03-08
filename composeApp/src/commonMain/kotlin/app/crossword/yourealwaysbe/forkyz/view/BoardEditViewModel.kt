@@ -605,12 +605,14 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
         if (clueID == null) {
             if (displaySeparators == DisplaySeparators.DS_ALWAYS) {
                 box.getIsPartOfClues().forEach { cid ->
-                    separators = addSeparators(
-                        clue = puz.getClue(cid),
-                        inferSeparators = inferSeparators,
-                        position = position,
-                        separators = separators,
-                    )
+                    puz.getClue(cid)?.let { clue ->
+                        separators = addSeparators(
+                            clue = clue,
+                            inferSeparators = inferSeparators,
+                            position = position,
+                            separators = separators,
+                        )
+                    }
                 }
             }
         }
@@ -618,13 +620,15 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
         // current clue takes precedence
         val currentCID = clueID ?: board.currentWord.clueID
         if (currentCID != null && box.isPartOf(currentCID)) {
-            separators = addSeparators(
-                clue = puz.getClue(currentCID),
-                inferSeparators = inferSeparators,
-                position = position,
-                separators = separators,
-                allAcross = (clueID != null),
-            )
+            puz.getClue(currentCID)?.let { clue ->
+                separators = addSeparators(
+                    clue = clue,
+                    inferSeparators = inferSeparators,
+                    position = position,
+                    separators = separators,
+                    allAcross = (clueID != null),
+                )
+            }
         }
 
         return separators
@@ -650,7 +654,7 @@ class BoardEditViewModel(
         get() { return board?.puzzle?.height ?: 0 }
     val pinnedHeight : Int
         get() {
-            return if (board?.puzzle?.hasPinnedClueID() ?: false) {
+            return if (board?.puzzle?.hasPinnedClueID ?: false) {
                 1 + (
                     (board.puzzle.pinnedClue?.zone?.size() ?: 0) / width
                 )
@@ -707,7 +711,7 @@ class BoardEditViewModel(
 
         val selectedPositions = board.currentWord.zone.toSet()
 
-        val images = board.puzzle.images?.map {
+        val images = board.puzzle.images.map {
             Image(
                 row = it.row,
                 col = it.col,
@@ -715,7 +719,7 @@ class BoardEditViewModel(
                 height = it.height,
                 url = it.url,
             )
-        }?.toImmutableList() ?: persistentListOf()
+        }.toImmutableList()
 
         return BoardState(
             boxes = getBoxes(
@@ -767,7 +771,7 @@ class BoardEditViewModel(
         if (puz == null)
             return null
 
-        return if (puz.hasPinnedClueID()) {
+        return if (puz.hasPinnedClueID) {
             puz.pinnedClue?.zone?.let { zone ->
                 if (zone.size() <= width) {
                     val padding = List((width - zone.size()) / 2) { col ->

@@ -292,7 +292,7 @@ class MetaCache(private val utils : NativeBackendUtils) {
             }
         )
         val mainFileName = fileHandler.getName(mainFileHandle)
-        var date = AppPuzzleUtils.deriveDate(puz.getDate(), mainFileName)
+        var date = AppPuzzleUtils.deriveDate(puz.date, mainFileName)
         if (date == null)
             date = fileHandler.getModifiedDate(mainFileHandle)
 
@@ -302,13 +302,13 @@ class MetaCache(private val utils : NativeBackendUtils) {
             directoryUri = fileHandler.getUri(puzHandle.dirHandle),
             isUpdatable = true, // used to be a puzzle field
             date = date,
-            percentComplete = puz.getPercentComplete(),
-            percentFilled = puz.getPercentFilled(),
-            percentHinted = puz.getPercentHinted(),
-            source = puz.getSource(),
-            title = puz.getTitle(),
-            author = puz.getAuthor(),
-            ratingCode = puz.getRating().code,
+            percentComplete = puz.percentComplete,
+            percentFilled = puz.percentFilled,
+            percentHinted = puz.percentHinted,
+            source = puz.source,
+            title = puz.title,
+            author = puz.author,
+            ratingCode = puz.rating.code,
             hasSolution = puz.hasSolution()
         )
 

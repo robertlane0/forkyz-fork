@@ -50,8 +50,8 @@ class KeesingDownloader(
         headers : Map<String, String>?,
     ) : Puzzle? {
         return super.download(date, headers)?.apply {
-            setCopyright(name)
-            setDate(date)
+            this.copyright = name
+            this.date = date
         }
     }
 }

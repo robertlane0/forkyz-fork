@@ -22,7 +22,7 @@ import app.crossword.yourealwaysbe.puz.io.StreamUtils;
 import app.crossword.yourealwaysbe.puz.util.PuzzleUtils;
 
 public class PuzzleBuilder {
-    private final Puzzle puzzle = new Puzzle();
+    private final Puzzle puzzle;
     private Map<String, Position> numberPositions;
 
     /**
@@ -41,7 +41,7 @@ public class PuzzleBuilder {
     }
 
     public PuzzleBuilder(Box[][] boxes) {
-        puzzle.setBoxes(boxes);
+        puzzle = new Puzzle(boxes);
     }
 
     public PuzzleBuilder(Box[] boxesList, int width, int height) {
@@ -52,7 +52,7 @@ public class PuzzleBuilder {
                 boxes[y][x] = boxesList[i++];
             }
         }
-        puzzle.setBoxes(boxes);
+        puzzle = new Puzzle(boxes);
     }
 
     /**
@@ -253,7 +253,7 @@ public class PuzzleBuilder {
         return this;
     }
 
-    public PuzzleBuilder setKind(Puzzle.Kind kind) {
+    public PuzzleBuilder setKind(PuzzleKind kind) {
         puzzle.setKind(kind);
         return this;
     }

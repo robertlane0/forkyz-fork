@@ -39,7 +39,7 @@ class Playboard(puzzle : Puzzle) {
     var responder : String? = null
     var isSkipCompletedLetters : Boolean = false
 
-    private val sortedClueListNames = puzzle.getClueListNames().sorted()
+    private val sortedClueListNames = puzzle.clueListNames.sorted()
     private var showErrorsGrid = false
     private var showErrorsCursor = false
     private var showErrorsClue = false
@@ -135,15 +135,12 @@ class Playboard(puzzle : Puzzle) {
     init {
         this.puzzle = puzzle
 
-        if (puzzle.getPosition() == null)
-            selectFirstPosition()
-
         // setup bookkeeping
-        val curID = puzzle.getCurrentClueID()
+        val curID = puzzle.currentClueID
 
         updateHistory(curID)
 
-        previousPosition = puzzle.getPosition()
+        previousPosition = puzzle.position
 
         val clue = puzzle.getClue(curID)
         if (clue == null || !clue.hasZone()) {
@@ -194,7 +191,7 @@ class Playboard(puzzle : Puzzle) {
     }
 
     val boxes : Array<Array<Box?>>
-        get() = puzzle.getBoxes()
+        get() = puzzle.boxes
 
     val clue : Clue?
         /**
@@ -205,7 +202,7 @@ class Playboard(puzzle : Puzzle) {
         }
 
     val clueID : ClueID?
-        get() = puzzle.getCurrentClueID()
+        get() = puzzle.currentClueID
 
     val currentClueList : ClueList?
         /**
@@ -331,9 +328,10 @@ class Playboard(puzzle : Puzzle) {
         val length = min(zone.size(), response.length)
         for (i in 0..<length) {
             val pos = zone.getPosition(i)
-            val box = puzzle.checkedGetBox(pos)
-            if (!isBlock(box))
-                box.response = response.get(i).toString()
+            puzzle.checkedGetBox(pos)?.let { box ->
+                if (!isBlock(box))
+                    box.response = response.get(i).toString()
+            }
             flagChange(pos)
         }
         notifyChange()
@@ -354,25 +352,26 @@ class Playboard(puzzle : Puzzle) {
         if (highlightLetter == currentHighlight) {
             toggleSelection()
         } else {
-            val box = puzzle.checkedGetBox(highlightLetter)
-            if (!isBlock(box)) {
-                flagChange(currentHighlight, highlightLetter)
+            puzzle.checkedGetBox(highlightLetter)?.let { box ->
+                if (!isBlock(box)) {
+                    flagChange(currentHighlight, highlightLetter)
 
-                puzzle.setPosition(highlightLetter)
+                    puzzle.position = highlightLetter
 
-                // if box is part of a clue, only toggle if it's not
-                // part of the current clue (i.e. toggle to the right
-                // clue selection)
-                // else it's not part of a clue (detached), so only
-                // toggle if there we're moving from a non-detached cell
-                // to a detached one.
-                if (box.isPartOfClues()) {
-                    val zone = w.zone
-                    if (!zone.hasPosition(highlightLetter)) {
+                    // if box is part of a clue, only toggle if it's not
+                    // part of the current clue (i.e. toggle to the right
+                    // clue selection)
+                    // else it's not part of a clue (detached), so only
+                    // toggle if there we're moving from a non-detached cell
+                    // to a detached one.
+                    if (box.isPartOfClues()) {
+                        val zone = w.zone
+                        if (!zone.hasPosition(highlightLetter)) {
+                            toggleSelection()
+                        }
+                    } else if (this.clueID != null) {
                         toggleSelection()
                     }
-                } else if (this.clueID != null) {
-                    toggleSelection()
                 }
             }
         }
@@ -403,7 +402,7 @@ class Playboard(puzzle : Puzzle) {
         val w = currentWord
 
         val box = puzzle.checkedGetBox(highlightLetter)
-        if (isBlock(box))
+        if (box == null || isBlock(box))
             return w
 
         val curHighlightLetter = this.highlightLetter
@@ -418,8 +417,8 @@ class Playboard(puzzle : Puzzle) {
             return w
 
         if (box.getIsPartOfClues().contains(cid)) {
-            puzzle.setPosition(highlightLetter)
-            puzzle.setCurrentClueID(cid)
+            puzzle.position = highlightLetter
+            puzzle.currentClueID = cid
 
             flagChange(curHighlightLetter, highlightLetter)
             // don't flag change of word as notify picks this up from
@@ -442,7 +441,7 @@ class Playboard(puzzle : Puzzle) {
 
     // TODO: Puzzle has to enforce always a position
     val highlightLetter : Position
-        get() = puzzle.getPosition()
+        get() = puzzle.position
 
     /**
      * Show errors across the whole grid
@@ -629,7 +628,7 @@ class Playboard(puzzle : Puzzle) {
                 playLetterUndoStack.pushClearDisabled()
                 setHighlightLetter(pos)
                 playLetterUndoStack.popClearDisabled()
-                puzzle.setCurrentClueID(undo.clueID)
+                puzzle.currentClueID = undo.clueID
                 flagChange(pos)
             }
             // pause delete when empty stack reached to provide a
@@ -698,7 +697,7 @@ class Playboard(puzzle : Puzzle) {
             // don't delete crossing doesn't make sense for acrostic
             val skipAdjacent = (
                 deleteCrossingMode != DeleteCrossingMode.DELETE
-                && (Puzzle.Kind.ACROSTIC != puzzle.getKind())
+                && (PuzzleKind.ACROSTIC != puzzle.kind)
                 && currentBoxHasFilledAdjacent(
                     deleteCrossingMode
                         == DeleteCrossingMode.PRESERVE_FILLED_WORDS
@@ -741,25 +740,28 @@ class Playboard(puzzle : Puzzle) {
             if (filledWordsOnly) {
                 return isFilledClueID(otherCID)
             } else {
-                val zone = puzzle.getClue(otherCID).zone
-                val curPos = zone.indexOf(currentPos)
-                val posBefore = if (curPos > 0)
-                    zone.getPosition(curPos - 1)
-                else
-                    null
+                puzzle.getClue(otherCID)?.zone?.let { zone ->
+                    val curPos = zone.indexOf(currentPos)
+                    val posBefore = if (curPos > 0)
+                        zone.getPosition(curPos - 1)
+                    else
+                        null
 
-                val boxBefore = puzzle.checkedGetBox(posBefore)
-                if (!isBlock(boxBefore) && !boxBefore.isBlank())
-                    return true
+                    puzzle.checkedGetBox(posBefore)?.let { boxBefore ->
+                        if (!isBlock(boxBefore) && !boxBefore.isBlank())
+                            return true
 
-                val posAfter = if (curPos < zone.size() - 1)
-                    zone.getPosition(curPos + 1)
-                else
-                    null
+                        val posAfter = if (curPos < zone.size() - 1)
+                            zone.getPosition(curPos + 1)
+                        else
+                            null
 
-                val boxAfter = puzzle.checkedGetBox(posAfter)
-                if (!isBlock(boxAfter) && !boxAfter.isBlank())
-                    return true
+                        puzzle.checkedGetBox(posAfter)?.let { boxAfter ->
+                            if (!isBlock(boxAfter) && !boxAfter.isBlank())
+                                return true
+                        }
+                    }
+                }
             }
         }
 
@@ -780,7 +782,7 @@ class Playboard(puzzle : Puzzle) {
 
         if (pos != null) {
             setHighlightLetter(pos)
-            puzzle.setCurrentClueID(clueID)
+            puzzle.currentClueID = clueID
         }
 
         popNotificationDisabled()
@@ -812,7 +814,7 @@ class Playboard(puzzle : Puzzle) {
             val puz = this.puzzle
             for (clueListName in sortedClueListNames) {
                 clues = puz.getClues(clueListName)
-                clue = clues.getClueByNumber(number)
+                clue = clues?.getClueByNumber(number)
                 if (clue != null) {
                     jumpToClue(clue)
                     return
@@ -834,7 +836,7 @@ class Playboard(puzzle : Puzzle) {
 
         if (pos != null) {
             setHighlightLetter(pos)
-            puzzle.setCurrentClueID(clueID)
+            puzzle.currentClueID = clueID
         }
 
         popNotificationDisabled()
@@ -898,8 +900,8 @@ class Playboard(puzzle : Puzzle) {
         if (
             next.col < 0
             || next.row < 0
-            || next.col >= puzzle.getWidth()
-            || next.row >= puzzle.getHeight()
+            || next.col >= puzzle.width
+            || next.row >= puzzle.height
         ) {
             return null
         }
@@ -927,10 +929,13 @@ class Playboard(puzzle : Puzzle) {
         val newPos = findNextDelta(oldPos, false, drow, dcol)
         val newBox = puzzle.checkedGetBox(newPos)
 
-        if (newPos == null || isBlock(newBox))
+        if (newPos == null || newBox == null || isBlock(newBox))
             return w
 
         val oldBox = puzzle.checkedGetBox(oldPos)
+        if (oldBox == null)
+            return w
+
         val newBoxClues = newBox.getIsPartOfClues()
         val curClue = w.clueID
 
@@ -948,7 +953,7 @@ class Playboard(puzzle : Puzzle) {
                 .firstOrNull()
 
             if (nextClue != null) {
-                puzzle.setCurrentClueID(nextClue)
+                puzzle.currentClueID = nextClue
                 notifyChange()
             } else {
                 setHighlightLetter(newPos)
@@ -1013,7 +1018,6 @@ class Playboard(puzzle : Puzzle) {
         delta : Int,
     ) : Position? {
         val zone = currentZone
-
         if (zone == null)
             return null
 
@@ -1257,7 +1261,7 @@ class Playboard(puzzle : Puzzle) {
         val pos = this.highlightLetter
         val b = puzzle.checkedGetBox(pos)
 
-        if (isBlock(b)) {
+        if (b == null || isBlock(b)) {
             return null
         }
 
@@ -1331,8 +1335,9 @@ class Playboard(puzzle : Puzzle) {
         val prevWord = this.currentWord
         pushNotificationDisabled()
         val highlightPos = this.highlightLetter
-        val box = puzzle.checkedGetBox(highlightPos)
-        setScratchLetter(box, letter)
+        puzzle.checkedGetBox(highlightPos)?.let { box ->
+            setScratchLetter(box, letter)
+        }
         nextLetter()
         popNotificationDisabled()
         notifyChange()
@@ -1399,7 +1404,7 @@ class Playboard(puzzle : Puzzle) {
         val highlightLetter = this.highlightLetter
         val b = puzzle.checkedGetBox(highlightLetter)
 
-        if (!isBlock(b) && b.hasInitialValue()) {
+        if (b != null && !isBlock(b) && b.hasInitialValue()) {
             b.initialValue?.let { initialValue ->
                 if (b.response != initialValue) {
                     b.response = initialValue
@@ -1416,11 +1421,12 @@ class Playboard(puzzle : Puzzle) {
     fun revealInitialLetters() {
         var changed = false
 
-        for (row in 0..<puzzle.getHeight()) {
-            for (col in 0..<puzzle.getWidth()) {
+        for (row in 0..<puzzle.height) {
+            for (col in 0..<puzzle.width) {
                 val b = puzzle.checkedGetBox(row, col)
                 val reveal = (
-                    !isBlock(b)
+                    b != null
+                    && !isBlock(b)
                     && b.hasInitialValue()
                     && (b.response != b.initialValue)
                 )
@@ -1443,7 +1449,7 @@ class Playboard(puzzle : Puzzle) {
         val highlightLetter = this.highlightLetter
         val b = puzzle.checkedGetBox(highlightLetter)
 
-        if (!isBlock(b)) {
+        if (b != null && !isBlock(b)) {
             val correctResponse = b.solution == b.response
             if (!correctResponse) {
                 b.solution?.let { solution ->
@@ -1470,8 +1476,8 @@ class Playboard(puzzle : Puzzle) {
         val changes = mutableListOf<Position>()
         val boxes = this.boxes
 
-        for (row in 0..<puzzle.getHeight()) {
-            for (col in 0..<puzzle.getWidth()) {
+        for (row in 0..<puzzle.height) {
+            for (col in 0..<puzzle.width) {
                 puzzle.checkedGetBox(row, col)?.let { b ->
                     if (!isBlock(b)) {
                         val correctResponse = b.solution == b.response
@@ -1498,8 +1504,8 @@ class Playboard(puzzle : Puzzle) {
         val changes = mutableListOf<Position>()
         val boxes = this.boxes
 
-        for (row in 0..<puzzle.getHeight()) {
-            for (col in 0..<puzzle.getWidth()) {
+        for (row in 0..<puzzle.height) {
+            for (col in 0..<puzzle.width) {
                 puzzle.checkedGetBox(row, col)?.let { b ->
                     if (!isBlock(b)) {
                         val correctResponse = b.solution == b.response
@@ -1588,7 +1594,7 @@ class Playboard(puzzle : Puzzle) {
         val w = this.currentWord
 
         val box = puzzle.checkedGetBox(this.highlightLetter)
-        if (isBlock(box))
+        if (box == null || isBlock(box))
             return w
 
         var changed = false
@@ -1603,7 +1609,7 @@ class Playboard(puzzle : Puzzle) {
             changed = true
             if (this.clueID == null)
                 selectDetachedZone = !selectDetachedZone
-            puzzle.setCurrentClueID(null)
+            puzzle.currentClueID = null
         } else {
             val curCid = this.clueID
 
@@ -1612,7 +1618,7 @@ class Playboard(puzzle : Puzzle) {
                 var newCid = boxClues.higher(curCid)
                 if (newCid == null)
                     newCid = boxClues.first()
-                puzzle.setCurrentClueID(newCid)
+                puzzle.currentClueID = newCid
                 changed = curCid != newCid
             } else {
                 var newCid : ClueID? = null
@@ -1620,7 +1626,7 @@ class Playboard(puzzle : Puzzle) {
                     newCid = box.getIsPartOfClue(curCid.listName)
                 if (newCid == null)
                     newCid = boxClues.first()
-                puzzle.setCurrentClueID(newCid)
+                puzzle.currentClueID = newCid
                 changed = true
             }
         }
@@ -1675,7 +1681,7 @@ class Playboard(puzzle : Puzzle) {
      * For consistency with setClueNote really.
      */
     fun setPlayerNote(note : Note?) {
-        puzzle.setPlayerNote(note)
+        puzzle.playerNote = note
     }
 
     fun flagClue(cid : ClueID?, flag : Boolean) {
@@ -1777,7 +1783,7 @@ class Playboard(puzzle : Puzzle) {
                 continue
 
             val b = puzzle.checkedGetBox(pos)
-            if (isBlock(b))
+            if (b == null || isBlock(b))
                 break
 
             // get next letter and try to handle unicode
@@ -1948,45 +1954,6 @@ class Playboard(puzzle : Puzzle) {
     }
 
     /**
-     * Find the first clue with a non-empty zone in board order, or all
-     * back to first clue with zone found
-     *
-     * Requires sortedClueListNames
-     */
-    private fun selectFirstPosition() {
-        for (cid in puzzle.getBoardClueIDs()) {
-            val clue = puzzle.getClue(cid)
-            if (clue.hasZone()) {
-                puzzle.setPosition(clue.zone.getPosition(0))
-                puzzle.setCurrentClueID(cid)
-                return
-            }
-        }
-        // try all clues
-        for (clue in puzzle.getAllClues()) {
-            if (clue.hasZone()) {
-                puzzle.setPosition(clue.zone.getPosition(0))
-                puzzle.setCurrentClueID(clue.clueID)
-                return
-            }
-        }
-        // fall back to first cell in grid
-        val width = puzzle.getWidth()
-        val height = puzzle.getHeight()
-        for (row in 0..<height) {
-            for (col in 0..<width) {
-                if (!isBlock(puzzle.checkedGetBox(row, col))) {
-                    puzzle.setPosition(Position(row, col))
-                    return
-                }
-            }
-        }
-        throw IllegalArgumentException(
-            "Can't handled grids with no cells"
-        )
-    }
-
-    /**
      * Returns the zone of the clue, or null
      */
     private fun getZone(clueID : ClueID?) : Zone? {
@@ -2093,7 +2060,7 @@ class Playboard(puzzle : Puzzle) {
                 val highlight = this.highlightLetter
                 val puz = this.puzzle
                 val box = puz.checkedGetBox(highlight)
-                if (!isBlock(box) && !box.isPartOfClues()) {
+                if (box != null && !isBlock(box) && !box.isPartOfClues()) {
                     return getDetachedCellsZone()
                 } else {
                     val zone = Zone()
@@ -2133,10 +2100,10 @@ class Playboard(puzzle : Puzzle) {
         // because Zone.hasPosition is O(n)
         val oldPositions = mutableSetOf<Position>()
 
-        for (row in 0..<puz.getHeight()) {
-            for (col in 0..<puz.getWidth()) {
+        for (row in 0..<puz.height) {
+            for (col in 0..<puz.width) {
                 val box = puz.checkedGetBox(row, col)
-                if (!isBlock(box) && !box.isPartOfClues()) {
+                if (box != null && !isBlock(box) && !box.isPartOfClues()) {
                     val pos = Position(row, col)
                     if (oldPositions.contains(pos))
                         continue
@@ -2187,7 +2154,11 @@ class Playboard(puzzle : Puzzle) {
                 val zoneBox = puz.checkedGetBox(zonePos)
 
                 // if isn't detached, abort
-                if (isBlock(zoneBox) || zoneBox.isPartOfClues())
+                if (
+                    zoneBox == null
+                    || isBlock(zoneBox)
+                    || zoneBox.isPartOfClues()
+                )
                     return
 
                 if (!oldPositions.contains(zonePos)) {

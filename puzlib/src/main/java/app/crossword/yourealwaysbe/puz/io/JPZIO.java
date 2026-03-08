@@ -6,6 +6,7 @@ import app.crossword.yourealwaysbe.puz.ClueID;
 import app.crossword.yourealwaysbe.puz.Position;
 import app.crossword.yourealwaysbe.puz.Puzzle;
 import app.crossword.yourealwaysbe.puz.PuzzleBuilder;
+import app.crossword.yourealwaysbe.puz.PuzzleKind;
 import app.crossword.yourealwaysbe.puz.Zone;
 import app.crossword.yourealwaysbe.puz.util.HtmlUtil;
 
@@ -767,7 +768,7 @@ public class JPZIO implements PuzzleParser {
             .setCopyright(handler.getCopyright())
             .setIntroMessage(handler.getInstructions())
             .setNotes(handler.getDescription())
-            .setKind(Puzzle.Kind.ACROSTIC);
+            .setKind(PuzzleKind.ACROSTIC);
 
         try {
             setAcrosticClues(builder, handler);

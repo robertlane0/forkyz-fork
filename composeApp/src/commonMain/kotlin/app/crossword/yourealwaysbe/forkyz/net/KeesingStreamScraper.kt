@@ -63,12 +63,8 @@ class KeesingStreamScraper : AbstractStreamScraper() {
         try {
             getInputStream(puzzleURL).use { inputStream ->
                 val puz = KeesingXMLIO.readPuzzle(inputStream)
-                if (
-                    puz != null
-                    && puz.getSource() != null
-                    && !puz.getSource().isEmpty()
-                ) {
-                    puz.setSource(DEFAULT_SOURCE)
+                if (puz?.source?.isEmpty() ?: true) {
+                    puz.source = DEFAULT_SOURCE
                 }
                 return puz
             }

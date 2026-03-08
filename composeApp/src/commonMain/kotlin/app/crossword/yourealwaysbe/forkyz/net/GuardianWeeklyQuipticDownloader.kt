@@ -37,11 +37,11 @@ class GuardianWeeklyQuipticDownloader(
                 (URI(sourceUrl)).toURL(), headers
             ).use { inputStream ->
                 return GuardianJSONIO.readFromHTML(inputStream)?.apply {
-                    setCopyright("Guardian / " + getAuthor())
-                    setSource(name)
-                    setSupportUrl(supportUrl)
-                    setSourceUrl(sourceUrl)
-                    setShareUrl(sourceUrl)
+                    this.copyright = "Guardian / " + author
+                    this.source = name
+                    this.supportUrl = supportUrl
+                    this.sourceUrl = sourceUrl
+                    this.shareUrl = sourceUrl
                 }
             }
         } catch (e : IOException) {

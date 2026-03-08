@@ -169,9 +169,9 @@ open class ShareTextData(
             utils : NativeBackendUtils,
             puz : Puzzle,
         ) : String {
-            var source = puz.getSource()
-            var title = puz.getTitle()
-            var author = puz.getAuthor()
+            var source = puz.source
+            var title = puz.title
+            var author = puz.author
 
             if (source == null)
                 source = ""
@@ -190,7 +190,7 @@ open class ShareTextData(
                     author = null
             }
 
-            val shareUrl = puz.getShareUrl();
+            val shareUrl = puz.shareUrl;
 
             if (shareUrl == null || shareUrl.isEmpty()) {
                 return if (author != null) {

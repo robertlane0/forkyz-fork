@@ -53,7 +53,7 @@ class PMLStreamScraper : AbstractStreamScraper() {
         }
 
         if (puz != null)
-            puz.setSource(DEFAULT_SOURCE)
+            puz.source = DEFAULT_SOURCE
 
         return puz
     }
