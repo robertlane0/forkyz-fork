@@ -10,6 +10,8 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import app.crossword.yourealwaysbe.puz.util.HtmlUtil;
+
 /**
  * A clue on the board
  *
@@ -272,7 +274,7 @@ public class Clue {
     private void inferSeparators() {
         inferredSeparators = new TreeMap<>();
 
-        Matcher m = ENUMERATION_HINT_RE.matcher(getHint());
+        Matcher m = ENUMERATION_HINT_RE.matcher(HtmlUtil.unHtmlString(getHint()));
         if (!m.matches())
             return;
 
