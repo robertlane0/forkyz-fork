@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -116,8 +117,10 @@ fun ForkyzApp(
 inline fun <reified T : Any> isTopState(
     navController : NavController,
 ) : Flow<Boolean> {
-    return navController.currentBackStackEntryFlow.map { entry ->
-        entry.destination.hasRoute(T::class)
+    return remember(navController) {
+        navController.currentBackStackEntryFlow.map { entry ->
+            entry.destination.hasRoute(T::class)
+        }
     }
 }
 
