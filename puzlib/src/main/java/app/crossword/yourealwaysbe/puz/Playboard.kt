@@ -136,6 +136,18 @@ class Playboard(puzzle : Puzzle) {
         this.puzzle = puzzle
 
         // setup bookkeeping
+
+        // coerce currentClueID to a clue in the current box if needed
+        puzzle.checkedGetBox(puzzle.position)?.let { box ->
+            val isPartOfClues = box.getIsPartOfClues()
+            if (
+                !isPartOfClues.isEmpty()
+                && puzzle.currentClueID !in isPartOfClues
+            ) {
+                puzzle.currentClueID = isPartOfClues.first()
+            }
+        }
+
         val curID = puzzle.currentClueID
 
         updateHistory(curID)

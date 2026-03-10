@@ -99,8 +99,6 @@ class Puzzle(var boxes : Array<Array<Box?>>) {
         for (row in boxes.indices) {
             require(boxes[row].size == width) { "Boxes do not form a grid" }
         }
-
-        addCluesToBoxes()
     }
 
     /**
@@ -111,7 +109,7 @@ class Puzzle(var boxes : Array<Array<Box?>>) {
      * Note: this field must be initialised after the height/width and
      * clues are added to boxes (see init above)
      */
-    var position : Position = getSelectFirstPosition()
+    var position : Position = getFirstPosition()
         set(value) {
             if (!isBlock(checkedGetBox(value)))
                 field = value
@@ -544,42 +542,6 @@ class Puzzle(var boxes : Array<Array<Box?>>) {
         return false
     }
 
-    /**
-     * Find the first clue with a non-empty zone in board order, or all
-     * back to first clue with zone found
-     *
-     * Sets currentClueID, returns position to help field initialisation
-     */
-    fun getSelectFirstPosition() : Position {
-        for (cid in boardClueIDs) {
-            getClue(cid)?.let { clue ->
-                if (clue.hasZone()) {
-                    val position = clue.zone.getPosition(0)
-                    currentClueID = cid
-                    return position
-                }
-            }
-        }
-        // try all clues
-        for (clue in allClues) {
-            if (clue.hasZone()) {
-                val position = clue.zone.getPosition(0)
-                currentClueID = clue.clueID
-                return position
-            }
-        }
-        for (row in 0..<height) {
-            for (col in 0..<width) {
-                if (!isBlock(checkedGetBox(row, col))) {
-                    return Position(row, col)
-                }
-            }
-        }
-        throw IllegalArgumentException(
-            "Can't handled grids with no cells"
-        )
-    }
-
     val hasPinnedClueID : Boolean
         get() {
             return pinnedClueID != null
@@ -767,17 +729,20 @@ class Puzzle(var boxes : Array<Array<Box?>>) {
         return result
     }
 
-
     /**
-     * Goes through existing clues and makes sure info in boxes
-     *
-     * E.g. clue starts are marked in the boxes, and
-     * ispartofacross/down.
+     * Find the first non-block box position
      */
-    private fun addCluesToBoxes() {
-        for (listName in this.clueListNames)
-            for (clue in getClues(listName)!!)
-                addClueToBoxes(clue)
+    private fun getFirstPosition() : Position {
+        for (row in 0..<height) {
+            for (col in 0..<width) {
+                if (!isBlock(checkedGetBox(row, col))) {
+                    return Position(row, col)
+                }
+            }
+        }
+        throw IllegalArgumentException(
+            "Can't handled grids with no cells"
+        )
     }
 
     /**
