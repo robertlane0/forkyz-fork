@@ -537,7 +537,7 @@ interface MovementStrategy {
 
                 if (
                     clue == null
-                    || clue.zone.isEmpty()
+                    || clue.zone.isEmpty
                     || board.isFilledClueID(clue.clueID)
                     || !cycleForwards
                 ) {
@@ -569,7 +569,7 @@ interface MovementStrategy {
 
                 if (
                     clue == null
-                    || clue.zone.isEmpty()
+                    || clue.zone.isEmpty
                     || board.isFilledClueID(clue.clueID)
                     || !cycleBackwards
                 ) {

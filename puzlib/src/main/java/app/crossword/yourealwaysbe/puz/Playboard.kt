@@ -550,7 +550,7 @@ class Playboard(puzzle : Puzzle) {
     fun isFilledClueID(clueID : ClueID?) : Boolean {
         val zone = getZone(clueID)
 
-        if (zone == null || zone.isEmpty())
+        if (zone == null || zone.isEmpty)
             return false
 
         for (pos in zone) {
@@ -1035,7 +1035,11 @@ class Playboard(puzzle : Puzzle) {
 
         val index : Int
 
-        if (original == zone.getPosition(lastFoundZoneIndex)) {
+        if (
+            lastFoundZoneIndex >= 0
+            && lastFoundZoneIndex < zone.size()
+            && original == zone.getPosition(lastFoundZoneIndex)
+        ) {
             index = lastFoundZoneIndex
         } else {
             index = zone.indexOf(original)
@@ -1180,7 +1184,7 @@ class Playboard(puzzle : Puzzle) {
         val startPos = this.highlightLetter
         val zone = currentZone
 
-        if (zone == null || zone.isEmpty())
+        if (zone == null || zone.isEmpty)
             return
 
         pushNotificationDisabled()
@@ -1543,7 +1547,7 @@ class Playboard(puzzle : Puzzle) {
     fun revealWord() : List<Position> {
         val changes = mutableListOf<Position>()
         val zone = this.currentZone
-        if (zone == null || zone.isEmpty())
+        if (zone == null || zone.isEmpty)
             return changes
 
         val curPos = this.highlightLetter
@@ -1982,7 +1986,7 @@ class Playboard(puzzle : Puzzle) {
         val clue = puzzle.getClue(clueID)
         val zone = clue?.zone
 
-        return if (zone == null || zone.isEmpty())
+        return if (zone == null || zone.isEmpty)
             null
         else
             zone.getPosition(0)
@@ -1997,7 +2001,7 @@ class Playboard(puzzle : Puzzle) {
         val clue = puzzle.getClue(clueID)
         val zone = clue?.zone
 
-        return if (zone == null || zone.isEmpty())
+        return if (zone == null || zone.isEmpty)
             null
         else
             zone.getPosition(zone.size() - 1)

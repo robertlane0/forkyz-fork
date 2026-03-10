@@ -754,7 +754,7 @@ class Puzzle(var boxes : Array<Array<Box?>>) {
      */
     private fun addClueToBoxes(clue : Clue?) {
         val zone = clue?.zone
-        if (zone == null || zone.isEmpty())
+        if (zone == null || zone.isEmpty)
             return
 
         val number = clue.clueNumber

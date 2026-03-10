@@ -512,7 +512,7 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
         clue.getSeparator(offset + 1, inferSeparators)?.let { separator ->
             val cid = clue.clueID
             val zone = clue.zone
-            if (!zone.isEmpty()) {
+            if (!zone.isEmpty) {
                 var dir = Zone.Direction.RIGHT
 
                 if (!allAcross) {
@@ -880,24 +880,20 @@ class WordEditViewModel(
 
         return WordState(
             boxes = zone.mapIndexed { index, pos ->
-                if (pos == null) {
-                    null
+                val box = puz.checkedGetBox(pos)
+                val changedBox = hasBoxChanged(pos, box, changes)
+                if (!changedBox && prevState != null) {
+                    prevState.boxes.getOrNull(index)
                 } else {
-                    val box = puz.checkedGetBox(pos)
-                    val changedBox = hasBoxChanged(pos, box, changes)
-                    if (!changedBox && prevState != null) {
-                        prevState.boxes.getOrNull(index)
-                    } else {
-                        getBoxState(
-                            boardEditSettings,
-                            pos.row,
-                            pos.col,
-                            box,
-                            setOf(),
-                            shownWord.clueID,
-                            showOwnScratch,
-                        )
-                    }
+                    getBoxState(
+                        boardEditSettings,
+                        pos.row,
+                        pos.col,
+                        box,
+                        setOf(),
+                        shownWord.clueID,
+                        showOwnScratch,
+                    )
                 }
             }.toImmutableList(),
         )

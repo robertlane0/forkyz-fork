@@ -349,7 +349,7 @@ class ClueListPageViewModel(
      */
     private fun getCurrentFirstPosition() : Position? {
         val zone = getBoard()?.currentWord?.zone
-        if (zone != null && !zone.isEmpty())
+        if (zone != null && !zone.isEmpty)
             return zone.getPosition(0)
         else
             return null
@@ -360,7 +360,7 @@ class ClueListPageViewModel(
      */
     private fun getCurrentLastPosition() : Position? {
         val zone = getBoard()?.currentWord?.zone
-        if (zone != null && !zone.isEmpty())
+        if (zone != null && !zone.isEmpty)
             return zone.getPosition(zone.size() - 1)
         else
             return null
