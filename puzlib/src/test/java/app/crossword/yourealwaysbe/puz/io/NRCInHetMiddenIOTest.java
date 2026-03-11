@@ -101,7 +101,7 @@ public class NRCInHetMiddenIOTest {
         PuzzleBuilder builder = parser.parsePuzzle(
             getTestPuzzleInputStream("/inhetmidden-1.json")
         );
-        assertIsTestPuzzle1(builder.getPuzzle());
+        assertIsTestPuzzle1(builder.puzzle);
     }
 
     @Test
@@ -110,7 +110,7 @@ public class NRCInHetMiddenIOTest {
         PuzzleBuilder builder = parser.parsePuzzle(
             getTestPuzzleInputStream("/inhetmidden-2.json")
         );
-        assertIsTestPuzzle2(builder.getPuzzle());
+        assertIsTestPuzzle2(builder.puzzle);
     }
 
     @Test
@@ -119,7 +119,7 @@ public class NRCInHetMiddenIOTest {
         PuzzleBuilder builder = parser.parsePuzzle(
             getTestPuzzleInputStream("/inhetmidden-3.json")
         );
-        assertIsTestPuzzle3(builder.getPuzzle());
+        assertIsTestPuzzle3(builder.puzzle);
     }
 }
 

@@ -90,7 +90,7 @@ public class AMUniversalJSONIO extends AbstractJSONIO {
 
         addClues(json, builder);
 
-        return builder.getPuzzle();
+        return builder.puzzle;
     }
 
     private static LocalDate getDate(JSONObject json) {

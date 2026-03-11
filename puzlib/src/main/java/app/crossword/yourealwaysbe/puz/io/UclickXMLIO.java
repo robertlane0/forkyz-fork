@@ -193,7 +193,7 @@ public class UclickXMLIO implements PuzzleParser {
             for (BasicClue basicClue : handler.getDownClues())
                 builder.addDownClue(DOWN_LIST, basicClue);
 
-            return builder.getPuzzle();
+            return builder.puzzle;
         } catch (Exception e) {
             return null;
         }

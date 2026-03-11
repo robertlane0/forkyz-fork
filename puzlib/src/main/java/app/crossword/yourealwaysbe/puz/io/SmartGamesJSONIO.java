@@ -104,7 +104,7 @@ public class SmartGamesJSONIO extends AbstractJSONIO {
             addMetaData(data, builder);
             addClues(data, builder);
 
-            return builder.getPuzzle();
+            return builder.puzzle;
         } catch (IllegalArgumentException e) {
             throw new SmartGamesJSONFormatException(
                 "Could not set grid boxes from data file: " + e.getMessage()

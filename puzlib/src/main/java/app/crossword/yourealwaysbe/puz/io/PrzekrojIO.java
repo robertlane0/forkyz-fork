@@ -99,7 +99,7 @@ public class PrzekrojIO implements PuzzleParser {
         addClues(json, builder);
         addImages(json, builder);
 
-        return builder.getPuzzle();
+        return builder.puzzle;
     }
 
     private static Box[][] readBoxes(JSONObject json)

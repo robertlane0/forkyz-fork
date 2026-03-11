@@ -91,7 +91,7 @@ public class XWordJSONIO extends AbstractJSONIO {
 
         addClues(json, builder);
 
-        return builder.getPuzzle();
+        return builder.puzzle;
     }
 
     private static LocalDate getDate(JSONObject json) {

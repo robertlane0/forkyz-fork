@@ -177,7 +177,7 @@ public class KingFeaturesPlaintextIO implements PuzzleParser {
         builder.setTitle("King Features Puzzle");
         builder.setNotes("");
 
-        return builder.getPuzzle();
+        return builder.puzzle;
     }
 
     /**

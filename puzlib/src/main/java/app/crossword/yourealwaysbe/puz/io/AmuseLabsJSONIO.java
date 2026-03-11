@@ -84,7 +84,7 @@ public class AmuseLabsJSONIO extends AbstractJSONIO {
 
             addClues(json, builder);
 
-            return builder.getPuzzle();
+            return builder.puzzle;
         } catch (IllegalArgumentException e) {
             throw new AmuseLabsFormatException("Could not set grid boxes from data file: " + e.getMessage());
         }

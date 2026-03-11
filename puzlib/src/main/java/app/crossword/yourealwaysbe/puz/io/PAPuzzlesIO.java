@@ -93,7 +93,7 @@ public class PAPuzzlesIO implements PuzzleParser {
 
             getClues(doc, builder);
 
-            return builder.getPuzzle();
+            return builder.puzzle;
         } catch (IOException | PAPuzzlesFormatException e) {
             LOG.info("Could not read PA Puzzles crossword: " + e);
             return null;

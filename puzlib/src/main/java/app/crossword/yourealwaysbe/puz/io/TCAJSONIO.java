@@ -118,7 +118,7 @@ public class TCAJSONIO extends AbstractJSONIO {
             addMetaData(json, builder);
             addClues(data, cellPositions, builder);
 
-            return builder.getPuzzle();
+            return builder.puzzle;
         } catch (IllegalArgumentException e) {
             throw new TCAJSONFormatException(
                 "Could not set grid boxes from data file: " + e.getMessage()

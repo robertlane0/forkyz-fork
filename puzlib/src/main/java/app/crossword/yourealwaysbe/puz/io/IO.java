@@ -294,7 +294,7 @@ public class IO implements PuzzleParser {
 
         removeSolutionIfBlank(builder);
 
-        return builder.getPuzzle();
+        return builder.puzzle;
     }
 
     public static void readCustom(Puzzle puz, DataInputStream is)

@@ -38,7 +38,7 @@ public class FortyTwoPuzzlesIO extends AbstractJSONIO {
 
     @Override
     public Puzzle parseInput(InputStream is) throws Exception {
-        return parsePuzzle(is).getPuzzle();
+        return parsePuzzle(is).puzzle;
     }
 
     protected PuzzleBuilder parsePuzzle(InputStream is) throws Exception {

@@ -70,7 +70,7 @@ public class SpoonbillIO implements PuzzleParser {
                 getClues(reader, false, builder);
             }
 
-            return builder.getPuzzle();
+            return builder.puzzle;
         } catch (SpoonbillFormatException e) {
             LOG.info("Failed to parse Spoonbill file: " + e);
             return null;

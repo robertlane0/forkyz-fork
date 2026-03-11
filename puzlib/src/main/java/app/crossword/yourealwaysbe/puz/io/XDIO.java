@@ -421,7 +421,7 @@ public class XDIO implements PuzzleParser {
 
         buildClues(clues, meta, builder);
 
-        return builder.getPuzzle();
+        return builder.puzzle;
     }
 
     /**

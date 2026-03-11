@@ -206,7 +206,7 @@ public class BrainsOnlyIO implements PuzzleParser {
             }
         }
 
-        return builder.getPuzzle();
+        return builder.puzzle;
     }
 
     private static String readLineAtOffset(BufferedReader reader, int offset) throws IOException {

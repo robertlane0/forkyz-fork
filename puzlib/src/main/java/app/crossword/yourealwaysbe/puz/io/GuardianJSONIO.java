@@ -149,7 +149,7 @@ public class GuardianJSONIO extends AbstractJSONIO {
 
         addClues(json, builder);
 
-        return builder.getPuzzle();
+        return builder.puzzle;
     }
 
     private static Box[][] getBoxes(JSONObject json) throws JSONException {
@@ -278,7 +278,7 @@ public class GuardianJSONIO extends AbstractJSONIO {
             int y = position.getInt("y");
             boolean across = entry.getString("direction").equals("across");
 
-            Puzzle puz = builder.getPuzzle();
+            Puzzle puz = builder.puzzle;
             Position start = new Position(y, x);
 
             Zone zone = across

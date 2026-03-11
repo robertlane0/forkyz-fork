@@ -372,7 +372,7 @@ public class IPuzIO extends AbstractJSONIO {
             if (PuzzleKind.ACROSTIC.equals(kind))
                 ensureBoardClue(builder);
 
-            return builder.getPuzzle();
+            return builder.puzzle;
         } catch (IPuzFormatException | JSONException e) {
             LOG.severe("Could not read IPuz file: " + e);
             return null;
@@ -1728,7 +1728,7 @@ public class IPuzIO extends AbstractJSONIO {
     private static ClueID getClueIDFromListNum(
         String listName, String number, PuzzleBuilder builder
     ) throws IPuzFormatException {
-        Puzzle puz = builder.getPuzzle();
+        Puzzle puz = builder.puzzle;
 
         ClueList clues = puz.getClues(listName);
         if (clues == null) {
@@ -1755,7 +1755,7 @@ public class IPuzIO extends AbstractJSONIO {
      * if needed.
      */
     private static void ensureBoardClue(PuzzleBuilder builder) {
-        Puzzle puz = builder.getPuzzle();
+        Puzzle puz = builder.puzzle;
 
         Zone boardZone = getCluedBoardZone(puz);
         if (!hasClueCoveringZone(puz, boardZone)) {

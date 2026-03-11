@@ -113,7 +113,7 @@ public class RaetselZentraleSchwedenJSONIO extends AbstractJSONIO {
         addClues(payload, builder);
         addWinWord(payload, builder);
 
-        return builder.getPuzzle();
+        return builder.puzzle;
     }
 
     private static Box[][] getBoxes(JSONObject json) throws RZSFormatException {
@@ -202,7 +202,7 @@ public class RaetselZentraleSchwedenJSONIO extends AbstractJSONIO {
      */
     private static void addWinWord(JSONObject json, PuzzleBuilder builder)
             throws RZSFormatException {
-        Box[][] boxes = builder.getPuzzle().getBoxes();
+        Box[][] boxes = builder.puzzle.getBoxes();
 
         JSONObject solution = json.optJSONObject("solution");
         if (solution == null)

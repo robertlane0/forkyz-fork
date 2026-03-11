@@ -130,7 +130,7 @@ public class PMLIO extends AbstractJSONIO {
             .setTitle(optStringNull(json, "name"))
             .setDate(getDate(json));
         addClues(gameData, builder);
-        return builder.getPuzzle();
+        return builder.puzzle;
     }
 
     private static LocalDate getDate(

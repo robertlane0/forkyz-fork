@@ -548,7 +548,7 @@ public class KeesingXMLIO implements PuzzleParser {
         numberBoxes(handler.getClues(), builder);
 
         Map<String, List<ClueInfo>> clues = getNumberedClues(
-            handler.getClues(), builder.getPuzzle()
+            handler.getClues(), builder.puzzle
         );
         for (String listName : clues.keySet()) {
             for (ClueInfo clue : clues.get(listName)) {
@@ -560,7 +560,7 @@ public class KeesingXMLIO implements PuzzleParser {
             }
         }
 
-        return builder.getPuzzle();
+        return builder.puzzle;
     }
 
     public static boolean convertPuzzle(

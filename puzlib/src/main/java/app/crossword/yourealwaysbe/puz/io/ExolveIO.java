@@ -230,7 +230,7 @@ public class ExolveIO implements PuzzleParser {
         addCompletion(data, clueData, builder);
         addColors(data, clueData, builder);
 
-        return builder.getPuzzle();
+        return builder.puzzle;
     }
 
     /**

@@ -692,7 +692,7 @@ public class JPZIO implements PuzzleParser {
         setClues(builder, handler);
         setCompletionMessage(builder, handler);
 
-        return builder.getPuzzle();
+        return builder.puzzle;
     }
 
     private static void setClues(PuzzleBuilder builder, JPZXMLParser handler) {
@@ -778,7 +778,7 @@ public class JPZIO implements PuzzleParser {
 
         setCompletionMessage(builder, handler);
 
-        return builder.getPuzzle();
+        return builder.puzzle;
     }
 
     /**

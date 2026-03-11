@@ -116,7 +116,7 @@ public class RCIJeuxMFJIO implements PuzzleParser {
 
         addClues(hjson, builder);
 
-        return builder.getPuzzle();
+        return builder.puzzle;
     }
 
     private static Box[][] getBoxes(
