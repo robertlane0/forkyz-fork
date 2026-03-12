@@ -2241,7 +2241,7 @@ class Playboard(puzzle : Puzzle) {
      * Playboard listeners will be updated when the highlighted letter
      * changes or the contents of a box changes.
      */
-    interface PlayboardListener {
+    fun interface PlayboardListener {
         fun onPlayboardChange(changes : PlayboardChanges)
     }
 
