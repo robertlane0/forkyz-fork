@@ -138,8 +138,7 @@ class Puzzle(var boxes : Array<Array<Box?>>) {
 
     val allClues : Iterable<Clue>
         get() {
-            var clues : MutableCollection<Clue> =
-                mutableSetOf<Clue>()
+            var clues : Collection<Clue> = setOf<Clue>()
             for (listName in this.clueListNames) {
                 clues = CollectionUtils.join<Clue>(
                     clues,
