@@ -208,7 +208,9 @@ class Clue @JvmOverloads constructor(
     private fun inferSeparators() {
         val inferredSeparators = TreeMap<Int, String>()
 
-        val m = ENUMERATION_HINT_RE.matchEntire(HtmlUtil.unHtmlString(hint))
+        val m = HtmlUtil.unHtmlString(hint)?.let {
+            ENUMERATION_HINT_RE.matchEntire(it)
+        }
         if (m == null)
             return
 
