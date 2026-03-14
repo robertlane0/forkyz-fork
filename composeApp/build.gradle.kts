@@ -204,6 +204,8 @@ compose.desktop {
             }
         }
         buildTypes.release.proguard {
+            // TODO: remove when default proguard supports Java 25
+            version.set("7.8.0")
             obfuscate.set(false)
             configurationFiles.from(project.file("compose-desktop.pro"))
         }
