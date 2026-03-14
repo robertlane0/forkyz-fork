@@ -28,7 +28,7 @@ buildConfig {
 }
 
 kotlin {
-    androidLibrary {
+    android {
         namespace = appLibraryNamespace
         compileSdk = libs.versions.compileSdk.get().toInt()
         minSdk = libs.versions.minSdk.get().toInt()

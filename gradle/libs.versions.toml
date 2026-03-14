@@ -1,8 +1,8 @@
 [versions]
 # Core
-kotlin = "2.2.20"
+kotlin = "2.3.0"
 ksp = "2.3.4"
-agp = "9.0.0"
+agp = "9.1.0"
 
 # Android
 compileSdk = "36"
@@ -10,12 +10,12 @@ minSdk = "23"
 targetSdk = "36"
 
 # AndroidX
-activity = "1.12.3"
+activity = "1.13.0"
 appcompat = "1.7.1"
 arch-core = "2.2.0"
 concurrent-futures = "1.3.0"
-core-ktx = "1.17.0"
-datastore = "1.2.0"
+core-ktx = "1.18.0"
+datastore = "1.2.1"
 lifecycle = "2.10.0"
 preference = "1.2.1"
 room = "2.8.4"
@@ -27,10 +27,10 @@ compose = "1.11.0-alpha01"
 compose-material = "1.10.0"
 compose-material-icons = "1.7.3"
 compose-material3 = "1.11.0-alpha01"
-compose-foundation = "1.10.0"
-compose-resources = "1.10.0"
-compose-navigation = "2.9.1"
-compose-navigationevent = "1.0.0"
+compose-foundation = "1.10.2"
+compose-resources = "1.10.2"
+compose-navigation = "2.9.2"
+compose-navigationevent = "1.0.1"
 
 # Coil
 coil3 = "3.3.0"
@@ -44,8 +44,8 @@ kotlinx-coroutines = "1.10.2"
 kotlinx-datetime = "0.7.1"
 
 # Ktor
-ktor-android = "3.4.0"
-ktor-java = "3.4.0"
+ktor-android = "3.4.1"
+ktor-java = "3.4.1"
 
 # Apache
 httpclient5 = "5.6"
@@ -63,20 +63,20 @@ jsoup = "1.22.1"
 material = "1.13.0"
 seismic = "1.0.3"
 datetime-wheel-picker = "1.1.0"
-filekit = "0.12.0"
+filekit = "0.13.0"
 words-to-numbers = "8a97d258fd"
 
 # Testing
 junit4 = "4.13.2"
 junit5 = "6.1.0-M1"
 junit-platform = "1.11.4"
-mockito-kotlin = "6.2.2"
+mockito-kotlin = "6.2.3"
 
 # Plugins
-plugin-shadow = "9.3.1"
-plugin-buildconfig = "6.0.7"
+plugin-shadow = "9.3.2"
+plugin-buildconfig = "6.0.9"
 plugin-versions = "0.53.0"
-plugin-wire = "5.5.0"
+plugin-wire = "6.0.0"
 plugin-kotlin-parcelize = "2.3.0"
 
 [libraries]

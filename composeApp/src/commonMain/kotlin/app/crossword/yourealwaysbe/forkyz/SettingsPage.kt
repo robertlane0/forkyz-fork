@@ -56,6 +56,7 @@ import org.jetbrains.compose.resources.stringResource
 
 import io.github.vinceglb.filekit.absolutePath
 import io.github.vinceglb.filekit.bookmarkData
+import io.github.vinceglb.filekit.dialogs.FileKitDialogSettings
 import io.github.vinceglb.filekit.dialogs.compose.rememberDirectoryPickerLauncher
 import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.dialogs.compose.rememberFileSaverLauncher
@@ -288,7 +289,9 @@ fun SettingsPage(
                 }
             }
         }
-        val settingsExportLauncher = rememberFileSaverLauncher {
+        val settingsExportLauncher = rememberFileSaverLauncher(
+            dialogSettings = FileKitDialogSettings.createDefault(),
+        ) {
             it?.let { file ->
                 val uri = file.absolutePath().toUri()
                 viewModel.exportSettings(uri) {
