@@ -3,7 +3,6 @@
     <issue id="all">
         <ignore path="**/generated/**" />
     </issue>
-
     <issue id="NewApi">
         <ignore regexp="LocalDate"/>
         <ignore regexp="Map#forEach"/>
