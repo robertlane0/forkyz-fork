@@ -156,7 +156,6 @@ kotlin {
 dependencies {
     add("kspAndroid", libs.androidx.room.compiler)
     add("kspJvm", libs.androidx.room.compiler)
-    coreLibraryDesugaring(libs.desugar.jdk.libs)
 }
 
 lint {
