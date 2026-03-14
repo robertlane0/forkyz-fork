@@ -17,10 +17,6 @@
         android:description="@string/perm_internet_desc"
     />
     <uses-permission
-        android:name="android.permission.ACCESS_NETWORK_STATE"
-        android:description="@string/perm_access_network_state_desc"
-    />
-    <uses-permission
         android:name="android.permission.RECEIVE_BOOT_COMPLETED"
         android:description="@string/perm_boot_desc"
     />

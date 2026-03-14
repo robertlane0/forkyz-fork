@@ -4,7 +4,6 @@
 >
     <!-- permissions -->
     <string name="perm_internet_desc">Requis pour télécharger des puzzles depuis Internet.</string>
-    <string name="perm_access_network_state_desc">Requis pour limiter le téléchargement de fond sur les données mobiles ou wifi.</string>
     <string name="perm_boot_desc">Requis pour (facultatif) permettre le téléchargement périodique de fond de puzzles.</string>
     <string name="vibrate_desc">Requis pour la rétroaction haptique sur clavier intégré.</string>
     <string name="wake_lock_desc">Utilisé uniquement pour le téléchargement automatique sur les anciennes versions d\'Android.</string>

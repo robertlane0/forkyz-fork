@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources
+    xmlns:tools="http://schemas.android.com/tools"
+>
+    <string name="perm_access_network_state_desc">Requis pour limiter le téléchargement de fond sur les données mobiles ou wifi.</string>
+</resources>

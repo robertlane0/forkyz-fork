@@ -4,7 +4,6 @@
 >
     <!-- permissions -->
     <string name="perm_internet_desc">Vereist om puzzels van het internet op te halen.</string>
-    <string name="perm_access_network_state_desc">Vereist om achtergronddownloads te begrenzen wanneer mobiel netwerk of wifi is ingeschakeld.</string>
     <string name="perm_boot_desc">Vereist om (optioneel) periodiek puzzels op te halen op de achtergrond.</string>
     <string name="vibrate_desc">Vereist voor trilling van ingebouwd toetsenbord.</string>
     <string name="wake_lock_desc">Alleen gebruikt voor automatisch ophalen van puzzels op oudere versies van Android.</string>

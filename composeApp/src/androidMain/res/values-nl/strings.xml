@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources
+    xmlns:tools="http://schemas.android.com/tools"
+>
+    <string name="perm_access_network_state_desc">Vereist om achtergronddownloads te begrenzen wanneer mobiel netwerk of wifi is ingeschakeld.</string>
+</resources>
