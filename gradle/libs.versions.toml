@@ -166,6 +166,7 @@ mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 android-kotlin-multiplatform-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
+android-lint = { id = "com.android.lint", version.ref = "agp" }
 buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "plugin-buildconfig" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

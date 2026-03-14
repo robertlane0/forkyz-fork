@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.room) apply false
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.android.kotlin.multiplatform.library) apply false
+    alias(libs.plugins.android.lint) apply false
     alias(libs.plugins.versions) apply false
     alias(libs.plugins.buildconfig) apply false
     alias(libs.plugins.ksp) apply false

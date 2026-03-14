@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.room)
     alias(libs.plugins.android.kotlin.multiplatform.library)
+    alias(libs.plugins.android.lint)
     alias(libs.plugins.compose)
     alias(libs.plugins.kotlin.plugin.compose)
     alias(libs.plugins.kotlin.plugin.parcelize)
@@ -156,6 +157,10 @@ dependencies {
     add("kspAndroid", libs.androidx.room.compiler)
     add("kspJvm", libs.androidx.room.compiler)
     coreLibraryDesugaring(libs.desugar.jdk.libs)
+}
+
+lint {
+    lintConfig = file("lint.xml")
 }
 
 wire {
