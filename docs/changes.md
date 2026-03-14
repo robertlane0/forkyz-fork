@@ -1,5 +1,14 @@
 # Forkyz Changelog
 
+## Version 80
+
+- Add options to highlight and scroll to crossing clue (display and interaction settings, thanks @davidglasser).
+- Add option to start download dialog from last selected date (browse settings).
+- Fix download date for some downloaders (e.g. NYT).
+- Set Material minimum height for clues in clue list.
+- Bug fixes and new bugs (chunk of backend rewritten).
+
+
 ## Version 79
 
 - Add Dutch translation (thanks @ojppe).
@@ -9,7 +18,8 @@
 - Add "advanced" puzzle source options pages.
 - Replace "auto downloaders" option with "block auto download on day" (advanced puzzle source settings).
 - Put page headings in settings search results.
-- Add option to collapse headings on puzzle list page (browse settings).- Hide some unusable options on Desktop.
+- Add option to collapse headings on puzzle list page (browse settings).
+- Hide some unusable options on Desktop.
 - Add decorations and undecorated setting on Desktop (desktop settings).
 
 ## Version 78

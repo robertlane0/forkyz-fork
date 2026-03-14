@@ -1,0 +1,8 @@
+- Ajouter des options pour mettre en valeur et faire défiler l'indice de croisement (paramètres d'affichage et d'interaction, merci @davidglasser).
+- Ajout d'une option pour démarrer la boîte de dialogue de téléchargement à partir de la dernière date sélectionnée (paramètres de navigation).
+- Fixer la date de téléchargement pour certains téléchargeurs (par exemple NYT).
+- Réglez la hauteur minimale des indices dans la liste des indices.
+- Corrections de bugs et nouveaux bugs (un morceau de backend réécrit).
+
+
+Changelog traduit automatiquement avec Argos Translate.

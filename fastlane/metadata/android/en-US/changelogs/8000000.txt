@@ -1,0 +1,6 @@
+- Add options to highlight and scroll to crossing clue (display and interaction settings, thanks @davidglasser).
+- Add option to start download dialog from last selected date (browse settings).
+- Fix download date for some downloaders (e.g. NYT).
+- Set Material minimum height for clues in clue list.
+- Bug fixes and new bugs (chunk of backend rewritten).
+

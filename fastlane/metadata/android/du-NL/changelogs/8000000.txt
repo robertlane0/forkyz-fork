@@ -1,0 +1,8 @@
+- Voeg opties toe om te markeren en scrollen naar kruising aanwijzing (display en interactie-instellingen, bedankt @davidglasser).
+- Voeg optie toe om het downloaddialoogvenster te starten vanaf de laatst geselecteerde datum (instellingen doorbladeren).
+- Repareer download datum voor sommige downloaders (bijv. NYT).
+- Stel de minimale hoogte van het materiaal in voor aanwijzingen in de lijst met aanwijzingen.
+- Bug fixes en nieuwe bugs (chunk of backend herschreven).
+
+
+Changelog automatisch vertaald met Argos Vertalen.
