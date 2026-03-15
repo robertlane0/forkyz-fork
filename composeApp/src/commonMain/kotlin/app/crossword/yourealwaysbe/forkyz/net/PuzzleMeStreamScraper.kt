@@ -187,7 +187,9 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
      * Try a variety of known rawc decodings
      */
     private fun getFromRawc(rawc : String) : Puzzle? {
-        val read : (String?) -> Puzzle? = AmuseLabsJSONIO::readPuzzle
+        val read : (String?) -> Puzzle? = {
+            it?.let { AmuseLabsJSONIO.readPuzzle(it) }
+        }
         return base64Decode(rawc)?.let(read)
             ?: deobfuscateRawc(rawc).let(read)
     }
