@@ -1,13 +1,14 @@
 
 package app.crossword.yourealwaysbe.puz
 
-import app.crossword.yourealwaysbe.puz.Box.Companion.isBlock
-import app.crossword.yourealwaysbe.puz.util.CollectionUtils
 import java.time.LocalDate
 import java.util.Collections
 import java.util.LinkedList
 import java.util.Objects
 import java.util.logging.Logger
+
+import app.crossword.yourealwaysbe.puz.Box.Companion.isBlock
+import app.crossword.yourealwaysbe.puz.util.CollectionUtils
 
 enum class PuzzleKind { CROSSWORD, ACROSTIC }
 
