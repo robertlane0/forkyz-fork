@@ -1,9 +1,6 @@
 
 package app.crossword.yourealwaysbe.puz
 
-import app.crossword.yourealwaysbe.puz.Box.Companion.isBlock
-import app.crossword.yourealwaysbe.puz.util.PuzzleUtils
-import app.crossword.yourealwaysbe.puz.util.WeakSet
 import java.util.Collections
 import java.util.NavigableSet
 import java.util.Objects
@@ -13,6 +10,10 @@ import java.util.function.BiFunction
 import java.util.function.IntPredicate
 import java.util.logging.Logger
 import kotlin.math.min
+
+import app.crossword.yourealwaysbe.puz.Box.Companion.isBlock
+import app.crossword.yourealwaysbe.puz.util.PuzzleUtils
+import app.crossword.yourealwaysbe.puz.util.WeakSet
 
 class Playboard(puzzle : Puzzle) {
     /**
