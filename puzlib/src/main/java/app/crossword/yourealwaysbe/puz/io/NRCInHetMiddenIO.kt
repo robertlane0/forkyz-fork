@@ -1,12 +1,12 @@
 
-package app.crossword.yourealwaysbe.puz.io;
+package app.crossword.yourealwaysbe.puz.io
 
-import java.io.InputStream;
-import java.util.ArrayList;
+import java.io.InputStream
 
-import app.crossword.yourealwaysbe.puz.Box;
-import app.crossword.yourealwaysbe.puz.Position;
-import app.crossword.yourealwaysbe.puz.PuzzleBuilder;
+import app.crossword.yourealwaysbe.puz.Box
+import app.crossword.yourealwaysbe.puz.Position
+import app.crossword.yourealwaysbe.puz.PuzzleBuilder
+import app.crossword.yourealwaysbe.puz.PuzzleBuilder.BasicClue
 
 /**
  * Parser specifically for the "In Het Midden" crossword of the NRC newspaper.
@@ -21,52 +21,54 @@ import app.crossword.yourealwaysbe.puz.PuzzleBuilder;
  * middenwoord might be broken up in multiple words, separated by a highlighted
  * block. In this case, all middenwoord words are added as separate clues.
  */
-public class NRCInHetMiddenIO extends FortyTwoPuzzlesIO {
-    private boolean inMiddenWoord = false;
-    private ArrayList<Box> middenWoordStartBoxes = new ArrayList<>();
+class NRCInHetMiddenIO : FortyTwoPuzzlesIO() {
+    private var inMiddenWoord = false
+    private val middenWoordStartBoxes = ArrayList<Box>()
 
-    public String middenwoordHint = "MIDDENWOORD";
+    var middenwoordHint : String = "MIDDENWOORD"
 
-    @Override
-    protected PuzzleBuilder parsePuzzle(InputStream is) throws Exception {
-        PuzzleBuilder builder = super.parsePuzzle(is);
+    @Throws(Exception::class)
+    override fun parsePuzzle(inStream : InputStream) : PuzzleBuilder? {
+        val builder = super.parsePuzzle(inStream)
+        if (builder == null)
+            return null
 
         // If there's just one middenwoord woord, relabel the clue from "m1" to
         // just "m".
         if (
-            middenWoordStartBoxes.size() == 1
-            && middenWoordStartBoxes.get(0).getClueNumber().equals("m1")
+            middenWoordStartBoxes.size == 1
+            && middenWoordStartBoxes.get(0).clueNumber == "m1"
         ) {
-            Position pos = builder.getNumberPositions().get("m1");
-            builder.setBoxClueNumber(pos.getRow(), pos.getCol(), "m");
+            builder.getNumberPositions().get("m1")?.let { pos ->
+                builder.setBoxClueNumber(pos.row, pos.col, "m")
+            }
         }
 
         // Inject the middenwoord clues
-        for (Box box: middenWoordStartBoxes) {
-            PuzzleBuilder.BasicClue clue = new PuzzleBuilder.BasicClue(
-                box.getClueNumber(), middenwoordHint
-            );
-            builder.addAcrossClue(DefaultListNames.ACROSS_LIST, clue);
+        for (box in middenWoordStartBoxes) {
+            box.clueNumber?.let { clueNumber ->
+                val clue = BasicClue(clueNumber, middenwoordHint)
+                builder.addAcrossClue(DefaultListNames.ACROSS_LIST, clue)
+            }
         }
 
-        return builder;
+        return builder
     }
 
-    @Override
-    protected Box createBox(String value, String solution) {
+    override fun createBox(value : String, solution : String) : Box {
         // 42games marks the "middenwoord" as highlighted boxes, using a # sign
-        boolean isMiddenWoord = value.startsWith("#");
+        var isMiddenWoord = value.startsWith("#")
 
-        Box box = super.createBox(value, solution);
+        val box = super.createBox(value, solution)
 
-        if (inMiddenWoord && box.isBlock()) {
+        if (inMiddenWoord && box.isBlock) {
             // We encountered a block inside the middenwoord, which means we're
             // in a situation where the middenwoord consists of multiple words,
             // and we just left one of them. So mark that we're not in the
             // middenwoord (anymore), so the next cycle detects that we entered
             // the middenwoord.
-            isMiddenWoord = false;
-            inMiddenWoord = false;
+            isMiddenWoord = false
+            inMiddenWoord = false
         }
 
         if (isMiddenWoord) {
@@ -75,15 +77,15 @@ public class NRCInHetMiddenIO extends FortyTwoPuzzlesIO {
             // a special clue "number", which we'll label "m" plus the word
             // number.
             if (!inMiddenWoord) {
-                middenWoordStartBoxes.add(box);
-                if (box.getClueNumber().isEmpty()) {
-                    box.setClueNumber("m" + middenWoordStartBoxes.size());
+                middenWoordStartBoxes.add(box)
+                if (box.clueNumber?.isEmpty() ?: true) {
+                    box.clueNumber = "m" + middenWoordStartBoxes.size
                 }
             }
-            inMiddenWoord = true;
+            inMiddenWoord = true
         }
 
-        return box;
+        return box
     }
 }
 
