@@ -4,7 +4,6 @@ package app.crossword.yourealwaysbe.puz
 import java.util.Collections
 import java.util.NavigableSet
 import java.util.Objects
-import java.util.Set
 import java.util.Stack
 import java.util.function.BiFunction
 import java.util.function.IntPredicate
