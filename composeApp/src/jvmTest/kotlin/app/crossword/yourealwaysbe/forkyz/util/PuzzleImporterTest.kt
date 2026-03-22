@@ -133,7 +133,7 @@ class PuzzleImporterTest {
         )
         for (pm in pms) {
             fileHandler.load(pm.puzHandle)?.let {
-                gotCrosswordTitles.add(it.title)
+                it.title?.let(gotCrosswordTitles::add)
             }
         }
 
