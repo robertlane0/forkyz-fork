@@ -115,6 +115,7 @@ Supported import file formats (can be zipped or unzipped):
 * Przekrój Magazine JSON and HTML,
 * RCI Jeux Mots-Fléchés and Croisés HJSON,
 * Raetsel Zentrale Schwedenratsel JSON,
+* Slow Down Wise Up JSON,
 * Smart Games JSON,
 * Spoonbill,
 * Uclick XML,
