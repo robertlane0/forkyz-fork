@@ -111,19 +111,19 @@ class StreamScrapersTest {
 
     @Test
     @Throws(Exception::class)
-    fun testPuzzleMe() {
+    fun testCrossweird() {
         testScraper(
-            "https://observer.co.uk/puzzles/everyman/article/everyman-no-4123",
-            PuzzleMeStreamScraper(),
+            "https://crossweirdpuzzles.com/solver/?file=puzzles/forthebirds.ipuz",
+            CrossweirdStreamScraper(),
         )
     }
 
     @Test
     @Throws(Exception::class)
-    fun testCrossweird() {
+    fun testSlowDownWiseUp() {
         testScraper(
-            "https://crossweirdpuzzles.com/solver/?file=puzzles/forthebirds.ipuz",
-            CrossweirdStreamScraper(),
+            "https://observer.co.uk/puzzles/everyman/article/everyman-no-4144",
+            SlowDownWiseUpStreamScraper(),
         )
     }
 
