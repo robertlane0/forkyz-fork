@@ -6,10 +6,10 @@ import java.util.regex.Pattern
 
 import app.crossword.yourealwaysbe.forkyz.util.apacheGetURLInputStream
 import app.crossword.yourealwaysbe.puz.Puzzle
-import app.crossword.yourealwaysbe.puz.io.WallStreetJournalJSONIO
+import app.crossword.yourealwaysbe.puz.io.SlowDownWiseUpJSONIO
 
 /**
- * Sraper for puzzles embedded in Wall Street Journal
+ * Scraper for puzzles embedded in Wall Street Journal
  *
  * Check is Wall Street Journal by looking for wsj.com.
  *
@@ -32,7 +32,7 @@ class WSJStreamScraper : AbstractStreamScraper() {
 
         try {
             apacheGetURLInputStream(jsonURL, timeout).use { jsonIS ->
-                val puz = WallStreetJournalJSONIO.readPuzzle(jsonIS)
+                val puz = SlowDownWiseUpJSONIO.readPuzzle(jsonIS)
                 puz?.source = DEFAULT_SOURCE
                 return puz
             }

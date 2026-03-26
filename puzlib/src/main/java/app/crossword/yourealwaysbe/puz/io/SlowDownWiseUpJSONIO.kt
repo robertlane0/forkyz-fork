@@ -6,12 +6,10 @@ import java.io.InputStream
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
-import java.util.function.Consumer
 import java.util.logging.Logger
 
 import org.json.JSONException
 import org.json.JSONObject
-import org.jsoup.Jsoup
 
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Clue
@@ -20,68 +18,42 @@ import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.PuzzleBuilder
 import app.crossword.yourealwaysbe.puz.Zone
 import app.crossword.yourealwaysbe.puz.util.JSONParser.parse
-import app.crossword.yourealwaysbe.puz.util.PuzzleUtils.getAcrossZone
-import app.crossword.yourealwaysbe.puz.util.PuzzleUtils.getDownZone
 
 /**
- * JSON Format used by slowdownwiseup
+ * SlowDownWiseUp JSON format
  *
- * {
- *  "copy": {
- *   "title": "..",
- *   "setter": "..",
- *   "date-publish": "Sunday, 22 March 2026",
- *   "type": "block",
- *   "gridsize": {
- *     "type": "Standard",
- *     "cols": "15",
- *     "rows": "15"
- *   },
- *   "settings": {
- *    "solution_hashed": "md5sum?"
- *   },
- *   "words": [
- *     { "id": 1, "x": "1-4", "y": "1" },
+ * "data": {
+ *   "grid": [
+ *     [ { "Number": "<num>", "Letter": "<solution>", "Blank": "<blank>" } ...]
  *     ..
  *   ],
- *   "clues": [
- *    {
- *     "name": "Clues",
- *     "title": "Across",
- *     "clues": [
- *      {
- *       "word": 1,
- *       "number": 1,
- *       "clue": "hint",
- *       "format": "2,2",
- *       "length": 4
- *      },
- *      ..
- *     ]
- *    }
- *   ],
- *  }
- *  "grid": [
- *   [
- *    {
- *     "Number": "1" or "",
- *     "Blank": "" or "blank" (blank for block)
- *     "WordAcrossID": 1,
- *     "WordDownID": "",
- *     "Letter": "" (solution?)
- *    },
- *    ..
- *   ],
- *   ..
- *  ]
+ *   "copy": {
+ *     "title": "Test title",
+ *     "description": "..",
+ *     "setter": "..",
+ *     "publisher": "..",
+ *     "date-publish": "..",
+ *     "type": "block",
+ *     "settings": {
+ *        "solution_hashed": "md5sum?"
+ *     },
+ *     "correctsolutionmessagetext": "Correct solution",
+ *     "type": "block",
+ *     "clues": [ {
+ *         "title": "listname",
+ *         "clues": [
+ *           { "word": <id>, "number": n, "clue": ".." }, ...
+ *         ]
+ *       }
+ *     ],
+ *   },
+ *   "words": [
+ *      { id: n, "x": "1-5", "y": "3" }, ...
+ *   ]
  * }
- *
  */
 class SlowDownWiseUpJSONIO : AbstractJSONIO() {
-    /**
-     * An unfancy exception indicating error while parsing
-     */
-    class SlowDownWiseUpFormatException(msg : String) : Exception(msg)
+    class SlowDownWiseUpJSONFormatException(msg : String) : Exception(msg)
 
     @Throws(Exception::class)
     override fun parseInput(inStream : InputStream) : Puzzle? {
@@ -89,11 +61,14 @@ class SlowDownWiseUpJSONIO : AbstractJSONIO() {
     }
 
     companion object {
-        private val LOG = Logger.getLogger(
-            SlowDownWiseUpJSONIO::class.java.getCanonicalName(),
-        )
+        private val LOG
+            = Logger.getLogger(AmuseLabsJSONIO::class.java.getCanonicalName())
+
         private val DATE_FORMATTER
-            = DateTimeFormatter.ofPattern("EEEE, d MMMM uuuu")
+            = DateTimeFormatter.ofPattern("EEEE, d MMMM y")
+
+        private val DEFAULT_CLUE_LIST_NAME
+            = DefaultListNames.NODIR_LIST
 
         @JvmStatic
         @Throws(IOException::class)
@@ -101,130 +76,157 @@ class SlowDownWiseUpJSONIO : AbstractJSONIO() {
             try {
                 val json = parse(inStream)
                 return readPuzzleFromJSON(json)
-            } catch (e : IOException) {
-                return null
-            } catch (e : SlowDownWiseUpFormatException) {
+            } catch (e : SlowDownWiseUpJSONFormatException) {
+                LOG.severe("Could not read SlowDownWiseUp JSON: " + e)
                 return null
             } catch (e : JSONException) {
+                LOG.severe("Could not read SlowDownWiseUp JSON: " + e)
                 return null
             }
         }
 
-        @Throws(JSONException::class, SlowDownWiseUpFormatException::class)
+        fun readPuzzle(jsonString : String) : Puzzle? {
+            try {
+                val json = parse(jsonString)
+                return readPuzzleFromJSON(json)
+            } catch (e : SlowDownWiseUpJSONFormatException) {
+                LOG.severe("Could not read SlowDownWiseUp JSON: " + e)
+                return null
+            } catch (e : JSONException) {
+                LOG.severe("Could not read SlowDownWiseUp JSON: " + e)
+                return null
+            }
+        }
+
+        @Throws(JSONException::class, SlowDownWiseUpJSONFormatException::class)
         private fun readPuzzleFromJSON(json : JSONObject) : Puzzle {
-            val builder = PuzzleBuilder(getBoxes(json))
-            addMetaData(json, builder)
-            addClues(json, builder)
-            return builder.puzzle
+            try {
+                var data = json.optJSONObject("data")
+                if (data == null)
+                    data = json
+
+                val builder = PuzzleBuilder(getBoxes(data))
+
+                addMetaData(data, builder)
+                addClues(data, builder)
+
+                return builder.puzzle
+            } catch (e : IllegalArgumentException) {
+                throw SlowDownWiseUpJSONFormatException(
+                    "Could not set grid boxes from data file: " + e.message,
+                )
+            }
         }
 
         @Throws(JSONException::class)
         private fun getBoxes(json : JSONObject) : Array<Array<Box?>> {
-            val dimensions = json.getJSONObject("copy")
-                .getJSONObject("gridsize")
-            val numRows = Integer.valueOf(dimensions.getString("rows"))
-            val numCols = Integer.valueOf(dimensions.getInt("cols"))
-
-            val boxes = Array<Array<Box?>>(numRows) {
-                arrayOfNulls<Box>(numCols)
-            }
+            val rowList = mutableListOf<Array<Box?>>()
 
             val rows = json.getJSONArray("grid")
-            for (row in 0..<rows.length()) {
-                val rowData = rows.getJSONArray(row)
-                for (col in 0..<rowData.length()) {
-                    val cell = rowData.getJSONObject(col)
-
-                    val blank = optStringNull(cell, "Blank")
+            return Array(rows.length()) { row ->
+                val rowArray = rows.getJSONArray(row)
+                val rowBoxes = arrayOfNulls<Box?>(rowArray.length())
+                for (col in 0..<rowArray.length()) {
+                    val cell = rowArray.getJSONObject(col)
                     if (
-                        "blank".equals(
+                        !"blank".equals(
                             optStringNull(cell, "Blank"),
                             ignoreCase = true,
                         )
                     ) {
-                        continue
+                        val box = Box()
+
+                        box.clueNumber = optStringNull(cell, "Number")
+                        box.solution = optStringNull(cell, "Letter")
+
+                        val style = cell.optJSONObject("style")
+                        if (style != null) {
+                            val shape = optStringNull(style, "shapebg")
+                            if ("circle".equals(shape, ignoreCase = true)) {
+                                box.shape = Box.Shape.CIRCLE
+                            } else {
+                                // see if it's an IPuz value why not
+                                val boxShape = IPuzIO.getShape(shape)
+                                if (boxShape != null)
+                                    box.shape = boxShape
+                            }
+
+                            if (style.optBoolean("highlight", false)) {
+                                box.color = IPuzIO.HIGHLIGHT_COLOR
+                            }
+                        }
+
+                        rowBoxes[col] = box
                     }
-
-                    val box = Box()
-
-                    val number = optStringNull(cell, "Number")
-                    if (number != null && !number.isEmpty())
-                        box.clueNumber = number
-
-                    val solution = optStringNull(cell, "Letter")
-                    if (solution != null && !solution.isEmpty())
-                        box.solution = solution
-
-                    boxes[row][col] = box
                 }
+                rowBoxes
             }
-
-            return boxes
         }
 
-        @Throws(JSONException::class, SlowDownWiseUpFormatException::class)
+        @Throws(JSONException::class)
         private fun addMetaData(json : JSONObject, builder : PuzzleBuilder) {
-            val copyData = json.getJSONObject("copy")
-            if (
-                !"block".equals(
-                    copyData.getString("type"),
-                    ignoreCase = true,
-                )
-            ) {
-                throw SlowDownWiseUpFormatException("Puzzle is not a block type")
-            }
+            val copy = json.getJSONObject("copy")
+            builder.setTitle(optStringNull(copy, "title"))
+            builder.setAuthor(optStringNull(copy, "setter"))
+            builder.setSource(optStringNull(copy, "publisher"))
+            builder.setNotes(optStringNull(copy, "description"))
+            builder.setCompletionMessage(
+                optStringNull(copy, "correctsolutionmessagetext"),
+            )
 
-            optStringNull(copyData, "title")?.let { title ->
-                builder.setTitle(title)
-            }
-            optStringNull(copyData, "date-publish")?.let { date ->
-                try {
-                    val parsedDate = LocalDate.parse(date, DATE_FORMATTER)
-                    builder.setDate(parsedDate)
-                } catch (e : DateTimeParseException) {
-                    // ignore
-                }
-            }
-            optStringNull(copyData, "setter")?.let { setter ->
-                builder.setAuthor(setter)
+            try {
+                val date = optStringNull(copy, "date-publish")
+                if (date != null)
+                    builder.setDate(LocalDate.parse(date, DATE_FORMATTER))
+            } catch (e : DateTimeParseException) {
+                // oh well
             }
         }
 
         @Throws(JSONException::class)
         private fun addClues(json : JSONObject, builder : PuzzleBuilder) {
-            val words = getWords(json)
-            val clueLists = json.getJSONObject("copy").getJSONArray("clues")
-            for (i in 0..<clueLists.length()) {
-                val clueList = clueLists.getJSONObject(i)
-                addClueList(clueList, words, builder)
+            val zones : Map<Int, Zone> = getZones(json)
+            val clues = json.getJSONObject("copy").getJSONArray("clues")
+            for (i in 0..<clues.length()) {
+                addCluesList(clues.getJSONObject(i), zones, builder)
             }
         }
 
-        private fun addClueList(
-            clueList : JSONObject,
-            words : Map<Int, Zone>,
+        @Throws(JSONException::class)
+        private fun addCluesList(
+            json : JSONObject,
+            zones : Map<Int, Zone>,
             builder : PuzzleBuilder,
         ) {
-            val listName = clueList.getString("title")
-            val clues = clueList.getJSONArray("clues")
+            var listName = optStringNull(json, "title")
+                ?: DEFAULT_CLUE_LIST_NAME
+
+            val clues = json.getJSONArray("clues")
             for (i in 0..<clues.length()) {
                 val clue = clues.getJSONObject(i)
 
-                val wid : Int? = clue.optInt("word")
-                val zone = wid?.let { words.get(it) }
-                    ?: Zone()
+                var zone : Zone? = null
+                val zoneID = clue.optInt("word", -1)
+                if (zoneID >= 0) {
+                    zone = zones.get(zoneID)
+                }
 
-                val numberInt : Int? = clue.optInt("number")
-                val number = numberInt?.let { it.toString() }
-
+                val number = optStringNull(clue, "number")
                 val format = optStringNull(clue, "format")
                 val separators = getSeparators(format)
                 val hintMain = clue.getString("clue")
                 val hint = hintMain + (format?.let { " ($it)" } ?: "")
                 val index = builder.getNextClueIndex(listName)
-
                 builder.addClue(
-                    Clue(listName, index, number, null, hint, zone, separators),
+                    Clue(
+                        listName,
+                        index,
+                        number,
+                        null,
+                        hint,
+                        zone ?: Zone(),
+                        separators,
+                    ),
                 )
             }
         }
@@ -258,41 +260,56 @@ class SlowDownWiseUpJSONIO : AbstractJSONIO() {
             return separators
         }
 
-        /**
-         * Gets map from word ID to zones
-         */
-        private fun getWords(json : JSONObject) : Map<Int, Zone> {
-            val wordMap : MutableMap<Int, Zone> = mutableMapOf()
-            val words = json.getJSONObject("copy").getJSONArray("words")
+        @Throws(JSONException::class)
+        private fun getZones(json : JSONObject) : Map<Int, Zone> {
+            val copy = json.getJSONObject("copy")
+            val words = copy.getJSONArray("words")
+
+            val zones = mutableMapOf<Int, Zone>()
+
             for (i in 0..<words.length()) {
                 val word = words.getJSONObject(i)
-                val wid = word.getInt("id")
-                val xs = getRange(word.getString("x"))
-                val ys = getRange(word.getString("y"))
-
-                val zone = Zone()
-                for (col in xs) {
-                    for (row in ys) {
-                        zone.addPosition(Position(row - 1, col - 1))
-                    }
-                }
-
-                wordMap.put(wid, zone)
+                val id = word.getInt("id")
+                val x = optStringNull(word, "x")
+                val y = optStringNull(word, "y")
+                if (x != null && y != null)
+                    zones.put(id, parseCells(x, y))
             }
 
-            return wordMap
+            return zones
         }
 
         /**
-         * Convert 3 to [3] and 3-5 to [3, 4, 5]
+         * Parse cells data into zone
+         *
+         * E.g. x="1-3" y = "2" is (2, 1), (2, 2), (2, 3);
          */
-        private fun getRange(range : String) : IntRange {
-            val nums = range.split("-").map { it.toInt() }
-            return when (nums.size) {
-                0 -> 0..<0
-                1 -> nums[0]..nums[0]
-                else -> (nums[0]..nums[1])
-            }
+        private fun parseCells(x : String, y : String) : Zone {
+            val zone = Zone()
+
+            val xs : Array<String> = x.split("-".toRegex())
+                .dropLastWhile { it.isEmpty() }
+                .toTypedArray()
+            val xstart = xs[0].toInt() - 1
+            val xend = if (xs.size > 1)
+                xs[1].toInt() - 1
+            else
+                xstart
+
+            val ys : Array<String> = y.split("-".toRegex())
+                .dropLastWhile { it.isEmpty() }
+                .toTypedArray()
+            val ystart = ys[0].toInt() - 1
+            val yend = if (ys.size > 1)
+                ys[1].toInt() - 1
+            else
+                ystart
+
+            for (row in ystart..yend)
+                for (col in xstart..xend)
+                    zone.addPosition(Position(row, col))
+
+            return zone
         }
     }
 }

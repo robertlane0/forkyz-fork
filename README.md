@@ -119,7 +119,6 @@ Supported import file formats (can be zipped or unzipped):
 * Smart Games JSON,
 * Spoonbill,
 * Uclick XML,
-* Wall Street Journal JSON,
 * .xd,
 * XWord JSON.
 
