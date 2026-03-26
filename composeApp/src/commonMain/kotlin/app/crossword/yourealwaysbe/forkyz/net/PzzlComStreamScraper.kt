@@ -145,7 +145,7 @@ class PzzlComStreamScraper : AbstractStreamScraper() {
             ).use { reader ->
                 val first = reader.readLine()
                 if (first != null)
-                    return first.trim { it <= ' ' }
+                    return first.trim()
             }
         } catch (e : IOException) {
             /* fall through */

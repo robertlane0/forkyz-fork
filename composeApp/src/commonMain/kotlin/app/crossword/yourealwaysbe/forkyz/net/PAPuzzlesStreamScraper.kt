@@ -38,7 +38,7 @@ class PAPuzzlesStreamScraper : AbstractStreamScraper() {
         if (puz != null) {
             puz.source = DEFAULT_SOURCE
             if (title != null)
-                puz.title = title.trim { it <= ' ' }
+                puz.title = title.trim()
         }
 
         return puz
