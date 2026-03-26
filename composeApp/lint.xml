@@ -3,4 +3,12 @@
     <issue id="all">
         <ignore path="**/generated/**" />
     </issue>
+
+    <issue id="NewApi">
+        <ignore regexp="LocalDate"/>
+        <ignore regexp="Map#forEach"/>
+        <ignore regexp="Map#putIfAbsent"/>
+        <ignore regexp="Temporal"/>
+        <ignore regexp="java.time"/>
+    </issue>
 </lint>

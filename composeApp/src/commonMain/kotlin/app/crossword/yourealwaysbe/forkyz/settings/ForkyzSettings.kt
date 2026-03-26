@@ -9,7 +9,6 @@ import java.io.OutputStream
 import java.io.OutputStreamWriter
 import java.io.PrintWriter
 import java.nio.charset.Charset
-import java.util.function.Consumer
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -98,11 +97,10 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveBackgroundDownloadSettings : Flow<BackgroundDownloadSettings>
         = settingsMap(this::makeBackgroundDownloadSettings)
 
-    // Consumer for BackgroundDownloadManager.java
     fun getBackgroundDownloadSettings(
-        cb : Consumer<BackgroundDownloadSettings>,
+        cb : (BackgroundDownloadSettings) -> Unit,
     ) = settingsOnce(
-        cb::accept,
+        cb,
         this::makeBackgroundDownloadSettings,
     )
 
@@ -929,7 +927,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val livePlayDoubleTapFitBoard : Flow<Boolean>
         = settingsMap { it.doubleTap }
 
-    // Consumer for BoardEditViews.java
     fun setPlayDoubleTapFitBoard(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(doubleTap = value)
@@ -960,10 +957,9 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val livePlayEnsureVisible : Flow<Boolean>
         = settingsMap { it.ensureVisible }
 
-    // Consumer for BoardEditViews.java
-    fun getPlayEnsureVisible(cb : Consumer<Boolean>)
+    fun getPlayEnsureVisible(cb : (Boolean) -> Unit)
         = settingsOnce(
-            cb::accept,
+            cb,
             { it.ensureVisible },
         )
 
@@ -1346,7 +1342,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val livePlayRenderSettings : Flow<RenderSettings>
         = settingsMap(this::makeRenderSettings)
 
-    // Consumer for BoardEditViews.java
     val livePlayScale : Flow<Float>
         = settingsMap { it.scale }
 
@@ -1364,10 +1359,9 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val livePlayScratchMode : Flow<Boolean>
         = settingsMap { it.scratchMode }
 
-    // Consumer for BoardEditView.java
-    fun getPlayScratchMode(cb : Consumer<Boolean>)
+    fun getPlayScratchMode(cb : (Boolean) -> Unit)
         = settingsOnce(
-            cb::accept,
+            cb,
             { it.scratchMode },
         )
 
@@ -1443,7 +1437,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val livePlaySkipFilled : Flow<Boolean>
         = settingsMap { it.skipFilled }
 
-    // Consumer for BoardEditText.java
     fun setPlaySkipFilled(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(skipFilled = value)
@@ -1551,10 +1544,9 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveAppDayNightMode : Flow<DayNightMode>
         = settingsMap { it.uiTheme }
 
-    // consumer for NightModeHelper.java
-    fun getAppDayNightMode(cb : Consumer<DayNightMode>)
+    fun getAppDayNightMode(cb : (DayNightMode) -> Unit)
         = settingsOnce(
-            cb::accept,
+            cb,
             { it.uiTheme },
         )
 

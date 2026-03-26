@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.util.function.Consumer
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
@@ -54,8 +53,8 @@ class DownloadersProvider(
      * Builds a new downloaders object from settings
      */
     @MainThread
-    fun get(cb : Consumer<Downloaders>) {
-        liveDownloaders.filterNotNull().getOnce { cb.accept(it) }
+    fun get(cb : (Downloaders) -> Unit) {
+        liveDownloaders.filterNotNull().getOnce { cb(it) }
     }
 
     private fun constructFromSettings(

@@ -2,7 +2,6 @@
 package app.crossword.yourealwaysbe.forkyz.util
 
 import java.io.IOException
-import java.util.function.Consumer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -72,7 +71,7 @@ public class CurrentPuzzleHolder(
     fun loadPuzzle(
         puzHandle : PuzHandle,
         cb : Runnable,
-        onErr : Consumer<IOException>,
+        onErr : (IOException) -> Unit,
     ) {
         ioScope.launch {
             ioLock.lock()
@@ -122,7 +121,7 @@ public class CurrentPuzzleHolder(
                                 cb.run()
                             }
                         } catch (e : IOException) {
-                            mainScope.launch { onErr.accept(e) }
+                            mainScope.launch { onErr(e) }
                         } finally {
                             ioLock.unlock()
                         }
@@ -154,7 +153,7 @@ public class CurrentPuzzleHolder(
     }
 
     @MainThread
-    fun getFreshCurrentPuzzleMeta(cb : Consumer<PuzMetaFile?>) {
+    fun getFreshCurrentPuzzleMeta(cb : (PuzMetaFile?) -> Unit) {
         val puz = board?.puzzle
         val curHandle = puzHandle
         if (curHandle == null || puz == null)
@@ -170,7 +169,7 @@ public class CurrentPuzzleHolder(
                             puz,
                         )
                         ioLock.unlock()
-                        mainScope.launch { cb.accept(meta) }
+                        mainScope.launch { cb(meta) }
                     }
                 }
             }
