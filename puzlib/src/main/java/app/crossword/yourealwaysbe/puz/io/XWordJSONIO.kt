@@ -1,0 +1,224 @@
+
+package app.crossword.yourealwaysbe.puz.io
+
+import java.io.IOException
+import java.io.InputStream
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
+import java.util.Locale
+import java.util.logging.Logger
+
+import org.json.JSONArray
+import org.json.JSONException
+import org.json.JSONObject
+
+import app.crossword.yourealwaysbe.puz.Box
+import app.crossword.yourealwaysbe.puz.Puzzle
+import app.crossword.yourealwaysbe.puz.PuzzleBuilder
+import app.crossword.yourealwaysbe.puz.util.JSONParser.parse
+
+/**
+ * JSON Format used by xword
+ *
+ * https://www.xwordinfo.com/JSON/
+ *
+ * "title": ..
+ * "author": ..
+ * "copyright": ..
+ * "publisher": ..
+ * "date": "m/d/yyyy"
+ * "size": { "rows": n, "cols": n }
+ * "grid": [ "A", "B", ".", "REBUS" ... ]
+ * "gridnums": [ n, n, 0, n, 0, 0 ... ]
+ * "circles": [ 0, 1 ... ]
+ * "rbars": ..
+ * "bbars": ..
+ * "clues": {
+ * "across": [ "n. hint", ... ]
+ * "down": ...
+ * }
+ * "notepad": "<notes>"
+ * "jnotes": "<notes>"
+ */
+class XWordJSONIO : AbstractJSONIO() {
+    class XWordJSONFormatException(msg : String) : Exception(msg)
+
+    @Throws(Exception::class)
+    override fun parseInput(inStream : InputStream) : Puzzle? {
+        return readPuzzle(inStream)
+    }
+
+    companion object {
+        private val LOG
+            = Logger.getLogger(XWordJSONIO::class.java.getCanonicalName())
+
+        private val DATE_FORMATTER
+            = DateTimeFormatter.ofPattern("M/d/yyyy", Locale.US)
+
+        private val ACROSS_LIST = DefaultListNames.ACROSS_LIST
+        private val DOWN_LIST = DefaultListNames.DOWN_LIST
+
+        @JvmStatic
+        @Throws(IOException::class)
+        fun readPuzzle(inStream : InputStream) : Puzzle? {
+            try {
+                val json = parse(inStream)
+                return readPuzzleFromJSON(json)
+            } catch (e : IOException) {
+                LOG.info("Error parsing XWord JSON: " + e)
+                return null
+            } catch (e : JSONException) {
+                LOG.info("Error parsing XWord JSON: " + e)
+                return null
+            } catch (e : XWordJSONFormatException) {
+                LOG.info("Error parsing XWord JSON: " + e)
+                return null
+            }
+        }
+
+        @Throws(JSONException::class, XWordJSONFormatException::class)
+        private fun readPuzzleFromJSON(json : JSONObject) : Puzzle {
+            val boxes : Array<Array<Box?>> = getBoxes(json)
+            val builder = PuzzleBuilder(boxes)
+                .setTitle(optStringNull(json, "title"))
+                .setAuthor(optStringNull(json, "author"))
+                .setCopyright(optStringNull(json, "copyright"))
+                .setSource(optStringNull(json, "publisher"))
+                .setDate(getDate(json))
+                .setNotes(getNotes(json))
+
+            addClues(json, builder)
+
+            return builder.puzzle
+        }
+
+        private fun getDate(json : JSONObject) : LocalDate? {
+            try {
+                val date = optStringNull(json, "date")
+                return if (date == null)
+                    null
+                else
+                    LocalDate.parse(date, DATE_FORMATTER)
+            } catch (e : DateTimeParseException) {
+                return null
+            }
+        }
+
+        private fun getNotes(json : JSONObject) : String? {
+            val notepad = optStringNull(json, "notepad")
+            val jnotes = optStringNull(json, "jnotes")
+
+            if (jnotes == null && notepad == null)
+                return null
+
+            if (jnotes == null)
+                return notepad
+
+            if (notepad == null)
+                return jnotes
+
+            return "<p>" + notepad + "</p><p>" + jnotes + "</p>"
+        }
+
+        @Throws(JSONException::class, XWordJSONFormatException::class)
+        private fun getBoxes(json : JSONObject) : Array<Array<Box?>> {
+            val size = json.getJSONObject("size")
+            val numRows = size.getInt("rows")
+            val numCols = size.getInt("cols")
+
+            val boxes = Array<Array<Box?>>(numRows) {
+                arrayOfNulls<Box>(numCols)
+            }
+
+            val grid = json.getJSONArray("grid")
+            val numbers = json.getJSONArray("gridnums")
+            val circles = json.optJSONArray("circles")
+            val rbars = json.optJSONArray("rbars")
+            val bbars = json.optJSONArray("bbars")
+
+            for (cell in 0..<grid.length()) {
+                val row = cell / numRows
+                val col = cell % numRows
+
+                if (row < numRows && col < numCols) {
+                    val contents = grid.getString(cell)
+                    if ("." != contents) {
+                        val box = Box()
+
+                        box.solution = contents
+
+                        if (cell < numbers.length()) {
+                            val number = numbers.getInt(cell)
+                            if (number > 0)
+                                box.clueNumber = number.toString()
+                        }
+
+                        if (circles != null && cell < circles.length()) {
+                            val circle = circles.getInt(cell)
+                            if (circle != 0)
+                                box.shape = Box.Shape.CIRCLE
+                        }
+                        if (rbars != null && cell < rbars.length()) {
+                            val rbar = rbars.getInt(cell)
+                            if (rbar != 0)
+                                box.barRight = Box.Bar.SOLID
+                        }
+                        if (bbars != null && cell < bbars.length()) {
+                            val bbar = bbars.getInt(cell)
+                            if (bbar != 0)
+                                box.barBottom = Box.Bar.SOLID
+                        }
+
+                        boxes[row][col] = box
+                    }
+                }
+            }
+
+            return boxes
+        }
+
+        @Throws(JSONException::class, XWordJSONFormatException::class)
+        private fun addClues(json : JSONObject, builder : PuzzleBuilder) {
+            val clues = json.getJSONObject("clues")
+            val across = clues.getJSONArray("across")
+            addCluesArray(across, builder, true)
+            val down = clues.getJSONArray("down")
+            addCluesArray(down, builder, false)
+        }
+
+        @Throws(XWordJSONFormatException::class)
+        private fun addCluesArray(
+            clues : JSONArray,
+            builder : PuzzleBuilder,
+            across : Boolean,
+        ) {
+            for (i in 0..<clues.length()) {
+                val clue = clues.getString(i)
+                val split : Array<String>
+                    = clue.split("\\.".toRegex(), limit = 2).toTypedArray()
+
+                if (split.size != 2) {
+                    throw XWordJSONFormatException(
+                        "Clue text not in num. hint format: " + clue,
+                    )
+                }
+
+                val numString = split[0].trim()
+                val hint = split[1].trim()
+                try {
+                    val num = numString.toInt().toString()
+                    if (across)
+                        builder.addAcrossClue(ACROSS_LIST, num, hint)
+                    else
+                        builder.addDownClue(DOWN_LIST, num, hint)
+                } catch (e : NumberFormatException) {
+                    throw XWordJSONFormatException(
+                        "Bad clue number " + numString,
+                    )
+                }
+            }
+        }
+    }
+}
+
