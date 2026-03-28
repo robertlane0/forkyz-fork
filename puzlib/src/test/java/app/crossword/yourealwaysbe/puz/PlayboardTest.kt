@@ -1027,7 +1027,7 @@ class PlayboardTest {
         if (blockObjects)
             insertBlockObjects(puz)
 
-        return puz
+        return puz!!
     }
 
     /**

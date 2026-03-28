@@ -22,8 +22,8 @@ data class PuzzleMeta @JvmOverloads constructor(
     var position : Position? = null,
     var across : Boolean = false,
     var historyList : MutableList<ListNum> = mutableListOf(),
-    var acrossNotes : MutableList<Note> = mutableListOf(),
-    var downNotes : MutableList<Note> = mutableListOf(),
+    var acrossNotes : MutableList<Note?> = mutableListOf(),
+    var downNotes : MutableList<Note?> = mutableListOf(),
     var playerNote : Note? = null,
 )
 

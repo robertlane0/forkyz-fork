@@ -43,7 +43,7 @@ class PuzzleBuilder {
         get() = puzzle.width
     val height : Int
         get() = puzzle.height
-    val boardClueIDs : Iterable<ClueID?>
+    val boardClueIDs : Iterable<ClueID>
         get() = puzzle.boardClueIDs
 
     fun getBox(row : Int, col : Int) : Box? {
