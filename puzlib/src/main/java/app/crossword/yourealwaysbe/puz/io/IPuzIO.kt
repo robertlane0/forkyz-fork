@@ -530,7 +530,7 @@ class IPuzIO : AbstractJSONIO() {
          */
         private fun unHtmlOptString(
             json : JSONObject,
-            field : String?,
+            field : String,
         ) : String? {
             val value = optStringNull(json, field)
 
@@ -815,7 +815,7 @@ class IPuzIO : AbstractJSONIO() {
          */
         private fun getBarredFromStyleObj(
             style : JSONObject,
-            barField : String?,
+            barField : String,
             barStyle : Box.Bar,
             box : Box,
         ) : Boolean {
