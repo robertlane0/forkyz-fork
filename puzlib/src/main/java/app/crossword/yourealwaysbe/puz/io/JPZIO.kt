@@ -675,7 +675,7 @@ class JPZIO : PuzzleParser {
     }
 
     @Throws(Exception::class)
-    override fun parseInput(inStream : InputStream?) : Puzzle? {
+    override fun parseInput(inStream : InputStream) : Puzzle? {
         return readPuzzle(inStream)
     }
 

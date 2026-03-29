@@ -1,10 +1,11 @@
-package app.crossword.yourealwaysbe.puz.io;
 
-import java.io.InputStream;
+package app.crossword.yourealwaysbe.puz.io
 
-import app.crossword.yourealwaysbe.puz.Puzzle;
+import java.io.InputStream
 
-public interface PuzzleParser {
+import app.crossword.yourealwaysbe.puz.Puzzle
+
+interface PuzzleParser {
     /**
      * Parse puzzle from input stream
      *
@@ -15,5 +16,7 @@ public interface PuzzleParser {
      *
      * @return parse puzzle or null if failed or not in right format
      */
-    public Puzzle parseInput(InputStream is) throws Exception;
+    @Throws(Exception::class)
+    fun parseInput(inStream : InputStream) : Puzzle?
 }
+

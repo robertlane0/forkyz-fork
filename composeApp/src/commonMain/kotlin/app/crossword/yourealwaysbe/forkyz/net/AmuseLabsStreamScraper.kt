@@ -109,8 +109,8 @@ class AmuseLabsStreamScraper : AbstractStreamScraper() {
 
     private inner class SecondStageParser : PuzzleParser {
         @Throws(Exception::class)
-        override fun parseInput(inputStream : InputStream) : Puzzle? {
-            return parseSecondStage(inputStream)
+        override fun parseInput(inStream : InputStream) : Puzzle? {
+            return parseSecondStage(inStream)
         }
     }
 

@@ -48,14 +48,14 @@ abstract class AbstractStreamScraper : StreamScraper {
     var timeout : Int = 30000
 
     @Throws(Exception::class)
-    override fun parseInput(inputStream : InputStream) : Puzzle? {
-        return parseInput(inputStream, null)
+    override fun parseInput(inStream : InputStream) : Puzzle? {
+        return parseInput(inStream, null)
     }
 
     @Throws(Exception::class)
     abstract override fun parseInput(
         inputStream : InputStream,
-        url : String?
+        url : String?,
     ) : Puzzle?
 
     @Throws(IOException::class)
