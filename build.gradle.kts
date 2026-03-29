@@ -22,14 +22,3 @@ plugins {
     alias(libs.plugins.kotlin.plugin.serialization) apply false
 }
 
-allprojects {
-    gradle.projectsEvaluated {
-        tasks.withType<JavaCompile>().configureEach {
-            options.compilerArgs.addAll(listOf(
-                "-Xlint:fallthrough",
-                "-Xmaxerrs", "5",
-                "-Xmaxwarns", "5"
-            ))
-        }
-    }
-}
