@@ -1040,7 +1040,7 @@ class PlayboardTest {
     private fun loadTestDetachedPuz(blockObjects : Boolean) : Puzzle {
         val puz = IPuzIO.readPuzzle(
             IOTest::class.java.getResourceAsStream("/detachedCells.ipuz")
-        )
+        )!!
 
         if (blockObjects)
             insertBlockObjects(puz)
