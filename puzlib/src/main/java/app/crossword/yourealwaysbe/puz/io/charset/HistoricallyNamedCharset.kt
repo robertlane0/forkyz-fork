@@ -22,12 +22,8 @@
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
  */
+package app.crossword.yourealwaysbe.puz.io.charset
 
-package app.crossword.yourealwaysbe.puz.io.charset;
-
-
-public interface HistoricallyNamedCharset {
-
-    public String historicalName();
-
+interface HistoricallyNamedCharset {
+    fun historicalName() : String
 }
