@@ -1,8 +1,8 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.time.Duration
-import java.time.LocalDate
+import kotlin.time.Duration
+import kotlinx.datetime.LocalDate
 
 import app.crossword.yourealwaysbe.puz.Puzzle
 

@@ -2,12 +2,13 @@
 package app.crossword.yourealwaysbe.forkyz.net
 
 import java.io.IOException
-import java.time.DayOfWeek
-import java.time.Duration
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
-import java.util.Locale
+import kotlin.time.Duration
+import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.format
+import kotlinx.datetime.format.Padding
+import kotlinx.datetime.format.char
 
 import org.json.JSONArray
 import org.json.JSONException
@@ -70,10 +71,13 @@ class KingDigitalLoginDownloader(
 
     private val LOGIN_URL = "https://kdig.kingfeatures.net/login/"
     private val DOWNLOAD_URL = "https://kdig.kingfeatures.net/"
-    private val DATE_FORMATTER = DateTimeFormatter.ofPattern(
-        "yyyy-M-d",
-        Locale.US,
-    )
+    private val DATE_FORMATTER = LocalDate.Format {
+        year()
+        char('-')
+        monthNumber(Padding.NONE)
+        char('-')
+        day(Padding.NONE)
+    }
 
     override protected fun download(
         date : LocalDate,
@@ -159,7 +163,7 @@ class KingDigitalLoginDownloader(
         // get all available puzzle assets
         val getPuzUrlJson = JSONObject()
         with (getPuzUrlJson) {
-            val dateStr = DATE_FORMATTER.format(date)
+            val dateStr = date.format(DATE_FORMATTER)
             put("t", "json")
             put("k", key)
             put("e", dateStr)
@@ -187,17 +191,16 @@ class KingDigitalLoginDownloader(
                 try {
                     val assetDate = asset.optString("PUBDATE")
                     if (!assetDate.isEmpty()) {
-                        val parsedDate = LocalDate.parse(
+                        val parsedDate = LocalDateTime.Formats.ISO.parse(
                             assetDate,
-                            DateTimeFormatter.ISO_LOCAL_DATE_TIME,
-                        )
+                        ).date
                         if (parsedDate == date) {
                             val url = asset.optString("ASSETLINK")
                             if (!url.isEmpty())
                                 return url
                         }
                     }
-                } catch (e : DateTimeParseException) {
+                } catch (e : IllegalArgumentException) {
                     // ignore
                 }
             }
@@ -205,3 +208,4 @@ class KingDigitalLoginDownloader(
         return null
     }
 }
+

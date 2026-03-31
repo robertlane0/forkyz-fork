@@ -6,9 +6,6 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.io.OutputStreamWriter
 import java.nio.charset.Charset
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
 import java.util.Arrays
 import java.util.Collections
 import java.util.LinkedList
@@ -17,6 +14,9 @@ import java.util.function.Consumer
 import java.util.logging.Logger
 import kotlin.math.log10
 import kotlin.math.min
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.format.Padding
+import kotlinx.datetime.format.char
 
 import org.json.JSONArray
 import org.json.JSONException
@@ -336,14 +336,29 @@ class IPuzIO : AbstractJSONIO() {
         private const val FIELD_RATING = "rating"
         private const val FIELD_CLUE_SEPARATORS = "separators"
 
-        private val DATE_FORMATTER_V1
-            = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.US)
-        private val DATE_FORMATTER
-            = DateTimeFormatter.ofPattern("MM/dd/yyyy", Locale.US)
+        private val DATE_FORMATTER_V1 = LocalDate.Format {
+            day()
+            char('/')
+            monthNumber()
+            char('/')
+            year()
+        }
+        private val DATE_FORMATTER = LocalDate.Format {
+            monthNumber()
+            char('/')
+            day()
+            char('/')
+            year()
+        }
 
         // for puzzles that forget to double digits
-        private val DATE_FORMATTER_SINGLES
-            = DateTimeFormatter.ofPattern("M/d/yyyy")
+        private val DATE_FORMATTER_SINGLES = LocalDate.Format {
+            monthNumber(Padding.NONE)
+            char('/')
+            day(Padding.NONE)
+            char('/')
+            year()
+        }
 
         private const val FIELD_CLUES_CLUES = "Clues"
         private const val FIELD_CLUES_ZONES = "Zones"
@@ -499,13 +514,13 @@ class IPuzIO : AbstractJSONIO() {
 
             try {
                 if (getIOVersion(puzJson) == 1)
-                    return LocalDate.parse(date, DATE_FORMATTER_V1)
+                    return DATE_FORMATTER_V1.parse(date)
                 else
-                    return LocalDate.parse(date, DATE_FORMATTER)
-            } catch (e : DateTimeParseException) {
+                    return DATE_FORMATTER.parse(date)
+            } catch (e : IllegalArgumentException) {
                 try {
-                    return LocalDate.parse(date, DATE_FORMATTER_SINGLES)
-                } catch (e2 : DateTimeParseException) {
+                    return DATE_FORMATTER_SINGLES.parse(date)
+                } catch (e2 : IllegalArgumentException) {
                     return null
                 }
             }

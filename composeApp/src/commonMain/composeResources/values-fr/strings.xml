@@ -117,6 +117,9 @@
     <string name="collapse_headings_desc">Afficher les titres uniquement dans la liste des casse-têtes sauf en expansion.</string>
     <string name="expand">Expansion</string>
     <string name="collapse">Collapse</string>
+    <!-- day name, day num, month name, year -->
+    <string name="browse_date_format_non_header">%1$s\n%2$d %3$s\n%4$d</string>
+    <string name="browse_date_format_header">%1$s %2$d %3$s %4$d</string>
 
     <!-- play page -->
     <string name="open_clue_list">Ouvrir la liste des indices</string>
@@ -640,11 +643,13 @@
     <string name="done">Fait</string>
     <string name="num_hinted_boxes">%1$d (%2$d%)</string>
     <string name="share_your_time">Partagez votre temps</string>
+    <!-- puzzle name, day, month name, year, num hints, time -->
     <plurals name="share_message_with_date">
-        <item quantity="one">J'ai terminé le mot croisé %1$s pour %2$s dans #Forkyz avec %3$d aide !\nJ'ai complété le mot croisé dans %4$s.</item>
-        <item quantity="many">J'ai terminé le mot croisé %1$s pour %2$s en #Forkyz avec %3$d aides !\nJ'ai complété le mot croisé dans %4$s.</item>
-        <item quantity="other">J'ai terminé le mot croisé %1$s pour %2$s en #Forkyz avec %3$d aides !\nJ'ai complété le mot croisé dans %4$s.</item>
+        <item quantity="one">J'ai terminé le mot croisé %1$s pour %2$d %3$s %4$d dans #Forkyz avec %5$d aide !\nJ'ai complété le mot croisé dans %6$s.</item>
+        <item quantity="many">J'ai terminé le mot croisé %1$s pour %2$d %3$s %4$d en #Forkyz avec %5$d aides !\nJ'ai complété le mot croisé dans %6$s.</item>
+        <item quantity="other">J'ai terminé le mot croisé %1$s pour %2$d %3$s %4$d en #Forkyz avec %5$d aides !\nJ'ai complété le mot croisé dans %6$s.</item>
     </plurals>
+    <!-- puzzle name, num hints, time -->
     <plurals name="share_message_no_date">
         <item quantity="one">J'ai fini le mot croisé %1$s dans #Forkyz avec %2$d aide !\nJ'ai complété le mot croisé dans %3$s.</item>
         <item quantity="many">J'ai fini le mot croisé %1$s dans #Forkyz avec %2$d aides !\nJ'ai complété le mot croisé dans %3$s.</item>
@@ -792,4 +797,27 @@
     <string name="llm_agent_voice_command_prompt_clue_no_zone">%1$s %2$s</string>
     <string name="llm_voice_commands">Commandes vocales améliorées LLM</string>
     <string name="llm_voice_commands_desc">Nécessite la configuration de LLM dans des outils externes. Utilisez LLM pour améliorer l'interprétation des commandes vocales et permettre une communication en langage naturel.</string>
+
+    <!-- days of the week -->
+    <string name="day_monday">Lundi</string>
+    <string name="day_tuesday">Mardi</string>
+    <string name="day_wednesday">Mercredi</string>
+    <string name="day_thursday">Jeudi</string>
+    <string name="day_friday">Vendredi</string>
+    <string name="day_saturday">Samedi</string>
+    <string name="day_sunday">Dimanche</string>
+
+    <!-- months of the year -->
+    <string name="month_january">Janvier</string>
+    <string name="month_february">Février</string>
+    <string name="month_march">Mars</string>
+    <string name="month_april">Avril</string>
+    <string name="month_may">Mai</string>
+    <string name="month_june">Juin</string>
+    <string name="month_july">Juillet</string>
+    <string name="month_august">Août</string>
+    <string name="month_september">Septembre</string>
+    <string name="month_october">Octobre</string>
+    <string name="month_november">Novembre</string>
+    <string name="month_december">Décembre</string>
 </resources>

@@ -3,9 +3,8 @@ package app.crossword.yourealwaysbe.puz.io
 
 import java.io.IOException
 import java.io.InputStream
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.format.char
 
 import org.json.JSONException
 import org.json.JSONObject
@@ -29,8 +28,14 @@ open class FortyTwoPuzzlesIO : AbstractJSONIO() {
     private var height = 0
 
     private val DATE_FORMATS = listOf(
-        "dd-MM-yyyy",
-        "yyyy-MM-dd",
+        LocalDate.Format {
+            day()
+            char('-')
+            monthNumber()
+            char('-')
+            year()
+        },
+        LocalDate.Formats.ISO,
     )
 
     @Throws(Exception::class)
@@ -165,13 +170,10 @@ open class FortyTwoPuzzlesIO : AbstractJSONIO() {
         srcPuzzle.optString("date")?.let { dateStr ->
             for (dateFormat in DATE_FORMATS) {
                 try {
-                    val date = LocalDate.parse(
-                        dateStr,
-                        DateTimeFormatter.ofPattern("dd-MM-yyyy"),
-                    )
+                    val date = dateFormat.parse(dateStr)
                     builder.setDate(date)
                     break
-                } catch (e : DateTimeParseException) {
+                } catch (e : IllegalArgumentException) {
                     // try next
                 }
             }

@@ -3,19 +3,23 @@ package app.crossword.yourealwaysbe.forkyz.net
 
 import java.net.URI
 import java.net.URL
-import java.time.Duration
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
+import kotlin.time.Duration.Companion.days
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.format.Padding
 
 import app.crossword.yourealwaysbe.forkyz.util.JSONUtils
 import app.crossword.yourealwaysbe.puz.io.TCAJSONIO
 
-private val PUZZLES_FEED_FORMAT = DateTimeFormatter.ofPattern(
-    "'https://crosswords-sgweb.gamedistribution.com/feed/"
-        + "tca_la-times-daily-crossword/year/'yyyy'/month/'M"
-)
-private val PUZZLES_FEED_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+private val PUZZLES_FEED_FORMAT = LocalDate.Format {
+    chars(
+        "https://crosswords-sgweb.gamedistribution.com/feed/"
+         + "tca_la-times-daily-crossword/year/"
+    )
+    year()
+    chars("/month/")
+    monthNumber(Padding.NONE)
+}
+private val PUZZLES_FEED_DATE_FORMAT = LocalDate.Formats.ISO
 
 /**
  * Get embedded PuzzleMe puzzles
@@ -38,14 +42,14 @@ class LATimesDownloader(
     downloaderID,
     downloaderName,
     DAYS_DAILY,
-    Duration.ofDays(-5), // was 7 days ahead when checked
+    -5.days, // was 7 days ahead when checked
     "https://subscription.chicagotribune.com/",
     TCAJSONIO(),
     null,
     "https://fun.chicagotribune.com/game/la-times-daily-crossword",
 ) {
     override fun getSourceUrl(date : LocalDate) : String? {
-        val url = date.format(PUZZLES_FEED_FORMAT)
+        val url = PUZZLES_FEED_FORMAT.format(date)
         return getInputStream(URI(url).toURL(), null).use { input ->
             val puzzles = JSONUtils.streamToJSONArray(input)
             (0 until puzzles.length()).forEach {
@@ -64,7 +68,7 @@ class LATimesDownloader(
                             else
                                 return puzURL
                         }
-                    } catch (e : DateTimeParseException) {
+                    } catch (e : IllegalArgumentException) {
                         // ignore
                     }
                 }

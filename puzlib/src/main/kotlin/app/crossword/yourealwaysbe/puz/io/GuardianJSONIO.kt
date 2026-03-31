@@ -3,11 +3,8 @@ package app.crossword.yourealwaysbe.puz.io
 
 import java.io.IOException
 import java.io.InputStream
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
-import java.util.function.Consumer
 import java.util.logging.Logger
+import kotlinx.datetime.LocalDate
 
 import org.json.JSONException
 import org.json.JSONObject
@@ -138,19 +135,18 @@ class GuardianJSONIO : AbstractJSONIO() {
                 try {
                     val epochMillis = json.getLong("date")
                     builder.setDate(
-                        LocalDate.ofEpochDay(
+                        LocalDate.fromEpochDays(
                             epochMillis / (1000 * 60 * 60 * 24),
                         ),
                     )
                 } catch (e : JSONException) {
                     try {
                         builder.setDate(
-                            LocalDate.parse(
+                            LocalDate.Formats.ISO.parse(
                                 json.getString("date"),
-                                DateTimeFormatter.ISO_LOCAL_TIME,
                             ),
                         )
-                    } catch (e2 : DateTimeParseException) {
+                    } catch (e2 : IllegalArgumentException) {
                         // ignore
                     }
                 }

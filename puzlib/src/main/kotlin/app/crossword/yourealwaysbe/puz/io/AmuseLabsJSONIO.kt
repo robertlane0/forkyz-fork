@@ -3,8 +3,8 @@ package app.crossword.yourealwaysbe.puz.io
 
 import java.io.IOException
 import java.io.InputStream
-import java.time.LocalDate
 import java.util.logging.Logger
+import kotlinx.datetime.LocalDate
 
 import org.json.JSONException
 import org.json.JSONObject
@@ -79,7 +79,7 @@ class AmuseLabsJSONIO : AbstractJSONIO() {
                 if (json.has("publishTime")) {
                     val epochMillis = json.getLong("publishTime")
                     builder.setDate(
-                        LocalDate.ofEpochDay(
+                        LocalDate.fromEpochDays(
                             epochMillis / (1000 * 60 * 60 * 24),
                         )
                     )

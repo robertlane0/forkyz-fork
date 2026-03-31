@@ -3,11 +3,10 @@ package app.crossword.yourealwaysbe.puz.io
 
 import java.io.IOException
 import java.io.InputStream
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
-import java.util.Locale
 import java.util.logging.Logger
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.format.Padding
+import kotlinx.datetime.format.char
 
 import org.json.JSONArray
 import org.json.JSONException
@@ -53,8 +52,13 @@ class XWordJSONIO : AbstractJSONIO() {
         private val LOG
             = Logger.getLogger(XWordJSONIO::class.java.getCanonicalName())
 
-        private val DATE_FORMATTER
-            = DateTimeFormatter.ofPattern("M/d/yyyy", Locale.US)
+        private val DATE_FORMATTER = LocalDate.Format {
+            monthNumber(Padding.NONE)
+            char('/')
+            day(Padding.NONE)
+            char('/')
+            year()
+        }
 
         private val ACROSS_LIST = DefaultListNames.ACROSS_LIST
         private val DOWN_LIST = DefaultListNames.DOWN_LIST
@@ -99,8 +103,8 @@ class XWordJSONIO : AbstractJSONIO() {
                 return if (date == null)
                     null
                 else
-                    LocalDate.parse(date, DATE_FORMATTER)
-            } catch (e : DateTimeParseException) {
+                    DATE_FORMATTER.parse(date)
+            } catch (e : IllegalArgumentException) {
                 return null
             }
         }

@@ -1,7 +1,7 @@
 package app.crossword.yourealwaysbe.puz.io
 
 import java.io.InputStream
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -33,7 +33,7 @@ class XWordJSONIOTest {
             Assertions.assertEquals(puz.author, "Test author")
             Assertions.assertEquals(puz.notes, "Test notes")
             Assertions.assertEquals(puz.source, "Test publisher")
-            Assertions.assertEquals(puz.date, LocalDate.of(2024, 1, 5))
+            Assertions.assertEquals(puz.date, LocalDate(2024, 1, 5))
 
             Assertions.assertEquals(puz.width, 15)
             Assertions.assertEquals(puz.height, 15)

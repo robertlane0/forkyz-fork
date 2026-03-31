@@ -113,6 +113,9 @@
     <string name="collapse_headings_desc">Titels alleen in de puzzellijst weergeven, tenzij uitgevouwen.</string>
     <string name="expand">Uitvouwen</string>
     <string name="collapse">Samenvouwen</string>
+    <!-- day name, day num, month name, year -->
+    <string name="browse_date_format_non_header">%1$s\n%2$d %3$s\n%4$d</string>
+    <string name="browse_date_format_header">%1$s %2$d %3$s %4$d</string>
 
     <!-- play page -->
     <string name="open_clue_list">Lijst met omschrijvingen openen</string>
@@ -681,10 +684,12 @@
     <string name="done">Klaar</string>
     <string name="num_hinted_boxes">%1$d (%2$d%%)</string>
     <string name="share_your_time">Deel je tijd</string>
+    <!-- puzzle name, day, month name, year, num hints, time -->
     <plurals name="share_message_with_date">
-        <item quantity="one">Ik heb de %1$s kruiswoord van %2$s opgelost in #Forkyz met %3$d hint!\nIk heb de kruiswoord voltooid in %4$s.</item>
-        <item quantity="other">Ik heb de %1$s kruiswoord van %2$s opgelost in #Forkyz met %3$d hints!\nIk heb de kruiswoord voltooid in %4$s.</item>
+        <item quantity="one">Ik heb de %1$s kruiswoord van %2$d %3$s %4$d opgelost in #Forkyz met %5$d hint!\nIk heb de kruiswoord voltooid in %6$s.</item>
+        <item quantity="other">Ik heb de %1$s kruiswoord van %2$d %3$s %4$d opgelost in #Forkyz met %5$d hints!\nIk heb de kruiswoord voltooid in %6$s.</item>
     </plurals>
+    <!-- puzzle name, num hints, time -->
     <plurals name="share_message_no_date">
         <item quantity="one">Ik heb de %1$s kruiswoord opgelost in #Forkyz met %2$d hint!\nIk heb de kruiswoord voltooid in %3$s.</item>
         <item quantity="other">Ik heb de %1$s kruiswoord opgelost in #Forkyz met %2$d hints!\nIk heb de kruiswoord voltooid in %3$s.</item>
@@ -845,4 +850,27 @@
     <string name="nrc">NRC</string>
     <string name="nrc_scrypto_title">Scrypto</string>
     <string name="nrc_in_het_midden_title">In Het Midden</string>
+
+    <!-- days of the week -->
+    <string name="day_monday">Maandag</string>
+    <string name="day_tuesday">Dinsdag</string>
+    <string name="day_wednesday">Woensdag</string>
+    <string name="day_thursday">Donderdag</string>
+    <string name="day_friday">Vrijdag</string>
+    <string name="day_saturday">Zaterdag</string>
+    <string name="day_sunday">Zondag</string>
+
+    <!-- months of the year -->
+    <string name="month_january">Januari</string>
+    <string name="month_february">Februari</string>
+    <string name="month_march">Maart</string>
+    <string name="month_april">April</string>
+    <string name="month_may">Mei</string>
+    <string name="month_june">Juni</string>
+    <string name="month_july">Juli</string>
+    <string name="month_august">Augustus</string>
+    <string name="month_september">September</string>
+    <string name="month_october">Oktober</string>
+    <string name="month_november">November</string>
+    <string name="month_december">December</string>
 </resources>

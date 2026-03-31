@@ -3,10 +3,8 @@ package app.crossword.yourealwaysbe.puz.io
 
 import java.io.IOException
 import java.io.InputStream
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
 import java.util.logging.Logger
+import kotlinx.datetime.LocalDate
 
 import org.json.JSONException
 import org.json.JSONObject
@@ -56,7 +54,7 @@ class SmartGamesJSONIO : AbstractJSONIO() {
             SmartGamesJSONIO::class.java.getCanonicalName(),
         )
 
-        private val DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        private val DATE_FORMATTER = LocalDate.Formats.ISO
 
         private val ACROSS_LIST : String = DefaultListNames.ACROSS_LIST
         private val DOWN_LIST : String = DefaultListNames.DOWN_LIST
@@ -158,8 +156,8 @@ class SmartGamesJSONIO : AbstractJSONIO() {
                 try {
                     val date = optStringNull(json, "publicationDate")
                     if (date != null)
-                        builder.setDate(LocalDate.parse(date, DATE_FORMATTER))
-                } catch (e : DateTimeParseException) {
+                        builder.setDate(DATE_FORMATTER.parse(date))
+                } catch (e : IllegalArgumentException) {
                     // oh well
                 }
             }

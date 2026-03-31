@@ -4,14 +4,14 @@ package app.crossword.yourealwaysbe.forkyz.net
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.io.InputStream
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.format
 
 import org.jsoup.nodes.Document
 
+import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.io.PMLIO
 import app.crossword.yourealwaysbe.puz.io.StreamUtils
@@ -77,8 +77,11 @@ class PMLStreamScraper : AbstractStreamScraper() {
             0,
         )
 
-        private val DATE_FORMATTER
-            = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US)
+        private val DATE_FORMATTER = LocalDate.Format {
+            year()
+            monthNumber()
+            day()
+        }
 
         private const val DEFAULT_SOURCE = "PML Puzzles"
 
@@ -106,7 +109,7 @@ class PMLStreamScraper : AbstractStreamScraper() {
 
             val m = IS_LATEST_RE.matcher(url)
             if (m.matches()) {
-                val today = DATE_FORMATTER.format(LocalDate.now())
+                val today = TimeUtils.today().format(DATE_FORMATTER)
                 return (
                     (m.group(IS_LATEST_PRE_URL_GRP) ?: "")
                     + today

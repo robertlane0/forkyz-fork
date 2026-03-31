@@ -2,7 +2,7 @@
 package app.crossword.yourealwaysbe.puz.io
 
 import java.io.InputStream
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -31,7 +31,7 @@ class PMLIOTest {
         @Throws(Exception::class)
         fun assertIsTestPuzzle1(puz : Puzzle) {
             Assertions.assertEquals(puz.title, "Test Crossword")
-            Assertions.assertEquals(puz.date, LocalDate.of(2024, 12, 16))
+            Assertions.assertEquals(puz.date, LocalDate(2024, 12, 16))
 
             Assertions.assertEquals(puz.width, 13)
             Assertions.assertEquals(puz.height, 13)

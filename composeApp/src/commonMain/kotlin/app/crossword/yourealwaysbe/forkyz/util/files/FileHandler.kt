@@ -10,16 +10,15 @@ import java.io.DataOutputStream
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
-import java.time.Instant
-import java.time.LocalDate
-import java.time.ZoneId
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import kotlinx.coroutines.runBlocking
+import kotlinx.datetime.LocalDate
 
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings
 import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
+import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.files.MetaCache.MetaRecord
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle.IPuz
@@ -409,9 +408,7 @@ abstract class FileHandler {
     }
 
     fun getModifiedDate(file : FileHandle) : LocalDate {
-        return Instant.ofEpochMilli(getLastModified(file))
-            .atZone(ZoneId.systemDefault())
-            .toLocalDate()
+        return TimeUtils.fromEpochMilliseconds(getLastModified(file))
     }
 
     @Throws(IOException::class)

@@ -2,13 +2,15 @@
 package app.crossword.yourealwaysbe.forkyz.util
 
 import java.text.Normalizer
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
 import java.util.Locale
 import java.util.UUID
 import java.util.regex.Pattern
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.format.DateTimeFormat
+import kotlinx.datetime.format.Padding
+import kotlinx.datetime.format.char
 
+import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 import app.crossword.yourealwaysbe.puz.Puzzle
 
 object AppPuzzleUtils {
@@ -23,14 +25,24 @@ object AppPuzzleUtils {
             "(.*) - (\\d{8})(?: - .*)?\\.\\w*",
             1,
             2,
-            "yyyyMMdd",
+            LocalDate.Format {
+                year()
+                monthNumber()
+                day()
+            },
         ),
         // Forkyz style file names
         FilenameFormat(
             "(\\d{4}-\\d{1,2}-\\d{1,2})-(\\w*)(?:-.*)?\\.\\w*",
             2,
             1,
-            "yyyy-M-d",
+            LocalDate.Format {
+                year()
+                char('-')
+                monthNumber(Padding.NONE)
+                char('-')
+                day(Padding.NONE)
+            },
         )
     )
 
@@ -48,7 +60,7 @@ object AppPuzzleUtils {
 
         var date = puzzle.date
         if (date == null)
-            date = LocalDate.now()
+            date = TimeUtils.today()
 
         val normalizedName = Normalizer.normalize(name, Normalizer.Form.NFD)
             .replace(FILE_NAME_REMOVE_CHARS.toRegex(), "")
@@ -112,9 +124,10 @@ object AppPuzzleUtils {
                 if (matcher.find()) {
                     try {
                         return LocalDate.parse(
-                            matcher.group(fmt.dateGrp), fmt.dateFormat
+                            matcher.group(fmt.dateGrp) ?: "",
+                            fmt.dateFormat,
                         )
-                    } catch (e : DateTimeParseException) {
+                    } catch (e : IllegalArgumentException) {
                         // fall through
                     }
                 }
@@ -128,11 +141,9 @@ object AppPuzzleUtils {
         regex : String,
         val sourceGrp : Int,
         val dateGrp : Int,
-        dateFormat : String,
+        val dateFormat : DateTimeFormat<LocalDate>,
     ) {
         val regex : Pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE)
-        val dateFormat : DateTimeFormatter
-            = DateTimeFormatter.ofPattern(dateFormat, Locale.US)
     }
 }
 

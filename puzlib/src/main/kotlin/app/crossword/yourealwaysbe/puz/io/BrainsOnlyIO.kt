@@ -8,10 +8,8 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.nio.charset.Charset
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
 import java.util.Locale
+import kotlinx.datetime.LocalDate
 
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Box.Companion.isBlock
@@ -38,7 +36,11 @@ class BrainsOnlyIO : PuzzleParser {
         private val DOWN_LIST : String = DefaultListNames.DOWN_LIST
         private const val NOTEPAD_START_TAG = "<NOTEPAD>"
         private const val NOTEPAD_END_TAG = "</NOTEPAD>"
-        private val DATE_FORMATTER = DateTimeFormatter.ofPattern("yyMMdd")
+        private val DATE_FORMATTER = LocalDate.Format {
+            yearTwoDigits(2000)
+            monthNumber()
+            day()
+        }
 
         fun convertBrainsOnly(
             inStream : InputStream,
@@ -152,8 +154,8 @@ class BrainsOnlyIO : PuzzleParser {
 
             var parsedDate : LocalDate? = null
             try {
-                parsedDate = LocalDate.parse(date, DATE_FORMATTER)
-            } catch (e : DateTimeParseException) {
+                parsedDate = DATE_FORMATTER.parse(date)
+            } catch (e : IllegalArgumentException) {
                 // fall through with no date
             }
 

@@ -1,9 +1,9 @@
 
 package app.crossword.yourealwaysbe.forkyz.view
 
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.coroutineScope
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture

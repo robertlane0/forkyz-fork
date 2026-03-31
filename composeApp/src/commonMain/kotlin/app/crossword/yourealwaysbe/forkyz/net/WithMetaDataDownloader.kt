@@ -4,13 +4,13 @@ package app.crossword.yourealwaysbe.forkyz.net
 import java.io.IOException
 import java.net.URI
 import java.net.URISyntaxException
-import java.time.DayOfWeek
-import java.time.Duration
-import java.time.LocalDate
+import kotlin.time.Duration
+import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.LocalDate
 
 import app.crossword.yourealwaysbe.forkyz.util.AppLogger
-import app.crossword.yourealwaysbe.puz.io.PuzzleParser
 import app.crossword.yourealwaysbe.puz.Puzzle
+import app.crossword.yourealwaysbe.puz.io.PuzzleParser
 
 private const val TAG = "WithMetaDataDownloader"
 

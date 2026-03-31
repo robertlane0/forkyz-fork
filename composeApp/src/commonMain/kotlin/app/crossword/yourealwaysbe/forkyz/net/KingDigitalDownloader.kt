@@ -1,8 +1,8 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.time.DayOfWeek
-import java.time.Duration
+import kotlin.time.Duration
+import kotlinx.datetime.DayOfWeek
 
 import app.crossword.yourealwaysbe.puz.io.JPZIO
 

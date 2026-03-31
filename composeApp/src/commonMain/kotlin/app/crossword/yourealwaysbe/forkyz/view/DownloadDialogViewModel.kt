@@ -1,13 +1,13 @@
 
 package app.crossword.yourealwaysbe.forkyz.view
 
-import java.time.LocalDate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDate
 
 import app.crossword.yourealwaysbe.forkyz.net.Downloader
 import app.crossword.yourealwaysbe.forkyz.net.DownloaderID
@@ -15,6 +15,7 @@ import app.crossword.yourealwaysbe.forkyz.net.Downloaders
 import app.crossword.yourealwaysbe.forkyz.net.DownloadersProvider
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.util.MediatedStateWithFlow
+import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 import app.crossword.yourealwaysbe.forkyz.util.getOnce
 import app.crossword.yourealwaysbe.forkyz.util.stateInSubscribed
 
@@ -53,7 +54,7 @@ data class DownloaderData(
  * @param selected the set of selected downloaders
  */
 data class DownloaderDialogUIState (
-    val date : LocalDate = LocalDate.now(),
+    val date : LocalDate = TimeUtils.today(),
     val downloaders : List<DownloaderData>? = null,
     val selected : Set<DownloaderID> = setOf(),
 )
@@ -100,7 +101,7 @@ class DownloadDialogViewModel(
                     downloaders.getDownloaders().filter { downloader ->
                         if (downloader.downloaderID in state.selected) {
                             isAvailableNow(
-                                downloader.getUntilAvailable(date)?.toHours(),
+                                downloader.getUntilAvailable(date)?.inWholeHours,
                                 downloader.isAvailable(date),
                             )
                         } else {
@@ -149,7 +150,7 @@ class DownloadDialogViewModel(
             .getDownloaders()
             .map { downloader ->
                 val availableHours
-                    = downloader.getUntilAvailable(date)?.toHours()
+                    = downloader.getUntilAvailable(date)?.inWholeHours
                 val availableNow = isAvailableNow(
                     availableHours,
                     downloader.isAvailable(date),

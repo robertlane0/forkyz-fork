@@ -2,7 +2,6 @@
 package app.crossword.yourealwaysbe.forkyz
 
 import java.io.IOException
-import java.time.format.DateTimeFormatter
 import kotlin.collections.ArrayDeque
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -16,6 +15,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.datetime.LocalDate
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -250,6 +250,8 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.guardian_quick
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.guardian_quiptic
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.hamburger_abendblatt_daily
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.hamburger_abendblatt_daily_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.highlight_crossing_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.highlight_crossing_clue_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.independent_daily
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.indicate_show_errors
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.indicate_show_errors_desc
@@ -381,8 +383,6 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.regular_sized
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.release_notes
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.scraper_sources
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.scraper_sources_desc
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.highlight_crossing_clue
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.highlight_crossing_clue_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.scroll_to_clue
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.scroll_to_clue_crossing
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.scroll_to_clue_current
@@ -427,7 +427,6 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.toggle_before_
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.toggle_before_move_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.undecorated
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.undecorated_desc
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.undecorated_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.universal_crossword
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.updates_daily
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.updates_mon_fri
@@ -466,11 +465,12 @@ import app.crossword.yourealwaysbe.forkyz.settings.KeyboardLayout
 import app.crossword.yourealwaysbe.forkyz.settings.KeyboardMode
 import app.crossword.yourealwaysbe.forkyz.settings.LLMAgent
 import app.crossword.yourealwaysbe.forkyz.settings.MovementStrategySetting
-import app.crossword.yourealwaysbe.forkyz.settings.SnapClueMode
 import app.crossword.yourealwaysbe.forkyz.settings.Orientation
+import app.crossword.yourealwaysbe.forkyz.settings.SnapClueMode
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation
 import app.crossword.yourealwaysbe.forkyz.settings.Theme
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
+import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.mediate
 import app.crossword.yourealwaysbe.forkyz.util.stateInSubscribed
@@ -856,7 +856,7 @@ class SettingsPageViewModel(
                     utils.getString(Res.string.custom_url_missing)
                 } else {
                     try {
-                        DateTimeFormatter.ofPattern(url)
+                        TimeUtils.convertUrlFormatPattern(url)
                         null
                     } catch (e : IllegalArgumentException) {
                         e.message

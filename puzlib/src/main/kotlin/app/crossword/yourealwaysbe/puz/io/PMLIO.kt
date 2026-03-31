@@ -5,11 +5,12 @@ import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
 import java.util.Locale
 import java.util.logging.Logger
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.format.MonthNames
+import kotlinx.datetime.format.Padding
+import kotlinx.datetime.format.char
 
 import org.json.JSONException
 import org.json.JSONObject
@@ -36,8 +37,13 @@ class PMLIO : AbstractJSONIO() {
         private val ACROSS_LIST = DefaultListNames.ACROSS_LIST
         private val DOWN_LIST = DefaultListNames.DOWN_LIST
 
-        private val DATE_FORMATTER
-            = DateTimeFormatter.ofPattern("d MMM y", Locale.US)
+        private val DATE_FORMATTER = LocalDate.Format {
+            day(Padding.NONE)
+            char(' ')
+            monthName(MonthNames.ENGLISH_ABBREVIATED)
+            char(' ')
+            year(Padding.NONE)
+        }
 
         private val CW_JSON_RE
             = "^.*starting_puzzle\\s*:\\s*(\\{.*pml_id.*\\}).*$".toRegex()
@@ -137,8 +143,8 @@ class PMLIO : AbstractJSONIO() {
                 val date = gameData.optString("rdate")
                 if (date == null)
                     return null
-                return LocalDate.parse(date, DATE_FORMATTER)
-            } catch (e : DateTimeParseException) {
+                return DATE_FORMATTER.parse(date)
+            } catch (e : IllegalArgumentException) {
                 return null
             }
         }

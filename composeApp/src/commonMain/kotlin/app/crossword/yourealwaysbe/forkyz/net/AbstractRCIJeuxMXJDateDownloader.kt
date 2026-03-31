@@ -1,13 +1,17 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.time.DayOfWeek
-import java.time.Duration
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.util.Locale
 import kotlin.math.max
+import kotlin.time.Duration
+import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.daysUntil
+import kotlinx.datetime.format
+import kotlinx.datetime.format.char
+import kotlinx.datetime.isoDayNumber
 
+import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.io.PuzzleParser
 import app.crossword.yourealwaysbe.puz.io.RCIJeuxMCJIO
@@ -41,7 +45,7 @@ class AbstractRCIJeuxMXJDateDownloader private constructor(
     puzzleParser,
     null,
     shareUrlFormatPattern,
-    LocalDate.now().minusDays(ARCHIVE_LENGTH_DAYS.toLong()),
+    TimeUtils.plusDays(TimeUtils.today(), -ARCHIVE_LENGTH_DAYS),
 ) {
     override fun getSourceUrl(date : LocalDate) : String? {
         val cwNumber = getCrosswordNumber(date)
@@ -59,10 +63,10 @@ class AbstractRCIJeuxMXJDateDownloader private constructor(
 
     private fun getCrosswordNumber(date : LocalDate) : Long {
         val daysDelta = getDaysDelta(date)
-        val startDay = baseDate.dayOfWeek.value
+        val startDay = baseDate.dayOfWeek.isoDayNumber
 
         val trueDelta = days.map { weekday ->
-            val offset = (7 + (weekday.value - startDay)) % 7
+            val offset = (7 + (weekday.isoDayNumber - startDay)) % 7
             val deltaFromDay = daysDelta - offset
             if (deltaFromDay > 0)
                 1 + (deltaFromDay - 1) / 7
@@ -77,25 +81,26 @@ class AbstractRCIJeuxMXJDateDownloader private constructor(
      * Get number of days between base date and argument
      */
     private fun getDaysDelta(date : LocalDate) : Long {
-        val diff = Duration.between(
-            this.baseDate.atStartOfDay(),
-            date.atStartOfDay(),
-        )
-        return diff.toDays()
+        return baseDate.daysUntil(date).toLong()
     }
 
     private fun getCrosswordTitle(date : LocalDate) : String {
         return (
             getCrosswordNumber(date).toString()
             + ", "
-            + titleDateFormat.format(date)
+            + date.format(titleDateFormat)
         )
     }
 
     companion object {
         private const val ARCHIVE_LENGTH_DAYS = 364
-        private val titleDateFormat : DateTimeFormatter
-            = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+        private val titleDateFormat = LocalDate.Format {
+            day()
+            char('/')
+            monthNumber()
+            char('/')
+            year()
+        }
 
         fun buildMFJ(
             downloaderID : DownloaderID,

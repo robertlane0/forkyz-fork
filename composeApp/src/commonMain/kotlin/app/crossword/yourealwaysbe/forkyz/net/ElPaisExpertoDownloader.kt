@@ -1,13 +1,13 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.time.Duration
-import java.time.LocalDate
-import java.time.ZoneId
-import java.time.ZonedDateTime
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
+import kotlinx.datetime.LocalDate
 
-import app.crossword.yourealwaysbe.puz.io.SmartGamesJSONIO
+import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 import app.crossword.yourealwaysbe.puz.Puzzle
+import app.crossword.yourealwaysbe.puz.io.SmartGamesJSONIO
 
 class ElPaisExpertoDownloader(
     downloaderID : DownloaderID,
@@ -16,15 +16,13 @@ class ElPaisExpertoDownloader(
     downloaderID,
     name,
     AbstractDateDownloader.DAYS_DAILY,
-    Duration.ofHours(-1), // midnight, guessed
+    -1.hours, // midnight, guessed
     "https://elpais.com/suscripciones",
     SmartGamesJSONIO(),
     "'https://backend.smartgames.media/api/game/crossword"
         + "/category/experto/'yyyy'-'MM'-'dd",
     "'https://elpais.com/juegos/crucigramas/experto/'yyyy'-'MM'-'dd",
-    ZonedDateTime.now(ZoneId.of("Europe/Madrid"))
-        .toLocalDate()
-        .minusDays(7),
+    TimeUtils.offsetTodayUTC(-7.days),
 ) {
     override protected fun download(
         date : LocalDate,

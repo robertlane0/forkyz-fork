@@ -1,8 +1,8 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.time.LocalDate
 import java.io.InputStream
+import kotlinx.datetime.LocalDate
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -45,7 +45,7 @@ class SlowDownWiseUpJSONIOTest {
         fun assertIsTestPuzzle1(puz : Puzzle) {
             Assertions.assertEquals(puz.title, "Test Crossword")
             Assertions.assertEquals(puz.author, "Test Author")
-            Assertions.assertEquals(puz.date, LocalDate.of(2026, 3, 22))
+            Assertions.assertEquals(puz.date, LocalDate(2026, 3, 22))
 
             Assertions.assertEquals(puz.width, 15)
             Assertions.assertEquals(puz.height, 15)
@@ -104,7 +104,7 @@ class SlowDownWiseUpJSONIOTest {
             Assertions.assertEquals(puz.completionMessage, "Correct solution")
             Assertions.assertEquals(puz.notes, "Test description")
             Assertions.assertEquals(puz.source, "Test publisher")
-            Assertions.assertEquals(puz.date, LocalDate.of(2024, 1, 3))
+            Assertions.assertEquals(puz.date, LocalDate(2024, 1, 3))
 
             Assertions.assertEquals(puz.width, 15)
             Assertions.assertEquals(puz.height, 15)

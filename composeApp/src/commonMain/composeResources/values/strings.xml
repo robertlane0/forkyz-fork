@@ -113,6 +113,9 @@
     <string name="collapse_headings_desc">Show headings only in the puzzle list unless expanded.</string>
     <string name="expand">Expand</string>
     <string name="collapse">Collapse</string>
+    <!-- day name, day num, month name, year -->
+    <string name="browse_date_format_non_header">%1$s\n%2$d %3$s\n%4$d</string>
+    <string name="browse_date_format_header">%1$s %2$d %3$s %4$d</string>
 
     <!-- play page -->
     <string name="open_clue_list">Open clue list</string>
@@ -681,10 +684,12 @@
     <string name="done">Done</string>
     <string name="num_hinted_boxes">%1$d (%2$d%)</string>
     <string name="share_your_time">Share your time</string>
+    <!-- puzzle name, day, month name, year, num hints, time -->
     <plurals name="share_message_with_date">
-        <item quantity="one">I finished the %1$s crossword for %2$s in #Forkyz with %3$d hint!\nI completed the crossword in %4$s.</item>
-        <item quantity="other">I finished the %1$s crossword for %2$s in #Forkyz with %3$d hints!\nI completed the crossword in %4$s.</item>
+        <item quantity="one">I finished the %1$s crossword for %2$d %3$s %4$d in #Forkyz with %5$d hint!\nI completed the crossword in %6$s.</item>
+        <item quantity="other">I finished the %1$s crossword for %2$d %3$s %4$d in #Forkyz with %5$d hints!\nI completed the crossword in %6$s.</item>
     </plurals>
+    <!-- puzzle name, num hints, time -->
     <plurals name="share_message_no_date">
         <item quantity="one">I finished the %1$s crossword in #Forkyz with %2$d hint!\nI completed the crossword in %3$s.</item>
         <item quantity="other">I finished the %1$s crossword in #Forkyz with %2$d hints!\nI completed the crossword in %3$s.</item>
@@ -845,4 +850,27 @@
     <string name="nrc">NRC</string>
     <string name="nrc_scrypto_title">Scrypto</string>
     <string name="nrc_in_het_midden_title">In Het Midden</string>
+
+    <!-- days of the week -->
+    <string name="day_monday">Monday</string>
+    <string name="day_tuesday">Tuesday</string>
+    <string name="day_wednesday">Wednesday</string>
+    <string name="day_thursday">Thursday</string>
+    <string name="day_friday">Friday</string>
+    <string name="day_saturday">Saturday</string>
+    <string name="day_sunday">Sunday</string>
+
+    <!-- months of the year -->
+    <string name="month_january">January</string>
+    <string name="month_february">February</string>
+    <string name="month_march">March</string>
+    <string name="month_april">April</string>
+    <string name="month_may">May</string>
+    <string name="month_june">June</string>
+    <string name="month_july">July</string>
+    <string name="month_august">August</string>
+    <string name="month_september">September</string>
+    <string name="month_october">October</string>
+    <string name="month_november">November</string>
+    <string name="month_december">December</string>
 </resources>

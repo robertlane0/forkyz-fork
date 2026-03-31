@@ -2,9 +2,6 @@
 package app.crossword.yourealwaysbe.forkyz
 
 import java.io.IOException
-import java.time.LocalDate
-import java.time.Period
-import java.time.format.DateTimeFormatter
 import java.util.ArrayList
 import java.util.Collections
 import java.util.function.BiConsumer
@@ -15,6 +12,10 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.minus
+import kotlinx.datetime.toJavaLocalDate
 
 import androidx.annotation.MainThread
 import androidx.lifecycle.ViewModel
@@ -22,6 +23,7 @@ import androidx.lifecycle.viewModelScope
 
 import app.crossword.yourealwaysbe.forkyz.BuildConfig
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.browse_date_format_header
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.import_failure
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.import_success
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.puzzle_caption_with_author
@@ -45,6 +47,7 @@ import app.crossword.yourealwaysbe.forkyz.util.MediatedStateWithFlow
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.Parcelable
 import app.crossword.yourealwaysbe.forkyz.util.Parcelize
+import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.files.DirHandle
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler
@@ -56,8 +59,6 @@ import app.crossword.yourealwaysbe.forkyz.util.processPuzzleToImportDirectory
 import app.crossword.yourealwaysbe.forkyz.view.DownloadDialogViewModel
 
 private val TAG = "ForkyzBrowsePage"
-private val HEADER_DATE_FORMAT
-    = DateTimeFormatter.ofPattern("EEEE dd MMM yyyy")
 private val DEFAULT_DAY_NIGHT_MODE = DayNightMode.fromValue(0)
     ?: DayNightMode.DNM_DAY
 
@@ -584,7 +585,10 @@ class BrowsePageViewModel(
                 fileHandler.getPuzMetas(crosswords).forEach { pm ->
                     val doClean
                         = pm.complete == 100
-                        || (maxAge != null && getDate(pm).isBefore(maxAge))
+                        || (
+                            maxAge != null
+                            && getDate(pm).compareTo(maxAge) < 0
+                        )
 
                     if (doClean) {
                         if (deleteOnCleanup) {
@@ -597,7 +601,7 @@ class BrowsePageViewModel(
 
                 if (archiveMaxAge != null) {
                    fileHandler.getPuzMetas(archive).forEach { pm ->
-                        if (getDate(pm).isBefore(archiveMaxAge)) {
+                        if (getDate(pm).compareTo(archiveMaxAge) < 0) {
                             toDelete.add(pm.puzHandle)
                         }
                     }
@@ -674,7 +678,7 @@ class BrowsePageViewModel(
                     settings.setBrowseLastDownload(
                         System.currentTimeMillis()
                     )
-                    val now = LocalDate.now()
+                    val now = TimeUtils.today()
                     download(now, dls.getAutoDownloaders(now))
                 }
             }
@@ -914,7 +918,7 @@ class BrowsePageViewModel(
     private fun getMaxAge(preferenceValue : Int) : LocalDate? {
         val cleanupValue = preferenceValue + 1
         if (cleanupValue > 0)
-            return LocalDate.now().minus(Period.ofDays(cleanupValue))
+            return TimeUtils.plusDays(TimeUtils.today(), -cleanupValue)
         else
             return null
     }
@@ -944,7 +948,7 @@ class BrowsePageViewModel(
         }
     }
 
-    private fun entryMatches(
+    private suspend fun entryMatches(
         pe : PuzEntry,
         filterText : String?,
     ) : Boolean {
@@ -965,11 +969,7 @@ class BrowsePageViewModel(
         if (pe.source.uppercase().contains(upperFilterText))
             return true
 
-        if (
-            HEADER_DATE_FORMAT.format(pe.date)
-                .uppercase()
-                .contains(upperFilterText)
-        )
+        if (formatDateHeader(pe.date).uppercase().contains(upperFilterText))
             return true
 
         return false
@@ -1033,7 +1033,7 @@ class BrowsePageViewModel(
      * state
      * @param puzzleFilter new puzzle filter value
      */
-    private fun getUpdatedState(
+    private suspend fun getUpdatedState(
         state : UIState,
         browseSettings : BrowseSettings,
     ) : UIState {
@@ -1109,7 +1109,7 @@ class BrowsePageViewModel(
         )
     }
 
-    private fun getPuzzleList(
+    private suspend fun getPuzzleList(
         puzzleFilter : String?,
         sortOrder : AccessorSetting,
     ) : List<PuzGroup> {
@@ -1119,7 +1119,7 @@ class BrowsePageViewModel(
             .groupBy { pe ->
                 when (sortOrder) {
                     AccessorSetting.AS_SOURCE -> pe.source
-                    else -> HEADER_DATE_FORMAT.format(pe.date)
+                    else -> formatDateHeader(pe.date)
                 }
             }.map { e ->
                 PuzGroup(
@@ -1298,6 +1298,18 @@ class BrowsePageViewModel(
 
     private fun runMain(run : () -> Unit) {
         viewModelScope.launch(Dispatchers.Main) { run() }
+    }
+
+    private suspend fun formatDateHeader(date : LocalDate) : String {
+        val dayID = TimeUtils.getDayNameID(date)
+        val monthID = TimeUtils.getMonthNameID(date)
+        return utils.getString(
+            Res.string.browse_date_format_header,
+            utils.getString(dayID),
+            date.day,
+            utils.getString(monthID),
+            date.year,
+        )
     }
 
     private val currentVersion : String = BuildConfig.APP_VERSION

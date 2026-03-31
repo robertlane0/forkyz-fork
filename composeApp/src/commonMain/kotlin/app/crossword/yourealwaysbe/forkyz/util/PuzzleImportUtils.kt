@@ -6,12 +6,13 @@ import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.net.URISyntaxException
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.import_fallback_source
 import app.crossword.yourealwaysbe.forkyz.net.GenericStreamScraper
 import app.crossword.yourealwaysbe.forkyz.util.AppLogger
+import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.files.DirHandle
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandle
@@ -146,7 +147,7 @@ private suspend fun ensurePuzSource(
 
 private fun ensurePuzDate(puz : Puzzle, fileName : String?) {
     val date
-        = AppPuzzleUtils.deriveDate(puz.date, fileName) ?: LocalDate.now()
+        = AppPuzzleUtils.deriveDate(puz.date, fileName) ?: TimeUtils.today()
     puz.date = date
 }
 

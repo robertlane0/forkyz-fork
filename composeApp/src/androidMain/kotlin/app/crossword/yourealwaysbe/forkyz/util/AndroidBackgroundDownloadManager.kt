@@ -1,13 +1,11 @@
 
 package app.crossword.yourealwaysbe.forkyz.util
 
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.temporal.ChronoUnit
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDate
 
 import android.content.Context
 import androidx.annotation.MainThread
@@ -27,6 +25,7 @@ import app.crossword.yourealwaysbe.forkyz.net.DownloadersProvider
 import app.crossword.yourealwaysbe.forkyz.settings.BackgroundDownloadSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.util.AppLogger
+import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 
@@ -187,18 +186,7 @@ class AndroidBackgroundDownloadManager(
      * @param hourOfDay 0-23
      */
     private fun getDelay(dayOfWeek : Int, hourOfDay : Int) : Long {
-        // start from now and adjust
-        val now = LocalDateTime.now()
-        val nowDayOfWeek = now.getDayOfWeek().getValue()
-
-        var nextDownload = now.plusDays(dayOfWeek.toLong() - nowDayOfWeek)
-            .withHour(hourOfDay)
-            .truncatedTo(ChronoUnit.HOURS)
-
-        if (!nextDownload.isAfter(LocalDateTime.now()))
-            nextDownload = nextDownload.plusDays(7)
-
-        return ChronoUnit.MILLIS.between(now, nextDownload)
+        return TimeUtils.millisecondsUntilNext(dayOfWeek, hourOfDay)
     }
 
     private fun getWorkManager() : WorkManager { return workManager }
@@ -225,7 +213,7 @@ abstract class BaseDownloadWorker(
         downloadersProvider.get { dls ->
             downloadScope.launch {
                 try {
-                    val now = LocalDate.now()
+                    val now = TimeUtils.today()
                     dls.downloadLatestInRange(
                         now, now, dls.getAutoDownloaders(now)
                     )

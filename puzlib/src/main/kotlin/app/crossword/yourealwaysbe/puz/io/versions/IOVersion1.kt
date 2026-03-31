@@ -5,8 +5,10 @@ import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.io.IOException
 import java.nio.charset.Charset
-import java.time.Instant
-import java.time.ZoneId
+import kotlin.time.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.toLocalDateTime
 
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Box.Companion.isBlock
@@ -56,10 +58,9 @@ open class IOVersion1 : IOVersion {
         meta.date = if (dateEpoch == 0L)
             null
         else
-            Instant.ofEpochMilli(dateEpoch)
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate()
-
+            Instant.fromEpochMilliseconds(dateEpoch)
+                .toLocalDateTime(TimeZone.currentSystemDefault())
+                .date
 
         meta.percentComplete = inStream.readInt()
         meta.percentFilled = meta.percentComplete
@@ -93,9 +94,8 @@ open class IOVersion1 : IOVersion {
             os.writeLong(0)
         } else {
             os.writeLong(
-                date.atStartOfDay(ZoneId.systemDefault())
-                    .toInstant()
-                    .toEpochMilli()
+                date.atStartOfDayIn(TimeZone.currentSystemDefault())
+                    .toEpochMilliseconds(),
             )
         }
         os.writeInt(puz.percentComplete)

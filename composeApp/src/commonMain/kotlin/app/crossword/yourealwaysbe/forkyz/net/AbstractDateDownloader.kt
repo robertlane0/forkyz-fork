@@ -3,17 +3,19 @@ package app.crossword.yourealwaysbe.forkyz.net
 import java.net.MalformedURLException
 import java.net.URI
 import java.net.URISyntaxException
-import java.time.DayOfWeek
-import java.time.Duration
-import java.time.LocalDate
-import java.time.LocalTime
-import java.time.ZoneId
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
 import java.util.Arrays
+import kotlin.time.Duration
+import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.format
+import kotlinx.datetime.format.DateTimeFormat
+import kotlinx.datetime.format.FormatStringsInDatetimeFormats
+import kotlinx.datetime.format.byUnicodePattern
+import kotlinx.datetime.number
 
 import app.crossword.yourealwaysbe.forkyz.net.Downloader.DownloadResult
 import app.crossword.yourealwaysbe.forkyz.util.AppLogger
+import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.io.PuzzleParser
 
@@ -40,10 +42,11 @@ import app.crossword.yourealwaysbe.puz.io.PuzzleParser
  * newspaper subscription page).
  * @param puzzleParser the PuzzleParser for parsing the downloaded
  * puzzle.
- * @param sourceUrlFormatPattern Java DateTimeFormatter pattern for
- * the source URL on a given date. If null, override getSourceUrl.
- * @param shareUrlFormatPattern Java DateTimeFormatter pattern for
- * the share URL (i.e. the website where the puzzle is).
+ * @param sourceUrlFormatPattern Kotlin supported date-time format
+ * pattern for the source URL on a given date. If null, override
+ * getSourceUrl.
+ * @param shareUrlFormatPattern Kotlin supported date-time format
+ * patternfor the share URL (i.e. the website where the puzzle is).
  * getShareUrl can be overridden if more complex logic is needed.
  * @param goodFrom the first date the source is available. Can also
  * override getGoodFrom. Epoch 0 by default.
@@ -60,25 +63,23 @@ open class AbstractDateDownloader constructor(
     protected var puzzleParser : PuzzleParser,
     sourceUrlFormatPattern : String? = null,
     shareUrlFormatPattern : String? = null,
-    val goodFrom : LocalDate = LocalDate.ofEpochDay(0L),
+    val goodFrom : LocalDate = LocalDate.fromEpochDays(0L),
     private val overrideEmbeddedDate : Boolean = true,
 ) : AbstractDownloader() {
-    private val sourceUrlFormat : DateTimeFormatter?
-    private val shareUrlFormat : DateTimeFormatter?
 
-    init {
-        this.sourceUrlFormat = convertUrlFormatPattern(sourceUrlFormatPattern)
-        this.shareUrlFormat = convertUrlFormatPattern(shareUrlFormatPattern)
-    }
+    private val sourceUrlFormat : DateTimeFormat<LocalDate>?
+        = convertUrlFormatPattern(sourceUrlFormatPattern)
+    private val shareUrlFormat : DateTimeFormat<LocalDate>?
+        = convertUrlFormatPattern(shareUrlFormatPattern)
 
     /**
      * A unique consistent filename for the given date
      */
     protected fun createFileName(date : LocalDate) : String {
         return (
-            date.getYear().toString() + "-" +
-            date.getMonthValue() + "-" +
-            date.getDayOfMonth() + "-" +
+            date.year.toString() + "-" +
+            date.month.number.toString() + "-" +
+            date.day.toString() + "-" +
             name.replace(" ".toRegex(), "")
         )
     }
@@ -91,11 +92,7 @@ open class AbstractDateDownloader constructor(
      * Where to do the actual download from
      */
     protected open fun getSourceUrl(date : LocalDate) : String? {
-        return if (sourceUrlFormat == null) {
-            null
-        } else {
-            sourceUrlFormat.format(date)
-        }
+        return sourceUrlFormat?.let { date.format(it) }
     }
 
     /**
@@ -105,7 +102,7 @@ open class AbstractDateDownloader constructor(
      * backend data file
      */
     protected open fun getShareUrl(date : LocalDate) : String? {
-        return shareUrlFormat?.let { it.format(date) }
+        return shareUrlFormat?.let { date.format(it) }
     }
 
     override fun download(
@@ -171,55 +168,43 @@ open class AbstractDateDownloader constructor(
 
     override fun isAvailable(date : LocalDate) : Boolean {
         val untilAvail = getUntilAvailable(date)
-        return (
-            untilAvail != null
-            && (untilAvail.isZero() || untilAvail.isNegative())
-        )
+        return untilAvail != null && !(untilAvail.isPositive())
     }
 
     override fun getUntilAvailable(date : LocalDate) : Duration? {
         // check not before puzzle was available
-        if (goodFrom.isAfter(date))
+        if (goodFrom.compareTo(date) > 0)
             return null
 
         // check not after puzzle was made unavailable
-        if (goodThrough?.isBefore(date) ?: false)
+        if ((goodThrough?.compareTo(date) ?: 0) > 0)
             return null
 
         if (!isPublishedOnDay(date))
             return null
 
-        // check current time is before required date plus offset
-        val now = ZonedDateTime.now(ZoneId.of("UTC"))
-        val availableFrom = ZonedDateTime.of(
-            date,
-            LocalTime.MIDNIGHT,
-            ZoneId.of("UTC"),
-        ).plus(utcAvailabilityOffset)
-
-        return Duration.between(now, availableFrom)
+        return TimeUtils.durationUntil(date, utcAvailabilityOffset)
     }
 
     override val latestDate : LocalDate?
         get() = getLatestDate(null)
 
     override fun getLatestDate(until : LocalDate?) : LocalDate? {
-        val now = LocalDate.now()
+        val now = TimeUtils.today()
 
         // look ahead offset and in previous week for an available date this
         // relies on puzzles being weekly according to our model include this
         // day last week in case current day not yet available
-        var lookAhead : Long = utcAvailabilityOffset.toDays()
-
-        var startDate = now.plusDays(-lookAhead)
-        startDate = if (until == null || startDate.isBefore(until))
+        var lookAhead = utcAvailabilityOffset.inWholeDays
+        var startDate = TimeUtils.plusDays(now, -lookAhead)
+        startDate = if (until == null || startDate.compareTo(until) < 0)
             startDate
         else
             until
 
         val lenWindow = this.latestDateWindow
         for (i in 0..lenWindow) {
-            val tryDate = startDate.plusDays(-i.toLong())
+            val tryDate = TimeUtils.plusDays(startDate, -i)
             if (isAvailable(tryDate))
                 return tryDate
         }
@@ -248,7 +233,7 @@ open class AbstractDateDownloader constructor(
      * until 1/1/2001, then Monday after.
      */
     protected open fun isPublishedOnDay(date : LocalDate) : Boolean {
-        val dayOfWeek = date.getDayOfWeek()
+        val dayOfWeek = date.dayOfWeek
         return Arrays.binarySearch(days, dayOfWeek) >= 0
     }
 
@@ -301,10 +286,9 @@ open class AbstractDateDownloader constructor(
          */
         private fun convertUrlFormatPattern(
             pattern : String?,
-        ) : DateTimeFormatter? {
+        ) : DateTimeFormat<LocalDate>? {
             try {
-                if (pattern != null)
-                    return DateTimeFormatter.ofPattern(pattern)
+                return TimeUtils.convertUrlFormatPattern(pattern)
             } catch (e : IllegalArgumentException) {
                 // fall through
             }

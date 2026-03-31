@@ -5,9 +5,9 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 
+import androidx.datastore.core.okio.OkioSerializer
 import okio.BufferedSink
 import okio.BufferedSource
-import androidx.datastore.core.okio.OkioSerializer
 
 class SettingsSerializer(
     val defaultSettings : Settings,

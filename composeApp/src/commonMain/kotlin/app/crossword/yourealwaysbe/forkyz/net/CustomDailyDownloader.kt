@@ -1,7 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.time.Duration
+import kotlin.time.Duration
 
 import app.crossword.yourealwaysbe.puz.io.PuzzleStreamReader
 

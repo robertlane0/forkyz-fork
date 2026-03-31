@@ -3,11 +3,7 @@ package app.crossword.yourealwaysbe.forkyz.view
 
 import androidx.compose.material3.MaterialTheme
 
-import java.time.format.DateTimeFormatter
-import java.time.format.TextStyle
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.toJavaLocalDate
-import kotlinx.datetime.toKotlinLocalDate
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -44,6 +40,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.no_downloaders
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.no_downloaders_enabled_msg
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.select_sources
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.settings
+import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 
 @Composable
 fun DownloadDialog(
@@ -88,23 +85,18 @@ fun DownloadDialog(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     val date by remember { derivedStateOf { state.date } }
-                    val day = date.getDayOfWeek()
-                        .getDisplayName(
-                            TextStyle.FULL,
-                            java.util.Locale.getDefault(),
-                        )
 
-                    Text(text = day)
+                    Text(text = stringResource(TimeUtils.getDayNameID(date)))
                     WheelDatePicker(
                         modifier = Modifier.padding(vertical = 8.dp),
-                        startDate = date.toKotlinLocalDate(),
+                        startDate = date,
                         dateFormatter = dateFormatter(
                             locale = Locale.current,
                             monthDisplayStyle = MonthDisplayStyle.SHORT,
                             cjkSuffixConfig = CjkSuffixConfig.ShowAll,
                         ),
                         onSnappedDate = { newDate ->
-                            viewModel.date = newDate.toJavaLocalDate()
+                            viewModel.date = newDate
                         },
                     )
                 }

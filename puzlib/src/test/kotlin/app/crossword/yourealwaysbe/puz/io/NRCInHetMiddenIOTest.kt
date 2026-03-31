@@ -2,7 +2,7 @@
 package app.crossword.yourealwaysbe.puz.io
 
 import java.io.InputStream
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -53,7 +53,7 @@ class NRCInHetMiddenIOTest {
             val ACROSS_CLUES = "Across"
             val DOWN_CLUES = "Down"
 
-            Assertions.assertEquals(LocalDate.of(2025, 11, 18), puz.date)
+            Assertions.assertEquals(LocalDate(2025, 11, 18), puz.date)
 
             val boxes: Array<Array<Box?>> = puz.boxes
 

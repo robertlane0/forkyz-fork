@@ -1,11 +1,10 @@
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.time.DayOfWeek
-import java.time.Duration
-import java.time.LocalDate
-import java.time.ZoneId
-import java.time.ZonedDateTime
+import kotlin.time.Duration
+import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.LocalDate
 
+import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.io.KeesingXMLIO
 
@@ -35,9 +34,7 @@ class KeesingDownloader(
     // website has "yesterday's" puzzle up until the
     // utcAvailabilityOffset, so either return today or yesterday
     // depending on what's available
-    ZonedDateTime.now(ZoneId.of("UTC"))
-        .minus(utcAvailabilityOffset)
-        .toLocalDate(),
+    TimeUtils.offsetTodayUTC(-utcAvailabilityOffset),
 ) {
     override fun getSourceUrl(date : LocalDate) : String? {
         val scraper = KeesingStreamScraper()

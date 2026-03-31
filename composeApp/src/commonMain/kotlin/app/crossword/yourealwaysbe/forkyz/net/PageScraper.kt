@@ -5,17 +5,18 @@ import java.io.IOException
 import java.net.MalformedURLException
 import java.net.URI
 import java.net.URISyntaxException
-import java.time.Duration
-import java.time.LocalDate
 import java.util.Deque
 import java.util.LinkedList
 import java.util.regex.Pattern
+import kotlin.time.Duration
+import kotlinx.datetime.LocalDate
 
 import org.jsoup.Connection
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
 import app.crossword.yourealwaysbe.forkyz.net.Downloader.DownloadResult
+import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.PuzzleBuilder
 import app.crossword.yourealwaysbe.puz.io.IO
@@ -81,11 +82,11 @@ open class PageScraper(
     }
 
     override val latestDate : LocalDate
-        get() { return LocalDate.now() }
+        get() { return TimeUtils.today() }
 
     override fun getLatestDate(until : LocalDate?) : LocalDate? {
-        val now = LocalDate.now()
-        return if (until == null || now.isBefore(until)) now else until
+        val now = TimeUtils.today()
+        return if (until == null || now.compareTo(until) < 0) now else until
     }
 
     override fun download(
@@ -124,7 +125,7 @@ open class PageScraper(
                             puz.sourceUrl = url
                             puz.supportUrl = supportUrl
                             puz.shareUrl = if (shareFileUrl) url else scrapeUrl
-                            puz.date = LocalDate.now()
+                            puz.date = TimeUtils.today()
 
                             val title = puz.title
                             if (title == null || title.isEmpty())

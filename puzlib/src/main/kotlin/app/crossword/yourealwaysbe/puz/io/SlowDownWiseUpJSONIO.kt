@@ -3,10 +3,12 @@ package app.crossword.yourealwaysbe.puz.io
 
 import java.io.IOException
 import java.io.InputStream
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
 import java.util.logging.Logger
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.format.DayOfWeekNames
+import kotlinx.datetime.format.MonthNames
+import kotlinx.datetime.format.Padding
+import kotlinx.datetime.format.char
 
 import org.json.JSONException
 import org.json.JSONObject
@@ -64,8 +66,15 @@ class SlowDownWiseUpJSONIO : AbstractJSONIO() {
         private val LOG
             = Logger.getLogger(AmuseLabsJSONIO::class.java.getCanonicalName())
 
-        private val DATE_FORMATTER
-            = DateTimeFormatter.ofPattern("EEEE, d MMMM y")
+        private val DATE_FORMATTER = LocalDate.Format {
+            dayOfWeek(DayOfWeekNames.ENGLISH_FULL)
+            chars(", ")
+            day(Padding.NONE)
+            char(' ')
+            monthName(MonthNames.ENGLISH_FULL)
+            char(' ')
+            year(Padding.NONE)
+        }
 
         private val DEFAULT_CLUE_LIST_NAME
             = DefaultListNames.NODIR_LIST
@@ -177,8 +186,8 @@ class SlowDownWiseUpJSONIO : AbstractJSONIO() {
             try {
                 val date = optStringNull(copy, "date-publish")
                 if (date != null)
-                    builder.setDate(LocalDate.parse(date, DATE_FORMATTER))
-            } catch (e : DateTimeParseException) {
+                    builder.setDate(DATE_FORMATTER.parse(date))
+            } catch (e : IllegalArgumentException) {
                 // oh well
             }
         }

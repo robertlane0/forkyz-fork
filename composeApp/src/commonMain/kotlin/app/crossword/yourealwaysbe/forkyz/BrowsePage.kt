@@ -1,7 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz
 
-import java.time.format.DateTimeFormatter
+import kotlinx.datetime.LocalDate
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
@@ -95,6 +95,7 @@ import io.github.vinceglb.filekit.releaseBookmark
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.add_puzzle
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.android_app_settings_button
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.browse_date_format_non_header
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.by_date_asc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.by_date_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.by_source
@@ -160,6 +161,7 @@ import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 import app.crossword.yourealwaysbe.forkyz.util.MATERIAL_MIN_CLICKABLE_DP
 import app.crossword.yourealwaysbe.forkyz.util.NativeFrontendUtils
 import app.crossword.yourealwaysbe.forkyz.util.NativeImportFinishedResult
+import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.util.toUri
@@ -175,7 +177,6 @@ import app.crossword.yourealwaysbe.forkyz.view.SwipeToDismissBoxValue
 import app.crossword.yourealwaysbe.forkyz.view.TwoButtonDialog
 import app.crossword.yourealwaysbe.forkyz.view.rememberSwipeToDismissBoxState
 
-private val DATE_FORMAT = DateTimeFormatter.ofPattern("EEEE\ndd MMM\nyyyy")
 private val HORIZONTAL_PADDING = 16.dp
 private val FAB_OPEN_ANGLE = 45F
 private val FAB_OVERLAY_ALPHA = 0.6F
@@ -681,6 +682,19 @@ fun BrowsePage(
     }
 
     @Composable
+    fun formatDateNonHeader(date : LocalDate) : String {
+        val dayID = TimeUtils.getDayNameID(date)
+        val monthID = TimeUtils.getMonthNameID(date)
+        return stringResource(
+            Res.string.browse_date_format_non_header,
+            stringResource(dayID),
+            date.day,
+            stringResource(monthID),
+            date.year,
+        )
+    }
+
+    @Composable
     fun PuzzleDetails(pe : PuzEntry) {
         val state by viewModel.uiState.collectAsStateWithLifecycle()
         val percentFilled by remember {
@@ -733,6 +747,7 @@ fun BrowsePage(
                 val dateWidth = with(LocalDensity.current) {
                     81.sp.toDp()
                 }
+                val date = formatDateNonHeader(pe.date)
                 Text(
                     modifier = Modifier.width(dateWidth)
                         .padding(end=4.dp),
@@ -740,7 +755,7 @@ fun BrowsePage(
                     maxLines = 3,
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.bodySmall,
-                    text = DATE_FORMAT.format(pe.date),
+                    text = date,
                     color = textColor,
                 )
             }

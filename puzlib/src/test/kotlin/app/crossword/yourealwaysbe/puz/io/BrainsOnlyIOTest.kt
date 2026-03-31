@@ -3,7 +3,7 @@ package app.crossword.yourealwaysbe.puz.io
 
 import java.io.IOException
 import java.io.InputStream
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -73,7 +73,7 @@ class BrainsOnlyIOTest {
                 puz.author,
             )
             Assertions.assertEquals("Test note", puz.notes)
-            Assertions.assertEquals(LocalDate.of(2014, 2, 7), puz.date)
+            Assertions.assertEquals(LocalDate(2014, 2, 7), puz.date)
 
             val boxes : Array<Array<Box?>> = puz.boxes
 

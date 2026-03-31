@@ -6,10 +6,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-import app.crossword.yourealwaysbe.forkyz.settings.BackgroundDownloadSettings
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_downloads_not_available
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.background_downloads_not_available_desc
+import app.crossword.yourealwaysbe.forkyz.settings.BackgroundDownloadSettings
 
 class JVMBackgroundDownloadManager(
     private val utils : NativeBackendUtils,

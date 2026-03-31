@@ -1,9 +1,9 @@
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.time.DayOfWeek
-import java.time.Duration
-import java.time.LocalDate
 import java.util.Locale
+import kotlin.time.Duration
+import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.LocalDate
 
 import app.crossword.yourealwaysbe.forkyz.net.Downloader.DownloadResult
 import app.crossword.yourealwaysbe.puz.io.UclickXMLIO
@@ -44,7 +44,7 @@ class UclickDownloader(
     ) : DownloadResult {
         val res : DownloadResult = super.download(date, existingFileNames)
         if (res.isSuccess) {
-            res.puzzle?.copyright = "\u00a9 " + date.getYear() + " " + copyright
+            res.puzzle?.copyright = "\u00a9 " + date.year + " " + copyright
         }
         return res
     }

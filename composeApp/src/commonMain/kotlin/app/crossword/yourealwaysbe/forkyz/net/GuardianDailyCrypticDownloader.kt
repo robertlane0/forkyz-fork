@@ -3,11 +3,11 @@ package app.crossword.yourealwaysbe.forkyz.net
 import java.io.IOException
 import java.net.URI
 import java.net.URISyntaxException
-import java.time.DayOfWeek
-import java.time.Duration
-import java.time.LocalDate
-import java.time.Period
+import kotlin.time.Duration
+import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.LocalDate
 
+import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.io.GuardianJSONIO
 
@@ -69,19 +69,14 @@ class GuardianDailyCrypticDownloader(
         var upper = date
         var direction = 1
 
-        if (lower.isAfter(upper)) {
+        if (lower.compareTo(upper) > 0) {
             lower = date
             upper = BASE_CW_DATE
             direction = -1
         }
 
-        val diff = Duration.between(
-            lower.atStartOfDay(),
-            upper.atStartOfDay()
-        )
-
-        val daysDiff = diff.toDays()
-        val yearsDiff = Period.between(lower, upper).getYears()
+        val diff = TimeUtils.durationBetween(lower, upper)
+        val daysDiff = diff.inWholeDays
 
         var cwNumOffset = daysDiff
         // no Sundays (base day is Monday so negative gets one more)
@@ -93,7 +88,7 @@ class GuardianDailyCrypticDownloader(
         // no Boxing day pre 2010
         cwNumOffset -= countNonSundayBoxing(
             lower,
-            LocalDate.of(2009, 12, 26),
+            LocalDate(2009, 12, 26),
         ).toLong()
 
         val cwNum : Long = BASE_CW_NUMBER + direction * cwNumOffset
@@ -107,7 +102,7 @@ class GuardianDailyCrypticDownloader(
         private const val BASE_SOURCE_URL
             = "https://www.theguardian.com/crosswords/cryptic/"
         private const val BASE_CW_NUMBER = 28112
-        private val BASE_CW_DATE : LocalDate = LocalDate.of(2020, 4, 20)
+        private val BASE_CW_DATE : LocalDate = LocalDate(2020, 4, 20)
 
         /**
          * Counts number of Christmasses that aren't Sunday between dates
@@ -151,17 +146,17 @@ class GuardianDailyCrypticDownloader(
             month : Int,
             day : Int,
         ) : Int {
-            if (upper.isBefore(lower))
+            if (upper.compareTo(lower) < 0)
                 return 0
 
-            var special = LocalDate.of(lower.getYear(), month, day)
-            if (lower.isAfter(special))
-                special = special.plusYears(1)
+            var special = LocalDate(lower.year, month, day)
+            if (lower.compareTo(special) > 0)
+                special = TimeUtils.plusYears(special, 1)
 
             var count = 0
-            while (!special.isAfter(upper)) {
-                if (DayOfWeek.from(special) != DayOfWeek.SUNDAY) count += 1
-                special = special.plusYears(1)
+            while (special.compareTo(upper) <= 0) {
+                if (special.dayOfWeek != DayOfWeek.SUNDAY) count += 1
+                special = TimeUtils.plusYears(special, 1)
             }
 
             return count

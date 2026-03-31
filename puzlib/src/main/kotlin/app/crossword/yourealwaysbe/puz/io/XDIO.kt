@@ -5,14 +5,11 @@ import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
 import java.util.Collections
-import java.util.Locale
 import java.util.logging.Logger
 import java.util.regex.Pattern
 import kotlin.math.max
+import kotlinx.datetime.LocalDate
 
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Clue
@@ -139,8 +136,7 @@ class XDIO : PuzzleParser {
         private val DOWN_LIST = DefaultListNames.DOWN_LIST
         private val ANON_LIST = DefaultListNames.NODIR_LIST
 
-        private val DATE_FORMATTER
-            = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.US)
+        private val DATE_FORMATTER = LocalDate.Formats.ISO
 
         private val BLOCKS = setOf('#', '_', '■', '＿')
 
@@ -266,8 +262,8 @@ class XDIO : PuzzleParser {
                     parseLookupTable(value, clueGroups)
                 } else if ("date".equals(key, ignoreCase = true)) {
                     try {
-                        date = LocalDate.parse(value, DATE_FORMATTER)
-                    } catch (e : DateTimeParseException) {
+                        date = DATE_FORMATTER.parse(value)
+                    } catch (e : IllegalArgumentException) {
                         throw XDFormatException(
                             "Unexpected date format: " + value,
                         )

@@ -4,10 +4,11 @@ package app.crossword.yourealwaysbe.forkyz.net
 import java.io.IOException
 import java.net.URI
 import java.net.URISyntaxException
-import java.time.DayOfWeek
-import java.time.Duration
-import java.time.LocalDate
+import kotlin.time.Duration
+import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.LocalDate
 
+import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.io.GuardianJSONIO
 
@@ -66,18 +67,14 @@ class GuardianWeeklyQuipticDownloader(
         var upper = date
         var direction = 1
 
-        if (lower.isAfter(upper)) {
+        if (lower.compareTo(upper) > 0) {
             lower = date
             upper = BASE_CW_DATE
             direction = -1
         }
 
-        val diff = Duration.between(
-            lower.atStartOfDay(),
-            upper.atStartOfDay()
-        )
-
-        val daysDiff = diff.toDays()
+        val diff = TimeUtils.durationBetween(lower, upper)
+        val daysDiff = diff.inWholeDays
 
         // change between tue/mon/sun release smoothed over by rounding
         var cwNumOffset = (daysDiff / 7)
@@ -86,8 +83,8 @@ class GuardianWeeklyQuipticDownloader(
         // Revisit in 2033 to see if that Christmas is skipped or not
         // (other Christmases weren't missed)
         if (
-            date.isBefore(BASE_CW_DATE)
-            && date.isAfter(LocalDate.of(2023, 12, 25))
+            date.compareTo(BASE_CW_DATE) < 0
+            && date.compareTo(LocalDate(2023, 12, 25)) > 0
         ) {
             cwNumOffset = cwNumOffset + 1
         }
@@ -99,16 +96,16 @@ class GuardianWeeklyQuipticDownloader(
 
     // override default isPublishedOnDay behaviour to follow changing release date
     override fun isPublishedOnDay(date : LocalDate) : Boolean {
-        val dayOfWeek = date.getDayOfWeek()
+        val dayOfWeek = date.dayOfWeek
 
         // #1272 onwards on Sundays
-        if (date.isAfter(BASE_CW_DATE) || date.isEqual(BASE_CW_DATE))
+        if (date.compareTo(BASE_CW_DATE) >= 0)
             return (dayOfWeek == DayOfWeek.SUNDAY)
         // #1 on Tuesday
-        else if (date.isEqual(LocalDate.of(1999, 11, 23)))
+        else if (date == LocalDate(1999, 11, 23))
             return true
         // Skip 2024-12-25
-        else if (date.isEqual(LocalDate.of(2023, 12, 25)))
+        else if (date == LocalDate(2023, 12, 25))
             return false
         // #2 to #1271 on Mondays
         else
@@ -121,7 +118,7 @@ class GuardianWeeklyQuipticDownloader(
         private const val BASE_SOURCE_URL
             = "https://www.theguardian.com/crosswords/quiptic/"
         private const val BASE_CW_NUMBER = 1272
-        private val BASE_CW_DATE : LocalDate = LocalDate.of(2024, 4, 7)
+        private val BASE_CW_DATE : LocalDate = LocalDate(2024, 4, 7)
     }
 }
 

@@ -3,11 +3,8 @@ package app.crossword.yourealwaysbe.puz.io
 
 import java.io.IOException
 import java.io.InputStream
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
-import java.util.Locale
 import java.util.logging.Logger
+import kotlinx.datetime.LocalDate
 
 import org.json.JSONException
 import org.json.JSONObject
@@ -61,8 +58,11 @@ class AMUniversalJSONIO : AbstractJSONIO() {
         private val LOG
             = Logger.getLogger(AMUniversalJSONIO::class.java.getCanonicalName())
 
-        private val DATE_FORMATTER
-            = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US)
+        private val DATE_FORMATTER = LocalDate.Format {
+            year()
+            monthNumber()
+            day()
+        }
 
         private val ACROSS_LIST : String = DefaultListNames.ACROSS_LIST
         private val DOWN_LIST : String = DefaultListNames.DOWN_LIST
@@ -106,8 +106,8 @@ class AMUniversalJSONIO : AbstractJSONIO() {
                 return if (date == null)
                     null
                 else
-                    LocalDate.parse(date, DATE_FORMATTER)
-            } catch (e : DateTimeParseException) {
+                    DATE_FORMATTER.parse(date)
+            } catch (e : IllegalArgumentException) {
                 return null
             }
         }

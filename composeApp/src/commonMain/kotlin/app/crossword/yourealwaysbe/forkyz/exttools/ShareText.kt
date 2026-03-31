@@ -1,10 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.exttools
 
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
-import java.util.Locale
-import java.util.function.Consumer
 import kotlinx.coroutines.flow.first
 
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
@@ -67,13 +63,13 @@ open class ShareTextData(
             val date = puz.date
             val completionTime = TimeUtils.convertMillisecondsToTime(puz.time)
             val message = if (date != null) {
-                val dateFormat
-                    = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
                 utils.getQuantityString(
                     Res.plurals.share_message_with_date,
                     cheatedBoxes,
                     source,
-                    dateFormat.format(date),
+                    date.day,
+                    utils.getString(TimeUtils.getMonthNameID(date)),
+                    date.year,
                     cheatedBoxes,
                     completionTime,
                 )

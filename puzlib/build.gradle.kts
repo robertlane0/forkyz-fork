@@ -12,11 +12,12 @@ dependencies {
     testImplementation(libs.junit5.jupiter.params)
     testRuntimeOnly(libs.junit.platform.launcher)
 
-    implementation(libs.base64)
     implementation(libs.apache.commons.text)
+    implementation(libs.base64)
     implementation(libs.hjson)
     implementation(libs.json)
     implementation(libs.jsoup)
+    implementation(libs.kotlinx.datetime)
 }
 
 tasks.test {
@@ -26,6 +27,7 @@ tasks.test {
 tasks.shadowJar {
     relocate("org.json", "app.crossword.yourealwaysbe.org.json")
     exclude("kotlin/**")
+    exclude("kotlinx/datetime/**")
     exclude("META-INF/kotlin*")
     exclude("org/intellij/**")
     exclude("org/jetbrains/annotations/**")

@@ -1,7 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.util.files
 
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 
 import androidx.annotation.NonNull
 import androidx.annotation.Nullable
@@ -35,12 +35,12 @@ class MetaCache(private val utils : NativeBackendUtils) {
         // https://stackoverflow.com/a/77888612
         @TypeConverter
         fun fromEpochDay(value : Long?) : LocalDate? {
-            return value?.let { LocalDate.ofEpochDay(it) }
+            return value?.let { LocalDate.fromEpochDays(it) }
         }
 
         @TypeConverter
         fun dateToEpochDay(date : LocalDate?) : Long? {
-            return date?.let { it.toEpochDay() }
+            return date?.let { it.toEpochDays() }
         }
 
         @TypeConverter

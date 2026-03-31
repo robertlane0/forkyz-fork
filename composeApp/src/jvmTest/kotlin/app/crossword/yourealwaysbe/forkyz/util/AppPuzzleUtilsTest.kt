@@ -1,7 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.util
 
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 
 import org.junit.Assert
 import org.junit.Test
@@ -107,7 +107,7 @@ class AppPuzzleUtilsTest {
     }
 
     fun testDeriveDateDate() {
-        val date = LocalDate.of(2023, 1, 2)
+        val date = LocalDate(2023, 1, 2)
         Assert.assertEquals(
             date,
             deriveDate(
@@ -121,7 +121,7 @@ class AppPuzzleUtilsTest {
         Assert.assertEquals(
             null,
             deriveDate(
-                LocalDate.of(2023, 1, 2),
+                LocalDate(2023, 1, 2),
                 "FileSource - 20230101 - FileTitle.puz",
             ),
         )
@@ -131,7 +131,7 @@ class AppPuzzleUtilsTest {
         Assert.assertEquals(
             null,
             deriveDate(
-                LocalDate.of(2023, 1, 12),
+                LocalDate(2023, 1, 12),
                 "2023-1-12-FileSource.ipuz",
             ),
         )
@@ -141,7 +141,7 @@ class AppPuzzleUtilsTest {
         Assert.assertEquals(
             null,
             deriveDate(
-                LocalDate.of(2023, 1, 2),
+                LocalDate(2023, 1, 2),
                 "FileSource - 20230101.puz",
             ),
         )

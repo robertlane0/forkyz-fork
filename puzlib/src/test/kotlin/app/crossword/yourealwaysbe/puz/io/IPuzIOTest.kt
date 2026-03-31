@@ -4,7 +4,7 @@ package app.crossword.yourealwaysbe.puz.io
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -453,7 +453,7 @@ class IPuzIOTest {
             Assertions.assertEquals(puz.source, "Test publisher")
             Assertions.assertEquals(puz.introMessage, "Intro")
             Assertions.assertEquals(puz.completionMessage, "Explanation")
-            Assertions.assertEquals(puz.date, LocalDate.of(2003, 2, 1))
+            Assertions.assertEquals(puz.date, LocalDate(2003, 2, 1))
 
             Assertions.assertEquals(puz.width, 3)
             Assertions.assertEquals(puz.height, 2)

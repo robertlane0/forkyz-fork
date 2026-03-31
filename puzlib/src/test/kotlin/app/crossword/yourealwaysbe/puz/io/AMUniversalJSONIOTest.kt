@@ -2,7 +2,7 @@
 package app.crossword.yourealwaysbe.puz.io
 
 import java.io.InputStream
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -33,7 +33,7 @@ class AMUniversalJSONIOTest {
             Assertions.assertEquals("Test title", puz.title)
             Assertions.assertEquals("Test author", puz.author)
             Assertions.assertEquals("Test copyright", puz.copyright)
-            Assertions.assertEquals(LocalDate.of(2024, 1, 2), puz.date)
+            Assertions.assertEquals(LocalDate(2024, 1, 2), puz.date)
 
             val boxes : Array<Array<Box?>> = puz.boxes
 

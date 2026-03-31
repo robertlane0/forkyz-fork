@@ -1,8 +1,8 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.time.LocalDate
 import java.io.InputStream
+import kotlinx.datetime.LocalDate
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -31,7 +31,7 @@ class GuardianJSONIOTest {
         fun assertIsTestPuzzle1(puz : Puzzle) {
             Assertions.assertEquals(puz.title, "Test Crossword")
             Assertions.assertEquals(puz.author, "Test Author")
-            Assertions.assertEquals(puz.date, LocalDate.of(2021, 8, 12))
+            Assertions.assertEquals(puz.date, LocalDate(2021, 8, 12))
 
             Assertions.assertEquals(puz.width, 15)
             Assertions.assertEquals(puz.height, 15)

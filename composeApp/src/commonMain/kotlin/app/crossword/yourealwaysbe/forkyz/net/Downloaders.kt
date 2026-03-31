@@ -1,15 +1,16 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.time.Duration
-import java.time.LocalDate
-import java.time.ZoneId
-import java.time.ZonedDateTime
 import java.util.concurrent.Executors
 import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.runBlocking
+import kotlinx.datetime.LocalDate
 
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.cru_puzzle_workshop
@@ -58,6 +59,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.washington_pos
 import app.crossword.yourealwaysbe.forkyz.settings.DownloadersSettings
 import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
+import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler
 import app.crossword.yourealwaysbe.puz.io.BrainsOnlyIO
 import app.crossword.yourealwaysbe.puz.io.FortyTwoPuzzlesIO
@@ -171,7 +173,7 @@ class Downloaders(
         val puzzlesToDownload = HashMap<Downloader, LocalDate>()
         for (d in downloaders) {
             val latestDate = d.getLatestDate(to)
-            if (latestDate != null && !latestDate.isBefore(from)) {
+            if (latestDate != null && latestDate.compareTo(from) >= 0) {
                 AppLogger.i(
                     TAG,
                     "Will try to download puzzle " + d + " @ " + latestDate
@@ -329,7 +331,7 @@ class Downloaders(
                 DownloaderID.DE_STANDAARD,
                 utils.getString(Res.string.de_standaard),
                 AbstractDateDownloader.DAYS_DAILY,
-                Duration.ofHours(-1), // midnight, tested
+                -1.hours, // midnight, tested
                 "https://aboshop.standaard.be/",
                 "'https://www.standaard.be/kruiswoordraadsel'",
                 "hetnieuwsbladpremium",
@@ -342,7 +344,7 @@ class Downloaders(
                 DownloaderID.DE_TELEGRAAF,
                 utils.getString(Res.string.de_telegraaf),
                 AbstractDateDownloader.DAYS_SUNDAY,
-                Duration.ofHours(-1), // midnight, tested
+                -1.hours, // midnight, tested
                 "https://abonnement.telegraaf.nl/abonnement-bestellen",
                 FortyTwoPuzzlesIO(),
                 "'https://api.42puzzles.com/player/mediahuis/"
@@ -378,7 +380,7 @@ class Downloaders(
                 utils.getString(Res.string.hamburger_abendblatt_daily),
                 "hhab",
                 AbstractDateDownloader.DAYS_DAILY,
-                Duration.ofHours(1), // midnight Germany (verified)
+                1.hours, // midnight Germany (verified)
                 "https://www.abendblatt.de/plus",
                 "'https://www.abendblatt.de/ratgeber/wissen/"
                     + "article106560367/Spielen-Sie-hier-taeglich"
@@ -411,7 +413,7 @@ class Downloaders(
                 PAPuzzlesStreamScraper(),
                 "'https://www.irishnews.com/puzzles/cryptic-crossword/'",
                 "'https://www.irishnews.com/puzzles/cryptic-crossword/'",
-                ZonedDateTime.now(ZoneId.of("Europe/Belfast")).toLocalDate(),
+                TimeUtils.todayIn("Europe/Belfast"),
              ))
         }
 
@@ -420,7 +422,7 @@ class Downloaders(
                 DownloaderID.JONESIN,
                 utils.getString(Res.string.jonesin_crosswords),
                 AbstractDateDownloader.DAYS_THURSDAY,
-                Duration.ofDays(-2), // by experiment
+                -2.days, // by experiment
                 "https://crosswordnexus.com/jonesin/",
                 IO(),
                 "'https://herbach.dnsalias.com/Jonesin/jz'yyMMdd'.puz'",
@@ -437,7 +439,7 @@ class Downloaders(
                 DownloaderID.JOSEPH,
                 utils.getString(Res.string.joseph_crossword),
                 AbstractDateDownloader.DAYS_NO_SUNDAY,
-                Duration.ofDays(-20), // by experiment
+                -20.days, // by experiment
                 "https://puzzles.kingdigital.com",
                 arkadiumUrl,
                 arkadiumUrl,
@@ -453,7 +455,7 @@ class Downloaders(
                 DownloaderID.TWENTY_MINUTES,
                 utils.getString(Res.string.vingminutes),
                 AbstractDateDownloader.DAYS_DAILY,
-                Duration.ofHours(0), // guess-ish
+                0.hours, // guess-ish
                 "https://www.20minutes.fr",
                 "'https://www.20minutes.fr/services/mots-fleches'",
                 "20minutes",
@@ -466,13 +468,13 @@ class Downloaders(
                 DownloaderID.LA_CROIX,
                 utils.getString(Res.string.la_croix),
                 AbstractDateDownloader.DAYS_WEEKDAY,
-                Duration.ofHours(1),
+                1.hours,
                 "https://abonnement.la-croix.com/",
                 "https://www.rcijeux.fr/drupal_game/lacroix/mcroises1/"
                     +"grids/gary%d.mcj",
                 "'https://www.la-croix.com/mots-croises'",
                 8815,
-                LocalDate.of(2026, 1, 30),
+                LocalDate(2026, 1, 30),
             ))
         }
 
@@ -488,13 +490,13 @@ class Downloaders(
                 DownloaderID.LE_PARISIEN_F1,
                 utils.getString((Res.string.le_parisien_daily_f1)),
                 AbstractDateDownloader.DAYS_DAILY,
-                Duration.ofHours(1),
+                1.hours,
                 "https://abonnement.leparisien.fr",
                 "https://www.rcijeux.fr/drupal_game/leparisien/mfleches1/grids/"
                         + "mfleches_1_%d.mfj",
                 "'https://www.leparisien.fr/jeux/mots-fleches/'",
                 2536,
-                LocalDate.of(2022, 6, 21),
+                LocalDate(2022, 6, 21),
             ))
         }
 
@@ -503,13 +505,13 @@ class Downloaders(
                 DownloaderID.LE_PARISIEN_F2,
                 utils.getString((Res.string.le_parisien_daily_f2)),
                 AbstractDateDownloader.DAYS_DAILY,
-                Duration.ofHours(1),
+                1.hours,
                 "https://abonnement.leparisien.fr",
                 "https://www.rcijeux.fr/drupal_game/leparisien/mfleches1/grids/"
                         + "mfleches_2_%d.mfj",
                 "'https://www.leparisien.fr/jeux/mots-fleches/force-2/'",
                 2536,
-                LocalDate.of(2022, 6, 21),
+                LocalDate(2022, 6, 21),
             ))
         }
 
@@ -518,13 +520,13 @@ class Downloaders(
                 DownloaderID.LE_PARISIEN_F3,
                 utils.getString((Res.string.le_parisien_daily_f3)),
                 AbstractDateDownloader.DAYS_DAILY,
-                Duration.ofHours(1),
+                1.hours,
                 "https://abonnement.leparisien.fr",
                 "https://www.rcijeux.fr/drupal_game/leparisien/mfleches1/grids/"
                         + "mfleches_3_%d.mfj",
                 "'https://www.leparisien.fr/jeux/mots-fleches/force-3/'",
                 300,
-                LocalDate.of(2023, 3, 4),
+                LocalDate(2023, 3, 4),
             ))
         }
 
@@ -533,13 +535,13 @@ class Downloaders(
                 DownloaderID.LE_PARISIEN_F4,
                 utils.getString((Res.string.le_parisien_daily_f4)),
                 AbstractDateDownloader.DAYS_DAILY,
-                Duration.ofHours(1),
+                1.hours,
                 "https://abonnement.leparisien.fr",
                 "https://www.rcijeux.fr/drupal_game/leparisien/mfleches1/grids/"
                         + "mfleches_4_%d.mfj",
                 "'https://www.leparisien.fr/jeux/mots-fleches/force-4/'",
                 300,
-                LocalDate.of(2023, 3, 4),
+                LocalDate(2023, 3, 4),
             ))
         }
 
@@ -553,7 +555,7 @@ class Downloaders(
                 PMLIO(),
                 "'https://metro.co.uk/puzzles/cryptic-crossword'",
                 "'https://metro.co.uk/puzzles/cryptic-crossword'",
-                ZonedDateTime.now(ZoneId.of("Europe/London")).toLocalDate(),
+                TimeUtils.todayIn("Europe/London"),
                 overrideEmbeddedDate = false,
             ))
         }
@@ -568,7 +570,7 @@ class Downloaders(
                 PMLIO(),
                 "'https://metro.co.uk/puzzles/quick-crossword'",
                 "'https://metro.co.uk/puzzles/quick-crossword'",
-                ZonedDateTime.now(ZoneId.of("Europe/London")).toLocalDate(),
+                TimeUtils.todayIn("Europe/London"),
                 overrideEmbeddedDate = false,
             ))
         }
@@ -578,7 +580,7 @@ class Downloaders(
                 DownloaderID.NEWSDAY,
                 utils.getString(Res.string.newsday),
                 AbstractDateDownloader.DAYS_DAILY,
-                Duration.ofHours(5), // midnight US? (by experiment)
+                5.hours, // midnight US? (by experiment)
                 // i can't browse this site for a more specific URL
                 // (GDPR)
                 "https://www.newsday.com",
@@ -594,7 +596,7 @@ class Downloaders(
                 DownloaderID.NYT_SYNDICATED,
                 utils.getString(Res.string.new_york_times_syndicated),
                 AbstractDateDownloader.DAYS_DAILY,
-                Duration.ofHours(5), // guess midnight NY
+                5.hours, // guess midnight NY
                 "https://www.seattletimes.com/games-nytimes-crossword/",
                 BrainsOnlyIO(),
                 "'https://nytsyn.pzzl.com/nytsyn-crossword-mh/"
@@ -602,7 +604,7 @@ class Downloaders(
                     + "yyMMdd",
                 "'https://nytsyn.pzzl.com/cwd_seattle/#/s/'"
                     + "yyMMdd",
-                LocalDate.now().plusDays(-7),
+                TimeUtils.offsetTodayUTC(-7.days),
             ))
         }
 
@@ -611,7 +613,7 @@ class Downloaders(
                 DownloaderID.NRC_IN_HET_MIDDEN,
                 utils.getString(Res.string.nrc_in_het_midden),
                 AbstractDateDownloader.DAYS_WEEKDAY,
-                Duration.ofHours(1), // Wild guess
+                1.hours, // Wild guess
                 "https://abonnementen.nrc.nl/",
                 NRCInHetMiddenIO(),
                 "'https://api.42puzzles.com/player/nrc/rrFksRq7v6pSweNyhBXk"
@@ -627,7 +629,7 @@ class Downloaders(
                 DownloaderID.NRC_SCRYPTO,
                 utils.getString(Res.string.nrc_scrypto),
                 AbstractDateDownloader.DAYS_SATURDAY,
-                Duration.ofHours(1), // Wild guess
+                1.hours, // Wild guess
                 "https://abonnementen.nrc.nl/",
                 FortyTwoPuzzlesIO(),
                 "'https://api.42puzzles.com/player/nrc/AIbjYuckKZdc4pUpBKjW"
@@ -646,7 +648,7 @@ class Downloaders(
                 DownloaderID.PREMIER,
                 utils.getString(Res.string.premier_crossword),
                 AbstractDateDownloader.DAYS_SUNDAY,
-                Duration.ofHours(0), // guess midnight NY
+                0.hours, // guess midnight NY
                 "https://puzzles.kingdigital.com",
                 arkadiumUrl,
                 arkadiumUrl,
@@ -665,7 +667,7 @@ class Downloaders(
                 DownloaderID.SHEFFER,
                 utils.getString(Res.string.sheffer_crossword),
                 AbstractDateDownloader.DAYS_NO_SUNDAY,
-                Duration.ofDays(-20), // from full puzzle list during login
+                -20.days, // from full puzzle list during login
                 "https://puzzles.kingdigital.com",
                 arkadiumUrl,
                 arkadiumUrl,
@@ -681,12 +683,12 @@ class Downloaders(
                 DownloaderID.SUD_OUEST_MOTS_CROISES,
                 utils.getString((Res.string.sud_ouest_mots_croises)),
                 AbstractDateDownloader.DAYS_DAILY,
-                Duration.ofHours(1),
+                1.hours,
                 "https://abonnement.sudouest.fr/",
                 "https://www.rcijeux.fr/drupal_game/gso/mcroises/grids/%d.mcj",
                 "'https://www.sudouest.fr/jeux/mots-croises/'",
                 1992,
-                LocalDate.of(2025, 10, 26),
+                LocalDate(2025, 10, 26),
             ))
         }
 
@@ -695,12 +697,12 @@ class Downloaders(
                 DownloaderID.SUD_OUEST_MOTS_FLECHES,
                 utils.getString((Res.string.sud_ouest_mots_fleches)),
                 AbstractDateDownloader.DAYS_DAILY,
-                Duration.ofHours(1),
+                1.hours,
                 "https://abonnement.sudouest.fr/",
                 "https://www.rcijeux.fr/drupal_game/gso/mfleches/grids/%d.mfj",
                 "'https://www.sudouest.fr/jeux/mots-fleches/'",
                 1988,
-                LocalDate.of(2025, 10, 22),
+                LocalDate(2025, 10, 22),
             ))
         }
 
@@ -709,12 +711,12 @@ class Downloaders(
                 DownloaderID.TF1_MOTS_CROISES,
                 utils.getString((Res.string.tf1_mots_croises)),
                 AbstractDateDownloader.DAYS_DAILY,
-                Duration.ofHours(1),
+                1.hours,
                 "https://www.tf1info.fr/",
                 "https://www.rcijeux.fr/drupal_game/lci/mcroises/grids/%d.mcj",
                 "'https://www.tf1info.fr/jeux/mots-croises/'",
                 4739,
-                LocalDate.of(2025, 10, 26),
+                LocalDate(2025, 10, 26),
             ))
         }
 
@@ -723,12 +725,12 @@ class Downloaders(
                 DownloaderID.TF1_MOTS_FLECHES,
                 utils.getString((Res.string.tf1_mots_fleches)),
                 AbstractDateDownloader.DAYS_DAILY,
-                Duration.ofHours(1),
+                1.hours,
                 "https://www.tf1info.fr/",
                 "https://www.rcijeux.fr/drupal_game/lci/mfleches/grids/%d.mfj",
                 "'https://www.tf1info.fr/jeux/mots-fleches/'",
                 5395,
-                LocalDate.of(2025, 10, 26),
+                LocalDate(2025, 10, 26),
             ))
         }
 
@@ -740,7 +742,7 @@ class Downloaders(
                 utils.getString(Res.string.uclick_copyright),
                 "http://www.uclick.com/client/spi/fcx/",
                 AbstractDateDownloader.DAYS_DAILY,
-                Duration.ofMinutes(6 * 60 + 30), // 06:30 by experiment
+                6.hours + 30.minutes, // 06:30 by experiment
                 null,
             ))
         }
@@ -753,7 +755,7 @@ class Downloaders(
                 utils.getString(Res.string.usa_today),
                 "https://subscribe.usatoday.com",
                 AbstractDateDownloader.DAYS_DAILY,
-                Duration.ofMinutes(6 * 60 + 30), // 06:30 by experiment
+                6.hours + 30.minutes, // 06:30 by experiment
                 "'https://games.usatoday.com/en/games/uclick-crossword'",
             ))
         }
@@ -763,7 +765,7 @@ class Downloaders(
                 DownloaderID.WAPO_SUNDAY,
                 utils.getString(Res.string.washington_post_sunday),
                 AbstractDateDownloader.DAYS_SUNDAY,
-                Duration.ofHours(-1), // by experiment
+                -1.hours, // by experiment
                 "https://subscribe.wsj.com",
                 IO(),
                 "'https://herbach.dnsalias.com/Wapo/wp'yyMMdd'.puz'",
@@ -776,7 +778,7 @@ class Downloaders(
                 DownloaderID.WSJ,
                 utils.getString(Res.string.wall_street_journal),
                 AbstractDateDownloader.DAYS_NO_SUNDAY,
-                Duration.ofHours(-3), // by experiment
+                -3.hours, // by experiment
                 "https://subscribe.wsj.com",
                 IO(),
                 "'https://herbach.dnsalias.com/wsj/wsj'yyMMdd'.puz'",

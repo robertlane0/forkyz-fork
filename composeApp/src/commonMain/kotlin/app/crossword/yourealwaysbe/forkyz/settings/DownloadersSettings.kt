@@ -1,8 +1,8 @@
 
 package app.crossword.yourealwaysbe.forkyz.settings
 
-import java.time.DayOfWeek
-import java.time.LocalDate
+import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.LocalDate
 
 import app.crossword.yourealwaysbe.forkyz.net.DownloaderID
 

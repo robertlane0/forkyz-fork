@@ -3,10 +3,9 @@ package app.crossword.yourealwaysbe.puz.io
 
 import java.io.IOException
 import java.io.InputStream
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
 import java.util.logging.Logger
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.format.char
 
 import org.json.JSONException
 import org.json.JSONObject
@@ -64,10 +63,14 @@ class TCAJSONIO : AbstractJSONIO() {
         private val LOG
             = Logger.getLogger(TCAJSONIO::class.java.getCanonicalName())
 
-        private val DATE_META_FORMATTER
-            = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-        private val DATE_DATA_FORMATTER
-            = DateTimeFormatter.ofPattern("MM/dd/yyyy")
+        private val DATE_META_FORMATTER = LocalDate.Formats.ISO
+        private val DATE_DATA_FORMATTER = LocalDate.Format {
+            monthNumber()
+            char('/')
+            day()
+            char('/')
+            year()
+        }
 
         private val ACROSS_LIST = DefaultListNames.ACROSS_LIST
         private val DOWN_LIST = DefaultListNames.DOWN_LIST
@@ -213,10 +216,10 @@ class TCAJSONIO : AbstractJSONIO() {
                     val date = optStringNull(metaData, "date")
                     if (date != null) {
                         builder.setDate(
-                            LocalDate.parse(date, DATE_META_FORMATTER),
+                            DATE_META_FORMATTER.parse(date),
                         )
                     }
-                } catch (e : DateTimeParseException) {
+                } catch (e : IllegalArgumentException) {
                     // oh well
                 }
             }
@@ -226,10 +229,10 @@ class TCAJSONIO : AbstractJSONIO() {
                     val date = optStringNull(data, "date")
                     if (date != null) {
                         builder.setDate(
-                            LocalDate.parse(date, DATE_DATA_FORMATTER),
+                            DATE_DATA_FORMATTER.parse(date),
                         )
                     }
-                } catch (e : DateTimeParseException) {
+                } catch (e : IllegalArgumentException) {
                     // oh well
                 }
             }
