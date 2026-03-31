@@ -15,14 +15,14 @@ class TimeUtils {
             if (hours == 0L) {
                 return String.format(
                     Locale.getDefault(),
-                    "%02d:%02.2f",
+                    "%02d:%05.2f",
                     minutes,
                     seconds,
                 )
             }
             return String.format(
                 Locale.getDefault(),
-                "%02d:%02d:%02.2f",
+                "%02d:%02d:%05.2f",
                 hours,
                 minutes,
                 seconds,
