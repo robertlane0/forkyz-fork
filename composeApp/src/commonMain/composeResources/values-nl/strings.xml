@@ -62,7 +62,7 @@
     <string name="online_sources">Online bronnen</string>
     <string name="online_sources_url">https://hague.gitlab.io/forkyz</string>
     <string name="import_puzzle">Puzzel importeren</string>
-    <string name="download_puzzles">Puzzles ophalen</string>
+    <string name="download_puzzles">Puzzels ophalen</string>
     <string name="no_puzzles_download_or_configure_storage">Geen puzzels gevonden. Haal puzzels op met de knop hieronder of configureer een opslag in de instellingen.</string>
     <string name="no_puzzles">Geen puzzels gevonden.</string>
     <string name="unable_to_read_file">Kan bestand niet lezen %1$s</string>
@@ -109,6 +109,10 @@
     </plurals>
     <string name="no_downloaders_enabled">Geen bronnen ingeschakeld</string>
     <string name="no_downloaders_enabled_msg">Schakel een aantal puzzelbronnen in via de instellingen om puzzels op te halen.</string>
+    <string name="collapse_headings">Titels samenvouwen</string>
+    <string name="collapse_headings_desc">Titels alleen in de puzzellijst weergeven, tenzij uitgevouwen.</string>
+    <string name="expand">Uitvouwen</string>
+    <string name="collapse">Samenvouwen</string>
 
     <!-- play page -->
     <string name="open_clue_list">Lijst met omschrijvingen openen</string>
@@ -161,7 +165,7 @@
     <!-- preferences -->
     <string name="settings_label">Instellingen</string>
     <string name="storage_location">Opslaglocatie</string>
-    <string name="storage_location_desc">Configureer waar Forkyz bestanden opslaat/vind. Herstart app na wijzigen.</string>
+    <string name="storage_location_desc">Configureer waar Forkyz bestanden opslaat/vindt. Herstart app na wijzigen.</string>
     <string name="internal_storage">Interne app-opslag</string>
     <string name="external_storage_saf">Externe opslag</string>
     <string name="external_storage_saf_current_uri">(Current: %1$s)</string>
@@ -183,7 +187,7 @@
     <string name="keyboard_settings">Toetsenbord</string>
     <string name="keyboard_settings_desc">Uiterlijk, gedrag, en type toetsenbord dat gebruikt wordt tijdens het invullen van tekst.</string>
     <string name="display_settings">Weergave</string>
-    <string name="display_settings_desc">Uiterlijk van de app en weergegeven puzzelraster.</string>
+    <string name="display_settings_desc">Uiterlijk van de app en weergeven puzzelraster.</string>
     <string name="download_settings">Puzzels ophalen</string>
     <string name="download_settings_desc">Opties voor het ophalen van puzzels.</string>
     <string name="about_forkyz">Over Forkyz</string>
@@ -274,6 +278,25 @@
     <string name="sud_ouest_mots_fleches">(FR) Sud Ouest Mots Fléchés</string>
     <string name="sud_ouest_mots_croises">(FR) Sud Ouest Mots Croisés</string>
     <string name="la_croix">(FR) La Croix</string>
+
+    <!-- preferences extra downloader -->
+    <string name="block_auto_mon">Maandag ophalen verhinderen</string>
+    <string name="block_auto_mon_desc">Haal deze puzzel maandag niet op wanneer automatisch ophalen ingeschakeld is.</string>
+    <string name="block_auto_tue">Dinsdag ophalen verhinderen</string>
+    <string name="block_auto_tue_desc">Haal deze puzzel dinsdag niet op wanneer automatisch ophalen ingeschakeld is.</string>
+    <string name="block_auto_wed">Woensdag ophalen verhinderen</string>
+    <string name="block_auto_wed_desc">Haal deze puzzel woensdag niet op wanneer automatisch ophalen ingeschakeld is.</string>
+    <string name="block_auto_thu">Donderdag ophalen verhinderen</string>
+    <string name="block_auto_thu_desc">Haal deze puzzel donderdag niet op wanneer automatisch ophalen ingeschakeld is.</string>
+    <string name="block_auto_fri">Vrijdag ophalen verhinderen</string>
+    <string name="block_auto_fri_desc">Haal deze puzzel vrijdag niet op wanneer automatisch ophalen ingeschakeld is.</string>
+    <string name="block_auto_sat">Zaterdag ophalen verhinderen</string>
+    <string name="block_auto_sat_desc">Haal deze puzzel zaterdag niet op wanneer automatisch ophalen ingeschakeld is.</string>
+    <string name="block_auto_sun">Zondag ophalen verhinderen</string>
+    <string name="block_auto_sun_desc">Haal deze puzzel zondag niet op wanneer automatisch ophalen ingeschakeld is.</string>
+    <string name="toggle_all_auto_download_blocks">Alle verhinderen</string>
+    <string name="toggle_all_auto_download_blocks_desc">Verhinder alle automatische downloads.</string>
+    <string name="block_auto_downloads">Automatisch ophalen verhinderen</string>
 
     <!-- preferences display -->
     <string name="clue_below_grid">Omschrijving onder raster</string>
@@ -372,9 +395,9 @@
     <string name="background_download_days">Puzzels ophalen op de dagen</string>
     <string name="background_download_days_desc">Puzzels op de achtergrond ophalen op de geselecteerde dagen.</string>
     <string name="background_download_days_time">Dagelijkse ophaaltijd</string>
-    <string name="background_download_days_time_desc">Selecteer ophaaltijd wanneer er op de geselecteerde dagen opgehaald wordt (exacte tijd hangt af van beperkingen en telefoonoptimisaties).</string>
+    <string name="background_download_days_time_desc">Selecteer ophaaltijd wanneer er op de geselecteerde dagen opgehaald wordt (exacte tijd hangt af van beperkingen en telefoonoptimalisaties).</string>
     <string name="background_download_fri">Vrijdag</string>
-    <string name="background_download_hourly">Puzzles uurlijks ophalen</string>
+    <string name="background_download_hourly">Puzzels uurlijks ophalen</string>
     <string name="background_download_hourly_desc">Puzzels eens per uur op de achtergrond ophalen.</string>
     <string name="background_download_mon">Maandag</string>
     <string name="background_download_opts">Ophalen op de achtergrond</string>
@@ -387,6 +410,8 @@
     <string name="background_download_wed">Woensdag</string>
     <string name="download_charging">Alleen ophalen tijdens het opladen</string>
     <string name="download_charging_desc">Alleen puzzels op de achtergrond ophalen tijdens het opladen.</string>
+    <string name="download_remember_date">Laatste datum onthouden</string>
+    <string name="download_remember_date_desc">Onthoud de laatst geselecteerde datum in het downloadvenster.</string>
     <string name="download_roaming">Ophalen tijdens roaming</string>
     <string name="download_roaming_desc">Puzzel op de achtergrond ophalen, zelfs tijdens het roamen.</string>
     <string name="download_timeout">Ophaalwachttijd</string>
@@ -486,7 +511,6 @@
     <string name="movement_style_clue_list_desc">Selecteer wat er gebeurt als je voorbij het einde van een woord typt op het scherm met de omschrijvingslijst.</string>
     <string name="dont_snap_board_to_borders">Raster niet vastklikken op randen</string>
     <string name="dont_snap_board_to_borders_desc">Rasterranden niet vastklikken op de randen van het scherm.</string>
-
     <string name="play_letter_undo">Ingevulde letters ongedaan maken</string>
     <string name="play_letter_undo_desc">Verwijderen maakt recent ingevulde letters ongedaan of verwijdert als er geen recente letters zijn om ongedaan te maken.</string>
     <string name="predict_anagram_chars">Anagramletters voorspellen</string>
@@ -497,6 +521,11 @@
     <string name="random_clue_on_shake_desc">Springt naar een willekeurige oningevulde omschrijving wanneer schudden wordt gedetecteerd tijdens het oplossen.</string>
     <string name="scroll_to_clue">Naar omschrijving scrollen</string>
     <string name="scroll_to_clue_desc">Schakelt automatisch scrollen in naar de geselecteerde omschrijving in de omschrijvingslijst. (Werkt zoals Shortyz 1).</string>
+    <string name="scroll_to_clue_off">Uit</string>
+    <string name="scroll_to_clue_current">Huidige omschrijving</string>
+    <string name="scroll_to_clue_crossing">Kruisende omschrijving</string>
+    <string name="highlight_crossing_clue">Kruisende omschrijving markeren</string>
+    <string name="highlight_crossing_clue_desc">Markeer de kruisende omschrijving in de omschrijvingslijst met een achtergrondkleur.</string>
     <string name="skip_filled">Ingevulde vakjes overslaan</string>
     <string name="skip_filled_desc">Schakelt het overslaan van ingevulde vakjes in als je een nieuwe letter invult.</string>
     <string name="snap_current">Vastklikken op huidig ​​woord</string>
@@ -524,8 +553,8 @@
     <string name="voice_with_button_desc">Knop op het scherm toevoegen om spraakopdracht te activeren.</string>
     <string name="voice_with_volume">Volume-omlaagknop om spraak te activeren</string>
     <string name="voice_with_volume_desc">Gebruik de volume-omlaagknop om spraakopdracht te activeren tijdens het oplossen.</string>
-    <string name="llm_voice_commands">LLM Verbeterde spraakbesturing</string>
-    <string name="llm_voice_commands_desc">LLM moet geconfigureerd worden in de externe hulpmiddelen. Gebruik LLM om de interpretatie van spraakopdrachten te verbeteren en natuurlijke taalcommunicatie mogelijk te maken.</string>
+    <string name="llm_voice_commands">LLM-verbeterde spraakbesturing</string>
+    <string name="llm_voice_commands_desc">LLM moet geconfigureerd worden in de externe hulpmiddelen. Gebruik een LLM om de interpretatie van spraakopdrachten te verbeteren en natuurlijke taalcommunicatie mogelijk te maken.</string>
 
     <!-- preferences weekly -->
     <string name="updates_thursdays">Publiceert op donderdag.</string>
@@ -560,6 +589,12 @@
     <string name="weekly_crosswords">Wekelijkse kruiswoordpuzzels</string>
     <string name="weekly_crosswords_desc">Puzzels die wekelijks worden gepubliceerd.</string>
 
+    <!-- preferences desktop -->
+    <string name="desktop_settings">Desktopinstellingen</string>
+    <string name="desktop_settings_desc">Instellingen specifiek voor de desktopomgeving.</string>
+    <string name="undecorated">Applicatievenster zonder rand</string>
+    <string name="undecorated_desc">Maak een ongedecoreerd appvenster (werkt misschien beter met getegeld vensterbeheer in plaats van wmname LG3D of _JAVA_AWT_WM_NONREPARENTING=1). Vereist herstart.</string>
+
     <!-- menus general -->
     <string name="help">Help</string>
     <string name="settings">Instellingen</string>
@@ -567,7 +602,7 @@
     <string name="share_clue">Omschrijving</string>
     <string name="share_clue_response">Omschrijving met raster</string>
     <string name="share_puzzle_full">Huidige puzzel</string>
-    <string name="share_puzzle_without_extensions">Puzzle zonder IPuz-extensies</string>
+    <string name="share_puzzle_without_extensions">Puzzel zonder IPuz-extensies</string>
     <string name="share_puzzle_orig">Lege puzzel</string>
     <string name="share_puzzle_open_share_url">Deel-URL openen</string>
     <string name="menu_flag_cell_toggle">Vakjesmarkering</string>
@@ -640,7 +675,7 @@
     <!-- completed -->
     <string name="puzzle_finished_title">Puzzel opgelost</string>
     <string name="completed_in">Voltooid in</string>
-    <string name="total_clues">Aantal omschrijvingen</string>
+    <string name="total_clues">Omschrijvingen</string>
     <string name="total_boxes">Aantal vakjes</string>
     <string name="hinted_boxes">Gehinte vakjes</string>
     <string name="done">Klaar</string>
@@ -707,7 +742,7 @@
 
     <!-- special entry -->
     <string name="special_character">Speciaal teken</string>
-    <string name="enter_special_desc">Voer het antwoord in het onderstaande vak in. Tekens zullen als zodanig in het raster ingevoerd worden. kleine letters zullen bijvoorbeeld niet in hoofdletters worden omgezet. Meerdere en speciale tekens zijn toegestaan.</string>
+    <string name="enter_special_desc">Voer het antwoord in het onderstaande vak in. Tekens zullen als zodanig in het raster ingevoerd worden. Kleine letters zullen bijvoorbeeld niet in hoofdletters worden omgezet. Meerdere en speciale tekens zijn toegestaan.</string>
     <string name="special_entry_force_caps">Hoofdletters forceren</string>
 
     <!-- share clue -->
