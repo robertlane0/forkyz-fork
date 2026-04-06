@@ -423,6 +423,56 @@ fun ForkyzKeyboard(
     }
 
     @Composable
+    fun SpaceRow() {
+        Row() {
+            val mAction = Modifier.weight(1.25F)
+            val mSpace = Modifier.weight(2.5F)
+            IconKey(
+                mAction,
+                inputConnectionMediator.keyUp,
+                Res.drawable.arrow_up,
+                Res.string.key_up,
+            )
+            IconKey(
+                mAction,
+                inputConnectionMediator.keyDown,
+                Res.drawable.arrow_down,
+                Res.string.key_down,
+            )
+            SpecialIconKey(
+                mAction,
+                SpecialKey.KEY_PREVIOUS_CLUE,
+                Res.drawable.ic_prev_clue,
+                Res.string.prev_clue,
+            )
+            IconKey(
+                mSpace,
+                inputConnectionMediator.keySpace,
+                Res.drawable.space,
+                Res.string.key_space,
+            )
+            SpecialIconKey(
+                mAction,
+                SpecialKey.KEY_NEXT_CLUE,
+                Res.drawable.ic_next_clue,
+                Res.string.next_clue,
+            )
+            IconKey(
+                mAction,
+                inputConnectionMediator.keyLeft,
+                Res.drawable.arrow_left,
+                Res.string.key_left,
+            )
+            IconKey(
+                mAction,
+                inputConnectionMediator.keyRight,
+                Res.drawable.arrow_right,
+                Res.string.key_right,
+            )
+        }
+    }
+
+    @Composable
     fun QwertyKeyboard() {
         Column(modifier.fillMaxWidth()) {
             Row() {
@@ -473,52 +523,7 @@ fun ForkyzKeyboard(
                     Res.string.key_delete,
                 )
             }
-            Row() {
-                val m1 = Modifier.weight(1.0F)
-                val m5 = Modifier.weight(5.0F)
-                IconKey(
-                    m1,
-                    inputConnectionMediator.keyUp,
-                    Res.drawable.arrow_up,
-                    Res.string.key_up,
-                )
-                IconKey(
-                    m1,
-                    inputConnectionMediator.keyDown,
-                    Res.drawable.arrow_down,
-                    Res.string.key_down,
-                )
-                SpecialIconKey(
-                    m1,
-                    SpecialKey.KEY_PREVIOUS_CLUE,
-                    Res.drawable.ic_prev_clue,
-                    Res.string.prev_clue,
-                )
-                IconKey(
-                    m5,
-                    inputConnectionMediator.keySpace,
-                    Res.drawable.space,
-                    Res.string.key_space,
-                )
-                SpecialIconKey(
-                    m1,
-                    SpecialKey.KEY_NEXT_CLUE,
-                    Res.drawable.ic_next_clue,
-                    Res.string.next_clue,
-                )
-                IconKey(
-                    m1,
-                    inputConnectionMediator.keyLeft,
-                    Res.drawable.arrow_left,
-                    Res.string.key_left,
-                )
-                IconKey(
-                    m1,
-                    inputConnectionMediator.keyRight,
-                    Res.drawable.arrow_right,
-                    Res.string.key_right,
-                )
-            }
+            SpaceRow()
         }
     }
 
@@ -573,52 +578,7 @@ fun ForkyzKeyboard(
                     Res.string.key_delete,
                 )
             }
-            Row() {
-                val m1 = Modifier.weight(1.0F)
-                val m5 = Modifier.weight(5.0F)
-                IconKey(
-                    m1,
-                    inputConnectionMediator.keyUp,
-                    Res.drawable.arrow_up,
-                    Res.string.key_up,
-                )
-                IconKey(
-                    m1,
-                    inputConnectionMediator.keyDown,
-                    Res.drawable.arrow_down,
-                    Res.string.key_down,
-                )
-                SpecialIconKey(
-                    m1,
-                    SpecialKey.KEY_PREVIOUS_CLUE,
-                    Res.drawable.ic_prev_clue,
-                    Res.string.prev_clue,
-                )
-                IconKey(
-                    m5,
-                    inputConnectionMediator.keySpace,
-                    Res.drawable.space,
-                    Res.string.key_space,
-                )
-                SpecialIconKey(
-                    m1,
-                    SpecialKey.KEY_NEXT_CLUE,
-                    Res.drawable.ic_next_clue,
-                    Res.string.next_clue,
-                )
-                IconKey(
-                    m1,
-                    inputConnectionMediator.keyLeft,
-                    Res.drawable.arrow_left,
-                    Res.string.key_left,
-                )
-                IconKey(
-                    m1,
-                    inputConnectionMediator.keyRight,
-                    Res.drawable.arrow_right,
-                    Res.string.key_right,
-                )
-            }
+            SpaceRow()
         }
     }
 
@@ -669,52 +629,7 @@ fun ForkyzKeyboard(
                     Res.string.key_delete,
                 )
             }
-            Row() {
-                val m1 = Modifier.weight(1.0F)
-                val m5 = Modifier.weight(5.0F)
-                IconKey(
-                    m1,
-                    inputConnectionMediator.keyUp,
-                    Res.drawable.arrow_up,
-                    Res.string.key_up,
-                )
-                IconKey(
-                    m1,
-                    inputConnectionMediator.keyDown,
-                    Res.drawable.arrow_down,
-                    Res.string.key_down,
-                )
-                SpecialIconKey(
-                    m1,
-                    SpecialKey.KEY_PREVIOUS_CLUE,
-                    Res.drawable.ic_prev_clue,
-                    Res.string.prev_clue,
-                )
-                IconKey(
-                    m5,
-                    inputConnectionMediator.keySpace,
-                    Res.drawable.space,
-                    Res.string.key_space,
-                )
-                SpecialIconKey(
-                    m1,
-                    SpecialKey.KEY_NEXT_CLUE,
-                    Res.drawable.ic_next_clue,
-                    Res.string.next_clue,
-                )
-                IconKey(
-                    m1,
-                    inputConnectionMediator.keyLeft,
-                    Res.drawable.arrow_left,
-                    Res.string.key_left,
-                )
-                IconKey(
-                    m1,
-                    inputConnectionMediator.keyRight,
-                    Res.drawable.arrow_right,
-                    Res.string.key_right,
-                )
-            }
+            SpaceRow()
         }
     }
 
@@ -767,52 +682,7 @@ fun ForkyzKeyboard(
                     Res.string.key_delete,
                 )
             }
-            Row() {
-                val m1 = Modifier.weight(1.0F)
-                val m5 = Modifier.weight(5.0F)
-                IconKey(
-                    m1,
-                    inputConnectionMediator.keyUp,
-                    Res.drawable.arrow_up,
-                    Res.string.key_up,
-                )
-                IconKey(
-                    m1,
-                    inputConnectionMediator.keyDown,
-                    Res.drawable.arrow_down,
-                    Res.string.key_down,
-                )
-                SpecialIconKey(
-                    m1,
-                    SpecialKey.KEY_PREVIOUS_CLUE,
-                    Res.drawable.ic_prev_clue,
-                    Res.string.prev_clue,
-                )
-                IconKey(
-                    m5,
-                    inputConnectionMediator.keySpace,
-                    Res.drawable.space,
-                    Res.string.key_space,
-                )
-                SpecialIconKey(
-                    m1,
-                    SpecialKey.KEY_NEXT_CLUE,
-                    Res.drawable.ic_next_clue,
-                    Res.string.next_clue,
-                )
-                IconKey(
-                    m1,
-                    inputConnectionMediator.keyLeft,
-                    Res.drawable.arrow_left,
-                    Res.string.key_left,
-                )
-                IconKey(
-                    m1,
-                    inputConnectionMediator.keyRight,
-                    Res.drawable.arrow_right,
-                    Res.string.key_right,
-                )
-            }
+            SpaceRow()
         }
     }
 
@@ -864,52 +734,7 @@ fun ForkyzKeyboard(
                 TextKey(m1, inputConnectionMediator.keyV, Res.string.key_v)
                 TextKey(m1, inputConnectionMediator.keyZ, Res.string.key_z)
             }
-            Row() {
-                val m1 = Modifier.weight(1.0F)
-                val m5 = Modifier.weight(5.0F)
-                IconKey(
-                    m1,
-                    inputConnectionMediator.keyUp,
-                    Res.drawable.arrow_up,
-                    Res.string.key_up,
-                )
-                IconKey(
-                    m1,
-                    inputConnectionMediator.keyDown,
-                    Res.drawable.arrow_down,
-                    Res.string.key_down,
-                )
-                SpecialIconKey(
-                    m1,
-                    SpecialKey.KEY_PREVIOUS_CLUE,
-                    Res.drawable.ic_prev_clue,
-                    Res.string.prev_clue,
-                )
-                IconKey(
-                    m5,
-                    inputConnectionMediator.keySpace,
-                    Res.drawable.space,
-                    Res.string.key_space,
-                )
-                SpecialIconKey(
-                    m1,
-                    SpecialKey.KEY_NEXT_CLUE,
-                    Res.drawable.ic_next_clue,
-                    Res.string.next_clue,
-                )
-                IconKey(
-                    m1,
-                    inputConnectionMediator.keyLeft,
-                    Res.drawable.arrow_left,
-                    Res.string.key_left,
-                )
-                IconKey(
-                    m1,
-                    inputConnectionMediator.keyRight,
-                    Res.drawable.arrow_right,
-                    Res.string.key_right,
-                )
-            }
+            SpaceRow()
         }
     }
 
