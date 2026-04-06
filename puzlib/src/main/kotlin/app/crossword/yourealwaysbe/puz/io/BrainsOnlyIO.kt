@@ -10,6 +10,7 @@ import java.io.InputStreamReader
 import java.nio.charset.Charset
 import java.util.Locale
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.format.Padding
 
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Box.Companion.isBlock
@@ -38,8 +39,8 @@ class BrainsOnlyIO : PuzzleParser {
         private const val NOTEPAD_END_TAG = "</NOTEPAD>"
         private val DATE_FORMATTER = LocalDate.Format {
             yearTwoDigits(2000)
-            monthNumber()
-            day()
+            monthNumber(Padding.ZERO)
+            day(Padding.ZERO)
         }
 
         fun convertBrainsOnly(

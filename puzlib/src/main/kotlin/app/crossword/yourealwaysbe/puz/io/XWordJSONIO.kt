@@ -57,7 +57,7 @@ class XWordJSONIO : AbstractJSONIO() {
             char('/')
             day(Padding.NONE)
             char('/')
-            year()
+            year(Padding.ZERO)
         }
 
         private val ACROSS_LIST = DefaultListNames.ACROSS_LIST

@@ -337,18 +337,18 @@ class IPuzIO : AbstractJSONIO() {
         private const val FIELD_CLUE_SEPARATORS = "separators"
 
         private val DATE_FORMATTER_V1 = LocalDate.Format {
-            day()
+            day(Padding.ZERO)
             char('/')
-            monthNumber()
+            monthNumber(Padding.ZERO)
             char('/')
-            year()
+            year(Padding.ZERO)
         }
         private val DATE_FORMATTER = LocalDate.Format {
-            monthNumber()
+            monthNumber(Padding.ZERO)
             char('/')
-            day()
+            day(Padding.ZERO)
             char('/')
-            year()
+            year(Padding.ZERO)
         }
 
         // for puzzles that forget to double digits
@@ -357,7 +357,7 @@ class IPuzIO : AbstractJSONIO() {
             char('/')
             day(Padding.NONE)
             char('/')
-            year()
+            year(Padding.ZERO)
         }
 
         private const val FIELD_CLUES_CLUES = "Clues"

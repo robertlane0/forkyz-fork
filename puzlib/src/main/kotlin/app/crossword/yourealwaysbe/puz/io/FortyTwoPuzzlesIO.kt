@@ -4,6 +4,7 @@ package app.crossword.yourealwaysbe.puz.io
 import java.io.IOException
 import java.io.InputStream
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
 
 import org.json.JSONException
@@ -29,11 +30,11 @@ open class FortyTwoPuzzlesIO : AbstractJSONIO() {
 
     private val DATE_FORMATS = listOf(
         LocalDate.Format {
-            day()
+            day(Padding.ZERO)
             char('-')
-            monthNumber()
+            monthNumber(Padding.ZERO)
             char('-')
-            year()
+            year(Padding.ZERO)
         },
         LocalDate.Formats.ISO,
     )

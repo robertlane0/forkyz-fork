@@ -5,6 +5,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.util.logging.Logger
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
 
 import org.json.JSONException
@@ -65,11 +66,11 @@ class TCAJSONIO : AbstractJSONIO() {
 
         private val DATE_META_FORMATTER = LocalDate.Formats.ISO
         private val DATE_DATA_FORMATTER = LocalDate.Format {
-            monthNumber()
+            monthNumber(Padding.ZERO)
             char('/')
-            day()
+            day(Padding.ZERO)
             char('/')
-            year()
+            year(Padding.ZERO)
         }
 
         private val ACROSS_LIST = DefaultListNames.ACROSS_LIST

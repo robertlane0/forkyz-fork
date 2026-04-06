@@ -5,6 +5,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.util.logging.Logger
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.format.Padding
 
 import org.json.JSONException
 import org.json.JSONObject
@@ -59,9 +60,9 @@ class AMUniversalJSONIO : AbstractJSONIO() {
             = Logger.getLogger(AMUniversalJSONIO::class.java.getCanonicalName())
 
         private val DATE_FORMATTER = LocalDate.Format {
-            year()
-            monthNumber()
-            day()
+            year(Padding.ZERO)
+            monthNumber(Padding.ZERO)
+            day(Padding.ZERO)
         }
 
         private val ACROSS_LIST : String = DefaultListNames.ACROSS_LIST
