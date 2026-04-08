@@ -15,6 +15,8 @@ import org.koin.dsl.module
 import app.crossword.yourealwaysbe.forkyz.settings.SETTINGS_FILE_NAME
 import app.crossword.yourealwaysbe.forkyz.settings.Settings
 import app.crossword.yourealwaysbe.forkyz.settings.createDataStore
+import app.crossword.yourealwaysbe.forkyz.exttools.AndroidMCPBoardManager
+import app.crossword.yourealwaysbe.forkyz.exttools.MCPBoardManager
 import app.crossword.yourealwaysbe.forkyz.util.AndroidBackgroundDownloadManager
 import app.crossword.yourealwaysbe.forkyz.util.AndroidNativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.AndroidNotifications
@@ -67,6 +69,9 @@ val androidModules = module {
     }
     single<PuzzleSaveServiceCaller> {
         AndroidPuzzleSaveServiceCaller(androidContext())
+    }
+    single<MCPBoardManager> {
+        AndroidMCPBoardManager(androidContext(), get(), get(), get())
     }
     single<WorkManager> { WorkManager.getInstance(androidContext()) }
     singleOf(::MigrationHelper)

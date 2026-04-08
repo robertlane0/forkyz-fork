@@ -1,7 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz
 
-import kotlin.random.Random
+import java.util.Locale
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -10,6 +10,8 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 import androidx.lifecycle.viewModelScope
+
+import org.jg.wordstonumbers.WordsToNumbersUtil
 
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_clues
@@ -22,6 +24,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_previo
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_right
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_toggle
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_up
+import app.crossword.yourealwaysbe.forkyz.exttools.MCPBoardManager
 import app.crossword.yourealwaysbe.forkyz.settings.FitToScreenMode
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.GridRatio
@@ -121,11 +124,13 @@ class PlayPageViewModel(
     utils : NativeBackendUtils,
     currentPuzzleHolder : CurrentPuzzleHolder,
     fileHandlerProvider : FileHandlerProvider,
+    mcpBoardManager : MCPBoardManager,
 ) : PuzzlePageViewModel(
     settings,
     utils,
     currentPuzzleHolder,
     fileHandlerProvider,
+    mcpBoardManager,
 ) {
     // so we don't interleave updates and end up with out of date clue
     // lines
@@ -357,25 +362,7 @@ class PlayPageViewModel(
     }
 
     fun pickRandomUnfilledClue() {
-        val board = getBoard()
-        val puz = getPuzzle()
-        if (board == null || puz == null)
-            return
-
-        val currentID = board.clueID
-
-        val unfilledClues = puz.allClues.filter { clue ->
-            val cid = clue.clueID
-            cid != currentID && !board.isFilledClueID(clue.clueID)
-        }
-
-        if (!unfilledClues.isEmpty()) {
-            // bit inefficient, but saves a field
-            val idx = Random.nextInt(unfilledClues.size)
-            val oldWord = board.currentWord
-            board.jumpToClue(unfilledClues[idx])
-            displayKeyboard(oldWord)
-        }
+        getBoard()?.pickRandomUnfilledClue()
     }
 
     fun clearFirstPlayMessage() {

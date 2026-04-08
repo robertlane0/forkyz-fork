@@ -325,6 +325,9 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.llm_agent_none
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.llm_voice_commands
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.llm_voice_commands_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.logcat
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.mcp_host_port
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.mcp_host_port_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.mcp_host_port_hint
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.metro_cryptic
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.metro_quick
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.movement_strategy_next_clue
@@ -2281,6 +2284,14 @@ class SettingsPageViewModel(
                 Res.string.fifteen_squared_desc,
                 settings.liveExtFifteenSquaredEnabled.stateInHere(),
                 settings::setExtFifteenSquaredEnabled,
+            ),
+            SettingsString(
+                SettingsPage.EXTERNAL_TOOLS,
+                Res.string.mcp_host_port,
+                Res.string.mcp_host_port_desc,
+                Res.string.mcp_host_port_hint,
+                settings.liveExtMCPHostPort.stateInHere(),
+                settings::setExtMCPHostPort,
             ),
 
             // Export/Import

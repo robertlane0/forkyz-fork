@@ -251,6 +251,8 @@ message Settings {
     bool downloadRememberDate = 155;
     string downloadLastSelectedDate = 156;
     bool highlightCrossingClue = 157;
+    string mcpHostPort = 158;
+    bool mcpRunning = 159;
 
     // defunct settings
     repeated string autoDownloaders = 5;

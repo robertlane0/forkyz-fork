@@ -7,7 +7,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -129,6 +128,7 @@ private fun ForkyzAppMain(
     themeHelper : ThemeHelper,
     utils : NativeFrontendUtils,
 ) {
+    val appViewModel = koinViewModel<ForkyzAppViewModel>()
     val navController = rememberNavController()
 
     fun doBackAction() {

@@ -8,6 +8,7 @@ import org.koin.dsl.module
 
 import app.crossword.yourealwaysbe.forkyz.BrowsePageViewModel
 import app.crossword.yourealwaysbe.forkyz.ClueListPageViewModel
+import app.crossword.yourealwaysbe.forkyz.ForkyzAppViewModel
 import app.crossword.yourealwaysbe.forkyz.HTMLPageViewModel
 import app.crossword.yourealwaysbe.forkyz.LogcatPageViewModel
 import app.crossword.yourealwaysbe.forkyz.NotesPageViewModel
@@ -27,8 +28,9 @@ val sharedModules = module {
     singleOf(::DownloadersProvider)
     viewModelOf(::BrowsePageViewModel)
     viewModelOf(::ClueListPageViewModel)
+    viewModelOf(::ForkyzAppViewModel)
     viewModel { params ->
-        NotesPageViewModel(params[0], get(), get(), get(), get())
+        NotesPageViewModel(params[0], get(), get(), get(), get(), get())
     }
     viewModelOf(::PlayPageViewModel)
     viewModelOf(::SettingsPageViewModel)

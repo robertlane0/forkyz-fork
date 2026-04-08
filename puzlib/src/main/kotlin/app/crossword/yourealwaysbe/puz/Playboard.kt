@@ -5,10 +5,9 @@ import java.util.Collections
 import java.util.NavigableSet
 import java.util.Objects
 import java.util.Stack
-import java.util.function.BiFunction
-import java.util.function.IntPredicate
 import java.util.logging.Logger
 import kotlin.math.min
+import kotlin.random.Random
 
 import app.crossword.yourealwaysbe.puz.Box.Companion.isBlock
 import app.crossword.yourealwaysbe.puz.util.PuzzleUtils
@@ -863,6 +862,20 @@ class Playboard(puzzle : Puzzle) {
     fun jumpToClueEnd(clue : Clue?) {
         if (clue != null)
             jumpToClueEnd(clue.clueID)
+    }
+
+    fun pickRandomUnfilledClue() {
+        val currentID = clueID
+
+        val unfilledClues = puzzle.allClues.filter { clue ->
+            clue.clueID != currentID && !isFilledClueID(clue.clueID)
+        }
+
+        if (!unfilledClues.isEmpty()) {
+            // bit inefficient, but saves a field
+            val idx = Random.nextInt(unfilledClues.size)
+            jumpToClue(unfilledClues[idx])
+        }
     }
 
     /**

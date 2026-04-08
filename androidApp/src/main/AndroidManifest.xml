@@ -101,6 +101,11 @@
             android:foregroundServiceType="dataSync"
             android:exported="false"
         />
+        <service
+            android:name="app.crossword.yourealwaysbe.forkyz.exttools.MCPService"
+            android:foregroundServiceType="dataSync"
+            android:exported="false"
+        />
         <provider
             android:name="app.crossword.yourealwaysbe.forkyz.util.files.FileProviderShared"
             android:authorities="${applicationId}.files"

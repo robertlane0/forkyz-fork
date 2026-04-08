@@ -14,6 +14,7 @@ data class ExternalToolSettings(
     val duckDuckGoEnabled : Boolean,
     val externalDictionary : ExternalDictionarySetting,
     val fifteenSquaredEnabled : Boolean,
+    val mcpHostPort : String,
 ) {
     val hasExternal
         get() = (

@@ -18,8 +18,11 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.download_notif
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.download_notification_channel_name
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.export_notification_channel_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.export_notification_channel_name
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.mcp_notification_channel_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.mcp_notification_channel_name
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.save_notification_channel_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.save_notification_channel_name
+import app.crossword.yourealwaysbe.forkyz.exttools.MCPService
 import app.crossword.yourealwaysbe.forkyz.net.DownloadersProvider
 import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.PuzzleExportService
@@ -68,6 +71,16 @@ open class OreoUtil : NougatUtil() {
             description = getString(Res.string.export_notification_channel_desc)
             channel = NotificationChannel(
                 PuzzleExportService.NOTIFICATION_CHANNEL_ID,
+                name,
+                NotificationManager.IMPORTANCE_LOW,
+            )
+            channel.setDescription(description)
+            notificationManager.createNotificationChannel(channel)
+
+            name = getString(Res.string.mcp_notification_channel_name)
+            description = getString(Res.string.mcp_notification_channel_desc)
+            channel = NotificationChannel(
+                MCPService.NOTIFICATION_CHANNEL_ID,
                 name,
                 NotificationManager.IMPORTANCE_LOW,
             )

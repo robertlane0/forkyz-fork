@@ -21,6 +21,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_right
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_scratch
 import app.crossword.yourealwaysbe.forkyz.exttools.CrosswordSolverData
 import app.crossword.yourealwaysbe.forkyz.exttools.ExternalDictionaries
+import app.crossword.yourealwaysbe.forkyz.exttools.MCPBoardManager
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.RenderSettings
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
@@ -173,11 +174,13 @@ class NotesPageViewModel(
     utils : NativeBackendUtils,
     currentPuzzleHolder : CurrentPuzzleHolder,
     fileHandlerProvider : FileHandlerProvider,
+    mcpBoardManager : MCPBoardManager,
 ) : PuzzlePageViewModel(
     settings,
     utils,
     currentPuzzleHolder,
     fileHandlerProvider,
+    mcpBoardManager,
 ) {
     private val mediatedNotesUIState
         = MediatedStateWithFlow<NotesPageUIState, NotesSettings>(

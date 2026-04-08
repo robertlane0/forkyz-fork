@@ -15,6 +15,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_next
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_previous
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_right
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_up
+import app.crossword.yourealwaysbe.forkyz.exttools.MCPBoardManager
 import app.crossword.yourealwaysbe.forkyz.settings.CycleUnfilledMode
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.RenderSettings
@@ -38,11 +39,13 @@ class ClueListPageViewModel(
     utils : NativeBackendUtils,
     currentPuzzleHolder : CurrentPuzzleHolder,
     fileHandlerProvider : FileHandlerProvider,
+    mcpBoardManager : MCPBoardManager,
 ) : PuzzlePageViewModel(
     settings,
     utils,
     currentPuzzleHolder,
     fileHandlerProvider,
+    mcpBoardManager,
 ) {
     init {
         setupVoiceCommands()

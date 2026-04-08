@@ -12,6 +12,8 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
 import app.crossword.yourealwaysbe.forkyz.JVMAppViewModel
+import app.crossword.yourealwaysbe.forkyz.exttools.JVMMCPBoardManager
+import app.crossword.yourealwaysbe.forkyz.exttools.MCPBoardManager
 import app.crossword.yourealwaysbe.forkyz.settings.ClueTabsDouble
 import app.crossword.yourealwaysbe.forkyz.settings.DEFAULT_SETTINGS
 import app.crossword.yourealwaysbe.forkyz.settings.FitToScreenMode
@@ -52,6 +54,7 @@ val jvmModules = module {
     single<NativeBackendUtils> { JVMNativeBackendUtils(get()) }
     single<Notifications> { JVMNotifications() }
     single<PuzzleSaveServiceCaller> { JVMPuzzleSaveServiceCaller() }
+    single<MCPBoardManager> { JVMMCPBoardManager(get(), get(), get()) }
     singleOf(::JVMAppViewModel)
 }
 

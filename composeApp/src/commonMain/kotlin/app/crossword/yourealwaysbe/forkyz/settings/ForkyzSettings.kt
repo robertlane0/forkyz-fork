@@ -621,6 +621,7 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             settings.duckDuckGoEnabled,
             settings.externalDictionary,
             settings.fifteenSquaredEnabled,
+            settings.mcpHostPort,
         );
     }
 
@@ -1020,6 +1021,24 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     fun setExtFifteenSquaredEnabled(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(fifteenSquaredEnabled = value)
+        }
+    }
+
+    val liveExtMCPRunning : Flow<Boolean>
+        = settingsMap { it.mcpRunning }
+
+    fun setExtMCPRunning(value : Boolean) {
+        settingsUpdate { settings ->
+            settings.copy(mcpRunning = value)
+        }
+    }
+
+    val liveExtMCPHostPort : Flow<String>
+        = settingsMap { it.mcpHostPort }
+
+    fun setExtMCPHostPort(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(mcpHostPort = value)
         }
     }
 
@@ -2310,6 +2329,16 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             { key ->
                 json.ifHasString(key) { setBrowseLastSeenVersion(it) }
             },
+        )
+        run(
+            "mcpRunning",
+            { s, key -> json.put(key, s.mcpRunning) },
+            { key -> json.ifHasBoolean(key) { setExtMCPRunning(it) } },
+        )
+        run(
+            "mcpHostPort",
+            { s, key -> json.put(key, s.mcpHostPort) },
+            { key -> json.ifHasString(key) { setExtMCPHostPort(it) } },
         )
         run(
             "movementStrategy",

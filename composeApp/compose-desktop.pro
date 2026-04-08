@@ -49,14 +49,28 @@
     ** clone();
 }
 
-# SLF4J
+# SLF4J / kotlin-logging
+# logback and GraalVM native-image annotations are optional dependencies
+-dontwarn ch.qos.logback.**
+-dontwarn com.oracle.svm.core.annotate.**
+-dontwarn io.github.oshai.kotlinlogging.internal.Target_**
+-dontwarn io.github.oshai.kotlinlogging.logback.**
 -dontwarn org.slf4j.**
 -keep class org.slf4j.** { *; }
 
 # Ktor
+-dontnote com.typesafe.config.impl.ConfigBeanImpl
+-dontnote io.ktor.server.engine.ClassLoadersKt
 -dontwarn io.ktor.**
 -dontwarn io.ktor.utils.io.jvm.javaio.PollersKt
+-dontwarn java.lang.management.ManagementFactory
+-dontwarn java.lang.management.RuntimeMXBean
+-keep class com.typesafe.config.** { *; }
 -keep class io.ktor.** { *; }
+-keep class kotlinx.datetime.** { *; }
+
+# MCP
+-keep class io.modelcontextprotocol.kotlin.** { *; }
 
 # coil3
 -dontwarn coil3.**
@@ -132,6 +146,9 @@
 -dontnote org.junit.runners.Parameterized$TestClassRunnerForParameters
 
 # Can't find dynamically referenced classes
+-dontnote com.typesafe.config.ConfigFactory
+-dontnote io.github.oshai.kotlinlogging.internal.LogbackNotOnClasspath
+-dontnote org.fusesource.jansi.internal.MingwSupport
 -dontnote dev.dirs.Util
 -dontnote io.ktor.http.content.BlockingBridgeKt
 -dontnote org.apache.hc.client5.http.entity.BrotliDecompressingEntity

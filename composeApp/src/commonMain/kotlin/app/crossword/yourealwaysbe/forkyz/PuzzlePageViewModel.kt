@@ -36,6 +36,7 @@ import app.crossword.yourealwaysbe.forkyz.exttools.DuckDuckGoData
 import app.crossword.yourealwaysbe.forkyz.exttools.ExternalDictionaries
 import app.crossword.yourealwaysbe.forkyz.exttools.ExternalToolData
 import app.crossword.yourealwaysbe.forkyz.exttools.FifteenSquaredData
+import app.crossword.yourealwaysbe.forkyz.exttools.MCPBoardManager
 import app.crossword.yourealwaysbe.forkyz.exttools.SharePuzzleData
 import app.crossword.yourealwaysbe.forkyz.exttools.ShareTextData
 import app.crossword.yourealwaysbe.forkyz.exttools.askLLMAgentForCurrentClue
@@ -94,6 +95,8 @@ data class ExternalToolsMenuState(
     val hasDuckDuckGo : Boolean = true,
     val hasFifteenSquared : Boolean = true,
     val hasExternalDictionary : Boolean = true,
+    val hasMCPEnabled : Boolean = true,
+    val isMCPRunning : Boolean = true,
 ) {
     val hasExternal : Boolean
         = hasLLMAgent
@@ -241,6 +244,11 @@ private data class PuzzleMenuSettings(
     val showErrorsGrid : Boolean,
 )
 
+private data class PuzzleMenuStateParams(
+    val settings : PuzzleMenuSettings,
+    val isMCPRunning : Boolean,
+)
+
 private data class UIStateSettings(
     val showTimer : Boolean,
     val indicateShowErrors : Boolean,
@@ -254,6 +262,7 @@ open class PuzzlePageViewModel(
     val utils : NativeBackendUtils,
     val currentPuzzleHolder : CurrentPuzzleHolder,
     val fileHandlerProvider : FileHandlerProvider,
+    val mcpBoardManager : MCPBoardManager,
 ) : ViewModel(), PlayboardListener {
     private val _announceEvent = MutableStateFlow<AnnounceData?>(null)
     val announceEvent : StateFlow<AnnounceData?> = _announceEvent
@@ -306,18 +315,22 @@ open class PuzzlePageViewModel(
     private val menuExpandStack : MutableList<PuzzleSubMenu> = mutableListOf()
 
     private val mediatedMenuState
-        = MediatedStateWithFlow<PuzzleMenuState, PuzzleMenuSettings>(
+        = MediatedStateWithFlow<PuzzleMenuState, PuzzleMenuStateParams>(
             viewModelScope,
                 PuzzleMenuState(),
                 this::getUpdatedMenuState,
                 combine(
-                    settings.liveExternalToolSettings,
-                    settings.livePlayScratchMode,
-                    settings.livePlayShowErrorsClue,
-                    settings.livePlayShowErrorsCursor,
-                    settings.livePlayShowErrorsGrid,
-                    ::PuzzleMenuSettings,
-                ),
+                    combine(
+                        settings.liveExternalToolSettings,
+                        settings.livePlayScratchMode,
+                        settings.livePlayShowErrorsClue,
+                        settings.livePlayShowErrorsCursor,
+                        settings.livePlayShowErrorsGrid,
+                        ::PuzzleMenuSettings,
+                    ),
+                    settings.liveExtMCPRunning,
+                    ::PuzzleMenuStateParams,
+                )
             )
     val menuState : StateFlow<PuzzleMenuState> = mediatedMenuState.stateFlow
 
@@ -895,6 +908,20 @@ open class PuzzlePageViewModel(
         }
     }
 
+    /**
+     * Returns a text description of the current clue and word state,
+     * or null if there is no current clue.
+     */
+    suspend fun getCurrentClueInfo() : String? {
+        val board = getBoard() ?: return null
+        val showCount = settings.livePlayShowCount.first()
+        return PlayboardTextRenderer.getAccessibleCurrentClueWord(
+            utils,
+            board,
+            showCount,
+        )?.toString()
+    }
+
     fun expandMenu(menu : PuzzleSubMenu) {
         menuExpandStack.add(menu)
         currentMenuState = currentMenuState.copy(expanded = menu)
@@ -1024,6 +1051,14 @@ open class PuzzlePageViewModel(
 
     fun clearSpecialEntry() {
         _specialEntryDialogViewModel.value = null
+    }
+
+    fun startMCP() {
+        mcpBoardManager.start()
+    }
+
+    fun stopMCP() {
+        mcpBoardManager.stop()
     }
 
     /**
@@ -1192,10 +1227,12 @@ open class PuzzlePageViewModel(
 
     private fun getUpdatedMenuState(
         state : PuzzleMenuState,
-        menuSettings : PuzzleMenuSettings,
+        params : PuzzleMenuStateParams,
     ) : PuzzleMenuState {
         val board = getBoard()
         val puz = getPuzzle()
+
+        val menuSettings = params.settings
 
         val hasShareURL = puz?.shareUrl != null
         val hasSupportURL = puz?.supportUrl != null
@@ -1214,6 +1251,8 @@ open class PuzzlePageViewModel(
             extSettings.duckDuckGoEnabled,
             extSettings.fifteenSquaredEnabled,
             extSettings.hasExternalDictionary,
+            extSettings.mcpHostPort.isNotEmpty(),
+            params.isMCPRunning,
         )
 
         val isScratchMode = menuSettings.scratchMode

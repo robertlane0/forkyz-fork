@@ -27,6 +27,9 @@
     <string name="export_notification_channel_name">Export Puzzles</string>
     <string name="export_notification_channel_desc">Notification when puzzles are being exported.</string>
     <string name="exporting_puzzles">Exporting Puzzles</string>
+    <string name="mcp_notification_channel_name">MCP Server</string>
+    <string name="mcp_notification_channel_desc">Notification while the MCP server is running.</string>
+    <string name="mcp_server_notification_title">MCP Server</string>
 
     <!-- downloading -->
     <string name="download">Download</string>
@@ -464,6 +467,9 @@
     <string name="duckduckgo_desc">Search for clue on DuckDuckGo.</string>
     <!-- takes clue formatted without punctuation and - instead of spaces -->
     <string name="duckduckgo_search_url">https://duckduckgo.com/?q=%1$s</string>
+    <string name="mcp_host_port">MCP Server</string>
+    <string name="mcp_host_port_desc">If non-empty, run an MCP server during play for external LLM interaction at http://host:port/mcp. Format is host_ip:port.</string>
+    <string name="mcp_host_port_hint">host:port or empty to disable</string>
 
     <!-- preferences keyboard -->
     <string name="keyboard_showhide">Show/Hide In-App Keyboard</string>
@@ -648,6 +654,8 @@
     <string name="help_crossword_solver">Crossword Solver</string>
     <string name="help_crossword_solver_anagram">Anagram Solver</string>
     <string name="help_fifteen_squared">Search Fifteen Squared</string>
+    <string name="mcp_stop">Stop MCP Server</string>
+    <string name="mcp_start">Start MCP Server</string>
 
     <!-- Clue Tabs -->
     <string name="clue_tab_history">History</string>

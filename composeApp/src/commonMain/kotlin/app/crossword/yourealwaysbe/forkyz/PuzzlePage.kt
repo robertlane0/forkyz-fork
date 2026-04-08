@@ -87,6 +87,8 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.info
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.initial_letter
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.initial_letters
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.letter
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.mcp_start
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.mcp_stop
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.menu_flag_cell_toggle
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.menu_flag_clue_toggle
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.menu_notes
@@ -866,6 +868,24 @@ class PuzzlePageScope(
                     },
                     onClick = {
                         viewModel.searchFifteenSquared()
+                        viewModel.dismissMenu()
+                    },
+                )
+            }
+            if (externalToolsState.hasMCPEnabled) {
+                val isMCPRunning = externalToolsState.isMCPRunning
+                val text = if (isMCPRunning)
+                    Res.string.mcp_stop
+                else
+                    Res.string.mcp_start
+
+                DropdownMenuItem(
+                    text = { MenuText(stringResource(text)) },
+                    onClick = {
+                        if (isMCPRunning)
+                            viewModel.stopMCP()
+                        else
+                            viewModel.startMCP()
                         viewModel.dismissMenu()
                     },
                 )
