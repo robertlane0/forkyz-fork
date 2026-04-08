@@ -1149,6 +1149,7 @@ class Playboard(puzzle : Puzzle) {
         playLetters(answer)
         this.movementStrategy = oldMovementStrategy
         popNotificationDisabled()
+        notifyChange()
     }
 
     /**
