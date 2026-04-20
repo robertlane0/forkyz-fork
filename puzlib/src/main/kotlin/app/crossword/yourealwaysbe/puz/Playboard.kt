@@ -789,7 +789,10 @@ class Playboard(puzzle : Puzzle) {
 
         pushNotificationDisabled()
 
-        val pos = getClueStart(clueID)
+        val start = getClueStart(clueID)
+        val pos = getZone(clueID)
+            ?.firstOrNull { !skipPosition(it, isSkipCompletedLetters) }
+            ?: start
 
         if (pos != null) {
             setHighlightLetter(pos)
