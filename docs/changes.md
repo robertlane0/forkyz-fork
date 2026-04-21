@@ -1,5 +1,14 @@
 # Forkyz Changelog
 
+## Version 81
+
+- Add MCP server to control Forkyz from LLM agent (external tools).
+- Fix Everyman share (again).
+- Change built-in keyboard bottom row spacing.
+- Update Dutch translation (thanks @ojppe).
+- Backend rewrite to fully Kotlin and change date/time library.
+- Bug fixes and new bugs.
+
 ## Version 80
 
 - Add options to highlight and scroll to crossing clue (display and interaction settings, thanks @davidglasser).
