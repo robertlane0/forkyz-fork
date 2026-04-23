@@ -7,15 +7,15 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
 
-import org.json.JSONException
-import org.json.JSONObject
-
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.PuzzleBuilder
 import app.crossword.yourealwaysbe.puz.PuzzleBuilder.BasicClue
 import app.crossword.yourealwaysbe.puz.util.HtmlUtil.parseHtmlColor
-import app.crossword.yourealwaysbe.puz.util.JSONParser.parse
+import app.crossword.yourealwaysbe.puz.util.JSONException
+import app.crossword.yourealwaysbe.puz.util.JSONObject
+import app.crossword.yourealwaysbe.puz.util.parseJSONObject
+
 
 /**
  * Parser for puzzles distributed by 42puzzles.com.
@@ -49,14 +49,14 @@ open class FortyTwoPuzzlesIO : AbstractJSONIO() {
         val copy = StreamUtils.makeByteArrayInputStream(inStream)
         val json : JSONObject
         try {
-            json = parse(copy)
+            json = parseJSONObject(copy)
         } catch (e : IOException) {
             return null
         } catch (e : JSONException) {
             return null
         }
 
-        return json.getJSONObject("puzzle")?.let { srcPuzzle ->
+        return json.getJSONObject("puzzle").let { srcPuzzle ->
             width = srcPuzzle.getInt("width")
             height = srcPuzzle.getInt("height")
 
@@ -148,7 +148,7 @@ open class FortyTwoPuzzlesIO : AbstractJSONIO() {
         // The JSONObject returns its keys in random order. Since we know that
         // all keys are numbers, we can convert them to actual numbers and sort
         // them this way.
-        val clueNums = srcClues.keySet()
+        val clueNums = srcClues.keys
             .stream()
             .map<Int> { it.toInt() }
             .sorted()

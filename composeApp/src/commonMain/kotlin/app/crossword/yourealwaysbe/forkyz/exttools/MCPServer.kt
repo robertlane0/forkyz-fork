@@ -7,10 +7,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.put
 
 import io.ktor.server.cio.CIO
 import io.ktor.server.cio.CIOApplicationEngine
@@ -27,6 +23,9 @@ import io.modelcontextprotocol.kotlin.sdk.types.TextContent
 import io.modelcontextprotocol.kotlin.sdk.types.ToolSchema
 
 import app.crossword.yourealwaysbe.forkyz.util.AppLogger
+import app.crossword.yourealwaysbe.puz.util.JSONObject
+import app.crossword.yourealwaysbe.puz.util.asForkyzJSONObject
+import app.crossword.yourealwaysbe.puz.util.buildJSONObject
 
 private val TAG = "ForkyzMCPServer"
 
@@ -42,8 +41,8 @@ private val TAG = "ForkyzMCPServer"
 data class MCPTool(
     val name : String,
     val description : String,
-    val inputSchema : JsonElement,
-    val execute : suspend (params : JsonElement?) -> String,
+    val inputSchema : JSONObject,
+    val execute : suspend (params : JSONObject?) -> String,
 )
 
 /**
@@ -149,12 +148,15 @@ class MCPServer(
                     name = tool.name,
                     description = tool.description,
                     inputSchema = ToolSchema(
-                        properties = buildJsonObject {
+                        properties = buildJSONObject {
                             put("input", tool.inputSchema)
-                        },
+                        }.toKotlinJSON,
                     )
                 ) { request ->
-                    val args = request.arguments?.get("input")?.jsonObject
+                    val args = request
+                        .arguments
+                        ?.asForkyzJSONObject
+                        ?.getJSONObject("input")
                     val result = tool.execute(args)
                     CallToolResult(content = listOf(TextContent(result)))
                 }

@@ -13,7 +13,6 @@ plugins {
     alias(libs.plugins.buildconfig) apply false
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.wire) apply false
-    alias(libs.plugins.shadow) apply false
     alias(libs.plugins.compose) apply false
     alias(libs.plugins.kotlin.jvm) apply false
     alias(libs.plugins.kotlin.multiplatform) apply false

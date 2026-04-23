@@ -7,8 +7,8 @@ import kotlin.time.Duration.Companion.days
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.Padding
 
-import app.crossword.yourealwaysbe.forkyz.util.JSONUtils
 import app.crossword.yourealwaysbe.puz.io.TCAJSONIO
+import app.crossword.yourealwaysbe.puz.util.parseJSONArray
 
 private val PUZZLES_FEED_FORMAT = LocalDate.Format {
     chars(
@@ -51,10 +51,10 @@ class LATimesDownloader(
     override fun getSourceUrl(date : LocalDate) : String? {
         val url = PUZZLES_FEED_FORMAT.format(date)
         return getInputStream(URI(url).toURL(), null).use { input ->
-            val puzzles = JSONUtils.streamToJSONArray(input)
-            (0 until puzzles.length()).forEach {
+            val puzzles = parseJSONArray(input)
+            (0 until puzzles.size).forEach {
                 val puzzle = puzzles.getJSONObject(it)
-                val dateStr = puzzle.optString("date")
+                val dateStr = puzzle.optString("date") ?: ""
                 if (!dateStr.isEmpty()) {
                     try {
                         val puzzleDate = LocalDate.parse(
@@ -62,7 +62,7 @@ class LATimesDownloader(
                             PUZZLES_FEED_DATE_FORMAT,
                         )
                         if (puzzleDate == date) {
-                            val puzURL = puzzle.optString("feedUrl")
+                            val puzURL = puzzle.optString("feedUrl") ?: ""
                             if (puzURL.isEmpty())
                                 return null
                             else

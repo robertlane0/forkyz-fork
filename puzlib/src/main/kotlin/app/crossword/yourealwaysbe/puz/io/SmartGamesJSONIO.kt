@@ -6,14 +6,13 @@ import java.io.InputStream
 import java.util.logging.Logger
 import kotlinx.datetime.LocalDate
 
-import org.json.JSONException
-import org.json.JSONObject
-
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.PuzzleBuilder
-import app.crossword.yourealwaysbe.puz.util.JSONParser.parse
+import app.crossword.yourealwaysbe.puz.util.JSONException
+import app.crossword.yourealwaysbe.puz.util.JSONObject
 import app.crossword.yourealwaysbe.puz.util.PuzzleUtils
+import app.crossword.yourealwaysbe.puz.util.parseJSONObject
 
 /**
  * Puzzle format used by Smart Games
@@ -63,7 +62,7 @@ class SmartGamesJSONIO : AbstractJSONIO() {
         @Throws(IOException::class)
         fun readPuzzle(inStream : InputStream) : Puzzle? {
             try {
-                val json = parse(inStream)
+                val json = parseJSONObject(inStream)
                 return readPuzzleFromJSON(json)
             } catch (e : SmartGamesJSONFormatException) {
                 LOG.severe("Could not read SmartGames JSON: " + e)
@@ -76,7 +75,7 @@ class SmartGamesJSONIO : AbstractJSONIO() {
 
         fun readPuzzle(jsonString : String) : Puzzle? {
             try {
-                val json = parse(jsonString)
+                val json = parseJSONObject(jsonString)
                 return readPuzzleFromJSON(json)
             } catch (e : SmartGamesJSONFormatException) {
                 LOG.severe("Could not read SmartGames JSON: " + e)
@@ -152,9 +151,9 @@ class SmartGamesJSONIO : AbstractJSONIO() {
         @Throws(JSONException::class)
         private fun addMetaData(json : JSONObject?, builder : PuzzleBuilder) {
             if (json != null) {
-                builder.setAuthor(optStringNull(json, "author"))
+                builder.setAuthor(json.optStringEmptyNull("author"))
                 try {
-                    val date = optStringNull(json, "publicationDate")
+                    val date = json.optStringEmptyNull("publicationDate")
                     if (date != null)
                         builder.setDate(DATE_FORMATTER.parse(date))
                 } catch (e : IllegalArgumentException) {
@@ -180,7 +179,7 @@ class SmartGamesJSONIO : AbstractJSONIO() {
             if (clues == null)
                 return
 
-            clues.keySet()
+            clues.keys
                 .sortedWith(PuzzleUtils::compareStringNumbers)
                 .forEach { number ->
                     val clue = clues.getJSONObject(number)

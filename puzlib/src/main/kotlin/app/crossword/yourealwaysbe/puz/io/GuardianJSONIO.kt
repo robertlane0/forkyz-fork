@@ -6,8 +6,6 @@ import java.io.InputStream
 import java.util.logging.Logger
 import kotlinx.datetime.LocalDate
 
-import org.json.JSONException
-import org.json.JSONObject
 import org.jsoup.Jsoup
 
 import app.crossword.yourealwaysbe.puz.Box
@@ -16,9 +14,12 @@ import app.crossword.yourealwaysbe.puz.Position
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.PuzzleBuilder
 import app.crossword.yourealwaysbe.puz.Zone
-import app.crossword.yourealwaysbe.puz.util.JSONParser.parse
+import app.crossword.yourealwaysbe.puz.util.JSONException
+import app.crossword.yourealwaysbe.puz.util.JSONObject
 import app.crossword.yourealwaysbe.puz.util.PuzzleUtils.getAcrossZone
 import app.crossword.yourealwaysbe.puz.util.PuzzleUtils.getDownZone
+import app.crossword.yourealwaysbe.puz.util.parseJSONObject
+
 
 /**
  * Read a character stream of JSON data in the format used by the
@@ -62,7 +63,7 @@ class GuardianJSONIO : AbstractJSONIO() {
          */
         fun readFromJSON(inStream : InputStream) : Puzzle? {
             try {
-                val json = parse(inStream)
+                val json = parseJSONObject(inStream)
                 return readPuzzleFromJSON(json)
             } catch (e : IOException) {
                 return null
@@ -82,7 +83,8 @@ class GuardianJSONIO : AbstractJSONIO() {
                     .attr("props")
                 if (!cwJsonStr.isEmpty()) {
                     try {
-                        cwJson = parse(cwJsonStr).optJSONObject("data")
+                        cwJson = parseJSONObject(cwJsonStr)
+                            .optJSONObject("data")
                     } catch (e : JSONException) {
                         err = e
                     }
@@ -92,7 +94,8 @@ class GuardianJSONIO : AbstractJSONIO() {
                 if (cwJson == null) {
                     cwJsonStr = doc.select(".js-crossword")
                         .attr("data-crossword-data")
-                    if (!cwJsonStr.isEmpty()) cwJson = parse(cwJsonStr)
+                    if (!cwJsonStr.isEmpty())
+                        cwJson = parseJSONObject(cwJsonStr)
                 }
 
                 if (cwJson != null)
@@ -108,7 +111,7 @@ class GuardianJSONIO : AbstractJSONIO() {
 
         fun readPuzzle(jsonString : String) : Puzzle? {
             try {
-                val json = parse(jsonString)
+                val json = parseJSONObject(jsonString)
                 return readPuzzleFromJSON(json)
             } catch (e : JSONException) {
                 LOG.severe("Could not read Guardian JSON: " + e)
@@ -125,11 +128,11 @@ class GuardianJSONIO : AbstractJSONIO() {
         @Throws(JSONException::class)
         private fun readPuzzleFromJSON(json : JSONObject) : Puzzle {
             val builder = PuzzleBuilder(getBoxes(json))
-                .setTitle(optStringNull(json, "name"))
+                .setTitle(json.optStringEmptyNull("name"))
 
             val creator = json.optJSONObject("creator")
             if (creator != null)
-                builder.setAuthor(optStringNull(creator, "name"))
+                builder.setAuthor(creator.optStringEmptyNull("name"))
 
             if (json.has("date")) {
                 try {
@@ -168,7 +171,7 @@ class GuardianJSONIO : AbstractJSONIO() {
             }
 
             val entries = json.getJSONArray("entries")
-            for (i in 0..<entries.length()) {
+            for (i in 0..<entries.size) {
                 val entry = entries.getJSONObject(i)
 
                 val position = entry.getJSONObject("position")
@@ -179,7 +182,7 @@ class GuardianJSONIO : AbstractJSONIO() {
                     continue
 
                 val num = entry.getInt("number").toString()
-                val clueSol = optStringNull(entry, "solution")
+                val clueSol = entry.optStringEmptyNull("solution")
                 val direction = entry.getString("direction")
                 val length = entry.getInt("length")
 
@@ -216,7 +219,7 @@ class GuardianJSONIO : AbstractJSONIO() {
         private fun addClues(json : JSONObject, builder : PuzzleBuilder) {
             val info = getCluesInfo(json, builder)
             val entries = json.getJSONArray("entries")
-            for (i in 0..<entries.length()) {
+            for (i in 0..<entries.size) {
                 val entry = entries.getJSONObject(i)
                 addClue(entry, info, builder)
             }
@@ -237,8 +240,8 @@ class GuardianJSONIO : AbstractJSONIO() {
 
             val separators : MutableMap<Int, String> = mutableMapOf()
 
-            if (group.length() > 0 && id == group.getString(0)) {
-                for (i in 0..<group.length()) {
+            if (group.size > 0 && id == group.getString(0)) {
+                for (i in 0..<group.size) {
                     val otherId = group.getString(i)
                     val otherInfo = info.get(otherId)
                     if (otherInfo != null) {
@@ -275,7 +278,7 @@ class GuardianJSONIO : AbstractJSONIO() {
         ) : MutableMap<String, ClueInfo> {
             val info : MutableMap<String, ClueInfo> = mutableMapOf()
             val entries = json.getJSONArray("entries")
-            for (i in 0..<entries.length()) {
+            for (i in 0..<entries.size) {
                 val entry = entries.getJSONObject(i)
 
                 val id = entry.getString("id")
@@ -308,21 +311,22 @@ class GuardianJSONIO : AbstractJSONIO() {
 
             val separators : MutableMap<Int, String> = mutableMapOf()
 
-            sepObj.keys().forEachRemaining { sep ->
+            sepObj.keys.forEach { sep ->
                 var sep = sep
-                if (sep == null || sep.isEmpty())
-                    return@forEachRemaining
+                if (sep.isEmpty())
+                    return@forEach
 
                 val positions = sepObj.optJSONArray(sep)
                 if (positions == null)
-                    return@forEachRemaining
+                    return@forEach
 
                 if ("," == sep)
                     sep = " "
 
-                for (i in 0..<positions.length()) {
-                    val pos = positions.optInt(i)
-                    separators.put(pos, sep)
+                for (i in 0..<positions.size) {
+                    positions.optInt(i)?.let { pos ->
+                        separators.put(pos, sep)
+                    }
                 }
             }
 

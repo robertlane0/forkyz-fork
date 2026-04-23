@@ -1,12 +1,9 @@
 
 package app.crossword.yourealwaysbe.forkyz.settings
 
-import java.io.BufferedWriter
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
-import java.io.OutputStreamWriter
-import java.io.PrintWriter
 import java.nio.charset.Charset
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -23,19 +20,19 @@ import kotlinx.datetime.LocalDate
 import androidx.annotation.WorkerThread
 import androidx.datastore.core.DataStore
 
-import org.json.JSONArray
-import org.json.JSONException
-import org.json.JSONObject
-
 import app.crossword.yourealwaysbe.forkyz.net.DownloaderID
-import app.crossword.yourealwaysbe.forkyz.util.JSONUtils
 import app.crossword.yourealwaysbe.forkyz.util.getOnce
 import app.crossword.yourealwaysbe.puz.MovementStrategy
 import app.crossword.yourealwaysbe.puz.Playboard.DeleteCrossingMode
+import app.crossword.yourealwaysbe.puz.util.JSONException
+import app.crossword.yourealwaysbe.puz.util.JSONObject
+import app.crossword.yourealwaysbe.puz.util.JSONObjectBuilder
+import app.crossword.yourealwaysbe.puz.util.buildJSONArray
+import app.crossword.yourealwaysbe.puz.util.buildJSONObject
+import app.crossword.yourealwaysbe.puz.util.parseJSONObject
+import app.crossword.yourealwaysbe.puz.util.writeJSONObject
 
 class ForkyzSettings(val settingsStore : DataStore<Settings>) {
-    private val WRITE_CHARSET = Charset.forName("UTF-8")
-
     val settingsFlow : Flow<Settings>
         = settingsStore.data
             .catch { exception ->
@@ -1599,21 +1596,13 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
         try {
             val settings = runBlocking { settingsFlow.first() }
-            val json = JSONObject()
-
-            doExportImport(json, settings)
-
-            // don't close but flush, it's the caller's job on the
-            // outputStream
-            val writer = PrintWriter(
-                BufferedWriter(
-                    OutputStreamWriter(
-                        outputStream, WRITE_CHARSET
-                    )
+            val json = buildJSONObject {
+                doExportImport(
+                    builder = this,
+                    settings = settings,
                 )
-            )
-            writer.print(json.toString())
-            writer.flush()
+            }
+            writeJSONObject(json, outputStream)
         } catch (e : JSONException) {
             throw IOException("JSON error exporting settings", e)
         }
@@ -1625,29 +1614,29 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             return
 
         try {
-            val json = JSONUtils.streamToJSON(inputStream)
-            doExportImport(json)
+            val json = parseJSONObject(inputStream)
+            doExportImport(json = json)
         } catch (e : JSONException) {
             throw IOException("JSON error importing settings", e)
         }
     }
 
     private fun addListToJSON(
-        json : JSONObject, key : String, items : List<*>
+        builder : JSONObjectBuilder?,
+        key : String,
+        items : List<String>?,
     ) {
-        val array = JSONArray()
-        items.forEach { array.put(it) }
-        json.put(key, array)
+        builder?.put(key, buildJSONArray { items?.forEach { add(it) } })
     }
 
     private fun getStringSetFromJSON(
-        json : JSONObject,
+        json : JSONObject?,
         key : String,
         setFun : (Set<String>) -> Unit,
     ) {
-        json.optJSONArray(key)?.let { arr ->
+        json?.optJSONArray(key)?.let { arr ->
             var items = mutableSetOf<String>()
-            for (i in 0..(arr.length() - 1))
+            for (i in 0..(arr.size - 1))
                 arr.optString(i)?.let { items.add(it) }
             setFun(items)
         }
@@ -1696,27 +1685,27 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
 
     private fun JSONObject.ifHasBoolean(key : String, cb : (Boolean) -> Unit) {
         if (has(key))
-            cb(optBoolean(key))
+            cb(getBoolean(key))
     }
 
     private fun JSONObject.ifHasString(key : String, cb : (String) -> Unit) {
         if (has(key))
-            cb(optString(key))
+            cb(getString(key))
     }
 
     private fun JSONObject.ifHasInt(key : String, cb : (Int) -> Unit) {
         if (has(key))
-            cb(optInt(key))
+            cb(getInt(key))
     }
 
     private fun JSONObject.ifHasLong(key : String, cb : (Long) -> Unit) {
         if (has(key))
-            cb(optLong(key))
+            cb(getLong(key))
     }
 
     private fun JSONObject.ifHasDouble(key : String, cb : (Double) -> Unit) {
         if (has(key))
-            cb(optDouble(key))
+            cb(getDouble(key))
     }
 
     private fun toggleStringSet(
@@ -1733,42 +1722,49 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
      *
      * Combined to avoid key constants.
      *
-     * @param settings non-null if export wanted
+     * @param json json object to read from (or null if not reading)
+     * @param builder json object to write to (or null if not writing)
+     * @param settings non-null if export wanted (builder must also not
+     * be null)
      */
     private fun doExportImport(
-        json : JSONObject,
+        json : JSONObject? = null,
+        builder : JSONObjectBuilder? = null,
         settings : Settings? = null,
     ) {
         val run : (
             String,
-            (Settings, String) -> Unit,
-            (String) -> Unit
+            (String) -> Unit,
+            (String) -> Unit,
         ) -> Unit = { key, exportFun, importFun ->
-            if (settings != null)
-                exportFun(settings, key)
-            else
+            if (settings != null && builder != null)
+                exportFun(key)
+            else if (json != null)
                 importFun(key)
+            else throw IllegalArgumentException(
+                "doExportImport must have settings and builder, or json",
+            )
         }
 
         run(
             "alwaysAnnounceBox",
-            { s, key -> json.put(key, s.alwaysAnnounceBox) },
+            { key -> builder?.put(key, settings?.alwaysAnnounceBox) },
             { key ->
-                json.ifHasBoolean(key) { setVoiceAlwaysAnnounceBox(it) }
+                json?.ifHasBoolean(key) { setVoiceAlwaysAnnounceBox(it) }
             },
         )
         run(
             "alwaysAnnounceClue",
-            { s, key -> json.put(key, s.alwaysAnnounceClue) },
+            { key -> builder?.put(key, settings?.alwaysAnnounceClue) },
             { key ->
-                json.ifHasBoolean(key) { setVoiceAlwaysAnnounceClue(it) }
+                json?.ifHasBoolean(key) { setVoiceAlwaysAnnounceClue(it) }
             },
         )
         run(
             "applicationTheme",
-            { s, key -> json.put(key, s.applicationTheme.toString()) },
+            { key -> builder?.put(key, settings?.applicationTheme.toString()) },
             { key ->
-               json.ifHasString(key) {
+               json?.ifHasString(key) {
                    try {
                        setAppTheme(Theme.valueOf(it))
                    } catch (e : IllegalArgumentException) {
@@ -1779,14 +1775,16 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         )
         run(
             "archiveCleanupAge",
-            { s, key -> json.put(key, s.archiveCleanupAge) },
+            { key -> builder?.put(key, settings?.archiveCleanupAge) },
             { key ->
-                json.ifHasInt(key) { setBrowseCleanupAgeArchive(it) }
+                json?.ifHasInt(key) { setBrowseCleanupAgeArchive(it) }
             },
         )
         run(
             "autoDownloadersBlockMon",
-            { s, key -> addListToJSON(json, key, s.autoDownloadersBlockMon) },
+            { key ->
+                addListToJSON(builder, key, settings?.autoDownloadersBlockMon)
+            },
             { key ->
                 getStringSetFromJSON(
                     json, key, this::setDownloadAutoDownloadersBlockMon,
@@ -1795,7 +1793,9 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         )
         run(
             "autoDownloadersBlockTue",
-            { s, key -> addListToJSON(json, key, s.autoDownloadersBlockTue) },
+            { key ->
+                addListToJSON(builder, key, settings?.autoDownloadersBlockTue)
+            },
             { key ->
                 getStringSetFromJSON(
                     json, key, this::setDownloadAutoDownloadersBlockTue,
@@ -1804,7 +1804,9 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         )
         run(
             "autoDownloadersBlockWed",
-            { s, key -> addListToJSON(json, key, s.autoDownloadersBlockWed) },
+            { key ->
+                addListToJSON(builder, key, settings?.autoDownloadersBlockWed)
+            },
             { key ->
                 getStringSetFromJSON(
                     json, key, this::setDownloadAutoDownloadersBlockWed,
@@ -1813,7 +1815,9 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         )
         run(
             "autoDownloadersBlockThu",
-            { s, key -> addListToJSON(json, key, s.autoDownloadersBlockThu) },
+            { key ->
+                addListToJSON(builder, key, settings?.autoDownloadersBlockThu)
+            },
             { key ->
                 getStringSetFromJSON(
                     json, key, this::setDownloadAutoDownloadersBlockThu,
@@ -1822,7 +1826,9 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         )
         run(
             "autoDownloadersBlockFri",
-            { s, key -> addListToJSON(json, key, s.autoDownloadersBlockFri) },
+            { key ->
+                addListToJSON(builder, key, settings?.autoDownloadersBlockFri)
+            },
             { key ->
                 getStringSetFromJSON(
                     json, key, this::setDownloadAutoDownloadersBlockFri,
@@ -1831,7 +1837,9 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         )
         run(
             "autoDownloadersBlockSat",
-            { s, key -> addListToJSON(json, key, s.autoDownloadersBlockSat) },
+            { key ->
+                addListToJSON(builder, key, settings?.autoDownloadersBlockSat)
+            },
             { key ->
                 getStringSetFromJSON(
                     json, key, this::setDownloadAutoDownloadersBlockSat,
@@ -1840,7 +1848,9 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         )
         run(
             "autoDownloadersBlockSun",
-            { s, key -> addListToJSON(json, key, s.autoDownloadersBlockSun) },
+            { key ->
+                addListToJSON(builder, key, settings?.autoDownloadersBlockSun)
+            },
             { key ->
                 getStringSetFromJSON(
                     json, key, this::setDownloadAutoDownloadersBlockSun,
@@ -1849,15 +1859,17 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         )
         run(
             "backgroundDownloadAllowRoaming",
-            { s, key -> json.put(key, s.backgroundDownloadAllowRoaming) },
             { key ->
-                json.ifHasBoolean(key) { setDownloadAllowRoaming(it) }
+                builder?.put(key, settings?.backgroundDownloadAllowRoaming)
+            },
+            { key ->
+                json?.ifHasBoolean(key) { setDownloadAllowRoaming(it) }
             },
         )
         run(
             "backgroundDownloadDays",
-            { s, key ->
-                addListToJSON(json, key, s.backgroundDownloadDays)
+            { key ->
+                addListToJSON(builder, key, settings?.backgroundDownloadDays)
             },
             { key ->
                 getStringSetFromJSON(
@@ -1867,73 +1879,77 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         )
         run(
             "backgroundDownloadDaysTime",
-            { s, key -> json.put(key, s.backgroundDownloadDaysTime) },
-            { key -> json.ifHasInt(key) { setDownloadDaysTime(it) } },
+            { key -> builder?.put(key, settings?.backgroundDownloadDaysTime) },
+            { key -> json?.ifHasInt(key) { setDownloadDaysTime(it) } },
         )
         run(
             "backgroundDownloadHourly",
-            { s, key -> json.put(key, s.backgroundDownloadHourly) },
-            { key -> json.ifHasBoolean(key) { setDownloadHourly(it) } },
+            { key -> builder?.put(key, settings?.backgroundDownloadHourly) },
+            { key -> json?.ifHasBoolean(key) { setDownloadHourly(it) } },
         )
         run(
             "backgroundDownloadRequireCharging",
-            { s, key -> json.put(key, s.backgroundDownloadRequireCharging) },
             { key ->
-                json.ifHasBoolean(key) { setDownloadRequireCharging(it) }
+                builder?.put(key, settings?.backgroundDownloadRequireCharging)
+            },
+            { key ->
+                json?.ifHasBoolean(key) { setDownloadRequireCharging(it) }
             },
         )
         run(
             "backgroundDownloadRequireUnmetered",
-            { s, key -> json.put(key, s.backgroundDownloadRequireUnmetered) },
             { key ->
-                json.ifHasBoolean(key) { setDownloadRequireUnmetered(it) }
+                builder?.put(key, settings?.backgroundDownloadRequireUnmetered)
+            },
+            { key ->
+                json?.ifHasBoolean(key) { setDownloadRequireUnmetered(it) }
             },
         )
         run(
             "browseAlwaysShowRating",
-            { s, key -> json.put(key, s.browseAlwaysShowRating) },
+            { key -> builder?.put(key, settings?.browseAlwaysShowRating) },
             { key ->
-                json.ifHasBoolean(key) { setBrowseAlwaysShowRating(it) }
+                json?.ifHasBoolean(key) { setBrowseAlwaysShowRating(it) }
             },
         )
         run(
             "browseIndicateIfSolution",
-            { s, key -> json.put(key, s.browseIndicateIfSolution) },
+            { key -> builder?.put(key, settings?.browseIndicateIfSolution) },
             { key ->
-                json.ifHasBoolean(key) { setBrowseIndicateIfSolution(it) }
+                json?.ifHasBoolean(key) { setBrowseIndicateIfSolution(it) }
             },
         )
         run(
             "browseNewPuzzle",
-            { s, key -> json.put(key, s.browseNewPuzzle) },
-            { key -> json.ifHasBoolean(key) { setBrowseNewPuzzle(it) } },
+            { key -> builder?.put(key, settings?.browseNewPuzzle) },
+            { key -> json?.ifHasBoolean(key) { setBrowseNewPuzzle(it) } },
         )
         run(
             "browseShowPercentageCorrect",
-            { s, key -> json.put(key, s.browseShowPercentageCorrect) },
+            { key -> builder?.put(key, settings?.browseShowPercentageCorrect) },
             { key ->
-                json.ifHasBoolean(key) { setBrowseShowPercentageCorrect(it) }
+                json?.ifHasBoolean(key) { setBrowseShowPercentageCorrect(it) }
             },
         )
         run(
             "buttonActivatesVoice",
-            { s, key -> json.put(key, s.buttonActivatesVoice) },
+            { key -> builder?.put(key, settings?.buttonActivatesVoice) },
             { key ->
-                json.ifHasBoolean(key) { setVoiceButtonActivatesVoice(it) }
+                json?.ifHasBoolean(key) { setVoiceButtonActivatesVoice(it) }
             },
         )
         run(
             "buttonAnnounceClue",
-            { s, key -> json.put(key, s.buttonAnnounceClue) },
+            { key -> builder?.put(key, settings?.buttonAnnounceClue) },
             { key ->
-                json.ifHasBoolean(key) { setVoiceButtonAnnounceClue(it) }
+                json?.ifHasBoolean(key) { setVoiceButtonAnnounceClue(it) }
             },
         )
         run(
             "llmAgent",
-            { s, key -> json.put(key, s.llmAgent.toString()) },
+            { key -> builder?.put(key, settings?.llmAgent.toString()) },
             { key ->
-               json.ifHasString(key) {
+               json?.ifHasString(key) {
                    try {
                        setExtLLMAgent(LLMAgent.valueOf(it))
                    } catch (e : IllegalArgumentException) {
@@ -1944,31 +1960,31 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         )
         run(
             "llmAgentAPIKey",
-            { s, key -> json.put(key, s.llmAgentAPIKey) },
-            { key -> json.ifHasString(key) { setExtLLMAgentAPIKey(it) } },
+            { key -> builder?.put(key, settings?.llmAgentAPIKey) },
+            { key -> json?.ifHasString(key) { setExtLLMAgentAPIKey(it) } },
         )
         run(
             "llmVoiceCommands",
-            { s, key -> json.put(key, s.llmVoiceCommands) },
+            { key -> builder?.put(key, settings?.llmVoiceCommands) },
             { key ->
-                json.ifHasBoolean(key) { setVoiceLLMVoiceCommands(it) }
+                json?.ifHasBoolean(key) { setVoiceLLMVoiceCommands(it) }
             },
         )
         run(
             "cleanupAge",
-            { s, key -> json.put(key, s.cleanupAge) },
-            { key -> json.ifHasInt(key) { setBrowseCleanupAge(it) } },
+            { key -> builder?.put(key, settings?.cleanupAge) },
+            { key -> json?.ifHasInt(key) { setBrowseCleanupAge(it) } },
         )
         run(
             "clueBelowGrid",
-            { s, key -> json.put(key, s.clueBelowGrid) },
-            { key -> json.ifHasBoolean(key) { setPlayClueBelowGrid(it) } },
+            { key -> builder?.put(key, settings?.clueBelowGrid) },
+            { key -> json?.ifHasBoolean(key) { setPlayClueBelowGrid(it) } },
         )
         run(
             "clueHighlight",
-            { s, key -> json.put(key, s.clueHighlight.toString()) },
+            { key -> builder?.put(key, settings?.clueHighlight.toString()) },
             { key ->
-               json.ifHasString(key) {
+               json?.ifHasString(key) {
                    try {
                        setPlayClueHighlight(ClueHighlight.valueOf(it))
                    } catch (e : IllegalArgumentException) {
@@ -1979,9 +1995,9 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         )
         run(
             "clueTabsDouble",
-            { s, key -> json.put(key, s.clueTabsDouble.toString()) },
+            { key -> builder?.put(key, settings?.clueTabsDouble.toString()) },
             { key ->
-               json.ifHasString(key) {
+               json?.ifHasString(key) {
                    try {
                        setClueListClueTabsDouble(ClueTabsDouble.valueOf(it))
                    } catch (e : IllegalArgumentException) {
@@ -1992,37 +2008,39 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         )
         run(
             "collapseBrowseHeadings",
-            { s, key -> json.put(key, s.collapseBrowseHeadings) },
+            { key -> builder?.put(key, settings?.collapseBrowseHeadings) },
             { key ->
-                json.ifHasBoolean(key) { setBrowseCollapseHeadings(it) }
+                json?.ifHasBoolean(key) { setBrowseCollapseHeadings(it) }
             },
         )
         run(
             "crosswordSolverEnabled",
-            { s, key -> json.put(key, s.crosswordSolverEnabled) },
+            { key -> builder?.put(key, settings?.crosswordSolverEnabled) },
             { key ->
-                json.ifHasBoolean(key) { setExtCrosswordSolverEnabled(it) }
+                json?.ifHasBoolean(key) { setExtCrosswordSolverEnabled(it) }
             },
         )
         run(
             "customDailyTitle",
-            { s, key -> json.put(key, s.customDailyTitle) },
+            { key -> builder?.put(key, settings?.customDailyTitle) },
             { key ->
-                json.ifHasString(key) { setDownloadCustomDailyTitle(it) }
+                json?.ifHasString(key) { setDownloadCustomDailyTitle(it) }
             },
         )
         run(
             "customDailyUrl",
-            { s, key -> json.put(key, s.customDailyUrl) },
+            { key -> builder?.put(key, settings?.customDailyUrl) },
             { key ->
-                json.ifHasString(key) { setDownloadCustomDailyURL(it) }
+                json?.ifHasString(key) { setDownloadCustomDailyURL(it) }
             },
         )
         run(
             "cycleUnfilledMode",
-            { s, key -> json.put(key, s.cycleUnfilledMode.toString()) },
             { key ->
-               json.ifHasString(key) {
+                builder?.put(key, settings?.cycleUnfilledMode.toString())
+            },
+            { key ->
+               json?.ifHasString(key) {
                    try {
                        setPlayCycleUnfilledMode(CycleUnfilledMode.valueOf(it))
                    } catch (e : IllegalArgumentException) {
@@ -2033,9 +2051,11 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         )
         run(
             "deleteCrossingMode",
-            { s, key -> json.put(key, s.deleteCrossingMode.toString()) },
             { key ->
-               json.ifHasString(key) {
+                builder?.put(key, settings?.deleteCrossingMode.toString())
+            },
+            { key ->
+               json?.ifHasString(key) {
                    try {
                        setPlayDeleteCrossingModeSetting(
                            DeleteCrossingModeSetting.valueOf(it)
@@ -2048,14 +2068,14 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         )
         run(
             "deleteOnCleanup",
-            { s, key -> json.put(key, s.deleteOnCleanup) },
+            { key -> builder?.put(key, settings?.deleteOnCleanup) },
             { key ->
-                json.ifHasBoolean(key) { setBrowseDeleteOnCleanup(it) }
+                json?.ifHasBoolean(key) { setBrowseDeleteOnCleanup(it) }
             },
         )
         run(
             "disabledDownloaders",
-            { s, key -> addListToJSON(json, key, s.disabledDownloaders) },
+            { key -> addListToJSON(builder, key, settings?.disabledDownloaders) },
             { key ->
                 getStringSetFromJSON(
                     json, key, this::setDownloadDisabledDownloaders,
@@ -2064,26 +2084,28 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         )
         run(
             "disableRatings",
-            { s, key -> json.put(key, s.disableRatings) },
+            { key -> builder?.put(key, settings?.disableRatings) },
             { key ->
-                json.ifHasBoolean(key) { setRatingsDisableRatings(it) }
+                json?.ifHasBoolean(key) { setRatingsDisableRatings(it) }
             },
         )
         run(
             "disableSwipe",
-            { s, key -> json.put(key, s.disableSwipe) },
-            { key -> json.ifHasBoolean(key) { setBrowseDisableSwipe(it) } },
+            { key -> builder?.put(key, settings?.disableSwipe) },
+            { key -> json?.ifHasBoolean(key) { setBrowseDisableSwipe(it) } },
         )
         run(
             "displayScratch",
-            { s, key -> json.put(key, s.displayScratch) },
-            { key -> json.ifHasBoolean(key) { setPlayScratchDisplay(it) } },
+            { key -> builder?.put(key, settings?.displayScratch) },
+            { key -> json?.ifHasBoolean(key) { setPlayScratchDisplay(it) } },
         )
         run(
             "displaySeparators",
-            { s, key -> json.put(key, s.displaySeparators.toString()) },
             { key ->
-               json.ifHasString(key) {
+                builder?.put(key, settings?.displaySeparators.toString())
+            },
+            { key ->
+               json?.ifHasString(key) {
                    try {
                        setPlayDisplaySeparators(DisplaySeparators.valueOf(it))
                    } catch (e : IllegalArgumentException) {
@@ -2094,92 +2116,94 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         )
         run(
             "dlLast",
-            { s, key -> json.put(key, s.dlLast) },
-            { key -> json.ifHasLong(key) { setBrowseLastDownload(it) } },
+            { key -> builder?.put(key, settings?.dlLast) },
+            { key -> json?.ifHasLong(key) { setBrowseLastDownload(it) } },
         )
         run(
             "dlOnStartup",
-            { s, key -> json.put(key, s.dlOnStartup) },
-            { key -> json.ifHasBoolean(key) { setDownloadOnStartUp(it) } },
+            { key -> builder?.put(key, settings?.dlOnStartup) },
+            { key -> json?.ifHasBoolean(key) { setDownloadOnStartUp(it) } },
         )
         run(
             "dontConfirmCleanup",
-            { s, key -> json.put(key, s.dontConfirmCleanup) },
+            { key -> builder?.put(key, settings?.dontConfirmCleanup) },
             { key ->
-                json.ifHasBoolean(key) { setBrowseDontConfirmCleanup(it) }
+                json?.ifHasBoolean(key) { setBrowseDontConfirmCleanup(it) }
             },
         )
         run(
             "dontConfirmBrowseDelete",
-            { s, key -> json.put(key, s.dontConfirmBrowseDelete) },
+            { key -> builder?.put(key, settings?.dontConfirmBrowseDelete) },
             { key ->
-                json.ifHasBoolean(key) { setBrowseDontConfirmDelete(it) }
+                json?.ifHasBoolean(key) { setBrowseDontConfirmDelete(it) }
             },
         )
         run(
             "dontSnapBoardToBorders",
-            { s, key -> json.put(key, s.dontSnapBoardToBorders) },
+            { key -> builder?.put(key, settings?.dontSnapBoardToBorders) },
             { key ->
-                json.ifHasBoolean(key) { setPlayDontSnapBoardToBorders(it) }
+                json?.ifHasBoolean(key) { setPlayDontSnapBoardToBorders(it) }
             },
         )
         run(
             "doubleTap",
-            { s, key -> json.put(key, s.doubleTap) },
+            { key -> builder?.put(key, settings?.doubleTap) },
             { key ->
-                json.ifHasBoolean(key) { setPlayDoubleTapFitBoard(it) }
+                json?.ifHasBoolean(key) { setPlayDoubleTapFitBoard(it) }
             },
         )
         run(
             "downloadRememberDate",
-            { s, key -> json.put(key, s.downloadRememberDate) },
+            { key -> builder?.put(key, settings?.downloadRememberDate) },
             { key ->
-                json.ifHasBoolean(key) { setDownloadRememberDate(it) }
+                json?.ifHasBoolean(key) { setDownloadRememberDate(it) }
             },
         )
         run(
             "downloadTimeout",
-            { s, key -> json.put(key, s.downloadTimeout) },
-            { key -> json.ifHasInt(key) { setDownloadTimeout(it) } },
+            { key -> builder?.put(key, settings?.downloadTimeout) },
+            { key -> json?.ifHasInt(key) { setDownloadTimeout(it) } },
         )
         run(
             "duckDuckGoEnabled",
-            { s, key -> json.put(key, s.duckDuckGoEnabled) },
+            { key -> builder?.put(key, settings?.duckDuckGoEnabled) },
             { key ->
-                json.ifHasBoolean(key) { setExtDuckDuckGoEnabled(it) }
+                json?.ifHasBoolean(key) { setExtDuckDuckGoEnabled(it) }
             },
         )
         run(
             "ensureVisible",
-            { s, key -> json.put(key, s.ensureVisible) },
-            { key -> json.ifHasBoolean(key) { setPlayEnsureVisible(it) } },
+            { key -> builder?.put(key, settings?.ensureVisible) },
+            { key -> json?.ifHasBoolean(key) { setPlayEnsureVisible(it) } },
         )
         run(
             "enterChangesDirection",
-            { s, key -> json.put(key, s.enterChangesDirection) },
+            { key -> builder?.put(key, settings?.enterChangesDirection) },
             { key ->
-                json.ifHasBoolean(key) { setPlayEnterChangesDirection(it) }
+                json?.ifHasBoolean(key) { setPlayEnterChangesDirection(it) }
             },
         )
         run(
             "equalsAnnounceClue",
-            { s, key -> json.put(key, s.equalsAnnounceClue) },
+            { key -> builder?.put(key, settings?.equalsAnnounceClue) },
             { key ->
-                json.ifHasBoolean(key) { setVoiceEqualsAnnounceClue(it) }
+                json?.ifHasBoolean(key) { setVoiceEqualsAnnounceClue(it) }
             },
         )
         run(
             "expandableClueLine",
-            { s, key -> json.put(key, s.expandableClueLine) },
+            { key -> builder?.put(key, settings?.expandableClueLine) },
             { key ->
-                json.ifHasBoolean(key) { setPlayExpandableClueLine(it) }
+                json?.ifHasBoolean(key) { setPlayExpandableClueLine(it) }
             },
         )
         run(
             "externalDictionary",
-            { s, key -> json.put(key, s.externalDictionary.toString()) },
             { key ->
-               json.ifHasString(key) {
+                builder?.put(key, settings?.externalDictionary.toString())
+            },
+            { key ->
+               json?.ifHasString(key) {
                    try {
                        setExtDictionarySetting(
                            ExternalDictionarySetting.valueOf(it)
@@ -2192,16 +2216,16 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         )
         run(
             "fifteenSquaredEnabled",
-            { s, key -> json.put(key, s.fifteenSquaredEnabled) },
+            { key -> builder?.put(key, settings?.fifteenSquaredEnabled) },
             { key ->
-                json.ifHasBoolean(key) { setExtFifteenSquaredEnabled(it) }
+                json?.ifHasBoolean(key) { setExtFifteenSquaredEnabled(it) }
             },
         )
         run(
             "fitToScreenMode",
-            { s, key -> json.put(key, s.fitToScreenMode.toString()) },
+            { key -> builder?.put(key, settings?.fitToScreenMode.toString()) },
             { key ->
-               json.ifHasString(key) {
+               json?.ifHasString(key) {
                    try {
                        setPlayFitToScreenMode(FitToScreenMode.valueOf(it))
                    } catch (e : IllegalArgumentException) {
@@ -2212,14 +2236,14 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         )
         run(
             "fullScreen",
-            { s, key -> json.put(key, s.fullScreen) },
-            { key -> json.ifHasBoolean(key) { setPlayFullScreen(it) } },
+            { key -> builder?.put(key, settings?.fullScreen) },
+            { key -> json?.ifHasBoolean(key) { setPlayFullScreen(it) } },
         )
         run(
             "gridRatio",
-            { s, key -> json.put(key, s.gridRatio.toString()) },
+            { key -> builder?.put(key, settings?.gridRatio.toString()) },
             { key ->
-               json.ifHasString(key) {
+               json?.ifHasString(key) {
                    try {
                        setPlayGridRatioPortrait(GridRatio.valueOf(it))
                    } catch (e : IllegalArgumentException) {
@@ -2230,9 +2254,9 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         )
         run(
             "gridRatioLand",
-            { s, key -> json.put(key, s.gridRatioLand.toString()) },
+            { key -> builder?.put(key, settings?.gridRatioLand.toString()) },
             { key ->
-               json.ifHasString(key) {
+               json?.ifHasString(key) {
                    try {
                        setPlayGridRatioLandscape(GridRatio.valueOf(it))
                    } catch (e : IllegalArgumentException) {
@@ -2243,50 +2267,50 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         )
         run(
             "highlightCrossingClue",
-            { s, key -> json.put(key, s.highlightCrossingClue) },
+            { key -> builder?.put(key, settings?.highlightCrossingClue) },
             { key ->
-                json.ifHasBoolean(key) {
+                json?.ifHasBoolean(key) {
                     setClueListHighlightCrossingClue(it)
                 }
             },
         )
         run(
             "indicateShowErrors",
-            { s, key -> json.put(key, s.indicateShowErrors) },
+            { key -> builder?.put(key, settings?.indicateShowErrors) },
             { key ->
-                json.ifHasBoolean(key) { setPlayIndicateShowErrors(it) }
+                json?.ifHasBoolean(key) { setPlayIndicateShowErrors(it) }
             },
         )
         run(
             "inferSeparators",
-            { s, key -> json.put(key, s.inferSeparators) },
-            { key -> json.ifHasBoolean(key) { setPlayInferSeparators(it) } },
+            { key -> builder?.put(key, settings?.inferSeparators) },
+            { key -> json?.ifHasBoolean(key) { setPlayInferSeparators(it) } },
         )
         run(
             "keyboardCompact",
-            { s, key -> json.put(key, s.keyboardCompact) },
-            { key -> json.ifHasBoolean(key) { setKeyboardCompact(it) } },
+            { key -> builder?.put(key, settings?.keyboardCompact) },
+            { key -> json?.ifHasBoolean(key) { setKeyboardCompact(it) } },
         )
         run(
             "keyboardForceCaps",
-            { s, key -> json.put(key, s.keyboardForceCaps) },
-            { key -> json.ifHasBoolean(key) { setKeyboardForceCaps(it) } },
+            { key -> builder?.put(key, settings?.keyboardForceCaps) },
+            { key -> json?.ifHasBoolean(key) { setKeyboardForceCaps(it) } },
         )
         run(
             "keyboardHaptic",
-            { s, key -> json.put(key, s.keyboardHaptic) },
-            { key -> json.ifHasBoolean(key) { setKeyboardHaptic(it) } },
+            { key -> builder?.put(key, settings?.keyboardHaptic) },
+            { key -> json?.ifHasBoolean(key) { setKeyboardHaptic(it) } },
         )
         run(
             "keyboardHideButton",
-            { s, key -> json.put(key, s.keyboardHideButton) },
-            { key -> json.ifHasBoolean(key) { setKeyboardHideButton(it) } },
+            { key -> builder?.put(key, settings?.keyboardHideButton) },
+            { key -> json?.ifHasBoolean(key) { setKeyboardHideButton(it) } },
         )
         run(
             "keyboardLayout",
-            { s, key -> json.put(key, s.keyboardLayout.toString()) },
+            { key -> builder?.put(key, settings?.keyboardLayout.toString()) },
             { key ->
-               json.ifHasString(key) {
+               json?.ifHasString(key) {
                    try {
                        setKeyboardLayout(KeyboardLayout.valueOf(it))
                    } catch (e : IllegalArgumentException) {
@@ -2297,19 +2321,19 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         )
         run(
             "keyboardRepeatDelay",
-            { s, key -> json.put(key, s.keyboardRepeatDelay) },
-            { key -> json.ifHasInt(key) { setKeyboardRepeatDelay(it) } },
+            { key -> builder?.put(key, settings?.keyboardRepeatDelay) },
+            { key -> json?.ifHasInt(key) { setKeyboardRepeatDelay(it) } },
         )
         run(
             "keyboardRepeatInterval",
-            { s, key -> json.put(key, s.keyboardRepeatInterval) },
-            { key -> json.ifHasInt(key) { setKeyboardRepeatInterval(it) } },
+            { key -> builder?.put(key, settings?.keyboardRepeatInterval) },
+            { key -> json?.ifHasInt(key) { setKeyboardRepeatInterval(it) } },
         )
         run(
             "keyboardShowHide",
-            { s, key -> json.put(key, s.keyboardShowHide.toString()) },
+            { key -> builder?.put(key, settings?.keyboardShowHide.toString()) },
             { key ->
-               json.ifHasString(key) {
+               json?.ifHasString(key) {
                    try {
                        setKeyboardMode(KeyboardMode.valueOf(it))
                    } catch (e : IllegalArgumentException) {
@@ -2320,31 +2344,31 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         )
         run(
             "keyboardSplitWords",
-            { s, key -> json.put(key, s.keyboardSplitWords) },
-            { key -> json.ifHasBoolean(key) { setKeyboardSplitWords(it) } },
+            { key -> builder?.put(key, settings?.keyboardSplitWords) },
+            { key -> json?.ifHasBoolean(key) { setKeyboardSplitWords(it) } },
         )
         run(
             "lastSeenVersion",
-            { s, key -> json.put(key, s.lastSeenVersion) },
+            { key -> builder?.put(key, settings?.lastSeenVersion) },
             { key ->
-                json.ifHasString(key) { setBrowseLastSeenVersion(it) }
+                json?.ifHasString(key) { setBrowseLastSeenVersion(it) }
             },
         )
         run(
             "mcpRunning",
-            { s, key -> json.put(key, s.mcpRunning) },
-            { key -> json.ifHasBoolean(key) { setExtMCPRunning(it) } },
+            { key -> builder?.put(key, settings?.mcpRunning) },
+            { key -> json?.ifHasBoolean(key) { setExtMCPRunning(it) } },
         )
         run(
             "mcpHostPort",
-            { s, key -> json.put(key, s.mcpHostPort) },
-            { key -> json.ifHasString(key) { setExtMCPHostPort(it) } },
+            { key -> builder?.put(key, settings?.mcpHostPort) },
+            { key -> json?.ifHasString(key) { setExtMCPHostPort(it) } },
         )
         run(
             "movementStrategy",
-            { s, key -> json.put(key, s.movementStrategy.toString()) },
+            { key -> builder?.put(key, settings?.movementStrategy.toString()) },
             { key ->
-               json.ifHasString(key) {
+               json?.ifHasString(key) {
                    try {
                        setPlayMovementStrategySetting(
                            MovementStrategySetting.valueOf(it)
@@ -2357,9 +2381,11 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         )
         run(
             "movementStrategyClueList",
-            { s, key -> json.put(key, s.movementStrategyClueList.toString()) },
             { key ->
-               json.ifHasString(key) {
+                builder?.put(key, settings?.movementStrategyClueList.toString())
+            },
+            { key ->
+               json?.ifHasString(key) {
                    try {
                         setPlayMovementStrategyClueListSetting(
                             MovementStrategySetting.valueOf(it)
@@ -2372,9 +2398,9 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         )
         run(
             "orientationLock",
-            { s, key -> json.put(key, s.orientationLock.toString()) },
+            { key -> builder?.put(key, settings?.orientationLock.toString()) },
             { key ->
-               json.ifHasString(key) {
+               json?.ifHasString(key) {
                    try {
                        setAppOrientationLock(Orientation.valueOf(it))
                    } catch (e : IllegalArgumentException) {
@@ -2385,59 +2411,63 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         )
         run(
             "playActivityClueTabsPage",
-            { s, key -> json.put(key, s.playActivityClueTabsPage) },
-            { key -> json.ifHasInt(key) { setPlayClueTabsPage(0, it) } },
+            { key -> builder?.put(key, settings?.playActivityClueTabsPage) },
+            { key -> json?.ifHasInt(key) { setPlayClueTabsPage(0, it) } },
         )
         run(
             "playActivityClueTabsPage1",
-            { s, key -> json.put(key, s.playActivityClueTabsPage1) },
-            { key -> json.ifHasInt(key) { setPlayClueTabsPage(1, it) } },
+            { key -> builder?.put(key, settings?.playActivityClueTabsPage1) },
+            { key -> json?.ifHasInt(key) { setPlayClueTabsPage(1, it) } },
         )
         run(
             "playLetterUndoEnabled",
-            { s, key -> json.put(key, s.playLetterUndoEnabled) },
+            { key -> builder?.put(key, settings?.playLetterUndoEnabled) },
             { key ->
-                json.ifHasBoolean(key) { setPlayPlayLetterUndoEnabled(it) }
+                json?.ifHasBoolean(key) { setPlayPlayLetterUndoEnabled(it) }
             },
         )
         run(
             "predictAnagramChars",
-            { s, key -> json.put(key, s.predictAnagramChars) },
+            { key -> builder?.put(key, settings?.predictAnagramChars) },
             { key ->
-                json.ifHasBoolean(key) { setPlayPredictAnagramChars(it) }
+                json?.ifHasBoolean(key) { setPlayPredictAnagramChars(it) }
             },
         )
         run(
             "preserveCorrectLettersInShowErrors",
-            { s, key -> json.put(key, s.preserveCorrectLettersInShowErrors) },
             { key ->
-                json.ifHasBoolean(key) {
+                builder?.put(key, settings?.preserveCorrectLettersInShowErrors)
+            },
+            { key ->
+                json?.ifHasBoolean(key) {
                     setPlayPreserveCorrectLettersInShowErrors(it)
                 }
             },
         )
         run(
             "randomClueOnShake",
-            { s, key -> json.put(key, s.randomClueOnShake) },
+            { key -> builder?.put(key, settings?.randomClueOnShake) },
             { key ->
-                json.ifHasBoolean(key) { setPlayRandomClueOnShake(it) }
+                json?.ifHasBoolean(key) { setPlayRandomClueOnShake(it) }
             },
         )
         run(
             "scale",
-            { s, key -> json.put(key, s.scale) },
-            { key -> json.ifHasDouble(key) { setPlayScale(it.toFloat()) } },
+            { key -> builder?.put(key, settings?.scale) },
+            { key -> json?.ifHasDouble(key) { setPlayScale(it.toFloat()) } },
         )
         run(
             "scratchMode",
-            { s, key -> json.put(key, s.scratchMode) },
-            { key -> json.ifHasBoolean(key) { setPlayScratchMode(it) } },
+            { key -> builder?.put(key, settings?.scratchMode) },
+            { key -> json?.ifHasBoolean(key) { setPlayScratchMode(it) } },
         )
         run(
             "clueListNameInClueLine",
-            { s, key -> json.put(key, s.clueListNameInClueLine.toString()) },
             { key ->
-               json.ifHasString(key) {
+                builder?.put(key, settings?.clueListNameInClueLine.toString())
+            },
+            { key ->
+               json?.ifHasString(key) {
                    try {
                        setPlayClueListNameInClueLine(
                            ClueListClueLine.valueOf(it)
@@ -2450,51 +2480,51 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         )
         run(
             "showCluesOnPlayScreen",
-            { s, key -> json.put(key, s.showCluesOnPlayScreen) },
-            { key -> json.ifHasBoolean(key) { setPlayShowClueTabs(it) } },
+            { key -> builder?.put(key, settings?.showCluesOnPlayScreen) },
+            { key -> json?.ifHasBoolean(key) { setPlayShowClueTabs(it) } },
         )
         run(
             "showCount",
-            { s, key -> json.put(key, s.showCount) },
-            { key -> json.ifHasBoolean(key) { setPlayShowCount(it) } },
+            { key -> builder?.put(key, settings?.showCount) },
+            { key -> json?.ifHasBoolean(key) { setPlayShowCount(it) } },
         )
         run(
             "showErrors",
-            { s, key -> json.put(key, s.showErrors) },
-            { key -> json.ifHasBoolean(key) { setPlayShowErrorsGrid(it) } },
+            { key -> builder?.put(key, settings?.showErrors) },
+            { key -> json?.ifHasBoolean(key) { setPlayShowErrorsGrid(it) } },
         )
         run(
             "showErrorsClue",
-            { s, key -> json.put(key, s.showErrorsClue) },
-            { key -> json.ifHasBoolean(key) { setPlayShowErrorsClue(it) } },
+            { key -> builder?.put(key, settings?.showErrorsClue) },
+            { key -> json?.ifHasBoolean(key) { setPlayShowErrorsClue(it) } },
         )
         run(
             "showErrorsCursor",
-            { s, key -> json.put(key, s.showErrorsCursor) },
+            { key -> builder?.put(key, settings?.showErrorsCursor) },
             { key ->
-                json.ifHasBoolean(key) { setPlayShowErrorsCursor(it) }
+                json?.ifHasBoolean(key) { setPlayShowErrorsCursor(it) }
             },
         )
         run(
             "showTimer",
-            { s, key -> json.put(key, s.showTimer) },
-            { key -> json.ifHasBoolean(key) { setPlayShowTimer(it) } },
+            { key -> builder?.put(key, settings?.showTimer) },
+            { key -> json?.ifHasBoolean(key) { setPlayShowTimer(it) } },
         )
         run(
             "showWordsInClueList",
-            { s, key -> json.put(key, s.showWordsInClueList) },
-            { key -> json.ifHasBoolean(key) { setClueListShowWords(it) } },
+            { key -> builder?.put(key, settings?.showWordsInClueList) },
+            { key -> json?.ifHasBoolean(key) { setClueListShowWords(it) } },
         )
         run(
             "skipFilled",
-            { s, key -> json.put(key, s.skipFilled) },
-            { key -> json.ifHasBoolean(key) { setPlaySkipFilled(it) } },
+            { key -> builder?.put(key, settings?.skipFilled) },
+            { key -> json?.ifHasBoolean(key) { setPlaySkipFilled(it) } },
         )
         run(
             "snapClue",
-            { _, _ -> },
+            { _ -> /* do nothing, deprecated */ },
             { key ->
-                json.ifHasBoolean(key) {
+                json?.ifHasBoolean(key) {
                     if (it) {
                         setClueListSnapClueMode(SnapClueMode.SCM_CLUE)
                     }
@@ -2503,9 +2533,9 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         )
         run(
             "snapClueMode",
-            { s, key -> json.put(key, s.snapClueMode.toString()) },
+            { key -> builder?.put(key, settings?.snapClueMode.toString()) },
             { key ->
-               json.ifHasString(key) {
+               json?.ifHasString(key) {
                    try {
                        setClueListSnapClueMode(SnapClueMode.valueOf(it))
                    } catch (e : IllegalArgumentException) {
@@ -2516,9 +2546,11 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         )
         run(
             "sort",
-            { s, key -> json.put(key, s.sort) },
             { key ->
-               json.ifHasString(key) {
+                builder?.put(key, settings?.sort?.toString())
+            },
+            { key ->
+               json?.ifHasString(key) {
                    try {
                        setBrowseSort(AccessorSetting.valueOf(it))
                    } catch (e : IllegalArgumentException) {
@@ -2529,41 +2561,41 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         )
         run(
             "spaceChangesDirection",
-            { s, key -> json.put(key, s.spaceChangesDirection) },
+            { key -> builder?.put(key, settings?.spaceChangesDirection) },
             { key ->
-                json.ifHasBoolean(key) { setPlaySpaceChangesDirection(it) }
+                json?.ifHasBoolean(key) { setPlaySpaceChangesDirection(it) }
             },
         )
         run(
             "suppressHints",
-            { s, key -> json.put(key, s.suppressHints) },
+            { key -> builder?.put(key, settings?.suppressHints) },
             { key ->
-                json.ifHasBoolean(key) {
+                json?.ifHasBoolean(key) {
                     setPlaySuppressHintHighlighting(it)
                 }
             },
         )
         run(
             "suppressMessages",
-            { s, key -> json.put(key, s.suppressMessages) },
+            { key -> builder?.put(key, settings?.suppressMessages) },
             { key ->
-                json.ifHasBoolean(key) { setDownloadSuppressMessages(it) }
+                json?.ifHasBoolean(key) { setDownloadSuppressMessages(it) }
             },
         )
         run(
             "suppressSummaryMessages",
-            { s, key -> json.put(key, s.suppressSummaryMessages) },
+            { key -> builder?.put(key, settings?.suppressSummaryMessages) },
             { key ->
-                json.ifHasBoolean(key) {
+                json?.ifHasBoolean(key) {
                     setDownloadSuppressSummaryMessages(it)
                 }
             },
         )
         run(
             "swipeAction",
-            { s, key -> json.put(key, s.swipeAction.toString()) },
+            { key -> builder?.put(key, settings?.swipeAction.toString()) },
             { key ->
-               json.ifHasString(key) {
+               json?.ifHasString(key) {
                    try {
                        setBrowseSwipeAction(BrowseSwipeAction.valueOf(it))
                    } catch (e : IllegalArgumentException) {
@@ -2574,16 +2606,16 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         )
         run(
             "toggleBeforeMove",
-            { s, key -> json.put(key, s.toggleBeforeMove) },
+            { key -> builder?.put(key, settings?.toggleBeforeMove) },
             { key ->
-                json.ifHasBoolean(key) { setPlayToggleBeforeMove(it) }
+                json?.ifHasBoolean(key) { setPlayToggleBeforeMove(it) }
             },
         )
         run(
             "uiTheme",
-            { s, key -> json.put(key, s.uiTheme.toString()) },
+            { key -> builder?.put(key, settings?.uiTheme.toString()) },
             { key ->
-               json.ifHasString(key) {
+               json?.ifHasString(key) {
                    try {
                        setAppDayNightMode(DayNightMode.valueOf(it))
                    } catch (e : IllegalArgumentException) {
@@ -2594,34 +2626,34 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         )
         run(
             "undecorated",
-            { s, key -> json.put(key, s.undecorated) },
+            { key -> builder?.put(key, settings?.undecorated) },
             { key ->
-                json.ifHasBoolean(key) { setAppUndecorated(it) }
+                json?.ifHasBoolean(key) { setAppUndecorated(it) }
             },
         )
         run(
             "useNativeKeyboard",
-            { s, key -> json.put(key, s.useNativeKeyboard) },
-            { key -> json.ifHasBoolean(key) { setKeyboardUseNative(it) } },
+            { key -> builder?.put(key, settings?.useNativeKeyboard) },
+            { key -> json?.ifHasBoolean(key) { setKeyboardUseNative(it) } },
         )
         run(
             "volumeActivatesVoice",
-            { s, key -> json.put(key, s.volumeActivatesVoice) },
+            { key -> builder?.put(key, settings?.volumeActivatesVoice) },
             { key ->
-                json.ifHasBoolean(key) { setVoiceVolumeActivatesVoice(it) }
+                json?.ifHasBoolean(key) { setVoiceVolumeActivatesVoice(it) }
             },
         )
         run(
             "specialEntryForceCaps",
-            { s, key -> json.put(key, s.specialEntryForceCaps) },
+            { key -> builder?.put(key, settings?.specialEntryForceCaps) },
             { key ->
-                json.ifHasBoolean(key) { setPlaySpecialEntryForceCaps(it) }
+                json?.ifHasBoolean(key) { setPlaySpecialEntryForceCaps(it) }
             },
         )
 
         // bit untidy for file handler settings
         if (settings == null) {
-            json.ifHasString("storageLocation") { location ->
+            json?.ifHasString("storageLocation") { location ->
             json.ifHasString("safRootUri") { root ->
             json.ifHasString("safCrosswordsFolderUri") { crosswords ->
             json.ifHasString("safArchiveFolderUri") { archive ->
@@ -2645,19 +2677,22 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
                 }
             }}}}}}}
         } else {
-            json.put("storageLocation", settings.storageLocation.toString())
-            json.put("safArchiveFolderUri", settings.safArchiveFolderUri)
-            json.put("safCrosswordsFolderUri", settings.safCrosswordsFolderUri)
-            json.put("safRootUri", settings.safRootUri)
-            json.put(
+            builder?.put("storageLocation", settings.storageLocation.toString())
+            builder?.put("safArchiveFolderUri", settings.safArchiveFolderUri)
+            builder?.put(
+                "safCrosswordsFolderUri",
+                settings.safCrosswordsFolderUri,
+            )
+            builder?.put("safRootUri", settings.safRootUri)
+            builder?.put(
                 "safToImportDoneFolderUri",
                 settings.safToImportDoneFolderUri
             )
-            json.put(
+            builder?.put(
                 "safToImportFailedFolderUri",
                 settings.safToImportFailedFolderUri,
             )
-            json.put("safToImportFolderUri", settings.safToImportFolderUri)
+            builder?.put("safToImportFolderUri", settings.safToImportFolderUri)
         }
     }
 }

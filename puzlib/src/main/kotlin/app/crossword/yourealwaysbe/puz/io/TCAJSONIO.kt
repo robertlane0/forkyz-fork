@@ -8,16 +8,16 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
 
-import org.json.JSONException
-import org.json.JSONObject
-
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Clue
 import app.crossword.yourealwaysbe.puz.Position
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.PuzzleBuilder
 import app.crossword.yourealwaysbe.puz.Zone
-import app.crossword.yourealwaysbe.puz.util.JSONParser.parse
+import app.crossword.yourealwaysbe.puz.util.JSONException
+import app.crossword.yourealwaysbe.puz.util.JSONObject
+import app.crossword.yourealwaysbe.puz.util.parseJSONObject
+
 
 /**
  * Puzzle format used by Tribune
@@ -80,7 +80,7 @@ class TCAJSONIO : AbstractJSONIO() {
         @Throws(IOException::class)
         fun readPuzzle(inStream : InputStream) : Puzzle? {
             try {
-                val json = parse(inStream)
+                val json = parseJSONObject(inStream)
                 return readPuzzleFromJSON(json)
             } catch (e : TCAJSONFormatException) {
                 LOG.severe("Could not read TCA JSON: " + e)
@@ -93,7 +93,7 @@ class TCAJSONIO : AbstractJSONIO() {
 
         fun readPuzzle(jsonString : String) : Puzzle? {
             try {
-                val json = parse(jsonString)
+                val json = parseJSONObject(jsonString)
                 return readPuzzleFromJSON(json)
             } catch (e : TCAJSONFormatException) {
                 LOG.severe("Could not read TCA JSON: " + e)
@@ -155,12 +155,12 @@ class TCAJSONIO : AbstractJSONIO() {
                 arrayOfNulls<Box?>(numCols)
             }
 
-            for (i in 0..<cells.length()) {
+            for (i in 0..<cells.size) {
                 val row = i / numCols
                 val col = i % numCols
 
                 val cell = cells.getJSONObject(i)
-                val cellType = optStringNull(cell, "cellType")
+                val cellType = cell.optStringEmptyNull("cellType")
                 if (
                     cellType == null
                     || "disable".equals(cellType, ignoreCase = true)
@@ -177,11 +177,11 @@ class TCAJSONIO : AbstractJSONIO() {
                     )
                 }
 
-                val clueNo = optStringNull(cell, "cellNumber")
+                val clueNo = cell.optStringEmptyNull("cellNumber")
                 if (clueNo != null && clueNo.length > 0)
                     box.clueNumber = clueNo
 
-                val solution = optStringNull(cell, "cellChar")
+                val solution = cell.optStringEmptyNull("cellChar")
                 if (solution != null && solution.length > 0)
                     box.solution = solution
 
@@ -210,11 +210,11 @@ class TCAJSONIO : AbstractJSONIO() {
             val data = json.optJSONObject("data")
 
             if (metaData != null) {
-                builder.setTitle(optStringNull(metaData, "title"))
-                builder.setAuthor(optStringNull(metaData, "author"))
-                builder.setNotes(optStringNull(metaData, "description"))
+                builder.setTitle(metaData.optStringEmptyNull("title"))
+                builder.setAuthor(metaData.optStringEmptyNull("author"))
+                builder.setNotes(metaData.optStringEmptyNull("description"))
                 try {
-                    val date = optStringNull(metaData, "date")
+                    val date = metaData.optStringEmptyNull("date")
                     if (date != null) {
                         builder.setDate(
                             DATE_META_FORMATTER.parse(date),
@@ -227,7 +227,7 @@ class TCAJSONIO : AbstractJSONIO() {
 
             if (data != null) {
                 try {
-                    val date = optStringNull(data, "date")
+                    val date = data.optStringEmptyNull("date")
                     if (date != null) {
                         builder.setDate(
                             DATE_DATA_FORMATTER.parse(date),
@@ -246,7 +246,7 @@ class TCAJSONIO : AbstractJSONIO() {
             builder : PuzzleBuilder,
         ) {
             val clues = json.getJSONArray("clues")
-            for (i in 0..<clues.length()) {
+            for (i in 0..<clues.size) {
                 val clue = clues.getJSONObject(i)
 
                 var clueNumber : String? = null
@@ -259,7 +259,7 @@ class TCAJSONIO : AbstractJSONIO() {
                 )
 
                 val zone = Zone()
-                val shape = clue.getJSONObject("shape")
+                val shape = clue.optJSONObject("shape")
                 if (shape != null) {
                     val cellIDs = shape.getString("value")
                     for (

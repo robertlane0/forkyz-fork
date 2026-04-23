@@ -7,13 +7,13 @@ import java.util.logging.Logger
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.Padding
 
-import org.json.JSONException
-import org.json.JSONObject
-
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.PuzzleBuilder
-import app.crossword.yourealwaysbe.puz.util.JSONParser.parse
+import app.crossword.yourealwaysbe.puz.util.JSONException
+import app.crossword.yourealwaysbe.puz.util.JSONObject
+import app.crossword.yourealwaysbe.puz.util.parseJSONObject
+
 
 /**
  * Format used by amuniversal.com
@@ -72,7 +72,7 @@ class AMUniversalJSONIO : AbstractJSONIO() {
         @Throws(IOException::class)
         fun readPuzzle(inStream : InputStream) : Puzzle? {
             try {
-                val json = parse(inStream)
+                val json = parseJSONObject(inStream)
                 return readPuzzleFromJSON(json)
             } catch (e : IOException) {
                 LOG.info("Error parsing AMUniversal JSON: " + e)
@@ -91,9 +91,9 @@ class AMUniversalJSONIO : AbstractJSONIO() {
             json : JSONObject,
         ) : Puzzle {
             val builder = PuzzleBuilder(getBoxes(json))
-                .setTitle(optStringNull(json, "Title"))
-                .setAuthor(optStringNull(json, "Author"))
-                .setCopyright(optStringNull(json, "Copyright"))
+                .setTitle(json.optStringEmptyNull("Title"))
+                .setAuthor(json.optStringEmptyNull("Author"))
+                .setCopyright(json.optStringEmptyNull("Copyright"))
                 .setDate(getDate(json))
 
             addClues(json, builder)
@@ -103,7 +103,7 @@ class AMUniversalJSONIO : AbstractJSONIO() {
 
         private fun getDate(json : JSONObject) : LocalDate? {
             try {
-                val date = optStringNull(json, "Date")
+                val date = json.optStringEmptyNull("Date")
                 return if (date == null)
                     null
                 else
@@ -170,10 +170,10 @@ class AMUniversalJSONIO : AbstractJSONIO() {
 
         @Throws(JSONException::class, AMUniversalFormatException::class)
         private fun addClues(json : JSONObject, builder : PuzzleBuilder) {
-            val across = optStringNull(json, "AcrossClue")
+            val across = json.optStringEmptyNull("AcrossClue")
             if (across != null)
                 addCluesFromString(across, builder, true)
-            val down = optStringNull(json, "DownClue")
+            val down = json.optStringEmptyNull("DownClue")
             if (down != null)
                 addCluesFromString(down, builder, false)
         }

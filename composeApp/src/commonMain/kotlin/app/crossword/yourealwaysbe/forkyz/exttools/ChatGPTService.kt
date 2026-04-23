@@ -6,12 +6,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 
-import org.json.JSONException
-import org.json.JSONObject
-
 import app.crossword.yourealwaysbe.forkyz.settings.ExternalToolSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.util.getURLJSON
+import app.crossword.yourealwaysbe.puz.util.JSONException
+import app.crossword.yourealwaysbe.puz.util.JSONObject
+import app.crossword.yourealwaysbe.puz.util.buildJSONObject
 
 private const val CHAT_GPT_API_URL = "https://api.openai.com/v1/completions"
 private const val CHAT_GPT_MODEL = "gpt-3.5-turbo-instruct"
@@ -50,8 +50,7 @@ object ChatGPTService : LLMService {
     }
 
     private fun getQueryData(query : String) : JSONObject {
-        val data = JSONObject()
-        with(data) {
+        val data = buildJSONObject {
             put("model", CHAT_GPT_MODEL)
             put("prompt", query)
             put("max_tokens", CHAT_GPT_MAX_TOKENS)

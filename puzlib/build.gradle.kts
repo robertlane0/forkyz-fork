@@ -1,7 +1,7 @@
 
 plugins {
     alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.shadow)
+    alias(libs.plugins.kotlin.plugin.serialization)
     alias(libs.plugins.versions)
 }
 
@@ -15,22 +15,13 @@ dependencies {
     implementation(libs.apache.commons.text)
     implementation(libs.base64)
     implementation(libs.hjson)
-    implementation(libs.json)
     implementation(libs.jsoup)
     implementation(libs.kotlinx.datetime)
+    implementation(libs.kotlinx.serialization.json)
 }
 
 tasks.test {
     useJUnitPlatform()
-}
-
-tasks.shadowJar {
-    relocate("org.json", "app.crossword.yourealwaysbe.org.json")
-    exclude("kotlin/**")
-    exclude("kotlinx/datetime/**")
-    exclude("META-INF/kotlin*")
-    exclude("org/intellij/**")
-    exclude("org/jetbrains/annotations/**")
 }
 
 kotlin {

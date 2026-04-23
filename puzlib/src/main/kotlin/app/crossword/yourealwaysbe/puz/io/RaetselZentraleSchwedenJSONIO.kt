@@ -7,10 +7,6 @@ import java.util.LinkedList
 import java.util.Locale
 import java.util.logging.Logger
 
-import org.json.JSONArray
-import org.json.JSONException
-import org.json.JSONObject
-
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Box.Companion.isBlock
 import app.crossword.yourealwaysbe.puz.Clue
@@ -18,7 +14,11 @@ import app.crossword.yourealwaysbe.puz.Position
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.PuzzleBuilder
 import app.crossword.yourealwaysbe.puz.Zone
-import app.crossword.yourealwaysbe.puz.util.JSONParser.parse
+import app.crossword.yourealwaysbe.puz.util.JSONArray
+import app.crossword.yourealwaysbe.puz.util.JSONException
+import app.crossword.yourealwaysbe.puz.util.JSONObject
+import app.crossword.yourealwaysbe.puz.util.parseJSONObject
+
 
 /**
  * Format used by RaetselZentrale for Schwedenrätsel
@@ -72,7 +72,7 @@ class RaetselZentraleSchwedenJSONIO : AbstractJSONIO() {
         @Throws(IOException::class)
         fun readPuzzle(inStream : InputStream) : Puzzle? {
             try {
-                val json = parse(inStream)
+                val json = parseJSONObject(inStream)
                 return readPuzzleFromJSON(json)
             } catch (e : JSONException) {
                 LOG.severe("Could not read RaetselZentrale JSON: " + e)
@@ -86,7 +86,7 @@ class RaetselZentraleSchwedenJSONIO : AbstractJSONIO() {
         @Throws(RZSFormatException::class)
         fun readPuzzle(jsonString : String) : Puzzle? {
             try {
-                val json = parse(jsonString)
+                val json = parseJSONObject(jsonString)
                 return readPuzzleFromJSON(json)
             } catch (e : JSONException) {
                 LOG.severe("Could not read Guardian JSON: " + e)
@@ -146,9 +146,9 @@ class RaetselZentraleSchwedenJSONIO : AbstractJSONIO() {
             grid : JSONArray,
             boxes : Array<Array<Box?>>,
         ) {
-            for (row in 0..<grid.length()) {
+            for (row in 0..<grid.size) {
                 val cellRow = grid.getJSONArray(row)
-                for (col in 0..<cellRow.length()) {
+                for (col in 0..<cellRow.size) {
                     val cell = cellRow.getString(col)
 
                     if (!isBlankCell(cell)) {
@@ -226,7 +226,7 @@ class RaetselZentraleSchwedenJSONIO : AbstractJSONIO() {
 
             val positions = solution.getJSONArray("matrix")
             val zone = Zone()
-            for (i in 0..<positions.length()) {
+            for (i in 0..<positions.size) {
                 val position = positions.getJSONArray(i)
                 val row = position.getInt(1) - 1
                 val col = position.getInt(0) - 1
@@ -254,7 +254,7 @@ class RaetselZentraleSchwedenJSONIO : AbstractJSONIO() {
                 = mutableMapOf()
 
             val clues = json.getJSONArray("words")
-            for (i in 0..<clues.length()) {
+            for (i in 0..<clues.size) {
                 val clue = clues.getJSONObject(i)
 
                 val position = clue.getJSONObject("position")

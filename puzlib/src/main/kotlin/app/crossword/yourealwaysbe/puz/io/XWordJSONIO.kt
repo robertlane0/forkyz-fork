@@ -8,14 +8,14 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
 
-import org.json.JSONArray
-import org.json.JSONException
-import org.json.JSONObject
-
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.PuzzleBuilder
-import app.crossword.yourealwaysbe.puz.util.JSONParser.parse
+import app.crossword.yourealwaysbe.puz.util.JSONArray
+import app.crossword.yourealwaysbe.puz.util.JSONException
+import app.crossword.yourealwaysbe.puz.util.JSONObject
+import app.crossword.yourealwaysbe.puz.util.parseJSONObject
+
 
 /**
  * JSON Format used by xword
@@ -67,7 +67,7 @@ class XWordJSONIO : AbstractJSONIO() {
         @Throws(IOException::class)
         fun readPuzzle(inStream : InputStream) : Puzzle? {
             try {
-                val json = parse(inStream)
+                val json = parseJSONObject(inStream)
                 return readPuzzleFromJSON(json)
             } catch (e : IOException) {
                 LOG.info("Error parsing XWord JSON: " + e)
@@ -85,10 +85,10 @@ class XWordJSONIO : AbstractJSONIO() {
         private fun readPuzzleFromJSON(json : JSONObject) : Puzzle {
             val boxes : Array<Array<Box?>> = getBoxes(json)
             val builder = PuzzleBuilder(boxes)
-                .setTitle(optStringNull(json, "title"))
-                .setAuthor(optStringNull(json, "author"))
-                .setCopyright(optStringNull(json, "copyright"))
-                .setSource(optStringNull(json, "publisher"))
+                .setTitle(json.optStringEmptyNull("title"))
+                .setAuthor(json.optStringEmptyNull("author"))
+                .setCopyright(json.optStringEmptyNull("copyright"))
+                .setSource(json.optStringEmptyNull("publisher"))
                 .setDate(getDate(json))
                 .setNotes(getNotes(json))
 
@@ -99,7 +99,7 @@ class XWordJSONIO : AbstractJSONIO() {
 
         private fun getDate(json : JSONObject) : LocalDate? {
             try {
-                val date = optStringNull(json, "date")
+                val date = json.optStringEmptyNull("date")
                 return if (date == null)
                     null
                 else
@@ -110,8 +110,8 @@ class XWordJSONIO : AbstractJSONIO() {
         }
 
         private fun getNotes(json : JSONObject) : String? {
-            val notepad = optStringNull(json, "notepad")
-            val jnotes = optStringNull(json, "jnotes")
+            val notepad = json.optStringEmptyNull("notepad")
+            val jnotes = json.optStringEmptyNull("jnotes")
 
             if (jnotes == null && notepad == null)
                 return null
@@ -141,7 +141,7 @@ class XWordJSONIO : AbstractJSONIO() {
             val rbars = json.optJSONArray("rbars")
             val bbars = json.optJSONArray("bbars")
 
-            for (cell in 0..<grid.length()) {
+            for (cell in 0..<grid.size) {
                 val row = cell / numRows
                 val col = cell % numRows
 
@@ -152,23 +152,23 @@ class XWordJSONIO : AbstractJSONIO() {
 
                         box.solution = contents
 
-                        if (cell < numbers.length()) {
+                        if (cell < numbers.size) {
                             val number = numbers.getInt(cell)
                             if (number > 0)
                                 box.clueNumber = number.toString()
                         }
 
-                        if (circles != null && cell < circles.length()) {
+                        if (circles != null && cell < circles.size) {
                             val circle = circles.getInt(cell)
                             if (circle != 0)
                                 box.shape = Box.Shape.CIRCLE
                         }
-                        if (rbars != null && cell < rbars.length()) {
+                        if (rbars != null && cell < rbars.size) {
                             val rbar = rbars.getInt(cell)
                             if (rbar != 0)
                                 box.barRight = Box.Bar.SOLID
                         }
-                        if (bbars != null && cell < bbars.length()) {
+                        if (bbars != null && cell < bbars.size) {
                             val bbar = bbars.getInt(cell)
                             if (bbar != 0)
                                 box.barBottom = Box.Bar.SOLID
@@ -197,7 +197,7 @@ class XWordJSONIO : AbstractJSONIO() {
             builder : PuzzleBuilder,
             across : Boolean,
         ) {
-            for (i in 0..<clues.length()) {
+            for (i in 0..<clues.size) {
                 val clue = clues.getString(i)
                 val split : Array<String>
                     = clue.split("\\.".toRegex(), limit = 2).toTypedArray()

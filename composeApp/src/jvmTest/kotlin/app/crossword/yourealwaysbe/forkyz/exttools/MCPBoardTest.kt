@@ -3,9 +3,6 @@ package app.crossword.yourealwaysbe.forkyz.exttools
 
 import java.io.DataInputStream
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
@@ -23,6 +20,8 @@ import app.crossword.yourealwaysbe.puz.Playboard
 import app.crossword.yourealwaysbe.puz.Position
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.io.IO
+import app.crossword.yourealwaysbe.puz.util.JSONObject
+import app.crossword.yourealwaysbe.puz.util.buildJSONObject
 
 class MCPBoardTest {
     private lateinit var puzzle : Puzzle
@@ -52,7 +51,7 @@ class MCPBoardTest {
     private suspend fun invoke(
         mcp : MCPBoard,
         name : String,
-        args : JsonElement? = null,
+        args : JSONObject? = null,
     ) : String {
         return mcp.tools.first { it.name == name }.execute(args)
     }
@@ -69,7 +68,7 @@ class MCPBoardTest {
             invoke(
                 noBoard,
                 "list_clues",
-                buildJsonObject { put("list_name", "Across") },
+                buildJSONObject { put("list_name", "Across") },
             ),
         )
     }
@@ -99,7 +98,7 @@ class MCPBoardTest {
             invoke(
                 noBoard,
                 "play_answer",
-                buildJsonObject { put("word", "test") },
+                buildJSONObject { put("word", "test") },
             ),
         )
     }
@@ -111,7 +110,7 @@ class MCPBoardTest {
             invoke(
                 noBoard,
                 "play_letter",
-                buildJsonObject { put("letter", "A") },
+                buildJSONObject { put("letter", "A") },
             ),
         )
     }
@@ -152,7 +151,7 @@ class MCPBoardTest {
         val result = invoke(
             mcpBoard,
             "list_clues",
-            buildJsonObject { put("list_name", "Across") },
+            buildJSONObject { put("list_name", "Across") },
         )
         assertTrue(result.contains("[number:"))
         assertTrue(result.contains("index:"))
@@ -165,7 +164,7 @@ class MCPBoardTest {
         val result = invoke(
             mcpBoard,
             "list_clues",
-            buildJsonObject { put("list_name", "Diagonal") },
+            buildJSONObject { put("list_name", "Diagonal") },
         )
         assertEquals("No clue list named: Diagonal", result)
     }
@@ -216,7 +215,7 @@ class MCPBoardTest {
         val result = invoke(
             mcpBoard,
             "play_answer",
-            buildJsonObject { put("word", "test word") },
+            buildJSONObject { put("word", "test word") },
         )
         assertEquals("Played: TESTWORD", result)
         assertEquals("T", puzzle.checkedGetBox(0, 0)?.response)
@@ -227,7 +226,7 @@ class MCPBoardTest {
         val result = invoke(
             mcpBoard,
             "play_answer",
-            buildJsonObject { put("word", "") },
+            buildJSONObject { put("word", "") },
         )
         assertEquals("Played: ", result)
         assertTrue(puzzle.checkedGetBox(0, 0)?.isBlank() ?: false)
@@ -238,7 +237,7 @@ class MCPBoardTest {
         val result = invoke(
             mcpBoard,
             "play_letter",
-            buildJsonObject { put("letter", "a") },
+            buildJSONObject { put("letter", "a") },
         )
         assertEquals("ok", result)
         assertEquals("A", puzzle.checkedGetBox(0, 0)?.response)
@@ -252,7 +251,7 @@ class MCPBoardTest {
         val result = invoke(
             mcpBoard,
             "play_letter",
-            buildJsonObject { put("letter", "") },
+            buildJSONObject { put("letter", "") },
         )
         assertEquals("ok", result)
         assertEquals(posBefore, board.highlightLetter)
@@ -264,7 +263,7 @@ class MCPBoardTest {
         val result = invoke(
             mcpBoard,
             "jump_to_clue_by_number",
-            buildJsonObject {
+            buildJSONObject {
                 put("list_name", "Down")
                 put("number", "5")
             },
@@ -280,7 +279,7 @@ class MCPBoardTest {
         val result = invoke(
             mcpBoard,
             "jump_to_clue_by_number",
-            buildJsonObject {
+            buildJSONObject {
                 put("list_name", "Across")
                 put("number", "999")
             },
@@ -294,7 +293,7 @@ class MCPBoardTest {
         val result = invoke(
             mcpBoard,
             "jump_to_clue_by_number",
-            buildJsonObject {
+            buildJSONObject {
                 put("list_name", "Diagonal")
                 put("number", "1")
             },
@@ -307,7 +306,7 @@ class MCPBoardTest {
         val result = invoke(
             mcpBoard,
             "jump_to_clue_by_index",
-            buildJsonObject {
+            buildJSONObject {
                 put("list_name", "Across")
                 put("index", 1)
             },
@@ -322,7 +321,7 @@ class MCPBoardTest {
         val result = invoke(
             mcpBoard,
             "jump_to_clue_by_index",
-            buildJsonObject {
+            buildJSONObject {
                 put("list_name", "Across")
                 put("index", 9999)
             },
@@ -336,7 +335,7 @@ class MCPBoardTest {
         val result = invoke(
             mcpBoard,
             "jump_to_clue_by_index",
-            buildJsonObject {
+            buildJSONObject {
                 put("list_name", "Across")
                 put("index", -1)
             },

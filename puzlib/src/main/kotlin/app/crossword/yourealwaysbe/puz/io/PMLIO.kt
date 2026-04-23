@@ -12,14 +12,13 @@ import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
 
-import org.json.JSONException
-import org.json.JSONObject
-
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.PuzzleBuilder
 import app.crossword.yourealwaysbe.puz.PuzzleBuilder.BasicClue
-import app.crossword.yourealwaysbe.puz.util.JSONParser.parse
+import app.crossword.yourealwaysbe.puz.util.JSONException
+import app.crossword.yourealwaysbe.puz.util.JSONObject
+import app.crossword.yourealwaysbe.puz.util.parseJSONObject
 
 /**
  * Read a character stream of JSON data in the format used by PML.
@@ -66,7 +65,7 @@ class PMLIO : AbstractJSONIO() {
          */
         fun readFromJSON(inStream : InputStream) : Puzzle? {
             try {
-                val json = parse(inStream)
+                val json = parseJSONObject(inStream)
                 return readPuzzleFromJSON(json)
             } catch (e : IOException) {
                 return null
@@ -79,7 +78,7 @@ class PMLIO : AbstractJSONIO() {
          * Returns null if failed
          */
         fun readFromJSON(jsonString : String) : Puzzle {
-            val json = parse(jsonString)
+            val json = parseJSONObject(jsonString)
             return readPuzzleFromJSON(json)
         }
 
@@ -87,7 +86,7 @@ class PMLIO : AbstractJSONIO() {
             try {
                 val cwJson = readPuzzleJSON(inStream)
                 if (cwJson != null && !cwJson.isEmpty())
-                    return readPuzzleFromJSON(parse(cwJson))
+                    return readPuzzleFromJSON(parseJSONObject(cwJson))
             } catch (e : JSONException) {
                 // pass through
             }
@@ -96,7 +95,7 @@ class PMLIO : AbstractJSONIO() {
 
         fun readPuzzle(jsonString : String) : Puzzle? {
             try {
-                val json = parse(jsonString)
+                val json = parseJSONObject(jsonString)
                 return readPuzzleFromJSON(json)
             } catch (e : JSONException) {
                 LOG.severe("Could not read PML JSON: " + e)
@@ -131,7 +130,7 @@ class PMLIO : AbstractJSONIO() {
         private fun readPuzzleFromJSON(json : JSONObject) : Puzzle {
             val gameData = json.getJSONObject("game_data")
             val builder = PuzzleBuilder(getBoxes(gameData))
-                .setTitle(optStringNull(json, "name"))
+                .setTitle(json.optStringEmptyNull("name"))
                 .setDate(getDate(json))
             addClues(gameData, builder)
             return builder.puzzle
@@ -159,7 +158,7 @@ class PMLIO : AbstractJSONIO() {
             }
 
             val items = gameData.getJSONArray("items")
-            for (i in 0..<items.length()) {
+            for (i in 0..<items.size) {
                 val item = items.getJSONObject(i)
 
                 val position = item.getInt("start") - 1
@@ -187,7 +186,7 @@ class PMLIO : AbstractJSONIO() {
                     if (boxes[boxRow][boxCol] == null)
                         boxes[boxRow][boxCol] = Box()
 
-                    if (clueSol != null && j < clueSol.length)
+                    if (j < clueSol.length)
                         boxes[boxRow][boxCol]?.setSolution(clueSol.get(j))
 
                     boxRow += drow
@@ -203,7 +202,7 @@ class PMLIO : AbstractJSONIO() {
         @Throws(JSONException::class)
         private fun addClues(gameData : JSONObject, builder : PuzzleBuilder) {
             val items = gameData.getJSONArray("items")
-            for (i in 0..<items.length()) {
+            for (i in 0..<items.size) {
                 val item = items.getJSONObject(i)
                 addClue(item, builder)
             }

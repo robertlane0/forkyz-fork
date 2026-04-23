@@ -10,13 +10,12 @@ import kotlin.collections.ArrayDeque
 import kotlin.io.encoding.Base64
 
 import app.crossword.yourealwaysbe.forkyz.util.AppLogger
-import app.crossword.yourealwaysbe.org.json.JSONException
-
 import app.crossword.yourealwaysbe.forkyz.util.getURLInputStream
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.io.AmuseLabsJSONIO
 import app.crossword.yourealwaysbe.puz.io.StreamUtils
-import app.crossword.yourealwaysbe.puz.util.JSONParser
+import app.crossword.yourealwaysbe.puz.util.JSONException
+import app.crossword.yourealwaysbe.puz.util.parseJSONObject
 
 private val DEOBFUSCATE_TIMEOUT = 30000L
 private val KEY_LEN = 7
@@ -348,7 +347,7 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
                     = deobfuscateRawcWithKey(rawc, candidateKeyPrefix)
                 if (deobfuscated != null) {
                     try {
-                        JSONParser.parse(deobfuscated)
+                        parseJSONObject(deobfuscated)
                         return deobfuscated
                     } catch (e : JSONException) {
                         continue

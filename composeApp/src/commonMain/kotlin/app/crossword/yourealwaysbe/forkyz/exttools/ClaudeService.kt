@@ -6,13 +6,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 
-import org.json.JSONArray
-import org.json.JSONException
-import org.json.JSONObject
-
 import app.crossword.yourealwaysbe.forkyz.settings.ExternalToolSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.util.getURLJSON
+import app.crossword.yourealwaysbe.puz.util.JSONException
+import app.crossword.yourealwaysbe.puz.util.JSONObject
+import app.crossword.yourealwaysbe.puz.util.buildJSONArray
+import app.crossword.yourealwaysbe.puz.util.buildJSONObject
 
 private const val CLAUDE_API_URL = "https://api.anthropic.com/v1/messages"
 private const val CLAUDE_MODEL = "claude-sonnet-4-5"
@@ -55,18 +55,18 @@ object ClaudeService : LLMService {
     }
 
     private fun getQueryData(query : String) : JSONObject {
-        val data = JSONObject()
-        with(data) {
+        val data = buildJSONObject {
             put("model", CLAUDE_MODEL)
             put("max_tokens", CLAUDE_MAX_TOKENS)
             put("temperature", CLAUDE_TEMPERATURE)
 
-            // Claude uses a messages array format
-            val messages = JSONArray()
-            val message = JSONObject()
-            message.put("role", "user")
-            message.put("content", query)
-            messages.put(message)
+            val messages = buildJSONArray {
+                val message = buildJSONObject {
+                    put("role", "user")
+                    put("content", query)
+                }
+                add(message)
+            }
 
             put("messages", messages)
         }

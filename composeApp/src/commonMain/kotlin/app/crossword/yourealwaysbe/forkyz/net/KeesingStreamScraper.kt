@@ -9,13 +9,11 @@ import java.net.URISyntaxException
 import java.util.Locale
 import java.util.regex.Pattern
 
-import org.json.JSONException
-import org.json.JSONObject
-import org.json.JSONTokener
-
 import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.io.KeesingXMLIO
+import app.crossword.yourealwaysbe.puz.util.JSONException
+import app.crossword.yourealwaysbe.puz.util.parseJSONObject
 
 /**
  * Downloader for Keesing.com embedded crosswords
@@ -95,7 +93,7 @@ class KeesingStreamScraper : AbstractStreamScraper() {
                 while ((reader.readLine().also { line = it }) != null)
                     rawJson.append(line + "\n")
 
-                val json = JSONObject(JSONTokener(rawJson.toString()))
+                val json = parseJSONObject(rawJson.toString())
                 val puzzleID = json.getString("puzzleID")
                 return String.format(
                     Locale.US,

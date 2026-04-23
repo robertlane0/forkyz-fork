@@ -1,3 +1,4 @@
+
 package app.crossword.yourealwaysbe.puz.io
 
 import java.io.BufferedWriter
@@ -18,11 +19,6 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
 
-import org.json.JSONArray
-import org.json.JSONException
-import org.json.JSONObject
-import org.json.JSONWriter
-
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Box.Companion.isBlock
 import app.crossword.yourealwaysbe.puz.Clue
@@ -37,8 +33,16 @@ import app.crossword.yourealwaysbe.puz.Zone
 import app.crossword.yourealwaysbe.puz.util.HtmlUtil.htmlString
 import app.crossword.yourealwaysbe.puz.util.HtmlUtil.parseHtmlColor
 import app.crossword.yourealwaysbe.puz.util.HtmlUtil.unHtmlString
-import app.crossword.yourealwaysbe.puz.util.JSONParser.parse
+import app.crossword.yourealwaysbe.puz.util.JSONArray
+import app.crossword.yourealwaysbe.puz.util.JSONArrayBuilder
+import app.crossword.yourealwaysbe.puz.util.JSONException
+import app.crossword.yourealwaysbe.puz.util.JSONObject
+import app.crossword.yourealwaysbe.puz.util.JSONObjectBuilder
 import app.crossword.yourealwaysbe.puz.util.PuzzleUtils
+import app.crossword.yourealwaysbe.puz.util.buildJSONArray
+import app.crossword.yourealwaysbe.puz.util.buildJSONObject
+import app.crossword.yourealwaysbe.puz.util.parseJSONObject
+import app.crossword.yourealwaysbe.puz.util.writeJSONObject
 
 /**
  * Read IPuz from a stream.
@@ -70,58 +74,6 @@ class IPuzIO : AbstractJSONIO() {
     @Throws(Exception::class)
     override fun parseInput(inStream : InputStream) : Puzzle? {
         return readPuzzle(inStream)
-    }
-
-    /**
-     * Extend JSONWriter with a write method to add custom formatting
-     */
-    private class FormatableJSONWriter(
-        writer : Appendable,
-    ) : JSONWriter(writer) {
-        /**
-         * Writes the field if it is not null with trailing new line
-         * @return self for chaining
-         */
-        @Throws(IOException::class)
-        fun keyValueNonNull(
-            field : String,
-            value : Any?,
-        ) : FormatableJSONWriter {
-            keyValueNonNull(0, field, value)
-            return this
-        }
-
-        /**
-         * Writes the field if not null with trailing new line and indent
-         * @return self for chaining
-         */
-        @Throws(IOException::class)
-        fun keyValueNonNull(
-            indentSteps : Int,
-            field : String,
-            value : Any?,
-        ) : FormatableJSONWriter {
-            if (value != null) {
-                indent(indentSteps)
-                key(field)
-                value(value)
-                newLine()
-            }
-            return this
-        }
-
-        @Throws(IOException::class)
-        fun newLine() : FormatableJSONWriter {
-            writer.append("\n")
-            return this
-        }
-
-        @Throws(IOException::class)
-        fun indent(count : Int) : FormatableJSONWriter {
-            for (i in 0..<count)
-                writer.append("\t")
-            return this
-        }
     }
 
     companion object {
@@ -405,11 +357,10 @@ class IPuzIO : AbstractJSONIO() {
             = (log10(DEFINED_COLORS.size.toDouble()).toInt()) + 1
         val HIGHLIGHT_COLOR : Int = DEFINED_COLORS[3]
 
-        @JvmStatic
         @Throws(IOException::class)
         fun readPuzzle(inStream : InputStream) : Puzzle? {
             try {
-                val json = parse(inStream)
+                val json = parseJSONObject(inStream)
 
                 checkIPuzVersion(json)
                 val kind : PuzzleKind? = getPuzKind(json)
@@ -459,7 +410,7 @@ class IPuzIO : AbstractJSONIO() {
             // done. Otherwise, assume crossword unless acrostic comes up
             // later
             val kinds = puzJson.getJSONArray(FIELD_KIND)
-            for (i in 0..<kinds.length()) {
+            for (i in 0..<kinds.size) {
                 val kind = kinds.getString(i).lowercase(Locale.getDefault())
 
                 if (kind.startsWith(ACROSTIC_PREFIX))
@@ -488,14 +439,15 @@ class IPuzIO : AbstractJSONIO() {
             puzJson : JSONObject,
             builder : PuzzleBuilder,
         ) {
-            builder.setTitle(optStringNull(puzJson, FIELD_TITLE))
-                .setAuthor(optStringNull(puzJson, FIELD_AUTHOR))
-                .setCopyright(optStringNull(puzJson, FIELD_COPYRIGHT))
-                .setIntroMessage(optStringNull(puzJson, FIELD_INTRO))
-                .setNotes(optStringNull(puzJson, FIELD_NOTES))
-                .setCompletionMessage(optStringNull(puzJson, FIELD_EXPLANATION))
-                .setSourceUrl(optStringNull(puzJson, FIELD_URL))
-                .setSource(optStringNull(puzJson, FIELD_PUBLISHER))
+            builder.setTitle(puzJson.optStringEmptyNull(FIELD_TITLE))
+                .setAuthor(puzJson.optStringEmptyNull(FIELD_AUTHOR))
+                .setCopyright(puzJson.optStringEmptyNull(FIELD_COPYRIGHT))
+                .setIntroMessage(puzJson.optStringEmptyNull(FIELD_INTRO))
+                .setNotes(puzJson.optStringEmptyNull(FIELD_NOTES))
+                .setCompletionMessage(
+                    puzJson.optStringEmptyNull(FIELD_EXPLANATION),
+                ).setSourceUrl(puzJson.optStringEmptyNull(FIELD_URL))
+                .setSource(puzJson.optStringEmptyNull(FIELD_PUBLISHER))
                 .setDate(parseDate(puzJson))
         }
 
@@ -508,7 +460,7 @@ class IPuzIO : AbstractJSONIO() {
          */
         @Throws(IPuzFormatException::class)
         private fun parseDate(puzJson : JSONObject) : LocalDate? {
-            val date = optStringNull(puzJson, FIELD_DATE)
+            val date = puzJson.optStringEmptyNull(FIELD_DATE)
             if (date == null)
                 return null
 
@@ -547,7 +499,7 @@ class IPuzIO : AbstractJSONIO() {
             json : JSONObject,
             field : String,
         ) : String? {
-            val value = optStringNull(json, field)
+            val value = json.optStringEmptyNull(field)
 
             if (value == null)
                 return null
@@ -589,7 +541,7 @@ class IPuzIO : AbstractJSONIO() {
         ) {
             val cells = puzJson.getJSONArray(FIELD_PUZZLE)
 
-            if (cells.length() < boxes.size) {
+            if (cells.size < boxes.size) {
                 throw IPuzFormatException(
                     "Number of cell rows doesn't match boxes dimensions"
                 )
@@ -602,7 +554,7 @@ class IPuzIO : AbstractJSONIO() {
             for (row in boxes.indices) {
                 val rowCells = cells.getJSONArray(row)
 
-                if (rowCells.length() < boxes[row].size) {
+                if (rowCells.size < boxes[row].size) {
                     throw IPuzFormatException(
                         "Number of cell columns doesn't match boxes dimension"
                     )
@@ -647,7 +599,7 @@ class IPuzIO : AbstractJSONIO() {
             empty : String,
             namedStyles : JSONObject?,
         ) : Box? {
-            if (isJSONNull(cell)) {
+            if (cell == null) {
                 return null
             } else if (cell is JSONObject) {
                 val json = cell
@@ -693,7 +645,7 @@ class IPuzIO : AbstractJSONIO() {
                 }
 
                 // overwrites label if there is one (not supporting both)
-                val initVal = optStringNull(json, FIELD_VALUE)
+                val initVal = json.optStringEmptyNull(FIELD_VALUE)
                 if (initVal != null) {
                     box.initialValue = initVal
                     box.response = initVal
@@ -767,7 +719,7 @@ class IPuzIO : AbstractJSONIO() {
             box : Box,
         ) : Boolean {
             var hasData = false
-            if (style.optBoolean(FIELD_HIGHLIGHT)) {
+            if (style.optBoolean(FIELD_HIGHLIGHT, false)) {
                 box.color = HIGHLIGHT_COLOR
                 hasData = true
             }
@@ -836,7 +788,7 @@ class IPuzIO : AbstractJSONIO() {
         ) : Boolean {
             var hasBars = false
 
-            var barred = optStringNull(style, barField)
+            var barred = style.optStringEmptyNull(barField)
             if (barred != null) {
                 barred = barred.uppercase(Locale.getDefault())
                 for (i in 0..<barred.length) {
@@ -884,15 +836,15 @@ class IPuzIO : AbstractJSONIO() {
                 return false
 
             val marks = Array<Array<String?>>(3) { arrayOfNulls<String>(3) }
-            marks[0][0] = optStringNull(markObj, FIELD_MARK_TOP_LEFT)
-            marks[0][1] = optStringNull(markObj, FIELD_MARK_TOP)
-            marks[0][2] = optStringNull(markObj, FIELD_MARK_TOP_RIGHT)
-            marks[1][0] = optStringNull(markObj, FIELD_MARK_LEFT)
-            marks[1][1] = optStringNull(markObj, FIELD_MARK_CENTER)
-            marks[1][2] = optStringNull(markObj, FIELD_MARK_RIGHT)
-            marks[2][0] = optStringNull(markObj, FIELD_MARK_BOTTOM_LEFT)
-            marks[2][1] = optStringNull(markObj, FIELD_MARK_BOTTOM)
-            marks[2][2] = optStringNull(markObj, FIELD_MARK_BOTTOM_RIGHT)
+            marks[0][0] = markObj.optStringEmptyNull(FIELD_MARK_TOP_LEFT)
+            marks[0][1] = markObj.optStringEmptyNull(FIELD_MARK_TOP)
+            marks[0][2] = markObj.optStringEmptyNull(FIELD_MARK_TOP_RIGHT)
+            marks[1][0] = markObj.optStringEmptyNull(FIELD_MARK_LEFT)
+            marks[1][1] = markObj.optStringEmptyNull(FIELD_MARK_CENTER)
+            marks[1][2] = markObj.optStringEmptyNull(FIELD_MARK_RIGHT)
+            marks[2][0] = markObj.optStringEmptyNull(FIELD_MARK_BOTTOM_LEFT)
+            marks[2][1] = markObj.optStringEmptyNull(FIELD_MARK_BOTTOM)
+            marks[2][2] = markObj.optStringEmptyNull(FIELD_MARK_BOTTOM_RIGHT)
 
             box.setMarks(marks)
 
@@ -910,7 +862,7 @@ class IPuzIO : AbstractJSONIO() {
             val block : String = getBlockString(puzJson)
             val empty : String = getEmptyCellString(puzJson)
             val saved = puzJson.optJSONArray(FIELD_SAVED)
-            if (saved != null && saved.length() > 0)
+            if (saved != null && saved.size > 0)
                 readValues(saved, boxes, false, block, empty)
         }
 
@@ -925,7 +877,7 @@ class IPuzIO : AbstractJSONIO() {
             val block : String = getBlockString(puzJson)
             val empty : String = getEmptyCellString(puzJson)
             val solution = puzJson.optJSONArray(FIELD_SOLUTION)
-            if (solution != null && solution.length() > 0)
+            if (solution != null && solution.size > 0)
                 readValues(solution, boxes, true, block, empty)
         }
 
@@ -945,12 +897,12 @@ class IPuzIO : AbstractJSONIO() {
             block : String,
             empty : String,
         ) {
-            val height = min(cells.length(), boxes.size)
+            val height = min(cells.size, boxes.size)
 
             for (row in 0..<height) {
                 val rowCells = cells.getJSONArray(row)
 
-                val width = min(rowCells.length(), boxes[row].size)
+                val width = min(rowCells.size, boxes[row].size)
 
                 for (col in 0..<width) {
                     val value : String? = getCrosswordValueFromObj(
@@ -989,19 +941,18 @@ class IPuzIO : AbstractJSONIO() {
             block : String,
             empty : String,
         ) : String? {
-            if (isJSONNull(cell)) {
+            if (cell == null) {
                 return null
             } else if (cell is JSONArray) {
                 val values = cell
-                if (values.length() != 1) {
+                if (values.size != 1) {
                     throw IPuzFormatException(
                         "Multiple cell values not supported: " + values,
                     )
                 }
                 return getCrosswordValueFromObj(values.get(0), block, empty)
             } else if (cell is JSONObject) {
-                val json = cell
-                val value = optStringNull(json, FIELD_VALUE)
+                val value = cell.optStringEmptyNull(FIELD_VALUE)
                 if (value == null)
                     return null
                 else if (value.isEmpty())
@@ -1034,18 +985,14 @@ class IPuzIO : AbstractJSONIO() {
             val separators = readSeparators(puzJson)
 
             val clues = puzJson.optJSONObject(FIELD_CLUES)
-            if (isJSONNull(clues))
+            if (clues == null)
                 return
 
-            val names = clues?.names()
-            if (names == null)
-                return
-
-            for (i in 0..<names.length()) {
-                val listName = names.getString(i)
+            val names = clues.keys
+            for (listName in names) {
                 addClues(
                     clues.getJSONArray(listName),
-                    names.getString(i),
+                    listName,
                     showEnumerations,
                     coordBase,
                     separators,
@@ -1070,7 +1017,7 @@ class IPuzIO : AbstractJSONIO() {
 
             val sepMap = mutableMapOf<ClueID, MutableMap<Int, String>>()
 
-            for (i in 0..<separators.length()) {
+            for (i in 0..<separators.size) {
                 try {
                     val clueSeparators = separators.getJSONObject(i)
 
@@ -1085,7 +1032,7 @@ class IPuzIO : AbstractJSONIO() {
                     val sepList = clueSeparators.getJSONObject(
                         FIELD_CLUE_SEPARATORS,
                     )
-                    sepList.keys().forEachRemaining { pos ->
+                    sepList.keys.forEach { pos ->
                         try {
                             val sep = sepList.getString(pos)
                             if (!sep.isEmpty()) {
@@ -1131,12 +1078,10 @@ class IPuzIO : AbstractJSONIO() {
                 val height = dimensions.getInt(FIELD_HEIGHT)
 
                 val clues = puzJson.optJSONObject(FIELD_CLUES)
-                if (clues != null && !isJSONNull(clues)) {
-                    val names = clues.names()
-                    for (i in 0..<names.length()) {
-                        val listName = names.getString(i)
+                if (clues != null) {
+                    for (listName in clues.keys) {
                         val clueList = clues.getJSONArray(listName)
-                        for (j in 0..<clueList.length()) {
+                        for (j in 0..<clueList.size) {
                             val clueObj = clueList.get(j)
                             if (clueObj is JSONObject) {
                                 val clueJson = clueObj
@@ -1144,7 +1089,7 @@ class IPuzIO : AbstractJSONIO() {
                                     FIELD_CLUE_CELLS,
                                 )
                                 if (cells != null) {
-                                    for (k in 0..<cells.length()) {
+                                    for (k in 0..<cells.size) {
                                         val cell = cells.getJSONArray(k)
                                         val row = cell.getInt(1)
                                         if (row >= height)
@@ -1168,7 +1113,8 @@ class IPuzIO : AbstractJSONIO() {
          * Adds enumeration text to hint if showEnumerations is true
          *
          * @param coordBase 0 if 0-based, 1 if 1-based
-         * @param separators map from clue id to separators at positions read from
+         * @param separators map from clue id to separators at positions
+         * read from
          * ipuz extensions, or null if no separators
          */
         @Throws(IPuzFormatException::class)
@@ -1187,20 +1133,22 @@ class IPuzIO : AbstractJSONIO() {
             val displayName = if (splitName.size > 1) splitName[1] else dirName
 
             try {
-                for (i in 0..<jsonClues.length()) {
+                for (i in 0..<jsonClues.size) {
                     val clueSeparators = separators?.get(ClueID(displayName, i))
 
                     val clueObj = jsonClues.get(i)
-                    // all clues not across until proven otherwise by list name
-                    addClue(
-                        dirName,
-                        displayName,
-                        clueObj,
-                        showEnumerations,
-                        coordBase,
-                        clueSeparators,
-                        builder,
-                    )
+                    if (clueObj != null) {
+                        // all clues not across until proven otherwise by list name
+                        addClue(
+                            dirName,
+                            displayName,
+                            clueObj,
+                            showEnumerations,
+                            coordBase,
+                            clueSeparators,
+                            builder,
+                        )
+                    }
                 }
             } catch (e : IllegalArgumentException) {
                 throw IPuzFormatException(e.message)
@@ -1241,9 +1189,9 @@ class IPuzIO : AbstractJSONIO() {
                 )
             } else if (clueObj is JSONArray) {
                 val clueArray = clueObj
-                if (clueArray.length() != 2) {
+                if (clueArray.size != 2) {
                     throw IPuzFormatException(
-                        "Unexpected clue array length: " + clueArray.length(),
+                        "Unexpected clue array length: " + clueArray.size,
                     )
                 }
                 val clueNumObj = clueArray.get(0)
@@ -1272,7 +1220,7 @@ class IPuzIO : AbstractJSONIO() {
                 if (getClueNumber(clueNumObj) == null)
                     clueNumObj = clueJson.opt(FIELD_CLUE_NUMBERS)
 
-                val label = optStringNull(clueJson, FIELD_CLUE_LABEL)
+                val label = clueJson.optStringEmptyNull(FIELD_CLUE_LABEL)
 
                 // build hint, bake in additional info
                 val hint = StringBuilder()
@@ -1280,17 +1228,17 @@ class IPuzIO : AbstractJSONIO() {
                 hint.append(clueJson.getString(FIELD_CLUE_HINT))
 
                 val conts = clueJson.optJSONArray(FIELD_CLUE_CONTINUED)
-                if (conts != null && conts.length() > 0) {
+                if (conts != null && conts.size > 0) {
                     addCrossRefList(hint, conts, "cont.")
                 }
 
                 val refs = clueJson.optJSONArray(FIELD_CLUE_REFERENCES)
-                if (refs != null && refs.length() > 0) {
+                if (refs != null && refs.size > 0) {
                     addCrossRefList(hint, refs, "ref.")
                 }
 
                 val enumeration = if (showEnumerations)
-                    optStringNull(clueJson, FIELD_ENUMERATION)
+                    clueJson.optStringEmptyNull(FIELD_ENUMERATION)
                 else
                     null
 
@@ -1342,7 +1290,7 @@ class IPuzIO : AbstractJSONIO() {
 
             val zone = Zone()
 
-            for (i in 0..<cells.length()) {
+            for (i in 0..<cells.size) {
                 val cell = cells.getJSONArray(i)
                 zone.addPosition(
                     Position(
@@ -1389,7 +1337,7 @@ class IPuzIO : AbstractJSONIO() {
             hint.append(" (")
             hint.append(description)
             hint.append(" ")
-            for (i in 0..<refs.length()) {
+            for (i in 0..<refs.size) {
                 if (i > 0) hint.append("/")
                 val ref = refs.getJSONObject(i)
                 hint.append(
@@ -1412,7 +1360,8 @@ class IPuzIO : AbstractJSONIO() {
          * @param label a label to display instead of clue number (null if
          * not used)
          * @param hint the clue hint
-         * @param enumeration null or empty if no enumeration to be shown in clue
+         * @param enumeration null or empty if no enumeration to be
+         * shown in clue
          * @param zone the zone of the clue or null
          * @param separators separators to add to clue or null if none
          * @param builder the builder to add the clue to
@@ -1496,9 +1445,8 @@ class IPuzIO : AbstractJSONIO() {
                 return clueNumObj
 
             if (clueNumObj is JSONArray) {
-                val clueNums = clueNumObj
-
-                for (subNumObj in clueNums) {
+                for (i in 0 until clueNumObj.size) {
+                    val subNumObj = clueNumObj.get(i)
                     val subNum = getClueNumber(subNumObj)
                     if (subNum != null)
                         return subNum
@@ -1527,7 +1475,7 @@ class IPuzIO : AbstractJSONIO() {
 
                 val builder = StringBuilder()
 
-                for (i in 0..<objs.length()) {
+                for (i in 0..<objs.size) {
                     if (i > 0) builder.append("/")
                     builder.append(getComplexClueNumString(objs.get(i)))
                 }
@@ -1549,11 +1497,11 @@ class IPuzIO : AbstractJSONIO() {
             puzJson : JSONObject,
             builder : PuzzleBuilder,
         ) {
-            val supportUrl = optStringNull(puzJson, FIELD_EXT_SUPPORT_URL)
+            val supportUrl = puzJson.optStringEmptyNull(FIELD_EXT_SUPPORT_URL)
             if (supportUrl != null)
                 builder.setSupportUrl(supportUrl)
 
-            val shareUrl = optStringNull(puzJson, FIELD_EXT_SHARE_URL)
+            val shareUrl = puzJson.optStringEmptyNull(FIELD_EXT_SHARE_URL)
             if (shareUrl != null)
                 builder.setShareUrl(shareUrl)
 
@@ -1567,7 +1515,7 @@ class IPuzIO : AbstractJSONIO() {
                 builder.setPinnedClueID(pinnedClueID)
 
             val playData = puzJson.optJSONObject(FIELD_EXT_PLAY_DATA)
-            if (playData != null && !isJSONNull(playData))
+            if (playData != null)
                 Companion.readPlayData(playData, builder)
         }
 
@@ -1576,7 +1524,7 @@ class IPuzIO : AbstractJSONIO() {
             if (images == null)
                 return
 
-            for (i in 0..<images.length()) {
+            for (i in 0..<images.size) {
                 val image = images.getJSONObject(i)
                 val url = image.getString(FIELD_EXT_IMAGE_URL)
                 val row = image.getInt(FIELD_EXT_IMAGE_ROW)
@@ -1626,12 +1574,12 @@ class IPuzIO : AbstractJSONIO() {
 
             val cellsJson = playData.getJSONArray(FIELD_BOX_EXTRAS)
 
-            val numRows = min(cellsJson.length(), builder.height)
+            val numRows = min(cellsJson.size, builder.height)
 
             for (row in 0..<numRows) {
                 val rowJson = cellsJson.getJSONArray(row)
 
-                val numCols = min(rowJson.length(), builder.width)
+                val numCols = min(rowJson.size, builder.width)
 
                 for (col in 0..<numCols) {
                     val box = builder.getBox(row, col)
@@ -1668,7 +1616,8 @@ class IPuzIO : AbstractJSONIO() {
         /**
          * Read the position from playData
          *
-         * Assumes builder already provides a puzzle with boxes and clues set up.
+         * Assumes builder already provides a puzzle with boxes and
+         * clues set up.
          */
         @Throws(IPuzFormatException::class)
         private fun readPosition(
@@ -1736,7 +1685,7 @@ class IPuzIO : AbstractJSONIO() {
 
             val history = mutableListOf<ClueID>()
 
-            for (i in 0..<historyJson.length()) {
+            for (i in 0..<historyJson.size) {
                 val itemJson = historyJson.getJSONObject(i)
                 val cid = decodeClueID(itemJson, builder)
                 if (cid != null)
@@ -1761,18 +1710,16 @@ class IPuzIO : AbstractJSONIO() {
 
             val notesJson = playData.getJSONArray(FIELD_CLUE_NOTES)
 
-            for (i in 0..<notesJson.length()) {
+            for (i in 0..<notesJson.size) {
                 val noteJson = notesJson.getJSONObject(i)
                 val cndJson = noteJson.optJSONObject(FIELD_CLUE_NOTE_CLUE)
                 val cid : ClueID? = decodeClueID(cndJson, builder)
 
                 if (cid != null) {
-                    val scratch = noteJson.optString(FIELD_NOTE_SCRATCH, null)
+                    val scratch = noteJson.optString(FIELD_NOTE_SCRATCH)
                     val text = unHtmlOptString(noteJson, FIELD_NOTE_TEXT)
-                    val anagramSrc
-                        = noteJson.optString(FIELD_NOTE_ANAGRAM_SRC, null)
-                    val anagramSol
-                        = noteJson.optString(FIELD_NOTE_ANAGRAM_SOL, null)
+                    val anagramSrc = noteJson.optString(FIELD_NOTE_ANAGRAM_SRC)
+                    val anagramSol = noteJson.optString(FIELD_NOTE_ANAGRAM_SOL)
 
                     if (
                         scratch != null
@@ -1801,10 +1748,10 @@ class IPuzIO : AbstractJSONIO() {
 
             val noteJson = playData.getJSONObject(FIELD_PLAYER_NOTE)
 
-            val scratch = noteJson.optString(FIELD_NOTE_SCRATCH, null)
+            val scratch = noteJson.optString(FIELD_NOTE_SCRATCH)
             val text = unHtmlOptString(noteJson, FIELD_NOTE_TEXT)
-            val anagramSrc = noteJson.optString(FIELD_NOTE_ANAGRAM_SRC, null)
-            val anagramSol = noteJson.optString(FIELD_NOTE_ANAGRAM_SOL, null)
+            val anagramSrc = noteJson.optString(FIELD_NOTE_ANAGRAM_SRC)
+            val anagramSol = noteJson.optString(FIELD_NOTE_ANAGRAM_SOL)
 
             if (
                 scratch != null
@@ -1834,7 +1781,7 @@ class IPuzIO : AbstractJSONIO() {
 
             val flagsJson = playData.getJSONArray(FIELD_FLAGGED_CLUES)
 
-            for (i in 0..<flagsJson.length()) {
+            for (i in 0..<flagsJson.size) {
                 val flagJson = flagsJson.getJSONObject(i)
                 val cid = decodeClueID(flagJson, builder)
                 if (cid != null) {
@@ -1869,7 +1816,7 @@ class IPuzIO : AbstractJSONIO() {
             cid : JSONObject?,
             builder : PuzzleBuilder?,
         ) : ClueID? {
-            if (cid == null || isJSONNull(cid))
+            if (cid == null)
                 return null
 
             // Version 3
@@ -2041,7 +1988,6 @@ class IPuzIO : AbstractJSONIO() {
         /**
          * Write puzzle to os using WRITE_CHARSET
          */
-        @JvmOverloads
         @Throws(IOException::class)
         fun writePuzzle(
             puz : Puzzle,
@@ -2049,174 +1995,135 @@ class IPuzIO : AbstractJSONIO() {
             omitPlayState : Boolean = false,
             omitExtensions : Boolean = false,
         ) {
-            var writer : BufferedWriter? = null
-            try {
-                writer = BufferedWriter(
-                    OutputStreamWriter(os, WRITE_CHARSET),
-                )
-
-                val jsonWriter = FormatableJSONWriter(writer)
-
-                jsonWriter.`object`()
-                jsonWriter.newLine()
-
-                writeIPuzHeader(puz, jsonWriter)
-                writeMetaData(puz, jsonWriter)
-                writeBoxes(puz, jsonWriter, omitPlayState)
-                writeClues(puz, jsonWriter)
+            val json = buildJSONObject {
+                writeIPuzHeader(puz)
+                writeMetaData(puz)
+                writeBoxes(puz, omitPlayState)
+                writeClues(puz)
 
                 if (!omitExtensions)
-                    writeExtensions(puz, jsonWriter, omitPlayState)
-
-                jsonWriter.endObject()
-                jsonWriter.newLine()
-            } finally {
-                // don't close original output stream, it's the caller's job
-                if (writer != null)
-                    writer.flush()
+                    writeExtensions(puz, omitPlayState)
             }
+            writeJSONObject(json, os)
         }
 
         /**
          * Write IPuz version and kind
          */
-        @Throws(IOException::class,IPuzFormatException::class)
-        private fun writeIPuzHeader(
-            puz : Puzzle,
-            writer : FormatableJSONWriter,
-        ) {
-            writer.keyValueNonNull(FIELD_VERSION, WRITE_VERSION)
-                .key(FIELD_KIND)
-                .array()
+        @Throws(IPuzFormatException::class)
+        private fun JSONObjectBuilder.writeIPuzHeader(puz : Puzzle) {
+            put(FIELD_VERSION, WRITE_VERSION)
 
-            when (puz.kind) {
-                PuzzleKind.CROSSWORD -> writer.value(WRITE_KIND)
-                PuzzleKind.ACROSTIC -> writer.value(WRITE_KIND_ACROSTIC)
-                else -> {
-                    throw IPuzFormatException(
-                        "Unrecognised puzzle kind ${puz.kind}",
-                    )
+            val kinds = buildJSONArray {
+                when (puz.kind) {
+                    PuzzleKind.CROSSWORD -> add(WRITE_KIND)
+                    PuzzleKind.ACROSTIC -> add(WRITE_KIND_ACROSTIC)
+                    else -> {
+                        throw IPuzFormatException(
+                            "Unrecognised puzzle kind ${puz.kind}",
+                        )
+                    }
                 }
             }
-
-            writer.endArray()
-            writer.newLine()
+            put(FIELD_KIND, kinds)
         }
 
         /**
          * Add basic puzzle metadata (title, author, etc).
          */
-        @Throws(IOException::class)
-        private fun writeMetaData(puz : Puzzle, writer : FormatableJSONWriter) {
-            writer
-                .keyValueNonNull(FIELD_TITLE, htmlUnicode(puz.title))
-                .keyValueNonNull(FIELD_AUTHOR, htmlUnicode(puz.author))
-                .keyValueNonNull(FIELD_COPYRIGHT, htmlUnicode(puz.copyright))
-                .keyValueNonNull(FIELD_INTRO, htmlUnicode(puz.introMessage))
-                .keyValueNonNull(FIELD_NOTES, htmlUnicode(puz.notes))
-                .keyValueNonNull(
-                    FIELD_EXPLANATION, htmlUnicode(puz.completionMessage),
-                ).keyValueNonNull(FIELD_URL, puz.sourceUrl)
-                .keyValueNonNull(FIELD_PUBLISHER, puz.source)
+        private fun JSONObjectBuilder.writeMetaData(puz : Puzzle) {
+            put(FIELD_TITLE, htmlUnicode(puz.title))
+            put(FIELD_AUTHOR, htmlUnicode(puz.author))
+            put(FIELD_COPYRIGHT, htmlUnicode(puz.copyright))
+            put(FIELD_INTRO, htmlUnicode(puz.introMessage))
+            put(FIELD_NOTES, htmlUnicode(puz.notes))
+            put(FIELD_EXPLANATION, htmlUnicode(puz.completionMessage))
+            put(FIELD_URL, puz.sourceUrl)
+            put(FIELD_PUBLISHER, puz.source)
 
-            val date = puz.date
-            if (date != null)
-                writer.keyValueNonNull(FIELD_DATE, DATE_FORMATTER.format(date))
+            puz.date?.let { date ->
+                put(FIELD_DATE, DATE_FORMATTER.format(date))
+            }
         }
 
         /**
          * Read all IPuz supported box information to json
          */
-        @Throws(IOException::class)
-        private fun writeBoxes(
+        private fun JSONObjectBuilder.writeBoxes(
             puz : Puzzle,
-            writer : FormatableJSONWriter,
             omitPlayState : Boolean,
         ) {
-            writeDimensions(puz, writer)
-            writePuzzleCells(puz, writer)
+            writeDimensions(puz)
+            writePuzzleCells(puz)
             if (!omitPlayState)
-                writeSaved(puz, writer)
-            writeSolution(puz, writer)
+                writeSaved(puz)
+            writeSolution(puz)
         }
 
         /**
          * Add puzzle dimensions to json
          */
-        @Throws(IOException::class)
-        private fun writeDimensions(
-            puz : Puzzle,
-            writer : FormatableJSONWriter,
-        ) {
-            writer.key(FIELD_DIMENSIONS)
-                .`object`()
-                .key(FIELD_WIDTH).value(puz.width.toLong())
-                .key(FIELD_HEIGHT).value(puz.height.toLong())
-                .endObject()
-            writer.newLine()
+        private fun JSONObjectBuilder.writeDimensions(puz : Puzzle) {
+            put(
+                FIELD_DIMENSIONS,
+                buildJSONObject {
+                    put(FIELD_WIDTH, puz.width.toLong())
+                    put(FIELD_HEIGHT, puz.height.toLong())
+                },
+            )
         }
 
         /**
          * Add the puzzle field to json
          */
-        @Throws(IOException::class)
-        private fun writePuzzleCells(
-            puz : Puzzle,
-            writer : FormatableJSONWriter,
-        ) {
-            writer.key(FIELD_PUZZLE)
-                .array()
-            writer.newLine()
-
+        private fun JSONObjectBuilder.writePuzzleCells(puz : Puzzle) {
             val boxes : Array<Array<Box?>> = puz.boxes
 
-            for (row in boxes.indices) {
-                writer.indent(1)
-                    .array()
-
-                for (col in boxes[row].indices) {
-                    val box = boxes[row][col]
-
-                    if (box == null) {
-                        writer.value(DEFAULT_BLOCK)
-                    } else {
-                        val cellContents = if (isBlock(box))
-                            DEFAULT_BLOCK
-                        else
-                            box.clueNumber
-                        if (isCellWithStyle(box) || box.hasInitialValue()) {
-                            writer.`object`()
-
-                            writeCellStyle(box, writer)
-
-                            // written as style label for blocks
-                            if (!isBlock(box) && box.hasInitialValue()) {
-                                writer.key(FIELD_VALUE)
-                                    .value(box.initialValue)
-                            }
-
-                            if (cellContents != null) {
-                                writer.key(FIELD_CELL).value(cellContents)
-                            } else {
-                                writer.key(FIELD_CELL)
-                                    .value(DEFAULT_EMPTY_WRITE.toLong())
-                            }
-
-                            writer.endObject()
-                        } else if (cellContents != null) {
-                            writer.value(cellContents)
-                        } else {
-                            writer.value(DEFAULT_EMPTY_WRITE.toLong())
+            val cellsArray = buildJSONArray {
+                for (row in boxes) {
+                    val rowArray = buildJSONArray {
+                        for (cell in row) {
+                            writePuzzleCell(cell)
                         }
                     }
+                    add(rowArray)
                 }
-
-                writer.endArray()
-                writer.newLine()
             }
 
-            writer.endArray()
-            writer.newLine()
+            put(FIELD_PUZZLE, cellsArray)
+        }
+
+        private fun JSONArrayBuilder.writePuzzleCell(box : Box?) {
+            if (box == null) {
+                add(DEFAULT_BLOCK)
+            } else {
+                val cellContents = if (isBlock(box))
+                    DEFAULT_BLOCK
+                else
+                    box.clueNumber
+                if (isCellWithStyle(box) || box.hasInitialValue()) {
+                    val cellObj = buildJSONObject {
+                        writeCellStyle(box)
+
+                        // written as style label for blocks
+                        if (!isBlock(box) && box.hasInitialValue()) {
+                            put(FIELD_VALUE, box.initialValue)
+                        }
+
+                        if (cellContents != null) {
+                            put(FIELD_CELL, cellContents)
+                        } else {
+                            put(FIELD_CELL, DEFAULT_EMPTY_WRITE.toLong())
+                        }
+                    }
+
+                    add(cellObj)
+                } else if (cellContents != null) {
+                    add(cellContents)
+                } else {
+                    add(DEFAULT_EMPTY_WRITE.toLong())
+                }
+            }
         }
 
         private fun isCellWithStyle(box : Box) : Boolean {
@@ -2229,65 +2136,52 @@ class IPuzIO : AbstractJSONIO() {
                 || (isBlock(box) && box.hasInitialValue())
         }
 
-        private fun writeCellStyle(
-            box : Box,
-            writer : FormatableJSONWriter,
-        ) {
+        private fun JSONObjectBuilder.writeCellStyle(box : Box) {
             if (!isCellWithStyle(box))
                 return
 
-            writer.key(FIELD_STYLE)
-                .`object`()
+            val styleObj = buildJSONObject {
+                val shape = SHAPE_BGS_REV.get(box.shape)
+                put(FIELD_SHAPE_BG, shape)
 
-            val shape = SHAPE_BGS_REV.get(box.shape)
-            if (shape != null) {
-                writer.key(FIELD_SHAPE_BG).value(shape)
+                // i say blocks have labels rather than values
+                if (isBlock(box) && box.hasInitialValue()) {
+                    put(FIELD_LABEL, box.initialValue)
+                }
+
+                writeColorFields(box)
+                writeBarredFields(box)
+                writeMarkField(box)
             }
 
-            // i say blocks have labels rather than values
-            if (isBlock(box) && box.hasInitialValue()) {
-                writer.key(FIELD_LABEL).value(box.initialValue)
-            }
-
-            writeColorFields(box, writer)
-            writeBarredFields(box, writer)
-            writeMarkField(box, writer)
-
-            writer.endObject()
+            put(FIELD_STYLE, styleObj)
         }
 
-        private fun writeColorFields(box : Box, writer : FormatableJSONWriter) {
+        private fun JSONObjectBuilder.writeColorFields(box : Box) {
             if (box.hasColor()) {
-                writer.key(FIELD_COLOR)
-                    .value(colorToHex(box.color))
+                put(FIELD_COLOR, colorToHex(box.color))
             }
             if (box.hasTextColor()) {
-                writer.key(FIELD_TEXT_COLOR)
-                    .value(colorToHex(box.textColor))
+                put(FIELD_TEXT_COLOR, colorToHex(box.textColor))
             }
             if (box.hasBarColor()) {
-                writer.key(FIELD_BAR_COLOR)
-                    .value(colorToHex(box.barColor))
+                put(FIELD_BAR_COLOR, colorToHex(box.barColor))
             }
         }
 
-        private fun writeBarredFields(
-            box : Box,
-            writer : FormatableJSONWriter,
-        ) {
+        private fun JSONObjectBuilder.writeBarredFields(box : Box) {
             if (!box.hasBars())
                 return
 
-            writeBarredField(box, FIELD_BARRED, Box.Bar.SOLID, writer)
-            writeBarredField(box, FIELD_BARRED_DASHED, Box.Bar.DASHED, writer)
-            writeBarredField(box, FIELD_BARRED_DOTTED, Box.Bar.DOTTED, writer)
+            writeBarredField(box, FIELD_BARRED, Box.Bar.SOLID)
+            writeBarredField(box, FIELD_BARRED_DASHED, Box.Bar.DASHED)
+            writeBarredField(box, FIELD_BARRED_DOTTED, Box.Bar.DOTTED)
         }
 
-        private fun writeBarredField(
+        private fun JSONObjectBuilder.writeBarredField(
             box : Box,
-            barField : String?,
+            barField : String,
             barStyle : Box.Bar?,
-            writer : FormatableJSONWriter,
         ) {
             var barred = ""
 
@@ -2301,605 +2195,422 @@ class IPuzIO : AbstractJSONIO() {
                 barred += BARRED_LEFT
 
             if (!barred.isEmpty())
-                writer.key(barField).value(barred)
+                put(barField, barred)
         }
 
-        private fun writeMarkField(box : Box, writer : FormatableJSONWriter) {
+        private fun JSONObjectBuilder.writeMarkField(box : Box) {
             if (box.hasMarks()) {
-                writer.key(FIELD_MARK)
-                    .`object`()
-
-                box.marks?.let { marks ->
-                    writeMark(FIELD_MARK_TOP_LEFT, marks[0][0], writer)
-                    writeMark(FIELD_MARK_TOP, marks[0][1], writer)
-                    writeMark(FIELD_MARK_TOP_RIGHT, marks[0][2], writer)
-                    writeMark(FIELD_MARK_LEFT, marks[1][0], writer)
-                    writeMark(FIELD_MARK_CENTER, marks[1][1], writer)
-                    writeMark(FIELD_MARK_RIGHT, marks[1][2], writer)
-                    writeMark(FIELD_MARK_BOTTOM_LEFT, marks[2][0], writer)
-                    writeMark(FIELD_MARK_BOTTOM, marks[2][1], writer)
-                    writeMark(FIELD_MARK_BOTTOM_RIGHT, marks[2][2], writer)
+                val marksObj = buildJSONObject {
+                    box.marks?.let { marks ->
+                        put(FIELD_MARK_TOP_LEFT, marks[0][0])
+                        put(FIELD_MARK_TOP, marks[0][1])
+                        put(FIELD_MARK_TOP_RIGHT, marks[0][2])
+                        put(FIELD_MARK_LEFT, marks[1][0])
+                        put(FIELD_MARK_CENTER, marks[1][1])
+                        put(FIELD_MARK_RIGHT, marks[1][2])
+                        put(FIELD_MARK_BOTTOM_LEFT, marks[2][0])
+                        put(FIELD_MARK_BOTTOM, marks[2][1])
+                        put(FIELD_MARK_BOTTOM_RIGHT, marks[2][2])
+                    }
                 }
 
-                writer.endObject()
+                put(FIELD_MARK, marksObj)
             }
-        }
-
-        private fun writeMark(
-            markField : String?,
-            text : String?,
-            writer : FormatableJSONWriter,
-        ) {
-            if (text == null)
-                return
-            writer.key(markField).value(text)
         }
 
         /**
          * Add the saved field to json
          */
-        @Throws(IOException::class)
-        private fun writeSaved(puz : Puzzle, writer : FormatableJSONWriter) {
-            writer.key(FIELD_SAVED)
-                .array()
-            writer.newLine()
-
+        private fun JSONObjectBuilder.writeSaved(puz : Puzzle) {
             val boxes : Array<Array<Box?>> = puz.boxes
 
-            for (row in boxes.indices) {
-                writer.indent(1)
-                    .array()
-
-                for (col in boxes[row].indices) {
-                    val box = boxes[row][col]
-
-                    if (box == null || isBlock(box))
-                        writer.value(DEFAULT_BLOCK)
-                    else if (box.isBlank())
-                        writer.value(DEFAULT_EMPTY_WRITE.toLong())
-                    else
-                        writer.value(box.response)
+            val savedArr = buildJSONArray {
+                for (row in boxes) {
+                    val rowArr = buildJSONArray {
+                        for (box in row) {
+                            if (box == null || isBlock(box))
+                                add(DEFAULT_BLOCK)
+                            else if (box.isBlank())
+                                add(DEFAULT_EMPTY_WRITE.toLong())
+                            else
+                                add(box.response)
+                        }
+                    }
+                    add(rowArr)
                 }
-
-                writer.endArray()
-                writer.newLine()
             }
 
-            writer.endArray()
-            writer.newLine()
+            put(FIELD_SAVED, savedArr)
         }
 
         /**
          * Add the solution field to json if the puzzle has one
          */
-        @Throws(IOException::class)
-        private fun writeSolution(puz : Puzzle, writer : FormatableJSONWriter) {
+        private fun JSONObjectBuilder.writeSolution(puz : Puzzle) {
             if (!puz.hasSolution())
                 return
 
-            writer.key(FIELD_SOLUTION)
-                .array()
-            writer.newLine()
-
             val boxes : Array<Array<Box?>> = puz.boxes
 
-            for (row in boxes.indices) {
-                writer.indent(1)
-                    .array()
-
-                for (col in boxes[row].indices) {
-                    val box = boxes[row][col]
-
-                    if (box == null || isBlock(box)) {
-                        writer.value(DEFAULT_BLOCK)
-                    } else if (box.hasSolution()) {
-                        writer.value(box.solution.toString())
-                    } else {
-                        writer.value(JSONObject.NULL)
+            val solutionArr = buildJSONArray {
+                for (row in boxes) {
+                    val rowArr = buildJSONArray {
+                        for (box in row) {
+                            if (box == null || isBlock(box)) {
+                                add(DEFAULT_BLOCK)
+                            } else if (box.hasSolution()) {
+                                add(box.solution.toString())
+                            } else {
+                                addNull()
+                            }
+                        }
                     }
+                    add(rowArr)
                 }
-
-                writer.endArray()
-                writer.newLine()
             }
 
-            writer.endArray()
-            writer.newLine()
+            put(FIELD_SOLUTION, solutionArr)
         }
 
         /**
          * Add the clues lists to the json
          */
-        @Throws(IOException::class)
-        private fun writeClues(puz : Puzzle, writer : FormatableJSONWriter) {
-            writer.key(FIELD_CLUES)
-                .`object`()
-            writer.newLine()
+        private fun JSONObjectBuilder.writeClues(puz : Puzzle) {
+            val cluesObj = buildJSONObject {
+                // Sort so guaranteed output order
+                for (listName in puz.clueListNames.sorted()) {
+                    val clues = puz.getClues(listName)
+                    if (clues == null)
+                        continue
 
-            // Sort so guaranteed output order
-            for (listName in puz.clueListNames.sorted()) {
-                val clues = puz.getClues(listName)
-                if (clues == null)
-                    continue
+                    var direction : String? = null
 
-                var direction : String? = null
+                    // check if a standard direction or "zones", else default to
+                    // "clues" list
+                    if (PuzzleUtils.isAcrossList(puz, clues)) {
+                        direction = FIELD_CLUES_ACROSS
+                    } else if (PuzzleUtils.isDownList(puz, clues)) {
+                        direction = FIELD_CLUES_DOWN
+                    } else if (PuzzleUtils.isZonesList(clues)) {
+                        direction = FIELD_CLUES_ZONES
+                    }
 
-                // check if a standard direction or "zones", else default to
-                // "clues" list
-                if (PuzzleUtils.isAcrossList(puz, clues)) {
-                    direction = FIELD_CLUES_ACROSS
-                } else if (PuzzleUtils.isDownList(puz, clues)) {
-                    direction = FIELD_CLUES_DOWN
-                } else if (PuzzleUtils.isZonesList(clues)) {
-                    direction = FIELD_CLUES_ZONES
-                }
-
-                // TODO: other directions
-                if (direction != null) {
-                    var fullListName = listName
-                    if (direction != fullListName)
-                        fullListName = direction + ":" + listName
-                    val zones = FIELD_CLUES_ZONES == direction
-                    Companion.writeClueList(fullListName, clues, zones, writer)
-                } else {
-                    // assume unrecognised fields are all Clues:xxx
-                    var fullListName = listName
-                    if (FIELD_CLUES_CLUES != listName)
-                        fullListName = FIELD_CLUES_CLUES + ":" + listName
-                    Companion.writeClueList(fullListName, clues, false, writer)
+                    // TODO: other directions
+                    if (direction != null) {
+                        var fullListName = listName
+                        if (direction != fullListName)
+                            fullListName = direction + ":" + listName
+                        val zones = FIELD_CLUES_ZONES == direction
+                        writeClueList(fullListName, clues, zones)
+                    } else {
+                        // assume unrecognised fields are all Clues:xxx
+                        var fullListName = listName
+                        if (FIELD_CLUES_CLUES != listName)
+                            fullListName = FIELD_CLUES_CLUES + ":" + listName
+                        writeClueList(fullListName, clues, false)
+                    }
                 }
             }
 
-            writer.endObject()
-            writer.newLine()
+            put(FIELD_CLUES, cluesObj)
         }
 
         /**
          * Convert a clues list into a json array and return it
          */
         @Throws(IOException::class)
-        private fun writeClueList(
-            fieldName : String?,
+        private fun JSONObjectBuilder.writeClueList(
+            fieldName : String,
             clues : Iterable<Clue>,
             withZones : Boolean,
-            writer : FormatableJSONWriter,
         ) {
-            writer.indent(1)
-                .key(fieldName)
-                .array()
-            writer.newLine()
+            val cluesArr = buildJSONArray {
+                for (clue in clues) {
+                    val hint = clue.hint
 
-            for (clue in clues) {
-                val hint = clue.hint
+                    if (withZones || clue.hasLabel()) {
+                        val clueObj = buildJSONObject {
+                            if (clue.hasClueNumber()) {
+                                put(FIELD_CLUE_NUMBER, clue.clueNumber)
+                            }
 
-                writer.indent(2)
+                            if (clue.hasLabel()) {
+                                put(FIELD_CLUE_LABEL, clue.label)
+                            }
 
-                if (withZones || clue.hasLabel()) {
-                    writer.`object`()
-                    writer.newLine()
+                            put(FIELD_CLUE_HINT, htmlUnicode(clue.hint))
 
-                    if (clue.hasClueNumber()) {
-                        writer.indent(3)
-                            .key(FIELD_CLUE_NUMBER)
-                            .value(clue.clueNumber)
-                        writer.newLine()
-                    }
-
-                    if (clue.hasLabel()) {
-                        writer.indent(3)
-                            .key(FIELD_CLUE_LABEL)
-                            .value(clue.label)
-                        writer.newLine()
-                    }
-
-                    writer.indent(3)
-                        .key(FIELD_CLUE_HINT)
-                        .value(htmlUnicode(clue.hint))
-                    writer.newLine()
-
-                    writer.newLine()
-
-                    if (clue.hasZone()) {
-                        writer.indent(3)
-                            .key(FIELD_CLUE_CELLS)
-                            .array()
-                        val zone = clue.zone
-                        for (pos in zone) {
-                            writer.array()
-                                .value(pos.col.toLong())
-                                .value(pos.row.toLong())
-                                .endArray()
+                            if (clue.hasZone()) {
+                                val zoneArr = buildJSONArray {
+                                    val zone = clue.zone
+                                    for (pos in zone) {
+                                        val posArr = buildJSONArray {
+                                            add(pos.col.toLong())
+                                            add(pos.row.toLong())
+                                        }
+                                        add(posArr)
+                                    }
+                                }
+                                put(FIELD_CLUE_CELLS, zoneArr)
+                            }
                         }
-                        writer.endArray()
-                        writer.newLine()
-                    }
-                    writer.indent(2)
-                        .endObject()
-                } else {
-                    if (clue.hasClueNumber()) {
-                        writer.array()
-                            .value(clue.clueNumber)
-                            .value(hint)
-                            .endArray()
+                        add(clueObj)
                     } else {
-                        writer.value(hint)
+                        if (clue.hasClueNumber()) {
+                            val clueArr = buildJSONArray {
+                                add(clue.clueNumber)
+                                add(hint)
+                            }
+                            add(clueArr)
+                        } else {
+                            add(hint)
+                        }
                     }
                 }
-                writer.newLine()
             }
 
-            writer.indent(1)
-                .endArray()
-            writer.newLine()
+            put(fieldName, cluesArr)
         }
 
         /**
          * Write Puzzle features not natively supported by IPuz
          */
         @Throws(IOException::class)
-        private fun writeExtensions(
+        private fun JSONObjectBuilder.writeExtensions(
             puz : Puzzle,
-            writer : FormatableJSONWriter,
             omitPlayState : Boolean,
         ) {
-            writeExtensionVolatility(writer)
+            writeExtensionVolatility()
 
-            writeClueSeparators(puz, writer)
+            writeClueSeparators(puz)
 
-            writer.keyValueNonNull(FIELD_EXT_SUPPORT_URL, puz.supportUrl)
-            writer.keyValueNonNull(FIELD_EXT_SHARE_URL, puz.shareUrl)
+            put(FIELD_EXT_SUPPORT_URL, puz.supportUrl)
+            put(FIELD_EXT_SHARE_URL, puz.shareUrl)
 
             if (puz.hasPinnedClueID) {
-                writer.key(FIELD_EXT_PINNED_CLUE_ID)
-                writeClueID(puz.pinnedClueID, writer)
-                writer.newLine()
+                puz.pinnedClueID?.let { cid ->
+                    put(
+                        FIELD_EXT_PINNED_CLUE_ID,
+                        getClueIDJSONObject(cid),
+                    )
+                }
             }
 
-            writer.keyValueNonNull(FIELD_EXT_IO_VERSION, IO_VERSION)
+            put(FIELD_EXT_IO_VERSION, IO_VERSION)
 
-            writeImages(puz, writer)
+            writeImages(puz)
 
             if (!omitPlayState) {
-                writer.key(FIELD_EXT_PLAY_DATA)
-                    .`object`()
-                writer.newLine()
+                val playDataObj = buildJSONObject {
+                    writeBoxExtras(puz)
+                    writePosition(puz)
+                    writeClueHistory(puz)
+                    writeClueNotes(puz)
+                    writePlayerNote(puz)
+                    writeFlaggedClues(puz)
 
-                writeBoxExtras(puz, writer)
-                writePosition(puz, writer)
-                writeClueHistory(puz, writer)
-                writeClueNotes(puz, writer)
-                writePlayerNote(puz, writer)
-                writeFlaggedClues(puz, writer)
-
-                writer.keyValueNonNull(1, FIELD_COMPLETION_TIME, puz.time)
-                    .keyValueNonNull(1, FIELD_PCNT_FILLED, puz.percentFilled)
-                    .keyValueNonNull(
-                        1,
-                        FIELD_PCNT_COMPLETE,
-                        puz.percentComplete,
-                    ).keyValueNonNull(1, FIELD_RATING, puz.rating.code)
-
-                writer.endObject()
-                writer.newLine()
+                    put(FIELD_COMPLETION_TIME, puz.time)
+                    put(FIELD_PCNT_FILLED, puz.percentFilled)
+                    put(FIELD_PCNT_COMPLETE, puz.percentComplete)
+                    put(FIELD_RATING, puz.rating.code)
+                }
+                put(FIELD_EXT_PLAY_DATA, playDataObj)
             }
         }
 
-        @Throws(IOException::class)
-        private fun writeImages(
-            puz : Puzzle,
-            writer : FormatableJSONWriter,
-        ) {
+        private fun JSONObjectBuilder.writeImages(puz : Puzzle) {
             val images = puz.images
             if (images.size > 0) {
-                writer.key(FIELD_EXT_IMAGES)
-                    .array()
-                writer.newLine()
-
-                for (image in images) {
-                    writer.`object`()
-                    writer.keyValueNonNull(1, FIELD_EXT_IMAGE_URL, image.url)
-                        .keyValueNonNull(1, FIELD_EXT_IMAGE_ROW, image.row)
-                        .keyValueNonNull(1, FIELD_EXT_IMAGE_COL, image.col)
-                        .keyValueNonNull(1, FIELD_EXT_IMAGE_WIDTH, image.width)
-                        .keyValueNonNull(
-                            1,
-                            FIELD_EXT_IMAGE_HEIGHT,
-                            image.height,
-                        )
-                        .endObject()
-                    writer.newLine()
+                val imagesArr = buildJSONArray {
+                    for (image in images) {
+                        val imageObj = buildJSONObject {
+                            put(FIELD_EXT_IMAGE_URL, image.url)
+                            put(FIELD_EXT_IMAGE_ROW, image.row)
+                            put(FIELD_EXT_IMAGE_COL, image.col)
+                            put(FIELD_EXT_IMAGE_WIDTH, image.width)
+                            put(FIELD_EXT_IMAGE_HEIGHT, image.height)
+                        }
+                        add(imageObj)
+                    }
                 }
-
-                writer.endArray()
-                writer.newLine()
+                put(FIELD_EXT_IMAGES, imagesArr)
             }
         }
 
         /**
          * Add Note objects about individual clues to json
          */
-        @Throws(IOException::class)
-        private fun writeClueNotes(
-            puz : Puzzle,
-            writer : FormatableJSONWriter,
-        ) {
-            writer.indent(1)
-                .key(FIELD_CLUE_NOTES)
-                .array()
-            writer.newLine()
+        private fun JSONObjectBuilder.writeClueNotes(puz : Puzzle) {
+            val clueNotesArr = buildJSONArray {
+                // Sort so guaranteed output order
+                for (listName in puz.clueListNames.sorted()) {
+                    val clues = puz.getClues(listName)
+                    if (clues == null)
+                        continue
 
-            // Sort so guaranteed output order
-            for (listName in puz.clueListNames.sorted()) {
-                val clues = puz.getClues(listName)
-                if (clues == null)
-                    continue
-
-                for (clue in clues) {
-                    val cid = clue.clueID
-                    val note = puz.getNote(cid)
-                    if (note != null && !note.isEmpty) {
-                        writer.indent(2)
-                            .`object`()
-                        writer.newLine()
-                            .indent(3)
-                            .key(FIELD_CLUE_NOTE_CLUE)
-                        writeClueID(cid, writer)
-                        writer.newLine()
-                            .keyValueNonNull(
-                                3,
-                                FIELD_NOTE_SCRATCH,
-                                note.compressedScratch
-                            ).keyValueNonNull(
-                                3,
-                                FIELD_NOTE_TEXT,
-                                htmlString(note.text)
-                            ).keyValueNonNull(
-                                3,
-                                FIELD_NOTE_ANAGRAM_SRC,
-                                note.compressedAnagramSource
-                            ).keyValueNonNull(
-                                3,
-                                FIELD_NOTE_ANAGRAM_SOL,
-                                note.compressedAnagramSolution
-                            )
-                        writer.indent(2)
-                            .endObject()
-                        writer.newLine()
+                    for (clue in clues) {
+                        val cid = clue.clueID
+                        val note = puz.getNote(cid)
+                        if (note != null && !note.isEmpty) {
+                            val noteObj = buildJSONObject {
+                                put(
+                                    FIELD_CLUE_NOTE_CLUE,
+                                    getClueIDJSONObject(cid),
+                                )
+                                put(FIELD_NOTE_SCRATCH, note.compressedScratch)
+                                put(FIELD_NOTE_TEXT, htmlString(note.text))
+                                put(
+                                    FIELD_NOTE_ANAGRAM_SRC,
+                                    note.compressedAnagramSource,
+                                )
+                                put(
+                                    FIELD_NOTE_ANAGRAM_SOL,
+                                    note.compressedAnagramSolution,
+                                )
+                            }
+                            add(noteObj)
+                        }
                     }
                 }
             }
 
-            writer.indent(1)
-                .endArray()
-            writer.newLine()
+            put(FIELD_CLUE_NOTES, clueNotesArr)
         }
 
         /**
          * Add player Note object
          */
-        @Throws(IOException::class)
-        private fun writePlayerNote(
-            puz : Puzzle,
-            writer : FormatableJSONWriter,
-        ) {
+        private fun JSONObjectBuilder.writePlayerNote(puz : Puzzle) {
             val note = puz.playerNote
             if (note != null && !note.isEmpty) {
-                writer.indent(1)
-                    .key(FIELD_PLAYER_NOTE)
-                    .`object`()
-                writer.newLine()
-                    .keyValueNonNull(
-                        2,
-                        FIELD_NOTE_SCRATCH,
-                        note.compressedScratch,
-                    ).keyValueNonNull(
-                        2,
-                        FIELD_NOTE_TEXT,
-                        htmlString(note.text),
-                    ).keyValueNonNull(
-                        2,
-                        FIELD_NOTE_ANAGRAM_SRC,
-                        note.compressedAnagramSource,
-                    ).keyValueNonNull(
-                        2,
-                        FIELD_NOTE_ANAGRAM_SOL,
-                        note.compressedAnagramSolution,
-                    )
-                writer.indent(1)
-                    .endObject()
-                writer.newLine()
+                val noteObj = buildJSONObject {
+                    put(FIELD_NOTE_SCRATCH, note.compressedScratch)
+                    put(FIELD_NOTE_TEXT, htmlString(note.text))
+                    put(FIELD_NOTE_ANAGRAM_SRC, note.compressedAnagramSource)
+                    put(FIELD_NOTE_ANAGRAM_SOL, note.compressedAnagramSolution)
+                }
+                put(FIELD_PLAYER_NOTE, noteObj)
             }
         }
 
-        @Throws(IOException::class)
-        private fun writeFlaggedClues(
-            puz : Puzzle,
-            writer : FormatableJSONWriter,
-        ) {
-            writer.indent(1)
-                .key(FIELD_FLAGGED_CLUES)
-                .array()
-            writer.newLine()
+        private fun JSONObjectBuilder.writeFlaggedClues(puz : Puzzle) {
+            val flaggedArr = buildJSONArray {
+                // guarantee writing order
+                val clues = puz.allClues
+                    .filter { it.isFlagged }
+                    .sortedWith { clue1, clue2 ->
+                        clue1.clueID.compareTo(clue2.clueID)
+                    }
 
-            // guarantee writing order
-            val clues = puz.allClues
-                .filter { it.isFlagged }
-                .sortedWith { clue1, clue2 ->
-                    clue1.clueID.compareTo(clue2.clueID)
+                for (clue in clues) {
+                    val cid = clue.clueID
+                    val flagObj = buildJSONObject {
+                        writeClueIDFields(cid)
+                        if (!clue.isDefaultFlagColor) {
+                            put(FIELD_COLOR, colorToHex(clue.flagColor))
+                        }
+                    }
+                    add(flagObj)
                 }
-
-            for (clue in clues) {
-                val cid = clue.clueID
-                writer.indent(2)
-
-                writer.`object`()
-                writeClueIDFields(cid, writer)
-                if (!clue.isDefaultFlagColor) {
-                    writer.key(FIELD_COLOR).value(colorToHex(clue.flagColor))
-                }
-                writer.endObject()
-
-                writer.newLine()
             }
 
-            writer.indent(1)
-                .endArray()
-            writer.newLine()
+            put(FIELD_FLAGGED_CLUES, flaggedArr)
         }
 
         /**
-         * Write a ClueID on one line as a JSONObject
+         * Get a ClueID as a JSONObject
          */
-        @Throws(IOException::class)
-        private fun writeClueID(
-            cid : ClueID?,
-            writer : FormatableJSONWriter,
-        ) {
-            if (cid != null) {
-                writer.`object`()
-                writeClueIDFields(cid, writer)
-                writer.endObject()
-            }
+        private fun getClueIDJSONObject(cid : ClueID) : JSONObject {
+            return buildJSONObject { writeClueIDFields(cid) }
         }
 
         /**
          * Write ClueID fields without wrapping in an object
          */
-        @Throws(IOException::class)
-        private fun writeClueIDFields(
-            cid : ClueID?,
-            writer : FormatableJSONWriter,
-        ) {
+        private fun JSONObjectBuilder.writeClueIDFields(cid : ClueID?) {
             if (cid != null) {
-                writer.key(FIELD_CLUE_LISTNAME).value(cid.listName)
-                    .key(FIELD_CLUE_INDEX).value(cid.index.toLong())
+                put(FIELD_CLUE_LISTNAME, cid.listName)
+                put(FIELD_CLUE_INDEX, cid.index.toLong())
             }
         }
 
         /**
          * Write separators field to extra data
          */
-        @Throws(IOException::class)
-        private fun writeClueSeparators(
-            puz : Puzzle,
-            writer : FormatableJSONWriter,
-        ) {
+        private fun JSONObjectBuilder.writeClueSeparators(puz : Puzzle) {
             if (!puz.hasClueSeparators())
                 return
 
-            writer.key(FIELD_EXT_SEPARATORS)
-                .array()
-            writer.newLine()
-
-            for (listName in puz.clueListNames) {
-                for (clue in puz.getClues(listName)!!) {
-                    writeClueSeparators(1, clue, writer)
+            val separatorsArr = buildJSONArray {
+                for (listName in puz.clueListNames) {
+                    for (clue in puz.getClues(listName)!!) {
+                        writeClueSeparators(clue)
+                    }
                 }
             }
 
-            writer.endArray()
-            writer.newLine()
+            put(FIELD_EXT_SEPARATORS, separatorsArr)
         }
 
         /**
          * Write clue separators to writer if has separators
          */
-        @Throws(IOException::class)
-        private fun writeClueSeparators(
-            indent : Int,
+        private fun JSONArrayBuilder.writeClueSeparators(
             clue : Clue,
-            writer : FormatableJSONWriter,
         ) {
             if (!clue.hasSeparators())
                 return
 
-            writer.indent(indent)
-                .`object`()
-            writer.newLine()
+            val clueSeparatorsObj = buildJSONObject {
+                put(FIELD_CLUEID, getClueIDJSONObject(clue.clueID))
 
-            writer.indent(indent + 1)
-                .key(FIELD_CLUEID)
-            writeClueID(clue.clueID, writer)
-            writer.newLine()
-
-            writer.indent(indent + 1)
-                .key(FIELD_CLUE_SEPARATORS)
-                .`object`()
-            writer.newLine()
-
-            for (pos in clue.separatorPositions) {
-                writer.indent(indent + 2)
-                    .key(pos.toString())
-                    .value(clue.getSeparator(pos).toString())
-                writer.newLine()
+                val separatorsObj = buildJSONObject {
+                    for (pos in clue.separatorPositions) {
+                        put(pos.toString(), clue.getSeparator(pos).toString())
+                    }
+                }
+                put(FIELD_CLUE_SEPARATORS, separatorsObj)
             }
 
-            writer.indent(indent + 1)
-                .endObject()
-            writer.newLine()
-
-            writer.indent(indent)
-                .endObject()
-            writer.newLine()
+            add(clueSeparatorsObj)
         }
 
         /**
          * Write clue history list
          */
-        @Throws(IOException::class)
-        private fun writeClueHistory(
-            puz : Puzzle,
-            writer : FormatableJSONWriter,
-        ) {
+        private fun JSONObjectBuilder.writeClueHistory(puz : Puzzle) {
             val history = puz.history
             if (history.isEmpty())
                 return
 
-            writer.indent(1)
-                .key(FIELD_CLUE_HISTORY)
-                .array()
-            writer.newLine()
-
-            for (item in puz.history) {
-                writer.indent(2)
-                writeClueID(item, writer)
-                writer.newLine()
+            val historyArr = buildJSONArray {
+                for (item in puz.history) {
+                    add(getClueIDJSONObject(item))
+                }
             }
-
-            writer.indent(1)
-                .endArray()
-            writer.newLine()
+            put(FIELD_CLUE_HISTORY, historyArr)
         }
 
         /**
          * Write current highlight position
          */
-        @Throws(IOException::class)
-        private fun writePosition(puz : Puzzle, writer : FormatableJSONWriter) {
+        private fun JSONObjectBuilder.writePosition(puz : Puzzle) {
             val pos = puz.position
-
-            writer.indent(1)
-                .key(FIELD_POSITION)
-                .`object`()
-                .key(FIELD_POSITION_ROW).value(pos.row.toLong())
-                .key(FIELD_POSITION_COL).value(pos.col.toLong())
-            val cid = puz.currentClueID
-            if (cid != null) {
-                writer.key(FIELD_CLUEID)
-                writeClueID(cid, writer)
+            val posObj = buildJSONObject {
+                put(FIELD_POSITION_ROW, pos.row.toLong())
+                put(FIELD_POSITION_COL, pos.col.toLong())
+                val cid = puz.currentClueID
+                if (cid != null) {
+                    put(FIELD_CLUEID, getClueIDJSONObject(cid))
+                }
             }
-            writer.endObject()
-            writer.newLine()
+            put(FIELD_POSITION, posObj)
         }
 
         /**
          * Write additional info about boxes (cheated, responder) if any
          */
-        @Throws(IOException::class)
-        private fun writeBoxExtras(
-            puz : Puzzle,
-            writer : FormatableJSONWriter,
-        ) {
+        private fun JSONObjectBuilder.writeBoxExtras(puz : Puzzle) {
             val hasBoxExtras = (
                 puz.hasCheated()
                 || puz.hasResponders()
@@ -2911,66 +2622,48 @@ class IPuzIO : AbstractJSONIO() {
 
             val boxes = puz.boxes
 
-            writer.indent(1)
-                .key(FIELD_BOX_EXTRAS)
-                .array()
-            writer.newLine()
+            val boxExtrasArr = buildJSONArray {
+                for (row in boxes) {
+                    val rowArr = buildJSONArray {
+                        for (box in row) {
+                            val boxObj = buildJSONObject {
+                                if (box != null && !isBlock(box)) {
+                                    if (box.isCheated)
+                                        put(FIELD_BOX_CHEATED, true)
+                                    put(FIELD_BOX_RESPONDER, box.responder)
+                                    if (box.isFlagged)
+                                        put(FIELD_BOX_FLAGGED, true)
+                                    if (!box.isDefaultFlagColor()) {
+                                        put(
+                                            FIELD_BOX_FLAG_COLOR,
+                                            colorToHex(box.flagColor),
+                                        )
+                                    }
+                                }
+                            }
 
-            for (row in boxes.indices) {
-                writer.indent(2)
-                    .array()
-                for (col in boxes[row].indices) {
-                    writer.`object`()
-
-                    val box = boxes[row][col]
-                    if (box != null && !isBlock(box)) {
-                        if (box.isCheated)
-                            writer.key(FIELD_BOX_CHEATED).value(true)
-                        val responder = box.responder
-                        if (responder != null)
-                            writer.key(FIELD_BOX_RESPONDER).value(responder)
-                        if (box.isFlagged)
-                            writer.key(FIELD_BOX_FLAGGED).value(true)
-                        if (!box.isDefaultFlagColor()) {
-                            writer.key(FIELD_BOX_FLAG_COLOR)
-                                .value(colorToHex(box.flagColor))
+                            add(boxObj)
                         }
                     }
 
-                    writer.endObject()
+                    add(rowArr)
                 }
-
-                writer.endArray()
-                writer.newLine()
             }
 
-            writer.indent(1)
-                .endArray()
-            writer.newLine()
+            put(FIELD_BOX_EXTRAS, boxExtrasArr)
         }
 
         /**
          * Write volatility info about our extensions to json
          */
-        @Throws(IOException::class)
-        private fun writeExtensionVolatility(writer : FormatableJSONWriter) {
-            writer.key(FIELD_VOLATILE)
-                .`object`()
-            writer.newLine()
-
-            for (field in VOLATILE_EXTENSIONS)
-                writer.keyValueNonNull(1, field, FIELD_IS_VOLATILE)
-
-            for (field in NON_VOLATILE_EXTENSIONS) {
-                writer.keyValueNonNull(
-                    1,
-                    field,
-                    FIELD_IS_NOT_VOLATILE,
-                )
+        private fun JSONObjectBuilder.writeExtensionVolatility() {
+            val volatilityObj = buildJSONObject {
+                for (field in VOLATILE_EXTENSIONS)
+                    put(field, FIELD_IS_VOLATILE)
+                for (field in NON_VOLATILE_EXTENSIONS)
+                    put(field, FIELD_IS_NOT_VOLATILE)
             }
-
-            writer.endObject()
-            writer.newLine()
+            put(FIELD_VOLATILE, volatilityObj)
         }
 
         /**

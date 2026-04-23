@@ -6,11 +6,10 @@ import java.io.InputStream
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-import org.json.JSONException
-import org.json.JSONObject
-
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.io.GuardianJSONIO
+import app.crossword.yourealwaysbe.puz.util.JSONException
+import app.crossword.yourealwaysbe.puz.util.parseJSONObject
 
 /**
  * Downloader for MyCrossword.co.uk embedded Crosswords
@@ -42,7 +41,7 @@ class MyCrosswordStreamScraper : AbstractStreamScraper() {
                 if (jsonString == null)
                     return null
 
-                val json = JSONObject(jsonString)
+                val json = parseJSONObject(jsonString)
                 var data = json.optJSONObject("state")
                 if (data == null)
                     return null

@@ -33,7 +33,6 @@
 -dontwarn androidx.datastore.**
 
 # JSoup
--keep class org.jsoup.** { *; }
 -keepclassmembers class org.jsoup.** { *; }
 -dontwarn org.jsoup.helper.RequestAuthHandler
 -dontwarn org.jsoup.helper.HttpClientExecutor
@@ -181,8 +180,6 @@
 -keep class org.jetbrains.compose.resources.DrawableResource
 -keep class org.jetbrains.compose.resources.PluralStringResource
 -keep class org.jetbrains.compose.resources.StringResource
--keep class org.json.JSONArray
--keep class org.json.JSONObject
 -keep class org.koin.core.KoinApplication
 -keep class org.koin.core.module.Module
 -keep class org.koin.core.parameter.ParametersHolder

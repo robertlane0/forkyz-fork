@@ -6,14 +6,14 @@ import java.io.InputStream
 import java.util.logging.Logger
 import kotlinx.datetime.LocalDate
 
-import org.json.JSONException
-import org.json.JSONObject
-
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Clue
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.PuzzleBuilder
-import app.crossword.yourealwaysbe.puz.util.JSONParser.parse
+import app.crossword.yourealwaysbe.puz.util.JSONException
+import app.crossword.yourealwaysbe.puz.util.JSONObject
+import app.crossword.yourealwaysbe.puz.util.parseJSONObject
+
 
 /**
  * Read a character stream of JSON data in the format used by the
@@ -38,7 +38,7 @@ class AmuseLabsJSONIO : AbstractJSONIO() {
         @Throws(IOException::class)
         fun readPuzzle(inStream : InputStream) : Puzzle? {
             try {
-                val json = parse(inStream)
+                val json = parseJSONObject(inStream)
                 return readPuzzleFromJSON(json)
             } catch (e : AmuseLabsFormatException) {
                 LOG.severe("Could not read Amuse Labs JSON: " + e)
@@ -51,7 +51,7 @@ class AmuseLabsJSONIO : AbstractJSONIO() {
 
         fun readPuzzle(jsonString : String) : Puzzle? {
             try {
-                val json = parse(jsonString)
+                val json = parseJSONObject(jsonString)
                 return readPuzzleFromJSON(json)
             } catch (e : AmuseLabsFormatException) {
                 LOG.severe("Could not read Amuse Labs JSON: " + e)
@@ -70,11 +70,11 @@ class AmuseLabsJSONIO : AbstractJSONIO() {
             try {
                 val builder = PuzzleBuilder(getBoxes(json))
 
-                builder.setTitle(optStringNull(json, "title"))
-                    .setAuthor(optStringNull(json, "author"))
-                    .setCopyright(optStringNull(json, "copyright"))
-                    .setSource(optStringNull(json, "publisher"))
-                    .setCompletionMessage(optStringNull(json, "endMessage"))
+                builder.setTitle(json.optStringEmptyNull("title"))
+                    .setAuthor(json.optStringEmptyNull("author"))
+                    .setCopyright(json.optStringEmptyNull("copyright"))
+                    .setSource(json.optStringEmptyNull("publisher"))
+                    .setCompletionMessage(json.optStringEmptyNull("endMessage"))
 
                 if (json.has("publishTime")) {
                     val epochMillis = json.getLong("publishTime")
@@ -105,9 +105,9 @@ class AmuseLabsJSONIO : AbstractJSONIO() {
             }
 
             var cols = json.getJSONArray("box")
-            for (col in 0..<cols.length()) {
+            for (col in 0..<cols.size) {
                 val rows = cols.getJSONArray(col)
-                for (row in 0..<rows.length()) {
+                for (row in 0..<rows.size) {
                     val entryString = rows.getString(row)
 
                     val isBox = (
@@ -124,11 +124,11 @@ class AmuseLabsJSONIO : AbstractJSONIO() {
                 }
             }
 
-            cols = json.optJSONArray("clueNums")
-            if (cols != null) {
-                for (col in 0..<cols.length()) {
-                    val rows = cols.getJSONArray(col)
-                    for (row in 0..<rows.length()) {
+            val nums = json.optJSONArray("clueNums")
+            if (nums != null) {
+                for (col in 0..<nums.size) {
+                    val rows = nums.getJSONArray(col)
+                    for (row in 0..<rows.size) {
                         val clueNum = rows.optInt(row, 0)
 
                         if (clueNum > 0) {
@@ -142,12 +142,12 @@ class AmuseLabsJSONIO : AbstractJSONIO() {
 
             val cellInfos = json.optJSONArray("cellInfos")
             if (cellInfos != null) {
-                for (i in 0..<cellInfos.length()) {
+                for (i in 0..<cellInfos.size) {
                     val cellInfo = cellInfos.getJSONObject(i)
 
                     val row = cellInfo.getInt("y")
                     val col = cellInfo.getInt("x")
-                    val circled = cellInfo.optBoolean("isCircled")
+                    val circled = cellInfo.optBoolean("isCircled", false)
 
                     if (circled) {
                         val box = boxes[row][col] ?: Box()
@@ -162,14 +162,14 @@ class AmuseLabsJSONIO : AbstractJSONIO() {
 
         @Throws(JSONException::class)
         private fun addClues(json : JSONObject, builder : PuzzleBuilder) {
-            val entries = json.getJSONArray("placedWords")
+            val entries = json.optJSONArray("placedWords")
 
             if (entries == null)
                 return
 
             val wordLengthsEnabled = json.optBoolean("wordLengthsEnabled", true)
 
-            for (i in 0..<entries.length()) {
+            for (i in 0..<entries.size) {
                 val entry = entries.getJSONObject(i)
 
                 val num = entry.getInt("clueNum")
@@ -177,7 +177,7 @@ class AmuseLabsJSONIO : AbstractJSONIO() {
                     val number = num.toString()
                     val across = entry.getBoolean("acrossNotDown")
                     var clue = entry.getJSONObject("clue").getString("clue")
-                    var listName = optStringNull(entry, "clueSection")
+                    var listName = entry.optStringEmptyNull("clueSection")
                     if (listName == null) listName = if (across)
                         DefaultListNames.ACROSS_LIST
                     else
@@ -222,7 +222,7 @@ class AmuseLabsJSONIO : AbstractJSONIO() {
 
             val enumeration = StringBuilder()
             enumeration.append("(")
-            for (i in 0..<wordLens.length()) {
+            for (i in 0..<wordLens.size) {
                 if (i > 0)
                     enumeration.append(",")
                 enumeration.append(wordLens.get(i).toString())
@@ -243,7 +243,7 @@ class AmuseLabsJSONIO : AbstractJSONIO() {
             var totalLen = 0
 
             // length - 1 to remove last marker
-            for (i in 0..<wordLens.length() - 1) {
+            for (i in 0..<wordLens.size - 1) {
                 val len = wordLens.optInt(i, -1)
                 if (len < 0)
                     return null

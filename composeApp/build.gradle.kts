@@ -82,6 +82,7 @@ kotlin {
             implementation(libs.datetime.wheel.picker)
             implementation(libs.filekit.dialogs.compose)
             implementation(libs.htmlconverter)
+            implementation(libs.jsoup)
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.koin.compose.viewmodel.navigation)
@@ -93,7 +94,7 @@ kotlin {
             implementation(libs.mcp.sdk.server)
             implementation(libs.words.to.numbers)
 
-            implementation(project(path = ":puzlib", configuration = "shadow"))
+            implementation(project(path = ":puzlib"))
         }
 
         androidMain.dependencies {
@@ -125,8 +126,6 @@ kotlin {
             implementation(libs.androidx.arch.core.testing)
             implementation(libs.kotlinx.coroutines.test)
             implementation(libs.junit4)
-            // thanks https://stackoverflow.com/a/30759769
-            implementation(libs.json.legacy)
             implementation(libs.mockito.kotlin)
         }
 
@@ -147,9 +146,6 @@ kotlin {
             implementation(libs.directories)
             implementation(libs.ktor.client.java)
             implementation(libs.kotlinx.coroutines.swing)
-
-            // thanks https://stackoverflow.com/a/30759769
-            implementation(libs.json.legacy)
         }
     }
 

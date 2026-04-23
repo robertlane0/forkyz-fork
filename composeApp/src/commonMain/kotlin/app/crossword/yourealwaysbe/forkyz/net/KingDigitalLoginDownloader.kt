@@ -10,15 +10,14 @@ import kotlinx.datetime.format
 import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
 
-import org.json.JSONArray
-import org.json.JSONException
-import org.json.JSONObject
-
 import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.getURLInputStream
 import app.crossword.yourealwaysbe.forkyz.util.getURLJSON
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.io.JPZIO
+import app.crossword.yourealwaysbe.puz.util.JSONArray
+import app.crossword.yourealwaysbe.puz.util.JSONException
+import app.crossword.yourealwaysbe.puz.util.buildJSONObject
 
 /**
  * King Digital Downloader for API with login
@@ -138,8 +137,7 @@ class KingDigitalLoginDownloader(
     private fun getLoginKey(
         headers : Map<String, String>? = null
     ) : String? {
-        val loginJson = JSONObject()
-        with (loginJson) {
+        val loginJson = buildJSONObject {
             put("t", "json")
             put("uid", username)
             put("pwd", password)
@@ -161,8 +159,7 @@ class KingDigitalLoginDownloader(
         key : String,
     ) : JSONArray? {
         // get all available puzzle assets
-        val getPuzUrlJson = JSONObject()
-        with (getPuzUrlJson) {
+        val getPuzUrlJson = buildJSONObject {
             val dateStr = date.format(DATE_FORMATTER)
             put("t", "json")
             put("k", key)
@@ -185,17 +182,17 @@ class KingDigitalLoginDownloader(
         assets : JSONArray,
         date : LocalDate,
     ) : String? {
-        for (i in 0 until assets.length()) {
+        for (i in 0 until assets.size) {
             val asset = assets.getJSONObject(i)
             if (asset.optString("FILEEXT") == "jpz") {
                 try {
-                    val assetDate = asset.optString("PUBDATE")
+                    val assetDate = asset.optString("PUBDATE") ?: ""
                     if (!assetDate.isEmpty()) {
                         val parsedDate = LocalDateTime.Formats.ISO.parse(
                             assetDate,
                         ).date
                         if (parsedDate == date) {
-                            val url = asset.optString("ASSETLINK")
+                            val url = asset.optString("ASSETLINK") ?: ""
                             if (!url.isEmpty())
                                 return url
                         }

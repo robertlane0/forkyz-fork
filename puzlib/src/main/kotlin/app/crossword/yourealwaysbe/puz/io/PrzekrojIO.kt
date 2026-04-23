@@ -6,16 +6,16 @@ import java.io.InputStream
 import java.util.Locale
 import java.util.logging.Logger
 
-import org.json.JSONException
-import org.json.JSONObject
-
 import org.jsoup.Jsoup
 
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.PuzImage
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.PuzzleBuilder
-import app.crossword.yourealwaysbe.puz.util.JSONParser.parse
+import app.crossword.yourealwaysbe.puz.util.JSONException
+import app.crossword.yourealwaysbe.puz.util.JSONObject
+import app.crossword.yourealwaysbe.puz.util.parseJSONObject
+
 
 /**
  * Read crosswords from https://przekroj.pl
@@ -54,7 +54,7 @@ class PrzekrojIO : PuzzleParser {
 
                 var puz : Puzzle? = null
                 try {
-                    puz = readPuzzleFromJSON(parse(copy))
+                    puz = readPuzzleFromJSON(parseJSONObject(copy))
                 } catch (e : JSONException) {
                     // fall through
                 }
@@ -73,7 +73,7 @@ class PrzekrojIO : PuzzleParser {
                             title = titleEle.text().trim()
                     }
 
-                    puz = readPuzzleFromJSON(parse(cwJson))
+                    puz = readPuzzleFromJSON(parseJSONObject(cwJson))
                     if (title != null) {
                         puz.let { it.title = title }
                     }
@@ -115,7 +115,7 @@ class PrzekrojIO : PuzzleParser {
             }
 
             val questions = json.getJSONArray("questions")
-            for (i in 0..<questions.length()) {
+            for (i in 0..<questions.size) {
                 val question = questions.getJSONObject(i)
                 var row = question.getInt("y") - 1
                 var col = question.getInt("x") - 1
@@ -164,7 +164,7 @@ class PrzekrojIO : PuzzleParser {
 
         private fun addClues(json : JSONObject, builder : PuzzleBuilder) {
             val questions = json.getJSONArray("questions")
-            for (i in 0..<questions.length()) {
+            for (i in 0..<questions.size) {
                 val question = questions.getJSONObject(i)
                 val number = question.getString("n")
                 val hint = question.getString("q")
@@ -183,7 +183,7 @@ class PrzekrojIO : PuzzleParser {
             if (images == null)
                 return
 
-            for (i in 0..<images.length()) {
+            for (i in 0..<images.size) {
                 val image = images.getJSONObject(i)
                 val url = image.getString("src")
                 val row = image.getInt("y") - 1
@@ -191,7 +191,7 @@ class PrzekrojIO : PuzzleParser {
                 val width = image.getInt("w")
                 val height = image.getInt("h")
 
-                if (url != null && !url.isEmpty())
+                if (!url.isEmpty())
                     builder.addImage(PuzImage(url, row, col, width, height))
             }
         }

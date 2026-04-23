@@ -10,16 +10,16 @@ import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
 
-import org.json.JSONException
-import org.json.JSONObject
-
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Clue
 import app.crossword.yourealwaysbe.puz.Position
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.PuzzleBuilder
 import app.crossword.yourealwaysbe.puz.Zone
-import app.crossword.yourealwaysbe.puz.util.JSONParser.parse
+import app.crossword.yourealwaysbe.puz.util.JSONException
+import app.crossword.yourealwaysbe.puz.util.JSONObject
+import app.crossword.yourealwaysbe.puz.util.parseJSONObject
+
 
 /**
  * SlowDownWiseUp JSON format
@@ -83,7 +83,7 @@ class SlowDownWiseUpJSONIO : AbstractJSONIO() {
         @Throws(IOException::class)
         fun readPuzzle(inStream : InputStream) : Puzzle? {
             try {
-                val json = parse(inStream)
+                val json = parseJSONObject(inStream)
                 return readPuzzleFromJSON(json)
             } catch (e : SlowDownWiseUpJSONFormatException) {
                 LOG.severe("Could not read SlowDownWiseUp JSON: " + e)
@@ -96,7 +96,7 @@ class SlowDownWiseUpJSONIO : AbstractJSONIO() {
 
         fun readPuzzle(jsonString : String) : Puzzle? {
             try {
-                val json = parse(jsonString)
+                val json = parseJSONObject(jsonString)
                 return readPuzzleFromJSON(json)
             } catch (e : SlowDownWiseUpJSONFormatException) {
                 LOG.severe("Could not read SlowDownWiseUp JSON: " + e)
@@ -132,25 +132,25 @@ class SlowDownWiseUpJSONIO : AbstractJSONIO() {
             val rowList = mutableListOf<Array<Box?>>()
 
             val rows = json.getJSONArray("grid")
-            return Array(rows.length()) { row ->
+            return Array(rows.size) { row ->
                 val rowArray = rows.getJSONArray(row)
-                val rowBoxes = arrayOfNulls<Box?>(rowArray.length())
-                for (col in 0..<rowArray.length()) {
+                val rowBoxes = arrayOfNulls<Box?>(rowArray.size)
+                for (col in 0..<rowArray.size) {
                     val cell = rowArray.getJSONObject(col)
                     if (
                         !"blank".equals(
-                            optStringNull(cell, "Blank"),
+                            cell.optStringEmptyNull("Blank"),
                             ignoreCase = true,
                         )
                     ) {
                         val box = Box()
 
-                        box.clueNumber = optStringNull(cell, "Number")
-                        box.solution = optStringNull(cell, "Letter")
+                        box.clueNumber = cell.optStringEmptyNull("Number")
+                        box.solution = cell.optStringEmptyNull("Letter")
 
                         val style = cell.optJSONObject("style")
                         if (style != null) {
-                            val shape = optStringNull(style, "shapebg")
+                            val shape = style.optStringEmptyNull("shapebg")
                             if ("circle".equals(shape, ignoreCase = true)) {
                                 box.shape = Box.Shape.CIRCLE
                             } else {
@@ -175,16 +175,16 @@ class SlowDownWiseUpJSONIO : AbstractJSONIO() {
         @Throws(JSONException::class)
         private fun addMetaData(json : JSONObject, builder : PuzzleBuilder) {
             val copy = json.getJSONObject("copy")
-            builder.setTitle(optStringNull(copy, "title"))
-            builder.setAuthor(optStringNull(copy, "setter"))
-            builder.setSource(optStringNull(copy, "publisher"))
-            builder.setNotes(optStringNull(copy, "description"))
+            builder.setTitle(copy.optStringEmptyNull("title"))
+            builder.setAuthor(copy.optStringEmptyNull("setter"))
+            builder.setSource(copy.optStringEmptyNull("publisher"))
+            builder.setNotes(copy.optStringEmptyNull("description"))
             builder.setCompletionMessage(
-                optStringNull(copy, "correctsolutionmessagetext"),
+                copy.optStringEmptyNull("correctsolutionmessagetext"),
             )
 
             try {
-                val date = optStringNull(copy, "date-publish")
+                val date = copy.optStringEmptyNull("date-publish")
                 if (date != null)
                     builder.setDate(DATE_FORMATTER.parse(date))
             } catch (e : IllegalArgumentException) {
@@ -196,7 +196,7 @@ class SlowDownWiseUpJSONIO : AbstractJSONIO() {
         private fun addClues(json : JSONObject, builder : PuzzleBuilder) {
             val zones : Map<Int, Zone> = getZones(json)
             val clues = json.getJSONObject("copy").getJSONArray("clues")
-            for (i in 0..<clues.length()) {
+            for (i in 0..<clues.size) {
                 addCluesList(clues.getJSONObject(i), zones, builder)
             }
         }
@@ -207,11 +207,11 @@ class SlowDownWiseUpJSONIO : AbstractJSONIO() {
             zones : Map<Int, Zone>,
             builder : PuzzleBuilder,
         ) {
-            var listName = optStringNull(json, "title")
+            var listName = json.optStringEmptyNull("title")
                 ?: DEFAULT_CLUE_LIST_NAME
 
             val clues = json.getJSONArray("clues")
-            for (i in 0..<clues.length()) {
+            for (i in 0..<clues.size) {
                 val clue = clues.getJSONObject(i)
 
                 var zone : Zone? = null
@@ -220,8 +220,8 @@ class SlowDownWiseUpJSONIO : AbstractJSONIO() {
                     zone = zones.get(zoneID)
                 }
 
-                val number = optStringNull(clue, "number")
-                val format = optStringNull(clue, "format")
+                val number = clue.optStringEmptyNull("number")
+                val format = clue.optStringEmptyNull("format")
                 val separators = getSeparators(format)
                 val hintMain = clue.getString("clue")
                 val hint = hintMain + (format?.let { " ($it)" } ?: "")
@@ -276,11 +276,11 @@ class SlowDownWiseUpJSONIO : AbstractJSONIO() {
 
             val zones = mutableMapOf<Int, Zone>()
 
-            for (i in 0..<words.length()) {
+            for (i in 0..<words.size) {
                 val word = words.getJSONObject(i)
                 val id = word.getInt("id")
-                val x = optStringNull(word, "x")
-                val y = optStringNull(word, "y")
+                val x = word.optStringEmptyNull("x")
+                val y = word.optStringEmptyNull("y")
                 if (x != null && y != null)
                     zones.put(id, parseCells(x, y))
             }

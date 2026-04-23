@@ -59,8 +59,6 @@ desugar = "2.1.5"
 directories = "26"
 hjson = "3.1.0"
 htmlconverter = "1.1.0"
-json = "20251224"
-json-legacy = "20080701"
 jsoup = "1.22.1"
 material = "1.13.0"
 seismic = "1.0.3"
@@ -76,7 +74,6 @@ junit-platform = "1.11.4"
 mockito-kotlin = "6.2.3"
 
 # Plugins
-plugin-shadow = "9.3.2"
 plugin-buildconfig = "6.0.9"
 plugin-versions = "0.53.0"
 plugin-wire = "6.0.0"
@@ -154,8 +151,6 @@ directories = { module = "dev.dirs:directories", version.ref = "directories" }
 filekit-dialogs-compose = { module = "io.github.vinceglb:filekit-dialogs-compose", version.ref = "filekit" }
 hjson = { module = "org.hjson:hjson", version.ref = "hjson" }
 htmlconverter = { module = "be.digitalia.compose.htmlconverter:htmlconverter", version.ref = "htmlconverter" }
-json = { module = "org.json:json", version.ref = "json" }
-json-legacy = { module = "org.json:json", version.ref = "json-legacy" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
 mcp-sdk-server = { module = "io.modelcontextprotocol:kotlin-sdk-server", version.ref = "mcp-sdk-server" }
@@ -182,6 +177,5 @@ kotlin-plugin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", versio
 kotlin-plugin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 room = { id = "androidx.room", version.ref = "room" }
-shadow = { id = "com.gradleup.shadow", version.ref = "plugin-shadow" }
 versions = { id = "com.github.ben-manes.versions", version.ref = "plugin-versions" }
 wire = { id = "com.squareup.wire", version.ref = "plugin-wire" }

@@ -403,7 +403,6 @@ class IPuzIOTest {
     }
 
     companion object {
-        @JvmStatic
         val testPuzzle1InputStream : InputStream
             get() = IPuzIOTest::class.java
                 .getResourceAsStream("/test.ipuz")!!
@@ -441,7 +440,6 @@ class IPuzIOTest {
             get() = IPuzIOTest::class.java
                 .getResourceAsStream("/extensions.ipuz")!!
 
-        @JvmStatic
         @Throws(Exception::class)
         fun assertIsTestPuzzle1(puz : Puzzle) {
             Assertions.assertEquals(puz.kind, PuzzleKind.CROSSWORD)
@@ -465,6 +463,8 @@ class IPuzIOTest {
             Assertions.assertFalse(boxes[0][1]!!.hasShape())
             Assertions.assertTrue(isBlock(boxes[0][2]))
             Assertions.assertEquals(boxes[1][0]!!.clueNumber, "3")
+            println(boxes[1][0])
+            println(boxes[1][0]?.response)
             Assertions.assertEquals(boxes[1][0]!!.response, "A")
             Assertions.assertEquals(boxes[1][0]!!.shape, Box.Shape.CIRCLE)
 

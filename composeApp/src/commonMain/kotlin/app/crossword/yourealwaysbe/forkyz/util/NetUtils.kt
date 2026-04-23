@@ -15,10 +15,10 @@ import org.apache.hc.client5.http.impl.classic.HttpClients
 import org.apache.hc.core5.http.ClassicHttpRequest
 import org.apache.hc.core5.http.io.support.ClassicRequestBuilder
 
-import org.json.JSONException
-import org.json.JSONObject
-
 import app.crossword.yourealwaysbe.puz.io.StreamUtils
+import app.crossword.yourealwaysbe.puz.util.JSONException
+import app.crossword.yourealwaysbe.puz.util.JSONObject
+import app.crossword.yourealwaysbe.puz.util.parseJSONObject
 
 private val HTTP_OK_RESPONSE = 200
 
@@ -125,8 +125,6 @@ fun getURLJSON(
     headers : Map<String, String>? = null,
     data : JSONObject? = null,
 ) : JSONObject {
-    return getURLInputStream(url, timeout, headers, data).use(
-        JSONUtils::streamToJSON
-    )
+    return getURLInputStream(url, timeout, headers, data).use(::parseJSONObject)
 }
 
