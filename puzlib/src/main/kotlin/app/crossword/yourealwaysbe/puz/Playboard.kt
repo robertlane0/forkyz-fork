@@ -758,19 +758,27 @@ class Playboard(puzzle : Puzzle) {
                     else
                         null
 
-                    puzzle.checkedGetBox(posBefore)?.let { boxBefore ->
-                        if (!isBlock(boxBefore) && !boxBefore.isBlank())
-                            return true
+                    val boxBefore = puzzle.checkedGetBox(posBefore)
+                    if (
+                        boxBefore != null
+                        && !isBlock(boxBefore)
+                        && !boxBefore.isBlank()
+                    ) {
+                        return true
+                    }
 
-                        val posAfter = if (curPos < zone.size() - 1)
-                            zone.getPosition(curPos + 1)
-                        else
-                            null
+                    val posAfter = if (curPos < zone.size() - 1)
+                        zone.getPosition(curPos + 1)
+                    else
+                        null
 
-                        puzzle.checkedGetBox(posAfter)?.let { boxAfter ->
-                            if (!isBlock(boxAfter) && !boxAfter.isBlank())
-                                return true
-                        }
+                    val boxAfter = puzzle.checkedGetBox(posAfter)
+                    if (
+                        boxAfter != null
+                        && !isBlock(boxAfter)
+                        && !boxAfter.isBlank()
+                    ) {
+                        return true
                     }
                 }
             }
