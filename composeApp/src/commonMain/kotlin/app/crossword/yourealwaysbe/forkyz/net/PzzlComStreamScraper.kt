@@ -28,7 +28,7 @@ import app.crossword.yourealwaysbe.puz.io.StreamUtils
  */
 class PzzlComStreamScraper : AbstractStreamScraper() {
     @Throws(Exception::class)
-    public override fun parseInput(
+    public override suspend fun parseInput(
         inputStream : InputStream,
         url : String?,
     ) : Puzzle? {
@@ -85,7 +85,7 @@ class PzzlComStreamScraper : AbstractStreamScraper() {
         return null
     }
 
-    private fun getMainInfo(
+    private suspend fun getMainInfo(
         embedURL : String,
         inputStream : InputStream,
     ) : MainInfo? {
@@ -127,7 +127,7 @@ class PzzlComStreamScraper : AbstractStreamScraper() {
     /**
      * Get puzzle date from URL or use latest from pzzl archive
      */
-    private fun getDateString(
+    private suspend fun getDateString(
         originalURL : String?,
         mainInfo : MainInfo,
     ) : String? {

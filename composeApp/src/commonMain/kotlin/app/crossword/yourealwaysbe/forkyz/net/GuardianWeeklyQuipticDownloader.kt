@@ -28,7 +28,7 @@ class GuardianWeeklyQuipticDownloader(
     SUPPORT_URL,
     GuardianJSONIO(),
 ) {
-    override fun download(
+    override suspend fun download(
         date : LocalDate,
         headers : Map<String, String>?,
     ) : Puzzle? {
@@ -54,11 +54,11 @@ class GuardianWeeklyQuipticDownloader(
         return null
     }
 
-    override fun getSourceUrl(date : LocalDate) : String? {
+    override suspend fun getSourceUrl(date : LocalDate) : String? {
         return BASE_SOURCE_URL + createUrlSuffix(date)
     }
 
-    override fun getShareUrl(date : LocalDate) : String? {
+    override suspend fun getShareUrl(date : LocalDate) : String? {
         return getSourceUrl(date)
     }
 

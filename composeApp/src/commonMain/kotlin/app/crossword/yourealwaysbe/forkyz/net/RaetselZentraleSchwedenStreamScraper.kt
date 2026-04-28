@@ -28,7 +28,7 @@ import app.crossword.yourealwaysbe.puz.io.StreamUtils
  */
 class RaetselZentraleSchwedenStreamScraper : AbstractStreamScraper() {
     @Throws(Exception::class)
-    public override fun parseInput(
+    public override suspend fun parseInput(
         inputStream : InputStream,
         url : String?,
     ) : Puzzle? {
@@ -74,7 +74,7 @@ class RaetselZentraleSchwedenStreamScraper : AbstractStreamScraper() {
      * Finds ID, then gets puzzle from API URL. Does not close input
      * stream.
      */
-    fun parseSecondStage(inputStream : InputStream) : Puzzle? {
+    private suspend fun parseSecondStage(inputStream : InputStream) : Puzzle? {
         val apiUrl = getAPIURL(inputStream)
         if (apiUrl == null)
             return null
@@ -88,10 +88,13 @@ class RaetselZentraleSchwedenStreamScraper : AbstractStreamScraper() {
         }
     }
 
-    private inner class SecondStageParser : PuzzleParser {
+    private inner class SecondStageParser : StreamScraper {
         @Throws(Exception::class)
-        override fun parseInput(inStream : InputStream) : Puzzle? {
-            return parseSecondStage(inStream)
+        override suspend fun parseInput(
+            inputStream : InputStream,
+            url : String?,
+        ) : Puzzle? {
+            return parseSecondStage(inputStream)
         }
     }
 

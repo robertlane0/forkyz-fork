@@ -1,5 +1,6 @@
 package app.crossword.yourealwaysbe.forkyz.net
 
+import java.io.InputStream
 import java.net.MalformedURLException
 import java.net.URI
 import java.net.URISyntaxException
@@ -60,12 +61,46 @@ open class AbstractDateDownloader constructor(
     protected val days : Array<DayOfWeek>,
     protected val utcAvailabilityOffset : Duration,
     override val supportUrl : String?,
-    protected var puzzleParser : PuzzleParser,
+    protected var puzzleParser : StreamScraper,
     sourceUrlFormatPattern : String? = null,
     shareUrlFormatPattern : String? = null,
     val goodFrom : LocalDate = LocalDate.fromEpochDays(0L),
     private val overrideEmbeddedDate : Boolean = true,
 ) : AbstractDownloader() {
+
+    /**
+     * Alternative constructor with PuzzleParser not StreamScraper
+     */
+    constructor(
+        downloaderID : DownloaderID,
+        name : String,
+        days : Array<DayOfWeek>,
+        utcAvailabilityOffset : Duration,
+        supportUrl : String?,
+        puzzleParser : PuzzleParser,
+        sourceUrlFormatPattern : String? = null,
+        shareUrlFormatPattern : String? = null,
+        goodFrom : LocalDate = LocalDate.fromEpochDays(0L),
+        overrideEmbeddedDate : Boolean = true,
+    ) : this(
+        downloaderID,
+        name,
+        days,
+        utcAvailabilityOffset,
+        supportUrl,
+        object : StreamScraper {
+            override suspend fun parseInput(
+                inputStream : InputStream,
+                url: String?,
+            ) : Puzzle? {
+                return puzzleParser.parseInput(inputStream)
+            }
+        },
+        sourceUrlFormatPattern,
+        shareUrlFormatPattern,
+        goodFrom,
+        overrideEmbeddedDate,
+    )
 
     private val sourceUrlFormat : DateTimeFormat<LocalDate>?
         = convertUrlFormatPattern(sourceUrlFormatPattern)
@@ -91,7 +126,7 @@ open class AbstractDateDownloader constructor(
     /**
      * Where to do the actual download from
      */
-    protected open fun getSourceUrl(date : LocalDate) : String? {
+    protected open suspend fun getSourceUrl(date : LocalDate) : String? {
         return sourceUrlFormat?.let { date.format(it) }
     }
 
@@ -101,11 +136,11 @@ open class AbstractDateDownloader constructor(
      * I.e. go here to find an online playable version, rather than the
      * backend data file
      */
-    protected open fun getShareUrl(date : LocalDate) : String? {
+    protected open suspend fun getShareUrl(date : LocalDate) : String? {
         return shareUrlFormat?.let { date.format(it) }
     }
 
-    override fun download(
+    override suspend fun download(
         date : LocalDate,
         existingFileNames : Set<String>,
     ) : DownloadResult {
@@ -120,7 +155,7 @@ open class AbstractDateDownloader constructor(
             return DownloadResult.FAILED
     }
 
-    protected open fun download(
+    protected open suspend fun download(
         date : LocalDate,
         headers : Map<String, String>?,
     ) : Puzzle? {
@@ -158,7 +193,7 @@ open class AbstractDateDownloader constructor(
         return null
     }
 
-    protected fun download(date : LocalDate) : Puzzle? {
+    protected suspend fun download(date : LocalDate) : Puzzle? {
         return download(date, null)
     }
 

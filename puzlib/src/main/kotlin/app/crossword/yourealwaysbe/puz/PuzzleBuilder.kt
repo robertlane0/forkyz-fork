@@ -5,9 +5,17 @@ import java.io.BufferedInputStream
 import java.io.IOException
 import java.net.URI
 import java.net.URISyntaxException
+import kotlin.io.encoding.Base64
 import kotlinx.datetime.LocalDate
 
-import net.iharder.Base64
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.engine.cio.endpoint
+import io.ktor.client.request.request
+import io.ktor.client.statement.readRawBytes
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.http.headers
 
 import app.crossword.yourealwaysbe.puz.Box.Companion.isBlock
 import app.crossword.yourealwaysbe.puz.io.StreamUtils
@@ -434,7 +442,7 @@ class PuzzleBuilder {
      * Downloads images, relative to relativeUrl (i.e. image in file at
      * relativeUrl).
      */
-    fun resolveImages(relativeUrl : String) {
+    suspend fun resolveImages(relativeUrl : String) {
         resolveImages(this.puzzle, relativeUrl)
     }
 
@@ -505,38 +513,51 @@ class PuzzleBuilder {
     }
 
     companion object {
-        fun resolveImages(puz : Puzzle, relativeUrl : String) {
-            for (image in puz.images) {
-                val imgUrl = image.url
-                if (
-                    imgUrl.length >= 6
-                    && imgUrl.substring(0, 5).equals("data:", ignoreCase = true)
-                ) {
-                    continue
-                }
+        private val TIMEOUT = 30000L
 
-                try {
-                    val imgFullUrl = URI(relativeUrl)
-                        .resolve(URI(imgUrl))
-                        .toURL()
-                    val connection = imgFullUrl.openConnection()
-                    BufferedInputStream(
-                        connection.getInputStream(),
-                    ).use { inStream ->
-                        val bytes = StreamUtils.getStreamBytes(inStream)
-                        val type = connection.getContentType()
-                        image.url = (
-                            "data:"
-                            + type
-                            + ";base64,"
-                            + Base64.encodeBytes(bytes)
-                        )
+        suspend fun resolveImages(puz : Puzzle, relativeUrl : String) {
+            val client = HttpClient(CIO) {
+                engine {
+                    requestTimeout = TIMEOUT
+                    endpoint {
+                        connectTimeout = TIMEOUT
                     }
-                } catch (e : IOException) {
-                    // ignore
-                } catch (e : URISyntaxException) {
-                    // ignore
                 }
+            }
+
+            try {
+                for (image in puz.images) {
+                    val imgUrl = image.url
+                    if (
+                        imgUrl.length >= 6
+                        && imgUrl.substring(0, 5).equals("data:", ignoreCase = true)
+                    ) {
+                        continue
+                    }
+
+                    try {
+                        val imgFullUrl = URI(relativeUrl)
+                            .resolve(URI(imgUrl))
+                            .toURL()
+                            .toString()
+                        val response = client.request(imgFullUrl)
+                        val bytes = response.readRawBytes()
+                        response.headers[HttpHeaders.ContentType]?.let { type ->
+                            image.url = (
+                                "data:"
+                                + type
+                                + ";base64,"
+                                + Base64.Default.encode(bytes)
+                            )
+                        }
+                    } catch (e : IOException) {
+                        // ignore
+                    } catch (e : URISyntaxException) {
+                        // ignore
+                    }
+                }
+            } finally {
+                client.close()
             }
         }
     }

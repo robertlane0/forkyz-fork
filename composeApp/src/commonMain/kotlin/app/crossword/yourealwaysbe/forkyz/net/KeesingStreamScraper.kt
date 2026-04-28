@@ -35,7 +35,7 @@ import app.crossword.yourealwaysbe.puz.util.parseJSONObject
  */
 class KeesingStreamScraper : AbstractStreamScraper() {
     @Throws(Exception::class)
-    public override fun parseInput(
+    override suspend fun parseInput(
         inputStream : InputStream,
         url : String?
     ) : Puzzle? {
@@ -57,7 +57,7 @@ class KeesingStreamScraper : AbstractStreamScraper() {
         return getPuzzleURL(customerID, puzzleSetID)?.let { getPuzzle(it) }
     }
 
-    fun getPuzzle(puzzleURL : String) : Puzzle? {
+    private suspend fun getPuzzle(puzzleURL : String) : Puzzle? {
         try {
             getInputStream(puzzleURL).use { inputStream ->
                 val puz = KeesingXMLIO.readPuzzle(inputStream)
@@ -77,7 +77,10 @@ class KeesingStreamScraper : AbstractStreamScraper() {
      *
      * Goes online.
      */
-    fun getPuzzleURL(customerID : String, puzzleSetID : String) : String? {
+    suspend fun getPuzzleURL(
+        customerID : String,
+        puzzleSetID : String,
+    ) : String? {
         val idUrl = String.format(
             Locale.US,
             ID_URL_FORMAT,

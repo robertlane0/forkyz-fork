@@ -36,13 +36,13 @@ class KeesingDownloader(
     // depending on what's available
     TimeUtils.offsetTodayUTC(-utcAvailabilityOffset),
 ) {
-    override fun getSourceUrl(date : LocalDate) : String? {
+    override suspend fun getSourceUrl(date : LocalDate) : String? {
         val scraper = KeesingStreamScraper()
         scraper.timeout = timeout
         return scraper.getPuzzleURL(clientID, puzzleSetID)
     }
 
-    override fun download(
+    override suspend fun download(
         date : LocalDate,
         headers : Map<String, String>?,
     ) : Puzzle? {

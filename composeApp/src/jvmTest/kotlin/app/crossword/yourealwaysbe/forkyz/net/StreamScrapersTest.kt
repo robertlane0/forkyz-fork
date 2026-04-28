@@ -2,6 +2,7 @@
 package app.crossword.yourealwaysbe.forkyz.net
 
 import java.io.InputStream
+import kotlinx.coroutines.runBlocking
 
 import org.junit.Assert
 import org.junit.Test
@@ -13,7 +14,6 @@ import org.mockito.Mockito
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 
-import app.crossword.yourealwaysbe.forkyz.util.apacheGetURLInputStream
 import app.crossword.yourealwaysbe.forkyz.util.getURLInputStream
 import app.crossword.yourealwaysbe.puz.io.PuzzleParser
 
@@ -65,12 +65,13 @@ class StreamScrapersTest {
     }
 
     //@Test
-    //public void testWSJ() throws Exception {
-    //    testScraperApache(
+    //@Throws(Exception::class)
+    //fun testWSJ() {
+    //    testScraper(
     //        "https://www.wsj.com/articles/"
     //            + "snack-time-wednesday-crossword-january-3-b09d36c8",
-    //        new WSJStreamScraper(new TiramisuUtil())
-    //    );
+    //        WSJStreamScraper(),
+    //    )
     //}
 
     //403 without user agent
@@ -148,25 +149,9 @@ class StreamScrapersTest {
             scraper: StreamScraper,
         ) {
             val inputStream : InputStream
-                = getURLInputStream(url, TIMEOUT)
+                = runBlocking { getURLInputStream(url, TIMEOUT) }
             run {
-                val puz = scraper.parseInput(inputStream, url)
-                Assert.assertNotNull(puz)
-            }
-        }
-
-        /**
-         * Test scraper gets a puzzle from the URL
-         *
-         * Uses Apache HTTP client
-         */
-        @Throws(Exception::class)
-        private fun testScraperApache(
-            url : String,
-            scraper : PuzzleParser,
-        ) {
-            apacheGetURLInputStream(url, TIMEOUT).use { inputStream ->
-                val puz = scraper.parseInput(inputStream)
+                val puz = runBlocking { scraper.parseInput(inputStream, url) }
                 Assert.assertNotNull(puz)
             }
         }

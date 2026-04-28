@@ -40,7 +40,7 @@ class WithMetaDataDownloader(
     sourceUrlFormatPattern,
     shareUrlFormatPattern,
 ) {
-    override protected fun download(
+    override protected suspend fun download(
         date : LocalDate,
         headers : Map<String, String>?,
     ) : Puzzle? {

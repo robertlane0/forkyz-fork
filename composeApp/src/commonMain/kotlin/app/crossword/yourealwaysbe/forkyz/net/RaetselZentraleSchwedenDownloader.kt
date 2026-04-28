@@ -51,7 +51,7 @@ class RaetselZentraleSchwedenDownloader(
     private val idUrl : String
         = String.format(Locale.US, ID_URL_FORMAT, shortName)
 
-    override fun getSourceUrl(date : LocalDate) : String? {
+    override suspend fun getSourceUrl(date : LocalDate) : String? {
         try {
             getInputStream((URI(idUrl)).toURL(), null).use { inputStream ->
                 return RaetselZentraleSchwedenStreamScraper
@@ -64,7 +64,7 @@ class RaetselZentraleSchwedenDownloader(
         return null
     }
 
-    override fun download(
+    override suspend fun download(
         date : LocalDate,
         headers : Map<String, String>?,
     ) : Puzzle? {

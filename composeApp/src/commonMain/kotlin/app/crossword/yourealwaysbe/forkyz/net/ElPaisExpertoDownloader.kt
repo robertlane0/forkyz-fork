@@ -24,7 +24,7 @@ class ElPaisExpertoDownloader(
     "'https://elpais.com/juegos/crucigramas/experto/'yyyy'-'MM'-'dd",
     TimeUtils.offsetTodayUTC(-7.days),
 ) {
-    override protected fun download(
+    override protected suspend fun download(
         date : LocalDate,
         headers : Map<String, String>?,
     ) : Puzzle? {

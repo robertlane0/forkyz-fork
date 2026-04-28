@@ -6,7 +6,6 @@ import java.io.IOException
 import java.net.URISyntaxException
 import java.net.URL
 
-import app.crossword.yourealwaysbe.forkyz.util.apacheGetURLInputStream
 import app.crossword.yourealwaysbe.forkyz.util.getURLInputStream
 
 /**
@@ -19,27 +18,15 @@ abstract class AbstractDownloader : Downloader {
     override var timeout : Int = 30000
 
     @Throws(IOException::class, URISyntaxException::class)
-    protected fun getInputStream(
-        url: URL,
+    protected suspend fun getInputStream(
+        url : URL,
         headers : Map<String, String>?,
-    ): BufferedInputStream {
-        if (headers != null && headers.containsKey("Origin")) {
-            // use apache as it allows setting origin via headers
-            return BufferedInputStream(
-                apacheGetURLInputStream(
-                    url.toURI(),
-                    timeout,
-                    headers
-                )
-            )
-        } else {
-            // more efficient implementation
-            return getURLInputStream(
-                url,
-                timeout,
-                headers
-            )
-        }
+    ) : BufferedInputStream {
+        return getURLInputStream(
+            url,
+            timeout,
+            headers
+        )
     }
 }
 

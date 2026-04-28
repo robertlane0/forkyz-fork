@@ -48,7 +48,7 @@ class LATimesDownloader(
     null,
     "https://fun.chicagotribune.com/game/la-times-daily-crossword",
 ) {
-    override fun getSourceUrl(date : LocalDate) : String? {
+    override suspend fun getSourceUrl(date : LocalDate) : String? {
         val url = PUZZLES_FEED_FORMAT.format(date)
         return getInputStream(URI(url).toURL(), null).use { input ->
             val puzzles = parseJSONArray(input)

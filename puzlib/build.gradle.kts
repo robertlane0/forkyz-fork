@@ -13,11 +13,11 @@ dependencies {
     testRuntimeOnly(libs.junit.platform.launcher)
 
     implementation(libs.apache.commons.text)
-    implementation(libs.base64)
     implementation(libs.hjson)
     implementation(libs.jsoup)
     implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.ktor.client.cio)
 }
 
 tasks.test {

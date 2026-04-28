@@ -69,7 +69,6 @@ kotlin {
             implementation(libs.androidx.datastore.core.okio)
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.androidx.room.runtime)
-            implementation(libs.apache.httpclient5)
             implementation(libs.coil3.compose)
             implementation(libs.coil3.network.ktor)
             implementation(libs.compose.components.resources)
@@ -91,6 +90,7 @@ kotlin {
             implementation(libs.kotlinx.datetime)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.ktor.server.cio)
+            implementation(libs.ktor.client.cio)
             implementation(libs.mcp.sdk.server)
             implementation(libs.words.to.numbers)
 

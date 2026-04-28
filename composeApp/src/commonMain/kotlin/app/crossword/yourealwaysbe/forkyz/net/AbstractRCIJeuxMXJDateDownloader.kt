@@ -47,12 +47,12 @@ class AbstractRCIJeuxMXJDateDownloader private constructor(
     shareUrlFormatPattern,
     TimeUtils.plusDays(TimeUtils.today(), -ARCHIVE_LENGTH_DAYS),
 ) {
-    override fun getSourceUrl(date : LocalDate) : String? {
+    override suspend fun getSourceUrl(date : LocalDate) : String? {
         val cwNumber = getCrosswordNumber(date)
         return String.format(Locale.US, this.sourceUrlFormat, cwNumber)
     }
 
-    override fun download(
+    override suspend fun download(
         date : LocalDate,
         headers : Map<String, String>?,
     ) : Puzzle? {

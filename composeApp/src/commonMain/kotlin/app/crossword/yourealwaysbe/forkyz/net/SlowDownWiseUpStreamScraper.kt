@@ -41,7 +41,7 @@ class SlowDownWiseUpStreamScraper() : AbstractStreamScraper() {
         private val STAGE2_REGEX = RegexScrape(STAGE2_URL_RE, 1)
     }
 
-    override fun parseInput(
+    override suspend fun parseInput(
         inputStream : InputStream,
         url : String?,
     ) : Puzzle? {
@@ -63,7 +63,7 @@ class SlowDownWiseUpStreamScraper() : AbstractStreamScraper() {
     /**
      * Look for SlowDownWiseUp or return reset inStream
      */
-    fun getStage2InputStream(
+    private suspend fun getStage2InputStream(
         bis : ByteArrayInputStream,
     ) : InputStream {
         val results = regexScrape(

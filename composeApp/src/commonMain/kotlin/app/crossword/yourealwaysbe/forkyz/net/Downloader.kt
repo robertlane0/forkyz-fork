@@ -60,7 +60,7 @@ interface Downloader {
      * already exists -- downloader will not save puzzles with filenames
      * that already exist.
      */
-    fun download(
+    suspend fun download(
         date : LocalDate,
         existingFileNames : Set<String>,
     ) : DownloadResult

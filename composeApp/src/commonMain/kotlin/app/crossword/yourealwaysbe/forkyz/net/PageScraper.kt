@@ -89,7 +89,7 @@ open class PageScraper(
         return if (until == null || now.compareTo(until) < 0) now else until
     }
 
-    override fun download(
+    override suspend fun download(
         date : LocalDate,
         existingFileNames : Set<String>,
     ) : DownloadResult {
@@ -156,7 +156,7 @@ open class PageScraper(
             return DownloadResult.ALREADY_EXISTS
     }
 
-    private fun downloadPuzzle(url : String) : Puzzle? {
+    private suspend fun downloadPuzzle(url : String) : Puzzle? {
         try {
             val u = (URI(url)).toURL()
             try {

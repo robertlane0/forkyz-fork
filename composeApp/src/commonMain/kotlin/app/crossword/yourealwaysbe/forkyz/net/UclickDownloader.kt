@@ -38,7 +38,7 @@ class UclickDownloader(
     ),
     shareUrlPattern
 ) {
-    public override fun download(
+    public override suspend fun download(
         date : LocalDate,
         existingFileNames : Set<String>,
     ) : DownloadResult {

@@ -79,7 +79,7 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
         )
     }
 
-    override fun parseInput(
+    override suspend fun parseInput(
         inputStream : InputStream,
         url : String?,
     ) : Puzzle? {
@@ -109,7 +109,7 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
      * @return either reset original if failed or new input stream to
      * stage 2.
      */
-    private fun getStage2InputStream(
+    private suspend fun getStage2InputStream(
         bis : ByteArrayInputStream
     ) : InputStream {
         val doc = getDocument(bis)

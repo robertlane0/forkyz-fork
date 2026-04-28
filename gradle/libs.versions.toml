@@ -47,14 +47,13 @@ kotlinx-serialization = "1.8.1"
 # Ktor
 ktor-android = "3.4.1"
 ktor-java = "3.4.1"
-ktor-server = "3.4.1"
+ktor-server-cio = "3.4.1"
+ktor-client-cio = "3.4.1"
 
 # Apache
-httpclient5 = "5.6"
 commons-text = "1.15.0"
 
 # Other Libraries
-base64 = "2.3.9"
 desugar = "2.1.5"
 directories = "26"
 hjson = "3.1.0"
@@ -136,15 +135,14 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 
 # Ktor
 ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor-android" }
+ktor-client-cio= { module = "io.ktor:ktor-client-cio", version.ref = "ktor-client-cio" }
 ktor-client-java = { module = "io.ktor:ktor-client-java", version.ref = "ktor-java" }
-ktor-server-cio = { module = "io.ktor:ktor-server-cio", version.ref = "ktor-server" }
+ktor-server-cio = { module = "io.ktor:ktor-server-cio", version.ref = "ktor-server-cio" }
 
 # Apache
-apache-httpclient5 = { module = "org.apache.httpcomponents.client5:httpclient5", version.ref = "httpclient5" }
 apache-commons-text = { module = "org.apache.commons:commons-text", version.ref = "commons-text" }
 
 # Other Libraries
-base64 = { module = "net.iharder:base64", version.ref = "base64" }
 datetime-wheel-picker = { module = "io.github.darkokoa:datetime-wheel-picker", version.ref = "datetime-wheel-picker" }
 desugar-jdk-libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar" }
 directories = { module = "dev.dirs:directories", version.ref = "directories" }

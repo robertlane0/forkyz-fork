@@ -76,7 +76,9 @@ class DownloadersTest(
     @Test
     fun testDownloaders() {
         downloader.latestDate?.let { latest ->
-            val res = downloader.download(latest, setOf())
+            val res = runBlocking {
+                downloader.download(latest, setOf())
+            }
             assertTrue(res.isSuccess)
         }
     }

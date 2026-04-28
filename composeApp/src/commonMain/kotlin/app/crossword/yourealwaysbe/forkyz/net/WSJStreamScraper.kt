@@ -4,7 +4,7 @@ import java.io.InputStream
 import java.util.Locale
 import java.util.regex.Pattern
 
-import app.crossword.yourealwaysbe.forkyz.util.apacheGetURLInputStream
+import app.crossword.yourealwaysbe.forkyz.util.getURLInputStream
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.io.SlowDownWiseUpJSONIO
 
@@ -16,13 +16,10 @@ import app.crossword.yourealwaysbe.puz.io.SlowDownWiseUpJSONIO
  * Get puzzle data URL by looking for puzzles/crossword/yyyymmdd/xxxxx
  * where xxxxx is a numeric puzzle ID. Data is then
  * wsj.com/puzzles/crossword/yyyymmdd/xxxxx/data.json.
- *
- * Need Apache HttpClient library to get data.json, HttpURLConnection
- * gets rejected.
  */
 class WSJStreamScraper : AbstractStreamScraper() {
     @Throws(Exception::class)
-    public override fun parseInput(
+    public override suspend fun parseInput(
         inputStream : InputStream,
         url : String?,
     ) : Puzzle? {
@@ -31,7 +28,7 @@ class WSJStreamScraper : AbstractStreamScraper() {
             return null
 
         try {
-            apacheGetURLInputStream(jsonURL, timeout).use { jsonIS ->
+            getURLInputStream(jsonURL, timeout).use { jsonIS ->
                 val puz = SlowDownWiseUpJSONIO.readPuzzle(jsonIS)
                 puz?.source = DEFAULT_SOURCE
                 return puz

@@ -230,15 +230,18 @@ class Downloaders(
                 val downloader = puzzle.key
                 val date = puzzle.value
                 downloadExecutor.submit {
-                    val result = downloadPuzzle(
-                        downloader,
-                        date,
-                        fileNames,
-                    )
-                    if (result.isSuccess)
-                        somethingDownloaded.set(true)
-                    else if (result.isFailed)
-                        somethingFailed.set(true)
+                    // TODO: remove executor, use coroutines
+                    runBlocking {
+                        val result = downloadPuzzle(
+                            downloader,
+                            date,
+                            fileNames,
+                        )
+                        if (result.isSuccess)
+                            somethingDownloaded.set(true)
+                        else if (result.isFailed)
+                            somethingFailed.set(true)
+                    }
                 }
             }
 
@@ -281,7 +284,7 @@ class Downloaders(
      * Only saves if we don't already have it. Only call if
      * puzzleDirLock is acquired (so existingFileNames doesn't expire).
      */
-    private fun downloadPuzzle(
+    private suspend fun downloadPuzzle(
         d : Downloader,
         date : LocalDate,
         existingFileNames : Set<String>,

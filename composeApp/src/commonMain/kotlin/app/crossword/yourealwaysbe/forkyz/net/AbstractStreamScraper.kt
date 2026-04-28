@@ -48,18 +48,13 @@ abstract class AbstractStreamScraper : StreamScraper {
     var timeout : Int = 30000
 
     @Throws(Exception::class)
-    override fun parseInput(inStream : InputStream) : Puzzle? {
-        return parseInput(inStream, null)
-    }
-
-    @Throws(Exception::class)
-    abstract override fun parseInput(
+    abstract override suspend fun parseInput(
         inputStream : InputStream,
         url : String?,
     ) : Puzzle?
 
     @Throws(IOException::class)
-    protected fun getInputStream(
+    protected suspend fun getInputStream(
         url : URL,
         headers : Map<String, String>?,
     ) : BufferedInputStream {
@@ -67,7 +62,7 @@ abstract class AbstractStreamScraper : StreamScraper {
     }
 
     @Throws(IOException::class, URISyntaxException::class)
-    protected fun getInputStream(url : String) : BufferedInputStream {
+    protected suspend fun getInputStream(url : String) : BufferedInputStream {
         return getInputStream((URI(url)).toURL(), null)
     }
 
@@ -86,7 +81,7 @@ abstract class AbstractStreamScraper : StreamScraper {
      * @param urlParser used to parse the contents of the found URL
      * @return puzzle or null
      */
-    protected fun htmlElementScrape(
+    protected suspend fun htmlElementScrape(
         doc : Document,
         selector : String,
         attribute : String,

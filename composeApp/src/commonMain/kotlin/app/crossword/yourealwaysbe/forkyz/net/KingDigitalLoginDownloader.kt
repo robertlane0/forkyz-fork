@@ -78,7 +78,7 @@ class KingDigitalLoginDownloader(
         day(Padding.NONE)
     }
 
-    override protected fun download(
+    override protected suspend fun download(
         date : LocalDate,
         headers : Map<String, String>?,
     ) : Puzzle? {
@@ -134,7 +134,7 @@ class KingDigitalLoginDownloader(
         }
     }
 
-    private fun getLoginKey(
+    private suspend fun getLoginKey(
         headers : Map<String, String>? = null
     ) : String? {
         val loginJson = buildJSONObject {
@@ -153,7 +153,7 @@ class KingDigitalLoginDownloader(
         return keys.getString("key")
     }
 
-    private fun getPuzzleAssets(
+    private suspend fun getPuzzleAssets(
         headers : Map<String, String>? = null,
         date : LocalDate,
         key : String,

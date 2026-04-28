@@ -12,7 +12,7 @@ import app.crossword.yourealwaysbe.puz.io.PAPuzzlesIO
  */
 class PAPuzzlesStreamScraper : AbstractStreamScraper() {
     @Throws(Exception::class)
-    public override fun parseInput(
+    public override suspend fun parseInput(
         inputStream : InputStream,
         url : String?,
     ) : Puzzle? {

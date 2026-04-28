@@ -24,7 +24,7 @@ import app.crossword.yourealwaysbe.puz.util.parseJSONObject
  */
 class MyCrosswordStreamScraper : AbstractStreamScraper() {
     @Throws(Exception::class)
-    public override fun parseInput(
+    public override suspend fun parseInput(
         inputStream : InputStream,
         url : String?,
     ) : Puzzle? {

@@ -205,7 +205,7 @@ private suspend fun importInputStream(
 }
 
 @Throws(IOException::class,URISyntaxException::class)
-private fun getRemoteInputStream(
+private suspend fun getRemoteInputStream(
     url : String,
     timeout : Int,
 ) : BufferedInputStream {
@@ -222,7 +222,7 @@ private fun getRemoteInputStream(
  * @param url the url of the webpage, may be null
  * @param timeout the timeout to use when following urls
  */
-private fun importPuzzleFromWebPage(
+private suspend fun importPuzzleFromWebPage(
     url : String?,
     inputStream : InputStream,
     timeout : Int,
