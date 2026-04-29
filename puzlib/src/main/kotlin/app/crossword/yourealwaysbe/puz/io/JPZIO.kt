@@ -1,18 +1,12 @@
+
 package app.crossword.yourealwaysbe.puz.io
 
 import java.io.DataOutputStream
 import java.io.InputStream
-import java.util.Collections
-import java.util.LinkedList
 import java.util.logging.Logger
-import javax.xml.parsers.SAXParserFactory
 import kotlin.math.max
 import kotlinx.datetime.LocalDate
-
-import org.xml.sax.Attributes
-import org.xml.sax.InputSource
-import org.xml.sax.SAXException
-import org.xml.sax.helpers.DefaultHandler
+import kotlinx.io.asSource
 
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Box.Companion.isBlock
@@ -25,6 +19,8 @@ import app.crossword.yourealwaysbe.puz.PuzzleKind
 import app.crossword.yourealwaysbe.puz.Zone
 import app.crossword.yourealwaysbe.puz.util.HtmlUtil.parseHtmlColor
 import app.crossword.yourealwaysbe.puz.util.HtmlUtil.unHtmlString
+import app.crossword.yourealwaysbe.puz.util.XMLElement
+import app.crossword.yourealwaysbe.puz.util.parseXMLElement
 
 /**
  * Converts a puzzle from the JPZ Crossword Compiler XML format.
@@ -74,22 +70,19 @@ import app.crossword.yourealwaysbe.puz.util.HtmlUtil.unHtmlString
 class JPZIO : PuzzleParser {
     class JPZIOException(msg : String) : Exception(msg)
 
-    private class ClueInfo(
-        listName : String,
-        index : Int,
+    private data class ClueInfo(
+        val listName : String,
+        val index : Int,
         val clueNumber : String?,
         val hint : String,
         val zoneID : String?,
         val citation : String?,
-    ) {
-        private val cid = ClueID(listName, index)
-        val listName : String
-            get() = cid.listName
-        val index : Int
-            get() = cid.index
-    }
+    )
 
-    private class JPZXMLParser : DefaultHandler() {
+    /**
+     * Extract puzzle info from content
+     */
+    private class JPZXMLParser(content : XMLElement) {
         var title : String = ""
             private set
         var creator : String = ""
@@ -108,16 +101,16 @@ class JPZIO : PuzzleParser {
             private set
         var boxes : Array<Array<Box?>>? = null
             private set
-        var isAcrostic : Boolean = false
-            private set
         val clues : MutableList<ClueInfo> = mutableListOf()
         val zoneMap : MutableMap<String, Zone> = mutableMapOf()
         private val charBuffer = StringBuilder()
 
+        val isAcrostic = content.selectFirst("acrostic") != null
         // sanity checks
-        private var hasRectangularPuzzleEle = false
-        private var hasGridEle = false
-        private var hasCluesEle = false
+        private val hasRectangularPuzzleEle
+            = content.selectFirst("rectangular-puzzle") != null
+        private val hasGridEle = content.selectFirst("grid") != null
+        private val hasCluesEle = content.selectFirst("clues") != null
 
         val isSuccessfulRead : Boolean
             /**
@@ -131,278 +124,160 @@ class JPZIO : PuzzleParser {
                     && this.height > 0
                     && (this.clues.size > 0)
 
-        // Use several handlers to maintain three different modes:
-        // outerXML, inGrid, and inClues
-        private val outerXML : DefaultHandler = object : DefaultHandler() {
-            @Throws(SAXException::class)
-            override fun startElement(
-                nsURI : String?,
-                strippedName : String,
-                tagName : String,
-                attributes : Attributes?,
-            ) {
-                var strippedName = strippedName
-                strippedName = strippedName.trim()
-                val name = if (strippedName.length == 0)
-                    tagName.trim()
-                else
-                    strippedName
+        init {
+            getMetaData(content)
+            getGrid(content)
+            getClues(content)
+            getWords(content)
+        }
 
-                if (
-                    name.equals("title", ignoreCase = true)
-                    || name.equals("creator", ignoreCase = true)
-                    || name.equals("copyright", ignoreCase = true)
-                    || name.equals("description", ignoreCase = true)
-                    || name.equals("instructions", ignoreCase = true)
-                    || name.equals("completion", ignoreCase = true)
-                ) {
-                    charBuffer.delete(0, charBuffer.length)
-                } else {
-                    charBuffer.append("<" + tagName + ">")
+        private fun getMetaData(content : XMLElement) {
+            content.selectFirst("metadata")?.let { metadata ->
+                metadata.selectFirst("title")?.let { title = it.html() }
+                metadata.selectFirst("creator")?.let { creator = it.html() }
+                metadata.selectFirst("copyright")?.let { copyright = it.html() }
+                metadata.selectFirst("description")?.let {
+                    description = it.html()
+                }
+                metadata.selectFirst("instructions")?.let {
+                    instructions = it.html()
                 }
             }
-
-            @Throws(SAXException::class)
-            override fun characters(ch : CharArray, start : Int, length : Int) {
-                charBuffer.append(ch, start, length)
-            }
-
-            @Throws(SAXException::class)
-            override fun endElement(
-                nsURI : String?,
-                strippedName : String,
-                tagName : String,
-            ) {
-                var strippedName = strippedName
-                strippedName = strippedName.trim()
-                val name = if (strippedName.length == 0)
-                    tagName.trim()
-                else
-                    strippedName
-
-                val charData = charBuffer.toString().trim()
-
-                if (name.equals("title", ignoreCase = true)) {
-                    title = charData
-                } else if (name.equals("creator", ignoreCase = true)) {
-                    creator = charData
-                } else if (name.equals("copyright", ignoreCase = true)) {
-                    copyright = charData
-                } else if (name.equals("description", ignoreCase = true)) {
-                    description = charData
-                } else if (name.equals("instructions", ignoreCase = true)) {
-                    instructions = charData
-                } else if (name.equals("completion", ignoreCase = true)) {
-                    completion = charData
-                } else {
-                    charBuffer.append("</" + tagName + ">")
-                }
+            content.selectFirst("completion")?.let {
+                completion = it.html()
             }
         }
 
-        private val inGrid : DefaultHandler = object : DefaultHandler() {
-            private var inCellPosition : Position? = null
+        private fun getGrid(content : XMLElement) {
+            content.selectFirst("grid")?.let { grid ->
+                 try {
+                    width = grid.attr("width").toInt()
+                    height = grid.attr("height").toInt()
+                    boxes = Array<Array<Box?>>(height) {
+                        arrayOfNulls<Box>(width)
+                    }
 
-            @Throws(SAXException::class)
-            override fun startElement(
-                nsURI : String?,
-                strippedName : String,
-                tagName : String,
-                attributes : Attributes,
-            ) {
-                var strippedName = strippedName
-                strippedName = strippedName.trim()
-                val name = if (strippedName.length == 0)
-                    tagName.trim()
-                else
-                    strippedName
-
-                try {
-                    if (name.equals("grid", ignoreCase = true)) {
-                        this@JPZXMLParser.width = attributes
-                            .getValue("width")
-                            .toInt()
-                        this@JPZXMLParser.height = attributes
-                            .getValue("height")
-                            .toInt()
-                        this@JPZXMLParser.boxes = Array<Array<Box?>>(height) {
-                            arrayOfNulls<Box>(width)
-                        }
-                    } else if (name.equals("cell", ignoreCase = true)) {
-                        parseCell(attributes)
-                    } else if (name.equals("arrow", ignoreCase = true)) {
-                        parseArrow(attributes)
+                    for (cell in grid.select("cell")) {
+                        parseCell(cell)
                     }
                 } catch (e : NumberFormatException) {
                     LOG.severe("Could not read JPZ XML cell data: " + e)
                 }
             }
+        }
 
-            @Throws(SAXException::class)
-            override fun endElement(
-                nsURI : String?,
-                strippedName : String,
-                tagName : String,
-            ) {
-                var strippedName = strippedName
-                strippedName = strippedName.trim()
-                val name = if (strippedName.length == 0)
-                    tagName.trim()
-                else
-                    strippedName
-
-                if (name.equals("cell", ignoreCase = true)) {
-                    inCellPosition = null
-                }
-            }
-
-            fun parseCell(attributes : Attributes) {
-                val x = attributes.getValue("x").toInt() - 1
-                val y = attributes.getValue("y").toInt() - 1
-
-                if (
-                    0 <= x
-                    && x < this@JPZXMLParser.width
-                    && 0 <= y
-                    && y < this@JPZXMLParser.height
-                ) {
-                    inCellPosition = Position(y, x)
-                    val box = Box()
-
-                    // keep track of whether the cell is interesting
-                    // uninteresting blocks get set to null
-                    var hasData = false
-                    if (!isCell(attributes))
-                        box.isBlock = true
-
-                    val solution = attributes.getValue("solution")
-                    if (
-                        solution != null
-                        && solution.length > 0
-                        && !isBlock(box)
-                    ) {
-                        box.solution = solution
-                    }
-
-                    val response = attributes.getValue("solve-state")
-                    if (response != null && response.length > 0) {
-                        box.initialValue = response
-                        box.response = response
-                        hasData = true
-                    } else {
-                        box.setBlank()
-                    }
-
-                    val number = attributes.getValue("number")
-                    if (number != null) {
-                        box.clueNumber = number
-                        hasData = true
-                    }
-
-                    val shape = attributes.getValue("background-shape")
-                    if ("circle".equals(shape, ignoreCase = true)) {
-                        box.shape = Box.Shape.CIRCLE
-                        hasData = true
-                    } else {
-                        // see if it's an IPuz value why not
-                        val boxShape = IPuzIO.getShape(shape)
-                        if (boxShape != null) {
-                            box.shape = boxShape
-                            hasData = true
-                        }
-                    }
-
-                    val color = attributes.getValue("background-color")
-                    if (color != null) {
-                        val iColor = parseHtmlColor(color)
-                        if (iColor >= 0) {
-                            box.color = iColor
-                            hasData = true
-                        }
-                    }
-
-                    val topBar = attributes.getValue("top-bar")
-                    if ("true".equals(topBar, ignoreCase = true))
-                        box.barTop = Box.Bar.SOLID
-                    val bottomBar = attributes.getValue("bottom-bar")
-                    if ("true".equals(bottomBar, ignoreCase = true))
-                        box.barBottom = Box.Bar.SOLID
-                    val leftBar = attributes.getValue("left-bar")
-                    if ("true".equals(leftBar, ignoreCase = true))
-                        box.barLeft = Box.Bar.SOLID
-                    val rightBar = attributes.getValue("right-bar")
-                    if ("true".equals(rightBar, ignoreCase = true))
-                        box.barRight = Box.Bar.SOLID
-                    hasData = hasData or box.hasBars()
-
-                    var hasMarks = false
-                    val marks = Array<Array<String?>>(3) {
-                        arrayOfNulls<String>(3)
-                    }
-                    for (row in 0..2) {
-                        for (col in 0..2) {
-                            val mark = attributes.getValue(
-                                markAttributes[row][col]
-                            )
-                            if (mark != null) {
-                                marks[row][col] = mark
-                                hasMarks = true
-                            }
-                        }
-                    }
-                    if (hasMarks) {
-                        box.setMarks(marks)
-                        hasData = true
-                    }
-
-                    if (!box.isBlock || hasData)
-                        this@JPZXMLParser.boxes?.let { it[y][x] = box }
-                }
-            }
-
-            fun parseArrow(attributes : Attributes) {
-                if (inCellPosition == null)
-                    return
-
-                // only interpret "to" field which gives arrow direction
-                // i don't quite understand the "from" field
-                var to = attributes.getValue("to")
-                if (to == null)
-                    return
-
-                to = to.trim()
-
-                var arrowShape : Box.Shape? = null
-                if (to.equals("left", ignoreCase = true))
-                    arrowShape = Box.Shape.ARROW_LEFT
-                else if (to.equals("right", ignoreCase = true))
-                    arrowShape = Box.Shape.ARROW_RIGHT
-                else if (to.equals("top", ignoreCase = true))
-                    arrowShape = Box.Shape.ARROW_UP
-                else if (to.equals("bottom", ignoreCase = true))
-                    arrowShape = Box.Shape.ARROW_DOWN
-
-                if (arrowShape == null)
-                    return
-
-                inCellPosition?.row?.let { row ->
-                    inCellPosition?.col?.let { col ->
-                        boxes?.let { boxes ->
-                            if (boxes[row][col] == null) {
-                                boxes[row][col] = Box().apply{
-                                    isBlock = true
-                                }
-                            }
-
-                            boxes[row][col]?.let { it.shape = arrowShape }
-                        }
-                    }
+        private fun parseCell(cell : XMLElement) {
+            parseCellAttributes(cell)?.let { pos ->
+                for (arrow in cell.select("arrow")) {
+                    parseArrow(pos, arrow)
                 }
             }
         }
 
-        fun isCell(attributes : Attributes) : Boolean {
-            val cellType = attributes.getValue("type")
+        private fun parseCellAttributes(cell : XMLElement) : Position? {
+            val x = cell.attr("x").toInt() - 1
+            val y = cell.attr("y").toInt() - 1
+            val pos = Position(y, x)
+
+            if (0 <= x && x < width && 0 <= y && y < height) {
+                val box = Box()
+
+                // keep track of whether the cell is interesting
+                // uninteresting blocks get set to null
+                var hasData = false
+                if (!isCell(cell))
+                    box.isBlock = true
+
+                val solution = cell.attr("solution")
+                if (!solution.isEmpty() && !isBlock(box)) {
+                    box.solution = solution
+                }
+
+                val response = cell.attr("solve-state")
+                if (!response.isEmpty()) {
+                    box.initialValue = response
+                    box.response = response
+                    hasData = true
+                } else {
+                    box.setBlank()
+                }
+
+                val number = cell.attr("number")
+                if (!number.isEmpty()) {
+                    box.clueNumber = number
+                    hasData = true
+                }
+
+                val shape = cell.attr("background-shape")
+                if ("circle".equals(shape, ignoreCase = true)) {
+                    box.shape = Box.Shape.CIRCLE
+                    hasData = true
+                } else {
+                    // see if it's an IPuz value why not
+                    val boxShape = IPuzIO.getShape(shape)
+                    if (boxShape != null) {
+                        box.shape = boxShape
+                        hasData = true
+                    }
+                }
+
+                val color = cell.attr("background-color")
+                if (!color.isEmpty()) {
+                    val iColor = parseHtmlColor(color)
+                    if (iColor >= 0) {
+                        box.color = iColor
+                        hasData = true
+                    }
+                }
+
+                val topBar = cell.attr("top-bar")
+                if ("true".equals(topBar, ignoreCase = true))
+                    box.barTop = Box.Bar.SOLID
+                val bottomBar = cell.attr("bottom-bar")
+                if ("true".equals(bottomBar, ignoreCase = true))
+                    box.barBottom = Box.Bar.SOLID
+                val leftBar = cell.attr("left-bar")
+                if ("true".equals(leftBar, ignoreCase = true))
+                    box.barLeft = Box.Bar.SOLID
+                val rightBar = cell.attr("right-bar")
+                if ("true".equals(rightBar, ignoreCase = true))
+                    box.barRight = Box.Bar.SOLID
+                hasData = hasData or box.hasBars()
+
+                var hasMarks = false
+                val marks = Array<Array<String?>>(3) {
+                    arrayOfNulls<String>(3)
+                }
+                for (row in 0..2) {
+                    for (col in 0..2) {
+                        val mark = cell.attr(markAttributes[row][col])
+                        if (!mark.isEmpty()) {
+                            marks[row][col] = mark
+                            hasMarks = true
+                        }
+                    }
+                }
+                if (hasMarks) {
+                    box.setMarks(marks)
+                    hasData = true
+                }
+
+                if (!box.isBlock || hasData)
+                    boxes?.let { it[y][x] = box }
+
+                return pos
+            } else {
+                return null
+            }
+        }
+
+        /**
+         * Checks if cell is a block or not
+         *
+         * Defaults true unless evidence to the contrary
+         */
+        private fun isCell(cell : XMLElement) : Boolean {
+            val cellType = cell.attr("type")
             if ("block".equals(cellType, ignoreCase = true))
                 return false
             if ("void".equals(cellType, ignoreCase = true))
@@ -412,264 +287,133 @@ class JPZIO : PuzzleParser {
             return true
         }
 
-        private val inClues : DefaultHandler = object : DefaultHandler() {
-            private var inClueNum : String? = null
-            private var inClueFormat : String? = ""
-            private var inListName : String? = "No List"
-            private var inClueZoneID : String? = null
-            private var inClueCitation : String? = null
-            private var inClueIndex = -1
+        private fun parseArrow(pos : Position, arrow : XMLElement) {
+            // only interpret "to" field which gives arrow direction
+            // i don't quite understand the "from" field
+            var to = arrow.attr("to")
+            if (to.isEmpty())
+                return
 
-            private val charBuffer = StringBuilder()
+            to = to.trim()
 
-            @Throws(SAXException::class)
-            override fun startElement(
-                nsURI : String?,
-                strippedName : String,
-                tagName : String,
-                attributes : Attributes,
-            ) {
-                var strippedName = strippedName
-                strippedName = strippedName.trim()
-                val name = if (strippedName.length == 0)
-                    tagName.trim()
-                else
-                    strippedName
+            var arrowShape : Box.Shape? = null
+            if (to.equals("left", ignoreCase = true))
+                arrowShape = Box.Shape.ARROW_LEFT
+            else if (to.equals("right", ignoreCase = true))
+                arrowShape = Box.Shape.ARROW_RIGHT
+            else if (to.equals("top", ignoreCase = true))
+                arrowShape = Box.Shape.ARROW_UP
+            else if (to.equals("bottom", ignoreCase = true))
+                arrowShape = Box.Shape.ARROW_DOWN
 
-                try {
-                    if (name.equals("title", ignoreCase = true)) {
-                        charBuffer.delete(0, charBuffer.length)
-                    } else if (name.equals("clue", ignoreCase = true)) {
-                        charBuffer.delete(0, charBuffer.length)
+            if (arrowShape == null)
+                return
 
-                        inClueNum = attributes.getValue("number")
-                        inClueIndex += 1
-
-                        val link = attributes.getValue("is-link")
-                        if (link == null) {
-                            inClueFormat = attributes.getValue("format")
-                            if (inClueFormat == null) inClueFormat = ""
-
-                            inClueCitation = attributes.getValue("citation")
-                            inClueZoneID = attributes.getValue("word")
-
-                            // clue appears in characters between start
-                            // and end
-                        }
-                    } else {
-                        charBuffer.append("<" + tagName + ">")
+            val row = pos.row
+            val col = pos.col
+            boxes?.let { boxes ->
+                if (boxes[row][col] == null) {
+                    boxes[row][col] = Box().apply{
+                        isBlock = true
                     }
-                } catch (e : NumberFormatException) {
-                    LOG.severe("Could not read JPZ XML cell data: " + e)
                 }
+
+                boxes[row][col]?.let { it.shape = arrowShape }
             }
+        }
 
-            @Throws(SAXException::class)
-            override fun characters(ch : CharArray, start : Int, length : Int) {
-                charBuffer.append(ch, start, length)
+        private fun getClues(content : XMLElement) {
+            for (clues in content.select("clues")) {
+                parseClueList(clues)
             }
+        }
 
-            @Throws(SAXException::class)
-            override fun endElement(
-                nsURI : String?,
-                strippedName : String,
-                tagName : String,
-            ) {
-                var strippedName = strippedName
-                strippedName = strippedName.trim()
-                val name = if (strippedName.length == 0)
-                    tagName.trim()
-                else
-                    strippedName
-
-                if (name.equals("title", ignoreCase = true)) {
-                    inListName = unHtmlString(charBuffer.toString())
-                    inClueIndex = -1
-                } else if (name.equals("clue", ignoreCase = true)) {
-                    var fullClue = charBuffer.toString()
-
-                    inClueFormat?.let { inClueFormat ->
-                        if (inClueFormat.length > 0) {
-                            fullClue = String.format(
-                                "%s (%s)",
-                                fullClue,
-                                inClueFormat,
-                            )
-                        }
-                    }
-
-                    inListName?.let { inListName ->
-                        clues.add(
-                            JPZIO.ClueInfo(
-                                inListName,
-                                inClueIndex,
-                                inClueNum,
-                                fullClue,
-                                inClueZoneID,
-                                inClueCitation,
-                            )
-                        )
-                    }
-
-                    inClueNum = null
-                    inClueFormat = ""
-                    inClueZoneID = null
-                    inClueCitation = null
-                } else {
-                    charBuffer.append("</" + tagName + ">")
+        private fun parseClueList(clues : XMLElement) {
+            clues.selectFirst("title")?.text()?.let { listName ->
+                var clueIndex = 0
+                for (clue in clues.select("clue")) {
+                    parseClue(listName, clueIndex, clue)
+                    clueIndex += 1
                 }
             }
         }
 
-        private val inWord : DefaultHandler = object : DefaultHandler() {
-            private var zoneID : String? = null
-            private var zone : Zone? = null
-
-            @Throws(SAXException::class)
-            override fun startElement(
-                nsURI : String?,
-                strippedName : String,
-                tagName : String,
-                attributes : Attributes,
-            ) {
-                var strippedName = strippedName
-                strippedName = strippedName.trim()
-                val name = if (strippedName.length == 0)
-                    tagName.trim()
-                else
-                    strippedName
-
-                if (name.equals("word", ignoreCase = true)) {
-                    zoneID = attributes.getValue("id")
-                    zone = Zone()
-
-                    val x = attributes.getValue("x")
-                    val y = attributes.getValue("y")
-                    if (x != null && y != null)
-                        parseCells(x, y)
-                } else if (name.equals("cells", ignoreCase = true)) {
-                    parseCells(
-                        attributes.getValue("x"),
-                        attributes.getValue("y"),
-                    )
-                }
-            }
-
-            @Throws(SAXException::class)
-            override fun endElement(
-                nsURI : String?,
-                strippedName : String,
-                tagName : String,
-            ) {
-                var strippedName = strippedName
-                strippedName = strippedName.trim()
-                val name = if (strippedName.length == 0)
-                    tagName.trim()
-                else
-                    strippedName
-
-                if (name.equals("word", ignoreCase = true)) {
-                    zoneID?.let { zoneID ->
-                        zone?.let { zone ->
-                            zoneMap.put(zoneID, zone)
-                        }
-                    }
-                    zoneID = null
-                    zone = null
-                }
-            }
-
-            /**
-             * Parse cells data into zone
-             *
-             * E.g. x="1-3" y = "2" is (2, 1), (2, 2), (2, 3);
-             */
-            fun parseCells(x : String, y : String) {
-                val xs = x.split("-".toRegex())
-                    .dropLastWhile { it.isEmpty() }
-                    .toTypedArray()
-                val xstart = xs[0].toInt() - 1
-                val xend = if (xs.size > 1)
-                    xs[1].toInt() - 1
-                else
-                    xstart
-
-                val ys = y.split("-".toRegex())
-                    .dropLastWhile { it.isEmpty() }
-                    .toTypedArray()
-                val ystart = ys[0].toInt() - 1
-                val yend = if (ys.size > 1)
-                    ys[1].toInt() - 1
-                else
-                    ystart
-
-                for (row in ystart..yend) {
-                    for (col in xstart..xend) {
-                        zone?.addPosition(Position(row, col))
-                    }
-                }
-            }
-        }
-
-        private var state : DefaultHandler = outerXML
-
-        @Throws(SAXException::class)
-        override fun startElement(
-            nsURI : String?,
-            strippedName : String,
-            tagName : String,
-            attributes : Attributes?,
+        private fun parseClue(
+            listName : String,
+            index : Int,
+            clue : XMLElement,
         ) {
-            var strippedName = strippedName
-            strippedName = strippedName.trim()
-            val name = if (strippedName.length == 0)
-                tagName.trim()
-            else
-                strippedName
+            val num = clue.attr("number")
+            val hint = clue.html()
+            val link = clue.attr("is-link")
+            var format = ""
+            var citation : String? = null
+            var zoneID : String? = null
+            if (link.isEmpty()) {
+                format = clue.attr("format")
+                citation = clue.attrNull("citation")
+                zoneID = clue.attrNull("word")
+            }
+            val fullClue = if (format.isEmpty()) hint else "$hint ($format)"
+            clues.add(
+                ClueInfo(listName, index, num, fullClue, zoneID, citation),
+            )
+        }
 
-            if (name.equals("rectangular-puzzle", ignoreCase = true)) {
-                hasRectangularPuzzleEle = true
-            } else if (name.equals("grid", ignoreCase = true)) {
-                hasGridEle = true
-                state = inGrid
-            } else if (name.equals("clues", ignoreCase = true)) {
-                hasCluesEle = true
-                state = inClues
-            } else if (name.equals("word", ignoreCase = true)) {
-                state = inWord
-            } else if (name.equals("acrostic", ignoreCase = true)) {
-                this.isAcrostic = true
+        private fun getWords(content : XMLElement) {
+            for (word in content.select("word")) {
+                parseWord(word)
+            }
+        }
+
+        private fun parseWord(word : XMLElement) {
+            val zoneID = word.attr("id")
+            if (zoneID.isEmpty())
+                return
+
+            val zone = Zone()
+
+            val x = word.attrNull("x")
+            val y = word.attrNull("y")
+            if (x != null && y != null) {
+                parseCells(zone, x, y)
             }
 
-            state.startElement(nsURI, name, tagName, attributes)
+            for (cells in word.select("cells")) {
+                val x = cells.attrNull("x")
+                val y = cells.attrNull("y")
+                if (x != null && y != null) {
+                    parseCells(zone, x, y)
+                }
+            }
+
+            zoneMap.put(zoneID, zone)
         }
 
-        @Throws(SAXException::class)
-        override fun characters(ch : CharArray?, start : Int, length : Int) {
-            state.characters(ch, start, length)
-        }
-
-        @Throws(SAXException::class)
-        override fun endElement(
-            nsURI : String?,
-            strippedName : String,
-            tagName : String,
-        ) {
-            var strippedName = strippedName
-            strippedName = strippedName.trim()
-            val name = if (strippedName.length == 0)
-                tagName.trim()
+        /**
+         * Parse cells data into zone
+         *
+         * E.g. x="1-3" y = "2" is (2, 1), (2, 2), (2, 3);
+         */
+        private fun parseCells(zone : Zone, x : String, y : String) {
+            val xs = x.split("-".toRegex())
+            val xstart = xs[0].toInt() - 1
+            val xend = if (xs.size > 1)
+                xs[1].toInt() - 1
             else
-                strippedName
+                xstart
 
-            state.endElement(nsURI, strippedName, tagName)
+            val ys = y.split("-".toRegex())
+            val ystart = ys[0].toInt() - 1
+            val yend = if (ys.size > 1)
+                ys[1].toInt() - 1
+            else
+                ystart
 
-            if (name.equals("grid", ignoreCase = true)) {
-                state = outerXML
-            } else if (name.equals("clues", ignoreCase = true)) {
-                state = outerXML
-            } else if (name.equals("word", ignoreCase = true)) {
-                state = outerXML
+            for (row in ystart..yend) {
+                for (col in xstart..xend) {
+                    zone.addPosition(Position(row, col))
+                }
             }
         }
     }
@@ -695,15 +439,10 @@ class JPZIO : PuzzleParser {
             ),
         )
 
-        @JvmStatic
         @Throws(Exception::class)
-        fun readPuzzle(inStream : InputStream?) : Puzzle? {
-            val factory = SAXParserFactory.newInstance()
-            val parser = factory.newSAXParser()
-            val xr = parser.getXMLReader()
-            val handler = JPZXMLParser()
-            xr.setContentHandler(handler)
-            xr.parse(InputSource(inStream))
+        fun readPuzzle(inStream : InputStream) : Puzzle? {
+            val content = parseXMLElement(inStream.asSource())
+            val handler = JPZXMLParser(content)
 
             if (!handler.isSuccessfulRead)
                 return null
@@ -716,7 +455,7 @@ class JPZIO : PuzzleParser {
         }
 
         fun convertPuzzle(
-            inStream : InputStream?,
+            inStream : InputStream,
             os : DataOutputStream,
             d : LocalDate?,
         ) : Boolean {
