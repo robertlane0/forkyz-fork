@@ -5,8 +5,10 @@ import java.io.IOException
 import java.io.InputStream
 import java.util.Locale
 import java.util.logging.Logger
+import kotlinx.io.asSource
 
-import org.jsoup.Jsoup
+import com.fleeksoft.ksoup.Ksoup
+import com.fleeksoft.ksoup.parseSource
 
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.PuzImage
@@ -61,7 +63,7 @@ class PrzekrojIO : PuzzleParser {
 
                 if (puz == null) {
                     copy.reset()
-                    val doc = Jsoup.parse(copy, null, "")
+                    val doc = Ksoup.parseSource(copy.asSource())
                     val cwJson = doc.select(".crossword")
                         .attr("data-json")
                         .replace("&quot;", "\"")

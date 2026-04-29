@@ -105,7 +105,7 @@ class KingDigitalLoginDownloader(
 
             return getURLInputStream(
                 url = url,
-                timeout = timeout,
+                timeoutMillis = timeout,
                 headers = headers,
             ).use(JPZIO::readPuzzle)?.let { puz ->
                 with (puz) {

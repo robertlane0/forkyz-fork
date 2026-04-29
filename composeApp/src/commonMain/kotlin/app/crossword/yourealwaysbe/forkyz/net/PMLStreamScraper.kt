@@ -9,7 +9,7 @@ import java.util.regex.Pattern
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format
 
-import org.jsoup.nodes.Document
+import com.fleeksoft.ksoup.nodes.Document
 
 import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 import app.crossword.yourealwaysbe.puz.Puzzle

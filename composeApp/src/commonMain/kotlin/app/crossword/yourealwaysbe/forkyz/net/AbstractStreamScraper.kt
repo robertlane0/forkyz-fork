@@ -10,9 +10,11 @@ import java.net.URI
 import java.net.URISyntaxException
 import java.net.URL
 import java.util.regex.Pattern
+import kotlinx.io.asSource
 
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
+import com.fleeksoft.ksoup.Ksoup
+import com.fleeksoft.ksoup.nodes.Document
+import com.fleeksoft.ksoup.parseSource
 
 import app.crossword.yourealwaysbe.forkyz.util.getURLInputStream
 import app.crossword.yourealwaysbe.puz.Puzzle
@@ -71,7 +73,7 @@ abstract class AbstractStreamScraper : StreamScraper {
      *
      * Tries first found URL, uses urlParser on the page pointed to.
      *
-     * @param doc Jsoup document to search (or null, meaning null
+     * @param doc Ksoup document to search (or null, meaning null
      * returned)
      * @param selector css selector of elements to look at
      * @param attribute attribute of element to look at
@@ -107,7 +109,7 @@ abstract class AbstractStreamScraper : StreamScraper {
         /**
          * From HTML pick out a particular URL
          *
-         * @param doc Jsoup document to search (or null, meaning null
+         * @param doc Ksoup document to search (or null, meaning null
          * returned)
          * @param selector css selector of elements to look at
          * @param attribute attribute of element to look at
@@ -197,7 +199,7 @@ abstract class AbstractStreamScraper : StreamScraper {
          */
         fun getDocument(inputStream : InputStream) : Document? {
             try {
-                return Jsoup.parse(inputStream, null, "")
+                return Ksoup.parseSource(inputStream.asSource())
             } catch (e : IOException) {
                 return null
             }

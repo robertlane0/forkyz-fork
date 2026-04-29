@@ -4,7 +4,7 @@ package app.crossword.yourealwaysbe.forkyz.net
 import java.io.InputStream
 import java.util.regex.Pattern
 
-import org.jsoup.nodes.Document
+import com.fleeksoft.ksoup.nodes.Document
 
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.io.PuzzleStreamReader

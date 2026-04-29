@@ -20,7 +20,18 @@ abstract class AbstractDownloader : Downloader {
     @Throws(IOException::class, URISyntaxException::class)
     protected suspend fun getInputStream(
         url : URL,
-        headers : Map<String, String>?,
+        headers : Map<String, String>? = null,
+    ) : BufferedInputStream {
+        return getURLInputStream(
+            url,
+            timeout,
+            headers
+        )
+    }
+
+    protected suspend fun getInputStream(
+        url : String,
+        headers : Map<String, String>? = null,
     ) : BufferedInputStream {
         return getURLInputStream(
             url,

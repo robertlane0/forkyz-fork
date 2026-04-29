@@ -14,9 +14,10 @@ dependencies {
 
     implementation(libs.apache.commons.text)
     implementation(libs.hjson)
-    implementation(libs.jsoup)
     implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.ksoup)
+    implementation(libs.ksoup.kotlinx)
     implementation(libs.ktor.client.cio)
 }
 

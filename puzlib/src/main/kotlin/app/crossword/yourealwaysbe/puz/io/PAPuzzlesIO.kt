@@ -7,9 +7,11 @@ import java.util.logging.Logger
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.text.RegexOption.IGNORE_CASE
+import kotlinx.io.asSource
 
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Element
+import com.fleeksoft.ksoup.Ksoup
+import com.fleeksoft.ksoup.nodes.Element
+import com.fleeksoft.ksoup.parseSource
 
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Clue
@@ -82,7 +84,7 @@ class PAPuzzlesIO : PuzzleParser {
         @Throws(IOException::class)
         fun readPuzzle(inStream : InputStream) : Puzzle? {
             try {
-                val doc = Jsoup.parse(inStream, null, "")
+                val doc = Ksoup.parseSource(inStream.asSource())
                 val builder = PuzzleBuilder(getBoxes(doc))
                 getClues(doc, builder)
                 return builder.puzzle

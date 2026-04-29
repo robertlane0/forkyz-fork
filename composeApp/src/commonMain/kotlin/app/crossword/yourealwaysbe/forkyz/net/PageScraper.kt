@@ -10,10 +10,11 @@ import java.util.LinkedList
 import java.util.regex.Pattern
 import kotlin.time.Duration
 import kotlinx.datetime.LocalDate
+import kotlinx.io.asSource
 
-import org.jsoup.Connection
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
+import com.fleeksoft.ksoup.Ksoup
+import com.fleeksoft.ksoup.nodes.Document
+import com.fleeksoft.ksoup.parseSource
 
 import app.crossword.yourealwaysbe.forkyz.net.Downloader.DownloadResult
 import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
@@ -96,7 +97,7 @@ open class PageScraper(
         var downloadFailed = false
 
         try {
-            val urls = this.puzzleURLs
+            val urls = getPuzzleURLs()
             val urlsToFilenames = mapURLsToFileNames(urls)
             val urlIterator = if (readReverse)
                 urls.descendingIterator()
@@ -175,24 +176,24 @@ open class PageScraper(
         return null
     }
 
-    @get:Throws(IOException::class)
-    private val puzzleURLs : Deque<String>
-        get() {
-            val result = LinkedList<String>()
+    @Throws(IOException::class)
+    private suspend fun getPuzzleURLs() : Deque<String> {
+        val result = LinkedList<String>()
 
-            val conn : Connection = Jsoup.connect(scrapeUrl)
-            conn.timeout(timeout)
+        val content = Ksoup.parseSource(
+            getInputStream(scrapeUrl).asSource(),
+            scrapeUrl,
+        )
 
-            val content : Document = conn.get()
-            for (a in content.select("a")) {
-                val url : String = a.attr("abs:href")
-                if (patFile.matcher(url).matches()) {
-                    result.add(url)
-                }
+        for (a in content.select("a")) {
+            val url : String = a.attr("abs:href")
+            if (patFile.matcher(url).matches()) {
+                result.add(url)
             }
-
-            return result
         }
+
+        return result
+    }
 
     private fun getLocalFileName(remoteFileName : String) : String {
         return (name + "-" + remoteFileName).replace(" ".toRegex(), "")

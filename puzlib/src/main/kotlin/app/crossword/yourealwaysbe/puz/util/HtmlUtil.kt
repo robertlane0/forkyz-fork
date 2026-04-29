@@ -5,15 +5,14 @@ import java.util.Locale
 import kotlin.math.max
 import kotlin.math.min
 
-import org.apache.commons.text.StringEscapeUtils
+import com.fleeksoft.ksoup.Ksoup
+import com.fleeksoft.ksoup.safety.Safelist
 
-import org.jsoup.Jsoup
-import org.jsoup.safety.Safelist
+import org.apache.commons.text.StringEscapeUtils
 
 object HtmlUtil {
     // IPuz tags not to strip from HTML (preserve line breaks)
     private val JSOUP_CLEAN_WHITELIST = Safelist()
-
     init {
         JSOUP_CLEAN_WHITELIST.addTags("br")
     }
@@ -183,7 +182,7 @@ object HtmlUtil {
         // this is a bit hacky: any break tag is normalised to "\r?\n<br>"
         // by the clean method, we remove the \r\ns and turn <br> into \n
         return StringEscapeUtils.unescapeHtml4(
-            Jsoup.clean(value, JSOUP_CLEAN_WHITELIST)
+            Ksoup.clean(value, JSOUP_CLEAN_WHITELIST)
                 .replace("\r", "")
                 .replace("\n", "")
                 .replace("<br>", "\n")

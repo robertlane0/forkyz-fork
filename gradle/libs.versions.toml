@@ -58,7 +58,7 @@ desugar = "2.1.5"
 directories = "26"
 hjson = "3.1.0"
 htmlconverter = "1.1.0"
-jsoup = "1.22.1"
+ksoup = "0.2.6"
 material = "1.13.0"
 seismic = "1.0.3"
 datetime-wheel-picker = "1.1.0"
@@ -149,7 +149,8 @@ directories = { module = "dev.dirs:directories", version.ref = "directories" }
 filekit-dialogs-compose = { module = "io.github.vinceglb:filekit-dialogs-compose", version.ref = "filekit" }
 hjson = { module = "org.hjson:hjson", version.ref = "hjson" }
 htmlconverter = { module = "be.digitalia.compose.htmlconverter:htmlconverter", version.ref = "htmlconverter" }
-jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
+ksoup = { module = "com.fleeksoft.ksoup:ksoup", version.ref = "ksoup" }
+ksoup-kotlinx = { module = "com.fleeksoft.ksoup:ksoup-kotlinx", version.ref = "ksoup" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
 mcp-sdk-server = { module = "io.modelcontextprotocol:kotlin-sdk-server", version.ref = "mcp-sdk-server" }
 seismic = { module = "com.squareup:seismic", version.ref = "seismic" }

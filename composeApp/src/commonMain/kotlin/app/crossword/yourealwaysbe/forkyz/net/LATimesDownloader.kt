@@ -1,8 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.net.URI
-import java.net.URL
 import kotlin.time.Duration.Companion.days
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.Padding
@@ -50,7 +48,7 @@ class LATimesDownloader(
 ) {
     override suspend fun getSourceUrl(date : LocalDate) : String? {
         val url = PUZZLES_FEED_FORMAT.format(date)
-        return getInputStream(URI(url).toURL(), null).use { input ->
+        return getInputStream(url).use { input ->
             val puzzles = parseJSONArray(input)
             (0 until puzzles.size).forEach {
                 val puzzle = puzzles.getJSONObject(it)

@@ -44,6 +44,25 @@ suspend fun getURLInputStream(
     headers : Map<String, String>? = null,
     data : JSONObject? = null,
 ) : BufferedInputStream {
+    return getURLInputStream(url.toString(), timeoutMillis, headers, data)
+}
+
+/**
+ * Get a buffered input stream for URL
+ *
+ * @param url url to open
+ * @param timeout the timeout in millis
+ * @param headers extra request headers
+ * @param data JSON data (will send as POST if not null)
+ * @return a buffered input stream (in stream or err stream if error)
+ * @throws IOException
+ */
+suspend fun getURLInputStream(
+    url : String,
+    timeoutMillis : Int,
+    headers : Map<String, String>? = null,
+    data : JSONObject? = null,
+) : BufferedInputStream {
     val client = HttpClient(CIO) {
         engine {
             requestTimeout = timeoutMillis.toLong()
@@ -54,7 +73,7 @@ suspend fun getURLInputStream(
     }
 
     try {
-        val response = client.request(url.toString()) {
+        val response = client.request(url) {
             method = if (data == null) HttpMethod.Get else HttpMethod.Post
             headers?.forEach { (k, v) -> header(k, v) }
             header(HttpHeaders.Accept, "*/*")
@@ -74,16 +93,6 @@ suspend fun getURLInputStream(
     } finally {
         client.close()
     }
-}
-
-@Throws(IOException::class, URISyntaxException::class)
-suspend fun getURLInputStream(
-    url : String,
-    timeout : Int,
-    headers : Map<String, String>? = null,
-    data : JSONObject? = null,
-) : BufferedInputStream  {
-    return getURLInputStream(URI(url).toURL(), timeout, headers, data)
 }
 
 /**

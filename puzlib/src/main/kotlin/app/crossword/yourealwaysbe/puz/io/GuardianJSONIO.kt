@@ -5,8 +5,10 @@ import java.io.IOException
 import java.io.InputStream
 import java.util.logging.Logger
 import kotlinx.datetime.LocalDate
+import kotlinx.io.asSource
 
-import org.jsoup.Jsoup
+import com.fleeksoft.ksoup.Ksoup
+import com.fleeksoft.ksoup.parseSource
 
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Clue
@@ -74,7 +76,7 @@ class GuardianJSONIO : AbstractJSONIO() {
 
         fun readFromHTML(inStream : InputStream) : Puzzle? {
             try {
-                val doc = Jsoup.parse(inStream, null, "")
+                val doc = Ksoup.parseSource(inStream.asSource())
                 var cwJson : JSONObject? = null
                 var err : JSONException? = null
 
