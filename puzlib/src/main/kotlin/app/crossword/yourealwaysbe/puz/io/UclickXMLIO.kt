@@ -3,8 +3,7 @@ package app.crossword.yourealwaysbe.puz.io
 
 import java.io.DataOutputStream
 import java.io.InputStream
-import java.io.UnsupportedEncodingException
-import java.net.URLDecoder
+import io.ktor.http.decodeURLQueryComponent
 import kotlinx.datetime.LocalDate
 import kotlinx.io.asSource
 
@@ -126,12 +125,10 @@ class UclickXMLIO : PuzzleParser {
         }
 
         companion object {
-            private const val CHARSET_NAME = "utf8"
-
             fun decodeValue(value : String) : String {
                 return try {
-                    URLDecoder.decode(value, CHARSET_NAME)
-                } catch (e : UnsupportedEncodingException) {
+                    value.decodeURLQueryComponent()
+                } catch (e : Exception) {
                     value
                 }
             }
