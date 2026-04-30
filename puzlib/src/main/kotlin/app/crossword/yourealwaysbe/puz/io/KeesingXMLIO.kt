@@ -3,15 +3,9 @@ package app.crossword.yourealwaysbe.puz.io
 
 import java.io.DataOutputStream
 import java.io.InputStream
-import java.util.Collections
 import java.util.logging.Logger
-import javax.xml.parsers.SAXParserFactory
 import kotlinx.datetime.LocalDate
-
-import org.xml.sax.Attributes
-import org.xml.sax.InputSource
-import org.xml.sax.SAXException
-import org.xml.sax.helpers.DefaultHandler
+import kotlinx.io.asSource
 
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Box.Companion.isBlock
@@ -21,6 +15,8 @@ import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.PuzzleBuilder
 import app.crossword.yourealwaysbe.puz.Zone
 import app.crossword.yourealwaysbe.puz.util.HtmlUtil.unHtmlString
+import app.crossword.yourealwaysbe.puz.util.XMLElement
+import app.crossword.yourealwaysbe.puz.util.parseXMLElement
 
 /**
  * Converts a puzzle from the XML format used by web.keesing.com
@@ -73,7 +69,6 @@ import app.crossword.yourealwaysbe.puz.util.HtmlUtil.unHtmlString
 class KeesingXMLIO : PuzzleParser {
     class KeesingXMLParserException(msg : String) : Exception(msg)
 
-    @JvmRecord
     private data class ClueIndex(
         val group : String,
         val index : String?,
@@ -95,7 +90,7 @@ class KeesingXMLIO : PuzzleParser {
         var zone : Zone?,
     )
 
-    private class KeesingXMLParser : DefaultHandler() {
+    private class KeesingXMLParser(content : XMLElement) {
         private var type : String? = null
         var title : String = ""
             private set
@@ -108,9 +103,7 @@ class KeesingXMLIO : PuzzleParser {
         val clues : MutableList<ClueInfo> = mutableListOf()
         private val indexedClues : MutableMap<ClueIndex, ClueInfo>
             = mutableMapOf()
-        private val charBuffer = StringBuilder()
 
-        // sanity checks
         private var hasGridEle = false
         private var hasWordGroupsEle = false
 
@@ -133,20 +126,143 @@ class KeesingXMLIO : PuzzleParser {
         val isArrowWord : Boolean
             get() = ARROWWORD_TYPE == type
 
-        fun cleanHint(hint : String) : String {
-            // in arrow word \ splits clue across lines
-            if (this.isArrowWord)
-                return hint.replace("\\", "")
-            else
-                return hint
+        init {
+            readMetaData(content)
+            readBoxes(content)
+            readClues(content)
         }
 
-        /**
-         * Add clue to clues
-         *
-         * If index info not use will be used to update existing clues
-         */
-        fun addClue(
+        private fun readMetaData(content : XMLElement) {
+            content.selectFirst("puzzle")?.let { puzzle ->
+                type = puzzle.attr("type").ifEmpty { null }
+            }
+            content.selectFirst("title")?.let { title = it.text() }
+        }
+
+        private fun readBoxes(content : XMLElement) {
+            content.selectFirst("puzzle")?.let { puzzle ->
+                width = puzzle.attr("width").toIntOrNull() ?: 0
+                height = puzzle.attr("height").toIntOrNull() ?: 0
+                if (width > 0 && height > 0)
+                    boxes = Array(height) { arrayOfNulls<Box>(width) }
+            }
+            if (boxes != null) {
+                content.selectFirst("grid")?.let { grid ->
+                    hasGridEle = true
+                    for (cell in grid.select("cell")) {
+                        readGridCell(cell)
+                    }
+                }
+            }
+        }
+
+        private fun readGridCell(cell : XMLElement) {
+            val x = cell.attr("x").toIntOrNull() ?: return
+            val y = cell.attr("y").toIntOrNull() ?: return
+
+            if (
+                isGridCell(cell)
+                && x >= 0
+                && x < width
+                && y >= 0
+                && y < height
+            ) {
+                val box = Box()
+                val solution = cell.attr("content")
+                if (solution.isNotEmpty()) {
+                    box.solution = solution
+                    if ("1" == cell.attr("giveaway"))
+                        box.response = solution
+                }
+                boxes?.let { it[y][x] = box }
+
+                for (border in cell.select("border")) {
+                    readBorder(box, border)
+                }
+            }
+
+            for (clue in cell.select("clue")) {
+                readGridClue(clue)
+            }
+        }
+
+        private fun isGridCell(cell : XMLElement) : Boolean {
+            val content = cell.attr("content")
+            val fillable = cell.attr("fillable")
+            return !(content.isEmpty() && "0" == fillable)
+        }
+
+        private fun readBorder(box : Box, border : XMLElement) {
+            val position = border.attr("position")
+            if ("top".equals(position, ignoreCase = true))
+                box.barTop = Box.Bar.DASHED
+            else if ("bottom".equals(position, ignoreCase = true))
+                box.barBottom = Box.Bar.DASHED
+            else if ("left".equals(position, ignoreCase = true))
+                box.barLeft = Box.Bar.DASHED
+            else if ("right".equals(position, ignoreCase = true))
+                box.barRight = Box.Bar.DASHED
+        }
+
+        private fun readGridClue(clue : XMLElement) {
+            val groupIndex = clue.attr("groupindex").ifEmpty { null } ?: return
+            val wordIndex = clue.attr("wordindex").ifEmpty { null } ?: return
+            addClue(
+                groupIndex,
+                wordIndex,
+                ClueInfo(null, null, cleanHint(clue.text()), null),
+            )
+        }
+
+        private fun readClues(content : XMLElement) {
+            content.selectFirst("wordgroups")?.let { wordgroups ->
+                hasWordGroupsEle = true
+                for (wordgroup in wordgroups.select("wordgroup")) {
+                    readWordGroup(wordgroup)
+                }
+            }
+        }
+
+        private fun readWordGroup(wordgroup : XMLElement) {
+            val groupIndex = wordgroup.attr("index").ifEmpty { null } ?: return
+            val listName = wordgroup.selectFirst("header")
+                ?.let { unHtmlString(it.text()) }
+                ?: return
+            for (word in wordgroup.select("word")) {
+                readWord(word, groupIndex, listName)
+            }
+        }
+
+        private fun readWord(
+            word : XMLElement,
+            groupIndex : String,
+            listName : String,
+        ) {
+            val wordIndex = word.attr("index").ifEmpty { null }
+            val rawNum = word.attr("number")
+            val clueNumber = if (rawNum == "0" || rawNum.isEmpty())
+                null
+            else
+                rawNum
+            val zone = Zone()
+            for (cell in word.select("cell")) {
+                val x = cell.attr("x").toIntOrNull() ?: continue
+                val y = cell.attr("y").toIntOrNull() ?: continue
+                zone.addPosition(Position(y, x))
+            }
+            val hint = word.selectFirst("clue")?.let { cleanHint(it.text()) }
+            addClue(
+                groupIndex,
+                wordIndex,
+                ClueInfo(listName, clueNumber, hint, zone),
+            )
+        }
+
+        private fun cleanHint(hint : String) : String {
+            return if (isArrowWord) hint.replace("\\", "") else hint
+        }
+
+        private fun addClue(
             groupIndex : String,
             wordIndex : String?,
             info : ClueInfo,
@@ -158,7 +274,6 @@ class KeesingXMLIO : PuzzleParser {
                 if (clueIndex != null)
                     indexedClues.put(clueIndex, info)
             } else {
-
                 if (info.listName != null)
                     existing.listName = info.listName
                 if (info.clueNumber != null)
@@ -167,351 +282,6 @@ class KeesingXMLIO : PuzzleParser {
                     existing.hint = info.hint
                 if (info.zone != null)
                     existing.zone = info.zone
-            }
-        }
-
-        // Use several handlers to maintain three different modes:
-        // outerXML, inGrid, and inClues
-        private val outerXML : DefaultHandler = object : DefaultHandler() {
-            @Throws(SAXException::class)
-            override fun startElement(
-                nsURI : String?,
-                strippedName : String,
-                tagName : String,
-                attributes : Attributes,
-            ) {
-                var strippedName = strippedName
-                strippedName = strippedName.trim()
-                val name = if (strippedName.length == 0)
-                    tagName.trim()
-                else
-                    strippedName
-
-                if (name.equals("puzzle", ignoreCase = true)) {
-                    charBuffer.delete(0, charBuffer.length)
-
-                    type = attributes.getValue("type")
-                    width = attributes.getValue("width").toInt()
-                    height = attributes.getValue("height").toInt()
-                    boxes = Array<Array<Box?>>(height) {
-                        arrayOfNulls<Box>(width)
-                    }
-                } else if (name.equals("title", ignoreCase = true)) {
-                    charBuffer.delete(0, charBuffer.length)
-                } else {
-                    charBuffer.append("<" + tagName + ">")
-                }
-            }
-
-            @Throws(SAXException::class)
-            override fun characters(ch : CharArray, start : Int, length : Int) {
-                charBuffer.append(ch, start, length)
-            }
-
-            @Throws(SAXException::class)
-            override fun endElement(
-                nsURI : String?,
-                strippedName : String,
-                tagName : String,
-            ) {
-                var strippedName = strippedName
-                strippedName = strippedName.trim()
-                val name = if (strippedName.length == 0)
-                    tagName.trim()
-                else
-                    strippedName
-
-                val charData = charBuffer.toString().trim()
-
-                if (name.equals("title", ignoreCase = true)) {
-                    title = charData
-                } else {
-                    charBuffer.append("</" + tagName + ">")
-                }
-            }
-        }
-
-        private val inGrid : DefaultHandler = object : DefaultHandler() {
-            private var inClueGroupIndex : String? = null
-            private var inClueWordIndex : String? = null
-            private val charBuffer = StringBuilder()
-            private var inBox : Box? = null
-
-            @Throws(SAXException::class)
-            override fun startElement(
-                nsURI : String?,
-                strippedName : String,
-                tagName : String,
-                attributes : Attributes,
-            ) {
-                var strippedName = strippedName
-                strippedName = strippedName.trim()
-                val name = if (strippedName.length == 0)
-                    tagName.trim()
-                else
-                    strippedName
-
-                if (name.equals("cell", ignoreCase = true)) {
-                    parseCell(attributes)
-                } else if (name.equals("clue", ignoreCase = true)) {
-                    inClueGroupIndex = attributes.getValue("groupindex")
-                    inClueWordIndex = attributes.getValue("wordindex")
-                    charBuffer.delete(0, charBuffer.length)
-                } else if (
-                    name.equals("border", ignoreCase = true)
-                ) {
-                    inBox?.let { inBox ->
-                        val position = attributes.getValue("position")
-                        if ("top".equals(position, ignoreCase = true))
-                            inBox.barTop = Box.Bar.DASHED
-                        else if ("bottom".equals(position, ignoreCase = true))
-                            inBox.barBottom = Box.Bar.DASHED
-                        else if ("left".equals(position, ignoreCase = true))
-                            inBox.barLeft = Box.Bar.DASHED
-                        else if ("right".equals(position, ignoreCase = true))
-                            inBox.barRight = Box.Bar.DASHED
-                    }
-                }
-            }
-
-            @Throws(SAXException::class)
-            override fun characters(ch : CharArray, start : Int, length : Int) {
-                charBuffer.append(ch, start, length)
-            }
-
-            @Throws(SAXException::class)
-            override fun endElement(
-                nsURI : String?,
-                strippedName : String,
-                tagName : String,
-            ) {
-                var strippedName = strippedName
-                strippedName = strippedName.trim()
-                val name = if (strippedName.length == 0)
-                    tagName.trim()
-                else
-                    strippedName
-
-                if (name.equals("clue", ignoreCase = true)) {
-                    endClue()
-                } else if (name.equals("cell", ignoreCase = true)) {
-                    inBox = null
-                }
-            }
-
-            fun endClue() {
-                val hint = cleanHint(charBuffer.toString())
-                inClueGroupIndex?.let { inClueGroupIndex ->
-                    inClueWordIndex?.let { inClueWordIndex ->
-                        addClue(
-                            inClueGroupIndex,
-                            inClueWordIndex,
-                            ClueInfo(null, null, hint, null),
-                        )
-                    }
-                }
-                inClueGroupIndex = null
-                inClueWordIndex = null
-            }
-
-            fun parseCell(attributes : Attributes) {
-                val x = attributes.getValue("x").toInt()
-                val y = attributes.getValue("y").toInt()
-
-                if (
-                    isCell(attributes)
-                    && 0 <= x
-                    && x < width
-                    && 0 <= y
-                    && y < height
-                ) {
-                    val box = Box()
-
-                    val solution = attributes.getValue("content")
-                    if (solution != null && solution.length > 0) {
-                        box.solution = solution
-                        if ("1" == attributes.getValue("giveaway"))
-                            box.response = solution
-                    }
-
-                    boxes?.let { boxes ->
-                        boxes[y][x] = box
-                    }
-                    inBox = box
-                }
-            }
-
-            fun isCell(attributes : Attributes) : Boolean {
-                val content = attributes.getValue("content")
-                val fillable = attributes.getValue("fillable")
-
-                val block = (
-                    (content == null || content.isEmpty())
-                    && "0" == fillable
-                )
-
-                return !block
-            }
-        }
-
-        private val inClues : DefaultHandler = object : DefaultHandler() {
-            private var inListName : String? = null
-            private var inClueNumber : String? = null
-            private var inClueHint : String? = null
-            private var inClueZone : Zone? = null
-            private var inGroupIndex : String? = null
-            private var inWordIndex : String? = null
-
-            private val charBuffer = StringBuilder()
-
-            @Throws(SAXException::class)
-            override fun startElement(
-                nsURI : String?,
-                strippedName : String,
-                tagName : String,
-                attributes : Attributes,
-            ) {
-                var strippedName = strippedName
-                strippedName = strippedName.trim()
-                val name = if (strippedName.length == 0)
-                    tagName.trim()
-                else
-                    strippedName
-
-                try {
-                    if (name.equals("wordgroup", ignoreCase = true)) {
-                        charBuffer.delete(0, charBuffer.length)
-                        inGroupIndex = attributes.getValue("index")
-                    } else if (name.equals("header", ignoreCase = true)) {
-                        charBuffer.delete(0, charBuffer.length)
-                    } else if (name.equals("word", ignoreCase = true)) {
-                        charBuffer.delete(0, charBuffer.length)
-
-                        inWordIndex = attributes.getValue("index")
-
-                        inClueNumber = attributes.getValue("number")
-                        if ("0" == inClueNumber)
-                            inClueNumber = null
-
-                        inClueZone = Zone()
-                    } else if (name.equals("cell", ignoreCase = true)) {
-                        inClueZone?.let { inClueZone ->
-                            val x = attributes.getValue("x").toInt()
-                            val y = attributes.getValue("y").toInt()
-                            inClueZone.addPosition(Position(y, x))
-                        }
-                    } else if (name.equals("clue", ignoreCase = true)) {
-                        charBuffer.delete(0, charBuffer.length)
-                    } else {
-                        charBuffer.append("<" + tagName + ">")
-                    }
-                } catch (e : NumberFormatException) {
-                    LOG.severe("Could not read Keesing XML cell data: " + e)
-                }
-            }
-
-            @Throws(SAXException::class)
-            override fun characters(ch : CharArray, start : Int, length : Int) {
-                charBuffer.append(ch, start, length)
-            }
-
-            @Throws(SAXException::class)
-            override fun endElement(
-                nsURI : String?,
-                strippedName : String,
-                tagName : String,
-            ) {
-                var strippedName = strippedName
-                strippedName = strippedName.trim()
-                val name = if (strippedName.length == 0)
-                    tagName.trim()
-                else
-                    strippedName
-
-                if (name.equals("wordgroup", ignoreCase = true)) {
-                    inWordIndex = null
-                } else if (name.equals("header", ignoreCase = true)) {
-                    inListName = unHtmlString(charBuffer.toString())
-                } else if (name.equals("clue", ignoreCase = true)) {
-                    inClueHint = cleanHint(charBuffer.toString())
-                } else if (name.equals("word", ignoreCase = true)) {
-                    inGroupIndex?.let { inGroupIndex ->
-                        inListName?.let { inListName ->
-                            addClue(
-                                inGroupIndex,
-                                inWordIndex,
-                                ClueInfo(
-                                    inListName,
-                                    inClueNumber,
-                                    inClueHint,
-                                    inClueZone,
-                                )
-                            )
-                        }
-                    }
-                    inWordIndex = null
-                    inClueNumber = null
-                    inClueZone = null
-                } else if (name.equals("wordgroup", ignoreCase = true)) {
-                    inListName = null
-                    inGroupIndex = null
-                } else {
-                    charBuffer.append("</" + tagName + ">")
-                }
-            }
-        }
-
-        private var state : DefaultHandler = outerXML
-
-        @Throws(SAXException::class)
-        override fun startElement(
-            nsURI : String?,
-            strippedName : String,
-            tagName : String,
-            attributes : Attributes,
-        ) {
-            var strippedName = strippedName
-            strippedName = strippedName.trim()
-            val name = if (strippedName.length == 0)
-                tagName.trim()
-            else
-                strippedName
-
-            if (name.equals("grid", ignoreCase = true)) {
-                hasGridEle = true
-                state = inGrid
-            } else if (name.equals("wordgroups", ignoreCase = true)) {
-                hasWordGroupsEle = true
-                state = inClues
-            }
-
-            state.startElement(nsURI, name, tagName, attributes)
-        }
-
-        @Throws(SAXException::class)
-        override fun characters(ch : CharArray, start : Int, length : Int) {
-            state.characters(ch, start, length)
-        }
-
-        @Throws(SAXException::class)
-        override fun endElement(
-            nsURI : String?,
-            strippedName : String,
-            tagName : String,
-        ) {
-            var strippedName = strippedName
-            strippedName = strippedName.trim()
-            val name = if (strippedName.length == 0)
-                tagName.trim()
-            else
-                strippedName
-
-            state.endElement(nsURI, strippedName, tagName)
-
-            if (name.equals("grid", ignoreCase = true)) {
-                state = outerXML
-            } else if (name.equals("wordgroups", ignoreCase = true)) {
-                state = outerXML
             }
         }
     }
@@ -529,15 +299,10 @@ class KeesingXMLIO : PuzzleParser {
         private const val CROSSWORD_TYPE = "Crossword"
         private const val ARROWWORD_TYPE = "Arrowword"
 
-        @JvmStatic
         @Throws(Exception::class)
         fun readPuzzle(inStream : InputStream) : Puzzle? {
-            val factory = SAXParserFactory.newInstance()
-            val parser = factory.newSAXParser()
-            val xr = parser.getXMLReader()
-            val handler = KeesingXMLParser()
-            xr.setContentHandler(handler)
-            xr.parse(InputSource(inStream))
+            val content = parseXMLElement(inStream.asSource())
+            val handler = KeesingXMLParser(content)
 
             val gottenBoxes = handler.boxes
             val gottenClues = handler.clues
@@ -704,4 +469,3 @@ class KeesingXMLIO : PuzzleParser {
         }
     }
 }
-
