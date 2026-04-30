@@ -5,18 +5,15 @@ import java.io.DataOutputStream
 import java.io.InputStream
 import java.io.UnsupportedEncodingException
 import java.net.URLDecoder
-import javax.xml.parsers.SAXParserFactory
 import kotlinx.datetime.LocalDate
-
-import org.xml.sax.Attributes
-import org.xml.sax.InputSource
-import org.xml.sax.SAXException
-import org.xml.sax.helpers.DefaultHandler
+import kotlinx.io.asSource
 
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.PuzzleBuilder
 import app.crossword.yourealwaysbe.puz.PuzzleBuilder.BasicClue
+import app.crossword.yourealwaysbe.puz.util.XMLElement
+import app.crossword.yourealwaysbe.puz.util.parseXMLElement
 
 /**
  * Converts a puzzle from the XML format used by uclick syndicated puzzles
@@ -43,7 +40,7 @@ import app.crossword.yourealwaysbe.puz.PuzzleBuilder.BasicClue
  * which the clue starts.  [Clue] text is HTML escaped.
  */
 class UclickXMLIO : PuzzleParser {
-    private class UclickXMLParser : DefaultHandler() {
+    private class UclickXMLParser(content : XMLElement) {
         var title : String? = null
             private set
         var author : String? = null
@@ -52,15 +49,13 @@ class UclickXMLIO : PuzzleParser {
             private set
         var boxList : Array<Box?>? = null
             private set
-        val acrossClues = mutableListOf<BasicClue>()
-        val downClues = mutableListOf<BasicClue>()
-
-        private var inAcross = false
-        private var inDown = false
-        private var maxClueNum = -1
+        val acrossClues : MutableList<BasicClue> = mutableListOf()
+        val downClues : MutableList<BasicClue> = mutableListOf()
         var width : Int = 0
             private set
         var height : Int = 0
+            private set
+        var maxClueNum : Int = -1
             private set
 
         val isSuccessfulRead : Boolean
@@ -73,97 +68,72 @@ class UclickXMLIO : PuzzleParser {
                 && height > 0
             )
 
-        @Throws(SAXException::class)
-        override fun startElement(
-            nsURI : String?,
-            strippedName : String,
-            tagName : String,
-            attributes : Attributes,
-        ) {
-            var strippedName = strippedName
-            strippedName = strippedName.trim()
-            val name = if (strippedName.length == 0)
-                tagName.trim()
-            else
-                strippedName
-            if (inAcross) {
-                val clueNum = attributes.getValue("cn")
-                val clueNumInt = clueNum.toInt()
-                if (clueNumInt > maxClueNum) {
-                    maxClueNum = clueNumInt
-                }
-                acrossClues.add(
-                    BasicClue(
-                        clueNum,
-                        decodeValue(attributes.getValue("c")),
-                    )
-                )
-            } else if (inDown) {
-                val clueNum = attributes.getValue("cn")
-                val clueNumInt = clueNum.toInt()
-                if (clueNumInt > maxClueNum) {
-                    maxClueNum = clueNumInt
-                }
-                downClues.add(
-                    BasicClue(
-                        clueNum,
-                        decodeValue(attributes.getValue("c")),
-                    ),
-                )
-            } else if (name.equals("title", ignoreCase = true)) {
-                title = decodeValue(attributes.getValue("v"))
-            } else if (name.equals("author", ignoreCase = true)) {
-                author = decodeValue(attributes.getValue("v"))
-            } else if (name.equals("copyright", ignoreCase = true)) {
-                copyright = decodeValue(attributes.getValue("v"))
-            } else if (name.equals("width", ignoreCase = true)) {
-                width = attributes.getValue("v").toInt()
-            } else if (name.equals("height", ignoreCase = true)) {
-                height = attributes.getValue("v").toInt()
-            } else if (name.equals("allanswer", ignoreCase = true)) {
-                val rawGrid = attributes.getValue("v")
-                boxList = arrayOfNulls<Box>(height * width)
-                for (i in 0..<rawGrid.length) {
-                    val sol = rawGrid.get(i)
+        init {
+            readMetadata(content)
+            readBoxes(content)
+            readClues(content)
+        }
+
+        private fun readMetadata(content : XMLElement) {
+            content.selectFirst("Title")?.attr("v")
+                ?.let { title = decodeValue(it) }
+            content.selectFirst("Author")?.attr("v")
+                ?.let { author = decodeValue(it) }
+            content.selectFirst("Copyright")?.attr("v")
+                ?.let { copyright = decodeValue(it) }
+            content.selectFirst("Width")?.attr("v")?.toIntOrNull()
+                ?.let { width = it }
+            content.selectFirst("Height")?.attr("v")?.toIntOrNull()
+                ?.let { height = it }
+        }
+
+        private fun readBoxes(content : XMLElement) {
+            content.selectFirst("AllAnswer")?.attr("v")?.let { rawGrid ->
+                val list = arrayOfNulls<Box>(height * width)
+                for (i in rawGrid.indices) {
+                    if (i >= height * width) break
+                    val sol = rawGrid[i]
                     if (sol != '-') {
-                        val box = Box()
-                        box.setSolution(sol)
-                        box.setBlank()
-                        boxList?.set(i, box)
+                        list[i] = Box().apply {
+                            setSolution(sol)
+                            setBlank()
+                        }
                     }
                 }
-            } else if (name.equals("across", ignoreCase = true)) {
-                inAcross = true
-            } else if (name.equals("down", ignoreCase = true)) {
-                inDown = true
+                boxList = list
             }
         }
 
-        @Throws(SAXException::class)
-        override fun endElement(
-            nsURI : String?,
-            strippedName : String,
-            tagName : String,
+        private fun readClue(
+            clue : XMLElement,
+            clues : MutableList<BasicClue>,
         ) {
-            var strippedName = strippedName
-            strippedName = strippedName.trim()
-            val name = if (strippedName.length == 0)
-                tagName.trim()
-            else
-                strippedName
+            val cn = clue.attr("cn")
+            cn.toIntOrNull()
+                ?.let { if (it > maxClueNum) maxClueNum = it }
+            clues.add(BasicClue(cn, decodeValue(clue.attr("c"))))
+        }
 
-            if (name.equals("across", ignoreCase = true)) {
-                inAcross = false
-            } else if (name.equals("down", ignoreCase = true)) {
-                inDown = false
+        private fun readClues(content : XMLElement) {
+            content.selectFirst("across")?.let { across ->
+                for (clue in across.select("[cn]"))
+                    readClue(clue, acrossClues)
+            }
+            content.selectFirst("down")?.let { down ->
+                for (clue in down.select("[cn]"))
+                    readClue(clue, downClues)
             }
         }
 
-        fun decodeValue(value : String) : String {
-            try {
-                return URLDecoder.decode(value, CHARSET_NAME)
-            } catch (e : UnsupportedEncodingException) {
-                return value
+        companion object {
+            private const val CHARSET_NAME = "utf8"
+
+            fun decodeValue(value : String) : String {
+                return try {
+                    URLDecoder.decode(value, CHARSET_NAME)
+                } catch (e : UnsupportedEncodingException) {
+                    value
+                }
             }
         }
     }
@@ -173,26 +143,19 @@ class UclickXMLIO : PuzzleParser {
     }
 
     companion object {
-        private const val CHARSET_NAME = "utf8"
         private val ACROSS_LIST : String = DefaultListNames.ACROSS_LIST
         private val DOWN_LIST : String = DefaultListNames.DOWN_LIST
 
         @JvmStatic
-        fun parsePuzzle(inStream : InputStream?) : Puzzle? {
-            val factory = SAXParserFactory.newInstance()
+        fun parsePuzzle(inStream : InputStream) : Puzzle? {
             try {
-                val parser = factory.newSAXParser()
-                val xr = parser.getXMLReader()
-                val handler = UclickXMLParser()
-                xr.setContentHandler(handler)
-                xr.parse(InputSource(inStream))
+                val content = parseXMLElement(inStream.asSource())
+                val handler = UclickXMLParser(content)
 
                 if (!handler.isSuccessfulRead)
                     return null
 
-                val boxList = handler.boxList
-                if (boxList == null)
-                    return null
+                val boxList = handler.boxList ?: return null
 
                 val builder = PuzzleBuilder(
                     boxList,
@@ -218,7 +181,7 @@ class UclickXMLIO : PuzzleParser {
         }
 
         fun convertUclickPuzzle(
-            inStream : InputStream?, os : DataOutputStream?,
+            inStream : InputStream, os : DataOutputStream?,
             copyright : String?, d : LocalDate?
         ) : Boolean {
             val puz = parsePuzzle(inStream)
@@ -240,4 +203,3 @@ class UclickXMLIO : PuzzleParser {
         }
     }
 }
-
