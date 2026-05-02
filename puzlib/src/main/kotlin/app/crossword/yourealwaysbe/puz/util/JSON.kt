@@ -7,7 +7,6 @@ package app.crossword.yourealwaysbe.puz.util
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
-
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
@@ -33,6 +32,9 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.long
 import kotlinx.serialization.json.longOrNull
 import kotlinx.serialization.json.put
+
+import net.akehurst.hjson.HJson
+import net.akehurst.hjson.HJsonParserException
 
 class JSONException(cause : Throwable) : Exception(cause)
 
@@ -75,6 +77,18 @@ fun parseJSONArray(inStream : InputStream) : JSONArray {
         val e : JsonElement = json.decodeFromStream(inStream)
         return JSONArray(e.jsonArray)
     } catch (err : IllegalArgumentException) {
+        throw JSONException(err)
+    }
+}
+
+@Throws(JSONException::class)
+fun parseHJSONObject(data : String) : JSONObject {
+    try {
+        val hjson = HJson.process(data)
+        return parseJSONObject(hjson.toJsonString())
+    } catch (err : IllegalArgumentException) {
+        throw JSONException(err)
+    } catch (err : HJsonParserException) {
         throw JSONException(err)
     }
 }
@@ -382,9 +396,23 @@ class JSONArray internal constructor(internal val arr : JsonArray) {
     /**
      * Get field of any type
      *
+     * Tries all possibilities or fails with exception
+     */
+    fun get(i : Int) : Any {
+        return opt(i)
+            ?: throw JSONException(
+                IllegalArgumentException(
+                    "Pos $i not of a recognised type",
+                ),
+            )
+    }
+
+    /**
+     * Get field of any type
+     *
      * Tries all possibilities or null
      */
-    fun get(i : Int) : Any? {
+    fun opt(i : Int) : Any? {
         return optBoolean(i)
             ?: optInt(i)
             ?: optJSONArray(i)

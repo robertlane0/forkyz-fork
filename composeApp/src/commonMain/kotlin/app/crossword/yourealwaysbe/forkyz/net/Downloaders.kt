@@ -69,7 +69,6 @@ import app.crossword.yourealwaysbe.puz.io.JPZIO
 import app.crossword.yourealwaysbe.puz.io.NRCInHetMiddenIO
 import app.crossword.yourealwaysbe.puz.io.PMLIO
 import app.crossword.yourealwaysbe.puz.io.PrzekrojIO
-import app.crossword.yourealwaysbe.puz.io.RCIJeuxMFJIO
 
 private val TAG = "ForkyzDownloaders"
 private val NUM_DOWNLOAD_THREADS = 3

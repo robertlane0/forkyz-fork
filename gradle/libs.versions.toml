@@ -56,7 +56,7 @@ commons-text = "1.15.0"
 # Other Libraries
 desugar = "2.1.5"
 directories = "26"
-hjson = "3.1.0"
+hjson = "2.1.21"
 htmlconverter = "1.1.0"
 ksoup = "0.2.6"
 material = "1.13.0"
@@ -147,7 +147,7 @@ datetime-wheel-picker = { module = "io.github.darkokoa:datetime-wheel-picker", v
 desugar-jdk-libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar" }
 directories = { module = "dev.dirs:directories", version.ref = "directories" }
 filekit-dialogs-compose = { module = "io.github.vinceglb:filekit-dialogs-compose", version.ref = "filekit" }
-hjson = { module = "org.hjson:hjson", version.ref = "hjson" }
+hjson = { module = "net.akehurst.kotlin.kserialisation:kserialisation-hjson", version.ref = "hjson" }
 htmlconverter = { module = "be.digitalia.compose.htmlconverter:htmlconverter", version.ref = "htmlconverter" }
 ksoup = { module = "com.fleeksoft.ksoup:ksoup", version.ref = "ksoup" }
 ksoup-kotlinx = { module = "com.fleeksoft.ksoup:ksoup-kotlinx", version.ref = "ksoup" }

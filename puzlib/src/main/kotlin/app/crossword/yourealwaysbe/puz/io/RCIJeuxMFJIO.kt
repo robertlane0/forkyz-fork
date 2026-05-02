@@ -8,15 +8,14 @@ import java.io.InputStreamReader
 import java.util.LinkedList
 import java.util.logging.Logger
 
-import org.hjson.JsonArray
-import org.hjson.JsonObject
-import org.hjson.JsonValue
-
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Box.Companion.isBlock
 import app.crossword.yourealwaysbe.puz.Position
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.PuzzleBuilder
+import app.crossword.yourealwaysbe.puz.util.JSONArray
+import app.crossword.yourealwaysbe.puz.util.JSONObject
+import app.crossword.yourealwaysbe.puz.util.parseHJSONObject
 
 /**
  * Format used by RCI Jeux for Mots Fleches puzzles
@@ -119,6 +118,7 @@ class RCIJeuxMFJIO : PuzzleParser {
         val isAcross : Boolean,
         val hint : String,
     )
+
     companion object {
         private val LOG
             = Logger.getLogger(RCIJeuxMFJIO::class.java.getCanonicalName())
@@ -136,9 +136,7 @@ class RCIJeuxMFJIO : PuzzleParser {
                 if (hjson == null)
                     return null
 
-                return readPuzzleFromHJSON(
-                    JsonValue.readHjson(hjson).asObject(),
-                )
+                return readPuzzleFromHJSON(parseHJSONObject(hjson))
             } catch (e : MFJFormatException) {
                 LOG.severe("Could not read RCIJeux MFJ: " + e)
                 return null
@@ -184,10 +182,8 @@ class RCIJeuxMFJIO : PuzzleParser {
          * Does not include author, date, source.
          */
         @Throws(MFJFormatException::class)
-        private fun readPuzzleFromHJSON(hjson : JsonObject) : Puzzle {
-            val title = hjson.getString("titre", null)
-            if (title == null)
-                throw MFJFormatException("No titre field in HJSON.")
+        private fun readPuzzleFromHJSON(hjson : JSONObject) : Puzzle {
+            val title = hjson.getString("titre")
 
             val builder = PuzzleBuilder(getBoxes(hjson))
                 .setTitle(title)
@@ -198,9 +194,9 @@ class RCIJeuxMFJIO : PuzzleParser {
         }
 
         @Throws(MFJFormatException::class)
-        private fun getBoxes(hjson : JsonObject) : Array<Array<Box?>> {
-            val numRows = hjson.getInt("nbcaseshauteur", -1)
-            val numCols = hjson.getInt("nbcaseslargeur", -1)
+        private fun getBoxes(hjson : JSONObject) : Array<Array<Box?>> {
+            val numRows = hjson.getInt("nbcaseshauteur")
+            val numCols = hjson.getInt("nbcaseslargeur")
 
             if (numRows < 0 || numCols < 0) {
                 throw MFJFormatException(
@@ -211,12 +207,12 @@ class RCIJeuxMFJIO : PuzzleParser {
             val boxes = Array<Array<Box?>>(numRows) {
                 arrayOfNulls<Box>(numCols)
             }
-            val rows : JsonArray = asArray(hjson.get("grille"))
-            val vdashes : JsonArray = asArray(hjson.get("spountzV"))
-            val hdashes : JsonArray = asArray(hjson.get("spountzH"))
+            val rows : JSONArray = hjson.getJSONArray("grille")
+            val vdashes : JSONArray = hjson.getJSONArray("spountzV")
+            val hdashes : JSONArray = hjson.getJSONArray("spountzH")
 
             for (row in 0..<numRows) {
-                val cols : String = asString(rows.get(row))
+                val cols : String = rows.getString(row)
                 for (col in 0..<numCols) {
                     val cell = cols.get(col)
                     if (Character.isUpperCase(cell)) {
@@ -228,17 +224,17 @@ class RCIJeuxMFJIO : PuzzleParser {
                 }
             }
 
-            for (vdash in vdashes) {
-                val vdash_arr = vdash.asArray()
-                val row = vdash_arr.get(1).asInt() - 1
-                val col = vdash_arr.get(0).asInt() - 1
+            for (i in 0 until vdashes.size) {
+                val vdash_arr = vdashes.getJSONArray(i)
+                val row = vdash_arr.getInt(1) - 1
+                val col = vdash_arr.getInt(0) - 1
                 boxes[row][col]?.let { it.barRight = Box.Bar.DASHED }
             }
 
-            for (hdash in hdashes) {
-                val hdash_arr = hdash.asArray()
-                val row = hdash_arr.get(1).asInt() - 1
-                val col = hdash_arr.get(0).asInt() - 1
+            for (i in 0 until hdashes.size) {
+                val hdash_arr = hdashes.getJSONArray(i)
+                val row = hdash_arr.getInt(1) - 1
+                val col = hdash_arr.getInt(0) - 1
                 boxes[row][col]?.let { it.barBottom = Box.Bar.DASHED }
             }
 
@@ -247,7 +243,7 @@ class RCIJeuxMFJIO : PuzzleParser {
 
         // this is exactly as RaetselZentrale, merge?
         @Throws(MFJFormatException::class)
-        private fun addClues(hjson : JsonObject, builder : PuzzleBuilder) {
+        private fun addClues(hjson : JSONObject, builder : PuzzleBuilder) {
             val clueInfos = getClueInfos(hjson)
 
             var nextClueNumber = 1
@@ -300,18 +296,18 @@ class RCIJeuxMFJIO : PuzzleParser {
 
         @Throws(MFJFormatException::class)
         private fun getClueInfos(
-            hjson : JsonObject,
+            hjson : JSONObject,
         ) : Map<Position, MutableList<ClueInfo>> {
             val clueInfos : MutableMap<Position, MutableList<ClueInfo>>
                 = mutableMapOf()
 
-            val rows : JsonArray = asArray(hjson.get("grille"))
-            val clues : JsonArray = asArray(hjson.get("definitions"))
+            val rows : JSONArray = hjson.getJSONArray("grille")
+            val clues : JSONArray = hjson.getJSONArray("definitions")
 
             var clueIdx = 0
 
-            for (row in 0..<rows.size()) {
-                val cols : String = asString(rows.get(row))
+            for (row in 0..<rows.size) {
+                val cols : String = rows.getString(row)
                 for (col in 0..<cols.length) {
                     val cell = cols.get(col)
                     if (Character.isLowerCase(cell)) {
@@ -321,14 +317,14 @@ class RCIJeuxMFJIO : PuzzleParser {
 
                         val position1 = arrow.getPosition1(row, col)
                         val isAcross1 = arrow.isAcross1
-                        val hint1 = getHint(asArray(clues.get(clueIdx)))
+                        val hint1 = getHint(clues.getJSONArray(clueIdx))
                         clueIdx += 1
                         addClueInfo(clueInfos, position1, isAcross1, hint1)
 
                         if (arrow.hasTwoClues) {
                             val position2 = arrow.getPosition2(row, col)
                             val isAcross2 = arrow.getIsAcross2()
-                            val hint2 = getHint(asArray(clues.get(clueIdx)))
+                            val hint2 = getHint(clues.getJSONArray(clueIdx))
                             clueIdx += 1
                             addClueInfo(clueInfos, position2, isAcross2, hint2)
                         }
@@ -362,39 +358,19 @@ class RCIJeuxMFJIO : PuzzleParser {
         }
 
         @Throws(MFJFormatException::class)
-        private fun getHint(clueParts : JsonArray) : String {
+        private fun getHint(clueParts : JSONArray) : String {
             val hint = StringBuilder()
 
-            for (i in 0..<clueParts.size()) {
-                hint.append(asString(clueParts.get(i)))
+            for (i in 0..<clueParts.size) {
+                hint.append(clueParts.getString(i))
                 val length = hint.length
                 if (hint.get(length - 1) == JOIN_DASH)
                     hint.setLength(length - 1)
-                else if (i < clueParts.size() - 1)
+                else if (i < clueParts.size - 1)
                     hint.append(" ")
             }
 
             return hint.toString()
-        }
-
-        @Throws(MFJFormatException::class)
-        private fun asArray(value : JsonValue?) : JsonArray {
-            if (value == null || !value.isArray()) {
-                throw MFJFormatException(
-                    "Expected " + value + " to be an array.",
-                )
-            }
-            return value.asArray()
-        }
-
-        @Throws(MFJFormatException::class)
-        private fun asString(value : JsonValue?) : String {
-            if (value == null || !value.isString()) {
-                throw MFJFormatException(
-                    "Expect " + value + " to be a string.",
-                )
-            }
-            return value.asString()
         }
     }
 }

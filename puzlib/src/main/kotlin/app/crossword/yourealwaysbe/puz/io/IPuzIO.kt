@@ -562,7 +562,7 @@ class IPuzIO : AbstractJSONIO() {
 
                 for (col in boxes[row].indices) {
                     boxes[row][col] = getBoxFromObj(
-                        rowCells.get(col),
+                        rowCells.opt(col),
                         block,
                         empty,
                         namedStyles,
@@ -906,7 +906,7 @@ class IPuzIO : AbstractJSONIO() {
 
                 for (col in 0..<width) {
                     val value : String? = getCrosswordValueFromObj(
-                        rowCells.get(col),
+                        rowCells.opt(col),
                         block,
                         empty,
                     )
@@ -950,7 +950,7 @@ class IPuzIO : AbstractJSONIO() {
                         "Multiple cell values not supported: " + values,
                     )
                 }
-                return getCrosswordValueFromObj(values.get(0), block, empty)
+                return getCrosswordValueFromObj(values.opt(0), block, empty)
             } else if (cell is JSONObject) {
                 val value = cell.optStringEmptyNull(FIELD_VALUE)
                 if (value == null)
@@ -1082,7 +1082,7 @@ class IPuzIO : AbstractJSONIO() {
                     for (listName in clues.keys) {
                         val clueList = clues.getJSONArray(listName)
                         for (j in 0..<clueList.size) {
-                            val clueObj = clueList.get(j)
+                            val clueObj = clueList.opt(j)
                             if (clueObj is JSONObject) {
                                 val clueJson = clueObj
                                 val cells = clueJson.optJSONArray(
@@ -1136,7 +1136,7 @@ class IPuzIO : AbstractJSONIO() {
                 for (i in 0..<jsonClues.size) {
                     val clueSeparators = separators?.get(ClueID(displayName, i))
 
-                    val clueObj = jsonClues.get(i)
+                    val clueObj = jsonClues.opt(i)
                     if (clueObj != null) {
                         // all clues not across until proven otherwise by list name
                         addClue(
@@ -1194,7 +1194,7 @@ class IPuzIO : AbstractJSONIO() {
                         "Unexpected clue array length: " + clueArray.size,
                     )
                 }
-                val clueNumObj = clueArray.get(0)
+                val clueNumObj = clueArray.opt(0)
                 val hint = clueArray.getString(1)
                 val zone = getDirZone(
                     getClueNumber(clueNumObj),
@@ -1446,7 +1446,7 @@ class IPuzIO : AbstractJSONIO() {
 
             if (clueNumObj is JSONArray) {
                 for (i in 0 until clueNumObj.size) {
-                    val subNumObj = clueNumObj.get(i)
+                    val subNumObj = clueNumObj.opt(i)
                     val subNum = getClueNumber(subNumObj)
                     if (subNum != null)
                         return subNum
@@ -1477,7 +1477,7 @@ class IPuzIO : AbstractJSONIO() {
 
                 for (i in 0..<objs.size) {
                     if (i > 0) builder.append("/")
-                    builder.append(getComplexClueNumString(objs.get(i)))
+                    builder.append(getComplexClueNumString(objs.opt(i)))
                 }
 
                 return builder.toString()
