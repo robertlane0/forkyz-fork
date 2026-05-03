@@ -461,7 +461,7 @@ class Playboard(puzzle : Puzzle) {
         val changed = (showErrorsGrid != showErrors)
         showErrorsGrid = showErrors
         if (changed)
-            notifyChange(true)
+            notifyChange(wholeBoard = true)
     }
 
     /**
@@ -493,7 +493,7 @@ class Playboard(puzzle : Puzzle) {
      */
     fun toggleShowErrorsGrid() {
         this.showErrorsGrid = !this.showErrorsGrid
-        notifyChange(true)
+        notifyChange(wholeBoard = true)
     }
 
     /**
@@ -812,7 +812,7 @@ class Playboard(puzzle : Puzzle) {
         if (pos != null) {
             // no need to flag changed words, notifyChange will take
             // care of that
-            notifyChange(tag)
+            notifyChange(tag = tag)
         }
     }
 
@@ -1916,11 +1916,7 @@ class Playboard(puzzle : Puzzle) {
         pendingListenerAdditions.add(listener)
     }
 
-    private fun notifyChange(tag : Any? = null) {
-        notifyChange(false, tag)
-    }
-
-    private fun notifyChange(wholeBoard : Boolean, tag : Any?) {
+    private fun notifyChange(wholeBoard : Boolean = false, tag : Any? = null) {
         if (notificationDisabledDepth == 0) {
             flagNotifying(true)
 
