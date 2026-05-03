@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz
 
-import java.io.IOException
 import kotlin.collections.ArrayDeque
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -16,6 +15,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.datetime.LocalDate
+import kotlinx.io.IOException
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -2424,7 +2424,7 @@ class SettingsPageViewModel(
                     utils.openOutputStream(uri)
                         .use(settings::exportSettings)
                     showMessage(Res.string.preferences_exported)
-                } catch (e : IOException) {
+                } catch (e : java.io.IOException) {
                     showMessage(Res.string.preferences_export_failed)
                 } finally {
                     viewModelScope.launch(Dispatchers.Main) { onDone() }
@@ -2437,8 +2437,7 @@ class SettingsPageViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             fileActionMutex.withLock {
                 try {
-                    utils.openInputStream(uri)
-                        .use(settings::importSettings)
+                    utils.openInput(uri).use(settings::importSettings)
                     showMessage(Res.string.preferences_imported)
                 } catch (e : IOException) {
                     showMessage(Res.string.preferences_import_failed)

@@ -1,11 +1,10 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.IOException
-import java.io.InputStream
 import java.util.Locale
 import java.util.logging.Logger
-import kotlinx.io.asSource
+import kotlinx.io.IOException
+import kotlinx.io.Source
 
 import com.fleeksoft.ksoup.Ksoup
 import com.fleeksoft.ksoup.parseSource
@@ -34,8 +33,8 @@ class PrzekrojIO : PuzzleParser {
     class PrzFormatException(msg : String) : Exception(msg)
 
     @Throws(Exception::class)
-    override fun parseInput(inStream : InputStream) : Puzzle? {
-        return readPuzzle(inStream)
+    override fun parseInput(input : Source) : Puzzle? {
+        return readPuzzle(input)
     }
 
     companion object {
@@ -48,11 +47,10 @@ class PrzekrojIO : PuzzleParser {
 
         private const val DEFAULT_SOURCE = "Przekroj"
 
-        @JvmStatic
         @Throws(IOException::class)
-        fun readPuzzle(inStream : InputStream) : Puzzle? {
+        fun readPuzzle(input : Source) : Puzzle? {
             try {
-                val copy = StreamUtils.copyInputStream(inStream)
+                val copy = input.peek()
 
                 var puz : Puzzle? = null
                 try {
@@ -62,8 +60,7 @@ class PrzekrojIO : PuzzleParser {
                 }
 
                 if (puz == null) {
-                    copy.reset()
-                    val doc = Ksoup.parseSource(copy.asSource())
+                    val doc = Ksoup.parseSource(input)
                     val cwJson = doc.select(".crossword")
                         .attr("data-json")
                         .replace("&quot;", "\"")

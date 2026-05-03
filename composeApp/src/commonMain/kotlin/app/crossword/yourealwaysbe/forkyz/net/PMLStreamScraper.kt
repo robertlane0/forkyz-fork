@@ -1,13 +1,12 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.io.ByteArrayInputStream
-import java.io.IOException
-import java.io.InputStream
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format
+import kotlinx.io.IOException
+import kotlinx.io.Source
 
 import com.fleeksoft.ksoup.nodes.Document
 
@@ -22,33 +21,29 @@ import app.crossword.yourealwaysbe.puz.io.StreamUtils
 class PMLStreamScraper : AbstractStreamScraper() {
     @Throws(Exception::class)
     public override suspend fun parseInput(
-        inputStream : InputStream,
+        input : Source,
         url : String?,
     ) : Puzzle? {
-        var bis = StreamUtils.makeByteArrayInputStream(inputStream)
+        var bis = StreamUtils.makeCopy(input)
 
-        val embedURL : String? = getPMLURL(bis)
+        val embedURL : String? = getPMLURL(bis.peek())
         if (embedURL != null) {
             try {
-                getInputStream(embedURL).use { embedIS ->
-                    bis = StreamUtils.makeByteArrayInputStream(embedIS)
+                getURL(embedURL).use { embedIn ->
+                    bis = StreamUtils.makeCopy(embedIn)
                 }
             } catch (e : IOException) {
                 // fall through, try old bis as embedded
-                bis.reset()
             }
-        } else {
-            bis.reset()
         }
 
         var puz : Puzzle? = null
 
-        val embedJSON : String? = getPMLJSON(bis)
+        val embedJSON = getPMLJSON(bis.peek())
         if (embedJSON != null)
             puz = PMLIO.readFromJSON(embedJSON)
 
         if (puz == null) {
-            bis.reset()
             puz = PMLIO.readPuzzle(bis)
         }
 
@@ -91,8 +86,8 @@ class PMLStreamScraper : AbstractStreamScraper() {
          * Replace latest.html with yyyyMMdd.html. Return null if nothing
          * that looks like a PML URL found.
          */
-        private fun getPMLURL(inputStream : InputStream) : String? {
-            val doc = getDocument(inputStream)
+        private fun getPMLURL(input : Source) : String? {
+            val doc = getDocument(input)
             if (doc == null)
                 return null
 
@@ -123,8 +118,8 @@ class PMLStreamScraper : AbstractStreamScraper() {
         /**
          * Find directly embedded JSON
          */
-        private fun getPMLJSON(inputStream : InputStream) : String? {
-            return regexScrape(inputStream, EMBED_JSON_MATCH)
+        private fun getPMLJSON(input : Source) : String? {
+            return regexScrape(input, EMBED_JSON_MATCH)
         }
     }
 }

@@ -1,12 +1,10 @@
 package app.crossword.yourealwaysbe.forkyz.util
 
-import java.io.BufferedInputStream
-import java.io.ByteArrayInputStream
 import java.io.File
-import java.io.IOException
-import java.io.InputStream
 import java.net.URISyntaxException
 import kotlinx.datetime.LocalDate
+import kotlinx.io.IOException
+import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.import_fallback_source
@@ -47,12 +45,12 @@ suspend fun importPuzzleURI(
         return null
 
     try {
-        return utils.openInputStream(uri)?.use { inputStream ->
-            importInputStream(
+        return utils.openInput(uri)?.use { input ->
+            importInput(
                 utils,
                 fileHandler,
                 null,
-                BufferedInputStream(inputStream),
+                input,
                 getFileName(uri),
                 timeout,
             )
@@ -60,12 +58,12 @@ suspend fun importPuzzleURI(
     } catch (e : IOException) {
         val url = uri.toString()
         try {
-            return getRemoteInputStream(url, timeout).use { inputStream ->
-                importInputStream(
+            return getURL(url, timeout).use { input ->
+                importInput(
                     utils,
                     fileHandler,
                     url,
-                    inputStream,
+                    input,
                     getFileName(uri),
                     timeout,
                 )
@@ -89,12 +87,12 @@ suspend fun processPuzzleToImportDirectory(
 
     for (fh in fileHandler.listFiles(toImportDir)) {
         try {
-            fileHandler.getBufferedInputStream(fh).use { inputStream ->
-                val ph = importInputStream(
+            fileHandler.getBufferedInput(fh).use { input ->
+                val ph = importInput(
                     utils,
                     fileHandler,
                     null,
-                    inputStream,
+                    input,
                     fileHandler.getName(fh),
                     0,
                 )
@@ -171,20 +169,17 @@ private fun getFileName(uri : Uri?) : String? {
  * @param url the url the input stream came from, may be null
  */
 @Throws(IOException::class)
-private suspend fun importInputStream(
+private suspend fun importInput(
     utils : NativeBackendUtils,
     fileHandler : FileHandler,
     url : String?,
-    inputStream : InputStream,
+    input : Source,
     fileName : String?,
     timeout : Int,
 ) : PuzHandle? {
-    val bis = StreamUtils.makeByteArrayInputStream(inputStream)
-
-    var puz = PuzzleStreamReader.parseInputStatic(bis)
+    var puz = PuzzleStreamReader.parseInputStatic(input.peek())
     if (puz == null) {
-        bis.reset()
-        puz = importPuzzleFromWebPage(url, bis, timeout)
+        puz = importPuzzleFromWebPage(url, input, timeout)
     }
 
     if (puz == null)
@@ -204,14 +199,6 @@ private suspend fun importInputStream(
 
 }
 
-@Throws(IOException::class,URISyntaxException::class)
-private suspend fun getRemoteInputStream(
-    url : String,
-    timeout : Int,
-) : BufferedInputStream {
-    return getURLInputStream(url, timeout)
-}
-
 /**
  * Try to extract puzzle from recognised webpages
  *
@@ -224,14 +211,15 @@ private suspend fun getRemoteInputStream(
  */
 private suspend fun importPuzzleFromWebPage(
     url : String?,
-    inputStream : InputStream,
+    input : Source,
     timeout : Int,
 ) : Puzzle? {
     try {
         val scraper = GenericStreamScraper()
         scraper.timeout = timeout
-        return scraper.parseInput(inputStream, url)
+        return scraper.parseInput(input, url)
     } catch (e : Exception) {
         return null
     }
 }
+

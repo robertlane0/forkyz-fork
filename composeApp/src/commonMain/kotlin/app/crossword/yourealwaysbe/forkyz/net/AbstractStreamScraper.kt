@@ -1,22 +1,16 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.io.BufferedInputStream
-import java.io.BufferedReader
-import java.io.IOException
-import java.io.InputStream
-import java.io.InputStreamReader
-import java.net.URI
-import java.net.URISyntaxException
-import java.net.URL
 import java.util.regex.Pattern
-import kotlinx.io.asSource
+import kotlinx.io.IOException
+import kotlinx.io.Source
+import kotlinx.io.readLine
 
 import com.fleeksoft.ksoup.Ksoup
 import com.fleeksoft.ksoup.nodes.Document
 import com.fleeksoft.ksoup.parseSource
 
-import app.crossword.yourealwaysbe.forkyz.util.getURLInputStream
+import app.crossword.yourealwaysbe.forkyz.util.getURL
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.io.PuzzleParser
 
@@ -42,7 +36,7 @@ class RegexScrape(
  * downloader can also use a stream scraper as its PuzzleParser.
  *
  * Provides some useful methods. Recommended to always use
- * getInputStream. If not, set a timeout of getTimeout().
+ * getURL. If not, set a timeout of getTimeout().
  *
  * Bit janky that it's a copy-paste of AbstractDownloader..
  */
@@ -51,21 +45,16 @@ abstract class AbstractStreamScraper : StreamScraper {
 
     @Throws(Exception::class)
     abstract override suspend fun parseInput(
-        inputStream : InputStream,
+        input : Source,
         url : String?,
     ) : Puzzle?
 
     @Throws(IOException::class)
-    protected suspend fun getInputStream(
-        url : URL,
-        headers : Map<String, String>?,
-    ) : BufferedInputStream {
-        return getURLInputStream(url, timeout, headers)
-    }
-
-    @Throws(IOException::class, URISyntaxException::class)
-    protected suspend fun getInputStream(url : String) : BufferedInputStream {
-        return getInputStream((URI(url)).toURL(), null)
+    protected suspend fun getURL(
+        url : String,
+        headers : Map<String, String>? = null,
+    ) : Source {
+        return getURL(url, timeout, headers)
     }
 
     /**
@@ -95,9 +84,7 @@ abstract class AbstractStreamScraper : StreamScraper {
             doc, selector, attribute, regex, extractString
         )?.let { url ->
             try {
-                getInputStream(url).use { urlIS ->
-                    urlParser.parseInput(urlIS)
-                }
+                getURL(url).use { urlParser.parseInput(it) }
             } catch (e : Exception) {
                 // we tried
                 null
@@ -147,19 +134,17 @@ abstract class AbstractStreamScraper : StreamScraper {
          * Will silently abort and return what we have so far if IOException.
          */
         fun regexScrape(
-            inputStream : InputStream,
+            input : Source,
             regexScrapes : Array<RegexScrape>,
         ) : Array<String?> {
             val results = arrayOfNulls<String>(regexScrapes.size)
             try {
-                val reader = BufferedReader(InputStreamReader(inputStream))
-
                 // stop when reaches num of scrapes
                 var countFreshHits = 0
 
                 var line : String?
                 while (
-                    (reader.readLine().also { line = it }) != null
+                    (input.readLine().also { line = it }) != null
                     && countFreshHits < regexScrapes.size
                 ) {
                     for (i in regexScrapes.indices) {
@@ -187,19 +172,19 @@ abstract class AbstractStreamScraper : StreamScraper {
          * Convencience method for regexScrape with one match
          */
         fun regexScrape(
-            inputStream : InputStream,
+            input : Source,
             regexScrapes : RegexScrape,
         ) : String? {
             val scrapes = arrayOf<RegexScrape>(regexScrapes)
-            return regexScrape(inputStream, scrapes)[0]
+            return regexScrape(input, scrapes)[0]
         }
 
         /**
          * Parse input as HTML, return document or null
          */
-        fun getDocument(inputStream : InputStream) : Document? {
+        fun getDocument(input : Source) : Document? {
             try {
-                return Ksoup.parseSource(inputStream.asSource())
+                return Ksoup.parseSource(input)
             } catch (e : IOException) {
                 return null
             }

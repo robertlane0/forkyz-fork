@@ -3,10 +3,12 @@ package app.crossword.yourealwaysbe.forkyz.util
 
 import java.io.BufferedReader
 import java.io.File
-import java.io.IOException
-import java.io.InputStream
 import java.io.InputStreamReader
 import java.io.OutputStream
+import kotlinx.io.IOException
+import kotlinx.io.Source
+import kotlinx.io.asSource
+import kotlinx.io.buffered
 
 import android.content.Context
 import androidx.core.content.FileProvider
@@ -65,13 +67,15 @@ class AndroidNativeBackendUtils(
     }
 
     @Throws(IOException::class)
-    override fun openInputStream(uri : Uri) : InputStream? {
+    override fun openInput(uri : Uri) : Source? {
         return applicationContext
             .getContentResolver()
             .openInputStream(uri.toAndroidUri())
+            ?.asSource()
+            ?.buffered()
     }
 
-    @Throws(IOException::class)
+    @Throws(java.io.IOException::class)
     override fun openOutputStream(uri : Uri) : OutputStream? {
         return applicationContext
             .getContentResolver()
@@ -138,7 +142,12 @@ class AndroidNativeBackendUtils(
 
     @Throws(IOException::class)
     override fun isInternalStorageFull(minimumRequired : Long) : Boolean {
-        return utils.isInternalStorageFull(applicationContext, minimumRequired)
+        try {
+            return utils
+                .isInternalStorageFull(applicationContext, minimumRequired)
+        } catch (e : java.io.IOException) {
+            throw IOException(e)
+        }
     }
 
     /**
@@ -162,11 +171,11 @@ class AndroidNativeBackendUtils(
         val process = Runtime.getRuntime().exec("logcat -d" + uidFlag)
         try {
             BufferedReader(
-                InputStreamReader(process.getInputStream())
+                InputStreamReader(process.getInputStream()),
             ).useLines {
                 return it.toList()
             }
-        } catch (e : IOException) {
+        } catch (e : java.io.IOException) {
             return null
         }
     }

@@ -4,9 +4,10 @@
 
 package app.crossword.yourealwaysbe.puz.util
 
-import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
+import kotlinx.io.IOException
+import kotlinx.io.Source
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
@@ -26,6 +27,7 @@ import kotlinx.serialization.json.double
 import kotlinx.serialization.json.encodeToStream
 import kotlinx.serialization.json.int
 import kotlinx.serialization.json.intOrNull
+import kotlinx.serialization.json.io.decodeFromSource
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -49,6 +51,17 @@ fun parseJSONObject(s : String) : JSONObject {
     }
 }
 
+@Throws(IOException::class, JSONException::class)
+@OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
+fun parseJSONObject(input : Source) : JSONObject {
+    try {
+        val e : JsonElement = json.decodeFromSource(input)
+        return JSONObject(e.jsonObject)
+    } catch (err : IllegalArgumentException) {
+        throw JSONException(err)
+    }
+}
+
 @Throws(JSONException::class)
 @OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
 fun parseJSONObject(inStream : InputStream) : JSONObject {
@@ -60,13 +73,13 @@ fun parseJSONObject(inStream : InputStream) : JSONObject {
     }
 }
 
-@Throws(IOException::class)
+@Throws(java.io.IOException::class)
 @OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
 fun writeJSONObject(obj : JSONObject, outStream : OutputStream) {
     try {
         json.encodeToStream(obj.obj, outStream)
     } catch (err : SerializationException) {
-        throw IOException(err)
+        throw java.io.IOException(err)
     }
 }
 
@@ -75,6 +88,17 @@ fun writeJSONObject(obj : JSONObject, outStream : OutputStream) {
 fun parseJSONArray(inStream : InputStream) : JSONArray {
     try {
         val e : JsonElement = json.decodeFromStream(inStream)
+        return JSONArray(e.jsonArray)
+    } catch (err : IllegalArgumentException) {
+        throw JSONException(err)
+    }
+}
+
+@Throws(IOException::class, JSONException::class)
+@OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
+fun parseJSONArray(input : Source) : JSONArray {
+    try {
+        val e : JsonElement = json.decodeFromSource(input)
         return JSONArray(e.jsonArray)
     } catch (err : IllegalArgumentException) {
         throw JSONException(err)

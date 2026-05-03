@@ -1,8 +1,6 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.InputStream
-
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
@@ -14,20 +12,15 @@ import app.crossword.yourealwaysbe.puz.io.RCIJeuxMCJIO.Companion.readPuzzle
 
 class RCIJeuxMCJIOTest {
     @Test
-    @Throws(Exception::class)
     fun testPuzzle1() {
-        testPuzzle1InputStream.use { inStream ->
-            val puz = readPuzzle(inStream)
-            Companion.assertIsTestPuzzle1(puz!!)
-        }
+        val puz = readPuzzle(testPuzzle1)
+        assertIsTestPuzzle1(puz!!)
     }
 
     companion object {
-        val testPuzzle1InputStream : InputStream
-            get() = JPZIOTest::class.java
-                .getResourceAsStream("/rcijeux-crossword.mcj")!!
+        val testPuzzle1
+            get() = SourceUtils.getResource("/rcijeux-crossword.mcj")
 
-        @Throws(Exception::class)
         fun assertIsTestPuzzle1(puz : Puzzle) {
             Assertions.assertEquals(puz.title, "Test Crossword")
 

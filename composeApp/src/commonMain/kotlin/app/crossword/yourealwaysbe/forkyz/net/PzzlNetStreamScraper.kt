@@ -1,8 +1,8 @@
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.io.InputStream
 import java.util.Locale
 import java.util.regex.Pattern
+import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.io.BrainsOnlyIO
@@ -17,17 +17,17 @@ import app.crossword.yourealwaysbe.puz.io.BrainsOnlyIO
 class PzzlNetStreamScraper : AbstractStreamScraper() {
     @Throws(Exception::class)
     public override suspend fun parseInput(
-        inputStream : InputStream,
+        input : Source,
         url : String?,
     ) : Puzzle? {
-        val txtURL = getTxtURL(inputStream)
+        val txtURL = getTxtURL(input)
 
         if (txtURL == null)
             return null
 
         try {
-            getInputStream(txtURL).use { txtIS ->
-                val puz = BrainsOnlyIO.parse(txtIS)
+            getURL(txtURL).use { txtIn ->
+                val puz = BrainsOnlyIO.parse(txtIn)
                 puz?.source = DEFAULT_SOURCE
                 return puz
             }
@@ -38,9 +38,9 @@ class PzzlNetStreamScraper : AbstractStreamScraper() {
         return null
     }
 
-    fun getTxtURL(inputStream : InputStream) : String? {
+    fun getTxtURL(input : Source) : String? {
         val matchers = arrayOf(ID_MATCH, DATE_MATCH)
-        val results = regexScrape(inputStream, matchers)
+        val results = regexScrape(input, matchers)
         val setID = results[0]
         val date = results[1]
         if (setID != null && date != null) {

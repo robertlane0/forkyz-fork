@@ -1,16 +1,14 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.io.ByteArrayInputStream
-import java.io.IOException
-import java.io.InputStream
-import java.nio.charset.Charset
 import java.util.regex.Pattern
 import kotlin.collections.ArrayDeque
 import kotlin.io.encoding.Base64
+import kotlinx.io.IOException
+import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.forkyz.util.AppLogger
-import app.crossword.yourealwaysbe.forkyz.util.getURLInputStream
+import app.crossword.yourealwaysbe.forkyz.util.getURL
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.io.AmuseLabsJSONIO
 import app.crossword.yourealwaysbe.puz.io.StreamUtils
@@ -80,43 +78,40 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
     }
 
     override suspend fun parseInput(
-        inputStream : InputStream,
+        input : Source,
         url : String?,
     ) : Puzzle? {
         AppLogger.i(TAG, "Trying PuzzleMe scraper on " + url)
-        // so we can reuse
-        val is1 = StreamUtils.makeByteArrayInputStream(inputStream)
-        val is2 = getStage2InputStream(is1)
-
-        try {
-            return getRawc(is2)?.let(this::getFromRawc)
-                ?.let { puz ->
-                    with (puz) {
-                        if (source == null)
-                            source = DEFAULT_SOURCE
+        getStage2Input(input).use { in2 ->
+            try {
+                return getRawc(in2)?.let(this::getFromRawc)
+                    ?.let { puz ->
+                        with (puz) {
+                            if (source == null)
+                                source = DEFAULT_SOURCE
+                        }
+                        return puz
                     }
-                    return puz
-                }
-        } catch (e : IOException) {
-            AppLogger.i(TAG, "Could not scrape PuzzleMe: " + e)
-            return null
+            } catch (e : IOException) {
+                AppLogger.i(TAG, "Could not scrape PuzzleMe: " + e)
+                return null
+            }
         }
     }
 
     /**
      * Do Stage 1 return input stream
      *
-     * @return either reset original if failed or new input stream to
-     * stage 2.
+     * @return either copy of original if failed or new input to
+     * stage 2. Close the return value.
      */
-    private suspend fun getStage2InputStream(
-        bis : ByteArrayInputStream
-    ) : InputStream {
-        val doc = getDocument(bis)
-        bis.reset()
-
-        if (doc == null)
-            return bis
+    private suspend fun getStage2Input(
+        input : Source
+    ) : Source {
+        val doc = getDocument(input.peek())
+        if (doc == null) {
+            return StreamUtils.makeCopy(input)
+        }
 
         val div = doc.selectFirst(".pm-embed-div")
 
@@ -126,10 +121,9 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
         var subdir : String? = DEFAULT_SUBDIR
         if (cwID == null || cwSet == null) {
             val results = regexScrape(
-                bis,
+                input.peek(),
                 arrayOf(CDN_REGEX, SUBDIR_REGEX, CW_ID_REGEX, CW_SET_REGEX),
             )
-            bis.reset()
 
             if (results.size == 4) {
                 cdn = results[0]
@@ -145,14 +139,13 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
                 || cwSet == null
             ) {
                 val results = regexScrape(
-                    bis,
+                    input.peek(),
                     arrayOf(
                         CDN_ALT_REGEX,
                         CW_ID_ALT_REGEX,
                         CW_SET_ALT_REGEX,
                     ),
                 )
-                bis.reset()
 
                 if (results.size == 3) {
                     cdn = results[0]
@@ -163,23 +156,21 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
             }
         }
         if (cdn == null || subdir == null || cwID == null || cwSet == null) {
-            return bis
+            return StreamUtils.makeCopy(input)
         } else {
-            return getInputStream(
+            return getURL(
                 STAGE2_URL_FORMAT.format(cdn, subdir, cwID, cwSet),
-            ).use {
-                StreamUtils.makeByteArrayInputStream(it)
-            }
+            )
         }
     }
 
     /**
-     * Get rawc field from JSON in inputStream
+     * Get rawc field from JSON in input
      *
      * @return field value or null if not found
      */
-    private fun getRawc(inputStream : InputStream) : String? {
-        return regexScrape(inputStream, RAWC_REGEX)
+    private fun getRawc(input : Source) : String? {
+        return regexScrape(input, RAWC_REGEX)
     }
 
     /**
@@ -198,10 +189,7 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
      */
     private fun base64Decode(s : String) : String? {
         try {
-            return String(
-                Base64.Default.decode(s),
-                Charset.forName("UTF-8"),
-            )
+            return String(Base64.Default.decode(s))
         } catch (e : IllegalArgumentException) {
             return null
         }

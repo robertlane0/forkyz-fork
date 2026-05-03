@@ -1,10 +1,6 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.InputStream
-
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
@@ -16,38 +12,23 @@ import app.crossword.yourealwaysbe.puz.io.KeesingXMLIO.Companion.readPuzzle
 
 class KeesingXMLIOTest {
     @Test
-    @Throws(Exception::class)
     fun testKeesingXML() {
-        val baos = ByteArrayOutputStream()
-        StreamUtils.copyStream(testPuzzle1InputStream, baos)
-        val puz = readPuzzle(
-            ByteArrayInputStream(baos.toByteArray())
-        )
-        Companion.assertIsTestPuzzle1(puz!!)
+        val puz = testPuzzle1.use { readPuzzle(it) }
+        assertIsTestPuzzle1(puz!!)
     }
 
     @Test
-    @Throws(Exception::class)
     fun testKeesingXMLArrow() {
-        val baos = ByteArrayOutputStream()
-        StreamUtils.copyStream(testPuzzle2InputStream, baos)
-        val puz = readPuzzle(
-            ByteArrayInputStream(baos.toByteArray())
-        )
-        Companion.assertIsTestPuzzle2(puz!!)
+        val puz = testPuzzle2.use { readPuzzle(it) }
+        assertIsTestPuzzle2(puz!!)
     }
 
     companion object {
-        @JvmStatic
-        val testPuzzle1InputStream : InputStream
-            get() = KeesingXMLIOTest::class.java
-                .getResourceAsStream("/keesing.xml")!!
+        val testPuzzle1
+            get() = SourceUtils.getResource("/keesing.xml")
+        val testPuzzle2
+            get() = SourceUtils.getResource("/keesingarrow.xml")
 
-        val testPuzzle2InputStream : InputStream
-            get() = KeesingXMLIOTest::class.java
-                .getResourceAsStream("/keesingarrow.xml")!!
-
-        @JvmStatic
         fun assertIsTestPuzzle1(puz : Puzzle) {
             val ACROSS_CLUES = "Across"
             val DOWN_CLUES = "Down"

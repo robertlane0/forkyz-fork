@@ -1,10 +1,9 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.io.ByteArrayInputStream
-import java.io.IOException
-import java.io.InputStream
 import java.util.regex.Pattern
+import kotlinx.io.IOException
+import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.puz.Puzzle
@@ -42,15 +41,13 @@ class SlowDownWiseUpStreamScraper() : AbstractStreamScraper() {
     }
 
     override suspend fun parseInput(
-        inputStream : InputStream,
+        input : Source,
         url : String?,
     ) : Puzzle? {
         AppLogger.i(TAG, "Trying SlowDownWiseUp scraper on " + url)
-        val is1 = StreamUtils.makeByteArrayInputStream(inputStream)
-        val is2 = getStage2InputStream(is1)
-
+        val input2 = getStage2Input(input)
         try {
-            return SlowDownWiseUpJSONIO.readPuzzle(is2)?.apply {
+            return SlowDownWiseUpJSONIO.readPuzzle(input2)?.apply {
                 if (source == null)
                     source = DEFAULT_SOURCE
             }
@@ -63,20 +60,19 @@ class SlowDownWiseUpStreamScraper() : AbstractStreamScraper() {
     /**
      * Look for SlowDownWiseUp or return reset inStream
      */
-    private suspend fun getStage2InputStream(
-        bis : ByteArrayInputStream,
-    ) : InputStream {
+    private suspend fun getStage2Input(
+        input : Source,
+    ) : Source{
         val results = regexScrape(
-            bis,
+            input.peek(),
             arrayOf(IS_SLOWDOWNWISEUP_REGEX, STAGE2_REGEX),
         )
         val isSlowDownWiseUp = results[0]
         val uuid = results[1]
         if (isSlowDownWiseUp == null || uuid == null) {
-            bis.reset()
-            return bis
+            return input
         } else {
-            return getInputStream(STAGE2_URL_FORMAT.format(uuid))
+            return getURL(STAGE2_URL_FORMAT.format(uuid))
         }
     }
 }

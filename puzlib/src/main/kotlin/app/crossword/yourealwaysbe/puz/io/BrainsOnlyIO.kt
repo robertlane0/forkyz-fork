@@ -1,16 +1,13 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.BufferedReader
-import java.io.DataOutputStream
-import java.io.EOFException
-import java.io.IOException
-import java.io.InputStream
-import java.io.InputStreamReader
-import java.nio.charset.Charset
 import java.util.Locale
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.Padding
+import kotlinx.io.EOFException
+import kotlinx.io.IOException
+import kotlinx.io.Source
+import kotlinx.io.readLine
 
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Box.Companion.isBlock
@@ -27,12 +24,11 @@ import app.crossword.yourealwaysbe.puz.util.HtmlUtil.htmlString
  */
 class BrainsOnlyIO : PuzzleParser {
     @Throws(IOException::class)
-    override fun parseInput(inStream : InputStream) : Puzzle? {
-        return parse(inStream)
+    override fun parseInput(input : Source) : Puzzle? {
+        return parse(input)
     }
 
     companion object {
-        private val CHARSET : Charset = Charset.forName("ISO-8859-1")
         private val ACROSS_LIST : String = DefaultListNames.ACROSS_LIST
         private val DOWN_LIST : String = DefaultListNames.DOWN_LIST
         private const val NOTEPAD_START_TAG = "<NOTEPAD>"
@@ -43,35 +39,12 @@ class BrainsOnlyIO : PuzzleParser {
             day(Padding.ZERO)
         }
 
-        fun convertBrainsOnly(
-            inStream : InputStream,
-            os : DataOutputStream,
-            date : LocalDate,
-        ) : Boolean {
-            try {
-                val puz : Puzzle? = parse(inStream)
-                if (puz != null) {
-                    puz.date = date
-                    IO.saveNative(puz, os)
-                }
-            } catch (e : IOException) {
-                System.err.println("Unable to dump puzzle to output stream.")
-                e.printStackTrace()
-                return false
-            }
-
-            return true
-        }
-
-        @JvmStatic
         @Throws(IOException::class)
-        fun parse(inStream : InputStream) : Puzzle? {
-            val reader = BufferedReader(InputStreamReader(inStream, CHARSET))
-
-            val date : String = readLineAtOffset(reader, 2)
-            val title : String = readLineAtOffset(reader, 1)
+        fun parse(input : Source) : Puzzle? {
+            val date : String = readLineAtOffset(input, 2)
+            val title : String = readLineAtOffset(input, 1)
             val puzTitle = htmlString(title)
-            var author : String = readLineAtOffset(reader, 1)
+            var author : String = readLineAtOffset(input, 1)
 
             // Not sure if note should be part of author line or a separate line
             // Assume part of author for now as De Telegraaf replaces author line
@@ -94,15 +67,15 @@ class BrainsOnlyIO : PuzzleParser {
                 author = htmlString(author)!!
             }
 
-            val width = readLineAtOffset(reader, 1).toInt()
-            val height = readLineAtOffset(reader, 1).toInt()
+            val width = readLineAtOffset(input, 1).toInt()
+            val height = readLineAtOffset(input, 1).toInt()
             if (width == 0 || height == 0) {
                 throw IOException("Invalid puzzle contents")
             }
-            readLineAtOffset(reader, 4)
+            readLineAtOffset(input, 4)
             val boxes = Array<Array<Box?>>(height) { arrayOfNulls<Box>(width) }
             for (down in 0..<height) {
-                val line : String = readLineAtOffset(reader, 0)
+                val line : String = readLineAtOffset(input, 0)
 
                 var nextCircled = false
                 var nextShaded = false
@@ -167,21 +140,21 @@ class BrainsOnlyIO : PuzzleParser {
                 .setNotes(notes)
                 .setDate(parsedDate)
 
-            readLineAtOffset(reader, 0)
+            readLineAtOffset(input, 0)
             val acrossClues = ArrayList<String?>()
             run {
-                var clue : String = Companion.readLineAtOffset(reader, 0)
+                var clue : String = Companion.readLineAtOffset(input, 0)
                 while ("" != clue) {
                     acrossClues.add(clue)
-                    clue = Companion.readLineAtOffset(reader, 0)
+                    clue = Companion.readLineAtOffset(input, 0)
                 }
             }
 
             val downClues = ArrayList<String>()
-            var clue : String = readLineAtOffset(reader, 0)
+            var clue : String = readLineAtOffset(input, 0)
             while ("" != clue) {
                 downClues.add(clue)
-                clue = readLineAtOffset(reader, 0)
+                clue = readLineAtOffset(input, 0)
             }
 
             var acrossIdx = 0
@@ -229,18 +202,15 @@ class BrainsOnlyIO : PuzzleParser {
 
         @Throws(IOException::class)
         private fun readLineAtOffset(
-            reader : BufferedReader,
+            input : Source,
             offset : Int,
         ) : String {
             var read : String? = null
             var i = 0
             while (i <= offset) {
-                read = reader.readLine()
+                read = input.readLine()
                 if (read == null) {
-                    throw EOFException("Offset past end of file")
-                }
-                if (read.endsWith("\r")) {
-                    i++
+                    throw IOException("Offset past end of file")
                 }
                 i++
             }

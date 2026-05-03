@@ -1,16 +1,12 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.BufferedReader
-import java.io.IOException
-import java.io.InputStream
-import java.io.InputStreamReader
-import java.util.Arrays
-import java.util.Collections
 import java.util.Locale
-import java.util.Objects
 import java.util.logging.Logger
 import java.util.regex.Pattern
+import kotlinx.io.IOException
+import kotlinx.io.Source
+import kotlinx.io.readLine
 
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Clue
@@ -34,8 +30,8 @@ class ExolveIO : PuzzleParser {
     class ExolveFormatException(msg : String) : Exception(msg)
 
     @Throws(IOException::class)
-    override fun parseInput(inStream : InputStream) : Puzzle? {
-        return readPuzzle(inStream)
+    override fun parseInput(input : Source) : Puzzle? {
+        return readPuzzle(input)
     }
 
     private class ExolveClue(
@@ -354,11 +350,10 @@ class ExolveIO : PuzzleParser {
         // u for up
         private val DOWN_SUFFIXES = setOf("d", "dn", "u")
 
-        @JvmStatic
         @Throws(IOException::class)
-        fun readPuzzle(inStream : InputStream) : Puzzle? {
+        fun readPuzzle(input : Source) : Puzzle? {
             try {
-                val data : Map<String, String> = extractData(inStream)
+                val data : Map<String, String> = extractData(input)
                 return readPuzzleFromData(data)
             } catch (e : ExolveFormatException) {
                 LOG.info("Failed to parse Exolve file: " + e)
@@ -368,15 +363,13 @@ class ExolveIO : PuzzleParser {
 
         @Throws(IOException::class, ExolveFormatException::class)
         private fun extractData(
-            inStream : InputStream,
+            input : Source,
         ) : Map<String, String> {
             val data : MutableMap<String, String> = mutableMapOf()
 
-            val reader = BufferedReader(InputStreamReader(inStream))
+            chompToStart(input)
 
-            chompToStart(reader)
-
-            var line = reader.readLine()
+            var line = input.readLine()
 
             while (line != null) {
                 line = line.trim()
@@ -385,7 +378,7 @@ class ExolveIO : PuzzleParser {
                     break
 
                 if (isComment(line) || line.isEmpty()) {
-                    line = reader.readLine()
+                    line = input.readLine()
                     continue
                 }
 
@@ -409,13 +402,13 @@ class ExolveIO : PuzzleParser {
 
                 if (!MULTILINES_SECTIONS.contains(key)) {
                     addKeyValue(data, key, value)
-                    line = reader.readLine()
+                    line = input.readLine()
                 } else {
                     val fullValue = StringBuilder()
                     fullValue.append(value + "\n")
 
                     while (true) {
-                        line = reader.readLine()
+                        line = input.readLine()
                         if (line == null) break
                         line = line.trim()
                         if (isSection(line)) {
@@ -471,11 +464,9 @@ class ExolveIO : PuzzleParser {
         }
 
         @Throws(ExolveFormatException::class, IOException::class)
-        private fun chompToStart(
-            reader : BufferedReader,
-        ) {
+        private fun chompToStart(input : Source) {
             var line : String?
-            while ((reader.readLine().also { line = it }) != null) {
+            while ((input.readLine().also { line = it }) != null) {
                 if ("exolve-begin".equals(line!!.trim(), ignoreCase = true))
                     return
             }

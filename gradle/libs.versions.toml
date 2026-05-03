@@ -65,6 +65,7 @@ datetime-wheel-picker = "1.1.0"
 filekit = "0.13.0"
 words-to-numbers = "8a97d258fd"
 mcp-sdk-server = "0.11.0"
+zip = "0.11.1"
 
 # Testing
 junit4 = "4.13.2"
@@ -132,6 +133,7 @@ kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+kotlinx-serialization-json-io = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json-io", version.ref = "kotlinx-serialization" }
 
 # Ktor
 ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor-android" }
@@ -155,6 +157,8 @@ material = { module = "com.google.android.material:material", version.ref = "mat
 mcp-sdk-server = { module = "io.modelcontextprotocol:kotlin-sdk-server", version.ref = "mcp-sdk-server" }
 seismic = { module = "com.squareup:seismic", version.ref = "seismic" }
 words-to-numbers = { module = "com.github.jgraham0325:words-to-numbers", version.ref = "words-to-numbers" }
+zip = { module = "no.synth:kmp-zip", version.ref = "zip" }
+zip-kotlinx = { module = "no.synth:kmp-zip-kotlinx", version.ref = "zip" }
 
 # Testing
 junit4 = { module = "junit:junit", version.ref = "junit4" }

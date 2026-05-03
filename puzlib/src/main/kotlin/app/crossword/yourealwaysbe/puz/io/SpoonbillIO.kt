@@ -1,11 +1,10 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.BufferedReader
-import java.io.IOException
-import java.io.InputStream
-import java.io.InputStreamReader
 import java.util.logging.Logger
+import kotlinx.io.IOException
+import kotlinx.io.Source
+import kotlinx.io.readLine
 
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Clue
@@ -24,8 +23,8 @@ class SpoonbillIO : PuzzleParser {
     class SpoonbillFormatException(msg : String) : Exception(msg)
 
     @Throws(IOException::class)
-    override fun parseInput(inStream : InputStream) : Puzzle? {
-        return readPuzzle(inStream)
+    override fun parseInput(input : Source) : Puzzle? {
+        return readPuzzle(input)
     }
 
     companion object {
@@ -40,15 +39,10 @@ class SpoonbillIO : PuzzleParser {
         private val ACROSS_LIST = DefaultListNames.ACROSS_LIST
         private val DOWN_LIST = DefaultListNames.DOWN_LIST
 
-        @JvmStatic
         @Throws(IOException::class)
-        fun readPuzzle(inStream : InputStream) : Puzzle? {
+        fun readPuzzle(input : Source) : Puzzle? {
             try {
-                val reader = BufferedReader(
-                    InputStreamReader(inStream)
-                )
-
-                val versionLine : String = expectLine(reader)
+                val versionLine : String = expectLine(input)
 
                 val split = versionLine.split(" ".toRegex(), limit = 2)
                     .toTypedArray()
@@ -58,17 +52,17 @@ class SpoonbillIO : PuzzleParser {
                     )
                 }
                 val author = split[1]
-                val title = expectLine(reader)
-                val mode = expectLine(reader)
+                val title = expectLine(input)
+                val mode = expectLine(input)
 
-                val builder = PuzzleBuilder(getBoxes(reader))
+                val builder = PuzzleBuilder(getBoxes(input))
 
                 builder.setTitle(title)
                     .setAuthor(author)
 
                 if (MODE_CLUE == mode || MODE_SOLVE == mode) {
-                    getClues(reader, true, builder)
-                    getClues(reader, false, builder)
+                    getClues(input, true, builder)
+                    getClues(input, false, builder)
                 }
 
                 return builder.puzzle
@@ -84,17 +78,17 @@ class SpoonbillIO : PuzzleParser {
          * Will return a grid, throws an exception if error
          */
         @Throws(IOException::class, SpoonbillFormatException::class)
-        private fun getBoxes(reader : BufferedReader) : Array<Array<Box?>> {
+        private fun getBoxes(input : Source) : Array<Array<Box?>> {
             try {
-                val height = expectLine(reader).toInt()
-                val width = expectLine(reader).toInt()
+                val height = expectLine(input).toInt()
+                val width = expectLine(input).toInt()
 
                 val boxes = Array<Array<Box?>>(height) {
                     arrayOfNulls<Box>(width)
                 }
 
                 for (row in 0..<height) {
-                    val line = expectLine(reader)
+                    val line = expectLine(input)
                     var col = 0
                     while (col < width && col < line.length) {
                         val cell = line.get(col)
@@ -119,13 +113,13 @@ class SpoonbillIO : PuzzleParser {
 
         @Throws(IOException::class, SpoonbillFormatException::class)
         private fun getClues(
-            reader : BufferedReader,
+            input : Source,
             across : Boolean,
             builder : PuzzleBuilder,
         ) {
-            val numClues = expectLine(reader).toInt()
+            val numClues = expectLine(input).toInt()
             for (i in 0..<numClues) {
-                val line : String = expectLine(reader)
+                val line : String = expectLine(input)
                 val data = line.split("\\|".toRegex())
                         .dropLastWhile { it.isEmpty() }
                         .toTypedArray()
@@ -184,8 +178,8 @@ class SpoonbillIO : PuzzleParser {
          * Return trimmed next line or exception
          */
         @Throws(IOException::class, SpoonbillFormatException::class)
-        private fun expectLine(reader : BufferedReader) : String {
-            val line = reader.readLine()
+        private fun expectLine(input : Source) : String {
+            val line = input.readLine()
             if (line == null) {
                 throw SpoonbillFormatException("Expected more input")
             }

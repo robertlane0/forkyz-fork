@@ -1,13 +1,11 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.io.BufferedReader
-import java.io.IOException
-import java.io.InputStream
-import java.io.InputStreamReader
-import java.net.URISyntaxException
 import java.util.Locale
 import java.util.regex.Pattern
+import kotlinx.io.IOException
+import kotlinx.io.Source
+import kotlinx.io.readLine
 
 import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.puz.Puzzle
@@ -36,12 +34,12 @@ import app.crossword.yourealwaysbe.puz.util.parseJSONObject
 class KeesingStreamScraper : AbstractStreamScraper() {
     @Throws(Exception::class)
     override suspend fun parseInput(
-        inputStream : InputStream,
+        input : Source,
         url : String?
     ) : Puzzle? {
         // get customerID and puzzleID
         val matchers = arrayOf<RegexScrape>(CUSTOMER_ID_MATCH, PUZZLE_ID_MATCH)
-        val results = regexScrape(inputStream, matchers)
+        val results = regexScrape(input, matchers)
         val customerID = results[0]
         val puzzleID = results[1]
         if (customerID == null || puzzleID == null)
@@ -59,8 +57,8 @@ class KeesingStreamScraper : AbstractStreamScraper() {
 
     private suspend fun getPuzzle(puzzleURL : String) : Puzzle? {
         try {
-            getInputStream(puzzleURL).use { inputStream ->
-                val puz = KeesingXMLIO.readPuzzle(inputStream)
+            getURL(puzzleURL).use { input ->
+                val puz = KeesingXMLIO.readPuzzle(input)
                 if (puz != null) {
                     if (puz.source?.isEmpty() ?: true)
                         puz.source = DEFAULT_SOURCE
@@ -88,12 +86,10 @@ class KeesingStreamScraper : AbstractStreamScraper() {
             puzzleSetID,
         )
         try {
-            BufferedReader(
-                InputStreamReader(getInputStream(idUrl))
-            ).use { reader ->
+            getURL(idUrl).use { input ->
                 val rawJson = StringBuilder()
                 var line : String?
-                while ((reader.readLine().also { line = it }) != null)
+                while ((input.readLine().also { line = it }) != null)
                     rawJson.append(line + "\n")
 
                 val json = parseJSONObject(rawJson.toString())
@@ -109,9 +105,6 @@ class KeesingStreamScraper : AbstractStreamScraper() {
             AppLogger.e(TAG, "Could not read Keesing JSON: " + e)
             return null
         } catch (e : IOException) {
-            AppLogger.e(TAG, "Could not read Keesing JSON: " + e)
-            return null
-        } catch (e : URISyntaxException) {
             AppLogger.e(TAG, "Could not read Keesing JSON: " + e)
             return null
         }

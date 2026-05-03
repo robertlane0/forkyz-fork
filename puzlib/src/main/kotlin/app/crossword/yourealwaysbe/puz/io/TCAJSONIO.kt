@@ -1,12 +1,12 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.IOException
-import java.io.InputStream
 import java.util.logging.Logger
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
+import kotlinx.io.IOException
+import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Clue
@@ -56,8 +56,8 @@ class TCAJSONIO : AbstractJSONIO() {
     class TCAJSONFormatException(msg : String) : Exception(msg)
 
     @Throws(Exception::class)
-    override fun parseInput(inStream : InputStream) : Puzzle? {
-        return readPuzzle(inStream)
+    override fun parseInput(input : Source) : Puzzle? {
+        return readPuzzle(input)
     }
 
     companion object {
@@ -76,11 +76,10 @@ class TCAJSONIO : AbstractJSONIO() {
         private val ACROSS_LIST = DefaultListNames.ACROSS_LIST
         private val DOWN_LIST = DefaultListNames.DOWN_LIST
 
-        @JvmStatic
         @Throws(IOException::class)
-        fun readPuzzle(inStream : InputStream) : Puzzle? {
+        fun readPuzzle(input : Source) : Puzzle? {
             try {
-                val json = parseJSONObject(inStream)
+                val json = parseJSONObject(input)
                 return readPuzzleFromJSON(json)
             } catch (e : TCAJSONFormatException) {
                 LOG.severe("Could not read TCA JSON: " + e)

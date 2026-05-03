@@ -1,7 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.util.files
 
-import java.io.IOException
+import kotlinx.io.IOException
 
 import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
@@ -88,7 +88,7 @@ private fun exportDirectory(
             name,
             handle.mimeType ?: FileHandler.MIME_TYPE_GENERIC,
         )?.let { newHandle ->
-            sourceHandler.getInputStream(handle).use { ins ->
+            sourceHandler.getBufferedInput(handle).use { ins ->
                 targetHandler.getOutputStream(newHandle).use { outs ->
                     StreamUtils.copyStream(ins, outs)
                 }

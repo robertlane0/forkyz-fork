@@ -2,9 +2,11 @@
 package app.crossword.yourealwaysbe.forkyz.util.files
 
 import java.io.FileNotFoundException
-import java.io.IOException
-import java.io.InputStream
 import java.io.OutputStream
+import kotlinx.io.IOException
+import kotlinx.io.RawSource
+import kotlinx.io.asInputStream
+import kotlinx.io.asSource
 
 import android.content.ContentResolver
 import android.content.Context
@@ -246,10 +248,10 @@ class FileHandlerSAF(
                 getMimeType(fileHandle),
                 getName(fileHandle),
             )?.let { newUri ->
-                getBufferedInputStream(fileHandle).use { inputStream ->
+                getBufferedInput(fileHandle).use { input ->
                     getFileHandle(newUri.toForkyzUri())?.let { outHandle ->
                         getBufferedOutputStream(outHandle).use { outputStream ->
-                            StreamUtils.copyStream(inputStream, outputStream)
+                            StreamUtils.copyStream(input, outputStream)
                             DocumentsContract.deleteDocument(
                                 contentResolver,
                                 fileHandle.uri.toAndroidUri(),
@@ -272,7 +274,7 @@ class FileHandlerSAF(
                     + destDirHandle + " failed.",
             )
             e.printStackTrace()
-        } catch (e : IOException) {
+        } catch (e : java.io.IOException) {
             AppLogger.e(
                 TAG,
                 "Attempt to move " + fileHandle + " to "
@@ -282,7 +284,7 @@ class FileHandlerSAF(
         }
     }
 
-    @Throws(IOException::class)
+    @Throws(java.io.IOException::class)
     override fun getOutputStream(fileHandle : FileHandle) : OutputStream {
         try {
             val os = contentResolver.openOutputStream(
@@ -290,19 +292,19 @@ class FileHandlerSAF(
                 "wt",
             )
             if (os == null) {
-                throw IOException(
+                throw java.io.IOException(
                     "Could not get output stream for " + fileHandle,
                 )
             }
             return os
         } catch (e : IllegalArgumentException) {
             // happens when e.g. file was deleted, so consider as IO
-            throw IOException(e)
+            throw java.io.IOException(e)
         }
     }
 
     @Throws(IOException::class)
-    override fun getInputStream(fileHandle : FileHandle) : InputStream {
+    override fun getInput(fileHandle : FileHandle) : RawSource {
         try {
             val inStream = contentResolver.openInputStream(
                 fileHandle.uri.toAndroidUri(),
@@ -312,8 +314,11 @@ class FileHandlerSAF(
                     "Could not get output stream for " + fileHandle,
                 )
             }
-            return inStream
+            return inStream.asSource()
         } catch (e : IllegalArgumentException) {
+            // happens when e.g. file was deleted, so consider as IO
+            throw IOException(e)
+        } catch (e : java.io.IOException) {
             // happens when e.g. file was deleted, so consider as IO
             throw IOException(e)
         }

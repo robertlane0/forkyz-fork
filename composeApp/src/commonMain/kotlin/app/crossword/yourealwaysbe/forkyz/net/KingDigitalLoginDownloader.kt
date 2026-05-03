@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.io.IOException
 import kotlin.time.Duration
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
@@ -9,9 +8,10 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.format
 import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
+import kotlinx.io.IOException
 
 import app.crossword.yourealwaysbe.forkyz.util.AppLogger
-import app.crossword.yourealwaysbe.forkyz.util.getURLInputStream
+import app.crossword.yourealwaysbe.forkyz.util.getURL
 import app.crossword.yourealwaysbe.forkyz.util.getURLJSON
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.io.JPZIO
@@ -103,7 +103,7 @@ class KingDigitalLoginDownloader(
                 return null
             }
 
-            return getURLInputStream(
+            return getURL(
                 url = url,
                 timeoutMillis = timeout,
                 headers = headers,

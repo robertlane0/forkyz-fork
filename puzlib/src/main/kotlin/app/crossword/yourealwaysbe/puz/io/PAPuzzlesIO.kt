@@ -1,13 +1,12 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.IOException
-import java.io.InputStream
 import java.util.logging.Logger
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.text.RegexOption.IGNORE_CASE
-import kotlinx.io.asSource
+import kotlinx.io.IOException
+import kotlinx.io.Source
 
 import com.fleeksoft.ksoup.Ksoup
 import com.fleeksoft.ksoup.nodes.Element
@@ -65,8 +64,8 @@ class PAPuzzlesIO : PuzzleParser {
     class PAPuzzlesFormatException(msg : String?) : Exception(msg)
 
     @Throws(Exception::class)
-    override fun parseInput(inStream : InputStream) : Puzzle? {
-        return readPuzzle(inStream)
+    override fun parseInput(input : Source) : Puzzle? {
+        return readPuzzle(input)
     }
 
     companion object {
@@ -80,11 +79,10 @@ class PAPuzzlesIO : PuzzleParser {
         private val CLUE_HINT_RE = "\\s*[\\d/]+\\s*(.*)".toRegex()
         private const val CLUE_HINT_GRP = 1
 
-        @JvmStatic
         @Throws(IOException::class)
-        fun readPuzzle(inStream : InputStream) : Puzzle? {
+        fun readPuzzle(input : Source) : Puzzle? {
             try {
-                val doc = Ksoup.parseSource(inStream.asSource())
+                val doc = Ksoup.parseSource(input)
                 val builder = PuzzleBuilder(getBoxes(doc))
                 getClues(doc, builder)
                 return builder.puzzle

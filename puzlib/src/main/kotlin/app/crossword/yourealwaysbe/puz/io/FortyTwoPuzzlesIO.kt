@@ -1,11 +1,11 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.IOException
-import java.io.InputStream
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
+import kotlinx.io.IOException
+import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Puzzle
@@ -40,16 +40,15 @@ open class FortyTwoPuzzlesIO : AbstractJSONIO() {
     )
 
     @Throws(Exception::class)
-    override fun parseInput(inStream : InputStream) : Puzzle? {
-        return parsePuzzle(inStream)?.puzzle
+    override fun parseInput(input : Source) : Puzzle? {
+        return parsePuzzle(input)?.puzzle
     }
 
     @Throws(Exception::class)
-    open protected fun parsePuzzle(inStream : InputStream) : PuzzleBuilder? {
-        val copy = StreamUtils.makeByteArrayInputStream(inStream)
+    open protected fun parsePuzzle(input : Source) : PuzzleBuilder? {
         val json : JSONObject
         try {
-            json = parseJSONObject(copy)
+            json = parseJSONObject(input)
         } catch (e : IOException) {
             return null
         } catch (e : JSONException) {

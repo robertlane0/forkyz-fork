@@ -1,8 +1,8 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.io.InputStream
 import kotlinx.coroutines.runBlocking
+import kotlinx.io.Source
 
 import org.junit.Assert
 import org.junit.Test
@@ -14,7 +14,7 @@ import org.mockito.Mockito
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 
-import app.crossword.yourealwaysbe.forkyz.util.getURLInputStream
+import app.crossword.yourealwaysbe.forkyz.util.getURL
 import app.crossword.yourealwaysbe.puz.io.PuzzleParser
 
 class StreamScrapersTest {
@@ -148,11 +148,11 @@ class StreamScrapersTest {
             url: String,
             scraper: StreamScraper,
         ) {
-            val inputStream : InputStream
-                = runBlocking { getURLInputStream(url, TIMEOUT) }
-            run {
-                val puz = runBlocking { scraper.parseInput(inputStream, url) }
-                Assert.assertNotNull(puz)
+            runBlocking {
+                getURL(url, TIMEOUT).use { input ->
+                    val puz = scraper.parseInput(input, url)
+                    Assert.assertNotNull(puz)
+                }
             }
         }
     }

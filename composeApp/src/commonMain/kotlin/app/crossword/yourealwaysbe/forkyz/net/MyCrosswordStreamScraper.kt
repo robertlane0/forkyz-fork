@@ -1,10 +1,10 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.io.IOException
-import java.io.InputStream
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+import kotlinx.io.IOException
+import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.io.GuardianJSONIO
@@ -25,7 +25,7 @@ import app.crossword.yourealwaysbe.puz.util.parseJSONObject
 class MyCrosswordStreamScraper : AbstractStreamScraper() {
     @Throws(Exception::class)
     public override suspend fun parseInput(
-        inputStream : InputStream,
+        input : Source,
         url : String?,
     ) : Puzzle? {
         if (url == null)
@@ -36,8 +36,8 @@ class MyCrosswordStreamScraper : AbstractStreamScraper() {
             return null
 
         try {
-            getInputStream(url).use { puzIS ->
-                val jsonString = regexScrape(puzIS, JSON_MATCH)
+            getURL(url).use { puzIn ->
+                val jsonString = regexScrape(puzIn, JSON_MATCH)
                 if (jsonString == null)
                     return null
 
@@ -58,17 +58,15 @@ class MyCrosswordStreamScraper : AbstractStreamScraper() {
                 if (data == null)
                     return null
 
-                // need to bridge between competing json libraries :/
-                val puz = GuardianJSONIO.readPuzzle(data.toString())
-                if (puz != null) {
-                    if (puz.source == null)
-                        puz.source = DEFAULT_SOURCE
-                    return puz
-                }
+                val puz = GuardianJSONIO.readPuzzle(data)
+                if (puz.source == null)
+                    puz.source = DEFAULT_SOURCE
+                return puz
             }
         } catch (e : IOException) {
             /* fall through */
         } catch (e : JSONException) {
+            /* fall through */
         }
 
         return null

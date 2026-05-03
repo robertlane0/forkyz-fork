@@ -1,8 +1,6 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.InputStream
-
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
@@ -14,31 +12,22 @@ import app.crossword.yourealwaysbe.puz.io.XDIO.Companion.readPuzzle
 
 class XDIOTest {
     @Test
-    @Throws(Exception::class)
     fun testPuzzleImplicit() {
-        testPuzzleImplicitInputStream.use { inStream ->
-            val puz = readPuzzle(inStream)
-            Companion.assertIsTestPuzzle(puz!!, true, false)
-        }
+        val puz = testPuzzleImplicit.use { readPuzzle(it) }
+        assertIsTestPuzzle(puz!!, true, false)
     }
 
     @Test
-    @Throws(Exception::class)
     fun testPuzzleExplicit() {
-        testPuzzleExplicitInputStream.use { inStream ->
-            val puz = readPuzzle(inStream)
-            Companion.assertIsTestPuzzle(puz!!, false, true)
-        }
+        val puz = testPuzzleExplicit.use { readPuzzle(it) }
+        assertIsTestPuzzle(puz!!, false, true)
     }
 
     companion object {
-        val testPuzzleImplicitInputStream : InputStream
-            get() = XDIOTest::class.java
-                .getResourceAsStream("/implicitsections.xd")!!
-
-        val testPuzzleExplicitInputStream : InputStream
-            get() = XDIOTest::class.java
-                .getResourceAsStream("/explicitsections.xd")!!
+        val testPuzzleImplicit
+            get() = SourceUtils.getResource("/implicitsections.xd")
+        val testPuzzleExplicit
+            get() = SourceUtils.getResource("/explicitsections.xd")
 
         /**
          * Checks if puzzle is as expected
@@ -46,7 +35,6 @@ class XDIOTest {
          * @param specialCircled if special squares are circled or
          * highlighted
          */
-        @Throws(Exception::class)
         fun assertIsTestPuzzle(
             puz : Puzzle,
             specialCircled : Boolean,

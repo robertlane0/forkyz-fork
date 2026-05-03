@@ -1,10 +1,10 @@
 
 package app.crossword.yourealwaysbe.puz.io.versions
 
-import java.io.DataInputStream
 import java.io.DataOutputStream
-import java.io.IOException
 import java.util.logging.Logger
+import kotlinx.io.IOException
+import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.puz.Note
 import app.crossword.yourealwaysbe.puz.Puzzle
@@ -24,14 +24,14 @@ open class IOVersion6 : IOVersion5() {
     }
 
     @Throws(IOException::class)
-    override fun readMeta(inStream : DataInputStream) : PuzzleMeta {
-        val meta = super.readMeta(inStream)
-        loadNotes(true, meta, inStream)
-        loadNotes(false, meta, inStream)
+    override fun readMeta(input : Source) : PuzzleMeta {
+        val meta = super.readMeta(input)
+        loadNotes(true, meta, input)
+        loadNotes(false, meta, input)
         return meta
     }
 
-    @Throws(IOException::class)
+    @Throws(java.io.IOException::class)
     override fun writeMeta(puz : Puzzle, os : DataOutputStream) {
         super.writeMeta(puz, os)
         saveNotes(os, puz, true)
@@ -47,7 +47,7 @@ open class IOVersion6 : IOVersion5() {
     fun loadNotes(
         isAcross : Boolean,
         meta : PuzzleMeta,
-        input : DataInputStream,
+        input : Source,
     ) {
         val numNotes = input.readInt()
 
@@ -64,11 +64,11 @@ open class IOVersion6 : IOVersion5() {
     }
 
     @Throws(IOException::class)
-    protected fun readNote(inStream : DataInputStream) : Note? {
-        val scratch = readNullTerminatedString(inStream, charset)
-        val text = readNullTerminatedString(inStream, charset)
-        val anagramSrc = readNullTerminatedString(inStream, charset)
-        val anagramSol = readNullTerminatedString(inStream, charset)
+    protected fun readNote(input : Source) : Note? {
+        val scratch = readNullTerminatedString(input, charset)
+        val text = readNullTerminatedString(input, charset)
+        val anagramSrc = readNullTerminatedString(input, charset)
+        val anagramSol = readNullTerminatedString(input, charset)
         if (
             scratch != null
             || text != null

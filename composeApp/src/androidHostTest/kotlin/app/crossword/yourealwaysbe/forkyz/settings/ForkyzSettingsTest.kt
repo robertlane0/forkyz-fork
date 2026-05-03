@@ -13,6 +13,8 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
+import kotlinx.io.asSource
+import kotlinx.io.buffered
 
 import android.content.SharedPreferences
 import android.os.SystemClock
@@ -707,7 +709,7 @@ class ForkyzSettingsTest {
         baos.close();
 
         val bais = ByteArrayInputStream(baos.toByteArray())
-        settings1.importSettings(bais)
+        settings1.importSettings(bais.asSource().buffered())
         bais.close()
 
         val importedSettings = runBlocking { datastore1.data.first() }

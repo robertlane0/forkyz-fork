@@ -1,14 +1,14 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.IOException
-import java.io.InputStream
 import java.util.logging.Logger
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.DayOfWeekNames
 import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
+import kotlinx.io.IOException
+import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Clue
@@ -19,7 +19,6 @@ import app.crossword.yourealwaysbe.puz.Zone
 import app.crossword.yourealwaysbe.puz.util.JSONException
 import app.crossword.yourealwaysbe.puz.util.JSONObject
 import app.crossword.yourealwaysbe.puz.util.parseJSONObject
-
 
 /**
  * SlowDownWiseUp JSON format
@@ -58,8 +57,8 @@ class SlowDownWiseUpJSONIO : AbstractJSONIO() {
     class SlowDownWiseUpJSONFormatException(msg : String) : Exception(msg)
 
     @Throws(Exception::class)
-    override fun parseInput(inStream : InputStream) : Puzzle? {
-        return readPuzzle(inStream)
+    override fun parseInput(input : Source) : Puzzle? {
+        return readPuzzle(input)
     }
 
     companion object {
@@ -79,11 +78,10 @@ class SlowDownWiseUpJSONIO : AbstractJSONIO() {
         private val DEFAULT_CLUE_LIST_NAME
             = DefaultListNames.NODIR_LIST
 
-        @JvmStatic
         @Throws(IOException::class)
-        fun readPuzzle(inStream : InputStream) : Puzzle? {
+        fun readPuzzle(input : Source) : Puzzle? {
             try {
-                val json = parseJSONObject(inStream)
+                val json = parseJSONObject(input)
                 return readPuzzleFromJSON(json)
             } catch (e : SlowDownWiseUpJSONFormatException) {
                 LOG.severe("Could not read SlowDownWiseUp JSON: " + e)

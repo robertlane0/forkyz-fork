@@ -1,10 +1,10 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.IOException
-import java.io.InputStream
 import java.util.logging.Logger
 import kotlinx.datetime.LocalDate
+import kotlinx.io.IOException
+import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Clue
@@ -26,19 +26,18 @@ class AmuseLabsJSONIO : AbstractJSONIO() {
     class AmuseLabsFormatException(msg : String) : Exception(msg)
 
     @Throws(Exception::class)
-    override fun parseInput(inStream : InputStream) : Puzzle? {
-        return readPuzzle(inStream)
+    override fun parseInput(input : Source) : Puzzle? {
+        return readPuzzle(input)
     }
 
     companion object {
         private val LOG
             = Logger.getLogger(AmuseLabsJSONIO::class.java.getCanonicalName())
 
-        @JvmStatic
         @Throws(IOException::class)
-        fun readPuzzle(inStream : InputStream) : Puzzle? {
+        fun readPuzzle(input : Source) : Puzzle? {
             try {
-                val json = parseJSONObject(inStream)
+                val json = parseJSONObject(input)
                 return readPuzzleFromJSON(json)
             } catch (e : AmuseLabsFormatException) {
                 LOG.severe("Could not read Amuse Labs JSON: " + e)

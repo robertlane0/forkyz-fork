@@ -1,8 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.settings
 
-import java.io.IOException
-import java.io.InputStream
 import java.io.OutputStream
 import java.nio.charset.Charset
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -16,6 +14,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.LocalDate
+import kotlinx.io.IOException
+import kotlinx.io.Source
 
 import androidx.annotation.WorkerThread
 import androidx.datastore.core.DataStore
@@ -1605,16 +1605,18 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             writeJSONObject(json, outputStream)
         } catch (e : JSONException) {
             throw IOException("JSON error exporting settings", e)
+        } catch (e : java.io.IOException) {
+            throw IOException(e)
         }
     }
 
     @WorkerThread
-    fun importSettings(inputStream : InputStream?) {
-        if (inputStream == null)
+    fun importSettings(input : Source?) {
+        if (input == null)
             return
 
         try {
-            val json = parseJSONObject(inputStream)
+            val json = parseJSONObject(input)
             doExportImport(json = json)
         } catch (e : JSONException) {
             throw IOException("JSON error importing settings", e)

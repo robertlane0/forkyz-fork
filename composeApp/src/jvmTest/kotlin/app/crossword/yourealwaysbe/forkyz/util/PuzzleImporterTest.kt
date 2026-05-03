@@ -5,6 +5,8 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import kotlinx.coroutines.runBlocking
+import kotlinx.io.asSource
+import kotlinx.io.buffered
 
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -243,7 +245,10 @@ class PuzzleImporterTest {
         PuzzleImporterTest::class.java
             .getResourceAsStream(resourceName).use { inputStream ->
                 FileOutputStream(outFile).use { os ->
-                    StreamUtils.copyStream(inputStream, os)
+                    StreamUtils.copyStream(
+                        inputStream.asSource().buffered(),
+                        os,
+                    )
                 }
             }
     }

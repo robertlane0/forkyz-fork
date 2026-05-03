@@ -1,16 +1,16 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.io.BufferedReader
-import java.io.IOException
-import java.io.InputStream
-import java.io.InputStreamReader
 import java.net.URI
 import java.net.URISyntaxException
 import java.util.Locale
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 import kotlinx.datetime.LocalDate
+import kotlinx.io.Buffer
+import kotlinx.io.IOException
+import kotlinx.io.Source
+import kotlinx.io.readLine
 
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.io.BrainsOnlyIO
@@ -29,16 +29,16 @@ import app.crossword.yourealwaysbe.puz.io.StreamUtils
 class PzzlComStreamScraper : AbstractStreamScraper() {
     @Throws(Exception::class)
     public override suspend fun parseInput(
-        inputStream : InputStream,
+        input : Source,
         url : String?,
     ) : Puzzle? {
-        var bis = StreamUtils.makeByteArrayInputStream(inputStream)
+        var bis = StreamUtils.makeCopy(input)
 
-        var embedURL : String? = regexScrape(bis, IFRAME_MATCH)
+        var embedURL = regexScrape(bis.peek(), IFRAME_MATCH)
         if (embedURL != null) {
             try {
-                getInputStream(embedURL).use { embedIS ->
-                    bis = StreamUtils.makeByteArrayInputStream(embedIS)
+                getURL(embedURL).use { embedIn ->
+                    bis = StreamUtils.makeCopy(embedIn)
                 }
             } catch (e : IOException) {
                 // fall through, try old bis as embedded
@@ -47,8 +47,6 @@ class PzzlComStreamScraper : AbstractStreamScraper() {
             // fallback to the provided URL
             embedURL = url
         }
-
-        bis.reset()
 
         if (embedURL == null)
             return null
@@ -62,8 +60,8 @@ class PzzlComStreamScraper : AbstractStreamScraper() {
             return null
 
         try {
-            getInputStream(makePuzzleURL(mainInfo, date)).use { puzIS ->
-                val puz = BrainsOnlyIO.parse(puzIS)
+            getURL(makePuzzleURL(mainInfo, date)).use { puzIn ->
+                val puz = BrainsOnlyIO.parse(puzIn)
                 if (puz != null) {
                     if (puz.source == null)
                         puz.source = DEFAULT_SOURCE
@@ -87,10 +85,10 @@ class PzzlComStreamScraper : AbstractStreamScraper() {
 
     private suspend fun getMainInfo(
         embedURL : String,
-        inputStream : InputStream,
+        input : Source,
     ) : MainInfo? {
         val mains = regexScrape(
-            inputStream,
+            input,
             arrayOf(PZZL_XWORD_ID, MAIN_JS_PATH),
         )
         val relPath = mains[1]
@@ -98,10 +96,13 @@ class PzzlComStreamScraper : AbstractStreamScraper() {
             return null
 
         val mainJSPath = makeMainJSPath(embedURL, relPath)
+        if (mainJSPath == null)
+            return null
+
         try {
-            getInputStream(mainJSPath).use { mainIS ->
+            getURL(mainJSPath).use { mainIn ->
                 val results = regexScrape(
-                    mainIS,
+                    mainIn,
                     arrayOf(MAIN_SET_NAME, MAIN_BASE_URL),
                 )
                 val setName = results[0]
@@ -112,16 +113,18 @@ class PzzlComStreamScraper : AbstractStreamScraper() {
             }
         } catch (e : IOException) {
             return null
-        } catch (e : URISyntaxException) {
-            return null
         }
     }
 
     private fun makeMainJSPath(
         embedURL : String,
         relPath : String,
-    ) : String {
-        return URI.create(embedURL).resolve(relPath).toString()
+    ) : String? {
+        try {
+            return URI.create(embedURL).resolve(relPath).toString()
+        } catch (e : URISyntaxException) {
+            return null
+        }
     }
 
     /**
@@ -138,16 +141,12 @@ class PzzlComStreamScraper : AbstractStreamScraper() {
         }
 
         try {
-            BufferedReader(
-                InputStreamReader(getInputStream(makeArchiveURL(mainInfo)))
-            ).use { reader ->
-                val first = reader.readLine()
+            getURL(makeArchiveURL(mainInfo)).use { archiveIn ->
+                val first = archiveIn.readLine()
                 if (first != null)
                     return first.trim()
             }
         } catch (e : IOException) {
-            /* fall through */
-        } catch (e : URISyntaxException) {
             /* fall through */
         }
 

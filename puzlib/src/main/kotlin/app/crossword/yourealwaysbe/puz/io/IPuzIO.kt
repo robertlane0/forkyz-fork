@@ -2,8 +2,6 @@
 package app.crossword.yourealwaysbe.puz.io
 
 import java.io.BufferedWriter
-import java.io.IOException
-import java.io.InputStream
 import java.io.OutputStream
 import java.io.OutputStreamWriter
 import java.nio.charset.Charset
@@ -18,6 +16,8 @@ import kotlin.math.min
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
+import kotlinx.io.IOException
+import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Box.Companion.isBlock
@@ -72,8 +72,8 @@ class IPuzIO : AbstractJSONIO() {
     class IPuzFormatException(msg : String?) : Exception(msg)
 
     @Throws(Exception::class)
-    override fun parseInput(inStream : InputStream) : Puzzle? {
-        return readPuzzle(inStream)
+    override fun parseInput(input : Source) : Puzzle? {
+        return readPuzzle(input)
     }
 
     companion object {
@@ -358,9 +358,9 @@ class IPuzIO : AbstractJSONIO() {
         val HIGHLIGHT_COLOR : Int = DEFINED_COLORS[3]
 
         @Throws(IOException::class)
-        fun readPuzzle(inStream : InputStream) : Puzzle? {
+        fun readPuzzle(input: Source) : Puzzle? {
             try {
-                val json = parseJSONObject(inStream)
+                val json = parseJSONObject(input)
 
                 checkIPuzVersion(json)
                 val kind : PuzzleKind? = getPuzKind(json)

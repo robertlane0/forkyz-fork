@@ -1,10 +1,10 @@
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.io.InputStream
 import java.util.Locale
 import java.util.regex.Pattern
+import kotlinx.io.Source
 
-import app.crossword.yourealwaysbe.forkyz.util.getURLInputStream
+import app.crossword.yourealwaysbe.forkyz.util.getURL
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.io.SlowDownWiseUpJSONIO
 
@@ -20,15 +20,15 @@ import app.crossword.yourealwaysbe.puz.io.SlowDownWiseUpJSONIO
 class WSJStreamScraper : AbstractStreamScraper() {
     @Throws(Exception::class)
     public override suspend fun parseInput(
-        inputStream : InputStream,
+        input : Source,
         url : String?,
     ) : Puzzle? {
-        val jsonURL = getJSONURL(inputStream)
+        val jsonURL = getJSONURL(input)
         if (jsonURL == null)
             return null
 
         try {
-            getURLInputStream(jsonURL, timeout).use { jsonIS ->
+            getURL(jsonURL, timeout).use { jsonIS ->
                 val puz = SlowDownWiseUpJSONIO.readPuzzle(jsonIS)
                 puz?.source = DEFAULT_SOURCE
                 return puz
@@ -40,9 +40,9 @@ class WSJStreamScraper : AbstractStreamScraper() {
         return null
     }
 
-    fun getJSONURL(inputStream : InputStream) : String? {
+    fun getJSONURL(input : Source) : String? {
         val matchers = arrayOf(WSJ_MATCH, PUZZLE_PATH_MATCH)
-        val results = regexScrape(inputStream, matchers)
+        val results = regexScrape(input, matchers)
         val isWSJ = results[0]
         val puzzlePath = results[1]
 

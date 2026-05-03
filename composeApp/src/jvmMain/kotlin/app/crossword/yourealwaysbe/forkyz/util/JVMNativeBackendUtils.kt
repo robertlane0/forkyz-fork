@@ -4,9 +4,11 @@ package app.crossword.yourealwaysbe.forkyz.util
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.io.IOException
-import java.io.InputStream
 import java.io.OutputStream
+import kotlinx.io.IOException
+import kotlinx.io.Source
+import kotlinx.io.asSource
+import kotlinx.io.buffered
 
 import androidx.room.Room.databaseBuilder
 import androidx.room.RoomDatabase
@@ -78,16 +80,18 @@ class JVMNativeBackendUtils(
     }
 
     @Throws(IOException::class)
-    override fun openInputStream(uri : Uri) : InputStream? {
+    override fun openInput(uri : Uri) : Source? {
         try {
             return FileInputStream(File(uri.toJVMURI()))
+                .asSource()
+                .buffered()
         } catch (e : IllegalArgumentException) {
             // not a file, make IOException
             throw IOException(e.message)
         }
     }
 
-    @Throws(IOException::class)
+    @Throws(java.io.IOException::class)
     override fun openOutputStream(uri : Uri) : OutputStream? {
         try {
             return FileOutputStream(File(uri.toJVMURI()))

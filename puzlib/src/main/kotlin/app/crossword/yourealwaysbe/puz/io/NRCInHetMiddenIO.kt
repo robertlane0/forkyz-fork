@@ -1,7 +1,7 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.InputStream
+import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Position
@@ -28,8 +28,8 @@ class NRCInHetMiddenIO : FortyTwoPuzzlesIO() {
     var middenwoordHint : String = "MIDDENWOORD"
 
     @Throws(Exception::class)
-    override fun parsePuzzle(inStream : InputStream) : PuzzleBuilder? {
-        val builder = super.parsePuzzle(inStream)
+    override fun parsePuzzle(input : Source) : PuzzleBuilder? {
+        val builder = super.parsePuzzle(input)
         if (builder == null)
             return null
 

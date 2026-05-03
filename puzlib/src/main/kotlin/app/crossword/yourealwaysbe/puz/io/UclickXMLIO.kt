@@ -1,11 +1,9 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.DataOutputStream
-import java.io.InputStream
 import io.ktor.http.decodeURLQueryComponent
 import kotlinx.datetime.LocalDate
-import kotlinx.io.asSource
+import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Puzzle
@@ -135,18 +133,17 @@ class UclickXMLIO : PuzzleParser {
         }
     }
 
-    override fun parseInput(inStream : InputStream) : Puzzle? {
-        return parsePuzzle(inStream)
+    override fun parseInput(input : Source) : Puzzle? {
+        return parsePuzzle(input)
     }
 
     companion object {
         private val ACROSS_LIST : String = DefaultListNames.ACROSS_LIST
         private val DOWN_LIST : String = DefaultListNames.DOWN_LIST
 
-        @JvmStatic
-        fun parsePuzzle(inStream : InputStream) : Puzzle? {
+        fun parsePuzzle(input : Source) : Puzzle? {
             try {
-                val content = parseXMLElement(inStream.asSource())
+                val content = parseXMLElement(input)
                 val handler = UclickXMLParser(content)
 
                 if (!handler.isSuccessfulRead)
@@ -174,28 +171,6 @@ class UclickXMLIO : PuzzleParser {
                 return builder.puzzle
             } catch (e : Exception) {
                 return null
-            }
-        }
-
-        fun convertUclickPuzzle(
-            inStream : InputStream, os : DataOutputStream?,
-            copyright : String?, d : LocalDate?
-        ) : Boolean {
-            val puz = parsePuzzle(inStream)
-            if (puz == null)
-                return false
-
-            puz.date = d
-            if (copyright != null)
-                puz.copyright = copyright
-
-            try {
-                IO.saveNative(puz, os)
-                return true
-            } catch (e : Exception) {
-                e.printStackTrace()
-                System.err.println("Unable to save puzzle: " + e.message)
-                return false
             }
         }
     }

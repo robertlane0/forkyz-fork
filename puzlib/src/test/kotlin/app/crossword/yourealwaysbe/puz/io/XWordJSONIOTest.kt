@@ -1,6 +1,5 @@
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.InputStream
 import kotlinx.datetime.LocalDate
 
 import org.junit.jupiter.api.Assertions
@@ -14,20 +13,15 @@ import app.crossword.yourealwaysbe.puz.io.XWordJSONIO.Companion.readPuzzle
 
 class XWordJSONIOTest {
     @Test
-    @Throws(Exception::class)
     fun testPuzzle1() {
-        testPuzzle1InputStream.use { inStream ->
-            val puz = readPuzzle(inStream)
-            Companion.assertIsTestPuzzle1(puz!!)
-        }
+        val puz = testPuzzle1.use { readPuzzle(it) }
+        assertIsTestPuzzle1(puz!!)
     }
 
     companion object {
-        val testPuzzle1InputStream : InputStream
-            get() = XWordJSONIOTest::class.java
-                .getResourceAsStream("/xword.json")
+        val testPuzzle1
+            get() = SourceUtils.getResource("/xword.json")
 
-        @Throws(Exception::class)
         fun assertIsTestPuzzle1(puz : Puzzle) {
             Assertions.assertEquals(puz.title, "Test title")
             Assertions.assertEquals(puz.author, "Test author")

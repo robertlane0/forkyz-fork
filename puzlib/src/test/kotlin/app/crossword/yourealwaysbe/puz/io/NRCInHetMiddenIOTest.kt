@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.InputStream
 import kotlinx.datetime.LocalDate
 
 import org.junit.jupiter.api.Assertions
@@ -14,41 +13,33 @@ import app.crossword.yourealwaysbe.puz.Puzzle
 
 class NRCInHetMiddenIOTest {
     @Test
-    @Throws(Exception::class)
     fun testPuzzle1() {
         val parser = NRCInHetMiddenIO()
-        val puz = parser.parseInput(
-            getTestPuzzleInputStream("/inhetmidden-1.json")
-        )
+        val puz = SourceUtils.getResource("/inhetmidden-1.json").use {
+            parser.parseInput(it)
+        }
         assertIsTestPuzzle1(puz!!)
     }
 
     @Test
-    @Throws(Exception::class)
     fun testPuzzle2() {
         val parser = NRCInHetMiddenIO()
-        val puz = parser.parseInput(
-            getTestPuzzleInputStream("/inhetmidden-2.json"),
-        )
+        val puz = SourceUtils.getResource("/inhetmidden-2.json").use {
+            parser.parseInput(it)
+        }
         assertIsTestPuzzle2(puz!!)
     }
 
     @Test
-    @Throws(Exception::class)
     fun testPuzzle3() {
         val parser = NRCInHetMiddenIO()
-        val puz = parser.parseInput(
-            getTestPuzzleInputStream("/inhetmidden-3.json"),
-        )
+        val puz = SourceUtils.getResource("/inhetmidden-3.json").use {
+            parser.parseInput(it)
+        }
         assertIsTestPuzzle3(puz!!)
     }
 
     companion object {
-        fun getTestPuzzleInputStream(path : String) : InputStream {
-            return NRCInHetMiddenIOTest::class.java
-                .getResourceAsStream(path)!!
-        }
-
         fun assertIsTestPuzzle1(puz : Puzzle) {
             val ACROSS_CLUES = "Across"
             val DOWN_CLUES = "Down"

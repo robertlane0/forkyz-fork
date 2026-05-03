@@ -1,9 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.settings
 
-import java.io.IOException
-import java.io.InputStream
-import java.io.OutputStream
+import kotlinx.io.IOException
 
 import androidx.datastore.core.okio.OkioSerializer
 import okio.BufferedSink

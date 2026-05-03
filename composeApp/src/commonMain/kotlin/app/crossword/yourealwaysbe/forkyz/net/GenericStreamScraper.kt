@@ -1,11 +1,10 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.io.IOException
-import java.io.InputStream
+import kotlinx.io.IOException
+import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.puz.Puzzle
-import app.crossword.yourealwaysbe.puz.io.StreamUtils
 
 /**
  * Try out all stream scrapers on an input
@@ -36,16 +35,14 @@ class GenericStreamScraper : AbstractStreamScraper() {
 
     @Throws(Exception::class)
     public override suspend fun parseInput(
-        inputStream : InputStream,
+        input : Source,
         url : String?,
     ) : Puzzle? {
         try {
-            val bis = StreamUtils.makeByteArrayInputStream(inputStream)
             for (scraper in streamScrapers) {
-                bis.reset()
                 scraper.timeout = timeout
                 try {
-                    val puz = scraper.parseInput(bis, url)
+                    val puz = scraper.parseInput(input.peek(), url)
                     if (puz != null)
                         return puz
                 } catch (e : Exception) {

@@ -1,12 +1,10 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.BufferedReader
-import java.io.IOException
-import java.io.InputStream
-import java.io.InputStreamReader
-import java.util.LinkedList
 import java.util.logging.Logger
+import kotlinx.io.IOException
+import kotlinx.io.Source
+import kotlinx.io.readString
 
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Box.Companion.isBlock
@@ -31,8 +29,8 @@ class RCIJeuxMFJIO : PuzzleParser {
     class MFJFormatException(msg : String) : Exception(msg)
 
     @Throws(Exception::class)
-    override fun parseInput(inStream : InputStream) : Puzzle? {
-        return readPuzzle(inStream)
+    override fun parseInput(input : Source) : Puzzle? {
+        return readPuzzle(input)
     }
 
     private enum class Arrow(
@@ -128,11 +126,10 @@ class RCIJeuxMFJIO : PuzzleParser {
         private const val DOWN_LIST = "Vert."
         private const val JOIN_DASH = '–'
 
-        @JvmStatic
         @Throws(IOException::class)
-        fun readPuzzle(inStream : InputStream) : Puzzle? {
+        fun readPuzzle(input : Source) : Puzzle? {
             try {
-                val hjson = getHJSON(inStream)
+                val hjson = getHJSON(input)
                 if (hjson == null)
                     return null
 
@@ -157,23 +154,14 @@ class RCIJeuxMFJIO : PuzzleParser {
          * gameData"
          */
         @Throws(IOException::class)
-        private fun getHJSON(inStream : InputStream) : String? {
-            BufferedReader(InputStreamReader(inStream)).use { reader ->
-                val sb = StringBuilder()
-                reader.useLines { lines ->
-                    lines.forEach { line ->
-                        sb.append(line)
-                    }
-                }
-
-                val wholeFile = sb.toString()
-                val start = wholeFile.indexOf('{')
-                val end = wholeFile.lastIndexOf('}')
-                if (start < 0 || end < 0)
-                    return null
-                else
-                    return wholeFile.substring(start, end + 1)
-            }
+        private fun getHJSON(input : Source) : String? {
+            val wholeFile = input.readString()
+            val start = wholeFile.indexOf('{')
+            val end = wholeFile.lastIndexOf('}')
+            if (start < 0 || end < 0)
+                return null
+            else
+                return wholeFile.substring(start, end + 1)
         }
 
         /**

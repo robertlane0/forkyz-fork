@@ -1,9 +1,9 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.io.InputStream
 import java.util.Locale
 import java.util.regex.Pattern
+import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.io.PuzzleStreamReader
@@ -22,16 +22,16 @@ import app.crossword.yourealwaysbe.puz.io.PuzzleStreamReader
 class CrossweirdStreamScraper : AbstractStreamScraper() {
     @Throws(Exception::class)
     public override suspend fun parseInput(
-        inputStream : InputStream,
+        input : Source,
         url : String?,
     ) : Puzzle? {
-        val puzURL = getPuzURL(inputStream) ?: getPuzURL(url)
+        val puzURL = getPuzURL(input) ?: getPuzURL(url)
         if (puzURL == null)
             return null
 
         try {
-            getInputStream(puzURL).use { puzIS ->
-                val puz = PuzzleStreamReader.parseInputStatic(puzIS)
+            getURL(puzURL).use { puzIn ->
+                val puz = PuzzleStreamReader.parseInputStatic(puzIn)
                 puz?.source = DEFAULT_SOURCE
                 return puz
             }
@@ -42,8 +42,8 @@ class CrossweirdStreamScraper : AbstractStreamScraper() {
         return null
     }
 
-    fun getPuzURL(inputStream : InputStream) : String? {
-        val path = regexScrape(inputStream, PUZ_PATH_MATCH)
+    fun getPuzURL(input : Source) : String? {
+        val path = regexScrape(input, PUZ_PATH_MATCH)
         if (path != null) {
             return String.format(
                 Locale.US,

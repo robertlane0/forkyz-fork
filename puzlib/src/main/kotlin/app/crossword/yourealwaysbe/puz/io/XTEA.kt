@@ -1,13 +1,6 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import java.io.IOException
-import java.nio.charset.Charset
-
 /*
  * Copyright 2004-2011 H2 Group. Multiple-Licensed under the H2 License,
  * Version 1.0, and under the Eclipse Public License, Version 1.0
@@ -242,41 +235,6 @@ class XTEA {
     companion object {
         private const val ALIGN = 16
         private const val DELTA = -0x61c88647
-
-        @Throws(IOException::class)
-        @JvmStatic
-        fun main(args : Array<String>) {
-            val xtea = XTEA()
-            val key = "sjri5jf85jdor560"
-            var revered = ""
-            for (i in key.length downTo 1) {
-                revered += key.get(i - 1)
-            }
-            xtea.setKey(revered.toByteArray(Charset.forName("utf-8")))
-            val baos = ByteArrayOutputStream()
-            StreamUtils.copyStream(
-                FileInputStream("/Users/rcooper/Downloads/cs150608.jpz"), baos
-            )
-            val original = baos.toByteArray()
-            println(baos.toByteArray().size)
-            val bytes = ByteArray(original.size)
-            run {
-                var i = 0
-                while (i < original.size) {
-                    xtea.decryptBlock(original, bytes, i)
-                    i += 8
-                }
-            }
-            println("Changed: " + original.contentEquals(bytes))
-            println(String(bytes, Charset.forName("utf-8")))
-            for (i in bytes.indices) {
-                print(bytes[i].toInt())
-            }
-            StreamUtils.copyStream(
-                ByteArrayInputStream(bytes),
-                FileOutputStream("/Users/rcooper/test.zip")
-            )
-        }
     }
 }
 

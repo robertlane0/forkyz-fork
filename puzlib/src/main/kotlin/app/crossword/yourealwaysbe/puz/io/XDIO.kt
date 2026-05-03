@@ -1,15 +1,13 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.BufferedReader
-import java.io.IOException
-import java.io.InputStream
-import java.io.InputStreamReader
-import java.util.Collections
 import java.util.logging.Logger
 import java.util.regex.Pattern
 import kotlin.math.max
 import kotlinx.datetime.LocalDate
+import kotlinx.io.IOException
+import kotlinx.io.Source
+import kotlinx.io.readLine
 
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Clue
@@ -26,8 +24,8 @@ class XDIO : PuzzleParser {
     class XDFormatException(msg : String) : Exception(msg)
 
     @Throws(IOException::class)
-    override fun parseInput(inStream : InputStream) : Puzzle? {
-        return readPuzzle(inStream)
+    override fun parseInput(input : Source) : Puzzle? {
+        return readPuzzle(input)
     }
 
     private enum class Section(private val sectionName : String) {
@@ -69,13 +67,13 @@ class XDIO : PuzzleParser {
              * Peek to see if next characters are the start of a section
              */
             @Throws(IOException::class)
-            fun peekIsSectionStart(reader : BufferedReader) : Boolean {
+            fun peekIsSectionStart(input : Source) : Boolean {
                 val len : Int = SECTION_START.length
-                val buf = CharArray(len)
+                val buf = ByteArray(len)
 
-                reader.mark(len)
-                val numRead = reader.read(buf, 0, len)
-                reader.reset()
+                val peeker = input.peek()
+
+                val numRead = peeker.readAtMostTo(buf, 0, len)
 
                 if (numRead < len)
                     return false
@@ -152,18 +150,15 @@ class XDIO : PuzzleParser {
         )
         private val LINEBREAKS = MatchReplace("\\\\", "<br/>")
 
-        @JvmStatic
         @Throws(IOException::class)
-        fun readPuzzle(inStream : InputStream) : Puzzle? {
+        fun readPuzzle(input : Source) : Puzzle? {
             try {
-                val reader = BufferedReader(InputStreamReader(inStream))
-
-                val line = getNextNonBlankLine(reader)
+                val line = getNextNonBlankLine(input)
 
                 if (Section.Companion.isSectionTitle(line))
-                    return readTitledSections(line, reader)
+                    return readTitledSections(line, input)
                 else
-                    return readImplicitSections(line, reader)
+                    return readImplicitSections(line, input)
             } catch (e : XDFormatException) {
                 LOG.info("Failed to parse XD file: " + e)
                 return null
@@ -173,7 +168,7 @@ class XDIO : PuzzleParser {
         @Throws(IOException::class, XDFormatException::class)
         private fun readTitledSections(
             firstTitle : String?,
-            reader : BufferedReader,
+            input : Source,
         ) : Puzzle? {
             var title = firstTitle
 
@@ -184,14 +179,14 @@ class XDIO : PuzzleParser {
 
             while (title != null) {
                 when (Section.Companion.parseTitle(title)) {
-                    Section.META -> meta = readMeta(null, reader)
-                    Section.GRID -> boxes = readBoxes(reader, false)
-                    Section.CLUES -> clues = readClueInfo(reader, false)
-                    Section.NOTES -> notes = readNotes(reader, false)
+                    Section.META -> meta = readMeta(null, input)
+                    Section.GRID -> boxes = readBoxes(input, false)
+                    Section.CLUES -> clues = readClueInfo(input, false)
+                    Section.NOTES -> notes = readNotes(input, false)
                     Section.OTHER -> {}
                 }
 
-                title = getNextNonBlankLine(reader)
+                title = getNextNonBlankLine(input)
             }
 
             return boxes?.let { boxes ->
@@ -202,12 +197,12 @@ class XDIO : PuzzleParser {
         @Throws(IOException::class, XDFormatException::class)
         private fun readImplicitSections(
             firstLine : String?,
-            reader : BufferedReader,
+            input : Source,
         ) : Puzzle {
-            val meta : Meta = readMeta(firstLine, reader)
-            val boxes = readBoxes(reader, true)
-            val clues = readClueInfo(reader, true)
-            val notes = readNotes(reader, true)
+            val meta : Meta = readMeta(firstLine, input)
+            val boxes = readBoxes(input, true)
+            val clues = readClueInfo(input, true)
+            val notes = readNotes(input, true)
             return buildPuzzle(meta, boxes, clues, notes)
         }
 
@@ -215,12 +210,12 @@ class XDIO : PuzzleParser {
          * Read meta section
          *
          * First line is either the first line of the section, or null if
-         * the whole section is still in the reader (without the title)
+         * the whole section is still in the input (without the title)
          */
         @Throws(IOException::class, XDFormatException::class)
         private fun readMeta(
             firstLine : String?,
-            reader : BufferedReader,
+            input : Source,
         ) : Meta {
             var title : String? = null
             var author : String? = null
@@ -234,7 +229,7 @@ class XDIO : PuzzleParser {
 
             var line = firstLine
             if (line == null)
-                line = getNextDataLine(reader)
+                line = getNextDataLine(input)
 
             while (line != null) {
                 val keyValue = line.split(":".toRegex(), limit = 2)
@@ -277,7 +272,7 @@ class XDIO : PuzzleParser {
                     }
                 }
 
-                line = getNextDataLine(reader)
+                line = getNextDataLine(input)
             }
 
             return Meta(
@@ -332,7 +327,7 @@ class XDIO : PuzzleParser {
          *
          * Will return a grid, throws an exception if error
          *
-         * @param reader source of data
+         * @param input source of data
          * @param chompBlankLines whether to ignore any blank lines
          * appearing before the grid
          * @return matrix of chars for boxes (need meta data to convert to
@@ -340,15 +335,15 @@ class XDIO : PuzzleParser {
          */
         @Throws(IOException::class, XDFormatException::class)
         private fun readBoxes(
-            reader : BufferedReader,
+            input : Source,
             chompBlankLines : Boolean,
         ) : Array<CharArray> {
             val lines = mutableListOf<String>()
 
             var line : String? = if (chompBlankLines)
-                getNextNonBlankLine(reader)
+                getNextNonBlankLine(input)
             else
-                getNextDataLine(reader)
+                getNextDataLine(input)
 
             if (line == null)
                 throw XDFormatException("No grid!")
@@ -359,7 +354,7 @@ class XDIO : PuzzleParser {
                 line = line.trim()
                 maxWidth = max(line.length, maxWidth)
                 lines.add(line)
-                line = getNextDataLine(reader)
+                line = getNextDataLine(input)
             }
 
             val boxes = Array<CharArray>(lines.size) { row ->
@@ -394,22 +389,22 @@ class XDIO : PuzzleParser {
         /**
          * Read clues from file
          *
-         * @param reader source of data
+         * @param input source of data
          * @param chompBlankLines whether to ignore any blank lines
          * appearing before the grid
          * @return List of found clues
          */
         @Throws(IOException::class, XDFormatException::class)
         private fun readClueInfo(
-            reader : BufferedReader,
+            input : Source,
             chompBlankLines : Boolean,
         ) : MutableList<ClueInfo> {
             val clues = mutableListOf<ClueInfo>()
 
             var line : String? = if (chompBlankLines)
-                getNextNonBlankLine(reader)
+                getNextNonBlankLine(input)
             else
-                getNextDataLine(reader)
+                getNextDataLine(input)
 
             if (line == null)
                 return clues
@@ -418,7 +413,7 @@ class XDIO : PuzzleParser {
                 line = line.trim()
 
                 if (REF_CLUE_RE.matcher(line).matches()) {
-                    line = getNextDataLine(reader)
+                    line = getNextDataLine(input)
                     continue
                 }
 
@@ -444,7 +439,7 @@ class XDIO : PuzzleParser {
 
                 clues.add(ClueInfo(numberInfo, hint))
 
-                line = getNextDataLine(reader)
+                line = getNextDataLine(input)
             }
 
             return clues
@@ -453,20 +448,20 @@ class XDIO : PuzzleParser {
         /**
          * Read notes from file
          *
-         * @param reader source of data
+         * @param input source of data
          * @param chompBlankLines whether to ignore any blank lines
          * appearing before the grid
          * @return notes in html
          */
         @Throws(IOException::class, XDFormatException::class)
         private fun readNotes(
-            reader : BufferedReader,
+            input : Source,
             chompBlankLines : Boolean,
         ) : String? {
             var line = if (chompBlankLines)
-                getNextNonBlankLine(reader)
+                getNextNonBlankLine(input)
             else
-                getNextDataLine(reader)
+                getNextDataLine(input)
 
             if (line == null)
                 return null
@@ -476,10 +471,10 @@ class XDIO : PuzzleParser {
             while (line != null) {
                 sb.append(line.trim() + "<br/>")
 
-                if (Section.Companion.peekIsSectionStart(reader))
+                if (Section.Companion.peekIsSectionStart(input))
                     line = null
                 else
-                    line = reader.readLine()
+                    line = input.readLine()
             }
 
             // remove trailing blank lines
@@ -667,7 +662,7 @@ class XDIO : PuzzleParser {
         }
 
         /**
-         * Reads the next non-blank line from the reader
+         * Reads the next non-blank line from the input
          *
          * Returns null if the end of the file or section is reached.
          * Only chomps two blank lines at end of section, may leave further
@@ -677,21 +672,21 @@ class XDIO : PuzzleParser {
          * from the stream.
          */
         @Throws(IOException::class, XDFormatException::class)
-        private fun getNextDataLine(reader : BufferedReader) : String? {
-            if (Section.Companion.peekIsSectionStart(reader))
+        private fun getNextDataLine(input : Source) : String? {
+            if (Section.Companion.peekIsSectionStart(input))
                 return null
 
-            var line = reader.readLine()
+            var line = input.readLine()
             if (line == null) return null
 
             line = line.trim()
             if (!line.isEmpty())
                 return line
 
-            if (Section.Companion.peekIsSectionStart(reader))
+            if (Section.Companion.peekIsSectionStart(input))
                 return null
 
-            line = reader.readLine()
+            line = input.readLine()
             if (line == null)
                 return null
 
@@ -704,9 +699,9 @@ class XDIO : PuzzleParser {
          * Returns null if EOF reached
          */
         @Throws(IOException::class, XDFormatException::class)
-        private fun getNextNonBlankLine(reader : BufferedReader) : String? {
+        private fun getNextNonBlankLine(input : Source) : String? {
             while (true) {
-                var line = reader.readLine()
+                var line = input.readLine()
                 if (line == null)
                     return null
 

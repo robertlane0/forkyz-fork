@@ -48,7 +48,7 @@ class LATimesDownloader(
 ) {
     override suspend fun getSourceUrl(date : LocalDate) : String? {
         val url = PUZZLES_FEED_FORMAT.format(date)
-        return getInputStream(url).use { input ->
+        return getURL(url).use { input ->
             val puzzles = parseJSONArray(input)
             (0 until puzzles.size).forEach {
                 val puzzle = puzzles.getJSONObject(it)

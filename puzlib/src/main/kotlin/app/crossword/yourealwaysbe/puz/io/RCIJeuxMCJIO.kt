@@ -1,11 +1,10 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.BufferedReader
-import java.io.IOException
-import java.io.InputStream
-import java.io.InputStreamReader
 import java.util.logging.Logger
+import kotlinx.io.IOException
+import kotlinx.io.Source
+import kotlinx.io.readString
 
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Box.Companion.isBlock
@@ -13,6 +12,7 @@ import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.PuzzleBuilder
 import app.crossword.yourealwaysbe.puz.util.JSONArray
 import app.crossword.yourealwaysbe.puz.util.JSONObject
+import app.crossword.yourealwaysbe.puz.util.JSONException
 import app.crossword.yourealwaysbe.puz.util.parseHJSONObject
 
 /**
@@ -22,8 +22,8 @@ class RCIJeuxMCJIO : PuzzleParser {
     class MCJFormatException(msg : String) : Exception(msg)
 
     @Throws(Exception::class)
-    override fun parseInput(inStream : InputStream) : Puzzle? {
-        return readPuzzle(inStream)
+    override fun parseInput(input : Source) : Puzzle? {
+        return readPuzzle(input)
     }
 
     companion object {
@@ -39,16 +39,19 @@ class RCIJeuxMCJIO : PuzzleParser {
         private const val CROSSWORD_ACROSS_CLUE_FIELD_NAME = "definitionsh"
         private const val CROSSWORD_DOWN_CLUE_FIELD_NAME = "definitionsv"
 
-        @JvmStatic
         @Throws(IOException::class)
-        fun readPuzzle(inStream : InputStream) : Puzzle? {
+        fun readPuzzle(input : Source) : Puzzle? {
             try {
-                val hjson = getHJSON(inStream)
+                val hjson = getHJSON(input)
                 if (hjson == null)
                     return null
 
+                println(hjson)
                 return readPuzzleFromHJSON(parseHJSONObject(hjson))
             } catch (e : MCJFormatException) {
+                LOG.severe("Could not read RCIJeux MCJ: " + e)
+                return null
+            } catch (e : JSONException) {
                 LOG.severe("Could not read RCIJeux MCJ: " + e)
                 return null
             }
@@ -68,18 +71,14 @@ class RCIJeuxMCJIO : PuzzleParser {
          * gameData"
          */
         @Throws(IOException::class)
-        private fun getHJSON(inStream : InputStream) : String? {
-            BufferedReader(InputStreamReader(inStream)).use { reader ->
-                val sb = StringBuilder()
-                reader.useLines { lines -> lines.forEach { sb.append(it) } }
-                val wholeFile = sb.toString()
-                val start = wholeFile.indexOf('{')
-                val end = wholeFile.lastIndexOf('}')
-                if (start < 0 || end < 0)
-                    return null
-                else
-                    return wholeFile.substring(start, end + 1)
-            }
+        private fun getHJSON(input : Source) : String? {
+            val wholeFile = input.readString()
+            val start = wholeFile.indexOf('{')
+            val end = wholeFile.lastIndexOf('}')
+            if (start < 0 || end < 0)
+                return null
+            else
+                return wholeFile.substring(start, end + 1)
         }
 
         /**

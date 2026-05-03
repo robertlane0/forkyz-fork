@@ -1,12 +1,11 @@
 
 package app.crossword.yourealwaysbe.puz
 
-import java.io.BufferedInputStream
-import java.io.IOException
 import java.net.URI
 import java.net.URISyntaxException
 import kotlin.io.encoding.Base64
 import kotlinx.datetime.LocalDate
+import kotlinx.io.IOException
 
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO

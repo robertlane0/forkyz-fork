@@ -16,9 +16,12 @@ dependencies {
     implementation(libs.hjson)
     implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.kotlinx.serialization.json.io)
     implementation(libs.ksoup)
     implementation(libs.ksoup.kotlinx)
     implementation(libs.ktor.client.cio)
+    implementation(libs.zip)
+    implementation(libs.zip.kotlinx)
 }
 
 tasks.test {
@@ -26,12 +29,12 @@ tasks.test {
 }
 
 kotlin {
-    jvmToolchain(JavaVersion.VERSION_17.majorVersion.toInt())
+    jvmToolchain(JavaVersion.VERSION_21.majorVersion.toInt())
 }
 
 tasks.compileJava {
-    sourceCompatibility = JavaVersion.VERSION_17.toString()
-    targetCompatibility = JavaVersion.VERSION_17.toString()
+    sourceCompatibility = JavaVersion.VERSION_21.toString()
+    targetCompatibility = JavaVersion.VERSION_21.toString()
 
     // -processing as adding room annotation processor library
     // causes warnings about unprocessed annotations for an

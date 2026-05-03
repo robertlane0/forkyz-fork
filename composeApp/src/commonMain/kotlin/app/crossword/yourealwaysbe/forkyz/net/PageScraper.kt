@@ -1,16 +1,13 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.io.IOException
-import java.net.MalformedURLException
-import java.net.URI
-import java.net.URISyntaxException
 import java.util.Deque
 import java.util.LinkedList
 import java.util.regex.Pattern
 import kotlin.time.Duration
 import kotlinx.datetime.LocalDate
-import kotlinx.io.asSource
+import kotlinx.io.IOException
+import kotlinx.io.Source
 
 import com.fleeksoft.ksoup.Ksoup
 import com.fleeksoft.ksoup.nodes.Document
@@ -159,18 +156,11 @@ open class PageScraper(
 
     private suspend fun downloadPuzzle(url : String) : Puzzle? {
         try {
-            val u = (URI(url)).toURL()
-            try {
-                getInputStream(u, null).use { inputStream ->
-                    return parser.parseInput(inputStream)
-                }
-            } catch (e : Exception) {
-                e.printStackTrace()
+            getURL(url, null).use { input->
+                return parser.parseInput(input)
             }
-        } catch (e : URISyntaxException) {
-            // oh well
-        } catch (e : MalformedURLException) {
-            // oh well
+        } catch (e : Exception) {
+            e.printStackTrace()
         }
 
         return null
@@ -180,10 +170,7 @@ open class PageScraper(
     private suspend fun getPuzzleURLs() : Deque<String> {
         val result = LinkedList<String>()
 
-        val content = Ksoup.parseSource(
-            getInputStream(scrapeUrl).asSource(),
-            scrapeUrl,
-        )
+        val content = Ksoup.parseSource(getURL(scrapeUrl), scrapeUrl)
 
         for (a in content.select("a")) {
             val url : String = a.attr("abs:href")

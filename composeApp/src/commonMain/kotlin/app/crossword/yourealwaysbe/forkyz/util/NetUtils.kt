@@ -1,13 +1,12 @@
 
 package app.crossword.yourealwaysbe.forkyz.util
 
-import java.io.BufferedInputStream
-import java.io.BufferedOutputStream
-import java.io.IOException
-import java.io.InputStream
-import java.net.URI
-import java.net.URISyntaxException
 import java.net.URL
+import kotlinx.io.Buffer
+import kotlinx.io.IOException
+import kotlinx.io.RawSource
+import kotlinx.io.Source
+import kotlinx.io.buffered
 
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
@@ -19,7 +18,7 @@ import io.ktor.client.statement.bodyAsChannel
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
-import io.ktor.utils.io.jvm.javaio.toInputStream
+import io.ktor.utils.io.asSource
 
 import app.crossword.yourealwaysbe.puz.io.StreamUtils
 import app.crossword.yourealwaysbe.puz.util.JSONException
@@ -29,7 +28,7 @@ import app.crossword.yourealwaysbe.puz.util.parseJSONObject
 private val HTTP_OK_RESPONSE = 200
 
 /**
- * Get a buffered input stream for URL
+ * Get a buffered source for URL
  *
  * @param url url to open
  * @param timeout the timeout in millis
@@ -38,17 +37,17 @@ private val HTTP_OK_RESPONSE = 200
  * @return a buffered input stream (in stream or err stream if error)
  * @throws IOException
  */
-suspend fun getURLInputStream(
+suspend fun getURL(
     url : URL,
     timeoutMillis : Int,
     headers : Map<String, String>? = null,
     data : JSONObject? = null,
-) : BufferedInputStream {
-    return getURLInputStream(url.toString(), timeoutMillis, headers, data)
+) : Source {
+    return getURL(url.toString(), timeoutMillis, headers, data)
 }
 
 /**
- * Get a buffered input stream for URL
+ * Get a source for URL
  *
  * @param url url to open
  * @param timeout the timeout in millis
@@ -57,12 +56,12 @@ suspend fun getURLInputStream(
  * @return a buffered input stream (in stream or err stream if error)
  * @throws IOException
  */
-suspend fun getURLInputStream(
+suspend fun getURL(
     url : String,
     timeoutMillis : Int,
     headers : Map<String, String>? = null,
     data : JSONObject? = null,
-) : BufferedInputStream {
+) : Source {
     val client = HttpClient(CIO) {
         engine {
             requestTimeout = timeoutMillis.toLong()
@@ -85,10 +84,11 @@ suspend fun getURLInputStream(
             }
         }
 
-        return BufferedInputStream(
-            response.bodyAsChannel().toInputStream().withClientClose(client),
-        )
-    } catch (e: Exception) {
+        return response.bodyAsChannel()
+            .asSource()
+            .withClientClose(client)
+            .buffered()
+    } catch (e : Exception) {
         throw IOException(e)
     } finally {
         client.close()
@@ -105,17 +105,14 @@ suspend fun getURLJSON(
     headers : Map<String, String>? = null,
     data : JSONObject? = null,
 ) : JSONObject {
-    return getURLInputStream(url, timeout, headers, data).use(::parseJSONObject)
+    return getURL(url, timeout, headers, data).use(::parseJSONObject)
 }
 
-internal fun InputStream.withClientClose(
+internal fun RawSource.withClientClose(
     client : HttpClient,
-) : InputStream = object : InputStream() {
-    override fun read() : Int
-        = this@withClientClose.read()
-
-    override fun read(b : ByteArray, off : Int, len : Int) : Int
-        = this@withClientClose.read(b, off, len)
+) : RawSource = object : RawSource {
+    override fun readAtMostTo(sink : Buffer, byteCount : Long) : Long
+        = this@withClientClose.readAtMostTo(sink, byteCount)
 
     override fun close() {
         try {

@@ -34,7 +34,7 @@ kotlin {
         minSdk = libs.versions.minSdk.get().toInt()
 
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_17)
+            jvmTarget.set(JvmTarget.JVM_21)
             // Multiplatform Parcelize from
             // https://developer.android.com/kotlin/parcelize
             freeCompilerArgs.addAll(

@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.InputStream
 import kotlinx.datetime.LocalDate
 
 import org.junit.jupiter.api.Assertions
@@ -14,21 +13,15 @@ import app.crossword.yourealwaysbe.puz.Puzzle
 
 class PMLIOTest {
     @Test
-    @Throws(Exception::class)
     fun testPuzzle1() {
-        testPuzzle1InputStream.use { inStream ->
-            val puz: Puzzle? = PMLIO.readPuzzle(inStream)
-            Companion.assertIsTestPuzzle1(puz!!)
-        }
+        val puz = testPuzzle1.use { PMLIO.readPuzzle(it) }
+        assertIsTestPuzzle1(puz!!)
     }
 
     companion object {
-        @JvmStatic
-        val testPuzzle1InputStream : InputStream
-            get() = JPZIOTest::class.java.getResourceAsStream("/pml.json")!!
+        val testPuzzle1
+            get() = SourceUtils.getResource("/pml.json")
 
-        @JvmStatic
-        @Throws(Exception::class)
         fun assertIsTestPuzzle1(puz : Puzzle) {
             Assertions.assertEquals(puz.title, "Test Crossword")
             Assertions.assertEquals(puz.date, LocalDate(2024, 12, 16))

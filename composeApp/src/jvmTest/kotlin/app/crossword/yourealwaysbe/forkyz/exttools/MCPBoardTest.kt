@@ -1,8 +1,9 @@
 
 package app.crossword.yourealwaysbe.forkyz.exttools
 
-import java.io.DataInputStream
 import kotlinx.coroutines.runBlocking
+import kotlinx.io.asSource
+import kotlinx.io.buffered
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
@@ -20,6 +21,7 @@ import app.crossword.yourealwaysbe.puz.Playboard
 import app.crossword.yourealwaysbe.puz.Position
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.io.IO
+
 import app.crossword.yourealwaysbe.puz.util.JSONObject
 import app.crossword.yourealwaysbe.puz.util.buildJSONObject
 
@@ -32,10 +34,10 @@ class MCPBoardTest {
     @Before
     fun setUp() {
         puzzle = IO.loadNative(
-            DataInputStream(
-                MCPBoardTest::class.java.getResourceAsStream("/test.puz"),
-            )
+            MCPBoardTest::class.java
+                .getResourceAsStream("/test.puz")!!.asSource().buffered(),
         )!!
+
         board = Playboard(puzzle)
 
         val utils = mock<NativeBackendUtils>()

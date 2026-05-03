@@ -1,12 +1,10 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.io.IOException
-import java.net.URI
-import java.net.URISyntaxException
 import kotlin.time.Duration
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
+import kotlinx.io.IOException
 
 import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.puz.Puzzle
@@ -45,11 +43,11 @@ class WithMetaDataDownloader(
         headers : Map<String, String>?,
     ) : Puzzle? {
         val sourceUrl = getSourceUrl(date)
+        if (sourceUrl == null)
+            return null
+
         try {
-            return getInputStream(
-                (URI(sourceUrl)).toURL(),
-                headers,
-            ).use {
+            return getURL(sourceUrl, headers).use {
                 puzzleParser.parseInput(it)
             }?.also { puz ->
                 author?.let { puz.author = it }
@@ -57,10 +55,9 @@ class WithMetaDataDownloader(
             }
         } catch (e : IOException) {
             AppLogger.e(TAG, "Download failed with: " + e)
-        } catch (e : URISyntaxException) {
-            AppLogger.e(TAG, "Download failed with: " + e)
         }
 
         return null;
     }
 }
+

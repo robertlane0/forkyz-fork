@@ -1,9 +1,6 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.IOException
-import java.io.InputStream
-
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
@@ -15,22 +12,15 @@ import app.crossword.yourealwaysbe.puz.io.KingFeaturesPlaintextIO.Companion.pars
 
 class KingFeaturesPlaintextIOTest {
     @Test
-    @Throws(IOException::class)
     fun testRead() {
-        testPuzzle1InputStream.use { inStream ->
-            val puz = parsePuzzle(inStream)
-            Companion.assertIsTestPuzzle1(puz!!)
-        }
+        val puz = testPuzzle1.use { parsePuzzle(it) }
+        assertIsTestPuzzle1(puz!!)
     }
 
     companion object {
-        @JvmStatic
-        val testPuzzle1InputStream: InputStream
-            get() = KingFeaturesPlaintextIOTest::class.java.getResourceAsStream(
-                "/premiere-20100704.txt"
-            )!!
+        val testPuzzle1
+            get() = SourceUtils.getResource("/premiere-20100704.txt")
 
-        @JvmStatic
         fun assertIsTestPuzzle1(puz: Puzzle) {
             val boxes: Array<Array<Box?>> = puz.boxes
 

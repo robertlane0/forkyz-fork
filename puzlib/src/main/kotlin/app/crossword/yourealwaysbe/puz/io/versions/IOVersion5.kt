@@ -1,11 +1,11 @@
 
 package app.crossword.yourealwaysbe.puz.io.versions
 
-import java.io.DataInputStream
 import java.io.DataOutputStream
-import java.io.IOException
 import java.util.LinkedList
 import java.util.logging.Logger
+import kotlinx.io.IOException
+import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.puz.ClueID
 import app.crossword.yourealwaysbe.puz.ListNum
@@ -33,15 +33,15 @@ open class IOVersion5 : IOVersion4() {
     }
 
     @Throws(IOException::class)
-    override fun readMeta(inStream : DataInputStream) : PuzzleMeta {
-        val meta = super.readMeta(inStream)
+    override fun readMeta(input : Source) : PuzzleMeta {
+        val meta = super.readMeta(input)
 
         meta.historyList = mutableListOf<ListNum>()
 
-        val length = inStream.readInt()
+        val length = input.readInt()
         for (i in 0..<length) {
-            val number = inStream.readInt()
-            val across = inStream.readBoolean()
+            val number = input.readInt()
+            val across = input.readByte().toInt() != 0
             val listName = if (across) IO.ACROSS_LIST else IO.DOWN_LIST
 
             meta.historyList.add(ListNum(listName, number))
@@ -50,7 +50,7 @@ open class IOVersion5 : IOVersion4() {
         return meta
     }
 
-    @Throws(IOException::class)
+    @Throws(java.io.IOException::class)
     override fun writeMeta(puz : Puzzle, os : DataOutputStream) {
         super.writeMeta(puz, os)
 

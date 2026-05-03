@@ -1,11 +1,11 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.IOException
-import java.io.InputStream
 import java.util.LinkedList
 import java.util.Locale
 import java.util.logging.Logger
+import kotlinx.io.IOException
+import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Box.Companion.isBlock
@@ -30,8 +30,8 @@ class RaetselZentraleSchwedenJSONIO : AbstractJSONIO() {
     class RZSFormatException(msg : String) : Exception(msg)
 
     @Throws(Exception::class)
-    override fun parseInput(inStream : InputStream) : Puzzle? {
-        return readPuzzle(inStream)
+    override fun parseInput(input : Source) : Puzzle? {
+        return readPuzzle(input)
     }
 
     private data class ClueInfo(
@@ -68,11 +68,10 @@ class RaetselZentraleSchwedenJSONIO : AbstractJSONIO() {
             "<", ">", "?",
         )
 
-        @JvmStatic
         @Throws(IOException::class)
-        fun readPuzzle(inStream : InputStream) : Puzzle? {
+        fun readPuzzle(input : Source) : Puzzle? {
             try {
-                val json = parseJSONObject(inStream)
+                val json = parseJSONObject(input)
                 return readPuzzleFromJSON(json)
             } catch (e : JSONException) {
                 LOG.severe("Could not read RaetselZentrale JSON: " + e)

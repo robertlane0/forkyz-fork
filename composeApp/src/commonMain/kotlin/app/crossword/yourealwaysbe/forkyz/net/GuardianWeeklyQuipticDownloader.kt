@@ -1,12 +1,10 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.io.IOException
-import java.net.URI
-import java.net.URISyntaxException
 import kotlin.time.Duration
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
+import kotlinx.io.IOException
 
 import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 import app.crossword.yourealwaysbe.puz.Puzzle
@@ -33,11 +31,12 @@ class GuardianWeeklyQuipticDownloader(
         headers : Map<String, String>?,
     ) : Puzzle? {
         val sourceUrl = getSourceUrl(date)
+        if (sourceUrl == null)
+            return null
+
         try {
-            getInputStream(
-                (URI(sourceUrl)).toURL(), headers
-            ).use { inputStream ->
-                return GuardianJSONIO.readFromHTML(inputStream)?.apply {
+            getURL(sourceUrl, headers).use { input ->
+                return GuardianJSONIO.readFromHTML(input)?.apply {
                     this.copyright = "Guardian / " + author
                     this.source = name
                     this.supportUrl = supportUrl
@@ -46,8 +45,6 @@ class GuardianWeeklyQuipticDownloader(
                 }
             }
         } catch (e : IOException) {
-            e.printStackTrace()
-        } catch (e : URISyntaxException) {
             e.printStackTrace()
         }
 

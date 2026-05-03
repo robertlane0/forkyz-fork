@@ -1,43 +1,25 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.io.BufferedInputStream
-import java.io.IOException
-import java.net.URISyntaxException
-import java.net.URL
+import kotlinx.io.IOException
+import kotlinx.io.Source
 
-import app.crossword.yourealwaysbe.forkyz.util.getURLInputStream
+import app.crossword.yourealwaysbe.forkyz.util.getURL
 
 /**
  * Base class for downloaders
  *
  * Provides some useful methods. Recommended to always use
- * getInputStream. If not, set a timeout of getTimeout().
+ * getURL. If not, set a timeout of getTimeout().
  */
 abstract class AbstractDownloader : Downloader {
     override var timeout : Int = 30000
 
-    @Throws(IOException::class, URISyntaxException::class)
-    protected suspend fun getInputStream(
-        url : URL,
-        headers : Map<String, String>? = null,
-    ) : BufferedInputStream {
-        return getURLInputStream(
-            url,
-            timeout,
-            headers
-        )
-    }
-
-    protected suspend fun getInputStream(
+    protected suspend fun getURL(
         url : String,
         headers : Map<String, String>? = null,
-    ) : BufferedInputStream {
-        return getURLInputStream(
-            url,
-            timeout,
-            headers
-        )
+    ) : Source {
+        return getURL(url, timeout, headers)
     }
 }
 

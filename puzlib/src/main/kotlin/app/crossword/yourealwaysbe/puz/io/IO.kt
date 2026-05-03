@@ -2,16 +2,11 @@
 package app.crossword.yourealwaysbe.puz.io
 
 import java.io.ByteArrayOutputStream
-import java.io.DataInputStream
 import java.io.DataOutputStream
-import java.io.EOFException
-import java.io.IOException
-import java.io.InputStream
 import java.io.OutputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.charset.Charset
-import java.util.Arrays
 import kotlin.Array
 import kotlin.Boolean
 import kotlin.ByteArray
@@ -33,6 +28,12 @@ import kotlin.text.toByteArray
 import kotlin.text.toRegex
 import kotlin.text.trim
 import kotlin.toUShort
+import kotlinx.io.Buffer
+import kotlinx.io.EOFException
+import kotlinx.io.IOException
+import kotlinx.io.Source
+import kotlinx.io.readByteArray
+import kotlinx.io.readShortLe
 
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Box.Companion.isBlock
@@ -60,8 +61,8 @@ import app.crossword.yourealwaysbe.puz.util.PuzzleUtils.getDownListName
 
 class IO : PuzzleParser {
     @Throws(IOException::class)
-    override fun parseInput(inStream : InputStream) : Puzzle? {
-        return Companion.loadNative(DataInputStream(inStream))
+    override fun parseInput(input : Source) : Puzzle? {
+        return Companion.loadNative(input)
     }
 
     companion object {
@@ -106,11 +107,8 @@ class IO : PuzzleParser {
 
         private const val BLANK = '-'
 
-        @JvmField
         val ACROSS_LIST : String = DefaultListNames.ACROSS_LIST
-        @JvmField
         val DOWN_LIST : String = DefaultListNames.DOWN_LIST
-
 
         fun cksum_region(
             data : ByteArray,
@@ -133,41 +131,29 @@ class IO : PuzzleParser {
             return cksum
         }
 
-        @JvmStatic
         @Throws(IOException::class)
-        fun load(
-            puzzleInput : DataInputStream,
-            metaInput : DataInputStream,
-        ) : Puzzle? {
-            val puz : Puzzle? = Companion.loadNative(puzzleInput)
-
+        fun load(input : Source, metaInput : Source) : Puzzle? {
+            val puz : Puzzle? = Companion.loadNative(input)
             if (puz != null)
                 readCustom(puz, metaInput)
-
             return puz
         }
 
-        @JvmStatic
         @Throws(IOException::class)
-        fun loadNative(input : InputStream) : Puzzle? {
-            return Companion.loadNative(DataInputStream(input))
-        }
-
-        @JvmStatic
-        @Throws(IOException::class)
-        fun loadNative(input : DataInputStream) : Puzzle? {
-            input.skipBytes(0x2)
+        fun loadNative(input : Source) : Puzzle? {
+            input.skip(0x2)
 
             val fileMagic = ByteArray(FILE_MAGIC.length)
 
-            input.read(fileMagic, 0, fileMagic.size)
+            input.readAtMostTo(fileMagic, 0, fileMagic.size)
 
             // check that this is a puz file
-            if (FILE_MAGIC != String(fileMagic, CHARSET)) return null
+            if (FILE_MAGIC != String(fileMagic, CHARSET))
+                return null
 
             // done in two steps to match saveNative method
             input.skip(1)
-            input.skipBytes(0xA)
+            input.skip(0xA)
 
             val versionBytes = ByteArray(3)
 
@@ -184,20 +170,19 @@ class IO : PuzzleParser {
 
             input.skip(1)
 
-            input.skipBytes(2)
-            val solutionChecksum
-                = java.lang.Short.reverseBytes(input.readShort())
+            input.skip(2)
+            val solutionChecksum = input.readShortLe()
 
-            input.skipBytes(0xC)
+            input.skip(0xC)
 
             val width = 0xFFFF and input.readByte().toInt()
             val height = 0xFFFF and input.readByte().toInt()
 
             // read/skip number of clues
-            input.readShort()
+            input.readShortLe()
 
-            input.skipBytes(2)
-            val scrambled = input.readShort().toInt() != 0
+            input.skip(2)
+            val scrambled = input.readShortLe().toInt() != 0
 
             val boxes = Array<Array<Box?>>(height) { arrayOfNulls<Box>(width) }
             val answerByte = ByteArray(1)
@@ -344,14 +329,14 @@ class IO : PuzzleParser {
         }
 
         @Throws(IOException::class)
-        fun readCustom(puz : Puzzle, inStream : DataInputStream) {
-            val version = inStream.read()
+        fun readCustom(puz : Puzzle, input : Source) {
+            val version = input.readByte().toInt()
             val v = getIOVersion(version)
-            v.read(puz, inStream)
+            v.read(puz, input)
         }
 
         @Throws(IOException::class)
-        fun readExtraSectionType(input : DataInputStream) : Int {
+        fun readExtraSectionType(input : Source) : Int {
             val title = ByteArray(4)
 
             for (i in title.indices) {
@@ -378,11 +363,8 @@ class IO : PuzzleParser {
         }
 
         @Throws(IOException::class)
-        fun readGextSection(
-            input : DataInputStream,
-            builder : PuzzleBuilder,
-        ) {
-            input.skipBytes(4)
+        fun readGextSection(input : Source, builder : PuzzleBuilder) {
+            input.skip(4)
 
             for (x in 0..<builder.height) {
                 for (y in 0..<builder.width) {
@@ -399,49 +381,42 @@ class IO : PuzzleParser {
                 }
             }
 
-            input.skipBytes(1)
+            input.skip(1)
         }
 
         @Throws(IOException::class)
-        fun readMeta(inStream : InputStream) : PuzzleMeta? {
-            return Companion.readMeta(DataInputStream(inStream))
-        }
-
-        @Throws(IOException::class)
-        fun readMeta(inStream : DataInputStream) : PuzzleMeta? {
-            val version = inStream.read()
+        fun readMeta(input : Source) : PuzzleMeta? {
+            val version = input.readByte().toInt()
             val v = getIOVersion(version)
-            val m = v.readMeta(inStream)
+            val m = v.readMeta(input)
             return m
         }
 
-        @JvmStatic
         @Throws(IOException::class)
         fun readNullTerminatedString(
-            inStream : InputStream,
+            input : Source,
             charset : Charset,
         ) : String? {
-            val baos = ByteArrayOutputStream(128)
+            val baos = Buffer()
 
-            var nextByte = inStream.read().toByte()
+            var nextByte = input.readByte()
             while (nextByte.toInt() != 0x0) {
                 if (nextByte.toInt() != 0x0) {
-                    baos.write(nextByte.toInt())
+                    baos.writeByte(nextByte)
                 }
 
-                if (baos.size() > 4096) {
+                if (baos.size > 4096) {
                     throw IOException("Run on string!")
                 }
-                nextByte = inStream.read().toByte()
+                nextByte = input.readByte()
             }
 
-            return if (baos.size() == 0)
+            return if (baos.size == 0L)
                 null
             else
-                String(baos.toByteArray(), charset(charset.name()))
+                String(baos.readByteArray(), charset(charset.name()))
         }
 
-        @JvmStatic
         @Throws(IOException::class)
         fun save(
             puz : Puzzle,
@@ -467,13 +442,11 @@ class IO : PuzzleParser {
             metaOutputStream.close()
         }
 
-        @JvmStatic
         @Throws(IOException::class)
         fun saveNative(puz : Puzzle, dos : OutputStream?) {
             Companion.saveNative(puz, DataOutputStream(dos))
         }
 
-        @JvmStatic
         @Throws(IOException::class)
         fun saveNative(puz : Puzzle, dos : DataOutputStream) {
             // We write the puzzle to a temporary output stream, with 0
@@ -622,11 +595,11 @@ class IO : PuzzleParser {
         }
 
         @Throws(IOException::class)
-        fun skipExtraSection(input : DataInputStream) {
-            val numBytes = java.lang.Short.reverseBytes(input.readShort())
-            input.skipBytes(2) // checksum
-            input.skipBytes(numBytes.toInt()) // data
-            input.skipBytes(1) // null terminator
+        fun skipExtraSection(input : Source) {
+            val numBytes = input.readShortLe()
+            input.skip(2) // checksum
+            input.skip(numBytes.toLong()) // data
+            input.skip(1) // null terminator
         }
 
         /**
@@ -634,7 +607,6 @@ class IO : PuzzleParser {
          * the solution array occur in place. If true, the unscrambled solution
          * checksum is valid.
          */
-        @JvmStatic
         fun tryUnscramble(
             p : Puzzle,
             key_int : Int,
@@ -691,12 +663,11 @@ class IO : PuzzleParser {
 
         @Throws(IOException::class)
         fun writeCustom(puz : Puzzle, os : DataOutputStream) {
-            os.write(9)
+            os.writeByte(9)
             val v = IOVersion9()
             v.write(puz, os)
         }
 
-        @JvmStatic
         fun crack(puz : Puzzle) : Boolean {
             for (a in 0..9999) {
                 if (tryUnscramble(puz, a, initializeUnscrambleData(puz))) {
@@ -706,7 +677,6 @@ class IO : PuzzleParser {
             return false
         }
 
-        @JvmStatic
         @Throws(IOException::class)
         fun writeNullTerminatedString(
             os : OutputStream,
@@ -745,7 +715,6 @@ class IO : PuzzleParser {
             System.arraycopy(unscrambleTmp, 0, str, 0, keynum)
         }
 
-        @JvmStatic
         fun initializeUnscrambleData(puz : Puzzle) : ByteArray {
             val ans = StringBuilder()
             for (x in 0..<puz.width) {
@@ -857,7 +826,7 @@ class IO : PuzzleParser {
         private fun loadNotesNative(
             isAcross : Boolean,
             builder : PuzzleBuilder,
-            input : DataInputStream,
+            input : Source,
             charset : Charset,
         ) {
             for (cid in builder.boardClueIDs) {
@@ -988,20 +957,20 @@ class IO : PuzzleParser {
          */
         @Throws(IOException::class)
         private fun readRebusBoard(
-            input : DataInputStream,
+            input : Source,
             builder : PuzzleBuilder,
         ) : Array<ByteArray> {
             val height = builder.height
             val width = builder.width
             val rebusBoard = Array<ByteArray>(height) { ByteArray(width) }
 
-            input.skipBytes(4)
+            input.skip(4)
 
             for (row in 0..<height)
                 for (col in 0..<width)
                     rebusBoard[row][col] = input.readByte()
 
-            input.skipBytes(1)
+            input.skip(1)
 
             return rebusBoard
         }
@@ -1017,7 +986,7 @@ class IO : PuzzleParser {
          */
         @Throws(IOException::class)
         private fun readRebusTable(
-            input : DataInputStream,
+            input : Source,
             builder : PuzzleBuilder,
             charset : Charset,
         ) : Array<String?> {
@@ -1027,7 +996,7 @@ class IO : PuzzleParser {
             val table = arrayOfNulls<String>(width * height + 1)
 
             // 2 bytes len, 2 bytes checksum
-            input.skipBytes(4)
+            input.skip(4)
 
             readNullTerminatedString(input, charset)?.let { tableString ->
                 for (
