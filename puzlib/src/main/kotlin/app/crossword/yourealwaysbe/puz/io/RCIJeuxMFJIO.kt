@@ -13,7 +13,7 @@ import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.PuzzleBuilder
 import app.crossword.yourealwaysbe.puz.util.JSONArray
 import app.crossword.yourealwaysbe.puz.util.JSONObject
-import app.crossword.yourealwaysbe.puz.util.parseHJSONObject
+import app.crossword.yourealwaysbe.puz.util.parseJSON5Object
 
 /**
  * Format used by RCI Jeux for Mots Fleches puzzles
@@ -129,11 +129,11 @@ class RCIJeuxMFJIO : PuzzleParser {
         @Throws(IOException::class)
         fun readPuzzle(input : Source) : Puzzle? {
             try {
-                val hjson = getHJSON(input)
-                if (hjson == null)
+                val json = getJSON(input)
+                if (json == null)
                     return null
 
-                return readPuzzleFromHJSON(parseHJSONObject(hjson))
+                return readPuzzleFromJSON(parseJSON5Object(json))
             } catch (e : MFJFormatException) {
                 LOG.severe("Could not read RCIJeux MFJ: " + e)
                 return null
@@ -141,7 +141,7 @@ class RCIJeuxMFJIO : PuzzleParser {
         }
 
         /**
-         * Extract the HJSON part from the stream
+         * Extract the JSON5 part from the stream
          *
          * Format is usually
          *
@@ -149,12 +149,12 @@ class RCIJeuxMFJIO : PuzzleParser {
          *
          * };
          *
-         * just get the { ... } HJSON bit, return as a string, ignore
+         * just get the { ... } JSON bit, return as a string, ignore
          * anything outside of the outer { }, doesn't have to be "var
          * gameData"
          */
         @Throws(IOException::class)
-        private fun getHJSON(input : Source) : String? {
+        private fun getJSON(input : Source) : String? {
             val wholeFile = input.readString()
             val start = wholeFile.indexOf('{')
             val end = wholeFile.lastIndexOf('}')
@@ -170,21 +170,21 @@ class RCIJeuxMFJIO : PuzzleParser {
          * Does not include author, date, source.
          */
         @Throws(MFJFormatException::class)
-        private fun readPuzzleFromHJSON(hjson : JSONObject) : Puzzle {
-            val title = hjson.getString("titre")
+        private fun readPuzzleFromJSON(json : JSONObject) : Puzzle {
+            val title = json.getString("titre")
 
-            val builder = PuzzleBuilder(getBoxes(hjson))
+            val builder = PuzzleBuilder(getBoxes(json))
                 .setTitle(title)
 
-            addClues(hjson, builder)
+            addClues(json, builder)
 
             return builder.puzzle
         }
 
         @Throws(MFJFormatException::class)
-        private fun getBoxes(hjson : JSONObject) : Array<Array<Box?>> {
-            val numRows = hjson.getInt("nbcaseshauteur")
-            val numCols = hjson.getInt("nbcaseslargeur")
+        private fun getBoxes(json : JSONObject) : Array<Array<Box?>> {
+            val numRows = json.getInt("nbcaseshauteur")
+            val numCols = json.getInt("nbcaseslargeur")
 
             if (numRows < 0 || numCols < 0) {
                 throw MFJFormatException(
@@ -195,9 +195,9 @@ class RCIJeuxMFJIO : PuzzleParser {
             val boxes = Array<Array<Box?>>(numRows) {
                 arrayOfNulls<Box>(numCols)
             }
-            val rows : JSONArray = hjson.getJSONArray("grille")
-            val vdashes : JSONArray = hjson.getJSONArray("spountzV")
-            val hdashes : JSONArray = hjson.getJSONArray("spountzH")
+            val rows : JSONArray = json.getJSONArray("grille")
+            val vdashes : JSONArray = json.getJSONArray("spountzV")
+            val hdashes : JSONArray = json.getJSONArray("spountzH")
 
             for (row in 0..<numRows) {
                 val cols : String = rows.getString(row)
@@ -231,8 +231,8 @@ class RCIJeuxMFJIO : PuzzleParser {
 
         // this is exactly as RaetselZentrale, merge?
         @Throws(MFJFormatException::class)
-        private fun addClues(hjson : JSONObject, builder : PuzzleBuilder) {
-            val clueInfos = getClueInfos(hjson)
+        private fun addClues(json : JSONObject, builder : PuzzleBuilder) {
+            val clueInfos = getClueInfos(json)
 
             var nextClueNumber = 1
             val curPos = Position(0, 0)
@@ -284,13 +284,13 @@ class RCIJeuxMFJIO : PuzzleParser {
 
         @Throws(MFJFormatException::class)
         private fun getClueInfos(
-            hjson : JSONObject,
+            json : JSONObject,
         ) : Map<Position, MutableList<ClueInfo>> {
             val clueInfos : MutableMap<Position, MutableList<ClueInfo>>
                 = mutableMapOf()
 
-            val rows : JSONArray = hjson.getJSONArray("grille")
-            val clues : JSONArray = hjson.getJSONArray("definitions")
+            val rows : JSONArray = json.getJSONArray("grille")
+            val clues : JSONArray = json.getJSONArray("definitions")
 
             var clueIdx = 0
 

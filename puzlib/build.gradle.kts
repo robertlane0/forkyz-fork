@@ -13,7 +13,7 @@ dependencies {
     testRuntimeOnly(libs.junit.platform.launcher)
 
     implementation(libs.apache.commons.text)
-    implementation(libs.hjson)
+    implementation(libs.json5)
     implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.serialization.json.io)

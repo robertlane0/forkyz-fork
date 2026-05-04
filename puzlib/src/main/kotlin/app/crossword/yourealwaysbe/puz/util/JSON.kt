@@ -35,8 +35,7 @@ import kotlinx.serialization.json.long
 import kotlinx.serialization.json.longOrNull
 import kotlinx.serialization.json.put
 
-import net.akehurst.hjson.HJson
-import net.akehurst.hjson.HJsonParserException
+import li.songe.json5.Json5
 
 class JSONException(cause : Throwable) : Exception(cause)
 
@@ -106,13 +105,10 @@ fun parseJSONArray(input : Source) : JSONArray {
 }
 
 @Throws(JSONException::class)
-fun parseHJSONObject(data : String) : JSONObject {
+fun parseJSON5Object(data : String) : JSONObject {
     try {
-        val hjson = HJson.process(data)
-        return parseJSONObject(hjson.toJsonString())
+        return JSONObject(Json5.parseToJson5Element(data).jsonObject)
     } catch (err : IllegalArgumentException) {
-        throw JSONException(err)
-    } catch (err : HJsonParserException) {
         throw JSONException(err)
     }
 }
