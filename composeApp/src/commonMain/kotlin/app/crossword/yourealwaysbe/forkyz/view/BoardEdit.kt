@@ -47,6 +47,7 @@ import app.crossword.yourealwaysbe.forkyz.theme.BoardColorScheme
 import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
 import app.crossword.yourealwaysbe.forkyz.util.Parcelable
 import app.crossword.yourealwaysbe.forkyz.util.Parcelize
+import app.crossword.yourealwaysbe.forkyz.view.OrdinaryKey
 
 private val MAX_BOX_SIZE_DP : Float = 160f
 private val MIN_DP_PER_BOX : Float = 10f
@@ -449,6 +450,10 @@ private fun offsetToBox(
  *
  * @param onTap gets board row, col of tap
  * @param onLongPress gets board row, col of long press
+ * @param onOrdinaryKeyDown callback for unhandled OrdinaryKey events from
+ * ForkyzKeyboard
+ * @param onOrdinaryKeyUp callback for unhandled OrdinaryKey events from
+ * ForkyzKeyboard
  * @param body passes a focusReceiver callback for giving focus to the
  * input connection
  */
@@ -464,6 +469,8 @@ fun BoardEdit(
     onTap : (Int, Int) -> Unit,
     onLongPress : (Int, Int) -> Unit,
     onLongPressDescription : String,
+    onOrdinaryKeyDown : ((OrdinaryKey) -> Unit) = { },
+    onOrdinaryKeyUp : ((OrdinaryKey) -> Unit) = { },
 ) {
     BoxInput(
         modifier = modifier,
@@ -471,6 +478,8 @@ fun BoardEdit(
         inputConnectionMediator = inputConnectionMediator,
         onNewResponse = viewModel.playLetter,
         onDeleteResponse = viewModel.deleteLetter,
+        onOrdinaryKeyDown = onOrdinaryKeyDown,
+        onOrdinaryKeyUp = onOrdinaryKeyUp,
     ) {
         BoardFullBody(
             state = state,
@@ -723,6 +732,10 @@ private fun BoardFullBody(
  * @param maxWidth max width in dp to render board
  * @param onTap gets board row, col of tap
  * @param onLongPress gets board row, col of long press
+ * @param onOrdinaryKeyUp callback for unhandled OrdinaryKey events from
+ * ForkyzKeyboard
+ * @param body passes a focusReceiver callback for giving focus to the
+ * input connection
  * @param body passes a focusReceiver callback for giving focus to the
  * input connection
  */
@@ -740,7 +753,21 @@ fun WordEdit(
     onLongPressDescription : String,
     incognitoMode : Boolean = false,
     contentDescription : String = "",
+    onOrdinaryKeyDown : ((OrdinaryKey) -> Unit) = { },
+    onOrdinaryKeyUp : ((OrdinaryKey) -> Unit) = { },
 ) {
+    fun onOrdinaryKeyDown(key : OrdinaryKey) {
+        if (key == OrdinaryKey.KEY_SPACE)
+            viewModel.playLetter(" ")
+        else
+            onOrdinaryKeyDown(key)
+    }
+
+    fun onOrdinaryKeyUp(key : OrdinaryKey) {
+        if (key != OrdinaryKey.KEY_SPACE)
+            onOrdinaryKeyUp(key)
+    }
+
     val inputModifier = if (incognitoMode) Modifier else modifier
     val boardModifier = if (incognitoMode) modifier else Modifier
     BoxInput(
@@ -749,6 +776,8 @@ fun WordEdit(
         inputConnectionMediator = inputConnectionMediator,
         onNewResponse = viewModel.playLetter,
         onDeleteResponse = viewModel.deleteLetter,
+        onOrdinaryKeyDown = ::onOrdinaryKeyDown,
+        onOrdinaryKeyUp = ::onOrdinaryKeyUp,
     ) {
         if (!incognitoMode) {
             val boardState by viewModel.boardState.collectAsStateWithLifecycle()

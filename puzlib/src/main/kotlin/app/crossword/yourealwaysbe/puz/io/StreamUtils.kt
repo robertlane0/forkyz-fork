@@ -1,18 +1,14 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.OutputStream
 import kotlinx.io.Buffer
 import kotlinx.io.IOException
 import kotlinx.io.Source
-import kotlinx.io.asSink
 
 import no.synth.kmpzip.zip.ZipInputStream
 import no.synth.kmpzip.kotlinx.SourceInputStream
 
 object StreamUtils {
-    const val DEFAULT_BUFFER_SIZE : Int = 1024
-
     /**
      * If given input, returns unzipped input
      */
@@ -48,19 +44,6 @@ object StreamUtils {
         val copy = Buffer()
         input.transferTo(copy)
         return copy
-    }
-
-    /**
-     * Copies the data from an input to an OutputStream object.
-     *
-     * @param source The input to be read.
-     * @param destinationStream The output stream to be written to.
-     * @return long value of the number of bytes copied.
-     * @exception IOException from base io calls.
-     */
-    @Throws(IOException::class)
-    fun copyStream(source : Source, destinationStream : OutputStream) : Long {
-        return source.transferTo(destinationStream.asSink())
     }
 }
 

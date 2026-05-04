@@ -4,9 +4,10 @@ package app.crossword.yourealwaysbe.forkyz.util
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
-import java.io.OutputStream
 import kotlinx.io.IOException
+import kotlinx.io.Sink
 import kotlinx.io.Source
+import kotlinx.io.asSink
 import kotlinx.io.asSource
 import kotlinx.io.buffered
 
@@ -75,11 +76,13 @@ class AndroidNativeBackendUtils(
             ?.buffered()
     }
 
-    @Throws(java.io.IOException::class)
-    override fun openOutputStream(uri : Uri) : OutputStream? {
+    @Throws(IOException::class)
+    override fun openOutput(uri : Uri) : Sink? {
         return applicationContext
             .getContentResolver()
             .openOutputStream(uri.toAndroidUri())
+            ?.asSink()
+            ?.buffered()
     }
 
     override val isShareFileAvailable : Boolean = true

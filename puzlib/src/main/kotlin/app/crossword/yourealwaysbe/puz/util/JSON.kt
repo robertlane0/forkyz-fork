@@ -4,9 +4,8 @@
 
 package app.crossword.yourealwaysbe.puz.util
 
-import java.io.InputStream
-import java.io.OutputStream
 import kotlinx.io.IOException
+import kotlinx.io.Sink
 import kotlinx.io.Source
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
@@ -22,12 +21,11 @@ import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
-import kotlinx.serialization.json.decodeFromStream
 import kotlinx.serialization.json.double
-import kotlinx.serialization.json.encodeToStream
 import kotlinx.serialization.json.int
 import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.io.decodeFromSource
+import kotlinx.serialization.json.io.encodeToSink
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -61,35 +59,13 @@ fun parseJSONObject(input : Source) : JSONObject {
     }
 }
 
-@Throws(JSONException::class)
+@Throws(IOException::class)
 @OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
-fun parseJSONObject(inStream : InputStream) : JSONObject {
+fun writeJSONObject(obj : JSONObject, output : Sink) {
     try {
-        val e : JsonElement = json.decodeFromStream(inStream)
-        return JSONObject(e.jsonObject)
-    } catch (err : IllegalArgumentException) {
-        throw JSONException(err)
-    }
-}
-
-@Throws(java.io.IOException::class)
-@OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
-fun writeJSONObject(obj : JSONObject, outStream : OutputStream) {
-    try {
-        json.encodeToStream(obj.obj, outStream)
+        json.encodeToSink(obj.obj, output)
     } catch (err : SerializationException) {
-        throw java.io.IOException(err)
-    }
-}
-
-@Throws(JSONException::class)
-@OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
-fun parseJSONArray(inStream : InputStream) : JSONArray {
-    try {
-        val e : JsonElement = json.decodeFromStream(inStream)
-        return JSONArray(e.jsonArray)
-    } catch (err : IllegalArgumentException) {
-        throw JSONException(err)
+        throw IOException(err)
     }
 }
 

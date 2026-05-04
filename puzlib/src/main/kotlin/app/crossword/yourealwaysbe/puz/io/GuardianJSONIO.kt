@@ -78,6 +78,7 @@ class GuardianJSONIO : AbstractJSONIO() {
                 var cwJsonStr = doc
                     .select("[name=CrosswordComponent]")
                     .attr("props")
+
                 if (!cwJsonStr.isEmpty()) {
                     try {
                         cwJson = parseJSONObject(cwJsonStr)

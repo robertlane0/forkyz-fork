@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.settings
 
-import java.io.OutputStream
 import java.nio.charset.Charset
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -15,6 +14,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.LocalDate
 import kotlinx.io.IOException
+import kotlinx.io.Sink
 import kotlinx.io.Source
 
 import androidx.annotation.WorkerThread
@@ -1590,8 +1590,8 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     }
 
     @WorkerThread
-    fun exportSettings(outputStream : OutputStream?) {
-        if (outputStream == null)
+    fun exportSettings(output : Sink?) {
+        if (output == null)
             return
 
         try {
@@ -1602,10 +1602,10 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
                     settings = settings,
                 )
             }
-            writeJSONObject(json, outputStream)
+            writeJSONObject(json, output)
         } catch (e : JSONException) {
             throw IOException("JSON error exporting settings", e)
-        } catch (e : java.io.IOException) {
+        } catch (e : IOException) {
             throw IOException(e)
         }
     }

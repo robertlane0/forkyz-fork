@@ -2421,10 +2421,9 @@ class SettingsPageViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             fileActionMutex.withLock {
                 try {
-                    utils.openOutputStream(uri)
-                        .use(settings::exportSettings)
+                    utils.openOutput(uri).use(settings::exportSettings)
                     showMessage(Res.string.preferences_exported)
-                } catch (e : java.io.IOException) {
+                } catch (e : IOException) {
                     showMessage(Res.string.preferences_export_failed)
                 } finally {
                     viewModelScope.launch(Dispatchers.Main) { onDone() }

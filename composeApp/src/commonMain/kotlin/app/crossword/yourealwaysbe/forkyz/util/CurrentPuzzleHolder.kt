@@ -1,13 +1,13 @@
 
 package app.crossword.yourealwaysbe.forkyz.util
 
-import java.io.IOException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.io.IOException
 
 import androidx.annotation.MainThread
 

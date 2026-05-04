@@ -1,9 +1,9 @@
 
 package app.crossword.yourealwaysbe.puz.io.versions
 
-import java.io.DataOutputStream
 import java.util.logging.Logger
 import kotlinx.io.IOException
+import kotlinx.io.Sink
 import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.puz.Note
@@ -31,11 +31,11 @@ open class IOVersion6 : IOVersion5() {
         return meta
     }
 
-    @Throws(java.io.IOException::class)
-    override fun writeMeta(puz : Puzzle, os : DataOutputStream) {
-        super.writeMeta(puz, os)
-        saveNotes(os, puz, true)
-        saveNotes(os, puz, false)
+    @Throws(IOException::class)
+    override fun writeMeta(puz : Puzzle, output : Sink) {
+        super.writeMeta(puz, output)
+        saveNotes(output, puz, true)
+        saveNotes(output, puz, false)
     }
 
     /**
@@ -82,7 +82,7 @@ open class IOVersion6 : IOVersion5() {
 
     @Throws(IOException::class)
     private fun saveNotes(
-        os : DataOutputStream,
+        output : Sink,
         puz : Puzzle,
         isAcross : Boolean,
     ) {
@@ -98,18 +98,18 @@ open class IOVersion6 : IOVersion5() {
 
         // not really useful since notes should match the number of clue
         // positions
-        os.writeInt(size)
+        output.writeInt(size)
 
         for (cid in puz.boardClueIDs) {
             if (desiredList == cid.listName) {
                 val note = puz.getNote(cid)
-                writeNote(note, os)
+                writeNote(note, output)
             }
         }
     }
 
     @Throws(IOException::class)
-    protected fun writeNote(note : Note?, os : DataOutputStream) {
+    protected fun writeNote(note : Note?, output : Sink) {
         var scratch : String? = null
         var text : String? = null
         var anagramSrc : String? = null
@@ -122,10 +122,10 @@ open class IOVersion6 : IOVersion5() {
             anagramSol = note.compressedAnagramSolution
         }
 
-        writeNullTerminatedString(os, scratch, charset)
-        writeNullTerminatedString(os, text, charset)
-        writeNullTerminatedString(os, anagramSrc, charset)
-        writeNullTerminatedString(os, anagramSol, charset)
+        writeNullTerminatedString(output, scratch, charset)
+        writeNullTerminatedString(output, text, charset)
+        writeNullTerminatedString(output, anagramSrc, charset)
+        writeNullTerminatedString(output, anagramSol, charset)
     }
 
     private fun applyNotes(

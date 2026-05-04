@@ -1,10 +1,9 @@
 
 package app.crossword.yourealwaysbe.puz.io.versions
 
-import java.io.DataOutputStream
-import java.util.LinkedList
 import java.util.logging.Logger
 import kotlinx.io.IOException
+import kotlinx.io.Sink
 import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.puz.ClueID
@@ -50,15 +49,15 @@ open class IOVersion5 : IOVersion4() {
         return meta
     }
 
-    @Throws(java.io.IOException::class)
-    override fun writeMeta(puz : Puzzle, os : DataOutputStream) {
-        super.writeMeta(puz, os)
+    @Throws(IOException::class)
+    override fun writeMeta(puz : Puzzle, output : Sink) {
+        super.writeMeta(puz, output)
 
         val history = puz.history
         val acrossListName = getAcrossListName(puz)
         val downListName = getDownListName(puz)
 
-        os.writeInt(history.size)
+        output.writeInt(history.size)
         for (cid in puz.history) {
             val clue = puz.getClue(cid)
             // relies on puz files only have numeric numbers
@@ -66,11 +65,11 @@ open class IOVersion5 : IOVersion4() {
             if (number != null) {
                 val listName = cid.listName
                 if (acrossListName == listName) {
-                    os.writeInt(number)
-                    os.writeBoolean(true)
+                    output.writeInt(number)
+                    output.writeByte(1)
                 } else if (downListName == listName) {
-                    os.writeInt(number)
-                    os.writeBoolean(false)
+                    output.writeInt(number)
+                    output.writeByte(0)
                 } else {
                     // ignore
                 }

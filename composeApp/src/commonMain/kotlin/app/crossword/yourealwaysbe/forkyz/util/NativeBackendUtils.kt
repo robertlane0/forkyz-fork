@@ -2,8 +2,8 @@
 package app.crossword.yourealwaysbe.forkyz.util
 
 import java.io.File
-import java.io.OutputStream
 import kotlinx.io.IOException
+import kotlinx.io.Sink
 import kotlinx.io.Source
 
 import androidx.room.RoomDatabase
@@ -35,8 +35,8 @@ interface NativeBackendUtils {
     fun hasNetworkConnection() : Boolean
     @Throws(IOException::class)
     fun openInput(uri : Uri) : Source?
-    @Throws(java.io.IOException::class)
-    fun openOutputStream(uri : Uri) : OutputStream?
+    @Throws(IOException::class)
+    fun openOutput(uri : Uri) : Sink?
     val isShareFileAvailable : Boolean
     fun getShareDir() : File?
     fun getShareURIForFile(shareFile : File) : Uri

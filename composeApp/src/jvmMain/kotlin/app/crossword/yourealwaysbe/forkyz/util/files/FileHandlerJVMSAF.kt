@@ -2,7 +2,6 @@
 package app.crossword.yourealwaysbe.forkyz.util.files
 
 import java.io.File
-import java.io.IOException
 
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation

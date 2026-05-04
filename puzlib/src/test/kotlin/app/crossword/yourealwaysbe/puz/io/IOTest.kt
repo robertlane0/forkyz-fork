@@ -1,14 +1,7 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import java.io.InputStream
-import java.io.ObjectOutputStream
-import kotlinx.io.asSource
-import kotlinx.io.buffered
+import kotlinx.io.Buffer
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -35,50 +28,25 @@ class IOTest {
     @Test
     fun testSave() {
         val puz = testPuzzle1.use { loadNative(it) }
-        val tmp = File.createTempFile("test", ".puz")
-        tmp.deleteOnExit()
+        val tmp = Buffer()
+        IO.saveNative(puz!!, tmp)
+        val puz2 = loadNative(tmp.peek())
+        Assertions.assertEquals(puz, puz2)
 
-        FileOutputStream(tmp).use { os ->
-            IO.saveNative(puz!!, os)
-        }
-        FileInputStream(tmp).use { is2 ->
-            val puz2 = loadNative(is2.asSource().buffered())
-            Assertions.assertEquals(puz, puz2)
-        }
-        FileInputStream(tmp).use { isp ->
-            val p = loadNative(isp.asSource().buffered())
-            p!!.source = "Unit Test"
-            // Check HTML stripped/restored
-            p.notes = "X &nbsp; X<br/>"
+        val p = loadNative(tmp)
+        p!!.source = "Unit Test"
+        // Check HTML stripped/restored
+        p.notes = "X &nbsp; X<br/>"
 
-            // play
-            p.playerNote = Note("scratch", "a note", "anagsrc", "anagsol")
+        // play
+        p.playerNote = Note("scratch", "a note", "anagsrc", "anagsol")
 
+        val tmp2 = Buffer()
+        val tmpMeta = Buffer()
 
-            val metaFile = File(
-                tmp.getParentFile(),
-                tmp.getName().substring(
-                    0,
-                    tmp.getName().lastIndexOf("."),
-                ) + ".forkyz"
-            )
-            metaFile.deleteOnExit()
-
-            FileOutputStream(tmp).use { puzOS ->
-                FileOutputStream(metaFile).use { metaOS ->
-                    IO.save(p, puzOS, metaOS)
-                }
-            }
-            FileInputStream(tmp).use { isp2 ->
-                FileInputStream(metaFile).use { ism ->
-                    val pin = load(
-                        isp2.asSource().buffered(),
-                        ism.asSource().buffered(),
-                    )
-                    Assertions.assertEquals(p, pin)
-                }
-            }
-        }
+        IO.save(p, tmp2, tmpMeta)
+        val pin = load(tmp2, tmpMeta)
+        Assertions.assertEquals(p, pin)
     }
 
     @Test
@@ -86,18 +54,10 @@ class IOTest {
         var puz =  SourceUtils.getResource("/2010-7-4-LosAngelesTimes.puz").use {
            loadNative(it)
         }
-        val tmp = File.createTempFile("test", ".puz")
-        tmp.deleteOnExit()
-        FileOutputStream(tmp).use { dos ->
-            IO.saveNative(puz!!, dos)
-            FileInputStream(tmp).use { is2 ->
-                puz = loadNative(is2.asSource().buffered())
-                Assertions.assertEquals(
-                    puz!!.boxes[2][2]!!.shape,
-                    Box.Shape.CIRCLE
-                )
-            }
-        }
+        val tmp = Buffer()
+        IO.saveNative(puz!!, tmp)
+        puz = loadNative(tmp)
+        Assertions.assertEquals(puz!!.boxes[2][2]!!.shape, Box.Shape.CIRCLE)
     }
 
     @Test
@@ -145,32 +105,13 @@ class IOTest {
         puz.checkedGetBox(7, 7)!!.response = "NEW RESPONSE 2"
         puz.checkedGetBox(1, 8)!!.response = "NEW REBUS"
 
-        val tmp = File.createTempFile("test", ".puz")
-        tmp.deleteOnExit()
+        val tmp = Buffer()
+        val tmpMeta = Buffer()
 
-        val metaFile = File(
-            tmp.getParentFile(),
-            tmp.getName().substring(
-                0,
-                tmp.getName().lastIndexOf("."),
-            ) + ".forkyz"
-        )
-        metaFile.deleteOnExit()
+        IO.save(puz, tmp, tmpMeta)
+        val pin = load(tmp, tmpMeta)
 
-        FileOutputStream(tmp).use { puzOS ->
-            FileOutputStream(metaFile).use { metaOS ->
-                IO.save(puz, puzOS, metaOS)
-            }
-        }
-        FileInputStream(tmp).use { isp2 ->
-            FileInputStream(metaFile).use { ism ->
-                val pin = load(
-                    isp2.asSource().buffered(),
-                    ism.asSource().buffered(),
-                )
-                Assertions.assertEquals(puz, pin)
-            }
-        }
+        Assertions.assertEquals(puz, pin)
     }
 
     @Test
@@ -178,16 +119,10 @@ class IOTest {
         val puz = testPuzzleEmptySol.use { IO.loadNative(it) }
         Assertions.assertFalse(puz!!.hasSolution())
 
-        val tmp = File.createTempFile("test", ".puz")
-        tmp.deleteOnExit()
-
-        FileOutputStream(tmp).use { puzOS ->
-            IO.saveNative(puz, puzOS)
-        }
-        FileInputStream(tmp).use { isp2 ->
-            val pin = IO.loadNative(isp2.asSource().buffered())
-            Assertions.assertFalse(pin!!.hasSolution())
-        }
+        val tmp = Buffer()
+        IO.saveNative(puz, tmp)
+        val pin = IO.loadNative(tmp)
+        Assertions.assertFalse(pin!!.hasSolution())
     }
 
     companion object {

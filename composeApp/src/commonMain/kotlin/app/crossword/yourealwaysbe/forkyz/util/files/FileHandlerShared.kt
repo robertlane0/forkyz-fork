@@ -4,11 +4,13 @@ package app.crossword.yourealwaysbe.forkyz.util.files
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
-import java.io.IOException
 import java.io.PrintStream
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.io.IOException
+import kotlinx.io.asSink
+import kotlinx.io.buffered
 
 import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.AppPuzzleUtils.generateFileName
@@ -95,8 +97,8 @@ object FileHandlerShared {
         val shareFile = File(utils.getShareDir(), fileName)
 
         try {
-            BufferedOutputStream(FileOutputStream(shareFile)).use { os ->
-                IPuzIO.writePuzzle(puz, os, writeBlank, omitExtensions)
+            FileOutputStream(shareFile).asSink().buffered().use { output ->
+                IPuzIO.writePuzzle(puz, output, writeBlank, omitExtensions)
             }
         } catch (e : IOException) {
             AppLogger.e(TAG, "Could not create file for sharing : " + e)

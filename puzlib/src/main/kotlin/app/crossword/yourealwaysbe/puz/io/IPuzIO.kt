@@ -1,10 +1,6 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.BufferedWriter
-import java.io.OutputStream
-import java.io.OutputStreamWriter
-import java.nio.charset.Charset
 import java.util.Arrays
 import java.util.Collections
 import java.util.LinkedList
@@ -17,6 +13,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
 import kotlinx.io.IOException
+import kotlinx.io.Sink
 import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.puz.Box
@@ -82,8 +79,6 @@ class IPuzIO : AbstractJSONIO() {
 
         // version 1 was not tagged in file
         private const val IO_VERSION = 3
-
-        private val WRITE_CHARSET : Charset = Charset.forName("UTF-8")
 
         private const val FIELD_VERSION = "version"
         private const val FIELD_KIND = "kind"
@@ -1986,12 +1981,12 @@ class IPuzIO : AbstractJSONIO() {
         }
 
         /**
-         * Write puzzle to os using WRITE_CHARSET
+         * Write puzzle to os using UTF8
          */
         @Throws(IOException::class)
         fun writePuzzle(
             puz : Puzzle,
-            os : OutputStream,
+            output : Sink,
             omitPlayState : Boolean = false,
             omitExtensions : Boolean = false,
         ) {
@@ -2004,7 +1999,7 @@ class IPuzIO : AbstractJSONIO() {
                 if (!omitExtensions)
                     writeExtensions(puz, omitPlayState)
             }
-            writeJSONObject(json, os)
+            writeJSONObject(json, output)
         }
 
         /**

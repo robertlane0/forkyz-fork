@@ -2,10 +2,12 @@
 package app.crossword.yourealwaysbe.forkyz.util.files
 
 import java.io.FileNotFoundException
-import java.io.OutputStream
 import kotlinx.io.IOException
+import kotlinx.io.RawSink
 import kotlinx.io.RawSource
+import kotlinx.io.Sink
 import kotlinx.io.asInputStream
+import kotlinx.io.asSink
 import kotlinx.io.asSource
 
 import android.content.ContentResolver
@@ -23,7 +25,6 @@ import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.toAndroidUri
 import app.crossword.yourealwaysbe.forkyz.util.toForkyzUri
 import app.crossword.yourealwaysbe.forkyz.util.toUri
-import app.crossword.yourealwaysbe.puz.io.StreamUtils
 
 import androidx.core.net.toUri as toAndroidUri
 
@@ -250,8 +251,8 @@ class FileHandlerSAF(
             )?.let { newUri ->
                 getBufferedInput(fileHandle).use { input ->
                     getFileHandle(newUri.toForkyzUri())?.let { outHandle ->
-                        getBufferedOutputStream(outHandle).use { outputStream ->
-                            StreamUtils.copyStream(input, outputStream)
+                        getBufferedOutput(outHandle).use { output ->
+                            input.transferTo(output)
                             DocumentsContract.deleteDocument(
                                 contentResolver,
                                 fileHandle.uri.toAndroidUri(),
@@ -281,25 +282,32 @@ class FileHandlerSAF(
                     + destDirHandle + " failed.",
             )
             e.printStackTrace()
+        } catch (e : IOException) {
+            AppLogger.e(
+                TAG,
+                "Attempt to move " + fileHandle + " to "
+                    + destDirHandle + " failed.",
+            )
+            e.printStackTrace()
         }
     }
 
-    @Throws(java.io.IOException::class)
-    override fun getOutputStream(fileHandle : FileHandle) : OutputStream {
+    @Throws(IOException::class)
+    override fun getOutput(fileHandle : FileHandle) : RawSink {
         try {
             val os = contentResolver.openOutputStream(
                 fileHandle.uri.toAndroidUri(),
                 "wt",
             )
             if (os == null) {
-                throw java.io.IOException(
+                throw IOException(
                     "Could not get output stream for " + fileHandle,
                 )
             }
-            return os
+            return os.asSink()
         } catch (e : IllegalArgumentException) {
             // happens when e.g. file was deleted, so consider as IO
-            throw java.io.IOException(e)
+            throw IOException(e)
         }
     }
 

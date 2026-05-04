@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.ByteArrayOutputStream
 import kotlinx.datetime.LocalDate
 import kotlinx.io.Buffer
 
@@ -26,14 +25,11 @@ class IPuzIOTest {
     @Test
     fun testIPuzWriteRead() {
         val puz = testPuzzle1.use { IPuzIO.readPuzzle(it) }
-        val baos = ByteArrayOutputStream()
-        IPuzIO.writePuzzle(puz!!, baos)
-        baos.close()
 
-        val bais = Buffer()
-        bais.write(baos.toByteArray())
+        val buffer = Buffer()
 
-        val puz2 = IPuzIO.readPuzzle(bais)
+        IPuzIO.writePuzzle(puz!!, buffer)
+        val puz2 = IPuzIO.readPuzzle(buffer)
 
         // hack to get around html encoding of certain chars
         Assertions.assertEquals(puz2!!.title, "Test &amp; puzzle &#x2018;")
@@ -93,14 +89,9 @@ class IPuzIOTest {
         puz.pinnedClueID = cidA3
         puz.rating = 5.toChar()
 
-        val baos = ByteArrayOutputStream()
-        IPuzIO.writePuzzle(puz, baos)
-        baos.close()
-
-        val bais = Buffer()
-        bais.write(baos.toByteArray())
-
-        val puz2 = IPuzIO.readPuzzle(bais)
+        val buffer = Buffer()
+        IPuzIO.writePuzzle(puz, buffer)
+        val puz2 = IPuzIO.readPuzzle(buffer)
 
         val boxes2 : Array<Array<Box?>> = puz2!!.boxes
 
@@ -150,14 +141,9 @@ class IPuzIOTest {
     @Test
     fun testIPuzWriteReadHTML() {
         val puz = testPuzzleHTML.use { IPuzIO.readPuzzle(it) }
-        val baos = ByteArrayOutputStream()
-        IPuzIO.writePuzzle(puz!!, baos)
-        baos.close()
-
-        val bais = Buffer()
-        bais.write(baos.toByteArray())
-
-        val puz2 = IPuzIO.readPuzzle(bais)
+        val buffer = Buffer()
+        IPuzIO.writePuzzle(puz!!, buffer)
+        val puz2 = IPuzIO.readPuzzle(buffer)
         Assertions.assertEquals(puz, puz2)
     }
 
@@ -199,14 +185,9 @@ class IPuzIOTest {
         boxes[0][1]!!.responder = "Test"
         boxes[1][0]!!.isCheated = true
 
-        val baos = ByteArrayOutputStream()
-        IPuzIO.writePuzzle(puz, baos)
-        baos.close()
-
-        val bais = Buffer()
-        bais.write(baos.toByteArray())
-
-        val puz2 = IPuzIO.readPuzzle(bais)
+        val buffer = Buffer()
+        IPuzIO.writePuzzle(puz, buffer)
+        val puz2 = IPuzIO.readPuzzle(buffer)
 
         val boxes2 : Array<Array<Box?>> = puz2!!.boxes
 
@@ -239,14 +220,9 @@ class IPuzIOTest {
     @Test
     fun testIPuzWriteReadExtras() {
         val puz = testPuzzleExtras.use { IPuzIO.readPuzzle(it) }
-        val baos = ByteArrayOutputStream()
-        IPuzIO.writePuzzle(puz!!, baos)
-        baos.close()
-
-        val bais = Buffer()
-        bais.write(baos.toByteArray())
-
-        val puz2 = IPuzIO.readPuzzle(bais)
+        val buffer = Buffer()
+        IPuzIO.writePuzzle(puz!!, buffer)
+        val puz2 = IPuzIO.readPuzzle(buffer)
         Assertions.assertEquals(puz, puz2)
     }
 
@@ -271,14 +247,9 @@ class IPuzIOTest {
     @Test
     fun testIPuzWriteReadZones() {
         val puz = testPuzzleZones.use { IPuzIO.readPuzzle(it) }
-        val baos = ByteArrayOutputStream()
-        IPuzIO.writePuzzle(puz!!, baos)
-        baos.close()
-
-        val bais = Buffer()
-        bais.write(baos.toByteArray())
-
-        val puz2 = IPuzIO.readPuzzle(bais)
+        val buffer = Buffer()
+        IPuzIO.writePuzzle(puz!!, buffer)
+        val puz2 = IPuzIO.readPuzzle(buffer)
         Assertions.assertEquals(puz, puz2)
     }
 
@@ -291,28 +262,18 @@ class IPuzIOTest {
     @Test
     fun testIPuzWriteReadAcrostic() {
         val puz = testPuzzleAcrostic.use { IPuzIO.readPuzzle(it) }
-        val baos = ByteArrayOutputStream()
-        IPuzIO.writePuzzle(puz!!, baos)
-        baos.close()
-
-        val bais = Buffer()
-        bais.write(baos.toByteArray())
-
-        val puz2 = IPuzIO.readPuzzle(bais)
+        val buffer = Buffer()
+        IPuzIO.writePuzzle(puz!!, buffer)
+        val puz2 = IPuzIO.readPuzzle(buffer)
         Assertions.assertEquals(puz, puz2)
     }
 
     @Test
     fun testJPZAcrosticWriteIPuzRead() {
         val puz = JPZIOTest.testPuzzleAcrostic.use { JPZIO.readPuzzle(it) }
-        val baos = ByteArrayOutputStream()
-        IPuzIO.writePuzzle(puz!!, baos)
-        baos.close()
-
-        val bais = Buffer()
-        bais.write(baos.toByteArray())
-
-        val puz2 = IPuzIO.readPuzzle(bais)
+        val buffer = Buffer()
+        IPuzIO.writePuzzle(puz!!, buffer)
+        val puz2 = IPuzIO.readPuzzle(buffer)
 
         // bit of a hack because "" is read back as null
         puz.notes = null
@@ -326,14 +287,9 @@ class IPuzIOTest {
         val puz = testPuzzleShapes.use { IPuzIO.readPuzzle(it) }
         assertIsTestPuzzleShapes(puz!!)
 
-        val baos = ByteArrayOutputStream()
-        IPuzIO.writePuzzle(puz, baos)
-        baos.close()
-
-        val bais = Buffer()
-        bais.write(baos.toByteArray())
-
-        val puz2 = IPuzIO.readPuzzle(bais)
+        val buffer = Buffer()
+        IPuzIO.writePuzzle(puz, buffer)
+        val puz2 = IPuzIO.readPuzzle(buffer)
 
         // bit of a hack because "" is read back as null
         puz.notes = null
@@ -345,14 +301,9 @@ class IPuzIOTest {
         val puz = testPuzzleExtensions.use { IPuzIO.readPuzzle(it) }
         assertIsTestPuzzleExtensions(puz!!)
 
-        val baos = ByteArrayOutputStream()
-        IPuzIO.writePuzzle(puz, baos)
-        baos.close()
-
-        val bais = Buffer()
-        bais.write(baos.toByteArray())
-
-        val puz2 = IPuzIO.readPuzzle(bais)
+        val buffer = Buffer()
+        IPuzIO.writePuzzle(puz, buffer)
+        val puz2 = IPuzIO.readPuzzle(buffer)
         Assertions.assertEquals(puz, puz2)
     }
 

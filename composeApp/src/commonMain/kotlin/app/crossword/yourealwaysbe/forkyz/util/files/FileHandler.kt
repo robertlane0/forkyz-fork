@@ -1,17 +1,15 @@
 
 package app.crossword.yourealwaysbe.forkyz.util.files
 
-import java.io.BufferedOutputStream
-import java.io.ByteArrayOutputStream
-import java.io.DataOutputStream
-import java.io.OutputStream
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.LocalDate
 import kotlinx.io.Buffer
 import kotlinx.io.IOException
+import kotlinx.io.RawSink
 import kotlinx.io.RawSource
+import kotlinx.io.Sink
 import kotlinx.io.Source
 import kotlinx.io.buffered
 
@@ -26,7 +24,6 @@ import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle.VisitorIO
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.io.IO
 import app.crossword.yourealwaysbe.puz.io.IPuzIO
-import app.crossword.yourealwaysbe.puz.io.StreamUtils
 
 /**
  * Abstraction layer for file operations
@@ -84,8 +81,8 @@ abstract class FileHandler {
     /**
      * Get output stream to file, erasing previous contents
      */
-    @Throws(java.io.IOException::class)
-    abstract fun getOutputStream(fileHandle : FileHandle) : OutputStream
+    @Throws(IOException::class)
+    abstract fun getOutput(fileHandle : FileHandle) : RawSink
 
     @Throws(IOException::class)
     abstract fun getInput(fileHandle : FileHandle) : RawSource
@@ -412,10 +409,10 @@ abstract class FileHandler {
     }
 
     @Throws(java.io.IOException::class)
-    protected fun getBufferedOutputStream(
+    fun getBufferedOutput(
         fileHandle : FileHandle,
-    ) : BufferedOutputStream {
-        return BufferedOutputStream(getOutputStream(fileHandle))
+    ) : Sink {
+        return getOutput(fileHandle).buffered()
     }
 
     @Synchronized
@@ -505,22 +502,17 @@ abstract class FileHandler {
 
         // Write to buffers first so that we don't erase old data in
         // case of a problem encoding puzzle.
-        val baosPuz = ByteArrayOutputStream()
-        val baosMeta = ByteArrayOutputStream()
+        val bufPuz = Buffer()
+        val bufMeta = Buffer()
 
-        DataOutputStream(baosPuz).use { dosPuz ->
-            DataOutputStream(baosMeta).use { dosMeta ->
-                IO.save(puz, dosPuz, dosMeta)
-            }
-        }
+        IO.save(puz, bufPuz, bufMeta)
+
         // Write meta first, if doesn't throw, write main puzzle
         var metaSuccess = false
 
         try {
-            val baisMeta = Buffer()
-            baisMeta.write(baosMeta.toByteArray())
-            getBufferedOutputStream(metaFile).use { meta ->
-                StreamUtils.copyStream(baisMeta, meta)
+            getBufferedOutput(metaFile).use { meta ->
+                bufMeta.transferTo(meta)
                 metaSuccess = true
             }
         } finally {
@@ -531,10 +523,8 @@ abstract class FileHandler {
         var puzSuccess = false
 
         try {
-            val baisPuz = Buffer()
-            baisPuz.write(baosPuz.toByteArray())
-            getBufferedOutputStream(puzFile).use { puzzle ->
-                StreamUtils.copyStream(baisPuz, puzzle)
+            getBufferedOutput(puzFile).use { puzzle ->
+                bufPuz.transferTo(puzzle)
                 puzSuccess = true
             }
         } finally {
@@ -548,20 +538,18 @@ abstract class FileHandler {
     }
 
     @Synchronized
-    @Throws(java.io.IOException::class)
+    @Throws(IOException::class)
     private fun save(puz : Puzzle, ph : IPuz) : Boolean {
         val ipuzFile = ph.mainFileHandle
         val puzDir = ph.dirHandle
 
         // Write to buffer first -- get puzzle written to a stream
         // before truncating the previously saved file
-        val baos = ByteArrayOutputStream()
-        IPuzIO.writePuzzle(puz, baos)
+        val buffer = Buffer()
+        IPuzIO.writePuzzle(puz, buffer)
 
-        val bais = Buffer()
-        bais.write(baos.toByteArray())
-        getBufferedOutputStream(ipuzFile).use { os ->
-            StreamUtils.copyStream(bais, os)
+        getBufferedOutput(ipuzFile).use { output ->
+            buffer.transferTo(output)
             return true
         }
     }

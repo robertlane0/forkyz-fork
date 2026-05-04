@@ -1,9 +1,9 @@
 
 package app.crossword.yourealwaysbe.puz.io.versions
 
-import java.io.DataOutputStream
 import java.util.logging.Logger
 import kotlinx.io.IOException
+import kotlinx.io.Sink
 import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.puz.Box.Companion.isBlock
@@ -39,17 +39,17 @@ open class IOVersion3 : IOVersion2() {
         return meta
     }
 
-    @Throws(java.io.IOException::class)
-    override fun writeMeta(puz : Puzzle, os : DataOutputStream) {
-        super.writeMeta(puz, os)
+    @Throws(IOException::class)
+    override fun writeMeta(puz : Puzzle, output : Sink) {
+        super.writeMeta(puz, output)
         val p = puz.position
-        os.writeInt(p.col)
-        os.writeInt(p.row)
+        output.writeInt(p.col)
+        output.writeInt(p.row)
         val curCid = puz.currentClueID
         val acrossList = getAcrossListName(puz)
         if (curCid == null || acrossList == curCid.listName)
-            os.write(1)
-        else os.write(-1)
+            output.writeByte(1)
+        else output.writeByte(-1)
     }
 
     companion object {

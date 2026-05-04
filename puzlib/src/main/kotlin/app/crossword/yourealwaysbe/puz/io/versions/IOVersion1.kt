@@ -1,13 +1,13 @@
 
 package app.crossword.yourealwaysbe.puz.io.versions
 
-import java.io.DataOutputStream
 import java.nio.charset.Charset
 import kotlin.time.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.io.IOException
+import kotlinx.io.Sink
 import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.puz.Box
@@ -68,37 +68,37 @@ open class IOVersion1 : IOVersion {
         return meta
     }
 
-    @Throws(java.io.IOException::class)
-    override fun write(puz : Puzzle, os : DataOutputStream) {
-        writeMeta(puz, os)
+    @Throws(IOException::class)
+    override fun write(puz : Puzzle, output : Sink) {
+        writeMeta(puz, output)
         val boxes : Array<Array<Box?>> = puz.boxes
         for (row in boxes) {
             for (b in row) {
                 if (b == null || isBlock(b)) {
                     continue
                 }
-                os.writeBoolean(b.isCheated)
-                writeNullTerminatedString(os, b.responder, charset)
+                output.writeByte(if (b.isCheated) 1 else 0)
+                writeNullTerminatedString(output, b.responder, charset)
             }
         }
-        os.writeLong(puz.time)
+        output.writeLong(puz.time)
     }
 
-    @Throws(java.io.IOException::class)
-    protected open fun writeMeta(puz : Puzzle, os : DataOutputStream) {
-        writeNullTerminatedString(os, puz.author, charset)
-        writeNullTerminatedString(os, puz.source, charset)
-        writeNullTerminatedString(os, puz.title, charset)
+    @Throws(IOException::class)
+    protected open fun writeMeta(puz : Puzzle, output : Sink) {
+        writeNullTerminatedString(output, puz.author, charset)
+        writeNullTerminatedString(output, puz.source, charset)
+        writeNullTerminatedString(output, puz.title, charset)
         val date = puz.date
         if (date == null) {
-            os.writeLong(0)
+            output.writeLong(0)
         } else {
-            os.writeLong(
+            output.writeLong(
                 date.atStartOfDayIn(TimeZone.currentSystemDefault())
                     .toEpochMilliseconds(),
             )
         }
-        os.writeInt(puz.percentComplete)
+        output.writeInt(puz.percentComplete)
     }
 }
 

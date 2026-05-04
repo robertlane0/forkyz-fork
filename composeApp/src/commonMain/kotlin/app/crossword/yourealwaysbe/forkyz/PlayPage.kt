@@ -77,6 +77,7 @@ import app.crossword.yourealwaysbe.forkyz.util.keyEventToResponse
 import app.crossword.yourealwaysbe.forkyz.view.BoardEdit
 import app.crossword.yourealwaysbe.forkyz.view.ClueTabs
 import app.crossword.yourealwaysbe.forkyz.view.OKDialog
+import app.crossword.yourealwaysbe.forkyz.view.OrdinaryKey
 import app.crossword.yourealwaysbe.forkyz.view.SpecialKey
 import app.crossword.yourealwaysbe.forkyz.view.rememberBoardEditState
 import app.crossword.yourealwaysbe.forkyz.view.rememberBoardTextMeasurer
@@ -111,6 +112,98 @@ fun PlayPage(
                 viewModel.hideClueTabs()
             else
                 viewModel.showClueTabs()
+        }
+
+        fun onOrdinaryKeyDown(key : OrdinaryKey) {
+            when (key) {
+                OrdinaryKey.KEY_DELETE -> viewModel.deleteResponse()
+                OrdinaryKey.KEY_DOWN -> viewModel.moveDown()
+                OrdinaryKey.KEY_LEFT -> viewModel.moveLeft()
+                OrdinaryKey.KEY_RIGHT -> viewModel.moveRight()
+                OrdinaryKey.KEY_SPACE -> viewModel.playSpace()
+                OrdinaryKey.KEY_UP -> viewModel.moveUp()
+            }
+        }
+
+        fun onSpecialKeyDown(key : SpecialKey) {
+            when (key) {
+                SpecialKey.KEY_CHANGE_CLUE_DIRECTION ->
+                    viewModel.toggleSelection()
+                SpecialKey.KEY_NEXT_CLUE -> viewModel.nextClue()
+                SpecialKey.KEY_PREVIOUS_CLUE -> viewModel.prevClue()
+                else -> onSpecialKeyDownPuzzlePage(key)
+            }
+        }
+
+        fun onKeyEvent(event : KeyEvent) : Boolean {
+            val isDown = event.type == KeyEventType.KeyDown
+            var handled = false
+
+            viewModel.keyboardPushBlockHide()
+
+            when (event.key) {
+                Key.Search -> {
+                    if (isDown)
+                        viewModel.nextClue()
+                    handled = true
+                }
+                Key.DirectionDown -> {
+                    if (isDown)
+                        viewModel.moveDown()
+                    handled = true
+                }
+                Key.DirectionUp -> {
+                    if (isDown)
+                        viewModel.moveUp()
+                    handled = true
+                }
+                Key.DirectionLeft -> {
+                    if (isDown)
+                        viewModel.moveLeft()
+                    handled = true
+                }
+                Key.DirectionRight -> {
+                    if (isDown)
+                        viewModel.moveRight()
+                    handled = true
+                }
+                Key.DirectionCenter -> {
+                    if (isDown)
+                        viewModel.toggleSelection()
+                    handled = true
+                }
+                Key.Spacebar -> {
+                    if (isDown)
+                        viewModel.playSpace()
+                    handled = true
+                }
+                Key.Enter -> {
+                    if (isDown)
+                        viewModel.playEnter()
+                    handled = true
+                }
+                Key.Delete, Key.Backspace -> {
+                    if (isDown)
+                        viewModel.deleteResponse()
+                    handled = true
+                }
+            }
+
+            if (!handled) {
+                val response = keyEventToResponse(event)
+                if (response != null) {
+                    if (isDown)
+                        viewModel.playResponse(response)
+                    handled = true
+                }
+            }
+
+            viewModel.keyboardPopBlockHide();
+
+            if (handled)
+                return true
+            else
+                return onKeyEventPuzzlePage(event)
         }
 
         @Composable
@@ -405,6 +498,7 @@ fun PlayPage(
                 onLongPress = viewModel::longClickBoard,
                 onLongPressDescription
                     = stringResource(Res.string.open_clue_notes),
+                onOrdinaryKeyDown = ::onOrdinaryKeyDown,
             )
 
             LaunchedEffect(isTop) {
@@ -498,87 +592,6 @@ fun PlayPage(
             } else {
                 return this.fillMaxWidth()
             }
-        }
-
-        fun onSpecialKeyDown(key : SpecialKey) {
-            when (key) {
-                SpecialKey.KEY_CHANGE_CLUE_DIRECTION ->
-                    viewModel.toggleSelection()
-                SpecialKey.KEY_NEXT_CLUE -> viewModel.nextClue()
-                SpecialKey.KEY_PREVIOUS_CLUE -> viewModel.prevClue()
-                else -> onSpecialKeyDownPuzzlePage(key)
-            }
-        }
-
-        fun onKeyEvent(event : KeyEvent) : Boolean {
-            val isDown = event.type == KeyEventType.KeyDown
-            var handled = false
-
-            viewModel.keyboardPushBlockHide()
-
-            when (event.key) {
-                Key.Search -> {
-                    if (isDown)
-                        viewModel.nextClue()
-                    handled = true
-                }
-                Key.DirectionDown -> {
-                    if (isDown)
-                        viewModel.moveDown()
-                    handled = true
-                }
-                Key.DirectionUp -> {
-                    if (isDown)
-                        viewModel.moveUp()
-                    handled = true
-                }
-                Key.DirectionLeft -> {
-                    if (isDown)
-                        viewModel.moveLeft()
-                    handled = true
-                }
-                Key.DirectionRight -> {
-                    if (isDown)
-                        viewModel.moveRight()
-                    handled = true
-                }
-                Key.DirectionCenter -> {
-                    if (isDown)
-                        viewModel.toggleSelection()
-                    handled = true
-                }
-                Key.Spacebar -> {
-                    if (isDown)
-                        viewModel.playSpace()
-                    handled = true
-                }
-                Key.Enter -> {
-                    if (isDown)
-                        viewModel.playEnter()
-                    handled = true
-                }
-                Key.Delete, Key.Backspace -> {
-                    if (isDown)
-                        viewModel.deleteResponse()
-                    handled = true
-                }
-            }
-
-            if (!handled) {
-                val response = keyEventToResponse(event)
-                if (response != null) {
-                    if (isDown)
-                        viewModel.playResponse(response)
-                    handled = true
-                }
-            }
-
-            viewModel.keyboardPopBlockHide();
-
-            if (handled)
-                return true
-            else
-                return onKeyEventPuzzlePage(event)
         }
 
         @Composable

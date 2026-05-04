@@ -1,8 +1,8 @@
 
 package app.crossword.yourealwaysbe.puz.io.versions
 
-import java.io.DataOutputStream
 import kotlinx.io.IOException
+import kotlinx.io.Sink
 import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.puz.Puzzle
@@ -24,10 +24,10 @@ open class IOVersion2 : IOVersion1() {
         return meta
     }
 
-    @Throws(java.io.IOException::class)
-    override fun writeMeta(puz : Puzzle, os : DataOutputStream) {
-        super.writeMeta(puz, os)
-        os.write(1) // old updatable byte
-        writeNullTerminatedString(os, puz.sourceUrl, charset)
+    @Throws(IOException::class)
+    override fun writeMeta(puz : Puzzle, output : Sink) {
+        super.writeMeta(puz, output)
+        output.writeByte(1) // old updatable byte
+        writeNullTerminatedString(output, puz.sourceUrl, charset)
     }
 }
