@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz
 
-import java.util.Deque
 import java.util.Locale
 import kotlin.text.Regex
 import kotlinx.coroutines.Dispatchers
