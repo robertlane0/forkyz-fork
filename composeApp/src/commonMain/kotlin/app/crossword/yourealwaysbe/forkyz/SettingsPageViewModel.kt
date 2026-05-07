@@ -284,6 +284,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_layou
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_native
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_never_show
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_qwerty
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_russian
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_qwertz
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_repeat_delay
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_repeat_delay_desc
@@ -1888,6 +1889,10 @@ class SettingsPageViewModel(
                     SettingsListEntry(
                         Res.string.keyboard_colemak,
                         KeyboardLayout.KL_COLEMAK,
+                    ),
+                    SettingsListEntry(
+                        Res.string.keyboard_russian,
+                        KeyboardLayout.KL_RUSSIAN,
                     ),
                 ),
                 settings.liveKeyboardLayout.stateInHere(

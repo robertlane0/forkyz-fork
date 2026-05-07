@@ -752,6 +752,7 @@
     <string name="keyboard_azerty">AZERTY</string>
     <string name="keyboard_dvorak">Dvorak</string>
     <string name="keyboard_colemak">Colemak</string>
+    <string name="keyboard_russian">ЙЦУКЕН (Russian)</string>
 
     <!-- special entry -->
     <string name="special_character">Special Character</string>

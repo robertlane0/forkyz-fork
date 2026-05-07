@@ -26,6 +26,7 @@ import app.crossword.yourealwaysbe.forkyz.view.keyboardlayout.DvorakKeyboard
 import app.crossword.yourealwaysbe.forkyz.view.keyboardlayout.KeyboardLayoutScope
 import app.crossword.yourealwaysbe.forkyz.view.keyboardlayout.QwertyKeyboard
 import app.crossword.yourealwaysbe.forkyz.view.keyboardlayout.QwertzKeyboard
+import app.crossword.yourealwaysbe.forkyz.view.keyboardlayout.RussianKeyboard
 
 enum class OrdinaryKey {
     KEY_DELETE,
@@ -115,6 +116,7 @@ fun ForkyzKeyboard(
         KeyboardLayout.KL_AZERTY -> scope.AzertyKeyboard()
         KeyboardLayout.KL_COLEMAK -> scope.ColemakKeyboard()
         KeyboardLayout.KL_DVORAK -> scope.DvorakKeyboard()
+        KeyboardLayout.KL_RUSSIAN -> scope.RussianKeyboard()
     }
     if (showHideButton)
         HideButtonRow()
