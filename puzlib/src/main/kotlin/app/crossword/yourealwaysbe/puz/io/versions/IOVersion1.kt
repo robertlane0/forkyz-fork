@@ -1,14 +1,14 @@
 
 package app.crossword.yourealwaysbe.puz.io.versions
 
-import java.io.DataInputStream
-import java.io.DataOutputStream
-import java.io.IOException
 import java.nio.charset.Charset
 import kotlin.time.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toLocalDateTime
+import kotlinx.io.IOException
+import kotlinx.io.Sink
+import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Box.Companion.isBlock
@@ -21,8 +21,8 @@ open class IOVersion1 : IOVersion {
     override val charset = Charset.forName("Cp1252")
 
     @Throws(IOException::class)
-    override fun read(puz : Puzzle, inStream : DataInputStream) {
-        val meta = readMeta(inStream)
+    override fun read(puz : Puzzle, input : Source) {
+        val meta = readMeta(input)
         applyMeta(puz, meta)
         val boxes : Array<Array<Box?>> = puz.boxes
         for (row in boxes) {
@@ -30,12 +30,12 @@ open class IOVersion1 : IOVersion {
                 if (b == null || isBlock(b)) {
                     continue
                 }
-                b.isCheated = inStream.readBoolean()
-                b.responder = readNullTerminatedString(inStream, charset)
+                b.isCheated = input.readByte().toInt() != 0
+                b.responder = readNullTerminatedString(input, charset)
             }
         }
         try {
-            puz.time = inStream.readLong()
+            puz.time = input.readLong()
         } catch (ioe : IOException) {
             ioe.printStackTrace()
         }
@@ -47,14 +47,14 @@ open class IOVersion1 : IOVersion {
     }
 
     @Throws(IOException::class)
-    override fun readMeta(inStream : DataInputStream) : PuzzleMeta {
+    override fun readMeta(input : Source) : PuzzleMeta {
         val meta = PuzzleMeta()
 
-        meta.author = readNullTerminatedString(inStream, charset)
-        meta.source = readNullTerminatedString(inStream, charset)
-        meta.title = readNullTerminatedString(inStream, charset)
+        meta.author = readNullTerminatedString(input, charset)
+        meta.source = readNullTerminatedString(input, charset)
+        meta.title = readNullTerminatedString(input, charset)
 
-        val dateEpoch = inStream.readLong()
+        val dateEpoch = input.readLong()
         meta.date = if (dateEpoch == 0L)
             null
         else
@@ -62,43 +62,43 @@ open class IOVersion1 : IOVersion {
                 .toLocalDateTime(TimeZone.currentSystemDefault())
                 .date
 
-        meta.percentComplete = inStream.readInt()
+        meta.percentComplete = input.readInt()
         meta.percentFilled = meta.percentComplete
 
         return meta
     }
 
     @Throws(IOException::class)
-    override fun write(puz : Puzzle, os : DataOutputStream) {
-        writeMeta(puz, os)
+    override fun write(puz : Puzzle, output : Sink) {
+        writeMeta(puz, output)
         val boxes : Array<Array<Box?>> = puz.boxes
         for (row in boxes) {
             for (b in row) {
                 if (b == null || isBlock(b)) {
                     continue
                 }
-                os.writeBoolean(b.isCheated)
-                writeNullTerminatedString(os, b.responder, charset)
+                output.writeByte(if (b.isCheated) 1 else 0)
+                writeNullTerminatedString(output, b.responder, charset)
             }
         }
-        os.writeLong(puz.time)
+        output.writeLong(puz.time)
     }
 
     @Throws(IOException::class)
-    protected open fun writeMeta(puz : Puzzle, os : DataOutputStream) {
-        writeNullTerminatedString(os, puz.author, charset)
-        writeNullTerminatedString(os, puz.source, charset)
-        writeNullTerminatedString(os, puz.title, charset)
+    protected open fun writeMeta(puz : Puzzle, output : Sink) {
+        writeNullTerminatedString(output, puz.author, charset)
+        writeNullTerminatedString(output, puz.source, charset)
+        writeNullTerminatedString(output, puz.title, charset)
         val date = puz.date
         if (date == null) {
-            os.writeLong(0)
+            output.writeLong(0)
         } else {
-            os.writeLong(
+            output.writeLong(
                 date.atStartOfDayIn(TimeZone.currentSystemDefault())
                     .toEpochMilliseconds(),
             )
         }
-        os.writeInt(puz.percentComplete)
+        output.writeInt(puz.percentComplete)
     }
 }
 

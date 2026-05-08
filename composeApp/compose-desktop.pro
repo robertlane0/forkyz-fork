@@ -4,11 +4,6 @@
 -keep class com.squareup.wire.ProtoAdapter { *; }
 -keep class com.squareup.wire.Message { *; }
 
-# Apache HTTP Client
--dontwarn org.apache.hc.**
--dontwarn org.brotli.dec.BrotliInputStream
--dontwarn org.conscrypt.Conscrypt
-
 # App classes
 -keep class app.crossword.yourealwaysbe.** { *; }
 
@@ -31,11 +26,6 @@
 -keep class androidx.datastore.** { *; }
 -keepclassmembers class androidx.datastore.** { *; }
 -dontwarn androidx.datastore.**
-
-# JSoup
--keepclassmembers class org.jsoup.** { *; }
--dontwarn org.jsoup.helper.RequestAuthHandler
--dontwarn org.jsoup.helper.HttpClientExecutor
 
 # Apache Commons Text
 -keep class org.apache.commons.text.** { *; }
@@ -89,12 +79,6 @@
 # Build config
 -keep class app.crossword.yourealwaysbe.forkyz.BuildConfig { *; }
 
-# Ignore intended-to-be-optional re2j classes - only needed if using re2j for
-# jsoup regex jsoup safely falls back to JDK regex if re2j not on classpath,
-# but has concrete re2j refs
-# See: https://github.com/jhy/jsoup/issues/2459
--dontwarn com.google.re2j.**
-
 # Missing entry points and notes
 -dontnote META-INF**
 -dontnote module-info
@@ -127,7 +111,6 @@
 -dontnote org.apache.commons.lang3.ClassUtils
 -dontnote org.apache.commons.lang3.builder.Diff
 -dontnote org.apache.commons.lang3.reflect.**
--dontnote org.apache.hc.core5.io.SocketSupport
 -dontnote org.freedesktop.dbus.**
 -dontnote org.junit.experimental.theories.internal.AllMembersSupplier
 -dontnote org.junit.internal.builders.AnnotatedBuilder
@@ -150,17 +133,11 @@
 -dontnote org.fusesource.jansi.internal.MingwSupport
 -dontnote dev.dirs.Util
 -dontnote io.ktor.http.content.BlockingBridgeKt
--dontnote org.apache.hc.client5.http.entity.BrotliDecompressingEntity
--dontnote org.apache.hc.client5.http.entity.compress.CommonsCompressRuntime
--dontnote org.apache.hc.client5.http.impl.Brotli4jRuntime
--dontnote org.apache.hc.client5.http.impl.ZstdRuntime
--dontnote org.apache.hc.client5.http.socket.UnixDomainSocketFactory
--dontnote org.apache.hc.client5.http.ssl.ConscryptClientTlsStrategy
--dontnote org.jsoup.helper.AuthenticationHandler
--dontnote org.jsoup.helper.RequestDispatch
 -dontnote com.google.re2j.Pattern
 
 # Keep descriptor classes
+-keep class com.fleeksoft.ksoup.nodes.Document
+-keep class com.fleeksoft.ksoup.nodes.Element
 -keep class io.github.vinceglb.filekit.PlatformFile
 -keep class io.github.vinceglb.filekit.dialogs.compose.PickerResultLauncher
 -keep class io.github.vinceglb.filekit.dialogs.compose.SaverResultLauncher
@@ -172,11 +149,6 @@
 -keep class kotlinx.io.Sink
 -keep class kotlinx.io.Source
 -keep class kotlinx.io.bytestring.ByteString
--keep class org.apache.hc.core5.http.ClassicHttpResponse
--keep class org.apache.hc.core5.http.io.support.ClassicRequestBuilder
--keep class org.hjson.JsonArray
--keep class org.hjson.JsonObject
--keep class org.hjson.JsonValue
 -keep class org.jetbrains.compose.resources.DrawableResource
 -keep class org.jetbrains.compose.resources.PluralStringResource
 -keep class org.jetbrains.compose.resources.StringResource

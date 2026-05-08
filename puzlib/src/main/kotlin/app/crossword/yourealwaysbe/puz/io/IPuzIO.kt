@@ -1,12 +1,6 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.BufferedWriter
-import java.io.IOException
-import java.io.InputStream
-import java.io.OutputStream
-import java.io.OutputStreamWriter
-import java.nio.charset.Charset
 import java.util.Arrays
 import java.util.Collections
 import java.util.LinkedList
@@ -18,6 +12,9 @@ import kotlin.math.min
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
+import kotlinx.io.IOException
+import kotlinx.io.Sink
+import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Box.Companion.isBlock
@@ -72,8 +69,8 @@ class IPuzIO : AbstractJSONIO() {
     class IPuzFormatException(msg : String?) : Exception(msg)
 
     @Throws(Exception::class)
-    override fun parseInput(inStream : InputStream) : Puzzle? {
-        return readPuzzle(inStream)
+    override fun parseInput(input : Source) : Puzzle? {
+        return readPuzzle(input)
     }
 
     companion object {
@@ -82,8 +79,6 @@ class IPuzIO : AbstractJSONIO() {
 
         // version 1 was not tagged in file
         private const val IO_VERSION = 3
-
-        private val WRITE_CHARSET : Charset = Charset.forName("UTF-8")
 
         private const val FIELD_VERSION = "version"
         private const val FIELD_KIND = "kind"
@@ -358,9 +353,9 @@ class IPuzIO : AbstractJSONIO() {
         val HIGHLIGHT_COLOR : Int = DEFINED_COLORS[3]
 
         @Throws(IOException::class)
-        fun readPuzzle(inStream : InputStream) : Puzzle? {
+        fun readPuzzle(input: Source) : Puzzle? {
             try {
-                val json = parseJSONObject(inStream)
+                val json = parseJSONObject(input)
 
                 checkIPuzVersion(json)
                 val kind : PuzzleKind? = getPuzKind(json)
@@ -1986,12 +1981,12 @@ class IPuzIO : AbstractJSONIO() {
         }
 
         /**
-         * Write puzzle to os using WRITE_CHARSET
+         * Write puzzle to os using UTF8
          */
         @Throws(IOException::class)
         fun writePuzzle(
             puz : Puzzle,
-            os : OutputStream,
+            output : Sink,
             omitPlayState : Boolean = false,
             omitExtensions : Boolean = false,
         ) {
@@ -2004,7 +1999,7 @@ class IPuzIO : AbstractJSONIO() {
                 if (!omitExtensions)
                     writeExtensions(puz, omitPlayState)
             }
-            writeJSONObject(json, os)
+            writeJSONObject(json, output)
         }
 
         /**

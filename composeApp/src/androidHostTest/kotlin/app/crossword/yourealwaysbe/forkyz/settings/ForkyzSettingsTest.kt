@@ -1,9 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.settings
 
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -13,6 +10,9 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
+import kotlinx.io.Buffer
+import kotlinx.io.asSource
+import kotlinx.io.buffered
 
 import android.content.SharedPreferences
 import android.os.SystemClock
@@ -702,13 +702,9 @@ class ForkyzSettingsTest {
         val settings1 = ForkyzSettings(datastore1)
         val settings2 = ForkyzSettings(TestDataStore(settingsValue2))
 
-        val baos = ByteArrayOutputStream()
-        settings2.exportSettings(baos)
-        baos.close();
-
-        val bais = ByteArrayInputStream(baos.toByteArray())
-        settings1.importSettings(bais)
-        bais.close()
+        val buffer = Buffer()
+        settings2.exportSettings(buffer)
+        settings1.importSettings(buffer)
 
         val importedSettings = runBlocking { datastore1.data.first() }
 

@@ -1,10 +1,10 @@
 
 package app.crossword.yourealwaysbe.puz.io.versions
 
-import java.io.DataInputStream
-import java.io.DataOutputStream
-import java.io.IOException
 import java.util.logging.Logger
+import kotlinx.io.IOException
+import kotlinx.io.Sink
+import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.PuzzleMeta
@@ -19,16 +19,16 @@ open class IOVersion7 : IOVersion6() {
     }
 
     @Throws(IOException::class)
-    override fun readMeta(inStream : DataInputStream) : PuzzleMeta {
-        val meta = super.readMeta(inStream)
-        meta.supportUrl = readNullTerminatedString(inStream, charset)
+    override fun readMeta(input : Source) : PuzzleMeta {
+        val meta = super.readMeta(input)
+        meta.supportUrl = readNullTerminatedString(input, charset)
         return meta
     }
 
     @Throws(IOException::class)
-    override fun writeMeta(puz : Puzzle, os : DataOutputStream) {
-        super.writeMeta(puz, os)
-        writeNullTerminatedString(os, puz.supportUrl, charset)
+    override fun writeMeta(puz : Puzzle, output : Sink) {
+        super.writeMeta(puz, output)
+        writeNullTerminatedString(output, puz.supportUrl, charset)
     }
 
     companion object {

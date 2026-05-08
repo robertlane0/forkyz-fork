@@ -1,12 +1,11 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.DataOutputStream
-import java.io.IOException
-import java.io.InputStream
-import java.io.InputStreamReader
-import java.util.Scanner
+import java.nio.charset.Charset
 import kotlinx.datetime.LocalDate
+import kotlinx.io.IOException
+import kotlinx.io.Source
+import kotlinx.io.readByteArray
 
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Puzzle
@@ -22,15 +21,15 @@ import app.crossword.yourealwaysbe.puz.io.charset.MacRoman
  * -Across Clues
  * -Down Clues
  *
- * Each section begins with a { character, and each line except the last in a section
- * ends with a | character.  The charset used is Mac Roman.
+ * Each section begins with a { character, and each line except the last
+ * in a section ends with a | character.  The charset used is Mac Roman.
  *
  * For an example puzzle in this format, see:
  * src/test/resources/premiere-20100704.txt.
  */
 class KingFeaturesPlaintextIO : PuzzleParser {
-    override fun parseInput(inStream : InputStream) : Puzzle? {
-        return parsePuzzle(inStream)
+    override fun parseInput(input : Source) : Puzzle? {
+        return parsePuzzle(input)
     }
 
     companion object {
@@ -38,13 +37,12 @@ class KingFeaturesPlaintextIO : PuzzleParser {
         private val DOWN_LIST : String = DefaultListNames.DOWN_LIST
 
         /**
-         * Take an InputStream containing a plaintext puzzle parsed Puzzle if
+         * Take an input containing a plaintext puzzle parsed Puzzle if
          * succeeded, or null if it fails
          * (for example, if the plaintext file is not in a valid format).
          */
-        @JvmStatic
-        fun parsePuzzle(inStream : InputStream) : Puzzle? {
-            val scanner = Scanner(InputStreamReader(inStream, MacRoman()))
+        fun parsePuzzle(input : Source) : Puzzle? {
+            val scanner = LineScanner(input, MacRoman())
 
             if (!scanner.hasNextLine()) {
                 System.err.println("File empty.")
@@ -182,39 +180,21 @@ class KingFeaturesPlaintextIO : PuzzleParser {
 
             return builder.puzzle
         }
-
-        /**
-         * Take an InputStream containing a plaintext puzzle to a
-         * DataOutputStream containing the generated .puz file.  Returns
-         * true if the process succeeded, or false if it fails (for
-         * example, if the plaintext file is not in a valid format).
-         */
-        fun convertKFPuzzle(
-            inStream : InputStream,
-            os : DataOutputStream?,
-            title : String?,
-            author : String?,
-            copyright : String?,
-            date : LocalDate?,
-        ) : Boolean {
-            val puz : Puzzle? = parsePuzzle(inStream)
-            if (puz == null)
-                return false
-
-            puz.title = title
-            puz.author = author
-            puz.date = date
-            puz.copyright = copyright
-
-            try {
-                IO.saveNative(puz, os)
-            } catch (e : IOException) {
-                System.err.println("Unable to dump puzzle to output stream.")
-                return false
-            }
-
-            return true
-        }
     }
 }
 
+private class LineScanner(
+    val input : Source,
+    val charset : Charset,
+) {
+    private val lines = String(input.readByteArray(), charset).lines()
+    private var nextLine = 0
+
+    fun hasNextLine() : Boolean {
+        return nextLine < lines.size
+    }
+
+    fun nextLine() : String {
+        return lines[nextLine++]
+    }
+}

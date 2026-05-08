@@ -1,8 +1,6 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.InputStream
-
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
@@ -13,22 +11,17 @@ import app.crossword.yourealwaysbe.puz.Puzzle
 
 class RaetselZentraleSchwedenJSONIOTest {
     @Test
-    @Throws(Exception::class)
     fun testPuzzle1() {
-        testPuzzle1InputStream.use { inStream ->
-            val puz = RaetselZentraleSchwedenJSONIO.readPuzzle(inStream)
-            Companion.assertIsTestPuzzle1(puz!!)
+        val puz = testPuzzle1.use {
+            RaetselZentraleSchwedenJSONIO.readPuzzle(it)
         }
+        assertIsTestPuzzle1(puz!!)
     }
 
     companion object {
-        @JvmStatic
-        val testPuzzle1InputStream : InputStream
-            get() = JPZIOTest::class.java
-                .getResourceAsStream("/raetselzentrale.json")!!
+        val testPuzzle1
+            get() = SourceUtils.getResource("/raetselzentrale.json")
 
-        @JvmStatic
-        @Throws(Exception::class)
         fun assertIsTestPuzzle1(puz : Puzzle) {
             Assertions.assertEquals(puz.title, "Test Puzzle")
 

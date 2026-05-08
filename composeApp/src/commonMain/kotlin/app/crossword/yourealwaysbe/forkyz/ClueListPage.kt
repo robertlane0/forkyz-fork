@@ -52,6 +52,7 @@ import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.keyEventToResponse
 import app.crossword.yourealwaysbe.forkyz.view.BoxInputState
 import app.crossword.yourealwaysbe.forkyz.view.ClueTabs
+import app.crossword.yourealwaysbe.forkyz.view.OrdinaryKey
 import app.crossword.yourealwaysbe.forkyz.view.WordEdit
 import app.crossword.yourealwaysbe.forkyz.view.rememberBoardTextMeasurer
 import app.crossword.yourealwaysbe.puz.Clue
@@ -120,6 +121,17 @@ fun ClueListPage(
                 return true
             } else {
                 return onKeyEventPuzzlePage(event)
+            }
+        }
+
+        fun onOrdinaryKeyDown(key : OrdinaryKey) {
+            when (key) {
+                OrdinaryKey.KEY_DELETE -> viewModel.deleteResponse()
+                OrdinaryKey.KEY_DOWN -> viewModel.moveDown()
+                OrdinaryKey.KEY_LEFT -> viewModel.moveLeft()
+                OrdinaryKey.KEY_RIGHT -> viewModel.moveRight()
+                OrdinaryKey.KEY_SPACE -> viewModel.playSpace()
+                OrdinaryKey.KEY_UP -> viewModel.moveUp()
             }
         }
 
@@ -247,6 +259,7 @@ fun ClueListPage(
                         incognitoMode = showAllWords,
                         contentDescription
                             = stringResource(Res.string.current_word),
+                        onOrdinaryKeyDown = ::onOrdinaryKeyDown,
                     )
                     ClueLists(
                         Modifier.fillMaxWidth().weight(1.0F),

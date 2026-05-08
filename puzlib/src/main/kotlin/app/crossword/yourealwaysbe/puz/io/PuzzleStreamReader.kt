@@ -1,9 +1,9 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.IOException
-import java.io.InputStream
 import java.util.logging.Logger
+import kotlinx.io.IOException
+import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.puz.Puzzle
 
@@ -14,8 +14,8 @@ class PuzzleStreamReader : PuzzleParser {
      * The method will try known file formats until it finds one that
      * parses to completion.
      */
-    override fun parseInput(inStream : InputStream) : Puzzle? {
-        return parseInputStatic(inStream)
+    override fun parseInput(input : Source) : Puzzle? {
+        return parseInputStatic(input)
     }
 
     companion object {
@@ -50,18 +50,17 @@ class PuzzleStreamReader : PuzzleParser {
             FortyTwoPuzzlesIO(),
         )
 
-        @JvmStatic
-        fun parseInputStatic(inStream : InputStream) : Puzzle? {
+        fun parseInputStatic(input : Source) : Puzzle? {
             try {
-                val unzipped = StreamUtils.unzipOrPassThrough(inStream)
+                val unzipped = StreamUtils.unzipOrPassThrough(input)
                 for (parser in PARSERS) {
                     try {
-                        unzipped.reset()
+                        val copy = unzipped.peek()
                         LOGGER.info(
                             "Attempting parse with "
                                 + parser.javaClass.getName(),
                         )
-                        val puz = parser.parseInput(unzipped)
+                        val puz = parser.parseInput(copy)
                         if (puz != null)
                             return puz
                         else LOGGER.info("Parse returned null.")

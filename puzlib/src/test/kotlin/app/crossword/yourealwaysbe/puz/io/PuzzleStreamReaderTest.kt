@@ -6,107 +6,101 @@ import org.junit.jupiter.api.Test
 class PuzzleStreamReaderTest {
     @Test
     fun testAcrossLite() {
-        IOTest.assertIsTestPuzzle1(
-            PuzzleStreamReader.parseInputStatic(
-                IOTest.testPuzzle1InputStream,
-            )!!
-        )
+        IOTest.testPuzzle1.use { input ->
+            IOTest.assertIsTestPuzzle1(
+                PuzzleStreamReader.parseInputStatic(input)!!,
+            )
+        }
     }
 
     @Test
     fun testJPZ() {
-        JPZIOTest.assertIsTestPuzzle1(
-            PuzzleStreamReader.parseInputStatic(
-                JPZIOTest.testPuzzle1InputStream,
-            )!!
-        )
+        JPZIOTest.testPuzzle1.use { input ->
+            JPZIOTest.assertIsTestPuzzle1(
+                PuzzleStreamReader.parseInputStatic(input)!!,
+            )
+        }
     }
 
     @Test
     fun testBrainsOnly() {
-        BrainsOnlyIOTest.assertIsTestPuzzle1(
-            PuzzleStreamReader.parseInputStatic(
-                BrainsOnlyIOTest.testPuzzle1InputStream,
-            )!!
-        )
+        BrainsOnlyIOTest.testPuzzle1.use { input ->
+            BrainsOnlyIOTest.assertIsTestPuzzle1(
+                PuzzleStreamReader.parseInputStatic(input)!!,
+            )
+        }
     }
 
     @Test
     fun testKingFeaturesPlaintext() {
-        KingFeaturesPlaintextIOTest.assertIsTestPuzzle1(
-            PuzzleStreamReader.parseInputStatic(
-                KingFeaturesPlaintextIOTest.testPuzzle1InputStream,
-            )!!
-        )
+        KingFeaturesPlaintextIOTest.testPuzzle1.use { input ->
+            KingFeaturesPlaintextIOTest.assertIsTestPuzzle1(
+                PuzzleStreamReader.parseInputStatic(input)!!,
+            )
+        }
     }
 
     @Test
     fun testUclick() {
-        UclickXMLIOTest.assertIsTestPuzzle1(
-            PuzzleStreamReader.parseInputStatic(
-                UclickXMLIOTest.testPuzzle1InputStream,
-            )!!
-        )
+        UclickXMLIOTest.testPuzzle1.use { input ->
+            UclickXMLIOTest.assertIsTestPuzzle1(
+                PuzzleStreamReader.parseInputStatic(input)!!,
+            )
+        }
     }
 
     @Test
-    @Throws(Exception::class)
     fun testIPuz() {
-        IPuzIOTest.assertIsTestPuzzle1(
-            PuzzleStreamReader.parseInputStatic(
-                IPuzIOTest.testPuzzle1InputStream,
-            )!!
-        )
+        IPuzIOTest.testPuzzle1.use { input ->
+            IPuzIOTest.assertIsTestPuzzle1(
+                PuzzleStreamReader.parseInputStatic(input)!!,
+            )
+        }
     }
 
     @Test
-    @Throws(Exception::class)
     fun testRaetzelZentraleSchweden() {
-        RaetselZentraleSchwedenJSONIOTest.assertIsTestPuzzle1(
-            PuzzleStreamReader.parseInputStatic(
-                RaetselZentraleSchwedenJSONIOTest.testPuzzle1InputStream,
-            )!!
-        )
+        RaetselZentraleSchwedenJSONIOTest.testPuzzle1.let { input ->
+            RaetselZentraleSchwedenJSONIOTest.assertIsTestPuzzle1(
+                PuzzleStreamReader.parseInputStatic(input)!!,
+            )
+        }
     }
 
     @Test
-    @Throws(Exception::class)
     fun testRCIJeuxMFJ() {
-        RCIJeuxMFJIOTest.assertIsTestPuzzle1(
-            PuzzleStreamReader.parseInputStatic(
-                RCIJeuxMFJIOTest.testPuzzle1InputStream,
-            )!!
-        )
+        RCIJeuxMFJIOTest.testPuzzle1.let { input ->
+            RCIJeuxMFJIOTest.assertIsTestPuzzle1(
+                PuzzleStreamReader.parseInputStatic(input)!!,
+            )
+        }
     }
 
     @Test
-    @Throws(Exception::class)
     fun testPrzekroj() {
-        PrzekrojIOTest.assertIsTestPuzzle1(
-            PuzzleStreamReader.parseInputStatic(
-                PrzekrojIOTest.testPuzzle1InputStream,
-            )!!
-        )
+        PrzekrojIOTest.testPuzzle1.use { input ->
+            PrzekrojIOTest.assertIsTestPuzzle1(
+                PuzzleStreamReader.parseInputStatic(input)!!,
+            )
+        }
     }
 
     @Test
-    @Throws(Exception::class)
     fun testKeesingXML() {
-        KeesingXMLIOTest.assertIsTestPuzzle1(
-            PuzzleStreamReader.parseInputStatic(
-                KeesingXMLIOTest.testPuzzle1InputStream,
-            )!!
-        )
+        KeesingXMLIOTest.testPuzzle1.let { input ->
+            KeesingXMLIOTest.assertIsTestPuzzle1(
+                PuzzleStreamReader.parseInputStatic(input)!!,
+            )
+        }
     }
 
     @Test
-    @Throws(Exception::class)
     fun testPML() {
-        PMLIOTest.assertIsTestPuzzle1(
-            PuzzleStreamReader.parseInputStatic(
-                PMLIOTest.testPuzzle1InputStream,
-            )!!
-        )
+        PMLIOTest.testPuzzle1.let { input ->
+            PMLIOTest.assertIsTestPuzzle1(
+                PuzzleStreamReader.parseInputStatic(input)!!,
+            )
+        }
     }
 }
 

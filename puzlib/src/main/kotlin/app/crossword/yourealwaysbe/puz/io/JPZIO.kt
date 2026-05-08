@@ -1,12 +1,10 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.DataOutputStream
-import java.io.InputStream
 import java.util.logging.Logger
 import kotlin.math.max
 import kotlinx.datetime.LocalDate
-import kotlinx.io.asSource
+import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Box.Companion.isBlock
@@ -419,8 +417,8 @@ class JPZIO : PuzzleParser {
     }
 
     @Throws(Exception::class)
-    override fun parseInput(inStream : InputStream) : Puzzle? {
-        return readPuzzle(inStream)
+    override fun parseInput(input : Source) : Puzzle? {
+        return readPuzzle(input)
     }
 
     companion object {
@@ -440,8 +438,8 @@ class JPZIO : PuzzleParser {
         )
 
         @Throws(Exception::class)
-        fun readPuzzle(inStream : InputStream) : Puzzle? {
-            val content = parseXMLElement(inStream.asSource())
+        fun readPuzzle(input : Source) : Puzzle? {
+            val content = parseXMLElement(input)
             val handler = JPZXMLParser(content)
 
             if (!handler.isSuccessfulRead)
@@ -451,27 +449,6 @@ class JPZIO : PuzzleParser {
                 return buildAcrostic(handler) ?: buildCrossword(handler)
             } else {
                 return buildCrossword(handler)
-            }
-        }
-
-        fun convertPuzzle(
-            inStream : InputStream,
-            os : DataOutputStream,
-            d : LocalDate?,
-        ) : Boolean {
-            try {
-                val puz = readPuzzle(inStream)
-                if (puz != null) {
-                    puz.date = d
-                    IO.saveNative(puz, os)
-                    return true
-                } else {
-                    return false
-                }
-            } catch (e : Exception) {
-                e.printStackTrace()
-                LOG.severe("Unable to convert JPZ file: " + e.message)
-                return false
             }
         }
 

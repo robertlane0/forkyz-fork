@@ -1,8 +1,8 @@
 
 package app.crossword.yourealwaysbe.forkyz.util
 
-import java.io.IOException
 import java.util.Locale
+import kotlinx.io.IOException
 
 import org.jetbrains.compose.resources.MissingResourceException
 

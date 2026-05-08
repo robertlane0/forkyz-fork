@@ -1,12 +1,12 @@
 
 package app.crossword.yourealwaysbe.forkyz
 
-import java.io.IOException
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.io.IOException
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

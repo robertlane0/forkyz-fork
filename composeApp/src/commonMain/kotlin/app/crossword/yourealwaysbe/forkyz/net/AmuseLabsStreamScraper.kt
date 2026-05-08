@@ -1,12 +1,11 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.io.BufferedReader
-import java.io.IOException
-import java.io.InputStream
-import java.io.InputStreamReader
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+import kotlinx.io.IOException
+import kotlinx.io.Source
+import kotlinx.io.readLine
 
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.io.PuzzleParser
@@ -18,30 +17,26 @@ import app.crossword.yourealwaysbe.puz.io.StreamUtils
 class AmuseLabsStreamScraper : AbstractStreamScraper() {
     @Throws(Exception::class)
     public override suspend fun parseInput(
-        inputStream : InputStream,
+        input : Source,
         url : String?,
     ) : Puzzle? {
         // so we can reuse
-        val bis = StreamUtils.makeByteArrayInputStream(inputStream)
+        val bis = StreamUtils.makeCopy(input)
         val secondStage = SecondStageParser()
 
         var puz : Puzzle? = null
 
-        val secondStageURL = getSecondStageURL(bis)
-
-        println("FORKYZ: second stage " + secondStageURL)
-
+        val secondStageURL = getSecondStageURL(bis.peek())
         if (secondStageURL != null) {
             try {
-                getInputStream(secondStageURL).use { ssIS ->
-                    puz = secondStage.parseInput(ssIS)
+                getURL(secondStageURL).use { ssIn ->
+                    puz = secondStage.parseInput(ssIn)
                 }
             } catch (e : Exception) {
                 // fall through
             }
         }
         if (puz == null) {
-            bis.reset()
             puz = secondStage.parseInput(bis)
         }
 
@@ -58,15 +53,10 @@ class AmuseLabsStreamScraper : AbstractStreamScraper() {
      * Does not close input stream. Looking for iframes in a Jsoup
      * parsed doc doesn't seem to work. Perhaps the HTML is funky.
      */
-    fun getSecondStageURL(inputStream : InputStream) : String? {
+    fun getSecondStageURL(input : Source) : String? {
         try {
-            val reader = BufferedReader(
-                InputStreamReader(inputStream)
-            )
-
             var line : String?
-            while ((reader.readLine().also { line = it }) != null) {
-                println("FORKYZ: " + line)
+            while ((input.readLine().also { line = it }) != null) {
                 line?.let { line ->
                     val matcher : Matcher = SECOND_STAGE_URL_RE.matcher(line)
                     if (matcher.find()) {
@@ -86,15 +76,10 @@ class AmuseLabsStreamScraper : AbstractStreamScraper() {
      * Finds ID, then gets puzzle from API URL. Does not close input
      * stream.
      */
-    fun parseSecondStage(inputStream : InputStream) : Puzzle? {
+    fun parseSecondStage(input : Source) : Puzzle? {
         try {
-            val reader = BufferedReader(
-                InputStreamReader(inputStream)
-            )
-
             var line : String?
-            while ((reader.readLine().also { line = it }) != null) {
-                println("FORKYZ: " + line)
+            while ((input.readLine().also { line = it }) != null) {
                 //Matcher matcher = PUZZLE_ID_PAT.matcher(line);
                 //if (matcher.find()) {
                 //    String id = matcher.group(PUZZLE_ID_GROUP);
@@ -109,8 +94,8 @@ class AmuseLabsStreamScraper : AbstractStreamScraper() {
 
     private inner class SecondStageParser : PuzzleParser {
         @Throws(Exception::class)
-        override fun parseInput(inStream : InputStream) : Puzzle? {
-            return parseSecondStage(inStream)
+        override fun parseInput(input : Source) : Puzzle? {
+            return parseSecondStage(input)
         }
     }
 

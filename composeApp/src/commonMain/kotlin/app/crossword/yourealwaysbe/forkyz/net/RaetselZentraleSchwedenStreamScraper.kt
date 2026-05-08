@@ -1,9 +1,9 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.io.InputStream
 import java.util.Locale
 import java.util.regex.Pattern
+import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.io.PuzzleParser
@@ -29,28 +29,27 @@ import app.crossword.yourealwaysbe.puz.io.StreamUtils
 class RaetselZentraleSchwedenStreamScraper : AbstractStreamScraper() {
     @Throws(Exception::class)
     public override suspend fun parseInput(
-        inputStream : InputStream,
+        input : Source,
         url : String?,
     ) : Puzzle? {
         // so we can reuse
-        val bis = StreamUtils.makeByteArrayInputStream(inputStream)
         val secondStage = SecondStageParser()
 
         var puz : Puzzle? = null
 
-        val secondStageURL = getSecondStageURL(bis)
+        val secondStageURL = getSecondStageURL(input.peek())
         if (secondStageURL != null) {
             try {
-                getInputStream(secondStageURL).use { ssIS ->
-                    puz = secondStage.parseInput(ssIS)
+                getURL(secondStageURL).use { ss ->
+                    puz = secondStage.parseInput(ss)
                 }
             } catch (e : Exception) {
                 // fall through
             }
         }
+
         if (puz == null) {
-            bis.reset()
-            puz = secondStage.parseInput(bis)
+            puz = secondStage.parseInput(input)
         }
 
         puz?.source = DEFAULT_SOURCE
@@ -64,8 +63,8 @@ class RaetselZentraleSchwedenStreamScraper : AbstractStreamScraper() {
      * Does not close input stream. Looking for iframes in a Jsoup
      * parsed doc doesn't seem to work. Perhaps the HTML is funky.
      */
-    fun getSecondStageURL(inputStream : InputStream) : String? {
-        return regexScrape(inputStream, SECOND_STAGE_URL_MATCH)
+    fun getSecondStageURL(input : Source) : String? {
+        return regexScrape(input, SECOND_STAGE_URL_MATCH)
     }
 
     /**
@@ -74,14 +73,14 @@ class RaetselZentraleSchwedenStreamScraper : AbstractStreamScraper() {
      * Finds ID, then gets puzzle from API URL. Does not close input
      * stream.
      */
-    private suspend fun parseSecondStage(inputStream : InputStream) : Puzzle? {
-        val apiUrl = getAPIURL(inputStream)
+    private suspend fun parseSecondStage(input : Source) : Puzzle? {
+        val apiUrl = getAPIURL(input)
         if (apiUrl == null)
             return null
 
         try {
-            getInputStream(apiUrl).use { apiIS ->
-                return RaetselZentraleSchwedenJSONIO.readPuzzle(apiIS)
+            getURL(apiUrl).use { apiIn ->
+                return RaetselZentraleSchwedenJSONIO.readPuzzle(apiIn)
             }
         } catch (e : Exception) {
             return null
@@ -91,10 +90,10 @@ class RaetselZentraleSchwedenStreamScraper : AbstractStreamScraper() {
     private inner class SecondStageParser : StreamScraper {
         @Throws(Exception::class)
         override suspend fun parseInput(
-            inputStream : InputStream,
+            input : Source,
             url : String?,
         ) : Puzzle? {
-            return parseSecondStage(inputStream)
+            return parseSecondStage(input)
         }
     }
 
@@ -120,8 +119,8 @@ class RaetselZentraleSchwedenStreamScraper : AbstractStreamScraper() {
         /**
          * Gets API URL from input stream, does not close, or null
          */
-        fun getAPIURL(inputStream : InputStream) : String? {
-            val id : String? = regexScrape(inputStream, PUZZLE_ID_MATCH)
+        fun getAPIURL(input : Source) : String? {
+            val id : String? = regexScrape(input, PUZZLE_ID_MATCH)
             if (id != null)
                 return String.format(Locale.US, JSON_URL_FORMAT, id)
             else

@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.InputStream
 import kotlinx.datetime.LocalDate
 
 import org.junit.jupiter.api.Assertions
@@ -14,34 +13,23 @@ import app.crossword.yourealwaysbe.puz.Puzzle
 
 class SlowDownWiseUpJSONIOTest {
     @Test
-    @Throws(Exception::class)
     fun testPuzzle1() {
-        testPuzzle1InputStream.use { inStream ->
-            val puz = SlowDownWiseUpJSONIO.readPuzzle(inStream)
-            Companion.assertIsTestPuzzle1(puz!!)
-        }
+        val puz = testPuzzle1.use { SlowDownWiseUpJSONIO.readPuzzle(it) }
+        assertIsTestPuzzle1(puz!!)
     }
 
-
     @Test
-    @Throws(Exception::class)
     fun testPuzzle2() {
-        testPuzzle2InputStream.use { inStream ->
-            val puz = SlowDownWiseUpJSONIO.readPuzzle(inStream)
-            Companion.assertIsTestPuzzle2(puz!!)
-        }
+        val puz = testPuzzle2.use { SlowDownWiseUpJSONIO.readPuzzle(it) }
+        assertIsTestPuzzle2(puz!!)
     }
 
     companion object {
-        val testPuzzle1InputStream: InputStream
-            get() = SlowDownWiseUpJSONIOTest::class.java
-                .getResourceAsStream("/slowdownwiseup.json")!!
+        val testPuzzle1
+            get() = SourceUtils.getResource("/slowdownwiseup.json")
+        val testPuzzle2
+            get() = SourceUtils.getResource("/wsj.json")
 
-        val testPuzzle2InputStream : InputStream
-            get() = SlowDownWiseUpJSONIOTest::class.java
-                .getResourceAsStream("/wsj.json")
-
-        @Throws(Exception::class)
         fun assertIsTestPuzzle1(puz : Puzzle) {
             Assertions.assertEquals(puz.title, "Test Crossword")
             Assertions.assertEquals(puz.author, "Test Author")
@@ -97,7 +85,6 @@ class SlowDownWiseUpJSONIOTest {
             Assertions.assertEquals(twoDown.getSeparator(5), " ")
         }
 
-        @Throws(Exception::class)
         fun assertIsTestPuzzle2(puz : Puzzle) {
             Assertions.assertEquals(puz.title, "Test title")
             Assertions.assertEquals(puz.author, "Test setter")

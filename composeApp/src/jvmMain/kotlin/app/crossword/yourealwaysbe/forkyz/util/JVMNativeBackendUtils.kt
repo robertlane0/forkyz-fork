@@ -4,9 +4,12 @@ package app.crossword.yourealwaysbe.forkyz.util
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.io.IOException
-import java.io.InputStream
-import java.io.OutputStream
+import kotlinx.io.IOException
+import kotlinx.io.Sink
+import kotlinx.io.Source
+import kotlinx.io.asSink
+import kotlinx.io.asSource
+import kotlinx.io.buffered
 
 import androidx.room.Room.databaseBuilder
 import androidx.room.RoomDatabase
@@ -25,6 +28,11 @@ import app.crossword.yourealwaysbe.forkyz.SettingsSubPage
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.crossword_solver_enabled
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.external_dictionary
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_force_caps
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_haptic
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_native
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_split_words
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_use_native
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.random_clue_on_shake
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
@@ -78,9 +86,11 @@ class JVMNativeBackendUtils(
     }
 
     @Throws(IOException::class)
-    override fun openInputStream(uri : Uri) : InputStream? {
+    override fun openInput(uri : Uri) : Source? {
         try {
             return FileInputStream(File(uri.toJVMURI()))
+                .asSource()
+                .buffered()
         } catch (e : IllegalArgumentException) {
             // not a file, make IOException
             throw IOException(e.message)
@@ -88,9 +98,11 @@ class JVMNativeBackendUtils(
     }
 
     @Throws(IOException::class)
-    override fun openOutputStream(uri : Uri) : OutputStream? {
+    override fun openOutput(uri : Uri) : Sink? {
         try {
             return FileOutputStream(File(uri.toJVMURI()))
+                .asSink()
+                .buffered()
         } catch (e : IllegalArgumentException) {
             // not a file, make IOException
             throw IOException(e.message)
@@ -184,7 +196,6 @@ class JVMNativeBackendUtils(
         return settings.filter { item ->
             val badPage = item.page in listOf(
                 SettingsPage.DOWNLOAD_BACKGROUND,
-                SettingsPage.KEYBOARD,
                 SettingsPage.VOICE_ACCESSIBILITY,
             )
             if (badPage) {
@@ -194,7 +205,6 @@ class JVMNativeBackendUtils(
                     is SettingsSubPage -> {
                         item.subpage !in listOf(
                             SettingsPage.DOWNLOAD_BACKGROUND,
-                            SettingsPage.KEYBOARD,
                             SettingsPage.VOICE_ACCESSIBILITY,
                         )
                     }
@@ -204,6 +214,11 @@ class JVMNativeBackendUtils(
                             Res.string.external_dictionary,
                             Res.string.crossword_solver_enabled,
                             Res.string.random_clue_on_shake,
+                            Res.string.keyboard_use_native,
+                            Res.string.keyboard_haptic,
+                            Res.string.keyboard_native,
+                            Res.string.keyboard_force_caps,
+                            Res.string.keyboard_split_words,
                         )
                     }
                     else -> true

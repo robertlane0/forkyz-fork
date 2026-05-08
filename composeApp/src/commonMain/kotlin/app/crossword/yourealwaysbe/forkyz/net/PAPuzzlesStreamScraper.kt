@@ -1,8 +1,8 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.io.InputStream
 import java.util.regex.Pattern
+import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.io.PAPuzzlesIO
@@ -13,11 +13,11 @@ import app.crossword.yourealwaysbe.puz.io.PAPuzzlesIO
 class PAPuzzlesStreamScraper : AbstractStreamScraper() {
     @Throws(Exception::class)
     public override suspend fun parseInput(
-        inputStream : InputStream,
+        input : Source,
         url : String?,
     ) : Puzzle? {
         val scrapes = regexScrape(
-            inputStream,
+            input,
             arrayOf(PA_PUZZLES_URL_RE, TITLE_RE),
         )
 
@@ -27,8 +27,8 @@ class PAPuzzlesStreamScraper : AbstractStreamScraper() {
         var puz : Puzzle? = null
         if (srcUrl != null) {
             try {
-                getInputStream(srcUrl).use { urlIS ->
-                    puz = PAPuzzlesIO.readPuzzle(urlIS)
+                getURL(srcUrl).use { urlIn ->
+                    puz = PAPuzzlesIO.readPuzzle(urlIn)
                 }
             } catch (e : Exception) {
                 // we tried

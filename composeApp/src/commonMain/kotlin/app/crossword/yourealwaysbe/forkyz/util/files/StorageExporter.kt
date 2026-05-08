@@ -1,12 +1,11 @@
 
 package app.crossword.yourealwaysbe.forkyz.util.files
 
-import java.io.IOException
+import kotlinx.io.IOException
 
 import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
-import app.crossword.yourealwaysbe.puz.io.StreamUtils
 
 private val TAG = "ForkyzStorageExporter"
 
@@ -88,9 +87,9 @@ private fun exportDirectory(
             name,
             handle.mimeType ?: FileHandler.MIME_TYPE_GENERIC,
         )?.let { newHandle ->
-            sourceHandler.getInputStream(handle).use { ins ->
-                targetHandler.getOutputStream(newHandle).use { outs ->
-                    StreamUtils.copyStream(ins, outs)
+            sourceHandler.getBufferedInput(handle).use { input ->
+                targetHandler.getBufferedOutput(newHandle).use { output ->
+                    input.transferTo(output)
                 }
             }
         }

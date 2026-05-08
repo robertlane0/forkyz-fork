@@ -1,13 +1,7 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.ByteArrayOutputStream
-import java.io.DataInputStream
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import java.io.InputStream
-import java.io.ObjectOutputStream
+import kotlinx.io.Buffer
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -26,209 +20,119 @@ import app.crossword.yourealwaysbe.puz.io.IO.Companion.loadNative
  */
 class IOTest {
     @Test
-    @Throws(Exception::class)
     fun testLoad() {
-        testPuzzle1InputStream.use { inStream ->
-            val puz = IO.loadNative(inStream)
-            Companion.assertIsTestPuzzle1(puz!!)
-        }
+        val puz = testPuzzle1.use { IO.loadNative(it) }
+        assertIsTestPuzzle1(puz!!)
     }
 
     @Test
-    @Throws(Exception::class)
     fun testSave() {
-        IOTest::class.java.getResourceAsStream("/test.puz").use { inStream ->
-            val puz = loadNative(inStream)
-            println("Loaded.")
-            val tmp = File.createTempFile("test", ".puz")
-            tmp.deleteOnExit()
+        val puz = testPuzzle1.use { loadNative(it) }
+        val tmp = Buffer()
+        IO.saveNative(puz!!, tmp)
+        val puz2 = loadNative(tmp.peek())
+        Assertions.assertEquals(puz, puz2)
 
-            FileOutputStream(tmp).use { os ->
-                IO.saveNative(puz!!, os)
-            }
-            FileInputStream(tmp).use { is2 ->
-                val puz2 = loadNative(is2)
-                Assertions.assertEquals(puz, puz2)
-            }
-            FileInputStream(tmp).use { isp ->
-                val p = loadNative(isp)
-                p!!.source = "Unit Test"
-                // Check HTML stripped/restored
-                p.notes = "X &nbsp; X<br/>"
+        val p = loadNative(tmp)
+        p!!.source = "Unit Test"
+        // Check HTML stripped/restored
+        p.notes = "X &nbsp; X<br/>"
 
-                // play
-                p.playerNote = Note("scratch", "a note", "anagsrc", "anagsol")
+        // play
+        p.playerNote = Note("scratch", "a note", "anagsrc", "anagsol")
 
+        val tmp2 = Buffer()
+        val tmpMeta = Buffer()
 
-                val metaFile = File(
-                    tmp.getParentFile(),
-                    tmp.getName().substring(
-                        0,
-                        tmp.getName().lastIndexOf("."),
-                    ) + ".forkyz"
-                )
-                metaFile.deleteOnExit()
-
-                FileOutputStream(tmp).use { puzOS ->
-                    FileOutputStream(metaFile).use { metaOS ->
-                        IO.save(p, puzOS, metaOS)
-                    }
-                }
-                DataInputStream(FileInputStream(tmp)).use { isp2 ->
-                    DataInputStream(FileInputStream(metaFile)).use { ism ->
-                        val pin = load(isp2, ism)
-                        Assertions.assertEquals(p, pin)
-                    }
-                }
-            }
-        }
+        IO.save(p, tmp2, tmpMeta)
+        val pin = load(tmp2, tmpMeta)
+        Assertions.assertEquals(p, pin)
     }
 
     @Test
-    @Throws(Exception::class)
     fun testGext() {
-        IOTest::class.java
-            .getResourceAsStream("/2010-7-4-LosAngelesTimes.puz")
-            .use { inStream ->
-                var puz = loadNative(inStream)
-                val tmp = File.createTempFile("test", ".puz")
-                tmp.deleteOnExit()
-                FileOutputStream(tmp).use { dos ->
-                    IO.saveNative(puz!!, dos)
-                    FileInputStream(tmp).use { is2 ->
-                        puz = loadNative(is2)
-                        Assertions.assertEquals(
-                            puz!!.boxes[2][2]!!.shape,
-                            Box.Shape.CIRCLE
-                        )
-                    }
-                }
-            }
+        var puz =  SourceUtils.getResource("/2010-7-4-LosAngelesTimes.puz").use {
+           loadNative(it)
+        }
+        val tmp = Buffer()
+        IO.saveNative(puz!!, tmp)
+        puz = loadNative(tmp)
+        Assertions.assertEquals(puz!!.boxes[2][2]!!.shape, Box.Shape.CIRCLE)
     }
 
     @Test
-    @Throws(Exception::class)
     fun testCrack() {
         println("testCrack")
-        IOTest::class.java
-            .getResourceAsStream("/puz_110523margulies.puz")
-            .use { inStream ->
-                val p = loadNative(inStream)
-                val b = IO.crack(p!!)
-            }
+        SourceUtils.getResource("/puz_110523margulies.puz").use { input ->
+            val p = loadNative(input)
+            IO.crack(p!!)
+        }
     }
 
     /**
-     * Note: This is a sanity check, but any changes to unlock functionality should be tested more extensively.
+     * Note: This is a sanity check, but any changes to unlock
+     * functionality should be tested more extensively.
      */
     @Test
-    @Throws(Exception::class)
     fun testUnlockCode() {
-        IOTest::class.java
-            .getResourceAsStream("/2010-7-19-NewYorkTimes.puz")
-            .use { inStream ->
-                val puz = loadNative(inStream)
-                for (b in puz!!.boxesList) {
-                    if (!isBlock(b))
-                        print(b!!.solution + " ")
-                }
-                println()
-                try {
-                    Assertions.assertTrue(
-                        IO.tryUnscramble(
-                            puz,
-                            2465,
-                            IO.initializeUnscrambleData(puz),
-                        )
-                    )
-                    for (b in puz.boxesList) {
-                        if (!isBlock(b))
-                            print(b!!.solution + " ")
-                    }
-                    println()
-
-                    ObjectOutputStream(
-                        ByteArrayOutputStream()
-                    ).use { oos ->
-                        oos.writeObject(puz)
-                    }
-                } catch (e : Exception) {
-                    e.printStackTrace()
-                }
-            }
-    }
-
-    @Test
-    @Throws(Exception::class)
-    fun testRebus() {
-        testPuzzleRebusInputStream.use { inStream ->
-            val puz = IO.loadNative(inStream)
-            Companion.assertIsTestPuzzleRebus(puz!!)
-
-            puz.checkedGetBox(1, 7)!!.response = "NEW RESPONSE 1"
-            puz.checkedGetBox(7, 7)!!.response = "NEW RESPONSE 2"
-            puz.checkedGetBox(1, 8)!!.response = "NEW REBUS"
-
-            val tmp = File.createTempFile("test", ".puz")
-            tmp.deleteOnExit()
-
-            val metaFile = File(
-                tmp.getParentFile(),
-                tmp.getName().substring(
-                    0,
-                    tmp.getName().lastIndexOf("."),
-                ) + ".forkyz"
+        val puz = SourceUtils.getResource("/2010-7-19-NewYorkTimes.puz").use {
+            loadNative(it)
+        }
+        for (b in puz!!.boxesList) {
+            if (!isBlock(b))
+                print(b!!.solution + " ")
+        }
+        println()
+        Assertions.assertTrue(
+            IO.tryUnscramble(
+                puz,
+                2465,
+                IO.initializeUnscrambleData(puz),
             )
-            metaFile.deleteOnExit()
-
-            FileOutputStream(tmp).use { puzOS ->
-                FileOutputStream(metaFile).use { metaOS ->
-                    IO.save(puz, puzOS, metaOS)
-                }
-            }
-            DataInputStream(FileInputStream(tmp)).use { isp2 ->
-                DataInputStream(FileInputStream(metaFile)).use { ism ->
-                    val pin = load(isp2, ism)
-                    Assertions.assertEquals(puz, pin)
-                }
-            }
+        )
+        for (b in puz.boxesList) {
+            if (!isBlock(b))
+                print(b!!.solution + " ")
         }
     }
 
     @Test
-    @Throws(Exception::class)
+    fun testRebus() {
+        val puz = testPuzzleRebus.use { IO.loadNative(it) }
+        assertIsTestPuzzleRebus(puz!!)
+
+        puz.checkedGetBox(1, 7)!!.response = "NEW RESPONSE 1"
+        puz.checkedGetBox(7, 7)!!.response = "NEW RESPONSE 2"
+        puz.checkedGetBox(1, 8)!!.response = "NEW REBUS"
+
+        val tmp = Buffer()
+        val tmpMeta = Buffer()
+
+        IO.save(puz, tmp, tmpMeta)
+        val pin = load(tmp, tmpMeta)
+
+        Assertions.assertEquals(puz, pin)
+    }
+
+    @Test
     fun testEmptySolution() {
-        testPuzzleEmptySolInputStream.use { inStream ->
-            val puz = IO.loadNative(inStream)
-            Assertions.assertFalse(puz!!.hasSolution())
+        val puz = testPuzzleEmptySol.use { IO.loadNative(it) }
+        Assertions.assertFalse(puz!!.hasSolution())
 
-            val tmp = File.createTempFile("test", ".puz")
-            tmp.deleteOnExit()
-
-            FileOutputStream(tmp).use { puzOS ->
-                IO.saveNative(puz, puzOS)
-            }
-            DataInputStream(FileInputStream(tmp)).use { isp2 ->
-                val pin = IO.loadNative(isp2)
-                Assertions.assertFalse(pin!!.hasSolution())
-            }
-        }
+        val tmp = Buffer()
+        IO.saveNative(puz, tmp)
+        val pin = IO.loadNative(tmp)
+        Assertions.assertFalse(pin!!.hasSolution())
     }
 
     companion object {
-        @JvmStatic
-        val testPuzzle1InputStream : InputStream
-            get() = IOTest::class.java.getResourceAsStream("/test.puz")!!
+        val testPuzzle1
+            get() = SourceUtils.getResource("/test.puz")
+        val testPuzzleRebus
+            get() = SourceUtils.getResource("/test_rebus.puz")
+        val testPuzzleEmptySol
+            get() = SourceUtils.getResource("/test_empty_sol.puz")
 
-        val testPuzzleRebusInputStream : InputStream
-            get() = IOTest::class.java
-                .getResourceAsStream("/test_rebus.puz")!!
-
-        val testPuzzleEmptySolInputStream : InputStream
-            get() = IOTest::class.java
-                .getResourceAsStream("/test_empty_sol.puz")!!
-
-        @JvmStatic
         fun assertIsTestPuzzle1(puz : Puzzle) {
             Assertions.assertEquals("NY Times, Fri, Nov 13, 2009", puz.title)
             Assertions.assertEquals("Dana Motley / Will Shortz", puz.author)

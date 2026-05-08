@@ -1,10 +1,6 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.InputStream
-
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
@@ -16,39 +12,23 @@ import app.crossword.yourealwaysbe.puz.io.JPZIO.Companion.readPuzzle
 
 class JPZIOTest {
     @Test
-    @Throws(Exception::class)
     fun testJPZ() {
-        val baos = ByteArrayOutputStream()
-        StreamUtils.copyStream(testPuzzle1InputStream, baos)
-        val puz = readPuzzle(
-            ByteArrayInputStream(baos.toByteArray()),
-        )
-        Companion.assertIsTestPuzzle1(puz!!)
+        val puz = testPuzzle1.use { readPuzzle(it) }
+        assertIsTestPuzzle1(puz!!)
     }
 
     @Test
-    @Throws(Exception::class)
     fun testJPZAcrostic() {
-        val baos = ByteArrayOutputStream()
-        StreamUtils.copyStream(testPuzzleAcrosticInputStream, baos)
-        val puz = readPuzzle(
-            ByteArrayInputStream(baos.toByteArray()),
-        )
-        Companion.assertIsTestPuzzleAcrostic(puz!!)
+        val puz = testPuzzleAcrostic.use { readPuzzle(it) }
+        assertIsTestPuzzleAcrostic(puz!!)
     }
 
     companion object {
-        @JvmStatic
-        val testPuzzle1InputStream : InputStream
-            get() = JPZIOTest::class.java
-                .getResourceAsStream("/lat_puzzle_111128.xml")!!
+        val testPuzzle1
+            get() = SourceUtils.getResource("/lat_puzzle_111128.xml")
+        val testPuzzleAcrostic
+            get() = SourceUtils.getResource("/acrostic.jpz")
 
-        @JvmStatic
-        val testPuzzleAcrosticInputStream : InputStream
-            get() = JPZIOTest::class.java
-                .getResourceAsStream("/acrostic.jpz")!!
-
-        @JvmStatic
         fun assertIsTestPuzzle1(puz : Puzzle) {
             val ACROSS_CLUES = "Across"
             val DOWN_CLUES = "Down"

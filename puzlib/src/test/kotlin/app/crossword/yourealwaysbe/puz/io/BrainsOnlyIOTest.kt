@@ -1,9 +1,8 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.IOException
-import java.io.InputStream
 import kotlinx.datetime.LocalDate
+import kotlinx.io.IOException
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -16,19 +15,14 @@ import app.crossword.yourealwaysbe.puz.io.BrainsOnlyIO.Companion.parse
 
 class BrainsOnlyIOTest {
     @Test
-    @Throws(Exception::class)
     fun testParse() {
-        val puz = parse(testPuzzle1InputStream)
+        val puz = testPuzzle1.use { parse(it) }
         assertIsTestPuzzle1(puz!!)
     }
 
     @Test
-    @Throws(Exception::class)
     fun testParse2() {
-        val puz = parse(
-            BrainsOnlyIOTest::class.java
-                .getResourceAsStream("/brainsonly2.txt")!!
-        )
+        val puz = testPuzzle2.use { parse(it) }
         Assertions.assertEquals(
             puz!!.title,
             "02/09/14 OCCUPIED NATIONS: Surrounding the long answers",
@@ -45,27 +39,24 @@ class BrainsOnlyIOTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun testParse3() {
         try {
             // This was from http://brainsonly.com/servlets-newsday-crossword/newsdaycrossword?date=150903
-            parse(
-                BrainsOnlyIOTest::class.java
-                    .getResourceAsStream("/brainsonly3.txt")!!
-            )
+            testPuzzle3.use { parse(it) }
+            Assertions.fail<String>("Expected brainsonly3.txt to fail to parse")
         } catch (e : IOException) {
-            return
+            // expected
         }
-        Assertions.fail<String>("Expected brainsonly3.txt to fail to parse")
     }
 
     companion object {
-        @JvmStatic
-        val testPuzzle1InputStream : InputStream
-            get() = BrainsOnlyIOTest::class.java
-                .getResourceAsStream("/brainsonly.txt")!!
+        val testPuzzle1
+            get() = SourceUtils.getResource("/brainsonly.txt")
+        val testPuzzle2
+            get() = SourceUtils.getResource("/brainsonly2.txt")
+        val testPuzzle3
+            get() = SourceUtils.getResource("/brainsonly3.txt")
 
-        @JvmStatic
         fun assertIsTestPuzzle1(puz : Puzzle) {
             Assertions.assertEquals("02/07/14 SODA SPEAK", puz.title)
             Assertions.assertEquals(

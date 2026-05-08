@@ -1,8 +1,6 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.InputStream
-
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
@@ -15,33 +13,23 @@ import app.crossword.yourealwaysbe.puz.util.HtmlUtil.parseHtmlColor
 
 class ExolveIOTest {
     @Test
-    @Throws(Exception::class)
     fun testPuzzle1() {
-        testPuzzle1InputStream.use { inStream ->
-            val puz = readPuzzle(inStream)
-            Companion.assertIsTestPuzzle1(puz!!)
-        }
+        val puz = testPuzzle1.use { readPuzzle(it) }
+        assertIsTestPuzzle1(puz!!)
     }
 
     @Test
-    @Throws(Exception::class)
     fun testPuzzleRebus() {
-        testPuzzleRebusInputStream.use { inStream ->
-            val puz = readPuzzle(inStream)
-            Companion.assertIsTestPuzzleRebus(puz!!)
-        }
+        val puz = testPuzzleRebus.use { readPuzzle(it) }
+        assertIsTestPuzzleRebus(puz!!)
     }
 
     companion object {
-        val testPuzzle1InputStream : InputStream
-            get() = ExolveIOTest::class.java
-                .getResourceAsStream("/test.exolve")!!
+        val testPuzzle1
+            get() = SourceUtils.getResource("/test.exolve")
+        val testPuzzleRebus
+            get() = SourceUtils.getResource("/rebus.exolve")
 
-        val testPuzzleRebusInputStream : InputStream
-            get() = ExolveIOTest::class.java
-                .getResourceAsStream("/rebus.exolve")!!
-
-        @Throws(Exception::class)
         fun assertIsTestPuzzle1(puz : Puzzle) {
             Assertions.assertEquals(puz.title, "Test title")
             Assertions.assertEquals(puz.author, "Test author")
@@ -189,7 +177,6 @@ class ExolveIOTest {
             Assertions.assertNull(puz.getClues("Across")!!.getClueByNumber("8"))
         }
 
-        @Throws(Exception::class)
         fun assertIsTestPuzzleRebus(puz: Puzzle) {
             Assertions.assertEquals(puz.width, 3)
             Assertions.assertEquals(puz.height, 2)

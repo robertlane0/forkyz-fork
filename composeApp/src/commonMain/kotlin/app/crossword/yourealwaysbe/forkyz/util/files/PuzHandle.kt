@@ -1,7 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.util.files
 
-import java.io.IOException
+import kotlinx.io.IOException
 
 abstract class PuzHandle private constructor(
     var dirHandle : DirHandle,

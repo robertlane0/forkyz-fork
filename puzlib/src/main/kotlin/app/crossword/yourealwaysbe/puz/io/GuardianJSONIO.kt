@@ -1,11 +1,10 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.IOException
-import java.io.InputStream
 import java.util.logging.Logger
 import kotlinx.datetime.LocalDate
-import kotlinx.io.asSource
+import kotlinx.io.IOException
+import kotlinx.io.Source
 
 import com.fleeksoft.ksoup.Ksoup
 import com.fleeksoft.ksoup.parseSource
@@ -22,18 +21,16 @@ import app.crossword.yourealwaysbe.puz.util.PuzzleUtils.getAcrossZone
 import app.crossword.yourealwaysbe.puz.util.PuzzleUtils.getDownZone
 import app.crossword.yourealwaysbe.puz.util.parseJSONObject
 
-
 /**
  * Read a character stream of JSON data in the format used by the
  * Guardian.
  */
 class GuardianJSONIO : AbstractJSONIO() {
     @Throws(Exception::class)
-    override fun parseInput(inStream : InputStream) : Puzzle? {
-        return readPuzzle(inStream)
+    override fun parseInput(input : Source) : Puzzle? {
+        return readPuzzle(input)
     }
 
-    @JvmRecord
     private data class ClueInfo(
         val zone : Zone,
         val separators : Map<Int, String>?,
@@ -48,14 +45,12 @@ class GuardianJSONIO : AbstractJSONIO() {
         private const val ACROSS_LIST = "Across"
         private const val DOWN_LIST = "Down"
 
-        @JvmStatic
         @Throws(IOException::class)
-        fun readPuzzle(inStream : InputStream) : Puzzle? {
-            val copy = StreamUtils.makeByteArrayInputStream(inStream)
+        fun readPuzzle(input : Source) : Puzzle? {
+            val copy = input.peek()
             var puz : Puzzle? = readFromJSON(copy)
             if (puz == null) {
-                copy.reset()
-                puz = readFromHTML(copy)
+                puz = readFromHTML(input)
             }
             return puz
         }
@@ -63,10 +58,10 @@ class GuardianJSONIO : AbstractJSONIO() {
         /**
          * Returns null if failed
          */
-        fun readFromJSON(inStream : InputStream) : Puzzle? {
+        fun readFromJSON(input : Source) : Puzzle? {
             try {
-                val json = parseJSONObject(inStream)
-                return readPuzzleFromJSON(json)
+                val json = parseJSONObject(input)
+                return readPuzzle(json)
             } catch (e : IOException) {
                 return null
             } catch (e : JSONException) {
@@ -74,15 +69,16 @@ class GuardianJSONIO : AbstractJSONIO() {
             }
         }
 
-        fun readFromHTML(inStream : InputStream) : Puzzle? {
+        fun readFromHTML(input : Source) : Puzzle? {
             try {
-                val doc = Ksoup.parseSource(inStream.asSource())
+                val doc = Ksoup.parseSource(input)
                 var cwJson : JSONObject? = null
                 var err : JSONException? = null
 
                 var cwJsonStr = doc
                     .select("[name=CrosswordComponent]")
                     .attr("props")
+
                 if (!cwJsonStr.isEmpty()) {
                     try {
                         cwJson = parseJSONObject(cwJsonStr)
@@ -101,7 +97,7 @@ class GuardianJSONIO : AbstractJSONIO() {
                 }
 
                 if (cwJson != null)
-                    return readPuzzleFromJSON(cwJson)
+                    return readPuzzle(cwJson)
                 else if (err != null)
                     throw err
             } catch (e : IOException) {
@@ -111,16 +107,6 @@ class GuardianJSONIO : AbstractJSONIO() {
             return null
         }
 
-        fun readPuzzle(jsonString : String) : Puzzle? {
-            try {
-                val json = parseJSONObject(jsonString)
-                return readPuzzleFromJSON(json)
-            } catch (e : JSONException) {
-                LOG.severe("Could not read Guardian JSON: " + e)
-                return null
-            }
-        }
-
         /**
          * Read puzzle from Guardian JSON format
          *
@@ -128,7 +114,7 @@ class GuardianJSONIO : AbstractJSONIO() {
          * puzlib/io at some point).
          */
         @Throws(JSONException::class)
-        private fun readPuzzleFromJSON(json : JSONObject) : Puzzle {
+        fun readPuzzle(json : JSONObject) : Puzzle {
             val builder = PuzzleBuilder(getBoxes(json))
                 .setTitle(json.optStringEmptyNull("name"))
 

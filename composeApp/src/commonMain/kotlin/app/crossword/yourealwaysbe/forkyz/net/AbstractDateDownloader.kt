@@ -1,10 +1,5 @@
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.io.InputStream
-import java.net.MalformedURLException
-import java.net.URI
-import java.net.URISyntaxException
-import java.util.Arrays
 import kotlin.time.Duration
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
@@ -13,6 +8,7 @@ import kotlinx.datetime.format.DateTimeFormat
 import kotlinx.datetime.format.FormatStringsInDatetimeFormats
 import kotlinx.datetime.format.byUnicodePattern
 import kotlinx.datetime.number
+import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.forkyz.net.Downloader.DownloadResult
 import app.crossword.yourealwaysbe.forkyz.util.AppLogger
@@ -90,10 +86,10 @@ open class AbstractDateDownloader constructor(
         supportUrl,
         object : StreamScraper {
             override suspend fun parseInput(
-                inputStream : InputStream,
-                url: String?,
+                input : Source,
+                url : String?,
             ) : Puzzle? {
-                return puzzleParser.parseInput(inputStream)
+                return puzzleParser.parseInput(input)
             }
         },
         sourceUrlFormatPattern,
@@ -159,35 +155,28 @@ open class AbstractDateDownloader constructor(
         date : LocalDate,
         headers : Map<String, String>?,
     ) : Puzzle? {
+        val sourceUrl = getSourceUrl(date)
+        if (sourceUrl == null)
+            return null
+
         try {
-            val sourceUrl = getSourceUrl(date)
-            if (sourceUrl == null)
-                return null
+            getURL(sourceUrl, headers).use { input ->
+                val puz = puzzleParser.parseInput(input)
+                if (puz != null) {
+                    puz.date = if (overrideEmbeddedDate || puz.date == null)
+                        date
+                    else
+                        puz.date
+                    puz.source = name
+                    puz.sourceUrl = sourceUrl
+                    puz.supportUrl = supportUrl
+                    puz.shareUrl = getShareUrl(date)
 
-            val url = (URI(sourceUrl)).toURL()
-            try {
-                getInputStream(url, headers).use { inputStream ->
-                    val puz = puzzleParser.parseInput(inputStream)
-                    if (puz != null) {
-                        puz.date = if (overrideEmbeddedDate || puz.date == null)
-                            date
-                        else
-                            puz.date
-                        puz.source = name
-                        puz.sourceUrl = sourceUrl
-                        puz.supportUrl = supportUrl
-                        puz.shareUrl = getShareUrl(date)
-
-                        return puz
-                    }
+                    return puz
                 }
-            } catch (e : Exception) {
-                e.printStackTrace()
             }
-        } catch (e : URISyntaxException) {
-            AppLogger.e(TAG, "Malformed URL in download: " + e)
-        } catch (e : MalformedURLException) {
-            AppLogger.e(TAG, "Malformed URL in download: " + e)
+        } catch (e : Exception) {
+            e.printStackTrace()
         }
 
         return null
@@ -269,7 +258,7 @@ open class AbstractDateDownloader constructor(
      */
     protected open fun isPublishedOnDay(date : LocalDate) : Boolean {
         val dayOfWeek = date.dayOfWeek
-        return Arrays.binarySearch(days, dayOfWeek) >= 0
+        return days.binarySearch(dayOfWeek) >= 0
     }
 
     /**

@@ -1,8 +1,8 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.io.InputStream
 import java.util.regex.Pattern
+import kotlinx.io.Source
 
 import com.fleeksoft.ksoup.nodes.Document
 
@@ -15,10 +15,10 @@ import app.crossword.yourealwaysbe.puz.io.PuzzleStreamReader
 class CrosswordNexusStreamScraper : AbstractStreamScraper() {
     @Throws(Exception::class)
     public override suspend fun parseInput(
-        inputStream : InputStream,
+        input : Source,
         url : String?,
     ) : Puzzle? {
-        return getDocument(inputStream)?.let { doc ->
+        return getDocument(input)?.let { doc ->
             htmlElementScrape(
                 doc,
                 "iframe", "src",

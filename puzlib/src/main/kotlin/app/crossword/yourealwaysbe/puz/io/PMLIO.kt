@@ -1,16 +1,15 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.BufferedReader
-import java.io.IOException
-import java.io.InputStream
-import java.io.InputStreamReader
 import java.util.Locale
 import java.util.logging.Logger
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
+import kotlinx.io.IOException
+import kotlinx.io.Source
+import kotlinx.io.readLine
 
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Puzzle
@@ -25,8 +24,8 @@ import app.crossword.yourealwaysbe.puz.util.parseJSONObject
  */
 class PMLIO : AbstractJSONIO() {
     @Throws(Exception::class)
-    override fun parseInput(inStream : InputStream) : Puzzle? {
-        return readPuzzle(inStream)
+    override fun parseInput(input : Source) : Puzzle? {
+        return readPuzzle(input)
     }
 
     companion object {
@@ -48,14 +47,12 @@ class PMLIO : AbstractJSONIO() {
             = "^.*starting_puzzle\\s*:\\s*(\\{.*pml_id.*\\}).*$".toRegex()
         private const val CW_JSON_GRP = 1
 
-        @JvmStatic
         @Throws(IOException::class)
-        fun readPuzzle(inStream : InputStream) : Puzzle? {
-            val copy = StreamUtils.makeByteArrayInputStream(inStream)
+        fun readPuzzle(input : Source) : Puzzle? {
+            val copy = input.peek()
             var puz = readFromJSON(copy)
             if (puz == null) {
-                copy.reset()
-                puz = readFromHTML(copy)
+                puz = readFromHTML(input)
             }
             return puz
         }
@@ -63,9 +60,9 @@ class PMLIO : AbstractJSONIO() {
         /**
          * Returns null if failed
          */
-        fun readFromJSON(inStream : InputStream) : Puzzle? {
+        fun readFromJSON(input : Source) : Puzzle? {
             try {
-                val json = parseJSONObject(inStream)
+                val json = parseJSONObject(input)
                 return readPuzzleFromJSON(json)
             } catch (e : IOException) {
                 return null
@@ -82,9 +79,9 @@ class PMLIO : AbstractJSONIO() {
             return readPuzzleFromJSON(json)
         }
 
-        fun readFromHTML(inStream : InputStream) : Puzzle? {
+        fun readFromHTML(input : Source) : Puzzle? {
             try {
-                val cwJson = readPuzzleJSON(inStream)
+                val cwJson = readPuzzleJSON(input)
                 if (cwJson != null && !cwJson.isEmpty())
                     return readPuzzleFromJSON(parseJSONObject(cwJson))
             } catch (e : JSONException) {
@@ -106,16 +103,14 @@ class PMLIO : AbstractJSONIO() {
         /**
          * Return JSON or null if not found
          */
-        private fun readPuzzleJSON(inStream : InputStream) : String? {
+        private fun readPuzzleJSON(input : Source) : String? {
             try {
-                val reader = BufferedReader(InputStreamReader(inStream))
-
-                reader.useLines { lines ->
-                    lines.forEach { line ->
-                        val match = CW_JSON_RE.find(line)
-                        if (match != null)
-                            return match.groups[CW_JSON_GRP]?.value
-                    }
+                var line = input.readLine()
+                while (line != null) {
+                    val match = CW_JSON_RE.find(line)
+                    if (match != null)
+                        return match.groups[CW_JSON_GRP]?.value
+                    line = input.readLine()
                 }
             } catch (e : IOException) {
                 // fall through

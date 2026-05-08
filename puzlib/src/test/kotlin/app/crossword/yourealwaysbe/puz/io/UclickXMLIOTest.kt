@@ -1,9 +1,6 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.IOException
-import java.io.InputStream
-
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
@@ -15,25 +12,18 @@ import app.crossword.yourealwaysbe.puz.io.UclickXMLIO.Companion.parsePuzzle
 
 class UclickXMLIOTest {
     @Test
-    @Throws(IOException::class)
     fun testRead() {
-        testPuzzle1InputStream.use { inStream ->
-            val puz = parsePuzzle(inStream)
-            Companion.assertIsTestPuzzle1(puz!!)
-        }
+        val puz = testPuzzle1.use { parsePuzzle(it) }
+        assertIsTestPuzzle1(puz!!)
     }
 
     companion object {
         private const val TITLE = "12/15/09 LET'S BE HONEST"
         private const val AUTHOR = "by Billie Truitt, edited by Stanley Newman"
 
-        @JvmStatic
-        val testPuzzle1InputStream : InputStream
-            get() = UclickXMLIOTest::class.java.getResourceAsStream(
-                "/crnet091215-data.xml"
-            )!!
+        val testPuzzle1
+            get() = SourceUtils.getResource("/crnet091215-data.xml")
 
-        @JvmStatic
         fun assertIsTestPuzzle1(puz : Puzzle) {
             Assertions.assertEquals(TITLE, puz.title)
             Assertions.assertEquals(AUTHOR, puz.author)

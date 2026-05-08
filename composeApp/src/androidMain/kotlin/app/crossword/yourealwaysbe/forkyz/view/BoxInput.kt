@@ -22,6 +22,7 @@ import app.crossword.yourealwaysbe.forkyz.util.BoxInputConnection
 import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
 import app.crossword.yourealwaysbe.forkyz.util.KeyboardManageableView
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
+import app.crossword.yourealwaysbe.forkyz.view.OrdinaryKey
 
 /**
  * A View class that is blank except it establishes input connections
@@ -40,6 +41,12 @@ class BoxInputView(
     private var forceCaps : Boolean = true
     var onNewResponseCallback : ((String) -> Unit)? = null
     var onDeleteResponseCallback : (() -> Unit)? = null
+    var onOrdinaryKeyDownCallback : ((OrdinaryKey) -> Unit)? = null
+    var onOrdinaryKeyUpCallback : ((OrdinaryKey) -> Unit)? = null
+
+    override fun requestComposeFocus() {
+        requestFocus()
+    }
 
     var response : String? = null
         set(value) {
@@ -101,13 +108,24 @@ class BoxInputView(
         }
     }
 
-    @Override
-    override fun onCreateForkyzInputConnection(
-        ei : EditorInfo,
-    ) : InputConnection {
-        val fic = BaseInputConnection(this, false)
-        ei.inputType = InputType.TYPE_NULL
-        return fic
+    override fun onStringValueKeyDown(value : String) {
+        onNewResponse(value)
+    }
+
+    override fun onStringValueKeyUp(value : String) {
+        // ignore
+    }
+
+    override fun onOrdinaryKeyDown(key : OrdinaryKey) {
+        if (key == OrdinaryKey.KEY_DELETE)
+            onDeleteResponse()
+        else
+            onOrdinaryKeyDownCallback?.let { it(key) }
+    }
+
+    override fun onOrdinaryKeyUp(key : OrdinaryKey) {
+        if (key != OrdinaryKey.KEY_DELETE)
+            onOrdinaryKeyUpCallback?.let { it(key) }
     }
 }
 
@@ -118,6 +136,8 @@ actual fun BoxInput(
     inputConnectionMediator : InputConnectionMediator,
     onNewResponse : (String) -> Unit,
     onDeleteResponse : () -> Unit,
+    onOrdinaryKeyDown : (OrdinaryKey) -> Unit,
+    onOrdinaryKeyUp : (OrdinaryKey) -> Unit,
     body : @Composable () -> Unit,
 ) {
     Box(modifier = modifier) {
@@ -139,6 +159,8 @@ actual fun BoxInput(
                 view.apply {
                     onNewResponseCallback = onNewResponse
                     onDeleteResponseCallback = onDeleteResponse
+                    onOrdinaryKeyDownCallback = onOrdinaryKeyDown
+                    onOrdinaryKeyUpCallback = onOrdinaryKeyUp
                 }
             },
         )

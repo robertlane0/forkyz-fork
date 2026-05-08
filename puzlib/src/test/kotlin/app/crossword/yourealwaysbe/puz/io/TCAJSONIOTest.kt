@@ -1,7 +1,5 @@
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.IOException
-import java.io.InputStream
 import kotlinx.datetime.LocalDate
 
 import org.junit.jupiter.api.Assertions
@@ -16,17 +14,14 @@ import app.crossword.yourealwaysbe.puz.Zone
 
 class TCAJSONIOTest {
     @Test
-    @Throws(IOException::class)
     fun testRead() {
-        testPuzzle1InputStream.use { inStream ->
-            val puz = TCAJSONIO.readPuzzle(inStream)
-            Companion.assertIsTestPuzzle1(puz!!)
-        }
+        val puz = testPuzzle1.use { TCAJSONIO.readPuzzle(it) }
+        assertIsTestPuzzle1(puz!!)
     }
 
     companion object {
-        val testPuzzle1InputStream: InputStream
-            get() = TCAJSONIO::class.java.getResourceAsStream("/tca.json")!!
+        val testPuzzle1
+            get() = SourceUtils.getResource("/tca.json")
 
         fun assertIsTestPuzzle1(puz: Puzzle) {
             Assertions.assertEquals(puz.title, "Test Crossword")

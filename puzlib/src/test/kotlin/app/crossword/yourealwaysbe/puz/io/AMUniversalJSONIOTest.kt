@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.InputStream
 import kotlinx.datetime.LocalDate
 
 import org.junit.jupiter.api.Assertions
@@ -15,16 +14,14 @@ import app.crossword.yourealwaysbe.puz.io.AMUniversalJSONIO.Companion.readPuzzle
 
 class AMUniversalJSONIOTest {
     @Test
-    @Throws(Exception::class)
     fun testPuzzle1() {
-        val puz = readPuzzle(testPuzzle1InputStream)
-        Companion.assertIsTestPuzzle1(puz!!)
+        val puz = testPuzzle1.use { readPuzzle(it) }
+        assertIsTestPuzzle1(puz!!)
     }
 
     companion object {
-        val testPuzzle1InputStream : InputStream
-            get() = AMUniversalJSONIOTest::class.java
-                .getResourceAsStream("/amuniversal.json")!!
+        val testPuzzle1
+            get() = SourceUtils.getResource("/amuniversal.json")
 
         fun assertIsTestPuzzle1(puz : Puzzle) {
             val ACROSS_CLUES = "Across"

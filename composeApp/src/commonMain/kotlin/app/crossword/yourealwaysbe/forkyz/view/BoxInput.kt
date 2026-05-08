@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
+import app.crossword.yourealwaysbe.forkyz.view.OrdinaryKey
 
 /**
  * Class for doing some control of your input
@@ -35,6 +36,8 @@ class BoxInputState {
  * the response for the box that is now highlighted.
  * @param onDeleteResponse call back when response deleted, should
  * return the response for the box that is now highlighted
+ * @param onOrdinaryKeyDown callback for unhandled ForkyzKeyboard ordinary keys
+ * @param onOrdinaryKeyUp callback for unhandled ForkyzKeyboard ordinary keys
  * @param body what goes in front of the input
  */
 @Composable
@@ -44,6 +47,8 @@ expect fun BoxInput(
     inputConnectionMediator : InputConnectionMediator,
     onNewResponse : (String) -> Unit = { },
     onDeleteResponse : () -> Unit = { },
+    onOrdinaryKeyDown : (OrdinaryKey) -> Unit = { },
+    onOrdinaryKeyUp : (OrdinaryKey) -> Unit = { },
     body : @Composable () -> Unit,
 )
 

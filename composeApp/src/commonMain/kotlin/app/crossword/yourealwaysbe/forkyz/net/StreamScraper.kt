@@ -1,7 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.io.InputStream
+import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.io.PuzzleParser
@@ -20,9 +20,6 @@ interface StreamScraper {
      * @return parse puzzle or null if failed or not in right format
      */
     @Throws(Exception::class)
-    suspend fun parseInput(
-        inputStream : InputStream,
-        url : String? = null,
-    ): Puzzle?
+    suspend fun parseInput(input : Source, url : String? = null): Puzzle?
 }
 

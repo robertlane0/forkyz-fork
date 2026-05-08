@@ -1,6 +1,13 @@
 
 package app.crossword.yourealwaysbe.puz
 
+import java.util.concurrent.atomic.AtomicBoolean
+
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
+
 import app.crossword.yourealwaysbe.puz.Box.Companion.isBlock
 import app.crossword.yourealwaysbe.puz.MovementStrategy.CycleUnfilled
 import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges
@@ -8,13 +15,7 @@ import app.crossword.yourealwaysbe.puz.Playboard.PlayboardListener
 import app.crossword.yourealwaysbe.puz.io.IO
 import app.crossword.yourealwaysbe.puz.io.IOTest
 import app.crossword.yourealwaysbe.puz.io.IPuzIO
-import java.io.DataInputStream
-import java.io.IOException
-import java.util.concurrent.atomic.AtomicBoolean
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
+import app.crossword.yourealwaysbe.puz.io.SourceUtils
 
 class PlayboardTest {
     @Target(
@@ -28,7 +29,6 @@ class PlayboardTest {
     private annotation class TestWithAndWithoutBlockObjects
 
     @TestWithAndWithoutBlockObjects
-    @Throws(Exception::class)
     fun testMoveUp(blockObjects : Boolean) {
         val puz = loadTestPuz(blockObjects)
 
@@ -73,7 +73,6 @@ class PlayboardTest {
     }
 
     @TestWithAndWithoutBlockObjects
-    @Throws(Exception::class)
     fun testDeleteLetter(blockObjects : Boolean) {
         val puz = loadTestPuz(blockObjects)
 
@@ -114,7 +113,6 @@ class PlayboardTest {
     }
 
     @TestWithAndWithoutBlockObjects
-    @Throws(Exception::class)
     fun testDeleteLetterCrossingWords(blockObjects : Boolean) {
         val puz = loadTestPuz(blockObjects)
 
@@ -166,7 +164,6 @@ class PlayboardTest {
     }
 
     @TestWithAndWithoutBlockObjects
-    @Throws(Exception::class)
     fun testDeleteLetterCrossingCells(blockObjects : Boolean) {
         val puz = loadTestPuz(blockObjects)
 
@@ -217,7 +214,6 @@ class PlayboardTest {
     }
 
     @TestWithAndWithoutBlockObjects
-    @Throws(Exception::class)
     fun testDeletePreserveCorrect(blockObjects : Boolean) {
         val puz = loadTestPuz(blockObjects)
 
@@ -262,7 +258,6 @@ class PlayboardTest {
     }
 
     @TestWithAndWithoutBlockObjects
-    @Throws(Exception::class)
     fun testMoveNextOnAxis(blockObjects : Boolean) {
         val puz = loadTestPuz(blockObjects)
         val board = Playboard(puz)
@@ -310,7 +305,6 @@ class PlayboardTest {
     }
 
     @TestWithAndWithoutBlockObjects
-    @Throws(Exception::class)
     fun testMoveStopEnd(blockObjects : Boolean) {
         val puz = loadTestPuz(blockObjects)
         val board = Playboard(puz)
@@ -347,7 +341,6 @@ class PlayboardTest {
     }
 
     @TestWithAndWithoutBlockObjects
-    @Throws(Exception::class)
     fun testMoveNextClue(blockObjects : Boolean) {
         val puz = loadTestPuz(blockObjects)
         val board = Playboard(puz)
@@ -407,7 +400,6 @@ class PlayboardTest {
     }
 
     @TestWithAndWithoutBlockObjects
-    @Throws(Exception::class)
     fun testMoveParallel(blockObjects : Boolean) {
         val puz = loadTestPuz(blockObjects)
         val board = Playboard(puz)
@@ -456,7 +448,6 @@ class PlayboardTest {
     }
 
     @TestWithAndWithoutBlockObjects
-    @Throws(Exception::class)
     fun testCycleUnfilled(blockObjects : Boolean) {
         val puz = loadTestPuz(blockObjects)
         val board = Playboard(puz)
@@ -523,31 +514,26 @@ class PlayboardTest {
     }
 
     @TestWithAndWithoutBlockObjects
-    @Throws(Exception::class)
     fun testPlayFullMoveAxis(blockObjects : Boolean) {
         checkNoMoveFullGrid(blockObjects, MovementStrategy.MOVE_NEXT_ON_AXIS)
     }
 
     @TestWithAndWithoutBlockObjects
-    @Throws(Exception::class)
     fun testPlayFullMoveStopEnd(blockObjects : Boolean) {
         checkNoMoveFullGrid(blockObjects, MovementStrategy.STOP_ON_END)
     }
 
     @TestWithAndWithoutBlockObjects
-    @Throws(Exception::class)
     fun testPlayFullMoveNextClue(blockObjects : Boolean) {
         checkNoMoveFullGrid(blockObjects, MovementStrategy.MOVE_NEXT_CLUE)
     }
 
     @TestWithAndWithoutBlockObjects
-    @Throws(Exception::class)
     fun testPlayFullMoveParallelWord(blockObjects : Boolean) {
         checkNoMoveFullGrid(blockObjects, MovementStrategy.MOVE_PARALLEL_WORD)
     }
 
     @TestWithAndWithoutBlockObjects
-    @Throws(Exception::class)
     fun testPlayFullMoveCycleUnfilled(blockObjects : Boolean) {
         checkNoMoveFullGrid(
             blockObjects,
@@ -560,7 +546,6 @@ class PlayboardTest {
     }
 
     @TestWithAndWithoutBlockObjects
-    @Throws(Exception::class)
     fun testNextWord(blockObjects : Boolean) {
         val puz = loadTestPuz(blockObjects)
         val board = Playboard(puz)
@@ -597,7 +582,6 @@ class PlayboardTest {
     }
 
     @TestWithAndWithoutBlockObjects
-    @Throws(Exception::class)
     fun testPreviousWord(blockObjects : Boolean) {
         val puz = loadTestPuz(blockObjects)
         val board = Playboard(puz)
@@ -634,7 +618,6 @@ class PlayboardTest {
     }
 
     @TestWithAndWithoutBlockObjects
-    @Throws(Exception::class)
     fun testDetachedWord(blockObjects : Boolean) {
         val puz = loadTestDetachedPuz(blockObjects)
         val board = Playboard(puz)
@@ -663,7 +646,6 @@ class PlayboardTest {
     }
 
     @TestWithAndWithoutBlockObjects
-    @Throws(Exception::class)
     fun testRevealInitialLetter(blockObjects : Boolean) {
         val puz = loadTestPuz(blockObjects)
         val board = Playboard(puz)
@@ -693,7 +675,6 @@ class PlayboardTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testEditHint() {
         val puz = loadTestPuz(false)
         val board = Playboard(puz)
@@ -718,7 +699,6 @@ class PlayboardTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testFlagClue() {
         val puz = loadTestPuz(false)
         val board = Playboard(puz)
@@ -747,7 +727,6 @@ class PlayboardTest {
      * Test failure https://gitlab.com/Hague/forkyz/-/issues/86
      */
     @TestWithAndWithoutBlockObjects
-    @Throws(Exception::class)
     fun testNextWordBug86(blockObjects : Boolean) {
         val puz = loadTestPuz(blockObjects)
         val board = Playboard(puz)
@@ -760,7 +739,6 @@ class PlayboardTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun testPlayLetterUndoStack() {
         val puz = loadTestPuz(false)
         val board = Playboard(puz)
@@ -802,7 +780,6 @@ class PlayboardTest {
     }
 
     @TestWithAndWithoutBlockObjects
-    @Throws(Exception::class)
     fun testToggleBeforeMove() {
         val puz = loadTestPuz(false)
         val board = Playboard(puz)
@@ -847,7 +824,6 @@ class PlayboardTest {
     }
 
     @TestWithAndWithoutBlockObjects
-    @Throws(Exception::class)
     fun testPlayAnswer(blockObjects : Boolean) {
         val puz = loadTestPuz(blockObjects)
         val board = Playboard(puz)
@@ -865,7 +841,6 @@ class PlayboardTest {
         assertPosition(board, 1, 4)
     }
 
-    @Throws(Exception::class)
     fun testPlayLetters(blockObjects : Boolean) {
         val puz = loadTestPuz(blockObjects)
         val board = Playboard(puz)
@@ -883,7 +858,6 @@ class PlayboardTest {
         assertPosition(board, 1, 4)
     }
 
-    @Throws(Exception::class)
     fun testPlayScratchLetters(blockObjects : Boolean) {
         val puz = loadTestPuz(blockObjects)
         val board = Playboard(puz)
@@ -905,7 +879,6 @@ class PlayboardTest {
         )
     }
 
-    @Throws(Exception::class)
     fun testPlayScratchLettersSpace(
         blockObjects : Boolean
     ) {
@@ -930,7 +903,6 @@ class PlayboardTest {
         )
     }
 
-    @Throws(Exception::class)
     private fun checkNoMoveFullGrid(
         blockObjects : Boolean, moveStrat : MovementStrategy
     ) {
@@ -974,19 +946,16 @@ class PlayboardTest {
         Assertions.assertEquals(checkPos, board.highlightLetter)
     }
 
-    @Throws(Exception::class)
     private fun assertBoxBlank(puz : Puzzle, row : Int, col : Int) {
         Assertions.assertTrue(puz.checkedGetBox(row, col)!!.isBlank())
     }
 
-    @Throws(Exception::class)
     private fun assertBoxLetter(
         puz : Puzzle, row : Int, col : Int, letter : String?
     ) {
         Assertions.assertEquals(puz.checkedGetBox(row, col)!!.response, letter)
     }
 
-    @Throws(Exception::class)
     private fun assertPosition(board : Playboard, row : Int, col : Int) {
         Assertions.assertEquals(board.highlightLetter, Position(row, col))
     }
@@ -1001,7 +970,6 @@ class PlayboardTest {
         Assertions.assertEquals(clue.clueNumber, number)
     }
 
-    @Throws(Exception::class)
     private fun assertAtRow(board : Playboard, row : Int) {
         Assertions.assertEquals(board.highlightLetter.row, row)
     }
@@ -1018,11 +986,10 @@ class PlayboardTest {
      * @param blockObjects whether to use objects for blank boxes
      * instead of null
      */
-    @Throws(IOException::class)
     private fun loadTestPuz(blockObjects : Boolean) : Puzzle {
-        val puz = IO.loadNative(
-            DataInputStream(IOTest::class.java.getResourceAsStream("/test.puz"))
-        )
+        val puz = SourceUtils.getResource("/test.puz").use {
+            IO.loadNative(it)
+        }
 
         if (blockObjects)
             insertBlockObjects(puz)
@@ -1036,16 +1003,14 @@ class PlayboardTest {
      * @param blockObjects whether to use objects for blank boxes
      * instead of null
      */
-    @Throws(IOException::class)
     private fun loadTestDetachedPuz(blockObjects : Boolean) : Puzzle {
-        val puz = IPuzIO.readPuzzle(
-            IOTest::class.java.getResourceAsStream("/detachedCells.ipuz")
-        )!!
-
+        val puz = SourceUtils.getResource("/detachedCells.ipuz").use {
+            IPuzIO.readPuzzle(it)
+        }
         if (blockObjects)
-            insertBlockObjects(puz)
+            insertBlockObjects(puz!!)
 
-        return puz
+        return puz!!
     }
 
     /**

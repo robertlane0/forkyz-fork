@@ -1,9 +1,9 @@
 
 package app.crossword.yourealwaysbe.forkyz.util
 
+import app.crossword.yourealwaysbe.forkyz.view.OrdinaryKey
+
 expect class View
-expect class EditorInfo
-expect interface InputConnection
 
 interface KeyboardManageableView {
     /**
@@ -21,9 +21,29 @@ interface KeyboardManageableView {
     fun getView() : View
 
     /**
-     * Create an input connection for the built-in Forkyz keyboard
+     * Restore Compose focus to this view
      */
-    fun onCreateForkyzInputConnection(ei : EditorInfo) : InputConnection
+    fun requestComposeFocus() { }
+
+    /**
+     * When a string value key goes down on ForkyzKeyboard
+     */
+    fun onStringValueKeyDown(value : String)
+
+    /**
+     * When a string value key goes up on Forkyz Keyboard
+     */
+    fun onStringValueKeyUp(value : String)
+
+    /**
+     * When a OrdinaryKey goes down on Forkyz Keyboard
+     */
+    fun onOrdinaryKeyDown(key : OrdinaryKey)
+
+    /**
+     * When an OrdinaryKey goes up on Forkyz Keyboard
+     */
+    fun onOrdinaryKeyUp(key : OrdinaryKey)
 }
 
 /**
@@ -31,56 +51,46 @@ interface KeyboardManageableView {
  *
  * Currently use old views setup.
  *
- * Provide the ForkyzKeyboard and the ManageableView that wants to be
- * connected. Once has both, with refresh connection on any change. Holds the
- * live input connection between the view and ForkyzKeyboard if appropriate.
- *
- * Also provides helper functions for connecting to native keyboard.
+ * Provide the ManageableView that wants to be connected. Will refresh
+ * connection on any change. Maintains input connection between the view
+ * and native keyboard if appropriate.
  */
-interface InputConnectionMediator {
-    val actionUp : Int
-    val actionDown : Int
-    val keyA : Int
-    val keyB : Int
-    val keyC : Int
-    val keyD : Int
-    val keyE : Int
-    val keyF : Int
-    val keyG : Int
-    val keyH : Int
-    val keyI : Int
-    val keyJ : Int
-    val keyK : Int
-    val keyL : Int
-    val keyM : Int
-    val keyN : Int
-    val keyO : Int
-    val keyP : Int
-    val keyQ : Int
-    val keyR : Int
-    val keyS : Int
-    val keyT : Int
-    val keyU : Int
-    val keyV : Int
-    val keyW : Int
-    val keyX : Int
-    val keyY : Int
-    val keyZ : Int
-    val keySpace : Int
-    val keyDelete : Int
-    val keyUp : Int
-    val keyDown : Int
-    val keyLeft : Int
-    val keyRight : Int
+abstract class InputConnectionMediator {
+    protected var receiver : KeyboardManageableView? = null
+        private set
 
-    /**
-     * Will refresh if receiver is new and keyboard set
-     */
-    fun registerReceiver(receiver : KeyboardManageableView?)
-    fun clearReceiver()
-    fun focusReceiver()
-    fun showNative(forceCaps : Boolean)
-    fun hideNative()
-    fun sendForkyzKey(keyCode : Int, action : Int)
+    fun registerReceiver(receiver : KeyboardManageableView?) {
+        if (this.receiver !== receiver) {
+            this.receiver = receiver
+        }
+    }
+
+    fun clearReceiver() {
+        hideNative()
+        registerReceiver(null)
+    }
+
+    fun sendStringValueKeyDown(value : String) {
+        receiver?.onStringValueKeyDown(value)
+    }
+
+    fun sendStringValueKeyUp(value : String) {
+        receiver?.onStringValueKeyUp(value)
+    }
+
+    fun sendOrdinaryKeyDown(key : OrdinaryKey) {
+        receiver?.onOrdinaryKeyDown(key)
+    }
+
+    fun sendOrdinaryKeyUp(key : OrdinaryKey) {
+        receiver?.onOrdinaryKeyUp(key)
+    }
+
+    fun focusReceiver() {
+        receiver?.requestComposeFocus()
+    }
+
+    abstract fun showNative(forceCaps : Boolean)
+    abstract fun hideNative()
 }
 

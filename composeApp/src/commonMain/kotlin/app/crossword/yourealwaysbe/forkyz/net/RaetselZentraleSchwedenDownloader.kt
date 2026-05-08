@@ -1,12 +1,10 @@
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.io.IOException
-import java.net.URI
-import java.net.URISyntaxException
 import java.util.Locale
 import kotlin.time.Duration
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
+import kotlinx.io.IOException
 
 import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 import app.crossword.yourealwaysbe.puz.Puzzle
@@ -53,13 +51,12 @@ class RaetselZentraleSchwedenDownloader(
 
     override suspend fun getSourceUrl(date : LocalDate) : String? {
         try {
-            getInputStream((URI(idUrl)).toURL(), null).use { inputStream ->
+            getURL(idUrl, null).use { input ->
                 return RaetselZentraleSchwedenStreamScraper
-                    .getAPIURL(inputStream)
+                    .getAPIURL(input)
             }
         } catch (e : IOException) {
             // fall through
-        } catch (e : URISyntaxException) {
         }
         return null
     }

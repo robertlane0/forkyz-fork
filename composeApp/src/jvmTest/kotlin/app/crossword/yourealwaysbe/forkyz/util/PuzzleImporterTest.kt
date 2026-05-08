@@ -3,8 +3,11 @@ package app.crossword.yourealwaysbe.forkyz.util
 
 import java.io.File
 import java.io.FileOutputStream
-import java.io.IOException
 import kotlinx.coroutines.runBlocking
+import kotlinx.io.asSink
+import kotlinx.io.asSource
+import kotlinx.io.buffered
+import kotlinx.io.readString
 
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -25,7 +28,6 @@ import app.crossword.yourealwaysbe.forkyz.util.files.MetaCache
 import app.crossword.yourealwaysbe.forkyz.util.files.MetaCache.CachedMeta
 import app.crossword.yourealwaysbe.forkyz.util.files.MetaCache.MetaRecord
 import app.crossword.yourealwaysbe.forkyz.util.toUri
-import app.crossword.yourealwaysbe.puz.io.StreamUtils
 
 // thanks: https://derekwilson.net/blog/2018/08/23/mokito-kotlin
 object MockitoHelper {
@@ -241,9 +243,12 @@ class PuzzleImporterTest {
         outFile : File,
     ) {
         PuzzleImporterTest::class.java
-            .getResourceAsStream(resourceName).use { inputStream ->
-                FileOutputStream(outFile).use { os ->
-                    StreamUtils.copyStream(inputStream, os)
+            .getResourceAsStream(resourceName)
+            .asSource()
+            .buffered()
+            .use { input ->
+                FileOutputStream(outFile).asSink().buffered().use { output ->
+                    input.transferTo(output)
                 }
             }
     }

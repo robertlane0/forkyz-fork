@@ -1,10 +1,10 @@
 
 package app.crossword.yourealwaysbe.puz.io.versions
 
-import java.io.DataInputStream
-import java.io.DataOutputStream
-import java.io.IOException
 import java.util.logging.Logger
+import kotlinx.io.IOException
+import kotlinx.io.Sink
+import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.puz.Box.Companion.isBlock
 import app.crossword.yourealwaysbe.puz.Position
@@ -30,26 +30,26 @@ open class IOVersion3 : IOVersion2() {
     }
 
     @Throws(IOException::class)
-    override fun readMeta(inStream : DataInputStream) : PuzzleMeta {
-        val meta = super.readMeta(inStream)
-        val x = inStream.readInt()
-        val y = inStream.readInt()
+    override fun readMeta(input : Source) : PuzzleMeta {
+        val meta = super.readMeta(input)
+        val x = input.readInt()
+        val y = input.readInt()
         meta.position = Position(y, x)
-        meta.across = inStream.read() == 1
+        meta.across = input.readByte().toInt() == 1
         return meta
     }
 
     @Throws(IOException::class)
-    override fun writeMeta(puz : Puzzle, os : DataOutputStream) {
-        super.writeMeta(puz, os)
+    override fun writeMeta(puz : Puzzle, output : Sink) {
+        super.writeMeta(puz, output)
         val p = puz.position
-        os.writeInt(p.col)
-        os.writeInt(p.row)
+        output.writeInt(p.col)
+        output.writeInt(p.row)
         val curCid = puz.currentClueID
         val acrossList = getAcrossListName(puz)
         if (curCid == null || acrossList == curCid.listName)
-            os.write(1)
-        else os.write(-1)
+            output.writeByte(1)
+        else output.writeByte(-1)
     }
 
     companion object {

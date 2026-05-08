@@ -1,23 +1,23 @@
 
 package app.crossword.yourealwaysbe.puz.io.versions
 
-import java.io.DataInputStream
-import java.io.DataOutputStream
-import java.io.IOException
-import java.nio.charset.Charset;
+import java.nio.charset.Charset
+import kotlinx.io.IOException
+import kotlinx.io.Sink
+import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.PuzzleMeta
 
 interface IOVersion {
     @Throws(IOException::class)
-    fun write(puz : Puzzle, os : DataOutputStream)
+    fun write(puz : Puzzle, output : Sink)
 
     @Throws(IOException::class)
-    fun read(puz : Puzzle, inStream : DataInputStream)
+    fun read(puz : Puzzle, input : Source)
 
     @Throws(IOException::class)
-    fun readMeta(inStream : DataInputStream) : PuzzleMeta
+    fun readMeta(input : Source) : PuzzleMeta
 
     val charset : Charset
 }

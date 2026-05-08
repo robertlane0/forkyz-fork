@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -27,6 +28,7 @@ import androidx.compose.ui.unit.Dp
 import app.crossword.yourealwaysbe.forkyz.theme.BoardColorScheme
 import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
 import app.crossword.yourealwaysbe.forkyz.util.keyEventToResponse
+import app.crossword.yourealwaysbe.forkyz.view.OrdinaryKey
 
 // to avoid using Box.BLANK to keep data away from UI :(
 private val BLANK : Char = ' '
@@ -177,17 +179,29 @@ fun BoardEditText(
         onDelete(state.selected)
     }
 
+    fun onLeft() {
+        state.selected = Math.max(state.selected - 1, 0)
+    }
+
+    fun onRight() {
+        state.selected = Math.min(state.selected + 1, length - 1)
+    }
+
+    fun onSpace() {
+        onNewResponse(" ")
+    }
+
     fun onKeyEvent(event : KeyEvent) : Boolean {
         val isDown = event.type == KeyEventType.KeyDown
         when (event.key) {
             Key.DirectionLeft -> {
                 if (isDown)
-                    state.selected = Math.max(state.selected - 1, 0)
+                    onLeft()
                 return true
             }
             Key.DirectionRight -> {
                 if (isDown)
-                    state.selected = Math.min(state.selected + 1, length - 1)
+                    onRight()
                 return true
             }
             Key.Delete, Key.Backspace -> {
@@ -197,7 +211,7 @@ fun BoardEditText(
             }
             Key.Spacebar -> {
                 if (isDown)
-                    onNewResponse(" ")
+                    onSpace()
                 return true
             }
         }
@@ -212,23 +226,47 @@ fun BoardEditText(
         return false
     }
 
+    fun onOrdinaryKeyDown(key : OrdinaryKey) {
+        when (key) {
+            OrdinaryKey.KEY_DELETE -> onDeleteResponse()
+            OrdinaryKey.KEY_LEFT -> onLeft()
+            OrdinaryKey.KEY_RIGHT -> onRight()
+            OrdinaryKey.KEY_SPACE -> onSpace()
+            else -> onOrdinaryKeyDown(key)
+        }
+    }
+
+    fun onOrdinaryKeyUp(key : OrdinaryKey) {
+        when (key) {
+            OrdinaryKey.KEY_DELETE -> { }
+            OrdinaryKey.KEY_LEFT -> { }
+            OrdinaryKey.KEY_RIGHT -> { }
+            OrdinaryKey.KEY_SPACE -> { }
+            else -> onOrdinaryKeyUp(key)
+        }
+    }
+
+    var isFocused by remember { mutableStateOf(false) }
+
     BoxInput(
         modifier = modifier.onFocusChanged {
-            if (!it.hasFocus)
-                state.selected = -1
-            else if (state.selected < 0)
+            isFocused = it.hasFocus
+            if (it.hasFocus && state.selected < 0)
                 state.selected = 0
             onFocusChanged(it.hasFocus)
         }.onKeyEvent(::onKeyEvent),
         state = state.boxInputState,
         inputConnectionMediator = inputConnectionMediator,
-        onNewResponse = ::onNewResponse,
-        onDeleteResponse = ::onDeleteResponse,
+        onNewResponse = { onNewResponse(it) },
+        onDeleteResponse = { onDeleteResponse() },
+        onOrdinaryKeyDown = { onOrdinaryKeyDown(it) },
+        onOrdinaryKeyUp = { onOrdinaryKeyUp(it) },
     ) {
         val boxes = remember(
             length,
             value,
             state.selected,
+            isFocused,
             separators,
             shadow,
         ) {
@@ -243,7 +281,7 @@ fun BoardEditText(
                     isBlock = false,
                     isBlank = response == BLANK,
                     response = response.toString(),
-                    highlighted = col == state.selected,
+                    highlighted = isFocused && col == state.selected,
                     separators = Separators(
                         left = if (col == 0) separators.getOrNull(0) else null,
                         right = separators.getOrNull(col + 1),

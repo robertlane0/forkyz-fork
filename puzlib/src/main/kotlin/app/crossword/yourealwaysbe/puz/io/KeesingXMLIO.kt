@@ -1,11 +1,9 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.DataOutputStream
-import java.io.InputStream
 import java.util.logging.Logger
 import kotlinx.datetime.LocalDate
-import kotlinx.io.asSource
+import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.puz.Box
 import app.crossword.yourealwaysbe.puz.Box.Companion.isBlock
@@ -287,8 +285,8 @@ class KeesingXMLIO : PuzzleParser {
     }
 
     @Throws(Exception::class)
-    override fun parseInput(inStream : InputStream) : Puzzle? {
-        return readPuzzle(inStream)
+    override fun parseInput(input : Source) : Puzzle? {
+        return readPuzzle(input)
     }
 
     companion object {
@@ -300,8 +298,8 @@ class KeesingXMLIO : PuzzleParser {
         private const val ARROWWORD_TYPE = "Arrowword"
 
         @Throws(Exception::class)
-        fun readPuzzle(inStream : InputStream) : Puzzle? {
-            val content = parseXMLElement(inStream.asSource())
+        fun readPuzzle(input : Source) : Puzzle? {
+            val content = parseXMLElement(input)
             val handler = KeesingXMLParser(content)
 
             val gottenBoxes = handler.boxes
@@ -337,26 +335,6 @@ class KeesingXMLIO : PuzzleParser {
             }
 
             return builder.puzzle
-        }
-
-        fun convertPuzzle(
-            inStream : InputStream,
-            os : DataOutputStream,
-            d : LocalDate,
-        ) : Boolean {
-            try {
-                val puz : Puzzle? = readPuzzle(inStream)
-                if (puz == null) {
-                    return false
-                } else {
-                    puz.date = d
-                    IO.saveNative(puz, os)
-                }
-                return true
-            } catch (e : Exception) {
-                LOG.severe("Unable to convert Keesing XML file: " + e.message)
-                return false
-            }
         }
 
         /**

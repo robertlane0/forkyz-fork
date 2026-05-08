@@ -4,9 +4,11 @@ package app.crossword.yourealwaysbe.forkyz.util.files
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.io.IOException
-import java.io.InputStream
-import java.io.OutputStream
+import kotlinx.io.IOException
+import kotlinx.io.RawSink
+import kotlinx.io.RawSource
+import kotlinx.io.asSink
+import kotlinx.io.asSource
 
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
@@ -157,13 +159,17 @@ abstract class FileHandlerJavaFile : FileHandler {
     }
 
     @Throws(IOException::class)
-    override fun getOutputStream(fileHandle : FileHandle) : OutputStream {
-        return FileOutputStream(fileHandle.getFile())
+    override fun getOutput(fileHandle : FileHandle) : RawSink {
+        return FileOutputStream(fileHandle.getFile()).asSink()
     }
 
     @Throws(IOException::class)
-    override fun getInputStream(fileHandle : FileHandle) : InputStream {
-        return FileInputStream(fileHandle.getFile())
+    override fun getInput(fileHandle : FileHandle) : RawSource {
+        try {
+            return FileInputStream(fileHandle.getFile()).asSource()
+        } catch (e : IOException) {
+            throw IOException(e)
+        }
     }
 
     private fun getGenericDirectory(path : String) : DirHandle {

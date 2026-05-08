@@ -1,7 +1,7 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.io.InputStream
+import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.puz.Puzzle
 
@@ -10,5 +10,5 @@ import app.crossword.yourealwaysbe.puz.Puzzle
  */
 abstract class AbstractJSONIO : PuzzleParser {
     @Throws(Exception::class)
-    abstract override fun parseInput(inStream : InputStream) : Puzzle?
+    abstract override fun parseInput(input : Source) : Puzzle?
 }

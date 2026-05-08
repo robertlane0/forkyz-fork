@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz
 
-import java.io.IOException
 import kotlin.collections.ArrayDeque
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -16,6 +15,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.datetime.LocalDate
+import kotlinx.io.IOException
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -284,6 +284,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_layou
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_native
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_never_show
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_qwerty
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_russian
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_qwertz
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_repeat_delay
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_repeat_delay_desc
@@ -1889,6 +1890,10 @@ class SettingsPageViewModel(
                         Res.string.keyboard_colemak,
                         KeyboardLayout.KL_COLEMAK,
                     ),
+                    SettingsListEntry(
+                        Res.string.keyboard_russian,
+                        KeyboardLayout.KL_RUSSIAN,
+                    ),
                 ),
                 settings.liveKeyboardLayout.stateInHere(
                     KeyboardLayout.KL_QWERTY,
@@ -2421,8 +2426,7 @@ class SettingsPageViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             fileActionMutex.withLock {
                 try {
-                    utils.openOutputStream(uri)
-                        .use(settings::exportSettings)
+                    utils.openOutput(uri).use(settings::exportSettings)
                     showMessage(Res.string.preferences_exported)
                 } catch (e : IOException) {
                     showMessage(Res.string.preferences_export_failed)
@@ -2437,8 +2441,7 @@ class SettingsPageViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             fileActionMutex.withLock {
                 try {
-                    utils.openInputStream(uri)
-                        .use(settings::importSettings)
+                    utils.openInput(uri).use(settings::importSettings)
                     showMessage(Res.string.preferences_imported)
                 } catch (e : IOException) {
                     showMessage(Res.string.preferences_import_failed)

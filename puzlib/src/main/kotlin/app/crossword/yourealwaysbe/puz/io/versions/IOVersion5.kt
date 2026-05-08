@@ -1,11 +1,10 @@
 
 package app.crossword.yourealwaysbe.puz.io.versions
 
-import java.io.DataInputStream
-import java.io.DataOutputStream
-import java.io.IOException
-import java.util.LinkedList
 import java.util.logging.Logger
+import kotlinx.io.IOException
+import kotlinx.io.Sink
+import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.puz.ClueID
 import app.crossword.yourealwaysbe.puz.ListNum
@@ -33,15 +32,15 @@ open class IOVersion5 : IOVersion4() {
     }
 
     @Throws(IOException::class)
-    override fun readMeta(inStream : DataInputStream) : PuzzleMeta {
-        val meta = super.readMeta(inStream)
+    override fun readMeta(input : Source) : PuzzleMeta {
+        val meta = super.readMeta(input)
 
         meta.historyList = mutableListOf<ListNum>()
 
-        val length = inStream.readInt()
+        val length = input.readInt()
         for (i in 0..<length) {
-            val number = inStream.readInt()
-            val across = inStream.readBoolean()
+            val number = input.readInt()
+            val across = input.readByte().toInt() != 0
             val listName = if (across) IO.ACROSS_LIST else IO.DOWN_LIST
 
             meta.historyList.add(ListNum(listName, number))
@@ -51,14 +50,14 @@ open class IOVersion5 : IOVersion4() {
     }
 
     @Throws(IOException::class)
-    override fun writeMeta(puz : Puzzle, os : DataOutputStream) {
-        super.writeMeta(puz, os)
+    override fun writeMeta(puz : Puzzle, output : Sink) {
+        super.writeMeta(puz, output)
 
         val history = puz.history
         val acrossListName = getAcrossListName(puz)
         val downListName = getDownListName(puz)
 
-        os.writeInt(history.size)
+        output.writeInt(history.size)
         for (cid in puz.history) {
             val clue = puz.getClue(cid)
             // relies on puz files only have numeric numbers
@@ -66,11 +65,11 @@ open class IOVersion5 : IOVersion4() {
             if (number != null) {
                 val listName = cid.listName
                 if (acrossListName == listName) {
-                    os.writeInt(number)
-                    os.writeBoolean(true)
+                    output.writeInt(number)
+                    output.writeByte(1)
                 } else if (downListName == listName) {
-                    os.writeInt(number)
-                    os.writeBoolean(false)
+                    output.writeInt(number)
+                    output.writeByte(0)
                 } else {
                     // ignore
                 }

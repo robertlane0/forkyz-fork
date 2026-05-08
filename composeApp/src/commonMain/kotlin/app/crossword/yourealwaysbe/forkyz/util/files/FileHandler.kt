@@ -1,19 +1,17 @@
 
 package app.crossword.yourealwaysbe.forkyz.util.files
 
-import java.io.BufferedInputStream
-import java.io.BufferedOutputStream
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.DataInputStream
-import java.io.DataOutputStream
-import java.io.IOException
-import java.io.InputStream
-import java.io.OutputStream
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.LocalDate
+import kotlinx.io.Buffer
+import kotlinx.io.IOException
+import kotlinx.io.RawSink
+import kotlinx.io.RawSource
+import kotlinx.io.Sink
+import kotlinx.io.Source
+import kotlinx.io.buffered
 
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings
 import app.crossword.yourealwaysbe.forkyz.util.AppLogger
@@ -26,7 +24,6 @@ import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle.VisitorIO
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.io.IO
 import app.crossword.yourealwaysbe.puz.io.IPuzIO
-import app.crossword.yourealwaysbe.puz.io.StreamUtils
 
 /**
  * Abstraction layer for file operations
@@ -85,10 +82,10 @@ abstract class FileHandler {
      * Get output stream to file, erasing previous contents
      */
     @Throws(IOException::class)
-    abstract fun getOutputStream(fileHandle : FileHandle) : OutputStream
+    abstract fun getOutput(fileHandle : FileHandle) : RawSink
 
     @Throws(IOException::class)
-    abstract fun getInputStream(fileHandle : FileHandle) : InputStream
+    abstract fun getInput(fileHandle : FileHandle) : RawSource
 
     /**
      * Create a new file in the directory with the given display name
@@ -337,16 +334,16 @@ abstract class FileHandler {
      * time.
      */
     @Synchronized
-    @Throws(IOException::class)
+    @Throws(java.io.IOException::class)
     fun save(puz : Puzzle, ph : PuzHandle) {
         val success = ph.accept<Boolean>(
             object : VisitorIO<Boolean> {
-                @Throws(IOException::class)
+                @Throws(java.io.IOException::class)
                 override fun visit(puzHandle : PuzHandle.Puz) : Boolean {
                     return save(puz, puzHandle)
                 }
 
-                @Throws(IOException::class)
+                @Throws(java.io.IOException::class)
                 override fun visit(ipuzHandle : IPuz) : Boolean {
                     return save(puz, ipuzHandle)
                 }
@@ -376,7 +373,7 @@ abstract class FileHandler {
      * @return new puzzle handle if saved success
      */
     @Synchronized
-    @Throws(IOException::class)
+    @Throws(java.io.IOException::class)
     fun saveNewPuzzle(
         puz : Puzzle,
         fileNameBody : String,
@@ -403,19 +400,19 @@ abstract class FileHandler {
     }
 
     @Throws(IOException::class)
-    fun getBufferedInputStream(fileHandle : FileHandle) : BufferedInputStream {
-        return BufferedInputStream(getInputStream(fileHandle))
+    fun getBufferedInput(fileHandle : FileHandle) : Source {
+        return getInput(fileHandle).buffered()
     }
 
     fun getModifiedDate(file : FileHandle) : LocalDate {
         return TimeUtils.fromEpochMilliseconds(getLastModified(file))
     }
 
-    @Throws(IOException::class)
-    protected fun getBufferedOutputStream(
+    @Throws(java.io.IOException::class)
+    fun getBufferedOutput(
         fileHandle : FileHandle,
-    ) : BufferedOutputStream {
-        return BufferedOutputStream(getOutputStream(fileHandle))
+    ) : Sink {
+        return getOutput(fileHandle).buffered()
     }
 
     @Synchronized
@@ -453,12 +450,8 @@ abstract class FileHandler {
     private fun load(ph : PuzHandle.Puz) : Puzzle? {
         ph.metaFileHandle?.let { metaFile ->
             try {
-                DataInputStream(
-                    getBufferedInputStream(ph.mainFileHandle)
-                ).use { pis ->
-                    DataInputStream(
-                        getBufferedInputStream(metaFile)
-                    ).use { mis ->
+                getBufferedInput(ph.mainFileHandle).use { pis ->
+                    getBufferedInput(metaFile).use { mis ->
                         return IO.load(pis, mis)
                     }
                 }
@@ -473,9 +466,7 @@ abstract class FileHandler {
             }
         }
 
-        DataInputStream(
-            getBufferedInputStream(ph.mainFileHandle)
-        ).use { fis ->
+        getBufferedInput(ph.mainFileHandle).use { fis ->
             return IO.loadNative(fis)
         }
     }
@@ -483,13 +474,13 @@ abstract class FileHandler {
     @Synchronized
     @Throws(IOException::class)
     private fun load(ph : IPuz) : Puzzle? {
-        getBufferedInputStream(ph.mainFileHandle).use { inputStream ->
-            return IPuzIO.readPuzzle(inputStream)
+        getBufferedInput(ph.mainFileHandle).use { input ->
+            return IPuzIO.readPuzzle(input)
         }
     }
 
     @Synchronized
-    @Throws(IOException::class)
+    @Throws(java.io.IOException::class)
     private fun save(puz : Puzzle, ph : PuzHandle.Puz) : Boolean {
         val puzFile = ph.mainFileHandle
         var metaFile = ph.metaFileHandle
@@ -505,29 +496,24 @@ abstract class FileHandler {
                 MIME_TYPE_META,
             )
             if (metaFile == null)
-                throw IOException("Could not create meta file")
+                throw java.io.IOException("Could not create meta file")
             metaCreated = true
         }
 
         // Write to buffers first so that we don't erase old data in
         // case of a problem encoding puzzle.
-        val baosPuz = ByteArrayOutputStream()
-        val baosMeta = ByteArrayOutputStream()
+        val bufPuz = Buffer()
+        val bufMeta = Buffer()
 
-        DataOutputStream(baosPuz).use { dosPuz ->
-            DataOutputStream(baosMeta).use { dosMeta ->
-                IO.save(puz, dosPuz, dosMeta)
-            }
-        }
+        IO.save(puz, bufPuz, bufMeta)
+
         // Write meta first, if doesn't throw, write main puzzle
         var metaSuccess = false
 
         try {
-            ByteArrayInputStream(baosMeta.toByteArray()).use { baisMeta ->
-                getBufferedOutputStream(metaFile).use { meta ->
-                    StreamUtils.copyStream(baisMeta, meta)
-                    metaSuccess = true
-                }
+            getBufferedOutput(metaFile).use { meta ->
+                bufMeta.transferTo(meta)
+                metaSuccess = true
             }
         } finally {
             if (!metaSuccess && metaCreated)
@@ -537,11 +523,9 @@ abstract class FileHandler {
         var puzSuccess = false
 
         try {
-            ByteArrayInputStream(baosPuz.toByteArray()).use { baisPuz ->
-                getBufferedOutputStream(puzFile).use { puzzle ->
-                    StreamUtils.copyStream(baisPuz, puzzle)
-                    puzSuccess = true
-                }
+            getBufferedOutput(puzFile).use { puzzle ->
+                bufPuz.transferTo(puzzle)
+                puzSuccess = true
             }
         } finally {
             if (!puzSuccess && metaCreated)
@@ -561,14 +545,12 @@ abstract class FileHandler {
 
         // Write to buffer first -- get puzzle written to a stream
         // before truncating the previously saved file
-        val baos = ByteArrayOutputStream()
-        IPuzIO.writePuzzle(puz, baos)
+        val buffer = Buffer()
+        IPuzIO.writePuzzle(puz, buffer)
 
-        ByteArrayInputStream(baos.toByteArray()).use { bais ->
-            getBufferedOutputStream(ipuzFile).use { os ->
-                StreamUtils.copyStream(bais, os)
-                return true
-            }
+        getBufferedOutput(ipuzFile).use { output ->
+            buffer.transferTo(output)
+            return true
         }
     }
 
@@ -660,7 +642,7 @@ abstract class FileHandler {
         } else {
             try {
                 return loadPuzMetaFile(ph)
-            } catch (e : IOException) {
+            } catch (e : java.io.IOException) {
                 AppLogger.w(TAG, "Could not load puz meta for " + ph + " : " + e)
                 return null
             }

@@ -1,9 +1,7 @@
 
 package app.crossword.yourealwaysbe.puz
 
-import java.util.Collections
 import java.util.NavigableSet
-import java.util.Objects
 import java.util.Stack
 import java.util.logging.Logger
 import kotlin.math.min

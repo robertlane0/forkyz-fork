@@ -1,10 +1,10 @@
 
 package app.crossword.yourealwaysbe.puz.io.versions
 
-import java.io.DataInputStream
-import java.io.DataOutputStream
-import java.io.IOException
 import java.util.logging.Logger
+import kotlinx.io.IOException
+import kotlinx.io.Sink
+import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.puz.Note
 import app.crossword.yourealwaysbe.puz.Puzzle
@@ -24,18 +24,18 @@ open class IOVersion6 : IOVersion5() {
     }
 
     @Throws(IOException::class)
-    override fun readMeta(inStream : DataInputStream) : PuzzleMeta {
-        val meta = super.readMeta(inStream)
-        loadNotes(true, meta, inStream)
-        loadNotes(false, meta, inStream)
+    override fun readMeta(input : Source) : PuzzleMeta {
+        val meta = super.readMeta(input)
+        loadNotes(true, meta, input)
+        loadNotes(false, meta, input)
         return meta
     }
 
     @Throws(IOException::class)
-    override fun writeMeta(puz : Puzzle, os : DataOutputStream) {
-        super.writeMeta(puz, os)
-        saveNotes(os, puz, true)
-        saveNotes(os, puz, false)
+    override fun writeMeta(puz : Puzzle, output : Sink) {
+        super.writeMeta(puz, output)
+        saveNotes(output, puz, true)
+        saveNotes(output, puz, false)
     }
 
     /**
@@ -47,7 +47,7 @@ open class IOVersion6 : IOVersion5() {
     fun loadNotes(
         isAcross : Boolean,
         meta : PuzzleMeta,
-        input : DataInputStream,
+        input : Source,
     ) {
         val numNotes = input.readInt()
 
@@ -64,11 +64,11 @@ open class IOVersion6 : IOVersion5() {
     }
 
     @Throws(IOException::class)
-    protected fun readNote(inStream : DataInputStream) : Note? {
-        val scratch = readNullTerminatedString(inStream, charset)
-        val text = readNullTerminatedString(inStream, charset)
-        val anagramSrc = readNullTerminatedString(inStream, charset)
-        val anagramSol = readNullTerminatedString(inStream, charset)
+    protected fun readNote(input : Source) : Note? {
+        val scratch = readNullTerminatedString(input, charset)
+        val text = readNullTerminatedString(input, charset)
+        val anagramSrc = readNullTerminatedString(input, charset)
+        val anagramSol = readNullTerminatedString(input, charset)
         if (
             scratch != null
             || text != null
@@ -82,7 +82,7 @@ open class IOVersion6 : IOVersion5() {
 
     @Throws(IOException::class)
     private fun saveNotes(
-        os : DataOutputStream,
+        output : Sink,
         puz : Puzzle,
         isAcross : Boolean,
     ) {
@@ -98,18 +98,18 @@ open class IOVersion6 : IOVersion5() {
 
         // not really useful since notes should match the number of clue
         // positions
-        os.writeInt(size)
+        output.writeInt(size)
 
         for (cid in puz.boardClueIDs) {
             if (desiredList == cid.listName) {
                 val note = puz.getNote(cid)
-                writeNote(note, os)
+                writeNote(note, output)
             }
         }
     }
 
     @Throws(IOException::class)
-    protected fun writeNote(note : Note?, os : DataOutputStream) {
+    protected fun writeNote(note : Note?, output : Sink) {
         var scratch : String? = null
         var text : String? = null
         var anagramSrc : String? = null
@@ -122,10 +122,10 @@ open class IOVersion6 : IOVersion5() {
             anagramSol = note.compressedAnagramSolution
         }
 
-        writeNullTerminatedString(os, scratch, charset)
-        writeNullTerminatedString(os, text, charset)
-        writeNullTerminatedString(os, anagramSrc, charset)
-        writeNullTerminatedString(os, anagramSol, charset)
+        writeNullTerminatedString(output, scratch, charset)
+        writeNullTerminatedString(output, text, charset)
+        writeNullTerminatedString(output, anagramSrc, charset)
+        writeNullTerminatedString(output, anagramSol, charset)
     }
 
     private fun applyNotes(
