@@ -30,6 +30,7 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.onLongClick
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
@@ -78,6 +79,8 @@ internal class KeyboardLayoutScope(
     val repeatDelay: Long,
     val repeatInterval: Long,
 ) {
+    var overrideButtonTextStyle : TextStyle? = null
+
     @Composable
     private fun Modifier.buttonVerticalPadding(): Modifier {
         val screenHeight = LocalWindowInfo.current.containerSize.height.dp
@@ -182,11 +185,13 @@ internal class KeyboardLayoutScope(
                     contentColor = MaterialTheme.colorScheme.onSurface,
                 ),
             ) {
+                val buttonTextStyle = overrideButtonTextStyle
+                    ?: MaterialTheme.typography.titleLarge.copy(
+                        fontWeight = FontWeight.SemiBold,
+                    )
                 Text(
                     text = value,
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        fontWeight = FontWeight.SemiBold,
-                    ),
+                    style = buttonTextStyle,
                 )
             }
         }
@@ -201,7 +206,7 @@ internal class KeyboardLayoutScope(
             val changeDirLabel = stringResource(Res.string.change_direction)
             val longPressLabel = stringResource(Res.string.special_entry)
             BaseKey(
-                modifier = Modifier.semantics {
+                modifier = modifier.semantics {
                     onLongClick(
                         // handled by pointer input
                         action = null,
