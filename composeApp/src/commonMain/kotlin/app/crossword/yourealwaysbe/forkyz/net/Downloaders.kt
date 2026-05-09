@@ -1,15 +1,17 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.util.concurrent.Executors
-import java.util.concurrent.Semaphore
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
-import kotlinx.coroutines.runBlocking
+import kotlin.concurrent.atomics.AtomicBoolean
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
+import kotlinx.coroutines.sync.Mutex
 import kotlinx.datetime.LocalDate
 
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
@@ -146,7 +148,7 @@ class Downloaders(
         // separate downloaders don't cause duplicate downloads.
         // needs to be static as there may be multiple Downloaders
         // instances
-        private val puzzleDirLock = Semaphore(1)
+        private val puzzleDirLock = Mutex()
     }
 
     suspend fun getDownloaders(date : LocalDate) : List<Downloader> {
@@ -206,6 +208,7 @@ class Downloaders(
         }
     }
 
+    @OptIn(ExperimentalAtomicApi::class)
     private suspend fun download(
         puzzlesToDownload : Map<Downloader, LocalDate>,
     ) {
@@ -220,44 +223,36 @@ class Downloaders(
 
             val fileNames = fileHandler.getPuzzleNames()
 
-            val downloadExecutor
-                = Executors.newFixedThreadPool(NUM_DOWNLOAD_THREADS)
             val somethingDownloaded = AtomicBoolean(false)
             val somethingFailed = AtomicBoolean(false)
 
-            puzzlesToDownload.forEach { puzzle ->
-                val downloader = puzzle.key
-                val date = puzzle.value
-                downloadExecutor.submit {
-                    // TODO: remove executor, use coroutines
-                    runBlocking {
+            coroutineScope {
+                val scope = this + Dispatchers.IO.limitedParallelism(
+                    NUM_DOWNLOAD_THREADS,
+                    "Puzzle Downloader",
+                )
+
+                puzzlesToDownload.forEach { puzzle ->
+                    val downloader = puzzle.key
+                    val date = puzzle.value
+                    scope.launch {
                         val result = downloadPuzzle(
                             downloader,
                             date,
                             fileNames,
                         )
                         if (result.isSuccess)
-                            somethingDownloaded.set(true)
+                            somethingDownloaded.store(true)
                         else if (result.isFailed)
-                            somethingFailed.set(true)
+                            somethingFailed.store(true)
                     }
                 }
             }
 
-            downloadExecutor.shutdown()
-
-            try {
-                downloadExecutor.awaitTermination(
-                    Long.MAX_VALUE, TimeUnit.MILLISECONDS
-                )
-            } catch (e : InterruptedException) {
-                // Oh well
-            }
-
             if (downloadersListener != null) {
                 downloadersListener.onDownloadsFinished(
-                    somethingDownloaded.get(),
-                    somethingFailed.get()
+                    somethingDownloaded.load(),
+                    somethingFailed.load(),
                 )
             }
         } finally {
@@ -265,16 +260,12 @@ class Downloaders(
         }
     }
 
-    private fun acquirePuzzleDirLock() {
-        try {
-            puzzleDirLock.acquire()
-        } catch (e : InterruptedException) {
-            // oh well
-        }
+    private suspend fun acquirePuzzleDirLock() {
+        puzzleDirLock.lock()
     }
 
     private fun releasePuzzleDirLock() {
-        puzzleDirLock.release()
+        puzzleDirLock.unlock()
     }
 
     /**
@@ -292,9 +283,7 @@ class Downloaders(
         var result = Downloader.DownloadResult.FAILED
 
         AppLogger.i(TAG, "Downloading " + d.toString())
-        runBlocking {
-            downloadersListener?.onPuzzleDownloadStarted(d.name)
-        }
+        downloadersListener?.onPuzzleDownloadStarted(d.name)
 
         try {
             result = d.download(date, existingFileNames)
@@ -315,12 +304,10 @@ class Downloaders(
             AppLogger.w(TAG, "Failed to download "+d.name, e)
         }
 
-        runBlocking {
-            downloadersListener?.onPuzzleDownloadFinished(
-                d.name,
-                result,
-            )
-        }
+        downloadersListener?.onPuzzleDownloadFinished(
+            d.name,
+            result,
+        )
 
         return result
     }
