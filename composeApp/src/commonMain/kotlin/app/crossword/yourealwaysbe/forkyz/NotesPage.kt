@@ -329,10 +329,12 @@ fun NotesPage(
         @Composable
         fun MiniboardRow(maxWidth : Dp) {
             val state by viewModel.notesUIState.collectAsStateWithLifecycle()
-            val isPuzzleNotes by remember {
-                derivedStateOf { state.isPuzzleNotes }
+            val isNotShown by remember {
+                derivedStateOf {
+                    state.isPuzzleNotes || state.notesClueID == null
+                }
             }
-            if (isPuzzleNotes)
+            if (isNotShown)
                 return
 
             val boardColorScheme = themeHelper.getBoardColorScheme()
