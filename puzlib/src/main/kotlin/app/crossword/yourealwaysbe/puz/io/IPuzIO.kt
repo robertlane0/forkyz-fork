@@ -1656,9 +1656,13 @@ class IPuzIO : AbstractJSONIO() {
                     else
                         box.getIsPartOfClue(list)
                     builder.setCurrentClueID(cid)
-                } else if (positionJson.has(FIELD_CLUEID)) {
-                    val cidJson = positionJson.getJSONObject(FIELD_CLUEID)
-                    builder.setCurrentClueID(decodeClueID(cidJson, builder))
+                } else {
+                    if (positionJson.has(FIELD_CLUEID)) {
+                        val cidJson = positionJson.getJSONObject(FIELD_CLUEID)
+                        builder.setCurrentClueID(decodeClueID(cidJson, builder))
+                    } else {
+                        builder.setCurrentClueID(null)
+                    }
                 }
             }
         }

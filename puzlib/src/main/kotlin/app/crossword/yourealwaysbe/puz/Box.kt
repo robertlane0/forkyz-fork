@@ -9,7 +9,6 @@ class Box {
         const val BLANK = " "
         private const val NOCOLOR = -1
 
-        @JvmStatic
         fun isBlock(box : Box?) : Boolean = box == null || box.isBlock
     }
 

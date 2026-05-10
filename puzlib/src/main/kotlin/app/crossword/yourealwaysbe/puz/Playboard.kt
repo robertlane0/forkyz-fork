@@ -26,7 +26,6 @@ class Playboard(puzzle : Puzzle) {
         PRESERVE_FILLED_CELLS,
     }
 
-    @JvmField
     var movementStrategy : MovementStrategy = MovementStrategy.MOVE_NEXT_ON_AXIS
     val puzzle : Puzzle
 
