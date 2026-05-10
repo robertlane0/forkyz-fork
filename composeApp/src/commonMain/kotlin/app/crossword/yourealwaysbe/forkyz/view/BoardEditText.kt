@@ -232,7 +232,7 @@ fun BoardEditText(
             OrdinaryKey.KEY_LEFT -> onLeft()
             OrdinaryKey.KEY_RIGHT -> onRight()
             OrdinaryKey.KEY_SPACE -> onSpace()
-            else -> onOrdinaryKeyDown(key)
+            else -> { /* would pass to caller if setup */ }
         }
     }
 
@@ -242,7 +242,7 @@ fun BoardEditText(
             OrdinaryKey.KEY_LEFT -> { }
             OrdinaryKey.KEY_RIGHT -> { }
             OrdinaryKey.KEY_SPACE -> { }
-            else -> onOrdinaryKeyUp(key)
+            else -> { /* would pass to caller if set up */ }
         }
     }
 
