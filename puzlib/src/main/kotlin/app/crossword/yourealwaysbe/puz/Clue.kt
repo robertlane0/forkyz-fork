@@ -23,7 +23,7 @@ import app.crossword.yourealwaysbe.puz.util.HtmlUtil
  * @param separators a map of positions to separators between n and
  * n-1th char
  */
-class Clue @JvmOverloads constructor(
+class Clue constructor(
     val listName : String,
     val index : Int,
     val clueNumber : String? = null,
@@ -47,7 +47,6 @@ class Clue @JvmOverloads constructor(
         zone,
     )
 
-    @JvmField
     val clueID : ClueID = ClueID(listName, index)
 
     val zone : Zone = initZone ?: Zone()
@@ -76,7 +75,6 @@ class Clue @JvmOverloads constructor(
      * updated.
      */
     // 0x00rrggbb or DEFAULT_FLAG_COLOR
-    @JvmField
     var flagColor : Int = DEFAULT_FLAG_COLOR
 
     // separating characters between the n-1 and n cell in answer
@@ -153,7 +151,6 @@ class Clue @JvmOverloads constructor(
      * @param inferSeparators whether to include inferred separators
      * when answering
      */
-    @JvmOverloads
     fun hasSeparators(inferSeparators : Boolean = false) : Boolean {
         if (separators.size > 0) return true
 
@@ -264,7 +261,6 @@ class Clue @JvmOverloads constructor(
     }
 
     companion object {
-        @JvmField
         val DEFAULT_FLAG_COLOR : Int = -1
 
         // enumeration is e.g. (4, 5) at end of clue. Ignores IPuz word
