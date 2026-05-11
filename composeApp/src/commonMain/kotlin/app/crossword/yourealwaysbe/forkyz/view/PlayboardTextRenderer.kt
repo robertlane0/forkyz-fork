@@ -1,6 +1,5 @@
-package app.crossword.yourealwaysbe.forkyz.view
 
-import java.util.Locale
+package app.crossword.yourealwaysbe.forkyz.view
 
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.announce_box_response
@@ -317,6 +316,7 @@ object PlayboardTextRenderer {
         return if (listName.isNullOrEmpty())
             ""
         else
-            listName.substring(0, 1).lowercase(Locale.getDefault())
+            listName.substring(0, 1).lowercase()
     }
 }
+

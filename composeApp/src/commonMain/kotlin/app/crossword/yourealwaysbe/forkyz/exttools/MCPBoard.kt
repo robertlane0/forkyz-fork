@@ -1,8 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.exttools
 
-import java.util.Locale
-
 import org.jg.wordstonumbers.WordsToNumbersUtil
 
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
@@ -242,7 +240,7 @@ class MCPBoard(
                     val word = args?.optString("word") ?: ""
                     val prepped = word
                         .replace("\\W+".toRegex(), "")
-                        .uppercase(Locale.getDefault())
+                        .uppercase()
                     board.playAnswer(prepped)
                     "Played: $prepped"
                 }

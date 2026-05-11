@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz
 
-import java.util.Locale
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first

@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz
 
-import java.util.Locale
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -534,8 +533,7 @@ class NotesPageViewModel(
                     utils.getString(Res.string.command_scratch),
                     { text ->
                         // remove non-word as not usually entered into grids
-                        val prepped = text.replace("\\W+", "")
-                            .uppercase(Locale.getDefault())
+                        val prepped = text.replace("\\W+", "").uppercase()
 
                         // means you can't enter "clear" into scratch, but oh well
                         if (clear.equals(text, ignoreCase = true)) {

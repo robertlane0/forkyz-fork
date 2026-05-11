@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.util.Locale
 import java.util.logging.Logger
 import kotlinx.io.IOException
 import kotlinx.io.Source
@@ -140,11 +139,11 @@ class PrzekrojIO : PuzzleParser {
                 boxes[row][col]?.let { it.clueNumber = number }
 
                 val dir = question.getString("d")
-                val across = "horizontal" == dir.lowercase(Locale.getDefault())
+                val across = "horizontal" == dir.lowercase()
                 val drow = if (across) 0 else 1
                 val dcol = if (across) 1 else 0
 
-                val answer = question.getString("a").uppercase(Locale.getDefault())
+                val answer = question.getString("a").uppercase()
 
                 for (j in 0..<answer.length) {
                     if (boxes[row][col] == null)
@@ -168,7 +167,7 @@ class PrzekrojIO : PuzzleParser {
                 val number = question.getString("n")
                 val hint = question.getString("q")
                 val dir = question.getString("d")
-                val across = "horizontal" == dir.lowercase(Locale.getDefault())
+                val across = "horizontal" == dir.lowercase()
 
                 if (across)
                     builder.addAcrossClue(ACROSS_LIST, number, hint)

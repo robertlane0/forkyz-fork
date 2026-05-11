@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz
 
-import java.util.Locale
 import kotlin.text.Regex
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -831,7 +830,7 @@ open class PuzzlePageViewModel(
                     { answer ->
                         // remove non-word as not usually entered into grids
                         val prepped = answer.replace("\\W+".toRegex(), "")
-                            .uppercase(Locale.getDefault())
+                            .uppercase()
                         getBoard()?.playAnswer(prepped)
                     }
                 )

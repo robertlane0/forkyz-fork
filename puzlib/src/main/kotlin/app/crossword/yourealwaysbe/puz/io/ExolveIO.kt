@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.puz.io
 
-import java.util.Locale
 import java.util.logging.Logger
 import java.util.regex.Pattern
 import kotlinx.io.IOException
@@ -396,7 +395,7 @@ class ExolveIO : PuzzleParser {
                     // because even the exolve examples don't always end
                     // with a colon... hope the line is entirely a key
                     key = line.substring(0, valueStart).trim()
-                        .lowercase(Locale.getDefault())
+                        .lowercase()
                     value = line.substring(valueStart + 1).trim()
                 }
 

@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.puz.util
 
-import java.util.Locale
 import kotlin.math.max
 import kotlin.math.min
 
@@ -215,7 +214,7 @@ object HtmlUtil {
         if (color == null || color.isEmpty())
             return -1
 
-        color = color.trim { it <= ' ' }.lowercase(Locale.getDefault())
+        color = color.trim { it <= ' ' }.lowercase()
 
         if (color.startsWith("#")) {
             try {

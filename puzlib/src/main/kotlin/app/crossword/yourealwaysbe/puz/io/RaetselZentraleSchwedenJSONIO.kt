@@ -2,7 +2,6 @@
 package app.crossword.yourealwaysbe.puz.io
 
 import java.util.LinkedList
-import java.util.Locale
 import java.util.logging.Logger
 import kotlinx.io.IOException
 import kotlinx.io.Source
@@ -101,7 +100,7 @@ class RaetselZentraleSchwedenJSONIO : AbstractJSONIO() {
         @Throws(JSONException::class, RZSFormatException::class)
         private fun readPuzzleFromJSON(json : JSONObject) : Puzzle {
             val type = json.getString("type")
-            if (type.lowercase(Locale.getDefault()) != "sweden") {
+            if (type.lowercase() != "sweden") {
                 throw RZSFormatException(
                     "Unsupported puzzle type " + type + ".",
                 )

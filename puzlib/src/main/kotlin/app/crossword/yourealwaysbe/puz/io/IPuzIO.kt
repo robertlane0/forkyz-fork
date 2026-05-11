@@ -4,7 +4,6 @@ package app.crossword.yourealwaysbe.puz.io
 import java.util.Arrays
 import java.util.Collections
 import java.util.LinkedList
-import java.util.Locale
 import java.util.function.Consumer
 import java.util.logging.Logger
 import kotlin.math.log10
@@ -406,7 +405,7 @@ class IPuzIO : AbstractJSONIO() {
             // later
             val kinds = puzJson.getJSONArray(FIELD_KIND)
             for (i in 0..<kinds.size) {
-                val kind = kinds.getString(i).lowercase(Locale.getDefault())
+                val kind = kinds.getString(i).lowercase()
 
                 if (kind.startsWith(ACROSTIC_PREFIX))
                     return PuzzleKind.ACROSTIC
@@ -699,7 +698,7 @@ class IPuzIO : AbstractJSONIO() {
             // make lenient by removing all non alpha characters except /
             // and \ which are defined shapes
             name = name.replace("[^\\w/\\\\]".toRegex(), "")
-                .lowercase(Locale.getDefault())
+                .lowercase()
 
             return SHAPE_BGS.get(name)
         }
@@ -785,7 +784,7 @@ class IPuzIO : AbstractJSONIO() {
 
             var barred = style.optStringEmptyNull(barField)
             if (barred != null) {
-                barred = barred.uppercase(Locale.getDefault())
+                barred = barred.uppercase()
                 for (i in 0..<barred.length) {
                     val c = barred.get(i)
                     when (c) {
