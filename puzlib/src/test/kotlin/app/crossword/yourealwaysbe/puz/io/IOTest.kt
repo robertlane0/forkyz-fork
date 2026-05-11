@@ -137,7 +137,7 @@ class IOTest {
             Assertions.assertEquals("NY Times, Fri, Nov 13, 2009", puz.title)
             Assertions.assertEquals("Dana Motley / Will Shortz", puz.author)
             Assertions.assertEquals(
-                "&copy; 2009, The New York Times",
+                "© 2009, The New York Times",
                 puz.copyright,
             )
 

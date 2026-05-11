@@ -12,7 +12,6 @@ dependencies {
     testImplementation(libs.junit5.jupiter.params)
     testRuntimeOnly(libs.junit.platform.launcher)
 
-    implementation(libs.apache.commons.text)
     implementation(libs.json5)
     implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.serialization.json)

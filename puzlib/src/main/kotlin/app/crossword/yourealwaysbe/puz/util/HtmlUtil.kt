@@ -6,9 +6,8 @@ import kotlin.math.max
 import kotlin.math.min
 
 import com.fleeksoft.ksoup.Ksoup
+import com.fleeksoft.ksoup.nodes.Entities
 import com.fleeksoft.ksoup.safety.Safelist
-
-import org.apache.commons.text.StringEscapeUtils
 
 object HtmlUtil {
     // IPuz tags not to strip from HTML (preserve line breaks)
@@ -181,7 +180,7 @@ object HtmlUtil {
 
         // this is a bit hacky: any break tag is normalised to "\r?\n<br>"
         // by the clean method, we remove the \r\ns and turn <br> into \n
-        return StringEscapeUtils.unescapeHtml4(
+        return Entities.unescape(
             Ksoup.clean(value, JSOUP_CLEAN_WHITELIST)
                 .replace("\r", "")
                 .replace("\n", "")
@@ -198,7 +197,7 @@ object HtmlUtil {
         if (value == null)
             return null
 
-        return StringEscapeUtils.escapeHtml4(value)
+        return Entities.escape(value)
             .replace("\r", "")
             .replace("\n", "<br/>")
             .replace("  ", " &nbsp;")

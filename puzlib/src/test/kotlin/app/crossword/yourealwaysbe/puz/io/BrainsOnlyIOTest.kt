@@ -109,7 +109,7 @@ class BrainsOnlyIOTest {
             )
             Assertions.assertEquals(
                 downClues!!.getClueByNumber("1")!!.hint,
-                "Sancho Panza's mount",
+                "Sancho Panza&apos;s mount",
             )
             Assertions.assertEquals(
                 downClues.getClueByNumber("59")!!.hint,
