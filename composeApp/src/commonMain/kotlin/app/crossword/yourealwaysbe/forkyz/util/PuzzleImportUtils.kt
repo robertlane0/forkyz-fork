@@ -1,6 +1,5 @@
 package app.crossword.yourealwaysbe.forkyz.util
 
-import java.io.File
 import java.net.URISyntaxException
 import kotlinx.datetime.LocalDate
 import kotlinx.io.IOException
@@ -13,6 +12,7 @@ import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.files.DirHandle
+import app.crossword.yourealwaysbe.forkyz.util.files.File
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandle
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle
@@ -155,7 +155,7 @@ private fun getFileName(uri : Uri?) : String? {
 
     val path = uri.getPath()
     if (path != null)
-        return File(path).getName()
+        return File(path).name
 
     return null
 }

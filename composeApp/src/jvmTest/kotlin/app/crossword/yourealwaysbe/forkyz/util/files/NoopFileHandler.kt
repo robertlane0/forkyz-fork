@@ -1,18 +1,14 @@
 
 package app.crossword.yourealwaysbe.forkyz.util.files
 
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
 import kotlinx.io.RawSink
 import kotlinx.io.RawSource
-import kotlinx.io.asSink
-import kotlinx.io.asSource
 
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
+import app.crossword.yourealwaysbe.forkyz.util.files.File
 import app.crossword.yourealwaysbe.forkyz.util.toUri
 
 class NoopFileHandler(utils : NativeBackendUtils) : FileHandler(utils) {
@@ -73,13 +69,13 @@ class NoopFileHandler(utils : NativeBackendUtils) : FileHandler(utils) {
     override fun getOutput(
         fileHandle : FileHandle
     ) : RawSink {
-        return FileOutputStream(File("none")).asSink()
+        return File("none").sink()
     }
 
     override fun getInput(
         fileHandle : FileHandle,
     ) : RawSource {
-        return FileInputStream(File("none")).asSource()
+        return File("none").source()
     }
 
     override fun createFileHandle(

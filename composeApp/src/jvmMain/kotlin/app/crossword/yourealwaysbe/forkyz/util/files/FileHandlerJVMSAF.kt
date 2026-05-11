@@ -1,13 +1,11 @@
 
 package app.crossword.yourealwaysbe.forkyz.util.files
 
-import java.io.File
-
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
-import app.crossword.yourealwaysbe.forkyz.util.toJVMURI
+import app.crossword.yourealwaysbe.forkyz.util.files.File
 import app.crossword.yourealwaysbe.forkyz.util.toUri
 
 /**
@@ -16,7 +14,7 @@ import app.crossword.yourealwaysbe.forkyz.util.toUri
 class FileHandlerJVMSAF(
     utils : NativeBackendUtils,
     rootDir : Uri,
-) : FileHandlerJavaFile(utils, File(rootDir.toJVMURI())) {
+) : FileHandlerSystemFile(utils, File(rootDir.getPath()!!)) {
     override val isStorageMounted : Boolean = true
 
     override val settings : FileHandlerSettings = FileHandlerSettings(

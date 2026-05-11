@@ -1,10 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.util
 
-import java.io.File
-import java.io.FileOutputStream
 import kotlinx.coroutines.runBlocking
-import kotlinx.io.asSink
 import kotlinx.io.asSource
 import kotlinx.io.buffered
 import kotlinx.io.readString
@@ -22,8 +19,9 @@ import org.mockito.kotlin.stubbing
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation
 import app.crossword.yourealwaysbe.forkyz.util.AppStrings
+import app.crossword.yourealwaysbe.forkyz.util.files.File
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler
-import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerJavaFile
+import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerSystemFile
 import app.crossword.yourealwaysbe.forkyz.util.files.MetaCache
 import app.crossword.yourealwaysbe.forkyz.util.files.MetaCache.CachedMeta
 import app.crossword.yourealwaysbe.forkyz.util.files.MetaCache.MetaRecord
@@ -82,9 +80,9 @@ class PuzzleImporterTest {
             "Test &amp; puzzle"
         )
 
-        assertEquals(expectedToImport, toImport.list()?.toSet())
-        assertEquals(expectedToImportDone, toImportDone.list()?.toSet())
-        assertEquals(expectedToImportFailed, toImportFailed.list()?.toSet())
+        assertEquals(expectedToImport, getNames(toImport))
+        assertEquals(expectedToImportDone, getNames(toImportDone))
+        assertEquals(expectedToImportFailed, getNames(toImportFailed))
         assertEquals(expectedCrosswordTitles, getCrosswordTitles())
     }
 
@@ -113,16 +111,15 @@ class PuzzleImporterTest {
             "test.ipuz", "test (1).ipuz"
         )
 
-        assertEquals(expectedToImport, toImport.list()?.toSet())
-        assertEquals(expectedToImportDone, toImportDone.list()?.toSet())
+        assertEquals(expectedToImport, getNames(toImport))
+        assertEquals(expectedToImportDone, getNames(toImportDone))
     }
 
     private fun getDirectoryFiles(directory : File) : Set<String> {
-        return directory.listFiles()
-            ?.filter { it.isFile }
-            ?.map { it.name }
-            ?.toSet()
-            ?: emptySet()
+        return directory.list()
+            .filter { it.isRegularFile }
+            .map { it.name }
+            .toSet()
     }
 
     private fun getCrosswordTitles() : Set<String> {
@@ -143,7 +140,7 @@ class PuzzleImporterTest {
     }
 
     private fun getCrosswordsFolder() : File {
-        val crosswords = File(folder.root, "crosswords")
+        val crosswords = File(folder.root.getPath(), "crosswords")
         crosswords.mkdirs()
         return crosswords
     }
@@ -217,7 +214,7 @@ class PuzzleImporterTest {
                 } doReturn Unit
             }
 
-            fileHandler = object : FileHandlerJavaFile(
+            fileHandler = object : FileHandlerSystemFile(
                 utils,
                 metaCache,
                 getCrosswordsFolder(),
@@ -247,10 +244,14 @@ class PuzzleImporterTest {
             .asSource()
             .buffered()
             .use { input ->
-                FileOutputStream(outFile).asSink().buffered().use { output ->
+                outFile.sink().buffered().use { output ->
                     input.transferTo(output)
                 }
             }
+    }
+
+    private fun getNames(dir : File) : Set<String> {
+        return dir.list().map { it.name }.toSet()
     }
 }
 

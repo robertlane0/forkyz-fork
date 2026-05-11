@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.injection
 
-import java.io.File
 
 import androidx.datastore.core.DataStore
 
@@ -30,6 +29,7 @@ import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.Notifications
 import app.crossword.yourealwaysbe.forkyz.util.PuzzleSaveServiceCaller
 import app.crossword.yourealwaysbe.forkyz.util.XDG_DATA_DIR
+import app.crossword.yourealwaysbe.forkyz.util.files.File
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.util.files.JVMFileHandlerProvider
 
@@ -41,7 +41,10 @@ val jvmModules = module {
         createDataStore(
             fileSystem = FileSystem.SYSTEM,
             producePath = {
-                XDG_DATA_DIR.resolve(SETTINGS_FILE_NAME).absolutePath.toPath()
+                File(XDG_DATA_DIR, SETTINGS_FILE_NAME)
+                    .absoluteFile
+                    .pathString
+                    .toPath()
             },
             defaultSettings = DEFAULT_SETTINGS.copy(
                 clueTabsDouble = ClueTabsDouble.CTD_WIDE,

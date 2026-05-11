@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.util
 
-import java.io.File
 import kotlinx.io.IOException
 import kotlinx.io.Sink
 import kotlinx.io.Source
@@ -15,6 +14,7 @@ import app.crossword.yourealwaysbe.forkyz.SettingsItem
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.util.Uri
+import app.crossword.yourealwaysbe.forkyz.util.files.File
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler
 import app.crossword.yourealwaysbe.forkyz.util.files.MetaCache
 

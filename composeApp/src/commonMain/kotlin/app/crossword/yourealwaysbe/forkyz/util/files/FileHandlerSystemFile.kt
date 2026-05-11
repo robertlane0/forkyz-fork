@@ -1,23 +1,19 @@
 
 package app.crossword.yourealwaysbe.forkyz.util.files
 
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
 import kotlinx.io.IOException
 import kotlinx.io.RawSink
 import kotlinx.io.RawSource
-import kotlinx.io.asSink
-import kotlinx.io.asSource
 
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
+import app.crossword.yourealwaysbe.forkyz.util.files.File
 
 /**
- * Base implementation of java.io.File-based file access from a given
+ * Base implementation of app.crossword.yourealwaysbe.forkyz.util.files.File-based file access from a given
  * root directory.
  */
-abstract class FileHandlerJavaFile : FileHandler {
+abstract class FileHandlerSystemFile : FileHandler {
     private val rootDirectory : File
 
     constructor(
@@ -61,7 +57,7 @@ abstract class FileHandlerJavaFile : FileHandler {
             override fun iterator() : MutableIterator<FileHandle> {
                 return object : MutableIterator<FileHandle> {
                     private var pos = 0
-                    private val files = dir.getFile().listFiles()
+                    private val files = dir.getFile().list().toList()
                     private var next = getNext()
 
                     override fun hasNext() : Boolean {
@@ -82,12 +78,9 @@ abstract class FileHandlerJavaFile : FileHandler {
                     }
 
                     fun getNext() : File? {
-                        val fs = files
-                        if (fs == null)
-                            return null
-                        while (pos < fs.size) {
-                            next = fs[pos++]
-                            if (next?.isFile() ?: false)
+                        while (pos < files.size) {
+                            next = files[pos++]
+                            if (next?.isRegularFile ?: false)
                                 return next
                         }
                         return null
@@ -98,7 +91,7 @@ abstract class FileHandlerJavaFile : FileHandler {
     }
 
     override fun getName(f : FileHandle) : String {
-        return f.getFile().getName()
+        return f.getFile().name
     }
 
     override fun getFileHandle(uri : Uri) : FileHandle {
@@ -128,7 +121,7 @@ abstract class FileHandlerJavaFile : FileHandler {
     }
 
     override fun getLastModified(file : FileHandle) : Long {
-        return file.getFile().lastModified()
+        return file.getFile().lastModified
     }
 
     override fun createFileHandle(
@@ -154,22 +147,18 @@ abstract class FileHandlerJavaFile : FileHandler {
     ) {
         val file = fileHandle.getFile()
         val directory = destDirHandle.getFile()
-        val newFile = getUniqueFile(directory, file.getName())
-        file.renameTo(newFile)
+        val newFile = getUniqueFile(directory, file.name)
+        file.move(newFile)
     }
 
     @Throws(IOException::class)
     override fun getOutput(fileHandle : FileHandle) : RawSink {
-        return FileOutputStream(fileHandle.getFile()).asSink()
+        return fileHandle.getFile().sink()
     }
 
     @Throws(IOException::class)
     override fun getInput(fileHandle : FileHandle) : RawSource {
-        try {
-            return FileInputStream(fileHandle.getFile()).asSource()
-        } catch (e : IOException) {
-            throw IOException(e)
-        }
+        return fileHandle.getFile().source()
     }
 
     private fun getGenericDirectory(path : String) : DirHandle {

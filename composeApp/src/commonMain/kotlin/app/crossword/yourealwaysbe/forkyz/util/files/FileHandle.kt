@@ -1,10 +1,8 @@
 
 package app.crossword.yourealwaysbe.forkyz.util.files
 
-import java.io.File
-import java.util.Objects
-
 import app.crossword.yourealwaysbe.forkyz.util.Uri
+import app.crossword.yourealwaysbe.forkyz.util.files.File
 import app.crossword.yourealwaysbe.forkyz.util.toUri
 
 /**
@@ -27,7 +25,7 @@ class FileHandle {
     }
 
     override fun hashCode() : Int {
-        return Objects.hashCode(uri)
+        return uri.hashCode()
     }
 
     override fun toString() : String {
@@ -35,11 +33,11 @@ class FileHandle {
     }
 
     ///////////////////////////////////////////////////////////
-    // for FileHandlerJavaFile
+    // for FileHandlerSystemFile
     private var file : File? = null
 
     internal constructor(file : File) {
-        this.uri = file.toURI().toString().toUri()
+        this.uri = file.uri
         this.file = file
     }
 

@@ -2,7 +2,6 @@
 package app.crossword.yourealwaysbe.forkyz.util
 
 import java.io.BufferedReader
-import java.io.File
 import java.io.InputStreamReader
 import kotlinx.io.IOException
 import kotlinx.io.Sink
@@ -27,6 +26,7 @@ import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.util.AppStrings
 import app.crossword.yourealwaysbe.forkyz.util.Uri
+import app.crossword.yourealwaysbe.forkyz.util.files.File
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerSAF
 import app.crossword.yourealwaysbe.forkyz.util.files.MetaCache
@@ -88,7 +88,10 @@ class AndroidNativeBackendUtils(
     override val isShareFileAvailable : Boolean = true
 
     override fun getShareDir() : File? {
-        val shareDir = File(applicationContext.getCacheDir(), SHARE_DIR)
+        val shareDir = File(
+            applicationContext.getCacheDir().getPath(),
+            SHARE_DIR,
+        )
         shareDir.mkdirs()
         return shareDir
     }
@@ -98,7 +101,7 @@ class AndroidNativeBackendUtils(
         return FileProvider.getUriForFile(
             applicationContext,
             authority,
-            shareFile,
+            java.io.File(shareFile.pathString),
         ).toForkyzUri()
     }
 
@@ -140,7 +143,7 @@ class AndroidNativeBackendUtils(
     }
 
     override fun getAppFilesDir() : File {
-        return applicationContext.getFilesDir()
+        return File(applicationContext.getFilesDir().getPath())
     }
 
     @Throws(IOException::class)

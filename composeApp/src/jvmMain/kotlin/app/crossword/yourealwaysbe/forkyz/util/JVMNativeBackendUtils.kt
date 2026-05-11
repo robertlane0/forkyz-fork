@@ -1,14 +1,9 @@
 
 package app.crossword.yourealwaysbe.forkyz.util
 
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
 import kotlinx.io.IOException
 import kotlinx.io.Sink
 import kotlinx.io.Source
-import kotlinx.io.asSink
-import kotlinx.io.asSource
 import kotlinx.io.buffered
 
 import androidx.room.Room.databaseBuilder
@@ -39,11 +34,11 @@ import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation
 import app.crossword.yourealwaysbe.forkyz.util.AppStrings
 import app.crossword.yourealwaysbe.forkyz.util.Uri
+import app.crossword.yourealwaysbe.forkyz.util.files.File
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerJVMSAF
-import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerJavaFile
+import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerSystemFile
 import app.crossword.yourealwaysbe.forkyz.util.files.MetaCache
-import app.crossword.yourealwaysbe.forkyz.util.toJVMURI
 import app.crossword.yourealwaysbe.forkyz.util.toUri
 
 /**
@@ -88,9 +83,7 @@ class JVMNativeBackendUtils(
     @Throws(IOException::class)
     override fun openInput(uri : Uri) : Source? {
         try {
-            return FileInputStream(File(uri.toJVMURI()))
-                .asSource()
-                .buffered()
+            return uri.getPath()?.let { return File(it).source().buffered() }
         } catch (e : IllegalArgumentException) {
             // not a file, make IOException
             throw IOException(e.message)
@@ -100,9 +93,7 @@ class JVMNativeBackendUtils(
     @Throws(IOException::class)
     override fun openOutput(uri : Uri) : Sink? {
         try {
-            return FileOutputStream(File(uri.toJVMURI()))
-                .asSink()
-                .buffered()
+            return uri.getPath()?.let { return File(it).sink().buffered() }
         } catch (e : IllegalArgumentException) {
             // not a file, make IOException
             throw IOException(e.message)
@@ -116,7 +107,7 @@ class JVMNativeBackendUtils(
     }
 
     override fun getShareURIForFile(shareFile : File) : Uri {
-        return shareFile.toURI().toString().toUri()
+        return shareFile.uri
     }
 
     override fun getFilterClueToAlphabeticRegex() : String {
@@ -145,7 +136,7 @@ class JVMNativeBackendUtils(
         // I'm afraid of breaking existing databases on random Android
         // devices.
         val builder : RoomDatabase.Builder<MetaCache.CachedMetaDB>
-            = databaseBuilder(name = dbFile.absolutePath)
+            = databaseBuilder(name = dbFile.absoluteFile.pathString)
         builder.setDriver(BundledSQLiteDriver())
         return builder
     }
@@ -163,9 +154,9 @@ class JVMNativeBackendUtils(
      * Get a file handler rooted at uri for export
      */
     override fun getTargetFileHandler(uri : Uri) : FileHandler? {
-        return object : FileHandlerJavaFile(
+        return object : FileHandlerSystemFile(
             this@JVMNativeBackendUtils,
-            File(uri.toJVMURI()),
+            File(uri.getPath()!!),
         ) {
             override val isStorageMounted : Boolean = true
 

@@ -1,21 +1,18 @@
 
 package app.crossword.yourealwaysbe.forkyz.util.files
 
-import java.io.BufferedOutputStream
-import java.io.File
-import java.io.FileOutputStream
-import java.io.PrintStream
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.io.IOException
-import kotlinx.io.asSink
 import kotlinx.io.buffered
+import kotlinx.io.writeString
 
 import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.AppPuzzleUtils.generateFileName
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
+import app.crossword.yourealwaysbe.forkyz.util.files.File
 import app.crossword.yourealwaysbe.puz.Puzzle
 import app.crossword.yourealwaysbe.puz.io.IPuzIO
 
@@ -94,10 +91,14 @@ object FileHandlerShared {
     ) : Uri? {
         val fileName
             = generateFileName(puz) + FileHandler.Companion.FILE_EXT_IPUZ
-        val shareFile = File(utils.getShareDir(), fileName)
+        val shareDir = utils.getShareDir()
+        if (shareDir == null)
+            return null
+
+        val shareFile = File(shareDir, fileName)
 
         try {
-            FileOutputStream(shareFile).asSink().buffered().use { output ->
+            shareFile.sink().buffered().use { output ->
                 IPuzIO.writePuzzle(puz, output, writeBlank, omitExtensions)
             }
         } catch (e : IOException) {
@@ -113,14 +114,16 @@ object FileHandlerShared {
         utils : NativeBackendUtils,
         logcat : List<String>,
     ) : Uri? {
-        val shareFile = File(utils.getShareDir(), LOGCAT_FILENAME)
+        val shareDir = utils.getShareDir()
+        if (shareDir == null)
+            return null
+
+        val shareFile = File(shareDir, LOGCAT_FILENAME)
 
         try {
-            PrintStream(
-                BufferedOutputStream(FileOutputStream(shareFile))
-            ).use { os ->
+            shareFile.sink().buffered().use { output ->
                 for (line in logcat)
-                    os.println(line)
+                    output.writeString(line + "\n")
             }
         } catch (e : IOException) {
             AppLogger.e(TAG, "Could not create file for sharing : " + e)
@@ -132,8 +135,8 @@ object FileHandlerShared {
 
     @Synchronized
     private fun cleanCache(utils : NativeBackendUtils) {
-        utils.getShareDir()?.listFiles()?.forEach { file ->
-            val ageMillis = System.currentTimeMillis() - file.lastModified()
+        utils.getShareDir()?.list()?.forEach { file ->
+            val ageMillis = System.currentTimeMillis() - file.lastModified
             if (ageMillis > CACHE_CLEAR_AGE_MILLIS)
                 file.delete()
         }
