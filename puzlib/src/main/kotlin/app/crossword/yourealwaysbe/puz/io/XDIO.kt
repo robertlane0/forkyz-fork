@@ -2,7 +2,6 @@
 package app.crossword.yourealwaysbe.puz.io
 
 import java.util.logging.Logger
-import java.util.regex.Pattern
 import kotlin.math.max
 import kotlinx.datetime.LocalDate
 import kotlinx.io.IOException
@@ -140,7 +139,7 @@ class XDIO : PuzzleParser {
 
         private const val SECTION_START = "## "
 
-        private val REF_CLUE_RE = Pattern.compile("[^.]*\\^\\w*:.*")
+        private val REF_CLUE_RE = Regex("[^.]*\\^\\w*:.*")
 
         private val MARKUPS = arrayOf<MatchReplace>(
             MatchReplace("\\{/([^}]*)/\\}", "<i>$1</i>"),
@@ -412,7 +411,7 @@ class XDIO : PuzzleParser {
             while (line != null) {
                 line = line.trim()
 
-                if (REF_CLUE_RE.matcher(line).matches()) {
+                if (REF_CLUE_RE.matches(line)) {
                     line = getNextDataLine(input)
                     continue
                 }

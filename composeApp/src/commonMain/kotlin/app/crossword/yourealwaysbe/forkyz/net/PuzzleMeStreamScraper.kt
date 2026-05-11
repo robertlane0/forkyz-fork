@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.util.regex.Pattern
 import kotlin.collections.ArrayDeque
 import kotlin.io.encoding.Base64
 import kotlinx.io.IOException
@@ -48,7 +47,7 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
         private val DEFAULT_SUBDIR = "puzzleme"
         private val STAGE2_URL_FORMAT
             = "https://%s.amuselabs.com/%s/crossword?id=%s&set=%s"
-        private val STAGE2_URL_RE = Pattern.compile(
+        private val STAGE2_URL_RE = Regex(
             "https://(cdn.).amuselabs.com/([^/]*)/crossword[^\"]*"
                 + "id=([^&\"]*)[^\"]*set=([^&\"]*).*"
         )
@@ -57,22 +56,22 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
         private val CW_ID_REGEX = RegexScrape(STAGE2_URL_RE, 3)
         private val CW_SET_REGEX = RegexScrape(STAGE2_URL_RE, 4)
 
-        private val STAGE2_URL_ALT_RE = Pattern.compile(
+        private val STAGE2_URL_ALT_RE = Regex(
             "https://(cdn.).amuselabs.com/",
         )
         private val CDN_ALT_REGEX = RegexScrape(STAGE2_URL_ALT_RE, 1)
         // quotey
         private val CW_ID_ALT_REGEX = RegexScrape(
-            Pattern.compile("data-id=\\\\*\"([^\"\\\\]*)\\\\*\""),
+            Regex("data-id=\\\\*\"([^\"\\\\]*)\\\\*\""),
             1,
         )
         private val CW_SET_ALT_REGEX = RegexScrape(
-            Pattern.compile("data-set=\\\\*\"([^\"\\\\]*)\\\\*\""),
+            Regex("data-set=\\\\*\"([^\"\\\\]*)\\\\*\""),
             1,
         )
 
         private val RAWC_REGEX = RegexScrape(
-            Pattern.compile("\"rawc\":\\s*\"([^\"]*)\""),
+            Regex("\"rawc\":\\s*\"([^\"]*)\""),
             1,
         )
     }

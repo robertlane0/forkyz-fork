@@ -1,8 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.util.regex.Matcher
-import java.util.regex.Pattern
 import kotlinx.io.IOException
 import kotlinx.io.Source
 import kotlinx.io.readLine
@@ -58,9 +56,9 @@ class AmuseLabsStreamScraper : AbstractStreamScraper() {
             var line : String?
             while ((input.readLine().also { line = it }) != null) {
                 line?.let { line ->
-                    val matcher : Matcher = SECOND_STAGE_URL_RE.matcher(line)
-                    if (matcher.find()) {
-                        return matcher.group(SECOND_STAGE_URL_GRP)
+                    val match = SECOND_STAGE_URL_RE.find(line)
+                    if (match != null) {
+                        return match.groupValues[SECOND_STAGE_URL_GRP]
                     }
                 }
             }
@@ -103,7 +101,7 @@ class AmuseLabsStreamScraper : AbstractStreamScraper() {
         // Note <iframe> may be generated in javascript. Hamburger uses
         // pagespeed_iframe... So look for something that looks like it's
         // creating it.
-        private val SECOND_STAGE_URL_RE : Pattern = Pattern.compile(
+        private val SECOND_STAGE_URL_RE = Regex(
             "iframe[^>]*src=\"([^\"]*amuselabs\\.com[^\"]*crossword[^\"]*)\""
         )
         private const val SECOND_STAGE_URL_GRP = 1

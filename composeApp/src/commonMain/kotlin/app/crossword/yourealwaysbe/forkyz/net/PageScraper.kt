@@ -3,7 +3,6 @@ package app.crossword.yourealwaysbe.forkyz.net
 
 import java.util.Deque
 import java.util.LinkedList
-import java.util.regex.Pattern
 import kotlin.time.Duration
 import kotlinx.datetime.LocalDate
 import kotlinx.io.IOException
@@ -37,7 +36,7 @@ open class PageScraper(
     private val shareFileUrl : Boolean,
     private val readReverse : Boolean,
 ) : AbstractDownloader() {
-    private val patFile = Pattern.compile(regexFile)
+    private val patFile = Regex(regexFile)
 
     class Puz(
         scrapeUrl : String,
@@ -174,7 +173,7 @@ open class PageScraper(
 
         for (a in content.select("a")) {
             val url : String = a.attr("abs:href")
-            if (patFile.matcher(url).matches()) {
+            if (patFile.matches(url)) {
                 result.add(url)
             }
         }

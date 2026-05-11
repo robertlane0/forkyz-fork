@@ -1,9 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.exttools
 
-import java.util.regex.Matcher
-import java.util.regex.Pattern
-
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.duckduckgo_search_url
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils

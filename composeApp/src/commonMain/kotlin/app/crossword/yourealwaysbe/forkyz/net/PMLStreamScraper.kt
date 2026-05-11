@@ -1,8 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.util.regex.Matcher
-import java.util.regex.Pattern
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format
 import kotlinx.io.IOException
@@ -54,21 +52,21 @@ class PMLStreamScraper : AbstractStreamScraper() {
     }
 
     companion object {
-        private val PML_URL_RE : Pattern = Pattern.compile(
+        private val PML_URL_RE = Regex(
             ".*/puzzles/[a-z-]*crossword/(\\d{6}|latest).html?",
-            Pattern.CASE_INSENSITIVE,
+            RegexOption.IGNORE_CASE,
         )
         private const val PML_URL_EXTRACT = "$0"
 
-        private val IS_LATEST_RE : Pattern = Pattern.compile(
+        private val IS_LATEST_RE = Regex(
             "(.*)latest(.html?)",
-            Pattern.CASE_INSENSITIVE,
+            RegexOption.IGNORE_CASE,
         )
         private const val IS_LATEST_PRE_URL_GRP = 1
         private const val IS_LATEST_POST_URL_GRP = 2
 
         private val EMBED_JSON_MATCH = RegexScrape(
-            Pattern.compile("\\{\"pml_id\".*\\}"),
+            Regex("\\{\"pml_id\".*\\}"),
             0,
         )
 
@@ -102,13 +100,13 @@ class PMLStreamScraper : AbstractStreamScraper() {
             if (url == null)
                 return null
 
-            val m = IS_LATEST_RE.matcher(url)
-            if (m.matches()) {
+            val m = IS_LATEST_RE.matchEntire(url)
+            if (m != null) {
                 val today = TimeUtils.today().format(DATE_FORMATTER)
                 return (
-                    (m.group(IS_LATEST_PRE_URL_GRP) ?: "")
+                    m.groupValues[IS_LATEST_PRE_URL_GRP]
                     + today
-                    + (m.group(IS_LATEST_POST_URL_GRP) ?: "")
+                    + m.groupValues[IS_LATEST_POST_URL_GRP]
                 )
             } else {
                 return url

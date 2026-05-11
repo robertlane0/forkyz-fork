@@ -2,7 +2,6 @@
 package app.crossword.yourealwaysbe.puz.io
 
 import java.util.logging.Logger
-import java.util.regex.Pattern
 import kotlinx.io.IOException
 import kotlinx.io.Source
 import kotlinx.io.readLine
@@ -55,17 +54,16 @@ class ExolveIO : PuzzleParser {
     ) {
         companion object {
             // see exolve def of enums
-            private val CLUE_UPTO_ENUM_RE
-                    : Pattern = Pattern.compile(
+            private val CLUE_UPTO_ENUM_RE = Regex(
                 ("(\\(\\d[\\d-,'\\s.]*\\)"
                         + "|\\([^)]*(w|l)\\w*[^)]*\\)"
                         + "|\\([^)]*\\?\\))\\*?"),
-                Pattern.CASE_INSENSITIVE
+                RegexOption.IGNORE_CASE
             )
 
             // Eg. 1, 1a, or [ONE]
             private const val ONE_NUMBER_RE = "(?:\\d+[adbu]?|\\[[^\\]]+\\])"
-            private val CLUE_PARTS_RE = Pattern.compile( // zone
+            private val CLUE_PARTS_RE = Regex( // zone
                 ("\\s*((?:(?:\\#c\\d+r\\d+|\\#r\\d+c\\d+|\\#[a-z]\\d+)\\s*)*)"
                 // number
                 + "\\s*(" + ONE_NUMBER_RE + ")"
@@ -80,16 +78,13 @@ class ExolveIO : PuzzleParser {
             private const val CLUE_PART_EXTRA_NUMBERS_GRP = 4
             private const val CLUE_PART_HINT_GRP = 3
 
-            private val COL_ROW_COORD_RE
-                    : Pattern = Pattern.compile("\\#?c(\\d+)r(\\d+)")
+            private val COL_ROW_COORD_RE = Regex("\\#?c(\\d+)r(\\d+)")
             private const val COL_ROW_COORD_ROW_GRP = 2
             private const val COL_ROW_COORD_COL_GRP = 1
-            private val ROW_COL_COORD_RE
-                    : Pattern = Pattern.compile("\\#?r(\\d+)c(\\d+)")
+            private val ROW_COL_COORD_RE = Regex("\\#?r(\\d+)c(\\d+)")
             private const val ROW_COL_COORD_ROW_GRP = 1
             private const val ROW_COL_COORD_COL_GRP = 2
-            private val LETTER_NUM_COORD_RE
-                    : Pattern = Pattern.compile("\\#?([a-z])(\\d+)")
+            private val LETTER_NUM_COORD_RE = Regex("\\#?([a-z])(\\d+)")
             private const val LETTER_NUM_COORD_ROW_GRP = 2
             private const val LETTER_NUM_COORD_COL_GRP = 1
             private const val ANNOTATION_MARKER = "[]"
@@ -122,13 +117,13 @@ class ExolveIO : PuzzleParser {
                     clue = line.substring(0, hintEnd).trim()
                 }
 
-                val m = CLUE_PARTS_RE.matcher(clue)
-                if (m.matches()) {
-                    val zoneString = m.group(CLUE_PART_ZONE_GRP)
-                    val number = unwrapNumber(m.group(CLUE_PART_NUMBER_GRP))
+                val m = CLUE_PARTS_RE.matchEntire(clue)
+                if (m != null) {
+                    val zoneString = m.groupValues[CLUE_PART_ZONE_GRP]
+                    val number = unwrapNumber(m.groupValues[CLUE_PART_NUMBER_GRP])
                     val extraNumbersString
-                        = m.group(CLUE_PART_EXTRA_NUMBERS_GRP)
-                    val hint = parseHint(m.group(CLUE_PART_HINT_GRP))
+                        = m.groupValues[CLUE_PART_EXTRA_NUMBERS_GRP]
+                    val hint = parseHint(m.groupValues[CLUE_PART_HINT_GRP])
 
                     val extraNumbers = parseNumbers(extraNumbersString)
                     val zone = parseZone(zoneString, height)
@@ -180,33 +175,33 @@ class ExolveIO : PuzzleParser {
                 pos : String,
                 height : Int,
             ) : Position {
-                var m = ROW_COL_COORD_RE.matcher(pos)
-                if (m.matches()) {
+                var m = ROW_COL_COORD_RE.matchEntire(pos)
+                if (m != null) {
                     try {
-                        val row = m.group(ROW_COL_COORD_ROW_GRP).toInt()
-                        val col = m.group(ROW_COL_COORD_COL_GRP).toInt()
+                        val row = m.groupValues[ROW_COL_COORD_ROW_GRP].toInt()
+                        val col = m.groupValues[ROW_COL_COORD_COL_GRP].toInt()
                         return Position(height - row, col - 1)
                     } catch (e : NumberFormatException) {
                         throw ExolveFormatException("Bad position: " + pos)
                     }
                 }
 
-                m = COL_ROW_COORD_RE.matcher(pos)
-                if (m.matches()) {
+                m = COL_ROW_COORD_RE.matchEntire(pos)
+                if (m != null) {
                     try {
-                        val row = m.group(COL_ROW_COORD_ROW_GRP).toInt()
-                        val col = m.group(COL_ROW_COORD_COL_GRP).toInt()
+                        val row = m.groupValues[COL_ROW_COORD_ROW_GRP].toInt()
+                        val col = m.groupValues[COL_ROW_COORD_COL_GRP].toInt()
                         return Position(height - row, col - 1)
                     } catch (e : NumberFormatException) {
                         throw ExolveFormatException("Bad position: " + pos)
                     }
                 }
 
-                m = LETTER_NUM_COORD_RE.matcher(pos)
-                if (m.matches()) {
+                m = LETTER_NUM_COORD_RE.matchEntire(pos)
+                if (m != null) {
                     try {
-                        val row = m.group(LETTER_NUM_COORD_ROW_GRP).toInt()
-                        val colLetter = m.group(LETTER_NUM_COORD_COL_GRP)
+                        val row = m.groupValues[LETTER_NUM_COORD_ROW_GRP].toInt()
+                        val colLetter = m.groupValues[LETTER_NUM_COORD_COL_GRP]
                         if (colLetter.length != 1) {
                             throw ExolveFormatException("Bad position: " + pos)
                         }
@@ -236,9 +231,8 @@ class ExolveIO : PuzzleParser {
 
                 clueEnd = -1
 
-                val m = CLUE_UPTO_ENUM_RE.matcher(clue)
-                while (m.find()) {
-                    clueEnd = m.end()
+                for (m in CLUE_UPTO_ENUM_RE.findAll(clue)) {
+                    clueEnd = m.range.last + 1
                 }
 
                 return clueEnd

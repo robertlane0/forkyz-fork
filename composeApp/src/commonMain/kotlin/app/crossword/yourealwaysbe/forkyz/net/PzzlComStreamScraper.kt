@@ -4,8 +4,6 @@ package app.crossword.yourealwaysbe.forkyz.net
 import java.net.URI
 import java.net.URISyntaxException
 import java.util.Locale
-import java.util.regex.Matcher
-import java.util.regex.Pattern
 import kotlinx.datetime.LocalDate
 import kotlinx.io.Buffer
 import kotlinx.io.IOException
@@ -135,9 +133,9 @@ class PzzlComStreamScraper : AbstractStreamScraper() {
         mainInfo : MainInfo,
     ) : String? {
         if (originalURL != null) {
-            val matcher = DATE_URL.regex.matcher(originalURL)
-            if (matcher.matches())
-                return matcher.group(DATE_URL.group)
+            val match = DATE_URL.regex.matchEntire(originalURL)
+            if (match != null)
+                return match.groupValues[DATE_URL.group]
         }
 
         try {
@@ -185,19 +183,19 @@ class PzzlComStreamScraper : AbstractStreamScraper() {
 
     companion object {
         private val IFRAME_MATCH = RegexScrape(
-            Pattern.compile("src=\"([^\"]*pzzl.com/[^\"]*)\""),
+            Regex("src=\"([^\"]*pzzl.com/[^\"]*)\""),
             1,
         )
         private val PZZL_XWORD_ID = RegexScrape(
-            Pattern.compile("id=\"pzzl-xword\""),
+            Regex("id=\"pzzl-xword\""),
             0,
         )
         private val MAIN_JS_PATH = RegexScrape(
-            Pattern.compile("src=\"([^\"]*main.js)\""),
+            Regex("src=\"([^\"]*main.js)\""),
             1,
         )
 
-        private val MAIN_INFO = Pattern.compile(
+        private val MAIN_INFO = Regex(
             "var n=\"([^\"]*)\";n\\|\\|"
                 + "\\(n=\"[^\"]*\"\\);"
                 + "this.base_url=\"([^\"]*)\"",
@@ -206,7 +204,7 @@ class PzzlComStreamScraper : AbstractStreamScraper() {
         private val MAIN_BASE_URL = RegexScrape(MAIN_INFO, 2)
 
         private val DATE_URL = RegexScrape(
-            Pattern.compile(".*\\/(\\d{6})"),
+            Regex(".*\\/(\\d{6})"),
             1,
         )
         private val DATE_FORMATTER = LocalDate.Format {

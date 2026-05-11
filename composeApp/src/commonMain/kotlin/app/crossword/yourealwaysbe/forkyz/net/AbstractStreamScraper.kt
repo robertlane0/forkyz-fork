@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.util.regex.Pattern
 import kotlinx.io.IOException
 import kotlinx.io.Source
 import kotlinx.io.readLine
@@ -18,7 +17,7 @@ import app.crossword.yourealwaysbe.puz.io.PuzzleParser
  * Check each line against the regex return group
  */
 class RegexScrape(
-    val regex : Pattern,
+    val regex : Regex,
     val group : Int,
 )
 
@@ -76,7 +75,7 @@ abstract class AbstractStreamScraper : StreamScraper {
         doc : Document,
         selector : String,
         attribute : String,
-        regex : Pattern,
+        regex : Regex,
         extractString : String,
         urlParser : PuzzleParser,
     ) : Puzzle? {
@@ -109,14 +108,14 @@ abstract class AbstractStreamScraper : StreamScraper {
             doc : Document,
             selector : String,
             attribute : String,
-            regex : Pattern,
+            regex : Regex,
             extractString : String,
         ) : String? {
             for (ele in doc.select(selector)) {
                 val att = ele.attr(attribute)
-                val m = regex.matcher(att)
-                if (m.find())
-                    return m.replaceFirst(extractString)
+                val m = regex.find(att)
+                if (m != null)
+                    return regex.replaceFirst(att, extractString)
             }
 
             return null
@@ -152,11 +151,11 @@ abstract class AbstractStreamScraper : StreamScraper {
                             continue
 
                         line?.let { line ->
-                            val matcher = regexScrapes[i].regex.matcher(line)
-                            if (matcher.find()) {
-                                results[i] = matcher.group(
-                                    regexScrapes[i].group,
-                                )
+                            val match = regexScrapes[i].regex.find(line)
+                            if (match != null) {
+                                results[i] = match.groupValues[
+                                    regexScrapes[i].group
+                                ]
                                 countFreshHits += 1
                             }
                         }

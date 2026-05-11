@@ -2,7 +2,6 @@
 package app.crossword.yourealwaysbe.forkyz.net
 
 import java.util.Locale
-import java.util.regex.Pattern
 import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.puz.Puzzle
@@ -59,9 +58,9 @@ class CrossweirdStreamScraper : AbstractStreamScraper() {
         if (url == null)
             return null
 
-        val matcher = PUZ_PATH_MATCH.regex.matcher(url)
-        if (matcher.find()) {
-            val path = matcher.group(PUZ_PATH_MATCH.group)
+        val match = PUZ_PATH_MATCH.regex.find(url)
+        if (match != null) {
+            val path = match.groupValues[PUZ_PATH_MATCH.group]
             return String.format(
                 Locale.US,
                 PUZ_URL_FORMAT,
@@ -74,7 +73,7 @@ class CrossweirdStreamScraper : AbstractStreamScraper() {
 
     companion object {
         private val PUZ_PATH_MATCH = RegexScrape(
-            Pattern.compile("crossweirdpuzzles.com[^\" ]*file=([^&\" ]*)"),
+            Regex("crossweirdpuzzles.com[^\" ]*file=([^&\" ]*)"),
             1,
         )
 

@@ -1,7 +1,6 @@
 package app.crossword.yourealwaysbe.forkyz.net
 
 import java.util.Locale
-import java.util.regex.Pattern
 import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.forkyz.util.getURL
@@ -53,9 +52,9 @@ class WSJStreamScraper : AbstractStreamScraper() {
     }
 
     companion object {
-        private val WSJ_MATCH = RegexScrape(Pattern.compile("wsj.com"), 0)
+        private val WSJ_MATCH = RegexScrape(Regex("wsj.com"), 0)
         private val PUZZLE_PATH_MATCH = RegexScrape(
-            Pattern.compile("puzzles/crossword/\\d{8}/\\d+"),
+            Regex("puzzles/crossword/\\d{8}/\\d+"),
             0,
         )
 

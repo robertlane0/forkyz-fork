@@ -2,7 +2,6 @@
 package app.crossword.yourealwaysbe.forkyz.net
 
 import java.util.Locale
-import java.util.regex.Pattern
 import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.puz.Puzzle
@@ -102,14 +101,14 @@ class RaetselZentraleSchwedenStreamScraper : AbstractStreamScraper() {
         // pagespeed_iframe... So look for something that looks like it's
         // creating it.
         private val SECOND_STAGE_URL_MATCH = RegexScrape(
-            Pattern.compile(
+            Regex(
                 "https://raetsel.raetselzentrale.de/.*schwede"
             ),
             0,
         )
 
         private val PUZZLE_ID_MATCH
-            = RegexScrape(Pattern.compile("window.__riddleId = (\\d*);"), 1)
+            = RegexScrape(Regex("window.__riddleId = (\\d*);"), 1)
 
         private const val DEFAULT_SOURCE = "Raetsel Zentrale"
 

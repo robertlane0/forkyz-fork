@@ -1,8 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.util.regex.Matcher
-import java.util.regex.Pattern
 import kotlinx.io.IOException
 import kotlinx.io.Source
 
@@ -31,8 +29,7 @@ class MyCrosswordStreamScraper : AbstractStreamScraper() {
         if (url == null)
             return null
 
-        val m = URL_RE.matcher(url)
-        if (!m.matches())
+        if (!URL_RE.matches(url))
             return null
 
         try {
@@ -73,14 +70,14 @@ class MyCrosswordStreamScraper : AbstractStreamScraper() {
     }
 
     companion object {
-        private val URL_RE : Pattern = Pattern.compile(
+        private val URL_RE = Regex(
             ".*mycrossword.*\\/[^/]+\\/\\d+",
-            Pattern.CASE_INSENSITIVE,
+            RegexOption.IGNORE_CASE,
         )
         private val JSON_MATCH = RegexScrape(
-            Pattern.compile(
+            Regex(
                 "window.__remixContext = (\\{.*?\\});",
-                Pattern.CASE_INSENSITIVE,
+                RegexOption.IGNORE_CASE,
             ),
             1,
         )

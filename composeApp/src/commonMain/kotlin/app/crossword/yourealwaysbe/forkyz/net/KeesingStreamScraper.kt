@@ -2,7 +2,6 @@
 package app.crossword.yourealwaysbe.forkyz.net
 
 import java.util.Locale
-import java.util.regex.Pattern
 import kotlinx.io.IOException
 import kotlinx.io.Source
 import kotlinx.io.readLine
@@ -114,9 +113,9 @@ class KeesingStreamScraper : AbstractStreamScraper() {
         private const val TAG = "ForkyzKeesingStrmScrp"
 
         private val CUSTOMER_ID_MATCH
-            = RegexScrape(Pattern.compile("data-customerid=\"([^\"]*)\""), 1)
+            = RegexScrape(Regex("data-customerid=\"([^\"]*)\""), 1)
         private val PUZZLE_ID_MATCH = RegexScrape(
-            Pattern.compile("data-puzzleid=\"([^\"]*)\""),
+            Regex("data-puzzleid=\"([^\"]*)\""),
             1,
         )
 

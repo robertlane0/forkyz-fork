@@ -4,7 +4,6 @@ package app.crossword.yourealwaysbe.forkyz.util
 import java.text.Normalizer
 import java.util.Locale
 import java.util.UUID
-import java.util.regex.Pattern
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.DateTimeFormat
 import kotlinx.datetime.format.Padding
@@ -93,8 +92,8 @@ object AppPuzzleUtils {
 
         if (filename != null && !filename.isEmpty()) {
             for (fmt in FILE_NAME_FORMATS) {
-                val matcher = fmt.regex.matcher(filename)
-                if (matcher.find()) return matcher.group(fmt.sourceGrp)
+                val match = fmt.regex.find(filename)
+                if (match != null) return match.groupValues[fmt.sourceGrp]
             }
         }
 
@@ -120,11 +119,11 @@ object AppPuzzleUtils {
 
         if (filename != null) {
             for (fmt in FILE_NAME_FORMATS) {
-                val matcher = fmt.regex.matcher(filename)
-                if (matcher.find()) {
+                val match = fmt.regex.find(filename)
+                if (match != null) {
                     try {
                         return LocalDate.parse(
-                            matcher.group(fmt.dateGrp) ?: "",
+                            match.groupValues[fmt.dateGrp],
                             fmt.dateFormat,
                         )
                     } catch (e : IllegalArgumentException) {
@@ -143,7 +142,7 @@ object AppPuzzleUtils {
         val dateGrp : Int,
         val dateFormat : DateTimeFormat<LocalDate>,
     ) {
-        val regex : Pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE)
+        val regex : Regex = Regex(regex, RegexOption.IGNORE_CASE)
     }
 }
 

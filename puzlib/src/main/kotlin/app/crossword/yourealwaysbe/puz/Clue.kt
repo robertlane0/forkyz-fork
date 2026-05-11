@@ -3,9 +3,6 @@ package app.crossword.yourealwaysbe.puz
 import java.util.Objects
 import java.util.SortedMap
 import java.util.TreeMap
-import java.util.regex.Matcher
-import java.util.regex.Pattern
-
 import app.crossword.yourealwaysbe.puz.util.HtmlUtil
 
 /**

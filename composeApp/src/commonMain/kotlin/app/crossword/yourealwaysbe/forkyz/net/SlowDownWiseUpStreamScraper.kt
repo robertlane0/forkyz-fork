@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.util.regex.Pattern
 import kotlinx.io.IOException
 import kotlinx.io.Source
 
@@ -26,14 +25,14 @@ class SlowDownWiseUpStreamScraper() : AbstractStreamScraper() {
             "https://content-api.slowdownwiseup.co.uk/api/mobile/v1/"
             + "puzzle-data/%s/file/data.json"
         )
-        private val IS_SLOWDOWNWISEUP_RE = Pattern.compile(
+        private val IS_SLOWDOWNWISEUP_RE = Regex(
             "slowdownwiseup",
-            Pattern.CASE_INSENSITIVE
+            RegexOption.IGNORE_CASE
         )
-        private val STAGE2_URL_RE = Pattern.compile(
+        private val STAGE2_URL_RE = Regex(
             // \\\\\\\" = \"!
             "\\\\\\\"uuid\\\\\\\":\\s*\\\\\\\"([0-9a-f-]*)\\\\\\\"",
-            Pattern.CASE_INSENSITIVE
+            RegexOption.IGNORE_CASE
         )
         private val IS_SLOWDOWNWISEUP_REGEX
             = RegexScrape(IS_SLOWDOWNWISEUP_RE, 0)

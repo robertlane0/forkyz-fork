@@ -1,7 +1,6 @@
 package app.crossword.yourealwaysbe.forkyz.net
 
 import java.util.Locale
-import java.util.regex.Pattern
 import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.puz.Puzzle
@@ -57,11 +56,11 @@ class PzzlNetStreamScraper : AbstractStreamScraper() {
 
     companion object {
         private val ID_MATCH = RegexScrape(
-            Pattern.compile("pzzl.net/app/([^/]*)/"),
+            Regex("pzzl.net/app/([^/]*)/"),
             1,
         )
         private val DATE_MATCH = RegexScrape(
-            Pattern.compile("xword:\\s*\\{\\s*date:\\s*('|\")(\\d+)('|\")"),
+            Regex("xword:\\s*\\{\\s*date:\\s*('|\")(\\d+)('|\")"),
             2,
         )
 

@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.util.regex.Pattern
 import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.puz.Puzzle
@@ -46,16 +45,16 @@ class PAPuzzlesStreamScraper : AbstractStreamScraper() {
 
     companion object {
         private val PA_PUZZLES_URL_RE = RegexScrape(
-            Pattern.compile(
+            Regex(
                 "src=\\\\\"([^\"]*pa-puzzles.com[^\"]*)\\\\\"",
-                Pattern.CASE_INSENSITIVE,
+                RegexOption.IGNORE_CASE,
             ),
             1,
         )
         private val TITLE_RE = RegexScrape(
-            Pattern.compile(
+            Regex(
                 "<title>([^<]*)<\\/title>",
-                Pattern.CASE_INSENSITIVE,
+                RegexOption.IGNORE_CASE,
             ),
             1,
         )

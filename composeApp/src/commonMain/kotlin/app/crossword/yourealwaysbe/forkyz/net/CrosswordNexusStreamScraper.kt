@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.util.regex.Pattern
 import kotlinx.io.Source
 
 import com.fleeksoft.ksoup.nodes.Document
@@ -61,7 +60,7 @@ class CrosswordNexusStreamScraper : AbstractStreamScraper() {
     }
 
     companion object {
-        private val PUZZLE_URL_RE = Pattern.compile(
+        private val PUZZLE_URL_RE = Regex(
             "(.*crosswordnexus.com).*puzzle=([^&]*).*",
         )
         private const val PUZZLE_URL_EXTRACT = "$1/$2"
