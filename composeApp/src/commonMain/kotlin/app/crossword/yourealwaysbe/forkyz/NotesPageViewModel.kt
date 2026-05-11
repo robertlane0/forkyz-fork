@@ -118,11 +118,14 @@ private data class AnagramValues(
  *
  * @param notesClueID the ID of the clue if clue notes else null (puzzle
  * notes)
+ * @param showBoard whether the miniboard should be shown (not all clues
+ * have zones on the board)
  * @param clueText the clue text to display with the clue, or null if
  * this is the zone of cells with no clue attached
  */
 data class NotesPageUIState(
     val notesClueID : ClueID? = null,
+    val showBoard : Boolean = true,
     val clueText : String? = null,
     val boxesLength : Int = 0,
     val scratchValue : String = "",
@@ -563,6 +566,7 @@ class NotesPageViewModel(
             val note = puz?.playerNote
             currentNotesUIState = currentNotesUIState.copy(
                 notesClueID = null,
+                showBoard = false,
                 clueText = null,
                 boxesLength = maxPuzzleDimension,
                 scratchValue = note?.scratch ?: "",
@@ -579,6 +583,7 @@ class NotesPageViewModel(
             if (clue == null) {
                 currentNotesUIState = currentNotesUIState.copy(
                     notesClueID = cid,
+                    showBoard = false,
                     clueText = null,
                     boxesLength = maxPuzzleDimension,
                     scratchValue = note?.scratch ?: "",
@@ -601,6 +606,7 @@ class NotesPageViewModel(
 
                 currentNotesUIState = currentNotesUIState.copy(
                     notesClueID = cid,
+                    showBoard = clue.hasZone(),
                     boxesLength = boxesLength,
                     scratchValue = note?.scratch ?: "",
                     textValue = note?.text ?: "",
