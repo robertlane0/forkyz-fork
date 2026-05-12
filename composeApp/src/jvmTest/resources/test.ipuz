@@ -1,7 +1,7 @@
 {
     "version": "http://ipuz.org/v2",
     "kind": [ "http://ipuz.org/crossword#1" ],
-    "title": "Test &amp; puzzle",
+    "title": "Test &amp; puzzle \u2018",
     "author": "Test author",
     "copyright": "Test copyright",
     "intro": "Intro",
@@ -30,7 +30,7 @@
     "clues": {
         "Across": [
             [ 1, "Test clue 1" ],
-            [ "3", "Test clue 2" ],
+            [ "3", "Test clue 2" ]
         ],
         "Down:Vertical": [
             { "number": 1, "clue": "Test clue 3", "label": "One" },

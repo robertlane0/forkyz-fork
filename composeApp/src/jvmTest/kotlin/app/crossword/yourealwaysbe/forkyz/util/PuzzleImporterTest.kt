@@ -6,10 +6,9 @@ import kotlinx.io.asSource
 import kotlinx.io.buffered
 import kotlinx.io.readString
 
-import org.junit.Assert.assertEquals
-import org.junit.Rule
-import org.junit.Test
-import org.junit.rules.TemporaryFolder
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.io.TempDir
 
 import org.mockito.Mockito
 import org.mockito.Mockito.mock
@@ -40,8 +39,8 @@ object MockitoHelper {
 
 class PuzzleImporterTest {
 
-    @get:Rule
-    val folder = TemporaryFolder()
+    @TempDir
+    lateinit var tempDir : java.nio.file.Path
 
     private val utils = JVMNativeBackendUtils(AppStrings())
     private var fileHandler : FileHandler? = null
@@ -77,7 +76,7 @@ class PuzzleImporterTest {
         )
         val expectedCrosswordTitles = setOf(
             "NY Times, Fri, Nov 13, 2009",
-            "Test &amp; puzzle"
+            "Test &amp; puzzle &#x2018;"
         )
 
         assertEquals(expectedToImport, getNames(toImport))
@@ -140,7 +139,7 @@ class PuzzleImporterTest {
     }
 
     private fun getCrosswordsFolder() : File {
-        val crosswords = File(folder.root.getPath(), "crosswords")
+        val crosswords = File(tempDir.toString(), "crosswords")
         crosswords.mkdirs()
         return crosswords
     }

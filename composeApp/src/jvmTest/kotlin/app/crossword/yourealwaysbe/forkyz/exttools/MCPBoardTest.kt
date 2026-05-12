@@ -5,11 +5,11 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.io.asSource
 import kotlinx.io.buffered
 
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotEquals
-import org.junit.Assert.assertTrue
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotEquals
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
@@ -31,7 +31,7 @@ class MCPBoardTest {
     private lateinit var mcpBoard : MCPBoard
     private lateinit var noBoard : MCPBoard
 
-    @Before
+    @BeforeEach
     fun setUp() {
         puzzle = IO.loadNative(
             MCPBoardTest::class.java
@@ -134,9 +134,9 @@ class MCPBoardTest {
             )
         ) {
             assertEquals(
-                "Expected 'No playboard loaded.' for $name",
                 "No playboard loaded.",
                 invoke(noBoard, name),
+                "Expected 'No playboard loaded.' for $name",
             )
         }
     }

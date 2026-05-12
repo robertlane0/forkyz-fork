@@ -128,14 +128,12 @@ kotlin {
         getByName("androidHostTest").dependencies {
             implementation(libs.androidx.arch.core.testing)
             implementation(libs.kotlinx.coroutines.test)
-            implementation(libs.junit4)
+            implementation(libs.junit5.jupiter)
             implementation(libs.mockito.kotlin)
         }
 
         jvmTest.dependencies {
-            implementation(libs.junit4)
             implementation(libs.mockito.kotlin)
-
             implementation(libs.junit5.jupiter)
             implementation(libs.junit5.jupiter.params)
             runtimeOnly(libs.junit.platform.launcher)
@@ -162,6 +160,10 @@ kotlin {
 dependencies {
     add("kspAndroid", libs.androidx.room.compiler)
     add("kspJvm", libs.androidx.room.compiler)
+}
+
+tasks.named<Test>("jvmTest") {
+    useJUnitPlatform()
 }
 
 lint {

@@ -1,32 +1,20 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.util.AbstractList
-import java.util.Collections
+import java.util.stream.Stream
 import kotlinx.coroutines.runBlocking
-import kotlinx.datetime.LocalDate
 
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.Parameterized
-import org.junit.runners.Parameterized.Parameters
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 
 import app.crossword.yourealwaysbe.forkyz.settings.DownloadersSettings
 import app.crossword.yourealwaysbe.forkyz.util.AppStrings
 import app.crossword.yourealwaysbe.forkyz.util.JVMNativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.files.NoopFileHandler
 
-import org.junit.Assert.assertTrue
-import org.mockito.MockedStatic
-import org.mockito.Mockito.*
-
-private val DEFAULT_NAME = "puzzle"
-
-@RunWith(Parameterized::class)
-class DownloadersTest(
-    private val name : String,
-    private val downloader : Downloader,
-) {
+class DownloadersTest {
     companion object {
         private val settings = DownloadersSettings(
             setOf(DownloaderID.CUSTOM.id), // disabledDownloaders (custom daily disabled)
@@ -36,24 +24,17 @@ class DownloadersTest(
             true, // suppressIndividualNotifications,
             30000, // downloadTimeout,
             false, // downloadOnStartup
-            Collections.emptySet(), // autoDownloadersBlockMon,
-            Collections.emptySet(), // autoDownloadersBlockTue,
-            Collections.emptySet(), // autoDownloadersBlockWed,
-            Collections.emptySet(), // autoDownloadersBlockThu,
-            Collections.emptySet(), // autoDownloadersBlockFri,
-            Collections.emptySet(), // autoDownloadersBlockSat,
-            Collections.emptySet(), // autoDownloadersBlockSun,
+            setOf(), // autoDownloadersBlockMon,
+            setOf(), // autoDownloadersBlockTue,
+            setOf(), // autoDownloadersBlockWed,
+            setOf(), // autoDownloadersBlockThu,
+            setOf(), // autoDownloadersBlockFri,
+            setOf(), // autoDownloadersBlockSat,
+            setOf(), // autoDownloadersBlockSun,
         )
 
-        /**
-         * Parameters are the list of downloaders
-         *
-         * Gotten from the Downloaders class. Returned as a list of pairs:
-         * (downloaderID, downloader).
-         */
-        @Parameters(name = "Downloader {0}")
         @JvmStatic
-        fun downloaders() : Iterable<Array<Any>>? {
+        fun downloaders() : Stream<Arguments> {
             val strings = AppStrings()
             val utils = JVMNativeBackendUtils(strings)
             val dls = Downloaders(
@@ -62,19 +43,15 @@ class DownloadersTest(
                 settings,
             )
             val downloaders = runBlocking { dls.getDownloaders() }
-            return object : AbstractList<Array<Any>>() {
-                override val size : Int = downloaders.size
-
-                override fun get(i : Int) : Array<Any> {
-                    val d = downloaders.get(i)
-                    return arrayOf(d.downloaderID.id, d)
-                }
+            return downloaders.stream().map { d ->
+                Arguments.of(d.downloaderID.id, d)
             }
         }
     }
 
-    @Test
-    fun testDownloaders() {
+    @ParameterizedTest(name = "Downloader {0}")
+    @MethodSource("downloaders")
+    fun testDownloaders(name : String, downloader : Downloader) {
         downloader.latestDate?.let { latest ->
             val res = runBlocking {
                 downloader.download(latest, setOf())

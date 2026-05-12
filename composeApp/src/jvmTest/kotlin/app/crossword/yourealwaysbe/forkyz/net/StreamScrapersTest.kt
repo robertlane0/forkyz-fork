@@ -4,8 +4,8 @@ package app.crossword.yourealwaysbe.forkyz.net
 import kotlinx.coroutines.runBlocking
 import kotlinx.io.Source
 
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 
 import org.mockito.ArgumentMatchers
 import org.mockito.MockedStatic
@@ -151,7 +151,7 @@ class StreamScrapersTest {
             runBlocking {
                 getURL(url, TIMEOUT).use { input ->
                     val puz = scraper.parseInput(input, url)
-                    Assert.assertNotNull(puz)
+                    Assertions.assertNotNull(puz)
                 }
             }
         }

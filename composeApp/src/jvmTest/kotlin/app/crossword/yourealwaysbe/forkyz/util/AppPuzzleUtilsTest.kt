@@ -3,8 +3,8 @@ package app.crossword.yourealwaysbe.forkyz.util
 
 import kotlinx.datetime.LocalDate
 
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 
 import app.crossword.yourealwaysbe.forkyz.util.AppPuzzleUtils.deriveDate
 import app.crossword.yourealwaysbe.forkyz.util.AppPuzzleUtils.deriveSource
@@ -12,12 +12,12 @@ import app.crossword.yourealwaysbe.forkyz.util.AppPuzzleUtils.deriveSource
 class AppPuzzleUtilsTest {
     @Test
     fun testNull() {
-        Assert.assertNull(deriveSource(null, null, null, null))
+        Assertions.assertNull(deriveSource(null, null, null, null))
     }
 
     @Test
     fun testDeriveSourceSource() {
-        Assert.assertEquals(
+        Assertions.assertEquals(
             "Source",
             deriveSource(
                 "Source",
@@ -30,7 +30,7 @@ class AppPuzzleUtilsTest {
 
     @Test
     fun testDeriveSourceFileXWordDL() {
-        Assert.assertEquals(
+        Assertions.assertEquals(
             "FileSource",
             deriveSource(
                 null,
@@ -43,7 +43,7 @@ class AppPuzzleUtilsTest {
 
     @Test
     fun testDeriveSourceFileForkyz() {
-        Assert.assertEquals(
+        Assertions.assertEquals(
             "FileSource",
             deriveSource(
                 null,
@@ -56,7 +56,7 @@ class AppPuzzleUtilsTest {
 
     @Test
     fun testDeriveSourceFileForkyzUUID() {
-        Assert.assertEquals(
+        Assertions.assertEquals(
             "FileSource",
             deriveSource(
                 null,
@@ -69,7 +69,7 @@ class AppPuzzleUtilsTest {
 
     @Test
     fun testDeriveSourceShort() {
-        Assert.assertEquals(
+        Assertions.assertEquals(
             "FileSource",
             deriveSource(
                 null,
@@ -82,7 +82,7 @@ class AppPuzzleUtilsTest {
 
     @Test
     fun testDeriveSourceAuthor() {
-        Assert.assertEquals(
+        Assertions.assertEquals(
             "Author",
             deriveSource(
                 null,
@@ -95,7 +95,7 @@ class AppPuzzleUtilsTest {
 
     @Test
     fun testDeriveSourceTitle() {
-        Assert.assertEquals(
+        Assertions.assertEquals(
             "Title",
             deriveSource(
                 "",
@@ -108,7 +108,7 @@ class AppPuzzleUtilsTest {
 
     fun testDeriveDateDate() {
         val date = LocalDate(2023, 1, 2)
-        Assert.assertEquals(
+        Assertions.assertEquals(
             date,
             deriveDate(
                 date,
@@ -118,7 +118,7 @@ class AppPuzzleUtilsTest {
     }
 
     fun testDeriveDateFileXWordDL() {
-        Assert.assertEquals(
+        Assertions.assertEquals(
             null,
             deriveDate(
                 LocalDate(2023, 1, 2),
@@ -128,7 +128,7 @@ class AppPuzzleUtilsTest {
     }
 
     fun testDeriveDateFileForkyz() {
-        Assert.assertEquals(
+        Assertions.assertEquals(
             null,
             deriveDate(
                 LocalDate(2023, 1, 12),
@@ -138,7 +138,7 @@ class AppPuzzleUtilsTest {
     }
 
     fun testDeriveDateFileShort() {
-        Assert.assertEquals(
+        Assertions.assertEquals(
             null,
             deriveDate(
                 LocalDate(2023, 1, 2),
@@ -148,7 +148,7 @@ class AppPuzzleUtilsTest {
     }
 
     fun testDeriveDateNull() {
-        Assert.assertNull(
+        Assertions.assertNull(
             deriveDate(
                 null,
                 "Wrong File Format.puz",
@@ -157,7 +157,7 @@ class AppPuzzleUtilsTest {
     }
 
     fun testDeriveDateNullNull() {
-        Assert.assertNull(
+        Assertions.assertNull(
             deriveDate(
                 null,
                 null,
