@@ -83,6 +83,10 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.transfer_overw
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.transfer_scratch_to_focussed_view
 import app.crossword.yourealwaysbe.forkyz.menu.BaseMenuModifier
 import app.crossword.yourealwaysbe.forkyz.menu.MenuText
+import app.crossword.yourealwaysbe.forkyz.puz.Clue
+import app.crossword.yourealwaysbe.forkyz.puz.ClueID
+import app.crossword.yourealwaysbe.forkyz.puz.Playboard.Word
+import app.crossword.yourealwaysbe.forkyz.puz.Position
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 import app.crossword.yourealwaysbe.forkyz.util.NativeFrontendUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
@@ -96,10 +100,6 @@ import app.crossword.yourealwaysbe.forkyz.view.OrdinaryKey
 import app.crossword.yourealwaysbe.forkyz.view.WordEdit
 import app.crossword.yourealwaysbe.forkyz.view.rememberBoardEditTextState
 import app.crossword.yourealwaysbe.forkyz.view.rememberBoardTextMeasurer
-import app.crossword.yourealwaysbe.puz.Clue
-import app.crossword.yourealwaysbe.puz.ClueID
-import app.crossword.yourealwaysbe.puz.Playboard.Word
-import app.crossword.yourealwaysbe.puz.Position
 
 private val VERTICAL_BOARD_PADDING = 6.dp
 

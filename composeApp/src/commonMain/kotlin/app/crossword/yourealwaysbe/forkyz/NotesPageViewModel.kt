@@ -21,6 +21,13 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_scratc
 import app.crossword.yourealwaysbe.forkyz.exttools.CrosswordSolverData
 import app.crossword.yourealwaysbe.forkyz.exttools.ExternalDictionaries
 import app.crossword.yourealwaysbe.forkyz.exttools.MCPBoardManager
+import app.crossword.yourealwaysbe.forkyz.puz.Box
+import app.crossword.yourealwaysbe.forkyz.puz.Clue
+import app.crossword.yourealwaysbe.forkyz.puz.ClueID
+import app.crossword.yourealwaysbe.forkyz.puz.MovementStrategy
+import app.crossword.yourealwaysbe.forkyz.puz.Note
+import app.crossword.yourealwaysbe.forkyz.puz.Playboard.PlayboardChanges
+import app.crossword.yourealwaysbe.forkyz.puz.Playboard.Word
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.RenderSettings
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
@@ -31,13 +38,6 @@ import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.util.getOnce
 import app.crossword.yourealwaysbe.forkyz.util.stateInSubscribed
 import app.crossword.yourealwaysbe.forkyz.view.WordEditViewModel
-import app.crossword.yourealwaysbe.puz.Box
-import app.crossword.yourealwaysbe.puz.Clue
-import app.crossword.yourealwaysbe.puz.ClueID
-import app.crossword.yourealwaysbe.puz.MovementStrategy
-import app.crossword.yourealwaysbe.puz.Note
-import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges
-import app.crossword.yourealwaysbe.puz.Playboard.Word
 
 private val BLANK = Box.BLANK
 private val BLANK_CHAR = Box.BLANK[0]

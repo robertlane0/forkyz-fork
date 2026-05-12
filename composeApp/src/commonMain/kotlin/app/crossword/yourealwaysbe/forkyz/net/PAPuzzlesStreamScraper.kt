@@ -3,8 +3,8 @@ package app.crossword.yourealwaysbe.forkyz.net
 
 import kotlinx.io.Source
 
-import app.crossword.yourealwaysbe.puz.Puzzle
-import app.crossword.yourealwaysbe.puz.io.PAPuzzlesIO
+import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
+import app.crossword.yourealwaysbe.forkyz.puz.io.PAPuzzlesIO
 
 /**
  * Scraper for embedded PA Puzzles pages

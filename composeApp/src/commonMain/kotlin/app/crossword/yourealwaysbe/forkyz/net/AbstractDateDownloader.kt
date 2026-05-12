@@ -11,10 +11,10 @@ import kotlinx.datetime.number
 import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.forkyz.net.Downloader.DownloadResult
+import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
+import app.crossword.yourealwaysbe.forkyz.puz.io.PuzzleParser
 import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
-import app.crossword.yourealwaysbe.puz.Puzzle
-import app.crossword.yourealwaysbe.puz.io.PuzzleParser
 
 /**
  * Base downloader class

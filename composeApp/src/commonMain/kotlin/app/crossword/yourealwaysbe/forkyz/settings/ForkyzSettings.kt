@@ -21,16 +21,16 @@ import androidx.annotation.WorkerThread
 import androidx.datastore.core.DataStore
 
 import app.crossword.yourealwaysbe.forkyz.net.DownloaderID
+import app.crossword.yourealwaysbe.forkyz.puz.MovementStrategy
+import app.crossword.yourealwaysbe.forkyz.puz.Playboard.DeleteCrossingMode
+import app.crossword.yourealwaysbe.forkyz.puz.util.JSONException
+import app.crossword.yourealwaysbe.forkyz.puz.util.JSONObject
+import app.crossword.yourealwaysbe.forkyz.puz.util.JSONObjectBuilder
+import app.crossword.yourealwaysbe.forkyz.puz.util.buildJSONArray
+import app.crossword.yourealwaysbe.forkyz.puz.util.buildJSONObject
+import app.crossword.yourealwaysbe.forkyz.puz.util.parseJSONObject
+import app.crossword.yourealwaysbe.forkyz.puz.util.writeJSONObject
 import app.crossword.yourealwaysbe.forkyz.util.getOnce
-import app.crossword.yourealwaysbe.puz.MovementStrategy
-import app.crossword.yourealwaysbe.puz.Playboard.DeleteCrossingMode
-import app.crossword.yourealwaysbe.puz.util.JSONException
-import app.crossword.yourealwaysbe.puz.util.JSONObject
-import app.crossword.yourealwaysbe.puz.util.JSONObjectBuilder
-import app.crossword.yourealwaysbe.puz.util.buildJSONArray
-import app.crossword.yourealwaysbe.puz.util.buildJSONObject
-import app.crossword.yourealwaysbe.puz.util.parseJSONObject
-import app.crossword.yourealwaysbe.puz.util.writeJSONObject
 
 class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val settingsFlow : Flow<Settings>

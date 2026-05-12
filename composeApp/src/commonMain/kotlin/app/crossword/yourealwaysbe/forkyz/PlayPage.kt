@@ -68,6 +68,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.select_clue
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.toggle_clue_tabs
 import app.crossword.yourealwaysbe.forkyz.menu.BaseMenuModifier
 import app.crossword.yourealwaysbe.forkyz.menu.MenuText
+import app.crossword.yourealwaysbe.forkyz.puz.ClueID
 import app.crossword.yourealwaysbe.forkyz.settings.FitToScreenMode
 import app.crossword.yourealwaysbe.forkyz.settings.GridRatio
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
@@ -81,7 +82,6 @@ import app.crossword.yourealwaysbe.forkyz.view.OrdinaryKey
 import app.crossword.yourealwaysbe.forkyz.view.SpecialKey
 import app.crossword.yourealwaysbe.forkyz.view.rememberBoardEditState
 import app.crossword.yourealwaysbe.forkyz.view.rememberBoardTextMeasurer
-import app.crossword.yourealwaysbe.puz.ClueID
 
 private val ACROSTIC_CLUE_TABS_WORD_SCALE = 0.7F
 // min height of board in portrait / acrostic

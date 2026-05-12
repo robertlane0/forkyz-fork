@@ -3,10 +3,10 @@ package app.crossword.yourealwaysbe.forkyz.exttools
 
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.search_fifteen_squared_url
+import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.toUri
-import app.crossword.yourealwaysbe.puz.Puzzle
 
 class FifteenSquaredData(uri : Uri) : HTMLToolData(uri) {
     companion object {

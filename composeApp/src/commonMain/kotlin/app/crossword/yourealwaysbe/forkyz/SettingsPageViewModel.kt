@@ -284,7 +284,6 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_layou
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_native
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_never_show
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_qwerty
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_russian
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_qwertz
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_repeat_delay
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_repeat_delay_desc
@@ -292,6 +291,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_repea
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_repeat_interval
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_repeat_interval_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_repeat_interval_hint
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_russian
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_settings
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_settings_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_show_sparingly_desc

@@ -4,10 +4,10 @@ package app.crossword.yourealwaysbe.forkyz.net
 import kotlinx.io.IOException
 import kotlinx.io.Source
 
+import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
+import app.crossword.yourealwaysbe.forkyz.puz.io.SlowDownWiseUpJSONIO
+import app.crossword.yourealwaysbe.forkyz.puz.io.StreamUtils
 import app.crossword.yourealwaysbe.forkyz.util.AppLogger
-import app.crossword.yourealwaysbe.puz.Puzzle
-import app.crossword.yourealwaysbe.puz.io.SlowDownWiseUpJSONIO
-import app.crossword.yourealwaysbe.puz.io.StreamUtils
 
 /**
  * Get embedded SlowDownWiseUp puzzles

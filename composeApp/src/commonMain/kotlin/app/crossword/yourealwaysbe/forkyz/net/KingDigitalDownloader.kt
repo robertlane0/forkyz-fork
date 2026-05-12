@@ -4,7 +4,7 @@ package app.crossword.yourealwaysbe.forkyz.net
 import kotlin.time.Duration
 import kotlinx.datetime.DayOfWeek
 
-import app.crossword.yourealwaysbe.puz.io.JPZIO
+import app.crossword.yourealwaysbe.forkyz.puz.io.JPZIO
 
 /**
  * King Digital Downloader

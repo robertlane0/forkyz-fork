@@ -1,12 +1,12 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
+import kotlin.concurrent.atomics.AtomicBoolean
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
-import kotlin.concurrent.atomics.AtomicBoolean
-import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -58,19 +58,19 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.usa_today
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.vingminutes
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.wall_street_journal
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.washington_post_sunday
+import app.crossword.yourealwaysbe.forkyz.puz.io.BrainsOnlyIO
+import app.crossword.yourealwaysbe.forkyz.puz.io.FortyTwoPuzzlesIO
+import app.crossword.yourealwaysbe.forkyz.puz.io.GuardianJSONIO
+import app.crossword.yourealwaysbe.forkyz.puz.io.IO
+import app.crossword.yourealwaysbe.forkyz.puz.io.JPZIO
+import app.crossword.yourealwaysbe.forkyz.puz.io.NRCInHetMiddenIO
+import app.crossword.yourealwaysbe.forkyz.puz.io.PMLIO
+import app.crossword.yourealwaysbe.forkyz.puz.io.PrzekrojIO
 import app.crossword.yourealwaysbe.forkyz.settings.DownloadersSettings
 import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandler
-import app.crossword.yourealwaysbe.puz.io.BrainsOnlyIO
-import app.crossword.yourealwaysbe.puz.io.FortyTwoPuzzlesIO
-import app.crossword.yourealwaysbe.puz.io.GuardianJSONIO
-import app.crossword.yourealwaysbe.puz.io.IO
-import app.crossword.yourealwaysbe.puz.io.JPZIO
-import app.crossword.yourealwaysbe.puz.io.NRCInHetMiddenIO
-import app.crossword.yourealwaysbe.puz.io.PMLIO
-import app.crossword.yourealwaysbe.puz.io.PrzekrojIO
 
 private val TAG = "ForkyzDownloaders"
 private val NUM_DOWNLOAD_THREADS = 3

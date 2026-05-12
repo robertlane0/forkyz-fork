@@ -16,6 +16,11 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_previo
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_right
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_up
 import app.crossword.yourealwaysbe.forkyz.exttools.MCPBoardManager
+import app.crossword.yourealwaysbe.forkyz.puz.Clue
+import app.crossword.yourealwaysbe.forkyz.puz.ClueID
+import app.crossword.yourealwaysbe.forkyz.puz.MovementStrategy
+import app.crossword.yourealwaysbe.forkyz.puz.Playboard.Word
+import app.crossword.yourealwaysbe.forkyz.puz.Position
 import app.crossword.yourealwaysbe.forkyz.settings.CycleUnfilledMode
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.RenderSettings
@@ -28,11 +33,6 @@ import app.crossword.yourealwaysbe.forkyz.util.stateInSubscribed
 import app.crossword.yourealwaysbe.forkyz.view.ClueTabsPlayboardTag
 import app.crossword.yourealwaysbe.forkyz.view.ClueTabsViewModel
 import app.crossword.yourealwaysbe.forkyz.view.WordEditViewModel
-import app.crossword.yourealwaysbe.puz.Clue
-import app.crossword.yourealwaysbe.puz.ClueID
-import app.crossword.yourealwaysbe.puz.MovementStrategy
-import app.crossword.yourealwaysbe.puz.Playboard.Word
-import app.crossword.yourealwaysbe.puz.Position
 
 class ClueListPageViewModel(
     settings : ForkyzSettings,

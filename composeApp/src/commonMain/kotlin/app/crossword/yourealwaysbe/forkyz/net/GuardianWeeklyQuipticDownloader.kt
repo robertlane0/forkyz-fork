@@ -6,9 +6,9 @@ import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.io.IOException
 
+import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
+import app.crossword.yourealwaysbe.forkyz.puz.io.GuardianJSONIO
 import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
-import app.crossword.yourealwaysbe.puz.Puzzle
-import app.crossword.yourealwaysbe.puz.io.GuardianJSONIO
 
 /**
  * Guardian Weekly Quiptic downloader

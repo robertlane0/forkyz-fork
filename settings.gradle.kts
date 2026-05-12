@@ -20,4 +20,4 @@ dependencyResolutionManagement {
     }
 }
 
-include(":composeApp", ":puzlib", ":androidApp")
+include(":composeApp", ":androidApp")

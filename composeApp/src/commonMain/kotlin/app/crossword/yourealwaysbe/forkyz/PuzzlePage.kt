@@ -128,6 +128,15 @@ import app.crossword.yourealwaysbe.forkyz.menu.MenuHelp
 import app.crossword.yourealwaysbe.forkyz.menu.MenuSettings
 import app.crossword.yourealwaysbe.forkyz.menu.MenuSubEntry
 import app.crossword.yourealwaysbe.forkyz.menu.MenuText
+import app.crossword.yourealwaysbe.forkyz.puz.Clue
+import app.crossword.yourealwaysbe.forkyz.puz.ClueID
+import app.crossword.yourealwaysbe.forkyz.puz.MovementStrategy
+import app.crossword.yourealwaysbe.forkyz.puz.Playboard
+import app.crossword.yourealwaysbe.forkyz.puz.Playboard.PlayboardChanges
+import app.crossword.yourealwaysbe.forkyz.puz.Playboard.Word
+import app.crossword.yourealwaysbe.forkyz.puz.Position
+import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
+import app.crossword.yourealwaysbe.forkyz.puz.Zone
 import app.crossword.yourealwaysbe.forkyz.settings.KeyboardLayout
 import app.crossword.yourealwaysbe.forkyz.settings.RenderSettings
 import app.crossword.yourealwaysbe.forkyz.theme.BoardColorScheme
@@ -148,15 +157,6 @@ import app.crossword.yourealwaysbe.forkyz.view.SpecialEntryDialog
 import app.crossword.yourealwaysbe.forkyz.view.SpecialKey
 import app.crossword.yourealwaysbe.forkyz.view.StringDialog
 import app.crossword.yourealwaysbe.forkyz.view.TwoButtonDialog
-import app.crossword.yourealwaysbe.puz.Clue
-import app.crossword.yourealwaysbe.puz.ClueID
-import app.crossword.yourealwaysbe.puz.MovementStrategy
-import app.crossword.yourealwaysbe.puz.Playboard
-import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges
-import app.crossword.yourealwaysbe.puz.Playboard.Word
-import app.crossword.yourealwaysbe.puz.Position
-import app.crossword.yourealwaysbe.puz.Puzzle
-import app.crossword.yourealwaysbe.puz.Zone
 
 private val TAG = "ForkyzPuzzlePage"
 private val CLUE_TEXT_SIZE = 17.sp

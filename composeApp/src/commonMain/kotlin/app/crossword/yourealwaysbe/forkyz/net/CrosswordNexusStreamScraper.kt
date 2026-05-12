@@ -5,8 +5,8 @@ import kotlinx.io.Source
 
 import com.fleeksoft.ksoup.nodes.Document
 
-import app.crossword.yourealwaysbe.puz.Puzzle
-import app.crossword.yourealwaysbe.puz.io.PuzzleStreamReader
+import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
+import app.crossword.yourealwaysbe.forkyz.puz.io.PuzzleStreamReader
 
 /**
  * Scraper for embedded Crossword Nexus puzzles

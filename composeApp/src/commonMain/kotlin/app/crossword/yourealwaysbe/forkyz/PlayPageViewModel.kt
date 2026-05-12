@@ -24,6 +24,13 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_right
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_toggle
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_up
 import app.crossword.yourealwaysbe.forkyz.exttools.MCPBoardManager
+import app.crossword.yourealwaysbe.forkyz.puz.Box
+import app.crossword.yourealwaysbe.forkyz.puz.ClueID
+import app.crossword.yourealwaysbe.forkyz.puz.Playboard.PlayboardChanges
+import app.crossword.yourealwaysbe.forkyz.puz.Playboard.Word
+import app.crossword.yourealwaysbe.forkyz.puz.Position
+import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
+import app.crossword.yourealwaysbe.forkyz.puz.PuzzleKind
 import app.crossword.yourealwaysbe.forkyz.settings.FitToScreenMode
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.GridRatio
@@ -36,13 +43,6 @@ import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.view.BoardEditViewModel
 import app.crossword.yourealwaysbe.forkyz.view.ClueTabsPlayboardTag
 import app.crossword.yourealwaysbe.forkyz.view.ClueTabsViewModel
-import app.crossword.yourealwaysbe.puz.Box
-import app.crossword.yourealwaysbe.puz.ClueID
-import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges
-import app.crossword.yourealwaysbe.puz.Playboard.Word
-import app.crossword.yourealwaysbe.puz.Position
-import app.crossword.yourealwaysbe.puz.Puzzle
-import app.crossword.yourealwaysbe.puz.PuzzleKind
 
 /**
  * UI State for play

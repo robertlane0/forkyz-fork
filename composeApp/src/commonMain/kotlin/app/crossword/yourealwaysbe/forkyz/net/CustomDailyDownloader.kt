@@ -3,7 +3,7 @@ package app.crossword.yourealwaysbe.forkyz.net
 
 import kotlin.time.Duration
 
-import app.crossword.yourealwaysbe.puz.io.PuzzleStreamReader
+import app.crossword.yourealwaysbe.forkyz.puz.io.PuzzleStreamReader
 
 /**
  * Custom daily downloader

@@ -3,10 +3,10 @@ package app.crossword.yourealwaysbe.forkyz.exttools
 
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.duckduckgo_search_url
+import app.crossword.yourealwaysbe.forkyz.puz.Clue
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.toUri
-import app.crossword.yourealwaysbe.puz.Clue
 
 // removing enums (of format (label=3,4-4;2) reduced IPuz form)
 private val ENUMERATION_HINT_RE

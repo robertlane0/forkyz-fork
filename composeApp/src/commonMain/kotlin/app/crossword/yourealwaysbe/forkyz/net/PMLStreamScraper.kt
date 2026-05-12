@@ -8,10 +8,10 @@ import kotlinx.io.Source
 
 import com.fleeksoft.ksoup.nodes.Document
 
+import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
+import app.crossword.yourealwaysbe.forkyz.puz.io.PMLIO
+import app.crossword.yourealwaysbe.forkyz.puz.io.StreamUtils
 import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
-import app.crossword.yourealwaysbe.puz.Puzzle
-import app.crossword.yourealwaysbe.puz.io.PMLIO
-import app.crossword.yourealwaysbe.puz.io.StreamUtils
 
 /**
  * Scraper for embedded PML Puzzles pages

@@ -9,8 +9,8 @@ import kotlinx.datetime.format.DateTimeFormat
 import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
 
+import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
-import app.crossword.yourealwaysbe.puz.Puzzle
 
 object AppPuzzleUtils {
     // date, name, uuid

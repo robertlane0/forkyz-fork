@@ -4,9 +4,9 @@ import kotlin.time.Duration
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 
+import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
+import app.crossword.yourealwaysbe.forkyz.puz.io.KeesingXMLIO
 import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
-import app.crossword.yourealwaysbe.puz.Puzzle
-import app.crossword.yourealwaysbe.puz.io.KeesingXMLIO
 
 /**
  * Downloader for Keesing Crosswords

@@ -8,13 +8,13 @@ import kotlinx.io.IOException
 import kotlinx.io.buffered
 import kotlinx.io.writeString
 
+import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
+import app.crossword.yourealwaysbe.forkyz.puz.io.IPuzIO
 import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.AppPuzzleUtils.generateFileName
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.files.File
-import app.crossword.yourealwaysbe.puz.Puzzle
-import app.crossword.yourealwaysbe.puz.io.IPuzIO
 
 object FileHandlerShared {
     private const val TAG = "ForkyzFileHandlerShared"

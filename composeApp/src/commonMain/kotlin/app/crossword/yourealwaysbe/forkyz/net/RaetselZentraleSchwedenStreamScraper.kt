@@ -4,10 +4,10 @@ package app.crossword.yourealwaysbe.forkyz.net
 import java.util.Locale
 import kotlinx.io.Source
 
-import app.crossword.yourealwaysbe.puz.Puzzle
-import app.crossword.yourealwaysbe.puz.io.PuzzleParser
-import app.crossword.yourealwaysbe.puz.io.RaetselZentraleSchwedenJSONIO
-import app.crossword.yourealwaysbe.puz.io.StreamUtils
+import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
+import app.crossword.yourealwaysbe.forkyz.puz.io.PuzzleParser
+import app.crossword.yourealwaysbe.forkyz.puz.io.RaetselZentraleSchwedenJSONIO
+import app.crossword.yourealwaysbe.forkyz.puz.io.StreamUtils
 
 /**
  * Downloader for RaetselZentrale Swedish Crosswords

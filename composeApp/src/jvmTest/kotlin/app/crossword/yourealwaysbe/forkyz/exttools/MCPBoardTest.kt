@@ -15,15 +15,15 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
+import app.crossword.yourealwaysbe.forkyz.puz.ClueID
+import app.crossword.yourealwaysbe.forkyz.puz.Playboard
+import app.crossword.yourealwaysbe.forkyz.puz.Position
+import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
+import app.crossword.yourealwaysbe.forkyz.puz.io.IO
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
-import app.crossword.yourealwaysbe.puz.ClueID
-import app.crossword.yourealwaysbe.puz.Playboard
-import app.crossword.yourealwaysbe.puz.Position
-import app.crossword.yourealwaysbe.puz.Puzzle
-import app.crossword.yourealwaysbe.puz.io.IO
 
-import app.crossword.yourealwaysbe.puz.util.JSONObject
-import app.crossword.yourealwaysbe.puz.util.buildJSONObject
+import app.crossword.yourealwaysbe.forkyz.puz.util.JSONObject
+import app.crossword.yourealwaysbe.forkyz.puz.util.buildJSONObject
 
 class MCPBoardTest {
     private lateinit var puzzle : Puzzle

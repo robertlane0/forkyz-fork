@@ -14,7 +14,6 @@ plugins {
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.wire) apply false
     alias(libs.plugins.compose) apply false
-    alias(libs.plugins.kotlin.jvm) apply false
     alias(libs.plugins.kotlin.multiplatform) apply false
     alias(libs.plugins.kotlin.plugin.compose) apply false
     alias(libs.plugins.kotlin.plugin.parcelize) apply false

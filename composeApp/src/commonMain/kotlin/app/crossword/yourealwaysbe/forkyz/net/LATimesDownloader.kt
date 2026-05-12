@@ -5,8 +5,8 @@ import kotlin.time.Duration.Companion.days
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.Padding
 
-import app.crossword.yourealwaysbe.puz.io.TCAJSONIO
-import app.crossword.yourealwaysbe.puz.util.parseJSONArray
+import app.crossword.yourealwaysbe.forkyz.puz.io.TCAJSONIO
+import app.crossword.yourealwaysbe.forkyz.puz.util.parseJSONArray
 
 private val PUZZLES_FEED_FORMAT = LocalDate.Format {
     chars(

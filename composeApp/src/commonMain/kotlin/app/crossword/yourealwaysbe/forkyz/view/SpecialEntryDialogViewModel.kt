@@ -5,10 +5,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
+import app.crossword.yourealwaysbe.forkyz.puz.Playboard
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
 import app.crossword.yourealwaysbe.forkyz.util.stateInSubscribed
-import app.crossword.yourealwaysbe.puz.Playboard
 
 class SpecialEntryDialogViewModel(
     val viewModelScope : CoroutineScope,

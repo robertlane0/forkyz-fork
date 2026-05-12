@@ -11,11 +11,11 @@ import kotlinx.datetime.format
 import kotlinx.datetime.format.char
 import kotlinx.datetime.isoDayNumber
 
+import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
+import app.crossword.yourealwaysbe.forkyz.puz.io.PuzzleParser
+import app.crossword.yourealwaysbe.forkyz.puz.io.RCIJeuxMCJIO
+import app.crossword.yourealwaysbe.forkyz.puz.io.RCIJeuxMFJIO
 import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
-import app.crossword.yourealwaysbe.puz.Puzzle
-import app.crossword.yourealwaysbe.puz.io.PuzzleParser
-import app.crossword.yourealwaysbe.puz.io.RCIJeuxMCJIO
-import app.crossword.yourealwaysbe.puz.io.RCIJeuxMFJIO
 
 /**
  * Abstract downloader for RCI Jeux puzzles.

@@ -4,8 +4,8 @@ package app.crossword.yourealwaysbe.forkyz.net
 import java.util.Locale
 import kotlinx.io.Source
 
-import app.crossword.yourealwaysbe.puz.Puzzle
-import app.crossword.yourealwaysbe.puz.io.PuzzleStreamReader
+import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
+import app.crossword.yourealwaysbe.forkyz.puz.io.PuzzleStreamReader
 
 /**
  * Downloader for Crossweird embedded Crosswords

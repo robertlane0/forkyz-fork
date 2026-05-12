@@ -1,0 +1,85 @@
+
+package app.crossword.yourealwaysbe.forkyz.puz.io.versions
+
+import java.util.logging.Logger
+import kotlinx.io.IOException
+import kotlinx.io.Sink
+import kotlinx.io.Source
+
+import app.crossword.yourealwaysbe.forkyz.puz.ClueID
+import app.crossword.yourealwaysbe.forkyz.puz.ListNum
+import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
+import app.crossword.yourealwaysbe.forkyz.puz.PuzzleMeta
+import app.crossword.yourealwaysbe.forkyz.puz.io.IO
+import app.crossword.yourealwaysbe.forkyz.puz.util.PuzzleUtils.getAcrossListName
+import app.crossword.yourealwaysbe.forkyz.puz.util.PuzzleUtils.getDownListName
+
+// Adds history list in format
+// int length (int clue boolean across)*
+open class IOVersion5 : IOVersion4() {
+    override fun applyMeta(puz : Puzzle, meta : PuzzleMeta) {
+        super.applyMeta(puz, meta)
+
+        val cidHistory = mutableListOf<ClueID>()
+        for (ln in meta.historyList) {
+            val listName = ln.listName
+            val number = ln.number.toString()
+            val clue = puz.getClues(listName)?.getClueByNumber(number)
+            if (clue != null)
+                cidHistory.add(clue.clueID)
+        }
+        puz.history = cidHistory
+    }
+
+    @Throws(IOException::class)
+    override fun readMeta(input : Source) : PuzzleMeta {
+        val meta = super.readMeta(input)
+
+        meta.historyList = mutableListOf<ListNum>()
+
+        val length = input.readInt()
+        for (i in 0..<length) {
+            val number = input.readInt()
+            val across = input.readByte().toInt() != 0
+            val listName = if (across) IO.ACROSS_LIST else IO.DOWN_LIST
+
+            meta.historyList.add(ListNum(listName, number))
+        }
+
+        return meta
+    }
+
+    @Throws(IOException::class)
+    override fun writeMeta(puz : Puzzle, output : Sink) {
+        super.writeMeta(puz, output)
+
+        val history = puz.history
+        val acrossListName = getAcrossListName(puz)
+        val downListName = getDownListName(puz)
+
+        output.writeInt(history.size)
+        for (cid in puz.history) {
+            val clue = puz.getClue(cid)
+            // relies on puz files only have numeric numbers
+            val number = clue?.clueNumber?.toInt()
+            if (number != null) {
+                val listName = cid.listName
+                if (acrossListName == listName) {
+                    output.writeInt(number)
+                    output.writeByte(1)
+                } else if (downListName == listName) {
+                    output.writeInt(number)
+                    output.writeByte(0)
+                } else {
+                    // ignore
+                }
+            }
+        }
+    }
+
+    companion object {
+        private val LOG
+            = Logger.getLogger(IOVersion5::class.java.getCanonicalName())
+    }
+}
+

@@ -24,11 +24,11 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_format_sh
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.cur_box_blank
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.unknown_hint
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.word_all_blank
+import app.crossword.yourealwaysbe.forkyz.puz.Box
+import app.crossword.yourealwaysbe.forkyz.puz.Clue
+import app.crossword.yourealwaysbe.forkyz.puz.Playboard
+import app.crossword.yourealwaysbe.forkyz.puz.Playboard.Word
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
-import app.crossword.yourealwaysbe.puz.Box
-import app.crossword.yourealwaysbe.puz.Clue
-import app.crossword.yourealwaysbe.puz.Playboard
-import app.crossword.yourealwaysbe.puz.Playboard.Word
 
 object PlayboardTextRenderer {
     suspend fun getLongClueText(

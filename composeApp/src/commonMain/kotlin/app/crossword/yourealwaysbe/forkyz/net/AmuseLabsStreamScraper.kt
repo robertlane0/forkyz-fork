@@ -5,9 +5,9 @@ import kotlinx.io.IOException
 import kotlinx.io.Source
 import kotlinx.io.readLine
 
-import app.crossword.yourealwaysbe.puz.Puzzle
-import app.crossword.yourealwaysbe.puz.io.PuzzleParser
-import app.crossword.yourealwaysbe.puz.io.StreamUtils
+import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
+import app.crossword.yourealwaysbe.forkyz.puz.io.PuzzleParser
+import app.crossword.yourealwaysbe.forkyz.puz.io.StreamUtils
 
 /**
  * Downloader for embedded AmuseLabs crosswords

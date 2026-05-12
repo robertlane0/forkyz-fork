@@ -4,7 +4,7 @@ package app.crossword.yourealwaysbe.forkyz.net
 import kotlin.time.Duration
 import kotlinx.datetime.LocalDate
 
-import app.crossword.yourealwaysbe.puz.Puzzle
+import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 
 interface Downloader {
     class DownloadResult {

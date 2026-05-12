@@ -3,9 +3,9 @@ package app.crossword.yourealwaysbe.forkyz.net
 import java.util.Locale
 import kotlinx.io.Source
 
+import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
+import app.crossword.yourealwaysbe.forkyz.puz.io.SlowDownWiseUpJSONIO
 import app.crossword.yourealwaysbe.forkyz.util.getURL
-import app.crossword.yourealwaysbe.puz.Puzzle
-import app.crossword.yourealwaysbe.puz.io.SlowDownWiseUpJSONIO
 
 /**
  * Scraper for puzzles embedded in Wall Street Journal

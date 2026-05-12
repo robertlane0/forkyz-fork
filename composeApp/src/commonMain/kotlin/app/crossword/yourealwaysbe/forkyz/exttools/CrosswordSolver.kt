@@ -1,9 +1,9 @@
 
 package app.crossword.yourealwaysbe.forkyz.exttools
 
-import app.crossword.yourealwaysbe.puz.Box
-import app.crossword.yourealwaysbe.puz.Puzzle
-import app.crossword.yourealwaysbe.puz.Zone
+import app.crossword.yourealwaysbe.forkyz.puz.Box
+import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
+import app.crossword.yourealwaysbe.forkyz.puz.Zone
 
 private val CROSSWORD_SOLVER_MAIN = "org.billthefarmer.crossword.Main"
 private val CROSSWORD_SOLVER_ANAGRAM = "org.billthefarmer.crossword.Anagram"

@@ -15,8 +15,8 @@ import org.jetbrains.compose.resources.getString
 import org.koin.android.ext.android.inject
 
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.mcp_stop
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.mcp_server_notification_title
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.mcp_stop
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 
 class MCPService : Service() {

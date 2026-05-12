@@ -5,9 +5,9 @@ import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlinx.datetime.LocalDate
 
+import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
+import app.crossword.yourealwaysbe.forkyz.puz.io.SmartGamesJSONIO
 import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
-import app.crossword.yourealwaysbe.puz.Puzzle
-import app.crossword.yourealwaysbe.puz.io.SmartGamesJSONIO
 
 class ElPaisExpertoDownloader(
     downloaderID : DownloaderID,

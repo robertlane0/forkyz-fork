@@ -17,14 +17,14 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_puzzle_d
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_puzzle_details_no_author_url
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_your_time
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.unknown_hint
+import app.crossword.yourealwaysbe.forkyz.puz.Box
+import app.crossword.yourealwaysbe.forkyz.puz.Clue
+import app.crossword.yourealwaysbe.forkyz.puz.Playboard
+import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
-import app.crossword.yourealwaysbe.puz.Box
-import app.crossword.yourealwaysbe.puz.Clue
-import app.crossword.yourealwaysbe.puz.Playboard
-import app.crossword.yourealwaysbe.puz.Puzzle
 
 open class ShareTextData(
     val title : String,

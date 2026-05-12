@@ -10,6 +10,13 @@ import kotlinx.coroutines.runBlocking
 
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_tab_history
+import app.crossword.yourealwaysbe.forkyz.puz.Clue
+import app.crossword.yourealwaysbe.forkyz.puz.ClueID
+import app.crossword.yourealwaysbe.forkyz.puz.Playboard
+import app.crossword.yourealwaysbe.forkyz.puz.Playboard.PlayboardChanges
+import app.crossword.yourealwaysbe.forkyz.puz.Playboard.PlayboardListener
+import app.crossword.yourealwaysbe.forkyz.puz.Playboard.Word
+import app.crossword.yourealwaysbe.forkyz.puz.Position
 import app.crossword.yourealwaysbe.forkyz.settings.ClueHighlight
 import app.crossword.yourealwaysbe.forkyz.settings.ClueTabsDouble
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
@@ -18,13 +25,6 @@ import app.crossword.yourealwaysbe.forkyz.settings.SnapClueMode
 import app.crossword.yourealwaysbe.forkyz.util.MediatedStateWithFlow
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.addAlpha
-import app.crossword.yourealwaysbe.puz.Clue
-import app.crossword.yourealwaysbe.puz.ClueID
-import app.crossword.yourealwaysbe.puz.Playboard
-import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges
-import app.crossword.yourealwaysbe.puz.Playboard.PlayboardListener
-import app.crossword.yourealwaysbe.puz.Playboard.Word
-import app.crossword.yourealwaysbe.puz.Position
 
 /**
  * Tags to attach to Playboard actions to control ClueTab behaviour

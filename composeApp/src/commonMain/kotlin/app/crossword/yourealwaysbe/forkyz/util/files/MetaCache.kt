@@ -22,12 +22,12 @@ import androidx.room.migration.Migration
 import androidx.sqlite.SQLiteConnection
 import androidx.sqlite.execSQL
 
+import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.util.AppPuzzleUtils
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle
 import app.crossword.yourealwaysbe.forkyz.util.toUri
-import app.crossword.yourealwaysbe.puz.Puzzle
 
 class MetaCache(private val utils : NativeBackendUtils) {
     object Converters {

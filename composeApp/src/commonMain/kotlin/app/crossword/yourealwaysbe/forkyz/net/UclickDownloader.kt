@@ -6,7 +6,7 @@ import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 
 import app.crossword.yourealwaysbe.forkyz.net.Downloader.DownloadResult
-import app.crossword.yourealwaysbe.puz.io.UclickXMLIO
+import app.crossword.yourealwaysbe.forkyz.puz.io.UclickXMLIO
 
 /**
  * Uclick XML Puzzles

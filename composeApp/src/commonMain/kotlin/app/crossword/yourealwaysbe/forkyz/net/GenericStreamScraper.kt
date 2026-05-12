@@ -4,7 +4,7 @@ package app.crossword.yourealwaysbe.forkyz.net
 import kotlinx.io.IOException
 import kotlinx.io.Source
 
-import app.crossword.yourealwaysbe.puz.Puzzle
+import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 
 /**
  * Try out all stream scrapers on an input

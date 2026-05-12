@@ -4,10 +4,10 @@ package app.crossword.yourealwaysbe.forkyz.net
 import kotlinx.io.IOException
 import kotlinx.io.Source
 
-import app.crossword.yourealwaysbe.puz.Puzzle
-import app.crossword.yourealwaysbe.puz.io.GuardianJSONIO
-import app.crossword.yourealwaysbe.puz.util.JSONException
-import app.crossword.yourealwaysbe.puz.util.parseJSONObject
+import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
+import app.crossword.yourealwaysbe.forkyz.puz.io.GuardianJSONIO
+import app.crossword.yourealwaysbe.forkyz.puz.util.JSONException
+import app.crossword.yourealwaysbe.forkyz.puz.util.parseJSONObject
 
 /**
  * Downloader for MyCrossword.co.uk embedded Crosswords

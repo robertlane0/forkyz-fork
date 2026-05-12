@@ -9,10 +9,10 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.help_query_jus
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.help_query_just_solution
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.help_query_solution_and_response
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_clue_blank_box
+import app.crossword.yourealwaysbe.forkyz.puz.Playboard
 import app.crossword.yourealwaysbe.forkyz.settings.ExternalToolSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
-import app.crossword.yourealwaysbe.puz.Playboard
 
 /**
  * Makes request and returns response data

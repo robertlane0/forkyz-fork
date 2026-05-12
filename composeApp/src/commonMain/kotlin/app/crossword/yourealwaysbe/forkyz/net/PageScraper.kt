@@ -13,11 +13,11 @@ import com.fleeksoft.ksoup.nodes.Document
 import com.fleeksoft.ksoup.parseSource
 
 import app.crossword.yourealwaysbe.forkyz.net.Downloader.DownloadResult
+import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
+import app.crossword.yourealwaysbe.forkyz.puz.PuzzleBuilder
+import app.crossword.yourealwaysbe.forkyz.puz.io.IO
+import app.crossword.yourealwaysbe.forkyz.puz.io.PuzzleParser
 import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
-import app.crossword.yourealwaysbe.puz.Puzzle
-import app.crossword.yourealwaysbe.puz.PuzzleBuilder
-import app.crossword.yourealwaysbe.puz.io.IO
-import app.crossword.yourealwaysbe.puz.io.PuzzleParser
 
 /**
  * A downloader that scrapes from a dateless archive

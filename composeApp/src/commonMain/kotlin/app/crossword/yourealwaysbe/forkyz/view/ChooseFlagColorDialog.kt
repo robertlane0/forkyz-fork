@@ -14,10 +14,10 @@ import org.jetbrains.compose.resources.stringArrayResource
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.flag_color_labels
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.flag_color_title
+import app.crossword.yourealwaysbe.forkyz.puz.Clue
 import app.crossword.yourealwaysbe.forkyz.theme.BoardColorScheme
 import app.crossword.yourealwaysbe.forkyz.util.addAlpha
 import app.crossword.yourealwaysbe.forkyz.util.delAlpha
-import app.crossword.yourealwaysbe.puz.Clue
 
 /**
  * Choose the flag color

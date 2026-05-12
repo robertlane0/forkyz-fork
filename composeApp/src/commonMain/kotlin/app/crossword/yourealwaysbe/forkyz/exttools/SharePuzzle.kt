@@ -3,10 +3,10 @@ package app.crossword.yourealwaysbe.forkyz.exttools
 
 import kotlinx.coroutines.CoroutineScope
 
+import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerShared
-import app.crossword.yourealwaysbe.puz.Puzzle
 
 class SharePuzzleData(
     val mimeType : String,

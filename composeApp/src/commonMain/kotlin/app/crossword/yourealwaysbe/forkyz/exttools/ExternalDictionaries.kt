@@ -1,11 +1,11 @@
 
 package app.crossword.yourealwaysbe.forkyz.exttools
 
+import app.crossword.yourealwaysbe.forkyz.puz.Box
+import app.crossword.yourealwaysbe.forkyz.puz.Playboard
+import app.crossword.yourealwaysbe.forkyz.puz.Zone
 import app.crossword.yourealwaysbe.forkyz.settings.ExternalDictionarySetting
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
-import app.crossword.yourealwaysbe.puz.Box
-import app.crossword.yourealwaysbe.puz.Playboard
-import app.crossword.yourealwaysbe.puz.Zone
 
 abstract class ExternalDictionaryData(val word : String) : ExternalToolData()
 

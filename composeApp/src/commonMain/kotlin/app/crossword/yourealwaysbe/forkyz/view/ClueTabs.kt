@@ -57,12 +57,12 @@ import be.digitalia.compose.htmlconverter.htmlToAnnotatedString
 
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_word
+import app.crossword.yourealwaysbe.forkyz.puz.ClueID
+import app.crossword.yourealwaysbe.forkyz.puz.Playboard.Word
+import app.crossword.yourealwaysbe.forkyz.puz.Position
 import app.crossword.yourealwaysbe.forkyz.settings.ClueTabsDouble
 import app.crossword.yourealwaysbe.forkyz.theme.BoardColorScheme
 import app.crossword.yourealwaysbe.forkyz.util.MATERIAL_MIN_CLICKABLE_DP
-import app.crossword.yourealwaysbe.puz.ClueID
-import app.crossword.yourealwaysbe.puz.Playboard.Word
-import app.crossword.yourealwaysbe.puz.Position
 
 // from Android docs
 private val DP_PER_INCH = 160

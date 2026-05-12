@@ -38,6 +38,14 @@ import app.crossword.yourealwaysbe.forkyz.exttools.SharePuzzleData
 import app.crossword.yourealwaysbe.forkyz.exttools.ShareTextData
 import app.crossword.yourealwaysbe.forkyz.exttools.askLLMAgentForCurrentClue
 import app.crossword.yourealwaysbe.forkyz.exttools.isLLMAgentEnabled
+import app.crossword.yourealwaysbe.forkyz.puz.Box
+import app.crossword.yourealwaysbe.forkyz.puz.Clue
+import app.crossword.yourealwaysbe.forkyz.puz.ClueID
+import app.crossword.yourealwaysbe.forkyz.puz.Playboard
+import app.crossword.yourealwaysbe.forkyz.puz.Playboard.PlayboardChanges
+import app.crossword.yourealwaysbe.forkyz.puz.Playboard.PlayboardListener
+import app.crossword.yourealwaysbe.forkyz.puz.Position
+import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.settings.ClueListClueLine
 import app.crossword.yourealwaysbe.forkyz.settings.ExternalToolSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
@@ -58,14 +66,6 @@ import app.crossword.yourealwaysbe.forkyz.view.PlayboardTextRenderer
 import app.crossword.yourealwaysbe.forkyz.view.PuzzleFinishedDialogViewModel
 import app.crossword.yourealwaysbe.forkyz.view.PuzzleInfoDialogViewModel
 import app.crossword.yourealwaysbe.forkyz.view.SpecialEntryDialogViewModel
-import app.crossword.yourealwaysbe.puz.Box
-import app.crossword.yourealwaysbe.puz.Clue
-import app.crossword.yourealwaysbe.puz.ClueID
-import app.crossword.yourealwaysbe.puz.Playboard
-import app.crossword.yourealwaysbe.puz.Playboard.PlayboardChanges
-import app.crossword.yourealwaysbe.puz.Playboard.PlayboardListener
-import app.crossword.yourealwaysbe.puz.Position
-import app.crossword.yourealwaysbe.puz.Puzzle
 
 enum class PuzzleSubMenu {
     NONE,

@@ -81,6 +81,7 @@ kotlin {
             implementation(libs.datetime.wheel.picker)
             implementation(libs.filekit.dialogs.compose)
             implementation(libs.htmlconverter)
+            implementation(libs.json5)
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.koin.compose.viewmodel.navigation)
@@ -88,14 +89,15 @@ kotlin {
             implementation(libs.kotlinx.collections.immutable)
             implementation(libs.kotlinx.datetime)
             implementation(libs.kotlinx.serialization.json)
+            implementation(libs.kotlinx.serialization.json.io)
             implementation(libs.ksoup)
             implementation(libs.ksoup.kotlinx)
             implementation(libs.ktor.client.cio)
             implementation(libs.ktor.server.cio)
             implementation(libs.mcp.sdk.server)
             implementation(libs.words.to.numbers)
-
-            implementation(project(path = ":puzlib"))
+            implementation(libs.zip)
+            implementation(libs.zip.kotlinx)
         }
 
         androidMain.dependencies {
@@ -133,6 +135,10 @@ kotlin {
         jvmTest.dependencies {
             implementation(libs.junit4)
             implementation(libs.mockito.kotlin)
+
+            implementation(libs.junit5.jupiter)
+            implementation(libs.junit5.jupiter.params)
+            runtimeOnly(libs.junit.platform.launcher)
         }
 
         jvmMain.dependencies {
