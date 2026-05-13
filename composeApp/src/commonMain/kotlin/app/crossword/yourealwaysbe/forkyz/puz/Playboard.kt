@@ -8,7 +8,6 @@ import kotlin.random.Random
 
 import app.crossword.yourealwaysbe.forkyz.puz.Box.Companion.isBlock
 import app.crossword.yourealwaysbe.forkyz.puz.util.PuzzleUtils
-import app.crossword.yourealwaysbe.forkyz.puz.util.WeakSet
 import app.crossword.yourealwaysbe.forkyz.util.SortedSet
 
 class Playboard(puzzle : Puzzle) {
@@ -59,17 +58,9 @@ class Playboard(puzzle : Puzzle) {
     // selected
     private var selectDetachedZone = true
 
-    @Transient
-    private val listeners : MutableSet<PlayboardListener?>
-        = WeakSet.buildSet<PlayboardListener?>()
-
-    @Transient
-    private val pendingListenerRemovals : MutableSet<PlayboardListener?>
-        = WeakSet.buildSet<PlayboardListener?>()
-
-    @Transient
-    private val pendingListenerAdditions : MutableSet<PlayboardListener?>
-        = WeakSet.buildSet<PlayboardListener?>()
+    private val listeners = mutableSetOf<PlayboardListener?>()
+    private val pendingListenerRemovals = mutableSetOf<PlayboardListener?>()
+    private val pendingListenerAdditions = mutableSetOf<PlayboardListener?>()
 
     private var isNotifying = false
     private var notificationDisabledDepth = 0

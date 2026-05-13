@@ -693,6 +693,7 @@ class PlayboardTest {
 
         board.addListener(listener)
         board.editClue(clue, "Test update")
+        board.removeListener(listener)
 
         Assertions.assertEquals(clue.hint, "Test update")
         Assertions.assertTrue(notified.get())
@@ -718,6 +719,7 @@ class PlayboardTest {
 
         board.addListener(listener)
         board.flagClue(clue, true)
+        board.removeListener(listener)
 
         Assertions.assertTrue(clue.isFlagged)
         Assertions.assertTrue(notified.get())
