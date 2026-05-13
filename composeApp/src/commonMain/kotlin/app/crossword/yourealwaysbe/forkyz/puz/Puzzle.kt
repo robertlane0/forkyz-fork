@@ -8,7 +8,6 @@ import java.util.logging.Logger
 import kotlinx.datetime.LocalDate
 
 import app.crossword.yourealwaysbe.forkyz.puz.Box.Companion.isBlock
-import app.crossword.yourealwaysbe.forkyz.puz.util.CollectionUtils
 
 enum class PuzzleKind { CROSSWORD, ACROSTIC }
 
@@ -137,14 +136,11 @@ class Puzzle(var boxes : Array<Array<Box?>>) {
             return null
     }
 
-    val allClues : Iterable<Clue>
+    val allClues : Sequence<Clue>
         get() {
-            var clues : Collection<Clue> = setOf<Clue>()
+            var clues = sequenceOf<Clue>()
             for (listName in this.clueListNames) {
-                clues = CollectionUtils.join<Clue>(
-                    clues,
-                    getClues(listName)!!.getClues()
-                )
+                clues = clues + getClues(listName)!!.getClues().asSequence()
             }
             return clues
         }

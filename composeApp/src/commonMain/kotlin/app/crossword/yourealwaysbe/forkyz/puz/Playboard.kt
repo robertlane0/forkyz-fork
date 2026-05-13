@@ -877,7 +877,7 @@ class Playboard(puzzle : Puzzle) {
 
         val unfilledClues = puzzle.allClues.filter { clue ->
             clue.clueID != currentID && !isFilledClueID(clue.clueID)
-        }
+        }.toList()
 
         if (!unfilledClues.isEmpty()) {
             // bit inefficient, but saves a field

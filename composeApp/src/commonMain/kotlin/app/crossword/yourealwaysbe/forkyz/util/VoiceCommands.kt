@@ -127,6 +127,7 @@ class VoiceCommands {
         puz : Puzzle,
     ) : String {
         return puz.allClues
+            .toList()
             .map { clue -> getLLMPromptClueDescription(utils, clue) }
             .filterNotNull()
             .joinToString(", ")
