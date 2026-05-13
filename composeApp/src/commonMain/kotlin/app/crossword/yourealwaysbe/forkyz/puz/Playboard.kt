@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz
 
-import java.util.NavigableSet
 import java.util.Stack
 import java.util.logging.Logger
 import kotlin.math.min
@@ -10,6 +9,7 @@ import kotlin.random.Random
 import app.crossword.yourealwaysbe.forkyz.puz.Box.Companion.isBlock
 import app.crossword.yourealwaysbe.forkyz.puz.util.PuzzleUtils
 import app.crossword.yourealwaysbe.forkyz.puz.util.WeakSet
+import app.crossword.yourealwaysbe.forkyz.util.SortedSet
 
 class Playboard(puzzle : Puzzle) {
     /**
@@ -1637,7 +1637,7 @@ class Playboard(puzzle : Puzzle) {
 
         var changed = false
 
-        val boxClues : NavigableSet<ClueID> = box.getIsPartOfClues()
+        val boxClues : SortedSet<ClueID> = box.getIsPartOfClues()
 
         if (boxClues.isEmpty()) {
             // if is a detached cell, toggle between selecting all

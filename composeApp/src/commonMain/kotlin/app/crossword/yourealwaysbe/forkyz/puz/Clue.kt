@@ -1,9 +1,12 @@
+
 package app.crossword.yourealwaysbe.forkyz.puz
 
-import app.crossword.yourealwaysbe.forkyz.puz.util.HtmlUtil
 import java.util.Objects
-import java.util.SortedMap
-import java.util.TreeMap
+
+import app.crossword.yourealwaysbe.forkyz.puz.util.HtmlUtil
+import app.crossword.yourealwaysbe.forkyz.util.MutableSortedMap
+import app.crossword.yourealwaysbe.forkyz.util.SortedMap
+import app.crossword.yourealwaysbe.forkyz.util.SortedSet
 
 /**
  * A clue on the board
@@ -76,9 +79,9 @@ class Clue constructor(
 
     // separating characters between the n-1 and n cell in answer
     private val separators : SortedMap<Int, String> = if (separators == null)
-        TreeMap<Int, String>()
+        MutableSortedMap<Int, String>()
     else
-        TreeMap<Int, String>(separators)
+        MutableSortedMap<Int, String>(separators)
 
     private var inferredSeparators : SortedMap<Int, String>? = null
 
@@ -149,17 +152,19 @@ class Clue constructor(
      * when answering
      */
     fun hasSeparators(inferSeparators : Boolean = false) : Boolean {
-        if (separators.size > 0) return true
+        if (!separators.isEmpty())
+            return true
 
         if (inferSeparators) {
-            if (inferredSeparators == null) inferSeparators()
-            return (inferredSeparators?.size ?: 0) > 0
+            if (inferredSeparators == null)
+                inferSeparators()
+            return !(inferredSeparators?.isEmpty() ?: true)
         } else {
             return false
         }
     }
 
-    val separatorPositions : Set<Int>
+    val separatorPositions : SortedSet<Int>
         /**
          * Set of positions with separators (not inferred)
          *
@@ -200,7 +205,7 @@ class Clue constructor(
      * Same for + (see #173)
      */
     private fun inferSeparators() {
-        val inferredSeparators = TreeMap<Int, String>()
+        val inferredSeparators = MutableSortedMap<Int, String>()
 
         val m = HtmlUtil.unHtmlString(hint)?.let {
             ENUMERATION_HINT_RE.matchEntire(it)

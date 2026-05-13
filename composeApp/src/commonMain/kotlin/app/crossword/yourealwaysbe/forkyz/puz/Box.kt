@@ -1,7 +1,9 @@
+
 package app.crossword.yourealwaysbe.forkyz.puz
 
-import java.util.NavigableSet;
-import java.util.TreeMap;
+import app.crossword.yourealwaysbe.forkyz.util.MutableSortedMap
+import app.crossword.yourealwaysbe.forkyz.util.SortedMap
+import app.crossword.yourealwaysbe.forkyz.util.SortedSet
 
 class Box {
     companion object {
@@ -38,7 +40,7 @@ class Box {
     var clueNumber : String? = null
     // for each clue this box is a part of, the index of the cell it is
     // the clue word, sorted for consistency of cycling through clues
-    private val cluePositions = TreeMap<ClueID, Int>()
+    private val cluePositions = MutableSortedMap<ClueID, Int>()
 
     var barTop : Bar = Bar.NONE
     var barBottom : Bar = Bar.NONE
@@ -174,13 +176,13 @@ class Box {
      *
      * Set will iterate in ClueID order.
      */
-    fun getIsPartOfClues() : NavigableSet<ClueID>
-        = cluePositions.navigableKeySet()
+    fun getIsPartOfClues() : SortedSet<ClueID>
+        = cluePositions.keys
 
     /**
      * True if this box belongs to at least one clue
      */
-    fun isPartOfClues() : Boolean = cluePositions.isNotEmpty()
+    fun isPartOfClues() : Boolean = !cluePositions.isEmpty()
 
     /**
      * Get a clue that this box is part of from the specified list
@@ -203,7 +205,7 @@ class Box {
      * word
      */
     fun setCluePosition(clueID : ClueID, position : Int) {
-        cluePositions[clueID] = position
+        cluePositions.put(clueID, position)
     }
 
     /**
