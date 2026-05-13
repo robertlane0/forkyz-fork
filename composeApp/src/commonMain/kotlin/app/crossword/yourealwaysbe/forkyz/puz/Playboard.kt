@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz
 
-import java.util.Stack
 import java.util.logging.Logger
 import kotlin.math.min
 import kotlin.random.Random
@@ -2325,7 +2324,7 @@ class Playboard(puzzle : Puzzle) {
      */
     private class PlayLetterUndoStack(private var enabled : Boolean) {
         private var clearDisabledDepth = 0
-        private val undoStack : Stack<PlayLetterInfo> = Stack<PlayLetterInfo>()
+        private val undoStack = ArrayDeque<PlayLetterInfo>()
 
         /**
          * Stack will be cleared and not accept push if disabled
@@ -2367,11 +2366,11 @@ class Playboard(puzzle : Puzzle) {
         ) {
             if (!enabled)
                 return
-            undoStack.push(PlayLetterInfo(position, clueID, oldResponse))
+            undoStack.addFirst(PlayLetterInfo(position, clueID, oldResponse))
         }
 
         fun pop() : PlayLetterInfo {
-            return undoStack.pop()
+            return undoStack.removeFirst()
         }
 
         val isEmpty : Boolean
