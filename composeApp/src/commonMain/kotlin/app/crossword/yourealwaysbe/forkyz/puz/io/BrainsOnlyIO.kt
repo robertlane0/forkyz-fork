@@ -13,7 +13,7 @@ import app.crossword.yourealwaysbe.forkyz.puz.Box
 import app.crossword.yourealwaysbe.forkyz.puz.Box.Companion.isBlock
 import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.puz.PuzzleBuilder
-import app.crossword.yourealwaysbe.forkyz.puz.util.HtmlUtil.htmlString
+import app.crossword.yourealwaysbe.forkyz.util.HtmlUtil.htmlString
 
 /**
  * Created with IntelliJ IDEA.

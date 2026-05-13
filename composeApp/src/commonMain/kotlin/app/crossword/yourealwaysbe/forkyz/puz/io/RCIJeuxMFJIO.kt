@@ -11,9 +11,9 @@ import app.crossword.yourealwaysbe.forkyz.puz.Box.Companion.isBlock
 import app.crossword.yourealwaysbe.forkyz.puz.Position
 import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.puz.PuzzleBuilder
-import app.crossword.yourealwaysbe.forkyz.puz.util.JSONArray
-import app.crossword.yourealwaysbe.forkyz.puz.util.JSONObject
-import app.crossword.yourealwaysbe.forkyz.puz.util.parseJSON5Object
+import app.crossword.yourealwaysbe.forkyz.util.JSONArray
+import app.crossword.yourealwaysbe.forkyz.util.JSONObject
+import app.crossword.yourealwaysbe.forkyz.util.parseJSON5Object
 
 /**
  * Format used by RCI Jeux for Mots Fleches puzzles

@@ -9,6 +9,7 @@ import app.crossword.yourealwaysbe.forkyz.puz.Box.Companion.isBlock
 import app.crossword.yourealwaysbe.forkyz.puz.Position
 import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.puz.io.XDIO.Companion.readPuzzle
+import app.crossword.yourealwaysbe.forkyz.util.SourceUtils
 
 class XDIOTest {
     @Test

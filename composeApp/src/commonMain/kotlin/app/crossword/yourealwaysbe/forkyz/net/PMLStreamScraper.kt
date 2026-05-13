@@ -10,7 +10,7 @@ import com.fleeksoft.ksoup.nodes.Document
 
 import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.puz.io.PMLIO
-import app.crossword.yourealwaysbe.forkyz.puz.io.StreamUtils
+import app.crossword.yourealwaysbe.forkyz.util.StreamUtils
 import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 
 /**

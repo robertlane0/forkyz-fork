@@ -6,8 +6,8 @@ import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.puz.io.SlowDownWiseUpJSONIO
-import app.crossword.yourealwaysbe.forkyz.puz.io.StreamUtils
 import app.crossword.yourealwaysbe.forkyz.util.AppLogger
+import app.crossword.yourealwaysbe.forkyz.util.StreamUtils
 
 /**
  * Get embedded SlowDownWiseUp puzzles

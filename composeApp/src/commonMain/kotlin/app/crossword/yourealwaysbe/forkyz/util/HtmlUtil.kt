@@ -1,5 +1,5 @@
 
-package app.crossword.yourealwaysbe.forkyz.puz.util
+package app.crossword.yourealwaysbe.forkyz.util
 
 import kotlin.math.max
 import kotlin.math.min

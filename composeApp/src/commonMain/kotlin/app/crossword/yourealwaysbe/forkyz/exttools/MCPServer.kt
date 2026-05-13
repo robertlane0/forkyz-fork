@@ -22,10 +22,10 @@ import io.modelcontextprotocol.kotlin.sdk.types.ServerCapabilities
 import io.modelcontextprotocol.kotlin.sdk.types.TextContent
 import io.modelcontextprotocol.kotlin.sdk.types.ToolSchema
 
-import app.crossword.yourealwaysbe.forkyz.puz.util.JSONObject
-import app.crossword.yourealwaysbe.forkyz.puz.util.asForkyzJSONObject
-import app.crossword.yourealwaysbe.forkyz.puz.util.buildJSONObject
 import app.crossword.yourealwaysbe.forkyz.util.AppLogger
+import app.crossword.yourealwaysbe.forkyz.util.JSONObject
+import app.crossword.yourealwaysbe.forkyz.util.asForkyzJSONObject
+import app.crossword.yourealwaysbe.forkyz.util.buildJSONObject
 
 private val TAG = "ForkyzMCPServer"
 

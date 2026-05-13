@@ -2,7 +2,7 @@
  * org.json style interface to preferred JSON library
  */
 
-package app.crossword.yourealwaysbe.forkyz.puz.util
+package app.crossword.yourealwaysbe.forkyz.util
 
 import kotlinx.io.IOException
 import kotlinx.io.Sink

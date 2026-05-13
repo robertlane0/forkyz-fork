@@ -3,7 +3,7 @@ package app.crossword.yourealwaysbe.forkyz.puz
 
 import java.util.Objects
 
-import app.crossword.yourealwaysbe.forkyz.puz.util.HtmlUtil
+import app.crossword.yourealwaysbe.forkyz.util.HtmlUtil
 import app.crossword.yourealwaysbe.forkyz.util.MutableSortedMap
 import app.crossword.yourealwaysbe.forkyz.util.SortedMap
 import app.crossword.yourealwaysbe.forkyz.util.SortedSet

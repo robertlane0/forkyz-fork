@@ -12,8 +12,8 @@ import app.crossword.yourealwaysbe.forkyz.puz.Position
 import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.puz.PuzzleBuilder
 import app.crossword.yourealwaysbe.forkyz.puz.Zone
-import app.crossword.yourealwaysbe.forkyz.puz.util.HtmlUtil
-import app.crossword.yourealwaysbe.forkyz.puz.util.HtmlUtil.parseHtmlColor
+import app.crossword.yourealwaysbe.forkyz.util.HtmlUtil
+import app.crossword.yourealwaysbe.forkyz.util.HtmlUtil.parseHtmlColor
 
 /**
  * Parser for Exolve format

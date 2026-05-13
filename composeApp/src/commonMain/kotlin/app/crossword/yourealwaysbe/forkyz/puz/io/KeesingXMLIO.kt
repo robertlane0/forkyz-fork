@@ -12,9 +12,9 @@ import app.crossword.yourealwaysbe.forkyz.puz.Position
 import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.puz.PuzzleBuilder
 import app.crossword.yourealwaysbe.forkyz.puz.Zone
-import app.crossword.yourealwaysbe.forkyz.puz.util.HtmlUtil.unHtmlString
-import app.crossword.yourealwaysbe.forkyz.puz.util.XMLElement
-import app.crossword.yourealwaysbe.forkyz.puz.util.parseXMLElement
+import app.crossword.yourealwaysbe.forkyz.util.HtmlUtil.unHtmlString
+import app.crossword.yourealwaysbe.forkyz.util.XMLElement
+import app.crossword.yourealwaysbe.forkyz.util.parseXMLElement
 
 /**
  * Converts a puzzle from the XML format used by web.keesing.com

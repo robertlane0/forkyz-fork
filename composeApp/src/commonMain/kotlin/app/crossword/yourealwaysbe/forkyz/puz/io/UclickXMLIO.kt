@@ -9,8 +9,8 @@ import app.crossword.yourealwaysbe.forkyz.puz.Box
 import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.puz.PuzzleBuilder
 import app.crossword.yourealwaysbe.forkyz.puz.PuzzleBuilder.BasicClue
-import app.crossword.yourealwaysbe.forkyz.puz.util.XMLElement
-import app.crossword.yourealwaysbe.forkyz.puz.util.parseXMLElement
+import app.crossword.yourealwaysbe.forkyz.util.XMLElement
+import app.crossword.yourealwaysbe.forkyz.util.parseXMLElement
 
 /**
  * Converts a puzzle from the XML format used by uclick syndicated puzzles

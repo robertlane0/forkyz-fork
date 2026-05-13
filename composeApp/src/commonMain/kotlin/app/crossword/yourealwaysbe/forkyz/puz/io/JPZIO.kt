@@ -15,10 +15,10 @@ import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.puz.PuzzleBuilder
 import app.crossword.yourealwaysbe.forkyz.puz.PuzzleKind
 import app.crossword.yourealwaysbe.forkyz.puz.Zone
-import app.crossword.yourealwaysbe.forkyz.puz.util.HtmlUtil.parseHtmlColor
-import app.crossword.yourealwaysbe.forkyz.puz.util.HtmlUtil.unHtmlString
-import app.crossword.yourealwaysbe.forkyz.puz.util.XMLElement
-import app.crossword.yourealwaysbe.forkyz.puz.util.parseXMLElement
+import app.crossword.yourealwaysbe.forkyz.util.HtmlUtil.parseHtmlColor
+import app.crossword.yourealwaysbe.forkyz.util.HtmlUtil.unHtmlString
+import app.crossword.yourealwaysbe.forkyz.util.XMLElement
+import app.crossword.yourealwaysbe.forkyz.util.parseXMLElement
 
 /**
  * Converts a puzzle from the JPZ Crossword Compiler XML format.

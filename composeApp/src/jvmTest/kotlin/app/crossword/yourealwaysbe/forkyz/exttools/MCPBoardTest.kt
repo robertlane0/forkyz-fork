@@ -20,10 +20,9 @@ import app.crossword.yourealwaysbe.forkyz.puz.Playboard
 import app.crossword.yourealwaysbe.forkyz.puz.Position
 import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.puz.io.IO
+import app.crossword.yourealwaysbe.forkyz.util.JSONObject
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
-
-import app.crossword.yourealwaysbe.forkyz.puz.util.JSONObject
-import app.crossword.yourealwaysbe.forkyz.puz.util.buildJSONObject
+import app.crossword.yourealwaysbe.forkyz.util.buildJSONObject
 
 class MCPBoardTest {
     private lateinit var puzzle : Puzzle

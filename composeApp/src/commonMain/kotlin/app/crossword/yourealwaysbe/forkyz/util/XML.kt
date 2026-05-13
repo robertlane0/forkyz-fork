@@ -1,5 +1,5 @@
 
-package app.crossword.yourealwaysbe.forkyz.puz.util
+package app.crossword.yourealwaysbe.forkyz.util
 
 import kotlinx.io.RawSource
 import kotlinx.io.asSource

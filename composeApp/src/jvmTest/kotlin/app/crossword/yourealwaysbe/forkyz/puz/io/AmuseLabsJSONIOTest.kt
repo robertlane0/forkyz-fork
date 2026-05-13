@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test
 import app.crossword.yourealwaysbe.forkyz.puz.Box
 import app.crossword.yourealwaysbe.forkyz.puz.Box.Companion.isBlock
 import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
+import app.crossword.yourealwaysbe.forkyz.util.SourceUtils
 
 class AmuseLabsJSONIOTest {
     @Test

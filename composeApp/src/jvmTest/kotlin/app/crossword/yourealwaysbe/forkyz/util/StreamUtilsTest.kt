@@ -1,5 +1,5 @@
 
-package app.crossword.yourealwaysbe.forkyz.puz.io
+package app.crossword.yourealwaysbe.forkyz.util
 
 import kotlinx.io.readString
 

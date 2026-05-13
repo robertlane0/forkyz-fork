@@ -10,8 +10,8 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.import_fallbac
 import app.crossword.yourealwaysbe.forkyz.net.GenericStreamScraper
 import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.puz.io.PuzzleStreamReader
-import app.crossword.yourealwaysbe.forkyz.puz.io.StreamUtils
 import app.crossword.yourealwaysbe.forkyz.util.AppLogger
+import app.crossword.yourealwaysbe.forkyz.util.StreamUtils
 import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.files.DirHandle

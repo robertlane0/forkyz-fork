@@ -7,7 +7,7 @@ import kotlinx.io.readLine
 
 import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.puz.io.PuzzleParser
-import app.crossword.yourealwaysbe.forkyz.puz.io.StreamUtils
+import app.crossword.yourealwaysbe.forkyz.util.StreamUtils
 
 /**
  * Downloader for embedded AmuseLabs crosswords

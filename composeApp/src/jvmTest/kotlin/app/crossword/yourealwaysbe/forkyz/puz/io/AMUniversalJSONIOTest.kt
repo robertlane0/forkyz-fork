@@ -11,6 +11,7 @@ import app.crossword.yourealwaysbe.forkyz.puz.Box.Companion.isBlock
 import app.crossword.yourealwaysbe.forkyz.puz.ClueID
 import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.puz.io.AMUniversalJSONIO.Companion.readPuzzle
+import app.crossword.yourealwaysbe.forkyz.util.SourceUtils
 
 class AMUniversalJSONIOTest {
     @Test

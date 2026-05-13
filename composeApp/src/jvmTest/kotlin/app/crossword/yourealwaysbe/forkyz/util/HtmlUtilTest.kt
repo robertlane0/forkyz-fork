@@ -1,9 +1,10 @@
 
-package app.crossword.yourealwaysbe.forkyz.puz.util
+package app.crossword.yourealwaysbe.forkyz.util
 
-import app.crossword.yourealwaysbe.forkyz.puz.util.HtmlUtil.parseHtmlColor
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+
+import app.crossword.yourealwaysbe.forkyz.util.HtmlUtil.parseHtmlColor
 
 class HtmlUtilTest {
     @Test

@@ -11,10 +11,10 @@ import kotlinx.io.Source
 import app.crossword.yourealwaysbe.forkyz.puz.Box
 import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.puz.PuzzleBuilder
-import app.crossword.yourealwaysbe.forkyz.puz.util.JSONArray
-import app.crossword.yourealwaysbe.forkyz.puz.util.JSONException
-import app.crossword.yourealwaysbe.forkyz.puz.util.JSONObject
-import app.crossword.yourealwaysbe.forkyz.puz.util.parseJSONObject
+import app.crossword.yourealwaysbe.forkyz.util.JSONArray
+import app.crossword.yourealwaysbe.forkyz.util.JSONException
+import app.crossword.yourealwaysbe.forkyz.util.JSONObject
+import app.crossword.yourealwaysbe.forkyz.util.parseJSONObject
 
 
 /**

@@ -6,11 +6,11 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import kotlinx.io.IOException
 
-import app.crossword.yourealwaysbe.forkyz.puz.util.JSONException
-import app.crossword.yourealwaysbe.forkyz.puz.util.JSONObject
-import app.crossword.yourealwaysbe.forkyz.puz.util.buildJSONObject
 import app.crossword.yourealwaysbe.forkyz.settings.ExternalToolSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
+import app.crossword.yourealwaysbe.forkyz.util.JSONException
+import app.crossword.yourealwaysbe.forkyz.util.JSONObject
+import app.crossword.yourealwaysbe.forkyz.util.buildJSONObject
 import app.crossword.yourealwaysbe.forkyz.util.getURLJSON
 
 private const val CHAT_GPT_API_URL = "https://api.openai.com/v1/completions"

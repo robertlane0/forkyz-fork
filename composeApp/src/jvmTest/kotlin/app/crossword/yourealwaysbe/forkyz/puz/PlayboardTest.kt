@@ -15,7 +15,7 @@ import app.crossword.yourealwaysbe.forkyz.puz.Playboard.PlayboardListener
 import app.crossword.yourealwaysbe.forkyz.puz.io.IO
 import app.crossword.yourealwaysbe.forkyz.puz.io.IOTest
 import app.crossword.yourealwaysbe.forkyz.puz.io.IPuzIO
-import app.crossword.yourealwaysbe.forkyz.puz.io.SourceUtils
+import app.crossword.yourealwaysbe.forkyz.util.SourceUtils
 
 class PlayboardTest {
     @Target(

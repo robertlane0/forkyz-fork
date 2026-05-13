@@ -15,11 +15,11 @@ import app.crossword.yourealwaysbe.forkyz.puz.Position
 import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.puz.PuzzleBuilder
 import app.crossword.yourealwaysbe.forkyz.puz.Zone
-import app.crossword.yourealwaysbe.forkyz.puz.util.JSONException
-import app.crossword.yourealwaysbe.forkyz.puz.util.JSONObject
 import app.crossword.yourealwaysbe.forkyz.puz.util.PuzzleUtils.getAcrossZone
 import app.crossword.yourealwaysbe.forkyz.puz.util.PuzzleUtils.getDownZone
-import app.crossword.yourealwaysbe.forkyz.puz.util.parseJSONObject
+import app.crossword.yourealwaysbe.forkyz.util.JSONException
+import app.crossword.yourealwaysbe.forkyz.util.JSONObject
+import app.crossword.yourealwaysbe.forkyz.util.parseJSONObject
 
 /**
  * Read a character stream of JSON data in the format used by the

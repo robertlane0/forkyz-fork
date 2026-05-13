@@ -8,9 +8,9 @@ import kotlinx.io.readLine
 
 import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.puz.io.KeesingXMLIO
-import app.crossword.yourealwaysbe.forkyz.puz.util.JSONException
-import app.crossword.yourealwaysbe.forkyz.puz.util.parseJSONObject
 import app.crossword.yourealwaysbe.forkyz.util.AppLogger
+import app.crossword.yourealwaysbe.forkyz.util.JSONException
+import app.crossword.yourealwaysbe.forkyz.util.parseJSONObject
 
 /**
  * Downloader for Keesing.com embedded crosswords

@@ -6,6 +6,7 @@ import kotlinx.io.IOException
 import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
+import app.crossword.yourealwaysbe.forkyz.util.StreamUtils
 
 class PuzzleStreamReader : PuzzleParser {
     /**

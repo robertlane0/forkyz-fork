@@ -17,8 +17,8 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.headers
 
 import app.crossword.yourealwaysbe.forkyz.puz.Box.Companion.isBlock
-import app.crossword.yourealwaysbe.forkyz.puz.io.StreamUtils
 import app.crossword.yourealwaysbe.forkyz.puz.util.PuzzleUtils
+import app.crossword.yourealwaysbe.forkyz.util.StreamUtils
 
 class PuzzleBuilder {
     /**

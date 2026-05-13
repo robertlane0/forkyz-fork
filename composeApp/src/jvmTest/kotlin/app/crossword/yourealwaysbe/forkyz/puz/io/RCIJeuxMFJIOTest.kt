@@ -10,6 +10,7 @@ import app.crossword.yourealwaysbe.forkyz.puz.Clue
 import app.crossword.yourealwaysbe.forkyz.puz.Position
 import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.puz.io.RCIJeuxMFJIO.Companion.readPuzzle
+import app.crossword.yourealwaysbe.forkyz.util.SourceUtils
 
 class RCIJeuxMFJIOTest {
     @Test

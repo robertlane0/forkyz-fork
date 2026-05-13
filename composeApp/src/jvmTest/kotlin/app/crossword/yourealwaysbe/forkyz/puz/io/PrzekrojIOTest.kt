@@ -10,6 +10,7 @@ import app.crossword.yourealwaysbe.forkyz.puz.Position
 import app.crossword.yourealwaysbe.forkyz.puz.PuzImage
 import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.puz.io.PrzekrojIO.Companion.readPuzzle
+import app.crossword.yourealwaysbe.forkyz.util.SourceUtils
 
 class PrzekrojIOTest {
     @Test
