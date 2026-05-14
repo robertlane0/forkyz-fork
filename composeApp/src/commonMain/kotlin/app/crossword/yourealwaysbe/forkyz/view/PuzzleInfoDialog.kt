@@ -244,7 +244,7 @@ private fun FinishedInfo(
                 CompletionDataRow(
                     Res.string.completed_in,
                     TimeUtils.convertMillisecondsToTime(
-                        finishedState.completionTime
+                        finishedState.completionTime,
                     ),
                 )
                 CompletionDataRow(

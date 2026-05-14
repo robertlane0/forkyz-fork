@@ -1,12 +1,12 @@
 
 package app.crossword.yourealwaysbe.forkyz.util
 
-import java.util.Locale
 import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.DayOfWeek
@@ -51,27 +51,25 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.month_septembe
 class TimeUtils {
     companion object {
         fun convertMillisecondsToTime(milliseconds : Long) : String {
-            val duration = milliseconds.milliseconds
-            val hours = duration.inWholeHours
-            val minutes = (duration - hours.hours).inWholeMinutes
-            val seconds = (duration - hours.hours - minutes.minutes)
-                .inWholeMilliseconds / 1000f
+            var remaining = milliseconds.milliseconds
+            val hours = remaining.inWholeHours
+            remaining -= hours.hours
+            val minutes = remaining.inWholeMinutes
+            remaining -= minutes.minutes
+            val seconds = remaining.inWholeSeconds
+            remaining -= seconds.seconds
+            val milliseconds = remaining.inWholeMilliseconds / 10
+
+            val minutesStr = minutes.toString().padStart(2, '0')
+            val secondsStr = seconds.toString().padStart(2, '0')
+            val millisecondsStr = milliseconds.toString().padStart(2, '0')
 
             if (hours == 0L) {
-                return String.format(
-                    Locale.getDefault(),
-                    "%02d:%05.2f",
-                    minutes,
-                    seconds,
-                )
+                return "$minutesStr:$secondsStr.$millisecondsStr"
+            } else {
+                val hoursStr = hours.toString().padStart(2, '0')
+                return "$hoursStr:$minutesStr:$secondsStr.$millisecondsStr"
             }
-            return String.format(
-                Locale.getDefault(),
-                "%02d:%02d:%05.2f",
-                hours,
-                minutes,
-                seconds,
-            )
         }
 
         /**
