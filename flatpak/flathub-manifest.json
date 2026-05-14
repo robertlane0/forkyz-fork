@@ -10,7 +10,7 @@
   "modules": [
     {
       "build-commands": [
-        "/usr/lib/sdk/openjdk17/install.sh"
+        "/usr/lib/sdk/openjdk21/install.sh"
       ],
       "buildsystem": "simple",
       "name": "openjdk"
@@ -36,8 +36,8 @@
       ],
       "build-options": {
         "env": {
-          "JAVA_HOME": "/usr/lib/sdk/openjdk17/jvm/openjdk-17",
-          "PATH": "/app/bin:/usr/bin:/usr/lib/sdk/openjdk17/bin"
+          "JAVA_HOME": "/usr/lib/sdk/openjdk21/jvm/openjdk-21",
+          "PATH": "/app/bin:/usr/bin:/usr/lib/sdk/openjdk21/bin"
         }
       },
       "buildsystem": "simple",
@@ -12510,6 +12510,6 @@
   "runtime-version": "25.08",
   "sdk": "org.freedesktop.Sdk",
   "sdk-extensions": [
-    "org.freedesktop.Sdk.Extension.openjdk17"
+    "org.freedesktop.Sdk.Extension.openjdk21"
   ]
 }
