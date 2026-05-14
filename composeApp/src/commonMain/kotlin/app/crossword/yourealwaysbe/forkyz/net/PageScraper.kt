@@ -1,8 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.util.Deque
-import java.util.LinkedList
 import kotlin.time.Duration
 import kotlinx.datetime.LocalDate
 import kotlinx.io.IOException
@@ -96,7 +94,7 @@ open class PageScraper(
             val urls = getPuzzleURLs()
             val urlsToFilenames = mapURLsToFileNames(urls)
             val urlIterator = if (readReverse)
-                urls.descendingIterator()
+                urls.asReversed().iterator()
             else
                 urls.iterator()
 
@@ -166,8 +164,8 @@ open class PageScraper(
     }
 
     @Throws(IOException::class)
-    private suspend fun getPuzzleURLs() : Deque<String> {
-        val result = LinkedList<String>()
+    private suspend fun getPuzzleURLs() : List<String> {
+        val result = mutableListOf<String>()
 
         val content = Ksoup.parseSource(getURL(scrapeUrl), scrapeUrl)
 
@@ -196,7 +194,7 @@ open class PageScraper(
          * Map URLs to names of file at url, with file extension removed
          */
         private fun mapURLsToFileNames(
-            urls : Deque<String>,
+            urls : List<String>,
         ) : Map<String, String> {
             val result = HashMap<String, String>(urls.size)
             for (url in urls) {
