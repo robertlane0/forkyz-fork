@@ -1,5 +1,11 @@
 # Forkyz Changelog
 
+## Version 82
+
+- Add flexibility to internal keyboard handling and add Russian layout.
+- Fix show errors grid, skip filled behaviour, and handling of clues without zones.
+- Backend replacement of Java IO/parsing libraries.
+
 ## Version 81
 
 - Add MCP server to control Forkyz from LLM agent (external tools).

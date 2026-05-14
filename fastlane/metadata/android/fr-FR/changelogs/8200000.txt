@@ -1,0 +1,5 @@
+- Ajouter de la flexibilité à la manipulation interne du clavier et ajouter la disposition russe.
+- Correction montrer la grille d'erreurs, sauter le comportement rempli, et la manipulation des indices sans zone.
+- Remplacement des bibliothèques Java IO/parsing.
+
+Changelog traduit automatiquement avec Argos Translate.

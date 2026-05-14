@@ -1,0 +1,3 @@
+- Add flexibility to internal keyboard handling and add Russian layout.
+- Fix show errors grid, skip filled behaviour, and handling of clues without zones.
+- Backend replacement of Java IO/parsing libraries.
