@@ -514,9 +514,7 @@ class JPZIO : PuzzleParser {
                     if (!listNotes.containsKey(listName))
                         listNotes.put(listName, StringBuilder())
 
-                    listNotes.get(listName)?.append(
-                        String.format("<p>%s: %s</p>", number, citation)
-                    )
+                    listNotes.get(listName)?.append("<p>$number: $citation</p>")
                 }
             }
 

@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.util
 
-import java.util.Locale
 import kotlinx.io.IOException
 
 import org.jetbrains.compose.resources.MissingResourceException
@@ -9,8 +8,6 @@ import org.jetbrains.compose.resources.MissingResourceException
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.html_file_full_path
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
-
-private val DEFAULT_FILES_DIR = "files/en/%s"
 
 /**
  * Read file from files/<lang>/<unqualifiedname> or default lang.
@@ -27,11 +24,7 @@ suspend fun getFileResourceData(
         )
         return Res.readBytes(path).decodeToString()
     } catch (e : MissingResourceException) {
-        val path = String.format(
-            Locale.US,
-            DEFAULT_FILES_DIR,
-            unqualifiedFileName,
-        )
+        val path = "files/en/$unqualifiedFileName"
         return Res.readBytes(path).decodeToString()
     }
 }

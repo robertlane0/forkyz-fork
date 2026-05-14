@@ -1,8 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.exttools
 
-import java.util.Locale
-
 import android.app.SearchManager
 import android.content.Intent
 import androidx.core.app.ShareCompat
@@ -20,7 +18,6 @@ import app.crossword.yourealwaysbe.forkyz.util.toAndroidUri
 private val CROSSWORD_SOLVER = "org.billthefarmer.crossword"
 private val CROSSWORD_SOLVER_WEBSITE_URL
     = "https://billthefarmer.github.io/crossword";
-private val FREE_URL_FORMAT = "https://www.thefreedictionary.com/%s"
 
 @Throws(AppNotFoundException::class)
 actual suspend fun ExternalToolLauncher.visit(data : CrosswordSolverData) {
@@ -39,11 +36,7 @@ actual suspend fun ExternalToolLauncher.visit(data : CrosswordSolverData) {
 actual suspend fun ExternalToolLauncher.visit(data : FreeDictionaryData) {
     val intent = Intent(Intent.ACTION_VIEW)
     intent.setData(
-        String.format(
-            Locale.getDefault(),
-            FREE_URL_FORMAT,
-            data.word,
-        ).toUri()
+        "https://www.thefreedictionary.com/${data.word}".toUri()
     )
     this.activity.startActivity(intent)
 }

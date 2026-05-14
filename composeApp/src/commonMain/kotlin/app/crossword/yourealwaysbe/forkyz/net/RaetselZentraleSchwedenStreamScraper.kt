@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.util.Locale
 import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
@@ -112,16 +111,13 @@ class RaetselZentraleSchwedenStreamScraper : AbstractStreamScraper() {
 
         private const val DEFAULT_SOURCE = "Raetsel Zentrale"
 
-        private const val JSON_URL_FORMAT
-            = "https://raetsel.raetselzentrale.de/api/r/%s"
-
         /**
          * Gets API URL from input stream, does not close, or null
          */
         fun getAPIURL(input : Source) : String? {
             val id : String? = regexScrape(input, PUZZLE_ID_MATCH)
             if (id != null)
-                return String.format(Locale.US, JSON_URL_FORMAT, id)
+                return "https://raetsel.raetselzentrale.de/api/r/$id"
             else
                 return null
         }

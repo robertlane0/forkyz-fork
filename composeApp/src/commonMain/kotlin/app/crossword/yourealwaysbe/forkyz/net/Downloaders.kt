@@ -459,8 +459,10 @@ class Downloaders(
                 AbstractDateDownloader.DAYS_WEEKDAY,
                 1.hours,
                 "https://abonnement.la-croix.com/",
-                "https://www.rcijeux.fr/drupal_game/lacroix/mcroises1/"
-                    +"grids/gary%d.mcj",
+                {
+                    "https://www.rcijeux.fr/drupal_game/lacroix/mcroises1/" +
+                    "grids/gary$it.mcj"
+                },
                 "'https://www.la-croix.com/mots-croises'",
                 8815,
                 LocalDate(2026, 1, 30),
@@ -481,8 +483,10 @@ class Downloaders(
                 AbstractDateDownloader.DAYS_DAILY,
                 1.hours,
                 "https://abonnement.leparisien.fr",
-                "https://www.rcijeux.fr/drupal_game/leparisien/mfleches1/grids/"
-                        + "mfleches_1_%d.mfj",
+                {
+                    "https://www.rcijeux.fr/drupal_game/leparisien/mfleches1" +
+                    "/grids/mfleches_1_$it.mfj"
+                },
                 "'https://www.leparisien.fr/jeux/mots-fleches/'",
                 2536,
                 LocalDate(2022, 6, 21),
@@ -496,8 +500,10 @@ class Downloaders(
                 AbstractDateDownloader.DAYS_DAILY,
                 1.hours,
                 "https://abonnement.leparisien.fr",
-                "https://www.rcijeux.fr/drupal_game/leparisien/mfleches1/grids/"
-                        + "mfleches_2_%d.mfj",
+                {
+                    "https://www.rcijeux.fr/drupal_game/leparisien/mfleches1/" +
+                    "grids/mfleches_2_$it.mfj"
+                },
                 "'https://www.leparisien.fr/jeux/mots-fleches/force-2/'",
                 2536,
                 LocalDate(2022, 6, 21),
@@ -511,8 +517,10 @@ class Downloaders(
                 AbstractDateDownloader.DAYS_DAILY,
                 1.hours,
                 "https://abonnement.leparisien.fr",
-                "https://www.rcijeux.fr/drupal_game/leparisien/mfleches1/grids/"
-                        + "mfleches_3_%d.mfj",
+                {
+                    "https://www.rcijeux.fr/drupal_game/leparisien/mfleches1/" +
+                    "grids/mfleches_3_$it.mfj"
+                },
                 "'https://www.leparisien.fr/jeux/mots-fleches/force-3/'",
                 300,
                 LocalDate(2023, 3, 4),
@@ -526,8 +534,10 @@ class Downloaders(
                 AbstractDateDownloader.DAYS_DAILY,
                 1.hours,
                 "https://abonnement.leparisien.fr",
-                "https://www.rcijeux.fr/drupal_game/leparisien/mfleches1/grids/"
-                        + "mfleches_4_%d.mfj",
+                {
+                    "https://www.rcijeux.fr/drupal_game/leparisien/mfleches1/" +
+                    "grids/mfleches_4_$it.mfj"
+                },
                 "'https://www.leparisien.fr/jeux/mots-fleches/force-4/'",
                 300,
                 LocalDate(2023, 3, 4),
@@ -674,7 +684,10 @@ class Downloaders(
                 AbstractDateDownloader.DAYS_DAILY,
                 1.hours,
                 "https://abonnement.sudouest.fr/",
-                "https://www.rcijeux.fr/drupal_game/gso/mcroises/grids/%d.mcj",
+                {
+                    "https://www.rcijeux.fr/drupal_game/gso/mcroises/" +
+                    "grids/$it.mcj"
+                },
                 "'https://www.sudouest.fr/jeux/mots-croises/'",
                 1992,
                 LocalDate(2025, 10, 26),
@@ -688,7 +701,10 @@ class Downloaders(
                 AbstractDateDownloader.DAYS_DAILY,
                 1.hours,
                 "https://abonnement.sudouest.fr/",
-                "https://www.rcijeux.fr/drupal_game/gso/mfleches/grids/%d.mfj",
+                {
+                    "https://www.rcijeux.fr/drupal_game/gso/mfleches/" +
+                    "grids/$it.mfj"
+                },
                 "'https://www.sudouest.fr/jeux/mots-fleches/'",
                 1988,
                 LocalDate(2025, 10, 22),
@@ -702,7 +718,10 @@ class Downloaders(
                 AbstractDateDownloader.DAYS_DAILY,
                 1.hours,
                 "https://www.tf1info.fr/",
-                "https://www.rcijeux.fr/drupal_game/lci/mcroises/grids/%d.mcj",
+                {
+                    "https://www.rcijeux.fr/drupal_game/lci/mcroises/" +
+                    "grids/$it.mcj"
+                },
                 "'https://www.tf1info.fr/jeux/mots-croises/'",
                 4739,
                 LocalDate(2025, 10, 26),
@@ -716,7 +735,10 @@ class Downloaders(
                 AbstractDateDownloader.DAYS_DAILY,
                 1.hours,
                 "https://www.tf1info.fr/",
-                "https://www.rcijeux.fr/drupal_game/lci/mfleches/grids/%d.mfj",
+                {
+                    "https://www.rcijeux.fr/drupal_game/lci/mfleches/" +
+                    "grids/$it.mfj"
+                },
                 "'https://www.tf1info.fr/jeux/mots-fleches/'",
                 5395,
                 LocalDate(2025, 10, 26),

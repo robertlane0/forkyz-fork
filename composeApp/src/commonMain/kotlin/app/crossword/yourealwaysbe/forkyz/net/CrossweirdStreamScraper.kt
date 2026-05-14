@@ -43,15 +43,7 @@ class CrossweirdStreamScraper : AbstractStreamScraper() {
 
     fun getPuzURL(input : Source) : String? {
         val path = regexScrape(input, PUZ_PATH_MATCH)
-        if (path != null) {
-            return String.format(
-                Locale.US,
-                PUZ_URL_FORMAT,
-                path,
-            )
-        } else {
-            return null
-        }
+        return makeURL(path)
     }
 
     fun getPuzURL(url : String?) : String? {
@@ -61,14 +53,18 @@ class CrossweirdStreamScraper : AbstractStreamScraper() {
         val match = PUZ_PATH_MATCH.regex.find(url)
         if (match != null) {
             val path = match.groupValues[PUZ_PATH_MATCH.group]
-            return String.format(
-                Locale.US,
-                PUZ_URL_FORMAT,
-                path,
-            )
+            return makeURL(path)
         }
 
         return null
+    }
+
+    private fun makeURL(path : String?) : String? {
+        if (path != null) {
+            return "https://solver.crossweirdpuzzles.com/$path"
+        } else {
+            return null
+        }
     }
 
     companion object {
@@ -78,9 +74,6 @@ class CrossweirdStreamScraper : AbstractStreamScraper() {
         )
 
         private const val DEFAULT_SOURCE = "Crossweird Puzzles"
-
-        // args: path
-        private const val PUZ_URL_FORMAT = "https://solver.crossweirdpuzzles.com/%s"
     }
 }
 

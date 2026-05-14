@@ -3,7 +3,6 @@ package app.crossword.yourealwaysbe.forkyz.net
 
 import java.net.URI
 import java.net.URISyntaxException
-import java.util.Locale
 import kotlinx.datetime.LocalDate
 import kotlinx.io.Buffer
 import kotlinx.io.IOException
@@ -155,11 +154,9 @@ class PzzlComStreamScraper : AbstractStreamScraper() {
      * Get URL for list of available puzzles from mainInfo
      */
     private fun makeArchiveURL(mainInfo : MainInfo) : String {
-        return String.format(
-            Locale.US,
-            ARCHIVE_URL_FMT,
-            mainInfo.baseURL,
-            mainInfo.setName,
+        return (
+            "${mainInfo.baseURL}/${mainInfo.setName}"
+            + "?date=list&get=archivecurrent"
         )
     }
 
@@ -167,13 +164,7 @@ class PzzlComStreamScraper : AbstractStreamScraper() {
      * Make puzzle URL from mainInfo and date
      */
     private fun makePuzzleURL(mainInfo : MainInfo, date : String) : String {
-        return String.format(
-            Locale.US,
-            PUZZLE_URL_FMT,
-            mainInfo.baseURL,
-            mainInfo.setName,
-            date
-        )
+        return "${mainInfo.baseURL}/${mainInfo.setName}?date=${date}"
     }
 
     private inner class MainInfo(
@@ -212,12 +203,6 @@ class PzzlComStreamScraper : AbstractStreamScraper() {
             monthNumber()
             day()
         }
-
-        // needs baseURL then setName
-        private const val ARCHIVE_URL_FMT = "%s/%s?date=list&get=archivecurrent"
-
-        // needs baseURL then setName then date in yymmdd format
-        private const val PUZZLE_URL_FMT = "%s/%s?date=%s"
 
         private const val DEFAULT_SOURCE = "Pzzl.com"
     }

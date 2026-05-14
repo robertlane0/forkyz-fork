@@ -1,6 +1,5 @@
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.util.Locale
 import kotlin.time.Duration
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
@@ -31,11 +30,8 @@ class UclickDownloader(
     utcAvailabilityOffset,
     supportUrl,
     UclickXMLIO(),
-    String.format(
-        Locale.US,
-        SOURCE_URL_PATTERN_FORMAT,
-        shortName,
-    ),
+    "'https://picayune.uclick.com/comics/$shortName/"
+        + "data/$shortName'yyMMdd'-data.xml'",
     shareUrlPattern
 ) {
     public override suspend fun download(
@@ -47,13 +43,6 @@ class UclickDownloader(
             res.puzzle?.copyright = "\u00a9 " + date.year + " " + copyright
         }
         return res
-    }
-
-    companion object {
-        private const val SOURCE_URL_PATTERN_FORMAT = (
-            "'https://picayune.uclick.com/comics/"
-            + "%1\$s/data/%1\$s'yyMMdd'-data.xml'"
-        )
     }
 }
 

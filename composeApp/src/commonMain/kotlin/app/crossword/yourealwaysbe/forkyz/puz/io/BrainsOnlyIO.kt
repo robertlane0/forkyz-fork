@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
-import java.util.Locale
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.Padding
 import kotlinx.io.EOFException
@@ -50,7 +49,7 @@ class BrainsOnlyIO : PuzzleParser {
             // Assume part of author for now as De Telegraaf replaces author line
             // with it
             var notes : String = ""
-            val authorUpper = author.uppercase(Locale.getDefault())
+            val authorUpper = author.uppercase()
             val notesStart : Int = authorUpper.indexOf(NOTEPAD_START_TAG)
             if (notesStart > -1) {
                 val notesEnd : Int = authorUpper.indexOf(NOTEPAD_END_TAG)
@@ -118,11 +117,7 @@ class BrainsOnlyIO : PuzzleParser {
                 }
 
                 if (across != width) throw IOException(
-                    String.format(
-                        "Unexpected line length for width %d grid: %s",
-                        width,
-                        line
-                    )
+                    "Unexpected line length for width $width grid: $line",
                 )
             }
 

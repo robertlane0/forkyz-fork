@@ -106,7 +106,6 @@ class IPuzIO : AbstractJSONIO() {
         private const val FIELD_TEXT_COLOR = "colortext"
         private const val FIELD_BAR_COLOR = "colorbar"
         private const val HEX_CODE_LEN = 6
-        private val HEX_COLOR_FORMAT = "%0" + HEX_CODE_LEN + "X"
         private const val FIELD_BARRED = "barred"
         private const val FIELD_BARRED_DASHED = "dashed"
         private const val FIELD_BARRED_DOTTED = "dotted"
@@ -2703,10 +2702,7 @@ class IPuzIO : AbstractJSONIO() {
          */
         private fun colorToHex(color : Int) : String {
             // ignore alpha channel
-            return String.format(
-                HEX_COLOR_FORMAT,
-                color and 0x00ffffff,
-            )
+            return color.toString(16).padStart(HEX_CODE_LEN, '0')
         }
 
         /**

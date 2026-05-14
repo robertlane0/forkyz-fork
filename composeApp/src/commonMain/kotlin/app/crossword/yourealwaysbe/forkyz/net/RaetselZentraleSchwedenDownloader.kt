@@ -1,6 +1,5 @@
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.util.Locale
 import kotlin.time.Duration
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
@@ -47,7 +46,7 @@ class RaetselZentraleSchwedenDownloader(
     TimeUtils.offsetTodayUTC(-utcAvailabilityOffset),
 ) {
     private val idUrl : String
-        = String.format(Locale.US, ID_URL_FORMAT, shortName)
+        = "https://raetsel.raetselzentrale.de/l/$shortName/schwede"
 
     override suspend fun getSourceUrl(date : LocalDate) : String? {
         try {
@@ -69,11 +68,6 @@ class RaetselZentraleSchwedenDownloader(
             this.copyright = name
             this.date = date
         }
-    }
-
-    companion object {
-        private const val ID_URL_FORMAT
-            = "https://raetsel.raetselzentrale.de/l/%s/schwede"
     }
 }
 

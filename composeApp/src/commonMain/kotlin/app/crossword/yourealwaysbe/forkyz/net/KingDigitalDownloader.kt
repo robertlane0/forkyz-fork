@@ -27,12 +27,7 @@ class KingDigitalDownloader(
     utcAvailabilityOffset,
     supportUrl,
     JPZIO(),
-    String.format(SOURCE_URL_FMT_PATTERN, crosswordSet),
+    "'https://puzzles.kingdigital.com/jpz/$crosswordSet/'yyyyMMdd'.jpz'",
     shareUrlPattern
-) {
-    companion object {
-        private const val SOURCE_URL_FMT_PATTERN
-            = "'https://puzzles.kingdigital.com/jpz/%s/'yyyyMMdd'.jpz'"
-    }
-}
+)
 

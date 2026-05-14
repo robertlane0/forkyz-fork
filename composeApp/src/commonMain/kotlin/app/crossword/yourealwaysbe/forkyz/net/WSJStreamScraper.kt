@@ -1,6 +1,5 @@
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.util.Locale
 import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
@@ -48,7 +47,7 @@ class WSJStreamScraper : AbstractStreamScraper() {
         if (isWSJ == null || puzzlePath == null)
             return null
         else
-            return String.format(Locale.US, DATA_URL_FORMAT, puzzlePath)
+            return "https://www.wsj.com/$puzzlePath/data.json"
     }
 
     companion object {
@@ -59,9 +58,6 @@ class WSJStreamScraper : AbstractStreamScraper() {
         )
 
         private const val DEFAULT_SOURCE = "Wall Street Journal"
-
-        // args: puzzles/crossword/yyyymmdd/xxxxx
-        private const val DATA_URL_FORMAT = "https://www.wsj.com/%s/data.json"
     }
 }
 

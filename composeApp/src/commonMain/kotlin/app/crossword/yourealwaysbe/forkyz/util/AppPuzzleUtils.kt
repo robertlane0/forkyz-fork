@@ -2,7 +2,6 @@
 package app.crossword.yourealwaysbe.forkyz.util
 
 import java.text.Normalizer
-import java.util.Locale
 import java.util.UUID
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.DateTimeFormat
@@ -13,8 +12,6 @@ import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 
 object AppPuzzleUtils {
-    // date, name, uuid
-    private const val FILE_NAME_PATTERN = "%s-%s-%s"
     private const val FILE_NAME_REMOVE_CHARS = "[^A-Za-z0-9]"
 
     // source - yyyymmdd - title.puz (title optional)
@@ -64,13 +61,7 @@ object AppPuzzleUtils {
         val normalizedName = Normalizer.normalize(name, Normalizer.Form.NFD)
             .replace(FILE_NAME_REMOVE_CHARS.toRegex(), "")
 
-        return String.format(
-            Locale.US,
-            FILE_NAME_PATTERN,
-            date,
-            normalizedName,
-            UUID.randomUUID(),
-        )
+        return "$date-$normalizedName-${UUID.randomUUID()}"
     }
 
     /**

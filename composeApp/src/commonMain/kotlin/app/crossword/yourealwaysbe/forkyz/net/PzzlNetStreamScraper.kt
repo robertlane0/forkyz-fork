@@ -1,6 +1,5 @@
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.util.Locale
 import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
@@ -43,12 +42,7 @@ class PzzlNetStreamScraper : AbstractStreamScraper() {
         val setID = results[0]
         val date = results[1]
         if (setID != null && date != null) {
-            return String.format(
-                Locale.US,
-                TXT_URL_FORMAT,
-                setID,
-                date,
-            )
+            return "https://pzzl.net/servlet/$setID/netcrossword?date=$date"
         } else {
             return null
         }
@@ -65,10 +59,6 @@ class PzzlNetStreamScraper : AbstractStreamScraper() {
         )
 
         private const val DEFAULT_SOURCE = "Pzzl.net"
-
-        // args: id, date
-        private const val TXT_URL_FORMAT
-            = "https://pzzl.net/servlet/%s/netcrossword?date=%s"
     }
 }
 

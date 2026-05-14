@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.util.Locale
 import kotlinx.io.IOException
 import kotlinx.io.Source
 import kotlinx.io.readLine
@@ -44,12 +43,7 @@ class KeesingStreamScraper : AbstractStreamScraper() {
         if (customerID == null || puzzleID == null)
             return null
 
-        val puzzleSetID = String.format(
-            Locale.US,
-            PUZZLE_SET_ID_FORMAT,
-            puzzleID,
-            customerID,
-        )
+        val puzzleSetID = "${puzzleID}_${customerID}"
 
         return getPuzzleURL(customerID, puzzleSetID)?.let { getPuzzle(it) }
     }
@@ -78,12 +72,11 @@ class KeesingStreamScraper : AbstractStreamScraper() {
         customerID : String,
         puzzleSetID : String,
     ) : String? {
-        val idUrl = String.format(
-            Locale.US,
-            ID_URL_FORMAT,
-            customerID,
-            puzzleSetID,
+        val idUrl = (
+            "https://web.keesing.com/Content/GetPuzzleInfo/?"
+            + "clientid=$customerID&puzzleid=$puzzleSetID"
         )
+
         try {
             getURL(idUrl).use { input ->
                 val rawJson = StringBuilder()
@@ -93,11 +86,9 @@ class KeesingStreamScraper : AbstractStreamScraper() {
 
                 val json = parseJSONObject(rawJson.toString())
                 val puzzleID = json.getString("puzzleID")
-                return String.format(
-                    Locale.US,
-                    XML_URL_FORMAT,
-                    customerID,
-                    puzzleID,
+                return (
+                    "https://web.keesing.com/content/getxml?"
+                    + "clientid=$customerID&puzzleid=$puzzleID"
                 )
             }
         } catch (e : JSONException) {
@@ -118,15 +109,6 @@ class KeesingStreamScraper : AbstractStreamScraper() {
             Regex("data-puzzleid=\"([^\"]*)\""),
             1,
         )
-
-        // puzzleid_customerid
-        private const val PUZZLE_SET_ID_FORMAT = "%s_%s"
-        private val ID_URL_FORMAT = (
-            "https://web.keesing.com/Content/GetPuzzleInfo/?"
-            + "clientid=%s&puzzleid=%s"
-        )
-        private const val XML_URL_FORMAT =
-            "https://web.keesing.com/content/getxml?clientid=%s&puzzleid=%s"
 
         private const val DEFAULT_SOURCE = "Keesing"
     }

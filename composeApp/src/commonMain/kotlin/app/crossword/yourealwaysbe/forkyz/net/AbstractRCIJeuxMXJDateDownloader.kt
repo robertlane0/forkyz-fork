@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.util.Locale
 import kotlin.math.max
 import kotlin.time.Duration
 import kotlinx.datetime.DayOfWeek
@@ -22,8 +21,7 @@ import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
  *
  * Build with buildMFJ or buildMCJ for arrow words or crosswords.
  *
- * Note, sourceUrlFormat is not a date format pattern, it should
- * have a %d for the crossword number.
+ * @param makeSourceURL function from crossword number to URL
  */
 class AbstractRCIJeuxMXJDateDownloader private constructor(
     downloaderID : DownloaderID,
@@ -31,7 +29,7 @@ class AbstractRCIJeuxMXJDateDownloader private constructor(
     days : Array<DayOfWeek>,
     utcAvailabilityOffset : Duration,
     supportUrl : String?,
-    private val sourceUrlFormat : String,
+    private val makeSourceURL : (Long) -> String,
     shareUrlFormatPattern : String?,
     puzzleParser : PuzzleParser,
     private val baseCWNumber : Int,
@@ -48,8 +46,7 @@ class AbstractRCIJeuxMXJDateDownloader private constructor(
     TimeUtils.plusDays(TimeUtils.today(), -ARCHIVE_LENGTH_DAYS),
 ) {
     override suspend fun getSourceUrl(date : LocalDate) : String? {
-        val cwNumber = getCrosswordNumber(date)
-        return String.format(Locale.US, this.sourceUrlFormat, cwNumber)
+        return makeSourceURL(getCrosswordNumber(date))
     }
 
     override suspend fun download(
@@ -108,7 +105,7 @@ class AbstractRCIJeuxMXJDateDownloader private constructor(
             days : Array<DayOfWeek>,
             utcAvailabilityOffset : Duration,
             supportUrl : String?,
-            sourceUrlFormat : String,
+            makeSourceURL : (Long) -> String,
             shareUrlFormatPattern : String?,
             baseCWNumber : Int,
             baseDate : LocalDate,
@@ -119,7 +116,7 @@ class AbstractRCIJeuxMXJDateDownloader private constructor(
                 days,
                 utcAvailabilityOffset,
                 supportUrl,
-                sourceUrlFormat,
+                makeSourceURL,
                 shareUrlFormatPattern,
                 RCIJeuxMFJIO(),
                 baseCWNumber,
@@ -133,7 +130,7 @@ class AbstractRCIJeuxMXJDateDownloader private constructor(
             days : Array<DayOfWeek>,
             utcAvailabilityOffset : Duration,
             supportUrl : String?,
-            sourceUrlFormat : String,
+            makeSourceURL : (Long) -> String,
             shareUrlFormatPattern : String?,
             baseCWNumber : Int,
             baseDate : LocalDate,
@@ -144,7 +141,7 @@ class AbstractRCIJeuxMXJDateDownloader private constructor(
                 days,
                 utcAvailabilityOffset,
                 supportUrl,
-                sourceUrlFormat,
+                makeSourceURL,
                 shareUrlFormatPattern,
                 RCIJeuxMCJIO(),
                 baseCWNumber,
