@@ -4,7 +4,6 @@ package app.crossword.yourealwaysbe.forkyz.puz
 import java.util.Collections
 import java.util.LinkedList
 import java.util.Objects
-import java.util.logging.Logger
 import kotlinx.datetime.LocalDate
 
 import app.crossword.yourealwaysbe.forkyz.puz.Box.Companion.isBlock
@@ -767,11 +766,6 @@ class Puzzle(var boxes : Array<Array<Box?>>) {
             if (!box!!.hasCluePosition(clue.clueID))
                 box.setCluePosition(clue.clueID, offset)
         }
-    }
-
-    companion object {
-        private val LOG : Logger
-            = Logger.getLogger("app.crossword.yourealwaysbe")
     }
 }
 

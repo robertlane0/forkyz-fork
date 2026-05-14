@@ -41,5 +41,5 @@ actual object AppLogger {
             logger.warning("ERROR: [$tag] $message")
         }
     }
-
 }
+

@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io.versions
 
-import java.util.logging.Logger
 import kotlinx.io.IOException
 import kotlinx.io.Sink
 import kotlinx.io.Source
@@ -50,11 +49,6 @@ open class IOVersion3 : IOVersion2() {
         if (curCid == null || acrossList == curCid.listName)
             output.writeByte(1)
         else output.writeByte(-1)
-    }
-
-    companion object {
-        private val LOG
-            = Logger.getLogger(IOVersion3::class.java.getCanonicalName())
     }
 }
 

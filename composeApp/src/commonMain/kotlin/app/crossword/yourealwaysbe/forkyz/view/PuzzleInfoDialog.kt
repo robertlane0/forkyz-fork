@@ -125,7 +125,6 @@ fun PuzzleFinishedDialog(
             }
         }
     }
-
 }
 
 @Composable

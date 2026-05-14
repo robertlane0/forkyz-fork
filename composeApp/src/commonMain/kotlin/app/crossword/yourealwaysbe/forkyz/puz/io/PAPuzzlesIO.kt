@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
-import java.util.logging.Logger
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.text.RegexOption.IGNORE_CASE
@@ -18,6 +17,7 @@ import app.crossword.yourealwaysbe.forkyz.puz.Position
 import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.puz.PuzzleBuilder
 import app.crossword.yourealwaysbe.forkyz.puz.Zone
+import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 
 /**
  * Read crosswords from https://www.pa-puzzles.com
@@ -69,8 +69,7 @@ class PAPuzzlesIO : PuzzleParser {
     }
 
     companion object {
-        private val LOG
-            = Logger.getLogger(PAPuzzlesIO::class.java.getCanonicalName())
+        private val TAG = "ForkyzPAPuzzlesIO"
 
         private val CELL_ID_RE = "cell-(\\d+)-(\\d+)".toRegex(IGNORE_CASE)
         private const val CELL_ID_COL_GRP = 1
@@ -87,10 +86,10 @@ class PAPuzzlesIO : PuzzleParser {
                 getClues(doc, builder)
                 return builder.puzzle
             } catch (e : IOException) {
-                LOG.info("Could not read PA Puzzles crossword: " + e)
+                AppLogger.i(TAG, "Could not read PA Puzzles crossword: " + e)
                 return null
             } catch (e : PAPuzzlesFormatException) {
-                LOG.info("Could not read PA Puzzles crossword: " + e)
+                AppLogger.i(TAG, "Could not read PA Puzzles crossword: " + e)
                 return null
             }
         }

@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io.versions
 
-import java.util.logging.Logger
 import kotlinx.io.IOException
 import kotlinx.io.Sink
 import kotlinx.io.Source
@@ -22,11 +21,6 @@ open class IOVersion4 : IOVersion3() {
     override fun writeMeta(puz : Puzzle, output : Sink) {
         super.writeMeta(puz, output)
         output.writeInt(puz.percentFilled)
-    }
-
-    companion object {
-        private val LOG
-            = Logger.getLogger(IOVersion4::class.java.getCanonicalName())
     }
 }
 

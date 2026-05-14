@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io.versions
 
-import java.util.logging.Logger
 import kotlinx.io.IOException
 import kotlinx.io.Sink
 import kotlinx.io.Source
@@ -29,11 +28,6 @@ open class IOVersion7 : IOVersion6() {
     override fun writeMeta(puz : Puzzle, output : Sink) {
         super.writeMeta(puz, output)
         writeNullTerminatedString(output, puz.supportUrl, charset)
-    }
-
-    companion object {
-        private val LOG
-            = Logger.getLogger(IOVersion7::class.java.getCanonicalName())
     }
 }
 

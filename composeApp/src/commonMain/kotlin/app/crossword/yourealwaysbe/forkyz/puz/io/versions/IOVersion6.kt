@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io.versions
 
-import java.util.logging.Logger
 import kotlinx.io.IOException
 import kotlinx.io.Sink
 import kotlinx.io.Source
@@ -13,6 +12,7 @@ import app.crossword.yourealwaysbe.forkyz.puz.io.IO.Companion.readNullTerminated
 import app.crossword.yourealwaysbe.forkyz.puz.io.IO.Companion.writeNullTerminatedString
 import app.crossword.yourealwaysbe.forkyz.puz.util.PuzzleUtils.getAcrossListName
 import app.crossword.yourealwaysbe.forkyz.puz.util.PuzzleUtils.getDownListName
+import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 
 // Moves clue notes out of the puz file and into meta
 // i don't really think they were allowed in the puz file format
@@ -147,7 +147,8 @@ open class IOVersion6 : IOVersion5() {
                         puz.setNote(cid, n)
                     idx += 1
                 } else {
-                    LOG.info(
+                    AppLogger.i(
+                        TAG,
                         "WARNING: mismatch between number of "
                             + "clues and number of notes.",
                     )
@@ -157,8 +158,7 @@ open class IOVersion6 : IOVersion5() {
     }
 
     companion object {
-        private val LOG
-            = Logger.getLogger(IOVersion6::class.java.getCanonicalName())
+        private val TAG = "ForkyzIOVersion6"
     }
 }
 

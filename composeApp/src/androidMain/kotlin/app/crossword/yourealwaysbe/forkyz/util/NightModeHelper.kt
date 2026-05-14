@@ -3,15 +3,13 @@ package app.crossword.yourealwaysbe.forkyz.util
 
 import java.lang.ref.WeakReference
 import java.util.function.Consumer
-import java.util.logging.Level
-import java.util.logging.Logger
-
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 
 import app.crossword.yourealwaysbe.forkyz.settings.DayNightMode
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
+import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 
 /**
  * Heavily adapted from sources below, description no longer relevant so
@@ -52,6 +50,8 @@ class NightModeHelper private constructor(
     }
 
     companion object {
+        private val TAG = "ForkyzNightModeHelper"
+
         fun bind(
             activity : AppCompatActivity,
             settings : ForkyzSettings,
@@ -83,8 +83,7 @@ class NightModeHelper private constructor(
                 method.setAccessible(true)
                 return (method.invoke(context) as Int?)!!
             } catch (e : Exception) {
-                Logger.getAnonymousLogger()
-                    .log(Level.WARNING, "Exception getting theme", e)
+                AppLogger.w(TAG, "Exception getting theme", e)
             }
             return 0
         }

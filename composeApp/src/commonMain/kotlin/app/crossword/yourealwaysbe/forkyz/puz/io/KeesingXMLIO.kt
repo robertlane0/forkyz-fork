@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
-import java.util.logging.Logger
 import kotlinx.datetime.LocalDate
 import kotlinx.io.Source
 
@@ -290,10 +289,6 @@ class KeesingXMLIO : PuzzleParser {
     }
 
     companion object {
-        private val LOG = Logger.getLogger(
-            KeesingXMLIO::class.java.getCanonicalName(),
-        )
-
         private const val CROSSWORD_TYPE = "Crossword"
         private const val ARROWWORD_TYPE = "Arrowword"
 

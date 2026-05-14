@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz
 
-import java.util.logging.Logger
 import kotlin.math.min
 import kotlin.random.Random
 
@@ -2378,9 +2377,6 @@ class Playboard(puzzle : Puzzle) {
     }
 
     companion object {
-        private val LOG
-            = Logger.getLogger(Playboard::class.java.getCanonicalName())
-
         private const val PAUSE_DELETE_DELAY : Long = 150 // ms
     }
 }

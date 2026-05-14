@@ -2,7 +2,6 @@
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
 import java.util.LinkedList
-import java.util.logging.Logger
 import kotlinx.io.IOException
 import kotlinx.io.Source
 
@@ -16,6 +15,7 @@ import app.crossword.yourealwaysbe.forkyz.puz.Zone
 import app.crossword.yourealwaysbe.forkyz.util.JSONArray
 import app.crossword.yourealwaysbe.forkyz.util.JSONException
 import app.crossword.yourealwaysbe.forkyz.util.JSONObject
+import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.parseJSONObject
 
 
@@ -40,10 +40,7 @@ class RaetselZentraleSchwedenJSONIO : AbstractJSONIO() {
     )
 
     companion object {
-        private val LOG
-            = Logger.getLogger(
-                RaetselZentraleSchwedenJSONIO::class.java.getCanonicalName(),
-            )
+        private val TAG = "ForkyzRaetselJSON"
 
         // Not internationalised, assumed German
         private const val ACROSS_LIST = "Hinüber"
@@ -73,10 +70,10 @@ class RaetselZentraleSchwedenJSONIO : AbstractJSONIO() {
                 val json = parseJSONObject(input)
                 return readPuzzleFromJSON(json)
             } catch (e : JSONException) {
-                LOG.severe("Could not read RaetselZentrale JSON: " + e)
+                AppLogger.e(TAG, "Could not read RaetselZentrale JSON: " + e)
                 return null
             } catch (e : RZSFormatException) {
-                LOG.severe("Could not read RaetselZentrale JSON: " + e)
+                AppLogger.e(TAG, "Could not read RaetselZentrale JSON: " + e)
                 return null
             }
         }
@@ -87,7 +84,7 @@ class RaetselZentraleSchwedenJSONIO : AbstractJSONIO() {
                 val json = parseJSONObject(jsonString)
                 return readPuzzleFromJSON(json)
             } catch (e : JSONException) {
-                LOG.severe("Could not read Guardian JSON: " + e)
+                AppLogger.e(TAG, "Could not read Guardian JSON: " + e)
                 return null
             }
         }

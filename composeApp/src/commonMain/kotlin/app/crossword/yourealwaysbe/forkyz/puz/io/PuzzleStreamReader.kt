@@ -1,11 +1,11 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
-import java.util.logging.Logger
 import kotlinx.io.IOException
 import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
+import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.StreamUtils
 
 class PuzzleStreamReader : PuzzleParser {
@@ -20,9 +20,7 @@ class PuzzleStreamReader : PuzzleParser {
     }
 
     companion object {
-        private val LOGGER = Logger.getLogger(
-            PuzzleStreamReader::class.java.getCanonicalName(),
-        )
+        private val TAG = "ForkyzPuzzleStreamRdr"
 
         private val PARSERS = arrayOf(
             IO(),
@@ -57,21 +55,22 @@ class PuzzleStreamReader : PuzzleParser {
                 for (parser in PARSERS) {
                     try {
                         val copy = unzipped.peek()
-                        LOGGER.info(
+                        AppLogger.i(
+                            TAG,
                             "Attempting parse with "
                                 + parser.javaClass.getName(),
                         )
                         val puz = parser.parseInput(copy)
                         if (puz != null)
                             return puz
-                        else LOGGER.info("Parse returned null.")
+                        else AppLogger.i(TAG, "Parse returned null.")
                     } catch (e : Exception) {
-                        LOGGER.info("Parse attempt failed with " + e)
+                        AppLogger.i(TAG, "Parse attempt failed with " + e)
                         // on to the next one
                     }
                 }
             } catch (e : IOException) {
-                LOGGER.info("Could not read input stream with " + e)
+                AppLogger.i(TAG, "Could not read input stream with " + e)
             }
             return null
         }

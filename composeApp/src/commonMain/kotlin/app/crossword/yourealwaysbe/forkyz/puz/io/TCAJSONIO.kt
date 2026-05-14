@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
-import java.util.logging.Logger
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
@@ -16,6 +15,7 @@ import app.crossword.yourealwaysbe.forkyz.puz.PuzzleBuilder
 import app.crossword.yourealwaysbe.forkyz.puz.Zone
 import app.crossword.yourealwaysbe.forkyz.util.JSONException
 import app.crossword.yourealwaysbe.forkyz.util.JSONObject
+import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.parseJSONObject
 
 
@@ -61,8 +61,7 @@ class TCAJSONIO : AbstractJSONIO() {
     }
 
     companion object {
-        private val LOG
-            = Logger.getLogger(TCAJSONIO::class.java.getCanonicalName())
+        private val TAG = "ForkyzTCAJSONIO"
 
         private val DATE_META_FORMATTER = LocalDate.Formats.ISO
         private val DATE_DATA_FORMATTER = LocalDate.Format {
@@ -82,10 +81,10 @@ class TCAJSONIO : AbstractJSONIO() {
                 val json = parseJSONObject(input)
                 return readPuzzleFromJSON(json)
             } catch (e : TCAJSONFormatException) {
-                LOG.severe("Could not read TCA JSON: " + e)
+                AppLogger.e(TAG, "Could not read TCA JSON: " + e)
                 return null
             } catch (e : JSONException) {
-                LOG.severe("Could not read TCA JSON: " + e)
+                AppLogger.e(TAG, "Could not read TCA JSON: " + e)
                 return null
             }
         }
@@ -95,10 +94,10 @@ class TCAJSONIO : AbstractJSONIO() {
                 val json = parseJSONObject(jsonString)
                 return readPuzzleFromJSON(json)
             } catch (e : TCAJSONFormatException) {
-                LOG.severe("Could not read TCA JSON: " + e)
+                AppLogger.e(TAG, "Could not read TCA JSON: " + e)
                 return null
             } catch (e : JSONException) {
-                LOG.severe("Could not read TCA JSON: " + e)
+                AppLogger.e(TAG, "Could not read TCA JSON: " + e)
                 return null
             }
         }

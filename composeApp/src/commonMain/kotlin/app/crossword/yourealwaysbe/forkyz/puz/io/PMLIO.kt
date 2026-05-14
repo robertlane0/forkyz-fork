@@ -2,7 +2,6 @@
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
 import java.util.Locale
-import java.util.logging.Logger
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.Padding
@@ -17,6 +16,7 @@ import app.crossword.yourealwaysbe.forkyz.puz.PuzzleBuilder
 import app.crossword.yourealwaysbe.forkyz.puz.PuzzleBuilder.BasicClue
 import app.crossword.yourealwaysbe.forkyz.util.JSONException
 import app.crossword.yourealwaysbe.forkyz.util.JSONObject
+import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.parseJSONObject
 
 /**
@@ -29,8 +29,7 @@ class PMLIO : AbstractJSONIO() {
     }
 
     companion object {
-        private val LOG
-            = Logger.getLogger(PMLIO::class.java.getCanonicalName())
+        private val TAG = "ForkyzPMLIO"
 
         private val ACROSS_LIST = DefaultListNames.ACROSS_LIST
         private val DOWN_LIST = DefaultListNames.DOWN_LIST
@@ -95,7 +94,7 @@ class PMLIO : AbstractJSONIO() {
                 val json = parseJSONObject(jsonString)
                 return readPuzzleFromJSON(json)
             } catch (e : JSONException) {
-                LOG.severe("Could not read PML JSON: " + e)
+                AppLogger.e(TAG, "Could not read PML JSON: " + e)
                 return null
             }
         }

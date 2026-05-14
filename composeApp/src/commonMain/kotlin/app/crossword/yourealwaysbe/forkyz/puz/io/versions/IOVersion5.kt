@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io.versions
 
-import java.util.logging.Logger
 import kotlinx.io.IOException
 import kotlinx.io.Sink
 import kotlinx.io.Source
@@ -75,11 +74,6 @@ open class IOVersion5 : IOVersion4() {
                 }
             }
         }
-    }
-
-    companion object {
-        private val LOG
-            = Logger.getLogger(IOVersion5::class.java.getCanonicalName())
     }
 }
 

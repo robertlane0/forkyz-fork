@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
-import java.util.logging.Logger
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.DayOfWeekNames
 import kotlinx.datetime.format.MonthNames
@@ -18,6 +17,7 @@ import app.crossword.yourealwaysbe.forkyz.puz.PuzzleBuilder
 import app.crossword.yourealwaysbe.forkyz.puz.Zone
 import app.crossword.yourealwaysbe.forkyz.util.JSONException
 import app.crossword.yourealwaysbe.forkyz.util.JSONObject
+import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.parseJSONObject
 
 /**
@@ -62,8 +62,7 @@ class SlowDownWiseUpJSONIO : AbstractJSONIO() {
     }
 
     companion object {
-        private val LOG
-            = Logger.getLogger(AmuseLabsJSONIO::class.java.getCanonicalName())
+        private val TAG = "ForkyzSlowDownWiseUp"
 
         private val DATE_FORMATTER = LocalDate.Format {
             dayOfWeek(DayOfWeekNames.ENGLISH_FULL)
@@ -84,10 +83,10 @@ class SlowDownWiseUpJSONIO : AbstractJSONIO() {
                 val json = parseJSONObject(input)
                 return readPuzzleFromJSON(json)
             } catch (e : SlowDownWiseUpJSONFormatException) {
-                LOG.severe("Could not read SlowDownWiseUp JSON: " + e)
+                AppLogger.e(TAG, "Could not read SlowDownWiseUp JSON: " + e)
                 return null
             } catch (e : JSONException) {
-                LOG.severe("Could not read SlowDownWiseUp JSON: " + e)
+                AppLogger.e(TAG, "Could not read SlowDownWiseUp JSON: " + e)
                 return null
             }
         }
@@ -97,10 +96,10 @@ class SlowDownWiseUpJSONIO : AbstractJSONIO() {
                 val json = parseJSONObject(jsonString)
                 return readPuzzleFromJSON(json)
             } catch (e : SlowDownWiseUpJSONFormatException) {
-                LOG.severe("Could not read SlowDownWiseUp JSON: " + e)
+                AppLogger.e(TAG, "Could not read SlowDownWiseUp JSON: " + e)
                 return null
             } catch (e : JSONException) {
-                LOG.severe("Could not read SlowDownWiseUp JSON: " + e)
+                AppLogger.e(TAG, "Could not read SlowDownWiseUp JSON: " + e)
                 return null
             }
         }

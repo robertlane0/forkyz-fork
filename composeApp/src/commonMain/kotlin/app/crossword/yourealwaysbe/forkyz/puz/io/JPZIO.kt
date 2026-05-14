@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
-import java.util.logging.Logger
 import kotlin.math.max
 import kotlinx.datetime.LocalDate
 import kotlinx.io.Source
@@ -15,6 +14,7 @@ import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.puz.PuzzleBuilder
 import app.crossword.yourealwaysbe.forkyz.puz.PuzzleKind
 import app.crossword.yourealwaysbe.forkyz.puz.Zone
+import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.HtmlUtil.parseHtmlColor
 import app.crossword.yourealwaysbe.forkyz.util.HtmlUtil.unHtmlString
 import app.crossword.yourealwaysbe.forkyz.util.XMLElement
@@ -159,7 +159,7 @@ class JPZIO : PuzzleParser {
                         parseCell(cell)
                     }
                 } catch (e : NumberFormatException) {
-                    LOG.severe("Could not read JPZ XML cell data: " + e)
+                    AppLogger.e(TAG, "Could not read JPZ XML cell data: " + e)
                 }
             }
         }
@@ -422,7 +422,7 @@ class JPZIO : PuzzleParser {
     }
 
     companion object {
-        private val LOG = Logger.getLogger("app.crossword.yourealwaysbe")
+        private val TAG = "ForkyzJPZIO"
 
         private const val ACROSTIC_QUOTE_LISTNAME = "Quote"
         private const val ACROSTIC_QUOTE_HINT = "Quote"

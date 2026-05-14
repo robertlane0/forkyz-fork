@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io.versions
 
-import java.util.logging.Logger
 import kotlinx.io.IOException
 import kotlinx.io.Sink
 import kotlinx.io.Source
@@ -28,9 +27,5 @@ open class IOVersion8 : IOVersion7() {
         super.writeMeta(puz, output)
         writeNote(puz.playerNote, output)
     }
-
-    companion object {
-        private val LOG
-            = Logger.getLogger(IOVersion8::class.java.getCanonicalName())
-    }
 }
+

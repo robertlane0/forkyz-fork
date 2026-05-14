@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
-import java.util.logging.Logger
 import kotlinx.io.IOException
 import kotlinx.io.Source
 import kotlinx.io.readLine
@@ -12,6 +11,7 @@ import app.crossword.yourealwaysbe.forkyz.puz.Position
 import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.puz.PuzzleBuilder
 import app.crossword.yourealwaysbe.forkyz.puz.Zone
+import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.HtmlUtil
 import app.crossword.yourealwaysbe.forkyz.util.HtmlUtil.parseHtmlColor
 
@@ -313,8 +313,7 @@ class ExolveIO : PuzzleParser {
     )
 
     companion object {
-        private val LOG
-                = Logger.getLogger(ExolveIO::class.java.getCanonicalName())
+        private val TAG = "ForkyzExolveIO"
 
         private const val ACROSS_LIST = "Across"
         private const val DOWN_LIST = "Down"
@@ -349,7 +348,7 @@ class ExolveIO : PuzzleParser {
                 val data : Map<String, String> = extractData(input)
                 return readPuzzleFromData(data)
             } catch (e : ExolveFormatException) {
-                LOG.info("Failed to parse Exolve file: " + e)
+                AppLogger.i(TAG, "Failed to parse Exolve file: " + e)
                 return null
             }
         }

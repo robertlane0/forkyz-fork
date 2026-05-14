@@ -5,7 +5,6 @@ import java.util.Arrays
 import java.util.Collections
 import java.util.LinkedList
 import java.util.function.Consumer
-import java.util.logging.Logger
 import kotlin.math.log10
 import kotlin.math.min
 import kotlinx.datetime.LocalDate
@@ -27,6 +26,7 @@ import app.crossword.yourealwaysbe.forkyz.puz.PuzzleBuilder
 import app.crossword.yourealwaysbe.forkyz.puz.PuzzleKind
 import app.crossword.yourealwaysbe.forkyz.puz.Zone
 import app.crossword.yourealwaysbe.forkyz.puz.util.PuzzleUtils
+import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.HtmlUtil.htmlString
 import app.crossword.yourealwaysbe.forkyz.util.HtmlUtil.parseHtmlColor
 import app.crossword.yourealwaysbe.forkyz.util.HtmlUtil.unHtmlString
@@ -73,8 +73,7 @@ class IPuzIO : AbstractJSONIO() {
     }
 
     companion object {
-        private val LOG
-            = Logger.getLogger(IPuzIO::class.java.getCanonicalName())
+        private val TAG = "ForkyzIPuzIO"
 
         // version 1 was not tagged in file
         private const val IO_VERSION = 3
@@ -373,10 +372,10 @@ class IPuzIO : AbstractJSONIO() {
 
                 return builder.puzzle
             } catch (e : IPuzFormatException) {
-                LOG.severe("Could not read IPuz file: " + e)
+                AppLogger.e(TAG, "Could not read IPuz file: " + e)
                 return null
             } catch (e : JSONException) {
-                LOG.severe("Could not read IPuz file: " + e)
+                AppLogger.e(TAG, "Could not read IPuz file: " + e)
                 return null
             }
         }

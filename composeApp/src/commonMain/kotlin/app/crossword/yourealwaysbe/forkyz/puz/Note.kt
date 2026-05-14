@@ -1,7 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz
 
-import java.util.logging.Logger
+import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 
 data class Note(
     val scratch : String?,
@@ -109,8 +109,9 @@ data class Note(
         val newScratchText : String?
 
         if (scratch == null || pos < 0 || pos >= scratch.length) {
-            LOG.warning(
-                "Can't set scratch letter because scratch text not created"
+            AppLogger.w(
+                TAG,
+                "Can't set scratch letter because scratch text not created",
             )
             return this
         }
@@ -155,8 +156,7 @@ data class Note(
     }
 
     companion object {
-        private val LOG : Logger
-            = Logger.getLogger(Note::class.java.getCanonicalName())
+        private val TAG = "ForkyzNote"
 
         private val BLANK_CHAR = Box.BLANK.get(0)
 

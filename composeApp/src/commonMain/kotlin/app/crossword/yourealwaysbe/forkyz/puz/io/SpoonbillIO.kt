@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
-import java.util.logging.Logger
 import kotlinx.io.IOException
 import kotlinx.io.Source
 import kotlinx.io.readLine
@@ -12,6 +11,7 @@ import app.crossword.yourealwaysbe.forkyz.puz.Position
 import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.puz.PuzzleBuilder
 import app.crossword.yourealwaysbe.forkyz.puz.Zone
+import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 
 /**
  * Parser for .xwc Spoonbill
@@ -28,8 +28,7 @@ class SpoonbillIO : PuzzleParser {
     }
 
     companion object {
-        private val LOG
-            = Logger.getLogger(SpoonbillIO::class.java.getCanonicalName())
+        private val TAG = "ForkyzSpoonbillIO"
 
         private const val MODE_SKELETON = "Skeleton"
         private const val MODE_SOLUTION = "Solution"
@@ -67,7 +66,7 @@ class SpoonbillIO : PuzzleParser {
 
                 return builder.puzzle
             } catch (e : SpoonbillFormatException) {
-                LOG.info("Failed to parse Spoonbill file: " + e)
+                AppLogger.i(TAG, "Failed to parse Spoonbill file: " + e)
                 return null
             }
         }

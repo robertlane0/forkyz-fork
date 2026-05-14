@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
-import java.util.logging.Logger
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.Padding
 import kotlinx.io.IOException
@@ -12,6 +11,7 @@ import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.puz.PuzzleBuilder
 import app.crossword.yourealwaysbe.forkyz.util.JSONException
 import app.crossword.yourealwaysbe.forkyz.util.JSONObject
+import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.parseJSONObject
 
 
@@ -56,8 +56,7 @@ class AMUniversalJSONIO : AbstractJSONIO() {
     }
 
     companion object {
-        private val LOG
-            = Logger.getLogger(AMUniversalJSONIO::class.java.getCanonicalName())
+        private val TAG = "ForkyzAMUniversalJSON"
 
         private val DATE_FORMATTER = LocalDate.Format {
             year(Padding.ZERO)
@@ -74,13 +73,13 @@ class AMUniversalJSONIO : AbstractJSONIO() {
                 val json = parseJSONObject(input)
                 return readPuzzleFromJSON(json)
             } catch (e : IOException) {
-                LOG.info("Error parsing AMUniversal JSON: " + e)
+                AppLogger.i(TAG, "Error parsing AMUniversal JSON: " + e)
                 return null
             } catch (e : JSONException) {
-                LOG.info("Error parsing AMUniversal JSON: " + e)
+                AppLogger.i(TAG, "Error parsing AMUniversal JSON: " + e)
                 return null
             } catch (e : AMUniversalFormatException) {
-                LOG.info("Error parsing AMUniversal JSON: " + e)
+                AppLogger.i(TAG, "Error parsing AMUniversal JSON: " + e)
                 return null
             }
         }

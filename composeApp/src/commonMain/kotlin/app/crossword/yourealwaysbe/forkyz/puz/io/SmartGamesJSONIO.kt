@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
-import java.util.logging.Logger
 import kotlinx.datetime.LocalDate
 import kotlinx.io.IOException
 import kotlinx.io.Source
@@ -12,6 +11,7 @@ import app.crossword.yourealwaysbe.forkyz.puz.PuzzleBuilder
 import app.crossword.yourealwaysbe.forkyz.puz.util.PuzzleUtils
 import app.crossword.yourealwaysbe.forkyz.util.JSONException
 import app.crossword.yourealwaysbe.forkyz.util.JSONObject
+import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.parseJSONObject
 
 /**
@@ -49,9 +49,7 @@ class SmartGamesJSONIO : AbstractJSONIO() {
     }
 
     companion object {
-        private val LOG = Logger.getLogger(
-            SmartGamesJSONIO::class.java.getCanonicalName(),
-        )
+        private val TAG = "ForkyzSmartGamesJSON"
 
         private val DATE_FORMATTER = LocalDate.Formats.ISO
 
@@ -64,10 +62,10 @@ class SmartGamesJSONIO : AbstractJSONIO() {
                 val json = parseJSONObject(input)
                 return readPuzzleFromJSON(json)
             } catch (e : SmartGamesJSONFormatException) {
-                LOG.severe("Could not read SmartGames JSON: " + e)
+                AppLogger.e(TAG, "Could not read SmartGames JSON: " + e)
                 return null
             } catch (e : JSONException) {
-                LOG.severe("Could not read SmartGames JSON: " + e)
+                AppLogger.e(TAG, "Could not read SmartGames JSON: " + e)
                 return null
             }
         }
@@ -77,10 +75,10 @@ class SmartGamesJSONIO : AbstractJSONIO() {
                 val json = parseJSONObject(jsonString)
                 return readPuzzleFromJSON(json)
             } catch (e : SmartGamesJSONFormatException) {
-                LOG.severe("Could not read SmartGames JSON: " + e)
+                AppLogger.e(TAG, "Could not read SmartGames JSON: " + e)
                 return null
             } catch (e : JSONException) {
-                LOG.severe("Could not read SmartGames JSON: " + e)
+                AppLogger.e(TAG, "Could not read SmartGames JSON: " + e)
                 return null
             }
         }

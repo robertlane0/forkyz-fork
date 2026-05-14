@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
-import java.util.logging.Logger
 import kotlinx.io.IOException
 import kotlinx.io.Source
 import kotlinx.io.readString
@@ -13,6 +12,7 @@ import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.puz.PuzzleBuilder
 import app.crossword.yourealwaysbe.forkyz.util.JSONArray
 import app.crossword.yourealwaysbe.forkyz.util.JSONObject
+import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.parseJSON5Object
 
 /**
@@ -118,8 +118,7 @@ class RCIJeuxMFJIO : PuzzleParser {
     )
 
     companion object {
-        private val LOG
-            = Logger.getLogger(RCIJeuxMFJIO::class.java.getCanonicalName())
+        private val TAG = "ForkyzRCIJeuxMFJIO"
 
         // Not internationalised, assume French
         private const val ACROSS_LIST = "Horiz."
@@ -135,7 +134,7 @@ class RCIJeuxMFJIO : PuzzleParser {
 
                 return readPuzzleFromJSON(parseJSON5Object(json))
             } catch (e : MFJFormatException) {
-                LOG.severe("Could not read RCIJeux MFJ: " + e)
+                AppLogger.e(TAG, "Could not read RCIJeux MFJ: " + e)
                 return null
             }
         }

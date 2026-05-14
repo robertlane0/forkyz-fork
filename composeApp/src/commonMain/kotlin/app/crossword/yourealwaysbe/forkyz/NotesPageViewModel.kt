@@ -985,6 +985,5 @@ class NotesPageViewModel(
     private var currentNotesUIState : NotesPageUIState
         get() { return mediatedNotesUIState.current }
         set(value) { mediatedNotesUIState.current = value }
-
-
 }
+

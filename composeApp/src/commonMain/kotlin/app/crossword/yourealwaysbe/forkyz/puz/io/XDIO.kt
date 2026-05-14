@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
-import java.util.logging.Logger
 import kotlin.math.max
 import kotlinx.datetime.LocalDate
 import kotlinx.io.IOException
@@ -12,6 +11,7 @@ import app.crossword.yourealwaysbe.forkyz.puz.Box
 import app.crossword.yourealwaysbe.forkyz.puz.Clue
 import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.puz.PuzzleBuilder
+import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 
 /**
  * Parser for .xd
@@ -126,8 +126,7 @@ class XDIO : PuzzleParser {
     private class MatchReplace(val match : String, val replace : String)
 
     companion object {
-        private val LOG
-            = Logger.getLogger(XDIO::class.java.getCanonicalName())
+        private val TAG = "ForkyzXDIO"
 
         private val ACROSS_LIST = DefaultListNames.ACROSS_LIST
         private val DOWN_LIST = DefaultListNames.DOWN_LIST
@@ -159,7 +158,7 @@ class XDIO : PuzzleParser {
                 else
                     return readImplicitSections(line, input)
             } catch (e : XDFormatException) {
-                LOG.info("Failed to parse XD file: " + e)
+                AppLogger.i(TAG, "Failed to parse XD file: " + e)
                 return null
             }
         }

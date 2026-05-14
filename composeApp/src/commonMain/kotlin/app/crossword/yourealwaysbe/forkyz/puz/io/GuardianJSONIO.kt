@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
-import java.util.logging.Logger
 import kotlinx.datetime.LocalDate
 import kotlinx.io.IOException
 import kotlinx.io.Source
@@ -37,10 +36,6 @@ class GuardianJSONIO : AbstractJSONIO() {
     )
 
     companion object {
-        private val LOG = Logger.getLogger(
-            GuardianJSONIO::class.java.getCanonicalName(),
-        )
-
         // Not internationalised, Guardian crosswords are in English
         private const val ACROSS_LIST = "Across"
         private const val DOWN_LIST = "Down"

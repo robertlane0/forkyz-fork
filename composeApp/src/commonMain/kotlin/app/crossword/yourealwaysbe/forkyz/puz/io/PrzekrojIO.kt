@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
-import java.util.logging.Logger
 import kotlinx.io.IOException
 import kotlinx.io.Source
 
@@ -14,6 +13,7 @@ import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.puz.PuzzleBuilder
 import app.crossword.yourealwaysbe.forkyz.util.JSONException
 import app.crossword.yourealwaysbe.forkyz.util.JSONObject
+import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.parseJSONObject
 
 /**
@@ -36,8 +36,7 @@ class PrzekrojIO : PuzzleParser {
     }
 
     companion object {
-        private val LOG
-            = Logger.getLogger(PrzekrojIO::class.java.getCanonicalName())
+        private val TAG = "ForkyzPrzekrojIO"
 
         // Not internationalised, Polish crosswords
         private const val ACROSS_LIST = "Poziomo"
@@ -82,13 +81,13 @@ class PrzekrojIO : PuzzleParser {
 
                 return puz
             } catch (e : IOException) {
-                LOG.info("Could not read Przekroj crossword: " + e)
+                AppLogger.i(TAG, "Could not read Przekroj crossword: " + e)
                 return null
             } catch (e : JSONException) {
-                LOG.info("Could not read Przekroj crossword: " + e)
+                AppLogger.i(TAG, "Could not read Przekroj crossword: " + e)
                 return null
             } catch (e : PrzFormatException) {
-                LOG.info("Could not read Przekroj crossword: " + e)
+                AppLogger.i(TAG, "Could not read Przekroj crossword: " + e)
                 return null
             }
         }
