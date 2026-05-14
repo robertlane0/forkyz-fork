@@ -1,0 +1,8 @@
+- Ajouter un serveur MCP pour contrôler Forkyz depuis l'agent LLM (outils externes).
+- Fixez la part de tous les hommes.
+- Changer l'espacement du bas du clavier intégré.
+- Mettre à jour la traduction néerlandaise (merci @ojppe).
+- Réécriture du moteur pour entièrement Kotlin et changement de bibliothèque date/heure.
+- Corrections et nouveaux bugs.
+
+Changelog traduit automatiquement avec Argos Translate.
