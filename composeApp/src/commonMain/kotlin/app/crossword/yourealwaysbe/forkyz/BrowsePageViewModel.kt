@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz
 
-import java.util.ArrayList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -577,8 +576,8 @@ class BrowsePageViewModel(
                 val crosswords = fileHandler.crosswordsDirectory
                 val archive = fileHandler.archiveDirectory
 
-                val toArchive = ArrayList<PuzHandle>()
-                val toDelete = ArrayList<PuzHandle>()
+                val toArchive = mutableListOf<PuzHandle>()
+                val toDelete = mutableListOf<PuzHandle>()
 
                 fileHandler.getPuzMetas(crosswords).forEach { pm ->
                     val doClean
