@@ -65,10 +65,10 @@ open class IOVersion6 : IOVersion5() {
 
     @Throws(IOException::class)
     protected fun readNote(input : Source) : Note? {
-        val scratch = readNullTerminatedString(input, charset)
-        val text = readNullTerminatedString(input, charset)
-        val anagramSrc = readNullTerminatedString(input, charset)
-        val anagramSol = readNullTerminatedString(input, charset)
+        val scratch = readNullTerminatedString(input, charsetDecoder)
+        val text = readNullTerminatedString(input, charsetDecoder)
+        val anagramSrc = readNullTerminatedString(input, charsetDecoder)
+        val anagramSol = readNullTerminatedString(input, charsetDecoder)
         if (
             scratch != null
             || text != null
@@ -122,10 +122,10 @@ open class IOVersion6 : IOVersion5() {
             anagramSol = note.compressedAnagramSolution
         }
 
-        writeNullTerminatedString(output, scratch, charset)
-        writeNullTerminatedString(output, text, charset)
-        writeNullTerminatedString(output, anagramSrc, charset)
-        writeNullTerminatedString(output, anagramSol, charset)
+        writeNullTerminatedString(output, scratch, charsetEncoder)
+        writeNullTerminatedString(output, text, charsetEncoder)
+        writeNullTerminatedString(output, anagramSrc, charsetEncoder)
+        writeNullTerminatedString(output, anagramSol, charsetEncoder)
     }
 
     private fun applyNotes(

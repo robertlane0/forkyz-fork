@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
-import java.nio.charset.Charset
 import kotlinx.datetime.LocalDate
 import kotlinx.io.IOException
 import kotlinx.io.Source
@@ -10,7 +9,8 @@ import kotlinx.io.readByteArray
 import app.crossword.yourealwaysbe.forkyz.puz.Box
 import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.puz.PuzzleBuilder
-import app.crossword.yourealwaysbe.forkyz.puz.io.charset.MacRoman
+import app.crossword.yourealwaysbe.forkyz.puz.io.charset.CharsetDecoder
+import app.crossword.yourealwaysbe.forkyz.puz.io.charset.MacRomanDecoder
 
 /**
  * Converts a puzzle from the plaintext format used by King Features Syndicate
@@ -42,7 +42,7 @@ class KingFeaturesPlaintextIO : PuzzleParser {
          * (for example, if the plaintext file is not in a valid format).
          */
         fun parsePuzzle(input : Source) : Puzzle? {
-            val scanner = LineScanner(input, MacRoman())
+            val scanner = LineScanner(input, MacRomanDecoder())
 
             if (!scanner.hasNextLine()) {
                 System.err.println("File empty.")
@@ -185,9 +185,10 @@ class KingFeaturesPlaintextIO : PuzzleParser {
 
 private class LineScanner(
     val input : Source,
-    val charset : Charset,
+    val charsetDecoder : CharsetDecoder,
 ) {
-    private val lines = String(input.readByteArray(), charset).lines()
+    private val lines = charsetDecoder.decode(input).lines()
+
     private var nextLine = 0
 
     fun hasNextLine() : Boolean {
@@ -198,3 +199,4 @@ private class LineScanner(
         return lines[nextLine++]
     }
 }
+

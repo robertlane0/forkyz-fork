@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.settings
 
-import java.nio.charset.Charset
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope

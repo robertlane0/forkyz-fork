@@ -20,7 +20,7 @@ open class IOVersion2 : IOVersion1() {
     override fun readMeta(input : Source) : PuzzleMeta {
         val meta = super.readMeta(input)
         input.skip(1) // read old updatable byte
-        meta.sourceUrl = readNullTerminatedString(input, charset)
+        meta.sourceUrl = readNullTerminatedString(input, charsetDecoder)
         return meta
     }
 
@@ -28,6 +28,6 @@ open class IOVersion2 : IOVersion1() {
     override fun writeMeta(puz : Puzzle, output : Sink) {
         super.writeMeta(puz, output)
         output.writeByte(1) // old updatable byte
-        writeNullTerminatedString(output, puz.sourceUrl, charset)
+        writeNullTerminatedString(output, puz.sourceUrl, charsetEncoder)
     }
 }

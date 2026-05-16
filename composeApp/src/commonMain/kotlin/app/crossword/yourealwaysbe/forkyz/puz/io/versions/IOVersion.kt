@@ -1,13 +1,14 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io.versions
 
-import java.nio.charset.Charset
 import kotlinx.io.IOException
 import kotlinx.io.Sink
 import kotlinx.io.Source
 
 import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.puz.PuzzleMeta
+import app.crossword.yourealwaysbe.forkyz.puz.io.charset.CharsetDecoder
+import app.crossword.yourealwaysbe.forkyz.puz.io.charset.CharsetEncoder
 
 interface IOVersion {
     @Throws(IOException::class)
@@ -19,5 +20,6 @@ interface IOVersion {
     @Throws(IOException::class)
     fun readMeta(input : Source) : PuzzleMeta
 
-    val charset : Charset
+    val charsetDecoder : CharsetDecoder
+    val charsetEncoder : CharsetEncoder
 }

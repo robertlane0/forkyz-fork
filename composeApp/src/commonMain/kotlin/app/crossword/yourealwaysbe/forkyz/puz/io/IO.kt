@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
-import java.nio.charset.Charset
 import kotlin.Array
 import kotlin.Boolean
 import kotlin.ByteArray
@@ -14,7 +13,6 @@ import kotlin.arrayOfNulls
 import kotlin.code
 import kotlin.text.String
 import kotlin.text.StringBuilder
-import kotlin.text.charset
 import kotlin.text.isEmpty
 import kotlin.text.replace
 import kotlin.text.split
@@ -39,6 +37,12 @@ import app.crossword.yourealwaysbe.forkyz.puz.Note
 import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.puz.PuzzleBuilder
 import app.crossword.yourealwaysbe.forkyz.puz.PuzzleMeta
+import app.crossword.yourealwaysbe.forkyz.puz.io.charset.CP1252Decoder
+import app.crossword.yourealwaysbe.forkyz.puz.io.charset.CP1252Encoder
+import app.crossword.yourealwaysbe.forkyz.puz.io.charset.CharsetDecoder
+import app.crossword.yourealwaysbe.forkyz.puz.io.charset.CharsetEncoder
+import app.crossword.yourealwaysbe.forkyz.puz.io.charset.UTF8Decoder
+import app.crossword.yourealwaysbe.forkyz.puz.io.charset.UTF8Encoder
 import app.crossword.yourealwaysbe.forkyz.puz.io.versions.IOVersion
 import app.crossword.yourealwaysbe.forkyz.puz.io.versions.IOVersion1
 import app.crossword.yourealwaysbe.forkyz.puz.io.versions.IOVersion2
@@ -65,8 +69,10 @@ class IO : PuzzleParser {
     companion object {
         const val FILE_MAGIC : String = "ACROSS&DOWN"
         const val VERSION_STRING : String = "2.0"
-        private val CHARSET : Charset = Charset.forName("UTF-8")
-        private val CHARSET_OLD : Charset = Charset.forName("ISO-8859-1")
+        private val CHARSET_DECODER = UTF8Decoder()
+        private val CHARSET_ENCODER = UTF8Encoder()
+        private val CHARSET_DECODER_OLD = CP1252Decoder()
+        private val CHARSET_ENCODER_OLD = CP1252Encoder()
 
         // Extra Section IDs and markers
         private const val GEXT_MARKER = "GEXT"
@@ -140,29 +146,27 @@ class IO : PuzzleParser {
         fun loadNative(input : Source) : Puzzle? {
             input.skip(0x2)
 
-            val fileMagic = ByteArray(FILE_MAGIC.length)
-            input.readAtMostTo(fileMagic, 0, fileMagic.size)
+            val fileMagic = Buffer()
+            input.readAtMostTo(fileMagic, FILE_MAGIC.length.toLong())
+
+            val fileMagicStr = CHARSET_DECODER.decode(fileMagic)
 
             // check that this is a puz file
-            if (FILE_MAGIC != String(fileMagic, CHARSET))
+            if (FILE_MAGIC != fileMagicStr)
                 return null
 
             // done in two steps to match saveNative method
             input.skip(1)
             input.skip(0xA)
 
-            val versionBytes = ByteArray(3)
+            val versionBytes = Buffer()
+            input.readAtMostTo(versionBytes, 3)
+            val version = CHARSET_DECODER.decode(versionBytes)
 
-            for (i in versionBytes.indices) {
-                versionBytes[i] = input.readByte()
-            }
-
-            val version = String(versionBytes, charset(CHARSET.name()))
-
-            val charset : Charset = if ("2.0".compareTo(version) > 0)
-                CHARSET_OLD
+            val charsetDecoder = if ("2.0".compareTo(version) > 0)
+                CHARSET_DECODER_OLD
             else
-                CHARSET
+                CHARSET_DECODER
 
             input.skip(1)
 
@@ -181,16 +185,14 @@ class IO : PuzzleParser {
             val scrambled = input.readShortLe().toInt() != 0
 
             val boxes = Array<Array<Box?>>(height) { arrayOfNulls<Box>(width) }
-            val answerByte = ByteArray(1)
+
+            val answerByte = Buffer()
 
             for (x in boxes.indices) {
                 for (y in boxes[x].indices) {
-                    answerByte[0] = input.readByte()
+                    answerByte.writeByte(input.readByte())
 
-                    val solution = String(
-                        answerByte,
-                        charset(charset.name()),
-                    ).get(0)
+                    val solution = charsetDecoder.decode(answerByte).get(0)
 
                     if (solution != '.') {
                         boxes[x][y] = Box()
@@ -203,12 +205,9 @@ class IO : PuzzleParser {
 
             for (x in boxes.indices) {
                 for (y in boxes[x].indices) {
-                    answerByte[0] = input.readByte()
+                    answerByte.writeByte(input.readByte())
 
-                    val answer = String(
-                        answerByte,
-                        charset(charset.name()),
-                    ).get(0)
+                    val answer = charsetDecoder.decode(answerByte).get(0)
 
                     if (answer == '.') {
                         continue
@@ -234,13 +233,13 @@ class IO : PuzzleParser {
             builder.setSolutionChecksum(solutionChecksum)
             builder.setScrambled(scrambled)
             builder.setTitle(
-                htmlString(readNullTerminatedString(input, charset))
+                htmlString(readNullTerminatedString(input, charsetDecoder)),
             )
             builder.setAuthor(
-                htmlString(readNullTerminatedString(input, charset))
+                htmlString(readNullTerminatedString(input, charsetDecoder)),
             )
             builder.setCopyright(
-                htmlString(readNullTerminatedString(input, charset))
+                htmlString(readNullTerminatedString(input, charsetDecoder)),
             )
 
             for (x in 0..<builder.height) {
@@ -256,7 +255,8 @@ class IO : PuzzleParser {
                     if (
                         builder.isStartClue(x, y, true) && (clueNumber != null)
                     ) {
-                        val value = readNullTerminatedString(input, charset)
+                        val value
+                            = readNullTerminatedString(input, charsetDecoder)
                         htmlString(value)?.let { value ->
                             builder.addAcrossClue(
                                 ACROSS_LIST,
@@ -269,7 +269,8 @@ class IO : PuzzleParser {
                     if (
                         builder.isStartClue(x, y, false) && (clueNumber != null)
                     ) {
-                        val value = readNullTerminatedString(input, charset)
+                        val value
+                            = readNullTerminatedString(input, charsetDecoder)
                         htmlString(value)?.let { value ->
                             builder.addDownClue(
                                 DOWN_LIST,
@@ -282,7 +283,7 @@ class IO : PuzzleParser {
             }
 
             builder.setNotes(
-                htmlString(readNullTerminatedString(input, charset)),
+                htmlString(readNullTerminatedString(input, charsetDecoder)),
             )
 
             var eof = false
@@ -295,18 +296,28 @@ class IO : PuzzleParser {
                 try {
                     when (readExtraSectionType(input)) {
                         GEXT -> readGextSection(input, builder)
-                        ANTS -> loadNotesNative(true, builder, input, charset)
-                        DNTS -> loadNotesNative(false, builder, input, charset)
+                        ANTS -> loadNotesNative(
+                            true,
+                            builder,
+                            input,
+                            charsetDecoder,
+                        )
+                        DNTS -> loadNotesNative(
+                            false,
+                            builder,
+                            input,
+                            charsetDecoder,
+                        )
                         GRBS -> rebusBoard = readRebusBoard(input, builder)
                         RTBL -> solRebusTable = readRebusTable(
                             input,
                             builder,
-                            charset,
+                            charsetDecoder,
                         )
                         RUSR -> usrRebusTable = readRebusTable(
                             input,
                             builder,
-                            charset,
+                            charsetDecoder,
                         )
                         else -> skipExtraSection(input)
                     }
@@ -391,7 +402,7 @@ class IO : PuzzleParser {
         @Throws(IOException::class)
         fun readNullTerminatedString(
             input : Source,
-            charset : Charset,
+            charsetDecoder : CharsetDecoder,
         ) : String? {
             val baos = Buffer()
 
@@ -410,7 +421,7 @@ class IO : PuzzleParser {
             return if (baos.size == 0L)
                 null
             else
-                String(baos.readByteArray(), charset(charset.name()))
+                charsetDecoder.decode(baos)
         }
 
         @Throws(IOException::class)
@@ -433,12 +444,12 @@ class IO : PuzzleParser {
 
             tmp.writeShortLe(0)
 
-            tmp.write(FILE_MAGIC.toByteArray(CHARSET))
+            CHARSET_ENCODER.encode(FILE_MAGIC, tmp)
             tmp.writeByte(0)
 
             tmp.write(ByteArray(0xA))
 
-            tmp.write(VERSION_STRING.toByteArray(CHARSET))
+            CHARSET_ENCODER.encode(VERSION_STRING, tmp)
             tmp.writeByte(0)
 
             tmp.write(ByteArray(2))
@@ -470,16 +481,16 @@ class IO : PuzzleParser {
                 for (y in boxes[x].indices) {
                     val box = boxes[x][y]
                     if (box == null || isBlock(box)) {
-                        tmp.writeByte('.'.code.toByte())
+                        CHARSET_ENCODER.encode('.', tmp)
                     } else if (hasSolution) {
                         val sSol = box.solution
                         val value = if (sSol == null || sSol.isEmpty())
-                            BLANK.code.toByte()
+                            BLANK
                         else
-                            sSol.get(0).code.toByte()
-                        tmp.writeByte(value)
+                            sSol.get(0)
+                        CHARSET_ENCODER.encode(value, tmp)
                     } else {
-                        tmp.writeByte(EMPTY_SOL_CHAR.code.toByte())
+                        CHARSET_ENCODER.encode(EMPTY_SOL_CHAR, tmp)
                     }
                 }
             }
@@ -488,44 +499,54 @@ class IO : PuzzleParser {
                 for (y in boxes[x].indices) {
                     val box = boxes[x][y]
                     if (box == null || isBlock(box)) {
-                        tmp.writeByte('.'.code.toByte())
+                        CHARSET_ENCODER.encode('.', tmp)
                     } else {
                         val sRes = box.response
                         val value = if (sRes.isEmpty())
-                            BLANK.code.toByte()
+                            BLANK
                         else
-                            sRes.get(0).code.toByte()
+                            sRes.get(0)
 
-                        tmp.writeByte(
-                            if (box.isBlank())
-                                BLANK.code.toByte()
-                            else
-                                value,
+                        CHARSET_ENCODER.encode(
+                            if (box.isBlank()) BLANK else value,
+                            tmp,
                         )
                     }
                 }
             }
 
-            writeNullTerminatedString(tmp, unHtmlString(puz.title), CHARSET)
+            writeNullTerminatedString(
+                tmp,
+                unHtmlString(puz.title),
+                CHARSET_ENCODER,
+            )
             writeNullTerminatedString(
                 tmp,
                 unHtmlString(puz.author),
-                CHARSET,
+                CHARSET_ENCODER,
             )
             writeNullTerminatedString(
                 tmp,
                 unHtmlString(puz.copyright),
-                CHARSET,
+                CHARSET_ENCODER,
             )
 
             for (clue in getRawClues(puz)) {
-                writeNullTerminatedString(tmp, unHtmlString(clue), CHARSET)
+                writeNullTerminatedString(
+                    tmp,
+                    unHtmlString(clue),
+                    CHARSET_ENCODER,
+                )
             }
 
-            writeNullTerminatedString(tmp, unHtmlString(puz.notes), CHARSET)
+            writeNullTerminatedString(
+                tmp,
+                unHtmlString(puz.notes),
+                CHARSET_ENCODER,
+            )
 
             writeGEXT(tmp, puz)
-            writeRebus(tmp, puz, CHARSET)
+            writeRebus(tmp, puz, CHARSET_ENCODER)
 
             val bytes = tmp.readByteArray()
 
@@ -650,14 +671,12 @@ class IO : PuzzleParser {
         fun writeNullTerminatedString(
             output : Sink,
             value : String?,
-            charset : Charset,
+            charsetEncoder : CharsetEncoder,
         ) {
             var value = value
             value = if (value == null) "" else value
 
-            val encoded = charset.encode(value)
-
-            output.write(encoded.array(), encoded.position(), encoded.limit())
+            charsetEncoder.encode(value, output)
             output.writeByte(0)
         }
 
@@ -796,7 +815,7 @@ class IO : PuzzleParser {
             isAcross : Boolean,
             builder : PuzzleBuilder,
             input : Source,
-            charset : Charset,
+            charsetDecoder : CharsetDecoder,
         ) {
             for (cid in builder.boardClueIDs) {
                 val listName = cid.listName
@@ -813,7 +832,8 @@ class IO : PuzzleParser {
                     for (i in 0..<numFields) {
                         val field = input.readByte()
 
-                        val value = readNullTerminatedString(input, charset)
+                        val value
+                            = readNullTerminatedString(input, charsetDecoder)
 
                         when (field) {
                             NOTE_SCRATCH -> scratch = value
@@ -957,7 +977,7 @@ class IO : PuzzleParser {
         private fun readRebusTable(
             input : Source,
             builder : PuzzleBuilder,
-            charset : Charset,
+            charsetDecoder : CharsetDecoder,
         ) : Array<String?> {
             val height = builder.height
             val width = builder.width
@@ -967,19 +987,20 @@ class IO : PuzzleParser {
             // 2 bytes len, 2 bytes checksum
             input.skip(4)
 
-            readNullTerminatedString(input, charset)?.let { tableString ->
-                for (
-                    entry in tableString.split(";".toRegex())
-                        .dropLastWhile { it.isEmpty() }
-                        .toTypedArray()
-                ) {
-                    val items = entry.split(":".toRegex())
-                        .dropLastWhile { it.isEmpty() }
-                        .toTypedArray()
-                    val index = items[0].trim().toByte()
-                    table[index.toInt()] = items[1]
+            readNullTerminatedString(input, charsetDecoder)
+                ?.let { tableString ->
+                    for (
+                        entry in tableString.split(";".toRegex())
+                            .dropLastWhile { it.isEmpty() }
+                            .toTypedArray()
+                    ) {
+                        val items = entry.split(":".toRegex())
+                            .dropLastWhile { it.isEmpty() }
+                            .toTypedArray()
+                        val index = items[0].trim().toByte()
+                        table[index.toInt()] = items[1]
+                    }
                 }
-            }
 
             return table
         }
@@ -1077,7 +1098,7 @@ class IO : PuzzleParser {
         private fun writeRebus(
             output : Sink,
             puz : Puzzle,
-            charset : Charset,
+            charsetEncoder : CharsetEncoder,
         ) {
             if (!hasRebus(puz))
                 return
@@ -1113,10 +1134,12 @@ class IO : PuzzleParser {
 
             writeExtraSection(output, REBUS_BOARD_MARKER, rebusBoard)
 
-            val encodedSolTable = encodeRebusTable(solRebusTable, charset)
+            val encodedSolTable
+                = encodeRebusTable(solRebusTable, charsetEncoder)
             writeExtraSection(output, REBUS_TABLE_MARKER, encodedSolTable)
 
-            val encodedUsrTable = encodeRebusTable(usrRebusTable, charset)
+            val encodedUsrTable
+                = encodeRebusTable(usrRebusTable, charsetEncoder)
             writeExtraSection(output, REBUS_USER_MARKER, encodedUsrTable)
         }
 
@@ -1153,7 +1176,7 @@ class IO : PuzzleParser {
             marker : String,
             data : ByteArray,
         ) {
-            output.write(CHARSET.encode(marker).array())
+            CHARSET_ENCODER.encode(marker, output)
             output.writeShortLe(data.size.toShort())
             val chksum = cksum_region(data, 0, data.size, 0)
             output.writeShortLe(chksum.toShort())
@@ -1163,7 +1186,7 @@ class IO : PuzzleParser {
 
         private fun encodeRebusTable(
             table : Array<String?>,
-            charset : Charset,
+            charsetEncoder : CharsetEncoder,
         ) : ByteArray {
             val sb = StringBuilder()
             for (index in table.indices) {
@@ -1178,12 +1201,9 @@ class IO : PuzzleParser {
                 }
             }
 
-            val encoded = charset.encode(sb.toString())
-
-            val array = ByteArray(encoded.limit())
-            encoded.get(array, encoded.position(), encoded.limit())
-
-            return array
+            val buffer = Buffer()
+            charsetEncoder.encode(sb.toString(), buffer)
+            return buffer.readByteArray()
         }
 
         /**

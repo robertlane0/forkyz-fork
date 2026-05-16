@@ -20,14 +20,14 @@ open class IOVersion7 : IOVersion6() {
     @Throws(IOException::class)
     override fun readMeta(input : Source) : PuzzleMeta {
         val meta = super.readMeta(input)
-        meta.supportUrl = readNullTerminatedString(input, charset)
+        meta.supportUrl = readNullTerminatedString(input, charsetDecoder)
         return meta
     }
 
     @Throws(IOException::class)
     override fun writeMeta(puz : Puzzle, output : Sink) {
         super.writeMeta(puz, output)
-        writeNullTerminatedString(output, puz.supportUrl, charset)
+        writeNullTerminatedString(output, puz.supportUrl, charsetEncoder)
     }
 }
 
