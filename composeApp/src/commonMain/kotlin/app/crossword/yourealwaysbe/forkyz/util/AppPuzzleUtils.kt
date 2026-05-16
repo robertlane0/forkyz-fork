@@ -2,7 +2,8 @@
 package app.crossword.yourealwaysbe.forkyz.util
 
 import java.text.Normalizer
-import java.util.UUID
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.DateTimeFormat
 import kotlinx.datetime.format.Padding
@@ -45,6 +46,7 @@ object AppPuzzleUtils {
     /**
      * Generate a file name for the given puzzle
      */
+    @OptIn(ExperimentalUuidApi::class)
     fun generateFileName(puzzle : Puzzle) : String {
         var name = puzzle.source
         if (name == null || name.isEmpty())
@@ -61,7 +63,7 @@ object AppPuzzleUtils {
         val normalizedName = Normalizer.normalize(name, Normalizer.Form.NFD)
             .replace(FILE_NAME_REMOVE_CHARS.toRegex(), "")
 
-        return "$date-$normalizedName-${UUID.randomUUID()}"
+        return "$date-$normalizedName-${Uuid.random()}"
     }
 
     /**
