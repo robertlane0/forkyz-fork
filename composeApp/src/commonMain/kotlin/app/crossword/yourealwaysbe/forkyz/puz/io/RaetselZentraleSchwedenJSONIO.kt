@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
-import java.util.LinkedList
 import kotlinx.io.IOException
 import kotlinx.io.Source
 
