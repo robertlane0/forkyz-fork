@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
-import java.util.Locale
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.Padding
