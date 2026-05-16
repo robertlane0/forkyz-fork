@@ -72,6 +72,10 @@ class TimeUtils {
             }
         }
 
+        fun currentTimeMillis() : Long {
+            return Clock.System.now().toEpochMilliseconds()
+        }
+
         /**
          * Today in local timezone
          */

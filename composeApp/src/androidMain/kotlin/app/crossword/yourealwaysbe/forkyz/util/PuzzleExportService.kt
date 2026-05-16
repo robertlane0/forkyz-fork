@@ -23,11 +23,8 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.exporting_puzzles
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.puzzles_export_failed
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.puzzles_exported
-import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
-import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.util.files.exportStorage
-import app.crossword.yourealwaysbe.forkyz.util.toUri
 import app.crossword.yourealwaysbe.forkyz.versions.AndroidVersionUtils
 
 class PuzzleExportService() : Service() {
@@ -67,7 +64,7 @@ class PuzzleExportService() : Service() {
             NOTIFICATION_CHANNEL_ID,
         ).setSmallIcon(android.R.drawable.ic_menu_save)
             .setContentTitle(title)
-            .setWhen(System.currentTimeMillis())
+            .setWhen(TimeUtils.currentTimeMillis())
             .build()
 
         ServiceCompat.startForeground(

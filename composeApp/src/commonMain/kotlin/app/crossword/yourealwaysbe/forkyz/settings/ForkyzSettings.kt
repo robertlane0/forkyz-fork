@@ -25,6 +25,7 @@ import app.crossword.yourealwaysbe.forkyz.puz.Playboard.DeleteCrossingMode
 import app.crossword.yourealwaysbe.forkyz.util.JSONException
 import app.crossword.yourealwaysbe.forkyz.util.JSONObject
 import app.crossword.yourealwaysbe.forkyz.util.JSONObjectBuilder
+import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 import app.crossword.yourealwaysbe.forkyz.util.buildJSONArray
 import app.crossword.yourealwaysbe.forkyz.util.buildJSONObject
 import app.crossword.yourealwaysbe.forkyz.util.getOnce
@@ -883,7 +884,7 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         = runBlocking { settingsFlow.first().dlLast }
 
     fun setBrowseLastDownload(value : Long) {
-        if (0 <= value && value <= System.currentTimeMillis()) {
+        if (0 <= value && value <= TimeUtils.currentTimeMillis()) {
             settingsUpdate { settings ->
                 settings.copy(dlLast = value)
         }

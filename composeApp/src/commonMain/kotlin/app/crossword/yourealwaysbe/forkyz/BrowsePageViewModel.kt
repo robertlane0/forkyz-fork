@@ -665,7 +665,7 @@ class BrowsePageViewModel(
             viewModelScope.launch(autoDownloadDispatcher) {
                 val lastDL = settings.getBrowseLastDownloadSync()
                 val downloadCutoff
-                    = System.currentTimeMillis() - (12 * 60 * 60 * 1000)
+                    = TimeUtils.currentTimeMillis() - (12 * 60 * 60 * 1000)
 
                 val isDownload
                     = downloaderSettings.downloadOnStartUp
@@ -673,7 +673,7 @@ class BrowsePageViewModel(
 
                 if (isDownload) {
                     settings.setBrowseLastDownload(
-                        System.currentTimeMillis()
+                        TimeUtils.currentTimeMillis()
                     )
                     val now = TimeUtils.today()
                     download(now, dls.getAutoDownloaders(now))

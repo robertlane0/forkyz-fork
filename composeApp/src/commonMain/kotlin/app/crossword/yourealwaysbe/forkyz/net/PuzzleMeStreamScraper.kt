@@ -11,6 +11,7 @@ import app.crossword.yourealwaysbe.forkyz.puz.io.AmuseLabsJSONIO
 import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.JSONException
 import app.crossword.yourealwaysbe.forkyz.util.StreamUtils
+import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 import app.crossword.yourealwaysbe.forkyz.util.getURL
 import app.crossword.yourealwaysbe.forkyz.util.parseJSONObject
 
@@ -319,11 +320,11 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
      * Brute-force deobfuscate obfuscated crossword puzzle data.
      */
     fun deobfuscateRawc(rawc : String) : String {
-        val startTime = System.currentTimeMillis()
+        val startTime = TimeUtils.currentTimeMillis()
         val candidateQueue = ArrayDeque<List<Int>>(listOf(listOf()))
 
         while (candidateQueue.isNotEmpty()) {
-            val timeSoFar = System.currentTimeMillis() - startTime
+            val timeSoFar = TimeUtils.currentTimeMillis() - startTime
             if (timeSoFar > DEOBFUSCATE_TIMEOUT)
                 return "{}"
 

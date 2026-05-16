@@ -42,7 +42,7 @@ class AndroidNotifications(
                 channelID,
             ).setContentTitle(title)
                 .setContentText(contentText)
-                .setWhen(System.currentTimeMillis())
+                .setWhen(TimeUtils.currentTimeMillis())
 
             if (iconID >= 0)
                 builder.setSmallIcon(iconID)

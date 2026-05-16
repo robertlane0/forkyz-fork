@@ -7,6 +7,7 @@ import kotlin.random.Random
 import app.crossword.yourealwaysbe.forkyz.puz.Box.Companion.isBlock
 import app.crossword.yourealwaysbe.forkyz.puz.util.PuzzleUtils
 import app.crossword.yourealwaysbe.forkyz.util.SortedSet
+import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 
 class Playboard(puzzle : Puzzle) {
     /**
@@ -2203,7 +2204,7 @@ class Playboard(puzzle : Puzzle) {
     }
 
     private fun pauseDelete() {
-        pauseDeleteUntil = System.currentTimeMillis() + PAUSE_DELETE_DELAY
+        pauseDeleteUntil = TimeUtils.currentTimeMillis() + PAUSE_DELETE_DELAY
     }
 
     private val isPausedDelete : Boolean
@@ -2212,7 +2213,7 @@ class Playboard(puzzle : Puzzle) {
          */
         get() = (
             0 <= pauseDeleteUntil
-            && System.currentTimeMillis() < pauseDeleteUntil
+            && TimeUtils.currentTimeMillis() < pauseDeleteUntil
         )
 
     /**

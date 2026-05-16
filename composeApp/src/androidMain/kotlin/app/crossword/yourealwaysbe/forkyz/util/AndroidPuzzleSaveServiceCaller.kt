@@ -74,7 +74,7 @@ class PuzzleSaveService() : Service() {
             NOTIFICATION_CHANNEL_ID,
         ).setSmallIcon(android.R.drawable.ic_menu_save)
             .setContentTitle(savingPuzzle)
-            .setWhen(System.currentTimeMillis())
+            .setWhen(TimeUtils.currentTimeMillis())
             .build()
 
         ServiceCompat.startForeground(

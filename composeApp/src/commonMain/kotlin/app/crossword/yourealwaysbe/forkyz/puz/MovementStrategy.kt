@@ -2,6 +2,7 @@
 package app.crossword.yourealwaysbe.forkyz.puz
 
 import app.crossword.yourealwaysbe.forkyz.puz.Playboard.Word
+import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 
 interface MovementStrategy {
     fun move(board : Playboard, skipCompletedLetters : Boolean) : Word
@@ -590,7 +591,7 @@ interface MovementStrategy {
         }
 
         private fun recordBack() {
-            lastBack = System.currentTimeMillis()
+            lastBack = TimeUtils.currentTimeMillis()
         }
 
         /**
@@ -604,7 +605,7 @@ interface MovementStrategy {
             return if (lastBack < 0)
                 false
             else
-                System.currentTimeMillis() < lastBack + BACK_CYCLE_DELAY
+                TimeUtils.currentTimeMillis() < lastBack + BACK_CYCLE_DELAY
         }
 
         companion object {

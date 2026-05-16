@@ -7,18 +7,18 @@ class ImaginaryTimer(private var elapsed : Long) {
 
     fun getElapsed() : Long {
         return if (this.running)
-            ((System.currentTimeMillis() - this.incept) + elapsed)
+            ((TimeUtils.currentTimeMillis() - this.incept) + elapsed)
         else
             this.elapsed
     }
 
     fun start() {
-        this.incept = System.currentTimeMillis()
+        this.incept = TimeUtils.currentTimeMillis()
         running = true
     }
 
     fun stop() {
-        this.elapsed += (System.currentTimeMillis() - this.incept)
+        this.elapsed += (TimeUtils.currentTimeMillis() - this.incept)
         running = false
     }
 

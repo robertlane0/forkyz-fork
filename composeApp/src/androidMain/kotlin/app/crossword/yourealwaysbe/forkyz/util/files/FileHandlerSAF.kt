@@ -21,6 +21,7 @@ import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation
 import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
+import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.toAndroidUri
 import app.crossword.yourealwaysbe.forkyz.util.toForkyzUri
@@ -371,7 +372,7 @@ class FileHandlerSAF(
             if (uri != null) {
                 return FileHandle(
                     uri,
-                    Meta(fileName, System.currentTimeMillis(), mimeType)
+                    Meta(fileName, TimeUtils.currentTimeMillis(), mimeType)
                 )
             }
         } catch (e : FileNotFoundException) {
@@ -401,7 +402,7 @@ class FileHandlerSAF(
             if (c.getCount() > 0 && c.moveToFirst()) {
                 return Meta(
                     c.getString(0),
-                    getLongColumnWithDefault(c, 1, System.currentTimeMillis()),
+                    getLongColumnWithDefault(c, 1, TimeUtils.currentTimeMillis()),
                     c.getString(2),
                 )
             } else {
