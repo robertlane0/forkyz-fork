@@ -17,6 +17,8 @@ import io.ktor.client.statement.bodyAsChannel
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
+import io.ktor.http.URLBuilder
+import io.ktor.http.takeFrom
 import io.ktor.utils.io.asSource
 
 import app.crossword.yourealwaysbe.forkyz.util.JSONException
@@ -86,6 +88,10 @@ suspend fun getURLJSON(
     data : JSONObject? = null,
 ) : JSONObject {
     return getURL(url, timeout, headers, data).use(::parseJSONObject)
+}
+
+internal fun resolveUrl(base : String, relative : String) : String {
+    return URLBuilder(base).apply { takeFrom(relative) }.buildString()
 }
 
 internal fun RawSource.withClientClose(

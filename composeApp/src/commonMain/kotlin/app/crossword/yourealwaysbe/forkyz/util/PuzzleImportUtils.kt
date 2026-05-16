@@ -1,6 +1,5 @@
 package app.crossword.yourealwaysbe.forkyz.util
 
-import java.net.URISyntaxException
 import kotlinx.datetime.LocalDate
 import kotlinx.io.IOException
 import kotlinx.io.Source
@@ -70,8 +69,6 @@ suspend fun importPuzzleURI(
             }
         } catch (e : IOException) {
             // we tried
-            return null
-        } catch (e : URISyntaxException) {
             return null
         }
     }

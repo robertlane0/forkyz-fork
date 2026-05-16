@@ -1,8 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz
 
-import java.net.URI
-import java.net.URISyntaxException
 import kotlin.io.encoding.Base64
 import kotlinx.datetime.LocalDate
 import kotlinx.io.IOException
@@ -18,6 +16,7 @@ import io.ktor.http.headers
 
 import app.crossword.yourealwaysbe.forkyz.puz.Box.Companion.isBlock
 import app.crossword.yourealwaysbe.forkyz.puz.util.PuzzleUtils
+import app.crossword.yourealwaysbe.forkyz.util.resolveUrl
 import app.crossword.yourealwaysbe.forkyz.util.StreamUtils
 
 class PuzzleBuilder {
@@ -535,10 +534,7 @@ class PuzzleBuilder {
                     }
 
                     try {
-                        val imgFullUrl = URI(relativeUrl)
-                            .resolve(URI(imgUrl))
-                            .toURL()
-                            .toString()
+                        val imgFullUrl = resolveUrl(relativeUrl, imgUrl)
                         val response = client.request(imgFullUrl)
                         val bytes = response.readRawBytes()
                         response.headers[HttpHeaders.ContentType]?.let { type ->
@@ -551,7 +547,7 @@ class PuzzleBuilder {
                         }
                     } catch (e : IOException) {
                         // ignore
-                    } catch (e : URISyntaxException) {
+                    } catch (e : IllegalArgumentException) {
                         // ignore
                     }
                 }

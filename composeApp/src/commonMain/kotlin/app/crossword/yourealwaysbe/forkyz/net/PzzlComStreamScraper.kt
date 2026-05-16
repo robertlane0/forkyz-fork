@@ -1,8 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
-import java.net.URI
-import java.net.URISyntaxException
 import kotlinx.datetime.LocalDate
 import kotlinx.io.Buffer
 import kotlinx.io.IOException
@@ -12,6 +10,7 @@ import kotlinx.io.readLine
 import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.puz.io.BrainsOnlyIO
 import app.crossword.yourealwaysbe.forkyz.util.StreamUtils
+import app.crossword.yourealwaysbe.forkyz.util.resolveUrl
 
 /**
  * Downloader for Pzzl.com embedded Crosswords
@@ -117,10 +116,10 @@ class PzzlComStreamScraper : AbstractStreamScraper() {
         embedURL : String,
         relPath : String,
     ) : String? {
-        try {
-            return URI.create(embedURL).resolve(relPath).toString()
-        } catch (e : URISyntaxException) {
-            return null
+        return try {
+            resolveUrl(embedURL, relPath)
+        } catch (e : IllegalArgumentException) {
+            null
         }
     }
 
