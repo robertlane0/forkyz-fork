@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.util
 
-import java.text.Normalizer
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 import kotlinx.datetime.LocalDate
@@ -60,8 +59,8 @@ object AppPuzzleUtils {
         if (date == null)
             date = TimeUtils.today()
 
-        val normalizedName = Normalizer.normalize(name, Normalizer.Form.NFD)
-            .replace(FILE_NAME_REMOVE_CHARS.toRegex(), "")
+        // loses accented characters, but no KMP normalizer to use
+        val normalizedName = name.replace(FILE_NAME_REMOVE_CHARS.toRegex(), "")
 
         return "$date-$normalizedName-${Uuid.random()}"
     }
