@@ -930,14 +930,17 @@ class BrowsePageViewModel(
             fileHandler.crosswordsDirectory
     }
 
-    private fun threadWithUILock(taskName : String, r : Runnable) {
+    private fun threadWithUILock(
+        taskName : String,
+        run : suspend () -> Unit,
+    ) {
         // no lock actually needed because executorService is single
         // threaded guaranteed
         AppLogger.i(TAG, "Starting task " + taskName + " with isUIBusy")
         viewModelScope.launch(uiLockDispatcher) {
             try {
                 setUIBusy(true)
-                r.run()
+                run()
             } finally {
                 setUIBusy(false)
                 AppLogger.i(TAG, "Finished task " + taskName + " with isUIBusy")

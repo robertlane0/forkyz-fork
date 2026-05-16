@@ -126,12 +126,14 @@ class PuzzleImporterTest {
 
         val gotCrosswordTitles = mutableSetOf<String>()
 
-        val pms = fileHandler.getPuzMetas(
-            fileHandler.crosswordsDirectory
-        )
+        val pms = runBlocking {
+            fileHandler.getPuzMetas(fileHandler.crosswordsDirectory)
+        }
         for (pm in pms) {
-            fileHandler.load(pm.puzHandle)?.let {
-                it.title?.let(gotCrosswordTitles::add)
+            runBlocking {
+                fileHandler.load(pm.puzHandle)?.let {
+                    it.title?.let(gotCrosswordTitles::add)
+                }
             }
         }
 
