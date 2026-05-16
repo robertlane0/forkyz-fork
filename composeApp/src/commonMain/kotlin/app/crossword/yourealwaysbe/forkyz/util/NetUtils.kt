@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.util
 
-import java.net.URL
 import kotlinx.io.Buffer
 import kotlinx.io.IOException
 import kotlinx.io.RawSource
@@ -26,25 +25,6 @@ import app.crossword.yourealwaysbe.forkyz.util.StreamUtils
 import app.crossword.yourealwaysbe.forkyz.util.parseJSONObject
 
 private val HTTP_OK_RESPONSE = 200
-
-/**
- * Get a buffered source for URL
- *
- * @param url url to open
- * @param timeout the timeout in millis
- * @param headers extra request headers
- * @param data JSON data (will send as POST if not null)
- * @return a buffered input stream (in stream or err stream if error)
- * @throws IOException
- */
-suspend fun getURL(
-    url : URL,
-    timeoutMillis : Int,
-    headers : Map<String, String>? = null,
-    data : JSONObject? = null,
-) : Source {
-    return getURL(url.toString(), timeoutMillis, headers, data)
-}
 
 /**
  * Get a source for URL
