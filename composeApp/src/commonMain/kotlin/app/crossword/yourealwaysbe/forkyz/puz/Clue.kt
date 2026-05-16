@@ -1,8 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz
 
-import java.util.Objects
-
 import app.crossword.yourealwaysbe.forkyz.util.HtmlUtil
 import app.crossword.yourealwaysbe.forkyz.util.MutableSortedMap
 import app.crossword.yourealwaysbe.forkyz.util.SortedMap
@@ -193,7 +191,13 @@ class Clue constructor(
     }
 
     override fun hashCode() : Int {
-        return Objects.hash(clueID, clueNumber, label, hint, zone)
+        return arrayOf(
+            clueID,
+            clueNumber,
+            label,
+            hint,
+            zone,
+        ).contentHashCode()
     }
 
     /**

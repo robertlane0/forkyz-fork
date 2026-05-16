@@ -1,7 +1,6 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz
 
-import java.util.Objects
 import kotlinx.datetime.LocalDate
 
 import app.crossword.yourealwaysbe.forkyz.puz.Box.Companion.isBlock
@@ -703,21 +702,20 @@ class Puzzle(var boxes : Array<Array<Box?>>) {
         val prime = 31
         var result = 1
         result = (prime * result) + clueLists.hashCode()
-        result = (prime * result) + (if (author == null) 0 else author.hashCode())
+        result = (prime * result) + (author?.hashCode() ?: 0)
         result = (prime * result) + boxes.contentHashCode()
-        result = (prime * result) +
-                (if (copyright == null) 0 else copyright.hashCode())
+        result = (prime * result) +(copyright?.hashCode() ?: 0)
         result = (prime * result) + height
-        result = (prime * result) + (if (notes == null) 0 else notes.hashCode())
-        result = (prime * result) + (if (title == null) 0 else title.hashCode())
+        result = (prime * result) + (notes?.hashCode() ?: 0)
+        result = (prime * result) + (title?.hashCode() ?: 0)
         result = (prime * result) + width
         result = (prime * result) + clueNotes.hashCode()
-        result = (prime * result) + Objects.hashCode(playerNote)
-        result = (prime * result) + Objects.hashCode(images)
-        result = (prime * result) + Objects.hash(
+        result = (prime * result) + (playerNote?.hashCode() ?: 0)
+        result = (prime * result) + images.hashCode()
+        result = (prime * result) + arrayOf(
             sourceUrl, supportUrl, shareUrl, introMessage, completionMessage,
             pinnedClueID, kind
-        )
+        ).contentHashCode()
 
         return result
     }
