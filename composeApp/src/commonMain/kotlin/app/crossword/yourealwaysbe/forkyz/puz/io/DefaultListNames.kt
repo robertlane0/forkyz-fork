@@ -1,21 +1,36 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
-import java.util.Locale
-import java.util.ResourceBundle
+import org.jetbrains.compose.resources.getString
 
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.default_across_list_name
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.default_down_list_name
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.default_nodir_list_name
+import app.crossword.yourealwaysbe.forkyz.util.AppStrings
+
+/**
+ * Access default list names for IO classes
+ *
+ * Not using NativeBackendUtils here for legacy reasons. Was once a JVM
+ * resource lookup. A bit much to require IO classes to be injected or passed
+ * NativeBackendUtils just for a KMP string lookup.
+ *
+ * Strings are cached for fast repeated lookup.
+ */
 object DefaultListNames {
-    var ACROSS_LIST: String
-    var DOWN_LIST: String
-    var NODIR_LIST: String
+    private val cache = AppStrings()
 
-    init {
-        val resourceBundle = ResourceBundle.getBundle(
-            "app.crossword.yourealwaysbe.puz.strings",
-            Locale.getDefault(),
-        )
-        ACROSS_LIST = resourceBundle.getString("acrossListName")
-        DOWN_LIST = resourceBundle.getString("downListName")
-        NODIR_LIST = resourceBundle.getString("noDirListName")
+    suspend fun acrossList() : String {
+        return cache.getString(Res.string.default_across_list_name)
+    }
+
+    suspend fun downList() : String {
+        return cache.getString(Res.string.default_down_list_name)
+    }
+
+    suspend fun noDirList() : String {
+        return getString(Res.string.default_nodir_list_name)
     }
 }
+

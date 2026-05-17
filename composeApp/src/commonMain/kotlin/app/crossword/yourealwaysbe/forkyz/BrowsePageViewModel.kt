@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.minus
@@ -434,14 +433,12 @@ class BrowsePageViewModel(
                 else
                     fileHandler.crosswordsDirectory
 
-                puzzles = runBlocking {
-                    fileHandler.getPuzMetas(directory)
-                        .map { getPuzData(it) }
-                        .associateBy(
-                            { it.puzEntry.id },
-                            { it },
-                        ).toMutableMap()
-                }
+                puzzles = fileHandler.getPuzMetas(directory)
+                    .map { getPuzData(it) }
+                    .associateBy(
+                        { it.puzEntry.id },
+                        { it },
+                    ).toMutableMap()
 
                 runMain {
                     updateState(
@@ -838,14 +835,12 @@ class BrowsePageViewModel(
                 var needsReload = false
 
                 uris.forEach { uri ->
-                    val ph = runBlocking {
-                        importPuzzleURI(
-                            utils,
-                            fileHandler,
-                            uri,
-                            timeout,
-                        )
-                    }
+                    val ph = importPuzzleURI(
+                        utils,
+                        fileHandler,
+                        uri,
+                        timeout,
+                    )
 
                     someFailed = someFailed || (ph == null)
                     someSucceeded = someSucceeded || (ph != null)
@@ -853,7 +848,7 @@ class BrowsePageViewModel(
                     if (!isViewArchive && ph != null && !needsReload) {
                         try {
                             fileHandler.loadPuzMetaFile(ph)?.let { pm ->
-                                val pd = runBlocking { getPuzData(pm) }
+                                val pd = getPuzData(pm)
                                 puzzles[pd.puzEntry.id] = pd
                             }
                         } catch (e : IOException) {
@@ -880,14 +875,13 @@ class BrowsePageViewModel(
     fun processToImportDirectory() {
         fileHandlerProvider.get { fileHandler ->
             threadWithUILock("process to import dir") {
-                val imported = runBlocking {
-                    processPuzzleToImportDirectory(utils, fileHandler)
-                }
+                val imported
+                    = processPuzzleToImportDirectory(utils, fileHandler)
 
                 imported.forEach { ph ->
                     try {
                         fileHandler.loadPuzMetaFile(ph)?.let { pm ->
-                            val pd = runBlocking { getPuzData(pm) }
+                            val pd = getPuzData(pm)
                             puzzles[pd.puzEntry.id] = pd
                         }
                     } catch (e : IOException) {

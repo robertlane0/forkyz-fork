@@ -28,7 +28,7 @@ class NRCInHetMiddenIO : FortyTwoPuzzlesIO() {
     var middenwoordHint : String = "MIDDENWOORD"
 
     @Throws(Exception::class)
-    override fun parsePuzzle(input : Source) : PuzzleBuilder? {
+    override suspend fun parsePuzzle(input : Source) : PuzzleBuilder? {
         val builder = super.parsePuzzle(input)
         if (builder == null)
             return null
@@ -48,7 +48,10 @@ class NRCInHetMiddenIO : FortyTwoPuzzlesIO() {
         for (box in middenWoordStartBoxes) {
             box.clueNumber?.let { clueNumber ->
                 val clue = BasicClue(clueNumber, middenwoordHint)
-                builder.addAcrossClue(DefaultListNames.ACROSS_LIST, clue)
+                builder.addAcrossClue(
+                    DefaultListNames.acrossList(),
+                    clue,
+                )
             }
         }
 

@@ -29,7 +29,7 @@ open class IOVersion3 : IOVersion2() {
     }
 
     @Throws(IOException::class)
-    override fun readMeta(input : Source) : PuzzleMeta {
+    override suspend fun readMeta(input : Source) : PuzzleMeta {
         val meta = super.readMeta(input)
         val x = input.readInt()
         val y = input.readInt()

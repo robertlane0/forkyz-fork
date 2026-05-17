@@ -51,7 +51,7 @@ class AMUniversalJSONIO : AbstractJSONIO() {
     class AMUniversalFormatException(msg : String?) : Exception(msg)
 
     @Throws(Exception::class)
-    override fun parseInput(input : Source) : Puzzle? {
+    override suspend fun parseInput(input : Source) : Puzzle? {
         return readPuzzle(input)
     }
 
@@ -64,11 +64,8 @@ class AMUniversalJSONIO : AbstractJSONIO() {
             day(Padding.ZERO)
         }
 
-        private val ACROSS_LIST : String = DefaultListNames.ACROSS_LIST
-        private val DOWN_LIST : String = DefaultListNames.DOWN_LIST
-
         @Throws(IOException::class)
-        fun readPuzzle(input : Source) : Puzzle? {
+        suspend fun readPuzzle(input : Source) : Puzzle? {
             try {
                 val json = parseJSONObject(input)
                 return readPuzzleFromJSON(json)
@@ -85,7 +82,7 @@ class AMUniversalJSONIO : AbstractJSONIO() {
         }
 
         @Throws(JSONException::class, AMUniversalFormatException::class)
-        private fun readPuzzleFromJSON(
+        private suspend fun readPuzzleFromJSON(
             json : JSONObject,
         ) : Puzzle {
             val builder = PuzzleBuilder(getBoxes(json))
@@ -167,7 +164,7 @@ class AMUniversalJSONIO : AbstractJSONIO() {
         }
 
         @Throws(JSONException::class, AMUniversalFormatException::class)
-        private fun addClues(json : JSONObject, builder : PuzzleBuilder) {
+        private suspend fun addClues(json : JSONObject, builder : PuzzleBuilder) {
             val across = json.optStringEmptyNull("AcrossClue")
             if (across != null)
                 addCluesFromString(across, builder, true)
@@ -177,7 +174,7 @@ class AMUniversalJSONIO : AbstractJSONIO() {
         }
 
         @Throws(AMUniversalFormatException::class)
-        private fun addCluesFromString(
+        private suspend fun addCluesFromString(
             clues : String,
             builder : PuzzleBuilder,
             across : Boolean,
@@ -193,10 +190,19 @@ class AMUniversalJSONIO : AbstractJSONIO() {
                     val hint = parts[1]
                     try {
                         val num : String? = numString.toInt().toString()
-                        if (across)
-                            builder.addAcrossClue(ACROSS_LIST, num, hint)
-                        else
-                            builder.addDownClue(DOWN_LIST, num, hint)
+                        if (across) {
+                            builder.addAcrossClue(
+                                DefaultListNames.acrossList(),
+                                num,
+                                hint,
+                            )
+                        } else {
+                            builder.addDownClue(
+                                DefaultListNames.downList(),
+                                num,
+                                hint,
+                            )
+                        }
                     } catch (e : NumberFormatException) {
                         throw AMUniversalFormatException(
                             "Bad clue number " + numString,

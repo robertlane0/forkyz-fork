@@ -57,7 +57,7 @@ class SlowDownWiseUpJSONIO : AbstractJSONIO() {
     class SlowDownWiseUpJSONFormatException(msg : String) : Exception(msg)
 
     @Throws(Exception::class)
-    override fun parseInput(input : Source) : Puzzle? {
+    override suspend fun parseInput(input : Source) : Puzzle? {
         return readPuzzle(input)
     }
 
@@ -74,11 +74,8 @@ class SlowDownWiseUpJSONIO : AbstractJSONIO() {
             year(Padding.NONE)
         }
 
-        private val DEFAULT_CLUE_LIST_NAME
-            = DefaultListNames.NODIR_LIST
-
         @Throws(IOException::class)
-        fun readPuzzle(input : Source) : Puzzle? {
+        suspend fun readPuzzle(input : Source) : Puzzle? {
             try {
                 val json = parseJSONObject(input)
                 return readPuzzleFromJSON(json)
@@ -91,7 +88,7 @@ class SlowDownWiseUpJSONIO : AbstractJSONIO() {
             }
         }
 
-        fun readPuzzle(jsonString : String) : Puzzle? {
+        suspend fun readPuzzle(jsonString : String) : Puzzle? {
             try {
                 val json = parseJSONObject(jsonString)
                 return readPuzzleFromJSON(json)
@@ -105,7 +102,7 @@ class SlowDownWiseUpJSONIO : AbstractJSONIO() {
         }
 
         @Throws(JSONException::class, SlowDownWiseUpJSONFormatException::class)
-        private fun readPuzzleFromJSON(json : JSONObject) : Puzzle {
+        private suspend fun readPuzzleFromJSON(json : JSONObject) : Puzzle {
             try {
                 var data = json.optJSONObject("data")
                 if (data == null)
@@ -190,7 +187,7 @@ class SlowDownWiseUpJSONIO : AbstractJSONIO() {
         }
 
         @Throws(JSONException::class)
-        private fun addClues(json : JSONObject, builder : PuzzleBuilder) {
+        private suspend fun addClues(json : JSONObject, builder : PuzzleBuilder) {
             val zones : Map<Int, Zone> = getZones(json)
             val clues = json.getJSONObject("copy").getJSONArray("clues")
             for (i in 0..<clues.size) {
@@ -199,13 +196,13 @@ class SlowDownWiseUpJSONIO : AbstractJSONIO() {
         }
 
         @Throws(JSONException::class)
-        private fun addCluesList(
+        private suspend fun addCluesList(
             json : JSONObject,
             zones : Map<Int, Zone>,
             builder : PuzzleBuilder,
         ) {
             var listName = json.optStringEmptyNull("title")
-                ?: DEFAULT_CLUE_LIST_NAME
+                ?: DefaultListNames.noDirList()
 
             val clues = json.getJSONArray("clues")
             for (i in 0..<clues.size) {

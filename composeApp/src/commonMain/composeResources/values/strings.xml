@@ -882,4 +882,9 @@
     <string name="month_october">October</string>
     <string name="month_november">November</string>
     <string name="month_december">December</string>
+
+    <!-- default puzzle list names -->
+    <string name="default_across_list_name">Across</string>
+    <string name="default_down_list_name">Down</string>
+    <string name="default_nodir_list_name">Clues</string>
 </resources>

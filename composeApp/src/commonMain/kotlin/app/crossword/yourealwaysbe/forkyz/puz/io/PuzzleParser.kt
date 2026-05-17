@@ -17,6 +17,6 @@ interface PuzzleParser {
      * @return parse puzzle or null if failed or not in right format
      */
     @Throws(Exception::class)
-    fun parseInput(input : Source) : Puzzle?
+    suspend fun parseInput(input : Source) : Puzzle?
 }
 

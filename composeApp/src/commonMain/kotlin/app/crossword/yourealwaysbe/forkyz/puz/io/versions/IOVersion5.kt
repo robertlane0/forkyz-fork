@@ -31,7 +31,7 @@ open class IOVersion5 : IOVersion4() {
     }
 
     @Throws(IOException::class)
-    override fun readMeta(input : Source) : PuzzleMeta {
+    override suspend fun readMeta(input : Source) : PuzzleMeta {
         val meta = super.readMeta(input)
 
         meta.historyList = mutableListOf<ListNum>()
@@ -40,7 +40,10 @@ open class IOVersion5 : IOVersion4() {
         for (i in 0..<length) {
             val number = input.readInt()
             val across = input.readByte().toInt() != 0
-            val listName = if (across) IO.ACROSS_LIST else IO.DOWN_LIST
+            val listName = if (across)
+                IO.acrossListName()
+            else
+                IO.downListName()
 
             meta.historyList.add(ListNum(listName, number))
         }

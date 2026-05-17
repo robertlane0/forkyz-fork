@@ -17,7 +17,7 @@ open class IOVersion2 : IOVersion1() {
     }
 
     @Throws(IOException::class)
-    override fun readMeta(input : Source) : PuzzleMeta {
+    override suspend fun readMeta(input : Source) : PuzzleMeta {
         val meta = super.readMeta(input)
         input.skip(1) // read old updatable byte
         meta.sourceUrl = readNullTerminatedString(input, charsetDecoder)

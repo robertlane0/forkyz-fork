@@ -288,12 +288,16 @@ abstract class FileHandler {
         val puz = ph.accept<Puzzle?>(
             object : VisitorIO<Puzzle?> {
                 @Throws(IOException::class)
-                override fun visit(puzHandle : PuzHandle.Puz) : Puzzle? {
+                override suspend fun visit(
+                    puzHandle : PuzHandle.Puz,
+                ) : Puzzle? {
                     return load(puzHandle)
                 }
 
                 @Throws(IOException::class)
-                override fun visit(ipuzHandle : IPuz) : Puzzle? {
+                override suspend fun visit(
+                    ipuzHandle : IPuz,
+                ) : Puzzle? {
                     return load(ipuzHandle)
                 }
             }
@@ -324,13 +328,15 @@ abstract class FileHandler {
     suspend fun save(puz : Puzzle, ph : PuzHandle) {
         val success = ph.accept<Boolean>(
             object : VisitorIO<Boolean> {
-                @Throws(java.io.IOException::class)
-                override fun visit(puzHandle : PuzHandle.Puz) : Boolean {
+                @Throws(IOException::class)
+                override suspend fun visit(
+                    puzHandle : PuzHandle.Puz,
+                ) : Boolean {
                     return save(puz, puzHandle)
                 }
 
-                @Throws(java.io.IOException::class)
-                override fun visit(ipuzHandle : IPuz) : Boolean {
+                @Throws(IOException::class)
+                override suspend fun visit(ipuzHandle : IPuz) : Boolean {
                     return save(puz, ipuzHandle)
                 }
             }
@@ -427,9 +433,8 @@ abstract class FileHandler {
         return null
     }
 
-    @Synchronized
     @Throws(IOException::class)
-    private fun load(ph : PuzHandle.Puz) : Puzzle? {
+    private suspend fun load(ph : PuzHandle.Puz) : Puzzle? {
         ph.metaFileHandle?.let { metaFile ->
             try {
                 getBufferedInput(ph.mainFileHandle).use { pis ->

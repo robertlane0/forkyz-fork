@@ -1,6 +1,8 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
+import kotlinx.coroutines.runBlocking
+
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
@@ -14,13 +16,13 @@ import app.crossword.yourealwaysbe.forkyz.util.SourceUtils
 class XDIOTest {
     @Test
     fun testPuzzleImplicit() {
-        val puz = testPuzzleImplicit.use { readPuzzle(it) }
+        val puz = testPuzzleImplicit.use { runBlocking { readPuzzle(it) } }
         assertIsTestPuzzle(puz!!, true, false)
     }
 
     @Test
     fun testPuzzleExplicit() {
-        val puz = testPuzzleExplicit.use { readPuzzle(it) }
+        val puz = testPuzzleExplicit.use { runBlocking { readPuzzle(it) } }
         assertIsTestPuzzle(puz!!, false, true)
     }
 

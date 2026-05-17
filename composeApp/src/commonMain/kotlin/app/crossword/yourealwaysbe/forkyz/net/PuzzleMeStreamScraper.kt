@@ -84,7 +84,11 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
         AppLogger.i(TAG, "Trying PuzzleMe scraper on " + url)
         getStage2Input(input).use { in2 ->
             try {
-                return getRawc(in2)?.let(this::getFromRawc)
+                val rawc = getRawc(in2)
+                if (rawc == null)
+                    return null
+
+                return getFromRawc(rawc)
                     ?.let { puz ->
                         with (puz) {
                             if (source == null)
@@ -176,12 +180,15 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
     /**
      * Try a variety of known rawc decodings
      */
-    private fun getFromRawc(rawc : String) : Puzzle? {
-        val read : (String?) -> Puzzle? = {
-            it?.let { AmuseLabsJSONIO.readPuzzle(it) }
+    private suspend fun getFromRawc(rawc : String) : Puzzle? {
+        val read : suspend (String?) -> Puzzle? = { value ->
+            if (value == null)
+                null
+            else
+                AmuseLabsJSONIO.readPuzzle(value)
         }
-        return base64Decode(rawc)?.let(read)
-            ?: deobfuscateRawc(rawc).let(read)
+
+        return read(base64Decode(rawc)) ?: read(deobfuscateRawc(rawc))
     }
 
     /**

@@ -1,6 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
+import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.LocalDate
 
 import org.junit.jupiter.api.Assertions
@@ -15,13 +16,17 @@ import app.crossword.yourealwaysbe.forkyz.util.SourceUtils
 class SlowDownWiseUpJSONIOTest {
     @Test
     fun testPuzzle1() {
-        val puz = testPuzzle1.use { SlowDownWiseUpJSONIO.readPuzzle(it) }
+        val puz = testPuzzle1.use {
+            runBlocking { SlowDownWiseUpJSONIO.readPuzzle(it) }
+        }
         assertIsTestPuzzle1(puz!!)
     }
 
     @Test
     fun testPuzzle2() {
-        val puz = testPuzzle2.use { SlowDownWiseUpJSONIO.readPuzzle(it) }
+        val puz = testPuzzle2.use {
+            runBlocking { SlowDownWiseUpJSONIO.readPuzzle(it) }
+        }
         assertIsTestPuzzle2(puz!!)
     }
 

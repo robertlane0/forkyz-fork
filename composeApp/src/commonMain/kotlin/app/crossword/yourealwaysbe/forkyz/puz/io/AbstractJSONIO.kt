@@ -10,5 +10,5 @@ import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
  */
 abstract class AbstractJSONIO : PuzzleParser {
     @Throws(Exception::class)
-    abstract override fun parseInput(input : Source) : Puzzle?
+    abstract override suspend fun parseInput(input : Source) : Puzzle?
 }

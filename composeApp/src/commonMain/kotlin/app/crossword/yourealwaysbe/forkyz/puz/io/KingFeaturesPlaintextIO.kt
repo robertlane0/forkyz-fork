@@ -28,20 +28,17 @@ import app.crossword.yourealwaysbe.forkyz.puz.io.charset.MacRomanDecoder
  * src/test/resources/premiere-20100704.txt.
  */
 class KingFeaturesPlaintextIO : PuzzleParser {
-    override fun parseInput(input : Source) : Puzzle? {
+    override suspend fun parseInput(input : Source) : Puzzle? {
         return parsePuzzle(input)
     }
 
     companion object {
-        private val ACROSS_LIST : String = DefaultListNames.ACROSS_LIST
-        private val DOWN_LIST : String = DefaultListNames.DOWN_LIST
-
         /**
          * Take an input containing a plaintext puzzle parsed Puzzle if
          * succeeded, or null if it fails
          * (for example, if the plaintext file is not in a valid format).
          */
-        fun parsePuzzle(input : Source) : Puzzle? {
+        suspend fun parsePuzzle(input : Source) : Puzzle? {
             val scanner = LineScanner(input, MacRomanDecoder())
 
             if (!scanner.hasNextLine()) {
@@ -134,7 +131,11 @@ class KingFeaturesPlaintextIO : PuzzleParser {
                     i++
                 }
                 val clue = line.substring(i + 2).trim()
-                builder.addAcrossClue(ACROSS_LIST, clueNum.toString(), clue)
+                builder.addAcrossClue(
+                    DefaultListNames.acrossList(),
+                    clueNum.toString(),
+                    clue,
+                )
                 if (!scanner.hasNextLine()) {
                     System.err.println("Unexpected EOF - Across clues.")
                     return null
@@ -162,7 +163,11 @@ class KingFeaturesPlaintextIO : PuzzleParser {
                     i++
                 }
                 val clue = line.substring(i + 2).trim()
-                builder.addDownClue(DOWN_LIST, clueNum.toString(), clue)
+                builder.addDownClue(
+                    DefaultListNames.downList(),
+                    clueNum.toString(),
+                    clue,
+                )
                 if (!finished) {
                     if (!scanner.hasNextLine()) {
                         System.err.println("Unexpected EOF - Down clues.")

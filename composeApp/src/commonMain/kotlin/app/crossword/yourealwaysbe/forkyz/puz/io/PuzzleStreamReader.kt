@@ -15,7 +15,7 @@ class PuzzleStreamReader : PuzzleParser {
      * The method will try known file formats until it finds one that
      * parses to completion.
      */
-    override fun parseInput(input : Source) : Puzzle? {
+    override suspend fun parseInput(input : Source) : Puzzle? {
         return parseInputStatic(input)
     }
 
@@ -49,7 +49,7 @@ class PuzzleStreamReader : PuzzleParser {
             FortyTwoPuzzlesIO(),
         )
 
-        fun parseInputStatic(input : Source) : Puzzle? {
+        suspend fun parseInputStatic(input : Source) : Puzzle? {
             try {
                 val unzipped = StreamUtils.unzipOrPassThrough(input)
                 for (parser in PARSERS) {

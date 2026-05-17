@@ -23,7 +23,7 @@ class SpoonbillIO : PuzzleParser {
     class SpoonbillFormatException(msg : String) : Exception(msg)
 
     @Throws(IOException::class)
-    override fun parseInput(input : Source) : Puzzle? {
+    override suspend fun parseInput(input : Source) : Puzzle? {
         return readPuzzle(input)
     }
 
@@ -35,11 +35,8 @@ class SpoonbillIO : PuzzleParser {
         private const val MODE_CLUE = "Clue"
         private const val MODE_SOLVE = "Solve"
 
-        private val ACROSS_LIST = DefaultListNames.ACROSS_LIST
-        private val DOWN_LIST = DefaultListNames.DOWN_LIST
-
         @Throws(IOException::class)
-        fun readPuzzle(input : Source) : Puzzle? {
+        suspend fun readPuzzle(input : Source) : Puzzle? {
             try {
                 val versionLine : String = expectLine(input)
 
@@ -111,7 +108,7 @@ class SpoonbillIO : PuzzleParser {
         }
 
         @Throws(IOException::class, SpoonbillFormatException::class)
-        private fun getClues(
+        private suspend fun getClues(
             input : Source,
             across : Boolean,
             builder : PuzzleBuilder,
@@ -134,9 +131,9 @@ class SpoonbillIO : PuzzleParser {
                 val length = data[3].trim().toInt()
                 val zone : Zone = getZone(startRow, startCol, length, across)
                 val listName = if (across)
-                    SpoonbillIO.Companion.ACROSS_LIST
+                    DefaultListNames.acrossList()
                 else
-                    SpoonbillIO.Companion.DOWN_LIST
+                    DefaultListNames.downList()
                 val index = builder.getNextClueIndex(listName)
                 val hint = data[5].trim()
 

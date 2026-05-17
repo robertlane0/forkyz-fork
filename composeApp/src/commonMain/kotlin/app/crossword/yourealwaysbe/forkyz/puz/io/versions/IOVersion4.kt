@@ -11,7 +11,7 @@ import app.crossword.yourealwaysbe.forkyz.puz.PuzzleMeta
 // Adds percentFilled
 open class IOVersion4 : IOVersion3() {
     @Throws(IOException::class)
-    override fun readMeta(input : Source) : PuzzleMeta {
+    override suspend fun readMeta(input : Source) : PuzzleMeta {
         val meta = super.readMeta(input)
         meta.percentFilled = input.readInt()
         return meta

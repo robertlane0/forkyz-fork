@@ -28,7 +28,7 @@ class RaetselZentraleSchwedenJSONIO : AbstractJSONIO() {
     class RZSFormatException(msg : String) : Exception(msg)
 
     @Throws(Exception::class)
-    override fun parseInput(input : Source) : Puzzle? {
+    override suspend fun parseInput(input : Source) : Puzzle? {
         return readPuzzle(input)
     }
 

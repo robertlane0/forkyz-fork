@@ -15,10 +15,10 @@ interface IOVersion {
     fun write(puz : Puzzle, output : Sink)
 
     @Throws(IOException::class)
-    fun read(puz : Puzzle, input : Source)
+    suspend fun read(puz : Puzzle, input : Source)
 
     @Throws(IOException::class)
-    fun readMeta(input : Source) : PuzzleMeta
+    suspend fun readMeta(input : Source) : PuzzleMeta
 
     val charsetDecoder : CharsetDecoder
     val charsetEncoder : CharsetEncoder

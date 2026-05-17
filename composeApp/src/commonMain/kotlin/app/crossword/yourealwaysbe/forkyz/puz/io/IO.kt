@@ -62,7 +62,7 @@ import app.crossword.yourealwaysbe.forkyz.util.HtmlUtil.unHtmlString
 
 class IO : PuzzleParser {
     @Throws(IOException::class)
-    override fun parseInput(input : Source) : Puzzle? {
+    override suspend fun parseInput(input : Source) : Puzzle? {
         return loadNative(input)
     }
 
@@ -110,8 +110,13 @@ class IO : PuzzleParser {
 
         private const val BLANK = '-'
 
-        val ACROSS_LIST : String = DefaultListNames.ACROSS_LIST
-        val DOWN_LIST : String = DefaultListNames.DOWN_LIST
+        suspend fun acrossListName() : String {
+            return DefaultListNames.acrossList()
+        }
+
+        suspend fun downListName() : String {
+            return DefaultListNames.downList()
+        }
 
         fun cksum_region(
             data : ByteArray,
@@ -135,7 +140,7 @@ class IO : PuzzleParser {
         }
 
         @Throws(IOException::class)
-        fun load(input : Source, metaInput : Source) : Puzzle? {
+        suspend fun load(input : Source, metaInput : Source) : Puzzle? {
             val puz = loadNative(input)
             if (puz != null)
                 readCustom(puz, metaInput)
@@ -143,7 +148,7 @@ class IO : PuzzleParser {
         }
 
         @Throws(IOException::class)
-        fun loadNative(input : Source) : Puzzle? {
+        suspend fun loadNative(input : Source) : Puzzle? {
             input.skip(0x2)
 
             val fileMagic = Buffer()
@@ -259,7 +264,7 @@ class IO : PuzzleParser {
                             = readNullTerminatedString(input, charsetDecoder)
                         htmlString(value)?.let { value ->
                             builder.addAcrossClue(
-                                ACROSS_LIST,
+                                acrossListName(),
                                 clueNumber,
                                 value,
                             )
@@ -273,7 +278,7 @@ class IO : PuzzleParser {
                             = readNullTerminatedString(input, charsetDecoder)
                         htmlString(value)?.let { value ->
                             builder.addDownClue(
-                                DOWN_LIST,
+                                downListName(),
                                 clueNumber,
                                 value,
                             )
@@ -336,7 +341,7 @@ class IO : PuzzleParser {
         }
 
         @Throws(IOException::class)
-        fun readCustom(puz : Puzzle, input : Source) {
+        suspend fun readCustom(puz : Puzzle, input : Source) {
             val version = input.readByte().toInt()
             val v = getIOVersion(version)
             v.read(puz, input)
@@ -392,7 +397,7 @@ class IO : PuzzleParser {
         }
 
         @Throws(IOException::class)
-        fun readMeta(input : Source) : PuzzleMeta? {
+        suspend fun readMeta(input : Source) : PuzzleMeta? {
             val version = input.readByte().toInt()
             val v = getIOVersion(version)
             val m = v.readMeta(input)
@@ -811,7 +816,7 @@ class IO : PuzzleParser {
          * + null terminated string which is field value
          */
         @Throws(IOException::class)
-        private fun loadNotesNative(
+        private suspend fun loadNotesNative(
             isAcross : Boolean,
             builder : PuzzleBuilder,
             input : Source,
@@ -821,7 +826,10 @@ class IO : PuzzleParser {
                 val listName = cid.listName
 
                 // assume puz files only deal with across/down list
-                val desiredList = if (isAcross) ACROSS_LIST else DOWN_LIST
+                val desiredList = if (isAcross)
+                    acrossListName()
+                else
+                    downListName()
                 if (desiredList == listName) {
                     var scratch : String? = null
                     var text : String? = null

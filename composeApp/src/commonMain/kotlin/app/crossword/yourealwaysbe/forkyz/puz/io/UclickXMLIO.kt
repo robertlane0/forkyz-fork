@@ -133,15 +133,12 @@ class UclickXMLIO : PuzzleParser {
         }
     }
 
-    override fun parseInput(input : Source) : Puzzle? {
+    override suspend fun parseInput(input : Source) : Puzzle? {
         return parsePuzzle(input)
     }
 
     companion object {
-        private val ACROSS_LIST : String = DefaultListNames.ACROSS_LIST
-        private val DOWN_LIST : String = DefaultListNames.DOWN_LIST
-
-        fun parsePuzzle(input : Source) : Puzzle? {
+        suspend fun parsePuzzle(input : Source) : Puzzle? {
             try {
                 val content = parseXMLElement(input)
                 val handler = UclickXMLParser(content)
@@ -162,11 +159,19 @@ class UclickXMLIO : PuzzleParser {
                     .setCopyright(handler.copyright)
                     .setNotes("")
 
-                for (basicClue in handler.acrossClues)
-                    builder.addAcrossClue(ACROSS_LIST, basicClue)
+                for (basicClue in handler.acrossClues) {
+                    builder.addAcrossClue(
+                        DefaultListNames.acrossList(),
+                        basicClue,
+                    )
+                }
 
-                for (basicClue in handler.downClues)
-                    builder.addDownClue(DOWN_LIST, basicClue)
+                for (basicClue in handler.downClues) {
+                    builder.addDownClue(
+                        DefaultListNames.downList(),
+                        basicClue,
+                    )
+                }
 
                 return builder.puzzle
             } catch (e : Exception) {
@@ -175,3 +180,4 @@ class UclickXMLIO : PuzzleParser {
         }
     }
 }
+

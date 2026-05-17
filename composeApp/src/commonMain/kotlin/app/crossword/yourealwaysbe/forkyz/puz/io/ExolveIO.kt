@@ -28,7 +28,7 @@ class ExolveIO : PuzzleParser {
     class ExolveFormatException(msg : String) : Exception(msg)
 
     @Throws(IOException::class)
-    override fun parseInput(input : Source) : Puzzle? {
+    override suspend fun parseInput(input : Source) : Puzzle? {
         return readPuzzle(input)
     }
 

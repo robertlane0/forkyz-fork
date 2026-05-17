@@ -1,6 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
+import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.LocalDate
 import kotlinx.io.IOException
 
@@ -17,13 +18,13 @@ import app.crossword.yourealwaysbe.forkyz.util.SourceUtils
 class BrainsOnlyIOTest {
     @Test
     fun testParse() {
-        val puz = testPuzzle1.use { parse(it) }
+        val puz = testPuzzle1.use { runBlocking { parse(it) } }
         assertIsTestPuzzle1(puz!!)
     }
 
     @Test
     fun testParse2() {
-        val puz = testPuzzle2.use { parse(it) }
+        val puz = testPuzzle2.use { runBlocking { parse(it) } }
         Assertions.assertEquals(
             puz!!.title,
             "02/09/14 OCCUPIED NATIONS: Surrounding the long answers",
@@ -43,7 +44,7 @@ class BrainsOnlyIOTest {
     fun testParse3() {
         try {
             // This was from http://brainsonly.com/servlets-newsday-crossword/newsdaycrossword?date=150903
-            testPuzzle3.use { parse(it) }
+            testPuzzle3.use { runBlocking { parse(it) } }
             Assertions.fail<String>("Expected brainsonly3.txt to fail to parse")
         } catch (e : IOException) {
             // expected

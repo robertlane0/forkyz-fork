@@ -1,6 +1,8 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
+import kotlinx.coroutines.runBlocking
+
 import org.junit.jupiter.api.Test
 
 class PuzzleStreamReaderTest {
@@ -8,7 +10,7 @@ class PuzzleStreamReaderTest {
     fun testAcrossLite() {
         IOTest.testPuzzle1.use { input ->
             IOTest.assertIsTestPuzzle1(
-                PuzzleStreamReader.parseInputStatic(input)!!,
+                runBlocking { PuzzleStreamReader.parseInputStatic(input)!! },
             )
         }
     }
@@ -17,7 +19,7 @@ class PuzzleStreamReaderTest {
     fun testJPZ() {
         JPZIOTest.testPuzzle1.use { input ->
             JPZIOTest.assertIsTestPuzzle1(
-                PuzzleStreamReader.parseInputStatic(input)!!,
+                runBlocking { PuzzleStreamReader.parseInputStatic(input)!! },
             )
         }
     }
@@ -26,7 +28,7 @@ class PuzzleStreamReaderTest {
     fun testBrainsOnly() {
         BrainsOnlyIOTest.testPuzzle1.use { input ->
             BrainsOnlyIOTest.assertIsTestPuzzle1(
-                PuzzleStreamReader.parseInputStatic(input)!!,
+                runBlocking { PuzzleStreamReader.parseInputStatic(input)!! },
             )
         }
     }
@@ -35,7 +37,7 @@ class PuzzleStreamReaderTest {
     fun testKingFeaturesPlaintext() {
         KingFeaturesPlaintextIOTest.testPuzzle1.use { input ->
             KingFeaturesPlaintextIOTest.assertIsTestPuzzle1(
-                PuzzleStreamReader.parseInputStatic(input)!!,
+                runBlocking { PuzzleStreamReader.parseInputStatic(input)!! },
             )
         }
     }
@@ -44,7 +46,7 @@ class PuzzleStreamReaderTest {
     fun testUclick() {
         UclickXMLIOTest.testPuzzle1.use { input ->
             UclickXMLIOTest.assertIsTestPuzzle1(
-                PuzzleStreamReader.parseInputStatic(input)!!,
+                runBlocking { PuzzleStreamReader.parseInputStatic(input)!! },
             )
         }
     }
@@ -53,7 +55,7 @@ class PuzzleStreamReaderTest {
     fun testIPuz() {
         IPuzIOTest.testPuzzle1.use { input ->
             IPuzIOTest.assertIsTestPuzzle1(
-                PuzzleStreamReader.parseInputStatic(input)!!,
+                runBlocking { PuzzleStreamReader.parseInputStatic(input)!! },
             )
         }
     }
@@ -62,7 +64,7 @@ class PuzzleStreamReaderTest {
     fun testRaetzelZentraleSchweden() {
         RaetselZentraleSchwedenJSONIOTest.testPuzzle1.let { input ->
             RaetselZentraleSchwedenJSONIOTest.assertIsTestPuzzle1(
-                PuzzleStreamReader.parseInputStatic(input)!!,
+                runBlocking { PuzzleStreamReader.parseInputStatic(input)!! },
             )
         }
     }
@@ -71,7 +73,7 @@ class PuzzleStreamReaderTest {
     fun testRCIJeuxMFJ() {
         RCIJeuxMFJIOTest.testPuzzle1.let { input ->
             RCIJeuxMFJIOTest.assertIsTestPuzzle1(
-                PuzzleStreamReader.parseInputStatic(input)!!,
+                runBlocking { PuzzleStreamReader.parseInputStatic(input)!! },
             )
         }
     }
@@ -80,7 +82,7 @@ class PuzzleStreamReaderTest {
     fun testPrzekroj() {
         PrzekrojIOTest.testPuzzle1.use { input ->
             PrzekrojIOTest.assertIsTestPuzzle1(
-                PuzzleStreamReader.parseInputStatic(input)!!,
+                runBlocking { PuzzleStreamReader.parseInputStatic(input)!! },
             )
         }
     }
@@ -89,7 +91,7 @@ class PuzzleStreamReaderTest {
     fun testKeesingXML() {
         KeesingXMLIOTest.testPuzzle1.let { input ->
             KeesingXMLIOTest.assertIsTestPuzzle1(
-                PuzzleStreamReader.parseInputStatic(input)!!,
+                runBlocking { PuzzleStreamReader.parseInputStatic(input)!! },
             )
         }
     }
@@ -98,7 +100,7 @@ class PuzzleStreamReaderTest {
     fun testPML() {
         PMLIOTest.testPuzzle1.let { input ->
             PMLIOTest.assertIsTestPuzzle1(
-                PuzzleStreamReader.parseInputStatic(input)!!,
+                runBlocking { PuzzleStreamReader.parseInputStatic(input)!! },
             )
         }
     }

@@ -44,7 +44,7 @@ class XWordJSONIO : AbstractJSONIO() {
     class XWordJSONFormatException(msg : String) : Exception(msg)
 
     @Throws(Exception::class)
-    override fun parseInput(input : Source) : Puzzle? {
+    override suspend fun parseInput(input : Source) : Puzzle? {
         return readPuzzle(input)
     }
 
@@ -59,11 +59,8 @@ class XWordJSONIO : AbstractJSONIO() {
             year(Padding.ZERO)
         }
 
-        private val ACROSS_LIST = DefaultListNames.ACROSS_LIST
-        private val DOWN_LIST = DefaultListNames.DOWN_LIST
-
         @Throws(IOException::class)
-        fun readPuzzle(input : Source) : Puzzle? {
+        suspend fun readPuzzle(input : Source) : Puzzle? {
             try {
                 val json = parseJSONObject(input)
                 return readPuzzleFromJSON(json)
@@ -80,7 +77,7 @@ class XWordJSONIO : AbstractJSONIO() {
         }
 
         @Throws(JSONException::class, XWordJSONFormatException::class)
-        private fun readPuzzleFromJSON(json : JSONObject) : Puzzle {
+        private suspend fun readPuzzleFromJSON(json : JSONObject) : Puzzle {
             val boxes : Array<Array<Box?>> = getBoxes(json)
             val builder = PuzzleBuilder(boxes)
                 .setTitle(json.optStringEmptyNull("title"))
@@ -181,7 +178,10 @@ class XWordJSONIO : AbstractJSONIO() {
         }
 
         @Throws(JSONException::class, XWordJSONFormatException::class)
-        private fun addClues(json : JSONObject, builder : PuzzleBuilder) {
+        private suspend fun addClues(
+            json : JSONObject,
+            builder : PuzzleBuilder,
+        ) {
             val clues = json.getJSONObject("clues")
             val across = clues.getJSONArray("across")
             addCluesArray(across, builder, true)
@@ -190,7 +190,7 @@ class XWordJSONIO : AbstractJSONIO() {
         }
 
         @Throws(XWordJSONFormatException::class)
-        private fun addCluesArray(
+        private suspend fun addCluesArray(
             clues : JSONArray,
             builder : PuzzleBuilder,
             across : Boolean,
@@ -210,10 +210,19 @@ class XWordJSONIO : AbstractJSONIO() {
                 val hint = split[1].trim()
                 try {
                     val num = numString.toInt().toString()
-                    if (across)
-                        builder.addAcrossClue(ACROSS_LIST, num, hint)
-                    else
-                        builder.addDownClue(DOWN_LIST, num, hint)
+                    if (across) {
+                        builder.addAcrossClue(
+                            DefaultListNames.acrossList(),
+                            num,
+                            hint,
+                        )
+                    } else {
+                        builder.addDownClue(
+                            DefaultListNames.downList(),
+                            num,
+                            hint,
+                        )
+                    }
                 } catch (e : NumberFormatException) {
                     throw XWordJSONFormatException(
                         "Bad clue number " + numString,

@@ -32,10 +32,12 @@ class MCPBoardTest {
 
     @BeforeEach
     fun setUp() {
-        puzzle = IO.loadNative(
-            MCPBoardTest::class.java
-                .getResourceAsStream("/test.puz")!!.asSource().buffered(),
-        )!!
+        puzzle = runBlocking {
+            IO.loadNative(
+                MCPBoardTest::class.java
+                    .getResourceAsStream("/test.puz")!!.asSource().buffered(),
+            )!!
+        }
 
         board = Playboard(puzzle)
 

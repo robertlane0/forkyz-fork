@@ -2,6 +2,7 @@
 package app.crossword.yourealwaysbe.forkyz.puz
 
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlinx.coroutines.runBlocking
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -989,8 +990,10 @@ class PlayboardTest {
      * instead of null
      */
     private fun loadTestPuz(blockObjects : Boolean) : Puzzle {
-        val puz = SourceUtils.getResource("/test.puz").use {
-            IO.loadNative(it)
+        val puz = runBlocking {
+            SourceUtils.getResource("/test.puz").use {
+                IO.loadNative(it)
+            }
         }
 
         if (blockObjects)

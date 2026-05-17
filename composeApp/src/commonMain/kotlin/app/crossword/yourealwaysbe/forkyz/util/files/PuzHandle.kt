@@ -17,7 +17,7 @@ abstract class PuzHandle private constructor(
     abstract fun <R> accept(v : Visitor<R>) : R
 
     @Throws(IOException::class)
-    abstract fun <R> accept(v : VisitorIO<R>) : R
+    abstract suspend fun <R> accept(v : VisitorIO<R>) : R
 
     /**
      * To update directory if puzzle moves
@@ -43,7 +43,7 @@ abstract class PuzHandle private constructor(
         }
 
         @Throws(IOException::class)
-        override fun <R> accept(v : VisitorIO<R>): R {
+        override suspend fun <R> accept(v : VisitorIO<R>): R {
             return v.visit(this)
         }
     }
@@ -57,7 +57,7 @@ abstract class PuzHandle private constructor(
         }
 
         @Throws(IOException::class)
-        override fun <R> accept(v : VisitorIO<R>) : R {
+        override suspend fun <R> accept(v : VisitorIO<R>) : R {
             return v.visit(this)
         }
     }
@@ -69,10 +69,10 @@ abstract class PuzHandle private constructor(
 
     interface VisitorIO<R> {
         @Throws(IOException::class)
-        fun visit(puzHandle : Puz): R
+        suspend fun visit(puzHandle : Puz): R
 
         @Throws(IOException::class)
-        fun visit(ipuzHandle : IPuz): R
+        suspend fun visit(ipuzHandle : IPuz): R
     }
 }
 

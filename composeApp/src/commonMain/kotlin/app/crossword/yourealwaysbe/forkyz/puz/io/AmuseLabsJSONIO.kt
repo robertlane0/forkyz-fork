@@ -26,7 +26,7 @@ class AmuseLabsJSONIO : AbstractJSONIO() {
     class AmuseLabsFormatException(msg : String) : Exception(msg)
 
     @Throws(Exception::class)
-    override fun parseInput(input : Source) : Puzzle? {
+    override suspend fun parseInput(input : Source) : Puzzle? {
         return readPuzzle(input)
     }
 
@@ -34,7 +34,7 @@ class AmuseLabsJSONIO : AbstractJSONIO() {
         private val TAG = "ForkyzAmuseLabsJSON"
 
         @Throws(IOException::class)
-        fun readPuzzle(input : Source) : Puzzle? {
+        suspend fun readPuzzle(input : Source) : Puzzle? {
             try {
                 val json = parseJSONObject(input)
                 return readPuzzleFromJSON(json)
@@ -47,7 +47,7 @@ class AmuseLabsJSONIO : AbstractJSONIO() {
             }
         }
 
-        fun readPuzzle(jsonString : String) : Puzzle? {
+        suspend fun readPuzzle(jsonString : String) : Puzzle? {
             try {
                 val json = parseJSONObject(jsonString)
                 return readPuzzleFromJSON(json)
@@ -64,7 +64,7 @@ class AmuseLabsJSONIO : AbstractJSONIO() {
          * Read puzzle from Amuse Labs JSON format
          */
         @Throws(JSONException::class, AmuseLabsFormatException::class)
-        private fun readPuzzleFromJSON(json : JSONObject) : Puzzle {
+        private suspend fun readPuzzleFromJSON(json : JSONObject) : Puzzle {
             try {
                 val builder = PuzzleBuilder(getBoxes(json))
 
@@ -159,7 +159,7 @@ class AmuseLabsJSONIO : AbstractJSONIO() {
         }
 
         @Throws(JSONException::class)
-        private fun addClues(json : JSONObject, builder : PuzzleBuilder) {
+        private suspend fun addClues(json : JSONObject, builder : PuzzleBuilder) {
             val entries = json.optJSONArray("placedWords")
 
             if (entries == null)
@@ -177,9 +177,9 @@ class AmuseLabsJSONIO : AbstractJSONIO() {
                     var clue = entry.getJSONObject("clue").getString("clue")
                     var listName = entry.optStringEmptyNull("clueSection")
                     if (listName == null) listName = if (across)
-                        DefaultListNames.ACROSS_LIST
+                        DefaultListNames.acrossList()
                     else
-                        DefaultListNames.DOWN_LIST
+                        DefaultListNames.downList()
 
                     var separators : MutableMap<Int, String>? = null
                     if (wordLengthsEnabled) {

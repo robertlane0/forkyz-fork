@@ -44,7 +44,7 @@ class SmartGamesJSONIO : AbstractJSONIO() {
     class SmartGamesJSONFormatException(msg : String) : Exception(msg)
 
     @Throws(Exception::class)
-    override fun parseInput(input : Source) : Puzzle? {
+    override suspend fun parseInput(input : Source) : Puzzle? {
         return readPuzzle(input)
     }
 
@@ -53,11 +53,8 @@ class SmartGamesJSONIO : AbstractJSONIO() {
 
         private val DATE_FORMATTER = LocalDate.Formats.ISO
 
-        private val ACROSS_LIST : String = DefaultListNames.ACROSS_LIST
-        private val DOWN_LIST : String = DefaultListNames.DOWN_LIST
-
         @Throws(IOException::class)
-        fun readPuzzle(input : Source) : Puzzle? {
+        suspend fun readPuzzle(input : Source) : Puzzle? {
             try {
                 val json = parseJSONObject(input)
                 return readPuzzleFromJSON(json)
@@ -70,7 +67,7 @@ class SmartGamesJSONIO : AbstractJSONIO() {
             }
         }
 
-        fun readPuzzle(jsonString : String) : Puzzle? {
+        suspend fun readPuzzle(jsonString : String) : Puzzle? {
             try {
                 val json = parseJSONObject(jsonString)
                 return readPuzzleFromJSON(json)
@@ -84,7 +81,7 @@ class SmartGamesJSONIO : AbstractJSONIO() {
         }
 
         @Throws(JSONException::class, SmartGamesJSONFormatException::class)
-        private fun readPuzzleFromJSON(json : JSONObject) : Puzzle {
+        private suspend fun readPuzzleFromJSON(json : JSONObject) : Puzzle {
             try {
                 var data = json.optJSONObject("data")
                 if (data == null)
@@ -160,7 +157,10 @@ class SmartGamesJSONIO : AbstractJSONIO() {
         }
 
         @Throws(JSONException::class)
-        private fun addClues(json : JSONObject, builder : PuzzleBuilder) {
+        private suspend fun addClues(
+            json : JSONObject,
+            builder : PuzzleBuilder,
+        ) {
             val config = json.getJSONObject("config")
             val clues = config.getJSONObject("entries")
             addClueList(clues.optJSONObject("across"), true, builder)
@@ -168,7 +168,7 @@ class SmartGamesJSONIO : AbstractJSONIO() {
         }
 
         @Throws(JSONException::class)
-        private fun addClueList(
+        private suspend fun addClueList(
             clues : JSONObject?,
             across : Boolean,
             builder : PuzzleBuilder,
@@ -186,9 +186,17 @@ class SmartGamesJSONIO : AbstractJSONIO() {
 
                     builder.setBoxClueNumber(row, col, number)
                     if (across) {
-                        builder.addAcrossClue(ACROSS_LIST, number, hint)
+                        builder.addAcrossClue(
+                            DefaultListNames.acrossList(),
+                            number,
+                            hint,
+                        )
                     } else {
-                        builder.addDownClue(DOWN_LIST, number, hint)
+                        builder.addDownClue(
+                            DefaultListNames.downList(),
+                            number,
+                            hint,
+                        )
                     }
                 }
         }

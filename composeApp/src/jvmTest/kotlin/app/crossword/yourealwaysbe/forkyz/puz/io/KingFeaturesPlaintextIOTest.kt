@@ -1,6 +1,8 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
+import kotlinx.coroutines.runBlocking
+
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
@@ -14,7 +16,7 @@ import app.crossword.yourealwaysbe.forkyz.util.SourceUtils
 class KingFeaturesPlaintextIOTest {
     @Test
     fun testRead() {
-        val puz = testPuzzle1.use { parsePuzzle(it) }
+        val puz = testPuzzle1.use { runBlocking { parsePuzzle(it) } }
         assertIsTestPuzzle1(puz!!)
     }
 

@@ -23,15 +23,12 @@ import app.crossword.yourealwaysbe.forkyz.util.parseJSONObject
  */
 class PMLIO : AbstractJSONIO() {
     @Throws(Exception::class)
-    override fun parseInput(input : Source) : Puzzle? {
+    override suspend fun parseInput(input : Source) : Puzzle? {
         return readPuzzle(input)
     }
 
     companion object {
         private val TAG = "ForkyzPMLIO"
-
-        private val ACROSS_LIST = DefaultListNames.ACROSS_LIST
-        private val DOWN_LIST = DefaultListNames.DOWN_LIST
 
         private val DATE_FORMATTER = LocalDate.Format {
             day(Padding.NONE)
@@ -46,7 +43,7 @@ class PMLIO : AbstractJSONIO() {
         private const val CW_JSON_GRP = 1
 
         @Throws(IOException::class)
-        fun readPuzzle(input : Source) : Puzzle? {
+        suspend fun readPuzzle(input : Source) : Puzzle? {
             val copy = input.peek()
             var puz = readFromJSON(copy)
             if (puz == null) {
@@ -58,7 +55,7 @@ class PMLIO : AbstractJSONIO() {
         /**
          * Returns null if failed
          */
-        fun readFromJSON(input : Source) : Puzzle? {
+        suspend fun readFromJSON(input : Source) : Puzzle? {
             try {
                 val json = parseJSONObject(input)
                 return readPuzzleFromJSON(json)
@@ -72,12 +69,12 @@ class PMLIO : AbstractJSONIO() {
         /**
          * Returns null if failed
          */
-        fun readFromJSON(jsonString : String) : Puzzle {
+        suspend fun readFromJSON(jsonString : String) : Puzzle {
             val json = parseJSONObject(jsonString)
             return readPuzzleFromJSON(json)
         }
 
-        fun readFromHTML(input : Source) : Puzzle? {
+        suspend fun readFromHTML(input : Source) : Puzzle? {
             try {
                 val cwJson = readPuzzleJSON(input)
                 if (cwJson != null && !cwJson.isEmpty())
@@ -88,7 +85,7 @@ class PMLIO : AbstractJSONIO() {
             return null
         }
 
-        fun readPuzzle(jsonString : String) : Puzzle? {
+        suspend fun readPuzzle(jsonString : String) : Puzzle? {
             try {
                 val json = parseJSONObject(jsonString)
                 return readPuzzleFromJSON(json)
@@ -120,7 +117,7 @@ class PMLIO : AbstractJSONIO() {
          * Read puzzle from PML JSON format
          */
         @Throws(JSONException::class)
-        private fun readPuzzleFromJSON(json : JSONObject) : Puzzle {
+        private suspend fun readPuzzleFromJSON(json : JSONObject) : Puzzle {
             val gameData = json.getJSONObject("game_data")
             val builder = PuzzleBuilder(getBoxes(gameData))
                 .setTitle(json.optStringEmptyNull("name"))
@@ -193,7 +190,7 @@ class PMLIO : AbstractJSONIO() {
         }
 
         @Throws(JSONException::class)
-        private fun addClues(gameData : JSONObject, builder : PuzzleBuilder) {
+        private suspend fun addClues(gameData : JSONObject, builder : PuzzleBuilder) {
             val items = gameData.getJSONArray("items")
             for (i in 0..<items.size) {
                 val item = items.getJSONObject(i)
@@ -206,13 +203,20 @@ class PMLIO : AbstractJSONIO() {
         }
 
         @Throws(JSONException::class)
-        private fun addClue(item : JSONObject, builder : PuzzleBuilder) {
+        private suspend fun addClue(item : JSONObject, builder : PuzzleBuilder) {
             val num = item.getInt("num").toString()
             val hint = item.getString("clue")
-            if (isAcross(item))
-                builder.addAcrossClue(ACROSS_LIST, BasicClue(num, hint))
-            else
-                builder.addDownClue(DOWN_LIST, BasicClue(num, hint))
+            if (isAcross(item)) {
+                builder.addAcrossClue(
+                    DefaultListNames.acrossList(),
+                    BasicClue(num, hint),
+                )
+            } else {
+                builder.addDownClue(
+                    DefaultListNames.downList(),
+                    BasicClue(num, hint),
+                )
+            }
         }
     }
 }

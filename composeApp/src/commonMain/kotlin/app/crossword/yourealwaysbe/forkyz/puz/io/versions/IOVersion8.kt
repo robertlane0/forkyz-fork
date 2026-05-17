@@ -16,7 +16,7 @@ open class IOVersion8 : IOVersion7() {
     }
 
     @Throws(IOException::class)
-    override fun readMeta(input : Source) : PuzzleMeta {
+    override suspend fun readMeta(input : Source) : PuzzleMeta {
         val meta = super.readMeta(input)
         meta.playerNote = readNote(input)
         return meta

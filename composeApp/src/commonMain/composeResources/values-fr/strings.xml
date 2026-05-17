@@ -820,4 +820,9 @@
     <string name="month_october">Octobre</string>
     <string name="month_november">Novembre</string>
     <string name="month_december">Décembre</string>
+
+    <!-- default puzzle list names -->
+    <string name="default_across_list_name">Horizontal</string>
+    <string name="default_down_list_name">Vertical</string>
+    <string name="default_nodir_list_name">Indices</string>
 </resources>

@@ -1,6 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
+import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.LocalDate
 
 import org.junit.jupiter.api.Assertions
@@ -16,7 +17,7 @@ class FortyTwoPuzzlesIOTest {
     @Test
     fun testPuzzle1() {
         val parser = FortyTwoPuzzlesIO()
-        val puz = testPuzzle1.use { parser.parseInput(it) }
+        val puz = testPuzzle1.use { runBlocking { parser.parseInput(it) } }
         assertIsTestPuzzle1(puz!!)
     }
 

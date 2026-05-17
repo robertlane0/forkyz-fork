@@ -23,7 +23,7 @@ class XDIO : PuzzleParser {
     class XDFormatException(msg : String) : Exception(msg)
 
     @Throws(IOException::class)
-    override fun parseInput(input : Source) : Puzzle? {
+    override suspend fun parseInput(input : Source) : Puzzle? {
         return readPuzzle(input)
     }
 
@@ -128,10 +128,6 @@ class XDIO : PuzzleParser {
     companion object {
         private val TAG = "ForkyzXDIO"
 
-        private val ACROSS_LIST = DefaultListNames.ACROSS_LIST
-        private val DOWN_LIST = DefaultListNames.DOWN_LIST
-        private val ANON_LIST = DefaultListNames.NODIR_LIST
-
         private val DATE_FORMATTER = LocalDate.Formats.ISO
 
         private val BLOCKS = setOf('#', '_', '■', '＿')
@@ -149,7 +145,7 @@ class XDIO : PuzzleParser {
         private val LINEBREAKS = MatchReplace("\\\\", "<br/>")
 
         @Throws(IOException::class)
-        fun readPuzzle(input : Source) : Puzzle? {
+        suspend fun readPuzzle(input : Source) : Puzzle? {
             try {
                 val line = getNextNonBlankLine(input)
 
@@ -164,7 +160,7 @@ class XDIO : PuzzleParser {
         }
 
         @Throws(IOException::class, XDFormatException::class)
-        private fun readTitledSections(
+        private suspend fun readTitledSections(
             firstTitle : String?,
             input : Source,
         ) : Puzzle? {
@@ -193,7 +189,7 @@ class XDIO : PuzzleParser {
         }
 
         @Throws(IOException::class, XDFormatException::class)
-        private fun readImplicitSections(
+        private suspend fun readImplicitSections(
             firstLine : String?,
             input : Source,
         ) : Puzzle {
@@ -483,7 +479,7 @@ class XDIO : PuzzleParser {
          * Build puzzle from gathered info
          */
         @Throws(XDFormatException::class)
-        private fun buildPuzzle(
+        private suspend fun buildPuzzle(
             meta : Meta?,
             boxChars : Array<CharArray>,
             clues : List<ClueInfo>?,
@@ -520,7 +516,7 @@ class XDIO : PuzzleParser {
         /**
          * Add clue infos as clues to puzzle builder
          */
-        private fun buildClues(
+        private suspend fun buildClues(
             clues : List<ClueInfo>?,
             meta : Meta?,
             builder : PuzzleBuilder,
@@ -529,24 +525,33 @@ class XDIO : PuzzleParser {
                 return
 
             val clueGroups = if (meta == null) null else meta.extraClueGroups
+            val anonListName = DefaultListNames.noDirList()
 
             for (clue in clues) {
                 val numberInfo = clue.numberInfo
                 val hint = clue.hint
 
                 if (numberInfo.isEmpty()) {
-                    val index = builder.getNextClueIndex(ANON_LIST)
+                    val index = builder.getNextClueIndex(anonListName)
                     builder.addClue(
-                        Clue(ANON_LIST, index, null, null, hint, null),
+                        Clue(anonListName, index, null, null, hint, null),
                     )
                 } else {
                     val listID = numberInfo.get(0)
                     val number = numberInfo.substring(1)
 
                     if (listID == 'A') {
-                        builder.addAcrossClue(ACROSS_LIST, number, hint)
+                        builder.addAcrossClue(
+                            DefaultListNames.acrossList(),
+                            number,
+                            hint,
+                        )
                     } else if (listID == 'D') {
-                        builder.addDownClue(DOWN_LIST, number, hint)
+                        builder.addDownClue(
+                            DefaultListNames.downList(),
+                            number,
+                            hint,
+                        )
                     } else if (
                         clueGroups != null
                         && clueGroups.containsKey(listID)
@@ -559,10 +564,10 @@ class XDIO : PuzzleParser {
                     } else {
                         // use full number info as number since the first
                         // letter isn't a list
-                        val index = builder.getNextClueIndex(ANON_LIST)
+                        val index = builder.getNextClueIndex(anonListName)
                         builder.addClue(
                             Clue(
-                                ANON_LIST,
+                                anonListName,
                                 index,
                                 numberInfo,
                                 null,

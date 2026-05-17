@@ -25,7 +25,7 @@ open class IOVersion1 : IOVersion {
     override val charsetEncoder : CharsetEncoder = CP1252Encoder()
 
     @Throws(IOException::class)
-    override fun read(puz : Puzzle, input : Source) {
+    override suspend fun read(puz : Puzzle, input : Source) {
         val meta = readMeta(input)
         applyMeta(puz, meta)
         val boxes : Array<Array<Box?>> = puz.boxes
@@ -51,7 +51,7 @@ open class IOVersion1 : IOVersion {
     }
 
     @Throws(IOException::class)
-    override fun readMeta(input : Source) : PuzzleMeta {
+    override suspend fun readMeta(input : Source) : PuzzleMeta {
         val meta = PuzzleMeta()
 
         meta.author = readNullTerminatedString(input, charsetDecoder)

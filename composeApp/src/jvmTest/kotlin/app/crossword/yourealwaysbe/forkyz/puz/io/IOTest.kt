@@ -1,6 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
+import kotlinx.coroutines.runBlocking
 import kotlinx.io.Buffer
 
 import org.junit.jupiter.api.Assertions
@@ -22,19 +23,19 @@ import app.crossword.yourealwaysbe.forkyz.util.SourceUtils
 class IOTest {
     @Test
     fun testLoad() {
-        val puz = testPuzzle1.use { IO.loadNative(it) }
+        val puz = testPuzzle1.use { runBlocking { IO.loadNative(it) } }
         assertIsTestPuzzle1(puz!!)
     }
 
     @Test
     fun testSave() {
-        val puz = testPuzzle1.use { loadNative(it) }
+        val puz = testPuzzle1.use { runBlocking { loadNative(it) } }
         val tmp = Buffer()
         IO.saveNative(puz!!, tmp)
-        val puz2 = loadNative(tmp.peek())
+        val puz2 = runBlocking { loadNative(tmp.peek()) }
         Assertions.assertEquals(puz, puz2)
 
-        val p = loadNative(tmp)
+        val p = runBlocking { loadNative(tmp) }
         p!!.source = "Unit Test"
         // Check HTML stripped/restored
         p.notes = "X &nbsp; X<br/>"
@@ -46,18 +47,18 @@ class IOTest {
         val tmpMeta = Buffer()
 
         IO.save(p, tmp2, tmpMeta)
-        val pin = load(tmp2, tmpMeta)
+        val pin = runBlocking { load(tmp2, tmpMeta) }
         Assertions.assertEquals(p, pin)
     }
 
     @Test
     fun testGext() {
         var puz =  SourceUtils.getResource("/2010-7-4-LosAngelesTimes.puz").use {
-           loadNative(it)
+           runBlocking { loadNative(it) }
         }
         val tmp = Buffer()
         IO.saveNative(puz!!, tmp)
-        puz = loadNative(tmp)
+        puz = runBlocking { loadNative(tmp) }
         Assertions.assertEquals(puz!!.boxes[2][2]!!.shape, Box.Shape.CIRCLE)
     }
 
@@ -65,7 +66,7 @@ class IOTest {
     fun testCrack() {
         println("testCrack")
         SourceUtils.getResource("/puz_110523margulies.puz").use { input ->
-            val p = loadNative(input)
+            val p = runBlocking { loadNative(input) }
             IO.crack(p!!)
         }
     }
@@ -77,7 +78,7 @@ class IOTest {
     @Test
     fun testUnlockCode() {
         val puz = SourceUtils.getResource("/2010-7-19-NewYorkTimes.puz").use {
-            loadNative(it)
+            runBlocking { loadNative(it) }
         }
         for (b in puz!!.boxesList) {
             if (!isBlock(b))
@@ -99,7 +100,7 @@ class IOTest {
 
     @Test
     fun testRebus() {
-        val puz = testPuzzleRebus.use { IO.loadNative(it) }
+        val puz = testPuzzleRebus.use { runBlocking { IO.loadNative(it) } }
         assertIsTestPuzzleRebus(puz!!)
 
         puz.checkedGetBox(1, 7)!!.response = "NEW RESPONSE 1"
@@ -109,20 +110,20 @@ class IOTest {
         val tmp = Buffer()
         val tmpMeta = Buffer()
 
-        IO.save(puz, tmp, tmpMeta)
-        val pin = load(tmp, tmpMeta)
+        runBlocking { IO.save(puz, tmp, tmpMeta) }
+        val pin = runBlocking { load(tmp, tmpMeta) }
 
         Assertions.assertEquals(puz, pin)
     }
 
     @Test
     fun testEmptySolution() {
-        val puz = testPuzzleEmptySol.use { IO.loadNative(it) }
+        val puz = testPuzzleEmptySol.use { runBlocking { IO.loadNative(it) } }
         Assertions.assertFalse(puz!!.hasSolution())
 
         val tmp = Buffer()
         IO.saveNative(puz, tmp)
-        val pin = IO.loadNative(tmp)
+        val pin = runBlocking { IO.loadNative(tmp) }
         Assertions.assertFalse(pin!!.hasSolution())
     }
 

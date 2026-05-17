@@ -40,12 +40,12 @@ open class FortyTwoPuzzlesIO : AbstractJSONIO() {
     )
 
     @Throws(Exception::class)
-    override fun parseInput(input : Source) : Puzzle? {
+    override suspend fun parseInput(input : Source) : Puzzle? {
         return parsePuzzle(input)?.puzzle
     }
 
     @Throws(Exception::class)
-    open protected fun parsePuzzle(input : Source) : PuzzleBuilder? {
+    open protected suspend fun parsePuzzle(input : Source) : PuzzleBuilder? {
         val json : JSONObject
         try {
             json = parseJSONObject(input)
@@ -64,12 +64,12 @@ open class FortyTwoPuzzlesIO : AbstractJSONIO() {
             parseClues(
                 builder,
                 srcPuzzle.getJSONObject("hclues"),
-                DefaultListNames.ACROSS_LIST,
+                DefaultListNames.acrossList(),
             )
             parseClues(
                 builder,
                 srcPuzzle.getJSONObject("vclues"),
-                DefaultListNames.DOWN_LIST,
+                DefaultListNames.downList(),
             )
 
             setMetadata(srcPuzzle, builder)
@@ -139,7 +139,7 @@ open class FortyTwoPuzzlesIO : AbstractJSONIO() {
         return box
     }
 
-    protected fun parseClues(
+    protected suspend fun parseClues(
         builder : PuzzleBuilder,
         srcClues : JSONObject,
         listName : String,
@@ -158,7 +158,7 @@ open class FortyTwoPuzzlesIO : AbstractJSONIO() {
                 clueStr,
                 srcClues.getString(clueStr),
             )
-            if (listName == DefaultListNames.ACROSS_LIST) {
+            if (listName == DefaultListNames.acrossList()) {
                 builder.addAcrossClue(listName, clue)
             } else {
                 builder.addDownClue(listName, clue)

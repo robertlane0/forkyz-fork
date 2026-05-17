@@ -18,7 +18,7 @@ open class IOVersion7 : IOVersion6() {
     }
 
     @Throws(IOException::class)
-    override fun readMeta(input : Source) : PuzzleMeta {
+    override suspend fun readMeta(input : Source) : PuzzleMeta {
         val meta = super.readMeta(input)
         meta.supportUrl = readNullTerminatedString(input, charsetDecoder)
         return meta

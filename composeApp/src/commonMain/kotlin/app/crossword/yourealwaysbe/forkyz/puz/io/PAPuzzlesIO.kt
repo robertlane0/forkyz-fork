@@ -64,7 +64,7 @@ class PAPuzzlesIO : PuzzleParser {
     class PAPuzzlesFormatException(msg : String?) : Exception(msg)
 
     @Throws(Exception::class)
-    override fun parseInput(input : Source) : Puzzle? {
+    override suspend fun parseInput(input : Source) : Puzzle? {
         return readPuzzle(input)
     }
 
@@ -79,7 +79,7 @@ class PAPuzzlesIO : PuzzleParser {
         private const val CLUE_HINT_GRP = 1
 
         @Throws(IOException::class)
-        fun readPuzzle(input : Source) : Puzzle? {
+        suspend fun readPuzzle(input : Source) : Puzzle? {
             try {
                 val doc = Ksoup.parseSource(input)
                 val builder = PuzzleBuilder(getBoxes(doc))
@@ -186,7 +186,7 @@ class PAPuzzlesIO : PuzzleParser {
             return if (solution.isEmpty()) null else solution
         }
 
-        private fun getClues(doc : Element, builder : PuzzleBuilder) {
+        private suspend fun getClues(doc : Element, builder : PuzzleBuilder) {
             getClues(doc, "clues-across", builder)
             getClues(doc, "clues-down", builder)
         }
@@ -198,7 +198,7 @@ class PAPuzzlesIO : PuzzleParser {
          * @param listClass the class name identifying the list
          * @param builder add clues to this builder
          */
-        private fun getClues(
+        private suspend fun getClues(
             doc : Element,
             listClass : String?,
             builder : PuzzleBuilder,
@@ -236,13 +236,13 @@ class PAPuzzlesIO : PuzzleParser {
                     for (i in 0..<numClues) {
                         if ("across".equals(directions[i], ignoreCase = true)) {
                             if (i == 0 && listName == null)
-                                listName = DefaultListNames.ACROSS_LIST
+                                listName = DefaultListNames.acrossList()
                             zone.appendZone(builder.getAcrossZone(numbers[i]))
                         } else if (
                             "down".equals(directions[i], ignoreCase = true)
                         ) {
                             if (i == 0 && listName == null)
-                                listName = DefaultListNames.DOWN_LIST
+                                listName = DefaultListNames.downList()
                             zone.appendZone(builder.getDownZone(numbers[i]))
                         }
                     }

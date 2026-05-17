@@ -873,4 +873,8 @@
     <string name="month_october">Oktober</string>
     <string name="month_november">November</string>
     <string name="month_december">December</string>
+
+    <string name="default_across_list_name">Horizontaal</string>
+    <string name="default_down_list_name">Verticaal</string>
+    <string name="default_nodir_list_name">Omschrijvingen</string>
 </resources>

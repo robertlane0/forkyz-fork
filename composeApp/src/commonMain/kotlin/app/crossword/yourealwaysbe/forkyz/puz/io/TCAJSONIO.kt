@@ -56,7 +56,7 @@ class TCAJSONIO : AbstractJSONIO() {
     class TCAJSONFormatException(msg : String) : Exception(msg)
 
     @Throws(Exception::class)
-    override fun parseInput(input : Source) : Puzzle? {
+    override suspend fun parseInput(input : Source) : Puzzle? {
         return readPuzzle(input)
     }
 
@@ -72,11 +72,8 @@ class TCAJSONIO : AbstractJSONIO() {
             year(Padding.ZERO)
         }
 
-        private val ACROSS_LIST = DefaultListNames.ACROSS_LIST
-        private val DOWN_LIST = DefaultListNames.DOWN_LIST
-
         @Throws(IOException::class)
-        fun readPuzzle(input : Source) : Puzzle? {
+        suspend fun readPuzzle(input : Source) : Puzzle? {
             try {
                 val json = parseJSONObject(input)
                 return readPuzzleFromJSON(json)
@@ -89,7 +86,7 @@ class TCAJSONIO : AbstractJSONIO() {
             }
         }
 
-        fun readPuzzle(jsonString : String) : Puzzle? {
+        suspend fun readPuzzle(jsonString : String) : Puzzle? {
             try {
                 val json = parseJSONObject(jsonString)
                 return readPuzzleFromJSON(json)
@@ -103,7 +100,7 @@ class TCAJSONIO : AbstractJSONIO() {
         }
 
         @Throws(JSONException::class, TCAJSONFormatException::class)
-        private fun readPuzzleFromJSON(json : JSONObject) : Puzzle {
+        private suspend fun readPuzzleFromJSON(json : JSONObject) : Puzzle {
             try {
                 val metaData = json.optJSONObject("metadata")
                 var data = json.optJSONObject("data")
@@ -238,7 +235,7 @@ class TCAJSONIO : AbstractJSONIO() {
         }
 
         @Throws(JSONException::class)
-        private fun addClues(
+        private suspend fun addClues(
             json : JSONObject,
             cellPositions : Map<String, Position>,
             builder : PuzzleBuilder,
@@ -274,9 +271,9 @@ class TCAJSONIO : AbstractJSONIO() {
                 val hint = clue.getString("text")
 
                 val listName = if (across)
-                    TCAJSONIO.Companion.ACROSS_LIST
+                    DefaultListNames.acrossList()
                 else
-                    TCAJSONIO.Companion.DOWN_LIST
+                    DefaultListNames.downList()
                 val index = builder.getNextClueIndex(listName)
                 builder.addClue(
                     Clue(listName, index, clueNumber, null, hint, zone),

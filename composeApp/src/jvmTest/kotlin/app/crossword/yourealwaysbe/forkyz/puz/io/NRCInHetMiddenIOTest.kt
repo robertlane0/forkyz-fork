@@ -1,6 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
+import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.LocalDate
 
 import org.junit.jupiter.api.Assertions
@@ -17,7 +18,7 @@ class NRCInHetMiddenIOTest {
     fun testPuzzle1() {
         val parser = NRCInHetMiddenIO()
         val puz = SourceUtils.getResource("/inhetmidden-1.json").use {
-            parser.parseInput(it)
+            runBlocking { parser.parseInput(it) }
         }
         assertIsTestPuzzle1(puz!!)
     }
@@ -26,7 +27,7 @@ class NRCInHetMiddenIOTest {
     fun testPuzzle2() {
         val parser = NRCInHetMiddenIO()
         val puz = SourceUtils.getResource("/inhetmidden-2.json").use {
-            parser.parseInput(it)
+            runBlocking { parser.parseInput(it) }
         }
         assertIsTestPuzzle2(puz!!)
     }
@@ -35,7 +36,7 @@ class NRCInHetMiddenIOTest {
     fun testPuzzle3() {
         val parser = NRCInHetMiddenIO()
         val puz = SourceUtils.getResource("/inhetmidden-3.json").use {
-            parser.parseInput(it)
+            runBlocking { parser.parseInput(it) }
         }
         assertIsTestPuzzle3(puz!!)
     }

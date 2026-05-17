@@ -23,13 +23,11 @@ import app.crossword.yourealwaysbe.forkyz.util.HtmlUtil.htmlString
  */
 class BrainsOnlyIO : PuzzleParser {
     @Throws(IOException::class)
-    override fun parseInput(input : Source) : Puzzle? {
+    override suspend fun parseInput(input : Source) : Puzzle? {
         return parse(input)
     }
 
     companion object {
-        private val ACROSS_LIST : String = DefaultListNames.ACROSS_LIST
-        private val DOWN_LIST : String = DefaultListNames.DOWN_LIST
         private const val NOTEPAD_START_TAG = "<NOTEPAD>"
         private const val NOTEPAD_END_TAG = "</NOTEPAD>"
         private val DATE_FORMATTER = LocalDate.Format {
@@ -39,7 +37,7 @@ class BrainsOnlyIO : PuzzleParser {
         }
 
         @Throws(IOException::class)
-        fun parse(input : Source) : Puzzle? {
+        suspend fun parse(input : Source) : Puzzle? {
             val date : String = readLineAtOffset(input, 2)
             val title : String = readLineAtOffset(input, 1)
             val puzTitle = htmlString(title)
@@ -163,7 +161,7 @@ class BrainsOnlyIO : PuzzleParser {
                         && builder.isStartClue(h, w, true)
                     ) {
                         builder.addAcrossClue(
-                            ACROSS_LIST,
+                            DefaultListNames.acrossList(),
                             box.clueNumber,
                             htmlString(acrossClues.get(acrossIdx))!!,
                         )
@@ -183,7 +181,7 @@ class BrainsOnlyIO : PuzzleParser {
                         && builder.isStartClue(h, w, false)
                     ) {
                         builder.addDownClue(
-                            DOWN_LIST,
+                            DefaultListNames.downList(),
                             box.clueNumber,
                             htmlString(downClues.get(downIdx))!!,
                         )
