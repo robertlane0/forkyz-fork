@@ -60,7 +60,6 @@ material = "1.13.0"
 seismic = "1.0.3"
 datetime-wheel-picker = "1.1.0"
 filekit = "0.13.0"
-words-to-numbers = "8a97d258fd"
 mcp-sdk-server = "0.11.0"
 zip = "0.11.1"
 
@@ -149,7 +148,6 @@ ksoup-kotlinx = { module = "com.fleeksoft.ksoup:ksoup-kotlinx", version.ref = "k
 material = { module = "com.google.android.material:material", version.ref = "material" }
 mcp-sdk-server = { module = "io.modelcontextprotocol:kotlin-sdk-server", version.ref = "mcp-sdk-server" }
 seismic = { module = "com.squareup:seismic", version.ref = "seismic" }
-words-to-numbers = { module = "com.github.jgraham0325:words-to-numbers", version.ref = "words-to-numbers" }
 zip = { module = "no.synth:kmp-zip", version.ref = "zip" }
 zip-kotlinx = { module = "no.synth:kmp-zip-kotlinx", version.ref = "zip" }
 

@@ -95,7 +95,6 @@ kotlin {
             implementation(libs.ktor.client.cio)
             implementation(libs.ktor.server.cio)
             implementation(libs.mcp.sdk.server)
-            implementation(libs.words.to.numbers)
             implementation(libs.zip)
             implementation(libs.zip.kotlinx)
         }

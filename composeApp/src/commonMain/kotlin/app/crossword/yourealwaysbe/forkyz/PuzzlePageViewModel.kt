@@ -12,8 +12,6 @@ import kotlinx.coroutines.launch
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
-import org.jg.wordstonumbers.WordsToNumbersUtil
-
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_announce_clue
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.command_answer
@@ -60,6 +58,7 @@ import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands
 import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand
+import app.crossword.yourealwaysbe.forkyz.util.WordsToNumbers
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.util.mediate
 import app.crossword.yourealwaysbe.forkyz.view.PlayboardTextRenderer
@@ -1087,7 +1086,7 @@ open class PuzzlePageViewModel(
                 VoiceCommand(
                     utils.getString(Res.string.command_number),
                     { textNumber ->
-                        val prepped = WordsToNumbersUtil
+                        val prepped = WordsToNumbers
                             .convertTextualNumbersInDocument(textNumber)
                         try {
                             val number = prepped.toInt()
