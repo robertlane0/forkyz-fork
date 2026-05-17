@@ -14,7 +14,7 @@ abstract class PuzHandle private constructor(
         return dirHandle == this.dirHandle
     }
 
-    abstract fun <R> accept(v : Visitor<R>) : R
+    abstract suspend fun <R> accept(v : Visitor<R>) : R
 
     @Throws(IOException::class)
     abstract suspend fun <R> accept(v : VisitorIO<R>) : R
@@ -38,7 +38,7 @@ abstract class PuzHandle private constructor(
         mainHandle : FileHandle,
         var metaFileHandle : FileHandle?,
     ) : PuzHandle(dirHandle, mainHandle) {
-        override fun <R> accept(v : Visitor<R>): R {
+        override suspend fun <R> accept(v : Visitor<R>): R {
             return v.visit(this)
         }
 
@@ -52,7 +52,7 @@ abstract class PuzHandle private constructor(
         dirHandle : DirHandle,
         mainHandle : FileHandle,
     ) : PuzHandle(dirHandle, mainHandle) {
-        override fun <R> accept(v : Visitor<R>): R {
+        override suspend fun <R> accept(v : Visitor<R>): R {
             return v.visit(this)
         }
 
@@ -63,8 +63,8 @@ abstract class PuzHandle private constructor(
     }
 
     interface Visitor<R> {
-        fun visit(puzHandle : Puz): R
-        fun visit(ipuzHandle : IPuz): R
+        suspend fun visit(puzHandle : Puz): R
+        suspend fun visit(ipuzHandle : IPuz): R
     }
 
     interface VisitorIO<R> {

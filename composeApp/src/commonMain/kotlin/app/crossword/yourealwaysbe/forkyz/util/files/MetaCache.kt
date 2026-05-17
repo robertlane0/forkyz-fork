@@ -282,11 +282,15 @@ class MetaCache(private val utils : NativeBackendUtils) {
         val mainFileHandle = puzHandle.mainFileHandle
         val metaHandle = puzHandle.accept<FileHandle?>(
             object  : PuzHandle.Visitor<FileHandle?> {
-                override fun visit(puzHandle : PuzHandle.Puz) : FileHandle? {
+                override suspend fun visit(
+                    puzHandle : PuzHandle.Puz,
+                ) : FileHandle? {
                     return puzHandle.metaFileHandle
                 }
 
-                override fun visit(ipuzHandle : PuzHandle.IPuz) : FileHandle? {
+                override suspend fun visit(
+                    ipuzHandle : PuzHandle.IPuz,
+                ) : FileHandle? {
                     return null
                 }
             }

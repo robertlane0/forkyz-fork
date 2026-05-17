@@ -2,6 +2,7 @@
 package app.crossword.yourealwaysbe.forkyz.util.files
 
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.datetime.LocalDate
 import kotlinx.io.Buffer
 import kotlinx.io.IOException
@@ -29,7 +30,11 @@ import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle.VisitorIO
  * Implementations provided for different file backends
  */
 abstract class FileHandler {
+    // to avoid concurrent writes to meta cache
     val metaCacheMutex = Mutex()
+    // to avoid concurrent access to filesystem (e.g. reading a file being
+    // written to)
+    val ioMutex = Mutex()
 
     protected val nativeBackendUtils : NativeBackendUtils
     private val metaCache : MetaCache
@@ -120,19 +125,21 @@ abstract class FileHandler {
         return getName(puzHandle.mainFileHandle)
     }
 
-    fun exists(ph : PuzHandle) : Boolean {
+    suspend fun exists(ph : PuzHandle) : Boolean {
         if (!exists(ph.mainFileHandle))
             return false
 
         return ph.accept<Boolean>(
             object : PuzHandle.Visitor<Boolean> {
-                override fun visit(puzHandle : PuzHandle.Puz) : Boolean {
+                override suspend fun visit(
+                    puzHandle : PuzHandle.Puz,
+                ) : Boolean {
                     return puzHandle.metaFileHandle?.let { metaHandle ->
                         exists(metaHandle)
                     } ?: true
                 }
 
-                override fun visit(ipuzHandle : IPuz) : Boolean {
+                override suspend fun visit(ipuzHandle : IPuz) : Boolean {
                     return true
                 }
             }
@@ -140,25 +147,31 @@ abstract class FileHandler {
     }
 
     suspend fun delete(ph : PuzHandle) {
-        delete(ph.mainFileHandle)
+        withIOMutex {
+            delete(ph.mainFileHandle)
 
-        ph.accept<Void?>(
-            object : PuzHandle.Visitor<Void?> {
-                override fun visit(puzHandle : PuzHandle.Puz) : Void? {
-                    puzHandle.metaFileHandle?.let { metaHandle ->
-                        delete(metaHandle)
+            ph.accept<Void?>(
+                object : PuzHandle.Visitor<Void?> {
+                    override suspend fun visit(
+                        puzHandle : PuzHandle.Puz,
+                    ) : Void? {
+                        puzHandle.metaFileHandle?.let { metaHandle ->
+                            delete(metaHandle)
+                        }
+                        return null
                     }
-                    return null
-                }
 
-                override fun visit(ipuzHandle : PuzHandle.IPuz) : Void? {
-                    return null
+                    override suspend fun visit(
+                        ipuzHandle : PuzHandle.IPuz,
+                    ) : Void? {
+                        return null
+                    }
                 }
+            )
+
+            withMetaCacheMutex {
+                metaCache.deleteRecord(this@FileHandler, ph)
             }
-        )
-
-        withMetaCacheMutex {
-            metaCache.deleteRecord(this@FileHandler, ph)
         }
     }
 
@@ -166,29 +179,38 @@ abstract class FileHandler {
         ph : PuzHandle,
         destDirHandle : DirHandle,
     ) {
-        val srcDirHandle = ph.dirHandle
+        withIOMutex {
+            val srcDirHandle = ph.dirHandle
 
-        moveTo(ph.mainFileHandle, srcDirHandle, destDirHandle)
+            moveToUnsync(ph.mainFileHandle, srcDirHandle, destDirHandle)
 
-        ph.setDirectory(destDirHandle)
+            ph.setDirectory(destDirHandle)
 
-        ph.accept<Void?>(
-            object : PuzHandle.Visitor<Void?> {
-                override fun visit(puzHandle : PuzHandle.Puz) : Void? {
-                    puzHandle.metaFileHandle?.let { metaHandle ->
-                        moveTo(metaHandle, srcDirHandle, destDirHandle)
+            ph.accept<Void?>(
+                object : PuzHandle.Visitor<Void?> {
+                    override suspend fun visit(
+                        puzHandle : PuzHandle.Puz,
+                    ) : Void? {
+                        val metaHandle = puzHandle.metaFileHandle
+                        if (metaHandle != null) {
+                            moveToUnsync(
+                                metaHandle,
+                                srcDirHandle,
+                                destDirHandle,
+                            )
+                        }
+                        return null
                     }
-                    return null
-                }
 
-                override fun visit(ipuzHandle : IPuz) : Void? {
-                    return null
+                    override suspend fun visit(ipuzHandle : IPuz) : Void? {
+                        return null
+                    }
                 }
+            )
+
+            withMetaCacheMutex {
+                metaCache.deleteRecord(this@FileHandler, ph)
             }
-        )
-
-        withMetaCacheMutex {
-            metaCache.deleteRecord(this@FileHandler, ph)
         }
     }
 
@@ -199,13 +221,14 @@ abstract class FileHandler {
      * @param srcDirHandle the directory containing the file to move
      * @param destDirHandle the destination directory
      */
-    @Synchronized
-    fun moveTo(
+    suspend fun moveTo(
         fileHandle : FileHandle,
         srcDirHandle : DirHandle,
         destDirHandle : DirHandle,
     ) {
-        moveToUnsync(fileHandle, srcDirHandle, destDirHandle)
+        withIOMutex {
+            moveToUnsync(fileHandle, srcDirHandle, destDirHandle)
+        }
     }
 
     /**
@@ -257,6 +280,7 @@ abstract class FileHandler {
      */
     @Throws(IOException::class)
     suspend fun loadPuzMetaFile(puzHandle : PuzHandle) : PuzMetaFile? {
+        // both load and getRefreshedPuzMetaFile acquire mutex
         return load(puzHandle)?.let { puz ->
             getRefreshedPuzMetaFile(puzHandle, puz)
         }
@@ -269,10 +293,12 @@ abstract class FileHandler {
         puzHandle : PuzHandle,
         puz : Puzzle,
     ) : PuzMetaFile {
-        val metaRecord = withMetaCacheMutex {
-            metaCache.addRecord(this@FileHandler, puzHandle, puz)
+        return withIOMutex {
+            val metaRecord = withMetaCacheMutex {
+                metaCache.addRecord(this@FileHandler, puzHandle, puz)
+            }
+            PuzMetaFile(this, puzHandle, metaRecord)
         }
-        return PuzMetaFile(this, puzHandle, metaRecord)
     }
 
     /**
@@ -285,67 +311,68 @@ abstract class FileHandler {
      */
     @Throws(IOException::class)
     suspend fun load(ph : PuzHandle) : Puzzle? {
-        val puz = ph.accept<Puzzle?>(
-            object : VisitorIO<Puzzle?> {
-                @Throws(IOException::class)
-                override suspend fun visit(
-                    puzHandle : PuzHandle.Puz,
-                ) : Puzzle? {
-                    return load(puzHandle)
-                }
+        return withIOMutex {
+            val puz = ph.accept<Puzzle?>(
+                object : VisitorIO<Puzzle?> {
+                    @Throws(IOException::class)
+                    override suspend fun visit(
+                        puzHandle : PuzHandle.Puz,
+                    ) : Puzzle? {
+                        return load(puzHandle)
+                    }
 
-                @Throws(IOException::class)
-                override suspend fun visit(
-                    ipuzHandle : IPuz,
-                ) : Puzzle? {
-                    return load(ipuzHandle)
+                    @Throws(IOException::class)
+                    override suspend fun visit(
+                        ipuzHandle : IPuz,
+                    ) : Puzzle? {
+                        return load(ipuzHandle)
+                    }
                 }
-            }
-        )
+            )
 
-        if (puz != null) {
-            val mr = withMetaCacheMutex {
-                metaCache.addRecord(this@FileHandler, ph, puz)
+            if (puz != null) {
+                val mr = withMetaCacheMutex {
+                    metaCache.addRecord(this@FileHandler, ph, puz)
+                }
+                // if the puzzle doesn't have its own date, use the detected
+                // one
+                if (puz.date == null)
+                    puz.date = mr.date
             }
-            // if the puzzle doesn't have its own date, use the detected
-            // one
-            if (puz.date == null)
-                puz.date = mr.date
+
+            puz
         }
-
-        return puz
     }
 
     /** Save puzzle and meta data
      *
      * If puzHandle's meta handle is null, a new meta file will be created and
      * puzHandle is updated with the new meta file handle
-     *
-     * Synchronized to avoid reading/writing from the same file at the same
-     * time.
      */
-    @Throws(java.io.IOException::class)
+    @Throws(IOException::class)
     suspend fun save(puz : Puzzle, ph : PuzHandle) {
-        val success = ph.accept<Boolean>(
-            object : VisitorIO<Boolean> {
-                @Throws(IOException::class)
-                override suspend fun visit(
-                    puzHandle : PuzHandle.Puz,
-                ) : Boolean {
-                    return save(puz, puzHandle)
-                }
+        withIOMutex {
+            val success = ph.accept<Boolean>(
+                object : VisitorIO<Boolean> {
+                    @Throws(IOException::class)
+                    override suspend fun visit(
+                        puzHandle : PuzHandle.Puz,
+                    ) : Boolean {
+                        return save(puz, puzHandle)
+                    }
 
-                @Throws(IOException::class)
-                override suspend fun visit(ipuzHandle : IPuz) : Boolean {
-                    return save(puz, ipuzHandle)
+                    @Throws(IOException::class)
+                    override suspend fun visit(ipuzHandle : IPuz) : Boolean {
+                        return save(puz, ipuzHandle)
+                    }
                 }
-            }
-        )
+            )
 
-        // Cannot be done on main thread
-        if (success) {
-            withMetaCacheMutex {
-                metaCache.addRecord(this@FileHandler, ph, puz)
+            // Cannot be done on main thread
+            if (success) {
+                withMetaCacheMutex {
+                    metaCache.addRecord(this@FileHandler, ph, puz)
+                }
             }
         }
     }
@@ -362,7 +389,7 @@ abstract class FileHandler {
      * extension
      * @return new puzzle handle if saved success
      */
-    @Throws(java.io.IOException::class)
+    @Throws(IOException::class)
     suspend fun saveNewPuzzle(
         puz : Puzzle,
         fileNameBody : String,
@@ -375,16 +402,17 @@ abstract class FileHandler {
             MIME_TYPE_IPUZ,
         )
 
-        if (mainFile == null)
+        if (mainFile == null) {
             return null
-
-        try {
-            val ph : PuzHandle = IPuz(dirHandle, mainFile)
-            save(puz, ph)
-            return ph
-        } catch (e : Exception) {
-            delete(mainFile)
-            throw e
+        } else {
+            try {
+                val ph : PuzHandle = IPuz(dirHandle, mainFile)
+                save(puz, ph)
+                return ph
+            } catch (e : Exception) {
+                delete(mainFile)
+                throw e
+            }
         }
     }
 
@@ -397,14 +425,14 @@ abstract class FileHandler {
         return TimeUtils.fromEpochMilliseconds(getLastModified(file))
     }
 
-    @Throws(java.io.IOException::class)
+    @Throws(IOException::class)
     fun getBufferedOutput(
         fileHandle : FileHandle,
     ) : Sink {
         return getOutput(fileHandle).buffered()
     }
 
-    protected fun delete(fileHandle : FileHandle) {
+    protected suspend fun delete(fileHandle : FileHandle) {
         deleteUnsync(fileHandle)
     }
 
@@ -458,17 +486,15 @@ abstract class FileHandler {
         }
     }
 
-    @Synchronized
     @Throws(IOException::class)
-    private fun load(ph : IPuz) : Puzzle? {
-        getBufferedInput(ph.mainFileHandle).use { input ->
-            return IPuzIO.readPuzzle(input)
+    private suspend fun load(ph : IPuz) : Puzzle? {
+        return getBufferedInput(ph.mainFileHandle).use { input ->
+            IPuzIO.readPuzzle(input)
         }
     }
 
-    @Synchronized
-    @Throws(java.io.IOException::class)
-    private fun save(puz : Puzzle, ph : PuzHandle.Puz) : Boolean {
+    @Throws(IOException::class)
+    private suspend fun save(puz : Puzzle, ph : PuzHandle.Puz) : Boolean {
         val puzFile = ph.mainFileHandle
         var metaFile = ph.metaFileHandle
         val puzDir = ph.dirHandle
@@ -483,7 +509,7 @@ abstract class FileHandler {
                 MIME_TYPE_META,
             )
             if (metaFile == null)
-                throw java.io.IOException("Could not create meta file")
+                throw IOException("Could not create meta file")
             metaCreated = true
         }
 
@@ -524,9 +550,8 @@ abstract class FileHandler {
         return true
     }
 
-    @Synchronized
     @Throws(IOException::class)
-    private fun save(puz : Puzzle, ph : IPuz) : Boolean {
+    private suspend fun save(puz : Puzzle, ph : IPuz) : Boolean {
         val ipuzFile = ph.mainFileHandle
         val puzDir = ph.dirHandle
 
@@ -535,9 +560,9 @@ abstract class FileHandler {
         val buffer = Buffer()
         IPuzIO.writePuzzle(puz, buffer)
 
-        getBufferedOutput(ipuzFile).use { output ->
+        return getBufferedOutput(ipuzFile).use { output ->
             buffer.transferTo(output)
-            return true
+            true
         }
     }
 
@@ -629,7 +654,7 @@ abstract class FileHandler {
         } else {
             try {
                 return loadPuzMetaFile(ph)
-            } catch (e : java.io.IOException) {
+            } catch (e : IOException) {
                 AppLogger.w(TAG, "Could not load puz meta for " + ph + " : " + e)
                 return null
             }
@@ -637,12 +662,11 @@ abstract class FileHandler {
     }
 
     private suspend fun <T> withMetaCacheMutex(run : suspend () -> T) : T {
-        metaCacheMutex.lock()
-        try {
-            return run()
-        } finally {
-            metaCacheMutex.unlock()
-        }
+        return metaCacheMutex.withLock { run() }
+    }
+
+    private suspend fun <T> withIOMutex(run : suspend () -> T) : T {
+        return ioMutex.withLock { run() }
     }
 
     companion object {
