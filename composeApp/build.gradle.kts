@@ -129,6 +129,7 @@ kotlin {
             implementation(libs.kotlinx.coroutines.test)
             implementation(libs.junit5.jupiter)
             implementation(libs.mockito.kotlin)
+            runtimeOnly(libs.junit.platform.launcher)
         }
 
         jvmTest.dependencies {
@@ -161,7 +162,7 @@ dependencies {
     add("kspJvm", libs.androidx.room.compiler)
 }
 
-tasks.named<Test>("jvmTest") {
+tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }
 

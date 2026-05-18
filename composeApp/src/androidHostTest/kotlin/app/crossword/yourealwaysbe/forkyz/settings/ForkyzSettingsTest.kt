@@ -18,12 +18,10 @@ import android.content.SharedPreferences
 import android.os.SystemClock
 import androidx.datastore.core.DataStore
 
-import org.junit.After
-import org.junit.Assert.assertEquals
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import org.mockito.Mock
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.anyBoolean
 import org.mockito.Mockito.anyFloat
@@ -411,22 +409,21 @@ class ForkyzSettingsTest {
     private val testDispatcher = UnconfinedTestDispatcher()
 
     @ExperimentalCoroutinesApi
-    @Before
+    @BeforeEach
     fun setup() {
         Dispatchers.setMain(testDispatcher)
     }
 
     @ExperimentalCoroutinesApi
-    @After
+    @AfterEach
     fun tearDown() {
         Dispatchers.resetMain()
     }
 
-    @Mock
     val prefs = mock(SharedPreferences::class.java)
     val prefsEdit = mock(SharedPreferences.Editor::class.java)
 
-    @Before
+    @BeforeEach
     fun setupSharedPrefs() {
         `when`(prefs.contains(anyString())).thenReturn(true)
         `when`(prefs.getBoolean(eq("alwaysAnnounceBox"), anyBoolean()))
