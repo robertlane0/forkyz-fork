@@ -74,7 +74,7 @@ object WordsToNumbers {
             }
 
             // strip word of all punctuation to make it easier to process
-            var wordStripped = word.replace("[^a-zA-Z\\s]", "").lowercase()
+            var wordStripped = word.replace(Regex("[^a-zA-Z\\s]"), "").lowercase()
 
             // 2nd condition: skip "and" words by themselves and at start of num
             if (
@@ -209,7 +209,7 @@ object WordsToNumbers {
         var intermediateResult = 0L
         for (strOrig in words) {
             // clean up string for easier processing
-            val str = strOrig.lowercase().replace("[^a-zA-Z\\s]", "")
+            val str = strOrig.lowercase().replace(Regex("[^a-zA-Z\\s]"), "")
             if (str.equals("zero", ignoreCase = true)) {
                 intermediateResult += 0
             } else if (str.equals("one", ignoreCase = true)) {
