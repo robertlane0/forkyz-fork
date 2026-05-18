@@ -1,6 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.datetime.LocalDate
 import kotlinx.io.IOException
 import kotlinx.io.Source
@@ -33,7 +34,7 @@ class AmuseLabsJSONIO : AbstractJSONIO() {
     companion object {
         private val TAG = "ForkyzAmuseLabsJSON"
 
-        @Throws(IOException::class)
+        @Throws(IOException::class, CancellationException::class)
         suspend fun readPuzzle(input : Source) : Puzzle? {
             try {
                 val json = parseJSONObject(input)
@@ -63,7 +64,11 @@ class AmuseLabsJSONIO : AbstractJSONIO() {
         /**
          * Read puzzle from Amuse Labs JSON format
          */
-        @Throws(JSONException::class, AmuseLabsFormatException::class)
+        @Throws(
+            JSONException::class,
+            AmuseLabsFormatException::class,
+            CancellationException::class,
+        )
         private suspend fun readPuzzleFromJSON(json : JSONObject) : Puzzle {
             try {
                 val builder = PuzzleBuilder(getBoxes(json))
@@ -93,7 +98,11 @@ class AmuseLabsJSONIO : AbstractJSONIO() {
             }
         }
 
-        @Throws(JSONException::class, AmuseLabsFormatException::class)
+        @Throws(
+            JSONException::class,
+            AmuseLabsFormatException::class,
+            CancellationException::class,
+        )
         private fun getBoxes(json : JSONObject) : Array<Array<Box?>> {
             val numRows = json.getInt("h")
             val numCols = json.getInt("w")
@@ -158,7 +167,7 @@ class AmuseLabsJSONIO : AbstractJSONIO() {
             return boxes
         }
 
-        @Throws(JSONException::class)
+        @Throws(JSONException::class, CancellationException::class)
         private suspend fun addClues(json : JSONObject, builder : PuzzleBuilder) {
             val entries = json.optJSONArray("placedWords")
 

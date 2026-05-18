@@ -1,6 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.exttools
 
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.flow.first
 
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
@@ -229,6 +230,6 @@ open class ShareTextData(
     }
 }
 
-@Throws(AppNotFoundException::class)
+@Throws(AppNotFoundException::class, CancellationException::class)
 expect suspend fun ExternalToolLauncher.visit(data : ShareTextData)
 

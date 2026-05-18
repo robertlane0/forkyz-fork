@@ -148,8 +148,7 @@ open class FortyTwoPuzzlesIO : AbstractJSONIO() {
         // all keys are numbers, we can convert them to actual numbers and sort
         // them this way.
         val clueNums = srcClues.keys
-            .stream()
-            .map<Int> { it.toInt() }
+            .map { it.toInt() }
             .sorted()
             .toList()
         for (clueNum in clueNums) {

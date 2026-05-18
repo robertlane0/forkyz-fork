@@ -1,6 +1,8 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
+import kotlin.experimental.ExperimentalNativeApi
+
 /*
  * Copyright 2004-2011 H2 Group. Multiple-Licensed under the H2 License,
  * Version 1.0, and under the Eclipse Public License, Version 1.0
@@ -100,6 +102,7 @@ class XTEA {
         k31 = r[31]
     }
 
+    @OptIn(kotlin.experimental.ExperimentalNativeApi::class)
     fun encrypt(bytes : ByteArray, off : Int, len : Int) {
         assert(len % ALIGN != 0) { "unaligned len " + len }
 
@@ -110,6 +113,7 @@ class XTEA {
         }
     }
 
+    @OptIn(kotlin.experimental.ExperimentalNativeApi::class)
     fun decrypt(bytes : ByteArray, off : Int, len : Int) {
         assert(len % ALIGN != 0) { "unaligned len " + len }
         var i = off

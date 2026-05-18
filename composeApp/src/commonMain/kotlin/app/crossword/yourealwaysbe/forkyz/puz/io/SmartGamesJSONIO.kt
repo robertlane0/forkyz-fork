@@ -1,6 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.datetime.LocalDate
 import kotlinx.io.IOException
 import kotlinx.io.Source
@@ -53,7 +54,7 @@ class SmartGamesJSONIO : AbstractJSONIO() {
 
         private val DATE_FORMATTER = LocalDate.Formats.ISO
 
-        @Throws(IOException::class)
+        @Throws(IOException::class, CancellationException::class)
         suspend fun readPuzzle(input : Source) : Puzzle? {
             try {
                 val json = parseJSONObject(input)
@@ -80,7 +81,11 @@ class SmartGamesJSONIO : AbstractJSONIO() {
             }
         }
 
-        @Throws(JSONException::class, SmartGamesJSONFormatException::class)
+        @Throws(
+            JSONException::class,
+            SmartGamesJSONFormatException::class,
+            CancellationException::class,
+        )
         private suspend fun readPuzzleFromJSON(json : JSONObject) : Puzzle {
             try {
                 var data = json.optJSONObject("data")
@@ -131,7 +136,7 @@ class SmartGamesJSONIO : AbstractJSONIO() {
                 val len = cells[row].length
                 for (col in 0..<len) {
                     cells[row].get(col).let { cell ->
-                        if (Character.isAlphabetic(cell.code)) {
+                        if (cell.isLetter()) {
                             boxes[row][col] = Box()
                             boxes[row][col]?.setSolution(cell)
                         }
@@ -156,7 +161,7 @@ class SmartGamesJSONIO : AbstractJSONIO() {
             }
         }
 
-        @Throws(JSONException::class)
+        @Throws(JSONException::class, CancellationException::class)
         private suspend fun addClues(
             json : JSONObject,
             builder : PuzzleBuilder,
@@ -167,7 +172,7 @@ class SmartGamesJSONIO : AbstractJSONIO() {
             addClueList(clues.optJSONObject("down"), false, builder)
         }
 
-        @Throws(JSONException::class)
+        @Throws(JSONException::class, CancellationException::class)
         private suspend fun addClueList(
             clues : JSONObject?,
             across : Boolean,

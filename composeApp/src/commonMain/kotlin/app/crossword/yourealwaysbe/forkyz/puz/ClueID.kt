@@ -9,7 +9,7 @@ data class ClueID(val listName: String, val index: Int) : Comparable<ClueID> {
         if (listCompare != 0)
             return listCompare
 
-        return Integer.compare(index, other.index)
+        return index.compareTo(other.index)
     }
 
     override fun toString() : String {

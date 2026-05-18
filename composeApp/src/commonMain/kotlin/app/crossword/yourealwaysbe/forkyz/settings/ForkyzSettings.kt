@@ -16,7 +16,6 @@ import kotlinx.io.IOException
 import kotlinx.io.Sink
 import kotlinx.io.Source
 
-import androidx.annotation.WorkerThread
 import androidx.datastore.core.DataStore
 
 import app.crossword.yourealwaysbe.forkyz.net.DownloaderID
@@ -1589,7 +1588,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         }
     }
 
-    @WorkerThread
     fun exportSettings(output : Sink?) {
         if (output == null)
             return
@@ -1610,7 +1608,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         }
     }
 
-    @WorkerThread
     fun importSettings(input : Source?) {
         if (input == null)
             return

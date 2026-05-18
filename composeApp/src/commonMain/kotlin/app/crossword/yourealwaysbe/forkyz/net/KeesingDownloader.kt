@@ -16,7 +16,7 @@ import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 class KeesingDownloader(
     downloaderID : DownloaderID,
     name : String,
-    days : Array<DayOfWeek>,
+    days : List<DayOfWeek>,
     utcAvailabilityOffset : Duration,
     supportUrl : String?,
     shareUrlPattern : String?,

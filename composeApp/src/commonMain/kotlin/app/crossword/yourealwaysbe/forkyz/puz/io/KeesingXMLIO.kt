@@ -435,7 +435,7 @@ class KeesingXMLIO : PuzzleParser {
                 return 1
 
             try {
-                return Integer.compare(num1.toInt(), num2.toInt())
+                return num1.toInt().compareTo(num2.toInt())
             } catch (e : NumberFormatException) {
                 return num1.compareTo(num2)
             }

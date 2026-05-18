@@ -1,6 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
@@ -59,7 +60,7 @@ class XWordJSONIO : AbstractJSONIO() {
             year(Padding.ZERO)
         }
 
-        @Throws(IOException::class)
+        @Throws(IOException::class, CancellationException::class)
         suspend fun readPuzzle(input : Source) : Puzzle? {
             try {
                 val json = parseJSONObject(input)
@@ -76,7 +77,11 @@ class XWordJSONIO : AbstractJSONIO() {
             }
         }
 
-        @Throws(JSONException::class, XWordJSONFormatException::class)
+        @Throws(
+            JSONException::class,
+            XWordJSONFormatException::class,
+            CancellationException::class,
+        )
         private suspend fun readPuzzleFromJSON(json : JSONObject) : Puzzle {
             val boxes : Array<Array<Box?>> = getBoxes(json)
             val builder = PuzzleBuilder(boxes)
@@ -177,7 +182,11 @@ class XWordJSONIO : AbstractJSONIO() {
             return boxes
         }
 
-        @Throws(JSONException::class, XWordJSONFormatException::class)
+        @Throws(
+            JSONException::class,
+            XWordJSONFormatException::class,
+            CancellationException::class,
+        )
         private suspend fun addClues(
             json : JSONObject,
             builder : PuzzleBuilder,
@@ -189,7 +198,7 @@ class XWordJSONIO : AbstractJSONIO() {
             addCluesArray(down, builder, false)
         }
 
-        @Throws(XWordJSONFormatException::class)
+        @Throws(XWordJSONFormatException::class, CancellationException::class)
         private suspend fun addCluesArray(
             clues : JSONArray,
             builder : PuzzleBuilder,

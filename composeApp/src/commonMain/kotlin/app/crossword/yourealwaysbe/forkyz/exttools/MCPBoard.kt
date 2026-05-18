@@ -251,7 +251,7 @@ class MCPBoard(
                 ifBoard { board ->
                     val letter = args?.optString("letter") ?: ""
                     if (letter.isNotEmpty()) {
-                        board.playLetter(Character.toUpperCase(letter[0]))
+                        board.playLetter(letter[0].uppercase())
                     }
                     "ok"
                 }

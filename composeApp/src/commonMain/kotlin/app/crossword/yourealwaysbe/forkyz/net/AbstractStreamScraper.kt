@@ -1,6 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.io.IOException
 import kotlinx.io.Source
 import kotlinx.io.readLine
@@ -48,7 +49,7 @@ abstract class AbstractStreamScraper : StreamScraper {
         url : String?,
     ) : Puzzle?
 
-    @Throws(IOException::class)
+    @Throws(IOException::class, CancellationException::class)
     protected suspend fun getURL(
         url : String,
         headers : Map<String, String>? = null,

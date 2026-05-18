@@ -1,6 +1,8 @@
 
 package app.crossword.yourealwaysbe.forkyz.view
 
+import kotlin.math.max
+
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -41,10 +43,7 @@ fun ChooseFlagColorDialog(
     val labels = stringArrayResource(Res.array.flag_color_labels).toList()
     var selected by remember {
         mutableIntStateOf(
-            Math.max(
-                0,
-                colors.indexOfFirst { it == selectedColor },
-            )
+            max(0, colors.indexOfFirst { it == selectedColor })
         )
     }
 

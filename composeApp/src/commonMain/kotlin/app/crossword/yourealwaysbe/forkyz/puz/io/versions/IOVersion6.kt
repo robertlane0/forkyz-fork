@@ -1,6 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io.versions
 
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.io.IOException
 import kotlinx.io.Sink
 import kotlinx.io.Source
@@ -23,7 +24,7 @@ open class IOVersion6 : IOVersion5() {
         applyNotes(puz, meta.downNotes, false)
     }
 
-    @Throws(IOException::class)
+    @Throws(IOException::class, CancellationException::class)
     override suspend fun readMeta(input : Source) : PuzzleMeta {
         val meta = super.readMeta(input)
         loadNotes(true, meta, input)

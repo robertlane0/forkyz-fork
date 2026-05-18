@@ -202,7 +202,7 @@ class RCIJeuxMFJIO : PuzzleParser {
                 val cols : String = rows.getString(row)
                 for (col in 0..<numCols) {
                     val cell = cols.get(col)
-                    if (Character.isUpperCase(cell)) {
+                    if (cell.isUpperCase()) {
                         val b = Box()
                         b.solution = cell.toString()
                         boxes[row][col] = b
@@ -297,7 +297,7 @@ class RCIJeuxMFJIO : PuzzleParser {
                 val cols : String = rows.getString(row)
                 for (col in 0..<cols.length) {
                     val cell = cols.get(col)
-                    if (Character.isLowerCase(cell)) {
+                    if (cell.isLowerCase()) {
                         val arrow : Arrow = getArrowFromCell(cell)
                         if (arrow.upper == 'z')
                             continue

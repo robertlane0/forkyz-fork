@@ -54,7 +54,7 @@ import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 open class AbstractDateDownloader constructor(
     override val downloaderID : DownloaderID,
     override val name : String,
-    protected val days : Array<DayOfWeek>,
+    protected val days : List<DayOfWeek>,
     protected val utcAvailabilityOffset : Duration,
     override val supportUrl : String?,
     protected var puzzleParser : StreamScraper,
@@ -70,7 +70,7 @@ open class AbstractDateDownloader constructor(
     constructor(
         downloaderID : DownloaderID,
         name : String,
-        days : Array<DayOfWeek>,
+        days : List<DayOfWeek>,
         utcAvailabilityOffset : Duration,
         supportUrl : String?,
         puzzleParser : PuzzleParser,
@@ -273,14 +273,14 @@ open class AbstractDateDownloader constructor(
         protected const val TAG : String = "ForkyzDateDownloader"
 
         // These lists must be sorted for binary search.
-        var DAYS_SUNDAY = arrayOf(DayOfWeek.SUNDAY)
-        var DAYS_MONDAY = arrayOf(DayOfWeek.MONDAY)
-        var DAYS_TUESDAY = arrayOf(DayOfWeek.TUESDAY)
-        var DAYS_WEDNESDAY = arrayOf(DayOfWeek.WEDNESDAY)
-        var DAYS_THURSDAY = arrayOf(DayOfWeek.THURSDAY)
-        var DAYS_FRIDAY = arrayOf(DayOfWeek.FRIDAY)
-        var DAYS_SATURDAY = arrayOf(DayOfWeek.SATURDAY)
-        var DAYS_DAILY = arrayOf(
+        var DAYS_SUNDAY = listOf(DayOfWeek.SUNDAY)
+        var DAYS_MONDAY = listOf(DayOfWeek.MONDAY)
+        var DAYS_TUESDAY = listOf(DayOfWeek.TUESDAY)
+        var DAYS_WEDNESDAY = listOf(DayOfWeek.WEDNESDAY)
+        var DAYS_THURSDAY = listOf(DayOfWeek.THURSDAY)
+        var DAYS_FRIDAY = listOf(DayOfWeek.FRIDAY)
+        var DAYS_SATURDAY = listOf(DayOfWeek.SATURDAY)
+        var DAYS_DAILY = listOf(
             DayOfWeek.MONDAY,
             DayOfWeek.TUESDAY,
             DayOfWeek.WEDNESDAY,
@@ -289,7 +289,7 @@ open class AbstractDateDownloader constructor(
             DayOfWeek.SATURDAY,
             DayOfWeek.SUNDAY
         )
-        var DAYS_NO_SUNDAY = arrayOf(
+        var DAYS_NO_SUNDAY = listOf(
             DayOfWeek.MONDAY,
             DayOfWeek.TUESDAY,
             DayOfWeek.WEDNESDAY,
@@ -297,7 +297,7 @@ open class AbstractDateDownloader constructor(
             DayOfWeek.FRIDAY,
             DayOfWeek.SATURDAY
         )
-        var DAYS_WEEKDAY = arrayOf(
+        var DAYS_WEEKDAY = listOf(
             DayOfWeek.MONDAY,
             DayOfWeek.TUESDAY,
             DayOfWeek.WEDNESDAY,

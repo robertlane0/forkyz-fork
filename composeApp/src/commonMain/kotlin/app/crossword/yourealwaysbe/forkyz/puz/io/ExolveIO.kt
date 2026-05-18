@@ -5,6 +5,8 @@ import kotlinx.io.IOException
 import kotlinx.io.Source
 import kotlinx.io.readLine
 
+import de.cketti.codepoints.deluxe.toCodePoint
+
 import app.crossword.yourealwaysbe.forkyz.puz.Box
 import app.crossword.yourealwaysbe.forkyz.puz.Clue
 import app.crossword.yourealwaysbe.forkyz.puz.Position
@@ -27,7 +29,7 @@ import app.crossword.yourealwaysbe.forkyz.util.HtmlUtil.parseHtmlColor
 class ExolveIO : PuzzleParser {
     class ExolveFormatException(msg : String) : Exception(msg)
 
-    @Throws(IOException::class)
+    @Throws(Exception::class)
     override suspend fun parseInput(input : Source) : Puzzle? {
         return readPuzzle(input)
     }
@@ -1257,11 +1259,14 @@ class ExolveIO : PuzzleParser {
                         continues = false
                     } else if (
                         !continues
-                        && (next == ESCAPE || Character.isHighSurrogate(next))
+                        && (
+                            next == ESCAPE
+                            || next.toCodePoint().isHighSurrogate
+                        )
                     ) {
                         cells.add("" + next)
                         continues = true
-                    } else if (Character.isWhitespace(next)) {
+                    } else if (next.isWhitespace()) {
                         newCell = true
                     } else if (newCell) {
                         cells.add("" + next)

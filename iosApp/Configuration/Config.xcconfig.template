@@ -1,0 +1,12 @@
+# Copy this file to Config.xcconfig and fill in your values.
+# Config.xcconfig is gitignored and must not be committed.
+#
+# TEAM_ID: your 10-character Apple Developer Team ID.
+# Find it at https://developer.apple.com/account -> Membership Details.
+TEAM_ID=
+
+PRODUCT_NAME=Forkyz
+PRODUCT_BUNDLE_IDENTIFIER=app.crossword.yourealwaysbe.forkyz
+
+CURRENT_PROJECT_VERSION=1
+MARKETING_VERSION=1.0

@@ -1,6 +1,8 @@
 
 package app.crossword.yourealwaysbe.forkyz.view
 
+import kotlin.math.max
+import kotlin.math.min
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -27,6 +29,8 @@ import androidx.compose.ui.unit.Dp
 
 import app.crossword.yourealwaysbe.forkyz.theme.BoardColorScheme
 import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
+import app.crossword.yourealwaysbe.forkyz.util.isISOControl
+import app.crossword.yourealwaysbe.forkyz.util.isSurrogate
 import app.crossword.yourealwaysbe.forkyz.util.keyEventToResponse
 import app.crossword.yourealwaysbe.forkyz.view.OrdinaryKey
 
@@ -121,7 +125,7 @@ fun BoardEditText(
     }
 
     fun isAcceptableCharacterResponse(c : Char) : Boolean {
-        return !Character.isISOControl(c) && !Character.isSurrogate(c)
+        return !c.isISOControl() && !c.isSurrogate()
     }
 
     fun onNewResponse(response : String) {
@@ -142,7 +146,7 @@ fun BoardEditText(
                     changed = true
                     state.selected += 1
                     if (state.selected >= length) {
-                        state.selected = Math.max(0, state.selected - 1)
+                        state.selected = max(0, state.selected - 1)
                         break
                     }
                 }
@@ -173,18 +177,18 @@ fun BoardEditText(
 
     fun onDeleteResponse() {
         state.selected = if (isSelectedBlank(value))
-            Math.max(0, state.selected - 1)
+            max(0, state.selected - 1)
         else
             state.selected
         onDelete(state.selected)
     }
 
     fun onLeft() {
-        state.selected = Math.max(state.selected - 1, 0)
+        state.selected = max(state.selected - 1, 0)
     }
 
     fun onRight() {
-        state.selected = Math.min(state.selected + 1, length - 1)
+        state.selected = min(state.selected + 1, length - 1)
     }
 
     fun onSpace() {

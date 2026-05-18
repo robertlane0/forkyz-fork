@@ -1,5 +1,6 @@
 package app.crossword.yourealwaysbe.forkyz.util
 
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.datetime.LocalDate
 import kotlinx.io.IOException
 import kotlinx.io.Source
@@ -165,7 +166,7 @@ private fun getFileName(uri : Uri?) : String? {
  *
  * @param url the url the input stream came from, may be null
  */
-@Throws(IOException::class)
+@Throws(IOException::class,CancellationException::class)
 private suspend fun importInput(
     utils : NativeBackendUtils,
     fileHandler : FileHandler,

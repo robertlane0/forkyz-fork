@@ -11,7 +11,7 @@ package app.crossword.yourealwaysbe.forkyz.puz
  * that might want to keep a copy of their bitmap object somewhere
  * convenient.
  */
-data class PuzImage @JvmOverloads constructor(
+data class PuzImage constructor(
     var url : String,
     val row : Int,
     val col : Int,

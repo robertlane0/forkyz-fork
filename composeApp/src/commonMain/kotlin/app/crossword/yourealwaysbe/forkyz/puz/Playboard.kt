@@ -4,6 +4,9 @@ package app.crossword.yourealwaysbe.forkyz.puz
 import kotlin.math.min
 import kotlin.random.Random
 
+import de.cketti.codepoints.codePointCount
+import de.cketti.codepoints.deluxe.codePointSequence
+
 import app.crossword.yourealwaysbe.forkyz.puz.Box.Companion.isBlock
 import app.crossword.yourealwaysbe.forkyz.puz.util.PuzzleUtils
 import app.crossword.yourealwaysbe.forkyz.util.SortedSet
@@ -777,7 +780,6 @@ class Playboard(puzzle : Puzzle) {
     /**
      * Ignored if clue not on board
      */
-    @JvmOverloads
     fun jumpToClue(clueID : ClueID?, tag : Any? = null) {
         if (clueID == null)
             return
@@ -803,7 +805,6 @@ class Playboard(puzzle : Puzzle) {
         }
     }
 
-    @JvmOverloads
     fun jumpToClue(clue : Clue?, tag : Any? = null) {
         if (clue != null)
             jumpToClue(clue.clueID, tag)
@@ -1110,7 +1111,6 @@ class Playboard(puzzle : Puzzle) {
         return w
     }
 
-    @JvmOverloads
     fun nextLetter(
         skipCompletedLetters : Boolean = this.isSkipCompletedLetters,
     ) : Word {
@@ -1797,8 +1797,9 @@ class Playboard(puzzle : Puzzle) {
 
         var foundStart = false
 
-        val nonSpaceCodePoints = letters.codePoints()
-            .filter { c -> !Character.isWhitespace(c) }
+        // bit of a hacky version of isWhitespace..
+        val nonSpaceCodePoints = letters.codePointSequence()
+            .filter { it.toString().trim().isNotEmpty() }
             .iterator()
         val positions = zone.iterator()
         var pos : Position? = null
@@ -1815,8 +1816,7 @@ class Playboard(puzzle : Puzzle) {
                 break
 
             // get next letter and try to handle unicode
-            val codePoint : Int = nonSpaceCodePoints.next()
-            val letter = Character.toString(codePoint)
+            val letter = nonSpaceCodePoints.next().toString()
             val changed = callback(b, letter)
             if (changed)
                 flagChange(pos)
@@ -2288,7 +2288,7 @@ class Playboard(puzzle : Puzzle) {
         /**
          * List of clues that have had num/hint edited or flagged
          */
-        @JvmField val changedClueIDs : Collection<ClueID>,
+        val changedClueIDs : Collection<ClueID>,
         /**
          * Tags added by external callers of Playboard methods
          *
@@ -2297,7 +2297,7 @@ class Playboard(puzzle : Puzzle) {
          * scroll away from a clue that has just been clicked.
          */
         val tags : Collection<Any>,
-    ) : Cloneable {
+    ) {
         override fun toString() : String {
             return ("currentWord = " + currentWord
                     + ", previousWord = " + previousWord

@@ -21,10 +21,6 @@ class SlowDownWiseUpStreamScraper() : AbstractStreamScraper() {
     companion object {
         private val TAG = "SlowDownWiseUpScrp"
         private val DEFAULT_SOURCE = "SlowDownWiseUp"
-        private val STAGE2_URL_FORMAT = (
-            "https://content-api.slowdownwiseup.co.uk/api/mobile/v1/"
-            + "puzzle-data/%s/file/data.json"
-        )
         private val IS_SLOWDOWNWISEUP_RE = Regex(
             "slowdownwiseup",
             RegexOption.IGNORE_CASE
@@ -71,7 +67,10 @@ class SlowDownWiseUpStreamScraper() : AbstractStreamScraper() {
         if (isSlowDownWiseUp == null || uuid == null) {
             return input
         } else {
-            return getURL(STAGE2_URL_FORMAT.format(uuid))
+            return getURL(
+                "https://content-api.slowdownwiseup.co.uk/api/mobile/v1/"
+                    + "puzzle-data/$uuid/file/data.json",
+            )
         }
     }
 }

@@ -1,6 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.util
 
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.io.Buffer
 import kotlinx.io.IOException
 import kotlinx.io.RawSource
@@ -8,8 +9,7 @@ import kotlinx.io.Source
 import kotlinx.io.buffered
 
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
-import io.ktor.client.engine.cio.endpoint
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.request.header
 import io.ktor.client.request.request
 import io.ktor.client.request.setBody
@@ -44,12 +44,10 @@ suspend fun getURL(
     headers : Map<String, String>? = null,
     data : JSONObject? = null,
 ) : Source {
-    val client = HttpClient(CIO) {
-        engine {
-            requestTimeout = timeoutMillis.toLong()
-            endpoint {
-                connectTimeout = timeoutMillis.toLong()
-            }
+    val client = HttpClient {
+        install(HttpTimeout) {
+            requestTimeoutMillis = timeoutMillis.toLong()
+            connectTimeoutMillis = timeoutMillis.toLong()
         }
     }
 
@@ -80,7 +78,7 @@ suspend fun getURL(
 /**
  * Makes a JSON post request and reads JSON response
  */
-@Throws(IOException::class, JSONException::class)
+@Throws(IOException::class, JSONException::class, CancellationException::class)
 suspend fun getURLJSON(
     url : String,
     timeout : Int,

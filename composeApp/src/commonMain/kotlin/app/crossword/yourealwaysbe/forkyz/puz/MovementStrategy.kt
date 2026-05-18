@@ -9,7 +9,6 @@ interface MovementStrategy {
     fun back(board : Playboard) : Word
 
     companion object {
-        @JvmField
         val MOVE_NEXT_ON_AXIS : MovementStrategy = object : MovementStrategy {
             override fun move(
                 board : Playboard,
@@ -80,7 +79,6 @@ interface MovementStrategy {
             }
         }
 
-        @JvmField
         val STOP_ON_END : MovementStrategy = object : MovementStrategy {
             override fun move(
                 board : Playboard,
@@ -91,7 +89,6 @@ interface MovementStrategy {
                 = board.moveZoneBack(false)
         }
 
-        @JvmField
         val MOVE_NEXT_CLUE : MovementStrategy = object : MovementStrategy {
             override fun move(
                 board : Playboard,
@@ -251,7 +248,6 @@ interface MovementStrategy {
             }
         }
 
-        @JvmField
         val MOVE_PARALLEL_WORD : MovementStrategy = object : MovementStrategy {
             override fun move(
                 board : Playboard,

@@ -4,6 +4,7 @@ package app.crossword.yourealwaysbe.forkyz
 import kotlin.collections.ArrayDeque
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO // needed on IOS, not JVM or Android
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -1296,14 +1297,14 @@ class SettingsPageViewModel(
                 SettingsPage.DOWNLOAD,
                 Res.string.download_remember_date,
                 Res.string.download_remember_date_desc,
-                settings.liveDownloadRememberDate.stateInHere(),
+                settings.liveDownloadRememberDate.stateInHereBool(),
                 settings::setDownloadRememberDate,
             ),
             SettingsBoolean(
                 SettingsPage.DOWNLOAD,
                 Res.string.automatic_download,
                 Res.string.automatic_download_desc,
-                settings.liveDownloadOnStartUp.stateInHere(),
+                settings.liveDownloadOnStartUp.stateInHereBool(),
                 settings::setDownloadOnStartUp,
             ),
             SettingsSubPage(
@@ -1315,14 +1316,14 @@ class SettingsPageViewModel(
                 SettingsPage.DOWNLOAD,
                 Res.string.no_summary_download_notifs,
                 Res.string.no_summary_download_notifs_desc,
-                settings.liveDownloadSuppressSummaryMessages.stateInHere(),
+                settings.liveDownloadSuppressSummaryMessages.stateInHereBool(),
                 settings::setDownloadSuppressSummaryMessages,
             ),
             SettingsBoolean(
                 SettingsPage.DOWNLOAD,
                 Res.string.no_puzzle_download_notifs,
                 Res.string.no_puzzle_download_notifs_desc,
-                settings.liveDownloadSuppressMessages.stateInHere(),
+                settings.liveDownloadSuppressMessages.stateInHereBool(),
                 settings::setDownloadSuppressMessages,
             ),
             SettingsList<Int>(
@@ -1335,7 +1336,7 @@ class SettingsPageViewModel(
                     SettingsListEntry(Res.string.forty_five_seconds, 45000),
                     SettingsListEntry(Res.string.sixty_seconds, 60000),
                 ),
-                settings.liveDownloadTimeout.stateInHere(),
+                settings.liveDownloadTimeout.stateInHereInt(),
                 settings::setDownloadTimeout,
             ),
 
@@ -1348,7 +1349,7 @@ class SettingsPageViewModel(
                 SettingsPage.DOWNLOAD_BACKGROUND,
                 Res.string.background_download_hourly,
                 Res.string.background_download_hourly_desc,
-                settings.liveDownloadHourly.stateInHere(),
+                settings.liveDownloadHourly.stateInHereBool(),
                 { value -> settings.setDownloadHourly(value) },
             ),
             SettingsMultiList(
@@ -1365,7 +1366,7 @@ class SettingsPageViewModel(
                     SettingsListEntry(Res.string.background_download_sat, "6"),
                     SettingsListEntry(Res.string.background_download_sun, "7"),
                 ),
-                settings.liveDownloadDays.stateInHere(),
+                settings.liveDownloadDays.stateInHereSet(),
                 { value -> settings.setDownloadDays(value) },
             ),
             SettingsList<Int>(
@@ -1398,7 +1399,7 @@ class SettingsPageViewModel(
                     SettingsListEntry(Res.string.background_download_22, 22),
                     SettingsListEntry(Res.string.background_download_23, 23),
                 ),
-                settings.liveDownloadDaysTime.stateInHere(),
+                settings.liveDownloadDaysTime.stateInHereInt(),
                 { value -> settings.setDownloadDaysTime(value) },
             ),
             SettingsHeading(
@@ -1409,21 +1410,21 @@ class SettingsPageViewModel(
                 SettingsPage.DOWNLOAD_BACKGROUND,
                 Res.string.download_wifi_only,
                 Res.string.download_wifi_only_desc,
-                settings.liveDownloadRequireUnmetered.stateInHere(),
+                settings.liveDownloadRequireUnmetered.stateInHereBool(),
                 { value -> settings.setDownloadRequireUnmetered(value) },
             ),
             SettingsBoolean(
                 SettingsPage.DOWNLOAD_BACKGROUND,
                 Res.string.download_roaming,
                 Res.string.download_roaming_desc,
-                settings.liveDownloadAllowRoaming.stateInHere(),
+                settings.liveDownloadAllowRoaming.stateInHereBool(),
                 { value -> settings.setDownloadAllowRoaming(value) },
             ),
             SettingsBoolean(
                 SettingsPage.DOWNLOAD_BACKGROUND,
                 Res.string.download_charging,
                 Res.string.download_charging_desc,
-                settings.liveDownloadRequireCharging.stateInHere(),
+                settings.liveDownloadRequireCharging.stateInHereBool(),
                 { value -> settings.setDownloadRequireCharging(value) },
             ),
 
@@ -1432,14 +1433,14 @@ class SettingsPageViewModel(
                 SettingsPage.BROWSER,
                 Res.string.dont_confirm_cleanup,
                 Res.string.dont_confirm_cleanup_desc,
-                settings.liveBrowseDontConfirmCleanup.stateInHere(),
+                settings.liveBrowseDontConfirmCleanup.stateInHereBool(),
                 settings::setBrowseDontConfirmCleanup,
             ),
             SettingsBoolean(
                 SettingsPage.BROWSER,
                 Res.string.delete_on_cleanup,
                 Res.string.delete_on_cleanup_desc,
-                settings.liveBrowseDeleteOnCleanup.stateInHere(),
+                settings.liveBrowseDeleteOnCleanup.stateInHereBool(),
                 settings::setBrowseDeleteOnCleanup,
             ),
             SettingsList<Int>(
@@ -1452,7 +1453,7 @@ class SettingsPageViewModel(
                     SettingsListEntry(Res.string.cleanup_age_thirty_days, 30),
                     SettingsListEntry(Res.string.cleanup_age_never, -1),
                 ),
-                settings.liveBrowseCleanupAge.stateInHere(),
+                settings.liveBrowseCleanupAge.stateInHereInt(),
                 settings::setBrowseCleanupAge,
             ),
             SettingsList<Int>(
@@ -1465,14 +1466,14 @@ class SettingsPageViewModel(
                     SettingsListEntry(Res.string.cleanup_age_thirty_days, 30),
                     SettingsListEntry(Res.string.cleanup_age_never, -1),
                 ),
-                settings.liveBrowseCleanupAgeArchive.stateInHere(),
+                settings.liveBrowseCleanupAgeArchive.stateInHereInt(),
                 settings::setBrowseCleanupAgeArchive,
             ),
             SettingsBoolean(
                 SettingsPage.BROWSER,
                 Res.string.disable_swipe,
                 Res.string.disable_swipe_desc,
-                settings.liveBrowseDisableSwipe.stateInHere(),
+                settings.liveBrowseDisableSwipe.stateInHereBool(),
                 settings::setBrowseDisableSwipe,
             ),
             SettingsList<BrowseSwipeAction>(
@@ -1498,35 +1499,35 @@ class SettingsPageViewModel(
                 SettingsPage.BROWSER,
                 Res.string.dont_confirm_browse_delete,
                 Res.string.dont_confirm_browse_delete_desc,
-                settings.liveBrowseDontConfirmDelete.stateInHere(),
+                settings.liveBrowseDontConfirmDelete.stateInHereBool(),
                 settings::setBrowseDontConfirmDelete,
             ),
             SettingsBoolean(
                 SettingsPage.BROWSER,
                 Res.string.browse_show_percentage_correct,
                 Res.string.browse_show_percentage_correct_desc,
-                settings.liveBrowseShowPercentageCorrect.stateInHere(),
+                settings.liveBrowseShowPercentageCorrect.stateInHereBool(),
                 settings::setBrowseShowPercentageCorrect,
             ),
             SettingsBoolean(
                 SettingsPage.BROWSER,
                 Res.string.browse_always_show_rating,
                 Res.string.browse_always_show_rating_desc,
-                settings.liveBrowseAlwaysShowRating.stateInHere(),
+                settings.liveBrowseAlwaysShowRating.stateInHereBool(),
                 settings::setBrowseAlwaysShowRating,
             ),
             SettingsBoolean(
                 SettingsPage.BROWSER,
                 Res.string.browse_indicate_if_solution,
                 Res.string.browse_indicate_if_solution_desc,
-                settings.liveBrowseIndicateIfSolution.stateInHere(),
+                settings.liveBrowseIndicateIfSolution.stateInHereBool(),
                 settings::setBrowseIndicateIfSolution,
             ),
             SettingsBoolean(
                 SettingsPage.BROWSER,
                 Res.string.collapse_headings,
                 Res.string.collapse_headings_desc,
-                settings.liveBrowseCollapseHeadings.stateInHere(),
+                settings.liveBrowseCollapseHeadings.stateInHereBool(),
                 settings::setBrowseCollapseHeadings,
             ),
 
@@ -1543,14 +1544,14 @@ class SettingsPageViewModel(
                 SettingsPage.DISPLAY,
                 Res.string.clue_below_grid,
                 Res.string.clue_below_grid_desc,
-                settings.livePlayClueBelowGrid.stateInHere(),
+                settings.livePlayClueBelowGrid.stateInHereBool(),
                 settings::setPlayClueBelowGrid,
             ),
             SettingsBoolean(
                 SettingsPage.DISPLAY,
                 Res.string.expandable_clue_line,
                 Res.string.expandable_clue_line_desc,
-                settings.livePlayExpandableClueLine.stateInHere(),
+                settings.livePlayExpandableClueLine.stateInHereBool(),
                 settings::setPlayExpandableClueLine,
             ),
             SettingsList<ClueListClueLine>(
@@ -1580,7 +1581,7 @@ class SettingsPageViewModel(
                 SettingsPage.DISPLAY,
                 Res.string.show_length,
                 Res.string.show_length_desc,
-                settings.livePlayShowCount.stateInHere(),
+                settings.livePlayShowCount.stateInHereBool(),
                 settings::setPlayShowCount,
             ),
             SettingsList<FitToScreenMode>(
@@ -1610,14 +1611,14 @@ class SettingsPageViewModel(
                 SettingsPage.DISPLAY,
                 Res.string.display_scratch,
                 Res.string.display_scratch_desc,
-                settings.livePlayScratchDisplay.stateInHere(),
+                settings.livePlayScratchDisplay.stateInHereBool(),
                 settings::setPlayScratchDisplay,
             ),
             SettingsBoolean(
                 SettingsPage.DISPLAY,
                 Res.string.no_hint_highlighting,
                 Res.string.no_hint_highlighting_desc,
-                settings.livePlaySuppressHintHighlighting.stateInHere(),
+                settings.livePlaySuppressHintHighlighting.stateInHereBool(),
                 settings::setPlaySuppressHintHighlighting,
             ),
             SettingsList<DisplaySeparators>(
@@ -1647,28 +1648,28 @@ class SettingsPageViewModel(
                 SettingsPage.DISPLAY,
                 Res.string.infer_separators,
                 Res.string.infer_separators_desc,
-                settings.livePlayInferSeparators.stateInHere(),
+                settings.livePlayInferSeparators.stateInHereBool(),
                 settings::setPlayInferSeparators,
             ),
             SettingsBoolean(
                 SettingsPage.DISPLAY,
                 Res.string.indicate_show_errors,
                 Res.string.indicate_show_errors_desc,
-                settings.livePlayIndicateShowErrors.stateInHere(),
+                settings.livePlayIndicateShowErrors.stateInHereBool(),
                 settings::setPlayIndicateShowErrors,
             ),
             SettingsBoolean(
                 SettingsPage.DISPLAY,
                 Res.string.show_timer,
                 Res.string.show_timer_desc,
-                settings.livePlayShowTimer.stateInHere(),
+                settings.livePlayShowTimer.stateInHereBool(),
                 settings::setPlayShowTimer,
             ),
             SettingsBoolean(
                 SettingsPage.DISPLAY,
                 Res.string.full_screen,
                 Res.string.full_screen_desc,
-                settings.livePlayFullScreen.stateInHere(),
+                settings.livePlayFullScreen.stateInHereBool(),
                 settings::setPlayFullScreen,
             ),
             SettingsList<Orientation>(
@@ -1822,7 +1823,7 @@ class SettingsPageViewModel(
                 SettingsPage.DISPLAY,
                 Res.string.highlight_crossing_clue,
                 Res.string.highlight_crossing_clue_desc,
-                settings.liveClueListHighlightCrossingClue.stateInHere(),
+                settings.liveClueListHighlightCrossingClue.stateInHereBool(),
                 settings::setClueListHighlightCrossingClue,
             ),
 
@@ -1858,7 +1859,7 @@ class SettingsPageViewModel(
                 SettingsPage.KEYBOARD,
                 Res.string.keyboard_use_native,
                 Res.string.keyboard_use_native_desc,
-                settings.liveKeyboardUseNative.stateInHere(),
+                settings.liveKeyboardUseNative.stateInHereBool(),
                 settings::setKeyboardUseNative,
             ),
             SettingsHeading(
@@ -1904,21 +1905,21 @@ class SettingsPageViewModel(
                 SettingsPage.KEYBOARD,
                 Res.string.keyboard_hide_button,
                 Res.string.keyboard_hide_button_desc,
-                settings.liveKeyboardHideButton.stateInHere(),
+                settings.liveKeyboardHideButton.stateInHereBool(),
                 settings::setKeyboardHideButton,
             ),
             SettingsBoolean(
                 SettingsPage.KEYBOARD,
                 Res.string.keyboard_compact,
                 Res.string.keyboard_compact_desc,
-                settings.liveKeyboardCompact.stateInHere(),
+                settings.liveKeyboardCompact.stateInHereBool(),
                 settings::setKeyboardCompact,
             ),
             SettingsBoolean(
                 SettingsPage.KEYBOARD,
                 Res.string.keyboard_haptic,
                 Res.string.keyboard_haptic_desc,
-                settings.liveKeyboardHaptic.stateInHere(),
+                settings.liveKeyboardHaptic.stateInHereBool(),
                 settings::setKeyboardHaptic,
             ),
             SettingsInteger(
@@ -1926,7 +1927,7 @@ class SettingsPageViewModel(
                 Res.string.keyboard_repeat_delay,
                 Res.string.keyboard_repeat_delay_desc,
                 Res.string.keyboard_repeat_delay_hint,
-                settings.liveKeyboardRepeatDelay.stateInHere(),
+                settings.liveKeyboardRepeatDelay.stateInHereInt(),
                 settings::setKeyboardRepeatDelay,
             ),
             SettingsInteger(
@@ -1934,7 +1935,7 @@ class SettingsPageViewModel(
                 Res.string.keyboard_repeat_interval,
                 Res.string.keyboard_repeat_interval_desc,
                 Res.string.keyboard_repeat_interval_hint,
-                settings.liveKeyboardRepeatInterval.stateInHere(),
+                settings.liveKeyboardRepeatInterval.stateInHereInt(),
                 settings::setKeyboardRepeatInterval,
             ),
             SettingsHeading(
@@ -1945,14 +1946,14 @@ class SettingsPageViewModel(
                 SettingsPage.KEYBOARD,
                 Res.string.keyboard_force_caps,
                 Res.string.keyboard_force_caps_desc,
-                settings.liveKeyboardForceCaps.stateInHere(),
+                settings.liveKeyboardForceCaps.stateInHereBool(),
                 settings::setKeyboardForceCaps,
             ),
             SettingsBoolean(
                 SettingsPage.KEYBOARD,
                 Res.string.keyboard_split_words,
                 Res.string.keyboard_split_words_desc,
-                settings.liveKeyboardSplitWords.stateInHere(),
+                settings.liveKeyboardSplitWords.stateInHereBool(),
                 settings::setKeyboardSplitWords,
             ),
 
@@ -1961,7 +1962,7 @@ class SettingsPageViewModel(
                 SettingsPage.INTERACTION,
                 Res.string.snap_current,
                 Res.string.snap_current_desc,
-                settings.livePlayEnsureVisible.stateInHere(),
+                settings.livePlayEnsureVisible.stateInHereBool(),
                 settings::setPlayEnsureVisible,
             ),
             SettingsList<SnapClueMode>(
@@ -2037,7 +2038,7 @@ class SettingsPageViewModel(
                 SettingsPage.INTERACTION,
                 Res.string.skip_filled,
                 Res.string.skip_filled_desc,
-                settings.livePlaySkipFilled.stateInHere(),
+                settings.livePlaySkipFilled.stateInHereBool(),
                 settings::setPlaySkipFilled,
             ),
             SettingsList<CycleUnfilledMode>(
@@ -2067,14 +2068,14 @@ class SettingsPageViewModel(
                 SettingsPage.INTERACTION,
                 Res.string.double_tap_zoom,
                 Res.string.double_tap_zoom_desc,
-                settings.livePlayDoubleTapFitBoard.stateInHere(),
+                settings.livePlayDoubleTapFitBoard.stateInHereBool(),
                 settings::setPlayDoubleTapFitBoard,
             ),
             SettingsBoolean(
                 SettingsPage.INTERACTION,
                 Res.string.dont_snap_board_to_borders,
                 Res.string.dont_snap_board_to_borders_desc,
-                settings.livePlayDontSnapBoardToBorders.stateInHere(),
+                settings.livePlayDontSnapBoardToBorders.stateInHereBool(),
                 settings::setPlayDontSnapBoardToBorders,
             ),
             SettingsList<DeleteCrossingModeSetting>(
@@ -2104,56 +2105,57 @@ class SettingsPageViewModel(
                 SettingsPage.INTERACTION,
                 Res.string.preserve_correct,
                 Res.string.preserve_correct_desc,
-                settings.livePlayPreserveCorrectLettersInShowErrors.stateInHere(),
+                settings.livePlayPreserveCorrectLettersInShowErrors
+                    .stateInHereBool(),
                 settings::setPlayPreserveCorrectLettersInShowErrors,
             ),
             SettingsBoolean(
                 SettingsPage.INTERACTION,
                 Res.string.play_letter_undo,
                 Res.string.play_letter_undo_desc,
-                settings.livePlayPlayLetterUndoEnabled.stateInHere(),
+                settings.livePlayPlayLetterUndoEnabled.stateInHereBool(),
                 settings::setPlayPlayLetterUndoEnabled,
             ),
             SettingsBoolean(
                 SettingsPage.INTERACTION,
                 Res.string.space_change_dir,
                 Res.string.space_change_dir_desc,
-                settings.livePlaySpaceChangesDirection.stateInHere(),
+                settings.livePlaySpaceChangesDirection.stateInHereBool(),
                 settings::setPlaySpaceChangesDirection,
             ),
             SettingsBoolean(
                 SettingsPage.INTERACTION,
                 Res.string.enter_changes_direction,
                 Res.string.enter_changes_direction_desc,
-                settings.livePlayEnterChangesDirection.stateInHere(),
+                settings.livePlayEnterChangesDirection.stateInHereBool(),
                 settings::setPlayEnterChangesDirection,
             ),
             SettingsBoolean(
                 SettingsPage.INTERACTION,
                 Res.string.toggle_before_move,
                 Res.string.toggle_before_move_desc,
-                settings.livePlayToggleBeforeMove.stateInHere(),
+                settings.livePlayToggleBeforeMove.stateInHereBool(),
                 settings::setPlayToggleBeforeMove,
             ),
             SettingsBoolean(
                 SettingsPage.INTERACTION,
                 Res.string.random_clue_on_shake,
                 Res.string.random_clue_on_shake_desc,
-                settings.livePlayRandomClueOnShake.stateInHere(),
+                settings.livePlayRandomClueOnShake.stateInHereBool(),
                 settings::setPlayRandomClueOnShake,
             ),
             SettingsBoolean(
                 SettingsPage.INTERACTION,
                 Res.string.predict_anagram_chars,
                 Res.string.predict_anagram_chars_desc,
-                settings.livePlayPredictAnagramChars.stateInHere(),
+                settings.livePlayPredictAnagramChars.stateInHereBool(),
                 settings::setPlayPredictAnagramChars,
             ),
             SettingsBoolean(
                 SettingsPage.INTERACTION,
                 Res.string.disable_ratings,
                 Res.string.disable_ratings_desc,
-                settings.liveRatingsDisableRatings.stateInHere(),
+                settings.liveRatingsDisableRatings.stateInHereBool(),
                 settings::setRatingsDisableRatings,
             ),
 
@@ -2162,49 +2164,49 @@ class SettingsPageViewModel(
                 SettingsPage.VOICE_ACCESSIBILITY,
                 Res.string.voice_with_volume,
                 Res.string.voice_with_volume_desc,
-                settings.liveVoiceVolumeActivatesVoice.stateInHere(),
+                settings.liveVoiceVolumeActivatesVoice.stateInHereBool(),
                 settings::setVoiceVolumeActivatesVoice,
             ),
             SettingsBoolean(
                 SettingsPage.VOICE_ACCESSIBILITY,
                 Res.string.voice_with_button,
                 Res.string.voice_with_button_desc,
-                settings.liveVoiceButtonActivatesVoice.stateInHere(),
+                settings.liveVoiceButtonActivatesVoice.stateInHereBool(),
                 settings::setVoiceButtonActivatesVoice,
             ),
             SettingsBoolean(
                 SettingsPage.VOICE_ACCESSIBILITY,
                 Res.string.llm_voice_commands,
                 Res.string.llm_voice_commands_desc,
-                settings.liveVoiceLLMVoiceCommands.stateInHere(),
+                settings.liveVoiceLLMVoiceCommands.stateInHereBool(),
                 settings::setVoiceLLMVoiceCommands,
             ),
             SettingsBoolean(
                 SettingsPage.VOICE_ACCESSIBILITY,
                 Res.string.announce_clue_button,
                 Res.string.announce_clue_button_desc,
-                settings.liveVoiceButtonAnnounceClue.stateInHere(),
+                settings.liveVoiceButtonAnnounceClue.stateInHereBool(),
                 settings::setVoiceButtonAnnounceClue,
             ),
             SettingsBoolean(
                 SettingsPage.VOICE_ACCESSIBILITY,
                 Res.string.announce_clue_equals,
                 Res.string.announce_clue_equals_desc,
-                settings.liveVoiceEqualsAnnounceClue.stateInHere(),
+                settings.liveVoiceEqualsAnnounceClue.stateInHereBool(),
                 settings::setVoiceEqualsAnnounceClue,
             ),
             SettingsBoolean(
                 SettingsPage.VOICE_ACCESSIBILITY,
                 Res.string.announce_clue_always,
                 Res.string.announce_clue_always_desc,
-                settings.liveVoiceAlwaysAnnounceClue.stateInHere(),
+                settings.liveVoiceAlwaysAnnounceClue.stateInHereBool(),
                 settings::setVoiceAlwaysAnnounceClue,
             ),
             SettingsBoolean(
                 SettingsPage.VOICE_ACCESSIBILITY,
                 Res.string.announce_box_always,
                 Res.string.announce_box_always_desc,
-                settings.liveVoiceAlwaysAnnounceBox.stateInHere(),
+                settings.liveVoiceAlwaysAnnounceBox.stateInHereBool(),
                 settings::setVoiceAlwaysAnnounceBox,
             ),
             SettingsDivider(SettingsPage.VOICE_ACCESSIBILITY),
@@ -2246,7 +2248,7 @@ class SettingsPageViewModel(
                 SettingsPage.EXTERNAL_TOOLS,
                 Res.string.crossword_solver_enabled,
                 Res.string.crossword_solver_enabled_desc,
-                settings.liveExtCrosswordSolverEnabled.stateInHere(),
+                settings.liveExtCrosswordSolverEnabled.stateInHereBool(),
                 settings::setExtCrosswordSolverEnabled,
             ),
             SettingsList<LLMAgent>(
@@ -2272,7 +2274,7 @@ class SettingsPageViewModel(
                 Res.string.llm_agent_api_key,
                 Res.string.llm_agent_api_key_desc,
                 Res.string.llm_agent_api_key,
-                settings.liveExtLLMAgentAPIKey.stateInHere(),
+                settings.liveExtLLMAgentAPIKey.stateInHereString(),
                 settings::setExtLLMAgentAPIKey,
                 dialogMsg = Res.string.llm_agent_api_key_message,
             ),
@@ -2280,14 +2282,14 @@ class SettingsPageViewModel(
                 SettingsPage.EXTERNAL_TOOLS,
                 Res.string.duckduckgo,
                 Res.string.duckduckgo_desc,
-                settings.liveExtDuckDuckGoEnabled.stateInHere(),
+                settings.liveExtDuckDuckGoEnabled.stateInHereBool(),
                 settings::setExtDuckDuckGoEnabled,
             ),
             SettingsBoolean(
                 SettingsPage.EXTERNAL_TOOLS,
                 Res.string.fifteen_squared,
                 Res.string.fifteen_squared_desc,
-                settings.liveExtFifteenSquaredEnabled.stateInHere(),
+                settings.liveExtFifteenSquaredEnabled.stateInHereBool(),
                 settings::setExtFifteenSquaredEnabled,
             ),
             SettingsString(
@@ -2295,7 +2297,7 @@ class SettingsPageViewModel(
                 Res.string.mcp_host_port,
                 Res.string.mcp_host_port_desc,
                 Res.string.mcp_host_port_hint,
-                settings.liveExtMCPHostPort.stateInHere(),
+                settings.liveExtMCPHostPort.stateInHereString(),
                 settings::setExtMCPHostPort,
             ),
 
@@ -2324,7 +2326,7 @@ class SettingsPageViewModel(
                 SettingsPage.DESKTOP,
                 Res.string.undecorated,
                 Res.string.undecorated_desc,
-                settings.liveAppUndecorated.stateInHere(),
+                settings.liveAppUndecorated.stateInHereBool(),
                 settings::setAppUndecorated,
             ),
         )
@@ -2576,23 +2578,19 @@ class SettingsPageViewModel(
         return this.stateInSubscribed(viewModelScope, initialValue)
     }
 
-    @JvmName("stateInHereBoolean")
-    private fun Flow<Boolean>.stateInHere() : StateFlow<Boolean> {
+    private fun Flow<Boolean>.stateInHereBool() : StateFlow<Boolean> {
         return this.stateInHere(false)
     }
 
-    @JvmName("stateInHereString")
-    private fun Flow<String>.stateInHere() : StateFlow<String> {
+    private fun Flow<String>.stateInHereString() : StateFlow<String> {
         return this.stateInHere("")
     }
 
-    @JvmName("stateInHereInt")
-    private fun Flow<Int>.stateInHere() : StateFlow<Int> {
+    private fun Flow<Int>.stateInHereInt() : StateFlow<Int> {
         return this.stateInHere(0)
     }
 
-    @JvmName("stateInHereStringSet")
-    private fun <T> Flow<Set<T>>.stateInHere() : StateFlow<Set<T>> {
+    private fun <T> Flow<Set<T>>.stateInHereSet() : StateFlow<Set<T>> {
         return this.stateInHere(setOf())
     }
 
@@ -2612,7 +2610,7 @@ class SettingsPageViewModel(
             settingsData.title,
             settingsData.summary,
             settings.liveDownloadEnabledDownloader(settingsData.downloaderID)
-                .stateInHere(),
+                .stateInHereBool(),
             { enabled ->
                 settings.setDownloadEnableDownloader(
                     settingsData.downloaderID,
@@ -2640,7 +2638,7 @@ class SettingsPageViewModel(
                     Res.string.custom_title,
                     Res.string.custom_title_desc,
                     Res.string.custom_title_hint,
-                    settings.liveDownloadCustomDailyTitle.stateInHere(),
+                    settings.liveDownloadCustomDailyTitle.stateInHereString(),
                     settings::setDownloadCustomDailyTitle,
                 ),
                 SettingsString(
@@ -2648,7 +2646,7 @@ class SettingsPageViewModel(
                     Res.string.custom_url,
                     Res.string.custom_url_desc,
                     Res.string.custom_url_hint,
-                    settings.liveDownloadCustomDailyURL.stateInHere(),
+                    settings.liveDownloadCustomDailyURL.stateInHereString(),
                     settings::setDownloadCustomDailyURL,
                     downloadCustomDailyURLErrorMsg,
                 ),
@@ -2667,49 +2665,56 @@ class SettingsPageViewModel(
                 settingsPage,
                 Res.string.block_auto_mon,
                 Res.string.block_auto_mon_desc,
-                settings.liveDownloadAutoDownloaderBlockMon(did).stateInHere(),
+                settings.liveDownloadAutoDownloaderBlockMon(did)
+                    .stateInHereBool(),
                 { settings.setDownloadAutoDownloaderBlockMon(did, it) }
             ),
             SettingsBoolean(
                 settingsPage,
                 Res.string.block_auto_tue,
                 Res.string.block_auto_tue_desc,
-                settings.liveDownloadAutoDownloaderBlockTue(did).stateInHere(),
+                settings.liveDownloadAutoDownloaderBlockTue(did)
+                    .stateInHereBool(),
                 { settings.setDownloadAutoDownloaderBlockTue(did, it) }
             ),
             SettingsBoolean(
                 settingsPage,
                 Res.string.block_auto_wed,
                 Res.string.block_auto_wed_desc,
-                settings.liveDownloadAutoDownloaderBlockWed(did).stateInHere(),
+                settings.liveDownloadAutoDownloaderBlockWed(did)
+                    .stateInHereBool(),
                 { settings.setDownloadAutoDownloaderBlockWed(did, it) }
             ),
             SettingsBoolean(
                 settingsPage,
                 Res.string.block_auto_thu,
                 Res.string.block_auto_thu_desc,
-                settings.liveDownloadAutoDownloaderBlockThu(did).stateInHere(),
+                settings.liveDownloadAutoDownloaderBlockThu(did)
+                    .stateInHereBool(),
                 { settings.setDownloadAutoDownloaderBlockThu(did, it) }
             ),
             SettingsBoolean(
                 settingsPage,
                 Res.string.block_auto_fri,
                 Res.string.block_auto_fri_desc,
-                settings.liveDownloadAutoDownloaderBlockFri(did).stateInHere(),
+                settings.liveDownloadAutoDownloaderBlockFri(did)
+                    .stateInHereBool(),
                 { settings.setDownloadAutoDownloaderBlockFri(did, it) }
             ),
             SettingsBoolean(
                 settingsPage,
                 Res.string.block_auto_sat,
                 Res.string.block_auto_sat_desc,
-                settings.liveDownloadAutoDownloaderBlockSat(did).stateInHere(),
+                settings.liveDownloadAutoDownloaderBlockSat(did)
+                    .stateInHereBool(),
                 { settings.setDownloadAutoDownloaderBlockSat(did, it) }
             ),
             SettingsBoolean(
                 settingsPage,
                 Res.string.block_auto_sun,
                 Res.string.block_auto_sun_desc,
-                settings.liveDownloadAutoDownloaderBlockSun(did).stateInHere(),
+                settings.liveDownloadAutoDownloaderBlockSun(did)
+                    .stateInHereBool(),
                 { settings.setDownloadAutoDownloaderBlockSun(did, it) }
             ),
         )

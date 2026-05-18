@@ -1,6 +1,8 @@
 
 package app.crossword.yourealwaysbe.forkyz.view
 
+import kotlin.math.max
+
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -138,7 +140,7 @@ fun CircleProgressBar(
         }
 
         if (percentFilled >= 0 && percentHinted > 0) {
-            val sweep = Math.max(360F * percentHinted / 100F, MIN_HINTED_SWEEP)
+            val sweep = max(360F * percentHinted / 100F, MIN_HINTED_SWEEP)
             drawArc(
                 color = colors.progressHinted,
                 startAngle = -90f,

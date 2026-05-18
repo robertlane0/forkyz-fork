@@ -1,6 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io.versions
 
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.io.IOException
 import kotlinx.io.Sink
 import kotlinx.io.Source
@@ -17,7 +18,7 @@ open class IOVersion7 : IOVersion6() {
         puz.supportUrl = meta.supportUrl
     }
 
-    @Throws(IOException::class)
+    @Throws(IOException::class, CancellationException::class)
     override suspend fun readMeta(input : Source) : PuzzleMeta {
         val meta = super.readMeta(input)
         meta.supportUrl = readNullTerminatedString(input, charsetDecoder)

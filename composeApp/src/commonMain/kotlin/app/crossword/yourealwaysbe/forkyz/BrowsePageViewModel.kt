@@ -2,6 +2,7 @@
 package app.crossword.yourealwaysbe.forkyz
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO // needed on IOS, not JVM or Android
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -10,7 +11,6 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.minus
-import kotlinx.datetime.toJavaLocalDate
 import kotlinx.io.IOException
 
 import androidx.annotation.MainThread

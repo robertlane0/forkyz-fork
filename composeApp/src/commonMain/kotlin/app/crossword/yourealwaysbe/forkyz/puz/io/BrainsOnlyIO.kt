@@ -1,6 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.Padding
 import kotlinx.io.EOFException
@@ -22,7 +23,7 @@ import app.crossword.yourealwaysbe.forkyz.util.HtmlUtil.htmlString
  * To change this template use File | Settings | File Templates.
  */
 class BrainsOnlyIO : PuzzleParser {
-    @Throws(IOException::class)
+    @Throws(Exception::class)
     override suspend fun parseInput(input : Source) : Puzzle? {
         return parse(input)
     }
@@ -36,7 +37,7 @@ class BrainsOnlyIO : PuzzleParser {
             day(Padding.ZERO)
         }
 
-        @Throws(IOException::class)
+        @Throws(IOException::class, CancellationException::class)
         suspend fun parse(input : Source) : Puzzle? {
             val date : String = readLineAtOffset(input, 2)
             val title : String = readLineAtOffset(input, 1)

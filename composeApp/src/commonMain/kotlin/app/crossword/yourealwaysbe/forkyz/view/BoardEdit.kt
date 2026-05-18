@@ -1,6 +1,9 @@
 
 package app.crossword.yourealwaysbe.forkyz.view
 
+import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlinx.collections.immutable.ImmutableList
 
@@ -47,6 +50,7 @@ import app.crossword.yourealwaysbe.forkyz.theme.BoardColorScheme
 import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
 import app.crossword.yourealwaysbe.forkyz.util.Parcelable
 import app.crossword.yourealwaysbe.forkyz.util.Parcelize
+import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 import app.crossword.yourealwaysbe.forkyz.view.OrdinaryKey
 
 private val MAX_BOX_SIZE_DP : Float = 160f
@@ -351,13 +355,13 @@ class BoardEditState private constructor(
         val newX = x + delta
         if (sizePx > 0 && sizeBoxes > 0 && density > 0) {
             val threshold = STICKY_PAN_THRESHOLD_DP * density
-            if (Math.abs(newX) < threshold && !dontSnapBoardToBorders) {
+            if (abs(newX) < threshold && !dontSnapBoardToBorders) {
                 return 0f
             } else {
                 val boardSize = BASE_BOX_SIZE_DP * density * sizeBoxes * scale
                 val farX = sizePx - boardSize
                 if (
-                    Math.abs(farX - newX) < threshold
+                    abs(farX - newX) < threshold
                     && !dontSnapBoardToBorders
                 ) {
                     return farX
@@ -384,7 +388,7 @@ class BoardEditState private constructor(
         val hScale = viewWidthPx / (boxSizePx * boardWidthBoxes)
         val vScale = viewHeightPx / (boxSizePx * boardHeightBoxes)
 
-        fitScale = Math.min(hScale, vScale)
+        fitScale = min(hScale, vScale)
 
         if (pendingFit || locked) {
             pendingFit = false
@@ -397,7 +401,7 @@ class BoardEditState private constructor(
      */
     fun checkScale(newScale : Float) : Float {
         if (!locked || newScale == fitScale)
-            return Math.max(Math.min(newScale, MAX_SCALE), MIN_SCALE)
+            return max(min(newScale, MAX_SCALE), MIN_SCALE)
         else
             return scale
     }
@@ -541,7 +545,7 @@ private fun BoardFullBody(
                 detectTapGestures(
                     onTap = { offset ->
                         // don't use onDoubleTap to avoid delay of onTap
-                        val now = System.currentTimeMillis()
+                        val now = TimeUtils.currentTimeMillis()
                         val isDouble = (
                             now - lastTapTime < DOUBLE_CLICK_INTERVAL
                         )
@@ -863,9 +867,9 @@ fun BoxesEditNoInput(
         = remember(localDensity, colors, length, localTextStyle) {
             val baseBoxSizePx = BASE_BOX_SIZE_DP * localDensity.density
             val fillScale = displayWidth / (baseBoxSizePx * length)
-            val scale = Math.max(
+            val scale = max(
                 MIN_SCALE_WORD,
-                Math.min(MAX_SCALE_WORD, fillScale),
+                min(MAX_SCALE_WORD, fillScale),
             )
             BoxProfile.build(localDensity, colors, scale, localTextStyle)
         }

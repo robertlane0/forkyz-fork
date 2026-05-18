@@ -210,7 +210,7 @@ class ClueTabsViewModel(
 
     fun onCleared() {
         board?.removeListener(this)
-        wordEditViewModels.forEach { _, vm -> vm?.onCleared() }
+        wordEditViewModels.values.forEach { vm -> vm?.onCleared() }
     }
 
     fun getWordEditViewModel(clueID : ClueID) : WordEditViewModel? {

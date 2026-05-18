@@ -1,6 +1,8 @@
 
 package app.crossword.yourealwaysbe.forkyz.exttools
 
+import kotlin.coroutines.cancellation.CancellationException
+
 import app.crossword.yourealwaysbe.forkyz.puz.Box
 import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.puz.Zone
@@ -81,6 +83,6 @@ class CrosswordSolverData(
     }
 }
 
-@Throws(AppNotFoundException::class)
+@Throws(AppNotFoundException::class, CancellationException::class)
 expect suspend fun ExternalToolLauncher.visit(data : CrosswordSolverData)
 

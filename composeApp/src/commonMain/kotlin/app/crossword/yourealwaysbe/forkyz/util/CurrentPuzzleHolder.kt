@@ -3,6 +3,7 @@ package app.crossword.yourealwaysbe.forkyz.util
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO // needed on IOS, not JVM or Android
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -70,7 +71,7 @@ public class CurrentPuzzleHolder(
     @MainThread
     fun loadPuzzle(
         puzHandle : PuzHandle,
-        cb : Runnable,
+        cb : () -> Unit,
         onErr : (IOException) -> Unit,
     ) {
         ioScope.launch {
@@ -118,7 +119,7 @@ public class CurrentPuzzleHolder(
                                     splitWords,
                                 )
                                 this@CurrentPuzzleHolder.puzHandle = puzHandle
-                                cb.run()
+                                cb()
                             }
                         } catch (e : IOException) {
                             mainScope.launch { onErr(e) }

@@ -165,7 +165,7 @@ data class Note(
                 return ""
 
             val padding = CharArray(len) { BLANK_CHAR }
-            return String(padding)
+            return padding.concatToString()
         }
 
         private fun isBlankString(s : String?) : Boolean {

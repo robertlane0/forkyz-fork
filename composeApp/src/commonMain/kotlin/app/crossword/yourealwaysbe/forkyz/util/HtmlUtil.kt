@@ -172,7 +172,6 @@ object HtmlUtil {
      * Remove IPuz HTML from a string
      * @return decoded string or null if value was null
      */
-    @JvmStatic
     fun unHtmlString(value : String?) : String? {
         if (value == null)
             return null
@@ -191,7 +190,6 @@ object HtmlUtil {
      * Return IPuz HTML encoding of string
      * @return encoded string or null if value was null
      */
-    @JvmStatic
     fun htmlString(value : String?) : String? {
         if (value == null)
             return null
@@ -208,7 +206,6 @@ object HtmlUtil {
      * Ignores alpha channels since not supported by IPuz (our backend
      * format). Color always positive or 0 if success. I.e. 0x00rrggbb.
      */
-    @JvmStatic
     fun parseHtmlColor(color : String?) : Int {
         var color = color
         if (color == null || color.isEmpty())

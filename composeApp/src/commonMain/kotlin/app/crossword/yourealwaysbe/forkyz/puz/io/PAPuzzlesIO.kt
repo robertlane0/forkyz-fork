@@ -1,6 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.text.RegexOption.IGNORE_CASE
@@ -78,7 +79,7 @@ class PAPuzzlesIO : PuzzleParser {
         private val CLUE_HINT_RE = "\\s*[\\d/]+\\s*(.*)".toRegex()
         private const val CLUE_HINT_GRP = 1
 
-        @Throws(IOException::class)
+        @Throws(IOException::class, CancellationException::class)
         suspend fun readPuzzle(input : Source) : Puzzle? {
             try {
                 val doc = Ksoup.parseSource(input)

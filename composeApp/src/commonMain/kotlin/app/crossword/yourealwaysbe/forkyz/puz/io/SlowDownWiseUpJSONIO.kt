@@ -1,6 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.DayOfWeekNames
 import kotlinx.datetime.format.MonthNames
@@ -74,7 +75,7 @@ class SlowDownWiseUpJSONIO : AbstractJSONIO() {
             year(Padding.NONE)
         }
 
-        @Throws(IOException::class)
+        @Throws(IOException::class, CancellationException::class)
         suspend fun readPuzzle(input : Source) : Puzzle? {
             try {
                 val json = parseJSONObject(input)
@@ -101,7 +102,11 @@ class SlowDownWiseUpJSONIO : AbstractJSONIO() {
             }
         }
 
-        @Throws(JSONException::class, SlowDownWiseUpJSONFormatException::class)
+        @Throws(
+            JSONException::class,
+            SlowDownWiseUpJSONFormatException::class,
+            CancellationException::class,
+        )
         private suspend fun readPuzzleFromJSON(json : JSONObject) : Puzzle {
             try {
                 var data = json.optJSONObject("data")
@@ -186,8 +191,11 @@ class SlowDownWiseUpJSONIO : AbstractJSONIO() {
             }
         }
 
-        @Throws(JSONException::class)
-        private suspend fun addClues(json : JSONObject, builder : PuzzleBuilder) {
+        @Throws(JSONException::class, CancellationException::class)
+        private suspend fun addClues(
+            json : JSONObject,
+            builder : PuzzleBuilder,
+        ) {
             val zones : Map<Int, Zone> = getZones(json)
             val clues = json.getJSONObject("copy").getJSONArray("clues")
             for (i in 0..<clues.size) {
@@ -195,7 +203,7 @@ class SlowDownWiseUpJSONIO : AbstractJSONIO() {
             }
         }
 
-        @Throws(JSONException::class)
+        @Throws(JSONException::class, CancellationException::class)
         private suspend fun addCluesList(
             json : JSONObject,
             zones : Map<Int, Zone>,
@@ -246,7 +254,7 @@ class SlowDownWiseUpJSONIO : AbstractJSONIO() {
             var i = 0
             while (i < format.length) {
                 var c = format[i]
-                if (Character.isDigit(c)) {
+                if (c.isDigit()) {
                     val digit = c.digitToIntOrNull() ?: -1
                     len = 10 * len + digit
                 } else {

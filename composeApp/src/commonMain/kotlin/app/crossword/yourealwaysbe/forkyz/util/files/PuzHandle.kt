@@ -1,6 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.util.files
 
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.io.IOException
 
 abstract class PuzHandle private constructor(
@@ -16,7 +17,7 @@ abstract class PuzHandle private constructor(
 
     abstract suspend fun <R> accept(v : Visitor<R>) : R
 
-    @Throws(IOException::class)
+    @Throws(IOException::class, CancellationException::class)
     abstract suspend fun <R> accept(v : VisitorIO<R>) : R
 
     /**
@@ -42,7 +43,7 @@ abstract class PuzHandle private constructor(
             return v.visit(this)
         }
 
-        @Throws(IOException::class)
+        @Throws(IOException::class, CancellationException::class)
         override suspend fun <R> accept(v : VisitorIO<R>): R {
             return v.visit(this)
         }
@@ -56,7 +57,7 @@ abstract class PuzHandle private constructor(
             return v.visit(this)
         }
 
-        @Throws(IOException::class)
+        @Throws(IOException::class, CancellationException::class)
         override suspend fun <R> accept(v : VisitorIO<R>) : R {
             return v.visit(this)
         }
@@ -68,10 +69,10 @@ abstract class PuzHandle private constructor(
     }
 
     interface VisitorIO<R> {
-        @Throws(IOException::class)
+        @Throws(IOException::class, CancellationException::class)
         suspend fun visit(puzHandle : Puz): R
 
-        @Throws(IOException::class)
+        @Throws(IOException::class, CancellationException::class)
         suspend fun visit(ipuzHandle : IPuz): R
     }
 }

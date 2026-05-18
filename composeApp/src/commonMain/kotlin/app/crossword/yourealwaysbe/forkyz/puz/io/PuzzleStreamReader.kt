@@ -58,7 +58,7 @@ class PuzzleStreamReader : PuzzleParser {
                         AppLogger.i(
                             TAG,
                             "Attempting parse with "
-                                + parser.javaClass.getName(),
+                                + parser::class,
                         )
                         val puz = parser.parseInput(copy)
                         if (puz != null)

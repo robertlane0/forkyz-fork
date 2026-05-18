@@ -3,9 +3,8 @@ package app.crossword.yourealwaysbe.forkyz.util.files
 
 import kotlinx.datetime.LocalDate
 
-import androidx.annotation.NonNull
-import androidx.annotation.Nullable
 import androidx.room.ColumnInfo
+import androidx.room.ConstructedBy
 import androidx.room.Dao
 import androidx.room.Database
 import androidx.room.Delete
@@ -15,6 +14,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.RoomDatabase
+import androidx.room.RoomDatabaseConstructor
 import androidx.room.Transaction
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
@@ -28,6 +28,12 @@ import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle
 import app.crossword.yourealwaysbe.forkyz.util.toUri
+
+@Suppress("KotlinNoActualForExpect")
+expect object CachedMetaDBConstructor
+    : RoomDatabaseConstructor<MetaCache.CachedMetaDB> {
+    override fun initialize() : MetaCache.CachedMetaDB
+}
 
 class MetaCache(private val utils : NativeBackendUtils) {
     object Converters {
@@ -153,6 +159,7 @@ class MetaCache(private val utils : NativeBackendUtils) {
     }
 
     @Database(entities = [CachedMeta::class], version = 5)
+    @ConstructedBy(CachedMetaDBConstructor::class)
     abstract class CachedMetaDB : RoomDatabase() {
         abstract fun cachedMetaDao() : CachedMetaDao
 

@@ -1,6 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.net
 
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration
 import kotlinx.datetime.LocalDate
 import kotlinx.io.IOException
@@ -15,7 +16,10 @@ import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.puz.PuzzleBuilder
 import app.crossword.yourealwaysbe.forkyz.puz.io.IO
 import app.crossword.yourealwaysbe.forkyz.puz.io.PuzzleParser
+import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
+
+private val TAG = "ForkyzPageScraper"
 
 /**
  * A downloader that scrapes from a dateless archive
@@ -131,11 +135,10 @@ open class PageScraper(
                             return DownloadResult(puz, filename)
                         }
                     } catch (e : Exception) {
-                        System.err.println(
-                            "Exception downloading "
-                                + url + " for " + this.name,
+                        AppLogger.e(
+                            TAG,
+                            "Exception downloading $url for ${this.name}",
                         )
-                        e.printStackTrace()
                         downloadFailed = true
                     }
                 }
@@ -163,7 +166,7 @@ open class PageScraper(
         return null
     }
 
-    @Throws(IOException::class)
+    @Throws(IOException::class, CancellationException::class)
     private suspend fun getPuzzleURLs() : List<String> {
         val result = mutableListOf<String>()
 

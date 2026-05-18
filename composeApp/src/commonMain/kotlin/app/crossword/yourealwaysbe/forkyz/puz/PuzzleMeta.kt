@@ -10,7 +10,7 @@ data class ListNum(val listName : String, val number : Int)
  *
  * TODO: rename!
  */
-data class PuzzleMeta @JvmOverloads constructor(
+data class PuzzleMeta constructor(
     var author : String? = null,
     var title : String? = null,
     var source : String? = null,

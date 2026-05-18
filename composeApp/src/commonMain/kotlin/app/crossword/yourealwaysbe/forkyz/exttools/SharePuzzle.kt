@@ -1,6 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.exttools
 
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.CoroutineScope
 
 import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
@@ -39,6 +40,6 @@ class SharePuzzleData(
     }
 }
 
-@Throws(AppNotFoundException::class)
+@Throws(AppNotFoundException::class, CancellationException::class)
 expect suspend fun ExternalToolLauncher.visit(data : SharePuzzleData)
 

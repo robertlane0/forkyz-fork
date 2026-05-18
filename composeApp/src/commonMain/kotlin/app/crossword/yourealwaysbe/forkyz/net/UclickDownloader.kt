@@ -20,7 +20,7 @@ class UclickDownloader(
     fullName : String,
     private val copyright : String?,
     supportUrl : String?,
-    days : Array<DayOfWeek>,
+    days : List<DayOfWeek>,
     utcAvailabilityOffset : Duration,
     shareUrlPattern : String?,
 ) : AbstractDateDownloader(

@@ -6,8 +6,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.io.IOException
 
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
-import io.ktor.client.engine.cio.endpoint
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.request.request
 import io.ktor.client.statement.readRawBytes
 import io.ktor.http.ContentType
@@ -23,7 +22,6 @@ class PuzzleBuilder {
     /**
      * Provides access to puzzle methods directly
      */
-    @JvmField
     val puzzle : Puzzle
     private var numberPositions : MutableMap<String, Position>? = null
 
@@ -260,7 +258,6 @@ class PuzzleBuilder {
      * @throws IllegalArgumentException if mismatch with existing
      * numbers
      */
-    @JvmOverloads
     @Throws(IllegalArgumentException::class)
     fun autoNumberBoxes(
         skipNumberCells : Set<Position> = setOf<Position>(),
@@ -514,12 +511,10 @@ class PuzzleBuilder {
         private val TIMEOUT = 30000L
 
         suspend fun resolveImages(puz : Puzzle, relativeUrl : String) {
-            val client = HttpClient(CIO) {
-                engine {
-                    requestTimeout = TIMEOUT
-                    endpoint {
-                        connectTimeout = TIMEOUT
-                    }
+            val client = HttpClient {
+                install(HttpTimeout) {
+                    requestTimeoutMillis = TIMEOUT
+                    connectTimeoutMillis = TIMEOUT
                 }
             }
 

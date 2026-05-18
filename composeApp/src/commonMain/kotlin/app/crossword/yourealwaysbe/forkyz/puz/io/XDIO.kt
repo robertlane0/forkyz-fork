@@ -1,6 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.math.max
 import kotlinx.datetime.LocalDate
 import kotlinx.io.IOException
@@ -22,7 +23,7 @@ import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 class XDIO : PuzzleParser {
     class XDFormatException(msg : String) : Exception(msg)
 
-    @Throws(IOException::class)
+    @Throws(Exception::class)
     override suspend fun parseInput(input : Source) : Puzzle? {
         return readPuzzle(input)
     }
@@ -77,7 +78,7 @@ class XDIO : PuzzleParser {
                 if (numRead < len)
                     return false
                 else
-                    return SECTION_START == String(buf)
+                    return SECTION_START == buf.decodeToString()
             }
         }
     }
@@ -144,7 +145,7 @@ class XDIO : PuzzleParser {
         )
         private val LINEBREAKS = MatchReplace("\\\\", "<br/>")
 
-        @Throws(IOException::class)
+        @Throws(IOException::class, CancellationException::class)
         suspend fun readPuzzle(input : Source) : Puzzle? {
             try {
                 val line = getNextNonBlankLine(input)
@@ -159,7 +160,11 @@ class XDIO : PuzzleParser {
             }
         }
 
-        @Throws(IOException::class, XDFormatException::class)
+        @Throws(
+            IOException::class,
+            XDFormatException::class,
+            CancellationException::class,
+        )
         private suspend fun readTitledSections(
             firstTitle : String?,
             input : Source,
@@ -188,7 +193,11 @@ class XDIO : PuzzleParser {
             }
         }
 
-        @Throws(IOException::class, XDFormatException::class)
+        @Throws(
+            IOException::class,
+            XDFormatException::class,
+            CancellationException::class,
+        )
         private suspend fun readImplicitSections(
             firstLine : String?,
             input : Source,
@@ -372,7 +381,7 @@ class XDIO : PuzzleParser {
             if (special == null)
                 special = Special.CIRCLE
 
-            if (Character.isLowerCase(cell)) {
+            if (cell.isLowerCase()) {
                 when (special) {
                     Special.CIRCLE -> box.shape = Box.Shape.CIRCLE
                     Special.SHADED -> box.color = IPuzIO.HIGHLIGHT_COLOR
@@ -478,7 +487,7 @@ class XDIO : PuzzleParser {
         /**
          * Build puzzle from gathered info
          */
-        @Throws(XDFormatException::class)
+        @Throws(XDFormatException::class, CancellationException::class)
         private suspend fun buildPuzzle(
             meta : Meta?,
             boxChars : Array<CharArray>,

@@ -1,6 +1,8 @@
 
 package app.crossword.yourealwaysbe.forkyz.exttools
 
+import kotlin.coroutines.cancellation.CancellationException
+
 import app.crossword.yourealwaysbe.forkyz.puz.Box
 import app.crossword.yourealwaysbe.forkyz.puz.Playboard
 import app.crossword.yourealwaysbe.forkyz.puz.Zone
@@ -79,10 +81,10 @@ class ExternalDictionaries {
     }
 }
 
-@Throws(AppNotFoundException::class)
+@Throws(AppNotFoundException::class, CancellationException::class)
 expect suspend fun ExternalToolLauncher.visit(data : FreeDictionaryData)
-@Throws(AppNotFoundException::class)
+@Throws(AppNotFoundException::class, CancellationException::class)
 expect suspend fun ExternalToolLauncher.visit(data : QuickDictionaryData)
-@Throws(AppNotFoundException::class)
+@Throws(AppNotFoundException::class, CancellationException::class)
 expect suspend fun ExternalToolLauncher.visit(data : Aard2DictionaryData)
 

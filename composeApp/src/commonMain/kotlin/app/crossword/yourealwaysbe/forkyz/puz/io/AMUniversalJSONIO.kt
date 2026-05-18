@@ -1,6 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.Padding
 import kotlinx.io.IOException
@@ -64,7 +65,7 @@ class AMUniversalJSONIO : AbstractJSONIO() {
             day(Padding.ZERO)
         }
 
-        @Throws(IOException::class)
+        @Throws(IOException::class, CancellationException::class)
         suspend fun readPuzzle(input : Source) : Puzzle? {
             try {
                 val json = parseJSONObject(input)
@@ -81,7 +82,11 @@ class AMUniversalJSONIO : AbstractJSONIO() {
             }
         }
 
-        @Throws(JSONException::class, AMUniversalFormatException::class)
+        @Throws(
+            JSONException::class,
+            AMUniversalFormatException::class,
+            CancellationException::class,
+        )
         private suspend fun readPuzzleFromJSON(
             json : JSONObject,
         ) : Puzzle {
@@ -163,7 +168,11 @@ class AMUniversalJSONIO : AbstractJSONIO() {
             return boxes
         }
 
-        @Throws(JSONException::class, AMUniversalFormatException::class)
+        @Throws(
+            JSONException::class,
+            AMUniversalFormatException::class,
+            CancellationException::class,
+        )
         private suspend fun addClues(json : JSONObject, builder : PuzzleBuilder) {
             val across = json.optStringEmptyNull("AcrossClue")
             if (across != null)
@@ -173,7 +182,7 @@ class AMUniversalJSONIO : AbstractJSONIO() {
                 addCluesFromString(down, builder, false)
         }
 
-        @Throws(AMUniversalFormatException::class)
+        @Throws(AMUniversalFormatException::class, CancellationException::class)
         private suspend fun addCluesFromString(
             clues : String,
             builder : PuzzleBuilder,

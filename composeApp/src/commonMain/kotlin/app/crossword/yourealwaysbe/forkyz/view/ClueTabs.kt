@@ -1,6 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.view
 
+import kotlin.math.min
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
@@ -313,10 +314,7 @@ fun ClueTabs(
             val coroutineScope = rememberCoroutineScope()
             val uiStatePage by remember(paneIndex) {
                 derivedStateOf {
-                    Math.min(
-                        state.panePages.get(paneIndex),
-                        numPages - 1,
-                    )
+                    min(state.panePages.get(paneIndex), numPages - 1)
                 }
             }
             val pagerState = rememberPagerState(
@@ -362,7 +360,7 @@ fun ClueTabs(
                             onLongClick = onBarLongClick,
                             onLongClickLabel = onBarLongClickDescription,
                         ),
-                        selectedTabIndex = Math.min(
+                        selectedTabIndex = min(
                             pagerState.currentPage,
                             pages.size - 1,
                         ),

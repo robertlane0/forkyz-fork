@@ -1,6 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
@@ -72,7 +73,7 @@ class TCAJSONIO : AbstractJSONIO() {
             year(Padding.ZERO)
         }
 
-        @Throws(IOException::class)
+        @Throws(IOException::class, CancellationException::class)
         suspend fun readPuzzle(input : Source) : Puzzle? {
             try {
                 val json = parseJSONObject(input)
@@ -99,7 +100,11 @@ class TCAJSONIO : AbstractJSONIO() {
             }
         }
 
-        @Throws(JSONException::class, TCAJSONFormatException::class)
+        @Throws(
+            JSONException::class,
+            TCAJSONFormatException::class,
+            CancellationException::class,
+        )
         private suspend fun readPuzzleFromJSON(json : JSONObject) : Puzzle {
             try {
                 val metaData = json.optJSONObject("metadata")
@@ -234,7 +239,7 @@ class TCAJSONIO : AbstractJSONIO() {
             }
         }
 
-        @Throws(JSONException::class)
+        @Throws(JSONException::class, CancellationException::class)
         private suspend fun addClues(
             json : JSONObject,
             cellPositions : Map<String, Position>,

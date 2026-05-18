@@ -1,6 +1,8 @@
 
 package app.crossword.yourealwaysbe.forkyz
 
+import kotlin.math.max
+import kotlin.math.min
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -264,15 +266,13 @@ class NotesPageViewModel(
         get() {
             return getBoard()?.let { board ->
                 val zone = notesClue?.zone ?: board.currentWord.zone
-                return String(
-                    zone.map { pos ->
-                        val box = board.puzzle.checkedGetBox(pos)
-                        if (box?.isBlank() ?: true)
-                            BLANK_CHAR
-                        else
-                            box.response[0]
-                    }.toCharArray()
-                )
+                return zone.map { pos ->
+                    val box = board.puzzle.checkedGetBox(pos)
+                    if (box?.isBlank() ?: true)
+                        BLANK_CHAR
+                    else
+                        box.response[0]
+                }.toCharArray().concatToString()
             } ?: ""
         }
 
@@ -502,7 +502,7 @@ class NotesPageViewModel(
     private val maxPuzzleDimension : Int
         get() {
             return getPuzzle()?.let { puz ->
-                Math.max(puz.width, puz.height)
+                max(puz.width, puz.height)
             } ?: 0
         }
 
@@ -539,7 +539,7 @@ class NotesPageViewModel(
                         if (clear.equals(text, ignoreCase = true)) {
                             setScratchValue("")
                         } else {
-                            val len = Math.min(prepped.length, boxesLength)
+                            val len = min(prepped.length, boxesLength)
                             setScratchValue(prepped.substring(0, len))
                         }
                     }
@@ -695,7 +695,7 @@ class NotesPageViewModel(
         // for anagram solution we just move letters
         val checkBlanks = target != NoteEntry.ANAGRAM_SOLUTION
 
-        for (i in 0 until Math.min(sourceValue.length, targetValue.length)) {
+        for (i in 0 until min(sourceValue.length, targetValue.length)) {
             if (
                 (checkBlanks || !isBlank(sourceValue[i]))
                 && !isBlank(targetValue[i])
@@ -723,7 +723,7 @@ class NotesPageViewModel(
                     values,
                     i,
                     oldChar,
-                    String(anagSol),
+                    anagSol.concatToString(),
                 )
             }
             updateAnagramValues(values)
@@ -766,7 +766,7 @@ class NotesPageViewModel(
                     anagramSourceValue,
                     boxesLength,
                 )
-                val len = Math.min(value.length, anagSrc.size)
+                val len = min(value.length, anagSrc.size)
                 var numRemaining = numRemainingAnagramCharacters
 
                 for (i in 0 until len) {
@@ -777,11 +777,11 @@ class NotesPageViewModel(
                     anagSrc[i] = value[i]
                 }
 
-                updateNote() { it.withAnagramSource(String(anagSrc)) }
+                updateNote() { it.withAnagramSource(anagSrc.concatToString()) }
             }
             NoteEntry.ANAGRAM_SOLUTION -> {
                 var values = currentAnagramValues
-                val len = Math.min(value.length, boxesLength)
+                val len = min(value.length, boxesLength)
                 for (i in 0 until len) {
                     if (!isBlank(value[i])) {
                         val solution = padBlank(values.solution, boxesLength)
@@ -905,7 +905,7 @@ class NotesPageViewModel(
         length : Int = source.length,
     ) : String {
         val sb = StringBuilder()
-        val end = Math.min(source.length, start + length)
+        val end = min(source.length, start + length)
         for (i in start until end) {
             val c = source[i]
             if (c.isLetter())

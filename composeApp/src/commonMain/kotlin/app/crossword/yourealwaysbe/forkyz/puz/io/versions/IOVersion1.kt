@@ -1,6 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io.versions
 
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
@@ -24,7 +25,7 @@ open class IOVersion1 : IOVersion {
     override val charsetDecoder : CharsetDecoder = CP1252Decoder()
     override val charsetEncoder : CharsetEncoder = CP1252Encoder()
 
-    @Throws(IOException::class)
+    @Throws(IOException::class, CancellationException::class)
     override suspend fun read(puz : Puzzle, input : Source) {
         val meta = readMeta(input)
         applyMeta(puz, meta)
@@ -50,7 +51,7 @@ open class IOVersion1 : IOVersion {
         puz.date = meta.date
     }
 
-    @Throws(IOException::class)
+    @Throws(IOException::class, CancellationException::class)
     override suspend fun readMeta(input : Source) : PuzzleMeta {
         val meta = PuzzleMeta()
 

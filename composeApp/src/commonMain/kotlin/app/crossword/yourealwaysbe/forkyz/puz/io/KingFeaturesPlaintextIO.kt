@@ -12,6 +12,8 @@ import app.crossword.yourealwaysbe.forkyz.puz.PuzzleBuilder
 import app.crossword.yourealwaysbe.forkyz.puz.io.charset.CharsetDecoder
 import app.crossword.yourealwaysbe.forkyz.puz.io.charset.MacRomanDecoder
 
+class KingFeaturesPlaintextIOException(msg : String) : Exception(msg)
+
 /**
  * Converts a puzzle from the plaintext format used by King Features Syndicate
  * puzzles to the Across Lite .puz format.  The format is:
@@ -42,22 +44,23 @@ class KingFeaturesPlaintextIO : PuzzleParser {
             val scanner = LineScanner(input, MacRomanDecoder())
 
             if (!scanner.hasNextLine()) {
-                System.err.println("File empty.")
-                return null
+                throw KingFeaturesPlaintextIOException("File empty.")
             }
 
             var line = scanner.nextLine()
             if (!line.startsWith("{") || !scanner.hasNextLine()) {
-                System.err.println("First line format incorrect.")
-                return null
+                throw KingFeaturesPlaintextIOException(
+                    "First line format incorrect.",
+                )
             }
 
             // Skip over redundant grid information.
             line = scanner.nextLine()
             while (!line.startsWith("{")) {
                 if (!scanner.hasNextLine()) {
-                    System.err.println("Unexpected EOF - Grid information.")
-                    return null
+                    throw KingFeaturesPlaintextIOException(
+                        "Unexpected EOF - Grid information.",
+                    )
                 }
                 line = scanner.nextLine()
             }
@@ -77,8 +80,7 @@ class KingFeaturesPlaintextIO : PuzzleParser {
                     .dropLastWhile { it.isEmpty() }
                     .toTypedArray()
                 if (rowString.size != width) {
-                    System.err.println("Not a square grid.")
-                    return null
+                    throw KingFeaturesPlaintextIOException("Not a square grid.")
                 }
 
                 val row = CharArray(width)
@@ -88,8 +90,9 @@ class KingFeaturesPlaintextIO : PuzzleParser {
                 solGrid.add(row)
 
                 if (!scanner.hasNextLine()) {
-                    System.err.println("Unexpected EOF - Solution grid.")
-                    return null
+                    throw KingFeaturesPlaintextIOException(
+                        "Unexpected EOF - Solution grid.",
+                    )
                 }
                 line = scanner.nextLine()
             } while (!line.startsWith("{"))
@@ -137,8 +140,9 @@ class KingFeaturesPlaintextIO : PuzzleParser {
                     clue,
                 )
                 if (!scanner.hasNextLine()) {
-                    System.err.println("Unexpected EOF - Across clues.")
-                    return null
+                    throw KingFeaturesPlaintextIOException(
+                        "Unexpected EOF - Across clues.",
+                    )
                 }
                 line = scanner.nextLine()
             } while (!line.startsWith("{"))
@@ -170,8 +174,9 @@ class KingFeaturesPlaintextIO : PuzzleParser {
                 )
                 if (!finished) {
                     if (!scanner.hasNextLine()) {
-                        System.err.println("Unexpected EOF - Down clues.")
-                        return null
+                        throw KingFeaturesPlaintextIOException(
+                            "Unexpected EOF - Down clues.",
+                        )
                     }
                     line = scanner.nextLine()
                 }

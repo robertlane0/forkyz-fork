@@ -1,6 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.Padding
@@ -42,7 +43,7 @@ class PMLIO : AbstractJSONIO() {
             = "^.*starting_puzzle\\s*:\\s*(\\{.*pml_id.*\\}).*$".toRegex()
         private const val CW_JSON_GRP = 1
 
-        @Throws(IOException::class)
+        @Throws(IOException::class, CancellationException::class)
         suspend fun readPuzzle(input : Source) : Puzzle? {
             val copy = input.peek()
             var puz = readFromJSON(copy)
@@ -116,7 +117,7 @@ class PMLIO : AbstractJSONIO() {
         /**
          * Read puzzle from PML JSON format
          */
-        @Throws(JSONException::class)
+        @Throws(JSONException::class, CancellationException::class)
         private suspend fun readPuzzleFromJSON(json : JSONObject) : Puzzle {
             val gameData = json.getJSONObject("game_data")
             val builder = PuzzleBuilder(getBoxes(gameData))
@@ -189,8 +190,11 @@ class PMLIO : AbstractJSONIO() {
             return boxes
         }
 
-        @Throws(JSONException::class)
-        private suspend fun addClues(gameData : JSONObject, builder : PuzzleBuilder) {
+        @Throws(JSONException::class, CancellationException::class)
+        private suspend fun addClues(
+            gameData : JSONObject,
+            builder : PuzzleBuilder,
+        ) {
             val items = gameData.getJSONArray("items")
             for (i in 0..<items.size) {
                 val item = items.getJSONObject(i)
@@ -202,8 +206,11 @@ class PMLIO : AbstractJSONIO() {
             return item.getInt("dir") == 0
         }
 
-        @Throws(JSONException::class)
-        private suspend fun addClue(item : JSONObject, builder : PuzzleBuilder) {
+        @Throws(JSONException::class, CancellationException::class)
+        private suspend fun addClue(
+            item : JSONObject,
+            builder : PuzzleBuilder,
+        ) {
             val num = item.getInt("num").toString()
             val hint = item.getString("clue")
             if (isAcross(item)) {

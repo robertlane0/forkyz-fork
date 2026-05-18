@@ -29,7 +29,8 @@ class ElPaisExpertoDownloader(
         headers : Map<String, String>?,
     ) : Puzzle? {
         val fullHeaders = headers?.toMutableMap() ?: mutableMapOf()
-        fullHeaders.putIfAbsent("Origin", "https://elpais.com")
+        if (!fullHeaders.contains("Origin"))
+            fullHeaders.put("Origin", "https://elpais.com")
         return super.download(date, fullHeaders)?.also {
             it.source = name
         }

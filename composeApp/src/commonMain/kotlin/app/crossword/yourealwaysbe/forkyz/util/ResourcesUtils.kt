@@ -1,6 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.util
 
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.io.IOException
 
 import org.jetbrains.compose.resources.MissingResourceException
@@ -12,7 +13,7 @@ import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 /**
  * Read file from files/<lang>/<unqualifiedname> or default lang.
  */
-@Throws(IOException::class)
+@Throws(IOException::class,CancellationException::class)
 suspend fun getFileResourceData(
     utils : NativeBackendUtils,
     unqualifiedFileName : String,

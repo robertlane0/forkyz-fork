@@ -70,7 +70,6 @@ object PuzzleUtils {
     /**
      * Return first across list name found or null
      */
-    @JvmStatic
     fun getAcrossListName(puz : Puzzle) : String? {
         for (listName in puz.clueListNames) {
             val list = puz.getClues(listName)
@@ -83,7 +82,6 @@ object PuzzleUtils {
     /**
      * Returns first across list found or null
      */
-    @JvmStatic
     fun getAcrossList(puz : Puzzle) : ClueList? {
         val list = getAcrossListName(puz)
         if (list == null)
@@ -98,7 +96,6 @@ object PuzzleUtils {
      * I.e. start at the right number, then go right until the box is no
      * longer joined to the right.
      */
-    @JvmStatic
     fun isAcrossList(puz : Puzzle, clues : ClueList) : Boolean {
         for (clue in clues) {
             if (!clue.hasZone())
@@ -147,7 +144,6 @@ object PuzzleUtils {
     /**
      * Return first down list name found or null
      */
-    @JvmStatic
     fun getDownListName(puz : Puzzle) : String? {
         for (listName in puz.clueListNames) {
             val list = puz.getClues(listName)
@@ -160,7 +156,6 @@ object PuzzleUtils {
     /**
      * Returns first down list found or null
      */
-    @JvmStatic
     fun getDownList(puz : Puzzle) : ClueList? {
         val list = getDownListName(puz)
         if (list == null)
@@ -169,7 +164,6 @@ object PuzzleUtils {
             return puz.getClues(list)
     }
 
-    @JvmStatic
     fun isDownList(puz : Puzzle, clues : ClueList) : Boolean {
         for (clue in clues) {
             if (!clue.hasZone())
@@ -218,7 +212,6 @@ object PuzzleUtils {
     /**
      * True if any clue has a non-empty zone
      */
-    @JvmStatic
     fun isZonesList(clues : ClueList) : Boolean {
         for (clue in clues) {
             if (clue.hasZone() && !clue.zone.isEmpty)
@@ -227,7 +220,6 @@ object PuzzleUtils {
         return false
     }
 
-    @JvmStatic
     fun getAcrossZone(puz : Puzzle, start : Position) : Zone {
         val zone = Zone()
 
@@ -243,7 +235,6 @@ object PuzzleUtils {
         return zone
     }
 
-    @JvmStatic
     fun getDownZone(puz : Puzzle, start : Position) : Zone {
         val zone = Zone()
 
@@ -259,7 +250,6 @@ object PuzzleUtils {
         return zone
     }
 
-    @JvmStatic
     fun compareStringNumbers(
         num1 : String?,
         num2 : String?
@@ -274,7 +264,7 @@ object PuzzleUtils {
             try {
                 val n1 = num1.toInt()
                 val n2 = num2.toInt()
-                return Integer.compare(n1, n2)
+                return n1.compareTo(n2)
             } catch (e : NumberFormatException) {
                 return num1.compareTo(num2)
             }

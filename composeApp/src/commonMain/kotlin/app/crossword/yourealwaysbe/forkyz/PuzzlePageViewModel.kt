@@ -3,6 +3,7 @@ package app.crossword.yourealwaysbe.forkyz
 
 import kotlin.text.Regex
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO // needed on IOS, not JVM or Android
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -1067,9 +1068,7 @@ open class PuzzlePageViewModel(
                     utils.getString(Res.string.command_letter),
                     { letter ->
                         if (!letter.isEmpty()) {
-                            getBoard()?.playLetter(
-                                Character.toUpperCase(letter[0])
-                            )
+                            getBoard()?.playLetter(letter[0].uppercase())
                         }
                     },
                 )

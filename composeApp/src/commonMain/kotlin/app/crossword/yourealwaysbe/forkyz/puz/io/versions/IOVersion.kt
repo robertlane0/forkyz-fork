@@ -1,6 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io.versions
 
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.io.IOException
 import kotlinx.io.Sink
 import kotlinx.io.Source
@@ -14,10 +15,10 @@ interface IOVersion {
     @Throws(IOException::class)
     fun write(puz : Puzzle, output : Sink)
 
-    @Throws(IOException::class)
+    @Throws(IOException::class, CancellationException::class)
     suspend fun read(puz : Puzzle, input : Source)
 
-    @Throws(IOException::class)
+    @Throws(IOException::class, CancellationException::class)
     suspend fun readMeta(input : Source) : PuzzleMeta
 
     val charsetDecoder : CharsetDecoder

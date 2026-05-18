@@ -54,14 +54,17 @@ kotlin {
             enable = true
         }
 
-        room {
-            schemaDirectory("$projectDir/schemas")
-        }
-
         withHostTestBuilder {}.configure {}
     }
 
     jvm { }
+
+    listOf(iosArm64(), iosSimulatorArm64()).forEach { iosTarget ->
+        iosTarget.binaries.framework {
+            baseName = "ComposeApp"
+            isStatic = true
+        }
+    }
 
     sourceSets {
         commonMain.dependencies {
@@ -69,6 +72,7 @@ kotlin {
             implementation(libs.androidx.datastore.core.okio)
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.androidx.room.runtime)
+            implementation(libs.codepoints)
             implementation(libs.coil3.compose)
             implementation(libs.coil3.network.ktor)
             implementation(libs.compose.components.resources)
@@ -92,9 +96,7 @@ kotlin {
             implementation(libs.kotlinx.serialization.json.io)
             implementation(libs.ksoup)
             implementation(libs.ksoup.kotlinx)
-            implementation(libs.ktor.client.cio)
             implementation(libs.ktor.server.cio)
-            implementation(libs.mcp.sdk.server)
             implementation(libs.zip)
             implementation(libs.zip.kotlinx)
         }
@@ -113,6 +115,7 @@ kotlin {
             implementation(libs.androidx.preference.ktx)
             implementation(libs.seismic)
             implementation(libs.koin.androidx.workmanager)
+            implementation(libs.mcp.sdk.server)
 
             // mainly replaced by
             // org.jetbrains.compose.material:material but a few bits still
@@ -151,15 +154,27 @@ kotlin {
             implementation(libs.directories)
             implementation(libs.ktor.client.java)
             implementation(libs.kotlinx.coroutines.swing)
+            implementation(libs.mcp.sdk.server)
+        }
+
+        iosMain.dependencies {
+            implementation(libs.androidx.sqlite.bundled)
+            implementation(libs.ktor.client.darwin)
         }
     }
 
     compilerOptions.freeCompilerArgs.add("-Xexpect-actual-classes")
 }
 
+room {
+    schemaDirectory("$projectDir/schemas")
+}
+
 dependencies {
     add("kspAndroid", libs.androidx.room.compiler)
     add("kspJvm", libs.androidx.room.compiler)
+    add("kspIosArm64", libs.androidx.room.compiler)
+    add("kspIosSimulatorArm64", libs.androidx.room.compiler)
 }
 
 tasks.withType<Test>().configureEach {

@@ -46,8 +46,6 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
         private val DEFAULT_SOURCE = "PuzzleMe"
         private val DEFAULT_CDN = "cdn2"
         private val DEFAULT_SUBDIR = "puzzleme"
-        private val STAGE2_URL_FORMAT
-            = "https://%s.amuselabs.com/%s/crossword?id=%s&set=%s"
         private val STAGE2_URL_RE = Regex(
             "https://(cdn.).amuselabs.com/([^/]*)/crossword[^\"]*"
                 + "id=([^&\"]*)[^\"]*set=([^&\"]*).*"
@@ -163,7 +161,8 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
             return StreamUtils.makeCopy(input)
         } else {
             return getURL(
-                STAGE2_URL_FORMAT.format(cdn, subdir, cwID, cwSet),
+                "https://$cdn.amuselabs.com/$subdir/crossword"
+                    + "?id=$cwID&set=$cwSet",
             )
         }
     }
@@ -196,7 +195,7 @@ class PuzzleMeStreamScraper() : AbstractStreamScraper() {
      */
     private fun base64Decode(s : String) : String? {
         try {
-            return String(Base64.Default.decode(s))
+            return Base64.Default.decode(s).decodeToString()
         } catch (e : IllegalArgumentException) {
             return null
         }

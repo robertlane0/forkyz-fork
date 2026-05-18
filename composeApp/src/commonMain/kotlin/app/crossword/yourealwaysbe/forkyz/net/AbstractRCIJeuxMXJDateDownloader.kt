@@ -26,7 +26,7 @@ import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 class AbstractRCIJeuxMXJDateDownloader private constructor(
     downloaderID : DownloaderID,
     downloaderName : String,
-    days : Array<DayOfWeek>,
+    days : List<DayOfWeek>,
     utcAvailabilityOffset : Duration,
     supportUrl : String?,
     private val makeSourceURL : (Long) -> String,
@@ -102,7 +102,7 @@ class AbstractRCIJeuxMXJDateDownloader private constructor(
         fun buildMFJ(
             downloaderID : DownloaderID,
             downloaderName : String,
-            days : Array<DayOfWeek>,
+            days : List<DayOfWeek>,
             utcAvailabilityOffset : Duration,
             supportUrl : String?,
             makeSourceURL : (Long) -> String,
@@ -127,7 +127,7 @@ class AbstractRCIJeuxMXJDateDownloader private constructor(
         fun buildMCJ(
             downloaderID : DownloaderID,
             downloaderName : String,
-            days : Array<DayOfWeek>,
+            days : List<DayOfWeek>,
             utcAvailabilityOffset : Duration,
             supportUrl : String?,
             makeSourceURL : (Long) -> String,

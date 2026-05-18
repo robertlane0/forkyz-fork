@@ -1,6 +1,8 @@
 
 package app.crossword.yourealwaysbe.forkyz.exttools
 
+import kotlin.coroutines.cancellation.CancellationException
+
 import android.app.SearchManager
 import android.content.Intent
 import androidx.core.app.ShareCompat
@@ -19,7 +21,7 @@ private val CROSSWORD_SOLVER = "org.billthefarmer.crossword"
 private val CROSSWORD_SOLVER_WEBSITE_URL
     = "https://billthefarmer.github.io/crossword";
 
-@Throws(AppNotFoundException::class)
+@Throws(AppNotFoundException::class, CancellationException::class)
 actual suspend fun ExternalToolLauncher.visit(data : CrosswordSolverData) {
     ExternalCaller.launchApp(
         this.activity,
@@ -32,7 +34,7 @@ actual suspend fun ExternalToolLauncher.visit(data : CrosswordSolverData) {
     )
 }
 
-@Throws(AppNotFoundException::class)
+@Throws(AppNotFoundException::class, CancellationException::class)
 actual suspend fun ExternalToolLauncher.visit(data : FreeDictionaryData) {
     val intent = Intent(Intent.ACTION_VIEW)
     intent.setData(
@@ -44,7 +46,7 @@ actual suspend fun ExternalToolLauncher.visit(data : FreeDictionaryData) {
 /**
  * Launch or display warning if app not installed
  */
-@Throws(AppNotFoundException::class)
+@Throws(AppNotFoundException::class, CancellationException::class)
 actual suspend fun ExternalToolLauncher.visit(data : QuickDictionaryData) {
     ExternalCaller.launchApp(
         this.activity,
@@ -60,7 +62,7 @@ actual suspend fun ExternalToolLauncher.visit(data : QuickDictionaryData) {
 /**
  * Launch or display warning if app not installed
  */
-@Throws(AppNotFoundException::class)
+@Throws(AppNotFoundException::class, CancellationException::class)
 actual suspend fun ExternalToolLauncher.visit(data : Aard2DictionaryData) {
     ExternalCaller.launchIntent(
         this.activity,
@@ -72,14 +74,14 @@ actual suspend fun ExternalToolLauncher.visit(data : Aard2DictionaryData) {
     )
 }
 
-@Throws(AppNotFoundException::class)
+@Throws(AppNotFoundException::class, CancellationException::class)
 actual suspend fun ExternalToolLauncher.visit(data : HTMLToolData) {
     val i = Intent(Intent.ACTION_VIEW)
     i.setData(data.uri.toAndroidUri())
     this.activity.startActivity(i)
 }
 
-@Throws(AppNotFoundException::class)
+@Throws(AppNotFoundException::class, CancellationException::class)
 actual suspend fun ExternalToolLauncher.visit(data : SharePuzzleData) {
     val title = getString(Res.string.share_puzzle_title)
     val shareIntent = ShareCompat.IntentBuilder(this.activity)
@@ -90,7 +92,7 @@ actual suspend fun ExternalToolLauncher.visit(data : SharePuzzleData) {
     this.activity.startActivity(shareIntent);
 }
 
-@Throws(AppNotFoundException::class)
+@Throws(AppNotFoundException::class, CancellationException::class)
 actual suspend fun ExternalToolLauncher.visit(data : ShareTextData) {
     // ShareCompat from
     // https://stackoverflow.com/a/39619468/6882587

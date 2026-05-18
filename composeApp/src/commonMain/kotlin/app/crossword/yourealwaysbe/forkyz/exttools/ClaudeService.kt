@@ -2,6 +2,7 @@
 package app.crossword.yourealwaysbe.forkyz.exttools
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO // needed on IOS, not JVM or Android
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import kotlinx.io.IOException

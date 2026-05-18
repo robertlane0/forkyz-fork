@@ -3,6 +3,7 @@ package app.crossword.yourealwaysbe.forkyz.util.files
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO // needed on IOS, not JVM or Android
 import kotlinx.coroutines.launch
 import kotlinx.io.IOException
 import kotlinx.io.buffered
@@ -13,6 +14,7 @@ import app.crossword.yourealwaysbe.forkyz.puz.io.IPuzIO
 import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.AppPuzzleUtils.generateFileName
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
+import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.files.File
 
@@ -39,7 +41,6 @@ object FileHandlerShared {
      * flagged clues and filled in letters
      * @param omitExtensions whether to omit Forkyz IPuz extensions
      */
-    @Synchronized
     fun getShareUri(
         scope : CoroutineScope,
         utils : NativeBackendUtils,
@@ -68,7 +69,6 @@ object FileHandlerShared {
      *
      * @param lines the logcat lines
      */
-    @Synchronized
     fun getLogcatShareUri(
         scope : CoroutineScope,
         utils : NativeBackendUtils,
@@ -82,7 +82,6 @@ object FileHandlerShared {
         }
     }
 
-    @Synchronized
     private fun getShareUriBackground(
         utils : NativeBackendUtils,
         puz : Puzzle,
@@ -109,7 +108,6 @@ object FileHandlerShared {
         return utils.getShareURIForFile(shareFile)
     }
 
-    @Synchronized
     private fun getLogcatShareUriBackground(
         utils : NativeBackendUtils,
         logcat : List<String>,
@@ -133,10 +131,9 @@ object FileHandlerShared {
         return utils.getShareURIForFile(shareFile)
     }
 
-    @Synchronized
     private fun cleanCache(utils : NativeBackendUtils) {
         utils.getShareDir()?.list()?.forEach { file ->
-            val ageMillis = System.currentTimeMillis() - file.lastModified
+            val ageMillis = TimeUtils.currentTimeMillis() - file.lastModified
             if (ageMillis > CACHE_CLEAR_AGE_MILLIS)
                 file.delete()
         }

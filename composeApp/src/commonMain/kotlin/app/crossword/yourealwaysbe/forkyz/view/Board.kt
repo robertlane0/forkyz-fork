@@ -1,8 +1,12 @@
 
 package app.crossword.yourealwaysbe.forkyz.view
 
+import kotlin.math.ceil
+import kotlin.math.max
+import kotlin.math.min
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.requiredSize
@@ -270,8 +274,8 @@ fun BoardWord(
         return
 
     val textMeasurer = rememberTextMeasurer(cacheSize = TEXT_MEASURE_CACHE_SIZE)
-    val width = Math.min(boxes.size, widthBoxes)
-    val height = Math.ceil(boxes.size / widthBoxes.toDouble()).toInt()
+    val width = min(boxes.size, widthBoxes)
+    val height = ceil(boxes.size / widthBoxes.toDouble()).toInt()
 
     Box(
         modifier = modifier.requiredSize(
@@ -356,7 +360,7 @@ private fun DrawScope.drawResponse(
             val size = textResult.size
             val factor = profile.boxSizePx / size.width
             val fontSize = (
-                baseStyle.fontSize * Math.min(
+                baseStyle.fontSize * min(
                     1f,
                     factor * MULTI_CHAR_RESPONSE_SIZE_FUDGE_FACTOR,
                 )
@@ -647,8 +651,8 @@ private fun DrawScope.drawMarks(
     val coords = arrayOf(mo, 0.5f * bs, bs - mo)
     val adjusts = arrayOf(0f, -0.5f, -1f)
 
-    for (row in 0 until Math.max(3, box.marks.size)) {
-        for (col in 0 until Math.max(3, box.marks[row].size)) {
+    for (row in 0 until max(3, box.marks.size)) {
+        for (col in 0 until max(3, box.marks[row].size)) {
             box.marks[row][col]?.let { mark ->
                 drawOffsetText(
                     textMeasurer,

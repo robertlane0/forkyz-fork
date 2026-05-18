@@ -11,13 +11,13 @@ import kotlin.String
 import kotlin.Throws
 import kotlin.arrayOfNulls
 import kotlin.code
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.text.String
 import kotlin.text.StringBuilder
 import kotlin.text.isEmpty
 import kotlin.text.replace
 import kotlin.text.split
 import kotlin.text.toByte
-import kotlin.text.toByteArray
 import kotlin.text.toRegex
 import kotlin.text.trim
 import kotlin.toUShort
@@ -61,7 +61,7 @@ import app.crossword.yourealwaysbe.forkyz.util.HtmlUtil.htmlString
 import app.crossword.yourealwaysbe.forkyz.util.HtmlUtil.unHtmlString
 
 class IO : PuzzleParser {
-    @Throws(IOException::class)
+    @Throws(Exception::class)
     override suspend fun parseInput(input : Source) : Puzzle? {
         return loadNative(input)
     }
@@ -139,7 +139,7 @@ class IO : PuzzleParser {
             return cksum
         }
 
-        @Throws(IOException::class)
+        @Throws(IOException::class, CancellationException::class)
         suspend fun load(input : Source, metaInput : Source) : Puzzle? {
             val puz = loadNative(input)
             if (puz != null)
@@ -147,7 +147,7 @@ class IO : PuzzleParser {
             return puz
         }
 
-        @Throws(IOException::class)
+        @Throws(IOException::class, CancellationException::class)
         suspend fun loadNative(input : Source) : Puzzle? {
             input.skip(0x2)
 
@@ -299,7 +299,7 @@ class IO : PuzzleParser {
 
             while (!eof) {
                 try {
-                    when (readExtraSectionType(input)) {
+                    when (readExtraSectionType(input, charsetDecoder)) {
                         GEXT -> readGextSection(input, builder)
                         ANTS -> loadNotesNative(
                             true,
@@ -340,7 +340,7 @@ class IO : PuzzleParser {
             return builder.puzzle
         }
 
-        @Throws(IOException::class)
+        @Throws(IOException::class, CancellationException::class)
         suspend fun readCustom(puz : Puzzle, input : Source) {
             val version = input.readByte().toInt()
             val v = getIOVersion(version)
@@ -348,14 +348,13 @@ class IO : PuzzleParser {
         }
 
         @Throws(IOException::class)
-        fun readExtraSectionType(input : Source) : Int {
-            val title = ByteArray(4)
-
-            for (i in title.indices) {
-                title[i] = input.readByte()
-            }
-
-            val section = String(title)
+        fun readExtraSectionType(
+            input : Source,
+            charsetDecoder : CharsetDecoder,
+        ) : Int {
+            val title = Buffer()
+            input.readAtMostTo(title, 4)
+            val section = charsetDecoder.decode(title)
 
             if (GEXT_MARKER == section) {
                 return GEXT
@@ -396,7 +395,7 @@ class IO : PuzzleParser {
             input.skip(1)
         }
 
-        @Throws(IOException::class)
+        @Throws(IOException::class, CancellationException::class)
         suspend fun readMeta(input : Source) : PuzzleMeta? {
             val version = input.readByte().toInt()
             val v = getIOVersion(version)
@@ -618,7 +617,7 @@ class IO : PuzzleParser {
 
             for (i in 3 downTo 0) {
                 unscrambleString(unscrambleBuf, solution)
-                System.arraycopy(
+                arraycopy(
                     unscrambleBuf,
                     0,
                     solution,
@@ -703,9 +702,9 @@ class IO : PuzzleParser {
             str : ByteArray,
             keynum : Int,
         ) {
-            System.arraycopy(str, str.size - keynum, unscrambleTmp, 0, keynum)
-            System.arraycopy(str, 0, str, keynum, str.size - keynum)
-            System.arraycopy(unscrambleTmp, 0, str, 0, keynum)
+            arraycopy(str, str.size - keynum, unscrambleTmp, 0, keynum)
+            arraycopy(str, 0, str, keynum, str.size - keynum)
+            arraycopy(unscrambleTmp, 0, str, 0, keynum)
         }
 
         fun initializeUnscrambleData(puz : Puzzle) : ByteArray {
@@ -718,7 +717,9 @@ class IO : PuzzleParser {
                     }
                 }
             }
-            return ans.toString().toByteArray()
+            val buf = Buffer()
+            CHARSET_ENCODER.encode(ans.toString(), buf)
+            return buf.readByteArray()
         }
 
         private fun cksum_cib(puzByteArray : ByteArray, cksum : Int) : Int {
@@ -815,7 +816,7 @@ class IO : PuzzleParser {
          * + byte identifying field
          * + null terminated string which is field value
          */
-        @Throws(IOException::class)
+        @Throws(IOException::class, CancellationException::class)
         private suspend fun loadNotesNative(
             isAcross : Boolean,
             builder : PuzzleBuilder,
@@ -1225,6 +1226,28 @@ class IO : PuzzleParser {
             this[index] = (v and 0xFF).toByte()
             this[index + 1] = ((v shr 8) and 0xFF).toByte()
         }
+
+        /**
+         * Simple implementation of arraycopy to avoid JVM
+         */
+        private fun arraycopy(
+            src : ByteArray,
+            srcPos : Int,
+            dest : ByteArray,
+            destPos : Int,
+            len : Int,
+        ) {
+            if (srcPos >= destPos) {
+                for (i in 0 until len) {
+                    dest[destPos + i] = src[srcPos + i]
+                }
+            } else {
+                for (i in (len - 1) downTo 0) {
+                    dest[destPos + i] = src[srcPos + i]
+                }
+            }
+        }
+
     }
 }
 

@@ -226,7 +226,7 @@ class Clue constructor(
         var i = 0
         while (i < enumeration.length) {
             var c = enumeration.get(i)
-            if (Character.isDigit(c)) {
+            if (c.isDigit()) {
                 val digit = c.digitToIntOrNull() ?: -1
                 // abandon after first word of unspecified length
                 if (len == 0 && digit == 0) return

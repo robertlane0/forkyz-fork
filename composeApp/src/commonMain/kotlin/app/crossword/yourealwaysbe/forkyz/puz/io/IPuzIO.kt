@@ -1252,7 +1252,7 @@ class IPuzIO : AbstractJSONIO() {
             } else {
                 throw IPuzFormatException(
                     "Unsupported clue format "
-                        + clueObj.javaClass
+                        + clueObj::class
                         + ": "
                         + clueObj,
                 )
@@ -1412,7 +1412,7 @@ class IPuzIO : AbstractJSONIO() {
                 return true
 
             throw IPuzFormatException(
-                "Unrecognised clue number format: " + clueNumObj.javaClass,
+                "Unrecognised clue number format: " + clueNumObj::class,
             )
         }
 
@@ -2719,7 +2719,7 @@ class IPuzIO : AbstractJSONIO() {
                     if (isJSONUChar(c)) {
                         // adapted from org.json
                         sb.append("&#x")
-                        val hhhh = Integer.toHexString(c.code)
+                        val hhhh = c.code.toString(16)
                         sb.append("0000", 0, 4 - hhhh.length)
                         sb.append(hhhh)
                         sb.append(";")

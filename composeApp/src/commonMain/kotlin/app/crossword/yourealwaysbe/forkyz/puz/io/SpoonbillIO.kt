@@ -1,6 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.puz.io
 
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.io.IOException
 import kotlinx.io.Source
 import kotlinx.io.readLine
@@ -22,7 +23,7 @@ import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 class SpoonbillIO : PuzzleParser {
     class SpoonbillFormatException(msg : String) : Exception(msg)
 
-    @Throws(IOException::class)
+    @Throws(Exception::class)
     override suspend fun parseInput(input : Source) : Puzzle? {
         return readPuzzle(input)
     }
@@ -35,7 +36,7 @@ class SpoonbillIO : PuzzleParser {
         private const val MODE_CLUE = "Clue"
         private const val MODE_SOLVE = "Solve"
 
-        @Throws(IOException::class)
+        @Throws(IOException::class, CancellationException::class)
         suspend fun readPuzzle(input : Source) : Puzzle? {
             try {
                 val versionLine : String = expectLine(input)
@@ -107,7 +108,11 @@ class SpoonbillIO : PuzzleParser {
             }
         }
 
-        @Throws(IOException::class, SpoonbillFormatException::class)
+        @Throws(
+            IOException::class,
+            SpoonbillFormatException::class,
+            CancellationException::class,
+        )
         private suspend fun getClues(
             input : Source,
             across : Boolean,

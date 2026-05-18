@@ -27,7 +27,7 @@ class RaetselZentraleSchwedenDownloader(
     downloaderID : DownloaderID,
     name : String,
     shortName : String,
-    days : Array<DayOfWeek>,
+    days : List<DayOfWeek>,
     utcAvailabilityOffset : Duration,
     supportUrl : String?,
     shareUrlPattern : String?

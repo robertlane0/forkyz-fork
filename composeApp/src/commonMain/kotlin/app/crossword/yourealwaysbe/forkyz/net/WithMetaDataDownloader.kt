@@ -20,7 +20,7 @@ private const val TAG = "WithMetaDataDownloader"
 class WithMetaDataDownloader(
     downloaderID : DownloaderID,
     downloaderName : String,
-    days : Array<DayOfWeek>,
+    days : List<DayOfWeek>,
     utcAvailabilityOffset : Duration,
     supportUrl : String,
     puzzleParser : PuzzleParser,

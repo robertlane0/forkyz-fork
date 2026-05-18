@@ -1,6 +1,7 @@
 
 package app.crossword.yourealwaysbe.forkyz.util.files
 
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.datetime.LocalDate
@@ -150,21 +151,20 @@ abstract class FileHandler {
         withIOMutex {
             delete(ph.mainFileHandle)
 
-            ph.accept<Void?>(
-                object : PuzHandle.Visitor<Void?> {
+            ph.accept<Unit>(
+                object : PuzHandle.Visitor<Unit> {
                     override suspend fun visit(
                         puzHandle : PuzHandle.Puz,
-                    ) : Void? {
+                    ) : Unit {
                         puzHandle.metaFileHandle?.let { metaHandle ->
                             delete(metaHandle)
                         }
-                        return null
                     }
 
                     override suspend fun visit(
                         ipuzHandle : PuzHandle.IPuz,
-                    ) : Void? {
-                        return null
+                    ) : Unit {
+                        // nothing to do
                     }
                 }
             )
@@ -186,11 +186,11 @@ abstract class FileHandler {
 
             ph.setDirectory(destDirHandle)
 
-            ph.accept<Void?>(
-                object : PuzHandle.Visitor<Void?> {
+            ph.accept<Unit>(
+                object : PuzHandle.Visitor<Unit> {
                     override suspend fun visit(
                         puzHandle : PuzHandle.Puz,
-                    ) : Void? {
+                    ) : Unit {
                         val metaHandle = puzHandle.metaFileHandle
                         if (metaHandle != null) {
                             moveToUnsync(
@@ -199,11 +199,10 @@ abstract class FileHandler {
                                 destDirHandle,
                             )
                         }
-                        return null
                     }
 
-                    override suspend fun visit(ipuzHandle : IPuz) : Void? {
-                        return null
+                    override suspend fun visit(ipuzHandle : IPuz) : Unit {
+                        // do nothing
                     }
                 }
             )
@@ -278,7 +277,7 @@ abstract class FileHandler {
      *
      * @return null if could not be loaded
      */
-    @Throws(IOException::class)
+    @Throws(IOException::class,CancellationException::class)
     suspend fun loadPuzMetaFile(puzHandle : PuzHandle) : PuzMetaFile? {
         // both load and getRefreshedPuzMetaFile acquire mutex
         return load(puzHandle)?.let { puz ->
@@ -309,19 +308,19 @@ abstract class FileHandler {
      * Synchronized to avoid reading/writing from the same file at the same
      * time.
      */
-    @Throws(IOException::class)
+    @Throws(IOException::class,CancellationException::class)
     suspend fun load(ph : PuzHandle) : Puzzle? {
         return withIOMutex {
             val puz = ph.accept<Puzzle?>(
                 object : VisitorIO<Puzzle?> {
-                    @Throws(IOException::class)
+                    @Throws(IOException::class,CancellationException::class)
                     override suspend fun visit(
                         puzHandle : PuzHandle.Puz,
                     ) : Puzzle? {
                         return load(puzHandle)
                     }
 
-                    @Throws(IOException::class)
+                    @Throws(IOException::class,CancellationException::class)
                     override suspend fun visit(
                         ipuzHandle : IPuz,
                     ) : Puzzle? {
@@ -349,19 +348,19 @@ abstract class FileHandler {
      * If puzHandle's meta handle is null, a new meta file will be created and
      * puzHandle is updated with the new meta file handle
      */
-    @Throws(IOException::class)
+    @Throws(IOException::class,CancellationException::class)
     suspend fun save(puz : Puzzle, ph : PuzHandle) {
         withIOMutex {
             val success = ph.accept<Boolean>(
                 object : VisitorIO<Boolean> {
-                    @Throws(IOException::class)
+                    @Throws(IOException::class,CancellationException::class)
                     override suspend fun visit(
                         puzHandle : PuzHandle.Puz,
                     ) : Boolean {
                         return save(puz, puzHandle)
                     }
 
-                    @Throws(IOException::class)
+                    @Throws(IOException::class,CancellationException::class)
                     override suspend fun visit(ipuzHandle : IPuz) : Boolean {
                         return save(puz, ipuzHandle)
                     }
@@ -389,7 +388,7 @@ abstract class FileHandler {
      * extension
      * @return new puzzle handle if saved success
      */
-    @Throws(IOException::class)
+    @Throws(IOException::class,CancellationException::class)
     suspend fun saveNewPuzzle(
         puz : Puzzle,
         fileNameBody : String,
@@ -461,7 +460,7 @@ abstract class FileHandler {
         return null
     }
 
-    @Throws(IOException::class)
+    @Throws(IOException::class,CancellationException::class)
     private suspend fun load(ph : PuzHandle.Puz) : Puzzle? {
         ph.metaFileHandle?.let { metaFile ->
             try {
@@ -486,14 +485,14 @@ abstract class FileHandler {
         }
     }
 
-    @Throws(IOException::class)
+    @Throws(IOException::class,CancellationException::class)
     private suspend fun load(ph : IPuz) : Puzzle? {
         return getBufferedInput(ph.mainFileHandle).use { input ->
             IPuzIO.readPuzzle(input)
         }
     }
 
-    @Throws(IOException::class)
+    @Throws(IOException::class,CancellationException::class)
     private suspend fun save(puz : Puzzle, ph : PuzHandle.Puz) : Boolean {
         val puzFile = ph.mainFileHandle
         var metaFile = ph.metaFileHandle
@@ -550,7 +549,7 @@ abstract class FileHandler {
         return true
     }
 
-    @Throws(IOException::class)
+    @Throws(IOException::class,CancellationException::class)
     private suspend fun save(puz : Puzzle, ph : IPuz) : Boolean {
         val ipuzFile = ph.mainFileHandle
         val puzDir = ph.dirHandle
