@@ -133,12 +133,12 @@ class JVMNativeBackendUtils(
 
     override fun getCachedMetaDBBuilder()
             : RoomDatabase.Builder<MetaCache.CachedMetaDB> {
-        val dbFile = File(XDG_DATA_DIR, "meta-cache.db")
+        val dbFile = File(getAppFilesDir(), "meta-cache.db")
         // TODO: do we want the BundledSQLiteDriver on all platforms?
         // I'm afraid of breaking existing databases on random Android
         // devices.
         val builder : RoomDatabase.Builder<MetaCache.CachedMetaDB>
-            = databaseBuilder(name = dbFile.absoluteFile.pathString)
+            = databaseBuilder(name = dbFile.pathString)
         builder.setDriver(BundledSQLiteDriver())
         return builder
     }

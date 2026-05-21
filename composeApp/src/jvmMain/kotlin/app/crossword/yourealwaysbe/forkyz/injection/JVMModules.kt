@@ -42,7 +42,6 @@ val jvmModules = module {
             fileSystem = FileSystem.SYSTEM,
             producePath = {
                 File(XDG_DATA_DIR, SETTINGS_FILE_NAME)
-                    .absoluteFile
                     .pathString
                     .toPath()
             },
