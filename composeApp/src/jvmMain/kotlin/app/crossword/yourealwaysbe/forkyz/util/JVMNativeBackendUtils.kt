@@ -46,13 +46,15 @@ import app.crossword.yourealwaysbe.forkyz.util.toUri
  *
  * Currently hardcoded to ~/.local/share/forkyz.
  */
-val XDG_DATA_DIR : File = File(
-    ProjectDirectories.from(
-        "app",
-        "crossword.yourealwaysbe",
-        "forkyz",
-    ).dataDir,
-)
+val XDG_DATA_DIR : File by lazy {
+    File(
+        ProjectDirectories.from(
+            "app",
+            "crossword.yourealwaysbe",
+            "forkyz",
+        ).dataDir,
+    ).also { it.mkdirs() }
+}
 
 class JVMNativeBackendUtils(
     private val strings : AppStrings,
