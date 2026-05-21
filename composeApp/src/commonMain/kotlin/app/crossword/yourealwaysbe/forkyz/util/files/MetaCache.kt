@@ -29,7 +29,7 @@ import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.files.PuzHandle
 import app.crossword.yourealwaysbe.forkyz.util.toUri
 
-@Suppress("KotlinNoActualForExpect")
+@Suppress("NO_ACTUAL_FOR_EXPECT")
 expect object CachedMetaDBConstructor
     : RoomDatabaseConstructor<MetaCache.CachedMetaDB> {
     override fun initialize() : MetaCache.CachedMetaDB
