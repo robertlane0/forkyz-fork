@@ -72,6 +72,7 @@ kotlin {
             implementation(libs.androidx.datastore.core.okio)
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.androidx.room.runtime)
+            implementation(libs.androidx.sqlite.bundled)
             implementation(libs.codepoints)
             implementation(libs.coil3.compose)
             implementation(libs.coil3.network.ktor)
@@ -150,7 +151,6 @@ kotlin {
             //implementation(compose.desktop.windows_x64)
             //implementation(compose.desktop.linux_x64)
 
-            implementation(libs.androidx.sqlite.bundled)
             implementation(libs.directories)
             implementation(libs.ktor.client.java)
             implementation(libs.kotlinx.coroutines.swing)
@@ -158,7 +158,6 @@ kotlin {
         }
 
         iosMain.dependencies {
-            implementation(libs.androidx.sqlite.bundled)
             implementation(libs.ktor.client.darwin)
         }
     }
