@@ -103,7 +103,7 @@ class BrainsOnlyIOTest {
 
             Assertions.assertEquals(
                 acrossClues!!.getClueByNumber("1")!!.hint,
-                "Toss out",
+                "Táss out",
             )
             Assertions.assertEquals(
                 acrossClues.getClueByNumber("41")!!.hint,

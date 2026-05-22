@@ -7,7 +7,7 @@ import kotlinx.datetime.format.Padding
 import kotlinx.io.EOFException
 import kotlinx.io.IOException
 import kotlinx.io.Source
-import kotlinx.io.readLine
+import kotlinx.io.readUByte
 
 import app.crossword.yourealwaysbe.forkyz.puz.Box
 import app.crossword.yourealwaysbe.forkyz.puz.Box.Companion.isBlock
@@ -137,10 +137,10 @@ class BrainsOnlyIO : PuzzleParser {
             readLineAtOffset(input, 0)
             val acrossClues = ArrayList<String?>()
             run {
-                var clue : String = Companion.readLineAtOffset(input, 0)
+                var clue : String = readLineAtOffset(input, 0)
                 while ("" != clue) {
                     acrossClues.add(clue)
-                    clue = Companion.readLineAtOffset(input, 0)
+                    clue = readLineAtOffset(input, 0)
                 }
             }
 
@@ -202,7 +202,7 @@ class BrainsOnlyIO : PuzzleParser {
             var read : String? = null
             var i = 0
             while (i <= offset) {
-                read = input.readLine()
+                read = readLine(input)
                 if (read == null) {
                     throw IOException("Offset past end of file")
                 }
@@ -212,6 +212,43 @@ class BrainsOnlyIO : PuzzleParser {
                 throw EOFException("End of line")
             }
             return read.trim()
+        }
+
+        /**
+         * Read ISO-8859-1 line
+         */
+        @Throws(IOException::class)
+        private fun readLine(input : Source) : String? {
+            if (input.exhausted())
+                return null
+
+            val s = StringBuilder()
+            while (!input.exhausted()) {
+                val c = readChar(input)
+                if (c == '\n') {
+                    break
+                }
+
+                if (
+                    c == '\r'
+                    && !input.exhausted()
+                    && readChar(input.peek()) == '\n'
+                ) {
+                    input.readUByte()
+                    break
+                }
+
+                s.append(c)
+            }
+            return s.toString()
+        }
+
+        /**
+         * Read ISO-8859-1 char
+         */
+        @Throws(IOException::class)
+        private fun readChar(input : Source) : Char {
+            return input.readUByte().toInt().toChar()
         }
     }
 }
