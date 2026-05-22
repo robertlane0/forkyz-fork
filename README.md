@@ -150,7 +150,7 @@ It is currently not implemented on iOS.
 
 ## Compilation
 
-Gradle should compile fine as long as you have Java 17 or above.
+Gradle should compile fine as long as you have Java 21 or above.
 
 For Android:
 
