@@ -15,6 +15,8 @@ follow a standard across/down set-up) and other customisations.
 * Flatpak (experimental)
 * Windows (experimental)
 
+Mac and iOS builds are also possible, but need to be compiled on an Apple device.
+
 [Forkyz Scanner][forkyz-scanner] is a companion app for scanning crosswords from the camera, images, or PDFs.
 
 ## Features
@@ -126,7 +128,9 @@ Current downloaders are De Standaard, De Telegraaf, El Pais Experto, Guardian Da
 
 ### Sharing From a Browser
 
-From an online puzzle page, you can use your browser's "share" function to share the URL with Forkyz. Forkyz will attempt to retrieve the crossword from the website.
+From an online puzzle page, you can use your browser's "share" function to share the URL with Forkyz on Android. On desktop, you can pass a URL as a command-line argument.
+
+Forkyz will attempt to retrieve the crossword from the website.
 
 This only works for a limited number of sites, but may work for sites using similar crossword software. It has been tested with:
 
@@ -141,6 +145,8 @@ This only works for a limited number of sites, but may work for sites using simi
 * De Telegraaf (embedded from Pzzl.net),
 * Przekrój,
 * Wall Street Journal.
+
+It is currently not implemented on iOS.
 
 ## Compilation
 
@@ -159,6 +165,8 @@ For desktop:
     $ ./gradlew run
 
 See `./gradlew tasks` for all build commands.
+
+For iOS: open `iosApp/iosApp.xcodeproj` in Xcode and bash it until it works. I am not much help here as i'm a fish-out-of-water on Mac. I have tested a build on a borrowed computer and iPhone.
 
 ## Project Structure
 
@@ -196,12 +204,8 @@ Translations are welcome. Here is a quick guide to what is needed.
   a barrier to releases. I will accept corrections though.
 * The desktop metainfo in `flatpak/com.gitlab.Hague.forkyz.metainfo.xml` needs
   additional elements for supported languages.
-* Finally, create a translated copy of
-  `puzlib/src/main/resources/app/crossword/yourealwaysbe/puz/strings.properties`
-  with the name
-  `puzlib/src/main/resources/app/crossword/yourealwaysbe/puz/strings_<lang>.properties`.
 
-The last bullet is a file of clue list names. These have a strange status. Some input formats include the list name as part of the file (which will be used instead of any translations). Some don't encode the list name, but are kind of tied to a particular country. Hardcoded strings are used for these. The properties file will be used for formats that don't specify the list name, but aren't tied to a country. Note, the list names are decided on import, so the translation won't apply to previously downloaded/imported puzzles.
+The default puzzle list names in the strings files have a strange status. Some input formats include the list name as part of the file (which will be used instead of any translations). Some don't encode the list name, but are kind of tied to a particular country. Hardcoded strings are used for these. The entries in the strings files will be used for formats that don't specify the list name, but aren't tied to a country. Note, the list names are decided on import, so the translation won't apply to previously downloaded/imported puzzles.
 
 Strings without translations are given [on this page][missingtranslations].
 
