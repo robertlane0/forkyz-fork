@@ -60,6 +60,11 @@ private val TOAST_SHAPE = RoundedCornerShape(10.dp)
 private val TOAST_DURATION = 5000L // ms
 
 private var koinStarted = false
+private val pendingImports = mutableListOf<Uri>()
+
+fun addPendingImport(uriString : String) {
+    pendingImports.add(Uri.parse(uriString))
+}
 
 fun MainViewController() = ComposeUIViewController {
     if (!koinStarted) {
@@ -123,6 +128,14 @@ private fun MainContent() {
                 delay(TOAST_DURATION)
                 activeToasts.removeFirst()
             }
+        }
+
+        override fun getPendingImports() : Collection<Uri> {
+            return pendingImports.toList()
+        }
+
+        override fun clearPendingImports() {
+            pendingImports.clear()
         }
 
         override fun onImportFinish(ifr : NativeImportFinishedResult) {
