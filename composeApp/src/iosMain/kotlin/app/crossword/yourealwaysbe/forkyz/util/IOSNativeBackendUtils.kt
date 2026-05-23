@@ -97,7 +97,7 @@ class IOSNativeBackendUtils(
     override fun openOutput(uri : Uri) : Sink? {
         try {
             return uri.getPath()?.let { path ->
-                return PlatformFile(it).sink().buffered()
+                return PlatformFile(path).sink().buffered()
             }
         } catch (e : IllegalArgumentException) {
             throw IOException(e.message)
