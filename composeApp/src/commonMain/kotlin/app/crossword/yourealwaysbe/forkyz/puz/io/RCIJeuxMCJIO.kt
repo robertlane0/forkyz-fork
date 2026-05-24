@@ -45,7 +45,6 @@ class RCIJeuxMCJIO : PuzzleParser {
                 if (json == null)
                     return null
 
-                println(json)
                 return readPuzzleFromJSON(parseJSON5Object(json))
             } catch (e : MCJFormatException) {
                 AppLogger.e(TAG, "Could not read RCIJeux MCJ: " + e)
