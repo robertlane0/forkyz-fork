@@ -170,9 +170,14 @@ For iOS: open `iosApp/iosApp.xcodeproj` in Xcode and bash it until it works. I a
 
 ## Project Structure
 
-  * ./app The Android App.
-  * ./puzlib A platform independent Java library for dealing with puzzle formats.
-  * ./gfx Misc art assets.
+* ./composeApp the main multiplatform codebase
+    * see commonMain for all but platform specific code
+    * .../forkyz/puz is the back end puzzle model
+    * .../forkyz/puz/io for puzzle parsing classes
+    * .../forkyz/net for downloading/scraping code
+* ./androidApp required shell for Android app
+* ./iosApp required shell for iOS app
+* ./gfx Misc art assets.
 
 ## Translations
 
