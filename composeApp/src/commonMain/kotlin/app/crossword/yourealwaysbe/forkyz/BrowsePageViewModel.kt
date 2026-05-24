@@ -1,6 +1,8 @@
 
 package app.crossword.yourealwaysbe.forkyz
 
+import kotlin.concurrent.atomics.AtomicBoolean
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO // needed on IOS, not JVM or Android
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -249,6 +251,9 @@ class BrowsePageViewModel(
         = Dispatchers.IO.limitedParallelism(1, "UI Lock")
     private val autoDownloadDispatcher
         = Dispatchers.IO.limitedParallelism(1, "Auto Downloads")
+
+    @OptIn(ExperimentalAtomicApi::class)
+    private val uiBusy = AtomicBoolean(false)
 
     private val mediatedUIState = MediatedStateWithFlow<UIState, BrowseSettings>(
         viewModelScope,
@@ -730,9 +735,7 @@ class BrowsePageViewModel(
     @MainThread
     fun refreshCurrentPuzzleMeta() {
         AppLogger.i(TAG, "Refreshing current puzzle in list with isUIBusy")
-        setUIBusy(true)
         currentPuzzleHolder.getFreshCurrentPuzzleMeta() { refreshedMeta ->
-            setUIBusy(false)
             AppLogger.i(TAG, "Done refreshing current puzzle in list with isUIBusy")
             if (refreshedMeta != null) {
                 viewModelScope.launch {
@@ -928,11 +931,10 @@ class BrowsePageViewModel(
         taskName : String,
         run : suspend () -> Unit,
     ) {
-        // no lock actually needed because executorService is single
-        // threaded guaranteed
-        AppLogger.i(TAG, "Starting task " + taskName + " with isUIBusy")
+        // No actual lock because dispatcher is single-thread
         viewModelScope.launch(uiLockDispatcher) {
             try {
+                AppLogger.i(TAG, "Starting task " + taskName + " with isUIBusy")
                 setUIBusy(true)
                 run()
             } finally {
@@ -1133,9 +1135,11 @@ class BrowsePageViewModel(
             }
     }
 
+    @OptIn(ExperimentalAtomicApi::class)
     private fun setUIBusy(value : Boolean) {
+        uiBusy.store(value)
         runMain {
-            currentUIState = currentUIState.copy(isBusy = value)
+            currentUIState = currentUIState.copy(isBusy = uiBusy.load())
         }
     }
 
