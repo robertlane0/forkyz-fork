@@ -47,9 +47,7 @@ class WithMetaDataDownloader(
             return null
 
         try {
-            return getURL(sourceUrl, headers).use {
-                puzzleParser.parseInput(it)
-            }?.also { puz ->
+            return super.download(date, headers)?.also { puz ->
                 author?.let { puz.author = it }
                 title?.let { puz.title = it }
             }
