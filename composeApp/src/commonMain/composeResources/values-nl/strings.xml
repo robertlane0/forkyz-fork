@@ -27,6 +27,9 @@
     <string name="export_notification_channel_name">Puzzels exporteren</string>
     <string name="export_notification_channel_desc">Melding wanneer puzzels worden geëxporteerd.</string>
     <string name="exporting_puzzles">Puzzels exporteren</string>
+    <string name="mcp_notification_channel_name">MCP-server</string>
+    <string name="mcp_notification_channel_desc">Melding terwijl MCP-server draait.</string>
+    <string name="mcp_server_notification_title">MCP-server</string>
 
     <!-- downloading -->
     <string name="download">Download</string>
@@ -51,7 +54,7 @@
     <!-- Browse -->
     <string name="unknown_source">Onbekende bron</string>
     <plurals name="num_selected">
-        <item quantity="other">%d Geselecteerd</item>
+        <item quantity="other">%1$d Geselecteerd</item>
     </plurals>
     <string name="delete">Verwijderen</string>
     <string name="archive">Archiveren</string>
@@ -171,7 +174,7 @@
     <string name="storage_location_desc">Configureer waar Forkyz bestanden opslaat/vindt. Herstart app na wijzigen.</string>
     <string name="internal_storage">Interne app-opslag</string>
     <string name="external_storage_saf">Externe opslag</string>
-    <string name="external_storage_saf_current_uri">(Current: %1$s)</string>
+    <string name="external_storage_saf_current_uri">(Huidig: %1$s)</string>
     <string name="external_storage_saf_none_selected">geen opslag geselecteerd</string>
     <string name="storage_changed_title">Opslag verandert</string>
     <string name="storage_changed_please_restart">Start Forkyz a.u.b. opnieuw op om de wijziging toe te passen.</string>
@@ -307,7 +310,7 @@
     <string name="display_scratch">Krabbels weergeven</string>
     <string name="display_scratch_desc">Krabbels op het raster weergeven.</string>
     <string name="fit_to_screen_mode">Aanpassen aan scherm</string>
-    <string name="fit_to_screen_mode_desc">Of/hoe de puzzel automastisch van formaat wijzigd om zich aan het scherm aan te passen.</string>
+    <string name="fit_to_screen_mode_desc">Of/hoe de puzzel automatisch van formaat wijzigd om zich aan het scherm aan te passen.</string>
     <string name="fit_to_screen_mode_never">Nooit</string>
     <string name="fit_to_screen_mode_start">Start puzzel</string>
     <string name="fit_to_screen_mode_locked">Vergrendeld</string>
@@ -464,6 +467,9 @@
     <string name="duckduckgo_desc">Omschrijving opzoeken op DuckDuckGo.</string>
     <!-- takes clue formatted without punctuation and - instead of spaces -->
     <string name="duckduckgo_search_url">https://duckduckgo.com/?q=%1$s</string>
+    <string name="mcp_host_port">MCP-server</string>
+    <string name="mcp_host_port_desc">Indien niet leeg, voer tijdens het oplossen een MCP-server uit voor externe LLM-interactie op http://host:poort/mcp. Het formaat is host_ip:poort.</string>
+    <string name="mcp_host_port_hint">host:poort of leeg om uit te schakelen</string>
 
     <!-- preferences keyboard -->
     <string name="keyboard_showhide">Intern toetsenbord weergeven/verbergen</string>
@@ -647,7 +653,9 @@
     <string name="help_duckduckgo">DuckDuckGo Clue</string>
     <string name="help_crossword_solver">Kruiswoordoplosser</string>
     <string name="help_crossword_solver_anagram">Anagramoplosser </string>
-    <string name="help_fifteen_squared">Fifteen Squared doorzoeken</string>
+    <string name="help_fifteen_squared">Fifteen Squared</string>
+    <string name="mcp_stop">MCP-server stoppen</string>
+    <string name="mcp_start">MCP-server starten</string>
 
     <!-- Clue Tabs -->
     <string name="clue_tab_history">Geschiedenis</string>
@@ -744,6 +752,7 @@
     <string name="keyboard_azerty">AZERTY</string>
     <string name="keyboard_dvorak">Dvorak</string>
     <string name="keyboard_colemak">Colemak</string>
+    <string name="keyboard_russian">ЙЦУКЕН (Russisch)</string>
 
     <!-- special entry -->
     <string name="special_character">Speciaal teken</string>
@@ -874,6 +883,7 @@
     <string name="month_november">November</string>
     <string name="month_december">December</string>
 
+    <!-- default puzzle list names -->
     <string name="default_across_list_name">Horizontaal</string>
     <string name="default_down_list_name">Verticaal</string>
     <string name="default_nodir_list_name">Omschrijvingen</string>
