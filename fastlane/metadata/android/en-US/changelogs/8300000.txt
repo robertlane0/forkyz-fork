@@ -1,0 +1,4 @@
+- Final backend changes required to make Forkyz a multiplatform project.
+- iOS version now compilable (must be self-built and installed).
+- Dutch translation updates (thanks @ojppe).
+- Repair Scrypto download.

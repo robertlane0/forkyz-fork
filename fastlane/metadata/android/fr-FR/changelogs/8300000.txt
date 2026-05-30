@@ -1,0 +1,6 @@
+- Dernières modifications nécessaires pour faire de Forkyz un projet multiplateforme.
+- Version iOS maintenant compilable (doit être auto-construit et installé).
+- Mises à jour de la traduction néerlandaise (merci @ojppe).
+- Réparation Scrypto téléchargement.
+
+Changelog traduit automatiquement avec Argos Translate.

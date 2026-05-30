@@ -1,5 +1,12 @@
 # Forkyz Changelog
 
+## Version 83
+
+- Final backend changes required to make Forkyz a multiplatform project.
+- iOS version now compilable (must be self-built and installed).
+- Dutch translation updates (thanks @ojppe).
+- Repair Scrypto download.
+
 ## Version 82
 
 - Add flexibility to internal keyboard handling and add Russian layout.
