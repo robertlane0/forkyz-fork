@@ -1602,6 +1602,7 @@ class Playboard(puzzle : Puzzle) {
             && !b.isBlank()
             && (
                 !this.isShowErrors
+                || !b.hasSolution()
                 || b.response == b.solution
             )
         )
