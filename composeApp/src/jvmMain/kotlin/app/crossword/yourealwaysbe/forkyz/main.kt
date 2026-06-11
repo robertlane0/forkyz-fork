@@ -36,6 +36,7 @@ import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 import org.koin.core.context.startKoin
@@ -48,6 +49,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.announce_not_i
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.app_name
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.exporting_puzzles
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.feature_not_implemented
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.forkyz_icon
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.puzzles_export_failed
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.puzzles_exported
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.select_puzzle_files
@@ -338,6 +340,7 @@ private fun MainWindow(
     Window(
         onCloseRequest = ::doExitApplication,
         title = stringResource(Res.string.app_name),
+        icon = painterResource(Res.drawable.forkyz_icon),
         state = windowState,
         undecorated = viewModel.undecorated,
         resizable = true,
