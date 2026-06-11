@@ -321,9 +321,15 @@ fun PlayPage(
         @Composable
         fun ClueText(modifier : Modifier) {
             val state by viewModel.playUIState.collectAsStateWithLifecycle()
-            val clueText by remember {
-                derivedStateOf { state.clueText }
-            }
+            // This used to be a remember derivedStateOf, but desktop
+            // had a bug where the state update did not always result in
+            // a recompose. The derivedStateOf is not necessary for
+            // avoiding unnecessary recomposition. I have not been able
+            // to reproduce the bug with the formulation below. But
+            // moving state.clueText inside the ClueText rather than
+            // having a local variable results in code that does display
+            // the bug..?
+            val clueText = state.clueText
             ClueText(
                 modifier = modifier,
                 clueText = clueText,
