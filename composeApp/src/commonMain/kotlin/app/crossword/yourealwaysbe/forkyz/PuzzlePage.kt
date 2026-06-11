@@ -145,6 +145,7 @@ import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer
 import app.crossword.yourealwaysbe.forkyz.util.NativeFrontendUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
+import app.crossword.yourealwaysbe.forkyz.util.onRightClick
 import app.crossword.yourealwaysbe.forkyz.util.toUri
 import app.crossword.yourealwaysbe.forkyz.view.ChooseFlagColorDialog
 import app.crossword.yourealwaysbe.forkyz.view.ForkyzKeyboard
@@ -244,12 +245,14 @@ class PuzzlePageScope(
         onLongClick : () -> Unit = { },
         onLongClickDescription : String = "",
     ) {
-        val fullModifier = modifier.combinedClickable(
-            onClick = onClick,
-            onClickLabel = onClickDescription,
-            onLongClick = onLongClick,
-            onLongClickLabel = onLongClickDescription,
-        )
+        val fullModifier = modifier
+            .onRightClick { onLongClick() }
+            .combinedClickable(
+                onClick = onClick,
+                onClickLabel = onClickDescription,
+                onLongClick = onLongClick,
+                onLongClickLabel = onLongClickDescription,
+            )
         val text = clueText ?: stringResource(Res.string.unknown_hint)
 
         // Text doesn't support autoSize yet, so rebuild BasicText

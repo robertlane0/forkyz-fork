@@ -51,6 +51,7 @@ import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
 import app.crossword.yourealwaysbe.forkyz.util.Parcelable
 import app.crossword.yourealwaysbe.forkyz.util.Parcelize
 import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
+import app.crossword.yourealwaysbe.forkyz.util.onRightClick
 import app.crossword.yourealwaysbe.forkyz.view.OrdinaryKey
 
 private val MAX_BOX_SIZE_DP : Float = 160f
@@ -541,6 +542,13 @@ private fun BoardFullBody(
                     label = onLongPressDescription,
                 )
                 contentDescription = boardContentDescription
+            }.onRightClick { offset ->
+                offsetToBox(
+                    viewModel,
+                    state,
+                    localDensity.density,
+                    offset,
+                )?.let { box -> onLongPress(box.row, box.col) }
             }.pointerInput(true) {
                 detectTapGestures(
                     onTap = { offset ->
@@ -886,6 +894,14 @@ fun BoxesEditNoInput(
                     label = onLongPressDescription,
                 )
                 contentDescription = boxesContentDescription
+            }.onRightClick { offset ->
+                offsetToBoxWord(
+                    localDensity.density,
+                    boxProfile.boxSizePx,
+                    widthBoxes,
+                    offset,
+                    stateBoxes,
+                )?.let { box -> onLongPress(box.row, box.col) }
             }.pointerInput(true) {
                 detectTapGestures(
                     onTap = { offset ->

@@ -59,6 +59,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.prev_clue
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.space
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.special_entry
 import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
+import app.crossword.yourealwaysbe.forkyz.util.onRightClick
 import app.crossword.yourealwaysbe.forkyz.view.OrdinaryKey
 import app.crossword.yourealwaysbe.forkyz.view.SpecialKey
 
@@ -119,47 +120,49 @@ internal class KeyboardLayoutScope(
         val haptic = LocalHapticFeedback.current
 
         content(
-            modifier.focusProperties { canFocus = false }.pointerInput(true) {
-                awaitEachGesture {
-                    val down = awaitFirstDown(requireUnconsumed = false)
-                        .also { it.consume() }
+            modifier.focusProperties { canFocus = false }
+                .onRightClick { onLongPress?.invoke() }
+                .pointerInput(true) {
+                    awaitEachGesture {
+                        val down = awaitFirstDown(requireUnconsumed = false)
+                            .also { it.consume() }
 
-                    currentOnDown()
-                    if (hapticFeedback) {
-                        haptic.performHapticFeedback(
-                            HapticFeedbackType.VirtualKey,
-                        )
-                    }
+                        currentOnDown()
+                        if (hapticFeedback) {
+                            haptic.performHapticFeedback(
+                                HapticFeedbackType.VirtualKey,
+                            )
+                        }
 
-                    var wasLongPress = false
+                        var wasLongPress = false
 
-                    val heldButtonJob = scope.launch {
-                        if (onLongPress != null) {
-                            val longDelay = if (repeatDelay > 0) {
-                                repeatDelay
-                            } else {
-                                DEFAULT_LONG_PRESS_DELAY
-                            }
-                            delay(longDelay)
-                            wasLongPress = true
-                            onLongPress()
-                        } else if (repeatDelay > 0 && repeatInterval > 0) {
-                            delay(repeatDelay)
-                            while (down.pressed) {
-                                delay(repeatInterval)
-                                currentOnUp()
-                                currentOnDown()
+                        val heldButtonJob = scope.launch {
+                            if (onLongPress != null) {
+                                val longDelay = if (repeatDelay > 0) {
+                                    repeatDelay
+                                } else {
+                                    DEFAULT_LONG_PRESS_DELAY
+                                }
+                                delay(longDelay)
+                                wasLongPress = true
+                                onLongPress()
+                            } else if (repeatDelay > 0 && repeatInterval > 0) {
+                                delay(repeatDelay)
+                                while (down.pressed) {
+                                    delay(repeatInterval)
+                                    currentOnUp()
+                                    currentOnDown()
+                                }
                             }
                         }
-                    }
 
-                    waitForUpOrCancellation()?.also { it.consume() }
-                    heldButtonJob.cancel()
-                    if (!wasLongPress)
-                        currentOnUp()
-                    inputConnectionMediator.focusReceiver()
-                }
-            }.buttonVerticalPadding()
+                        waitForUpOrCancellation()?.also { it.consume() }
+                        heldButtonJob.cancel()
+                        if (!wasLongPress)
+                            currentOnUp()
+                        inputConnectionMediator.focusReceiver()
+                    }
+                }.buttonVerticalPadding()
         )
     }
 
