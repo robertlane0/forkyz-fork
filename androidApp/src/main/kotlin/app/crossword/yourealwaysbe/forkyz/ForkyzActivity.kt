@@ -337,7 +337,7 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
         // running, which is hella confusing
         override val isExitAfterPendingImports : Boolean = true
 
-        override fun onFinish() { finish() }
+        override fun onFinishByBack() { finish() }
 
         override fun onExit() {
             // ask all Forkyz activities to close

@@ -113,7 +113,7 @@ private fun MainContent() {
 
         override val isExitAfterPendingImports : Boolean = false
 
-        override fun onFinish() {
+        override fun onFinishByBack() {
             // iOS manages app lifecycle; no explicit finish needed
         }
 

@@ -25,7 +25,7 @@ interface NativeFrontendUtils {
     val isPortrait : Boolean
     val isExitAfterPendingImports : Boolean
 
-    fun onFinish()
+    fun onFinishByBack()
     fun onExit()
 
     fun toast(msg : String) { }

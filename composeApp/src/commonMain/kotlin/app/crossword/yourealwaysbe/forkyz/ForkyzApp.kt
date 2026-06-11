@@ -132,8 +132,11 @@ private fun ForkyzAppMain(
     val navController = rememberNavController()
 
     fun doBackAction() {
-        if (!navController.popBackStack())
-            utils.onFinish()
+        if (navController.previousBackStackEntry != null) {
+            navController.popBackStack()
+        } else {
+            utils.onFinishByBack()
+        }
     }
 
     fun openHTMLPage(page : HTMLFile) {

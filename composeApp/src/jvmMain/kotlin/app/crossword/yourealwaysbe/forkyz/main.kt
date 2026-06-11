@@ -137,8 +137,8 @@ private fun MainWindow(
 
         override val isExitAfterPendingImports : Boolean = false
 
-        override fun onFinish() {
-            doExitApplication()
+        override fun onFinishByBack() {
+            // don't exit via back
         }
 
         override fun onExit() {
