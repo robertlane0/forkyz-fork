@@ -112,6 +112,7 @@ private fun MainContent() {
             get() { return displayWidth < displayHeight }
 
         override val isExitAfterPendingImports : Boolean = false
+        override val hasExitMenuItem : Boolean = false
 
         override fun onFinishByBack() {
             // iOS manages app lifecycle; no explicit finish needed

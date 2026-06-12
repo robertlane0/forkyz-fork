@@ -24,6 +24,7 @@ interface NativeFrontendUtils {
     val displayHeight : Int
     val isPortrait : Boolean
     val isExitAfterPendingImports : Boolean
+    val hasExitMenuItem : Boolean
 
     fun onFinishByBack()
     fun onExit()

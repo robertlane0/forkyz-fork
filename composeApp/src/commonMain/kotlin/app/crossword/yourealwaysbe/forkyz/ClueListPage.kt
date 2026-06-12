@@ -45,6 +45,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.overflow
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.select_clue
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_all_words_clue_list
 import app.crossword.yourealwaysbe.forkyz.menu.BaseMenuModifier
+import app.crossword.yourealwaysbe.forkyz.menu.MenuExit
 import app.crossword.yourealwaysbe.forkyz.menu.MenuText
 import app.crossword.yourealwaysbe.forkyz.puz.Clue
 import app.crossword.yourealwaysbe.forkyz.puz.ClueID
@@ -185,6 +186,7 @@ fun ClueListPage(
                 MenuShare()
                 MenuHelp()
                 MenuSettings()
+                MenuExit(utils)
             }
             MenuNotesSub()
             MenuShowErrorsSub()

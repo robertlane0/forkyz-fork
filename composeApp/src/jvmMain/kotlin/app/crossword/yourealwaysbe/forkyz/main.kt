@@ -136,6 +136,7 @@ private fun MainWindow(
             get() { return displayWidth < displayHeight }
 
         override val isExitAfterPendingImports : Boolean = false
+        override val hasExitMenuItem : Boolean = true
 
         override fun onFinishByBack() {
             // don't exit via back

@@ -82,6 +82,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.transfer_board
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.transfer_overwrite_warning
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.transfer_scratch_to_focussed_view
 import app.crossword.yourealwaysbe.forkyz.menu.BaseMenuModifier
+import app.crossword.yourealwaysbe.forkyz.menu.MenuExit
 import app.crossword.yourealwaysbe.forkyz.menu.MenuText
 import app.crossword.yourealwaysbe.forkyz.puz.Clue
 import app.crossword.yourealwaysbe.forkyz.puz.ClueID
@@ -273,6 +274,7 @@ fun NotesPage(
                 MenuShare()
                 MenuHelp()
                 MenuSettings()
+                MenuExit(utils)
             }
             MenuNotesSub()
             MenuShowErrorsSub()

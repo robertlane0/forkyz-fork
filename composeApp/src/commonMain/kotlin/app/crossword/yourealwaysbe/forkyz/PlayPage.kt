@@ -67,6 +67,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.prev_clue
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.select_clue
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.toggle_clue_tabs
 import app.crossword.yourealwaysbe.forkyz.menu.BaseMenuModifier
+import app.crossword.yourealwaysbe.forkyz.menu.MenuExit
 import app.crossword.yourealwaysbe.forkyz.menu.MenuText
 import app.crossword.yourealwaysbe.forkyz.puz.ClueID
 import app.crossword.yourealwaysbe.forkyz.settings.FitToScreenMode
@@ -305,6 +306,7 @@ fun PlayPage(
                 MenuShare()
                 MenuHelp()
                 MenuSettings()
+                MenuExit(utils)
             }
             MenuNotesSub()
             MenuShowErrorsSub()

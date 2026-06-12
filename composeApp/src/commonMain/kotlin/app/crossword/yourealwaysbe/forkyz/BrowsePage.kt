@@ -149,6 +149,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.toggle_archive
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.view_release_notes
 import app.crossword.yourealwaysbe.forkyz.menu.BaseMenuModifier
 import app.crossword.yourealwaysbe.forkyz.menu.MenuDropdownHeading
+import app.crossword.yourealwaysbe.forkyz.menu.MenuExit
 import app.crossword.yourealwaysbe.forkyz.menu.MenuHelp
 import app.crossword.yourealwaysbe.forkyz.menu.MenuSettings
 import app.crossword.yourealwaysbe.forkyz.menu.MenuSubEntry
@@ -531,6 +532,7 @@ fun BrowsePage(
                 openSettings = { pageOpener.openSettingsPage() },
                 onDismiss = viewModel::dismissMenu,
             )
+            MenuExit(utils)
         }
         MenuSortSub()
     }

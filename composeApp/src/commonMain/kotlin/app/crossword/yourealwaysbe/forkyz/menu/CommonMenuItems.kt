@@ -17,9 +17,11 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.exit
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.help
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_submenu
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.settings
+import app.crossword.yourealwaysbe.forkyz.util.NativeFrontendUtils
 
 val BaseMenuModifier = Modifier.defaultMinSize(minWidth = 200.dp)
 
@@ -96,5 +98,15 @@ fun MenuSettings(
             onDismiss()
         }
     )
+}
+
+@Composable
+fun MenuExit(utils : NativeFrontendUtils) {
+    if (utils.hasExitMenuItem) {
+        DropdownMenuItem(
+            text = { MenuText(stringResource(Res.string.exit)) },
+            onClick = utils::onExit,
+        )
+    }
 }
 
