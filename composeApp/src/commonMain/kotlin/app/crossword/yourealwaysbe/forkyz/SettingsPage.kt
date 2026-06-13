@@ -328,7 +328,7 @@ fun SettingsPage(
                 LaunchedEffect(needsURI) {
                     settingsExportLauncher.launch(
                         suggestedName = SETTINGS_DEFAULT_FILENAME,
-                        extension = SETTINGS_DEFAULT_EXT,
+                        defaultExtension = SETTINGS_DEFAULT_EXT,
                     )
                     viewModel.clearNeedsURI()
                 }
