@@ -497,7 +497,7 @@ fun PlainDialog(
                             style = MaterialTheme.typography.headlineSmall,
                         )
                     }
-                    summary?.let { summary
+                    summary?.let { summary ->
                         Text(
                             modifier = Modifier.fillMaxWidth()
                                 .padding(bottom = DIALOG_PADDING),
