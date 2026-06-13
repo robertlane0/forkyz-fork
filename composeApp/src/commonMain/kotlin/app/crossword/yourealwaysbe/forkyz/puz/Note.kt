@@ -48,9 +48,9 @@ data class Note(
     val isEmpty : Boolean
         get() = (
             ((text?.length ?: 0) == 0)
-            && ((scratch?.trim { it <= ' ' }?.length ?: 0) == 0)
-            && ((anagramSource?.trim { it <= ' ' }?.length ?: 0) == 0)
-            && ((anagramSolution?.trim { it <= ' ' }?.length ?: 0) == 0)
+            && ((scratch?.trim()?.length ?: 0) == 0)
+            && ((anagramSource?.trim()?.length ?: 0) == 0)
+            && ((anagramSolution?.trim()?.length ?: 0) == 0)
         )
 
     fun withScratch(scratch : String?) : Note {

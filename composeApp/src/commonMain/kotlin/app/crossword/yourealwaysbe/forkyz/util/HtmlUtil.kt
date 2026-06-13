@@ -211,7 +211,7 @@ object HtmlUtil {
         if (color == null || color.isEmpty())
             return -1
 
-        color = color.trim { it <= ' ' }.lowercase()
+        color = color.trim().lowercase()
 
         if (color.startsWith("#")) {
             try {
@@ -303,7 +303,7 @@ object HtmlUtil {
      */
     private fun parse255String(value : String) : Int {
         var iValue = 0
-        val value = value.trim { it <= ' ' }
+        val value = value.trim()
         if (value.endsWith("%")) {
             val num = value.substring(0, value.length - 1)
             iValue = (num.toInt() / 100.0 * 255).toInt()
