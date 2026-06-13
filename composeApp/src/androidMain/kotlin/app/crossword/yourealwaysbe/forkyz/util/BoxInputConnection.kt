@@ -269,10 +269,10 @@ class BoxInputConnection(
         override fun getChars(
             start : Int,
             end : Int,
-            dest : CharArray?,
+            dest : CharArray,
             destoff : Int,
         ) {
-            spannable.getChars(start, end, dest, destoff)
+            spannable.toString().toCharArray(dest, destoff, start, end)
         }
 
         override fun removeSpan(what : Any?) {
