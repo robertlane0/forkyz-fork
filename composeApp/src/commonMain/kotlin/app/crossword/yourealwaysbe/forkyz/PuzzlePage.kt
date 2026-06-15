@@ -110,6 +110,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_errors
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_errors_clue
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_errors_cursor
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_errors_full_grid
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_errors_whole_word
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.showing_errors
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.special_entry
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.support_puzzle_source
@@ -581,6 +582,16 @@ class PuzzlePageScope(
                 },
                 onClick = {
                     viewModel.toggleShowErrorsGrid()
+                    viewModel.dismissMenu()
+                }
+            )
+            MenuCheckedItem(
+                checked = showErrorsState.isShowingErrorsWholeWord,
+                text = {
+                    MenuText(stringResource(Res.string.show_errors_whole_word))
+                },
+                onClick = {
+                    viewModel.toggleShowErrorsWholeWord()
                     viewModel.dismissMenu()
                 }
             )

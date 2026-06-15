@@ -254,6 +254,7 @@ message Settings {
     bool highlightCrossingClue = 157;
     string mcpHostPort = 158;
     bool mcpRunning = 159;
+    bool showErrorsWholeWord = 160;
 
     // defunct settings
     repeated string autoDownloaders = 5;

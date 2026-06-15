@@ -108,10 +108,14 @@ data class ShowErrorsMenuState(
     val isShowingErrorsClue : Boolean = false,
     val isShowingErrorsCursor : Boolean = false,
     val isShowingErrorsGrid : Boolean = false,
+    val isShowingErrorsWholeWord : Boolean = false,
 ) {
     val isShowing : Boolean
         get() = enabled && (
-            isShowingErrorsGrid || isShowingErrorsCursor || isShowingErrorsClue
+            isShowingErrorsGrid
+            || isShowingErrorsCursor
+            || isShowingErrorsClue
+            || isShowingErrorsWholeWord
         )
 }
 
@@ -233,12 +237,18 @@ private data class VoiceSettings(
     val alwaysSettings : VoiceAlwaysSettings,
 )
 
-private data class PuzzleMenuSettings(
-    val externalToolSettings : ExternalToolSettings,
-    val scratchMode : Boolean,
+private data class ShowErrorsSettings(
     val showErrorsClue : Boolean,
     val showErrorsCursor : Boolean,
     val showErrorsGrid : Boolean,
+    val showErrorsWholeWord : Boolean,
+    val indicateShowErrors : Boolean,
+)
+
+private data class PuzzleMenuSettings(
+    val externalToolSettings : ExternalToolSettings,
+    val scratchMode : Boolean,
+    val showErrors : ShowErrorsSettings,
 )
 
 private data class PuzzleMenuStateParams(
@@ -248,10 +258,7 @@ private data class PuzzleMenuStateParams(
 
 private data class UIStateSettings(
     val showTimer : Boolean,
-    val indicateShowErrors : Boolean,
-    val showErrorsClue : Boolean,
-    val showErrorsCursor : Boolean,
-    val showErrorsGrid : Boolean,
+    val showErrors : ShowErrorsSettings,
 )
 
 open class PuzzlePageViewModel(
@@ -320,9 +327,14 @@ open class PuzzlePageViewModel(
                     combine(
                         settings.liveExternalToolSettings,
                         settings.livePlayScratchMode,
-                        settings.livePlayShowErrorsClue,
-                        settings.livePlayShowErrorsCursor,
-                        settings.livePlayShowErrorsGrid,
+                        combine(
+                            settings.livePlayShowErrorsClue,
+                            settings.livePlayShowErrorsCursor,
+                            settings.livePlayShowErrorsGrid,
+                            settings.livePlayShowErrorsWholeWord,
+                            settings.livePlayIndicateShowErrors,
+                            ::ShowErrorsSettings,
+                        ),
                         ::PuzzleMenuSettings,
                     ),
                     settings.liveExtMCPRunning,
@@ -339,11 +351,12 @@ open class PuzzlePageViewModel(
                 val puzHasSolution = getPuzzle()?.hasSolution() ?: false
                 val indicateShowErrors =
                     puzHasSolution
-                    && uiSettings.indicateShowErrors
+                    && uiSettings.showErrors.indicateShowErrors
                     && (
-                        uiSettings.showErrorsClue
-                        || uiSettings.showErrorsCursor
-                        || uiSettings.showErrorsGrid
+                        uiSettings.showErrors.showErrorsClue
+                        || uiSettings.showErrors.showErrorsCursor
+                        || uiSettings.showErrors.showErrorsGrid
+                        || uiSettings.showErrors.showErrorsWholeWord
                     )
                 state.copy(
                     showTimer = uiSettings.showTimer,
@@ -352,10 +365,14 @@ open class PuzzlePageViewModel(
             },
             combine(
                 settings.livePlayShowTimer,
-                settings.livePlayIndicateShowErrors,
-                settings.livePlayShowErrorsClue,
-                settings.livePlayShowErrorsCursor,
-                settings.livePlayShowErrorsGrid,
+                combine(
+                    settings.livePlayShowErrorsClue,
+                    settings.livePlayShowErrorsCursor,
+                    settings.livePlayShowErrorsGrid,
+                    settings.livePlayShowErrorsWholeWord,
+                    settings.livePlayIndicateShowErrors,
+                    ::ShowErrorsSettings,
+                ),
                 ::UIStateSettings
             ),
         )
@@ -554,6 +571,12 @@ open class PuzzlePageViewModel(
     fun toggleShowErrorsGrid() {
         getBoard()?.let { board ->
             settings.setPlayShowErrorsGrid(!board.isShowErrorsGrid())
+        }
+    }
+
+    fun toggleShowErrorsWholeWord() {
+        getBoard()?.let { board ->
+            settings.setPlayShowErrorsWholeWord(!board.isShowErrorsWholeWord())
         }
     }
 
@@ -1252,14 +1275,12 @@ open class PuzzlePageViewModel(
 
         val isScratchMode = menuSettings.scratchMode
 
-        val isShowingErrorsClue = menuSettings.showErrorsClue
-        val isShowingErrorsCursor = menuSettings.showErrorsCursor
-        val isShowingErrorsGrid = menuSettings.showErrorsGrid
         val showErrorsState = ShowErrorsMenuState(
             canReveal,
-            isShowingErrorsClue,
-            isShowingErrorsCursor,
-            isShowingErrorsGrid,
+            menuSettings.showErrors.showErrorsClue,
+            menuSettings.showErrors.showErrorsCursor,
+            menuSettings.showErrors.showErrorsGrid,
+            menuSettings.showErrors.showErrorsWholeWord,
         )
 
         val expanded = state.expanded

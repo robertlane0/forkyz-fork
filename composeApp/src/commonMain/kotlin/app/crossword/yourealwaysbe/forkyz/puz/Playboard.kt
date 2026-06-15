@@ -40,6 +40,7 @@ class Playboard(puzzle : Puzzle) {
     private var showErrorsGrid = false
     private var showErrorsCursor = false
     private var showErrorsClue = false
+    private var showErrorsWholeWord = false
     private var preserveCorrectLettersInShowErrors = false
     private var toggleBeforeMove = false
     private var deleteCrossingMode = DeleteCrossingMode.DELETE
@@ -82,6 +83,7 @@ class Playboard(puzzle : Puzzle) {
         showErrorsCursor : Boolean,
         showErrorsClue : Boolean,
         showErrorsGrid : Boolean,
+        showErrorsWholeWord : Boolean,
         toggleBeforeMove : Boolean,
         skipCompletedLetters : Boolean,
         undoEnabled : Boolean,
@@ -96,6 +98,7 @@ class Playboard(puzzle : Puzzle) {
         this.showErrorsClue = showErrorsClue
         this.showErrorsCursor = showErrorsCursor
         this.showErrorsGrid = showErrorsGrid
+        this.showErrorsWholeWord = showErrorsWholeWord
         this.toggleBeforeMove = toggleBeforeMove
         this.isSkipCompletedLetters = skipCompletedLetters
         playLetterUndoStack.setEnabled(undoEnabled)
@@ -503,6 +506,24 @@ class Playboard(puzzle : Puzzle) {
     }
 
     /**
+     * Show errors by highlighting the entire word when it is complete and
+     * contains any mistake (without indicating which cells are wrong)
+     */
+    fun setShowErrorsWholeWord(showErrors : Boolean) {
+        val changed = (showErrorsWholeWord != showErrors)
+        showErrorsWholeWord = showErrors
+        if (changed)
+            notifyChange(wholeBoard = true)
+    }
+
+    /**
+     * Toggle whole-word error highlighting
+     */
+    fun toggleShowErrorsWholeWord() {
+        setShowErrorsWholeWord(!isShowErrorsWholeWord())
+    }
+
+    /**
      * Is showing errors across the whole grid
      */
     fun isShowErrorsGrid() : Boolean {
@@ -523,6 +544,13 @@ class Playboard(puzzle : Puzzle) {
         return showErrorsClue
     }
 
+    /**
+     * Is highlighting whole words that are filled and contain errors
+     */
+    fun isShowErrorsWholeWord() : Boolean {
+        return showErrorsWholeWord
+    }
+
     val isShowErrors : Boolean
         /**
          * Is showing errors in some form
@@ -530,6 +558,25 @@ class Playboard(puzzle : Puzzle) {
         get() = isShowErrorsGrid()
                 || isShowErrorsCursor()
                 || isShowErrorsClue()
+                || isShowErrorsWholeWord()
+
+    /**
+     * Whether any box in the clue's zone has an incorrect response
+     */
+    fun clueHasErrors(clueID : ClueID?) : Boolean {
+        val zone = getZone(clueID) ?: return false
+        for (pos in zone) {
+            val box = puzzle.checkedGetBox(pos) ?: continue
+            if (
+                !box.isBlank()
+                && box.hasSolution()
+                && box.solution != box.response
+            ) {
+                return true
+            }
+        }
+        return false
+    }
 
     /**
      * If the clue has been filled in

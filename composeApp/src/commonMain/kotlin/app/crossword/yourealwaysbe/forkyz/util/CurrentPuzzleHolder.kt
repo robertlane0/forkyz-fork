@@ -87,6 +87,8 @@ public class CurrentPuzzleHolder(
                 val showErrorsGrid = settings.livePlayShowErrorsGrid.first()
                 val showErrorsCursor = settings.livePlayShowErrorsCursor.first()
                 val showErrorsClue = settings.livePlayShowErrorsClue.first()
+                val showErrorsWholeWord
+                    = settings.livePlayShowErrorsWholeWord.first()
                 val toggleBeforeMove = settings.livePlayToggleBeforeMove.first()
                 val movementStrategy = settings.livePlayMovementStrategy.first()
                 val skipFilled = settings.livePlaySkipFilled.first()
@@ -112,6 +114,7 @@ public class CurrentPuzzleHolder(
                                     showErrorsCursor,
                                     showErrorsClue,
                                     showErrorsGrid,
+                                    showErrorsWholeWord,
                                     toggleBeforeMove,
                                     skipFilled,
                                     undoEnabled,
@@ -245,6 +248,10 @@ public class CurrentPuzzleHolder(
         settings.livePlayShowErrorsClue.observeForeverWithProcessLifecycle() {
             board?.setShowErrorsClue(it)
         }
+        settings.livePlayShowErrorsWholeWord
+            .observeForeverWithProcessLifecycle() {
+                board?.setShowErrorsWholeWord(it)
+            }
         settings.livePlayToggleBeforeMove.observeForeverWithProcessLifecycle() {
             board?.setToggleBeforeMove(it)
         }

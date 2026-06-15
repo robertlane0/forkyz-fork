@@ -1431,6 +1431,15 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         }
     }
 
+    val livePlayShowErrorsWholeWord : Flow<Boolean>
+        = settingsMap { it.showErrorsWholeWord }
+
+    fun setPlayShowErrorsWholeWord(value : Boolean) {
+        settingsUpdate { settings ->
+            settings.copy(showErrorsWholeWord = value)
+        }
+    }
+
     val livePlayShowTimer : Flow<Boolean>
         = settingsMap { it.showTimer }
 

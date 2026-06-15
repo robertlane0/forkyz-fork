@@ -478,6 +478,13 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
         if (board == null || box.isBlank() || !box.hasSolution())
             return false
 
+        if (board.isShowErrorsWholeWord()) {
+            val cid = board.clueID
+            return selected
+                && board.isFilledClueID(cid)
+                && board.clueHasErrors(cid)
+        }
+
         val correct = box.solution == box.response
         if (correct)
             return false;

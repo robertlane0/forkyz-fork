@@ -676,6 +676,27 @@ class PlayboardTest {
     }
 
     @Test
+    fun testClueHasErrors() {
+        val puz = loadTestPuz(false)
+        val board = Playboard(puz)
+
+        moveToPosition(board, 1, 0)
+        val cid = board.clueID
+
+        Assertions.assertFalse(board.clueHasErrors(cid))
+
+        board.revealPuzzle()
+        Assertions.assertFalse(board.clueHasErrors(cid))
+
+        val box = puz.checkedGetBox(1, 2)!!
+        box.response = "I"
+        Assertions.assertTrue(board.clueHasErrors(cid))
+
+        box.response = box.solution!!
+        Assertions.assertFalse(board.clueHasErrors(cid))
+    }
+
+    @Test
     fun testEditHint() {
         val puz = loadTestPuz(false)
         val board = Playboard(puz)
