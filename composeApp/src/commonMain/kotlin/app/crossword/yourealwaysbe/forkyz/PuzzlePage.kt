@@ -158,6 +158,7 @@ import app.crossword.yourealwaysbe.forkyz.view.PuzzleInfoDialog
 import app.crossword.yourealwaysbe.forkyz.view.SpecialEntryDialog
 import app.crossword.yourealwaysbe.forkyz.view.SpecialKey
 import app.crossword.yourealwaysbe.forkyz.view.StringDialog
+import app.crossword.yourealwaysbe.forkyz.puz.Playboard.ShowErrorsMode
 import app.crossword.yourealwaysbe.forkyz.view.TwoButtonDialog
 
 private val TAG = "ForkyzPuzzlePage"
@@ -563,7 +564,7 @@ class PuzzlePageScope(
                     MenuText(stringResource(Res.string.show_errors_cursor))
                 },
                 onClick = {
-                    viewModel.toggleShowErrorsCursor()
+                    viewModel.toggleShowErrorsMode(ShowErrorsMode.CURSOR)
                     viewModel.dismissMenu()
                 }
             )
@@ -571,7 +572,7 @@ class PuzzlePageScope(
                 checked = showErrorsState.isShowingErrorsClue,
                 text = { MenuText(stringResource(Res.string.show_errors_clue)) },
                 onClick = {
-                    viewModel.toggleShowErrorsClue()
+                    viewModel.toggleShowErrorsMode(ShowErrorsMode.CLUE)
                     viewModel.dismissMenu()
                 }
             )
@@ -581,7 +582,7 @@ class PuzzlePageScope(
                     MenuText(stringResource(Res.string.show_errors_full_grid))
                 },
                 onClick = {
-                    viewModel.toggleShowErrorsGrid()
+                    viewModel.toggleShowErrorsMode(ShowErrorsMode.GRID)
                     viewModel.dismissMenu()
                 }
             )
@@ -591,7 +592,7 @@ class PuzzlePageScope(
                     MenuText(stringResource(Res.string.show_errors_whole_word))
                 },
                 onClick = {
-                    viewModel.toggleShowErrorsWholeWord()
+                    viewModel.toggleShowErrorsMode(ShowErrorsMode.WHOLE_WORD)
                     viewModel.dismissMenu()
                 }
             )

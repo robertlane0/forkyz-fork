@@ -21,6 +21,7 @@ import androidx.datastore.core.DataStore
 import app.crossword.yourealwaysbe.forkyz.net.DownloaderID
 import app.crossword.yourealwaysbe.forkyz.puz.MovementStrategy
 import app.crossword.yourealwaysbe.forkyz.puz.Playboard.DeleteCrossingMode
+import app.crossword.yourealwaysbe.forkyz.puz.Playboard.ShowErrorsMode
 import app.crossword.yourealwaysbe.forkyz.util.JSONException
 import app.crossword.yourealwaysbe.forkyz.util.JSONObject
 import app.crossword.yourealwaysbe.forkyz.util.JSONObjectBuilder
@@ -602,6 +603,30 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
                 -> DeleteCrossingMode.PRESERVE_FILLED_CELLS
             DeleteCrossingModeSetting.DCMS_PRESERVE_FILLED_WORDS
                 -> DeleteCrossingMode.PRESERVE_FILLED_WORDS
+        }
+    }
+
+    private fun makeShowErrorsMode(
+        settings : Settings,
+    ) : ShowErrorsMode {
+        return when (settings.showErrorsMode) {
+            ShowErrorsModeSetting.SEMS_NONE -> ShowErrorsMode.NONE
+            ShowErrorsModeSetting.SEMS_CURSOR -> ShowErrorsMode.CURSOR
+            ShowErrorsModeSetting.SEMS_CLUE -> ShowErrorsMode.CLUE
+            ShowErrorsModeSetting.SEMS_WHOLE_WORD -> ShowErrorsMode.WHOLE_WORD
+            ShowErrorsModeSetting.SEMS_GRID -> ShowErrorsMode.GRID
+        }
+    }
+
+    private fun makeShowErrorsModeSetting(
+        mode : ShowErrorsMode,
+    ) : ShowErrorsModeSetting {
+        return when (mode) {
+            ShowErrorsMode.NONE -> ShowErrorsModeSetting.SEMS_NONE
+            ShowErrorsMode.CURSOR -> ShowErrorsModeSetting.SEMS_CURSOR
+            ShowErrorsMode.CLUE -> ShowErrorsModeSetting.SEMS_CLUE
+            ShowErrorsMode.WHOLE_WORD -> ShowErrorsModeSetting.SEMS_WHOLE_WORD
+            ShowErrorsMode.GRID -> ShowErrorsModeSetting.SEMS_GRID
         }
     }
 
@@ -1404,39 +1429,16 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         }
     }
 
-    val livePlayShowErrorsGrid : Flow<Boolean>
-        = settingsMap { it.showErrors }
+    val livePlayShowErrorsMode : Flow<ShowErrorsMode>
+        = settingsMap(this::makeShowErrorsMode)
 
-    fun setPlayShowErrorsGrid(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(showErrors = value)
-        }
+    fun setPlayShowErrorsMode(value : ShowErrorsMode) {
+        setPlayShowErrorsModeSetting(makeShowErrorsModeSetting(value))
     }
 
-    val livePlayShowErrorsClue : Flow<Boolean>
-        = settingsMap { it.showErrorsClue }
-
-    fun setPlayShowErrorsClue(value : Boolean) {
+    private fun setPlayShowErrorsModeSetting(value : ShowErrorsModeSetting) {
         settingsUpdate { settings ->
-            settings.copy(showErrorsClue = value)
-        }
-    }
-
-    val livePlayShowErrorsCursor : Flow<Boolean>
-        = settingsMap { it.showErrorsCursor }
-
-    fun setPlayShowErrorsCursor(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(showErrorsCursor = value)
-        }
-    }
-
-    val livePlayShowErrorsWholeWord : Flow<Boolean>
-        = settingsMap { it.showErrorsWholeWord }
-
-    fun setPlayShowErrorsWholeWord(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(showErrorsWholeWord = value)
+            settings.copy(showErrorsMode = value)
         }
     }
 
@@ -2497,20 +2499,20 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             { key -> json?.ifHasBoolean(key) { setPlayShowCount(it) } },
         )
         run(
-            "showErrors",
-            { key -> builder?.put(key, settings?.showErrors) },
-            { key -> json?.ifHasBoolean(key) { setPlayShowErrorsGrid(it) } },
-        )
-        run(
-            "showErrorsClue",
-            { key -> builder?.put(key, settings?.showErrorsClue) },
-            { key -> json?.ifHasBoolean(key) { setPlayShowErrorsClue(it) } },
-        )
-        run(
-            "showErrorsCursor",
-            { key -> builder?.put(key, settings?.showErrorsCursor) },
+            "showErrorsMode",
             { key ->
-                json?.ifHasBoolean(key) { setPlayShowErrorsCursor(it) }
+                builder?.put(key, settings?.showErrorsMode.toString())
+            },
+            { key ->
+               json?.ifHasString(key) {
+                   try {
+                       setPlayShowErrorsModeSetting(
+                           ShowErrorsModeSetting.valueOf(it),
+                       )
+                   } catch (e : IllegalArgumentException) {
+                       // ignore
+                   }
+               }
             },
         )
         run(

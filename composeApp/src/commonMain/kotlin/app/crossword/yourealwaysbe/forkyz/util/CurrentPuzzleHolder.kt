@@ -13,6 +13,7 @@ import kotlinx.io.IOException
 import androidx.annotation.MainThread
 
 import app.crossword.yourealwaysbe.forkyz.puz.Playboard
+import app.crossword.yourealwaysbe.forkyz.puz.Playboard.ShowErrorsMode
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
@@ -84,11 +85,7 @@ public class CurrentPuzzleHolder(
                         .first()
                 val deleteCrossingMode
                     = settings.livePlayDeleteCrossingMode.first()
-                val showErrorsGrid = settings.livePlayShowErrorsGrid.first()
-                val showErrorsCursor = settings.livePlayShowErrorsCursor.first()
-                val showErrorsClue = settings.livePlayShowErrorsClue.first()
-                val showErrorsWholeWord
-                    = settings.livePlayShowErrorsWholeWord.first()
+                val showErrorsMode = settings.livePlayShowErrorsMode.first()
                 val toggleBeforeMove = settings.livePlayToggleBeforeMove.first()
                 val movementStrategy = settings.livePlayMovementStrategy.first()
                 val skipFilled = settings.livePlaySkipFilled.first()
@@ -111,10 +108,7 @@ public class CurrentPuzzleHolder(
                                     movementStrategy,
                                     preserveCorrect,
                                     deleteCrossingMode,
-                                    showErrorsCursor,
-                                    showErrorsClue,
-                                    showErrorsGrid,
-                                    showErrorsWholeWord,
+                                    showErrorsMode,
                                     toggleBeforeMove,
                                     skipFilled,
                                     undoEnabled,
@@ -239,19 +233,9 @@ public class CurrentPuzzleHolder(
             .observeForeverWithProcessLifecycle() {
                 board?.setDeleteCrossingMode(it)
             }
-        settings.livePlayShowErrorsGrid.observeForeverWithProcessLifecycle() {
-            board?.setShowErrorsGrid(it)
+        settings.livePlayShowErrorsMode.observeForeverWithProcessLifecycle() {
+            board?.setShowErrorsMode(it)
         }
-        settings.livePlayShowErrorsCursor.observeForeverWithProcessLifecycle() {
-            board?.setShowErrorsCursor(it)
-        }
-        settings.livePlayShowErrorsClue.observeForeverWithProcessLifecycle() {
-            board?.setShowErrorsClue(it)
-        }
-        settings.livePlayShowErrorsWholeWord
-            .observeForeverWithProcessLifecycle() {
-                board?.setShowErrorsWholeWord(it)
-            }
         settings.livePlayToggleBeforeMove.observeForeverWithProcessLifecycle() {
             board?.setToggleBeforeMove(it)
         }

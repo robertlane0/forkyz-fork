@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 
 import app.crossword.yourealwaysbe.forkyz.net.DownloaderID
+import app.crossword.yourealwaysbe.forkyz.puz.Playboard.ShowErrorsMode
 
 /**
  * Migrate shared preferences to new settings
@@ -538,14 +539,14 @@ fun migratePreferences(
     getBoolean(prefs, "showCount")?.let {
         settings.setPlayShowCount(it)
     }
-    getBoolean(prefs, "showErrors")?.let {
-        settings.setPlayShowErrorsGrid(it)
+    getBoolean(prefs, "showErrorsCursor")?.let {
+        if (it) settings.setPlayShowErrorsMode(ShowErrorsMode.CURSOR)
     }
     getBoolean(prefs, "showErrorsClue")?.let {
-        settings.setPlayShowErrorsClue(it)
+        if (it) settings.setPlayShowErrorsMode(ShowErrorsMode.CLUE)
     }
-    getBoolean(prefs, "showErrorsCursor")?.let {
-        settings.setPlayShowErrorsCursor(it)
+    getBoolean(prefs, "showErrors")?.let {
+        if (it) settings.setPlayShowErrorsMode(ShowErrorsMode.GRID)
     }
     getBoolean(prefs, "showTimer")?.let {
         settings.setPlayShowTimer(it)

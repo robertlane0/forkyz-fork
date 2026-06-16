@@ -27,6 +27,14 @@ class Playboard(puzzle : Puzzle) {
         PRESERVE_FILLED_CELLS,
     }
 
+    enum class ShowErrorsMode {
+        NONE,
+        CURSOR,
+        CLUE,
+        WHOLE_WORD,
+        GRID,
+    }
+
     var movementStrategy : MovementStrategy = MovementStrategy.MOVE_NEXT_ON_AXIS
     val puzzle : Puzzle
 
@@ -37,10 +45,7 @@ class Playboard(puzzle : Puzzle) {
     var isSkipCompletedLetters : Boolean = false
 
     private val sortedClueListNames = puzzle.clueListNames.sorted()
-    private var showErrorsGrid = false
-    private var showErrorsCursor = false
-    private var showErrorsClue = false
-    private var showErrorsWholeWord = false
+    private var showErrorsMode = ShowErrorsMode.NONE
     private var preserveCorrectLettersInShowErrors = false
     private var toggleBeforeMove = false
     private var deleteCrossingMode = DeleteCrossingMode.DELETE
@@ -80,10 +85,7 @@ class Playboard(puzzle : Puzzle) {
         movementStrategy : MovementStrategy,
         preserveCorrectLettersInShowErrors : Boolean,
         deleteCrossingMode : DeleteCrossingMode,
-        showErrorsCursor : Boolean,
-        showErrorsClue : Boolean,
-        showErrorsGrid : Boolean,
-        showErrorsWholeWord : Boolean,
+        showErrorsMode : ShowErrorsMode,
         toggleBeforeMove : Boolean,
         skipCompletedLetters : Boolean,
         undoEnabled : Boolean,
@@ -95,10 +97,7 @@ class Playboard(puzzle : Puzzle) {
         preserveCorrectLettersInShowErrors,
         deleteCrossingMode,
     ) {
-        this.showErrorsClue = showErrorsClue
-        this.showErrorsCursor = showErrorsCursor
-        this.showErrorsGrid = showErrorsGrid
-        this.showErrorsWholeWord = showErrorsWholeWord
+        this.showErrorsMode = showErrorsMode
         this.toggleBeforeMove = toggleBeforeMove
         this.isSkipCompletedLetters = skipCompletedLetters
         playLetterUndoStack.setEnabled(undoEnabled)
@@ -447,118 +446,17 @@ class Playboard(puzzle : Puzzle) {
     val highlightLetter : Position
         get() = puzzle.position
 
-    /**
-     * Show errors across the whole grid
-     */
-    fun setShowErrorsGrid(showErrors : Boolean) {
-        val changed = (showErrorsGrid != showErrors)
-        showErrorsGrid = showErrors
+    fun setShowErrorsMode(mode : ShowErrorsMode) {
+        val changed = (showErrorsMode != mode)
+        showErrorsMode = mode
         if (changed)
             notifyChange(wholeBoard = true)
     }
 
-    /**
-     * Show errors under the cursor only
-     */
-    fun setShowErrorsCursor(showErrors : Boolean) {
-        val changed = (showErrorsCursor != showErrors)
-        showErrorsCursor = showErrors
-        if (changed) {
-            flagChange(highlightLetter)
-            notifyChange()
-        }
-    }
-
-    /**
-     * Show errors for filled in clues
-     */
-    fun setShowErrorsClue(showErrors : Boolean) {
-        val changed = (showErrorsClue != showErrors)
-        showErrorsClue = showErrors
-        if (changed) {
-            flagUnusualZoneChange(currentZone)
-            notifyChange()
-        }
-    }
-
-    /**
-     * Toggle show errors across the grid
-     */
-    fun toggleShowErrorsGrid() {
-        this.showErrorsGrid = !this.showErrorsGrid
-        notifyChange(wholeBoard = true)
-    }
-
-    /**
-     * Toggle show errors across under cursor
-     */
-    fun toggleShowErrorsCursor() {
-        this.showErrorsCursor = !this.showErrorsCursor
-        flagChange(highlightLetter)
-        notifyChange()
-    }
-
-    /**
-     * Toggle show errors for filled clues
-     */
-    fun toggleShowErrorsClue() {
-        setShowErrorsClue(!isShowErrorsClue())
-    }
-
-    /**
-     * Show errors by highlighting the entire word when it is complete and
-     * contains any mistake (without indicating which cells are wrong)
-     */
-    fun setShowErrorsWholeWord(showErrors : Boolean) {
-        val changed = (showErrorsWholeWord != showErrors)
-        showErrorsWholeWord = showErrors
-        if (changed)
-            notifyChange(wholeBoard = true)
-    }
-
-    /**
-     * Toggle whole-word error highlighting
-     */
-    fun toggleShowErrorsWholeWord() {
-        setShowErrorsWholeWord(!isShowErrorsWholeWord())
-    }
-
-    /**
-     * Is showing errors across the whole grid
-     */
-    fun isShowErrorsGrid() : Boolean {
-        return showErrorsGrid
-    }
-
-    /**
-     * Is showing errors across under cursor
-     */
-    fun isShowErrorsCursor() : Boolean {
-        return showErrorsCursor
-    }
-
-    /**
-     * Is showing errors for filled clues
-     */
-    fun isShowErrorsClue() : Boolean {
-        return showErrorsClue
-    }
-
-    /**
-     * Is highlighting whole words that are filled and contain errors
-     */
-    fun isShowErrorsWholeWord() : Boolean {
-        return showErrorsWholeWord
-    }
+    fun getShowErrorsMode() : ShowErrorsMode = showErrorsMode
 
     val isShowErrors : Boolean
-        /**
-         * Is showing errors in some form
-         */
-        get() = isShowErrorsGrid()
-                || isShowErrorsCursor()
-                || isShowErrorsClue()
-                || isShowErrorsWholeWord()
+        get() = showErrorsMode != ShowErrorsMode.NONE
 
     /**
      * Whether any box in the clue's zone has an incorrect response

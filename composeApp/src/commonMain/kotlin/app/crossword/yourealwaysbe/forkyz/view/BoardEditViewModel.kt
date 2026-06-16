@@ -21,6 +21,7 @@ import app.crossword.yourealwaysbe.forkyz.puz.ClueID
 import app.crossword.yourealwaysbe.forkyz.puz.Playboard
 import app.crossword.yourealwaysbe.forkyz.puz.Playboard.PlayboardChanges
 import app.crossword.yourealwaysbe.forkyz.puz.Playboard.PlayboardListener
+import app.crossword.yourealwaysbe.forkyz.puz.Playboard.ShowErrorsMode
 import app.crossword.yourealwaysbe.forkyz.puz.Playboard.Word
 import app.crossword.yourealwaysbe.forkyz.puz.Position
 import app.crossword.yourealwaysbe.forkyz.puz.PuzImage
@@ -478,7 +479,12 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
         if (board == null || box.isBlank() || !box.hasSolution())
             return false
 
-        if (board.isShowErrorsWholeWord()) {
+        val mode = board.getShowErrorsMode()
+
+        if (mode == ShowErrorsMode.NONE)
+            return false
+
+        if (mode == ShowErrorsMode.WHOLE_WORD) {
             val cid = board.clueID
             return selected
                 && board.isFilledClueID(cid)
@@ -487,18 +493,16 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
 
         val correct = box.solution == box.response
         if (correct)
-            return false;
-
-        // it's wrong, so when do we highlight?
-        if (board.isShowErrorsGrid()) {
-            return true
-        } else if (board.isShowErrorsCursor() && highlighted) {
-            return true
-        } else if (board.isShowErrorsClue()) {
-            val cid = board.clueID
-            return selected && board.isFilledClueID(cid)
-        } else {
             return false
+
+        return when (mode) {
+            ShowErrorsMode.GRID -> true
+            ShowErrorsMode.CURSOR -> highlighted
+            ShowErrorsMode.CLUE -> {
+                val cid = board.clueID
+                selected && board.isFilledClueID(cid)
+            }
+            ShowErrorsMode.NONE, ShowErrorsMode.WHOLE_WORD -> false
         }
     }
 

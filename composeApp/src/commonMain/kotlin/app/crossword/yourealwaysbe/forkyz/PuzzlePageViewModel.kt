@@ -50,6 +50,7 @@ import app.crossword.yourealwaysbe.forkyz.settings.ExternalToolSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.KeyboardLayout
 import app.crossword.yourealwaysbe.forkyz.settings.KeyboardSettings
+import app.crossword.yourealwaysbe.forkyz.puz.Playboard.ShowErrorsMode
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
 import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer
 import app.crossword.yourealwaysbe.forkyz.util.KeyboardInfo
@@ -105,18 +106,18 @@ data class ExternalToolsMenuState(
 
 data class ShowErrorsMenuState(
     val enabled : Boolean = true,
-    val isShowingErrorsClue : Boolean = false,
-    val isShowingErrorsCursor : Boolean = false,
-    val isShowingErrorsGrid : Boolean = false,
-    val isShowingErrorsWholeWord : Boolean = false,
+    val mode : ShowErrorsMode = ShowErrorsMode.NONE,
 ) {
     val isShowing : Boolean
-        get() = enabled && (
-            isShowingErrorsGrid
-            || isShowingErrorsCursor
-            || isShowingErrorsClue
-            || isShowingErrorsWholeWord
-        )
+        get() = enabled && mode != ShowErrorsMode.NONE
+    val isShowingErrorsCursor : Boolean
+        get() = mode == ShowErrorsMode.CURSOR
+    val isShowingErrorsClue : Boolean
+        get() = mode == ShowErrorsMode.CLUE
+    val isShowingErrorsGrid : Boolean
+        get() = mode == ShowErrorsMode.GRID
+    val isShowingErrorsWholeWord : Boolean
+        get() = mode == ShowErrorsMode.WHOLE_WORD
 }
 
 data class PuzzleMenuState(
@@ -237,18 +238,10 @@ private data class VoiceSettings(
     val alwaysSettings : VoiceAlwaysSettings,
 )
 
-private data class ShowErrorsSettings(
-    val showErrorsClue : Boolean,
-    val showErrorsCursor : Boolean,
-    val showErrorsGrid : Boolean,
-    val showErrorsWholeWord : Boolean,
-    val indicateShowErrors : Boolean,
-)
-
 private data class PuzzleMenuSettings(
     val externalToolSettings : ExternalToolSettings,
     val scratchMode : Boolean,
-    val showErrors : ShowErrorsSettings,
+    val showErrorsMode : ShowErrorsMode,
 )
 
 private data class PuzzleMenuStateParams(
@@ -258,7 +251,8 @@ private data class PuzzleMenuStateParams(
 
 private data class UIStateSettings(
     val showTimer : Boolean,
-    val showErrors : ShowErrorsSettings,
+    val showErrorsMode : ShowErrorsMode,
+    val indicateShowErrors : Boolean,
 )
 
 open class PuzzlePageViewModel(
@@ -327,14 +321,7 @@ open class PuzzlePageViewModel(
                     combine(
                         settings.liveExternalToolSettings,
                         settings.livePlayScratchMode,
-                        combine(
-                            settings.livePlayShowErrorsClue,
-                            settings.livePlayShowErrorsCursor,
-                            settings.livePlayShowErrorsGrid,
-                            settings.livePlayShowErrorsWholeWord,
-                            settings.livePlayIndicateShowErrors,
-                            ::ShowErrorsSettings,
-                        ),
+                        settings.livePlayShowErrorsMode,
                         ::PuzzleMenuSettings,
                     ),
                     settings.liveExtMCPRunning,
@@ -351,13 +338,8 @@ open class PuzzlePageViewModel(
                 val puzHasSolution = getPuzzle()?.hasSolution() ?: false
                 val indicateShowErrors =
                     puzHasSolution
-                    && uiSettings.showErrors.indicateShowErrors
-                    && (
-                        uiSettings.showErrors.showErrorsClue
-                        || uiSettings.showErrors.showErrorsCursor
-                        || uiSettings.showErrors.showErrorsGrid
-                        || uiSettings.showErrors.showErrorsWholeWord
-                    )
+                    && uiSettings.indicateShowErrors
+                    && uiSettings.showErrorsMode != ShowErrorsMode.NONE
                 state.copy(
                     showTimer = uiSettings.showTimer,
                     indicateShowErrors = indicateShowErrors,
@@ -365,15 +347,9 @@ open class PuzzlePageViewModel(
             },
             combine(
                 settings.livePlayShowTimer,
-                combine(
-                    settings.livePlayShowErrorsClue,
-                    settings.livePlayShowErrorsCursor,
-                    settings.livePlayShowErrorsGrid,
-                    settings.livePlayShowErrorsWholeWord,
-                    settings.livePlayIndicateShowErrors,
-                    ::ShowErrorsSettings,
-                ),
-                ::UIStateSettings
+                settings.livePlayShowErrorsMode,
+                settings.livePlayIndicateShowErrors,
+                ::UIStateSettings,
             ),
         )
     val uiState : StateFlow<PuzzlePageUIState> = mediatedUIState.stateFlow
@@ -508,9 +484,13 @@ open class PuzzlePageViewModel(
         timer = null
     }
 
-    fun toggleShowErrorsClue() {
+    fun toggleShowErrorsMode(mode : ShowErrorsMode) {
         getBoard()?.let { board ->
-            settings.setPlayShowErrorsClue(!board.isShowErrorsClue())
+            val newMode = if (board.getShowErrorsMode() == mode)
+                ShowErrorsMode.NONE
+            else
+                mode
+            settings.setPlayShowErrorsMode(newMode)
         }
     }
 
@@ -562,23 +542,6 @@ open class PuzzlePageViewModel(
         _flagCellDialogState.value = null
     }
 
-    fun toggleShowErrorsCursor() {
-        getBoard()?.let { board ->
-            settings.setPlayShowErrorsCursor(!board.isShowErrorsCursor())
-        }
-    }
-
-    fun toggleShowErrorsGrid() {
-        getBoard()?.let { board ->
-            settings.setPlayShowErrorsGrid(!board.isShowErrorsGrid())
-        }
-    }
-
-    fun toggleShowErrorsWholeWord() {
-        getBoard()?.let { board ->
-            settings.setPlayShowErrorsWholeWord(!board.isShowErrorsWholeWord())
-        }
-    }
 
     fun revealInitialLetter() {
         getBoard()?.revealInitialLetter()
@@ -1276,11 +1239,8 @@ open class PuzzlePageViewModel(
         val isScratchMode = menuSettings.scratchMode
 
         val showErrorsState = ShowErrorsMenuState(
-            canReveal,
-            menuSettings.showErrors.showErrorsClue,
-            menuSettings.showErrors.showErrorsCursor,
-            menuSettings.showErrors.showErrorsGrid,
-            menuSettings.showErrors.showErrorsWholeWord,
+            enabled = canReveal,
+            mode = menuSettings.showErrorsMode,
         )
 
         val expanded = state.expanded

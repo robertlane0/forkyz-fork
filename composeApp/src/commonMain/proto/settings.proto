@@ -135,6 +135,14 @@ enum LLMAgent {
   LA_CLAUDE = 2;
 }
 
+enum ShowErrorsModeSetting {
+    SEMS_NONE = 0;
+    SEMS_CURSOR = 1;
+    SEMS_CLUE = 2;
+    SEMS_WHOLE_WORD = 3;
+    SEMS_GRID = 4;
+}
+
 message Settings {
     bool alwaysAnnounceBox = 1;
     bool alwaysAnnounceClue = 2;
@@ -210,9 +218,6 @@ message Settings {
     bool scratchMode = 104;
     bool showCluesOnPlayScreen = 105;
     bool showCount = 106;
-    bool showErrors = 107;
-    bool showErrorsClue = 108;
-    bool showErrorsCursor = 109;
     bool showTimer = 110;
     bool showWordsInClueList = 111;
     bool skipFilled = 112;
@@ -254,9 +259,13 @@ message Settings {
     bool highlightCrossingClue = 157;
     string mcpHostPort = 158;
     bool mcpRunning = 159;
-    bool showErrorsWholeWord = 160;
+    ShowErrorsModeSetting showErrorsMode = 161;
 
     // defunct settings
+    bool showErrors = 107;
+    bool showErrorsClue = 108;
+    bool showErrorsCursor = 109;
+    bool showErrorsWholeWord = 160;
     repeated string autoDownloaders = 5;
     bool download20Minutes = 36;
     bool downloadCustomDaily = 37;

@@ -13,6 +13,7 @@ import app.crossword.yourealwaysbe.forkyz.puz.Box.Companion.isBlock
 import app.crossword.yourealwaysbe.forkyz.puz.MovementStrategy.CycleUnfilled
 import app.crossword.yourealwaysbe.forkyz.puz.Playboard.PlayboardChanges
 import app.crossword.yourealwaysbe.forkyz.puz.Playboard.PlayboardListener
+import app.crossword.yourealwaysbe.forkyz.puz.Playboard.ShowErrorsMode
 import app.crossword.yourealwaysbe.forkyz.puz.io.IO
 import app.crossword.yourealwaysbe.forkyz.puz.io.IOTest
 import app.crossword.yourealwaysbe.forkyz.puz.io.IPuzIO
@@ -219,7 +220,7 @@ class PlayboardTest {
         val puz = loadTestPuz(blockObjects)
 
         val board = Playboard(puz)
-        board.setShowErrorsGrid(true)
+        board.setShowErrorsMode(ShowErrorsMode.GRID)
         board.movementStrategy = MovementStrategy.MOVE_NEXT_CLUE
 
         // Reveal full puzzle, but make one letter wrong

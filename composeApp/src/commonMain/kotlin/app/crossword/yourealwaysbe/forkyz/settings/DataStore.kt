@@ -12,7 +12,7 @@ import okio.Path
 import app.crossword.yourealwaysbe.forkyz.net.DownloaderID
 
 const val SETTINGS_FILE_NAME = "settings.pb"
-private val CURRENT_SETTINGS_VERSION = 2
+private val CURRENT_SETTINGS_VERSION = 3
 
 val DEFAULT_SETTINGS : Settings = Settings(
     alwaysAnnounceBox = false,
@@ -141,9 +141,7 @@ val DEFAULT_SETTINGS : Settings = Settings(
     scratchMode = false,
     showCluesOnPlayScreen = true,
     showCount = false,
-    showErrors = false,
-    showErrorsClue = false,
-    showErrorsCursor = false,
+    showErrorsMode = ShowErrorsModeSetting.SEMS_NONE,
     showTimer = false,
     showWordsInClueList = false,
     skipFilled = false,
@@ -187,6 +185,7 @@ fun createDataStore(
     migrations = listOf(
         DownloaderBooleanToSetMigration(),
         AutoDownloadersToDayBlocksMigration(),
+        ShowErrorsModeFromBooleansMigration(),
     ),
 )
 
@@ -381,6 +380,41 @@ class AutoDownloadersToDayBlocksMigration : DataMigration<Settings> {
             autoDownloadersBlockFri = block.toList(),
             autoDownloadersBlockSat = block.toList(),
             autoDownloadersBlockSun = block.toList(),
+            settingsVersion = MIGRATION_VERSION,
+        )
+    }
+
+    override suspend fun cleanUp() {
+        // Nothing to do
+    }
+}
+
+/**
+ * Migration to consolidate four showErrors booleans into a single enum
+ */
+class ShowErrorsModeFromBooleansMigration : DataMigration<Settings> {
+    companion object {
+        const val MIGRATION_VERSION = 3
+    }
+
+    override suspend fun shouldMigrate(currentData : Settings) : Boolean {
+        return currentData.settingsVersion < MIGRATION_VERSION
+    }
+
+    override suspend fun migrate(currentData : Settings) : Settings {
+        val newMode = when {
+            currentData.showErrorsWholeWord -> ShowErrorsModeSetting.SEMS_WHOLE_WORD
+            currentData.showErrors -> ShowErrorsModeSetting.SEMS_GRID
+            currentData.showErrorsCursor -> ShowErrorsModeSetting.SEMS_CURSOR
+            currentData.showErrorsClue -> ShowErrorsModeSetting.SEMS_CLUE
+            else -> ShowErrorsModeSetting.SEMS_NONE
+        }
+        return currentData.copy(
+            showErrorsMode = newMode,
+            showErrors = false,
+            showErrorsClue = false,
+            showErrorsCursor = false,
+            showErrorsWholeWord = false,
             settingsVersion = MIGRATION_VERSION,
         )
     }
