@@ -677,24 +677,24 @@ class PlayboardTest {
     }
 
     @Test
-    fun testClueHasErrors() {
+    fun testIsHasErrorsClue() {
         val puz = loadTestPuz(false)
         val board = Playboard(puz)
 
         moveToPosition(board, 1, 0)
         val cid = board.clueID
 
-        Assertions.assertFalse(board.clueHasErrors(cid))
+        Assertions.assertFalse(board.isHasErrorsClue(cid))
 
         board.revealPuzzle()
-        Assertions.assertFalse(board.clueHasErrors(cid))
+        Assertions.assertFalse(board.isHasErrorsClue(cid))
 
         val box = puz.checkedGetBox(1, 2)!!
         box.response = "I"
-        Assertions.assertTrue(board.clueHasErrors(cid))
+        Assertions.assertTrue(board.isHasErrorsClue(cid))
 
         box.response = box.solution!!
-        Assertions.assertFalse(board.clueHasErrors(cid))
+        Assertions.assertFalse(board.isHasErrorsClue(cid))
     }
 
     @Test

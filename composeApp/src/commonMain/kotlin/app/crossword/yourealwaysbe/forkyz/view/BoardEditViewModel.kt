@@ -488,7 +488,7 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
             val cid = board.clueID
             return selected
                 && board.isFilledClueID(cid)
-                && board.clueHasErrors(cid)
+                && board.isHasErrorsClue(cid)
         }
 
         val correct = box.solution == box.response

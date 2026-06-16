@@ -461,7 +461,7 @@ class Playboard(puzzle : Puzzle) {
     /**
      * Whether any box in the clue's zone has an incorrect response
      */
-    fun clueHasErrors(clueID : ClueID?) : Boolean {
+    fun isHasErrorsClue(clueID : ClueID?) : Boolean {
         val zone = getZone(clueID) ?: return false
         for (pos in zone) {
             val box = puzzle.checkedGetBox(pos) ?: continue
