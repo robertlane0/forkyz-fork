@@ -77,6 +77,13 @@ data class BarState(
     val color : Color? = null,
 )
 
+val ERROR_BAR_STATE = BarState(
+    top = Bar.SOLID,
+    bottom = Bar.SOLID,
+    left = Bar.SOLID,
+    right = Bar.SOLID,
+)
+
 data class Separators(
     val top : String? = null,
     val bottom : String? = null,
@@ -108,6 +115,7 @@ data class BoxState(
     val textColor : Color? = null,
     val shape : Shape? = null,
     val isError : Boolean = false,
+    val errorBarState : BarState? = null,
     val separators : Separators = Separators(),
 )
 
@@ -277,6 +285,8 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
         val highlighted = (position == board.highlightLetter)
         val selected = selectedPositions.contains(position)
         val isError = getIsError(boardEditSettings, box, highlighted, selected)
+        val errorBarState
+            = getErrorBarState(isError, row, col, selectedPositions)
         if (isError)
             box.isCheated = true
         val cheated = (
@@ -312,6 +322,7 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
                 = if (box.hasTextColor()) colorFromInt(box.textColor) else null,
             shape = getShape(box),
             isError = isError,
+            errorBarState = errorBarState,
             separators = getSeparators(boardEditSettings, position, clueID),
         )
     }
@@ -504,6 +515,31 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
             }
             ShowErrorsMode.NONE, ShowErrorsMode.FILLED_WORD_WORD -> false
         }
+    }
+
+    private fun getErrorBarState(
+        isError : Boolean,
+        row : Int,
+        col : Int,
+        selectedPositions : Set<Position>,
+    ) : BarState? {
+        if (!isError) return null
+        if (board?.getShowErrorsMode() != ShowErrorsMode.FILLED_WORD_WORD)
+            return ERROR_BAR_STATE
+        return BarState(
+            top = if (
+                selectedPositions.contains(Position(row - 1, col))
+            ) Bar.NONE else Bar.SOLID,
+            bottom = if (
+                selectedPositions.contains(Position(row + 1, col))
+            ) Bar.NONE else Bar.SOLID,
+            left = if (
+                selectedPositions.contains(Position(row, col - 1))
+            ) Bar.NONE else Bar.SOLID,
+            right = if (
+                selectedPositions.contains(Position(row, col + 1))
+            ) Bar.NONE else Bar.SOLID,
+        )
     }
 
     /**

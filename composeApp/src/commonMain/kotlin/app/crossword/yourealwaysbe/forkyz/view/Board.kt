@@ -66,12 +66,6 @@ private val MULTI_CHAR_RESPONSE_SIZE_FUDGE_FACTOR : Float = 0.8f
 // remember 26 characters and 100 numbers and 5 different zooms * 3 for
 // good measure!
 private val TEXT_MEASURE_CACHE_SIZE : Int = (26 + 100) * 5 * 3
-private val ERROR_BAR_STATE = BarState(
-    top = Bar.SOLID,
-    bottom = Bar.SOLID,
-    left = Bar.SOLID,
-    right = Bar.SOLID,
-)
 
 /**
  * Rendering data
@@ -400,12 +394,8 @@ private fun DrawScope.drawError(
     profile : BoxProfile,
     box : BoxState,
 ) {
-    if (box.isError) {
-        drawBars(
-            profile,
-            ERROR_BAR_STATE,
-            profile.colors.errorColor,
-        )
+    box.errorBarState?.let { barState ->
+        drawBars(profile, barState, profile.colors.errorColor)
     }
 }
 
