@@ -107,10 +107,10 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_puzzle_o
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_puzzle_orig
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_puzzle_without_extensions
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_errors
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_errors_clue
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_errors_cursor
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_errors_filled_word_cells
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_errors_filled_word_word
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_errors_full_grid
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_errors_whole_word
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.showing_errors
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.special_entry
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.support_puzzle_source
@@ -569,10 +569,32 @@ class PuzzlePageScope(
                 }
             )
             MenuCheckedItem(
-                checked = showErrorsState.isShowingErrorsClue,
-                text = { MenuText(stringResource(Res.string.show_errors_clue)) },
+                checked = showErrorsState.isShowingErrorsFilledWordCells,
+                text = {
+                    MenuText(
+                        stringResource(
+                            Res.string.show_errors_filled_word_cells,
+                        ),
+                    )
+                },
                 onClick = {
-                    viewModel.toggleShowErrorsMode(ShowErrorsMode.CLUE)
+                    viewModel.toggleShowErrorsMode(
+                        ShowErrorsMode.FILLED_WORD_CELLS,
+                    )
+                    viewModel.dismissMenu()
+                }
+            )
+            MenuCheckedItem(
+                checked = showErrorsState.isShowingErrorsFilledWordWord,
+                text = {
+                    MenuText(
+                        stringResource(Res.string.show_errors_filled_word_word),
+                    )
+                },
+                onClick = {
+                    viewModel.toggleShowErrorsMode(
+                        ShowErrorsMode.FILLED_WORD_WORD,
+                    )
                     viewModel.dismissMenu()
                 }
             )
@@ -583,16 +605,6 @@ class PuzzlePageScope(
                 },
                 onClick = {
                     viewModel.toggleShowErrorsMode(ShowErrorsMode.GRID)
-                    viewModel.dismissMenu()
-                }
-            )
-            MenuCheckedItem(
-                checked = showErrorsState.isShowingErrorsWholeWord,
-                text = {
-                    MenuText(stringResource(Res.string.show_errors_whole_word))
-                },
-                onClick = {
-                    viewModel.toggleShowErrorsMode(ShowErrorsMode.WHOLE_WORD)
                     viewModel.dismissMenu()
                 }
             )

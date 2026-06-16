@@ -403,10 +403,12 @@ class ShowErrorsModeFromBooleansMigration : DataMigration<Settings> {
 
     override suspend fun migrate(currentData : Settings) : Settings {
         val newMode = when {
-            currentData.showErrorsWholeWord -> ShowErrorsModeSetting.SEMS_WHOLE_WORD
+            currentData.showErrorsWholeWord
+                -> ShowErrorsModeSetting.SEMS_FILLED_WORD_WORD
             currentData.showErrors -> ShowErrorsModeSetting.SEMS_GRID
             currentData.showErrorsCursor -> ShowErrorsModeSetting.SEMS_CURSOR
-            currentData.showErrorsClue -> ShowErrorsModeSetting.SEMS_CLUE
+            currentData.showErrorsClue
+                -> ShowErrorsModeSetting.SEMS_FILLED_WORD_CELLS
             else -> ShowErrorsModeSetting.SEMS_NONE
         }
         return currentData.copy(

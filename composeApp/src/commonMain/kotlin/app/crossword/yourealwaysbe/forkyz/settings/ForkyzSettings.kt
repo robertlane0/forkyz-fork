@@ -612,8 +612,10 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         return when (settings.showErrorsMode) {
             ShowErrorsModeSetting.SEMS_NONE -> ShowErrorsMode.NONE
             ShowErrorsModeSetting.SEMS_CURSOR -> ShowErrorsMode.CURSOR
-            ShowErrorsModeSetting.SEMS_CLUE -> ShowErrorsMode.CLUE
-            ShowErrorsModeSetting.SEMS_WHOLE_WORD -> ShowErrorsMode.WHOLE_WORD
+            ShowErrorsModeSetting.SEMS_FILLED_WORD_CELLS
+                -> ShowErrorsMode.FILLED_WORD_CELLS
+            ShowErrorsModeSetting.SEMS_FILLED_WORD_WORD
+                -> ShowErrorsMode.FILLED_WORD_WORD
             ShowErrorsModeSetting.SEMS_GRID -> ShowErrorsMode.GRID
         }
     }
@@ -624,8 +626,10 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         return when (mode) {
             ShowErrorsMode.NONE -> ShowErrorsModeSetting.SEMS_NONE
             ShowErrorsMode.CURSOR -> ShowErrorsModeSetting.SEMS_CURSOR
-            ShowErrorsMode.CLUE -> ShowErrorsModeSetting.SEMS_CLUE
-            ShowErrorsMode.WHOLE_WORD -> ShowErrorsModeSetting.SEMS_WHOLE_WORD
+            ShowErrorsMode.FILLED_WORD_CELLS
+                -> ShowErrorsModeSetting.SEMS_FILLED_WORD_CELLS
+            ShowErrorsMode.FILLED_WORD_WORD
+                -> ShowErrorsModeSetting.SEMS_FILLED_WORD_WORD
             ShowErrorsMode.GRID -> ShowErrorsModeSetting.SEMS_GRID
         }
     }

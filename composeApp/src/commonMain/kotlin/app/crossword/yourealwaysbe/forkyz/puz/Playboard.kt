@@ -30,8 +30,8 @@ class Playboard(puzzle : Puzzle) {
     enum class ShowErrorsMode {
         NONE,
         CURSOR,
-        CLUE,
-        WHOLE_WORD,
+        FILLED_WORD_CELLS,
+        FILLED_WORD_WORD,
         GRID,
     }
 

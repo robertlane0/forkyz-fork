@@ -112,12 +112,12 @@ data class ShowErrorsMenuState(
         get() = enabled && mode != ShowErrorsMode.NONE
     val isShowingErrorsCursor : Boolean
         get() = mode == ShowErrorsMode.CURSOR
-    val isShowingErrorsClue : Boolean
-        get() = mode == ShowErrorsMode.CLUE
+    val isShowingErrorsFilledWordCells : Boolean
+        get() = mode == ShowErrorsMode.FILLED_WORD_CELLS
     val isShowingErrorsGrid : Boolean
         get() = mode == ShowErrorsMode.GRID
-    val isShowingErrorsWholeWord : Boolean
-        get() = mode == ShowErrorsMode.WHOLE_WORD
+    val isShowingErrorsFilledWordWord : Boolean
+        get() = mode == ShowErrorsMode.FILLED_WORD_WORD
 }
 
 data class PuzzleMenuState(

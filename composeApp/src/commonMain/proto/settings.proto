@@ -138,8 +138,8 @@ enum LLMAgent {
 enum ShowErrorsModeSetting {
     SEMS_NONE = 0;
     SEMS_CURSOR = 1;
-    SEMS_CLUE = 2;
-    SEMS_WHOLE_WORD = 3;
+    SEMS_FILLED_WORD_CELLS = 2;
+    SEMS_FILLED_WORD_WORD = 3;
     SEMS_GRID = 4;
 }
 

@@ -484,7 +484,7 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
         if (mode == ShowErrorsMode.NONE)
             return false
 
-        if (mode == ShowErrorsMode.WHOLE_WORD) {
+        if (mode == ShowErrorsMode.FILLED_WORD_WORD) {
             val cid = board.clueID
             return selected
                 && board.isFilledClueID(cid)
@@ -498,11 +498,11 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
         return when (mode) {
             ShowErrorsMode.GRID -> true
             ShowErrorsMode.CURSOR -> highlighted
-            ShowErrorsMode.CLUE -> {
+            ShowErrorsMode.FILLED_WORD_CELLS -> {
                 val cid = board.clueID
                 selected && board.isFilledClueID(cid)
             }
-            ShowErrorsMode.NONE, ShowErrorsMode.WHOLE_WORD -> false
+            ShowErrorsMode.NONE, ShowErrorsMode.FILLED_WORD_WORD -> false
         }
     }
 

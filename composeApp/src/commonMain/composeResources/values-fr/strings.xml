@@ -600,7 +600,8 @@
     <string name="showing_errors">Affichage des erreurs</string>
     <string name="show_errors_full_grid">Grille</string>
     <string name="show_errors_cursor">Curseur</string>
-    <string name="show_errors_clue">Mot rempli</string>
+    <string name="show_errors_filled_word_cells">Mot rempli (cases)</string>
+    <string name="show_errors_filled_word_word">Mot rempli (mot)</string>
     <string name="scratch_mode">Mode brouillon</string>
     <string name="reveal">Révéler</string>
     <string name="initial_letter">Lettre initiale</string>

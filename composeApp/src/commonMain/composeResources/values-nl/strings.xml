@@ -636,7 +636,8 @@
     <string name="showing_errors">Fouten worden getoond</string>
     <string name="show_errors_full_grid">Raster</string>
     <string name="show_errors_cursor">Aanwijzer</string>
-    <string name="show_errors_clue">Ingevuld woord</string>
+    <string name="show_errors_filled_word_cells">Ingevuld woord (cellen)</string>
+    <string name="show_errors_filled_word_word">Ingevuld woord (woord)</string>
     <string name="scratch_mode">Krabbelmodus</string>
     <string name="reveal">Onthullen</string>
     <string name="initial_letter">Eerste letter</string>

@@ -543,7 +543,7 @@ fun migratePreferences(
         if (it) settings.setPlayShowErrorsMode(ShowErrorsMode.CURSOR)
     }
     getBoolean(prefs, "showErrorsClue")?.let {
-        if (it) settings.setPlayShowErrorsMode(ShowErrorsMode.CLUE)
+        if (it) settings.setPlayShowErrorsMode(ShowErrorsMode.FILLED_WORD_CELLS)
     }
     getBoolean(prefs, "showErrors")?.let {
         if (it) settings.setPlayShowErrorsMode(ShowErrorsMode.GRID)
