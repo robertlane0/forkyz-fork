@@ -558,6 +558,9 @@ class Playboard(puzzle : Puzzle) {
             }
 
             if (!this.isDontDeleteCurrent) {
+                // flag now while we know what's highlighted
+                // the delete will unhighlight
+                flagFilledWordErrorCells(this.clueID, currentZone)
                 currentBox = this.currentBox
                 currentBox?.setBlank()
                 flagChange(this.highlightLetter)
@@ -570,6 +573,10 @@ class Playboard(puzzle : Puzzle) {
             // Jump back to last box and delete the letter.
             currentBox = puzzle.checkedGetBox(pos)
             if (currentBox != null) {
+                // flag now while we know what's highlighted
+                // the delete will unhighlight
+                if (undo.oldResponse == Box.BLANK)
+                    flagFilledWordErrorCells(this.clueID, currentZone)
                 currentBox.response = undo.oldResponse
                 playLetterUndoStack.pushClearDisabled()
                 setHighlightLetter(pos)
@@ -1254,11 +1261,16 @@ class Playboard(puzzle : Puzzle) {
             b.responder = this.responder
             flagChange(pos)
 
+            val wordClueID = this.clueID
+            val wordZone = currentZone
+
             // movement normally clears undo stack but we want to keep
             // it here
             playLetterUndoStack.pushClearDisabled()
             val next = this.nextLetter()
             playLetterUndoStack.popClearDisabled()
+
+            flagFilledWordErrorCells(wordClueID, wordZone)
 
             popNotificationDisabled()
             notifyChange()
@@ -1776,6 +1788,8 @@ class Playboard(puzzle : Puzzle) {
             playLetterUndoStack.popClearDisabled()
         }
 
+        flagFilledWordErrorCells(curID, zone)
+
         popNotificationDisabled()
 
         notifyChange()
@@ -1981,6 +1995,37 @@ class Playboard(puzzle : Puzzle) {
     private fun flagChange(vararg positions : Position) {
         for (pos in positions) {
             changedPositions.add(pos)
+        }
+    }
+
+    /**
+     * In filled-word error modes, flag cells that would be highlighted
+     */
+    private fun flagFilledWordErrorCells(clueID : ClueID?, zone : Zone?) {
+        if (zone == null) return
+        when (showErrorsMode) {
+            ShowErrorsMode.FILLED_WORD_WORD -> {
+                if (isFilledClueID(clueID) && isHasErrorsClue(clueID)) {
+                    for (pos in zone) {
+                        flagChange(pos)
+                    }
+                }
+            }
+            ShowErrorsMode.FILLED_WORD_CELLS -> {
+                if (isFilledClueID(clueID)) {
+                    for (pos in zone) {
+                        val box = puzzle.checkedGetBox(pos) ?: continue
+                        if (
+                            !box.isBlank()
+                            && box.hasSolution()
+                            && box.solution != box.response
+                        ) {
+                            flagChange(pos)
+                        }
+                    }
+                }
+            }
+            else -> {}
         }
     }
 
