@@ -358,10 +358,6 @@ class PlayPageViewModel(
         getBoard()?.toggleSelection()
     }
 
-    fun pickRandomUnfilledClue() {
-        getBoard()?.pickRandomUnfilledClue()
-    }
-
     fun clearFirstPlayMessage() {
         firstPlayCleared = true
         currentUIState = currentUIState.copy(firstPlayMessage = null)

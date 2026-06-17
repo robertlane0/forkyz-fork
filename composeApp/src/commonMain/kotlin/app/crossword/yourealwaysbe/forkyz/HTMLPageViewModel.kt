@@ -23,6 +23,7 @@ import app.crossword.yourealwaysbe.forkyz.util.getFileResourceData
 
 enum class HTMLFile(val unqualifiedFileName : String) {
     BROWSE_HELP("filescreen.html"),
+    KEYBOARD_BINDINGS_HELP("keybindings.html"),
     LICENSE("license.html"),
     PLAY_HELP("play.html"),
     RELEASE_NOTES("release.html"),

@@ -142,51 +142,71 @@ fun PlayPage(
 
             viewModel.keyboardPushBlockHide()
 
-            when (event.key) {
-                Key.Search -> {
-                    if (isDown)
-                        viewModel.nextClue()
-                    handled = true
-                }
-                Key.DirectionDown -> {
-                    if (isDown)
-                        viewModel.moveDown()
-                    handled = true
-                }
-                Key.DirectionUp -> {
-                    if (isDown)
-                        viewModel.moveUp()
-                    handled = true
-                }
-                Key.DirectionLeft -> {
-                    if (isDown)
-                        viewModel.moveLeft()
-                    handled = true
-                }
-                Key.DirectionRight -> {
-                    if (isDown)
-                        viewModel.moveRight()
-                    handled = true
-                }
-                Key.DirectionCenter -> {
-                    if (isDown)
-                        viewModel.toggleSelection()
-                    handled = true
-                }
-                Key.Spacebar -> {
-                    if (isDown)
-                        viewModel.playSpace()
-                    handled = true
-                }
-                Key.Enter -> {
-                    if (isDown)
-                        viewModel.playEnter()
-                    handled = true
-                }
-                Key.Delete, Key.Backspace -> {
-                    if (isDown)
-                        viewModel.deleteResponse()
-                    handled = true
+            handled = onKeyEventKeyboardBindings(
+                event = event,
+                onClueListDown = viewModel::launchClueList,
+                onClueNotesDown = viewModel::launchCurrentClueNotes,
+                onFitToScreenDown = boardEditState::zoomFit,
+                onInsertSpecialDown = viewModel::doSpecialEntry,
+                onNextClueDown = viewModel::nextClue,
+                onPrevClueDown = viewModel::prevClue,
+                onPuzzleNotesDown = viewModel::launchPuzzleNotes,
+                onRandomClueDown = viewModel::pickRandomUnfilledClue,
+                onToggleScratchModeDown = viewModel::toggleScratchMode,
+                onToggleSelectionDown = viewModel::toggleSelection,
+                onZoomInDown = boardEditState::zoomIn,
+                onZoomInMaxDown = boardEditState::zoomInMax,
+                onZoomOutDown = boardEditState::zoomOut,
+                onZoomResetDown = boardEditState::zoomReset,
+            )
+
+            if (!handled) {
+                when (event.key) {
+                    Key.Search -> {
+                        if (isDown)
+                            viewModel.nextClue()
+                        handled = true
+                    }
+                    Key.DirectionDown -> {
+                        if (isDown)
+                            viewModel.moveDown()
+                        handled = true
+                    }
+                    Key.DirectionUp -> {
+                        if (isDown)
+                            viewModel.moveUp()
+                        handled = true
+                    }
+                    Key.DirectionLeft -> {
+                        if (isDown)
+                            viewModel.moveLeft()
+                        handled = true
+                    }
+                    Key.DirectionRight -> {
+                        if (isDown)
+                            viewModel.moveRight()
+                        handled = true
+                    }
+                    Key.DirectionCenter -> {
+                        if (isDown)
+                            viewModel.toggleSelection()
+                        handled = true
+                    }
+                    Key.Spacebar -> {
+                        if (isDown)
+                            viewModel.playSpace()
+                        handled = true
+                    }
+                    Key.Enter -> {
+                        if (isDown)
+                            viewModel.playEnter()
+                        handled = true
+                    }
+                    Key.Delete, Key.Backspace -> {
+                        if (isDown)
+                            viewModel.deleteResponse()
+                        handled = true
+                    }
                 }
             }
 

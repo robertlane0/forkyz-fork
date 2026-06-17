@@ -22,6 +22,7 @@ import app.crossword.yourealwaysbe.forkyz.net.DownloaderID
 import app.crossword.yourealwaysbe.forkyz.puz.MovementStrategy
 import app.crossword.yourealwaysbe.forkyz.puz.Playboard.DeleteCrossingMode
 import app.crossword.yourealwaysbe.forkyz.puz.Playboard.ShowErrorsMode
+import app.crossword.yourealwaysbe.forkyz.util.ForkyzKey
 import app.crossword.yourealwaysbe.forkyz.util.JSONException
 import app.crossword.yourealwaysbe.forkyz.util.JSONObject
 import app.crossword.yourealwaysbe.forkyz.util.JSONObjectBuilder
@@ -1175,6 +1176,452 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         }
     }
 
+    val liveKeyboardBindings : Flow<KeyboardBindings>
+        = settingsMap {
+            KeyboardBindings(
+                ForkyzKey.parseKey(it.keyboardBindingAnnounceBox),
+                ForkyzKey.parseKey(it.keyboardBindingAnnounceClue),
+                ForkyzKey.parseKey(it.keyboardBindingBack),
+                ForkyzKey.parseKey(it.keyboardBindingClueList),
+                ForkyzKey.parseKey(it.keyboardBindingClueNotes),
+                ForkyzKey.parseKey(it.keyboardBindingExit),
+                ForkyzKey.parseKey(it.keyboardBindingFitToScreen),
+                ForkyzKey.parseKey(it.keyboardBindingHelp),
+                ForkyzKey.parseKey(it.keyboardBindingInsertSpecial),
+                ForkyzKey.parseKey(it.keyboardBindingNextClue),
+                ForkyzKey.parseKey(it.keyboardBindingOpenCrosswordSolver),
+                ForkyzKey.parseKey(it.keyboardBindingOpenDictionary),
+                ForkyzKey.parseKey(it.keyboardBindingOpenInfo),
+                ForkyzKey.parseKey(it.keyboardBindingOpenShareUrl),
+                ForkyzKey.parseKey(it.keyboardBindingPrevClue),
+                ForkyzKey.parseKey(it.keyboardBindingPuzzleNotes),
+                ForkyzKey.parseKey(it.keyboardBindingRandomClue),
+                ForkyzKey.parseKey(it.keyboardBindingRevealErrors),
+                ForkyzKey.parseKey(it.keyboardBindingRevealLetter),
+                ForkyzKey.parseKey(it.keyboardBindingRevealPuzzle),
+                ForkyzKey.parseKey(it.keyboardBindingRevealWord),
+                ForkyzKey.parseKey(it.keyboardBindingSearchDuckduckgo),
+                ForkyzKey.parseKey(it.keyboardBindingSearchFifteenSquared),
+                ForkyzKey.parseKey(it.keyboardBindingSettings),
+                ForkyzKey.parseKey(it.keyboardBindingShareClue),
+                ForkyzKey.parseKey(it.keyboardBindingShareClueWithBoard),
+                ForkyzKey.parseKey(it.keyboardBindingSharePuzzle),
+                ForkyzKey.parseKey(it.keyboardBindingSharePuzzleBlank),
+                ForkyzKey.parseKey(it.keyboardBindingSharePuzzleNoIpuz),
+                ForkyzKey.parseKey(it.keyboardBindingSharePuzzleOriginal),
+                ForkyzKey.parseKey(it.keyboardBindingShuffleAnagram),
+                ForkyzKey.parseKey(it.keyboardBindingToggleCellFlag),
+                ForkyzKey.parseKey(it.keyboardBindingToggleClueFlag),
+                ForkyzKey.parseKey(it.keyboardBindingToggleScratchMode),
+                ForkyzKey.parseKey(it.keyboardBindingToggleSelection),
+                ForkyzKey.parseKey(it.keyboardBindingToggleShowErrorsCursor),
+                ForkyzKey.parseKey(it.keyboardBindingToggleShowErrorsGrid),
+                ForkyzKey.parseKey(it.keyboardBindingToggleShowErrorsWordCells),
+                ForkyzKey.parseKey(it.keyboardBindingToggleShowErrorsWordWord),
+                ForkyzKey.parseKey(it.keyboardBindingVoiceInput),
+                ForkyzKey.parseKey(it.keyboardBindingZoomIn),
+                ForkyzKey.parseKey(it.keyboardBindingZoomInMax),
+                ForkyzKey.parseKey(it.keyboardBindingZoomOut),
+                ForkyzKey.parseKey(it.keyboardBindingZoomReset),
+            )
+        }
+
+    val liveKeyboardBindingAnnounceBox : Flow<String>
+        = settingsMap { it.keyboardBindingAnnounceBox }
+
+    fun setKeyboardBindingAnnounceBox(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingAnnounceBox = value)
+        }
+    }
+
+    val liveKeyboardBindingAnnounceClue : Flow<String>
+        = settingsMap { it.keyboardBindingAnnounceClue }
+
+    fun setKeyboardBindingAnnounceClue(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingAnnounceClue = value)
+        }
+    }
+
+    val liveKeyboardBindingBack : Flow<String>
+        = settingsMap { it.keyboardBindingBack }
+
+    fun setKeyboardBindingBack(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingBack = value)
+        }
+    }
+
+    val liveKeyboardBindingClueList : Flow<String>
+        = settingsMap { it.keyboardBindingClueList }
+
+    fun setKeyboardBindingClueList(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingClueList = value)
+        }
+    }
+
+    val liveKeyboardBindingClueNotes : Flow<String>
+        = settingsMap { it.keyboardBindingClueNotes }
+
+    fun setKeyboardBindingClueNotes(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingClueNotes = value)
+        }
+    }
+
+    val liveKeyboardBindingExit : Flow<String>
+        = settingsMap { it.keyboardBindingExit }
+
+    fun setKeyboardBindingExit(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingExit = value)
+        }
+    }
+
+    val liveKeyboardBindingFitToScreen : Flow<String>
+        = settingsMap { it.keyboardBindingFitToScreen }
+
+    fun setKeyboardBindingFitToScreen(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingFitToScreen = value)
+        }
+    }
+
+    val liveKeyboardBindingHelp : Flow<String>
+        = settingsMap { it.keyboardBindingHelp }
+
+    fun setKeyboardBindingHelp(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingHelp = value)
+        }
+    }
+
+    val liveKeyboardBindingInsertSpecial : Flow<String>
+        = settingsMap { it.keyboardBindingInsertSpecial }
+
+    fun setKeyboardBindingInsertSpecial(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingInsertSpecial = value)
+        }
+    }
+
+    val liveKeyboardBindingNextClue : Flow<String>
+        = settingsMap { it.keyboardBindingNextClue }
+
+    fun setKeyboardBindingNextClue(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingNextClue = value)
+        }
+    }
+
+    val liveKeyboardBindingOpenCrosswordSolver : Flow<String>
+        = settingsMap { it.keyboardBindingOpenCrosswordSolver }
+
+    fun setKeyboardBindingOpenCrosswordSolver(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingOpenCrosswordSolver = value)
+        }
+    }
+
+    val liveKeyboardBindingOpenDictionary : Flow<String>
+        = settingsMap { it.keyboardBindingOpenDictionary }
+
+    fun setKeyboardBindingOpenDictionary(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingOpenDictionary = value)
+        }
+    }
+
+    val liveKeyboardBindingOpenInfo : Flow<String>
+        = settingsMap { it.keyboardBindingOpenInfo }
+
+    fun setKeyboardBindingOpenInfo(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingOpenInfo = value)
+        }
+    }
+
+    val liveKeyboardBindingOpenShareUrl : Flow<String>
+        = settingsMap { it.keyboardBindingOpenShareUrl }
+
+    fun setKeyboardBindingOpenShareUrl(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingOpenShareUrl = value)
+        }
+    }
+
+    val liveKeyboardBindingPrevClue : Flow<String>
+        = settingsMap { it.keyboardBindingPrevClue }
+
+    fun setKeyboardBindingPrevClue(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingPrevClue = value)
+        }
+    }
+
+    val liveKeyboardBindingPuzzleNotes : Flow<String>
+        = settingsMap { it.keyboardBindingPuzzleNotes }
+
+    fun setKeyboardBindingPuzzleNotes(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingPuzzleNotes = value)
+        }
+    }
+
+    val liveKeyboardBindingRandomClue : Flow<String>
+        = settingsMap { it.keyboardBindingRandomClue }
+
+    fun setKeyboardBindingRandomClue(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingRandomClue = value)
+        }
+    }
+
+    val liveKeyboardBindingRevealErrors : Flow<String>
+        = settingsMap { it.keyboardBindingRevealErrors }
+
+    fun setKeyboardBindingRevealErrors(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingRevealErrors = value)
+        }
+    }
+
+    val liveKeyboardBindingRevealLetter : Flow<String>
+        = settingsMap { it.keyboardBindingRevealLetter }
+
+    fun setKeyboardBindingRevealLetter(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingRevealLetter = value)
+        }
+    }
+
+    val liveKeyboardBindingRevealPuzzle : Flow<String>
+        = settingsMap { it.keyboardBindingRevealPuzzle }
+
+    fun setKeyboardBindingRevealPuzzle(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingRevealPuzzle = value)
+        }
+    }
+
+    val liveKeyboardBindingRevealWord : Flow<String>
+        = settingsMap { it.keyboardBindingRevealWord }
+
+    fun setKeyboardBindingRevealWord(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingRevealWord = value)
+        }
+    }
+
+    val liveKeyboardBindingSearchDuckduckgo : Flow<String>
+        = settingsMap { it.keyboardBindingSearchDuckduckgo }
+
+    fun setKeyboardBindingSearchDuckduckgo(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingSearchDuckduckgo = value)
+        }
+    }
+
+    val liveKeyboardBindingSearchFifteenSquared : Flow<String>
+        = settingsMap { it.keyboardBindingSearchFifteenSquared }
+
+    fun setKeyboardBindingSearchFifteenSquared(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingSearchFifteenSquared = value)
+        }
+    }
+
+    val liveKeyboardBindingSettings : Flow<String>
+        = settingsMap { it.keyboardBindingSettings }
+
+    fun setKeyboardBindingSettings(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingSettings = value)
+        }
+    }
+
+    val liveKeyboardBindingShareClue : Flow<String>
+        = settingsMap { it.keyboardBindingShareClue }
+
+    fun setKeyboardBindingShareClue(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingShareClue = value)
+        }
+    }
+
+    val liveKeyboardBindingShareClueWithBoard : Flow<String>
+        = settingsMap { it.keyboardBindingShareClueWithBoard }
+
+    fun setKeyboardBindingShareClueWithBoard(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingShareClueWithBoard = value)
+        }
+    }
+
+    val liveKeyboardBindingSharePuzzle : Flow<String>
+        = settingsMap { it.keyboardBindingSharePuzzle }
+
+    fun setKeyboardBindingSharePuzzle(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingSharePuzzle = value)
+        }
+    }
+
+    val liveKeyboardBindingSharePuzzleBlank : Flow<String>
+        = settingsMap { it.keyboardBindingSharePuzzleBlank }
+
+    fun setKeyboardBindingSharePuzzleBlank(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingSharePuzzleBlank = value)
+        }
+    }
+
+    val liveKeyboardBindingSharePuzzleNoIpuz : Flow<String>
+        = settingsMap { it.keyboardBindingSharePuzzleNoIpuz }
+
+    fun setKeyboardBindingSharePuzzleNoIpuz(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingSharePuzzleNoIpuz = value)
+        }
+    }
+
+    val liveKeyboardBindingSharePuzzleOriginal : Flow<String>
+        = settingsMap { it.keyboardBindingSharePuzzleOriginal }
+
+    fun setKeyboardBindingSharePuzzleOriginal(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingSharePuzzleOriginal = value)
+        }
+    }
+
+    val liveKeyboardBindingShuffleAnagram : Flow<String>
+        = settingsMap { it.keyboardBindingShuffleAnagram }
+
+    fun setKeyboardBindingShuffleAnagram(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingShuffleAnagram = value)
+        }
+    }
+
+    val liveKeyboardBindingToggleCellFlag : Flow<String>
+        = settingsMap { it.keyboardBindingToggleCellFlag }
+
+    fun setKeyboardBindingToggleCellFlag(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingToggleCellFlag = value)
+        }
+    }
+
+    val liveKeyboardBindingToggleClueFlag : Flow<String>
+        = settingsMap { it.keyboardBindingToggleClueFlag }
+
+    fun setKeyboardBindingToggleClueFlag(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingToggleClueFlag = value)
+        }
+    }
+
+    val liveKeyboardBindingToggleScratchMode : Flow<String>
+        = settingsMap { it.keyboardBindingToggleScratchMode }
+
+    fun setKeyboardBindingToggleScratchMode(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingToggleScratchMode = value)
+        }
+    }
+
+    val liveKeyboardBindingToggleSelection : Flow<String>
+        = settingsMap { it.keyboardBindingToggleSelection }
+
+    fun setKeyboardBindingToggleSelection(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingToggleSelection = value)
+        }
+    }
+
+    val liveKeyboardBindingToggleShowErrorsCursor : Flow<String>
+        = settingsMap { it.keyboardBindingToggleShowErrorsCursor }
+
+    fun setKeyboardBindingToggleShowErrorsCursor(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingToggleShowErrorsCursor = value)
+        }
+    }
+
+    val liveKeyboardBindingToggleShowErrorsGrid : Flow<String>
+        = settingsMap { it.keyboardBindingToggleShowErrorsGrid }
+
+    fun setKeyboardBindingToggleShowErrorsGrid(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingToggleShowErrorsGrid = value)
+        }
+    }
+
+    val liveKeyboardBindingToggleShowErrorsWordCells : Flow<String>
+        = settingsMap { it.keyboardBindingToggleShowErrorsWordCells }
+
+    fun setKeyboardBindingToggleShowErrorsWordCells(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingToggleShowErrorsWordCells = value)
+        }
+    }
+
+    val liveKeyboardBindingToggleShowErrorsWordWord : Flow<String>
+        = settingsMap { it.keyboardBindingToggleShowErrorsWordWord }
+
+    fun setKeyboardBindingToggleShowErrorsWordWord(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingToggleShowErrorsWordWord = value)
+        }
+    }
+
+    val liveKeyboardBindingVoiceInput : Flow<String>
+        = settingsMap { it.keyboardBindingVoiceInput }
+
+    fun setKeyboardBindingVoiceInput(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingVoiceInput = value)
+        }
+    }
+
+    val liveKeyboardBindingZoomIn : Flow<String>
+        = settingsMap { it.keyboardBindingZoomIn }
+
+    fun setKeyboardBindingZoomIn(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingZoomIn = value)
+        }
+    }
+
+    val liveKeyboardBindingZoomInMax : Flow<String>
+        = settingsMap { it.keyboardBindingZoomInMax }
+
+    fun setKeyboardBindingZoomInMax(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingZoomInMax = value)
+        }
+    }
+
+    val liveKeyboardBindingZoomOut : Flow<String>
+        = settingsMap { it.keyboardBindingZoomOut }
+
+    fun setKeyboardBindingZoomOut(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingZoomOut = value)
+        }
+    }
+
+    val liveKeyboardBindingZoomReset : Flow<String>
+        = settingsMap { it.keyboardBindingZoomReset }
+
+    fun setKeyboardBindingZoomReset(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingZoomReset = value)
+        }
+    }
+
     val liveKeyboardForceCaps : Flow<Boolean>
         = settingsMap { it.keyboardForceCaps }
 
@@ -2304,6 +2751,402 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             "keyboardCompact",
             { key -> builder?.put(key, settings?.keyboardCompact) },
             { key -> json?.ifHasBoolean(key) { setKeyboardCompact(it) } },
+        )
+        run(
+            "keyboardBindingAnnounceBox",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingAnnounceBox)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingAnnounceBox(it) }
+            },
+        )
+        run(
+            "keyboardBindingAnnounceClue",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingAnnounceClue)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingAnnounceClue(it) }
+            },
+        )
+        run(
+            "keyboardBindingBack",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingBack)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingBack(it) }
+            },
+        )
+        run(
+            "keyboardBindingClueList",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingClueList)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingClueList(it) }
+            },
+        )
+        run(
+            "keyboardBindingClueNotes",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingClueNotes)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingClueNotes(it) }
+            },
+        )
+        run(
+            "keyboardBindingExit",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingExit)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingExit(it) }
+            },
+        )
+        run(
+            "keyboardBindingFitToScreen",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingFitToScreen)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingFitToScreen(it) }
+            },
+        )
+        run(
+            "keyboardBindingHelp",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingHelp)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingHelp(it) }
+            },
+        )
+        run(
+            "keyboardBindingInsertSpecial",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingInsertSpecial)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingInsertSpecial(it) }
+            },
+        )
+        run(
+            "keyboardBindingNextClue",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingNextClue)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingNextClue(it) }
+            },
+        )
+        run(
+            "keyboardBindingOpenCrosswordSolver",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingOpenCrosswordSolver)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingOpenCrosswordSolver(it) }
+            },
+        )
+        run(
+            "keyboardBindingOpenDictionary",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingOpenDictionary)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingOpenDictionary(it) }
+            },
+        )
+        run(
+            "keyboardBindingOpenInfo",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingOpenInfo)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingOpenInfo(it) }
+            },
+        )
+        run(
+            "keyboardBindingOpenShareUrl",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingOpenShareUrl)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingOpenShareUrl(it) }
+            },
+        )
+        run(
+            "keyboardBindingPrevClue",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingPrevClue)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingPrevClue(it) }
+            },
+        )
+        run(
+            "keyboardBindingPuzzleNotes",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingPuzzleNotes)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingPuzzleNotes(it) }
+            },
+        )
+        run(
+            "keyboardBindingRandomClue",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingRandomClue)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingRandomClue(it) }
+            },
+        )
+        run(
+            "keyboardBindingRevealErrors",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingRevealErrors)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingRevealErrors(it) }
+            },
+        )
+        run(
+            "keyboardBindingRevealLetter",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingRevealLetter)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingRevealLetter(it) }
+            },
+        )
+        run(
+            "keyboardBindingRevealPuzzle",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingRevealPuzzle)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingRevealPuzzle(it) }
+            },
+        )
+        run(
+            "keyboardBindingRevealWord",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingRevealWord)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingRevealWord(it) }
+            },
+        )
+        run(
+            "keyboardBindingSearchDuckduckgo",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingSearchDuckduckgo)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingSearchDuckduckgo(it) }
+            },
+        )
+        run(
+            "keyboardBindingSearchFifteenSquared",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingSearchFifteenSquared)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingSearchFifteenSquared(it) }
+            },
+        )
+        run(
+            "keyboardBindingSettings",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingSettings)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingSettings(it) }
+            },
+        )
+        run(
+            "keyboardBindingShareClue",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingShareClue)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingShareClue(it) }
+            },
+        )
+        run(
+            "keyboardBindingShareClueWithBoard",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingShareClueWithBoard)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingShareClueWithBoard(it) }
+            },
+        )
+        run(
+            "keyboardBindingSharePuzzle",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingSharePuzzle)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingSharePuzzle(it) }
+            },
+        )
+        run(
+            "keyboardBindingSharePuzzleBlank",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingSharePuzzleBlank)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingSharePuzzleBlank(it) }
+            },
+        )
+        run(
+            "keyboardBindingSharePuzzleNoIpuz",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingSharePuzzleNoIpuz)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingSharePuzzleNoIpuz(it) }
+            },
+        )
+        run(
+            "keyboardBindingSharePuzzleOriginal",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingSharePuzzleOriginal)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingSharePuzzleOriginal(it) }
+            },
+        )
+        run(
+            "keyboardBindingShuffleAnagram",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingShuffleAnagram)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingShuffleAnagram(it) }
+            },
+        )
+        run(
+            "keyboardBindingToggleCellFlag",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingToggleCellFlag)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingToggleCellFlag(it) }
+            },
+        )
+        run(
+            "keyboardBindingToggleClueFlag",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingToggleClueFlag)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingToggleClueFlag(it) }
+            },
+        )
+        run(
+            "keyboardBindingToggleScratchMode",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingToggleScratchMode)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingToggleScratchMode(it) }
+            },
+        )
+        run(
+            "keyboardBindingToggleSelection",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingToggleSelection)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingToggleSelection(it) }
+            },
+        )
+        run(
+            "keyboardBindingToggleShowErrorsCursor",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingToggleShowErrorsCursor)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingToggleShowErrorsCursor(it) }
+            },
+        )
+        run(
+            "keyboardBindingToggleShowErrorsGrid",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingToggleShowErrorsGrid)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingToggleShowErrorsGrid(it) }
+            },
+        )
+        run(
+            "keyboardBindingToggleShowErrorsWordCells",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingToggleShowErrorsWordCells)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingToggleShowErrorsWordCells(it) }
+            },
+        )
+        run(
+            "keyboardBindingToggleShowErrorsWordWord",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingToggleShowErrorsWordWord)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingToggleShowErrorsWordWord(it) }
+            },
+        )
+        run(
+            "keyboardBindingVoiceInput",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingVoiceInput)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingVoiceInput(it) }
+            },
+        )
+        run(
+            "keyboardBindingZoomIn",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingZoomIn)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingZoomIn(it) }
+            },
+        )
+        run(
+            "keyboardBindingZoomInMax",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingZoomInMax)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingZoomInMax(it) }
+            },
+        )
+        run(
+            "keyboardBindingZoomOut",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingZoomOut)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingZoomOut(it) }
+            },
+        )
+        run(
+            "keyboardBindingZoomReset",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingZoomReset)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingZoomReset(it) }
+            },
         )
         run(
             "keyboardForceCaps",

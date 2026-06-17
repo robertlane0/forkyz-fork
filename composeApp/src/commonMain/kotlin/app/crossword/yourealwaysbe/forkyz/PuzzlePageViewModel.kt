@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 import androidx.lifecycle.ViewModel
@@ -43,15 +44,17 @@ import app.crossword.yourealwaysbe.forkyz.puz.ClueID
 import app.crossword.yourealwaysbe.forkyz.puz.Playboard
 import app.crossword.yourealwaysbe.forkyz.puz.Playboard.PlayboardChanges
 import app.crossword.yourealwaysbe.forkyz.puz.Playboard.PlayboardListener
+import app.crossword.yourealwaysbe.forkyz.puz.Playboard.ShowErrorsMode
 import app.crossword.yourealwaysbe.forkyz.puz.Position
 import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.settings.ClueListClueLine
 import app.crossword.yourealwaysbe.forkyz.settings.ExternalToolSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
+import app.crossword.yourealwaysbe.forkyz.settings.KeyboardBindings
 import app.crossword.yourealwaysbe.forkyz.settings.KeyboardLayout
 import app.crossword.yourealwaysbe.forkyz.settings.KeyboardSettings
-import app.crossword.yourealwaysbe.forkyz.puz.Playboard.ShowErrorsMode
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
+import app.crossword.yourealwaysbe.forkyz.util.ForkyzKey
 import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer
 import app.crossword.yourealwaysbe.forkyz.util.KeyboardInfo
 import app.crossword.yourealwaysbe.forkyz.util.KeyboardManagerKt
@@ -218,7 +221,7 @@ data class KeyboardState(
 )
 
 data class ClueNotesData(
-    val clueID : ClueID?
+    val clueID : ClueID?,
 )
 
 private data class VoiceActivateSettings(
@@ -329,6 +332,16 @@ open class PuzzlePageViewModel(
                 )
             )
     val menuState : StateFlow<PuzzleMenuState> = mediatedMenuState.stateFlow
+
+    var keyboardBindings = KeyboardBindings()
+        private set
+    init {
+        viewModelScope.launch {
+            settings.liveKeyboardBindings.collect {
+                keyboardBindings = it
+            }
+        }
+    }
 
     private val mediatedUIState
         = MediatedStateWithFlow<PuzzlePageUIState, UIStateSettings>(
@@ -578,6 +591,10 @@ open class PuzzlePageViewModel(
 
     fun toggleScratchMode() {
         settings.getPlayScratchMode() { settings.setPlayScratchMode(!it); }
+    }
+
+    fun pickRandomUnfilledClue() {
+        getBoard()?.pickRandomUnfilledClue()
     }
 
     fun requestHelpForCurrentClue() {

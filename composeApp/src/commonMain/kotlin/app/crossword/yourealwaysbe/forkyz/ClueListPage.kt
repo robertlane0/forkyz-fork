@@ -82,6 +82,20 @@ fun ClueListPage(
 
         fun onKeyEvent(event : KeyEvent) : Boolean {
             val isDown = event.type == KeyEventType.KeyDown
+
+            val handled = onKeyEventKeyboardBindings(
+                event = event,
+                onClueNotesDown = viewModel::launchCurrentClueNotes,
+                onInsertSpecialDown = viewModel::doSpecialEntry,
+                onNextClueDown = viewModel::moveDown,
+                onPrevClueDown = viewModel::moveUp,
+                onPuzzleNotesDown = viewModel::launchPuzzleNotes,
+                onRandomClueDown = viewModel::pickRandomUnfilledClue,
+                onToggleScratchModeDown = viewModel::toggleScratchMode,
+            )
+            if (handled)
+                return true
+
             when (event.key) {
                 Key.DirectionLeft -> {
                     if (isDown)

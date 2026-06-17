@@ -168,6 +168,17 @@ fun NotesPage(
         }
 
         fun onKeyEvent(event : KeyEvent) : Boolean {
+            val handled = onKeyEventKeyboardBindings(
+                event = event,
+                onInsertSpecialDown = {
+                    if (focussedEntry == NoteEntry.BOARD)
+                        viewModel.doSpecialEntry()
+                },
+                onShuffleAnagramDown = viewModel::shuffleAnagramSource,
+            )
+            if (handled)
+                return true
+
             return onKeyEventPuzzlePage(event)
         }
 

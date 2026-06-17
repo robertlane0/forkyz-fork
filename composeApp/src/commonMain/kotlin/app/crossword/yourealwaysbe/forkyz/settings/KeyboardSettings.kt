@@ -1,5 +1,4 @@
 
-
 package app.crossword.yourealwaysbe.forkyz.settings
 
 /**
@@ -29,3 +28,4 @@ data class KeyboardSettings(
     val repeatInterval : Int,
     val useNative : Boolean,
 )
+

@@ -21,7 +21,6 @@ import platform.Foundation.NSApplicationSupportDirectory
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSUserDomainMask
 
-import app.crossword.yourealwaysbe.forkyz.SettingsItem
 import app.crossword.yourealwaysbe.forkyz.SettingsLogcat
 import app.crossword.yourealwaysbe.forkyz.SettingsNamedItem
 import app.crossword.yourealwaysbe.forkyz.SettingsPage
@@ -29,6 +28,17 @@ import app.crossword.yourealwaysbe.forkyz.SettingsSubPage
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.crossword_solver_enabled
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.external_dictionary
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_binding_announce_box,
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_binding_announce_clue,
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_binding_exit,import app.crossword.yourealwaysbe.forkyz.SettingsItem
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_binding_open_crossword_solver,
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_binding_share_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_binding_share_clue_with_board
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_binding_share_puzzle
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_binding_share_puzzle_blank
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_binding_share_puzzle_no_ipuz
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_binding_share_puzzle_original
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_binding_voice_input,
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_force_caps
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_haptic
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_native
@@ -209,6 +219,17 @@ class IOSNativeBackendUtils(
                             Res.string.keyboard_force_caps,
                             Res.string.keyboard_split_words,
                             Res.string.storage_location,
+                            Res.string.keyboard_binding_announce_box,
+                            Res.string.keyboard_binding_announce_clue,
+                            Res.string.keyboard_binding_open_crossword_solver,
+                            Res.string.keyboard_binding_share_clue,
+                            Res.string.keyboard_binding_share_clue_with_board,
+                            Res.string.keyboard_binding_share_puzzle,
+                            Res.string.keyboard_binding_share_puzzle_blank,
+                            Res.string.keyboard_binding_share_puzzle_no_ipuz,
+                            Res.string.keyboard_binding_share_puzzle_original,
+                            Res.string.keyboard_binding_voice_input,
+                            Res.string.keyboard_binding_exit,
                         )
                     }
                     else -> true
