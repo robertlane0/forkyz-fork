@@ -772,12 +772,12 @@ fun WordEdit(
         if (key == OrdinaryKey.KEY_SPACE)
             viewModel.playLetter(" ")
         else
-            onOrdinaryKeyDown(key)
+            onOrdinaryKeyDown.invoke(key)
     }
 
     fun onOrdinaryKeyUp(key : OrdinaryKey) {
         if (key != OrdinaryKey.KEY_SPACE)
-            onOrdinaryKeyUp(key)
+            onOrdinaryKeyUp.invoke(key)
     }
 
     val inputModifier = if (incognitoMode) Modifier else modifier
