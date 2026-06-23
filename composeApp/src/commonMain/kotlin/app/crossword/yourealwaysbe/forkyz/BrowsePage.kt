@@ -165,7 +165,7 @@ import app.crossword.yourealwaysbe.forkyz.util.NativeImportFinishedResult
 import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
-import app.crossword.yourealwaysbe.forkyz.util.onRightClick
+import app.crossword.yourealwaysbe.forkyz.util.onMiddleClick
 import app.crossword.yourealwaysbe.forkyz.util.toUri
 import app.crossword.yourealwaysbe.forkyz.view.CircleProgressBar
 import app.crossword.yourealwaysbe.forkyz.view.DownloadDialog
@@ -731,7 +731,7 @@ fun BrowsePage(
         Row(
             modifier = Modifier.heightIn(min=MIN_PUZZLE_ITEM_HEIGHT)
                 .background(backgroundColor)
-                .onRightClick { viewModel.toggleSelectPuzzle(pe.id) }
+                .onMiddleClick { viewModel.toggleSelectPuzzle(pe.id) }
                 .combinedClickable(
                     onClick = {
                         if (isSelecting)

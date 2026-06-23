@@ -59,7 +59,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.prev_clue
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.space
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.special_entry
 import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
-import app.crossword.yourealwaysbe.forkyz.util.onRightClick
+import app.crossword.yourealwaysbe.forkyz.util.onMiddleClick
 import app.crossword.yourealwaysbe.forkyz.view.OrdinaryKey
 import app.crossword.yourealwaysbe.forkyz.view.SpecialKey
 
@@ -121,7 +121,7 @@ internal class KeyboardLayoutScope(
 
         content(
             modifier.focusProperties { canFocus = false }
-                .onRightClick { onLongPress?.invoke() }
+                .onMiddleClick { onLongPress?.invoke() }
                 .pointerInput(true) {
                     awaitEachGesture {
                         val down = awaitFirstDown(requireUnconsumed = false)

@@ -153,7 +153,7 @@ import app.crossword.yourealwaysbe.forkyz.util.ForkyzKeySymbol
 import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer
 import app.crossword.yourealwaysbe.forkyz.util.NativeFrontendUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
-import app.crossword.yourealwaysbe.forkyz.util.onRightClick
+import app.crossword.yourealwaysbe.forkyz.util.onMiddleClick
 import app.crossword.yourealwaysbe.forkyz.util.toUri
 import app.crossword.yourealwaysbe.forkyz.view.ChooseFlagColorDialog
 import app.crossword.yourealwaysbe.forkyz.view.ForkyzKeyboard
@@ -254,7 +254,7 @@ class PuzzlePageScope(
         onLongClickDescription : String = "",
     ) {
         val fullModifier = modifier
-            .onRightClick { onLongClick() }
+            .onMiddleClick { onLongClick() }
             .combinedClickable(
                 onClick = onClick,
                 onClickLabel = onClickDescription,

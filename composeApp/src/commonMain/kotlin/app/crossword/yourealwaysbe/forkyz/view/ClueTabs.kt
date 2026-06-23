@@ -64,7 +64,7 @@ import app.crossword.yourealwaysbe.forkyz.puz.Position
 import app.crossword.yourealwaysbe.forkyz.settings.ClueTabsDouble
 import app.crossword.yourealwaysbe.forkyz.theme.BoardColorScheme
 import app.crossword.yourealwaysbe.forkyz.util.MATERIAL_MIN_CLICKABLE_DP
-import app.crossword.yourealwaysbe.forkyz.util.onRightClick
+import app.crossword.yourealwaysbe.forkyz.util.onMiddleClick
 
 // from Android docs
 private val DP_PER_INCH = 160
@@ -169,7 +169,7 @@ fun ClueTabs(
         Column(
             modifier = Modifier.fillMaxWidth()
                 .heightIn(min = MATERIAL_MIN_CLICKABLE_DP)
-                .onRightClick { onClueLongClick(clue.cid) }
+                .onMiddleClick { onClueLongClick(clue.cid) }
                 .combinedClickable(
                     onClick = { onClueClick(clue.cid) },
                     onClickLabel = onClueClickDescription,
@@ -358,7 +358,7 @@ fun ClueTabs(
                 if (pages.size > 0) {
                     SecondaryTabRow(
                         modifier = Modifier
-                            .onRightClick { onBarLongClick() }
+                            .onMiddleClick { onBarLongClick() }
                             .combinedClickable(
                                 onClick = { /* handled in Tab */ },
                                 onLongClick = onBarLongClick,

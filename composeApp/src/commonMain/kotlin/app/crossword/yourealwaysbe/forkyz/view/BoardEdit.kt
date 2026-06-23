@@ -51,7 +51,7 @@ import app.crossword.yourealwaysbe.forkyz.util.InputConnectionMediator
 import app.crossword.yourealwaysbe.forkyz.util.Parcelable
 import app.crossword.yourealwaysbe.forkyz.util.Parcelize
 import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
-import app.crossword.yourealwaysbe.forkyz.util.onRightClick
+import app.crossword.yourealwaysbe.forkyz.util.onMiddleClick
 import app.crossword.yourealwaysbe.forkyz.view.OrdinaryKey
 
 private val MAX_BOX_SIZE_DP : Float = 160f
@@ -542,7 +542,7 @@ private fun BoardFullBody(
                     label = onLongPressDescription,
                 )
                 contentDescription = boardContentDescription
-            }.onRightClick { offset ->
+            }.onMiddleClick { offset ->
                 offsetToBox(
                     viewModel,
                     state,
@@ -894,7 +894,7 @@ fun BoxesEditNoInput(
                     label = onLongPressDescription,
                 )
                 contentDescription = boxesContentDescription
-            }.onRightClick { offset ->
+            }.onMiddleClick { offset ->
                 offsetToBoxWord(
                     localDensity.density,
                     boxProfile.boxSizePx,
