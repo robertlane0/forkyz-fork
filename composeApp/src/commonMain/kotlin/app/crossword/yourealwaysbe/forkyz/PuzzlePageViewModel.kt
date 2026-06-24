@@ -50,7 +50,6 @@ import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.settings.ClueListClueLine
 import app.crossword.yourealwaysbe.forkyz.settings.ExternalToolSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
-import app.crossword.yourealwaysbe.forkyz.settings.KeyboardBindings
 import app.crossword.yourealwaysbe.forkyz.settings.KeyboardLayout
 import app.crossword.yourealwaysbe.forkyz.settings.KeyboardSettings
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
@@ -259,12 +258,12 @@ private data class UIStateSettings(
 )
 
 open class PuzzlePageViewModel(
-    val settings : ForkyzSettings,
-    val utils : NativeBackendUtils,
-    val currentPuzzleHolder : CurrentPuzzleHolder,
-    val fileHandlerProvider : FileHandlerProvider,
-    val mcpBoardManager : MCPBoardManager,
-) : ViewModel(), PlayboardListener {
+    settings : ForkyzSettings,
+    protected val utils : NativeBackendUtils,
+    protected val currentPuzzleHolder : CurrentPuzzleHolder,
+    protected val fileHandlerProvider : FileHandlerProvider,
+    protected val mcpBoardManager : MCPBoardManager,
+) : ForkyzPageViewModel(settings), PlayboardListener {
     private val _announceEvent = MutableStateFlow<AnnounceData?>(null)
     val announceEvent : StateFlow<AnnounceData?> = _announceEvent
 
@@ -332,16 +331,6 @@ open class PuzzlePageViewModel(
                 )
             )
     val menuState : StateFlow<PuzzleMenuState> = mediatedMenuState.stateFlow
-
-    var keyboardBindings = KeyboardBindings()
-        private set
-    init {
-        viewModelScope.launch {
-            settings.liveKeyboardBindings.collect {
-                keyboardBindings = it
-            }
-        }
-    }
 
     private val mediatedUIState
         = MediatedStateWithFlow<PuzzlePageUIState, UIStateSettings>(

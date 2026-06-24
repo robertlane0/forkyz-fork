@@ -16,7 +16,6 @@ import kotlinx.datetime.minus
 import kotlinx.io.IOException
 
 import androidx.annotation.MainThread
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
 import app.crossword.yourealwaysbe.forkyz.BuildConfig
@@ -237,13 +236,13 @@ private data class BrowseSettings(
 )
 
 class BrowsePageViewModel(
-    val settings : ForkyzSettings,
+    settings : ForkyzSettings,
     val utils : NativeBackendUtils,
     val fileHandlerProvider : FileHandlerProvider,
     val currentPuzzleHolder : CurrentPuzzleHolder,
     val downloadersProvider : DownloadersProvider,
     val backgroundDownloadManager : BackgroundDownloadManager,
-) : ViewModel() {
+) : ForkyzPageViewModel(settings) {
 
     // important that it is single thread to avoid multiple
     // simultaneous operations

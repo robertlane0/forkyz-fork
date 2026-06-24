@@ -234,6 +234,7 @@ private fun ForkyzAppMain(
             HTMLPage(
                 viewModel = viewModel,
                 themeHelper = themeHelper,
+                utils = utils,
                 unqualifiedFileName = html.unqualifiedFileName,
                 onBack = ::doBackAction,
             )
@@ -243,6 +244,7 @@ private fun ForkyzAppMain(
             LogcatPage(
                 viewModel = viewModel,
                 themeHelper = themeHelper,
+                utils = utils,
                 onShareFile = utils::onShareFile,
                 onBack = ::doBackAction,
             )

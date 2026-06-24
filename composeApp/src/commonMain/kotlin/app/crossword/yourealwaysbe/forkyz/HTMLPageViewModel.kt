@@ -11,13 +11,13 @@ import kotlinx.io.IOException
 
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
 import be.digitalia.compose.htmlconverter.htmlToAnnotatedString
 
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.asset_not_found
+import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.getFileResourceData
 
@@ -32,8 +32,9 @@ enum class HTMLFile(val unqualifiedFileName : String) {
 }
 
 class HTMLPageViewModel(
+    settings : ForkyzSettings,
     private val utils : NativeBackendUtils,
-) : ViewModel() {
+) : ForkyzPageViewModel(settings) {
 
     private val _assetText = MutableStateFlow<AnnotatedString>(
         buildAnnotatedString { }

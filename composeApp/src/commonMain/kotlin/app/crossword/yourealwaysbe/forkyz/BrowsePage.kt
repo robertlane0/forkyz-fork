@@ -178,6 +178,7 @@ import app.crossword.yourealwaysbe.forkyz.view.SwipeToDismissBox
 import app.crossword.yourealwaysbe.forkyz.view.SwipeToDismissBoxValue
 import app.crossword.yourealwaysbe.forkyz.view.TwoButtonDialog
 import app.crossword.yourealwaysbe.forkyz.view.rememberSwipeToDismissBoxState
+import app.crossword.yourealwaysbe.forkyz.util.onKeyEventKeyboardBindings
 
 private val HORIZONTAL_PADDING = 16.dp
 private val FAB_OPEN_ANGLE = 45F
@@ -1134,17 +1135,27 @@ fun BrowsePage(
         }
     }
 
+    fun handleBack() {
+        val isSelecting = viewModel.uiState.value.isSelecting
+        if (isSelecting)
+            viewModel.clearSelection()
+        else
+            pageOpener.onBack()
+    }
+
     fun onKeyEvent(event : KeyEvent) : Boolean {
+        val handled = onKeyEventKeyboardBindings(
+            event = event,
+            binds = viewModel.keyboardBindings,
+            onBackDown = ::handleBack,
+            onExitDown = utils::onExit,
+        )
+
         val isDown = event.type == KeyEventType.KeyDown
         when (event.key) {
             Key.Escape -> {
-                if (isDown) {
-                    val isSelecting = viewModel.uiState.value.isSelecting
-                    if (isSelecting)
-                        viewModel.clearSelection()
-                    else
-                        pageOpener.onBack()
-                }
+                if (isDown)
+                    handleBack()
                 return true
             }
         }
