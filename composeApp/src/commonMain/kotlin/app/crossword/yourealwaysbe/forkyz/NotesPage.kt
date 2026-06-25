@@ -168,7 +168,7 @@ fun NotesPage(
         }
 
         fun onKeyEvent(event : KeyEvent) : Boolean {
-            val handled = onKeyEventKeyboardBindings(
+            val handled = onKeyEventKeyboardBindingsPuzzlePage(
                 event = event,
                 onInsertSpecialDown = {
                     if (focussedEntry == NoteEntry.BOARD)

@@ -142,7 +142,7 @@ fun PlayPage(
 
             viewModel.keyboardPushBlockHide()
 
-            handled = onKeyEventKeyboardBindings(
+            handled = onKeyEventKeyboardBindingsPuzzlePage(
                 event = event,
                 onClueListDown = viewModel::launchClueList,
                 onClueNotesDown = viewModel::launchCurrentClueNotes,

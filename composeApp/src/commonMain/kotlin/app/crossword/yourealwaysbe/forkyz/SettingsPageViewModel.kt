@@ -884,10 +884,10 @@ private data class DownloaderSettingsData(
 )
 
 class SettingsPageViewModel(
-    private val settings : ForkyzSettings,
+    settings : ForkyzSettings,
     private val utils : NativeBackendUtils,
     private val downloadersProvider : DownloadersProvider,
-) : ViewModel() {
+) : ForkyzPageViewModel(settings) {
 
     private val fileActionMutex = Mutex()
 

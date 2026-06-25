@@ -24,6 +24,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -35,7 +41,9 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.jump_to_end
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.logcat
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_logcat
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
+import app.crossword.yourealwaysbe.forkyz.util.NativeFrontendUtils
 import app.crossword.yourealwaysbe.forkyz.util.ShareFileData
+import app.crossword.yourealwaysbe.forkyz.util.onKeyEventKeyboardBindings
 
 private val PADDING = 20.dp
 
@@ -44,9 +52,29 @@ private val PADDING = 20.dp
 fun LogcatPage(
     viewModel : LogcatPageViewModel,
     themeHelper : ThemeHelper,
+    utils : NativeFrontendUtils,
     onShareFile : (ShareFileData) -> Unit,
     onBack : () -> Unit,
 ) {
+    fun onKeyEvent(event : KeyEvent) : Boolean {
+        val handled = onKeyEventKeyboardBindings(
+            event = event,
+            binds = viewModel.keyboardBindings,
+            onBackDown = onBack,
+            onExitDown = utils::onExit,
+        )
+
+        val isDown = event.type == KeyEventType.KeyDown
+        when (event.key) {
+            Key.Escape -> {
+                if (isDown)
+                    onBack()
+                return true
+            }
+        }
+        return false
+    }
+
     @Composable
     fun Launchers() {
         LaunchedEffect(Unit) {
@@ -70,6 +98,9 @@ fun LogcatPage(
         val scope = rememberCoroutineScope()
 
         Scaffold(
+            modifier = Modifier.nestedScroll(
+                scrollBehavior.nestedScrollConnection
+            ).onKeyEvent(::onKeyEvent),
             topBar = {
                 themeHelper.ForkyzTopAppBar(
                     title = { Text(stringResource(Res.string.logcat)) },
@@ -88,9 +119,6 @@ fun LogcatPage(
 
                 )
             },
-            modifier = Modifier.nestedScroll(
-                scrollBehavior.nestedScrollConnection
-            ),
             floatingActionButton = {
                 if (listState.canScrollForward) {
                     SmallFloatingActionButton(

@@ -44,6 +44,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -73,6 +79,7 @@ import app.crossword.yourealwaysbe.forkyz.theme.ForkyzTopAppBar
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 import app.crossword.yourealwaysbe.forkyz.util.NativeFrontendUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
+import app.crossword.yourealwaysbe.forkyz.util.onKeyEventKeyboardBindings
 import app.crossword.yourealwaysbe.forkyz.util.toUri
 import app.crossword.yourealwaysbe.forkyz.view.ListDialog
 import app.crossword.yourealwaysbe.forkyz.view.MultiListDialog
@@ -365,6 +372,25 @@ fun SettingsPage(
             viewModel.popState()
         else
             pageOpener.onBack()
+    }
+
+    fun onKeyEvent(event : KeyEvent) : Boolean {
+        val handled = onKeyEventKeyboardBindings(
+            event = event,
+            binds = viewModel.keyboardBindings,
+            onBackDown = ::handleBack,
+            onExitDown = utils::onExit,
+        )
+
+        val isDown = event.type == KeyEventType.KeyDown
+        when (event.key) {
+            Key.Escape -> {
+                if (isDown)
+                    handleBack()
+                return true
+            }
+        }
+        return false
     }
 
     @Composable
@@ -698,7 +724,7 @@ fun SettingsPage(
         topBar = { TopAppBar(scrollBehavior) },
         modifier = Modifier.nestedScroll(
             scrollBehavior.nestedScrollConnection
-        )
+        ).onKeyEvent(::onKeyEvent),
     ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
             val inSearchMode by remember {

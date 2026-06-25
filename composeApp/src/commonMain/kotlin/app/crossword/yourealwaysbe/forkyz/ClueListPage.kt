@@ -83,7 +83,7 @@ fun ClueListPage(
         fun onKeyEvent(event : KeyEvent) : Boolean {
             val isDown = event.type == KeyEventType.KeyDown
 
-            val handled = onKeyEventKeyboardBindings(
+            val handled = onKeyEventKeyboardBindingsPuzzlePage(
                 event = event,
                 onClueNotesDown = viewModel::launchCurrentClueNotes,
                 onInsertSpecialDown = viewModel::doSpecialEntry,
