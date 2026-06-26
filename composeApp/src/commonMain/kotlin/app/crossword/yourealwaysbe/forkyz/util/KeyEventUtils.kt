@@ -53,6 +53,7 @@ fun onKeyEventKeyboardBindings(
     onBackDown : (() -> Unit)? = null,
     onClueListDown : (() -> Unit)? = null,
     onClueNotesDown : (() -> Unit)? = null,
+    onCopyClueDown : (() -> Unit)? = null,
     onExitDown : (() -> Unit)? = null,
     onFitToScreenDown : (() -> Unit)? = null,
     onHelpDown : (() -> Unit)? = null,
@@ -111,6 +112,7 @@ fun onKeyEventKeyboardBindings(
             || ifKey(binds.back, onBackDown)
             || ifKey(binds.clueList, onClueListDown)
             || ifKey(binds.clueNotes, onClueNotesDown)
+            || ifKey(binds.copyClue, onCopyClueDown)
             || ifKey(binds.exit, onExitDown)
             || ifKey(binds.fitToScreen, onFitToScreenDown)
             || ifKey(binds.help, onHelpDown)

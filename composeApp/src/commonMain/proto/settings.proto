@@ -304,6 +304,7 @@ message Settings {
     string keyboardBindingHelp = 203;
     string keyboardBindingSettings = 204;
     string keyboardBindingShuffleAnagram = 206;
+    string keyboardBindingCopyClue = 207;
 
     // defunct settings
     bool showErrors = 107;

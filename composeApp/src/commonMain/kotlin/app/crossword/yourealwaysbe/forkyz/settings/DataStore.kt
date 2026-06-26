@@ -120,6 +120,7 @@ val DEFAULT_SETTINGS : Settings = Settings(
     keyboardBindingBack = fkey(ForkyzKeySymbol.ESCAPE).text,
     keyboardBindingClueList = "",
     keyboardBindingClueNotes = "",
+    keyboardBindingCopyClue = fctrl(ForkyzKeySymbol.C).text,
     keyboardBindingExit = fctrl(ForkyzKeySymbol.Q).text,
     keyboardBindingFitToScreen = "",
     keyboardBindingHelp = "",

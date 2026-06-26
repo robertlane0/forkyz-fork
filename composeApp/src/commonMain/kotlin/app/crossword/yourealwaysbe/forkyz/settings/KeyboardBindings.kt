@@ -9,6 +9,7 @@ data class KeyboardBindings(
     val back : ForkyzKey? = null,
     val clueList : ForkyzKey? = null,
     val clueNotes : ForkyzKey? = null,
+    val copyClue : ForkyzKey? = null,
     val exit : ForkyzKey? = null,
     val fitToScreen : ForkyzKey? = null,
     val help : ForkyzKey? = null,

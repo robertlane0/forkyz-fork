@@ -278,6 +278,8 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_bindi
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_binding_clue_list_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_binding_clue_notes
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_binding_clue_notes_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_binding_copy_clue
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_binding_copy_clue_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_binding_exit
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_binding_exit_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_binding_fit_to_screen
@@ -2118,6 +2120,17 @@ class SettingsPageViewModel(
                 settings.liveKeyboardBindingClueNotes.stateInHereString(),
                 settings::setKeyboardBindingClueNotes,
                 settings.liveKeyboardBindingClueNotes.map(
+                    this::getKeyboardBindingErrorMessage,
+                ).stateInSubscribed(viewModelScope, null),
+            ),
+            SettingsString(
+                SettingsPage.KEYBOARD_BINDINGS,
+                Res.string.keyboard_binding_copy_clue,
+                Res.string.keyboard_binding_copy_clue_desc,
+                Res.string.keyboard_binding_hint,
+                settings.liveKeyboardBindingCopyClue.stateInHereString(),
+                settings::setKeyboardBindingCopyClue,
+                settings.liveKeyboardBindingCopyClue.map(
                     this::getKeyboardBindingErrorMessage,
                 ).stateInSubscribed(viewModelScope, null),
             ),

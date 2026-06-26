@@ -47,6 +47,7 @@ import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
@@ -67,8 +68,10 @@ import be.digitalia.compose.htmlconverter.htmlToAnnotatedString
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.announce_clue_label
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.are_you_sure
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_copied
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.clue_hint
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.completed
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.copy_clue
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.edit_clue
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.errors
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.external_app_install_msg
@@ -147,8 +150,8 @@ import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer
 import app.crossword.yourealwaysbe.forkyz.util.NativeFrontendUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
-import app.crossword.yourealwaysbe.forkyz.util.onMiddleClick
 import app.crossword.yourealwaysbe.forkyz.util.onKeyEventKeyboardBindings
+import app.crossword.yourealwaysbe.forkyz.util.onMiddleClick
 import app.crossword.yourealwaysbe.forkyz.util.toUri
 import app.crossword.yourealwaysbe.forkyz.view.ChooseFlagColorDialog
 import app.crossword.yourealwaysbe.forkyz.view.ForkyzKeyboard
@@ -287,6 +290,7 @@ class PuzzlePageScope(
         onBackDown : (() -> Unit)? = ::doExitPage,
         onClueListDown : (() -> Unit)? = null,
         onClueNotesDown : (() -> Unit)? = null,
+        onCopyClueDown : (() -> Unit)? = viewModel::copyClue,
         onExitDown : (() -> Unit)? = utils::onExit,
         onFitToScreenDown : (() -> Unit)? = null,
         onHelpDown : (() -> Unit)? = ::openHelp,
@@ -349,6 +353,7 @@ class PuzzlePageScope(
             onBackDown = onBackDown,
             onClueListDown = onClueListDown,
             onClueNotesDown = onClueNotesDown,
+            onCopyClueDown = onCopyClueDown,
             onExitDown = onExitDown,
             onFitToScreenDown = onFitToScreenDown,
             onHelpDown = onHelpDown,
@@ -1040,12 +1045,10 @@ class PuzzlePageScope(
 
     @Composable
     fun MenuShare() {
-        if (utils.canShareFiles) {
-            MenuSubEntry(
-                text = { MenuText(stringResource(Res.string.share)) },
-                onClick = { viewModel.expandMenu(PuzzleSubMenu.SHARE) },
-            )
-        }
+        MenuSubEntry(
+            text = { MenuText(stringResource(Res.string.share)) },
+            onClick = { viewModel.expandMenu(PuzzleSubMenu.SHARE) },
+        )
     }
 
     @Composable
@@ -1076,59 +1079,75 @@ class PuzzlePageScope(
             }
 
             DropdownMenuItem(
-                text = { MenuText(stringResource(Res.string.share_clue)) },
+                text = { MenuText(stringResource(Res.string.copy_clue)) },
                 onClick = {
-                    viewModel.shareClue(false)
+                    viewModel.copyClue()
                     viewModel.dismissMenu()
                 },
             )
-            DropdownMenuItem(
-                text = {
-                    MenuText(stringResource(Res.string.share_clue_response))
-                },
-                onClick = {
-                    viewModel.shareClue(true)
-                    viewModel.dismissMenu()
-                },
-            )
-            DropdownMenuItem(
-                text = {
-                    MenuText(stringResource(Res.string.share_puzzle_full))
-                },
-                onClick = {
-                    viewModel.sharePuzzle(false, false)
-                    viewModel.dismissMenu()
-                },
-            )
-            DropdownMenuItem(
-                text = {
-                    MenuText(
-                        stringResource(Res.string.share_puzzle_without_extensions)
-                    )
-                },
-                onClick = {
-                    viewModel.sharePuzzle(false, true)
-                    viewModel.dismissMenu()
-                },
-            )
-            DropdownMenuItem(
-                text = { MenuText(stringResource(Res.string.share_puzzle_orig)) },
-                onClick = {
-                    viewModel.sharePuzzle(true, true)
-                    viewModel.dismissMenu()
-                },
-            )
-            DropdownMenuItem(
-                text = {
-                    MenuText(
-                        stringResource(Res.string.share_puzzle_open_share_url)
-                    )
-                },
-                onClick = {
-                    openShareUrl()
-                    viewModel.dismissMenu()
-                },
-            )
+
+            if (utils.canShareFiles) {
+                DropdownMenuItem(
+                    text = { MenuText(stringResource(Res.string.share_clue)) },
+                    onClick = {
+                        viewModel.shareClue(false)
+                        viewModel.dismissMenu()
+                    },
+                )
+                DropdownMenuItem(
+                    text = {
+                        MenuText(stringResource(Res.string.share_clue_response))
+                    },
+                    onClick = {
+                        viewModel.shareClue(true)
+                        viewModel.dismissMenu()
+                    },
+                )
+                DropdownMenuItem(
+                    text = {
+                        MenuText(stringResource(Res.string.share_puzzle_full))
+                    },
+                    onClick = {
+                        viewModel.sharePuzzle(false, false)
+                        viewModel.dismissMenu()
+                    },
+                )
+                DropdownMenuItem(
+                    text = {
+                        MenuText(
+                            stringResource(
+                                Res.string.share_puzzle_without_extensions,
+                            )
+                        )
+                    },
+                    onClick = {
+                        viewModel.sharePuzzle(false, true)
+                        viewModel.dismissMenu()
+                    },
+                )
+                DropdownMenuItem(
+                    text = {
+                        MenuText(stringResource(Res.string.share_puzzle_orig))
+                    },
+                    onClick = {
+                        viewModel.sharePuzzle(true, true)
+                        viewModel.dismissMenu()
+                    },
+                )
+                DropdownMenuItem(
+                    text = {
+                        MenuText(
+                            stringResource(
+                                Res.string.share_puzzle_open_share_url,
+                            )
+                        )
+                    },
+                    onClick = {
+                        openShareUrl()
+                        viewModel.dismissMenu()
+                    },
+                )
+            }
         }
     }
 
@@ -1275,6 +1294,20 @@ fun PuzzlePage(
             if (backEvent) {
                 pageOpener.onBack()
                 viewModel.clearBackEvent()
+            }
+        }
+        val copyClueEvent
+            by viewModel.copyClueEvent.collectAsStateWithLifecycle()
+        val clueCopiedMsg = stringResource(Res.string.clue_copied)
+        // Suppress deprecation because Clipboard does not have an KMP API
+        // as of June 2026
+        @Suppress("deprecation")
+        val clipboardManager = LocalClipboardManager.current
+        LaunchedEffect(copyClueEvent) {
+            copyClueEvent?.let {
+                clipboardManager.setText(htmlToAnnotatedString(it.text))
+                viewModel.clearCopyClueEvent()
+                utils.toast(clueCopiedMsg)
             }
         }
     }

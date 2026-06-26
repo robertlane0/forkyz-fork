@@ -1184,6 +1184,7 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
                 ForkyzKey.parseKey(it.keyboardBindingBack),
                 ForkyzKey.parseKey(it.keyboardBindingClueList),
                 ForkyzKey.parseKey(it.keyboardBindingClueNotes),
+                ForkyzKey.parseKey(it.keyboardBindingCopyClue),
                 ForkyzKey.parseKey(it.keyboardBindingExit),
                 ForkyzKey.parseKey(it.keyboardBindingFitToScreen),
                 ForkyzKey.parseKey(it.keyboardBindingHelp),
@@ -1268,6 +1269,15 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     fun setKeyboardBindingClueNotes(value : String) {
         settingsUpdate { settings ->
             settings.copy(keyboardBindingClueNotes = value)
+        }
+    }
+
+    val liveKeyboardBindingCopyClue : Flow<String>
+        = settingsMap { it.keyboardBindingCopyClue }
+
+    fun setKeyboardBindingCopyClue(value : String) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardBindingCopyClue = value)
         }
     }
 
@@ -2795,6 +2805,15 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             },
             { key ->
                 json?.ifHasString(key) { setKeyboardBindingClueNotes(it) }
+            },
+        )
+        run(
+            "keyboardBindingCopyClue",
+            { key ->
+                builder?.put(key, settings?.keyboardBindingCopyClue)
+            },
+            { key ->
+                json?.ifHasString(key) { setKeyboardBindingCopyClue(it) }
             },
         )
         run(

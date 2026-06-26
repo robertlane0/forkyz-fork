@@ -223,6 +223,10 @@ data class ClueNotesData(
     val clueID : ClueID?,
 )
 
+data class CopyClueEvent(
+    val text : String,
+)
+
 private data class VoiceActivateSettings(
     val volumeActivatesVoice : Boolean,
     val equalsAnnounceClue : Boolean,
@@ -281,6 +285,9 @@ open class PuzzlePageViewModel(
 
     protected val _backEvent = MutableStateFlow<Boolean>(false)
     val backEvent : StateFlow<Boolean> = _backEvent
+
+    private val _copyClueEvent = MutableStateFlow<CopyClueEvent?>(null)
+    val copyClueEvent : StateFlow<CopyClueEvent?> = _copyClueEvent
 
     val voiceState : StateFlow<VoiceState> = mediate(
         viewModelScope,
@@ -733,6 +740,26 @@ open class PuzzlePageViewModel(
 
     fun clearBackEvent() {
         _backEvent.value = false
+    }
+
+    fun copyClue() {
+        viewModelScope.launch {
+            getBoard()?.clue?.let { clue ->
+                val showCount = settings.livePlayShowCount.first()
+                val text = PlayboardTextRenderer.getShortClueText(
+                    utils,
+                    clue,
+                    false,
+                    false,
+                    showCount
+                )
+                _copyClueEvent.value = CopyClueEvent(text)
+            }
+        }
+    }
+
+    fun clearCopyClueEvent() {
+        _copyClueEvent.value = null
     }
 
     fun dispatchVoiceCommand(text : List<String>?) {
