@@ -251,6 +251,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.guardian_quick
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.guardian_quiptic
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.hamburger_abendblatt_daily
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.hamburger_abendblatt_daily_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.hardware_keyboard
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.highlight_crossing_clue
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.highlight_crossing_clue_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.independent_daily
@@ -1953,11 +1954,6 @@ class SettingsPageViewModel(
                 ),
                 settings::setKeyboardMode,
             ),
-            SettingsSubPage(
-                SettingsPage.KEYBOARD,
-                Res.string.keyboard_bindings_desc,
-                SettingsPage.KEYBOARD_BINDINGS,
-            ),
             SettingsBoolean(
                 SettingsPage.KEYBOARD,
                 Res.string.keyboard_use_native,
@@ -2058,6 +2054,15 @@ class SettingsPageViewModel(
                 Res.string.keyboard_split_words_desc,
                 settings.liveKeyboardSplitWords.stateInHereBool(),
                 settings::setKeyboardSplitWords,
+            ),
+            SettingsHeading(
+                SettingsPage.KEYBOARD,
+                Res.string.hardware_keyboard,
+            ),
+            SettingsSubPage(
+                SettingsPage.KEYBOARD,
+                Res.string.keyboard_bindings_desc,
+                SettingsPage.KEYBOARD_BINDINGS,
             ),
 
             // Keyboard Bindings
