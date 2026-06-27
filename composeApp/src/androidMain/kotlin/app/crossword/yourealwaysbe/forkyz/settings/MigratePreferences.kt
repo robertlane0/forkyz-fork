@@ -566,7 +566,7 @@ fun migratePreferences(
         settings.setBrowseSort(
             when (it) {
                 1 -> AccessorSetting.AS_DATE_ASC
-                2 -> AccessorSetting.AS_SOURCE
+                2 -> AccessorSetting.AS_SOURCE_DATE_DESC
                 else -> AccessorSetting.AS_DATE_DESC;
             }
         )

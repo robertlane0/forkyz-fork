@@ -1113,15 +1113,17 @@ class BrowsePageViewModel(
             .filter { entryMatches(it, puzzleFilter) }
             .groupBy { pe ->
                 when (sortOrder) {
-                    AccessorSetting.AS_SOURCE -> pe.source
+                    AccessorSetting.AS_SOURCE_DATE_ASC -> pe.source
+                    AccessorSetting.AS_SOURCE_DATE_DESC -> pe.source
                     else -> formatDateHeader(pe.date)
                 }
             }.map { e ->
+                val groupPuzzles = e.value.sortedWith { pe1, pe2 ->
+                    comparePuzEntries(sortOrder, pe1, pe2)
+                }
                 PuzGroup(
                     e.key,
-                    e.value.sortedWith { pe1, pe2 ->
-                        pe1.id.compareTo(pe2.id)
-                    }
+                    groupPuzzles,
                 )
             }.sortedWith { g1, g2 ->
                 if (!g1.puzzles.isEmpty() && !g2.puzzles.isEmpty()) {
@@ -1165,11 +1167,47 @@ class BrowsePageViewModel(
         pe1 : PuzEntry,
         pe2 : PuzEntry,
     ) : Int {
-        return when (sortOrder) {
-            AccessorSetting.AS_SOURCE -> pe1.source.compareTo(pe2.source)
-            AccessorSetting.AS_DATE_ASC -> pe1.date.compareTo(pe2.date)
-            else -> pe2.date.compareTo(pe1.date)
+        when (sortOrder) {
+            AccessorSetting.AS_SOURCE_DATE_ASC -> {
+                val srcCmp = pe1.source.compareTo(pe2.source)
+                if (srcCmp != 0)
+                    return srcCmp
+
+                val dateCmp = pe1.date.compareTo(pe2.date)
+                if (dateCmp != 0)
+                    return dateCmp
+            }
+            AccessorSetting.AS_SOURCE_DATE_DESC -> {
+                val srcCmp = pe1.source.compareTo(pe2.source)
+                if (srcCmp != 0)
+                    return srcCmp
+
+                val dateCmp = pe2.date.compareTo(pe1.date)
+                if (dateCmp != 0)
+                    return dateCmp
+            }
+            AccessorSetting.AS_DATE_ASC -> {
+                val dateCmp = pe1.date.compareTo(pe2.date)
+                if (dateCmp != 0)
+                    return dateCmp
+
+                val srcCmp = pe1.source.compareTo(pe2.source)
+                if (srcCmp != 0)
+                    return srcCmp
+            }
+            else -> {
+                val dateCmp = pe2.date.compareTo(pe1.date)
+                if (dateCmp != 0)
+                    return dateCmp
+
+                val srcCmp = pe1.source.compareTo(pe2.source)
+                if (srcCmp != 0)
+                    return srcCmp
+            }
         }
+
+        // fallback
+        return pe1.id.compareTo(pe2.id)
     }
 
     private fun sendToast(message : String) {

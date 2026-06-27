@@ -98,7 +98,8 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.android_app_se
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.browse_date_format_non_header
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.by_date_asc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.by_date_desc
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.by_source
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.by_source_date_asc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.by_source_date_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.cleanup
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.close
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.collapse
@@ -165,6 +166,7 @@ import app.crossword.yourealwaysbe.forkyz.util.NativeImportFinishedResult
 import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
+import app.crossword.yourealwaysbe.forkyz.util.onKeyEventKeyboardBindings
 import app.crossword.yourealwaysbe.forkyz.util.onMiddleClick
 import app.crossword.yourealwaysbe.forkyz.util.toUri
 import app.crossword.yourealwaysbe.forkyz.view.CircleProgressBar
@@ -178,7 +180,6 @@ import app.crossword.yourealwaysbe.forkyz.view.SwipeToDismissBox
 import app.crossword.yourealwaysbe.forkyz.view.SwipeToDismissBoxValue
 import app.crossword.yourealwaysbe.forkyz.view.TwoButtonDialog
 import app.crossword.yourealwaysbe.forkyz.view.rememberSwipeToDismissBoxState
-import app.crossword.yourealwaysbe.forkyz.util.onKeyEventKeyboardBindings
 
 private val HORIZONTAL_PADDING = 16.dp
 private val FAB_OPEN_ANGLE = 45F
@@ -495,9 +496,20 @@ fun BrowsePage(
                 }
             )
             DropdownMenuItem(
-                text = { MenuText(stringResource(Res.string.by_source)) },
+                text = {
+                    MenuText(stringResource(Res.string.by_source_date_desc))
+                },
                 onClick = {
-                    viewModel.setSortOrder(AccessorSetting.AS_SOURCE)
+                    viewModel.setSortOrder(AccessorSetting.AS_SOURCE_DATE_DESC)
+                    viewModel.dismissMenu()
+                }
+            )
+            DropdownMenuItem(
+                text = {
+                    MenuText(stringResource(Res.string.by_source_date_asc))
+                },
+                onClick = {
+                    viewModel.setSortOrder(AccessorSetting.AS_SOURCE_DATE_ASC)
                     viewModel.dismissMenu()
                 }
             )
@@ -747,7 +759,10 @@ fun BrowsePage(
             val sortOrder by remember {
                 derivedStateOf { state.sortOrder }
             }
-            if (sortOrder == AccessorSetting.AS_SOURCE) {
+            if (
+                sortOrder == AccessorSetting.AS_SOURCE_DATE_ASC
+                || sortOrder == AccessorSetting.AS_SOURCE_DATE_DESC
+            ) {
                 // wide enough for a wednesday
                 val dateWidth = with(LocalDensity.current) {
                     81.sp.toDp()

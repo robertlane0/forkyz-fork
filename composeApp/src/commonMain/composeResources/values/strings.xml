@@ -777,7 +777,8 @@
     <string name="sort">Sort</string>
     <string name="by_date_desc">By Date (Descending)</string>
     <string name="by_date_asc">By Date (Ascending)</string>
-    <string name="by_source">By Source</string>
+    <string name="by_source_date_desc">By Source/Date (Descending)</string>
+    <string name="by_source_date_asc">By Source/Date (Ascending)</string>
     <string name="cleanup">Cleanup</string>
 
     <!-- puzzle info dialog -->

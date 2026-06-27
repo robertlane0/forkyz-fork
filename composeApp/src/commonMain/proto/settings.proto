@@ -6,7 +6,8 @@ option java_multiple_files = true;
 enum AccessorSetting {
     AS_DATE_DESC = 0;
     AS_DATE_ASC = 1;
-    AS_SOURCE = 2;
+    AS_SOURCE_DATE_DESC = 2;
+    AS_SOURCE_DATE_ASC = 3;
 }
 
 enum BrowseSwipeAction {
