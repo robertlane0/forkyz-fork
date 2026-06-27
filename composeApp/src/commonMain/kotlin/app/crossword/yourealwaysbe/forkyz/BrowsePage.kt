@@ -763,9 +763,9 @@ fun BrowsePage(
                 sortOrder == AccessorSetting.AS_SOURCE_DATE_ASC
                 || sortOrder == AccessorSetting.AS_SOURCE_DATE_DESC
             ) {
-                // wide enough for a wednesday
+                // Wide enough for a Wednesday in December to fit
                 val dateWidth = with(LocalDensity.current) {
-                    81.sp.toDp()
+                    85.sp.toDp()
                 }
                 val date = formatDateNonHeader(pe.date)
                 Text(
