@@ -4,9 +4,9 @@ plugins {
     alias(libs.plugins.kotlin.plugin.compose)
 }
 
-val appName : String by project
-val appPackageName : String by project
-val appVersion : String by project
+val appName = providers.gradleProperty("appName").get()
+val appPackageName = providers.gradleProperty("appPackageName").get()
+val appVersion = providers.gradleProperty("appVersion").get()
 
 android {
     namespace = appPackageName
