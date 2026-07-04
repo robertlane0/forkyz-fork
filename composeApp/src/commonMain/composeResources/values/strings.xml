@@ -983,6 +983,18 @@
     <string name="month_october">October</string>
     <string name="month_november">November</string>
     <string name="month_december">December</string>
+    <string name="month_short_january">Jan</string>
+    <string name="month_short_february">Feb</string>
+    <string name="month_short_march">Mar</string>
+    <string name="month_short_april">Apr</string>
+    <string name="month_short_may">May</string>
+    <string name="month_short_june">Jun</string>
+    <string name="month_short_july">Jul</string>
+    <string name="month_short_august">Aug</string>
+    <string name="month_short_september">Sep</string>
+    <string name="month_short_october">Oct</string>
+    <string name="month_short_november">Nov</string>
+    <string name="month_short_december">Dec</string>
 
     <!-- default puzzle list names -->
     <string name="default_across_list_name">Across</string>

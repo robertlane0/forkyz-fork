@@ -59,7 +59,7 @@ json5 = "0.5.0"
 ksoup = "0.2.6"
 material = "1.14.0"
 seismic = "1.0.3"
-datetime-wheel-picker = "1.3.2"
+date-picker-spinner = "1.0.4"
 filekit = "0.14.1"
 mcp-sdk-server = "0.11.0"
 zip = "0.11.0"
@@ -140,7 +140,7 @@ ktor-server-cio = { module = "io.ktor:ktor-server-cio", version.ref = "ktor" }
 
 # Other Libraries
 codepoints = { module = "de.cketti.unicode:kotlin-codepoints-deluxe", version.ref = "codepoints" }
-datetime-wheel-picker = { module = "io.github.darkokoa:datetime-wheel-picker", version.ref = "datetime-wheel-picker" }
+date-picker-spinner = { module = "com.commit451:datepickerspinner", version.ref = "date-picker-spinner" }
 desugar-jdk-libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar" }
 directories = { module = "dev.dirs:directories", version.ref = "directories" }
 filekit-dialogs-compose = { module = "io.github.vinceglb:filekit-dialogs-compose", version.ref = "filekit" }

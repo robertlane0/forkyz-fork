@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -19,11 +20,10 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
-import dev.darkokoa.datetimewheelpicker.WheelDatePicker
-import dev.darkokoa.datetimewheelpicker.core.format.CjkSuffixConfig
-import dev.darkokoa.datetimewheelpicker.core.format.DateFormatter
-import dev.darkokoa.datetimewheelpicker.core.format.MonthDisplayStyle
-import dev.darkokoa.datetimewheelpicker.core.format.dateFormatter
+import com.commit451.datepickerspinner.DateField
+import com.commit451.datepickerspinner.DatePickerSpinner
+import com.commit451.datepickerspinner.DatePickerSpinnerDefaults
+import com.commit451.datepickerspinner.rememberDatePickerSpinnerState
 
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
@@ -36,6 +36,18 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.downloader_ava
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.downloader_available_hours
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.downloader_available_soon
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.downloader_not_available
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.month_short_april
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.month_short_august
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.month_short_december
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.month_short_february
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.month_short_january
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.month_short_july
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.month_short_june
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.month_short_march
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.month_short_may
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.month_short_november
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.month_short_october
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.month_short_september
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.no_downloaders_enabled
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.no_downloaders_enabled_msg
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.select_sources
@@ -49,6 +61,22 @@ fun DownloadDialog(
     onDownload : () -> Unit,
     onOpenSettings : () -> Unit,
 ) {
+
+    val monthNames = listOf(
+        stringResource(Res.string.month_short_january),
+        stringResource(Res.string.month_short_february),
+        stringResource(Res.string.month_short_march),
+        stringResource(Res.string.month_short_april),
+        stringResource(Res.string.month_short_may),
+        stringResource(Res.string.month_short_june),
+        stringResource(Res.string.month_short_july),
+        stringResource(Res.string.month_short_august),
+        stringResource(Res.string.month_short_september),
+        stringResource(Res.string.month_short_october),
+        stringResource(Res.string.month_short_november),
+        stringResource(Res.string.month_short_december),
+    )
+
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val downloaders by remember {
         derivedStateOf { state.downloaders }
@@ -84,20 +112,31 @@ fun DownloadDialog(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    val date by remember { derivedStateOf { state.date } }
-
-                    Text(text = stringResource(TimeUtils.getDayNameID(date)))
-                    WheelDatePicker(
-                        modifier = Modifier.padding(vertical = 8.dp),
-                        startDate = date,
-                        dateFormatter = dateFormatter(
-                            locale = Locale.current,
-                            monthDisplayStyle = MonthDisplayStyle.SHORT,
-                            cjkSuffixConfig = CjkSuffixConfig.ShowAll,
+                    Text(
+                        text = stringResource(
+                            TimeUtils.getDayNameID(state.date),
                         ),
-                        onSnappedDate = { newDate ->
-                            viewModel.date = newDate
-                        },
+                    )
+
+                    val dateState = rememberDatePickerSpinnerState(
+                        initialDate = state.date,
+                    )
+                    LaunchedEffect(dateState.selectedDate) {
+                        viewModel.date = dateState.selectedDate
+                    }
+
+                    DatePickerSpinner(
+                        modifier = Modifier.padding(vertical = 8.dp)
+                            .fillMaxWidth(),
+                        state = dateState,
+                        dateFormatter = DatePickerSpinnerDefaults.dateFormatter(
+                            monthNames = monthNames,
+                            fieldOrder = listOf(
+                                DateField.Day,
+                                DateField.Month,
+                                DateField.Year,
+                            ),
+                        ),
                     )
                 }
             }

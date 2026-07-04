@@ -821,6 +821,18 @@
     <string name="month_october">Octobre</string>
     <string name="month_november">Novembre</string>
     <string name="month_december">Décembre</string>
+    <string name="month_short_january">Janv</string>
+    <string name="month_short_february">Févr</string>
+    <string name="month_short_march">Mars</string>
+    <string name="month_short_april">Avr</string>
+    <string name="month_short_may">Mai</string>
+    <string name="month_short_june">Juin</string>
+    <string name="month_short_july">Juil</string>
+    <string name="month_short_august">Août</string>
+    <string name="month_short_september">Sept</string>
+    <string name="month_short_october">Oct</string>
+    <string name="month_short_november">Nov</string>
+    <string name="month_short_december">Déc</string>
 
     <!-- default puzzle list names -->
     <string name="default_across_list_name">Horizontal</string>
