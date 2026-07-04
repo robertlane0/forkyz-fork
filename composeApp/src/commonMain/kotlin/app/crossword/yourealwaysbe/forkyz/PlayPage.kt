@@ -651,7 +651,7 @@ fun PlayPage(
                         CluesList(Modifier.weight(1.0F).fillMaxWidth())
                     }
                 }
-                VoiceButtons()
+                ActionButtons()
                 Keyboard(
                     showSpecialKeys = true,
                     onSpecialKeyDown = ::onSpecialKeyDown,
@@ -689,7 +689,7 @@ fun PlayPage(
                     if (showClueTabs) {
                         Column(Modifier.weight(1.0F).fillMaxHeight()) {
                             CluesList(Modifier.weight(1.0F).fillMaxWidth())
-                            VoiceButtons()
+                            ActionButtons()
                         }
                     }
                 }

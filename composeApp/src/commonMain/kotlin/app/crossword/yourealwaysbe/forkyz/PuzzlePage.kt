@@ -433,38 +433,17 @@ class PuzzlePageScope(
 
     @Composable
     @OptIn(ExperimentalMaterial3Api::class)
-    fun VoiceButtons() {
-        val state by viewModel.voiceState.collectAsStateWithLifecycle()
+    fun ActionButtons() {
+        val state by viewModel.actionButtonState.collectAsStateWithLifecycle()
 
-        val showVoiceButton by remember {
-            derivedStateOf { state.showVoiceButton }
-        }
-        val showAnnounceButton by remember {
-            derivedStateOf { state.showAnnounceButton }
-        }
-
-        if (showVoiceButton || showAnnounceButton) {
+        if (state.hasButtons) {
             Row(
                 modifier = Modifier.fillMaxWidth()
                     .background(MaterialTheme.colorScheme.surface)
                     .padding(bottom = 5.dp),
                 horizontalArrangement = Arrangement.Center,
             ) {
-                if (showVoiceButton) {
-                    FilledIconButton(
-                        modifier = Modifier.padding(horizontal=10.dp)
-                            .width(50.dp),
-                        onClick = { utils.launchVoiceInput() },
-                    ) {
-                        Icon(
-                            modifier = Modifier.width(50.dp),
-                            painter = painterResource(Res.drawable.ic_voice),
-                            contentDescription
-                                = stringResource(Res.string.voice_command),
-                        )
-                    }
-                }
-                if (showAnnounceButton) {
+                if (state.announceClue) {
                     FilledIconButton(
                         modifier = Modifier.padding(horizontal=10.dp)
                             .width(50.dp),
@@ -476,6 +455,20 @@ class PuzzlePageScope(
                             contentDescription = stringResource(
                                 Res.string.announce_clue_label,
                             ),
+                        )
+                    }
+                }
+                if (state.voiceInput) {
+                    FilledIconButton(
+                        modifier = Modifier.padding(horizontal=10.dp)
+                            .width(50.dp),
+                        onClick = { utils.launchVoiceInput() },
+                    ) {
+                        Icon(
+                            modifier = Modifier.width(50.dp),
+                            painter = painterResource(Res.drawable.ic_voice),
+                            contentDescription
+                                = stringResource(Res.string.voice_command),
                         )
                     }
                 }

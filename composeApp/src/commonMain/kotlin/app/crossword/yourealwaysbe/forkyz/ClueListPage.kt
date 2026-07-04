@@ -281,7 +281,7 @@ fun ClueListPage(
                         Modifier.fillMaxWidth().weight(1.0F),
                         showAllWords,
                     )
-                    VoiceButtons()
+                    ActionButtons()
                     Keyboard()
 
                     LaunchedEffect(isTop) {

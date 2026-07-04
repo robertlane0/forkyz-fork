@@ -18,6 +18,8 @@ const val SETTINGS_FILE_NAME = "settings.pb"
 private val CURRENT_SETTINGS_VERSION = 3
 
 val DEFAULT_SETTINGS : Settings = Settings(
+    actionButtonAnnounceClue = false,
+    actionButtonVoiceInput = false,
     alwaysAnnounceBox = false,
     alwaysAnnounceClue = false,
     applicationTheme = Theme.T_STANDARD,
@@ -39,8 +41,6 @@ val DEFAULT_SETTINGS : Settings = Settings(
     browseIndicateIfSolution = false,
     browseNewPuzzle = false,
     browseShowPercentageCorrect = false,
-    buttonActivatesVoice = false,
-    buttonAnnounceClue = false,
     cleanupAge = -1,
     clueBelowGrid = false,
     clueHighlight = ClueHighlight.CH_RADIO_BUTTON,

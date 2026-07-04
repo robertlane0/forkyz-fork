@@ -47,6 +47,7 @@ import app.crossword.yourealwaysbe.forkyz.puz.Playboard.PlayboardListener
 import app.crossword.yourealwaysbe.forkyz.puz.Playboard.ShowErrorsMode
 import app.crossword.yourealwaysbe.forkyz.puz.Position
 import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
+import app.crossword.yourealwaysbe.forkyz.settings.ActionButtonSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ClueListClueLine
 import app.crossword.yourealwaysbe.forkyz.settings.ExternalToolSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
@@ -65,6 +66,7 @@ import app.crossword.yourealwaysbe.forkyz.util.VoiceCommands.VoiceCommand
 import app.crossword.yourealwaysbe.forkyz.util.WordsToNumbers
 import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerProvider
 import app.crossword.yourealwaysbe.forkyz.util.mediate
+import app.crossword.yourealwaysbe.forkyz.util.stateInSubscribed
 import app.crossword.yourealwaysbe.forkyz.view.PlayboardTextRenderer
 import app.crossword.yourealwaysbe.forkyz.view.PuzzleFinishedDialogViewModel
 import app.crossword.yourealwaysbe.forkyz.view.PuzzleInfoDialogViewModel
@@ -137,8 +139,6 @@ data class PuzzleMenuState(
 data class VoiceState(
     val volumeActivatesVoice : Boolean = false,
     val equalsAnnounceClue : Boolean = false,
-    val showVoiceButton : Boolean = false,
-    val showAnnounceButton : Boolean = false,
     val alwaysAnnounceBox : Boolean = false,
     val alwaysAnnounceClue : Boolean = false,
 )
@@ -230,8 +230,6 @@ data class CopyClueEvent(
 private data class VoiceActivateSettings(
     val volumeActivatesVoice : Boolean,
     val equalsAnnounceClue : Boolean,
-    val buttonActivatesVoice : Boolean,
-    val buttonAnnounceClue : Boolean,
 )
 
 private data class VoiceAlwaysSettings(
@@ -296,8 +294,6 @@ open class PuzzlePageViewModel(
             VoiceState(
                 voiceSettings.activateSettings.volumeActivatesVoice,
                 voiceSettings.activateSettings.equalsAnnounceClue,
-                voiceSettings.activateSettings.buttonActivatesVoice,
-                voiceSettings.activateSettings.buttonAnnounceClue,
                 voiceSettings.alwaysSettings.alwaysAnnounceBox,
                 voiceSettings.alwaysSettings.alwaysAnnounceClue,
             )
@@ -306,8 +302,6 @@ open class PuzzlePageViewModel(
             combine(
                 settings.liveVoiceVolumeActivatesVoice,
                 settings.liveVoiceEqualsAnnounceClue,
-                settings.liveVoiceButtonActivatesVoice,
-                settings.liveVoiceButtonAnnounceClue,
                 ::VoiceActivateSettings,
             ),
             combine(
@@ -338,6 +332,12 @@ open class PuzzlePageViewModel(
                 )
             )
     val menuState : StateFlow<PuzzleMenuState> = mediatedMenuState.stateFlow
+
+    val actionButtonState : StateFlow<ActionButtonSettings>
+        = settings.liveActionButtonSettings.stateInSubscribed(
+            viewModelScope,
+            ActionButtonSettings(),
+        )
 
     private val mediatedUIState
         = MediatedStateWithFlow<PuzzlePageUIState, UIStateSettings>(

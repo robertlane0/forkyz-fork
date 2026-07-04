@@ -53,6 +53,8 @@ class TestDataStore(initialDataStoreSettings : Settings) : DataStore<Settings> {
 
 class ForkyzSettingsTest {
     val settingsValue1 : Settings = Settings(
+        actionButtonAnnounceClue = false,
+        actionButtonVoiceInput = false,
         alwaysAnnounceBox = false,
         alwaysAnnounceClue = false,
         applicationTheme = Theme.T_STANDARD,
@@ -74,8 +76,6 @@ class ForkyzSettingsTest {
         browseIndicateIfSolution = false,
         browseNewPuzzle = false,
         browseShowPercentageCorrect = false,
-        buttonActivatesVoice = false,
-        buttonAnnounceClue = false,
         llmAgent = LLMAgent.LA_NONE,
         llmAgentAPIKey = "",
         llmVoiceCommands = false,
@@ -243,6 +243,8 @@ class ForkyzSettingsTest {
     )
 
     val settingsValue2 : Settings = Settings(
+        actionButtonAnnounceClue = true,
+        actionButtonVoiceInput = true,
         alwaysAnnounceBox = true,
         alwaysAnnounceClue = true,
         applicationTheme = Theme.T_DYNAMIC,
@@ -264,8 +266,6 @@ class ForkyzSettingsTest {
         browseIndicateIfSolution = true,
         browseNewPuzzle = true,
         browseShowPercentageCorrect = true,
-        buttonActivatesVoice = true,
-        buttonAnnounceClue = true,
         llmAgent = LLMAgent.LA_CHATGPT,
         llmAgentAPIKey = "xx",
         llmVoiceCommands = true,

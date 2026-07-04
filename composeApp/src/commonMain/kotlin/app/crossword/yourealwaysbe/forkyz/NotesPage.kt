@@ -686,7 +686,7 @@ fun NotesPage(
                         FlagRow()
                         AnagramSourceRow(maxWidth = miniboardMaxWidth)
                         AnagramSolutionRow(maxWidth = miniboardMaxWidth)
-                        VoiceButtons()
+                        ActionButtons()
                     }
                     Keyboard()
                 }

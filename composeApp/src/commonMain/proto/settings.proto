@@ -159,8 +159,8 @@ message Settings {
     bool browseIndicateIfSolution = 13;
     bool browseNewPuzzle = 14;
     bool browseShowPercentageCorrect = 15;
-    bool buttonActivatesVoice = 16;
-    bool buttonAnnounceClue = 17;
+    bool actionButtonVoiceInput = 16;
+    bool actionButtonAnnounceClue = 17;
     string llmAgentAPIKey = 18;
     int32 cleanupAge = 19;
     bool clueBelowGrid = 20;

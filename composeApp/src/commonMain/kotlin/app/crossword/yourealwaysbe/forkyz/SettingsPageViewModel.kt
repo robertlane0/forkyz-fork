@@ -2782,8 +2782,8 @@ class SettingsPageViewModel(
                 SettingsPage.VOICE_ACCESSIBILITY,
                 Res.string.voice_with_button,
                 Res.string.voice_with_button_desc,
-                settings.liveVoiceButtonActivatesVoice.stateInHereBool(),
-                settings::setVoiceButtonActivatesVoice,
+                settings.liveActionButtonVoiceInput.stateInHereBool(),
+                settings::setActionButtonVoiceInput,
             ),
             SettingsBoolean(
                 SettingsPage.VOICE_ACCESSIBILITY,
@@ -2796,8 +2796,8 @@ class SettingsPageViewModel(
                 SettingsPage.VOICE_ACCESSIBILITY,
                 Res.string.announce_clue_button,
                 Res.string.announce_clue_button_desc,
-                settings.liveVoiceButtonAnnounceClue.stateInHereBool(),
-                settings::setVoiceButtonAnnounceClue,
+                settings.liveActionButtonAnnounceClue.stateInHereBool(),
+                settings::setActionButtonAnnounceClue,
             ),
             SettingsBoolean(
                 SettingsPage.VOICE_ACCESSIBILITY,

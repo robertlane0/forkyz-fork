@@ -102,10 +102,10 @@ fun migratePreferences(
         settings.setBrowseShowPercentageCorrect(it)
     }
     getBoolean(prefs, "buttonActivatesVoice")?.let {
-        settings.setVoiceButtonActivatesVoice(it)
+        settings.setActionButtonVoiceInput(it)
     }
     getBoolean(prefs, "buttonAnnounceClue")?.let {
-        settings.setVoiceButtonAnnounceClue(it)
+        settings.setActionButtonAnnounceClue(it)
     }
     getString(prefs, "chatGPTAPIKey")?.let {
         if (it.trim().length > 0) {

@@ -44,6 +44,32 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
                 }
             }
 
+    val liveActionButtonSettings : Flow<ActionButtonSettings>
+        = settingsMap {
+            ActionButtonSettings(
+                announceClue = it.actionButtonAnnounceClue,
+                voiceInput = it.actionButtonVoiceInput,
+            )
+        }
+
+    val liveActionButtonVoiceInput : Flow<Boolean>
+        = settingsMap { it.actionButtonVoiceInput }
+
+    fun setActionButtonVoiceInput(value : Boolean) {
+        settingsUpdate { settings ->
+            settings.copy(actionButtonVoiceInput = value)
+        }
+    }
+
+    val liveActionButtonAnnounceClue : Flow<Boolean>
+        = settingsMap { it.actionButtonAnnounceClue }
+
+    fun setActionButtonAnnounceClue(value : Boolean) {
+        settingsUpdate { settings ->
+            settings.copy(actionButtonAnnounceClue = value)
+        }
+    }
+
     val liveVoiceAlwaysAnnounceBox : Flow<Boolean>
         = settingsMap { it.alwaysAnnounceBox }
 
@@ -455,24 +481,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     fun setBrowseShowPercentageCorrect(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(browseShowPercentageCorrect = value)
-        }
-    }
-
-    val liveVoiceButtonActivatesVoice : Flow<Boolean>
-        = settingsMap { it.buttonActivatesVoice }
-
-    fun setVoiceButtonActivatesVoice(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(buttonActivatesVoice = value)
-        }
-    }
-
-    val liveVoiceButtonAnnounceClue : Flow<Boolean>
-        = settingsMap { it.buttonAnnounceClue }
-
-    fun setVoiceButtonAnnounceClue(value : Boolean) {
-        settingsUpdate { settings ->
-            settings.copy(buttonAnnounceClue = value)
         }
     }
 
@@ -2218,6 +2226,20 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         }
 
         run(
+            "actionButtonAnnounceClue",
+            { key -> builder?.put(key, settings?.actionButtonAnnounceClue) },
+            { key ->
+                json?.ifHasBoolean(key) { setActionButtonAnnounceClue(it) }
+            },
+        )
+        run(
+            "actionButtonVoiceInput",
+            { key -> builder?.put(key, settings?.actionButtonVoiceInput) },
+            { key ->
+                json?.ifHasBoolean(key) { setActionButtonVoiceInput(it) }
+            },
+        )
+        run(
             "alwaysAnnounceBox",
             { key -> builder?.put(key, settings?.alwaysAnnounceBox) },
             { key ->
@@ -2400,20 +2422,6 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             { key -> builder?.put(key, settings?.browseShowPercentageCorrect) },
             { key ->
                 json?.ifHasBoolean(key) { setBrowseShowPercentageCorrect(it) }
-            },
-        )
-        run(
-            "buttonActivatesVoice",
-            { key -> builder?.put(key, settings?.buttonActivatesVoice) },
-            { key ->
-                json?.ifHasBoolean(key) { setVoiceButtonActivatesVoice(it) }
-            },
-        )
-        run(
-            "buttonAnnounceClue",
-            { key -> builder?.put(key, settings?.buttonAnnounceClue) },
-            { key ->
-                json?.ifHasBoolean(key) { setVoiceButtonAnnounceClue(it) }
             },
         )
         run(
