@@ -28,6 +28,8 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.aard2
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.about_forkyz
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.about_scrapes
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.about_voice_commands
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.action_buttons
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.action_buttons_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.announce_box_always
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.announce_box_always_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.announce_clue_always
@@ -597,6 +599,7 @@ data class SettingsPage(val title : StringResource) {
         val EXPORT_IMPORT = SettingsPage(Res.string.preferences_export_import)
         val SEARCH = SettingsPage(Res.string.filter_settings_title)
         val DESKTOP = SettingsPage(Res.string.desktop_settings)
+        val ACTION_BUTTONS = SettingsPage(Res.string.action_buttons)
     }
 }
 
@@ -1286,6 +1289,11 @@ class SettingsPageViewModel(
             ),
             SettingsSubPage(
                 SettingsPage.ROOT,
+                Res.string.action_buttons_desc,
+                SettingsPage.ACTION_BUTTONS,
+            ),
+            SettingsSubPage(
+                SettingsPage.ROOT,
                 Res.string.keyboard_settings_desc,
                 SettingsPage.KEYBOARD,
             ),
@@ -1924,6 +1932,22 @@ class SettingsPageViewModel(
                 Res.string.highlight_crossing_clue_desc,
                 settings.liveClueListHighlightCrossingClue.stateInHereBool(),
                 settings::setClueListHighlightCrossingClue,
+            ),
+
+            // Action Buttons
+            SettingsBoolean(
+                SettingsPage.ACTION_BUTTONS,
+                Res.string.announce_clue_button,
+                Res.string.announce_clue_button_desc,
+                settings.liveActionButtonAnnounceClue.stateInHereBool(),
+                settings::setActionButtonAnnounceClue,
+            ),
+            SettingsBoolean(
+                SettingsPage.ACTION_BUTTONS,
+                Res.string.voice_with_button,
+                Res.string.voice_with_button_desc,
+                settings.liveActionButtonVoiceInput.stateInHereBool(),
+                settings::setActionButtonVoiceInput,
             ),
 
             // Keyboard
