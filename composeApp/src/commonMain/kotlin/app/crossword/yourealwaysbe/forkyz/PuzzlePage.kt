@@ -25,6 +25,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -85,6 +86,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.help_external_
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.help_fifteen_squared
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.help_query_llm_agent
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_announce
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_scratch_mode
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_voice
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.info
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.initial_letter
@@ -117,6 +119,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_errors_fu
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.showing_errors
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.special_entry
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.support_puzzle_source
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.toggle_scratch_mode
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.unknown_hint
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.voice_command
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.website
@@ -435,6 +438,7 @@ class PuzzlePageScope(
     @OptIn(ExperimentalMaterial3Api::class)
     fun ActionButtons() {
         val state by viewModel.actionButtonState.collectAsStateWithLifecycle()
+        val menuState by viewModel.menuState.collectAsStateWithLifecycle()
 
         if (state.hasButtons) {
             Row(
@@ -454,6 +458,35 @@ class PuzzlePageScope(
                             painter = painterResource(Res.drawable.ic_announce),
                             contentDescription = stringResource(
                                 Res.string.announce_clue_label,
+                            ),
+                        )
+                    }
+                }
+                if (state.toggleScratchMode) {
+                    val isScratchMode by remember {
+                        derivedStateOf { menuState.isScratchMode }
+                    }
+                    val colors = if (isScratchMode) {
+                        IconButtonDefaults.filledIconButtonColors(
+                            containerColor
+                                = MaterialTheme.colorScheme.primaryContainer,
+                        )
+                    } else {
+                        IconButtonDefaults.filledIconButtonColors()
+                    }
+
+                    FilledIconButton(
+                        modifier = Modifier.padding(horizontal=10.dp)
+                            .width(50.dp),
+                        colors = colors,
+                        onClick = { viewModel.toggleScratchMode() },
+                    ) {
+                        Icon(
+                            modifier = Modifier.width(50.dp),
+                            painter
+                                = painterResource(Res.drawable.ic_scratch_mode),
+                            contentDescription = stringResource(
+                                Res.string.toggle_scratch_mode,
                             ),
                         )
                     }

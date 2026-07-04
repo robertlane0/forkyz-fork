@@ -1004,4 +1004,7 @@
     <!-- action buttons -->
     <string name="action_buttons">Action Buttons</string>
     <string name="action_buttons_desc">On-screen button shortcuts.</string>
+    <string name="action_button_toggle_scratch_mode">Scratch Mode</string>
+    <string name="action_button_toggle_scratch_mode_desc">Action button to toggle scratch mode.</string>
+    <string name="toggle_scratch_mode">Toggle Scratch Mode</string>
 </resources>

@@ -28,6 +28,8 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.aard2
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.about_forkyz
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.about_scrapes
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.about_voice_commands
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.action_button_toggle_scratch_mode
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.action_button_toggle_scratch_mode_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.action_buttons
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.action_buttons_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.announce_box_always
@@ -1941,6 +1943,13 @@ class SettingsPageViewModel(
                 Res.string.announce_clue_button_desc,
                 settings.liveActionButtonAnnounceClue.stateInHereBool(),
                 settings::setActionButtonAnnounceClue,
+            ),
+            SettingsBoolean(
+                SettingsPage.ACTION_BUTTONS,
+                Res.string.action_button_toggle_scratch_mode,
+                Res.string.action_button_toggle_scratch_mode_desc,
+                settings.liveActionButtonToggleScratchMode.stateInHereBool(),
+                settings::setActionButtonToggleScratchMode,
             ),
             SettingsBoolean(
                 SettingsPage.ACTION_BUTTONS,

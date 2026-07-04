@@ -48,6 +48,7 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         = settingsMap {
             ActionButtonSettings(
                 announceClue = it.actionButtonAnnounceClue,
+                toggleScratchMode = it.actionButtonToggleScratchMode,
                 voiceInput = it.actionButtonVoiceInput,
             )
         }
@@ -58,6 +59,15 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     fun setActionButtonVoiceInput(value : Boolean) {
         settingsUpdate { settings ->
             settings.copy(actionButtonVoiceInput = value)
+        }
+    }
+
+    val liveActionButtonToggleScratchMode : Flow<Boolean>
+        = settingsMap { it.actionButtonToggleScratchMode }
+
+    fun setActionButtonToggleScratchMode(value : Boolean) {
+        settingsUpdate { settings ->
+            settings.copy(actionButtonToggleScratchMode = value)
         }
     }
 
@@ -2230,6 +2240,15 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             { key -> builder?.put(key, settings?.actionButtonAnnounceClue) },
             { key ->
                 json?.ifHasBoolean(key) { setActionButtonAnnounceClue(it) }
+            },
+        )
+        run(
+            "actionButtonToggleScratchMode",
+            { key ->
+                builder?.put(key, settings?.actionButtonToggleScratchMode)
+            },
+            { key ->
+                json?.ifHasBoolean(key) { setActionButtonToggleScratchMode(it) }
             },
         )
         run(

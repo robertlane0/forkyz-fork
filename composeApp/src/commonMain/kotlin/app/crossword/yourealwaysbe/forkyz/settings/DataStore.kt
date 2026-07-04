@@ -19,6 +19,7 @@ private val CURRENT_SETTINGS_VERSION = 3
 
 val DEFAULT_SETTINGS : Settings = Settings(
     actionButtonAnnounceClue = false,
+    actionButtonToggleScratchMode = false,
     actionButtonVoiceInput = false,
     alwaysAnnounceBox = false,
     alwaysAnnounceClue = false,
