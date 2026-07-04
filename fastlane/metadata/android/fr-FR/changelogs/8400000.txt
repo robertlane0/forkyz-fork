@@ -1,0 +1,8 @@
+- Ajouter des attaches clavier configurables (matériel).
+- Ajoutez un mot complet aux erreurs.
+- Ajouter copie-clue pour partager le menu.
+- Raffinez "par source".
+- Prise en charge du clic intermédiaire (comme la longue pression) sur le bureau.
+- Séparer la sortie de l'arrière/évasion avec l'option menu sur le bureau.
+
+Changelog traduit automatiquement avec Argos Translate.

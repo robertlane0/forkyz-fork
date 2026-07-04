@@ -1,5 +1,14 @@
 # Forkyz Changelog
 
+## Version 84
+
+- Add configurable (hardware) keyboard bindings.
+- Add show errors full word.
+- Add copy-clue to share menu.
+- Refine "by source" sort order.
+- Support middle-click (like long-press) on desktop.
+- Make exit separate from back/escape with menu option on desktop.
+
 ## Version 83
 
 - Final backend changes required to make Forkyz a multiplatform project.
