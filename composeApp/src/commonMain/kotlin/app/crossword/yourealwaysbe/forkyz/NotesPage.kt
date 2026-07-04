@@ -267,8 +267,7 @@ fun NotesPage(
                 MenuCellFlagToggle()
                 if (focussedEntry == NoteEntry.BOARD)
                     MenuSpecialEntry()
-                MenuShowErrors()
-                MenuReveal()
+                MenuHint()
                 MenuExternalTools()
                 val uiState
                     by viewModel.notesUIState.collectAsStateWithLifecycle()
@@ -288,8 +287,7 @@ fun NotesPage(
                 MenuExit(utils)
             }
             MenuNotesSub()
-            MenuShowErrorsSub()
-            MenuRevealSub()
+            MenuHintSub()
             MenuExternalToolsSub(
                 onCallExternalDictionary = ::callExternalDictionary,
                 onCallCrosswordSolver = ::callCrosswordSolver,

@@ -51,16 +51,23 @@ fun MenuSubEntry(
 @Composable
 fun MenuDropdownHeading(
     titleId : StringResource,
-    onClick : () -> Unit,
+    onClick : () -> Unit = { },
+    withBack : Boolean = true
 ) {
+    val leadingIcon : (@Composable () -> Unit)? = if (withBack) {
+        {
+            Icon(
+                painter = painterResource(Res.drawable.ic_submenu),
+                modifier = Modifier.rotate(180f),
+                contentDescription = null,
+            )
+        }
+    } else {
+        null
+    }
+
     DropdownMenuItem(
-        leadingIcon = {
-                Icon(
-                    painter = painterResource(Res.drawable.ic_submenu),
-                    modifier = Modifier.rotate(180f),
-                    contentDescription = null,
-                )
-        },
+        leadingIcon = leadingIcon,
         text = {
             Text(
                 stringResource(titleId),

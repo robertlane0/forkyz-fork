@@ -731,13 +731,15 @@
     <string name="zoom_out">Zoom Out</string>
     <string name="fit_to_screen">Fit to Screen</string>
     <string name="zoom_reset">Zoom Reset</string>
+    <string name="scratch_mode">Scratch Mode</string>
+    <string name="menu_hint">Hint</string>
+    <string name="menu_hinting">Hinting</string>
     <string name="show_errors">Show Errors</string>
     <string name="showing_errors">Showing Errors</string>
     <string name="show_errors_full_grid">Grid</string>
     <string name="show_errors_cursor">Cursor</string>
     <string name="show_errors_filled_word_cells">Filled Word (Cells)</string>
     <string name="show_errors_filled_word_word">Filled Word (Word)</string>
-    <string name="scratch_mode">Scratch Mode</string>
     <string name="reveal">Reveal</string>
     <string name="initial_letter">Initial Letter</string>
     <string name="initial_letters">Initial Letters</string>

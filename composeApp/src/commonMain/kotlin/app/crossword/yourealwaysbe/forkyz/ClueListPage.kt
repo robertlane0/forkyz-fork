@@ -190,8 +190,7 @@ fun ClueListPage(
                 MenuNotes()
                 MenuScratchMode()
                 MenuSpecialEntry()
-                MenuShowErrors()
-                MenuReveal()
+                MenuHint()
                 MenuExternalTools()
                 MenuShowAllWords()
                 MenuEditClue()
@@ -203,8 +202,7 @@ fun ClueListPage(
                 MenuExit(utils)
             }
             MenuNotesSub()
-            MenuShowErrorsSub()
-            MenuRevealSub()
+            MenuHintSub()
             MenuExternalToolsSub()
             MenuShareSub()
         }

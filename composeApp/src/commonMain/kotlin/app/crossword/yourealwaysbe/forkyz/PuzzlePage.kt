@@ -24,6 +24,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LocalContentColor
@@ -101,6 +102,8 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.menu_notes_clu
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.menu_notes_puzzle
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ok
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.puzzle
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_errors
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.showing_errors
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.reveal
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.reveal_puzzle
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.scratch_mode
@@ -111,12 +114,12 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_puzzle_f
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_puzzle_open_share_url
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_puzzle_orig
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_puzzle_without_extensions
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_errors
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.menu_hint
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.menu_hinting
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_errors_cursor
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_errors_filled_word_cells
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_errors_filled_word_word
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_errors_full_grid
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.showing_errors
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.special_entry
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.support_puzzle_source
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.toggle_scratch_mode
@@ -663,49 +666,71 @@ class PuzzlePageScope(
     }
 
     @Composable
-    fun MenuShowErrors() {
+    fun MenuHint() {
         val state by viewModel.menuState.collectAsStateWithLifecycle()
-        val enabled by remember {
-            derivedStateOf { state.showErrorsState.enabled }
+        val canHint by remember {
+            derivedStateOf { state.canReveal || state.showErrorsState.enabled }
         }
-        if (!enabled)
+        if (!canHint)
             return
 
-
-        val isShowing by remember {
+        val isShowingErrors by remember {
             derivedStateOf { state.showErrorsState.isShowing }
         }
         MenuSubEntry(
             text = {
-                if (isShowing)
-                    MenuText(stringResource(Res.string.showing_errors))
-                else
-                    MenuText(stringResource(Res.string.show_errors))
+                if (isShowingErrors) {
+                    MenuText(stringResource(Res.string.menu_hinting))
+                } else {
+                    MenuText(stringResource(Res.string.menu_hint))
+                }
             },
-            onClick = { viewModel.expandMenu(PuzzleSubMenu.SHOW_ERRORS) },
+            onClick = { viewModel.expandMenu(PuzzleSubMenu.HINT) },
         )
     }
 
     @Composable
-    fun MenuShowErrorsSub() {
+    fun MenuHintSub() {
         val state by viewModel.menuState.collectAsStateWithLifecycle()
-        val showErrorsState by remember {
-            derivedStateOf { state.showErrorsState }
-        }
-        if (!showErrorsState.enabled)
+        val canReveal by remember { derivedStateOf { state.canReveal } }
+        if (!canReveal)
             return
 
         val expanded by remember {
-            derivedStateOf { state.expanded == PuzzleSubMenu.SHOW_ERRORS }
+            derivedStateOf { state.expanded == PuzzleSubMenu.HINT }
         }
         DropdownMenu(
             modifier = BaseMenuModifier,
             expanded = expanded,
             onDismissRequest = viewModel::dismissMenu,
         ) {
+            val showErrorsState by remember {
+                derivedStateOf { state.showErrorsState }
+            }
+            val isShowingErrors by remember {
+                derivedStateOf { showErrorsState.isShowing }
+            }
+
+            val menuHintHeading = if (isShowingErrors)
+                Res.string.menu_hinting
+            else
+                Res.string.menu_hint
+
             MenuDropdownHeading(
-                Res.string.show_errors,
+                titleId = menuHintHeading,
                 onClick = viewModel::closeMenu,
+            )
+
+            HorizontalDivider()
+
+            val showErrorsHeading = if (isShowingErrors)
+                Res.string.showing_errors
+            else
+                Res.string.show_errors
+
+            MenuDropdownHeading(
+                titleId = showErrorsHeading,
+                withBack = false,
             )
             MenuCheckedItem(
                 checked = showErrorsState.isShowingErrorsCursor,
@@ -757,41 +782,14 @@ class PuzzlePageScope(
                     viewModel.dismissMenu()
                 }
             )
-        }
-    }
 
-    @Composable
-    fun MenuReveal() {
-        val state by viewModel.menuState.collectAsStateWithLifecycle()
-        val canReveal by remember { derivedStateOf { state.canReveal } }
-        if (!canReveal)
-            return
+            HorizontalDivider()
 
-        MenuSubEntry(
-            text = { MenuText(stringResource(Res.string.reveal)) },
-            onClick = { viewModel.expandMenu(PuzzleSubMenu.REVEAL) },
-        )
-    }
-
-    @Composable
-    fun MenuRevealSub() {
-        val state by viewModel.menuState.collectAsStateWithLifecycle()
-        val canReveal by remember { derivedStateOf { state.canReveal } }
-        if (!canReveal)
-            return
-
-        val expanded by remember {
-            derivedStateOf { state.expanded == PuzzleSubMenu.REVEAL }
-        }
-        DropdownMenu(
-            modifier = BaseMenuModifier,
-            expanded = expanded,
-            onDismissRequest = viewModel::dismissMenu,
-        ) {
             MenuDropdownHeading(
-                Res.string.reveal,
-                onClick = viewModel::closeMenu,
+                titleId = Res.string.reveal,
+                withBack = false,
             )
+
             val canRevealInitialBoxLetter by remember {
                 derivedStateOf { state.canRevealInitialBoxLetter }
             }
