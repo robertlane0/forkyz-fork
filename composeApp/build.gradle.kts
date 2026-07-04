@@ -17,9 +17,9 @@ plugins {
     alias(libs.plugins.versions)
 }
 
-val appName : String by project
-val appPackageName : String by project
-val appVersion : String by project
+val appName : String = providers.gradleProperty("appName").get()
+val appPackageName : String = providers.gradleProperty("appPackageName").get()
+val appVersion : String = providers.gradleProperty("appVersion").get()
 val appLibraryNamespace = "$appPackageName.lib"
 
 buildConfig {
@@ -83,7 +83,7 @@ kotlin {
             implementation(libs.compose.material3)
             implementation(libs.compose.navigation)
             implementation(libs.compose.navigationevent)
-            implementation(libs.datetime.wheel.picker)
+            implementation(libs.date.picker.spinner)
             implementation(libs.filekit.dialogs.compose)
             implementation(libs.htmlconverter)
             implementation(libs.json5)
