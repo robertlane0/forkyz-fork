@@ -747,7 +747,7 @@
     <string name="word">Word</string>
     <string name="errors">Errors</string>
     <string name="puzzle">Puzzle</string>
-    <string name="info">Info</string>
+    <string name="info">Puzzle Info</string>
     <string name="support_puzzle_source">Support Puzzle Source</string>
     <string name="menu_notes">Notes</string>
     <string name="external_tools">External Tools</string>
