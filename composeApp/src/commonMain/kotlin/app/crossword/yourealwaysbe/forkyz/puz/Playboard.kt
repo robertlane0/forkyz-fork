@@ -1329,6 +1329,64 @@ class Playboard(puzzle : Puzzle) {
         return prevWord
     }
 
+    /**
+     * Copy non-blank scratch to non-blank responses in current cell
+     *
+     * Does nothing if box has multiple conflicting non-blank scratch
+     * entries
+     */
+    fun promoteScratchCell(
+        position : Position = highlightLetter,
+    ) {
+        val box = puzzle.checkedGetBox(position)
+        if (box == null || !box.isBlank())
+            return
+
+        var response = Box.BLANK
+
+        for (cid in box.getIsPartOfClues()) {
+            val cluePosition = box.getCluePosition(cid)
+            val scratch = puzzle.getNote(cid)?.scratch
+            if (
+                scratch != null
+                && 0 <= cluePosition
+                && cluePosition < scratch.length
+            ) {
+                val newResponse = scratch[cluePosition].toString()
+                if (response == Box.BLANK) {
+                    response = newResponse
+                } else if (
+                    newResponse != Box.BLANK
+                    && response != newResponse
+                ) {
+                    // conflict, so do nothing
+                    return
+                }
+            }
+        }
+
+        if (response != Box.BLANK) {
+            box.response = response
+            flagChange(position)
+            notifyChange()
+        }
+    }
+
+    /**
+     * Copy non-blank scratch to non-blank responses in current word
+     */
+    fun promoteScratchCurrentWord() {
+        for (pos in (currentZone ?: emptyList()))
+            promoteScratchCell(pos)
+    }
+
+    /**
+     * Copy non-blank scratch to non-blank responses in current word
+     */
+    fun promoteScratchGrid() {
+        puzzle.forEachPosition { promoteScratchCell(it) }
+    }
+
     fun previousLetter() : Word {
         return movementStrategy.back(this)
     }

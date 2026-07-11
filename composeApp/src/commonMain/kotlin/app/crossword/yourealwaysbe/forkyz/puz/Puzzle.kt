@@ -585,6 +585,14 @@ class Puzzle(var boxes : Array<Array<Box?>>) {
         _images.add(image)
     }
 
+    fun forEachPosition(cb : (Position) -> Unit) {
+        for (row in 0 until height) {
+            for (col in 0 until width) {
+                cb(Position(row, col))
+            }
+        }
+    }
+
     override fun equals(other : Any?) : Boolean {
         if (this === other) {
             return true
