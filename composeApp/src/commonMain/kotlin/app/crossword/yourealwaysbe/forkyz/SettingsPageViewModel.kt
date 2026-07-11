@@ -173,6 +173,8 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.delete_on_clea
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.delete_on_cleanup_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.desktop_settings
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.desktop_settings_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.development_site
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.development_site_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.dictionary_none
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.disable_ratings
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.disable_ratings_desc
@@ -583,6 +585,8 @@ import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.mediate
 import app.crossword.yourealwaysbe.forkyz.util.stateInSubscribed
 
+private val DEVELOPMENT_URL = "https://gitlab.com/Hague/forkyz"
+
 data class SettingsPage(val title : StringResource) {
     companion object {
         val ROOT = SettingsPage(Res.string.settings_label)
@@ -831,6 +835,13 @@ class SettingsHTMLPage(
         htmlPage : HTMLFile,
     ) : this(page, title, null, htmlPage)
 }
+
+class SettingsOpenURI(
+    page : SettingsPage,
+    title : StringResource,
+    summary : StringResource?,
+    val uri : Uri,
+) : SettingsNamedItem(page, title, summary)
 
 class SettingsDivider(
     page : SettingsPage,
@@ -1331,6 +1342,12 @@ class SettingsPageViewModel(
             SettingsHeading(
                 SettingsPage.ROOT,
                 Res.string.about_forkyz,
+            ),
+            SettingsOpenURI(
+                SettingsPage.ROOT,
+                Res.string.development_site,
+                Res.string.development_site_desc,
+                Uri.parse(DEVELOPMENT_URL),
             ),
             SettingsHTMLPage(
                 SettingsPage.ROOT,

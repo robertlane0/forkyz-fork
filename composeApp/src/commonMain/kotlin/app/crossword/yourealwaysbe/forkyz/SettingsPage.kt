@@ -488,6 +488,17 @@ fun SettingsPage(
                             },
                         )
                     }
+                    is SettingsOpenURI -> {
+                        SettingsClickable(
+                            modifier = modifier,
+                            title = title,
+                            summary = summary,
+                            errorMsg = errorMsg?.value,
+                            onClick = {
+                                pageOpener.openURI(item.uri)
+                            },
+                        )
+                    }
                     is SettingsAction -> {
                         SettingsClickable(
                             modifier = modifier,
