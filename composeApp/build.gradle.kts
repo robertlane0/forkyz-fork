@@ -15,6 +15,7 @@ plugins {
     alias(libs.plugins.wire)
     alias(libs.plugins.buildconfig)
     alias(libs.plugins.versions)
+    alias(libs.plugins.aboutlibraries)
 }
 
 val appName : String = providers.gradleProperty("appName").get()
@@ -68,6 +69,8 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
+            implementation(libs.aboutlibraries.compose.m3)
+            implementation(libs.aboutlibraries.core)
             implementation(libs.androidx.concurrent.futures)
             implementation(libs.androidx.datastore.core.okio)
             implementation(libs.androidx.lifecycle.runtime.compose)

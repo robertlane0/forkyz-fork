@@ -960,6 +960,9 @@
     <string name="logcat">Logcat</string>
     <string name="share_logcat">Share Logcat</string>
 
+    <!-- AboutLibraries activity -->
+    <string name="about_libraries">About Libraries</string>
+
     <!-- downloaders -->
     <string name="nrc">NRC</string>
     <string name="nrc_scrypto_title">Scrypto</string>

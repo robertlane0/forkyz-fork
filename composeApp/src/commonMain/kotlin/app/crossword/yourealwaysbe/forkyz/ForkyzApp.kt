@@ -67,6 +67,9 @@ internal object Settings
 internal data class HTML(val unqualifiedFileName : String)
 @Serializable
 internal object Logcat
+@Serializable
+internal object AboutLibraries
+
 
 /**
  * Page open funs
@@ -85,6 +88,7 @@ data class PageOpener(
     val openReleaseNotes : () -> Unit,
     val openSettingsPage : () -> Unit,
     val openLogcatPage : () -> Unit,
+    val openAboutLibrariesPage : () -> Unit,
     val onBack : () -> Unit,
 )
 
@@ -160,6 +164,9 @@ private fun ForkyzAppMain(
         openReleaseNotes = { openHTMLPage(HTMLFile.RELEASE_NOTES) },
         openSettingsPage = { navController.navigate(route = Settings) },
         openLogcatPage = { navController.navigate(route = Logcat) },
+        openAboutLibrariesPage = {
+            navController.navigate(route = AboutLibraries)
+        },
         onBack = ::doBackAction,
     )
 
@@ -246,6 +253,15 @@ private fun ForkyzAppMain(
                 themeHelper = themeHelper,
                 utils = utils,
                 onShareFile = utils::onShareFile,
+                onBack = ::doBackAction,
+            )
+        }
+        composable<AboutLibraries> {
+            val viewModel = koinViewModel<AboutLibrariesPageViewModel>()
+            AboutLibrariesPage(
+                viewModel = viewModel,
+                themeHelper = themeHelper,
+                utils = utils,
                 onBack = ::doBackAction,
             )
         }

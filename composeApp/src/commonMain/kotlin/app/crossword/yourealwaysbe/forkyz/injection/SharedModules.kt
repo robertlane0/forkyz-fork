@@ -6,6 +6,7 @@ import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
+import app.crossword.yourealwaysbe.forkyz.AboutLibrariesPageViewModel
 import app.crossword.yourealwaysbe.forkyz.BrowsePageViewModel
 import app.crossword.yourealwaysbe.forkyz.ClueListPageViewModel
 import app.crossword.yourealwaysbe.forkyz.ForkyzAppViewModel
@@ -26,6 +27,7 @@ val sharedModules = module {
     singleOf(::ForkyzSettings)
     singleOf(::ThemeHelper)
     singleOf(::DownloadersProvider)
+    viewModelOf(::AboutLibrariesPageViewModel)
     viewModelOf(::BrowsePageViewModel)
     viewModelOf(::ClueListPageViewModel)
     viewModelOf(::ForkyzAppViewModel)

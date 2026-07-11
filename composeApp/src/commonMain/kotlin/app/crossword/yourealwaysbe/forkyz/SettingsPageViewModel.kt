@@ -26,6 +26,7 @@ import org.jetbrains.compose.resources.StringResource
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.aard2
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.about_forkyz
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.about_libraries
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.about_scrapes
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.about_voice_commands
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.action_button_toggle_scratch_mode
@@ -852,6 +853,14 @@ class SettingsLogcat(
     title : StringResource,
 ) : SettingsNamedItem(page, title, null)
 
+/**
+ * Call page showing libaries
+ */
+class SettingsAboutLibraries(
+    page : SettingsPage,
+    title : StringResource,
+) : SettingsNamedItem(page, title, null)
+
 enum class RequestedURI {
     NONE, SAF, SETTINGS_EXPORT, SETTINGS_IMPORT, PUZZLES_EXPORT
 }
@@ -1332,6 +1341,10 @@ class SettingsPageViewModel(
                 SettingsPage.ROOT,
                 Res.string.license,
                 HTMLFile.LICENSE,
+            ),
+            SettingsAboutLibraries(
+                SettingsPage.ROOT,
+                Res.string.about_libraries,
             ),
             SettingsLogcat(
                 SettingsPage.ROOT,

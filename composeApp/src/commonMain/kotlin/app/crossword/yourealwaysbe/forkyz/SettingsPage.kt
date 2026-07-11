@@ -506,6 +506,15 @@ fun SettingsPage(
                             onClick = { pageOpener.openLogcatPage() },
                         )
                     }
+                    is SettingsAboutLibraries -> {
+                        SettingsClickable(
+                            modifier = modifier,
+                            title = title,
+                            summary = summary,
+                            errorMsg = errorMsg?.value,
+                            onClick = { pageOpener.openAboutLibrariesPage() },
+                        )
+                    }
                     else -> { } /* ignore */
                 }
             }
