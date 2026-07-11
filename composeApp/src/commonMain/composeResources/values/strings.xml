@@ -718,6 +718,8 @@
     <string name="menu_notes_puzzle">Puzzle Notes</string>
     <string name="menu_flag_clue_toggle">Toggle Clue Flag</string>
     <string name="overflow">More Options</string>
+    <string name="promote_scratch_word">Promote Scratch Word</string>
+    <string name="promote_scratch_grid">Promote Scratch Grid</string>
 
     <!-- clue list menu -->
     <string name="show_all_words_clue_list">Show all words</string>

@@ -614,6 +614,14 @@ open class PuzzlePageViewModel(
         }
     }
 
+    fun promoteScratchCurrentWord() {
+        getBoard()?.promoteScratchCurrentWord()
+    }
+
+    fun promoteScratchGrid() {
+        getBoard()?.promoteScratchGrid()
+    }
+
     fun clearDialogMessage() {
         _dialogMessage.value = null
     }

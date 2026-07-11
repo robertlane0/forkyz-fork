@@ -97,13 +97,15 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.mcp_start
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.mcp_stop
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.menu_flag_cell_toggle
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.menu_flag_clue_toggle
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.menu_hint
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.menu_hinting
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.menu_notes
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.menu_notes_clue
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.menu_notes_puzzle
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ok
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.promote_scratch_grid
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.promote_scratch_word
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.puzzle
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_errors
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.showing_errors
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.reveal
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.reveal_puzzle
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.scratch_mode
@@ -114,12 +116,12 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_puzzle_f
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_puzzle_open_share_url
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_puzzle_orig
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_puzzle_without_extensions
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.menu_hint
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.menu_hinting
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_errors
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_errors_cursor
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_errors_filled_word_cells
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_errors_filled_word_word
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_errors_full_grid
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.showing_errors
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.special_entry
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.support_puzzle_source
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.toggle_scratch_mode
@@ -632,6 +634,24 @@ class PuzzlePageScope(
                 },
                 onClick = {
                     viewModel.toggleCellFlag()
+                    viewModel.dismissMenu()
+                }
+            )
+            DropdownMenuItem(
+                text = {
+                    MenuText(stringResource(Res.string.promote_scratch_word))
+                },
+                onClick = {
+                    viewModel.promoteScratchCurrentWord()
+                    viewModel.dismissMenu()
+                }
+            )
+            DropdownMenuItem(
+                text = {
+                    MenuText(stringResource(Res.string.promote_scratch_grid))
+                },
+                onClick = {
+                    viewModel.promoteScratchGrid()
                     viewModel.dismissMenu()
                 }
             )
