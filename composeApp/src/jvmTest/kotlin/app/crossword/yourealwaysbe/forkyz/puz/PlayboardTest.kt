@@ -928,6 +928,185 @@ class PlayboardTest {
         )
     }
 
+    @TestWithAndWithoutBlockObjects
+    fun testPromoteScratchCellCopiesScratch(blockObjects : Boolean) {
+        val puz = loadTestPuz(blockObjects)
+        val board = Playboard(puz)
+
+        // row 0 across scratch "R" at (0,0), no conflicting down scratch
+        setAcrossScratchLetter(board, 0, 0, 'R')
+
+        board.promoteScratchCell(Position(0, 0))
+
+        assertBoxLetter(puz, 0, 0, "R")
+    }
+
+    @TestWithAndWithoutBlockObjects
+    fun testPromoteScratchCellNoScratchStaysBlank(blockObjects : Boolean) {
+        val puz = loadTestPuz(blockObjects)
+        val board = Playboard(puz)
+
+        board.promoteScratchCell(Position(0, 0))
+
+        assertBoxBlank(puz, 0, 0)
+    }
+
+    @TestWithAndWithoutBlockObjects
+    fun testPromoteScratchCellConflictNotCopied(blockObjects : Boolean) {
+        val puz = loadTestPuz(blockObjects)
+        val board = Playboard(puz)
+
+        // across and down scratch disagree at (0, 0)
+        setAcrossScratchLetter(board, 0, 0, 'R')
+        setDownScratchLetter(board, 0, 0, 'X')
+
+        board.promoteScratchCell(Position(0, 0))
+
+        assertBoxBlank(puz, 0, 0)
+    }
+
+    @TestWithAndWithoutBlockObjects
+    fun testPromoteScratchCellPreservesExistingResponse(
+        blockObjects : Boolean
+    ) {
+        val puz = loadTestPuz(blockObjects)
+        val board = Playboard(puz)
+
+        puz.checkedGetBox(0, 0)!!.response = "Z"
+        setAcrossScratchLetter(board, 0, 0, 'R')
+
+        board.promoteScratchCell(Position(0, 0))
+
+        assertBoxLetter(puz, 0, 0, "Z")
+    }
+
+    @TestWithAndWithoutBlockObjects
+    fun testPromoteScratchCurrentWord(blockObjects : Boolean) {
+        val puz = loadTestPuz(blockObjects)
+        val board = Playboard(puz)
+
+        // row 0, cols 0-4 is the across word under test ("1 Across")
+        //  col 0: plain scratch, should be promoted
+        //  col 1: conflicting down scratch, should be left blank
+        //  col 2: pre-existing response, should not be overwritten
+        //  cols 3-4: plain scratch, should be promoted
+        setAcrossScratch(board, 0, 0, "ABCDE")
+        setDownScratchLetter(board, 0, 1, 'X')
+        puz.checkedGetBox(0, 2)!!.response = "Z"
+
+        // unrelated crossing word (col 0, "1 Down") also has scratch,
+        // to confirm promoting the current word really is scoped to
+        // that word and doesn't also promote this one. First letter
+        // matches the across scratch at the shared cell (0, 0) so that
+        // cell isn't skipped as a conflict.
+        setDownScratch(board, 0, 0, "AXYZ")
+
+        moveToPosition(board, 0, 0)
+        if (board.clueID?.listName != "Across")
+            board.toggleSelection()
+        board.promoteScratchCurrentWord()
+
+        assertBoxLetter(puz, 0, 0, "A")
+        assertBoxBlank(puz, 0, 1)
+        assertBoxLetter(puz, 0, 2, "Z")
+        assertBoxLetter(puz, 0, 3, "D")
+        assertBoxLetter(puz, 0, 4, "E")
+
+        // unrelated crossing word should not have been promoted, despite
+        // having scratch of its own
+        assertBoxBlank(puz, 1, 0)
+        assertBoxBlank(puz, 2, 0)
+        assertBoxBlank(puz, 3, 0)
+    }
+
+    @TestWithAndWithoutBlockObjects
+    fun testPromoteScratchGrid(blockObjects : Boolean) {
+        val puz = loadTestPuz(blockObjects)
+        val board = Playboard(puz)
+
+        // first across word (row 0), same setup as testPromoteScratchCurrentWord
+        setAcrossScratch(board, 0, 0, "ABCDE")
+        setDownScratchLetter(board, 0, 1, 'X')
+        puz.checkedGetBox(0, 2)!!.response = "Z"
+
+        // second, unrelated across word (row 1, "14 Across"), no conflicts
+        setAcrossScratch(board, 1, 0, "FGHIJ")
+
+        // a third word left completely untouched
+        // (row 2, "17 Across")
+
+        board.promoteScratchGrid()
+
+        assertBoxLetter(puz, 0, 0, "A")
+        assertBoxBlank(puz, 0, 1)
+        assertBoxLetter(puz, 0, 2, "Z")
+        assertBoxLetter(puz, 0, 3, "D")
+        assertBoxLetter(puz, 0, 4, "E")
+
+        assertBoxLetter(puz, 1, 0, "F")
+        assertBoxLetter(puz, 1, 1, "G")
+        assertBoxLetter(puz, 1, 2, "H")
+        assertBoxLetter(puz, 1, 3, "I")
+        assertBoxLetter(puz, 1, 4, "J")
+
+        assertBoxBlank(puz, 2, 0)
+        assertBoxBlank(puz, 2, 1)
+    }
+
+    /**
+     * Set scratch letter for the across clue at the given position,
+     * switching direction if necessary. Does not change board position
+     * afterwards.
+     */
+    private fun setAcrossScratchLetter(
+        board : Playboard, row : Int, col : Int, letter : Char,
+    ) {
+        moveToPosition(board, row, col)
+        if (board.clueID?.listName != "Across")
+            board.toggleSelection()
+        board.playScratchLetter(letter)
+    }
+
+    /**
+     * Set scratch letter for the down clue at the given position,
+     * switching direction if necessary. Does not change board position
+     * afterwards.
+     */
+    private fun setDownScratchLetter(
+        board : Playboard, row : Int, col : Int, letter : Char,
+    ) {
+        moveToPosition(board, row, col)
+        if (board.clueID?.listName != "Down")
+            board.toggleSelection()
+        board.playScratchLetter(letter)
+    }
+
+    /**
+     * Set scratch letters for the across word starting at the given
+     * position
+     */
+    private fun setAcrossScratch(
+        board : Playboard, row : Int, col : Int, letters : String,
+    ) {
+        moveToPosition(board, row, col)
+        if (board.clueID?.listName != "Across")
+            board.toggleSelection()
+        board.playScratchLetters(letters)
+    }
+
+    /**
+     * Set scratch letters for the down word starting at the given
+     * position
+     */
+    private fun setDownScratch(
+        board : Playboard, row : Int, col : Int, letters : String,
+    ) {
+        moveToPosition(board, row, col)
+        if (board.clueID?.listName != "Down")
+            board.toggleSelection()
+        board.playScratchLetters(letters)
+    }
+
     private fun checkNoMoveFullGrid(
         blockObjects : Boolean, moveStrat : MovementStrategy
     ) {
