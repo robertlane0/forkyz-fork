@@ -21,6 +21,7 @@ import platform.Foundation.NSApplicationSupportDirectory
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSUserDomainMask
 
+import app.crossword.yourealwaysbe.forkyz.SettingsItem
 import app.crossword.yourealwaysbe.forkyz.SettingsLogcat
 import app.crossword.yourealwaysbe.forkyz.SettingsNamedItem
 import app.crossword.yourealwaysbe.forkyz.SettingsPage
@@ -30,7 +31,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.crossword_solv
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.external_dictionary
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_binding_announce_box
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_binding_announce_clue
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_binding_exit,import app.crossword.yourealwaysbe.forkyz.SettingsItem
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_binding_exit
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_binding_open_crossword_solver
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_binding_share_clue
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_binding_share_clue_with_board
