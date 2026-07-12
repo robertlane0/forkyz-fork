@@ -6,7 +6,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
@@ -28,6 +27,7 @@ import org.jetbrains.compose.resources.stringResource
 
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.app_name
+import app.crossword.yourealwaysbe.forkyz.theme.ForkyzScaffold
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 import app.crossword.yourealwaysbe.forkyz.util.NativeFrontendUtils
 import app.crossword.yourealwaysbe.forkyz.util.onKeyEventKeyboardBindings
@@ -73,7 +73,7 @@ fun HTMLPage(
     }
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-    Scaffold(
+    ForkyzScaffold(
         modifier = Modifier.nestedScroll(
             scrollBehavior.nestedScrollConnection
         ).onKeyEvent(::onKeyEvent),

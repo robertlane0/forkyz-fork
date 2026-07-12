@@ -24,7 +24,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -75,6 +74,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.filter_setting
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.storage_changed_please_restart
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.storage_changed_title
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.storage_select_saf_info
+import app.crossword.yourealwaysbe.forkyz.theme.ForkyzScaffold
 import app.crossword.yourealwaysbe.forkyz.theme.ForkyzTopAppBar
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 import app.crossword.yourealwaysbe.forkyz.util.NativeFrontendUtils
@@ -740,7 +740,7 @@ fun SettingsPage(
         rememberLazyListState()
     }
 
-    Scaffold(
+    ForkyzScaffold(
         topBar = { TopAppBar(scrollBehavior) },
         modifier = Modifier.nestedScroll(
             scrollBehavior.nestedScrollConnection

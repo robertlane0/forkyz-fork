@@ -39,7 +39,6 @@ import androidx.compose.material3.FloatingActionButtonMenuScope
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleFloatingActionButton
 import androidx.compose.material3.animateFloatingActionButton
@@ -159,6 +158,7 @@ import app.crossword.yourealwaysbe.forkyz.net.DownloadersProvider
 import app.crossword.yourealwaysbe.forkyz.settings.AccessorSetting
 import app.crossword.yourealwaysbe.forkyz.settings.BrowseSwipeAction
 import app.crossword.yourealwaysbe.forkyz.settings.DayNightMode
+import app.crossword.yourealwaysbe.forkyz.theme.ForkyzScaffold
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 import app.crossword.yourealwaysbe.forkyz.util.MATERIAL_MIN_CLICKABLE_DP
 import app.crossword.yourealwaysbe.forkyz.util.NativeFrontendUtils
@@ -1227,7 +1227,7 @@ fun BrowsePage(
     val toggleFAB = { fabMenuExpanded = !fabMenuExpanded }
     val primaryColor = MaterialTheme.colorScheme.primary
 
-    Scaffold(
+    ForkyzScaffold(
         modifier = Modifier.onKeyEvent(::onKeyEvent),
         topBar = { TopAppBar() },
         floatingActionButton = {

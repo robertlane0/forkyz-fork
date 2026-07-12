@@ -1,7 +1,9 @@
 
 package app.crossword.yourealwaysbe.forkyz.theme
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -10,6 +12,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
@@ -478,6 +481,27 @@ fun ForkyzTopAppBar(
         },
         actions = actions,
         scrollBehavior = scrollBehavior,
+    )
+}
+
+@Composable
+fun ForkyzScaffold(
+    modifier : Modifier = Modifier,
+    topBar : @Composable () -> Unit = { },
+    floatingActionButton : @Composable () -> Unit = { },
+    // pages already handle their own insets (e.g. statusBarsPadding,
+    // imePadding, ForkyzTopAppBar's own windowInsets), so don't let
+    // Scaffold reserve space for them again. On non-edge-to-edge
+    // platforms this is a no-op, but on edge-to-edge platforms (iOS)
+    // the default would double up and show as extra blank padding.
+    content : @Composable (PaddingValues) -> Unit,
+) {
+    Scaffold(
+        modifier = modifier,
+        topBar = topBar,
+        floatingActionButton = floatingActionButton,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        content = content,
     )
 }
 

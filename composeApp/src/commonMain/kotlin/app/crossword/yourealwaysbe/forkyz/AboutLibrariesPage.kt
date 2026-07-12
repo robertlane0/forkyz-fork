@@ -4,7 +4,6 @@ package app.crossword.yourealwaysbe.forkyz
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,6 +23,7 @@ import com.mikepenz.aboutlibraries.ui.compose.produceLibraries
 
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.about_libraries
+import app.crossword.yourealwaysbe.forkyz.theme.ForkyzScaffold
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 import app.crossword.yourealwaysbe.forkyz.util.NativeFrontendUtils
 import app.crossword.yourealwaysbe.forkyz.util.onKeyEventKeyboardBindings
@@ -55,7 +55,7 @@ fun AboutLibrariesPage(
         return false
     }
 
-    Scaffold(
+    ForkyzScaffold(
         modifier = Modifier.onKeyEvent(::onKeyEvent),
         topBar = {
             themeHelper.ForkyzTopAppBar(

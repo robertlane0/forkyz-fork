@@ -14,7 +14,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -40,6 +39,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.jump_to_end
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.logcat
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_logcat
+import app.crossword.yourealwaysbe.forkyz.theme.ForkyzScaffold
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 import app.crossword.yourealwaysbe.forkyz.util.NativeFrontendUtils
 import app.crossword.yourealwaysbe.forkyz.util.ShareFileData
@@ -97,7 +97,7 @@ fun LogcatPage(
         val listState = rememberLazyListState()
         val scope = rememberCoroutineScope()
 
-        Scaffold(
+        ForkyzScaffold(
             modifier = Modifier.nestedScroll(
                 scrollBehavior.nestedScrollConnection
             ).onKeyEvent(::onKeyEvent),

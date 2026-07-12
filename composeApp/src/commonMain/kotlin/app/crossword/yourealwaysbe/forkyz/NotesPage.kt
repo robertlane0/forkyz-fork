@@ -30,7 +30,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
@@ -88,6 +87,7 @@ import app.crossword.yourealwaysbe.forkyz.puz.Clue
 import app.crossword.yourealwaysbe.forkyz.puz.ClueID
 import app.crossword.yourealwaysbe.forkyz.puz.Playboard.Word
 import app.crossword.yourealwaysbe.forkyz.puz.Position
+import app.crossword.yourealwaysbe.forkyz.theme.ForkyzScaffold
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 import app.crossword.yourealwaysbe.forkyz.util.NativeFrontendUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
@@ -692,7 +692,7 @@ fun NotesPage(
             TransferConfirmationDialog()
         }
 
-        Scaffold(
+        ForkyzScaffold(
             modifier = Modifier.onKeyEvent(::onKeyEvent)
                 .imePadding()
                 .puzzleStatusBarColor(),
