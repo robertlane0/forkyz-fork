@@ -1,9 +1,11 @@
 
 package app.crossword.yourealwaysbe.forkyz.theme
 
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 
 import app.crossword.yourealwaysbe.forkyz.settings.Theme
 
@@ -18,8 +20,12 @@ actual fun AppTheme(
     darkMode : Boolean,
     content : @Composable() () -> Unit,
 ) {
-    MaterialTheme(
-        colorScheme = getColorScheme(appTheme, darkMode),
-        content = content,
-    )
+    CompositionLocalProvider(
+        LocalScaffoldContentWindowInsets provides WindowInsets(0, 0, 0, 0),
+    ) {
+        MaterialTheme(
+            colorScheme = getColorScheme(appTheme, darkMode),
+            content = content,
+        )
+    }
 }

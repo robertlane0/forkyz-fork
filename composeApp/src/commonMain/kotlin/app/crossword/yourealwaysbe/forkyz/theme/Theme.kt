@@ -13,6 +13,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
@@ -20,6 +21,7 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 
@@ -484,23 +486,33 @@ fun ForkyzTopAppBar(
     )
 }
 
+// pages already handle their own insets (e.g. statusBarsPadding,
+// imePadding, ForkyzTopAppBar's own windowInsets), so on platforms
+// where the default Scaffold insets would double up with that
+// manual handling (iOS), this is overridden to zero insets so
+// ForkyzScaffold stops reserving space for them again. Platforms
+// whose system bars are not otherwise accounted for (e.g. Android's
+// navigation bar) leave this null so Scaffold's normal defaults
+// still avoid drawing under them.
+val LocalScaffoldContentWindowInsets =
+    compositionLocalOf<WindowInsets?> { null }
+
 @Composable
 fun ForkyzScaffold(
     modifier : Modifier = Modifier,
     topBar : @Composable () -> Unit = { },
     floatingActionButton : @Composable () -> Unit = { },
-    // pages already handle their own insets (e.g. statusBarsPadding,
-    // imePadding, ForkyzTopAppBar's own windowInsets), so don't let
-    // Scaffold reserve space for them again. On non-edge-to-edge
-    // platforms this is a no-op, but on edge-to-edge platforms (iOS)
-    // the default would double up and show as extra blank padding.
     content : @Composable (PaddingValues) -> Unit,
 ) {
+    val contentWindowInsets =
+        LocalScaffoldContentWindowInsets.current
+            ?: ScaffoldDefaults.contentWindowInsets
+
     Scaffold(
         modifier = modifier,
         topBar = topBar,
         floatingActionButton = floatingActionButton,
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        contentWindowInsets = contentWindowInsets,
         content = content,
     )
 }
