@@ -4,7 +4,7 @@ import ComposeApp
 struct ContentView: SwiftUI.View {
     var body: some SwiftUI.View {
         ComposeView()
-            .ignoresSafeArea(.keyboard)
+            .ignoresSafeArea()
     }
 }
 
