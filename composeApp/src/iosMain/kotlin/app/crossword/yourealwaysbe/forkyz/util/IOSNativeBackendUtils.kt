@@ -125,7 +125,7 @@ class IOSNativeBackendUtils(
     }
 
     override fun getFilterClueToAlphabeticRegex() : String {
-        return "&[^;]*;|<[^>]*>|[^\\p{IsAlphabetic}]"
+        return "&[^;]*;|<[^>]*>|[^\\p{L}]"
     }
 
     override fun initialiseSAFForRoot(uri : Uri) : FileHandler? {
