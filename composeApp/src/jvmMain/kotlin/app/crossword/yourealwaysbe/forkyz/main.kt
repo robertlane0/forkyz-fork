@@ -108,7 +108,6 @@ private fun MainWindow(
     val activeToasts = remember { mutableStateListOf<String>() }
     var onImportComplete : ((Boolean) -> Unit)? = null
 
-    val density = androidx.compose.ui.unit.Density(density = 1.0F)
     val featureNotImplemented
         = stringResource(Res.string.feature_not_implemented)
     val announceNotImplemented
@@ -124,14 +123,10 @@ private fun MainWindow(
     val utils = object : NativeFrontendUtils {
         override val inputConnectionMediator = JVMInputConnectionMediator()
 
-        override val displayWidth : Int
-            get() {
-                return with(density) { windowState.size.width.roundToPx() }
-            }
-        override val displayHeight : Int
-            get() {
-                return with(density) { windowState.size.height.roundToPx() }
-            }
+        override val displayWidth : Dp
+            get() { return windowState.size.width }
+        override val displayHeight : Dp
+            get() { return windowState.size.height }
         override val isPortrait : Boolean
             get() { return displayWidth < displayHeight }
 

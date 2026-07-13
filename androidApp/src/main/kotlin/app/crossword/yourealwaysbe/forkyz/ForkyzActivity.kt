@@ -26,6 +26,8 @@ import androidx.activity.result.contract.ActivityResultContracts.RequestPermissi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.ShareCompat
 import androidx.core.content.ContextCompat
@@ -319,14 +321,14 @@ open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
     private val utils = object : NativeFrontendUtils {
         override val inputConnectionMediator = AndroidInputConnectionMediator()
 
-        override val displayWidth : Int by lazy {
+        override val displayWidth : Dp by lazy {
             val metrics = getResources().getDisplayMetrics()
-            (metrics.widthPixels / metrics.density).toInt()
+            (metrics.widthPixels / metrics.density).dp
         }
 
-        override val displayHeight : Int by lazy {
+        override val displayHeight : Dp by lazy {
             val metrics = getResources().getDisplayMetrics()
-            (metrics.heightPixels / metrics.density).toInt()
+            (metrics.heightPixels / metrics.density).dp
         }
 
         override val isPortrait : Boolean by lazy {

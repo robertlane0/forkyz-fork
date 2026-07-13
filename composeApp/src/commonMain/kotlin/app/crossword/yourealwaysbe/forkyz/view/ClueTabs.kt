@@ -64,11 +64,9 @@ import app.crossword.yourealwaysbe.forkyz.puz.Position
 import app.crossword.yourealwaysbe.forkyz.settings.ClueTabsDouble
 import app.crossword.yourealwaysbe.forkyz.theme.BoardColorScheme
 import app.crossword.yourealwaysbe.forkyz.util.MATERIAL_MIN_CLICKABLE_DP
+import app.crossword.yourealwaysbe.forkyz.util.WIDE_SCREEN_WIDTH_DP
 import app.crossword.yourealwaysbe.forkyz.util.onMiddleClick
 
-// from Android docs
-private val DP_PER_INCH = 160
-private val DOUBLE_UP_WIDTH_DP = (3 * DP_PER_INCH).dp
 private val FLAG_WIDTH = 2.sp
 private val CLUE_VERTICAL_PADDING = 4.sp
 private val CLUE_HORIZONTAL_PADDING = 16.dp
@@ -393,7 +391,7 @@ fun ClueTabs(
         return when(doubleMode) {
             ClueTabsDouble.CTD_ALWAYS -> true
             ClueTabsDouble.CTD_LANDSCAPE -> !isPortrait
-            ClueTabsDouble.CTD_WIDE -> maxWidth >= DOUBLE_UP_WIDTH_DP
+            ClueTabsDouble.CTD_WIDE -> maxWidth >= WIDE_SCREEN_WIDTH_DP
             else -> false
         }
     }

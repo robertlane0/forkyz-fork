@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.ComposeUIViewController
 
@@ -95,17 +96,17 @@ private fun MainContent() {
         override val inputConnectionMediator = IOSInputConnectionMediator()
 
         @OptIn(ExperimentalForeignApi::class)
-        override val displayWidth : Int
+        override val displayWidth : Dp
             get() {
                 return UIScreen.mainScreen.bounds
-                    .useContents { size.width.toInt() }
+                    .useContents { size.width.dp }
             }
 
         @OptIn(ExperimentalForeignApi::class)
-        override val displayHeight : Int
+        override val displayHeight : Dp
             get() {
                 return UIScreen.mainScreen.bounds
-                    .useContents { size.height.toInt() }
+                    .useContents { size.height.dp }
             }
 
         override val isPortrait : Boolean

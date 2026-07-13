@@ -541,10 +541,6 @@ fun PlayPage(
             return if (x > y) x else y
         }
 
-        fun fracDp(frac : Double, fracOf : Int) : Dp {
-            return (frac * fracOf).toInt().dp
-        }
-
         @Composable
         fun Modifier.boardHeightPortrait(
             width : Dp,
@@ -563,19 +559,19 @@ fun PlayPage(
 
             val desiredHeight = if (isAcrostic) {
                 val minHeight
-                    = ACROSTIC_BOARD_HEIGHT_RATIO_MIN * utils.displayHeight
+                    =  utils.displayHeight * ACROSTIC_BOARD_HEIGHT_RATIO_MIN
                 val aspectHeight = width / aspect
-                max(minHeight.dp, aspectHeight)
+                max(minHeight, aspectHeight)
             } else if (showClueTabs) {
                 val portraitGridRatio by remember {
                     derivedStateOf { state.portraitGridRatio }
                 }
                 when (portraitGridRatio) {
                     GridRatio.GR_ONE_TO_ONE -> width
-                    GridRatio.GR_THIRTY_PCNT -> fracDp(0.3, utils.displayHeight)
-                    GridRatio.GR_FORTY_PCNT -> fracDp(0.4, utils.displayHeight)
-                    GridRatio.GR_FIFTY_PCNT -> fracDp(0.5, utils.displayHeight)
-                    GridRatio.GR_SIXTY_PCNT -> fracDp(0.6, utils.displayHeight)
+                    GridRatio.GR_THIRTY_PCNT -> utils.displayHeight * 0.3F
+                    GridRatio.GR_FORTY_PCNT -> utils.displayHeight * 0.4F
+                    GridRatio.GR_FIFTY_PCNT -> utils.displayHeight * 0.5F
+                    GridRatio.GR_SIXTY_PCNT -> utils.displayHeight * 0.6F
                     else -> width / aspect
                 }
             } else {
@@ -599,9 +595,8 @@ fun PlayPage(
             }
 
             if (isAcrostic) {
-                val maxWidth = (
-                    ACROSTIC_BOARD_WIDTH_RATIO_MAX * utils.displayWidth
-                ).toInt().dp
+                val maxWidth
+                    = utils.displayWidth * ACROSTIC_BOARD_WIDTH_RATIO_MAX
                 return this.aspectRatio(aspect).widthIn(max=maxWidth)
             } else if (showClueTabs) {
                 val landscapeGridRatio by remember {

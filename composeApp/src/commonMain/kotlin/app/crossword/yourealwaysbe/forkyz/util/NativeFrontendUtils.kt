@@ -2,6 +2,7 @@
 package app.crossword.yourealwaysbe.forkyz.util
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 
 import app.crossword.yourealwaysbe.forkyz.exttools.AppNotFoundException
 import app.crossword.yourealwaysbe.forkyz.exttools.ExternalToolData
@@ -20,8 +21,8 @@ data class NativeImportFinishedResult(
 
 interface NativeFrontendUtils {
     val inputConnectionMediator : InputConnectionMediator
-    val displayWidth : Int
-    val displayHeight : Int
+    val displayWidth : Dp
+    val displayHeight : Dp
     val isPortrait : Boolean
     val isExitAfterPendingImports : Boolean
     val hasExitMenuItem : Boolean
