@@ -39,6 +39,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_nativ
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_split_words
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_use_native
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.random_clue_on_shake
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_settings
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation
@@ -232,6 +233,7 @@ class JVMNativeBackendUtils(
                             Res.string.keyboard_split_words,
                             Res.string.keyboard_use_native,
                             Res.string.random_clue_on_shake,
+                            Res.string.share_settings,
                         )
                     }
                     else -> true

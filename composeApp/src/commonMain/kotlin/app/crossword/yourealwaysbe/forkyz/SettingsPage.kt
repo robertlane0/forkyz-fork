@@ -71,13 +71,16 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.exit
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.failed_to_initialise_saf
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.filter_settings_hint
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_settings
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.storage_changed_please_restart
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.storage_changed_title
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.storage_select_saf_info
+import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.theme.ForkyzScaffold
 import app.crossword.yourealwaysbe.forkyz.theme.ForkyzTopAppBar
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 import app.crossword.yourealwaysbe.forkyz.util.NativeFrontendUtils
+import app.crossword.yourealwaysbe.forkyz.util.ShareFileData
 import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.onKeyEventKeyboardBindings
 import app.crossword.yourealwaysbe.forkyz.util.toUri
@@ -92,8 +95,6 @@ private val SETTINGS_VERTICAL_PADDING = 14.dp
 private val SWITCH_PADDING = 4.dp
 
 private val TAG = "ForkyzSettingsPage"
-private val SETTINGS_DEFAULT_FILENAME = "forkyz_settings"
-private val SETTINGS_DEFAULT_EXT = "json"
 // allow import of all docs (parser will take care of detecting if it's a
 // puzzle that's recognised)
 private val IMPORT_MIME_TYPE =  "*/*"
@@ -334,8 +335,8 @@ fun SettingsPage(
             RequestedURI.SETTINGS_EXPORT -> {
                 LaunchedEffect(needsURI) {
                     settingsExportLauncher.launch(
-                        suggestedName = SETTINGS_DEFAULT_FILENAME,
-                        defaultExtension = SETTINGS_DEFAULT_EXT,
+                        suggestedName = ForkyzSettings.EXPORT_FILENAME,
+                        defaultExtension = ForkyzSettings.EXPORT_EXT,
                     )
                     viewModel.clearNeedsURI()
                 }
@@ -364,6 +365,20 @@ fun SettingsPage(
         LaunchedEffect(messages) {
             messages.forEach(utils::toast)
             viewModel.clearMessages()
+        }
+    }
+
+    @Composable
+    fun ShareSettings() {
+        val event by viewModel.shareSettingsEvent.collectAsStateWithLifecycle()
+        val title = stringResource(Res.string.share_settings)
+        LaunchedEffect(event) {
+            event?.let { event ->
+                utils.onShareFile(
+                    ShareFileData(title, event.uri, event.mimeType),
+                )
+                viewModel.clearShareSettingsEvent()
+            }
         }
     }
 
@@ -734,6 +749,7 @@ fun SettingsPage(
 
     LaunchForExternalResults()
     ShowMessages()
+    ShareSettings()
 
     HandleBack()
 

@@ -11,6 +11,7 @@ import kotlinx.io.writeString
 
 import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.puz.io.IPuzIO
+import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.AppPuzzleUtils.generateFileName
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
@@ -23,6 +24,7 @@ object FileHandlerShared {
 
     private const val LOGCAT_FILENAME = "logcat.txt"
     const val LOGCAT_SHARE_URI_MIME_TYPE = "text/plain"
+    const val SETTINGS_SHARE_URI_MIME_TYPE = "application/json"
     const val SHARE_URI_MIME_TYPE = FileHandler.MIME_TYPE_IPUZ
 
     // clear older than 1 hour
@@ -82,6 +84,25 @@ object FileHandlerShared {
         }
     }
 
+    /**
+     * Save settings to cache and get Uri for sharing
+     *
+     * Runs off main thread to save file, calls back on main thread with
+     * uriCallback.
+     */
+    fun getSettingsShareUri(
+        scope : CoroutineScope,
+        utils : NativeBackendUtils,
+        settings : ForkyzSettings,
+        uriCallback : (Uri?) -> Unit,
+    ) {
+        scope.launch(ioDispatcher) {
+            cleanCache(utils)
+            val uri = getSettingsShareUriBackground(utils, settings)
+            scope.launch(Dispatchers.Main) { uriCallback(uri) }
+        }
+    }
+
     private fun getShareUriBackground(
         utils : NativeBackendUtils,
         puz : Puzzle,
@@ -122,6 +143,30 @@ object FileHandlerShared {
             shareFile.sink().buffered().use { output ->
                 for (line in logcat)
                     output.writeString(line + "\n")
+            }
+        } catch (e : IOException) {
+            AppLogger.e(TAG, "Could not create file for sharing : " + e)
+            return null
+        }
+
+        return utils.getShareURIForFile(shareFile)
+    }
+
+    private fun getSettingsShareUriBackground(
+        utils : NativeBackendUtils,
+        settings : ForkyzSettings,
+    ) : Uri? {
+        val shareDir = utils.getShareDir()
+        if (shareDir == null)
+            return null
+
+        val shareFileName
+            = ForkyzSettings.EXPORT_FILENAME + "." + ForkyzSettings.EXPORT_EXT
+        val shareFile = File(shareDir, shareFileName)
+
+        try {
+            shareFile.sink().buffered().use { output ->
+                settings.exportSettings(output)
             }
         } catch (e : IOException) {
             AppLogger.e(TAG, "Could not create file for sharing : " + e)

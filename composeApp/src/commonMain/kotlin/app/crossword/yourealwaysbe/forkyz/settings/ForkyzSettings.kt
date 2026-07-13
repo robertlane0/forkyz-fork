@@ -2097,6 +2097,11 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         }
     }
 
+    companion object {
+        const val EXPORT_FILENAME = "forkyz_settings"
+        const val EXPORT_EXT = "json"
+    }
+
     fun exportSettings(output : Sink?) {
         if (output == null)
             return

@@ -46,6 +46,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_nativ
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_split_words
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_use_native
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.random_clue_on_shake
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_settings
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.storage_location
 import app.crossword.yourealwaysbe.forkyz.settings.FileHandlerSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
@@ -212,16 +213,11 @@ class IOSNativeBackendUtils(
                     is SettingsLogcat -> false
                     is SettingsNamedItem -> {
                         item.title !in listOf(
-                            Res.string.external_dictionary,
                             Res.string.crossword_solver_enabled,
-                            Res.string.random_clue_on_shake,
-                            Res.string.keyboard_use_native,
-                            Res.string.keyboard_native,
-                            Res.string.keyboard_force_caps,
-                            Res.string.keyboard_split_words,
-                            Res.string.storage_location,
+                            Res.string.external_dictionary,
                             Res.string.keyboard_binding_announce_box,
                             Res.string.keyboard_binding_announce_clue,
+                            Res.string.keyboard_binding_exit,
                             Res.string.keyboard_binding_open_crossword_solver,
                             Res.string.keyboard_binding_share_clue,
                             Res.string.keyboard_binding_share_clue_with_board,
@@ -230,7 +226,13 @@ class IOSNativeBackendUtils(
                             Res.string.keyboard_binding_share_puzzle_no_ipuz,
                             Res.string.keyboard_binding_share_puzzle_original,
                             Res.string.keyboard_binding_voice_input,
-                            Res.string.keyboard_binding_exit,
+                            Res.string.keyboard_force_caps,
+                            Res.string.keyboard_native,
+                            Res.string.keyboard_split_words,
+                            Res.string.keyboard_use_native,
+                            Res.string.random_clue_on_shake,
+                            Res.string.share_settings,
+                            Res.string.storage_location,
                         )
                     }
                     else -> true

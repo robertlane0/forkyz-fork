@@ -508,6 +508,8 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.scroll_to_clue
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.select_sources
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.select_sources_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.settings_label
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_settings
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.share_settings_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.sheffer_crossword
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_length
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.show_length_desc
@@ -592,6 +594,7 @@ import app.crossword.yourealwaysbe.forkyz.util.ForkyzKey
 import app.crossword.yourealwaysbe.forkyz.util.NativeBackendUtils
 import app.crossword.yourealwaysbe.forkyz.util.TimeUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
+import app.crossword.yourealwaysbe.forkyz.util.files.FileHandlerShared
 import app.crossword.yourealwaysbe.forkyz.util.mediate
 import app.crossword.yourealwaysbe.forkyz.util.stateInSubscribed
 
@@ -894,6 +897,11 @@ class SettingsAboutLibraries(
     page : SettingsPage,
     title : StringResource,
 ) : SettingsNamedItem(page, title, null)
+
+data class ShareSettingsData(
+    val mimeType : String,
+    val uri : Uri,
+)
 
 enum class RequestedURI {
     NONE, SAF, SETTINGS_EXPORT, SETTINGS_IMPORT, PUZZLES_EXPORT
@@ -3042,6 +3050,12 @@ class SettingsPageViewModel(
             ),
             SettingsAction(
                 SettingsPage.EXPORT_IMPORT,
+                Res.string.share_settings,
+                Res.string.share_settings_desc,
+                this::shareSettings,
+            ),
+            SettingsAction(
+                SettingsPage.EXPORT_IMPORT,
                 Res.string.preferences_import,
                 Res.string.preferences_import_desc,
                 this::startSettingsImport,
@@ -3070,10 +3084,12 @@ class SettingsPageViewModel(
     // separate as should not appear on back stack
     private val _needsURI = MutableStateFlow<RequestedURI>(RequestedURI.NONE)
     private val _messages = MutableStateFlow<List<String>>(listOf())
+    private val _shareSettingsEvent = MutableStateFlow<ShareSettingsData?>(null)
 
     val state : StateFlow<SettingsPageViewState> = _state
     val needsURI : StateFlow<RequestedURI> = _needsURI
     val messages : StateFlow<List<String>> = _messages
+    val shareSettingsEvent : StateFlow<ShareSettingsData?> = _shareSettingsEvent
 
     fun startSearch() {
         if (!state.value.inSearchMode) {
@@ -3169,6 +3185,19 @@ class SettingsPageViewModel(
                 }
             }
         }
+    }
+
+    fun shareSettings() {
+        FileHandlerShared.getSettingsShareUri(viewModelScope, utils, settings) {
+            it?.let { uri ->
+                val mimeType = FileHandlerShared.SETTINGS_SHARE_URI_MIME_TYPE
+                _shareSettingsEvent.value = ShareSettingsData(mimeType, uri)
+            }
+        }
+    }
+
+    fun clearShareSettingsEvent() {
+        _shareSettingsEvent.value = null
     }
 
     fun importSettings(uri : Uri, onDone : () -> Unit) {
