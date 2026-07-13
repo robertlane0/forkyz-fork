@@ -314,6 +314,7 @@ message Settings {
     string keyboardBindingCopyClue = 207;
     bool actionButtonToggleScratchMode = 208;
     ActionButtonsMode actionButtonsMode = 209;
+    bool actionButtonToggleShowErrorsGrid = 210;
 
     // defunct settings
     bool showErrors = 107;

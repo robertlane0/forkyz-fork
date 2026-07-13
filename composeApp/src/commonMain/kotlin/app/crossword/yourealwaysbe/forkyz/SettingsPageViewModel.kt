@@ -37,6 +37,8 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.action_buttons
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.action_buttons_mode_top_wide
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.action_button_toggle_scratch_mode
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.action_button_toggle_scratch_mode_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.action_button_toggle_show_errors_grid
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.action_button_toggle_show_errors_grid_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.action_buttons
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.action_buttons_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.announce_box_always
@@ -2029,6 +2031,13 @@ class SettingsPageViewModel(
                 Res.string.action_button_toggle_scratch_mode_desc,
                 settings.liveActionButtonToggleScratchMode.stateInHereBool(),
                 settings::setActionButtonToggleScratchMode,
+            ),
+            SettingsBoolean(
+                SettingsPage.ACTION_BUTTONS,
+                Res.string.action_button_toggle_show_errors_grid,
+                Res.string.action_button_toggle_show_errors_grid_desc,
+                settings.liveActionButtonToggleShowErrorsGrid.stateInHereBool(),
+                settings::setActionButtonToggleShowErrorsGrid,
             ),
             SettingsBoolean(
                 SettingsPage.ACTION_BUTTONS,

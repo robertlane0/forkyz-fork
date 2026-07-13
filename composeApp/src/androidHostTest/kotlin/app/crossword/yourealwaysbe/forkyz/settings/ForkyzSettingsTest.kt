@@ -56,6 +56,7 @@ class ForkyzSettingsTest {
         actionButtonsMode = ActionButtonsMode.ABM_BOTTOM,
         actionButtonAnnounceClue = false,
         actionButtonToggleScratchMode = false,
+        actionButtonToggleShowErrorsGrid = false,
         actionButtonVoiceInput = false,
         alwaysAnnounceBox = false,
         alwaysAnnounceClue = false,
@@ -248,6 +249,7 @@ class ForkyzSettingsTest {
         actionButtonsMode = ActionButtonsMode.ABM_TOP_ALWAYS,
         actionButtonAnnounceClue = true,
         actionButtonToggleScratchMode = true,
+        actionButtonToggleShowErrorsGrid = true,
         actionButtonVoiceInput = true,
         alwaysAnnounceBox = true,
         alwaysAnnounceClue = true,
@@ -440,6 +442,7 @@ class ForkyzSettingsTest {
     val settingsValue3 = settingsValue2.copy(
         actionButtonsMode = ActionButtonsMode.ABM_BOTTOM,
         actionButtonToggleScratchMode = false,
+        actionButtonToggleShowErrorsGrid = false,
         clueListNameInClueLine = ClueListClueLine.CLCL_FULL,
         dontConfirmCleanup = true,
         dontConfirmBrowseDelete = false,

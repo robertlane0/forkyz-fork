@@ -21,6 +21,7 @@ val DEFAULT_SETTINGS : Settings = Settings(
     actionButtonsMode = ActionButtonsMode.ABM_BOTTOM,
     actionButtonAnnounceClue = false,
     actionButtonToggleScratchMode = false,
+    actionButtonToggleShowErrorsGrid = false,
     actionButtonVoiceInput = false,
     alwaysAnnounceBox = false,
     alwaysAnnounceClue = false,

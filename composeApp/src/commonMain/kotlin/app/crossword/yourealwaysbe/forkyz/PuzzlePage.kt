@@ -88,6 +88,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.help_fifteen_s
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.help_query_llm_agent
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_announce
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_scratch_mode
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_show_errors
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_voice
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.info
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.initial_letter
@@ -125,6 +126,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.showing_errors
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.special_entry
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.support_puzzle_source
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.toggle_scratch_mode
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.toggle_show_errors_grid
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.unknown_hint
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.voice_command
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.website
@@ -466,6 +468,10 @@ class PuzzlePageScope(
             IconButtonDefaults.filledIconButtonColors()
         }
 
+        val activeButtonColors = IconButtonDefaults.filledIconButtonColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+        )
+
         val plainModifier = if (inTitleBar) {
             Modifier
         } else {
@@ -505,10 +511,7 @@ class PuzzlePageScope(
                         derivedStateOf { menuState.isScratchMode }
                     }
                     val colors = if (isScratchMode) {
-                        IconButtonDefaults.filledIconButtonColors(
-                            containerColor
-                                = MaterialTheme.colorScheme.primaryContainer,
-                        )
+                        activeButtonColors
                     } else {
                         plainButtonColors
                     }
@@ -524,6 +527,38 @@ class PuzzlePageScope(
                                 = painterResource(Res.drawable.ic_scratch_mode),
                             contentDescription = stringResource(
                                 Res.string.toggle_scratch_mode,
+                            ),
+                        )
+                    }
+                }
+                if (
+                    state.toggleShowErrorsGrid
+                    && menuState.showErrorsState.enabled
+                ) {
+                    val isShowingErrorsGrid by remember {
+                        derivedStateOf {
+                            menuState.showErrorsState.isShowingErrorsGrid
+                        }
+                    }
+                    val colors = if (isShowingErrorsGrid) {
+                        activeButtonColors
+                    } else {
+                        plainButtonColors
+                    }
+
+                    FilledIconButton(
+                        modifier = plainModifier.width(50.dp),
+                        colors = colors,
+                        onClick = {
+                            viewModel.toggleShowErrorsMode(ShowErrorsMode.GRID)
+                        },
+                    ) {
+                        Icon(
+                            modifier = Modifier.width(50.dp),
+                            painter
+                                = painterResource(Res.drawable.ic_show_errors),
+                            contentDescription = stringResource(
+                                Res.string.toggle_show_errors_grid,
                             ),
                         )
                     }
