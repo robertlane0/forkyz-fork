@@ -10,6 +10,12 @@ enum AccessorSetting {
     AS_SOURCE_DATE_ASC = 3;
 }
 
+enum ActionButtonsMode {
+    ABM_BOTTOM = 0;
+    ABM_TOP_ALWAYS = 1;
+    ABM_TOP_WIDE = 2;
+}
+
 enum BrowseSwipeAction {
     BSA_DELETE = 0;
     BSA_ARCHIVE = 1;
@@ -307,6 +313,7 @@ message Settings {
     string keyboardBindingShuffleAnagram = 206;
     string keyboardBindingCopyClue = 207;
     bool actionButtonToggleScratchMode = 208;
+    ActionButtonsMode actionButtonsMode = 209;
 
     // defunct settings
     bool showErrors = 107;

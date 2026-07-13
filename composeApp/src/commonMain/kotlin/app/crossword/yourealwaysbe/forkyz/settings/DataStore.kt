@@ -18,6 +18,7 @@ const val SETTINGS_FILE_NAME = "settings.pb"
 private val CURRENT_SETTINGS_VERSION = 3
 
 val DEFAULT_SETTINGS : Settings = Settings(
+    actionButtonsMode = ActionButtonsMode.ABM_BOTTOM,
     actionButtonAnnounceClue = false,
     actionButtonToggleScratchMode = false,
     actionButtonVoiceInput = false,

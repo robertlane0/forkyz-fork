@@ -53,6 +53,7 @@ class TestDataStore(initialDataStoreSettings : Settings) : DataStore<Settings> {
 
 class ForkyzSettingsTest {
     val settingsValue1 : Settings = Settings(
+        actionButtonsMode = ActionButtonsMode.ABM_BOTTOM,
         actionButtonAnnounceClue = false,
         actionButtonToggleScratchMode = false,
         actionButtonVoiceInput = false,
@@ -244,6 +245,7 @@ class ForkyzSettingsTest {
     )
 
     val settingsValue2 : Settings = Settings(
+        actionButtonsMode = ActionButtonsMode.ABM_TOP_ALWAYS,
         actionButtonAnnounceClue = true,
         actionButtonToggleScratchMode = true,
         actionButtonVoiceInput = true,
@@ -436,6 +438,7 @@ class ForkyzSettingsTest {
     )
 
     val settingsValue3 = settingsValue2.copy(
+        actionButtonsMode = ActionButtonsMode.ABM_BOTTOM,
         actionButtonToggleScratchMode = false,
         clueListNameInClueLine = ClueListClueLine.CLCL_FULL,
         dontConfirmCleanup = true,

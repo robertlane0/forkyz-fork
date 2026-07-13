@@ -44,6 +44,15 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
                 }
             }
 
+    val liveActionButtonsMode : Flow<ActionButtonsMode>
+        = settingsMap { it.actionButtonsMode }
+
+    fun setActionButtonsMode(value : ActionButtonsMode) {
+        settingsUpdate { settings ->
+            settings.copy(actionButtonsMode = value)
+        }
+    }
+
     val liveActionButtonSettings : Flow<ActionButtonSettings>
         = settingsMap {
             ActionButtonSettings(
@@ -2235,6 +2244,19 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             )
         }
 
+        run(
+            "actionButtonsMode",
+            { key -> builder?.put(key, settings?.actionButtonsMode.toString()) },
+            { key ->
+               json?.ifHasString(key) {
+                   try {
+                       setActionButtonsMode(ActionButtonsMode.valueOf(it))
+                   } catch (e : IllegalArgumentException) {
+                       // ignore
+                   }
+               }
+            },
+        )
         run(
             "actionButtonAnnounceClue",
             { key -> builder?.put(key, settings?.actionButtonAnnounceClue) },

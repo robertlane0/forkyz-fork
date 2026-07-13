@@ -30,6 +30,11 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.about_forkyz
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.about_libraries
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.about_scrapes
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.about_voice_commands
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.action_buttons_mode
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.action_buttons_mode_bottom
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.action_buttons_mode_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.action_buttons_mode_top_always
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.action_buttons_mode_top_wide
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.action_button_toggle_scratch_mode
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.action_button_toggle_scratch_mode_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.action_buttons
@@ -560,6 +565,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.weekly_crosswo
 import app.crossword.yourealwaysbe.forkyz.net.Downloader
 import app.crossword.yourealwaysbe.forkyz.net.DownloaderID
 import app.crossword.yourealwaysbe.forkyz.net.DownloadersProvider
+import app.crossword.yourealwaysbe.forkyz.settings.ActionButtonsMode
 import app.crossword.yourealwaysbe.forkyz.settings.BrowseSwipeAction
 import app.crossword.yourealwaysbe.forkyz.settings.ClueHighlight
 import app.crossword.yourealwaysbe.forkyz.settings.ClueListClueLine
@@ -1987,6 +1993,29 @@ class SettingsPageViewModel(
             ),
 
             // Action Buttons
+            SettingsList<ActionButtonsMode>(
+                SettingsPage.ACTION_BUTTONS,
+                Res.string.action_buttons_mode,
+                Res.string.action_buttons_mode_desc,
+                listOf(
+                    SettingsListEntry(
+                        Res.string.action_buttons_mode_bottom,
+                        ActionButtonsMode.ABM_BOTTOM,
+                    ),
+                    SettingsListEntry(
+                        Res.string.action_buttons_mode_top_always,
+                        ActionButtonsMode.ABM_TOP_ALWAYS,
+                    ),
+                    SettingsListEntry(
+                        Res.string.action_buttons_mode_top_wide,
+                        ActionButtonsMode.ABM_TOP_WIDE,
+                    ),
+                ),
+                settings.liveActionButtonsMode.stateInHere(
+                    ActionButtonsMode.ABM_BOTTOM,
+                ),
+                settings::setActionButtonsMode,
+            ),
             SettingsBoolean(
                 SettingsPage.ACTION_BUTTONS,
                 Res.string.announce_clue_button,
