@@ -150,6 +150,7 @@ import app.crossword.yourealwaysbe.forkyz.puz.Playboard.Word
 import app.crossword.yourealwaysbe.forkyz.puz.Position
 import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.puz.Zone
+import app.crossword.yourealwaysbe.forkyz.settings.ActionButtonsMode
 import app.crossword.yourealwaysbe.forkyz.settings.KeyboardLayout
 import app.crossword.yourealwaysbe.forkyz.settings.RenderSettings
 import app.crossword.yourealwaysbe.forkyz.theme.BoardColorScheme
@@ -158,6 +159,7 @@ import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer
 import app.crossword.yourealwaysbe.forkyz.util.NativeFrontendUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
+import app.crossword.yourealwaysbe.forkyz.util.WIDE_SCREEN_WIDTH_DP
 import app.crossword.yourealwaysbe.forkyz.util.onKeyEventKeyboardBindings
 import app.crossword.yourealwaysbe.forkyz.util.onMiddleClick
 import app.crossword.yourealwaysbe.forkyz.util.toUri
@@ -441,21 +443,52 @@ class PuzzlePageScope(
 
     @Composable
     @OptIn(ExperimentalMaterial3Api::class)
-    fun ActionButtons() {
+    fun ActionButtons(inTitleBar : Boolean) {
         val state by viewModel.actionButtonState.collectAsStateWithLifecycle()
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         val menuState by viewModel.menuState.collectAsStateWithLifecycle()
 
+        val displayInTitleBar = when (uiState.actionButtonsMode) {
+            ActionButtonsMode.ABM_BOTTOM -> false
+            ActionButtonsMode.ABM_TOP_ALWAYS -> true
+            ActionButtonsMode.ABM_TOP_WIDE -> {
+                utils.displayWidth >= WIDE_SCREEN_WIDTH_DP
+            }
+        }
+        if (displayInTitleBar != inTitleBar)
+            return
+
+        val plainButtonColors = if (inTitleBar) {
+            IconButtonDefaults.filledIconButtonColors(
+                containerColor = Color.Transparent,
+            )
+        } else {
+            IconButtonDefaults.filledIconButtonColors()
+        }
+
+        val plainModifier = if (inTitleBar) {
+            Modifier
+        } else {
+            Modifier.padding(horizontal=5.dp)
+        }
+
         if (state.hasButtons) {
-            Row(
-                modifier = Modifier.fillMaxWidth()
+            val rowModifier = if (inTitleBar) {
+                Modifier
+            } else {
+                Modifier.fillMaxWidth()
                     .background(MaterialTheme.colorScheme.surface)
-                    .padding(bottom = 5.dp),
+                    .padding(bottom = 5.dp)
+            }
+
+            Row(
+                modifier = rowModifier,
                 horizontalArrangement = Arrangement.Center,
             ) {
                 if (state.announceClue) {
                     FilledIconButton(
-                        modifier = Modifier.padding(horizontal=10.dp)
-                            .width(50.dp),
+                        modifier = plainModifier.width(50.dp),
+                        colors = plainButtonColors,
                         onClick = { viewModel.announceClue() },
                     ) {
                         Icon(
@@ -477,12 +510,11 @@ class PuzzlePageScope(
                                 = MaterialTheme.colorScheme.primaryContainer,
                         )
                     } else {
-                        IconButtonDefaults.filledIconButtonColors()
+                        plainButtonColors
                     }
 
                     FilledIconButton(
-                        modifier = Modifier.padding(horizontal=10.dp)
-                            .width(50.dp),
+                        modifier = plainModifier.width(50.dp),
                         colors = colors,
                         onClick = { viewModel.toggleScratchMode() },
                     ) {
@@ -498,8 +530,8 @@ class PuzzlePageScope(
                 }
                 if (state.voiceInput) {
                     FilledIconButton(
-                        modifier = Modifier.padding(horizontal=10.dp)
-                            .width(50.dp),
+                        modifier = plainModifier.width(50.dp),
+                        colors = plainButtonColors,
                         onClick = { utils.launchVoiceInput() },
                     ) {
                         Icon(

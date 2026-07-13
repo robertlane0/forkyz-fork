@@ -48,6 +48,7 @@ import app.crossword.yourealwaysbe.forkyz.puz.Playboard.ShowErrorsMode
 import app.crossword.yourealwaysbe.forkyz.puz.Position
 import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.settings.ActionButtonSettings
+import app.crossword.yourealwaysbe.forkyz.settings.ActionButtonsMode
 import app.crossword.yourealwaysbe.forkyz.settings.ClueListClueLine
 import app.crossword.yourealwaysbe.forkyz.settings.ExternalToolSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
@@ -178,6 +179,7 @@ data class PuzzlePageUIState(
     val showTimer : Boolean = false,
     val indicateShowErrors : Boolean = false,
     val showDialog : PuzzleDialog = PuzzleDialog.NONE,
+    val actionButtonsMode : ActionButtonsMode = ActionButtonsMode.ABM_BOTTOM,
 )
 
 enum class KeyboardVisibility {
@@ -256,6 +258,7 @@ private data class UIStateSettings(
     val showTimer : Boolean,
     val showErrorsMode : ShowErrorsMode,
     val indicateShowErrors : Boolean,
+    val actionButtonsMode : ActionButtonsMode,
 )
 
 open class PuzzlePageViewModel(
@@ -351,12 +354,14 @@ open class PuzzlePageViewModel(
                 state.copy(
                     showTimer = uiSettings.showTimer,
                     indicateShowErrors = indicateShowErrors,
+                    actionButtonsMode = uiSettings.actionButtonsMode,
                 )
             },
             combine(
                 settings.livePlayShowTimer,
                 settings.livePlayShowErrorsMode,
                 settings.livePlayIndicateShowErrors,
+                settings.liveActionButtonsMode,
                 ::UIStateSettings,
             ),
         )

@@ -212,7 +212,10 @@ fun ClueListPage(
             themeHelper.ForkyzTopAppBar(
                 title = { Text(stringResource(Res.string.clues_list_label)) },
                 onBack = { doExitPage() },
-                actions = { OverflowMenu() },
+                actions = {
+                    ActionButtons(inTitleBar = true)
+                    OverflowMenu()
+                },
             )
         }
 
@@ -279,7 +282,7 @@ fun ClueListPage(
                         Modifier.fillMaxWidth().weight(1.0F),
                         showAllWords,
                     )
-                    ActionButtons()
+                    ActionButtons(inTitleBar = false)
                     Keyboard()
 
                     LaunchedEffect(isTop) {

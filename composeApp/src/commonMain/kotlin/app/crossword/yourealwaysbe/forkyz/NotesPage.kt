@@ -328,7 +328,10 @@ fun NotesPage(
                     }
                 },
                 onBack = { doExitPage() },
-                actions = { OverflowMenu() },
+                actions = {
+                    ActionButtons(inTitleBar = true)
+                    OverflowMenu()
+                },
             )
         }
 
@@ -684,7 +687,7 @@ fun NotesPage(
                         FlagRow()
                         AnagramSourceRow(maxWidth = miniboardMaxWidth)
                         AnagramSolutionRow(maxWidth = miniboardMaxWidth)
-                        ActionButtons()
+                        ActionButtons(inTitleBar = false)
                     }
                     Keyboard()
                 }

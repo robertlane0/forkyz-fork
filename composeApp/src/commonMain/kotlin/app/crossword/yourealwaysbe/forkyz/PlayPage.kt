@@ -404,7 +404,10 @@ fun PlayPage(
                     }
                 },
                 onBack = { doExitPage() },
-                actions = { OverflowMenu() },
+                actions = {
+                    ActionButtons(inTitleBar = true)
+                    OverflowMenu()
+                },
             )
         }
 
@@ -644,7 +647,7 @@ fun PlayPage(
                         CluesList(Modifier.weight(1.0F).fillMaxWidth())
                     }
                 }
-                ActionButtons()
+                ActionButtons(inTitleBar = false)
                 Keyboard(
                     showSpecialKeys = true,
                     onSpecialKeyDown = ::onSpecialKeyDown,
@@ -682,7 +685,7 @@ fun PlayPage(
                     if (showClueTabs) {
                         Column(Modifier.weight(1.0F).fillMaxHeight()) {
                             CluesList(Modifier.weight(1.0F).fillMaxWidth())
-                            ActionButtons()
+                            ActionButtons(inTitleBar = false)
                         }
                     }
                 }
