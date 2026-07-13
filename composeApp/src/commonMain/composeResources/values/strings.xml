@@ -204,6 +204,7 @@
     <string name="filter_settings_close">Cancel Search</string>
     <string name="development_site">Development Site</string>
     <string name="development_site_desc">Development site for source code, bug reports, &amp;c.</string>
+    <string name="version">Version</string>
 
     <!-- preferences browse -->
     <string name="browse_always_show_rating">Always Show Rating</string>

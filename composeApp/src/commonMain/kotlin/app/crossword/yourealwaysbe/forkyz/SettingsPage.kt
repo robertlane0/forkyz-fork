@@ -206,8 +206,8 @@ private fun SettingsTriState(
 private fun SettingsDescription(
     modifier : Modifier,
     title : String,
-    summary : String?,
-    errorMsg : String?,
+    summary : String? = null,
+    errorMsg : String? = null,
 ) {
     Column(modifier = modifier) {
         Text(
@@ -528,6 +528,13 @@ fun SettingsPage(
                     }
                     else -> { } /* ignore */
                 }
+            }
+            is SettingsText -> {
+                SettingsDescription(
+                    modifier = modifier,
+                    title = stringResource(item.title),
+                    summary = item.summary,
+                )
             }
             else -> { } /* ignore */
         }

@@ -23,6 +23,7 @@ import androidx.lifecycle.viewModelScope
 
 import org.jetbrains.compose.resources.StringResource
 
+import app.crossword.yourealwaysbe.forkyz.BuildConfig
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.aard2
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.about_forkyz
@@ -543,6 +544,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.updates_mon_sa
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.updates_sundays
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.updates_thursdays
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.usa_today
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.version
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.vingminutes
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.vingminutes_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.voice_settings
@@ -633,6 +635,19 @@ abstract class SettingsNamedItem(
     val title : StringResource,
     val summary : StringResource?,
     val errorMsg : StateFlow<String?>? = null
+) : SettingsItem(page)
+
+/**
+ * An entry that's just a title and string description
+ *
+ * @param page the page the item is on
+ * @param title the resource id of the title
+ * @param summary the summary text to display
+ */
+class SettingsText(
+    page : SettingsPage,
+    val title : StringResource,
+    val summary : String,
 ) : SettingsItem(page)
 
 /**
@@ -1342,6 +1357,11 @@ class SettingsPageViewModel(
             SettingsHeading(
                 SettingsPage.ROOT,
                 Res.string.about_forkyz,
+            ),
+            SettingsText(
+                SettingsPage.ROOT,
+                Res.string.version,
+                BuildConfig.APP_VERSION,
             ),
             SettingsOpenURI(
                 SettingsPage.ROOT,
