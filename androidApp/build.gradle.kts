@@ -91,6 +91,9 @@ dependencies {
     implementation(libs.androidx.work.runtime)
     implementation(libs.androidx.preference.ktx)
 
+    // Kotlin
+    implementation(libs.kotlinx.io.core)
+
     // Compose
     implementation(libs.compose.foundation)
     implementation(libs.compose.material)

@@ -110,11 +110,6 @@ val FORKYZ_CLOSE_TASK_ID = "app.crossword.yourealwaysbe.FORKYZ_CLOSE_TASK_ID"
  */
 val INTENT_IMPORT_SUCCESS = "app.crossword.yourealwaysbe.INTENT_IMPORT_SUCCESS"
 
-/**
- * For ex/importing settings
- */
-val SETTINGS_MIME_TYPE = "application/json"
-
 open class ForkyzActivity : AppCompatActivity(), ShakeDetector.Listener {
     private val versionUtils : AndroidVersionUtils by inject()
     private val themeHelper : ThemeHelper by inject()

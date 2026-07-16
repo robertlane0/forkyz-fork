@@ -13,4 +13,8 @@
 
     <!-- manifest -->
     <string name="app_name">Forkyz</string>
+    <string name="settings_importer_label">Settings Import</string>
+
+    <!-- settings importer -->
+    <string name="preferences_importing">Importing Forkyz Settings…</string>
 </resources>

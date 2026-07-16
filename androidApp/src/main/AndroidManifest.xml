@@ -84,10 +84,23 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="application/x-crossword" />
                 <data android:mimeType="application/octet-stream" />
+                <data android:mimeType="application/json" />
                 <data android:mimeType="text/html" />
                 <data android:mimeType="text/plain" />
                 <data android:mimeType="text/xml" />
                 <data android:mimeType="application/zip" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="app.crossword.yourealwaysbe.forkyz.ForkyzSettingsImporter"
+            android:theme="@style/Theme.Forkyz"
+            android:label="@string/settings_importer_label"
+            android:exported="true"
+        >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="application/json" />
             </intent-filter>
         </activity>
