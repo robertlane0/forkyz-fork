@@ -1,5 +1,16 @@
 # Forkyz Changelog
 
+## Version 85
+
+- Replace date-picker in download dialog to support mouse on desktop.
+- New action buttons options.
+- Move show errors and reveal into single hint submenu, relabel puzzle info.
+- Add menu options under notes to transfer scratch to board.
+- Add About Libraries page and other info to about section in settings.
+- Add "share" settings on Android (instead of export).
+- Add ability to import settings from "open with" menus on Android.
+- Dutch translation improvements (thanks @ojppe).
+
 ## Version 84
 
 - Add configurable (hardware) keyboard bindings.

@@ -1,0 +1,10 @@
+- Remplacer date-picker dans la boîte de dialogue de téléchargement pour prendre en charge la souris sur le bureau.
+- Nouvelles options de boutons d'action.
+- Déplacer afficher les erreurs et révéler en un seul sous-menu indice, relabel info puzzle.
+- Ajouter des options de menu sous les notes pour transférer les rayures à la carte.
+- Ajouter à propos de la page Bibliothèques et autres informations sur la section dans les paramètres.
+- Ajouter les paramètres "partager" sur Android (au lieu d'exporter).
+- Ajouter la possibilité d'importer les paramètres à partir des menus "ouverts avec" sur Android.
+- Amélioration de la traduction néerlandaise (merci @ojppe).
+
+Changelog traduit automatiquement avec Argos Translate.
