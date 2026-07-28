@@ -1321,7 +1321,9 @@ class Playboard(puzzle : Puzzle) {
         pushNotificationDisabled()
         val highlightPos = this.highlightLetter
         puzzle.checkedGetBox(highlightPos)?.let { box ->
-            setScratchLetter(box, letter)
+            val changed = setScratchLetter(box, letter)
+            if (changed)
+                flagChange(highlightPos)
         }
         nextLetter()
         popNotificationDisabled()
