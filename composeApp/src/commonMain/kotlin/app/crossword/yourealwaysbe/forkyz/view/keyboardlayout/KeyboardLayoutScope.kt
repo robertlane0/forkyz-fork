@@ -84,8 +84,6 @@ internal class KeyboardLayoutScope(
     val repeatDelay: Long,
     val repeatInterval: Long,
 ) {
-    var overrideButtonTextStyle : TextStyle? = null
-
     @Composable
     private fun Modifier.buttonVerticalPadding(): Modifier {
         val screenHeight = LocalWindowInfo.current.containerSize.height.dp
@@ -201,8 +199,7 @@ internal class KeyboardLayoutScope(
                 ),
             ) {
                 BoxWithConstraints {
-                    val buttonTextStyle = overrideButtonTextStyle
-                        ?: with (LocalDensity.current) {
+                    val buttonTextStyle = with (LocalDensity.current) {
                             // scale if not much space assuming 1 char
                             // in string
                             val titleLarge = MaterialTheme.typography.titleLarge

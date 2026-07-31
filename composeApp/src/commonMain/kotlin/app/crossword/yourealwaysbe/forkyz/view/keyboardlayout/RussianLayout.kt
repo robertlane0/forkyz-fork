@@ -18,9 +18,6 @@ import app.crossword.yourealwaysbe.forkyz.view.OrdinaryKey
 // Standard ЙЦУКЕН layout covering all 33 Russian letters
 @Composable
 internal fun KeyboardLayoutScope.RussianKeyboard() {
-    overrideButtonTextStyle = MaterialTheme.typography.titleMedium.copy(
-        fontWeight = FontWeight.SemiBold,
-    )
     Column(modifier.fillMaxWidth()) {
         Row() {
             val m1 = Modifier.weight(1.0F)
