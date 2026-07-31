@@ -8,6 +8,7 @@ import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ButtonDefaults
@@ -25,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.semantics.contentDescription
@@ -32,7 +34,9 @@ import androidx.compose.ui.semantics.onLongClick
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
@@ -166,6 +170,14 @@ internal class KeyboardLayoutScope(
         )
     }
 
+    fun min(x : TextUnit, y : TextUnit) : TextUnit {
+        return if (x < y) x else y
+    }
+
+    fun max(x : TextUnit, y : TextUnit) : TextUnit {
+        return if (x > y) x else y
+    }
+
     /**
      * A single text key
      *
@@ -188,14 +200,26 @@ internal class KeyboardLayoutScope(
                     contentColor = MaterialTheme.colorScheme.onSurface,
                 ),
             ) {
-                val buttonTextStyle = overrideButtonTextStyle
-                    ?: MaterialTheme.typography.titleLarge.copy(
-                        fontWeight = FontWeight.SemiBold,
+                BoxWithConstraints {
+                    val buttonTextStyle = overrideButtonTextStyle
+                        ?: with (LocalDensity.current) {
+                            // scale if not much space assuming 1 char
+                            // in string
+                            val titleLarge = MaterialTheme.typography.titleLarge
+                            val fontSize = max(
+                                10.sp,
+                                min(maxWidth.toSp(), titleLarge.fontSize),
+                            )
+                            MaterialTheme.typography.titleLarge.copy(
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = fontSize,
+                            )
+                        }
+                    Text(
+                        text = value,
+                        style = buttonTextStyle,
                     )
-                Text(
-                    text = value,
-                    style = buttonTextStyle,
-                )
+                }
             }
         }
     }
