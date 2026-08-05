@@ -5,6 +5,8 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+import androidx.compose.material3.FilledIconButton
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -23,7 +25,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
@@ -444,6 +446,28 @@ class PuzzlePageScope(
     }
 
     @Composable
+    fun ActionToggleButton(
+        modifier : Modifier = Modifier,
+        onClick : () -> Unit,
+        active : Boolean,
+        content : @Composable () -> Unit,
+    ) {
+        if (active) {
+            FilledIconButton(
+                modifier = modifier,
+                onClick = onClick,
+                content = content,
+            )
+        } else {
+            IconButton(
+                modifier = modifier,
+                onClick = onClick,
+                content = content,
+            )
+        }
+    }
+
+    @Composable
     @OptIn(ExperimentalMaterial3Api::class)
     fun ActionButtons(inTitleBar : Boolean) {
         val state by viewModel.actionButtonState.collectAsStateWithLifecycle()
@@ -460,24 +484,6 @@ class PuzzlePageScope(
         if (displayInTitleBar != inTitleBar)
             return
 
-        val plainButtonColors = if (inTitleBar) {
-            IconButtonDefaults.filledIconButtonColors(
-                containerColor = Color.Transparent,
-            )
-        } else {
-            IconButtonDefaults.filledIconButtonColors()
-        }
-
-        val activeButtonColors = IconButtonDefaults.filledIconButtonColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-        )
-
-        val plainModifier = if (inTitleBar) {
-            Modifier
-        } else {
-            Modifier.padding(horizontal=5.dp)
-        }
-
         if (state.hasButtons) {
             val rowModifier = if (inTitleBar) {
                 Modifier
@@ -492,9 +498,7 @@ class PuzzlePageScope(
                 horizontalArrangement = Arrangement.Center,
             ) {
                 if (state.announceClue) {
-                    FilledIconButton(
-                        modifier = plainModifier.width(50.dp),
-                        colors = plainButtonColors,
+                    IconButton(
                         onClick = { viewModel.announceClue() },
                     ) {
                         Icon(
@@ -510,16 +514,10 @@ class PuzzlePageScope(
                     val isScratchMode by remember {
                         derivedStateOf { menuState.isScratchMode }
                     }
-                    val colors = if (isScratchMode) {
-                        activeButtonColors
-                    } else {
-                        plainButtonColors
-                    }
 
-                    FilledIconButton(
-                        modifier = plainModifier.width(50.dp),
-                        colors = colors,
+                    ActionToggleButton(
                         onClick = { viewModel.toggleScratchMode() },
+                        active = isScratchMode,
                     ) {
                         Icon(
                             modifier = Modifier.width(50.dp),
@@ -540,18 +538,12 @@ class PuzzlePageScope(
                             menuState.showErrorsState.isShowingErrorsGrid
                         }
                     }
-                    val colors = if (isShowingErrorsGrid) {
-                        activeButtonColors
-                    } else {
-                        plainButtonColors
-                    }
 
-                    FilledIconButton(
-                        modifier = plainModifier.width(50.dp),
-                        colors = colors,
+                    ActionToggleButton(
                         onClick = {
                             viewModel.toggleShowErrorsMode(ShowErrorsMode.GRID)
                         },
+                        active = isShowingErrorsGrid,
                     ) {
                         Icon(
                             modifier = Modifier.width(50.dp),
@@ -564,9 +556,7 @@ class PuzzlePageScope(
                     }
                 }
                 if (state.voiceInput) {
-                    FilledIconButton(
-                        modifier = plainModifier.width(50.dp),
-                        colors = plainButtonColors,
+                    IconButton(
                         onClick = { utils.launchVoiceInput() },
                     ) {
                         Icon(
