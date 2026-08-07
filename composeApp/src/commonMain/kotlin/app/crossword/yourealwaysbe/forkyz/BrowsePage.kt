@@ -94,6 +94,7 @@ import io.github.vinceglb.filekit.releaseBookmark
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.add_puzzle
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.android_app_settings_button
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.blank_copy
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.browse_date_format_non_header
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.by_date_asc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.by_date_desc
@@ -116,6 +117,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.expand
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.filter_puzzles
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.filter_puzzles_hint
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.has_solution_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_blank_copy
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_delete
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_download
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.ic_import
@@ -288,6 +290,16 @@ fun BrowsePage(
                 painter = painterResource(toggleArchiveIcon(isArchive)),
                 contentDescription
                     = stringResource(Res.string.toggle_archive_selected),
+            )
+        }
+    }
+
+    @Composable
+    fun BlankCopySelectedButton() {
+        IconButton(onClick = viewModel::blankCopySelectedPuzzles) {
+            Icon(
+                painter = painterResource(Res.drawable.ic_blank_copy),
+                contentDescription = stringResource(Res.string.blank_copy),
             )
         }
     }
@@ -569,6 +581,7 @@ fun BrowsePage(
                     )
                 },
                 actions = {
+                    BlankCopySelectedButton()
                     DeleteSelectedButton()
                     ToggleArchiveSelectedButton()
                 },

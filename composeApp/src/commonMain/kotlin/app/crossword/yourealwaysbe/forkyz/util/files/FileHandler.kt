@@ -386,12 +386,16 @@ abstract class FileHandler {
      * @param dirHandle the directory to save under
      * @param fileNameBody the name to give the file without file
      * extension
+     * @param writeBlank whether to write as a blank puzzle
+     * @param omitExtensions whether to omit Forkyz extensions from the puzzle
      * @return new puzzle handle if saved success
      */
     @Throws(IOException::class,CancellationException::class)
     suspend fun saveNewPuzzle(
         puz : Puzzle,
         fileNameBody : String,
+        writeBlank : Boolean = false,
+        omitExtensions : Boolean = false,
     ) : PuzHandle? {
         val dirHandle = this.crosswordsDirectory
 
@@ -405,8 +409,8 @@ abstract class FileHandler {
             return null
         } else {
             try {
-                val ph : PuzHandle = IPuz(dirHandle, mainFile)
-                save(puz, ph)
+                val ph : PuzHandle.IPuz = IPuz(dirHandle, mainFile)
+                save(puz, ph, writeBlank, omitExtensions)
                 return ph
             } catch (e : Exception) {
                 delete(mainFile)
@@ -550,14 +554,19 @@ abstract class FileHandler {
     }
 
     @Throws(IOException::class,CancellationException::class)
-    private suspend fun save(puz : Puzzle, ph : IPuz) : Boolean {
+    private suspend fun save(
+        puz : Puzzle,
+        ph : IPuz,
+        writeBlank : Boolean = false,
+        omitExtensions : Boolean = false,
+    ) : Boolean {
         val ipuzFile = ph.mainFileHandle
         val puzDir = ph.dirHandle
 
         // Write to buffer first -- get puzzle written to a stream
         // before truncating the previously saved file
         val buffer = Buffer()
-        IPuzIO.writePuzzle(puz, buffer)
+        IPuzIO.writePuzzle(puz, buffer, writeBlank, omitExtensions)
 
         return getBufferedOutput(ipuzFile).use { output ->
             buffer.transferTo(output)

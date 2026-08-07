@@ -58,6 +58,11 @@
     </plurals>
     <string name="delete">Delete</string>
     <string name="archive">Archive</string>
+    <string name="blank_copy">Create Blank Copy</string>
+    <plurals name="blank_copied_puzzles_to_crosswords">
+        <item quantity="one">Puzzle blank-copied to crosswords folder.</item>
+        <item quantity="other">Puzzles blank-copied to crosswords folder.</item>
+    </plurals>
     <string name="delete_selected">Delete</string>
     <string name="toggle_archive_selected">Archive or un-archive selected</string>
     <string name="toggle_archive">Archive or un-archive</string>
