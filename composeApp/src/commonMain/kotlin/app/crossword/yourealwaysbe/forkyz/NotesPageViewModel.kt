@@ -961,7 +961,8 @@ class NotesPageViewModel(
         newChar : Char,
     ) : Boolean {
         return (
-            values.source.contains(newChar)
+            newChar == BLANK_CHAR
+            || values.source.contains(newChar)
             || values.solution.contains(newChar)
         )
     }
