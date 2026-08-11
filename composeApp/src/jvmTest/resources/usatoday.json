@@ -1,0 +1,54 @@
+{
+  "data": {
+    "__typename": "Query",
+    "gameData": {
+      "__typename": "CrosswordData",
+      "id": "12345",
+      "date": "2026-08-11",
+      "type": "crossword",
+      "title": "Test Crossword",
+      "width": 15,
+      "author": "Test Author",
+      "editor": "Test Editor",
+      "height": 15,
+      "layout": [
+        "0102030405-1-1060708-109101112",
+        "1300000000-114000000-115000000",
+        "16000000001700000000-118000000",
+        "190000-12000000000002100000000",
+        "-1-1-1220000-12300000000-1-1-1",
+        "-124250000-1260000-12700282930",
+        "31000000-1320000-1330000000000",
+        "34000000350000-136000000000000",
+        "370000000000-1380000-139000000",
+        "4000000000-1410000-142000000-1",
+        "-1-1-14300440000-1450000-1-1-1",
+        "4647480000000000490000-1505152",
+        "53000000-154000000000055000000",
+        "56000000-157000000-15800000000",
+        "59000000-1600000-1-16100000000"
+      ],
+      "downClue": "01|Test\n02|Test 2\n03|Test\n04|Test 4\n05|Test\n06|Test\n07|Test\n08|Test\n09|Test\n10|Test\n11|Test\n12|Test\n14|Test\n17|Test\n21|Test\n22|Test\n24|Test\n25|Test\n26|Test\n28|Test\n29|Test\n30|Test\n31|Test\n32|Test\n33|Test\n35|Test\n36|Test\n38|Test\n41|Test\n42|Test\n44|Test\n45|Test\n46|Test\n47|Test\n48|Test\n49|Test\n50|Test\n51|Test\n52|Test\n55|Test",
+      "solution": [
+        "XXBXX  XXX XXXX",
+        "XXXXX XXXX XXXX",
+        "XXXXCXXXXX XXXX",
+        "XXX XXXXXXXXXXX",
+        "   XXX XXXXX   ",
+        " XXXX XXX XXXXX",
+        "XXXX XXX XXXXXX",
+        "XXXXXXX XXXXXXX",
+        "XXXXXX XXX XXXX",
+        "XXXXX XXX XXXX ",
+        "   XXXXX XXX   ",
+        "XXXXXXXXXXX XXX",
+        "XXXX XXXXXXXXXX",
+        "XXXX XXXX XXXXX",
+        "XXXX XXX  XXXXX"
+      ],
+      "copyright": "Test Copyright",
+      "acrossClue": "01|Test 1\n06|Test\n09|Test 9\n13|Test\n14|Test\n15|Test\n16|Test\n18|Test\n19|Test\n20|Test\n22|Test\n23|Test\n24|Test\n26|Test\n27|Test\n31|Test\n32|Test\n33|Test\n34|Test\n36|Test\n37|Test\n38|Test\n39|Test\n40|Test\n41|Test\n42|Test\n43|Test\n45|Test\n46|Test\n50|Test\n53|Test\n54|Test\n56|Test\n57|Test\n58|Test\n59|Test\n60|Test\n61|Test"
+    },
+    "serverDate": "2026-08-11T07:07:56.377Z"
+  }
+}
