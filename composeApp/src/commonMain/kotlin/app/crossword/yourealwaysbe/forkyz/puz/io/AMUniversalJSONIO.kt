@@ -15,7 +15,6 @@ import app.crossword.yourealwaysbe.forkyz.util.JSONObject
 import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.parseJSONObject
 
-
 /**
  * Format used by amuniversal.com
  *
