@@ -156,6 +156,7 @@ open class AbstractDateDownloader constructor(
         headers : Map<String, String>?,
     ) : Puzzle? {
         val sourceUrl = getSourceUrl(date)
+        println(sourceUrl)
         if (sourceUrl == null)
             return null
 

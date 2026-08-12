@@ -53,7 +53,6 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.sud_ouest_mots
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.sud_ouest_mots_fleches
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.tf1_mots_croises
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.tf1_mots_fleches
-import app.crossword.yourealwaysbe.forkyz.app.generated.resources.uclick_copyright
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.universal_crossword
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.usa_today
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.vingminutes
@@ -747,15 +746,17 @@ class Downloaders(
         }
 
         if (settings.enabled(DownloaderID.UNIVERSAL)) {
-            downloaders.add(UclickDownloader(
+            downloaders.add(AMUniversalDownloader(
                 DownloaderID.UNIVERSAL,
                 "fcx",
+                "uucom",
+                "U2FsdGVkX18YuMv20%2B8cekf85%2Friz1H%2FzlWW4"
+                    + "bn0cizt8yclLsp7UYv34S77X0aX%0Axa513fPTc"
+                    + "5RoN2wa0h4ED9QWuBURjkqWgHEZey0WFL8%3D",
                 utils.getString(Res.string.universal_crossword),
-                utils.getString(Res.string.uclick_copyright),
-                "http://www.uclick.com/client/spi/fcx/",
+                "https://syndication.andrewsmcmeel.com/features/universal-crossword-universal-crossword-weekly/",
                 AbstractDateDownloader.DAYS_DAILY,
-                6.hours + 30.minutes, // 06:30 by experiment
-                null,
+                6.hours + 30.minutes, // guess
             ))
         }
 
