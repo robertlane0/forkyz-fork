@@ -5,6 +5,7 @@ import kotlinx.datetime.LocalDate
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.focusable
@@ -757,6 +758,15 @@ fun BrowsePage(
         Row(
             modifier = Modifier.heightIn(min=MIN_PUZZLE_ITEM_HEIGHT)
                 .background(backgroundColor)
+                .then(
+                    if (isSelected)
+                        Modifier.border(
+                            width = 2.dp,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                    else
+                        Modifier
+                )
                 .onMiddleClick { viewModel.toggleSelectPuzzle(pe.id) }
                 .combinedClickable(
                     onClick = {
