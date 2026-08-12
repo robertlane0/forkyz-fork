@@ -4,6 +4,7 @@ package app.crossword.yourealwaysbe.forkyz.net
 import kotlinx.io.IOException
 import kotlinx.io.Source
 
+import app.crossword.yourealwaysbe.forkyz.util.JSONObject
 import app.crossword.yourealwaysbe.forkyz.util.getURL
 
 /**
@@ -18,8 +19,10 @@ abstract class AbstractDownloader : Downloader {
     protected suspend fun getURL(
         url : String,
         headers : Map<String, String>? = null,
+        data : JSONObject? = null,
+        params : Map<String, String>? = null,
     ) : Source {
-        return getURL(url, timeout, headers)
+        return getURL(url, timeout, headers, data, params)
     }
 }
 

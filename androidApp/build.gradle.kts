@@ -30,6 +30,7 @@ android {
 
     buildFeatures {
         compose = true
+        resValues = true
     }
 
     compileOptions {
@@ -49,9 +50,11 @@ android {
 
     buildTypes {
         getByName("debug") {
+            resValue("string", "app_name", "$appName Debug")
             applicationIdSuffix = ".debug"
         }
         getByName("release") {
+            resValue("string", "app_name", appName)
             signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
             isShrinkResources = true

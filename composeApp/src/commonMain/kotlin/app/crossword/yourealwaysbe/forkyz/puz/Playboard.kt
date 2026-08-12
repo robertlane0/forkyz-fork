@@ -600,29 +600,12 @@ class Playboard(puzzle : Puzzle) {
     fun deleteScratchLetter() : Word {
         val prevWord = this.currentWord
 
-        this.currentBox?.let { currentBox ->
-            pushNotificationDisabled()
-
-            if (currentBox.isBlank()) {
-                var note = this.note
-
-                if (note != null) {
-                    this.clueID?.let { cid ->
-                        val cluePos = currentBox.getCluePosition(cid)
-                        val length = currentWordLength
-                        if (cluePos >= 0 && cluePos < length) {
-                            note = note.withDeleteScratchLetterAt(cluePos)
-                            puzzle.setNote(cid, note)
-                        }
-                        flagChange(this.highlightLetter)
-                    }
-                }
-            }
-
+        if (isCurrentScratchCharacterBlank) {
             previousLetter()
-
-            popNotificationDisabled()
-            notifyChange()
+            deleteCurrentScratchCharacter()
+        } else {
+            deleteCurrentScratchCharacter()
+            previousLetter()
         }
 
         return prevWord
@@ -2266,6 +2249,42 @@ class Playboard(puzzle : Puzzle) {
             0 <= pauseDeleteUntil
             && TimeUtils.currentTimeMillis() < pauseDeleteUntil
         )
+
+    /**
+     * Scratch from current box/clue is blank
+     *
+     * Or no note/clue forcurrent
+     */
+    private val isCurrentScratchCharacterBlank : Boolean
+        get() {
+            val currentBox = this.currentBox
+            val note = this.note
+            val cid = this.clueID
+            if (note == null || cid == null || currentBox == null)
+                return true
+            val cluePos = currentBox.getCluePosition(cid)
+            return note.isScratchBlankAt(cluePos)
+        }
+
+    /**
+     * Deletes without any movement
+     */
+    private fun deleteCurrentScratchCharacter() {
+        val note = this.note
+        val cid = this.clueID
+        val currentBox = this.currentBox
+        if (note != null && cid != null && currentBox != null) {
+            val cluePos = currentBox.getCluePosition(cid)
+            val length = currentWordLength
+            if (cluePos >= 0 && cluePos < length) {
+                puzzle.setNote(
+                    cid,
+                    note.withDeleteScratchLetterAt(cluePos),
+                )
+            }
+            flagChange(this.highlightLetter)
+        }
+    }
 
     /**
      * A word on the grid

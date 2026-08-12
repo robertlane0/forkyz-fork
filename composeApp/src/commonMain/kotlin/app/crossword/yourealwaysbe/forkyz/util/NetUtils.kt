@@ -35,6 +35,7 @@ private val HTTP_OK_RESPONSE = 200
  * @param timeout the timeout in millis
  * @param headers extra request headers
  * @param data JSON data (will send as POST if not null)
+ * @param params map of URL parameters
  * @return a buffered input stream (in stream or err stream if error)
  * @throws IOException
  */
@@ -43,6 +44,7 @@ suspend fun getURL(
     timeoutMillis : Int,
     headers : Map<String, String>? = null,
     data : JSONObject? = null,
+    params : Map<String, String>? = null,
 ) : Source {
     val client = HttpClient {
         install(HttpTimeout) {
@@ -57,6 +59,14 @@ suspend fun getURL(
             headers?.forEach { (k, v) -> header(k, v) }
             header(HttpHeaders.Accept, "*/*")
             header(HttpHeaders.Connection, "close")
+
+            if (params != null) {
+                url {
+                    params.forEach { entry ->
+                        parameters.append(entry.key, entry.value)
+                    }
+                }
+            }
 
             if (data != null) {
                 header(HttpHeaders.ContentType, ContentType.Application.Json)

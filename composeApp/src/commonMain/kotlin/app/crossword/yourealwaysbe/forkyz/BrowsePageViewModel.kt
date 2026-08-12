@@ -20,6 +20,7 @@ import androidx.lifecycle.viewModelScope
 
 import app.crossword.yourealwaysbe.forkyz.BuildConfig
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.Res
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.blank_copied_puzzles_to_crosswords
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.browse_date_format_header
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.import_failure
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.import_success
@@ -495,6 +496,56 @@ class BrowsePageViewModel(
         clearDialog(BrowseDialog.CONFIRM_DELETE_SELECTED)
     }
 
+    fun blankCopySelectedPuzzles() {
+        val selectedPuzzleIDs = currentUIState.selectedPuzzleIDs
+        clearSelection()
+
+        fileHandlerProvider.get { fileHandler ->
+            threadWithUILock("blank copy puzzles") {
+                var copiedCount = 0
+                for (puzzleID in selectedPuzzleIDs) {
+                    val puzData = puzzles[puzzleID] ?: continue
+                    try {
+                        val puz
+                            = fileHandler.load(puzData.puzHandle) ?: continue
+                        val ph = fileHandler.saveNewPuzzle(
+                            puz = puz,
+                            fileNameBody = AppPuzzleUtils.generateFileName(puz),
+                            writeBlank = true,
+                            omitExtensions = true,
+                        ) ?: continue
+
+                        copiedCount += 1
+
+                        if (!isViewArchive) {
+                            loadPuzData(fileHandler, ph)?.let { pd->
+                                puzzles[pd.puzEntry.id] = pd
+                            }
+                        }
+                    } catch (e : IOException) {
+                        AppLogger.w(
+                            TAG,
+                            "Failed to blank copy " + puzzleID,
+                        )
+                    }
+                }
+                if (!isViewArchive) {
+                    runMain {
+                        println("FORKYZ: update state")
+                        updateState(isNewPuzzleList = true)
+                    }
+                } else if (copiedCount > 0) {
+                    sendToast(
+                        utils.getQuantityString(
+                            Res.plurals.blank_copied_puzzles_to_crosswords,
+                            copiedCount,
+                        ),
+                    )
+                }
+            }
+        }
+    }
+
     @MainThread
     fun swipePuzzle(puzzleID : String) {
         fileHandlerProvider.get { fileHandler ->
@@ -849,8 +900,7 @@ class BrowsePageViewModel(
 
                     if (!isViewArchive && ph != null && !needsReload) {
                         try {
-                            fileHandler.loadPuzMetaFile(ph)?.let { pm ->
-                                val pd = getPuzData(pm)
+                            val pd = loadPuzData(fileHandler, ph)?.let { pd ->
                                 puzzles[pd.puzEntry.id] = pd
                             }
                         } catch (e : IOException) {
@@ -882,8 +932,7 @@ class BrowsePageViewModel(
 
                 imported.forEach { ph ->
                     try {
-                        fileHandler.loadPuzMetaFile(ph)?.let { pm ->
-                            val pd = getPuzData(pm)
+                        loadPuzData(fileHandler, ph)?.let { pd ->
                             puzzles[pd.puzEntry.id] = pd
                         }
                     } catch (e : IOException) {
@@ -1142,6 +1191,19 @@ class BrowsePageViewModel(
         runMain {
             currentUIState = currentUIState.copy(isBusy = uiBusy.load())
         }
+    }
+
+    /**
+     * Get puz data from handle
+     *
+     * Requires load of meta, so prefer getPuzData with existing meta file.
+     */
+    @Throws(IOException::class)
+    private suspend fun loadPuzData(
+        fileHandler : FileHandler,
+        ph : PuzHandle,
+    ) : PuzData? {
+        return fileHandler.loadPuzMetaFile(ph)?.let { getPuzData(it) }
     }
 
     private suspend fun getPuzData(pm : PuzMetaFile) : PuzData {
