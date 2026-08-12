@@ -9,6 +9,7 @@ import app.crossword.yourealwaysbe.forkyz.puz.Box
 import app.crossword.yourealwaysbe.forkyz.puz.Puzzle
 import app.crossword.yourealwaysbe.forkyz.puz.PuzzleBuilder
 import app.crossword.yourealwaysbe.forkyz.util.AppLogger
+import app.crossword.yourealwaysbe.forkyz.util.HtmlUtil.htmlString
 import app.crossword.yourealwaysbe.forkyz.util.JSONException
 import app.crossword.yourealwaysbe.forkyz.util.JSONObject
 import app.crossword.yourealwaysbe.forkyz.util.parseJSONObject
@@ -67,9 +68,9 @@ class USATodayJSONIO : AbstractJSONIO() {
                 author += ", ed. " + puzJson.getString("editor")
 
             val builder = PuzzleBuilder(getBoxes(puzJson))
-                .setTitle(puzJson.optStringEmptyNull("title"))
-                .setAuthor(author)
-                .setCopyright(puzJson.optString("copyright"))
+                .setTitle(htmlString(puzJson.optStringEmptyNull("title")))
+                .setAuthor(htmlString(author))
+                .setCopyright(htmlString(puzJson.optString("copyright")))
                 .setDate(date)
 
             addClues(puzJson, builder)
