@@ -12,8 +12,10 @@
     <string name="foreground_service_data_sync_desc">Used for exporting puzzles to an external directory.</string>
 
     <!-- manifest -->
-    <!-- app_name in gradle -->
+    <string name="app_name">Forkyz</string>
     <string name="settings_importer_label">Settings Import</string>
+    <string name="app_name_debug">Forkyz Debug</string>
+    <string name="settings_importer_label_debug">Settings Import Debug</string>
 
     <!-- settings importer -->
     <string name="preferences_importing">Importing Forkyz Settings…</string>

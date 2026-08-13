@@ -12,5 +12,5 @@
     <string name="foreground_service_data_sync_desc">Gebruikt voor het exporteren van puzzels naar een externe opslag.</string>
 
     <!-- manifest -->
-    <!-- app_name in gradle -->
+    <string name="app_name">Forkyz</string>
 </resources>

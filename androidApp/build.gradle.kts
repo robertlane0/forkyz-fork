@@ -22,6 +22,9 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        manifestPlaceholders["applicationLabel"] = "@string/app_name"
+        manifestPlaceholders["settingsImportLabel"] =
+            "@string/settings_importer_label"
     }
 
     androidResources {
@@ -30,7 +33,6 @@ android {
 
     buildFeatures {
         compose = true
-        resValues = true
     }
 
     compileOptions {
@@ -50,11 +52,12 @@ android {
 
     buildTypes {
         getByName("debug") {
-            resValue("string", "app_name", "$appName Debug")
             applicationIdSuffix = ".debug"
+            manifestPlaceholders["applicationLabel"] = "@string/app_name_debug"
+            manifestPlaceholders["settingsImportLabel"] =
+                "@string/settings_importer_label_debug"
         }
         getByName("release") {
-            resValue("string", "app_name", appName)
             signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
             isShrinkResources = true
