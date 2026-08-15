@@ -253,12 +253,20 @@ class Playboard(puzzle : Puzzle) {
     val currentBox : Box?
         get() = getCurrentBoxOffset(0, 0)
 
-    val currentResponse : String?
+    val currentTopMostResponse : String?
         /**
-         * The response in the currently highlighted box or null
+         * The "primary" response in the current cell
+         *
+         * "Primary" means the normal cell response when scratch mode
+         * not enabled, or the scratch entry of the currently selected
+         * clue in that box if it is.
          */
         get() {
-            return currentBox?.response
+            return if (scratchMode) {
+                currentScratchCharacter.toString()
+            } else {
+                currentBox?.response
+            }
         }
 
     /**
@@ -2251,19 +2259,29 @@ class Playboard(puzzle : Puzzle) {
         )
 
     /**
+     * The current scratch character in cell
+     *
+     * For currently selected clue, or BLANK_CHAR if no scratch there
+     */
+    private val currentScratchCharacter : Char
+        get() {
+            val currentBox = this.currentBox
+            val note = this.note
+            val cid = this.clueID
+            if (note == null || cid == null || currentBox == null)
+                return Box.BLANK_CHAR
+            val cluePos = currentBox.getCluePosition(cid)
+            return note.scratch?.getOrNull(cluePos) ?: Box.BLANK_CHAR
+        }
+
+    /**
      * Scratch from current box/clue is blank
      *
      * Or no note/clue forcurrent
      */
     private val isCurrentScratchCharacterBlank : Boolean
         get() {
-            val currentBox = this.currentBox
-            val note = this.note
-            val cid = this.clueID
-            if (note == null || cid == null || currentBox == null)
-                return true
-            val cluePos = currentBox.getCluePosition(cid)
-            return note.isScratchBlankAt(cluePos)
+            return currentScratchCharacter == Box.BLANK_CHAR
         }
 
     /**

@@ -53,11 +53,6 @@ data class Note(
             && ((anagramSolution?.trim()?.length ?: 0) == 0)
         )
 
-    fun isScratchBlankAt(pos : Int) : Boolean {
-        val charAt = scratch?.getOrNull(pos) ?: BLANK_CHAR
-        return (charAt == BLANK_CHAR)
-    }
-
     fun withScratch(scratch : String?) : Note {
         return Note(
             scratch,

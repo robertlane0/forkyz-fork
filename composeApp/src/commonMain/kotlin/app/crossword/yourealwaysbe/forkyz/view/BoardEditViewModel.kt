@@ -205,7 +205,7 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
 
     init {
         board?.addListener(this)
-        board?.currentResponse?.let(::emitNewResponseEvent)
+        board?.currentTopMostResponse?.let(::emitNewResponseEvent)
     }
 
     fun onCleared() {
@@ -235,7 +235,7 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
     }
 
     private fun updateResponse() {
-        board?.currentResponse?.let(::emitNewResponseEvent)
+        board?.currentTopMostResponse?.let(::emitNewResponseEvent)
     }
 
     /**
