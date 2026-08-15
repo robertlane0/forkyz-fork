@@ -148,7 +148,7 @@ data class Note(
      * Returns same object if pos out of range
      */
     fun withDeleteScratchLetterAt(pos : Int) : Note {
-        return withScratchLetter(pos, BLANK_CHAR)
+        return withScratchLetter(pos, Box.BLANK_CHAR)
     }
 
     override fun toString() : String {
@@ -163,13 +163,11 @@ data class Note(
     companion object {
         private val TAG = "ForkyzNote"
 
-        private val BLANK_CHAR = Box.BLANK.get(0)
-
         private fun createBlankString(len : Int) : String {
             if (len == 0)
                 return ""
 
-            val padding = CharArray(len) { BLANK_CHAR }
+            val padding = CharArray(len) { Box.BLANK_CHAR }
             return padding.concatToString()
         }
 
@@ -177,7 +175,7 @@ data class Note(
             if (s == null)
                 return true
             for (i in 0..<s.length) {
-                if (s.get(i) != BLANK_CHAR)
+                if (s.get(i) != Box.BLANK_CHAR)
                     return false
             }
             return true

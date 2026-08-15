@@ -42,7 +42,7 @@ import app.crossword.yourealwaysbe.forkyz.util.stateInSubscribed
 import app.crossword.yourealwaysbe.forkyz.view.WordEditViewModel
 
 private val BLANK = Box.BLANK
-private val BLANK_CHAR = Box.BLANK[0]
+private val BLANK_CHAR = Box.BLANK_CHAR
 
 private fun isBlank(c : Char) : Boolean {
     return c.toString() == BLANK

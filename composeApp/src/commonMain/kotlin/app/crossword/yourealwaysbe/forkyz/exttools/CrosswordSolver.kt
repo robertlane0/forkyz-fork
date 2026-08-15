@@ -22,8 +22,6 @@ class CrosswordSolverData(
     val request : String,
 ) : ExternalToolData() {
     companion object {
-        private const val BLANK_CHAR = Box.BLANK[0]
-
         /**
          * Build a missing letters request for zone of puzzle
          */
@@ -74,7 +72,7 @@ class CrosswordSolverData(
             )
 
         private fun convertBlanks(s : String) : String {
-            return s.replace(BLANK_CHAR, CROSSWORD_SOLVER_BLANK)
+            return s.replace(Box.BLANK_CHAR, CROSSWORD_SOLVER_BLANK)
         }
     }
 

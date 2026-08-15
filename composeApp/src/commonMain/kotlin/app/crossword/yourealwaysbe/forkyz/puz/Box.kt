@@ -9,6 +9,7 @@ class Box {
     companion object {
         const val DEFAULT_FLAG_COLOR = -1
         const val BLANK = " "
+        const val BLANK_CHAR = BLANK[0]
         private const val NOCOLOR = -1
 
         fun isBlock(box : Box?) : Boolean = box == null || box.isBlock
