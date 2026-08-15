@@ -501,8 +501,7 @@ fun BoardEdit(
             .newResponseEvent
             .collectAsStateWithLifecycle()
         LaunchedEffect(newResponse) {
-            newResponse?.let(state.boxInputState::setResponse)
-            viewModel.clearNewResponseEvent()
+            newResponse?.let { state.boxInputState.setResponse(it.response) }
         }
     }
 }
@@ -810,8 +809,7 @@ fun WordEdit(
             .newResponseEvent
             .collectAsStateWithLifecycle()
         LaunchedEffect(newResponse) {
-            newResponse?.let(state::setResponse)
-            viewModel.clearNewResponseEvent()
+            newResponse?.let { state.setResponse(it.response) }
         }
     }
 }

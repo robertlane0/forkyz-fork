@@ -154,6 +154,18 @@ data class BoardEditSettings(
     val ensureVisible : Boolean = false,
 )
 
+/**
+ * A response to be synced to the input connection
+ *
+ * id is monotonically increasing so that repeated identical responses
+ * (e.g. moving between two blank cells) are still each delivered, rather
+ * than being conflated away by StateFlow's equality check.
+ */
+data class ResponseEvent(
+    val id : Long,
+    val response : String,
+)
+
 abstract class BaseBoardEditViewModel<BaseBoardState>(
     private val viewModelScope : CoroutineScope,
     protected val settings : ForkyzSettings,
@@ -172,8 +184,9 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
     lateinit var boardState : StateFlow<BaseBoardState>
         private set
 
-    val _newResponseEvent = MutableStateFlow<String?>(null)
-    val newResponseEvent : StateFlow<String?> = _newResponseEvent
+    private var responseEventCounter = 0L
+    private val _newResponseEvent = MutableStateFlow<ResponseEvent?>(null)
+    val newResponseEvent : StateFlow<ResponseEvent?> = _newResponseEvent
 
     /**
      * Must be called during init of derived class
@@ -192,15 +205,16 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
 
     init {
         board?.addListener(this)
-        board?.currentResponse?.let { _newResponseEvent.value = it }
+        board?.currentResponse?.let(::emitNewResponseEvent)
     }
 
     fun onCleared() {
         board?.removeListener(this)
     }
 
-    fun clearNewResponseEvent() {
-        _newResponseEvent.value = null
+    private fun emitNewResponseEvent(response : String) {
+        responseEventCounter += 1
+        _newResponseEvent.value = ResponseEvent(responseEventCounter, response)
     }
 
     override fun onPlayboardChange(changes : PlayboardChanges) {
@@ -221,7 +235,7 @@ abstract class BaseBoardEditViewModel<BaseBoardState>(
     }
 
     private fun updateResponse() {
-        board?.currentResponse?.let { _newResponseEvent.value = it }
+        board?.currentResponse?.let(::emitNewResponseEvent)
     }
 
     /**
