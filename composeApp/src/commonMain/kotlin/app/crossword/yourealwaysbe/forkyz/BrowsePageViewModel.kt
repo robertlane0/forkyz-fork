@@ -532,7 +532,6 @@ class BrowsePageViewModel(
                 }
                 if (!isViewArchive) {
                     runMain {
-                        println("FORKYZ: update state")
                         updateState(isNewPuzzleList = true)
                     }
                 } else if (copiedCount > 0) {
