@@ -313,9 +313,8 @@ private fun PuzzleRating(
         ) {
             RatingBar(
                 modifier = Modifier.padding(top=10.dp),
-                stepSize = 1.0F,
-                onSet = { rating -> onSet(rating.toInt()) },
-                rating = rating.toFloat(),
+                onSet = onSet,
+                rating = rating,
             )
         }
     }

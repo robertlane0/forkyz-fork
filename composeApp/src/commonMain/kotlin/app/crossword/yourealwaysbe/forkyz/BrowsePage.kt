@@ -852,10 +852,9 @@ fun BrowsePage(
                     if (state.showRatings) {
                         RatingBar(
                             modifier = Modifier.padding(top=4.dp),
-                            stepSize = 1.0F,
                             isIndicator = true,
                             style = RatingBarStyle.SMALL,
-                            rating = pe.rating.code.toFloat(),
+                            rating = pe.rating.code,
                         )
                     }
                 }
