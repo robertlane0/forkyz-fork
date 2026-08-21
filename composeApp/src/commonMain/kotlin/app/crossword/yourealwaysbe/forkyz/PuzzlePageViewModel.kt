@@ -200,6 +200,8 @@ enum class KeyboardVisibility {
  * @param showHideButton whether the Forkyz keyboard should show a hide
  * button
  * @param forceCaps whether the native keyboard should convert to caps
+ * @param removePunctuation whether the native keyboard should strip
+ * punctuation from input
  * @param compact whether keyboard should be compact
  * @param hapticFeedback whether to use haptic feedback on key press
  * @param layout keyboard layout to use
@@ -213,6 +215,7 @@ data class KeyboardState(
     val hideOnBack : Boolean = false,
     val showHideButton : Boolean = false,
     val forceCaps : Boolean = false,
+    val removePunctuation : Boolean = false,
     val compact : Boolean = false,
     val hapticFeedback : Boolean = false,
     val layout : KeyboardLayout = KeyboardLayout.KL_QWERTY,
@@ -1354,6 +1357,7 @@ open class PuzzlePageViewModel(
     ) : KeyboardState {
         return state.copy(
             forceCaps = ks.forceCaps,
+            removePunctuation = ks.removePunctuation,
             compact = ks.compact,
             hapticFeedback = ks.haptic,
             layout = ks.layout,

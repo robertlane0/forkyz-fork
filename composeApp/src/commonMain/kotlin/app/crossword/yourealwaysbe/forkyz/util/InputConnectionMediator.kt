@@ -11,9 +11,15 @@ interface KeyboardManageableView {
      *
      * @param nativeInput if native input
      * @param forceCaps whether to convert all native input into uppercase
+     * @param removePunctuation whether to strip punctuation from native
+     * input responses
      * @return true if this is a change from previous mode
      */
-    fun setNativeInput(nativeInput : Boolean, forceCaps : Boolean) : Boolean
+    fun setNativeInput(
+        nativeInput : Boolean,
+        forceCaps : Boolean,
+        removePunctuation : Boolean,
+    ) : Boolean
 
     /**
      * The view that is manageable (usually this)
@@ -90,7 +96,7 @@ abstract class InputConnectionMediator {
         receiver?.requestComposeFocus()
     }
 
-    abstract fun showNative(forceCaps : Boolean)
+    abstract fun showNative(forceCaps : Boolean, removePunctuation : Boolean)
     abstract fun hideNative()
 }
 

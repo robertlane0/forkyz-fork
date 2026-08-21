@@ -168,6 +168,7 @@ val DEFAULT_SETTINGS : Settings = Settings(
     keyboardHaptic = true,
     keyboardHideButton = false,
     keyboardLayout = KeyboardLayout.KL_QWERTY,
+    keyboardRemovePunctuation = false,
     keyboardRepeatDelay = 300,
     keyboardRepeatInterval = 75,
     keyboardShowHide = KeyboardMode.KM_HIDE_MANUAL,

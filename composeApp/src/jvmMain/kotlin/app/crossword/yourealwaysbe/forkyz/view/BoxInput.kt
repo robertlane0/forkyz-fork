@@ -38,6 +38,7 @@ actual fun BoxInput(
             override fun setNativeInput(
                 nativeInput : Boolean,
                 forceCaps : Boolean,
+                removePunctuation : Boolean,
             ) : Boolean {
                 return false
             }

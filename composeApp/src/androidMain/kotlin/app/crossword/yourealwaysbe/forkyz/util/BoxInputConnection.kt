@@ -26,10 +26,12 @@ class BoxInputConnection(
     initialResponse : String?,
     listener : BoxInputListener?,
     forceCaps : Boolean,
+    removePunctuation : Boolean,
 )  : BaseInputConnection(targetView, true) {
     private val boardEditable : BoardEditable
     private val listener : BoxInputListener?
     private val isForceCaps : Boolean
+    private val isRemovePunctuation : Boolean
     private var updateExtractedTextToken = -1
     private var batchEditNestingDepth = 0
     private var pendingResponse : String? = null
@@ -45,11 +47,14 @@ class BoxInputConnection(
      * @param forceCaps whether to convert all input into uppercase (input is
      * always requested in uppercase, but not always enforced by input method,
      * this setting converts it)
+     * @param removePunctuation whether to strip punctuation from the
+     * response before reporting it to the listener
      */
     init {
         this.boardEditable = BoardEditable(initialResponse)
         this.listener = listener
         this.isForceCaps = forceCaps
+        this.isRemovePunctuation = removePunctuation
     }
 
     fun setOutAttrs(outAttrs : EditorInfo) {
@@ -157,8 +162,11 @@ class BoxInputConnection(
                 } else {
                     if (this.isForceCaps)
                         response = response.uppercase(Locale.getDefault())
+                    if (this.isRemovePunctuation)
+                        response = response.filterNot { it.isPunctuation() }
                     // give whole response so emojis work
-                    listener.onNewResponse(response)
+                    if (response.isNotEmpty())
+                        listener.onNewResponse(response)
                 }
             }
         }

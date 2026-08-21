@@ -501,6 +501,8 @@
     <string name="keyboard_repeat_interval_hint">Key Repeat Interval (ms)</string>
     <string name="keyboard_force_caps">Capitalise Native Keyboard</string>
     <string name="keyboard_force_caps_desc">Most crossword solutions use capital letters. If checked, convert all native keyboard input to upper case.</string>
+    <string name="keyboard_remove_punctuation">Strip Punctuation from Native Keyboard</string>
+    <string name="keyboard_remove_punctuation_desc">Remove punctuation from native keyboard input before applying it to the board.</string>
     <string name="keyboard_built_in">Built-in Forkyz Keyboard</string>
     <string name="keyboard_native">Native Android Keyboard</string>
     <string name="keyboard_split_words">Split Words</string>

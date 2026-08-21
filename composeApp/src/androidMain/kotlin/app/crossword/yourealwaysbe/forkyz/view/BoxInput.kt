@@ -39,6 +39,7 @@ class BoxInputView(
     private var currentInputConnection : BoxInputConnection? = null
     private var nativeInput : Boolean = false
     private var forceCaps : Boolean = true
+    private var removePunctuation : Boolean = false
     var onNewResponseCallback : ((String) -> Unit)? = null
     var onDeleteResponseCallback : (() -> Unit)? = null
     var onOrdinaryKeyDownCallback : ((OrdinaryKey) -> Unit)? = null
@@ -71,13 +72,16 @@ class BoxInputView(
     override fun setNativeInput(
         nativeInput : Boolean,
         forceCaps : Boolean,
+        removePunctuation : Boolean,
     ) : Boolean {
         val changed = (
             this.nativeInput != nativeInput
             || this.forceCaps != forceCaps
+            || this.removePunctuation != removePunctuation
         )
         this.nativeInput = nativeInput
         this.forceCaps = forceCaps
+        this.removePunctuation = removePunctuation
         return changed
     }
 
@@ -99,6 +103,7 @@ class BoxInputView(
                 response ?: "",
                 this,
                 forceCaps,
+                removePunctuation,
             ).apply {
                 setOutAttrs(outAttrs)
             }

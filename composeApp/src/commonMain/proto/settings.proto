@@ -315,6 +315,7 @@ message Settings {
     bool actionButtonToggleScratchMode = 208;
     ActionButtonsMode actionButtonsMode = 209;
     bool actionButtonToggleShowErrorsGrid = 210;
+    bool keyboardRemovePunctuation = 211;
 
     // defunct settings
     bool showErrors = 107;

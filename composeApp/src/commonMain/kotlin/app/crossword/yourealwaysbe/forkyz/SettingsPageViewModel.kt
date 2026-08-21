@@ -398,6 +398,8 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_nativ
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_never_show
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_qwerty
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_qwertz
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_remove_punctuation
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_remove_punctuation_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_repeat_delay
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_repeat_delay_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.keyboard_repeat_delay_hint
@@ -2183,6 +2185,13 @@ class SettingsPageViewModel(
                 Res.string.keyboard_split_words_desc,
                 settings.liveKeyboardSplitWords.stateInHereBool(),
                 settings::setKeyboardSplitWords,
+            ),
+            SettingsBoolean(
+                SettingsPage.KEYBOARD,
+                Res.string.keyboard_remove_punctuation,
+                Res.string.keyboard_remove_punctuation_desc,
+                settings.liveKeyboardRemovePunctuation.stateInHereBool(),
+                settings::setKeyboardRemovePunctuation,
             ),
             SettingsHeading(
                 SettingsPage.KEYBOARD,

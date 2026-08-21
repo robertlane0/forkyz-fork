@@ -712,6 +712,7 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             settings.keyboardHideButton,
             settings.keyboardLayout,
             settings.keyboardShowHide,
+            settings.keyboardRemovePunctuation,
             settings.keyboardRepeatDelay,
             settings.keyboardRepeatInterval,
             settings.useNativeKeyboard,
@@ -1711,6 +1712,15 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     fun setKeyboardMode(value : KeyboardMode) {
         settingsUpdate { settings ->
             settings.copy(keyboardShowHide = value)
+        }
+    }
+
+    val liveKeyboardRemovePunctuation : Flow<Boolean>
+        = settingsMap { it.keyboardRemovePunctuation }
+
+    fun setKeyboardRemovePunctuation(value : Boolean) {
+        settingsUpdate { settings ->
+            settings.copy(keyboardRemovePunctuation = value)
         }
     }
 
@@ -3268,6 +3278,15 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
                        // ignore
                    }
                }
+            },
+        )
+        run(
+            "keyboardRemovePunctuation",
+            { key ->
+                builder?.put(key, settings?.keyboardRemovePunctuation)
+            },
+            { key ->
+                json?.ifHasBoolean(key) { setKeyboardRemovePunctuation(it) }
             },
         )
         run(

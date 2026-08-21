@@ -4,7 +4,7 @@ package app.crossword.yourealwaysbe.forkyz.util
 actual class View
 
 class JVMInputConnectionMediator() : InputConnectionMediator() {
-    override fun showNative(forceCaps : Boolean) {
+    override fun showNative(forceCaps : Boolean, removePunctuation : Boolean) {
         // no native on JVM
     }
 

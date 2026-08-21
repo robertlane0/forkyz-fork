@@ -588,7 +588,10 @@ class PuzzlePageScope(
         LaunchedEffect(state.needsRefresh) {
             if (state.needsRefresh) {
                 if (state.visibility == KeyboardVisibility.NATIVE) {
-                    utils.inputConnectionMediator.showNative(state.forceCaps)
+                    utils.inputConnectionMediator.showNative(
+                        state.forceCaps,
+                        state.removePunctuation,
+                    )
                 } else {
                     utils.inputConnectionMediator.hideNative()
                 }

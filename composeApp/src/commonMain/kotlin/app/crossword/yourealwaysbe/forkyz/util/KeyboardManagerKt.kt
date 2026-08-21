@@ -12,12 +12,14 @@ import app.crossword.yourealwaysbe.forkyz.settings.KeyboardSettings
  * fired
  * @param showHideButton whether to show the keyboard hide button
  * @param forceCaps whether to force caps on input
+ * @param removePunctuation whether to strip punctuation from input
  */
 data class KeyboardInfo(
     val useNative : Boolean = false,
     val hideOnBack : Boolean = false,
     val showHideButton : Boolean = false,
     val forceCaps : Boolean = false,
+    val removePunctuation : Boolean = false,
 )
 
 /**
@@ -150,6 +152,7 @@ class KeyboardManagerKt(
                     hideOnBack,
                     showHideButton,
                     ks.forceCaps,
+                    ks.removePunctuation,
                 )
             )
         }

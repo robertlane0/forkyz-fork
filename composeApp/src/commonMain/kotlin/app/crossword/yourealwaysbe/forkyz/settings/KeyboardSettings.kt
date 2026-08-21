@@ -10,6 +10,8 @@ package app.crossword.yourealwaysbe.forkyz.settings
  * @param hideButton show hide button on built-in keyboard
  * @param layout which layout to use on built-in keyboard
  * @param mode the show/hide mode of the keyboard
+ * @param removePunctuation strip punctuation from native input before
+ * applying it to the board
  * @param repeatDelay how long to hold before key repeat on built-in
  * keyboard
  * @param repeatInterval how long between repeat presses on built-in
@@ -24,6 +26,7 @@ data class KeyboardSettings(
     val hideButton : Boolean,
     val layout : KeyboardLayout,
     val mode : KeyboardMode,
+    val removePunctuation : Boolean,
     val repeatDelay : Int,
     val repeatInterval : Int,
     val useNative : Boolean,
