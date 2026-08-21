@@ -3,6 +3,7 @@ package app.crossword.yourealwaysbe.forkyz
 
 import kotlin.concurrent.atomics.AtomicBoolean
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO // needed on IOS, not JVM or Android
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -1198,7 +1199,7 @@ class BrowsePageViewModel(
      *
      * Requires load of meta, so prefer getPuzData with existing meta file.
      */
-    @Throws(IOException::class)
+    @Throws(IOException::class, CancellationException::class)
     private suspend fun loadPuzData(
         fileHandler : FileHandler,
         ph : PuzHandle,
