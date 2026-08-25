@@ -1919,6 +1919,15 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
         }
     }
 
+    val livePlayScreenAwakeMode : Flow<ScreenAwakeMode>
+        = settingsMap { it.playScreenAwakeMode }
+
+    fun setPlayScreenAwakeMode(value : ScreenAwakeMode) {
+        settingsUpdate { settings ->
+            settings.copy(playScreenAwakeMode = value)
+        }
+    }
+
     val livePlayShowClueTabs : Flow<Boolean>
         = settingsMap { it.showCluesOnPlayScreen }
 
@@ -3394,6 +3403,19 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             { key -> builder?.put(key, settings?.playLetterUndoEnabled) },
             { key ->
                 json?.ifHasBoolean(key) { setPlayPlayLetterUndoEnabled(it) }
+            },
+        )
+        run(
+            "playScreenAwakeMode",
+            { key -> builder?.put(key, settings?.playScreenAwakeMode.toString()) },
+            { key ->
+               json?.ifHasString(key) {
+                   try {
+                       setPlayScreenAwakeMode(ScreenAwakeMode.valueOf(it))
+                   } catch (e : IllegalArgumentException) {
+                       // ignore
+                   }
+               }
             },
         )
         run(

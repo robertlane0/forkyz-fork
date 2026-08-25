@@ -502,6 +502,12 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.regular_sized
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.release_notes
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.scraper_sources
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.scraper_sources_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.screen_awake_mode
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.screen_awake_mode_10_min
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.screen_awake_mode_5_min
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.screen_awake_mode_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.screen_awake_mode_forever
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.screen_awake_mode_off
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.scroll_to_clue
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.scroll_to_clue_crossing
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.scroll_to_clue_current
@@ -589,6 +595,7 @@ import app.crossword.yourealwaysbe.forkyz.settings.KeyboardMode
 import app.crossword.yourealwaysbe.forkyz.settings.LLMAgent
 import app.crossword.yourealwaysbe.forkyz.settings.MovementStrategySetting
 import app.crossword.yourealwaysbe.forkyz.settings.Orientation
+import app.crossword.yourealwaysbe.forkyz.settings.ScreenAwakeMode
 import app.crossword.yourealwaysbe.forkyz.settings.SnapClueMode
 import app.crossword.yourealwaysbe.forkyz.settings.StorageLocation
 import app.crossword.yourealwaysbe.forkyz.settings.Theme
@@ -1848,6 +1855,33 @@ class SettingsPageViewModel(
                 Res.string.full_screen_desc,
                 settings.livePlayFullScreen.stateInHereBool(),
                 settings::setPlayFullScreen,
+            ),
+            SettingsList<ScreenAwakeMode>(
+                SettingsPage.DISPLAY,
+                Res.string.screen_awake_mode,
+                Res.string.screen_awake_mode_desc,
+                listOf(
+                    SettingsListEntry(
+                        Res.string.screen_awake_mode_off,
+                        ScreenAwakeMode.SAM_OFF,
+                    ),
+                    SettingsListEntry(
+                        Res.string.screen_awake_mode_5_min,
+                        ScreenAwakeMode.SAM_5_MIN,
+                    ),
+                    SettingsListEntry(
+                        Res.string.screen_awake_mode_10_min,
+                        ScreenAwakeMode.SAM_10_MIN,
+                    ),
+                    SettingsListEntry(
+                        Res.string.screen_awake_mode_forever,
+                        ScreenAwakeMode.SAM_FOREVER,
+                    ),
+                ),
+                settings.livePlayScreenAwakeMode.stateInHere(
+                    ScreenAwakeMode.SAM_OFF,
+                ),
+                settings::setPlayScreenAwakeMode,
             ),
             SettingsList<Orientation>(
                 SettingsPage.DISPLAY,

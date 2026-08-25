@@ -4,6 +4,8 @@ package app.crossword.yourealwaysbe.forkyz
 import kotlin.text.Regex
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO // needed on IOS, not JVM or Android
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -54,6 +56,7 @@ import app.crossword.yourealwaysbe.forkyz.settings.ExternalToolSettings
 import app.crossword.yourealwaysbe.forkyz.settings.ForkyzSettings
 import app.crossword.yourealwaysbe.forkyz.settings.KeyboardLayout
 import app.crossword.yourealwaysbe.forkyz.settings.KeyboardSettings
+import app.crossword.yourealwaysbe.forkyz.settings.ScreenAwakeMode
 import app.crossword.yourealwaysbe.forkyz.util.CurrentPuzzleHolder
 import app.crossword.yourealwaysbe.forkyz.util.ForkyzKey
 import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer
@@ -343,6 +346,47 @@ open class PuzzlePageViewModel(
             viewModelScope,
             ActionButtonSettings(),
         )
+
+    private var screenAwakeTimeoutJob : Job? = null
+
+    private val _keepScreenAwake = MutableStateFlow(false)
+    val keepScreenAwake : StateFlow<Boolean> = _keepScreenAwake
+
+    /**
+     * Call whenever the user interacts with a puzzle page (board
+     * change, resume) to keep the screen awake per the current
+     * ScreenAwakeMode setting, resetting any inactivity timeout.
+     */
+    fun registerUserActivity() {
+        viewModelScope.launch {
+            val mode = settings.livePlayScreenAwakeMode.first()
+
+            screenAwakeTimeoutJob?.cancel()
+
+            _keepScreenAwake.value = mode != ScreenAwakeMode.SAM_OFF
+
+            val timeoutMillis = when (mode) {
+                ScreenAwakeMode.SAM_5_MIN -> 5 * 60_000L
+                ScreenAwakeMode.SAM_10_MIN -> 10 * 60_000L
+                else -> 0L
+            }
+            if (timeoutMillis > 0) {
+                screenAwakeTimeoutJob = viewModelScope.launch {
+                    delay(timeoutMillis)
+                    _keepScreenAwake.value = false
+                }
+            }
+        }
+    }
+
+    /**
+     * Call when leaving a puzzle page (pause) to stop keeping the
+     * screen awake
+     */
+    fun releaseScreenAwake() {
+        screenAwakeTimeoutJob?.cancel()
+        _keepScreenAwake.value = false
+    }
 
     private val mediatedUIState
         = MediatedStateWithFlow<PuzzlePageUIState, UIStateSettings>(
@@ -1014,6 +1058,7 @@ open class PuzzlePageViewModel(
         handleChangeTimer()
         handleChangeAccessibility(changes)
         handleChangeMenu(changes)
+        registerUserActivity()
     }
 
     override protected fun onCleared() {

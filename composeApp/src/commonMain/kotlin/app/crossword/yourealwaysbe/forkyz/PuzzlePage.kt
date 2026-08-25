@@ -11,8 +11,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Arrangement.Center
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -51,6 +53,9 @@ import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -161,6 +166,7 @@ import app.crossword.yourealwaysbe.forkyz.theme.BoardColorScheme
 import app.crossword.yourealwaysbe.forkyz.theme.ThemeHelper
 import app.crossword.yourealwaysbe.forkyz.util.AppLogger
 import app.crossword.yourealwaysbe.forkyz.util.ImaginaryTimer
+import app.crossword.yourealwaysbe.forkyz.util.KeepScreenAwake
 import app.crossword.yourealwaysbe.forkyz.util.NativeFrontendUtils
 import app.crossword.yourealwaysbe.forkyz.util.Uri
 import app.crossword.yourealwaysbe.forkyz.util.WIDE_SCREEN_WIDTH_DP
@@ -359,6 +365,7 @@ class PuzzlePageScope(
         onZoomOutDown : (() -> Unit)? = null,
         onZoomResetDown : (() -> Unit)? = null,
    ) : Boolean {
+        viewModel.registerUserActivity()
         return onKeyEventKeyboardBindings(
             event = event,
             binds = viewModel.keyboardBindings,
@@ -1602,17 +1609,34 @@ fun PuzzlePage(
             pageOpener.onBack()
         }
         viewModel.startTimer()
+        viewModel.registerUserActivity()
 
         onPauseOrDispose {
             viewModel.stopTimer()
             viewModel.saveBoard()
+            viewModel.releaseScreenAwake()
         }
     }
+
+    val keepScreenAwake by viewModel.keepScreenAwake.collectAsStateWithLifecycle()
+    KeepScreenAwake(keepScreenAwake)
 
     HandleBack()
 
     Launchers()
-    body(scope)
+    Box(
+        modifier = Modifier.fillMaxSize().pointerInput(Unit) {
+            awaitPointerEventScope {
+                while (true) {
+                    val event = awaitPointerEvent(PointerEventPass.Initial)
+                    if (event.type == PointerEventType.Press)
+                        viewModel.registerUserActivity()
+                }
+            }
+        },
+    ) {
+        body(scope)
+    }
     PuzzleDialogs()
 }
 

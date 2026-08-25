@@ -116,6 +116,13 @@ enum Orientation {
     O_LANDSCAPE = 2;
 }
 
+enum ScreenAwakeMode {
+    SAM_OFF = 0;
+    SAM_5_MIN = 1;
+    SAM_10_MIN = 2;
+    SAM_FOREVER = 3;
+}
+
 enum StorageLocation {
     SL_INTERNAL = 0;
     SL_EXTERNAL_SAF = 1;
@@ -316,6 +323,7 @@ message Settings {
     ActionButtonsMode actionButtonsMode = 209;
     bool actionButtonToggleShowErrorsGrid = 210;
     bool keyboardRemovePunctuation = 211;
+    ScreenAwakeMode playScreenAwakeMode = 212;
 
     // defunct settings
     bool showErrors = 107;

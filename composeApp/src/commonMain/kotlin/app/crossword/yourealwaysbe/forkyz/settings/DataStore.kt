@@ -185,6 +185,7 @@ val DEFAULT_SETTINGS : Settings = Settings(
     playActivityClueTabsPage = 0,
     playActivityClueTabsPage1 = 1,
     playLetterUndoEnabled = false,
+    playScreenAwakeMode = ScreenAwakeMode.SAM_OFF,
     predictAnagramChars = true,
     preserveCorrectLettersInShowErrors = false,
     randomClueOnShake = false,

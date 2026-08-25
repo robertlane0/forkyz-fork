@@ -339,6 +339,12 @@
     <string name="no_hint_highlighting_desc">Prevents the pink boxes indicating 'hints' in the form of reveals or show errors.</string>
     <string name="orientation_lock">Orientation Lock</string>
     <string name="orientation_lock_desc">Locks the screen orientation.</string>
+    <string name="screen_awake_mode">Keep Screen On While Solving</string>
+    <string name="screen_awake_mode_desc">Keep the screen on while solving, up to a timeout.</string>
+    <string name="screen_awake_mode_off">Off</string>
+    <string name="screen_awake_mode_5_min">5 minutes</string>
+    <string name="screen_awake_mode_10_min">10 minutes</string>
+    <string name="screen_awake_mode_forever">Forever</string>
     <string name="show_length">Show Length</string>
     <string name="show_length_desc">Shows the number of letters in the answer on the clue line.</string>
     <string name="show_timer">Show Timer</string>
