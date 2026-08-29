@@ -9,6 +9,7 @@ import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ButtonDefaults
@@ -70,6 +71,8 @@ import app.crossword.yourealwaysbe.forkyz.view.SpecialKey
 // percent of display height
 private val BUTTON_PADDING_FRAC = 0.003F
 private val BUTTON_PADDING_FRAC_COMPACT = 0.0F
+// size of key text relative to button width
+private val TEXT_SIZE_BUTTON_FRAC = 0.9f
 // used when repeat delay set to 0 (disabled)
 private val DEFAULT_LONG_PRESS_DELAY = 300L // ms
 
@@ -197,6 +200,7 @@ internal class KeyboardLayoutScope(
                 colors = ButtonDefaults.textButtonColors().copy(
                     contentColor = MaterialTheme.colorScheme.onSurface,
                 ),
+                contentPadding = PaddingValues.Zero,
             ) {
                 BoxWithConstraints {
                     val buttonTextStyle = with (LocalDensity.current) {
@@ -205,7 +209,10 @@ internal class KeyboardLayoutScope(
                             val titleLarge = MaterialTheme.typography.titleLarge
                             val fontSize = max(
                                 10.sp,
-                                min(maxWidth.toSp(), titleLarge.fontSize),
+                                min(
+                                    (maxWidth * TEXT_SIZE_BUTTON_FRAC).toSp(),
+                                    titleLarge.fontSize,
+                                ),
                             )
                             MaterialTheme.typography.titleLarge.copy(
                                 fontWeight = FontWeight.SemiBold,
