@@ -12,5 +12,11 @@
     <string name="foreground_service_data_sync_desc">Utilisé pour exporter des puzzles vers un répertoire externe.</string>
 
     <!-- manifest -->
-    <string name="app_name">Forkyz</string>
+    <string tools:ignore="UnusedResources" name="app_name">Forkyz</string>
+    <string tools:ignore="UnusedResources" name="settings_importer_label">Importation des Paramètres</string>
+    <string tools:ignore="UnusedResources" name="app_name_debug">Forkyz (Débogage)</string>
+    <string tools:ignore="UnusedResources" name="settings_importer_label_debug">Importation des Paramètres (Débogage)</string>
+
+    <!-- settings importer -->
+    <string name="preferences_importing">Importation des paramètres Forkyz</string>
 </resources>

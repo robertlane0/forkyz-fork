@@ -12,5 +12,11 @@
     <string name="foreground_service_data_sync_desc">Gebruikt voor het exporteren van puzzels naar een externe opslag.</string>
 
     <!-- manifest -->
-    <string name="app_name">Forkyz</string>
+    <string tools:ignore="UnusedResources" name="app_name">Forkyz</string>
+    <string tools:ignore="UnusedResources" name="settings_importer_label">Instellingen Importeren</string>
+    <string tools:ignore="UnusedResources" name="app_name_debug">Forkyz (Foutopsporing)</string>
+    <string tools:ignore="UnusedResources" name="settings_importer_label_debug">Instellingen Importeren (Foutopsporing)</string>
+
+    <!-- settings importer -->
+    <string name="preferences_importing">Forkyz instellingen importeren</string>
 </resources>
