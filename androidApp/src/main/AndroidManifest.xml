@@ -70,6 +70,7 @@
             android:name="app.crossword.yourealwaysbe.forkyz.ForkyzActivity"
             android:configChanges="orientation"
             android:theme="@style/Theme.Forkyz"
+            android:windowSoftInputMode="adjustNothing"
             tools:ignore="AppLinkUrlError"
             android:exported="true"
         >
