@@ -761,15 +761,9 @@ class Downloaders(
         }
 
         if (settings.enabled(DownloaderID.USA_TODAY)) {
-            downloaders.add(UclickDownloader(
+            downloaders.add(USATodayDownloader(
                 DownloaderID.USA_TODAY,
-                "usaon",
                 utils.getString(Res.string.usa_today),
-                utils.getString(Res.string.usa_today),
-                "https://subscribe.usatoday.com",
-                AbstractDateDownloader.DAYS_DAILY,
-                6.hours + 30.minutes, // 06:30 by experiment
-                "'https://games.usatoday.com/en/games/uclick-crossword'",
             ))
         }
 

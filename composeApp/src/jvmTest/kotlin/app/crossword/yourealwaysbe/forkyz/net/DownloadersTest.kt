@@ -45,7 +45,7 @@ class DownloadersTest {
             val downloaders = runBlocking { dls.getDownloaders() }
             return downloaders.stream()
                 //filter if need to test a single one
-                //.filter { d -> d.downloaderID.id == "usatoday" }
+                .filter { d -> d.downloaderID.id == "universal" }
                 .map { d -> Arguments.of(d.downloaderID.id, d) }
         }
     }
