@@ -1,0 +1,9 @@
+- New USA Today downloader (ne fonctionne qu'aux États-Unis) et mise à jour du lien de téléchargement Universal.
+- Ajouter l'option "copie blanche" à la liste des puzzles.
+- Ajouter l'option « Garder l'écran sur » pendant la lecture (réglages d'interaction).
+- Ajout d'une option pour supprimer la ponctuation de l'entrée native (paramètres clavier).
+- Utilisez une barre de notation personnalisée pour toutes les plateformes.
+- Les modifications de l'interface utilisateur (boutons d'action/liste de puzzle) pour prendre en charge les écrans monochromes.
+- Échelle de police clavier pour éviter la coupure sur les petits écrans.
+
+Changelog traduit automatiquement avec Argos Translate.

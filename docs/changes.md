@@ -1,5 +1,15 @@
 # Forkyz Changelog
 
+## Version 86
+
+- New USA Today downloader (only works in US) and updated Universal download link.
+- Add "blank copy" option to puzzle list.
+- Add "keep screen on" option while playing (interaction settings).
+- Add option to remove punctuation from native input (keyboard settings).
+- Use custom ratings bar for all platforms.
+- UI tweaks (action buttons/puzzle list) to support monochrome screens.
+- Scale keyboard font to avoid cutoff on small screens.
+
 ## Version 85
 
 - Replace date-picker in download dialog to support mouse on desktop.
