@@ -40,9 +40,6 @@ koin = "4.2.2"
 
 # Kotlin Libraries
 kotlinx-collections-immutable = "0.5.2"
-# Bug with invoke special (on Java 21.0.11 apparently) in 1.11.0
-# Need to also avoid ktor 3.5.0, zip 0.12.1, and mcp-sdk-server 0.13.0
-# which pull in coroutines 1.11.0
 kotlinx-coroutines = "1.11.0"
 kotlinx-datetime = "0.8.0"
 kotlinx-io = "0.9.1"
