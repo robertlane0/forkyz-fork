@@ -83,7 +83,7 @@ fun parseJSONArray(input : Source) : JSONArray {
 @Throws(JSONException::class)
 fun parseJSON5Object(data : String) : JSONObject {
     try {
-        return JSONObject(Json5.parseToJson5Element(data).jsonObject)
+        return JSONObject(Json5.parseToJsonElement(data).jsonObject)
     } catch (err : IllegalArgumentException) {
         throw JSONException(err)
     }
