@@ -62,7 +62,7 @@ ksoup = "0.2.6"
 material = "1.14.0"
 seismic = "1.0.3"
 date-picker-spinner = "1.0.4"
-filekit = "0.15.0"
+filekit = "0.16.0"
 mcp-sdk-server = "0.15.0"
 zip = "0.15.0"
 
