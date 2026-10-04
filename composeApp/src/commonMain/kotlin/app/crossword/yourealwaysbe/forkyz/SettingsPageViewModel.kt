@@ -1130,7 +1130,7 @@ class SettingsPageViewModel(
             DownloaderID.METRO_QUICK,
             SettingsPage.PUZZLE_SOURCES_DAILY,
             Res.string.metro_quick,
-            Res.string.updates_mon_sat,
+            Res.string.updates_daily,
         ),
         DownloaderSettingsData(
             DownloaderID.NEWSDAY,

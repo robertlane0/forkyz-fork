@@ -563,7 +563,7 @@ class Downloaders(
             downloaders.add(AbstractDateDownloader(
                 DownloaderID.METRO_QUICK,
                 utils.getString(Res.string.metro_quick),
-                AbstractDateDownloader.DAYS_NO_SUNDAY,
+                AbstractDateDownloader.DAYS_DAILY,
                 Duration.ZERO,
                 "https://metro.co.uk/",
                 PMLIO(),
