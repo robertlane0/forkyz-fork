@@ -58,6 +58,11 @@
     </plurals>
     <string name="delete">Verwijderen</string>
     <string name="archive">Archiveren</string>
+    <string name="blank_copy">Lege kopie maken</string>
+    <plurals name="blank_copied_puzzles_to_crosswords">
+        <item quantity="one">Lege puzzel gekopieerd naar kruiswoordmap.</item>
+        <item quantity="other">Lege puzzels gekopieerd naar kruiswoordmap.</item>
+    </plurals>
     <string name="delete_selected">Verwijderen</string>
     <string name="toggle_archive_selected">Archiveren of terugzetten</string>
     <string name="toggle_archive">Archiveren of terugzetten</string>
@@ -203,7 +208,8 @@
     <string name="filter_settings_hint">Instellingen zoeken</string>
     <string name="filter_settings_close">Zoeken annuleren</string>
     <string name="development_site">Ontwikkelingssite</string>
-    <string name="development_site_desc">Website voor broncode, foutrapporten &amp;c.</string>
+    <string name="development_site_desc">Website voor broncode, foutrapporten etc.</string>
+    <string name="version">Versie</string>
 
     <!-- preferences browse -->
     <string name="browse_always_show_rating">Altijd beoordeling weergeven</string>
@@ -333,6 +339,12 @@
     <string name="no_hint_highlighting_desc">Voorkomt dat 'hints' roze vakjes aangeven in de vorm van onthullingen of fouten.</string>
     <string name="orientation_lock">Oriëntatievergrendeling</string>
     <string name="orientation_lock_desc">Vergrendeld de schermoriëntatie.</string>
+    <string name="screen_awake_mode">Scherm aanhouden</string>
+    <string name="screen_awake_mode_desc">Houdt het scherm aan tijdens het oplossen.</string>
+    <string name="screen_awake_mode_off">Uit</string>
+    <string name="screen_awake_mode_5_min">5 minuten</string>
+    <string name="screen_awake_mode_10_min">10 minuten</string>
+    <string name="screen_awake_mode_forever">Altijd</string>
     <string name="show_length">Lengte weergeven</string>
     <string name="show_length_desc">Geeft het aantal letters van het antwoord weer in de omschrijving.</string>
     <string name="show_timer">Klok weergeven</string>
@@ -352,7 +364,7 @@
     <string name="clue_highlight">Omschrijvingsmarkering</string>
     <string name="clue_highlight_desc">De stijl die wordt gebruikt om de huidige omschrijving te markeren in de omschrijvingslijsten.</string>
     <string name="display_separators">Weergave scheidingstekens</string>
-    <string name="display_separators_desc">Spaties/interpunctie aangeven tussen puzzelvakjes indien bekend.</string>
+    <string name="display_separators_desc">Spaties/leestekens aangeven tussen puzzelvakjes, indien bekend.</string>
     <string name="display_separators_never">Nooit</string>
     <string name="display_separators_selected">Geselecteerde omschrijving</string>
     <string name="display_separators_always">Altijd</string>
@@ -442,6 +454,8 @@
     <string name="preferences_export_import_desc">Exporteer puzzels of bewaar/herstel instellingen met een extern bestand.</string>
     <string name="preferences_export">Instellingen exporteren</string>
     <string name="preferences_export_desc">Bewaar instellingen in een extern bestand.</string>
+    <string name="share_settings">Instellingen delen</string>
+    <string name="share_settings_desc">Deel de instellingen met een andere app.</string>
     <string name="preferences_import">Instellingen importeren</string>
     <string name="preferences_import_desc">Herstel instellingen vanaf een extern bestand. Let op, Instellingen kunnen in de loop van de tijd veranderen. Gedateerde of onbekende instellingswaarden in een bestand zullen genegeerd worden.</string>
     <string name="preferences_imported">Instellingen geïmporteerd.</string>
@@ -493,8 +507,10 @@
     <string name="keyboard_repeat_interval_hint">Toetsherhalingsinterval (ms)</string>
     <string name="keyboard_force_caps">Hoofdletters forceren</string>
     <string name="keyboard_force_caps_desc">De meeste kruiswoordoplossingen gebruiken hoofdletters. Ingeschakeld wordt alle systeemtoetsenbordinvoer omgezet in hoofdletters.</string>
+    <string name="keyboard_remove_punctuation">Leestekens van systeemtoetsenbord blokkeren</string>
+    <string name="keyboard_remove_punctuation_desc">Blokkeer leestekens van systeemtoetsenbordinvoer.</string>
     <string name="keyboard_built_in">Ingebouwd Forkyz-toetsenbord </string>
-    <string name="keyboard_native">Android systeemtoetsenbord</string>
+    <string name="keyboard_native">Systeemtoetsenbord</string>
     <string name="keyboard_split_words">Woorden opsplitsen</string>
     <string name="keyboard_split_words_desc">Splits antwoorden van de systeeminvoermethode in afzonderlijke tekens in plaats van het volledige woord in één vakje in te voeren.</string>
     <string name="hardware_keyboard">Extern toetsenbord</string>
@@ -741,7 +757,7 @@
     <string name="showing_errors">Fouten worden getoond</string>
     <string name="show_errors_full_grid">Raster</string>
     <string name="show_errors_cursor">Aanwijzer</string>
-    <string name="show_errors_filled_word_cells">Ingevuld woord (cellen)</string>
+    <string name="show_errors_filled_word_cells">Ingevuld woord (vakjes)</string>
     <string name="show_errors_filled_word_word">Ingevuld woord (woord)</string>
     <string name="reveal">Onthullen</string>
     <string name="initial_letter">Eerste letter</string>
@@ -936,7 +952,7 @@
     <string name="share_logcat">Logcat delen</string>
 
     <!-- AboutLibraries activity -->
-    <string name="about_libraries">Over bibliotheken</string>
+    <string name="about_libraries">Bibliotheken</string>
 
     <!-- downloaders -->
     <string name="nrc">NRC</string>
@@ -984,9 +1000,17 @@
     <string name="default_nodir_list_name">Omschrijvingen</string>
 
     <!-- action buttons -->
+    <string name="action_buttons_mode">Positie actiebalk</string>
+    <string name="action_buttons_mode_desc">Waar de actiebalkbedieningselementen weer te geven.</string>
+    <string name="action_buttons_mode_bottom">Onderaan</string>
+    <string name="action_buttons_mode_top_always">Titelbalk (altijd)</string>
+    <string name="action_buttons_mode_top_wide">Titelbalk (groot scherm)</string>
     <string name="action_buttons">Actieknoppen</string>
     <string name="action_buttons_desc">Sneltoetsen op het scherm.</string>
     <string name="action_button_toggle_scratch_mode">Krabbelmodus</string>
     <string name="action_button_toggle_scratch_mode_desc">Knop om krabbelmodus in/uit te schakelen.</string>
+    <string name="action_button_toggle_show_errors_grid">Fouten tonen</string>
+    <string name="action_button_toggle_show_errors_grid_desc">Actieknop om fouten te tonen in het raster.</string>
     <string name="toggle_scratch_mode">Krabbelmodus in/uitschakelen</string>
+    <string name="toggle_show_errors_grid">Fouten tonen in-/uitschakelen</string>
 </resources>
