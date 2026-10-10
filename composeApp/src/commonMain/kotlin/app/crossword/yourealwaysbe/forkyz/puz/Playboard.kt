@@ -329,15 +329,18 @@ class Playboard(puzzle : Puzzle) {
     /**
      * Set current word from string
      *
-     * One character per box
+     * One character per box. Does not copy blanks.
      */
-    fun setCurrentWordFromString(response : String) {
+    fun copyLettersToCurrentWordFromString(response : String) {
         val zone = currentZone
         if (zone == null)
             return
 
         val length = min(zone.size(), response.length)
         for (i in 0..<length) {
+            val letter = response.get(i).toString()
+            if (letter == Box.BLANK)
+                continue
             val pos = zone.getPosition(i)
             puzzle.checkedGetBox(pos)?.let { box ->
                 if (!isBlock(box))
