@@ -725,8 +725,15 @@ class Playboard(puzzle : Puzzle) {
 
     /**
      * Ignored if clue not on board
+     *
+     * If skipCompletedLetters, jump to the first unfilled letter of the
+     * clue, else jump to the start of the clue.
      */
-    fun jumpToClue(clueID : ClueID?, tag : Any? = null) {
+    fun jumpToClue(
+        clueID : ClueID?,
+        tag : Any? = null,
+        skipCompletedLetters : Boolean = this.isSkipCompletedLetters,
+    ) {
         if (clueID == null)
             return
 
@@ -734,7 +741,7 @@ class Playboard(puzzle : Puzzle) {
 
         val start = getClueStart(clueID)
         val pos = getZone(clueID)
-            ?.firstOrNull { !skipPosition(it, isSkipCompletedLetters) }
+            ?.firstOrNull { !skipPosition(it, skipCompletedLetters) }
             ?: start
 
         if (pos != null) {
@@ -1099,7 +1106,8 @@ class Playboard(puzzle : Puzzle) {
             return
 
         pushNotificationDisabled()
-        jumpToClue(this.clueID)
+        // answers are always entered from the start of the word
+        jumpToClue(this.clueID, skipCompletedLetters = false)
         // use STOP_ON_END movement for entering answers
         val oldMovementStrategy = this.movementStrategy
         this.movementStrategy = MovementStrategy.STOP_ON_END
