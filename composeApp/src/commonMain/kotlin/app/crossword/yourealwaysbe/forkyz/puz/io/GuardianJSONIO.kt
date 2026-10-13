@@ -16,6 +16,7 @@ import app.crossword.yourealwaysbe.forkyz.puz.PuzzleBuilder
 import app.crossword.yourealwaysbe.forkyz.puz.Zone
 import app.crossword.yourealwaysbe.forkyz.puz.util.PuzzleUtils.getAcrossZone
 import app.crossword.yourealwaysbe.forkyz.puz.util.PuzzleUtils.getDownZone
+import app.crossword.yourealwaysbe.forkyz.util.HtmlUtil
 import app.crossword.yourealwaysbe.forkyz.util.JSONException
 import app.crossword.yourealwaysbe.forkyz.util.JSONObject
 import app.crossword.yourealwaysbe.forkyz.util.parseJSONObject
@@ -112,7 +113,11 @@ class GuardianJSONIO : AbstractJSONIO() {
         fun readPuzzle(json : JSONObject) : Puzzle {
             val builder = PuzzleBuilder(getBoxes(json))
                 .setTitle(json.optStringEmptyNull("name"))
-                .setNotes(json.optStringEmptyNull("instructions"))
+                .setIntroMessage(
+                    HtmlUtil.brString(
+                        json.optStringEmptyNull("instructions"),
+                    ),
+                )
 
             addAuthor(json, builder)
             addDate(json, builder)
