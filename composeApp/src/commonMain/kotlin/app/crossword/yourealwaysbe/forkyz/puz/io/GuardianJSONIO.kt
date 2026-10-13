@@ -105,8 +105,8 @@ class GuardianJSONIO : AbstractJSONIO() {
         /**
          * Read puzzle from Guardian JSON format
          *
-         * Does not set source or support url (this method may be moved to
-         * puzlib/io at some point).
+         * Does not set source or support url (not necessarily from the
+         * Guardian)
          */
         @Throws(JSONException::class)
         fun readPuzzle(json : JSONObject) : Puzzle {
