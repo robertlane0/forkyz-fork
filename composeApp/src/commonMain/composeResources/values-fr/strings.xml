@@ -252,6 +252,7 @@
     <string name="le_parisien_daily_f4">(FR) Le Parisien (ancien),  Niveau 4</string>
     <string name="le_parisien_daily_f4_desc">Mots croisés quotidiens en français, niveau 4. Plus de correspondances sur le site, mais des puzzles encore disponibles.</string>
     <string name="guardian_daily">Guardian Daily Cryptic</string>
+    <string name="guardian_quick_cryptic">Guardian Weekly Quick Cryptic</string>
     <string name="guardian_quiptic">Guardian Weekly Quiptic</string>
     <string name="independent_daily">Independent Daily Cryptic</string>
     <string name="newsday">Newsday</string>

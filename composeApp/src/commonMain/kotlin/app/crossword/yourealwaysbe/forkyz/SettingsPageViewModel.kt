@@ -262,6 +262,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.grid_ratio_six
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.grid_ratio_thirty_pcnt
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.guardian_daily
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.guardian_quick
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.guardian_quick_cryptic
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.guardian_quick_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.guardian_quiptic
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.hamburger_abendblatt_daily
@@ -558,6 +559,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.universal_cros
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.updates_daily
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.updates_mon_fri
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.updates_mon_sat
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.updates_saturdays
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.updates_sundays
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.updates_thursdays
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.usa_today
@@ -1219,6 +1221,12 @@ class SettingsPageViewModel(
             SettingsPage.PUZZLE_SOURCES_WEEKLY,
             Res.string.jonesin_crosswords,
             Res.string.updates_thursdays,
+        ),
+        DownloaderSettingsData(
+            DownloaderID.GUARDIAN_WEEKLY_QUICK_CRYPTIC,
+            SettingsPage.PUZZLE_SOURCES_WEEKLY,
+            Res.string.guardian_quick_cryptic,
+            Res.string.updates_saturdays,
         ),
         DownloaderSettingsData(
             DownloaderID.GUARDIAN_WEEKLY_QUIPTIC,
