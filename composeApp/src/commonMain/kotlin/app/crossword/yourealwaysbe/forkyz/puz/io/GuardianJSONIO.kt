@@ -112,6 +112,7 @@ class GuardianJSONIO : AbstractJSONIO() {
         fun readPuzzle(json : JSONObject) : Puzzle {
             val builder = PuzzleBuilder(getBoxes(json))
                 .setTitle(json.optStringEmptyNull("name"))
+                .setNotes(json.optStringEmptyNull("instructions"))
 
             addAuthor(json, builder)
             addDate(json, builder)
