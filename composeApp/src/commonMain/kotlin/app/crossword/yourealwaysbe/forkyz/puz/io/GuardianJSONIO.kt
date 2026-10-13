@@ -113,10 +113,21 @@ class GuardianJSONIO : AbstractJSONIO() {
             val builder = PuzzleBuilder(getBoxes(json))
                 .setTitle(json.optStringEmptyNull("name"))
 
+            addAuthor(json, builder)
+            addDate(json, builder)
+
+            addClues(json, builder)
+
+            return builder.puzzle
+        }
+
+        private fun addAuthor(json : JSONObject, builder : PuzzleBuilder) {
             val creator = json.optJSONObject("creator")
             if (creator != null)
                 builder.setAuthor(creator.optStringEmptyNull("name"))
+        }
 
+        private fun addDate(json : JSONObject, builder : PuzzleBuilder) {
             if (json.has("date")) {
                 try {
                     val epochMillis = json.getLong("date")
@@ -137,10 +148,6 @@ class GuardianJSONIO : AbstractJSONIO() {
                     }
                 }
             }
-
-            addClues(json, builder)
-
-            return builder.puzzle
         }
 
         @Throws(JSONException::class)
