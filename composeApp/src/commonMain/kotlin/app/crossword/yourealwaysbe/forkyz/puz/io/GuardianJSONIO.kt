@@ -16,6 +16,7 @@ import app.crossword.yourealwaysbe.forkyz.puz.PuzzleBuilder
 import app.crossword.yourealwaysbe.forkyz.puz.Zone
 import app.crossword.yourealwaysbe.forkyz.puz.util.PuzzleUtils.getAcrossZone
 import app.crossword.yourealwaysbe.forkyz.puz.util.PuzzleUtils.getDownZone
+import app.crossword.yourealwaysbe.forkyz.util.HtmlUtil
 import app.crossword.yourealwaysbe.forkyz.util.JSONException
 import app.crossword.yourealwaysbe.forkyz.util.JSONObject
 import app.crossword.yourealwaysbe.forkyz.util.parseJSONObject
@@ -105,18 +106,34 @@ class GuardianJSONIO : AbstractJSONIO() {
         /**
          * Read puzzle from Guardian JSON format
          *
-         * Does not set source or support url (this method may be moved to
-         * puzlib/io at some point).
+         * Does not set source or support url (not necessarily from the
+         * Guardian)
          */
         @Throws(JSONException::class)
         fun readPuzzle(json : JSONObject) : Puzzle {
             val builder = PuzzleBuilder(getBoxes(json))
                 .setTitle(json.optStringEmptyNull("name"))
+                .setIntroMessage(
+                    HtmlUtil.brString(
+                        json.optStringEmptyNull("instructions"),
+                    ),
+                )
 
+            addAuthor(json, builder)
+            addDate(json, builder)
+
+            addClues(json, builder)
+
+            return builder.puzzle
+        }
+
+        private fun addAuthor(json : JSONObject, builder : PuzzleBuilder) {
             val creator = json.optJSONObject("creator")
             if (creator != null)
                 builder.setAuthor(creator.optStringEmptyNull("name"))
+        }
 
+        private fun addDate(json : JSONObject, builder : PuzzleBuilder) {
             if (json.has("date")) {
                 try {
                     val epochMillis = json.getLong("date")
@@ -137,10 +154,6 @@ class GuardianJSONIO : AbstractJSONIO() {
                     }
                 }
             }
-
-            addClues(json, builder)
-
-            return builder.puzzle
         }
 
         @Throws(JSONException::class)

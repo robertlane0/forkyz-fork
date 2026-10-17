@@ -194,10 +194,16 @@ object HtmlUtil {
         if (value == null)
             return null
 
-        return Entities.escape(value)
-            .replace("\r", "")
-            .replace("\n", "<br/>")
-            .replace("  ", " &nbsp;")
+        return brString(Entities.escape(value).replace("  ", " &nbsp;"))
+    }
+
+    /**
+     * Convert newlines to <br> in string
+     */
+    fun brString(value : String?) : String? {
+        return value
+            ?.replace("\r", "")
+            ?.replace("\n", "<br/>")
     }
 
     /**

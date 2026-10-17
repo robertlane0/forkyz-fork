@@ -24,6 +24,7 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.elpais_experto
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.guardian_daily
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.guardian_quick
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.guardian_quiptic
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.guardian_quick_cryptic
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.hamburger_abendblatt_daily
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.independent_daily
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.irish_news_cryptic
@@ -80,6 +81,7 @@ enum class DownloaderID(val id : String) {
     DE_TELEGRAAF("detelegraaf"),
     EL_PAIS_EXPERTO("elpaisexperto"),
     GUARDIAN_DAILY_CRYPTIC("guardian"),
+    GUARDIAN_WEEKLY_QUICK_CRYPTIC("guardianQuickCryptic"),
     GUARDIAN_WEEKLY_QUIPTIC("guardianQuiptic"),
     HAM_ABEND("hamabend"),
     INDEPENDENT_DAILY_CRYPTIC("independent"),
@@ -353,6 +355,13 @@ class Downloaders(
             downloaders.add(GuardianDailyCrypticDownloader(
                 DownloaderID.GUARDIAN_DAILY_CRYPTIC,
                 utils.getString(Res.string.guardian_daily),
+            ))
+        }
+
+        if (settings.enabled(DownloaderID.GUARDIAN_WEEKLY_QUICK_CRYPTIC)) {
+            downloaders.add(GuardianWeeklyQuickCrypticDownloader(
+                DownloaderID.GUARDIAN_WEEKLY_QUICK_CRYPTIC,
+                utils.getString(Res.string.guardian_quick_cryptic),
             ))
         }
 

@@ -1,3 +1,11 @@
+# Coroutines
+# Shrinking was stripping an "unused" interface out of a class's
+# implements list (e.g. JobSupport) while leaving behind an invokespecial
+# that still targets it directly, producing a VerifyError ("interface
+# method reference is in an indirect superinterface") at runtime.
+-keep class kotlinx.coroutines.** { *; }
+-keep interface kotlinx.coroutines.** { *; }
+
 # Wire
 -dontwarn com.squareup.wire.**
 -keep class com.squareup.wire.** { *; }

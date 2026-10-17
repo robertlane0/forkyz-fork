@@ -329,15 +329,18 @@ class Playboard(puzzle : Puzzle) {
     /**
      * Set current word from string
      *
-     * One character per box
+     * One character per box. Does not copy blanks.
      */
-    fun setCurrentWordFromString(response : String) {
+    fun copyLettersToCurrentWordFromString(response : String) {
         val zone = currentZone
         if (zone == null)
             return
 
         val length = min(zone.size(), response.length)
         for (i in 0..<length) {
+            val letter = response.get(i).toString()
+            if (letter == Box.BLANK)
+                continue
             val pos = zone.getPosition(i)
             puzzle.checkedGetBox(pos)?.let { box ->
                 if (!isBlock(box))
@@ -722,8 +725,15 @@ class Playboard(puzzle : Puzzle) {
 
     /**
      * Ignored if clue not on board
+     *
+     * If skipCompletedLetters, jump to the first unfilled letter of the
+     * clue, else jump to the start of the clue.
      */
-    fun jumpToClue(clueID : ClueID?, tag : Any? = null) {
+    fun jumpToClue(
+        clueID : ClueID?,
+        tag : Any? = null,
+        skipCompletedLetters : Boolean = this.isSkipCompletedLetters,
+    ) {
         if (clueID == null)
             return
 
@@ -731,7 +741,7 @@ class Playboard(puzzle : Puzzle) {
 
         val start = getClueStart(clueID)
         val pos = getZone(clueID)
-            ?.firstOrNull { !skipPosition(it, isSkipCompletedLetters) }
+            ?.firstOrNull { !skipPosition(it, skipCompletedLetters) }
             ?: start
 
         if (pos != null) {
@@ -1096,7 +1106,8 @@ class Playboard(puzzle : Puzzle) {
             return
 
         pushNotificationDisabled()
-        jumpToClue(this.clueID)
+        // answers are always entered from the start of the word
+        jumpToClue(this.clueID, skipCompletedLetters = false)
         // use STOP_ON_END movement for entering answers
         val oldMovementStrategy = this.movementStrategy
         this.movementStrategy = MovementStrategy.STOP_ON_END

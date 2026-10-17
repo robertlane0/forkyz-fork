@@ -265,6 +265,7 @@
     <string name="nrc_scrypto">(NL) NRC Scrypto</string>
     <string name="nrc_scrypto_desc">Updates Saturdays, in Dutch.</string>
     <string name="guardian_daily">Guardian Daily Cryptic</string>
+    <string name="guardian_quick_cryptic">Guardian Weekly Quick Cryptic</string>
     <string name="guardian_quiptic">Guardian Weekly Quiptic</string>
     <string name="independent_daily">Independent Daily Cryptic</string>
     <string name="newsday">Newsday</string>
@@ -681,6 +682,7 @@
 
     <!-- preferences weekly -->
     <string name="updates_thursdays">Updates Thursdays.</string>
+    <string name="updates_saturdays">Updates Saturdays.</string>
     <string name="updates_sundays">Updates Sundays.</string>
     <string name="regular_sized">Regular Sized</string>
     <string name="large_sized">Large Sized</string>

@@ -866,6 +866,26 @@ class PlayboardTest {
         assertPosition(board, 1, 4)
     }
 
+    @TestWithAndWithoutBlockObjects
+    fun testPlayAnswerSkipCompletedLetters(blockObjects : Boolean) {
+        val puz = loadTestPuz(blockObjects)
+        val board = Playboard(puz)
+        board.isSkipCompletedLetters = true
+
+        // First letter filled should not shift the answer along
+        puz.checkedGetBox(1, 0)?.response = "X"
+        moveToPosition(board, 1, 2)
+        board.playAnswer("ABCDE")
+
+        assertBoxLetter(puz, 1, 0, "A")
+        assertBoxLetter(puz, 1, 1, "B")
+        assertBoxLetter(puz, 1, 2, "C")
+        assertBoxLetter(puz, 1, 3, "D")
+        assertBoxLetter(puz, 1, 4, "E")
+
+        assertPosition(board, 1, 4)
+    }
+
     fun testPlayLetters(blockObjects : Boolean) {
         val puz = loadTestPuz(blockObjects)
         val board = Playboard(puz)

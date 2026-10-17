@@ -681,6 +681,11 @@ class NotesPageViewModel(
         updateState()
     }
 
+    /**
+     * Check if can copy letters from source to target without clash
+     *
+     * Assumes blanks are not copied
+     */
     private fun hasCopyConflict(
         source : NoteEntry,
         target : NoteEntry,
@@ -692,12 +697,9 @@ class NotesPageViewModel(
         val sourceValue = getNotesValue(source)
         val targetValue = getNotesValue(target)
 
-        // for anagram solution we just move letters
-        val checkBlanks = target != NoteEntry.ANAGRAM_SOLUTION
-
         for (i in 0 until min(sourceValue.length, targetValue.length)) {
             if (
-                (checkBlanks || !isBlank(sourceValue[i]))
+                !isBlank(sourceValue[i])
                 && !isBlank(targetValue[i])
                 && sourceValue[i] != targetValue[i]
             ) {
@@ -746,14 +748,23 @@ class NotesPageViewModel(
         }
     }
 
+    /**
+     * Copies values ignoring blanks (except if to TEXT)
+     */
     private fun copyValueToTarget(value : String, target : NoteEntry) {
         when (target) {
             NoteEntry.BOARD -> {
-                getBoard()?.setCurrentWordFromString(value)
+                getBoard()?.copyLettersToCurrentWordFromString(value)
             }
             NoteEntry.SCRATCH -> {
-                // overwrite
-                setScratchValue(value)
+                // merge non-blanks then overwrite
+                val len = max(value.length, scratchValue.length)
+                val merged = charArrayWithBlanks(scratchValue, len)
+                for (i in 0 until len) {
+                    if (!isBlank(value[i]))
+                        merged[i] = value[i]
+                }
+                setScratchValue(merged.concatToString())
             }
             NoteEntry.TEXT -> {
                 // append to end
@@ -772,6 +783,8 @@ class NotesPageViewModel(
                 for (i in 0 until len) {
                     if (numRemaining == 0)
                         break
+                    if (isBlank(value[i]))
+                        continue
                     if (isBlank(anagSrc[i]))
                         numRemaining -= 1
                     anagSrc[i] = value[i]
@@ -783,18 +796,19 @@ class NotesPageViewModel(
                 var values = currentAnagramValues
                 val len = min(value.length, boxesLength)
                 for (i in 0 until len) {
-                    if (!isBlank(value[i])) {
-                        val solution = padBlank(values.solution, boxesLength)
-                        val oldChar = solution[i]
-                        val newChar = value[i]
-                        if (canAddToAnagramSolutionValues(values, newChar)) {
-                            values = updateAnagramSolutionValues(
-                                values,
-                                i,
-                                oldChar,
-                                setChar(solution, i, newChar)
-                            )
-                        }
+                    if (isBlank(value[i]))
+                        continue
+
+                    val solution = padBlank(values.solution, boxesLength)
+                    val oldChar = solution[i]
+                    val newChar = value[i]
+                    if (canAddToAnagramSolutionValues(values, newChar)) {
+                        values = updateAnagramSolutionValues(
+                            values,
+                            i,
+                            oldChar,
+                            setChar(solution, i, newChar)
+                        )
                     }
                 }
                 updateAnagramValues(values)
