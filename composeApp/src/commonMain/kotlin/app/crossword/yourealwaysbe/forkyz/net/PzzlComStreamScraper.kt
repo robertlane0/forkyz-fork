@@ -181,7 +181,7 @@ class PzzlComStreamScraper : AbstractStreamScraper() {
             0,
         )
         private val MAIN_JS_PATH = RegexScrape(
-            Regex("src=\"([^\"]*main.js)\""),
+            Regex("src=\"([^\"]*main.js[^\"]*)\""),
             1,
         )
 
