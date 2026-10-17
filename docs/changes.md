@@ -1,5 +1,12 @@
 # Forkyz Changelog
 
+## Version 87
+
+- Add Guardian Weekly Quick Cryptic downloader.
+- Support instructions in Guardian puzzles.
+- Dutch translation updates (thanks @ojppe).
+- Don't copy blanks on Notes page.
+
 ## Version 86
 
 - New USA Today downloader (only works in US) and updated Universal download link.
