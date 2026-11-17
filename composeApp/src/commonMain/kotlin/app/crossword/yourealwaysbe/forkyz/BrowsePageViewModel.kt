@@ -1364,8 +1364,9 @@ class BrowsePageViewModel(
      * date was found. Matching dates therefore indicate a fallback.
      */
     private fun getPublicationDate(pm : PuzMetaFile) : LocalDate? {
-        return AppPuzzleUtils.deriveDate(pm.date, pm.fileName)
-            ?.takeIf { it != pm.dateAdded }
+        return AppPuzzleUtils.deriveDateFromTitle(pm.title)
+            ?: AppPuzzleUtils.deriveDate(pm.date, pm.fileName)
+                ?.takeIf { it != pm.dateAdded }
     }
 
     private fun getSortDate(

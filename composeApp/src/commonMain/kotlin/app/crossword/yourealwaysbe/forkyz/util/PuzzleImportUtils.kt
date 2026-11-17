@@ -142,8 +142,9 @@ private suspend fun ensurePuzSource(
 }
 
 private fun ensurePuzDate(puz : Puzzle, fileName : String?) {
-    val date
-        = AppPuzzleUtils.deriveDate(puz.date, fileName) ?: TimeUtils.today()
+    val date = AppPuzzleUtils.deriveDate(puz.date, fileName)
+        ?: AppPuzzleUtils.deriveDateFromTitle(puz.title)
+        ?: TimeUtils.today()
     puz.date = date
 }
 

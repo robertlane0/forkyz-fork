@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
 import app.crossword.yourealwaysbe.forkyz.util.AppPuzzleUtils.deriveDate
+import app.crossword.yourealwaysbe.forkyz.util.AppPuzzleUtils.deriveDateFromTitle
 import app.crossword.yourealwaysbe.forkyz.util.AppPuzzleUtils.deriveSource
 
 class AppPuzzleUtilsTest {
@@ -103,6 +104,35 @@ class AppPuzzleUtilsTest {
                 "",
                 "Title",
             ),
+        )
+    }
+
+
+    @Test
+    fun testDeriveDateFromAbbreviatedPuzTitle() {
+        Assertions.assertEquals(
+            LocalDate(2009, 11, 13),
+            deriveDateFromTitle("NY Times, Fri, Nov 13, 2009"),
+        )
+    }
+
+    @Test
+    fun testDeriveDateFromFullPuzTitle() {
+        Assertions.assertEquals(
+            LocalDate(2021, 8, 9),
+            deriveDateFromTitle("NY Times, Monday, August 9, 2021"),
+        )
+    }
+
+    @Test
+    fun testDeriveDateFromTitleWithoutDate() {
+        Assertions.assertNull(deriveDateFromTitle("A crossword title"))
+    }
+
+    @Test
+    fun testDeriveDateFromInvalidTitleDate() {
+        Assertions.assertNull(
+            deriveDateFromTitle("NY Times, Monday, February 30, 2021"),
         )
     }
 
