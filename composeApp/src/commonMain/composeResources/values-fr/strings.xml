@@ -207,6 +207,8 @@
     <string name="browse_always_show_rating_desc">Montrez la notation de puzzle sur toutes les listes de puzzle, pas seulement les archives.</string>
     <string name="browse_show_percentage_correct">Afficher le pourcentage de corrects</string>
     <string name="browse_show_percentage_correct_desc">Afficher le pourcentage de cellules correctes au lieu du pourcentage de cellules remplies à côté du puzzle (comme Shortyz).</string>
+    <string name="browse_sort_by_publication_date">Trier par date de publication</string>
+    <string name="browse_sort_by_publication_date_desc">Utiliser la date de publication lorsqu’elle peut être déterminée ; sinon, utiliser la date d’ajout du mot croisé.</string>
     <string name="cleanup_archives">Nettoyage des Archives</string>
     <string name="cleanup_archives_desc">Détermine à partir de quel âge supprimer un puzzle archivé.</string>
     <string name="cleanup_unfinished">Nettoyage non achevé</string>

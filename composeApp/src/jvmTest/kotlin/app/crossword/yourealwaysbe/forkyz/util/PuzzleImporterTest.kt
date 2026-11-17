@@ -190,6 +190,7 @@ class PuzzleImporterTest {
                             directoryUri = "content://none".toUri(),
                             isUpdatable = false,
                             date = null,
+                            dateAdded = null,
                             percentComplete = 0,
                             percentFilled = 0,
                             source = null,

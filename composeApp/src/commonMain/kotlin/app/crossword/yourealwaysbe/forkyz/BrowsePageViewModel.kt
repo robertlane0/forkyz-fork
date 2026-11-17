@@ -120,6 +120,7 @@ data class UIState(
     val puzzleFilter : String? = null,
     val isBusy : Boolean = false,
     val sortOrder : AccessorSetting = AccessorSetting.AS_DATE_DESC,
+    val sortByPublicationDate : Boolean = false,
     val puzzleList : List<PuzGroup> = listOf(),
     val disableSwipe : Boolean = true,
     val swipeAction : BrowseSwipeAction = BrowseSwipeAction.BSA_ARCHIVE,
@@ -154,6 +155,7 @@ data class PuzEntry(
     val id : String,
     val caption : String,
     val date : LocalDate,
+    val publicationDate : LocalDate?,
     val percentComplete : Int,
     val percentFilled : Int,
     val percentHinted : Int,
@@ -207,6 +209,7 @@ private data class BrowseActionSettings(
 
 private data class BrowseDisplaySettings(
     val sortOrder : AccessorSetting,
+    val sortByPublicationDate : Boolean,
     val appDayNightMode : DayNightMode,
 )
 
@@ -273,6 +276,7 @@ class BrowsePageViewModel(
             ),
             combine(
                 settings.liveBrowseSort,
+                settings.liveBrowseSortByPublicationDate,
                 settings.liveAppDayNightMode,
                 ::BrowseDisplaySettings,
             ),
@@ -1015,6 +1019,10 @@ class BrowsePageViewModel(
 
         if (formatDateHeader(pe.date).uppercase().contains(upperFilterText))
             return true
+        if (pe.publicationDate?.let {
+            formatDateHeader(it).uppercase().contains(upperFilterText)
+        } == true)
+            return true
 
         return false
     }
@@ -1039,7 +1047,11 @@ class BrowsePageViewModel(
                 isNewPuzzleList
                 || puzzleFilter != currentUIState.puzzleFilter
             ) {
-                newPuzzleList = getPuzzleList(puzzleFilter, state.sortOrder)
+                newPuzzleList = getPuzzleList(
+                    puzzleFilter,
+                    state.sortOrder,
+                    state.sortByPublicationDate,
+                )
             }
 
             val displayInternalStorageMessage = (
@@ -1084,10 +1096,16 @@ class BrowsePageViewModel(
         var newPuzzleList : List<PuzGroup> = state.puzzleList
 
         val newSortOrder = browseSettings.displaySettings.sortOrder
-        if (state.sortOrder != newSortOrder) {
+        val sortByPublicationDate
+            = browseSettings.displaySettings.sortByPublicationDate
+        if (
+            state.sortOrder != newSortOrder
+            || state.sortByPublicationDate != sortByPublicationDate
+        ) {
             newPuzzleList = getPuzzleList(
                 currentUIState.puzzleFilter,
                 newSortOrder,
+                sortByPublicationDate,
             )
         }
 
@@ -1135,6 +1153,7 @@ class BrowsePageViewModel(
 
         return state.copy(
             sortOrder = newSortOrder,
+            sortByPublicationDate = sortByPublicationDate,
             puzzleList = newPuzzleList,
             disableSwipe = disableSwipe,
             swipeAction = browseSettings.actionSettings.swipeAction,
@@ -1156,6 +1175,7 @@ class BrowsePageViewModel(
     private suspend fun getPuzzleList(
         puzzleFilter : String?,
         sortOrder : AccessorSetting,
+        sortByPublicationDate : Boolean,
     ) : List<PuzGroup> {
         return puzzles.values
             .map { it.puzEntry }
@@ -1164,11 +1184,15 @@ class BrowsePageViewModel(
                 when (sortOrder) {
                     AccessorSetting.AS_SOURCE_DATE_ASC -> pe.source
                     AccessorSetting.AS_SOURCE_DATE_DESC -> pe.source
-                    else -> formatDateHeader(pe.date)
+                    else -> formatDateHeader(
+                        getSortDate(pe, sortByPublicationDate),
+                    )
                 }
             }.map { e ->
                 val groupPuzzles = e.value.sortedWith { pe1, pe2 ->
-                    comparePuzEntries(sortOrder, pe1, pe2)
+                    comparePuzEntries(
+                        sortOrder, pe1, pe2, sortByPublicationDate,
+                    )
                 }
                 PuzGroup(
                     e.key,
@@ -1180,6 +1204,7 @@ class BrowsePageViewModel(
                         sortOrder,
                         g1.puzzles[0],
                         g2.puzzles[0],
+                        sortByPublicationDate,
                     )
                 } else { 0 }
             }
@@ -1210,7 +1235,8 @@ class BrowsePageViewModel(
         val entry = PuzEntry(
             id = pm.mainFileURI,
             caption = getCaption(pm),
-            date = getDate(pm),
+            date = pm.dateAdded,
+            publicationDate = getPublicationDate(pm),
             percentComplete = pm.complete,
             percentFilled = pm.filled,
             percentHinted = pm.hinted,
@@ -1228,14 +1254,17 @@ class BrowsePageViewModel(
         sortOrder : AccessorSetting,
         pe1 : PuzEntry,
         pe2 : PuzEntry,
+        sortByPublicationDate : Boolean,
     ) : Int {
+        val date1 = getSortDate(pe1, sortByPublicationDate)
+        val date2 = getSortDate(pe2, sortByPublicationDate)
         when (sortOrder) {
             AccessorSetting.AS_SOURCE_DATE_ASC -> {
                 val srcCmp = pe1.source.compareTo(pe2.source)
                 if (srcCmp != 0)
                     return srcCmp
 
-                val dateCmp = pe1.date.compareTo(pe2.date)
+                val dateCmp = date1.compareTo(date2)
                 if (dateCmp != 0)
                     return dateCmp
             }
@@ -1244,12 +1273,12 @@ class BrowsePageViewModel(
                 if (srcCmp != 0)
                     return srcCmp
 
-                val dateCmp = pe2.date.compareTo(pe1.date)
+                val dateCmp = date2.compareTo(date1)
                 if (dateCmp != 0)
                     return dateCmp
             }
             AccessorSetting.AS_DATE_ASC -> {
-                val dateCmp = pe1.date.compareTo(pe2.date)
+                val dateCmp = date1.compareTo(date2)
                 if (dateCmp != 0)
                     return dateCmp
 
@@ -1258,7 +1287,7 @@ class BrowsePageViewModel(
                     return srcCmp
             }
             else -> {
-                val dateCmp = pe2.date.compareTo(pe1.date)
+                val dateCmp = date2.compareTo(date1)
                 if (dateCmp != 0)
                     return dateCmp
 
@@ -1327,7 +1356,26 @@ class BrowsePageViewModel(
 
     private fun getDate(pm : PuzMetaFile) : LocalDate {
         return AppPuzzleUtils.deriveDate(pm.date, pm.fileName)
-            ?: pm.fileModifiedDate
+            ?: pm.dateAdded
+    }
+
+    /**
+     * The metadata date falls back to the added date when no publication
+     * date was found. Matching dates therefore indicate a fallback.
+     */
+    private fun getPublicationDate(pm : PuzMetaFile) : LocalDate? {
+        return AppPuzzleUtils.deriveDate(pm.date, pm.fileName)
+            ?.takeIf { it != pm.dateAdded }
+    }
+
+    private fun getSortDate(
+        pe : PuzEntry,
+        sortByPublicationDate : Boolean,
+    ) : LocalDate {
+        return if (sortByPublicationDate)
+            pe.publicationDate ?: pe.date
+        else
+            pe.date
     }
 
     private fun getSource(pm : PuzMetaFile) : String? {

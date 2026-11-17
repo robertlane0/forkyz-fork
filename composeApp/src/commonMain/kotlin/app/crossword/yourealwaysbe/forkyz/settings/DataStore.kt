@@ -44,6 +44,7 @@ val DEFAULT_SETTINGS : Settings = Settings(
     browseIndicateIfSolution = false,
     browseNewPuzzle = false,
     browseShowPercentageCorrect = false,
+    browseSortByPublicationDate = false,
     cleanupAge = -1,
     clueBelowGrid = false,
     clueHighlight = ClueHighlight.CH_RADIO_BUTTON,

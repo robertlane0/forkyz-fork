@@ -117,6 +117,8 @@ import app.crossword.yourealwaysbe.forkyz.app.generated.resources.browse_indicat
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.browse_indicate_if_solution_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.browse_show_percentage_correct
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.browse_show_percentage_correct_desc
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.browse_sort_by_publication_date
+import app.crossword.yourealwaysbe.forkyz.app.generated.resources.browse_sort_by_publication_date_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.browser_settings
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.browser_settings_desc
 import app.crossword.yourealwaysbe.forkyz.app.generated.resources.cleanup_age_never
@@ -1700,6 +1702,13 @@ class SettingsPageViewModel(
                 Res.string.browse_show_percentage_correct_desc,
                 settings.liveBrowseShowPercentageCorrect.stateInHereBool(),
                 settings::setBrowseShowPercentageCorrect,
+            ),
+            SettingsBoolean(
+                SettingsPage.BROWSER,
+                Res.string.browse_sort_by_publication_date,
+                Res.string.browse_sort_by_publication_date_desc,
+                settings.liveBrowseSortByPublicationDate.stateInHereBool(),
+                settings::setBrowseSortByPublicationDate,
             ),
             SettingsBoolean(
                 SettingsPage.BROWSER,

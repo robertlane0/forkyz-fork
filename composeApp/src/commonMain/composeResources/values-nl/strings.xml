@@ -216,6 +216,8 @@
     <string name="browse_always_show_rating_desc">Puzzelbeoordeling op alle lijsten weergeven, niet alleen in het archief.</string>
     <string name="browse_show_percentage_correct">Percentage correct weergeven</string>
     <string name="browse_show_percentage_correct_desc">Percentage juiste vakjes weergeven, in plaats van percentage ingevulde vakjes (zoals Shortyz).</string>
+    <string name="browse_sort_by_publication_date">Sorteren op publicatiedatum</string>
+    <string name="browse_sort_by_publication_date_desc">Gebruik de publicatiedatum als die kan worden bepaald; gebruik anders de datum waarop de kruiswoordpuzzel is toegevoegd.</string>
     <string name="cleanup_archives">Archieven opruimen</string>
     <string name="cleanup_archives_desc">Bepaalt hoe oud een gearchiveerde puzzel moet zijn voordat deze verwijderd wordt.</string>
     <string name="cleanup_unfinished">Opruimen onvoltooid</string>

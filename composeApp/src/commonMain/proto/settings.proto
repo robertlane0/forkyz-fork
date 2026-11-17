@@ -324,6 +324,7 @@ message Settings {
     bool actionButtonToggleShowErrorsGrid = 210;
     bool keyboardRemovePunctuation = 211;
     ScreenAwakeMode playScreenAwakeMode = 212;
+    bool browseSortByPublicationDate = 213;
 
     // defunct settings
     bool showErrors = 107;

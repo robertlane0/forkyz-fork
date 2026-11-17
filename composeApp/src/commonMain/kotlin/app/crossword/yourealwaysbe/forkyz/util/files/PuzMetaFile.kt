@@ -31,6 +31,10 @@ class PuzMetaFile internal constructor(
     val date : LocalDate?
         get() = meta.date
 
+    val dateAdded : LocalDate
+        get() = meta.dateAdded
+            ?: handler.getModifiedDate(puzHandle.mainFileHandle)
+
     val fileModifiedDate : LocalDate
         get() = handler.getModifiedDate(puzHandle.mainFileHandle)
 

@@ -82,6 +82,9 @@ class MetaCache(private val utils : NativeBackendUtils) {
         var date : LocalDate?,
 
         @ColumnInfo
+        var dateAdded : LocalDate?,
+
+        @ColumnInfo
         var percentComplete : Int,
 
         @ColumnInfo
@@ -158,7 +161,7 @@ class MetaCache(private val utils : NativeBackendUtils) {
         }
     }
 
-    @Database(entities = [CachedMeta::class], version = 5)
+    @Database(entities = [CachedMeta::class], version = 6)
     @ConstructedBy(CachedMetaDBConstructor::class)
     abstract class CachedMetaDB : RoomDatabase() {
         abstract fun cachedMetaDao() : CachedMetaDao
@@ -207,6 +210,17 @@ class MetaCache(private val utils : NativeBackendUtils) {
                 }
             }
 
+            private val MIGRATION_5_6 = object : Migration(5, 6) {
+                override fun migrate(connection : SQLiteConnection) {
+                    connection.execSQL(
+                        "ALTER TABLE cachedMeta ADD COLUMN dateAdded INTEGER",
+                    )
+                    // Old cache entries have no separate added date. Leave
+                    // it null so the file's modified date can be used once
+                    // when the record is next refreshed.
+                }
+            }
+
             fun getInstance(utils : NativeBackendUtils) : CachedMetaDB {
                 val inst = instance ?: utils.getCachedMetaDBBuilder()
                     .addMigrations(
@@ -214,6 +228,7 @@ class MetaCache(private val utils : NativeBackendUtils) {
                         MIGRATION_2_3,
                         MIGRATION_3_4,
                         MIGRATION_4_5,
+                        MIGRATION_5_6,
                     ).build()
                 instance = inst
                 return inst
@@ -229,6 +244,8 @@ class MetaCache(private val utils : NativeBackendUtils) {
             get() = dbRow.title
         val date : LocalDate?
             get() = dbRow.date
+        val dateAdded : LocalDate?
+            get() = dbRow.dateAdded
         val percentComplete : Int
             get() = dbRow.percentComplete
         val percentFilled : Int
@@ -304,15 +321,20 @@ class MetaCache(private val utils : NativeBackendUtils) {
         )
         val mainFileName = fileHandler.getName(mainFileHandle)
         var date = AppPuzzleUtils.deriveDate(puz.date, mainFileName)
+        val mainFileUri = fileHandler.getUri(mainFileHandle)
+        val existingMeta = dao.getCache(mainFileUri)
+        val dateAdded = existingMeta?.dateAdded
+            ?: fileHandler.getModifiedDate(mainFileHandle)
         if (date == null)
-            date = fileHandler.getModifiedDate(mainFileHandle)
+            date = dateAdded
 
         val cm = CachedMeta(
-            mainFileUri = fileHandler.getUri(mainFileHandle),
+            mainFileUri = mainFileUri,
             metaFileUri = metaHandle?.let { fileHandler.getUri(it) },
             directoryUri = fileHandler.getUri(puzHandle.dirHandle),
             isUpdatable = true, // used to be a puzzle field
             date = date,
+            dateAdded = dateAdded,
             percentComplete = puz.percentComplete,
             percentFilled = puz.percentFilled,
             percentHinted = puz.percentHinted,

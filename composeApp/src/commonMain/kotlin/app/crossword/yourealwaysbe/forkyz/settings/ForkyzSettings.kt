@@ -2013,6 +2013,15 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
     val liveBrowseSort : Flow<AccessorSetting>
         = settingsMap { it.sort }
 
+    val liveBrowseSortByPublicationDate : Flow<Boolean>
+        = settingsMap { it.browseSortByPublicationDate }
+
+    fun setBrowseSortByPublicationDate(value : Boolean) {
+        settingsUpdate { settings ->
+            settings.copy(browseSortByPublicationDate = value)
+        }
+    }
+
     fun setBrowseSort(value : AccessorSetting) {
         settingsUpdate { settings ->
             settings.copy(sort = value)
@@ -2508,6 +2517,13 @@ class ForkyzSettings(val settingsStore : DataStore<Settings>) {
             { key -> builder?.put(key, settings?.browseShowPercentageCorrect) },
             { key ->
                 json?.ifHasBoolean(key) { setBrowseShowPercentageCorrect(it) }
+            },
+        )
+        run(
+            "browseSortByPublicationDate",
+            { key -> builder?.put(key, settings?.browseSortByPublicationDate) },
+            { key ->
+                json?.ifHasBoolean(key) { setBrowseSortByPublicationDate(it) }
             },
         )
         run(

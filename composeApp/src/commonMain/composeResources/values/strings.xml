@@ -216,6 +216,8 @@
     <string name="browse_always_show_rating_desc">Show the puzzle rating on all puzzle lists, not just the archives.</string>
     <string name="browse_show_percentage_correct">Show Percentage Correct</string>
     <string name="browse_show_percentage_correct_desc">Show percentage of correct cells instead of percentage of filled cells next to puzzle (like Shortyz).</string>
+    <string name="browse_sort_by_publication_date">Sort by Publication Date</string>
+    <string name="browse_sort_by_publication_date_desc">Use the publication date when it can be determined; otherwise use the date the crossword was added.</string>
     <string name="cleanup_archives">Cleanup Archives</string>
     <string name="cleanup_archives_desc">Determines how old an archived puzzle must be before it is deleted.</string>
     <string name="cleanup_unfinished">Cleanup Unfinished</string>

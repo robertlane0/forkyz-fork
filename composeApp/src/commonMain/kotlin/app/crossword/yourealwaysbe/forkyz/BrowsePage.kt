@@ -790,7 +790,12 @@ fun BrowsePage(
                 val dateWidth = with(LocalDensity.current) {
                     85.sp.toDp()
                 }
-                val date = formatDateNonHeader(pe.date)
+                val date = formatDateNonHeader(
+                    if (state.sortByPublicationDate)
+                        pe.publicationDate ?: pe.date
+                    else
+                        pe.date,
+                )
                 Text(
                     modifier = Modifier.width(dateWidth)
                         .padding(end=4.dp),
