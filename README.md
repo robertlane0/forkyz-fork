@@ -1,5 +1,7 @@
 # My Personal Forkyz Fork - See [Original](https://gitlab.com/Hague/forkyz)
 
+[![Android debug APK](https://github.com/robertlane0/forkyz-fork/actions/workflows/android-build.yml/badge.svg)](https://github.com/robertlane0/forkyz-fork/actions/workflows/android-build.yml)
+
 This is my personal Forkyz fork with some tweaks I wanted to make.
 
 Please see the upstream [https://gitlab.com/Hague/forkyz](https://gitlab.com/Hague/forkyz) for updates and support.
