@@ -6,6 +6,10 @@ name: Android debug APK
 # Release builds and the Flatpak/Linux/Windows targets stay in .gitlab-ci.yml
 # for the upstream project. This workflow intentionally builds debug variants
 # only, so no release signing secrets are required.
+#
+# Each successful push/manual run publishes a pre-release containing the debug
+# APK. Pull request runs only upload a workflow artifact, since fork PRs have a
+# read-only token and should not create releases.
 
 on:
   push:
@@ -15,7 +19,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: android-debug-${{ github.ref }}
@@ -55,11 +59,43 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-      - name: Add artifact link to summary
+      - name: Create GitHub release
+        id: create-release
+        if: success() && github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          APK_PATH: androidApp/build/outputs/apk/debug/androidApp-debug.apk
+          TAG: debug-build-${{ github.run_number }}-${{ github.run_attempt }}
+          TITLE: Debug build ${{ github.run_number }}.${{ github.run_attempt }}
+          COMMIT_SHA: ${{ github.sha }}
+          REF_NAME: ${{ github.ref_name }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          printf 'Automatic Android debug APK build from `%s` on `%s`.\n\nWorkflow run: %s\n' \
+            "$COMMIT_SHA" "$REF_NAME" "$RUN_URL" > release-notes.md
+          release_url=$(gh release create "$TAG" \
+            --repo "$REPO" \
+            "${APK_PATH}#Forkyz Android debug APK" \
+            --target "$COMMIT_SHA" \
+            --title "$TITLE" \
+            --notes-file release-notes.md \
+            --prerelease)
+          echo "release-url=$release_url" >> "$GITHUB_OUTPUT"
+
+      - name: Add download links to summary
         if: success()
+        env:
+          ARTIFACT_URL: ${{ steps.upload-apk.outputs.artifact-url }}
+          RELEASE_URL: ${{ steps.create-release.outputs.release-url }}
         run: |
           {
             echo "### Android debug APK"
             echo ""
-            echo "[Download the debug APK](${{ steps.upload-apk.outputs.artifact-url }})"
+            if [ -n "$ARTIFACT_URL" ]; then
+              echo "- [Workflow artifact]($ARTIFACT_URL)"
+            fi
+            if [ -n "$RELEASE_URL" ]; then
+              echo "- [GitHub release]($RELEASE_URL)"
+            fi
           } >> "$GITHUB_STEP_SUMMARY"
