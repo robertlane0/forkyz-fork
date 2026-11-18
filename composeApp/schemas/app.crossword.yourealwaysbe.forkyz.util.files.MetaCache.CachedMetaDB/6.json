@@ -1,0 +1,103 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 6,
+    "identityHash": "2b818ef00fc67aaea8dbd5958e190e7c",
+    "entities": [
+      {
+        "tableName": "cachedMeta",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`mainFileUri` TEXT NOT NULL, `metaFileUri` TEXT, `directoryUri` TEXT NOT NULL, `isUpdatable` INTEGER NOT NULL, `date` INTEGER, `dateAdded` INTEGER, `percentComplete` INTEGER NOT NULL, `percentFilled` INTEGER NOT NULL, `percentHinted` INTEGER NOT NULL, `source` TEXT, `title` TEXT, `author` TEXT, `rating` INTEGER NOT NULL, `hasSolution` INTEGER NOT NULL, PRIMARY KEY(`mainFileUri`))",
+        "fields": [
+          {
+            "fieldPath": "mainFileUri",
+            "columnName": "mainFileUri",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "metaFileUri",
+            "columnName": "metaFileUri",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "directoryUri",
+            "columnName": "directoryUri",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isUpdatable",
+            "columnName": "isUpdatable",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "date",
+            "columnName": "date",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "dateAdded",
+            "columnName": "dateAdded",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "percentComplete",
+            "columnName": "percentComplete",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "percentFilled",
+            "columnName": "percentFilled",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "percentHinted",
+            "columnName": "percentHinted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "source",
+            "columnName": "source",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "author",
+            "columnName": "author",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "ratingCode",
+            "columnName": "rating",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hasSolution",
+            "columnName": "hasSolution",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "mainFileUri"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2b818ef00fc67aaea8dbd5958e190e7c')"
+    ]
+  }
+}
